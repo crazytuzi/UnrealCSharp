@@ -27,6 +27,7 @@ public class UnrealCSharp : ModuleRules
 			{
 				"Core",
 				// ... add other public dependencies that you statically link with here ...
+				"Mono",
 			}
 			);
 			
@@ -41,7 +42,16 @@ public class UnrealCSharp : ModuleRules
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
-		
+
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"UnrealEd",
+				}
+			);
+		}
 		
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]

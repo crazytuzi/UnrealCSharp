@@ -1,0 +1,30 @@
+﻿#include "Domain/InternalCall/FPropertyImplementation.h"
+#include "Environment/FCSharpEnvironment.h"
+
+PROPERTY_IMPLEMENTATION(UInt16, uint16)
+
+PROPERTY_IMPLEMENTATION(UInt32, uint32)
+
+PROPERTY_IMPLEMENTATION(Int8, int8)
+
+PROPERTY_IMPLEMENTATION(Int16, int16)
+
+PROPERTY_IMPLEMENTATION(Int, int32)
+
+PROPERTY_IMPLEMENTATION(Int64, int64)
+
+PROPERTY_IMPLEMENTATION(Bool, bool)
+
+PROPERTY_IMPLEMENTATION(Float, float)
+
+PROPERTY_IMPLEMENTATION(Object, MonoObject)
+
+// @TODO
+
+// PROPERTY_IMPLEMENTATION(Array, MonoArray)
+
+// @TODO
+
+PROPERTY_IMPLEMENTATION(Double, double)
+
+// @TODO
