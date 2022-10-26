@@ -209,8 +209,12 @@ bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, const UClass* InClass
 		return true;
 	}
 
-	return !!InMonoDomain->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME), InClass->GetPrefixCPP() + InClass->GetName());
+	return InMonoDomain->Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME),
+			InClass->GetPrefixCPP() + InClass->GetName()) != nullptr ||
+		InMonoDomain->Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE),
+			InClass->GetPrefixCPP() + InClass->GetName()) != nullptr;
 }
 
 UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor, const UClass* InClass,

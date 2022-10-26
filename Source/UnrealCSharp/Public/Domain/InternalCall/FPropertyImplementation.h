@@ -24,7 +24,10 @@ public:
 
 	PROPERTY_IMPLEMENTATION_DEFINE(Float, float)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(Object, MonoObject)
+	static void GetObjectPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
+	                                            MonoObject** OutValue);
+
+	SET_PROPERTY_IMPLEMENTATION_DEFINE(Object, MonoObject)
 
 	// @TODO
 

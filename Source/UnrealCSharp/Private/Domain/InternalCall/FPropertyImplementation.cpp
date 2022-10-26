@@ -17,7 +17,25 @@ PROPERTY_IMPLEMENTATION(Bool, bool)
 
 PROPERTY_IMPLEMENTATION(Float, float)
 
-PROPERTY_IMPLEMENTATION(Object, MonoObject)
+void FPropertyImplementation::GetObjectPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
+                                                              MonoObject** OutValue)
+{
+	if (const auto InObject = FCSharpEnvironment::GetEnvironment()->GetObject(&InMonoObject))
+	{
+		if (const auto InClass = InObject->GetClass())
+		{
+			const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get();
+
+			if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor(
+				InClass, PropertyName))
+			{
+				PropertyDescriptor->Get(InObject, OutValue);
+			}
+		}
+	}
+}
+
+SET_PROPERTY_IMPLEMENTATION(Object, MonoObject)
 
 // @TODO
 

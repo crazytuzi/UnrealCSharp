@@ -44,8 +44,14 @@ FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDo
 		return *FoundClassDescriptor;
 	}
 
-	const auto FoundMonoClass = InMonoDomain->Class_From_Name(
+	auto FoundMonoClass = InMonoDomain->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME), InClass->GetPrefixCPP() + InClass->GetName());
+
+	if (FoundMonoClass == nullptr)
+	{
+		FoundMonoClass = InMonoDomain->Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE), InClass->GetPrefixCPP() + InClass->GetName());
+	}
 
 	const auto ClassDescriptor = new FClassDescriptor(InClass, FoundMonoClass);
 
