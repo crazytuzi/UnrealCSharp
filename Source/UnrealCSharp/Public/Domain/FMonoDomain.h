@@ -37,6 +37,8 @@ public:
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc);
 
+	void* Object_Unbox(MonoObject* InMonoObject);
+
 private:
 	void RegisterMonoTrace();
 

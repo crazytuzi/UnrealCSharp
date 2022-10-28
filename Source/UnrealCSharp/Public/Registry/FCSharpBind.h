@@ -32,7 +32,7 @@ private:
 
 	static UFunction* DuplicateFunction(UFunction* InOriginalFunction, UClass* InClass, const FName& InFunctionName);
 
-	static void UpdateCallCSharpFunction(UFunction* InFunction, const FFunctionDescriptor* InFunctionDescriptor);
+	static void UpdateCallCSharpFunction(UFunction* InFunction);
 
 	static void UpdateCallCSharpFunctionFlags(UFunction* InFunctionCallLua);
 };

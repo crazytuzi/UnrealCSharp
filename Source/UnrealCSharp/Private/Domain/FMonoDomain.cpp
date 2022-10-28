@@ -102,6 +102,11 @@ MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObje
 	return InFunction != nullptr ? mono_runtime_invoke(InFunction, InMonoObject, InParams, InExc) : nullptr;
 }
 
+void* FMonoDomain::Object_Unbox(MonoObject* InMonoObject)
+{
+	return InMonoObject != nullptr ? mono_object_unbox(InMonoObject) : nullptr;
+}
+
 void FMonoDomain::RegisterMonoTrace()
 {
 	mono_trace_set_log_handler(FMonoLog::MonoLog, nullptr);

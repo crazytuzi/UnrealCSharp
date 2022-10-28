@@ -1,30 +1,37 @@
 ﻿#pragma once
 
+#include "Reflection/Property/FPropertyDescriptor.h"
+
 class FFunctionDescriptor
 {
 public:
-	FFunctionDescriptor();
+	explicit FFunctionDescriptor(UFunction* InFunction);
 
-	~FFunctionDescriptor();
-
-public:
-	void Initialize();
-
-	void Deinitialize();
+	virtual ~FFunctionDescriptor();
 
 public:
-	bool CallCSharp(FFrame& Stack, RESULT_DECL);
+	virtual void Initialize();
+
+	virtual void Deinitialize();
+
+public:
+	virtual bool CallCSharp(FFrame& Stack, RESULT_DECL);
 
 private:
+	static FOutParmRec* FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty);
+
+protected:
+	// @TODO
 	friend class FCSharpBind;
 
-	TWeakObjectPtr<UFunction> OriginalFunction = nullptr;
+	TWeakObjectPtr<UFunction> Function;
 
-	TWeakObjectPtr<UFunction> CallCSharpFunction = nullptr;
+	// @TODO
+	TWeakObjectPtr<UFunction> OriginalFunction;
 
-	EFunctionFlags OriginalFunctionFlags;
+	TArray<FPropertyDescriptor*> PropertyDescriptors;
 
-	FNativeFuncPtr OriginalNativeFuncPtr;
+	FPropertyDescriptor* ReturnPropertyDescriptor;
 
-	TArray<uint8> OriginalScript;
+	TArray<uint32> OutPropertyIndexes;
 };

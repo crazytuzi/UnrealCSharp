@@ -1,6 +1,7 @@
 ﻿#include "Registry/FCSharpBind.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
+#include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
 
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
@@ -110,7 +111,11 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UClass* InClass)
 		for (const auto& FunctionPair : Functions)
 		{
 			if (InMonoDomain->Class_Get_Method_From_Name(FoundMonoClass, FunctionPair.Key.ToString(),
-			                                             FunctionPair.Value->NumParms))
+			                                             FunctionPair.Value->ReturnValueOffset != MAX_uint16
+				                                             ? (FunctionPair.Value->NumParms > 0
+					                                                ? FunctionPair.Value->NumParms - 1
+					                                                : 0)
+				                                             : FunctionPair.Value->NumParms))
 			{
 				Bind(NewClassDescriptor, InClass, FunctionPair.Value);
 			}
@@ -145,10 +150,6 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		return false;
 	}
 
-	const auto NewFunctionDescriptor = new FFunctionDescriptor();
-
-	InClassDescriptor->FunctionDescriptorMap.Add(InFunction->GetFName(), NewFunctionDescriptor);
-
 	const auto OriginalFunction = GetOriginalFunction(InClassDescriptor, InClass, InFunction);
 
 	if (OriginalFunction == nullptr)
@@ -160,23 +161,21 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 	if (OriginalFunction->GetOuter() == InClass)
 	{
-		if (!NewFunctionDescriptor->OriginalFunction.IsValid())
-		{
-			const FName NewFunctionName(*FString::Printf(TEXT("%s%s"), *FunctionName.ToString(), TEXT("_Original")));
+		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(OriginalFunction);
 
-			NewFunctionDescriptor->OriginalFunctionFlags = OriginalFunction->FunctionFlags;
+		InClassDescriptor->FunctionDescriptorMap.Add(InFunction->GetFName(), NewFunctionDescriptor);
 
-			NewFunctionDescriptor->OriginalNativeFuncPtr = OriginalFunction->GetNativeFunc();
+		const FName NewFunctionName(*FString::Printf(TEXT("%s%s"), *FunctionName.ToString(), TEXT("_Original")));
 
-			NewFunctionDescriptor->OriginalScript = OriginalFunction->Script;
+		NewFunctionDescriptor->OriginalFunctionFlags = OriginalFunction->FunctionFlags;
 
-			NewFunctionDescriptor->OriginalFunction = TWeakObjectPtr<UFunction>(
-				DuplicateFunction(OriginalFunction, InClass, NewFunctionName));
+		NewFunctionDescriptor->OriginalNativeFuncPtr = OriginalFunction->GetNativeFunc();
 
-			NewFunctionDescriptor->CallCSharpFunction = OriginalFunction;
+		NewFunctionDescriptor->OriginalScript = OriginalFunction->Script;
 
-			UpdateCallCSharpFunction(OriginalFunction, NewFunctionDescriptor);
-		}
+		NewFunctionDescriptor->OriginalFunction = DuplicateFunction(OriginalFunction, InClass, NewFunctionName);
+
+		UpdateCallCSharpFunction(OriginalFunction);
 	}
 	else
 	{
@@ -187,16 +186,15 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 			return false;
 		}
 
-		if (!NewFunctionDescriptor->OriginalFunction.IsValid())
-		{
-			NewFunctionDescriptor->OriginalFunction = TWeakObjectPtr<UFunction>(OriginalFunction);
+		NewFunction = DuplicateFunction(OriginalFunction, InClass, FunctionName);
 
-			NewFunction = DuplicateFunction(OriginalFunction, InClass, FunctionName);
+		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(NewFunction);
 
-			UpdateCallCSharpFunction(NewFunction, NewFunctionDescriptor);
+		InClassDescriptor->FunctionDescriptorMap.Add(InFunction->GetFName(), NewFunctionDescriptor);
 
-			NewFunctionDescriptor->CallCSharpFunction = NewFunction;
-		}
+		NewFunctionDescriptor->OriginalFunction = OriginalFunction;
+
+		UpdateCallCSharpFunction(NewFunction);
 	}
 
 	return true;
@@ -287,9 +285,9 @@ UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass*
 	return NewFunction;
 }
 
-void FCSharpBind::UpdateCallCSharpFunction(UFunction* InFunction, const FFunctionDescriptor* InFunctionDescriptor)
+void FCSharpBind::UpdateCallCSharpFunction(UFunction* InFunction)
 {
-	if (InFunction == nullptr || InFunctionDescriptor == nullptr)
+	if (InFunction == nullptr)
 	{
 		return;
 	}
