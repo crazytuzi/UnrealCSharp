@@ -97,10 +97,20 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 
 	for (const auto& PropertyDescriptor : PropertyDescriptors)
 	{
-		const auto Index = CSharpParams.Add(FMemory::Malloc(PropertyDescriptor->GetProperty()->GetSize()));
+		if (PropertyDescriptor->IsPointerProperty())
+		{
+			const auto Index = CSharpParams.Add(nullptr);
 
-		PropertyDescriptor->Get(PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
-		                        CSharpParams[Index]);
+			PropertyDescriptor->Get(PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
+			                        &CSharpParams[Index]);
+		}
+		else
+		{
+			const auto Index = CSharpParams.Add(FMemory::Malloc(PropertyDescriptor->GetProperty()->GetSize()));
+
+			PropertyDescriptor->Get(PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
+			                        CSharpParams[Index]);
+		}
 	}
 
 	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(Stack.Object))
@@ -112,15 +122,22 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 				Class_Get_Method_From_Name(FoundMonoClass, TCHAR_TO_UTF8(*Stack.Node->GetName()),
 				                           PropertyDescriptors.Num()))
 			{
-				const auto ResultValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+				const auto ReturnValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
 					FoundMonoMethod, FoundMonoObject, CSharpParams.GetData(), nullptr);
 
-				if (ResultValue != nullptr && ReturnPropertyDescriptor != nullptr)
+				if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 				{
-					if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
-						ResultValue))
+					if (ReturnPropertyDescriptor->IsPointerProperty())
 					{
-						ReturnPropertyDescriptor->Set(UnBoxResultValue, Z_Param__Result);
+						ReturnPropertyDescriptor->Set(ReturnValue, Z_Param__Result);
+					}
+					else
+					{
+						if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+							Object_Unbox(ReturnValue))
+						{
+							ReturnPropertyDescriptor->Set(UnBoxResultValue, Z_Param__Result);
+						}
 					}
 				}
 
@@ -142,9 +159,12 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 		}
 	}
 
-	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
+	for (auto Index = 0; Index < CSharpParams.Num(); ++Index)
 	{
-		FMemory::Free(CSharpParams[Index]);
+		if (!PropertyDescriptors[Index]->IsPointerProperty())
+		{
+			FMemory::Free(CSharpParams[Index]);
+		}
 
 		CSharpParams[Index] = nullptr;
 	}

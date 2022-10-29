@@ -25,11 +25,13 @@ public:
 	{
 	};
 
-	virtual void Get(UObject* Src, void* Dest) const;
+	void Get(UObject* Src, void* Dest) const;
 
-	virtual void Set(void* Src, UObject* Dest) const;
+	void Set(void* Src, UObject* Dest) const;
 
 	virtual FProperty* GetProperty() { return Property; }
+
+	virtual bool IsPointerProperty() const;
 
 protected:
 	union

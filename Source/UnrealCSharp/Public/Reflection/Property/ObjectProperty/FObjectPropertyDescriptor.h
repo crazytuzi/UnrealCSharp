@@ -12,7 +12,5 @@ public:
 
 	virtual void Set(void* Src, void* Dest) const override;
 
-	virtual void Get(UObject* Src, void* Dest) const override;
-
-	virtual void Set(void* Src, UObject* Dest) const override;
+	virtual bool IsPointerProperty() const override;
 };

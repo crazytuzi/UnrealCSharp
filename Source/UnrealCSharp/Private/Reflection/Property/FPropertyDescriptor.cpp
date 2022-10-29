@@ -174,3 +174,8 @@ void FPropertyDescriptor::Set(void* Src, UObject* Dest) const
 		Set(Src, Property->ContainerPtrToValuePtr<void>(Dest));
 	}
 }
+
+bool FPropertyDescriptor::IsPointerProperty() const
+{
+	return false;
+}
