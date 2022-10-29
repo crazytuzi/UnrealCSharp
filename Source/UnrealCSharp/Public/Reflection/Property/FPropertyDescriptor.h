@@ -17,21 +17,23 @@ public:
 	explicit FPropertyDescriptor(FProperty* InProperty);
 
 public:
-	virtual void Get(void* Src, void* Dest) const
-	{
-	};
+	virtual void Get(void* Src, void** Dest) const;
 
-	virtual void Set(void* Src, void* Dest) const
-	{
-	};
+	virtual void Get(void* Src, void* Dest) const;
+
+	virtual void Set(void* Src, void* Dest) const;
 
 	void Get(UObject* Src, void* Dest) const;
 
 	void Set(void* Src, UObject* Dest) const;
 
-	virtual FProperty* GetProperty() { return Property; }
+	FProperty* GetProperty() const;
 
 	virtual bool IsPointerProperty() const;
+
+	virtual bool IsPrimitiveProperty() const;
+
+	bool IsSharedMemory() const;
 
 protected:
 	union

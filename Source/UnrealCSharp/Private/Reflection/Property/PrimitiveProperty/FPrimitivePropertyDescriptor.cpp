@@ -15,3 +15,8 @@ void FPrimitivePropertyDescriptor::Set(void* Src, void* Dest) const
 		Property->CopySingleValue(Dest, Src);
 	}
 }
+
+bool FPrimitivePropertyDescriptor::IsPrimitiveProperty() const
+{
+	return true;
+}

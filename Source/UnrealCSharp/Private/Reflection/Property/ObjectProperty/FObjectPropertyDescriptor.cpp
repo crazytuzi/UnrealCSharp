@@ -1,7 +1,7 @@
 ﻿#include "Reflection/Property/ObjectProperty/FObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-void FObjectPropertyDescriptor::Get(void* Src, void* Dest) const
+void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (ObjectProperty != nullptr)
 	{
@@ -9,9 +9,15 @@ void FObjectPropertyDescriptor::Get(void* Src, void* Dest) const
 
 		const auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(SrcObject);
 
-		const auto DestMonoObject = static_cast<MonoObject**>(Dest);
+		*Dest = SrcMonoObject;
+	}
+}
 
-		*DestMonoObject = SrcMonoObject;
+void FObjectPropertyDescriptor::Get(void* Src, void* Dest) const
+{
+	if (ObjectProperty != nullptr)
+	{
+		Get(Src, static_cast<void**>(Dest));
 	}
 }
 

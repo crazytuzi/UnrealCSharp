@@ -8,6 +8,8 @@ public:
 	using FPropertyDescriptor::FPropertyDescriptor;
 
 public:
+	virtual void Get(void* Src, void** Dest) const override;
+
 	virtual void Get(void* Src, void* Dest) const override;
 
 	virtual void Set(void* Src, void* Dest) const override;

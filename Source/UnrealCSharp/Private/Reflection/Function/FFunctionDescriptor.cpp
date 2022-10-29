@@ -93,23 +93,38 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 
 	TArray<void*> CSharpParams;
 
+	TArray<uint32> MallocMemoryIndexes;
+
 	CSharpParams.Reserve(PropertyDescriptors.Num());
 
-	for (const auto& PropertyDescriptor : PropertyDescriptors)
+	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
-		if (PropertyDescriptor->IsPointerProperty())
+		if (PropertyDescriptors[Index]->IsSharedMemory())
 		{
-			const auto Index = CSharpParams.Add(nullptr);
+			if (OutPropertyIndexes.Contains(Index))
+			{
+				OutParams = FindOutParmRec(OutParams, PropertyDescriptors[Index]->GetProperty());
 
-			PropertyDescriptor->Get(PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
-			                        &CSharpParams[Index]);
+				CSharpParams.Add(OutParams->PropAddr);
+			}
+			else
+			{
+				CSharpParams.Add(nullptr);
+
+				PropertyDescriptors[Index]->Get(
+					PropertyDescriptors[Index]->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
+					&CSharpParams[Index]);
+			}
 		}
 		else
 		{
-			const auto Index = CSharpParams.Add(FMemory::Malloc(PropertyDescriptor->GetProperty()->GetSize()));
+			CSharpParams.Add(FMemory::Malloc(PropertyDescriptors[Index]->GetProperty()->GetSize()));
 
-			PropertyDescriptor->Get(PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
-			                        CSharpParams[Index]);
+			PropertyDescriptors[Index]->Get(
+				PropertyDescriptors[Index]->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
+				&CSharpParams[Index]);
+
+			MallocMemoryIndexes.Add(Index);
 		}
 	}
 
@@ -143,15 +158,21 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 
 				if (OutPropertyIndexes.Num() > 0)
 				{
-					for (auto Index = 0; Index < OutPropertyIndexes.Num(); ++Index)
+					OutParams = Stack.OutParms;
+
+					for (const auto& Index : OutPropertyIndexes)
 					{
-						const auto OutPropertyDescriptor = PropertyDescriptors[OutPropertyIndexes[Index]];
-
-						OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
-
-						if (OutParams != nullptr && OutPropertyDescriptor != nullptr)
+						if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
 						{
-							OutPropertyDescriptor->Set(CSharpParams[OutPropertyIndexes[Index]], OutParams->PropAddr);
+							if (!OutPropertyDescriptor->IsSharedMemory())
+							{
+								OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
+
+								if (OutParams != nullptr)
+								{
+									OutPropertyDescriptor->Set(CSharpParams[Index], OutParams->PropAddr);
+								}
+							}
 						}
 					}
 				}
@@ -159,15 +180,14 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 		}
 	}
 
-	for (auto Index = 0; Index < CSharpParams.Num(); ++Index)
+	for (const auto& Index : MallocMemoryIndexes)
 	{
-		if (!PropertyDescriptors[Index]->IsPointerProperty())
-		{
-			FMemory::Free(CSharpParams[Index]);
-		}
+		FMemory::Free(CSharpParams[Index]);
 
 		CSharpParams[Index] = nullptr;
 	}
+
+	MallocMemoryIndexes.Empty();
 
 	CSharpParams.Empty();
 

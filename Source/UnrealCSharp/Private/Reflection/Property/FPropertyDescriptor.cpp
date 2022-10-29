@@ -159,6 +159,19 @@ FPropertyDescriptor::FPropertyDescriptor(FProperty* InProperty):
 {
 }
 
+void FPropertyDescriptor::Get(void* Src, void** Dest) const
+{
+	*Dest = Src;
+}
+
+void FPropertyDescriptor::Get(void* Src, void* Dest) const
+{
+}
+
+void FPropertyDescriptor::Set(void* Src, void* Dest) const
+{
+}
+
 void FPropertyDescriptor::Get(UObject* Src, void* Dest) const
 {
 	if (Property != nullptr)
@@ -175,7 +188,22 @@ void FPropertyDescriptor::Set(void* Src, UObject* Dest) const
 	}
 }
 
+FProperty* FPropertyDescriptor::GetProperty() const
+{
+	return Property;
+}
+
 bool FPropertyDescriptor::IsPointerProperty() const
 {
 	return false;
+}
+
+bool FPropertyDescriptor::IsPrimitiveProperty() const
+{
+	return false;
+}
+
+bool FPropertyDescriptor::IsSharedMemory() const
+{
+	return IsPointerProperty() || IsPrimitiveProperty();
 }
