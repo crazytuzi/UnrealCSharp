@@ -6,7 +6,7 @@ namespace Script.Reflection.Function
     public static class FunctionImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void CallReflectionFunctionImplementation(Object InMonoObject, string InFunctionName,
-            params Object[] InValue);
+        public static extern void CallReflectionFunctionImplementation<T>(Object InMonoObject, string InFunctionName,
+            out T ReturnValue, out IntPtrList OutValue, params Object[] InValue);
     }
 }

@@ -2,17 +2,18 @@
 #include "Environment/FCSharpEnvironment.h"
 
 void FFunctionImplementation::CallReflectionFunctionImplementation(MonoObject InMonoObject,
-                                                                   const UTF16CHAR* InFunctionName, MonoArray* InValue)
+                                                                   const UTF16CHAR* InFunctionName,
+                                                                   MonoObject** ReturnValue, MonoObject** OutValue,
+                                                                   MonoArray* InValue)
 {
 	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(&InMonoObject))
 	{
 		const auto FunctionName = StringCast<TCHAR>(InFunctionName + 10).Get();
 
-		if (const auto FoundFunction = FoundObject->FindFunction(FunctionName))
+		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment()->GetFunctionDescriptor(
+			FoundObject->GetClass(), FunctionName))
 		{
-			FFrame Stack{FoundObject, FoundFunction, nullptr};
-
-			FoundObject->CallFunction(Stack, nullptr, FoundFunction);
+			FunctionDescriptor->CallUnreal(FoundObject, InMonoObject, ReturnValue, OutValue, InValue);
 		}
 	}
 }

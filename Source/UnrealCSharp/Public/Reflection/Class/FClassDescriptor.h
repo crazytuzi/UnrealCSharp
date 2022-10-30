@@ -20,7 +20,7 @@ public:
 	MonoClass* GetMonoClass() const;
 
 public:
-	FFunctionDescriptor* GetFunctionDescriptor(const FName& InFunctionName) const;
+	FFunctionDescriptor* GetFunctionDescriptor(const FName& InFunctionName);
 
 	FPropertyDescriptor* GetPropertyDescriptor(const FName& InPropertyName) const;
 

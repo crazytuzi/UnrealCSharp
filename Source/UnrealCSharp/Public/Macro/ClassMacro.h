@@ -7,3 +7,5 @@
 #define CLASS_PROPERTY_IMPLEMENTATION FString(TEXT("PropertyImplementation"))
 
 #define CLASS_FUNCTION_IMPLEMENTATION FString(TEXT("FunctionImplementation"))
+
+#define CLASS_INT_PTR_LIST FString(TEXT("IntPtrList"))

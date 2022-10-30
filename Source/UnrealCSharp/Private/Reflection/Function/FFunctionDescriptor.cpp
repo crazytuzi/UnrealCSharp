@@ -1,5 +1,9 @@
 ﻿#include "Reflection/Function/FFunctionDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Macro/ClassMacro.h"
+#include "Macro/FunctionMacro.h"
+#include "Macro/MonoMacro.h"
+#include "Macro/NamespaceMacro.h"
 
 FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction):
 	Function(InFunction),
@@ -68,21 +72,6 @@ void FFunctionDescriptor::Deinitialize()
 
 		ReturnPropertyDescriptor = nullptr;
 	}
-}
-
-FOutParmRec* FFunctionDescriptor::FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty)
-{
-	while (OutParam != nullptr)
-	{
-		if (OutParam->Property == OutProperty)
-		{
-			return OutParam;
-		}
-
-		OutParam = OutParam->NextOutParm;
-	}
-
-	return nullptr;
 }
 
 bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
@@ -192,4 +181,95 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 	CSharpParams.Empty();
 
 	return true;
+}
+
+bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject InMonoObject, MonoObject** ReturnValue,
+                                     MonoObject** OutValue, MonoArray* InValue)
+{
+	auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);
+
+	const bool bIsRemote = FunctionCallspace & FunctionCallspace::Remote;
+
+	const bool bIsLocal = FunctionCallspace & FunctionCallspace::Local;
+
+	void* Params = Function->ParmsSize > 0 ? FMemory::Malloc(Function->ParmsSize, 16) : nullptr;
+
+	auto ParamIndex = 0;
+
+	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
+	{
+		const auto& PropertyDescriptor = PropertyDescriptors[Index];
+
+		PropertyDescriptor->GetProperty()->InitializeValue_InContainer(Params);
+
+		if (!OutPropertyIndexes.Contains(Index))
+		{
+			PropertyDescriptor->Set(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->
+				                                      Object_Unbox(ARRAY_GET(InValue, MonoObject*, ParamIndex++)),
+				PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
+		}
+	}
+
+	if (ReturnPropertyDescriptor != nullptr)
+	{
+		ReturnPropertyDescriptor->GetProperty()->InitializeValue_InContainer(Params);
+	}
+
+	if (bIsLocal)
+	{
+		InObject->UObject::ProcessEvent(Function.Get(), Params);
+
+		if (ReturnPropertyDescriptor != nullptr)
+		{
+			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params),
+			                              ReturnValue);
+		}
+
+		if (OutPropertyIndexes.Num() > 0)
+		{
+			const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR_LIST);
+
+			const auto FoundMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+				FoundClass, FUNCTION_ADD, 1);
+
+			const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundClass);
+
+			for (auto Index = 0; Index < OutPropertyIndexes.Num(); ++Index)
+			{
+				if (const auto OutPropertyDescriptor = PropertyDescriptors[OutPropertyIndexes[Index]])
+				{
+					auto InParams = OutPropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params);
+
+					FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+						FoundMethod, NewMonoObject, &InParams, nullptr);
+				}
+			}
+
+			*OutValue = NewMonoObject;
+		}
+	}
+
+	if (bIsRemote && !bIsLocal)
+	{
+		InObject->CallRemoteFunction(Function.Get(), Params, nullptr, nullptr);
+	}
+
+	return true;
+}
+
+FOutParmRec* FFunctionDescriptor::FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty)
+{
+	while (OutParam != nullptr)
+	{
+		if (OutParam->Property == OutProperty)
+		{
+			return OutParam;
+		}
+
+		OutParam = OutParam->NextOutParm;
+	}
+
+	return nullptr;
 }

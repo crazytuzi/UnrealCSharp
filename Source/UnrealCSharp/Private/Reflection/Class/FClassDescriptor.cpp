@@ -43,11 +43,28 @@ MonoClass* FClassDescriptor::GetMonoClass() const
 	return BindMonoClass;
 }
 
-FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FName& InFunctionName) const
+FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FName& InFunctionName)
 {
-	const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionName);
+	if (const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionName))
+	{
+		return *FoundFunctionDescriptor;
+	}
 
-	return FoundFunctionDescriptor != nullptr ? *FoundFunctionDescriptor : nullptr;
+	while (Class != nullptr)
+	{
+		if (const auto FoundFunction = Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::ExcludeSuper))
+		{
+			const auto NewFunctionDescriptor = new FFunctionDescriptor(FoundFunction);
+
+			FunctionDescriptorMap.Add(InFunctionName, NewFunctionDescriptor);
+
+			return NewFunctionDescriptor;
+		}
+
+		Class = Class->GetSuperClass();
+	}
+
+	return nullptr;
 }
 
 FPropertyDescriptor* FClassDescriptor::GetPropertyDescriptor(const FName& InPropertyName) const
