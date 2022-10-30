@@ -64,22 +64,47 @@ void FMonoDomain::Deinitialize()
 	}
 }
 
-MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass, const bool bInit) const
+MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass) const
 {
 	if (Domain != nullptr && InMonoClass != nullptr)
 	{
 		if (const auto NewMonoObject = mono_object_new(Domain, InMonoClass))
 		{
-			if (bInit)
-			{
-				mono_runtime_object_init(NewMonoObject);
-			}
+			Runtime_Object_Init(NewMonoObject);
 
 			return NewMonoObject;
 		}
 	}
 
 	return nullptr;
+}
+
+MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass, const int32 InParamCount, void** InParams) const
+{
+	if (Domain != nullptr && InMonoClass != nullptr)
+	{
+		if (const auto NewMonoObject = mono_object_new(Domain, InMonoClass))
+		{
+			if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_CTOR, InParamCount))
+			{
+				Runtime_Invoke(FoundMethod, NewMonoObject, InParams, nullptr);
+
+				return NewMonoObject;
+			}
+
+			// @TODO
+		}
+	}
+
+	return nullptr;
+}
+
+void FMonoDomain::Runtime_Object_Init(MonoObject* InMonoObject) const
+{
+	if (InMonoObject != nullptr)
+	{
+		mono_runtime_object_init(InMonoObject);
+	}
 }
 
 MonoClass* FMonoDomain::Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName) const
@@ -97,14 +122,30 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, cons
 		       : nullptr;
 }
 
-MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc)
+MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams,
+                                        MonoObject** InExc) const
 {
 	return InFunction != nullptr ? mono_runtime_invoke(InFunction, InMonoObject, InParams, InExc) : nullptr;
 }
 
-void* FMonoDomain::Object_Unbox(MonoObject* InMonoObject)
+void* FMonoDomain::Object_Unbox(MonoObject* InMonoObject) const
 {
 	return InMonoObject != nullptr ? mono_object_unbox(InMonoObject) : nullptr;
+}
+
+MonoString* FMonoDomain::String_New(const char* InText) const
+{
+	return Domain != nullptr && InText != nullptr ? mono_string_new(Domain, InText) : nullptr;
+}
+
+MonoString* FMonoDomain::Object_To_String(MonoObject* InMonoObject, MonoObject** InExc) const
+{
+	return InMonoObject != nullptr ? mono_object_to_string(InMonoObject, InExc) : nullptr;
+}
+
+char* FMonoDomain::String_To_UTF8(MonoString* InMonoString) const
+{
+	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
 }
 
 void FMonoDomain::RegisterMonoTrace()

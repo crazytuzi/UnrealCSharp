@@ -11,3 +11,5 @@
 #define FUNCTION_CALL_REFLECTION_STATIC_FUNCTION_IMPLEMENTATION FString(TEXT("CallReflectionStaticFunctionImplementation"))
 
 #define FUNCTION_ADD FString(TEXT("Add"))
+
+#define FUNCTION_CTOR FString(".ctor")

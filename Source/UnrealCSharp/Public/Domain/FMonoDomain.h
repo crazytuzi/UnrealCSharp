@@ -28,16 +28,26 @@ public:
 	void Deinitialize();
 
 public:
-	MonoObject* Object_New(MonoClass* InMonoClass, bool bInit = true) const;
+	MonoObject* Object_New(MonoClass* InMonoClass) const;
+
+	MonoObject* Object_New(MonoClass* InMonoClass, const int32 InParamCount, void** InParams) const;
+
+	void Runtime_Object_Init(MonoObject* InMonoObject) const;
 
 	MonoClass* Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName) const;
 
 	MonoMethod* Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                       int32 InParamCount) const;
 
-	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc);
+	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;
 
-	void* Object_Unbox(MonoObject* InMonoObject);
+	void* Object_Unbox(MonoObject* InMonoObject) const;
+
+	MonoString* String_New(const char* InText) const;
+
+	MonoString* Object_To_String(MonoObject* InMonoObject, MonoObject** InExc) const;
+
+	char* String_To_UTF8(MonoString* InMonoString) const;
 
 private:
 	void RegisterMonoTrace();
