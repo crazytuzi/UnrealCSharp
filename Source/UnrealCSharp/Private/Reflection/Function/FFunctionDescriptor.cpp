@@ -183,8 +183,18 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 	return true;
 }
 
-bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject InMonoObject, MonoObject** ReturnValue,
-                                     MonoObject** OutValue, MonoArray* InValue)
+bool FFunctionDescriptor::CallUnreal(MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue)
+{
+	if (!Function.IsValid())
+	{
+		return false;
+	}
+
+	return CallUnreal(Function->GetOuterUClass()->GetDefaultObject(), ReturnValue, OutValue, InValue);
+}
+
+bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue, MonoObject** OutValue,
+                                     MonoArray* InValue)
 {
 	auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);
 

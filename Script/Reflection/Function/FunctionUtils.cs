@@ -5,11 +5,18 @@ namespace Script.Reflection.Function
 {
     public static class FunctionUtils
     {
-        public static void CallReflectionFunction<T>(Object InMonoObject, string InFunctionName, out T ReturnValue,
+        public static void CallReflectionMemberFunction<T>(Object InMonoObject, string InFunctionName,
+            out T ReturnValue, out IntPtrList OutValue, params Object[] InValue)
+        {
+            FunctionImplementation.CallReflectionMemberFunctionImplementation(InMonoObject, InFunctionName,
+                out ReturnValue, out OutValue, InValue);
+        }
+
+        public static void CallReflectionStaticFunction<T>(string InClassName, string InFunctionName, out T ReturnValue,
             out IntPtrList OutValue, params Object[] InValue)
         {
-            FunctionImplementation.CallReflectionFunctionImplementation(InMonoObject, InFunctionName, out ReturnValue,
-                out OutValue, InValue);
+            FunctionImplementation.CallReflectionStaticFunctionImplementation(InClassName, InFunctionName,
+                out ReturnValue, out OutValue, InValue);
         }
     }
 }

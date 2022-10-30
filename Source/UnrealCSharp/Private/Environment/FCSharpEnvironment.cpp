@@ -118,6 +118,11 @@ FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const UClass* InClass) 
 	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InClass) : nullptr;
 }
 
+FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const FName& InClassName) const
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InClassName) : nullptr;
+}
+
 FClassDescriptor* FCSharpEnvironment::NewClassDescriptor(const FMonoDomain* InMonoDomain, UClass* InClass) const
 {
 	return ClassRegistry != nullptr ? ClassRegistry->NewClassDescriptor(InMonoDomain, InClass) : nullptr;
@@ -134,6 +139,14 @@ void FCSharpEnvironment::DeleteClassDescriptor(const UClass* InClass) const
 FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const UClass* InClass, const FName& InFunctionName) const
 {
 	const auto FoundClassDescriptor = GetClassDescriptor(InClass);
+
+	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetFunctionDescriptor(InFunctionName) : nullptr;
+}
+
+FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const FName& InClassName,
+                                                               const FName& InFunctionName) const
+{
+	const auto FoundClassDescriptor = GetClassDescriptor(InClassName);
 
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetFunctionDescriptor(InFunctionName) : nullptr;
 }

@@ -152,8 +152,14 @@ void FMonoDomain::RegisterReflectionFunctionImplementation()
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_FUNCTION_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_CALL_REFLECTION_FUNCTION_IMPLEMENTATION))),
-		static_cast<void*>(FFunctionImplementation::CallReflectionFunctionImplementation));
+				COMBINE_FUNCTION(FUNCTION_CALL_REFLECTION_MEMBER_FUNCTION_IMPLEMENTATION))),
+		static_cast<void*>(FFunctionImplementation::CallReflectionMemberFunctionImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_FUNCTION_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_CALL_REFLECTION_STATIC_FUNCTION_IMPLEMENTATION))),
+		static_cast<void*>(FFunctionImplementation::CallReflectionStaticFunctionImplementation));
 }
 
 void FMonoDomain::RegisterLog()

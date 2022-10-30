@@ -37,11 +37,15 @@ public:
 public:
 	FClassDescriptor* GetClassDescriptor(const UClass* InClass) const;
 
+	FClassDescriptor* GetClassDescriptor(const FName& InClassName) const;
+
 	FClassDescriptor* NewClassDescriptor(const FMonoDomain* InMonoDomain, UClass* InClass) const;
 
 	void DeleteClassDescriptor(const UClass* InClass) const;
 
 	FFunctionDescriptor* GetFunctionDescriptor(const UClass* InClass, const FName& InFunctionName) const;
+
+	FFunctionDescriptor* GetFunctionDescriptor(const FName& InClassName, const FName& InFunctionName) const;
 
 	FPropertyDescriptor* GetPropertyDescriptor(const UClass* InClass, const FName& InPropertyName) const;
 

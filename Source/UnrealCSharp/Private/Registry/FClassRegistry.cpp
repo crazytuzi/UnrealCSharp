@@ -35,6 +35,13 @@ FClassDescriptor* FClassRegistry::GetClassDescriptor(const UClass* InClass)
 	return FoundClassDescriptor != nullptr ? *FoundClassDescriptor : nullptr;
 }
 
+FClassDescriptor* FClassRegistry::GetClassDescriptor(const FName& InClassName)
+{
+	const auto InClass = LoadClass<UObject>(nullptr, *InClassName.ToString());
+
+	return InClass != nullptr ? GetClassDescriptor(InClass) : nullptr;
+}
+
 FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDomain, UClass* InClass)
 {
 	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InClass);

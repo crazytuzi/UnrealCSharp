@@ -18,8 +18,9 @@ public:
 public:
 	virtual bool CallCSharp(FFrame& Stack, RESULT_DECL);
 
-	virtual bool CallUnreal(UObject* InObject, MonoObject InMonoObject, MonoObject** ReturnValue, MonoObject** OutValue,
-	                        MonoArray* InValue);
+	virtual bool CallUnreal(MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue);
+
+	virtual bool CallUnreal(UObject* InObject, MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue);
 
 private:
 	static FOutParmRec* FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty);

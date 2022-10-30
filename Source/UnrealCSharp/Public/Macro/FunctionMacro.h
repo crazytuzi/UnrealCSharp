@@ -6,6 +6,8 @@
 
 #define FUNCTION_SET_OUT FString(TEXT("SetOut"))
 
-#define FUNCTION_CALL_REFLECTION_FUNCTION_IMPLEMENTATION FString(TEXT("CallReflectionFunctionImplementation"))
+#define FUNCTION_CALL_REFLECTION_MEMBER_FUNCTION_IMPLEMENTATION FString(TEXT("CallReflectionMemberFunctionImplementation"))
+
+#define FUNCTION_CALL_REFLECTION_STATIC_FUNCTION_IMPLEMENTATION FString(TEXT("CallReflectionStaticFunctionImplementation"))
 
 #define FUNCTION_ADD FString(TEXT("Add"))
