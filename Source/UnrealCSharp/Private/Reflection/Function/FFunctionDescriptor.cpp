@@ -214,10 +214,21 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 
 		if (!OutPropertyIndexes.Contains(Index))
 		{
-			PropertyDescriptor->Set(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->
-				                                      Object_Unbox(ARRAY_GET(InValue, MonoObject*, ParamIndex++)),
-				PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
+			if (PropertyDescriptor->IsPointerProperty())
+			{
+				PropertyDescriptor->Set(
+					ARRAY_GET(InValue, MonoObject*, ParamIndex++),
+					PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
+			}
+			else
+			{
+				if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
+					ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
+				{
+					PropertyDescriptor->Set(
+						UnBoxValue, PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
+				}
+			}
 		}
 	}
 
