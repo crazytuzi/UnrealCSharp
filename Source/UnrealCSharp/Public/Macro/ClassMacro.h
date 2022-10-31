@@ -11,3 +11,7 @@
 #define CLASS_INT_PTR_LIST FString(TEXT("IntPtrList"))
 
 #define CLASS_F_STRING FString(TEXT("FString"))
+
+#define CLASS_F_NAME FString(TEXT("FName"))
+
+#define CLASS_F_TEXT FString(TEXT("FText"))

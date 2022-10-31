@@ -82,6 +82,8 @@ protected:
 
 		FStrProperty* StrProperty;
 
+		FTextProperty* TextProperty;
+
 		FArrayProperty* ArrayProperty;
 
 		FMapProperty* MapProperty;
