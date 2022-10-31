@@ -49,7 +49,7 @@ void FFunctionDescriptor::Initialize()
 			if (Property->HasAnyPropertyFlags(CPF_OutParm | CPF_ReferenceParm) && !Property->HasAnyPropertyFlags(
 				CPF_ConstParm))
 			{
-				OutPropertyIndexes.Add(Index);
+				OutPropertyIndexes.Emplace(Index);
 			}
 		}
 	}
@@ -72,6 +72,8 @@ void FFunctionDescriptor::Deinitialize()
 
 		ReturnPropertyDescriptor = nullptr;
 	}
+
+	OutPropertyIndexes.Empty();
 }
 
 bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
@@ -88,7 +90,7 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
-		if (PropertyDescriptors[Index]->IsSharedMemory())
+		if (PropertyDescriptors[Index]->IsPrimitiveProperty())
 		{
 			if (OutPropertyIndexes.Contains(Index))
 			{
@@ -131,17 +133,17 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 
 				if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 				{
-					if (ReturnPropertyDescriptor->IsPointerProperty())
-					{
-						ReturnPropertyDescriptor->Set(ReturnValue, Z_Param__Result);
-					}
-					else
+					if (ReturnPropertyDescriptor->IsPrimitiveProperty())
 					{
 						if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->
 							Object_Unbox(ReturnValue))
 						{
 							ReturnPropertyDescriptor->Set(UnBoxResultValue, Z_Param__Result);
 						}
+					}
+					else
+					{
+						ReturnPropertyDescriptor->Set(ReturnValue, Z_Param__Result);
 					}
 				}
 
@@ -153,7 +155,7 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 					{
 						if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
 						{
-							if (!OutPropertyDescriptor->IsSharedMemory())
+							if (!OutPropertyDescriptor->IsPrimitiveProperty())
 							{
 								OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
 
@@ -214,13 +216,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 
 		if (!OutPropertyIndexes.Contains(Index))
 		{
-			if (PropertyDescriptor->IsPointerProperty())
-			{
-				PropertyDescriptor->Set(
-					ARRAY_GET(InValue, MonoObject*, ParamIndex++),
-					PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
-			}
-			else
+			if (PropertyDescriptor->IsPrimitiveProperty())
 			{
 				if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
 					ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
@@ -228,6 +224,12 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 					PropertyDescriptor->Set(
 						UnBoxValue, PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
 				}
+			}
+			else
+			{
+				PropertyDescriptor->Set(
+					ARRAY_GET(InValue, MonoObject*, ParamIndex++),
+					PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
 			}
 		}
 	}
@@ -249,26 +251,41 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 
 		if (OutPropertyIndexes.Num() > 0)
 		{
-			const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR_LIST);
+			const auto FoundObjectListClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_OBJECT_LIST);
 
-			const auto FoundMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-				FoundClass, FUNCTION_ADD, 1);
+			const auto FoundIntPtrClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR);
 
-			const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundClass);
+			const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+				FoundObjectListClass, FUNCTION_ADD, 1);
 
-			for (auto Index = 0; Index < OutPropertyIndexes.Num(); ++Index)
+			const auto NewObjectList = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+				FoundObjectListClass);
+
+			for (const auto Index : OutPropertyIndexes)
 			{
-				if (const auto OutPropertyDescriptor = PropertyDescriptors[OutPropertyIndexes[Index]])
+				if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
 				{
-					auto InParams = OutPropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params);
+					auto Value = static_cast<void**>(FMemory_Alloca(sizeof(void*)));
+
+					OutPropertyDescriptor->Get(
+						OutPropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params), Value);
+
+					if (OutPropertyDescriptor->IsPrimitiveProperty())
+					{
+						auto NewIntPtr = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->
+							Object_New(FoundIntPtrClass, 1, Value));
+
+						Value = &NewIntPtr;
+					}
 
 					FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-						FoundMethod, NewMonoObject, &InParams, nullptr);
+						FoundAddMethod, NewObjectList, Value, nullptr);
 				}
 			}
 
-			*OutValue = NewMonoObject;
+			*OutValue = NewObjectList;
 		}
 	}
 

@@ -7,13 +7,11 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (TextProperty != nullptr)
 	{
-		const auto SrcValue = TCHAR_TO_UTF8(*TextProperty->GetPropertyValue(Src).ToString());
-
 		const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE), CLASS_F_TEXT);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->
-			String_New(SrcValue));
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+			TCHAR_TO_UTF8(*TextProperty->GetPropertyValue(Src).ToString())));
 
 		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
 			FoundClass, 1, &NewMonoString);

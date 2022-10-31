@@ -30,8 +30,3 @@ void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 		ObjectProperty->SetObjectPropertyValue(Dest, SrcObject);
 	}
 }
-
-bool FObjectPropertyDescriptor::IsPointerProperty() const
-{
-	return true;
-}

@@ -193,17 +193,7 @@ FProperty* FPropertyDescriptor::GetProperty() const
 	return Property;
 }
 
-bool FPropertyDescriptor::IsPointerProperty() const
-{
-	return false;
-}
-
 bool FPropertyDescriptor::IsPrimitiveProperty() const
 {
 	return false;
-}
-
-bool FPropertyDescriptor::IsSharedMemory() const
-{
-	return IsPointerProperty() || IsPrimitiveProperty();
 }

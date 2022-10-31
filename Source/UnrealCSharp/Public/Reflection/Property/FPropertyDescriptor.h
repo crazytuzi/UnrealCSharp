@@ -29,11 +29,7 @@ public:
 
 	FProperty* GetProperty() const;
 
-	virtual bool IsPointerProperty() const;
-
 	virtual bool IsPrimitiveProperty() const;
-
-	bool IsSharedMemory() const;
 
 protected:
 	union
