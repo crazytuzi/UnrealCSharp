@@ -28,23 +28,23 @@ void FClassRegistry::Deinitialize()
 	ClassDescriptorMap.Empty();
 }
 
-FClassDescriptor* FClassRegistry::GetClassDescriptor(const UClass* InClass)
+FClassDescriptor* FClassRegistry::GetClassDescriptor(const UStruct* InStruct)
 {
-	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InClass);
+	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct);
 
 	return FoundClassDescriptor != nullptr ? *FoundClassDescriptor : nullptr;
 }
 
 FClassDescriptor* FClassRegistry::GetClassDescriptor(const FName& InClassName)
 {
-	const auto InClass = LoadClass<UObject>(nullptr, *InClassName.ToString());
+	const auto InClass = LoadObject<UStruct>(nullptr, *InClassName.ToString());
 
 	return InClass != nullptr ? GetClassDescriptor(InClass) : nullptr;
 }
 
-FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDomain, UClass* InClass)
+FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDomain, UStruct* InStruct)
 {
-	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InClass);
+	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct);
 
 	if (FoundClassDescriptor != nullptr)
 	{
@@ -52,27 +52,27 @@ FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDo
 	}
 
 	auto FoundMonoClass = InMonoDomain->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME), InClass->GetPrefixCPP() + InClass->GetName());
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME), InStruct->GetPrefixCPP() + InStruct->GetName());
 
 	if (FoundMonoClass == nullptr)
 	{
 		FoundMonoClass = InMonoDomain->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE), InClass->GetPrefixCPP() + InClass->GetName());
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE), InStruct->GetPrefixCPP() + InStruct->GetName());
 	}
 
-	const auto ClassDescriptor = new FClassDescriptor(InClass, FoundMonoClass);
+	const auto ClassDescriptor = new FClassDescriptor(InStruct, FoundMonoClass);
 
-	ClassDescriptorMap.Add(InClass, ClassDescriptor);
+	ClassDescriptorMap.Add(InStruct, ClassDescriptor);
 
 	return ClassDescriptor;
 }
 
-void FClassRegistry::DeleteClassDescriptor(const UClass* InClass)
+void FClassRegistry::DeleteClassDescriptor(const UStruct* InStruct)
 {
-	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InClass))
+	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
 		delete FoundClassDescriptor;
 
-		ClassDescriptorMap.Remove(InClass);
+		ClassDescriptorMap.Remove(InStruct);
 	}
 }

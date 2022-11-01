@@ -7,7 +7,7 @@
 class FClassDescriptor
 {
 public:
-	FClassDescriptor(UClass* InClass, MonoClass* InBindMonoClass);
+	FClassDescriptor(UStruct* InStruct, MonoClass* InBindMonoClass);
 
 	~FClassDescriptor();
 
@@ -27,7 +27,7 @@ public:
 private:
 	friend class FCSharpBind;
 
-	UClass* Class;
+	UStruct* Struct;
 
 	MonoClass* BindMonoClass;
 

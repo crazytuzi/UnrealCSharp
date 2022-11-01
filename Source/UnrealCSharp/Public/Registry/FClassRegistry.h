@@ -15,14 +15,14 @@ public:
 	void Deinitialize();
 
 public:
-	FClassDescriptor* GetClassDescriptor(const UClass* InClass);
+	FClassDescriptor* GetClassDescriptor(const UStruct* InStruct);
 
 	FClassDescriptor* GetClassDescriptor(const FName& InClassName);
 
-	FClassDescriptor* NewClassDescriptor(const class FMonoDomain* InMonoDomain, UClass* InClass);
+	FClassDescriptor* NewClassDescriptor(const class FMonoDomain* InMonoDomain, UStruct* InStruct);
 
-	void DeleteClassDescriptor(const UClass* InClass);
+	void DeleteClassDescriptor(const UStruct* InStruct);
 
 private:
-	TMap<UClass*, FClassDescriptor*> ClassDescriptorMap;
+	TMap<UStruct*, FClassDescriptor*> ClassDescriptorMap;
 };

@@ -19,16 +19,14 @@
 #define GET_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
 void FPropertyImplementation::Get##PropertyType##PropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName, Type& OutValue) \
 { \
-	if (const auto InObject = FCSharpEnvironment::GetEnvironment()->GetObject(&InMonoObject)) \
+	UStruct* InStruct = nullptr; \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(&InMonoObject, InStruct)) \
 	{ \
-		if (const auto InClass = InObject->GetClass()) \
+		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor( \
+			InStruct, PropertyName)) \
 		{ \
-			const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
-\
-			if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor(InClass, PropertyName)) \
-			{ \
-				PropertyDescriptor->Get(InObject, &OutValue); \
-			} \
+			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), &OutValue); \
 		} \
 	} \
 }
@@ -36,16 +34,14 @@ void FPropertyImplementation::Get##PropertyType##PropertyImplementation(MonoObje
 #define SET_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
 void FPropertyImplementation::Set##PropertyType##PropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName, Type InValue) \
 { \
-	if (const auto InObject = FCSharpEnvironment::GetEnvironment()->GetObject(&InMonoObject)) \
+	UStruct* InStruct = nullptr; \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(&InMonoObject, InStruct)) \
 	{ \
-		if (const auto InClass = InObject->GetClass()) \
+		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor( \
+			InStruct, PropertyName)) \
 		{ \
-			const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
-\
-			if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor(InClass, PropertyName)) \
-			{ \
-				PropertyDescriptor->Set(&InValue, InObject); \
-			} \
+			PropertyDescriptor->Set(&InValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress)); \
 		} \
 	} \
 }

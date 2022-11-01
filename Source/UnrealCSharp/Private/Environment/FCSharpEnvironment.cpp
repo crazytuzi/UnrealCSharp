@@ -23,6 +23,8 @@ void FCSharpEnvironment::Initialize()
 
 	ObjectRegistry = new FObjectRegistry();
 
+	StructRegistry = new FStructRegistry();
+
 	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
 		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
@@ -32,6 +34,13 @@ void FCSharpEnvironment::Deinitialize()
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
 		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+	}
+
+	if (StructRegistry != nullptr)
+	{
+		delete StructRegistry;
+
+		StructRegistry = nullptr;
 	}
 
 	if (ObjectRegistry != nullptr)
@@ -89,7 +98,7 @@ void FCSharpEnvironment::NotifyUObjectDeleted(const UObjectBase* Object, int32 I
 		}
 		else
 		{
-			RemoveReference(InObject);
+			RemoveObjectReference(InObject);
 		}
 	}
 }
@@ -113,9 +122,14 @@ bool FCSharpEnvironment::Bind(UObject* Object) const
 	return FCSharpBind::Bind(Domain, Object);
 }
 
-FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const UClass* InClass) const
+bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
 {
-	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InClass) : nullptr;
+	return FCSharpBind::Bind(Domain, InMonoObject, InStructName);
+}
+
+FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const UStruct* InStruct) const
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InStruct) : nullptr;
 }
 
 FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const FName& InClassName) const
@@ -123,22 +137,23 @@ FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const FName& InClassNam
 	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InClassName) : nullptr;
 }
 
-FClassDescriptor* FCSharpEnvironment::NewClassDescriptor(const FMonoDomain* InMonoDomain, UClass* InClass) const
+FClassDescriptor* FCSharpEnvironment::NewClassDescriptor(const FMonoDomain* InMonoDomain, UStruct* InStruct) const
 {
-	return ClassRegistry != nullptr ? ClassRegistry->NewClassDescriptor(InMonoDomain, InClass) : nullptr;
+	return ClassRegistry != nullptr ? ClassRegistry->NewClassDescriptor(InMonoDomain, InStruct) : nullptr;
 }
 
-void FCSharpEnvironment::DeleteClassDescriptor(const UClass* InClass) const
+void FCSharpEnvironment::DeleteClassDescriptor(const UStruct* InStruct) const
 {
 	if (ClassRegistry != nullptr)
 	{
-		ClassRegistry->DeleteClassDescriptor(InClass);
+		ClassRegistry->DeleteClassDescriptor(InStruct);
 	}
 }
 
-FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const UClass* InClass, const FName& InFunctionName) const
+FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const UStruct* InStruct,
+                                                               const FName& InFunctionName) const
 {
-	const auto FoundClassDescriptor = GetClassDescriptor(InClass);
+	const auto FoundClassDescriptor = GetClassDescriptor(InStruct);
 
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetFunctionDescriptor(InFunctionName) : nullptr;
 }
@@ -151,14 +166,36 @@ FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const FName& InCl
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetFunctionDescriptor(InFunctionName) : nullptr;
 }
 
-FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const UClass* InClass, const FName& InPropertyName) const
+FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const UStruct* InStruct,
+                                                               const FName& InPropertyName) const
 {
-	const auto FoundClassDescriptor = GetClassDescriptor(InClass);
+	const auto FoundClassDescriptor = GetClassDescriptor(InStruct);
 
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetPropertyDescriptor(InPropertyName) : nullptr;
 }
 
-bool FCSharpEnvironment::AddReference(UObject* InObject, MonoObject* InMonoObject) const
+void* FCSharpEnvironment::GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct) const
+{
+	if (ObjectRegistry != nullptr)
+	{
+		if (const auto FoundObject = ObjectRegistry->GetAddress(InMonoObject, InStruct))
+		{
+			return FoundObject;
+		}
+	}
+
+	if (StructRegistry != nullptr)
+	{
+		if (const auto FoundStruct = StructRegistry->GetAddress(InMonoObject, InStruct))
+		{
+			return FoundStruct;
+		}
+	}
+
+	return nullptr;
+}
+
+bool FCSharpEnvironment::AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const
 {
 	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InObject, InMonoObject) : false;
 }
@@ -173,12 +210,38 @@ UObject* FCSharpEnvironment::GetObject(const MonoObject* InMonoObject) const
 	return ObjectRegistry != nullptr ? ObjectRegistry->GetObject(InMonoObject) : nullptr;
 }
 
-bool FCSharpEnvironment::RemoveReference(const UObject* InObject) const
+bool FCSharpEnvironment::RemoveObjectReference(const UObject* InObject) const
 {
 	return ObjectRegistry != nullptr ? ObjectRegistry->RemoveReference(InObject) : nullptr;
 }
 
-bool FCSharpEnvironment::RemoveReference(const MonoObject* InMonoObject) const
+bool FCSharpEnvironment::RemoveObjectReference(const MonoObject* InMonoObject) const
 {
 	return ObjectRegistry != nullptr ? ObjectRegistry->RemoveReference(InMonoObject) : nullptr;
+}
+
+bool FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, void* InStruct,
+                                            MonoObject* InMonoObject) const
+{
+	return StructRegistry != nullptr ? StructRegistry->AddReference(InScriptStruct, InStruct, InMonoObject) : nullptr;
+}
+
+MonoObject* FCSharpEnvironment::GetObject(const void* InStruct) const
+{
+	return StructRegistry != nullptr ? StructRegistry->GetObject(InStruct) : nullptr;
+}
+
+void* FCSharpEnvironment::GetStruct(const MonoObject* InMonoObject) const
+{
+	return StructRegistry != nullptr ? StructRegistry->GetStruct(InMonoObject) : nullptr;
+}
+
+bool FCSharpEnvironment::RemoveStructReference(const void* InStruct) const
+{
+	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InStruct) : nullptr;
+}
+
+bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) const
+{
+	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InMonoObject) : nullptr;
 }

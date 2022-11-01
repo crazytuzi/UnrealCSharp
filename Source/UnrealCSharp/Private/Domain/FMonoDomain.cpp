@@ -2,6 +2,7 @@
 #include "Domain/InternalCall/FMonoInternalCall.h"
 #include "Domain/InternalCall/FPropertyImplementation.h"
 #include "Domain/InternalCall/FFunctionImplementation.h"
+#include "Domain/InternalCall/FStructImplementation.h"
 #include "Log/FMonoLog.h"
 #include "Macro/NamespaceMacro.h"
 #include "Macro/ClassMacro.h"
@@ -36,6 +37,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 	RegisterReflectionPropertyImplementation();
 
 	RegisterReflectionFunctionImplementation();
+
+	RegisterReflectionStructImplementation();
 
 	RegisterLog();
 }
@@ -201,6 +204,21 @@ void FMonoDomain::RegisterReflectionFunctionImplementation()
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_FUNCTION_IMPLEMENTATION) +
 				COMBINE_FUNCTION(FUNCTION_CALL_REFLECTION_STATIC_FUNCTION_IMPLEMENTATION))),
 		static_cast<void*>(FFunctionImplementation::CallReflectionStaticFunctionImplementation));
+}
+
+void FMonoDomain::RegisterReflectionStructImplementation()
+{
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_STRUCT), CLASS_STRUCT_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_REGISTER_STRUCT_IMPLEMENTATION))),
+		static_cast<void*>(FStructImplementation::RegisterStructImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_STRUCT), CLASS_STRUCT_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_UNREGISTER_STRUCT_IMPLEMENTATION))),
+		static_cast<void*>(FStructImplementation::UnRegisterStructImplementation));
 }
 
 void FMonoDomain::RegisterLog()

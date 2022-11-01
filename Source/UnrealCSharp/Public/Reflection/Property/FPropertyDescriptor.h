@@ -23,11 +23,13 @@ public:
 
 	virtual void Set(void* Src, void* Dest) const;
 
-	void Get(UObject* Src, void* Dest) const;
-
-	void Set(void* Src, UObject* Dest) const;
-
 	FProperty* GetProperty() const;
+
+	template <typename ValueType>
+	FORCEINLINE ValueType* ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex = 0) const
+	{
+		return Property != nullptr ? Property->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex) : nullptr;
+	}
 
 	virtual bool IsPrimitiveProperty() const;
 

@@ -13,3 +13,5 @@
 #define NAMESPACE_PROPERTY FString(TEXT("Reflection.Property"))
 
 #define NAMESPACE_FUNCTION FString(TEXT("Reflection.Function"))
+
+#define NAMESPACE_STRUCT FString(TEXT("Reflection.Struct"))

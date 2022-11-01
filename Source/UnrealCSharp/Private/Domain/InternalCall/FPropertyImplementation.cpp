@@ -20,17 +20,16 @@ PROPERTY_IMPLEMENTATION(Float, float)
 void FPropertyImplementation::GetObjectPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
                                                               MonoObject** OutValue)
 {
-	if (const auto InObject = FCSharpEnvironment::GetEnvironment()->GetObject(&InMonoObject))
-	{
-		if (const auto InClass = InObject->GetClass())
-		{
-			const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get();
+	UStruct* InStruct = nullptr;
 
-			if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor(
-				InClass, PropertyName))
-			{
-				PropertyDescriptor->Get(InObject, OutValue);
-			}
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(&InMonoObject, InStruct))
+	{
+		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get();
+
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor(
+			InStruct, PropertyName))
+		{
+			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), OutValue);
 		}
 	}
 }

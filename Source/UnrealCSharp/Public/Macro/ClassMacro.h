@@ -8,6 +8,8 @@
 
 #define CLASS_FUNCTION_IMPLEMENTATION FString(TEXT("FunctionImplementation"))
 
+#define CLASS_STRUCT_IMPLEMENTATION FString(TEXT("StructImplementation"))
+
 #define CLASS_INT_PTR FString(TEXT("IntPtr"))
 
 #define CLASS_OBJECT_LIST FString(TEXT("ObjectList"))

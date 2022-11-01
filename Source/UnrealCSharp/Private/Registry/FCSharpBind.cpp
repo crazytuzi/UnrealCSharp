@@ -9,14 +9,19 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 	return BindImplementation(InMonoDomain, InObject);
 }
 
-bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UClass* InClass, const bool bNeedMonoClass)
+bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName)
 {
-	if (bNeedMonoClass && !CanBind(InMonoDomain, InClass))
+	return BindImplementation(InMonoDomain, InMonoObject, InStructName);
+}
+
+bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool bNeedMonoClass)
+{
+	if (bNeedMonoClass && !CanBind(InMonoDomain, InStruct))
 	{
 		return false;
 	}
 
-	return BindImplementation(InMonoDomain, InClass);
+	return BindImplementation(InMonoDomain, InStruct);
 }
 
 bool FCSharpBind::Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction)
@@ -59,70 +64,35 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObjec
 
 	const auto NewMonoObject = InMonoDomain->Object_New(FoundMonoClass);
 
-	FCSharpEnvironment::GetEnvironment()->AddReference(InObject, NewMonoObject);
+	FCSharpEnvironment::GetEnvironment()->AddObjectReference(InObject, NewMonoObject);
 
 	return true;
 }
 
-bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UClass* InClass)
+bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruct)
 {
-	if (InMonoDomain == nullptr || InClass == nullptr)
+	if (InMonoDomain == nullptr || InStruct == nullptr)
 	{
 		return false;
 	}
 
-	auto SuperClass = InClass->GetSuperClass();
+	auto SuperStruct = InStruct->GetSuperStruct();
 
-	while (SuperClass != nullptr)
+	while (SuperStruct != nullptr)
 	{
-		Bind(InMonoDomain, SuperClass, false);
+		Bind(InMonoDomain, SuperStruct, false);
 
-		SuperClass = SuperClass->GetSuperClass();
+		SuperStruct = SuperStruct->GetSuperStruct();
 	}
 
-	const auto NewClassDescriptor = FCSharpEnvironment::GetEnvironment()->NewClassDescriptor(InMonoDomain, InClass);
+	const auto NewClassDescriptor = FCSharpEnvironment::GetEnvironment()->NewClassDescriptor(InMonoDomain, InStruct);
 
 	if (NewClassDescriptor == nullptr)
 	{
 		return false;
 	}
 
-	if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME), InClass->GetPrefixCPP() + InClass->GetName()))
-	{
-		InClass->ClearFunctionMapsCaches();
-
-		TMap<FName, UFunction*> Functions;
-
-		for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::IncludeSuper,
-		                                  EFieldIteratorFlags::ExcludeDeprecated,
-		                                  EFieldIteratorFlags::IncludeInterfaces); It; ++It)
-		{
-			if (auto Function = *It)
-			{
-				if (Function->HasAnyFunctionFlags(FUNC_BlueprintEvent) && !Function->HasAnyFunctionFlags(FUNC_Final) &&
-					!Functions.Contains(Function->GetFName()))
-				{
-					Functions.Emplace(Function->GetName(), Function);
-				}
-			}
-		}
-
-		for (const auto& FunctionPair : Functions)
-		{
-			if (InMonoDomain->Class_Get_Method_From_Name(FoundMonoClass, FunctionPair.Key.ToString(),
-			                                             FunctionPair.Value->ReturnValueOffset != MAX_uint16
-				                                             ? (FunctionPair.Value->NumParms > 0
-					                                                ? FunctionPair.Value->NumParms - 1
-					                                                : 0)
-				                                             : FunctionPair.Value->NumParms))
-			{
-				Bind(NewClassDescriptor, InClass, FunctionPair.Value);
-			}
-		}
-	}
-
-	for (TFieldIterator<FProperty> It(InClass, EFieldIteratorFlags::ExcludeSuper,
+	for (TFieldIterator<FProperty> It(InStruct, EFieldIteratorFlags::ExcludeSuper,
 	                                  EFieldIteratorFlags::ExcludeDeprecated); It; ++It)
 	{
 		if (const auto Property = *It)
@@ -131,6 +101,42 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UClass* InClass)
 			{
 				NewClassDescriptor->PropertyDescriptorMap.Add(Property->GetFName(),
 				                                              FPropertyDescriptor::Factory(Property));
+			}
+		}
+	}
+
+	if (const auto InClass = Cast<UClass>(InStruct))
+	{
+		if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME), InStruct->GetPrefixCPP() + InStruct->GetName()))
+		{
+			TMap<FName, UFunction*> Functions;
+
+			for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::IncludeSuper,
+			                                  EFieldIteratorFlags::ExcludeDeprecated,
+			                                  EFieldIteratorFlags::IncludeInterfaces); It; ++It)
+			{
+				if (auto Function = *It)
+				{
+					if (Function->HasAnyFunctionFlags(FUNC_BlueprintEvent) && !Function->HasAnyFunctionFlags(FUNC_Final)
+						&& !Functions.Contains(Function->GetFName()))
+					{
+						Functions.Emplace(Function->GetName(), Function);
+					}
+				}
+			}
+
+			for (const auto& FunctionPair : Functions)
+			{
+				if (InMonoDomain->Class_Get_Method_From_Name(FoundMonoClass, FunctionPair.Key.ToString(),
+				                                             FunctionPair.Value->ReturnValueOffset != MAX_uint16
+					                                             ? (FunctionPair.Value->NumParms > 0
+						                                                ? FunctionPair.Value->NumParms - 1
+						                                                : 0)
+					                                             : FunctionPair.Value->NumParms))
+				{
+					Bind(NewClassDescriptor, InClass, FunctionPair.Value);
+				}
 			}
 		}
 	}
@@ -150,7 +156,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		return false;
 	}
 
-	const auto OriginalFunction = GetOriginalFunction(InClassDescriptor, InClass, InFunction);
+	const auto OriginalFunction = GetOriginalFunction(InClassDescriptor, InFunction);
 
 	if (OriginalFunction == nullptr)
 	{
@@ -200,25 +206,49 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 	return true;
 }
 
-bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, const UClass* InClass)
+bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName)
 {
-	if (FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(InClass))
+	const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *InStructName.ToString());
+
+	if (InMonoDomain == nullptr || InScriptStruct == nullptr)
+	{
+		return false;
+	}
+
+	if (!BindImplementation(InMonoDomain, InScriptStruct))
+	{
+		return false;
+	}
+
+	const auto StructureSize = InScriptStruct->GetStructureSize() ? InScriptStruct->GetStructureSize() : 1;
+
+	const auto Structure = static_cast<void*>(static_cast<uint8*>(FMemory::Malloc(StructureSize)));
+
+	InScriptStruct->InitializeStruct(Structure);
+
+	FCSharpEnvironment::GetEnvironment()->AddStructReference(InScriptStruct, Structure, InMonoObject);
+
+	return true;
+}
+
+bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, const UStruct* InStruct)
+{
+	if (FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(InStruct))
 	{
 		return true;
 	}
 
 	return InMonoDomain->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME),
-			InClass->GetPrefixCPP() + InClass->GetName()) != nullptr ||
+			InStruct->GetPrefixCPP() + InStruct->GetName()) != nullptr ||
 		InMonoDomain->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE),
-			InClass->GetPrefixCPP() + InClass->GetName()) != nullptr;
+			InStruct->GetPrefixCPP() + InStruct->GetName()) != nullptr;
 }
 
-UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor, const UClass* InClass,
-                                            UFunction* InFunction)
+UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor, UFunction* InFunction)
 {
-	if (InClassDescriptor == nullptr || InClass == nullptr || InFunction == nullptr)
+	if (InClassDescriptor == nullptr || InFunction == nullptr)
 	{
 		return nullptr;
 	}
@@ -245,7 +275,7 @@ UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor,
 		                                   ? SuperClass->FindFunctionByName(InFunction->GetFName())
 		                                   : nullptr;
 
-	return GetOriginalFunction(InClassDescriptor, SuperClass, SuperOriginalFunction);
+	return GetOriginalFunction(InClassDescriptor, SuperOriginalFunction);
 }
 
 bool FCSharpBind::IsCallCSharpFunction(UFunction* InFunction)
@@ -256,6 +286,11 @@ bool FCSharpBind::IsCallCSharpFunction(UFunction* InFunction)
 
 UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass* InClass, const FName& InFunctionName)
 {
+	if (InOriginalFunction == nullptr || InClass == nullptr)
+	{
+		return nullptr;
+	}
+
 	FObjectDuplicationParameters ObjectDuplicationParameters(InOriginalFunction, InClass);
 
 	ObjectDuplicationParameters.DestName = InFunctionName;

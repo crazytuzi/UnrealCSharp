@@ -102,18 +102,16 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 			{
 				CSharpParams.Add(nullptr);
 
-				PropertyDescriptors[Index]->Get(
-					PropertyDescriptors[Index]->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
-					&CSharpParams[Index]);
+				PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
+				                                &CSharpParams[Index]);
 			}
 		}
 		else
 		{
 			CSharpParams.Add(FMemory::Malloc(PropertyDescriptors[Index]->GetProperty()->GetSize()));
 
-			PropertyDescriptors[Index]->Get(
-				PropertyDescriptors[Index]->GetProperty()->ContainerPtrToValuePtr<void>(InParams),
-				&CSharpParams[Index]);
+			PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
+			                                &CSharpParams[Index]);
 
 			MallocMemoryIndexes.Add(Index);
 		}
@@ -221,15 +219,14 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 				if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
 					ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
 				{
-					PropertyDescriptor->Set(
-						UnBoxValue, PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
+					PropertyDescriptor->Set(UnBoxValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 				}
 			}
 			else
 			{
 				PropertyDescriptor->Set(
 					ARRAY_GET(InValue, MonoObject*, ParamIndex++),
-					PropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params));
+					PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 			}
 		}
 	}
@@ -245,8 +242,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 
 		if (ReturnPropertyDescriptor != nullptr)
 		{
-			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params),
-			                              ReturnValue);
+			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), ReturnValue);
 		}
 
 		if (OutPropertyIndexes.Num() > 0)
@@ -269,8 +265,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 				{
 					auto Value = static_cast<void**>(FMemory_Alloca(sizeof(void*)));
 
-					OutPropertyDescriptor->Get(
-						OutPropertyDescriptor->GetProperty()->ContainerPtrToValuePtr<void>(Params), Value);
+					OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), Value);
 
 					if (OutPropertyDescriptor->IsPrimitiveProperty())
 					{

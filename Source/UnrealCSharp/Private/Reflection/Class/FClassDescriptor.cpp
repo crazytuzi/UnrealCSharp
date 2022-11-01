@@ -1,8 +1,8 @@
 ﻿#include "Reflection/Class/FClassDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FClassDescriptor::FClassDescriptor(UClass* InClass, MonoClass* InBindMonoClass):
-	Class(InClass),
+FClassDescriptor::FClassDescriptor(UStruct* InStruct, MonoClass* InBindMonoClass):
+	Struct(InStruct),
 	BindMonoClass(InBindMonoClass)
 {
 	Initialize();
@@ -50,18 +50,21 @@ FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FName& InFunc
 		return *FoundFunctionDescriptor;
 	}
 
-	while (Class != nullptr)
+	if (auto InClass = Cast<UClass>(Struct))
 	{
-		if (const auto FoundFunction = Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::ExcludeSuper))
+		while (InClass != nullptr)
 		{
-			const auto NewFunctionDescriptor = new FFunctionDescriptor(FoundFunction);
+			if (const auto FoundFunction = InClass->FindFunctionByName(InFunctionName, EIncludeSuperFlag::ExcludeSuper))
+			{
+				const auto NewFunctionDescriptor = new FFunctionDescriptor(FoundFunction);
 
-			FunctionDescriptorMap.Add(InFunctionName, NewFunctionDescriptor);
+				FunctionDescriptorMap.Add(InFunctionName, NewFunctionDescriptor);
 
-			return NewFunctionDescriptor;
+				return NewFunctionDescriptor;
+			}
+
+			InClass = InClass->GetSuperClass();
 		}
-
-		Class = Class->GetSuperClass();
 	}
 
 	return nullptr;
@@ -74,10 +77,10 @@ FPropertyDescriptor* FClassDescriptor::GetPropertyDescriptor(const FName& InProp
 		return *FoundFunctionDescriptor;
 	}
 
-	if (Class != nullptr)
+	if (Struct != nullptr)
 	{
 		if (const auto FoundClassDescriptor = FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(
-			Class->GetSuperClass()))
+			Struct->GetSuperStruct()))
 		{
 			return FoundClassDescriptor->GetPropertyDescriptor(InPropertyName);
 		}

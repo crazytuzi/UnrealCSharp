@@ -9,24 +9,27 @@ class FCSharpBind
 public:
 	static bool Bind(FMonoDomain* InMonoDomain, UObject* InObject);
 
+	static bool Bind(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName);
+
 private:
-	static bool Bind(FMonoDomain* InMonoDomain, UClass* InClass, bool bNeedMonoClass = true);
+	static bool Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, bool bNeedMonoClass = true);
 
 	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
 private:
 	static bool BindImplementation(FMonoDomain* InMonoDomain, UObject* InObject);
 
-	static bool BindImplementation(FMonoDomain* InMonoDomain, UClass* InClass);
+	static bool BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruct);
 
 	static bool BindImplementation(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
-private:
-	static bool CanBind(const FMonoDomain* InMonoDomain, const UClass* InClass);
+	static bool BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName);
 
 private:
-	static UFunction* GetOriginalFunction(FClassDescriptor* InClassDescriptor, const UClass* InClass,
-	                                      UFunction* InFunction);
+	static bool CanBind(const FMonoDomain* InMonoDomain, const UStruct* InStruct);
+
+private:
+	static UFunction* GetOriginalFunction(FClassDescriptor* InClassDescriptor, UFunction* InFunction);
 
 	static bool IsCallCSharpFunction(UFunction* InFunction);
 

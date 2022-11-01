@@ -56,6 +56,8 @@ private:
 
 	void RegisterReflectionFunctionImplementation();
 
+	void RegisterReflectionStructImplementation();
+
 	void RegisterLog();
 
 private:

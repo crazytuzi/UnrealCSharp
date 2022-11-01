@@ -172,22 +172,6 @@ void FPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 }
 
-void FPropertyDescriptor::Get(UObject* Src, void* Dest) const
-{
-	if (Property != nullptr)
-	{
-		Get(Property->ContainerPtrToValuePtr<void>(Src), Dest);
-	}
-}
-
-void FPropertyDescriptor::Set(void* Src, UObject* Dest) const
-{
-	if (Property != nullptr)
-	{
-		Set(Src, Property->ContainerPtrToValuePtr<void>(Dest));
-	}
-}
-
 FProperty* FPropertyDescriptor::GetProperty() const
 {
 	return Property;
