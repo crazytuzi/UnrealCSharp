@@ -1,5 +1,5 @@
-﻿using Script.Reflection.Struct;
-using IntPtr = Script.Reflection.Function.IntPtr;
+﻿using System;
+using Script.Reflection.Struct;
 
 namespace Script.Engine
 {
@@ -7,7 +7,7 @@ namespace Script.Engine
     {
         protected UStruct() => RegisterStruct();
 
-        protected UStruct(IntPtr InValue)
+        protected UStruct(Type InValue)
         {
         }
 

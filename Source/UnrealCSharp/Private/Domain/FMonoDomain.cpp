@@ -231,9 +231,9 @@ void FMonoDomain::RegisterLog()
 
 	if (Domain != nullptr)
 	{
-		if (const auto FoundClass = Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LOG), CLASS_LOG))
+		if (const auto FoundMonoClass = Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LOG), CLASS_LOG))
 		{
-			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundClass, FUNCTION_SET_OUT, 0))
+			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_SET_OUT, 0))
 			{
 				Runtime_Invoke(FoundMethod, nullptr, nullptr, nullptr);
 			}

@@ -1,6 +1,5 @@
 ﻿#include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
@@ -11,24 +10,20 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 
 		if (SrcMonoObject == nullptr)
 		{
-			auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+			auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME),
 				StructProperty->Struct->GetPrefixCPP() + StructProperty->Struct->GetName());
 
-			if (FoundClass == nullptr)
+			if (FoundMonoClass == nullptr)
 			{
-				FoundClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+				FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE),
 					StructProperty->Struct->GetPrefixCPP() + StructProperty->Struct->GetName());
 			}
 
-			const auto FoundIntPtrClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR);
+			auto InParams = static_cast<void*>(FoundMonoClass);
 
-			auto NewIntPtr = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
-				FoundIntPtrClass, 1, &Src));
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundClass, 1, &NewIntPtr);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass, 1, &InParams);
 
 			FCSharpEnvironment::GetEnvironment()->AddStructReference(StructProperty->Struct, Src, SrcMonoObject, false);
 		}
