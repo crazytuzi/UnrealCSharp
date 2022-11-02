@@ -84,6 +84,8 @@ protected:
 
 		FArrayProperty* ArrayProperty;
 
+		FEnumProperty* EnumProperty;
+
 		FMapProperty* MapProperty;
 
 		FSetProperty* SetProperty;

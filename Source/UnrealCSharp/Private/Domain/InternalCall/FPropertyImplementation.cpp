@@ -1,6 +1,8 @@
 ﻿#include "Domain/InternalCall/FPropertyImplementation.h"
 #include "Environment/FCSharpEnvironment.h"
 
+PROPERTY_IMPLEMENTATION(Byte, uint8)
+
 PROPERTY_IMPLEMENTATION(UInt16, uint16)
 
 PROPERTY_IMPLEMENTATION(UInt32, uint32)

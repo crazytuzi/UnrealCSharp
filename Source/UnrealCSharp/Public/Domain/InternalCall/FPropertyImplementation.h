@@ -6,7 +6,7 @@
 class FPropertyImplementation
 {
 public:
-	// @TODO byte
+	PROPERTY_IMPLEMENTATION_DEFINE(Byte, uint8)
 
 	PROPERTY_IMPLEMENTATION_DEFINE(UInt16, uint16)
 

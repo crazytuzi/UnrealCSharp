@@ -8,11 +8,11 @@ namespace Script.Reflection.Property
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetBytePropertyImplementation(object InMonoObject, string InPropertyName,
-            out byte OutValue);
+            out Byte OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetBytePropertyImplementation(object InMonoObject, string InPropertyName,
-            byte InValue);
+            Byte InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetUInt16PropertyImplementation(object InMonoObject, string InPropertyName,

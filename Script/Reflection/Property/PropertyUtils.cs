@@ -5,12 +5,12 @@ namespace Script.Reflection.Property
 {
     public static class PropertyUtils
     {
-        public static void GetProperty(object InMonoObject, string InPropertyName, out byte OutValue)
+        public static void GetProperty(object InMonoObject, string InPropertyName, out Byte OutValue)
         {
             PropertyImplementation.GetBytePropertyImplementation(InMonoObject, InPropertyName, out OutValue);
         }
 
-        public static void SetProperty(object InMonoObject, string InPropertyName, byte InValue)
+        public static void SetProperty(object InMonoObject, string InPropertyName, Byte InValue)
         {
             PropertyImplementation.SetBytePropertyImplementation(InMonoObject, InPropertyName, InValue);
         }
