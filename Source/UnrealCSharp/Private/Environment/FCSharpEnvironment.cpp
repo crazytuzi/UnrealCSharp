@@ -220,10 +220,12 @@ bool FCSharpEnvironment::RemoveObjectReference(const MonoObject* InMonoObject) c
 	return ObjectRegistry != nullptr ? ObjectRegistry->RemoveReference(InMonoObject) : nullptr;
 }
 
-bool FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, void* InStruct,
-                                            MonoObject* InMonoObject) const
+bool FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject,
+                                            const bool bNeedFree) const
 {
-	return StructRegistry != nullptr ? StructRegistry->AddReference(InScriptStruct, InStruct, InMonoObject) : nullptr;
+	return StructRegistry != nullptr
+		       ? StructRegistry->AddReference(InScriptStruct, InStruct, InMonoObject, bNeedFree)
+		       : nullptr;
 }
 
 MonoObject* FCSharpEnvironment::GetObject(const void* InStruct) const

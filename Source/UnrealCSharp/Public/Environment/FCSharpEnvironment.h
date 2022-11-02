@@ -65,7 +65,8 @@ public:
 
 	bool RemoveObjectReference(const MonoObject* InMonoObject) const;
 
-	bool AddStructReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject) const;
+	bool AddStructReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject,
+	                        bool bNeedFree = true) const;
 
 	MonoObject* GetObject(const void* InStruct) const;
 

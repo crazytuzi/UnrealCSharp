@@ -10,6 +10,8 @@ public:
 		void* Address;
 
 		UScriptStruct* ScriptStruct;
+
+		bool bNeedFree;
 	};
 
 public:
@@ -30,7 +32,7 @@ public:
 	void* GetStruct(const MonoObject* InMonoObject);
 
 public:
-	bool AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject);
+	bool AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject, bool bNeedFree = true);
 
 	bool RemoveReference(const void* InStruct);
 

@@ -18,9 +18,12 @@ void FStructRegistry::Deinitialize()
 {
 	for (auto& MonoObject2StructAddress : MonoObject2StructAddressMap)
 	{
-		FMemory::Free(MonoObject2StructAddress.Value.Address);
+		if (MonoObject2StructAddress.Value.bNeedFree)
+		{
+			FMemory::Free(MonoObject2StructAddress.Value.Address);
 
-		MonoObject2StructAddress.Value.Address = nullptr;
+			MonoObject2StructAddress.Value.Address = nullptr;
+		}
 	}
 
 	StructAddress2MonoObjectMap.Empty();
@@ -54,11 +57,12 @@ void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InSt
 	return nullptr;
 }
 
-bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject)
+bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject,
+                                   const bool bNeedFree)
 {
 	StructAddress2MonoObjectMap.Emplace(InStruct, InMonoObject);
 
-	MonoObject2StructAddressMap.Emplace(InMonoObject, FStructAddress{InStruct, InScriptStruct});
+	MonoObject2StructAddressMap.Emplace(InMonoObject, FStructAddress{InStruct, InScriptStruct, bNeedFree});
 
 	return true;
 }
@@ -69,9 +73,12 @@ bool FStructRegistry::RemoveReference(const void* InStruct)
 	{
 		if (const auto FoundStructAddress = MonoObject2StructAddressMap.Find(*FoundMonoObject))
 		{
-			FMemory::Free(FoundStructAddress->Address);
+			if (FoundStructAddress->bNeedFree)
+			{
+				FMemory::Free(FoundStructAddress->Address);
 
-			FoundStructAddress->Address = nullptr;
+				FoundStructAddress->Address = nullptr;
+			}
 		}
 
 		StructAddress2MonoObjectMap.Remove(InStruct);
@@ -86,13 +93,16 @@ bool FStructRegistry::RemoveReference(const MonoObject* InMonoObject)
 {
 	if (const auto FoundStructAddress = MonoObject2StructAddressMap.Find(InMonoObject))
 	{
-		FMemory::Free(FoundStructAddress->Address);
+		if (FoundStructAddress->bNeedFree)
+		{
+			FMemory::Free(FoundStructAddress->Address);
 
-		FoundStructAddress->Address = nullptr;
+			FoundStructAddress->Address = nullptr;
 
-		MonoObject2StructAddressMap.Remove(InMonoObject);
+			MonoObject2StructAddressMap.Remove(InMonoObject);
 
-		StructAddress2MonoObjectMap.Remove(FoundStructAddress);
+			StructAddress2MonoObjectMap.Remove(FoundStructAddress);
+		}
 	}
 
 	return true;
