@@ -1,4 +1,5 @@
 #include "Domain/FMonoDomain.h"
+#include "Domain/InternalCall/FArrayImplementation.h"
 #include "Domain/InternalCall/FMonoInternalCall.h"
 #include "Domain/InternalCall/FPropertyImplementation.h"
 #include "Domain/InternalCall/FFunctionImplementation.h"
@@ -39,6 +40,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 	RegisterReflectionFunctionImplementation();
 
 	RegisterReflectionStructImplementation();
+
+	RegisterReflectionContainerImplementation();
 
 	RegisterLog();
 }
@@ -125,10 +128,22 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, cons
 		       : nullptr;
 }
 
+mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InClass, MonoClass* InSuperClass, mono_bool bCheckInterfaces)
+{
+	return InClass != nullptr && InSuperClass != nullptr
+		       ? mono_class_is_subclass_of(InClass, InSuperClass, bCheckInterfaces)
+		       : false;
+}
+
 MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams,
                                         MonoObject** InExc) const
 {
 	return InFunction != nullptr ? mono_runtime_invoke(InFunction, InMonoObject, InParams, InExc) : nullptr;
+}
+
+MonoObject* FMonoDomain::Value_Box(MonoClass* InMonoClass, void* InValue) const
+{
+	return Domain != nullptr && InMonoClass != nullptr ? mono_value_box(Domain, InMonoClass, InValue) : nullptr;
 }
 
 void* FMonoDomain::Object_Unbox(MonoObject* InMonoObject) const
@@ -149,6 +164,61 @@ MonoString* FMonoDomain::Object_To_String(MonoObject* InMonoObject, MonoObject**
 char* FMonoDomain::String_To_UTF8(MonoString* InMonoString) const
 {
 	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
+}
+
+MonoClass* FMonoDomain::Get_Byte_Class() const
+{
+	return mono_get_byte_class();
+}
+
+MonoClass* FMonoDomain::Get_UInt16_Class() const
+{
+	return mono_get_uint16_class();
+}
+
+MonoClass* FMonoDomain::Get_UInt32_Class() const
+{
+	return mono_get_uint32_class();
+}
+
+MonoClass* FMonoDomain::Get_UInt64_Class() const
+{
+	return mono_get_uint64_class();
+}
+
+MonoClass* FMonoDomain::Get_Int16_Class() const
+{
+	return mono_get_int16_class();
+}
+
+MonoClass* FMonoDomain::Get_Int32_Class() const
+{
+	return mono_get_int32_class();
+}
+
+MonoClass* FMonoDomain::Get_Int64_Class() const
+{
+	return mono_get_int64_class();
+}
+
+MonoClass* FMonoDomain::Get_Boolean_Class() const
+{
+	return mono_get_boolean_class();
+}
+
+MonoClass* FMonoDomain::Get_Single_Class() const
+{
+	return mono_get_single_class();
+}
+
+MonoClass* FMonoDomain::Get_Enum_Class() const
+{
+	return mono_get_enum_class();
+}
+
+MonoClass* FMonoDomain::Get_Double_Class() const
+{
+	return mono_get_double_class();
 }
 
 void FMonoDomain::RegisterMonoTrace()
@@ -221,6 +291,165 @@ void FMonoDomain::RegisterReflectionStructImplementation()
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_STRUCT), CLASS_STRUCT_IMPLEMENTATION) +
 				COMBINE_FUNCTION(FUNCTION_UNREGISTER_STRUCT_IMPLEMENTATION))),
 		static_cast<void*>(FStructImplementation::UnRegisterStructImplementation));
+}
+
+void FMonoDomain::RegisterReflectionContainerImplementation()
+{
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_REGISTER_ARRAY_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::RegisterArrayImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_UNREGISTER_ARRAY_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::UnRegisterArrayImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_GET_TYPE_SIZE_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_GetTypeSizeImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_GET_SLACK_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_GetSlackImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_IS_VALID_INDEX_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_IsValidIndexImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_NUM_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_NumImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_MAX_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_MaxImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_GET_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_GetImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_SET_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_SetImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_FIND_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_FindImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_FIND_LAST_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_FindLastImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_CONTAINS_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_ContainsImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_ADD_UNINITIALIZED_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_AddUninitializedImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_INSERT_ZEROED_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_InsertZeroedImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_INSERT_DEFAULTED_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_InsertDefaultedImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_REMOVE_AT_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_RemoveAtImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_RESET_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_ResetImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_EMPTY_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_EmptyImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_SET_NUM_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_SetNumImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_ADD_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_AddImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_ADD_ZEROED_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_AddZeroedImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_ADD_UNIQUE_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_AddUniqueImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_REMOVE_SINGLE_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_RemoveSingleImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_REMOVE_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_RemoveImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_SWAP_MEMORY_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_SwapMemoryImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_ARRAY_SWAP_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_SwapImplementation));
 }
 
 void FMonoDomain::RegisterLog()

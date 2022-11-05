@@ -2,6 +2,7 @@
 
 #include "Domain/FMonoDomain.h"
 #include "Registry/FClassRegistry.h"
+#include "Registry/FContainerRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
 
@@ -34,6 +35,8 @@ public:
 
 public:
 	bool Bind(UObject* Object) const;
+
+	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const;
 
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
 
@@ -76,6 +79,21 @@ public:
 
 	bool RemoveStructReference(const MonoObject* InMonoObject) const;
 
+public:
+	template<typename T>
+	T* GetContainer(const MonoObject* InMonoObject) const
+	{
+		return ContainerRegistry != nullptr ? ContainerRegistry->GetContainer<T>(InMonoObject) : nullptr;
+	}
+
+	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject,bool bNeedFree = true) const;
+
+	template<typename T>
+	bool RemoveContainerReference(const MonoObject* InMonoObject) const
+	{
+		return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference<T>(InMonoObject) : nullptr;
+	}
+
 private:
 	static FCSharpEnvironment* Environment;
 
@@ -90,4 +108,6 @@ private:
 	FObjectRegistry* ObjectRegistry;
 
 	FStructRegistry* StructRegistry;
+
+	FContainerRegistry* ContainerRegistry;
 };

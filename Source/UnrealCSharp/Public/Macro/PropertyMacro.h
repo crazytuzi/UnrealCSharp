@@ -2,6 +2,10 @@
 
 #include "Macro.h"
 
+#define CPT_ENUM CPT_Unused_Index_21
+
+#define CPT_ARRAY CPT_Unused_Index_22
+
 #define GET_PROPERTY_TYPE(FPropertyType, EPropertyType) if (CastField<FPropertyType>(Property)) return EPropertyType;
 
 #define NEW_PROPERTY_DESCRIPTOR_IMPLEMENTATION(FPropertyType, FPropertyDescriptorType) if (CastField<FPropertyType>(InProperty)) return new FPropertyDescriptorType(InProperty);

@@ -10,12 +10,20 @@
 
 #define CLASS_STRUCT_IMPLEMENTATION FString(TEXT("StructImplementation"))
 
+#define CLASS_ARRAY_IMPLEMENTATION FString(TEXT("ArrayImplementation"))
+
 #define CLASS_INT_PTR FString(TEXT("IntPtr"))
 
 #define CLASS_OBJECT_LIST FString(TEXT("ObjectList"))
+
+#define CLASS_U_OBJECT FString(TEXT("UObject"))
+
+#define CLASS_U_STRUCT FString(TEXT("UStruct"))
 
 #define CLASS_F_STRING FString(TEXT("FString"))
 
 #define CLASS_F_NAME FString(TEXT("FName"))
 
 #define CLASS_F_TEXT FString(TEXT("FText"))
+
+#define CLASS_CONTAINER_UTILS FString(TEXT("ContainerUtils"))

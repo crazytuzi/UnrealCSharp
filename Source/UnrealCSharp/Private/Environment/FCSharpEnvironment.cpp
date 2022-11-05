@@ -25,6 +25,8 @@ void FCSharpEnvironment::Initialize()
 
 	StructRegistry = new FStructRegistry();
 
+	ContainerRegistry = new FContainerRegistry();
+
 	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
 		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
@@ -34,6 +36,13 @@ void FCSharpEnvironment::Deinitialize()
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
 		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+	}
+
+	if (ContainerRegistry != nullptr)
+	{
+		delete ContainerRegistry;
+
+		ContainerRegistry = nullptr;
 	}
 
 	if (StructRegistry != nullptr)
@@ -120,6 +129,11 @@ void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 bool FCSharpEnvironment::Bind(UObject* Object) const
 {
 	return FCSharpBind::Bind(Domain, Object);
+}
+
+bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const
+{
+	return FCSharpBind::Bind(InMonoObject, InReflectionType);
 }
 
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
@@ -246,4 +260,11 @@ bool FCSharpEnvironment::RemoveStructReference(const void* InStruct) const
 bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InMonoObject) : nullptr;
+}
+
+bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* InMonoObject, const bool bNeedFree) const
+{
+	return ContainerRegistry != nullptr
+		       ? ContainerRegistry->AddReference(InContainer, InMonoObject, bNeedFree)
+		       : nullptr;
 }

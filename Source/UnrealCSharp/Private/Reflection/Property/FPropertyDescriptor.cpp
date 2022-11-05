@@ -29,7 +29,7 @@
 #include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
 #include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 
-int32 GetPropertyType(const FProperty* Property)
+EPropertyType FPropertyDescriptor::GetPropertyType(const FProperty* Property)
 {
 	if (Property != nullptr)
 	{
@@ -63,9 +63,9 @@ int32 GetPropertyType(const FProperty* Property)
 
 		GET_PROPERTY_TYPE(FStructProperty, CPT_Struct)
 
-		GET_PROPERTY_TYPE(FArrayProperty, CPT_Array)
+		GET_PROPERTY_TYPE(FArrayProperty, CPT_ARRAY)
 
-		GET_PROPERTY_TYPE(FEnumProperty, CPT_Enum)
+		GET_PROPERTY_TYPE(FEnumProperty, CPT_ENUM)
 
 		GET_PROPERTY_TYPE(FStrProperty, CPT_String)
 

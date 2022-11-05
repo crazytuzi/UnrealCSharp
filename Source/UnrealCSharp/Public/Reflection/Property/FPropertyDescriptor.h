@@ -1,14 +1,10 @@
 ﻿#pragma once
 
-enum
-{
-	CPT_Enum = CPT_Unused_Index_21,
-	CPT_Array = CPT_Unused_Index_22,
-};
-
 class FPropertyDescriptor
 {
 public:
+	static EPropertyType GetPropertyType(const FProperty* Property);
+
 	static FPropertyDescriptor* Factory(FProperty* InProperty);
 
 public:

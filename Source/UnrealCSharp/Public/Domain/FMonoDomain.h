@@ -39,7 +39,11 @@ public:
 	MonoMethod* Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                       int32 InParamCount) const;
 
+	mono_bool Class_Is_Subclass_Of(MonoClass* InClass, MonoClass* InSuperClass, mono_bool bCheckInterfaces);
+
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;
+
+	MonoObject* Value_Box(MonoClass* InMonoClass, void* InValue) const;
 
 	void* Object_Unbox(MonoObject* InMonoObject) const;
 
@@ -49,6 +53,28 @@ public:
 
 	char* String_To_UTF8(MonoString* InMonoString) const;
 
+	MonoClass* Get_Byte_Class() const;
+
+	MonoClass* Get_UInt16_Class() const;;
+
+	MonoClass* Get_UInt32_Class() const;
+
+	MonoClass* Get_UInt64_Class() const;
+
+	MonoClass* Get_Int16_Class() const;
+
+	MonoClass* Get_Int32_Class() const;
+
+	MonoClass* Get_Int64_Class() const;
+
+	MonoClass* Get_Boolean_Class() const;
+
+	MonoClass* Get_Single_Class() const;
+
+	MonoClass* Get_Enum_Class() const;
+
+	MonoClass* Get_Double_Class() const;
+
 private:
 	void RegisterMonoTrace();
 
@@ -57,6 +83,8 @@ private:
 	void RegisterReflectionFunctionImplementation();
 
 	void RegisterReflectionStructImplementation();
+
+	void RegisterReflectionContainerImplementation();
 
 	void RegisterLog();
 

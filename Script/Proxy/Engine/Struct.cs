@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Script.Reflection.Struct;
 
 namespace Script.Engine
@@ -11,10 +12,9 @@ namespace Script.Engine
         {
         }
 
-        private void RegisterStruct() => StructUtils.RegisterStruct(this, GetPathName());
+        private void RegisterStruct() =>
+            StructUtils.RegisterStruct(this, GetType().GetCustomAttribute<PathNameAttribute>(true).PathName);
 
         ~UStruct() => StructUtils.UnRegisterStruct(this);
-
-        protected abstract string GetPathName();
     }
 }
