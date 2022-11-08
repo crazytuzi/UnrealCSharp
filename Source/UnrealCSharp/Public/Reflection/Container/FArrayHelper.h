@@ -5,7 +5,7 @@
 class FArrayHelper final
 {
 public:
-	explicit FArrayHelper(FProperty* InProperty);
+	explicit FArrayHelper(FProperty* InProperty, void* InData = nullptr);
 
 	~FArrayHelper();
 
@@ -67,6 +67,8 @@ public:
 
 	FProperty* GetInnerProperty() const;
 
+	FScriptArray* GetScriptArray() const;
+
 	FORCEINLINE FScriptArrayHelper CreateHelperFormInnerProperty() const
 	{
 		return FScriptArrayHelper::CreateHelperFormInnerProperty(InnerPropertyDescriptor->GetProperty(), ScriptArray);
@@ -76,4 +78,6 @@ private:
 	FPropertyDescriptor* InnerPropertyDescriptor;
 
 	FScriptArray* ScriptArray;
+
+	bool bNeedFree;
 };

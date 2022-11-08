@@ -8,6 +8,10 @@ namespace Script.Engine
     {
         public TArray() => ArrayUtils.RegisterArray(this, typeof(T));
 
+        protected TArray(Type InValue)
+        {
+        }
+
         ~TArray() => ArrayUtils.UnRegisterArray(this);
 
         public IEnumerator GetEnumerator()

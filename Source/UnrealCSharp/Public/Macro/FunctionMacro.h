@@ -71,3 +71,5 @@
 #define FUNCTION_CTOR FString(".ctor")
 
 #define FUNCTION_GET_PATH_NAME FString(TEXT("GetPathName"))
+
+#define FUNCTION_MAKE_GENERIC_TYPE_INSTANCE FString(TEXT("MakeGenericTypeInstance"))

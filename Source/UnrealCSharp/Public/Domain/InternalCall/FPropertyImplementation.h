@@ -31,7 +31,10 @@ public:
 
 	// @TODO
 
-	PROPERTY_IMPLEMENTATION_DEFINE(Array, MonoArray)
+	static void GetArrayPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
+	                                           MonoObject** OutValue);
+
+	SET_PROPERTY_IMPLEMENTATION_DEFINE(Array, MonoObject)
 
 	// @TODO
 

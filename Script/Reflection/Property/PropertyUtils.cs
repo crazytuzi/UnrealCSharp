@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Script.Engine;
 
 namespace Script.Reflection.Property
 {
@@ -99,12 +100,12 @@ namespace Script.Reflection.Property
 
         // @TODO
 
-        public static void GetProperty(Object InMonoObject, string InPropertyName, out List<Object> OutValue)
+        public static void GetProperty<T>(Object InMonoObject, string InPropertyName, out TArray<T> OutValue)
         {
             PropertyImplementation.GetArrayPropertyImplementation(InMonoObject, InPropertyName, out OutValue);
         }
 
-        public static void SetProperty(Object InMonoObject, string InPropertyName, List<Object> OutValue)
+        public static void SetProperty<T>(Object InMonoObject, string InPropertyName, TArray<T> OutValue)
         {
             PropertyImplementation.SetArrayPropertyImplementation(InMonoObject, InPropertyName, OutValue);
         }

@@ -262,9 +262,19 @@ bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) c
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InMonoObject) : nullptr;
 }
 
-bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* InMonoObject, const bool bNeedFree) const
+MonoObject* FCSharpEnvironment::GetContainerObject(void* InContainer)
+{
+	return ContainerRegistry != nullptr ? ContainerRegistry->GetObject(InContainer) : nullptr;
+}
+
+bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* InMonoObject) const
+{
+	return ContainerRegistry != nullptr ? ContainerRegistry->AddReference(InContainer, InMonoObject) : nullptr;
+}
+
+bool FCSharpEnvironment::AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const
 {
 	return ContainerRegistry != nullptr
-		       ? ContainerRegistry->AddReference(InContainer, InMonoObject, bNeedFree)
+		       ? ContainerRegistry->AddReference(InAddress, InContainer, InMonoObject)
 		       : nullptr;
 }

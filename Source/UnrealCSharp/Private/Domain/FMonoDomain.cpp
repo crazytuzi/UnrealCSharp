@@ -128,17 +128,33 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, cons
 		       : nullptr;
 }
 
-mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InClass, MonoClass* InSuperClass, mono_bool bCheckInterfaces)
+mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
+                                            mono_bool bCheckInterfaces)
 {
-	return InClass != nullptr && InSuperClass != nullptr
-		       ? mono_class_is_subclass_of(InClass, InSuperClass, bCheckInterfaces)
+	return InMonoClass != nullptr && InSuperMonoClass != nullptr
+		       ? mono_class_is_subclass_of(InMonoClass, InSuperMonoClass, bCheckInterfaces)
 		       : false;
+}
+
+MonoType* FMonoDomain::Class_Get_Type(MonoClass* InMonoClass)
+{
+	return InMonoClass != nullptr ? mono_class_get_type(InMonoClass) : nullptr;
+}
+
+MonoReflectionType* FMonoDomain::Type_Get_Object(MonoType* InMonoType)
+{
+	return Domain != nullptr && InMonoType != nullptr ? mono_type_get_object(Domain, InMonoType) : nullptr;
 }
 
 MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams,
                                         MonoObject** InExc) const
 {
 	return InFunction != nullptr ? mono_runtime_invoke(InFunction, InMonoObject, InParams, InExc) : nullptr;
+}
+
+MonoClass* FMonoDomain::Object_Get_Class(MonoObject* InMonoObject)
+{
+	return InMonoObject != nullptr ? mono_object_get_class(InMonoObject) : nullptr;
 }
 
 MonoObject* FMonoDomain::Value_Box(MonoClass* InMonoClass, void* InValue) const
@@ -254,7 +270,7 @@ void FMonoDomain::RegisterReflectionPropertyImplementation()
 
 	// @TODO
 
-	// REGISTER_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Array)
+	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Array)
 
 	// @TODO
 

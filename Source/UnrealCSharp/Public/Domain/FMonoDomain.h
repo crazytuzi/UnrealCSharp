@@ -39,9 +39,15 @@ public:
 	MonoMethod* Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                       int32 InParamCount) const;
 
-	mono_bool Class_Is_Subclass_Of(MonoClass* InClass, MonoClass* InSuperClass, mono_bool bCheckInterfaces);
+	mono_bool Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass, mono_bool bCheckInterfaces);
+
+	MonoType* Class_Get_Type(MonoClass* InMonoClass);
+
+	MonoReflectionType* Type_Get_Object(MonoType* InMonoType);
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;
+
+	MonoClass* Object_Get_Class(MonoObject* InMonoObject);
 
 	MonoObject* Value_Box(MonoClass* InMonoClass, void* InValue) const;
 

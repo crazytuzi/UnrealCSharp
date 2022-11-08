@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Script.Engine;
 
 namespace Script.Reflection.Property
 {
@@ -81,12 +82,12 @@ namespace Script.Reflection.Property
         // @TODO
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void GetArrayPropertyImplementation(Object InMonoObject, string InPropertyName,
-            out List<Object> OutValue);
+        public static extern void GetArrayPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            out TArray<T> OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SetArrayPropertyImplementation(Object InMonoObject, string InPropertyName,
-            List<Object> InValue);
+        public static extern void SetArrayPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            TArray<T> InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetDoublePropertyImplementation(Object InMonoObject, string InPropertyName,

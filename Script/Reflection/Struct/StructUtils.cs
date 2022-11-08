@@ -1,4 +1,5 @@
-﻿using Script.Engine;
+﻿using System;
+using Script.Engine;
 
 namespace Script.Reflection.Struct
 {

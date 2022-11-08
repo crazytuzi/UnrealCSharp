@@ -80,18 +80,34 @@ public:
 	bool RemoveStructReference(const MonoObject* InMonoObject) const;
 
 public:
-	template<typename T>
+	template <typename T>
 	T* GetContainer(const MonoObject* InMonoObject) const
 	{
 		return ContainerRegistry != nullptr ? ContainerRegistry->GetContainer<T>(InMonoObject) : nullptr;
 	}
 
-	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject,bool bNeedFree = true) const;
+	template <typename T>
+	T* GetContainer(const void* InAddress) const
+	{
+		return ContainerRegistry != nullptr ? ContainerRegistry->GetContainer<T>(InAddress) : nullptr;
+	}
 
-	template<typename T>
+	MonoObject* GetContainerObject(void* InContainer);
+
+	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject) const;
+
+	bool AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const;
+
+	template <typename T>
 	bool RemoveContainerReference(const MonoObject* InMonoObject) const
 	{
 		return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference<T>(InMonoObject) : nullptr;
+	}
+
+	template <typename T>
+	bool RemoveContainerReference(const void* InContainer) const
+	{
+		return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference<T>(InContainer) : nullptr;
 	}
 
 private:
