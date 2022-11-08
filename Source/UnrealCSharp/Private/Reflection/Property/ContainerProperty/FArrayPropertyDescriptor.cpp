@@ -84,9 +84,9 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto DestContainer = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(Dest);
 
-		if (SrcContainer != nullptr && DestContainer != nullptr)
+		if (SrcContainer != nullptr)
 		{
-			if (SrcContainer->GetScriptArray() != DestContainer->GetScriptArray())
+			if (DestContainer == nullptr || SrcContainer->GetScriptArray() != DestContainer->GetScriptArray())
 			{
 				FCSharpEnvironment::GetEnvironment()->RemoveContainerReference<FArrayHelper>(Dest);
 
