@@ -43,6 +43,10 @@ public:
 
 	MonoType* Class_Get_Type(MonoClass* InMonoClass);
 
+	MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType);
+
+	MonoClass* Type_Get_Class(MonoType* InMonoType);
+
 	MonoReflectionType* Type_Get_Object(MonoType* InMonoType);
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;

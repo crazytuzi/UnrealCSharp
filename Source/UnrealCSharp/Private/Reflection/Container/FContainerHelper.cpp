@@ -9,9 +9,10 @@
 FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
                                      const FName& InName, const EObjectFlags InObjectFlags)
 {
-	const auto InMonoType = mono_reflection_type_get_type(InReflectionType);
+	const auto InMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
+		InReflectionType);
 
-	const auto InMonoClass = mono_type_get_class(InMonoType);
+	const auto InMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Class(InMonoType);
 
 	const auto PropertyType = FTypeBridge::GetPropertyType(InMonoClass);
 

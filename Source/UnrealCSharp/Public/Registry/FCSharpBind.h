@@ -11,6 +11,9 @@ public:
 
 	static bool Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
 
+	static bool Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+	                 MonoReflectionType* InValueReflectionType);
+
 	static bool Bind(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName);
 
 private:
@@ -26,6 +29,9 @@ private:
 	static bool BindImplementation(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
 	static bool BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
+
+	static bool BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+	                               MonoReflectionType* InValueReflectionType);
 
 	static bool BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName);
 

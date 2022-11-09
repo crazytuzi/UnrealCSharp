@@ -38,6 +38,9 @@ public:
 
 	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const;
 
+	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+	          MonoReflectionType* InValueReflectionType) const;
+
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
 
 public:

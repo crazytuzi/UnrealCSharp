@@ -3,6 +3,7 @@
 #include "Macro/NamespaceMacro.h"
 #include "Reflection/Container/FArrayHelper.h"
 #include "Reflection/Container/FContainerHelper.h"
+#include "Reflection/Container/FMapHelper.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
 
@@ -14,6 +15,12 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 {
 	return BindImplementation(InMonoObject, InReflectionType);
+}
+
+bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+                       MonoReflectionType* InValueReflectionType)
+{
+	return BindImplementation(InMonoObject, InKeyReflectionType, InValueReflectionType);
 }
 
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName)
@@ -220,6 +227,25 @@ bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 	const auto ArrayHelper = new FArrayHelper(Property);
 
 	FCSharpEnvironment::GetEnvironment()->AddContainerReference(ArrayHelper, InMonoObject);
+
+	return true;
+}
+
+bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+                                     MonoReflectionType* InValueReflectionType)
+{
+	const auto KeyProperty = FContainerHelper::Factory(InKeyReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+
+	KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+	const auto ValueProperty =
+		FContainerHelper::Factory(InValueReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+
+	ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+	const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty);
+
+	FCSharpEnvironment::GetEnvironment()->AddContainerReference(MapHelper, InMonoObject);
 
 	return true;
 }

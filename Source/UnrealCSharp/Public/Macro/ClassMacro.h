@@ -12,6 +12,8 @@
 
 #define CLASS_ARRAY_IMPLEMENTATION FString(TEXT("ArrayImplementation"))
 
+#define CLASS_MAP_IMPLEMENTATION FString(TEXT("MapImplementation"))
+
 #define CLASS_INT_PTR FString(TEXT("IntPtr"))
 
 #define CLASS_OBJECT_LIST FString(TEXT("ObjectList"))

@@ -66,6 +66,28 @@
 
 #define FUNCTION_ARRAY_SWAP_IMPLEMENTATION FString(TEXT("Array_SwapImplementation"))
 
+#define FUNCTION_REGISTER_MAP_IMPLEMENTATION FString(TEXT("RegisterMapImplementation"))
+
+#define FUNCTION_UNREGISTER_MAP_IMPLEMENTATION FString(TEXT("UnRegisterMapImplementation"))
+
+#define FUNCTION_MAP_EMPTY_IMPLEMENTATION FString(TEXT("Map_EmptyImplementation"))
+
+#define FUNCTION_MAP_NUM_IMPLEMENTATION FString(TEXT("Map_NumImplementation"))
+
+#define FUNCTION_MAP_ADD_IMPLEMENTATION FString(TEXT("Map_AddImplementation"))
+
+#define FUNCTION_MAP_REMOVE_IMPLEMENTATION FString(TEXT("Map_RemoveImplementation"))
+
+#define FUNCTION_MAP_FIND_KEY_IMPLEMENTATION FString(TEXT("Map_FindKeyImplementation"))
+
+#define FUNCTION_MAP_FIND_IMPLEMENTATION FString(TEXT("Map_FindImplementation"))
+
+#define FUNCTION_MAP_CONTAINS_IMPLEMENTATION FString(TEXT("Map_ContainsImplementation"))
+
+#define FUNCTION_MAP_GET_IMPLEMENTATION FString(TEXT("Map_GetImplementation"))
+
+#define FUNCTION_MAP_SET_IMPLEMENTATION FString(TEXT("Map_SetImplementation"))
+
 #define FUNCTION_ADD FString(TEXT("Add"))
 
 #define FUNCTION_CTOR FString(".ctor")

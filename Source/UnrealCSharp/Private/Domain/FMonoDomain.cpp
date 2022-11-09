@@ -3,6 +3,7 @@
 #include "Domain/InternalCall/FMonoInternalCall.h"
 #include "Domain/InternalCall/FPropertyImplementation.h"
 #include "Domain/InternalCall/FFunctionImplementation.h"
+#include "Domain/InternalCall/FMapImplementation.h"
 #include "Domain/InternalCall/FStructImplementation.h"
 #include "Log/FMonoLog.h"
 #include "Macro/NamespaceMacro.h"
@@ -139,6 +140,16 @@ mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* I
 MonoType* FMonoDomain::Class_Get_Type(MonoClass* InMonoClass)
 {
 	return InMonoClass != nullptr ? mono_class_get_type(InMonoClass) : nullptr;
+}
+
+MonoType* FMonoDomain::Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType)
+{
+	return InMonoReflectionType != nullptr ? mono_reflection_type_get_type(InMonoReflectionType) : nullptr;
+}
+
+MonoClass* FMonoDomain::Type_Get_Class(MonoType* InMonoType)
+{
+	return InMonoType != nullptr ? mono_type_get_class(InMonoType) : nullptr;
 }
 
 MonoReflectionType* FMonoDomain::Type_Get_Object(MonoType* InMonoType)
@@ -466,6 +477,72 @@ void FMonoDomain::RegisterReflectionContainerImplementation()
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
 				COMBINE_FUNCTION(FUNCTION_ARRAY_SWAP_IMPLEMENTATION))),
 		static_cast<void*>(FArrayImplementation::Array_SwapImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_REGISTER_MAP_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::RegisterMapImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_UNREGISTER_MAP_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::UnRegisterMapImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_EMPTY_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_EmptyImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_NUM_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_NumImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_ADD_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_AddImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_REMOVE_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_RemoveImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_FIND_KEY_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_FindKeyImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_FIND_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_FindImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_CONTAINS_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_ContainsImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_GET_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_GetImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_MAP_SET_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_SetImplementation));
 }
 
 void FMonoDomain::RegisterLog()

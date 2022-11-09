@@ -136,6 +136,12 @@ bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InRe
 	return FCSharpBind::Bind(InMonoObject, InReflectionType);
 }
 
+bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+                              MonoReflectionType* InValueReflectionType) const
+{
+	return FCSharpBind::Bind(InMonoObject, InKeyReflectionType, InValueReflectionType);
+}
+
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
 {
 	return FCSharpBind::Bind(Domain, InMonoObject, InStructName);
