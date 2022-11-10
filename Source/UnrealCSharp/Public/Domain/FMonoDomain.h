@@ -63,7 +63,11 @@ public:
 
 	char* String_To_UTF8(MonoString* InMonoString) const;
 
+	MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum);
+
 	MonoClass* Get_Byte_Class() const;
+
+	MonoClass* Get_Object_Class() const;
 
 	MonoClass* Get_UInt16_Class() const;;
 

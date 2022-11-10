@@ -193,9 +193,19 @@ char* FMonoDomain::String_To_UTF8(MonoString* InMonoString) const
 	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
 }
 
+MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
+{
+	return mono_array_new(Domain, InMonoClass, InNum);
+}
+
 MonoClass* FMonoDomain::Get_Byte_Class() const
 {
 	return mono_get_byte_class();
+}
+
+MonoClass* FMonoDomain::Get_Object_Class() const
+{
+	return mono_get_object_class();
 }
 
 MonoClass* FMonoDomain::Get_UInt16_Class() const

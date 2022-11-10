@@ -3,6 +3,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
+#include "Macro/MonoMacro.h"
 #include "Macro/NamespaceMacro.h"
 #include "Reflection/Container/FArrayHelper.h"
 
@@ -35,7 +36,12 @@ void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 
 			InParams[0] = FoundArrayReflectionType;
 
-			InParams[1] = FoundGenericReflectionType;
+			const auto GenericReflectionTypeMonoArray = FCSharpEnvironment::GetEnvironment()->GetDomain()->Array_New(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Object_Class(), 1);
+
+			ARRAY_SET(GenericReflectionTypeMonoArray, MonoReflectionType*, 0, FoundGenericReflectionType);
+
+			InParams[1] = GenericReflectionTypeMonoArray;
 
 			const auto ContainerUtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_CONTAINER_UTILS);
