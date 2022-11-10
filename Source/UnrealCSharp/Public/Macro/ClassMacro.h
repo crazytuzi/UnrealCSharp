@@ -31,3 +31,5 @@
 #define CLASS_CONTAINER_UTILS FString(TEXT("ContainerUtils"))
 
 #define CLASS_T_ARRAY FString(TEXT("TArray`1"))
+
+#define CLASS_T_MAP FString(TEXT("TMap`2"))

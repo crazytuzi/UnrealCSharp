@@ -40,5 +40,10 @@ public:
 
 	PROPERTY_IMPLEMENTATION_DEFINE(Double, double)
 
+	static void GetMapPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
+	                                         MonoObject** OutValue);
+
+	SET_PROPERTY_IMPLEMENTATION_DEFINE(Map, MonoObject)
+
 	// @TODO
 };

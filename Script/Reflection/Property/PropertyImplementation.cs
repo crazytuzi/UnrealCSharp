@@ -97,6 +97,14 @@ namespace Script.Reflection.Property
         public static extern void SetDoublePropertyImplementation(Object InMonoObject, string InPropertyName,
             Double InValue);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetMapPropertyImplementation<TKey, TValue>(Object InMonoObject, string InPropertyName,
+            out TMap<TKey, TValue> OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetMapPropertyImplementation<TKey, TValue>(Object InMonoObject, string InPropertyName,
+            TMap<TKey, TValue> InValue);
+
         // @TODO
     }
 }

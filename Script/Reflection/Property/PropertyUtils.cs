@@ -119,5 +119,17 @@ namespace Script.Reflection.Property
         {
             PropertyImplementation.SetDoublePropertyImplementation(InMonoObject, InPropertyName, OutValue);
         }
+
+        public static void GetProperty<TKey, TValue>(Object InMonoObject, string InPropertyName,
+            out TMap<TKey, TValue> OutValue)
+        {
+            PropertyImplementation.GetMapPropertyImplementation(InMonoObject, InPropertyName, out OutValue);
+        }
+
+        public static void SetProperty<TKey, TValue>(Object InMonoObject, string InPropertyName,
+            TMap<TKey, TValue> OutValue)
+        {
+            PropertyImplementation.SetMapPropertyImplementation(InMonoObject, InPropertyName, OutValue);
+        }
     }
 }
