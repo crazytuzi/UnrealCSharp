@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "Domain/FMonoDomain.h"
+#include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Class/FClassDescriptor.h"
+#include "Reflection/Container/FContainerHelper.h"
 #include "Reflection/Function/FFunctionDescriptor.h"
 
 class FCSharpBind
@@ -9,7 +11,11 @@ class FCSharpBind
 public:
 	static bool Bind(FMonoDomain* InMonoDomain, UObject* InObject);
 
-	static bool Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
+	template <typename T>
+	static bool Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
+	{
+		return BindImplementation<T>(InMonoObject, InReflectionType);
+	}
 
 	static bool Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	                 MonoReflectionType* InValueReflectionType);
@@ -28,7 +34,19 @@ private:
 
 	static bool BindImplementation(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
-	static bool BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
+	template <typename T>
+	static bool BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
+	{
+		const auto Property = FContainerHelper::Factory(InReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+
+		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+		const auto ContainerHelper = new T(Property);
+
+		FCSharpEnvironment::GetEnvironment()->AddContainerReference(ContainerHelper, InMonoObject);
+
+		return true;
+	}
 
 	static bool BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	                               MonoReflectionType* InValueReflectionType);

@@ -4,6 +4,7 @@
 #include "Domain/InternalCall/FPropertyImplementation.h"
 #include "Domain/InternalCall/FFunctionImplementation.h"
 #include "Domain/InternalCall/FMapImplementation.h"
+#include "Domain/InternalCall/FSetImplementation.h"
 #include "Domain/InternalCall/FStructImplementation.h"
 #include "Log/FMonoLog.h"
 #include "Macro/NamespaceMacro.h"
@@ -555,6 +556,48 @@ void FMonoDomain::RegisterReflectionContainerImplementation()
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
 				COMBINE_FUNCTION(FUNCTION_MAP_SET_IMPLEMENTATION))),
 		static_cast<void*>(FMapImplementation::Map_SetImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_REGISTER_SET_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::RegisterSetImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_UNREGISTER_SET_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::UnRegisterSetImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_SET_EMPTY_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::Set_EmptyImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_SET_NUM_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::Set_NumImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_SET_ADD_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::Set_AddImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_SET_REMOVE_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::Set_RemoveImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_SET_CONTAINS_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::Set_ContainsImplementation));
 }
 
 void FMonoDomain::RegisterLog()

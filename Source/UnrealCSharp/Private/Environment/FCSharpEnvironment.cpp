@@ -1,6 +1,5 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
-#include "Registry/FCSharpBind.h"
 #include "mono/metadata/object.h"
 
 FCSharpEnvironment* FCSharpEnvironment::Environment = nullptr;
@@ -129,11 +128,6 @@ void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 bool FCSharpEnvironment::Bind(UObject* Object) const
 {
 	return FCSharpBind::Bind(Domain, Object);
-}
-
-bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const
-{
-	return FCSharpBind::Bind(InMonoObject, InReflectionType);
 }
 
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,

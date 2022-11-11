@@ -5,7 +5,7 @@
 
 void FArrayImplementation::RegisterArrayImplementation(MonoObject InMonoObject, MonoReflectionType* InReflectionType)
 {
-	FCSharpEnvironment::GetEnvironment()->Bind(&InMonoObject, InReflectionType);
+	FCSharpEnvironment::GetEnvironment()->Bind<FArrayHelper>(&InMonoObject, InReflectionType);
 }
 
 void FArrayImplementation::UnRegisterArrayImplementation(MonoObject InMonoObject)

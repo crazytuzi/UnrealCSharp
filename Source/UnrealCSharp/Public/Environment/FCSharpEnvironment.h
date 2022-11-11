@@ -3,6 +3,7 @@
 #include "Domain/FMonoDomain.h"
 #include "Registry/FClassRegistry.h"
 #include "Registry/FContainerRegistry.h"
+#include "Registry/FCSharpBind.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
 
@@ -36,7 +37,11 @@ public:
 public:
 	bool Bind(UObject* Object) const;
 
-	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const;
+	template <typename T>
+	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const
+	{
+		return FCSharpBind::Bind<T>(InMonoObject, InReflectionType);
+	}
 
 	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	          MonoReflectionType* InValueReflectionType) const;

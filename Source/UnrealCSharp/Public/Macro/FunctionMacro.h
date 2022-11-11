@@ -88,6 +88,20 @@
 
 #define FUNCTION_MAP_SET_IMPLEMENTATION FString(TEXT("Map_SetImplementation"))
 
+#define FUNCTION_REGISTER_SET_IMPLEMENTATION FString(TEXT("RegisterSetImplementation"))
+
+#define FUNCTION_UNREGISTER_SET_IMPLEMENTATION FString(TEXT("UnRegisterSetImplementation"))
+
+#define FUNCTION_SET_EMPTY_IMPLEMENTATION FString(TEXT("Set_EmptyImplementation"))
+
+#define FUNCTION_SET_NUM_IMPLEMENTATION FString(TEXT("Set_NumImplementation"))
+
+#define FUNCTION_SET_ADD_IMPLEMENTATION FString(TEXT("Set_AddImplementation"))
+
+#define FUNCTION_SET_REMOVE_IMPLEMENTATION FString(TEXT("Set_RemoveImplementation"))
+
+#define FUNCTION_SET_CONTAINS_IMPLEMENTATION FString(TEXT("Set_ContainsImplementation"))
+
 #define FUNCTION_ADD FString(TEXT("Add"))
 
 #define FUNCTION_CTOR FString(".ctor")

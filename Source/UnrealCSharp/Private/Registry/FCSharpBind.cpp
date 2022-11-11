@@ -1,8 +1,6 @@
 ﻿#include "Registry/FCSharpBind.h"
-#include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 #include "Reflection/Container/FArrayHelper.h"
-#include "Reflection/Container/FContainerHelper.h"
 #include "Reflection/Container/FMapHelper.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
@@ -10,11 +8,6 @@
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 {
 	return BindImplementation(InMonoDomain, InObject);
-}
-
-bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
-{
-	return BindImplementation(InMonoObject, InReflectionType);
 }
 
 bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
@@ -216,17 +209,6 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		UpdateCallCSharpFunction(NewFunction);
 	}
-
-	return true;
-}
-
-bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
-{
-	const auto Property = FContainerHelper::Factory(InReflectionType, nullptr, "", EObjectFlags::RF_Transient);
-
-	const auto ArrayHelper = new FArrayHelper(Property);
-
-	FCSharpEnvironment::GetEnvironment()->AddContainerReference(ArrayHelper, InMonoObject);
 
 	return true;
 }
