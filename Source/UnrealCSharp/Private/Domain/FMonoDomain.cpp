@@ -300,7 +300,7 @@ void FMonoDomain::RegisterReflectionPropertyImplementation()
 
 	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Map)
 
-	// @TODO
+	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Set)
 }
 
 void FMonoDomain::RegisterReflectionFunctionImplementation()

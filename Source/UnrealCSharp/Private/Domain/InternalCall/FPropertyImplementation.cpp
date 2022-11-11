@@ -80,4 +80,21 @@ void FPropertyImplementation::GetMapPropertyImplementation(MonoObject InMonoObje
 
 SET_PROPERTY_IMPLEMENTATION(Map, MonoObject)
 
-// @TODO
+void FPropertyImplementation::GetSetPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
+                                                           MonoObject** OutValue)
+{
+	UStruct* InStruct = nullptr;
+
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(&InMonoObject, InStruct))
+	{
+		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get();
+
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor(
+			InStruct, PropertyName))
+		{
+			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), OutValue);
+		}
+	}
+}
+
+SET_PROPERTY_IMPLEMENTATION(Set, MonoObject)

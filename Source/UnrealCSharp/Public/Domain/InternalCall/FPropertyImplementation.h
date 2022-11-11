@@ -45,5 +45,8 @@ public:
 
 	SET_PROPERTY_IMPLEMENTATION_DEFINE(Map, MonoObject)
 
-	// @TODO
+	static void GetSetPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
+	                                         MonoObject** OutValue);
+
+	SET_PROPERTY_IMPLEMENTATION_DEFINE(Set, MonoObject)
 };

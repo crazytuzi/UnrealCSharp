@@ -105,6 +105,12 @@ namespace Script.Reflection.Property
         public static extern void SetMapPropertyImplementation<TKey, TValue>(Object InMonoObject, string InPropertyName,
             TMap<TKey, TValue> InValue);
 
-        // @TODO
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetSetPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            out TSet<T> OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetSetPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            TSet<T> InValue);
     }
 }

@@ -131,5 +131,15 @@ namespace Script.Reflection.Property
         {
             PropertyImplementation.SetMapPropertyImplementation(InMonoObject, InPropertyName, OutValue);
         }
+
+        public static void GetProperty<T>(Object InMonoObject, string InPropertyName, out TSet<T> OutValue)
+        {
+            PropertyImplementation.GetSetPropertyImplementation(InMonoObject, InPropertyName, out OutValue);
+        }
+
+        public static void SetProperty<T>(Object InMonoObject, string InPropertyName, TSet<T> OutValue)
+        {
+            PropertyImplementation.SetSetPropertyImplementation(InMonoObject, InPropertyName, OutValue);
+        }
     }
 }

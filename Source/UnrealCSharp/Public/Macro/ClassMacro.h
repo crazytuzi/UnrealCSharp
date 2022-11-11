@@ -35,3 +35,5 @@
 #define CLASS_T_ARRAY FString(TEXT("TArray`1"))
 
 #define CLASS_T_MAP FString(TEXT("TMap`2"))
+
+#define CLASS_T_SET FString(TEXT("TSet`1"))
