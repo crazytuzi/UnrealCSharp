@@ -5,7 +5,7 @@ namespace Script.Reflection.Delegate
 {
     public static class DelegateUtils
     {
-        public static unsafe void Delegate_Bind<T>(void* InAddress, T InDelegate) =>
+        public static unsafe void Delegate_Bind<T>(void* InAddress, T InDelegate) where T : System.Delegate =>
             DelegateImplementation.Delegate_BindImplementation(InAddress, InDelegate);
 
         public static unsafe Boolean Delegate_IsBound(void* InAddress) =>

@@ -4,7 +4,10 @@ void UDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 {
 	if (Function != nullptr && Function->GetName() == "CSharpCallBack")
 	{
-		DelegateDescriptor->CallCSharp(Delegate, Parms);
+		if (DelegateDescriptor != nullptr && Delegate != nullptr)
+		{
+			DelegateDescriptor->CallDelegate(Delegate, Parms);
+		}
 	}
 	else
 	{
@@ -16,7 +19,7 @@ void UDelegateHandler::BeginDestroy()
 {
 	Deinitialize();
 
-	UObject::BeginDestroy();
+	Super::BeginDestroy();
 }
 
 void UDelegateHandler::CSharpCallBack()
@@ -32,6 +35,8 @@ void UDelegateHandler::Initialize(FScriptDelegate* InScriptDelegate, UFunction* 
 
 void UDelegateHandler::Deinitialize()
 {
+	Delegate = nullptr;
+
 	if (ScriptDelegate != nullptr)
 	{
 		// @TODO
@@ -92,7 +97,10 @@ void UDelegateHandler::Execute(MonoObject** ReturnValue, MonoObject** OutValue, 
 	{
 		if (ScriptDelegate->IsBound())
 		{
-			DelegateDescriptor->CallUnreal(ScriptDelegate, ReturnValue, OutValue, InValue);
+			if (DelegateDescriptor != nullptr)
+			{
+				DelegateDescriptor->ProcessDelegate(ScriptDelegate, ReturnValue, OutValue, InValue);
+			}
 		}
 	}
 }

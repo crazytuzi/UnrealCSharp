@@ -5,7 +5,7 @@
 #include "Macro/MonoMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-bool FCSharpDelegateDescriptor::CallCSharp(MonoObject* InDelegateMonoObject, void* InParams)
+bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InParams)
 {
 	TArray<void*> CSharpParams;
 
@@ -40,9 +40,8 @@ bool FCSharpDelegateDescriptor::CallCSharp(MonoObject* InDelegateMonoObject, voi
 		}
 	}
 
-
 	const auto ReturnValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Delegate_Invoke(
-		InDelegateMonoObject, CSharpParams.GetData(), nullptr);
+		InDelegate, CSharpParams.GetData(), nullptr);
 
 	if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 	{
@@ -91,8 +90,8 @@ bool FCSharpDelegateDescriptor::CallCSharp(MonoObject* InDelegateMonoObject, voi
 	return true;
 }
 
-bool FCSharpDelegateDescriptor::CallUnreal(const FScriptDelegate* InScriptDelegate, MonoObject** ReturnValue,
-                                           MonoObject** OutValue, MonoArray* InValue)
+bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** ReturnValue,
+                                                MonoObject** OutValue, MonoArray* InValue)
 {
 	void* Params = Function->ParmsSize > 0 ? FMemory::Malloc(Function->ParmsSize, 16) : nullptr;
 
@@ -134,6 +133,80 @@ bool FCSharpDelegateDescriptor::CallUnreal(const FScriptDelegate* InScriptDelega
 	{
 		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), ReturnValue);
 	}
+
+	if (OutPropertyIndexes.Num() > 0)
+	{
+		const auto FoundObjectListClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_OBJECT_LIST);
+
+		const auto FoundIntPtrClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR);
+
+		const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+			FoundObjectListClass, FUNCTION_ADD, 1);
+
+		const auto NewObjectList = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundObjectListClass);
+
+		for (const auto Index : OutPropertyIndexes)
+		{
+			if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
+			{
+				auto Value = static_cast<void**>(FMemory_Alloca(sizeof(void*)));
+
+				OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), Value);
+
+				if (OutPropertyDescriptor->IsPrimitiveProperty())
+				{
+					auto NewIntPtr = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+						FoundIntPtrClass, 1, Value));
+
+					Value = &NewIntPtr;
+				}
+
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+					FoundAddMethod, NewObjectList, Value, nullptr);
+			}
+		}
+
+		*OutValue = NewObjectList;
+	}
+
+	return true;
+}
+
+bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptDelegate* InMulticastScriptDelegate,
+                                                         MonoObject** OutValue, MonoArray* InValue)
+{
+	void* Params = Function->ParmsSize > 0 ? FMemory::Malloc(Function->ParmsSize, 16) : nullptr;
+
+	auto ParamIndex = 0;
+
+	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
+	{
+		const auto& PropertyDescriptor = PropertyDescriptors[Index];
+
+		PropertyDescriptor->GetProperty()->InitializeValue_InContainer(Params);
+
+		if (!OutPropertyIndexes.Contains(Index))
+		{
+			if (PropertyDescriptor->IsPrimitiveProperty())
+			{
+				if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
+					ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
+				{
+					PropertyDescriptor->Set(UnBoxValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
+				}
+			}
+			else
+			{
+				PropertyDescriptor->Set(
+					ARRAY_GET(InValue, MonoObject*, ParamIndex++),
+					PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
+			}
+		}
+	}
+
+	InMulticastScriptDelegate->ProcessMulticastDelegate<UObject>(Params);
 
 	if (OutPropertyIndexes.Num() > 0)
 	{

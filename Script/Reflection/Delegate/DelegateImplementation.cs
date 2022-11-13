@@ -7,7 +7,8 @@ namespace Script.Reflection.Delegate
     public static class DelegateImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe void Delegate_BindImplementation<T>(void* InAddress, T InDelegate);
+        public static extern unsafe void Delegate_BindImplementation<T>(void* InAddress, T InDelegate)
+            where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern unsafe Boolean Delegate_IsBoundImplementation(void* InAddress);

@@ -18,6 +18,8 @@
 
 #define CLASS_DELEGATE_IMPLEMENTATION FString(TEXT("DelegateImplementation"))
 
+#define CLASS_MULTICAST_DELEGATE_IMPLEMENTATION FString(TEXT("MulticastDelegateImplementation"))
+
 #define CLASS_INT_PTR FString(TEXT("IntPtr"))
 
 #define CLASS_OBJECT_LIST FString(TEXT("ObjectList"))
@@ -33,6 +35,8 @@
 #define CLASS_F_TEXT FString(TEXT("FText"))
 
 #define CLASS_CONTAINER_UTILS FString(TEXT("ContainerUtils"))
+
+#define CLASS_MULTICAST_DELEGATE_UTILS FString(TEXT("MulticastDelegateUtils"))
 
 #define CLASS_T_ARRAY FString(TEXT("TArray`1"))
 

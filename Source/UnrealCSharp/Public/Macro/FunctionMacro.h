@@ -112,6 +112,26 @@
 
 #define FUNCTION_DELEGATE_EXECUTE_IMPLEMENTATION FString(TEXT("Delegate_ExecuteImplementation"))
 
+#define FUNCTION_MULTICAST_DELEGATE_IS_BOUND_IMPLEMENTATION FString(TEXT("MulticastDelegate_IsBoundImplementation"))
+
+#define FUNCTION_MULTICAST_DELEGATE_CONTAINS_IMPLEMENTATION FString(TEXT("MulticastDelegate_ContainsImplementation"))
+
+#define FUNCTION_MULTICAST_DELEGATE_ADD_IMPLEMENTATION FString(TEXT("MulticastDelegate_AddImplementation"))
+
+#define FUNCTION_MULTICAST_DELEGATE_ADD_UNIQUE_IMPLEMENTATION FString(TEXT("MulticastDelegate_AddUniqueImplementation"))
+
+#define FUNCTION_MULTICAST_DELEGATE_REMOVE_IMPLEMENTATION FString(TEXT("MulticastDelegate_RemoveImplementation"))
+
+#define FUNCTION_MULTICAST_DELEGATE_REMOVE_ALL_IMPLEMENTATION FString(TEXT("MulticastDelegate_RemoveAllImplementation"))
+
+#define FUNCTION_MULTICAST_DELEGATE_CLEAR_IMPLEMENTATION FString(TEXT("MulticastDelegate_ClearImplementation"))
+
+#define FUNCTION_MULTICAST_DELEGATE_BROADCAST_IMPLEMENTATION FString(TEXT("MulticastDelegate_BroadcastImplementation"))
+
+#define FUNCTION_MULTICAST_DELEGATE_GET_TARGET FString(TEXT("MulticastDelegate_GetTarget"))
+
+#define FUNCTION_MULTICAST_DELEGATE_EQUALS FString(TEXT("MulticastDelegate_Equals"))
+
 #define FUNCTION_ADD FString(TEXT("Add"))
 
 #define FUNCTION_CTOR FString(".ctor")

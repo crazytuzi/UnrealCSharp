@@ -8,8 +8,11 @@ public:
 	using FFunctionDescriptor::FFunctionDescriptor;
 
 public:
-	bool CallCSharp(MonoObject* InDelegateMonoObject, void* InParams);
+	bool CallDelegate(MonoObject* InDelegate, void* InParams);
 
-	bool CallUnreal(const FScriptDelegate* InScriptDelegate, MonoObject** ReturnValue, MonoObject** OutValue,
-	                MonoArray* InValue);
+	bool ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** ReturnValue, MonoObject** OutValue,
+	                     MonoArray* InValue);
+
+	bool ProcessMulticastDelegate(const FMulticastScriptDelegate* InMulticastScriptDelegate, MonoObject** OutValue,
+	                              MonoArray* InValue);
 };

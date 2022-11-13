@@ -5,6 +5,7 @@
 #include "Domain/InternalCall/FPropertyImplementation.h"
 #include "Domain/InternalCall/FFunctionImplementation.h"
 #include "Domain/InternalCall/FMapImplementation.h"
+#include "Domain/InternalCall/FMulticastDelegateImplementation.h"
 #include "Domain/InternalCall/FSetImplementation.h"
 #include "Domain/InternalCall/FStructImplementation.h"
 #include "Log/FMonoLog.h"
@@ -639,6 +640,62 @@ void FMonoDomain::RegisterReflectionDelegateImplementation()
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE), CLASS_DELEGATE_IMPLEMENTATION) +
 				COMBINE_FUNCTION(FUNCTION_DELEGATE_EXECUTE_IMPLEMENTATION))),
 		static_cast<void*>(FDelegateImplementation::Delegate_ExecuteImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),
+				CLASS_MULTICAST_DELEGATE_IMPLEMENTATION) + COMBINE_FUNCTION(
+				FUNCTION_MULTICAST_DELEGATE_IS_BOUND_IMPLEMENTATION))),
+		static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),
+				CLASS_MULTICAST_DELEGATE_IMPLEMENTATION) + COMBINE_FUNCTION(
+				FUNCTION_MULTICAST_DELEGATE_CONTAINS_IMPLEMENTATION))),
+		static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),
+				CLASS_MULTICAST_DELEGATE_IMPLEMENTATION) + COMBINE_FUNCTION(
+				FUNCTION_MULTICAST_DELEGATE_ADD_IMPLEMENTATION))),
+		static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_AddImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),
+				CLASS_MULTICAST_DELEGATE_IMPLEMENTATION) + COMBINE_FUNCTION(
+				FUNCTION_MULTICAST_DELEGATE_ADD_UNIQUE_IMPLEMENTATION))),
+		static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),
+				CLASS_MULTICAST_DELEGATE_IMPLEMENTATION) + COMBINE_FUNCTION(
+				FUNCTION_MULTICAST_DELEGATE_REMOVE_IMPLEMENTATION))),
+		static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),
+				CLASS_MULTICAST_DELEGATE_IMPLEMENTATION) + COMBINE_FUNCTION(
+				FUNCTION_MULTICAST_DELEGATE_REMOVE_ALL_IMPLEMENTATION))),
+		static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),
+				CLASS_MULTICAST_DELEGATE_IMPLEMENTATION) + COMBINE_FUNCTION(
+				FUNCTION_MULTICAST_DELEGATE_CLEAR_IMPLEMENTATION))),
+		static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),
+				CLASS_MULTICAST_DELEGATE_IMPLEMENTATION) + COMBINE_FUNCTION(
+				FUNCTION_MULTICAST_DELEGATE_BROADCAST_IMPLEMENTATION))),
+		static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation));
 }
 
 void FMonoDomain::RegisterLog()
