@@ -1,5 +1,6 @@
 #include "Domain/FMonoDomain.h"
 #include "Domain/InternalCall/FArrayImplementation.h"
+#include "Domain/InternalCall/FDelegateImplementation.h"
 #include "Domain/InternalCall/FMonoInternalCall.h"
 #include "Domain/InternalCall/FPropertyImplementation.h"
 #include "Domain/InternalCall/FFunctionImplementation.h"
@@ -44,6 +45,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 	RegisterReflectionStructImplementation();
 
 	RegisterReflectionContainerImplementation();
+
+	RegisterReflectionDelegateImplementation();
 
 	RegisterLog();
 }
@@ -162,6 +165,11 @@ MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObje
                                         MonoObject** InExc) const
 {
 	return InFunction != nullptr ? mono_runtime_invoke(InFunction, InMonoObject, InParams, InExc) : nullptr;
+}
+
+MonoObject* FMonoDomain::Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams, MonoObject** InExc)
+{
+	return InDelegate != nullptr ? mono_runtime_delegate_invoke(InDelegate, InParams, InExc) : nullptr;
 }
 
 MonoClass* FMonoDomain::Object_Get_Class(MonoObject* InMonoObject)
@@ -598,6 +606,39 @@ void FMonoDomain::RegisterReflectionContainerImplementation()
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
 				COMBINE_FUNCTION(FUNCTION_SET_CONTAINS_IMPLEMENTATION))),
 		static_cast<void*>(FSetImplementation::Set_ContainsImplementation));
+}
+
+void FMonoDomain::RegisterReflectionDelegateImplementation()
+{
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE), CLASS_DELEGATE_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_DELEGATE_BIND_IMPLEMENTATION))),
+		static_cast<void*>(FDelegateImplementation::Delegate_BindImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE), CLASS_DELEGATE_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_DELEGATE_IS_BOUND_IMPLEMENTATION))),
+		static_cast<void*>(FDelegateImplementation::Delegate_IsBoundImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE), CLASS_DELEGATE_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_DELEGATE_UNBIND_IMPLEMENTATION))),
+		static_cast<void*>(FDelegateImplementation::Delegate_UnBindImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE), CLASS_DELEGATE_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_DELEGATE_CLEAR_IMPLEMENTATION))),
+		static_cast<void*>(FDelegateImplementation::Delegate_ClearImplementation));
+
+	FMonoInternalCall::RegisterInternalCall(
+		TCHAR_TO_ANSI(
+			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE), CLASS_DELEGATE_IMPLEMENTATION) +
+				COMBINE_FUNCTION(FUNCTION_DELEGATE_EXECUTE_IMPLEMENTATION))),
+		static_cast<void*>(FDelegateImplementation::Delegate_ExecuteImplementation));
 }
 
 void FMonoDomain::RegisterLog()

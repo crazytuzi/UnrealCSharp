@@ -51,6 +51,8 @@ public:
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;
 
+	MonoObject* Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams, MonoObject** InExc);
+
 	MonoClass* Object_Get_Class(MonoObject* InMonoObject);
 
 	MonoObject* Value_Box(MonoClass* InMonoClass, void* InValue) const;
@@ -99,6 +101,8 @@ private:
 	void RegisterReflectionStructImplementation();
 
 	void RegisterReflectionContainerImplementation();
+
+	void RegisterReflectionDelegateImplementation();
 
 	void RegisterLog();
 

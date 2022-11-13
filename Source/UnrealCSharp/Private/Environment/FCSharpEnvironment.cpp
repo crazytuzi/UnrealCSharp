@@ -26,6 +26,8 @@ void FCSharpEnvironment::Initialize()
 
 	ContainerRegistry = new FContainerRegistry();
 
+	DelegateRegistry = new FDelegateRegistry();
+
 	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
 		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
@@ -35,6 +37,13 @@ void FCSharpEnvironment::Deinitialize()
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
 		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+	}
+
+	if (DelegateRegistry != nullptr)
+	{
+		delete DelegateRegistry;
+
+		DelegateRegistry = nullptr;
 	}
 
 	if (ContainerRegistry != nullptr)
@@ -277,4 +286,14 @@ bool FCSharpEnvironment::AddContainerReference(void* InAddress, void* InContaine
 	return ContainerRegistry != nullptr
 		       ? ContainerRegistry->AddReference(InAddress, InContainer, InMonoObject)
 		       : nullptr;
+}
+
+MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InDelegate) const
+{
+	return DelegateRegistry != nullptr ? DelegateRegistry->GetObject(InDelegate) : nullptr;
+}
+
+bool FCSharpEnvironment::AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const
+{
+	return DelegateRegistry != nullptr ? DelegateRegistry->AddReference(InAddress, InDelegate, InMonoObject) : nullptr;
 }

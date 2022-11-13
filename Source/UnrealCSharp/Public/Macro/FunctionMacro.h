@@ -102,6 +102,16 @@
 
 #define FUNCTION_SET_CONTAINS_IMPLEMENTATION FString(TEXT("Set_ContainsImplementation"))
 
+#define FUNCTION_DELEGATE_BIND_IMPLEMENTATION FString(TEXT("Delegate_BindImplementation"))
+
+#define FUNCTION_DELEGATE_IS_BOUND_IMPLEMENTATION FString(TEXT("Delegate_IsBoundImplementation"))
+
+#define FUNCTION_DELEGATE_UNBIND_IMPLEMENTATION FString(TEXT("Delegate_UnBindImplementation"))
+
+#define FUNCTION_DELEGATE_CLEAR_IMPLEMENTATION FString(TEXT("Delegate_ClearImplementation"))
+
+#define FUNCTION_DELEGATE_EXECUTE_IMPLEMENTATION FString(TEXT("Delegate_ExecuteImplementation"))
+
 #define FUNCTION_ADD FString(TEXT("Add"))
 
 #define FUNCTION_CTOR FString(".ctor")

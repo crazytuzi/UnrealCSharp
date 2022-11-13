@@ -16,6 +16,8 @@
 
 #define CLASS_SET_IMPLEMENTATION FString(TEXT("SetImplementation"))
 
+#define CLASS_DELEGATE_IMPLEMENTATION FString(TEXT("DelegateImplementation"))
+
 #define CLASS_INT_PTR FString(TEXT("IntPtr"))
 
 #define CLASS_OBJECT_LIST FString(TEXT("ObjectList"))

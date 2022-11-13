@@ -4,6 +4,7 @@
 #include "Registry/FClassRegistry.h"
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FCSharpBind.h"
+#include "Registry/FDelegateRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
 
@@ -118,6 +119,29 @@ public:
 		return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference<T>(InContainer) : nullptr;
 	}
 
+public:
+	template <typename T>
+	T* GetDelegate(const void* InAddress) const
+	{
+		return DelegateRegistry != nullptr ? DelegateRegistry->GetDelegate<T>(InAddress) : nullptr;
+	}
+
+	MonoObject* GetDelegateObject(const void* InDelegate) const;
+
+	bool AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const;
+
+	template <typename T>
+	bool RemoveDelegateReference(const MonoObject* InMonoObject) const
+	{
+		return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InMonoObject) : nullptr;
+	}
+
+	template <typename T>
+	bool RemoveDelegateReference(const void* InDelegate) const
+	{
+		return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InDelegate) : nullptr;
+	}
+
 private:
 	static FCSharpEnvironment* Environment;
 
@@ -134,4 +158,6 @@ private:
 	FStructRegistry* StructRegistry;
 
 	FContainerRegistry* ContainerRegistry;
+
+	FDelegateRegistry* DelegateRegistry;
 };
