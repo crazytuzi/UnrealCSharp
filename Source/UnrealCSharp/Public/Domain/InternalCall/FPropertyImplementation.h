@@ -6,47 +6,31 @@
 class FPropertyImplementation
 {
 public:
-	PROPERTY_IMPLEMENTATION_DEFINE(Byte, uint8)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Byte, uint8)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(UInt16, uint16)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(UInt16, uint16)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(UInt32, uint32)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(UInt32, uint32)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(Int8, int8)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Int8, int8)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(Int16, int16)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Int16, int16)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(Int, int32)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Int, int32)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(Int64, int64)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Int64, int64)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(Bool, bool)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Bool, bool)
 
-	PROPERTY_IMPLEMENTATION_DEFINE(Float, float)
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Float, float)
 
-	static void GetObjectPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
-	                                            MonoObject** OutValue);
+	COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(Object, MonoObject)
 
-	SET_PROPERTY_IMPLEMENTATION_DEFINE(Object, MonoObject)
+	COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(Array, MonoObject)
 
-	// @TODO
+	PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Double, double)
 
-	static void GetArrayPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
-	                                           MonoObject** OutValue);
+	COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(Map, MonoObject)
 
-	SET_PROPERTY_IMPLEMENTATION_DEFINE(Array, MonoObject)
-
-	// @TODO
-
-	PROPERTY_IMPLEMENTATION_DEFINE(Double, double)
-
-	static void GetMapPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
-	                                         MonoObject** OutValue);
-
-	SET_PROPERTY_IMPLEMENTATION_DEFINE(Map, MonoObject)
-
-	static void GetSetPropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName,
-	                                         MonoObject** OutValue);
-
-	SET_PROPERTY_IMPLEMENTATION_DEFINE(Set, MonoObject)
+	COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(Set, MonoObject)
 };

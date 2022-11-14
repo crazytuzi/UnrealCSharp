@@ -3,28 +3,28 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FMapHelper.h"
 
-void FMapImplementation::RegisterMapImplementation(MonoObject InMonoObject, MonoReflectionType* InKeyReflectionType,
-                                                   MonoReflectionType* InValueReflectionType)
+void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+                                                    MonoReflectionType* InValueReflectionType)
 {
-	FCSharpEnvironment::GetEnvironment()->Bind(&InMonoObject, InKeyReflectionType, InValueReflectionType);
+	FCSharpEnvironment::GetEnvironment()->Bind(InMonoObject, InKeyReflectionType, InValueReflectionType);
 }
 
-void FMapImplementation::UnRegisterMapImplementation(MonoObject InMonoObject)
+void FMapImplementation::Map_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference<FMapHelper>(&InMonoObject);
+	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference<FMapHelper>(InMonoObject);
 }
 
-void FMapImplementation::Map_EmptyImplementation(MonoObject InMonoObject, const int32 InExpectedNumElements)
+void FMapImplementation::Map_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		return MapHelper->Empty(InExpectedNumElements);
 	}
 }
 
-int32 FMapImplementation::Map_NumImplementation(MonoObject InMonoObject)
+int32 FMapImplementation::Map_NumImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		return MapHelper->Num();
 	}
@@ -32,17 +32,17 @@ int32 FMapImplementation::Map_NumImplementation(MonoObject InMonoObject)
 	return 0;
 }
 
-void FMapImplementation::Map_AddImplementation(MonoObject InMonoObject, void* InKey, void* InValue)
+void FMapImplementation::Map_AddImplementation(const MonoObject* InMonoObject, void* InKey, void* InValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		MapHelper->Add(&InKey, &InValue);
 	}
 }
 
-int32 FMapImplementation::Map_RemoveImplementation(MonoObject InMonoObject, void* InKey)
+int32 FMapImplementation::Map_RemoveImplementation(const MonoObject* InMonoObject, void* InKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		return MapHelper->Remove(&InKey);
 	}
@@ -50,9 +50,9 @@ int32 FMapImplementation::Map_RemoveImplementation(MonoObject InMonoObject, void
 	return 0;
 }
 
-void FMapImplementation::Map_FindKeyImplementation(MonoObject InMonoObject, void* InValue, MonoObject** OutKey)
+void FMapImplementation::Map_FindKeyImplementation(const MonoObject* InMonoObject, void* InValue, MonoObject** OutKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		const auto Key = MapHelper->FindKey(&InValue);
 
@@ -68,9 +68,9 @@ void FMapImplementation::Map_FindKeyImplementation(MonoObject InMonoObject, void
 	}
 }
 
-void FMapImplementation::Map_FindImplementation(MonoObject InMonoObject, void* InKey, MonoObject** OutValue)
+void FMapImplementation::Map_FindImplementation(const MonoObject* InMonoObject, void* InKey, MonoObject** OutValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		const auto Value = MapHelper->Find(&InKey);
 
@@ -86,9 +86,9 @@ void FMapImplementation::Map_FindImplementation(MonoObject InMonoObject, void* I
 	}
 }
 
-bool FMapImplementation::Map_ContainsImplementation(MonoObject InMonoObject, const void* InKey)
+bool FMapImplementation::Map_ContainsImplementation(const MonoObject* InMonoObject, const void* InKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		return MapHelper->Contains(&InKey);
 	}
@@ -96,9 +96,9 @@ bool FMapImplementation::Map_ContainsImplementation(MonoObject InMonoObject, con
 	return false;
 }
 
-void FMapImplementation::Map_GetImplementation(MonoObject InMonoObject, void* InKey, MonoObject** OutValue)
+void FMapImplementation::Map_GetImplementation(const MonoObject* InMonoObject, void* InKey, MonoObject** OutValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		const auto Value = MapHelper->Get(&InKey);
 
@@ -114,9 +114,9 @@ void FMapImplementation::Map_GetImplementation(MonoObject InMonoObject, void* In
 	}
 }
 
-void FMapImplementation::Map_SetImplementation(MonoObject InMonoObject, void* InKey, void* InValue)
+void FMapImplementation::Map_SetImplementation(const MonoObject* InMonoObject, void* InKey, void* InValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(&InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		MapHelper->Set(&InKey, &InValue);
 	}

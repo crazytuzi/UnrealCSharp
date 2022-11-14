@@ -166,15 +166,11 @@ void FPropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FPropertyDescriptor::Get(void* Src, void* Dest) const
 {
+	Get(Src, static_cast<void**>(Dest));
 }
 
 void FPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-}
-
-FProperty* FPropertyDescriptor::GetProperty() const
-{
-	return Property;
 }
 
 bool FPropertyDescriptor::IsPrimitiveProperty() const

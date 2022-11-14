@@ -7,7 +7,7 @@
 #include "Listener/FUObjectListener.h"
 #include "Modules/ModuleManager.h"
 
-class FUnrealCSharpModule : public IModuleInterface
+class FUnrealCSharpModule final: public IModuleInterface
 {
 public:
 	/** IModuleInterface implementation */

@@ -3,13 +3,13 @@ using Script.Engine;
 
 namespace Script.Reflection.Container
 {
-    public class MapUtils
+    public static class MapUtils
     {
-        public static void RegisterMap<TKey, TValue>(TMap<TKey, TValue> InMap, Type InKeyType, Type InValueType) =>
-            MapImplementation.RegisterMapImplementation(InMap, InKeyType, InValueType);
+        public static void Map_Register<TKey, TValue>(TMap<TKey, TValue> InMap, Type InKeyType, Type InValueType) =>
+            MapImplementation.Map_RegisterImplementation(InMap, InKeyType, InValueType);
 
-        public static void UnRegisterMap<TKey, TValue>(TMap<TKey, TValue> InMap) =>
-            MapImplementation.UnRegisterMapImplementation(InMap);
+        public static void Map_UnRegister<TKey, TValue>(TMap<TKey, TValue> InMap) =>
+            MapImplementation.Map_UnRegisterImplementation(InMap);
 
         public static void Map_Empty<TKey, TValue>(TMap<TKey, TValue> InMap, Int32 InExpectedNumElements) =>
             MapImplementation.Map_EmptyImplementation(InMap, InExpectedNumElements);

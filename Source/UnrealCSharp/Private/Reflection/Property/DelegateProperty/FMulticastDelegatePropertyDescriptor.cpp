@@ -41,11 +41,3 @@ void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 		}
 	}
 }
-
-void FMulticastDelegatePropertyDescriptor::Get(void* Src, void* Dest) const
-{
-	if (StructProperty != nullptr)
-	{
-		Get(Src, static_cast<void**>(Dest));
-	}
-}

@@ -2,10 +2,10 @@
 #include "Environment/FCSharpEnvironment.h"
 
 void FFunctionImplementation::CallReflectionMemberFunctionImplementation(
-	const MonoObject& InMonoObject, const UTF16CHAR* InFunctionName, MonoObject** ReturnValue, MonoObject** OutValue,
+	const MonoObject* InMonoObject, const UTF16CHAR* InFunctionName, MonoObject** ReturnValue, MonoObject** OutValue,
 	MonoArray* InValue)
 {
-	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(&InMonoObject))
+	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject))
 	{
 		const auto FunctionName = StringCast<TCHAR>(InFunctionName + 10).Get();
 

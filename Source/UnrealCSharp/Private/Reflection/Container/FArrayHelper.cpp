@@ -42,14 +42,9 @@ void FArrayHelper::Deinitialize()
 
 	if (InnerPropertyDescriptor != nullptr)
 	{
-		if (auto InnerProperty = InnerPropertyDescriptor->GetProperty())
+		if (bNeedFree)
 		{
-			if (bNeedFree)
-			{
-				delete InnerProperty;
-
-				InnerProperty = nullptr;
-			}
+			InnerPropertyDescriptor->DestroyProperty();
 		}
 
 		delete InnerPropertyDescriptor;
@@ -60,7 +55,7 @@ void FArrayHelper::Deinitialize()
 
 int32 FArrayHelper::GetTypeSize() const
 {
-	return InnerPropertyDescriptor->GetProperty()->GetSize();
+	return InnerPropertyDescriptor->GetSize();
 }
 
 int32 FArrayHelper::GetSlack() const
@@ -117,8 +112,7 @@ int32 FArrayHelper::Find(const void* InValue) const
 	{
 		const auto Item = ScriptArrayHelper.GetRawPtr(Index);
 
-		// @TODO
-		if (InnerPropertyDescriptor->GetProperty()->Identical(Item, InValue))
+		if (InnerPropertyDescriptor->Identical(Item, InValue))
 		{
 			return Index;
 		}
@@ -135,8 +129,7 @@ int32 FArrayHelper::FindLast(const void* InValue) const
 	{
 		const auto Item = ScriptArrayHelper.GetRawPtr(Index);
 
-		// @TODO
-		if (InnerPropertyDescriptor->GetProperty()->Identical(Item, InValue))
+		if (InnerPropertyDescriptor->Identical(Item, InValue))
 		{
 			return Index;
 		}
@@ -153,8 +146,7 @@ bool FArrayHelper::Contains(const void* InValue) const
 	{
 		const auto Item = ScriptArrayHelper.GetRawPtr(Index);
 
-		// @TODO
-		if (InnerPropertyDescriptor->GetProperty()->Identical(Item, InValue))
+		if (InnerPropertyDescriptor->Identical(Item, InValue))
 		{
 			return true;
 		}
@@ -172,8 +164,7 @@ int32 FArrayHelper::AddUninitialized(const int32 InCount) const
 
 void FArrayHelper::InsertZeroed(const int32 InIndex, const int32 InCount) const
 {
-	// @TODO
-	ScriptArray->InsertZeroed(InIndex, InCount, InnerPropertyDescriptor->GetProperty()->GetSize());
+	ScriptArray->InsertZeroed(InIndex, InCount, InnerPropertyDescriptor->GetSize());
 }
 
 void FArrayHelper::InsertDefaulted(const int32 InIndex, const int32 InCount) const
@@ -191,8 +182,7 @@ void FArrayHelper::RemoveAt(const int32 InIndex, const int32 InCount, const bool
 
 	if (bAllowShrinking)
 	{
-		// @TODO
-		ScriptArray->Shrink(InnerPropertyDescriptor->GetProperty()->GetSize());
+		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize());
 	}
 }
 
@@ -220,8 +210,7 @@ void FArrayHelper::SetNum(const int32 InNewNum, const bool bAllowShrinking) cons
 
 	if (bAllowShrinking)
 	{
-		// @TODO
-		ScriptArray->Shrink(InnerPropertyDescriptor->GetProperty()->GetSize());
+		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize());
 	}
 }
 
@@ -238,8 +227,7 @@ int32 FArrayHelper::Add(void* InValue) const
 
 int32 FArrayHelper::AddZeroed(const int32 InCount) const
 {
-	// @TODO
-	return ScriptArray->AddZeroed(InCount, InnerPropertyDescriptor->GetProperty()->GetSize());
+	return ScriptArray->AddZeroed(InCount, InnerPropertyDescriptor->GetSize());
 }
 
 int32 FArrayHelper::AddUnique(void* InValue) const
@@ -257,8 +245,7 @@ int32 FArrayHelper::RemoveSingle(const void* InValue) const
 	{
 		const auto Item = ScriptArrayHelper.GetRawPtr(Index);
 
-		// @TODO
-		if (InnerPropertyDescriptor->GetProperty()->Identical(Item, InValue))
+		if (InnerPropertyDescriptor->Identical(Item, InValue))
 		{
 			RemoveAt(Index, 1, true);
 
@@ -291,14 +278,12 @@ int32 FArrayHelper::Remove(const void* InValue) const
 
 void FArrayHelper::SwapMemory(const int32 InFirstIndexToSwap, const int32 InSecondIndexToSwap) const
 {
-	// @TODO
-	ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetProperty()->GetSize());
+	ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetSize());
 }
 
 void FArrayHelper::Swap(const int32 InFirstIndexToSwap, const int32 InSecondIndexToSwap) const
 {
-	// @TODO
-	ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetProperty()->GetSize());
+	ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetSize());
 }
 
 bool FArrayHelper::IsPrimitiveProperty() const

@@ -5,17 +5,17 @@
 class FSetImplementation
 {
 public:
-	static void RegisterSetImplementation(MonoObject InMonoObject, MonoReflectionType* InReflectionType);
+	static void Set_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
 
-	static void UnRegisterSetImplementation(MonoObject InMonoObject);
+	static void Set_UnRegisterImplementation(const MonoObject* InMonoObject);
 
-	static void Set_EmptyImplementation(MonoObject InMonoObject, int32 InExpectedNumElements);
+	static void Set_EmptyImplementation(const MonoObject* InMonoObject, int32 InExpectedNumElements);
 
-	static int32 Set_NumImplementation(MonoObject InMonoObject);
+	static int32 Set_NumImplementation(const MonoObject* InMonoObject);
 
-	static void Set_AddImplementation(MonoObject InMonoObject, void* InElement);
+	static void Set_AddImplementation(const MonoObject* InMonoObject, void* InElement);
 
-	static int32 Set_RemoveImplementation(MonoObject InMonoObject, void* InKey);
+	static int32 Set_RemoveImplementation(const MonoObject* InMonoObject, void* InKey);
 
-	static bool Set_ContainsImplementation(MonoObject InMonoObject, const void* InKey);
+	static bool Set_ContainsImplementation(const MonoObject* InMonoObject, const void* InKey);
 };

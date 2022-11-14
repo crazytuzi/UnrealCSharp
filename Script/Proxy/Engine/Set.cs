@@ -5,13 +5,13 @@ namespace Script.Engine
 {
     public class TSet<T>
     {
-        public TSet() => SetUtils.RegisterSet(this, typeof(T));
+        public TSet() => SetUtils.Set_Register(this, typeof(T));
 
         protected TSet(Type InValue)
         {
         }
 
-        ~TSet() => SetUtils.UnRegisterSet(this);
+        ~TSet() => SetUtils.Set_UnRegister(this);
 
         public void Empty(Int32 InExpectedNumElements = 0) => SetUtils.Set_Empty(this, InExpectedNumElements);
 

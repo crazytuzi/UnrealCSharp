@@ -5,7 +5,7 @@
 class FDelegateImplementation
 {
 public:
-	static void Delegate_BindImplementation(const void* InAddress, MonoObject InDelegate);
+	static void Delegate_BindImplementation(const void* InAddress, MonoObject* InDelegate);
 
 	static bool Delegate_IsBoundImplementation(const void* InAddress);
 

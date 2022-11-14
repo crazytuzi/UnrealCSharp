@@ -32,14 +32,6 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 	}
 }
 
-void FStructPropertyDescriptor::Get(void* Src, void* Dest) const
-{
-	if (StructProperty != nullptr)
-	{
-		Get(Src, static_cast<void**>(Dest));
-	}
-}
-
 void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (StructProperty != nullptr)

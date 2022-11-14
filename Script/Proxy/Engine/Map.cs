@@ -5,15 +5,15 @@ namespace Script.Engine
 {
     public class TMap<TKey, TValue>
     {
-        public TMap() => MapUtils.RegisterMap(this, typeof(TKey), typeof(TValue));
+        public TMap() => MapUtils.Map_Register(this, typeof(TKey), typeof(TValue));
 
         protected TMap(Type InKeyType, Type InValueType)
         {
         }
 
-        ~TMap() => MapUtils.UnRegisterMap(this);
+        ~TMap() => MapUtils.Map_UnRegister(this);
 
-        public void Empty(Int32 InExpectedNumElements) => MapUtils.Map_Empty(this, InExpectedNumElements);
+        public void Empty(Int32 InExpectedNumElements = 0) => MapUtils.Map_Empty(this, InExpectedNumElements);
 
         public Int32 Num() => MapUtils.Map_Num(this);
 

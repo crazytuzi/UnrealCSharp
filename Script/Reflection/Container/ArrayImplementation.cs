@@ -7,10 +7,10 @@ namespace Script.Reflection.Container
     public static class ArrayImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void RegisterArrayImplementation<T>(TArray<T> InArray, Type InType);
+        public static extern void Array_RegisterImplementation<T>(TArray<T> InArray, Type InType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UnRegisterArrayImplementation<T>(TArray<T> InArray);
+        public static extern void Array_UnRegisterImplementation<T>(TArray<T> InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Array_GetTypeSizeImplementation<T>(TArray<T> InArray);

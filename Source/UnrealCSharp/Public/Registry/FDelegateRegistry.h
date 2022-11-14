@@ -16,61 +16,18 @@ public:
 
 public:
 	template <typename T>
-	auto GetDelegate(const void* InAddress)
-	{
-		const auto FoundDelegate = Address2DelegateMap.Find(InAddress);
-
-		return FoundDelegate != nullptr ? static_cast<T*>(*FoundDelegate) : nullptr;
-	}
+	auto GetDelegate(const void* InAddress);
 
 	template <typename T>
-	MonoObject* GetObject(const T* InDelegate)
-	{
-		const auto FoundMonoObject = Delegate2MonoObjectMap.Find(InDelegate);
-
-		return FoundMonoObject != nullptr ? *FoundMonoObject : nullptr;
-	}
+	auto GetObject(const T* InDelegate);
 
 	bool AddReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject);
 
 	template <typename T>
-	bool RemoveReference(const MonoObject* InMonoObject)
-	{
-		if (const auto FoundDelegate = MonoObject2DelegateMap.Find(InMonoObject))
-		{
-			Delegate2MonoObjectMap.Remove(FoundDelegate);
-
-			delete static_cast<T*>(*FoundDelegate);
-
-			MonoObject2DelegateMap.Remove(InMonoObject);
-
-			return true;
-		}
-
-		return false;
-	}
+	auto RemoveReference(const MonoObject* InMonoObject);
 
 	template <typename T>
-	bool RemoveReference(const void* InAddress)
-	{
-		if (const auto FoundDelegate = Address2DelegateMap.Find(InAddress))
-		{
-			Address2DelegateMap.Remove(InAddress);
-
-			if (const auto FoundMonoObject = Delegate2MonoObjectMap.Find(FoundDelegate))
-			{
-				MonoObject2DelegateMap.Remove(*FoundMonoObject);
-			}
-
-			Delegate2MonoObjectMap.Remove(FoundDelegate);
-
-			delete static_cast<T*>(*FoundDelegate);
-
-			return true;
-		}
-
-		return false;
-	}
+	auto RemoveReference(const void* InAddress);
 
 private:
 	TMap<MonoObject*, void*> MonoObject2DelegateMap;
@@ -79,3 +36,5 @@ private:
 
 	TMap<void*, void*> Address2DelegateMap;
 };
+
+#include "FDelegateRegistry.inl"

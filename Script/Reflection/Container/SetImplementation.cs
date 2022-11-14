@@ -4,13 +4,13 @@ using Script.Engine;
 
 namespace Script.Reflection.Container
 {
-    public class SetImplementation
+    public static class SetImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void RegisterSetImplementation<T>(TSet<T> InSet, Type InType);
+        public static extern void Set_RegisterImplementation<T>(TSet<T> InSet, Type InType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UnRegisterSetImplementation<T>(TSet<T> InSet);
+        public static extern void Set_UnRegisterImplementation<T>(TSet<T> InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Set_EmptyImplementation<T>(TSet<T> InSet, Int32 InExpectedNumElements);

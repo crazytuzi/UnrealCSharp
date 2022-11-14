@@ -5,7 +5,7 @@
 class FFunctionImplementation
 {
 public:
-	static void CallReflectionMemberFunctionImplementation(const MonoObject& InMonoObject,
+	static void CallReflectionMemberFunctionImplementation(const MonoObject* InMonoObject,
 	                                                       const UTF16CHAR* InFunctionName, MonoObject** ReturnValue,
 	                                                       MonoObject** OutValue, MonoArray* InValue);
 

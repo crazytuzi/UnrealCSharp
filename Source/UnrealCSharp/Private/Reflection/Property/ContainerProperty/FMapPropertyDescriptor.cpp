@@ -29,16 +29,18 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 			const auto FoundKeyGenericMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 				FoundKeyGenericMonoClass);
 
-			const auto FoundKeyGenericReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
-				FoundKeyGenericMonoType);
+			const auto FoundKeyGenericReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+				Type_Get_Object(
+					FoundKeyGenericMonoType);
 
 			const auto FoundValueGenericMonoClass = FTypeBridge::GetMonoClass(MapProperty->ValueProp);
 
 			const auto FoundValueGenericMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 				FoundValueGenericMonoClass);
 
-			const auto FoundValueGenericReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
-				FoundValueGenericMonoType);
+			const auto FoundValueGenericReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+				Type_Get_Object(
+					FoundValueGenericMonoType);
 
 			void* InParams[2];
 
@@ -57,7 +59,8 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_CONTAINER_UTILS);
 
 			const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-				Class_Get_Method_From_Name(ContainerUtilsMonoClass,FUNCTION_MAKE_GENERIC_TYPE_INSTANCE, 2);
+				Class_Get_Method_From_Name(ContainerUtilsMonoClass,FUNCTION_CONTAINER_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
+				                           2);
 
 			const auto GenericClassMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
 				CreateGenericTypeMethod, nullptr, InParams, nullptr);
@@ -67,7 +70,7 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 
 			auto FoundArrayReflectionTypeParam = static_cast<void*>(FoundMapReflectionType);
 
-			FMapHelper* MapHelper = new FMapHelper(MapProperty->KeyProp, MapProperty->ValueProp, Src);
+			const auto MapHelper = new FMapHelper(MapProperty->KeyProp, MapProperty->ValueProp, Src);
 
 			*Dest = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
 				GenericClassMonoClass, 2, &FoundArrayReflectionTypeParam));
@@ -79,14 +82,6 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 		{
 			*Dest = FCSharpEnvironment::GetEnvironment()->GetContainerObject(SrcMapProperty);
 		}
-	}
-}
-
-void FMapPropertyDescriptor::Get(void* Src, void* Dest) const
-{
-	if (MapProperty != nullptr)
-	{
-		Get(Src, static_cast<void**>(Dest));
 	}
 }
 

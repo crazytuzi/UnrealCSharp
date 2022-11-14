@@ -20,14 +20,6 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest) const
 	}
 }
 
-void FTextPropertyDescriptor::Get(void* Src, void* Dest) const
-{
-	if (TextProperty != nullptr)
-	{
-		Get(Src, static_cast<void**>(Dest));
-	}
-}
-
 void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (TextProperty != nullptr)

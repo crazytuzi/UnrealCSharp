@@ -5,7 +5,7 @@
 class FStructImplementation
 {
 public:
-	static void RegisterStructImplementation(MonoObject InMonoObject, const UTF16CHAR* InStructName);
+	static void Struct_RegisterImplementation(MonoObject* InMonoObject, const UTF16CHAR* InStructName);
 
-	static void UnRegisterStructImplementation(MonoObject InMonoObject);
+	static void Struct_UnRegisterImplementation(const MonoObject* InMonoObject);
 };

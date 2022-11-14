@@ -20,14 +20,6 @@ void FNamePropertyDescriptor::Get(void* Src, void** Dest) const
 	}
 }
 
-void FNamePropertyDescriptor::Get(void* Src, void* Dest) const
-{
-	if (NameProperty != nullptr)
-	{
-		Get(Src, static_cast<void**>(Dest));
-	}
-}
-
 void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (NameProperty != nullptr)

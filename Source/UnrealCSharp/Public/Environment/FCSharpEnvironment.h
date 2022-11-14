@@ -39,10 +39,7 @@ public:
 	bool Bind(UObject* Object) const;
 
 	template <typename T>
-	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const
-	{
-		return FCSharpBind::Bind<T>(InMonoObject, InReflectionType);
-	}
+	auto Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const;
 
 	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	          MonoReflectionType* InValueReflectionType) const;
@@ -90,57 +87,36 @@ public:
 
 public:
 	template <typename T>
-	T* GetContainer(const MonoObject* InMonoObject) const
-	{
-		return ContainerRegistry != nullptr ? ContainerRegistry->GetContainer<T>(InMonoObject) : nullptr;
-	}
+	auto GetContainer(const MonoObject* InMonoObject) const;
 
 	template <typename T>
-	T* GetContainer(const void* InAddress) const
-	{
-		return ContainerRegistry != nullptr ? ContainerRegistry->GetContainer<T>(InAddress) : nullptr;
-	}
+	auto GetContainer(const void* InAddress) const;
 
-	MonoObject* GetContainerObject(void* InContainer);
+	MonoObject* GetContainerObject(const void* InContainer) const;
 
 	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject) const;
 
 	bool AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const;
 
 	template <typename T>
-	bool RemoveContainerReference(const MonoObject* InMonoObject) const
-	{
-		return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference<T>(InMonoObject) : nullptr;
-	}
+	auto RemoveContainerReference(const MonoObject* InMonoObject) const;
 
 	template <typename T>
-	bool RemoveContainerReference(const void* InContainer) const
-	{
-		return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference<T>(InContainer) : nullptr;
-	}
+	auto RemoveContainerReference(const void* InContainer) const;
 
 public:
 	template <typename T>
-	T* GetDelegate(const void* InAddress) const
-	{
-		return DelegateRegistry != nullptr ? DelegateRegistry->GetDelegate<T>(InAddress) : nullptr;
-	}
+	auto GetDelegate(const void* InAddress) const;
 
 	MonoObject* GetDelegateObject(const void* InDelegate) const;
 
 	bool AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const;
 
 	template <typename T>
-	bool RemoveDelegateReference(const MonoObject* InMonoObject) const
-	{
-		return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InMonoObject) : nullptr;
-	}
+	auto RemoveDelegateReference(const MonoObject* InMonoObject) const;
 
 	template <typename T>
-	bool RemoveDelegateReference(const void* InDelegate) const
-	{
-		return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InDelegate) : nullptr;
-	}
+	auto RemoveDelegateReference(const void* InDelegate) const;
 
 private:
 	static FCSharpEnvironment* Environment;
@@ -161,3 +137,5 @@ private:
 
 	FDelegateRegistry* DelegateRegistry;
 };
+
+#include "FCSharpEnvironment.inl"

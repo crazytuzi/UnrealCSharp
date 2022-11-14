@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Script.Engine;
 
@@ -44,8 +43,8 @@ namespace Script.Reflection.Property
             out Int32 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void
-            SetIntPropertyImplementation(Object InMonoObject, string InPropertyName, Int32 InValue);
+        public static extern void SetIntPropertyImplementation(Object InMonoObject, string InPropertyName,
+            Int32 InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetInt64PropertyImplementation(Object InMonoObject, string InPropertyName,
@@ -78,8 +77,6 @@ namespace Script.Reflection.Property
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetObjectPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
             T InValue);
-
-        // @TODO
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetArrayPropertyImplementation<T>(Object InMonoObject, string InPropertyName,

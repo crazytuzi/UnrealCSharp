@@ -12,7 +12,7 @@ namespace Script.Reflection.Delegate
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern unsafe Boolean MulticastDelegate_ContainsImplementation<T>(void* InAddress,
-            T InMulticastDelegate);
+            T InMulticastDelegate) where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern unsafe void MulticastDelegate_AddImplementation<T>(void* InAddress, T InMulticastDelegate)

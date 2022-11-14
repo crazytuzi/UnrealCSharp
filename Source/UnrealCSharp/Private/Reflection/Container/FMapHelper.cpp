@@ -50,14 +50,9 @@ void FMapHelper::Deinitialize()
 
 	if (KeyPropertyDescriptor != nullptr)
 	{
-		if (auto KeyProperty = KeyPropertyDescriptor->GetProperty())
+		if (bNeedFree)
 		{
-			if (bNeedFree)
-			{
-				delete KeyProperty;
-
-				KeyProperty = nullptr;
-			}
+			KeyPropertyDescriptor->DestroyProperty();
 		}
 
 		delete KeyPropertyDescriptor;
@@ -67,14 +62,9 @@ void FMapHelper::Deinitialize()
 
 	if (ValuePropertyDescriptor != nullptr)
 	{
-		if (auto ValueProperty = ValuePropertyDescriptor->GetProperty())
+		if (bNeedFree)
 		{
-			if (bNeedFree)
-			{
-				delete ValueProperty;
-
-				ValueProperty = nullptr;
-			}
+			ValuePropertyDescriptor->DestroyProperty();
 		}
 
 		delete ValuePropertyDescriptor;
@@ -108,12 +98,11 @@ int32 FMapHelper::Remove(const void* InKey) const
 		                                            ScriptMapLayout,
 		                                            [this](const void* ElementKey)
 		                                            {
-			                                            return KeyPropertyDescriptor->GetProperty()->GetValueTypeHash(
-				                                            ElementKey);
+			                                            return KeyPropertyDescriptor->GetValueTypeHash(ElementKey);
 		                                            },
 		                                            [this](const void* A, const void* B)
 		                                            {
-			                                            return KeyPropertyDescriptor->GetProperty()->Identical(A, B);
+			                                            return KeyPropertyDescriptor->Identical(A, B);
 		                                            }
 		);
 
@@ -128,14 +117,12 @@ int32 FMapHelper::Remove(const void* InKey) const
 
 		if (!KeyPropertyDescriptor->IsPrimitiveProperty())
 		{
-			// @TODO
-			KeyPropertyDescriptor->GetProperty()->DestroyValue(Data);
+			KeyPropertyDescriptor->DestroyValue(Data);
 		}
 
 		if (!ValuePropertyDescriptor->IsPrimitiveProperty())
 		{
-			// @TODO
-			ValuePropertyDescriptor->GetProperty()->DestroyValue(Data + ScriptMapLayout.ValueOffset);
+			ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
 		}
 
 		ScriptMap->RemoveAt(Index, ScriptMapLayout);
@@ -153,7 +140,7 @@ void* FMapHelper::FindKey(const void* InValue) const
 		{
 			const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
 
-			if (ValuePropertyDescriptor->GetProperty()->Identical(Data + ScriptMapLayout.ValueOffset, InValue))
+			if (ValuePropertyDescriptor->Identical(Data + ScriptMapLayout.ValueOffset, InValue))
 			{
 				return Data;
 			}
@@ -179,13 +166,11 @@ void* FMapHelper::Get(const void* InKey) const
 	                            ScriptMapLayout,
 	                            [this](const void* ElementKey)
 	                            {
-		                            // @TODO
-		                            return KeyPropertyDescriptor->GetProperty()->GetValueTypeHash(ElementKey);
+		                            return KeyPropertyDescriptor->GetValueTypeHash(ElementKey);
 	                            },
 	                            [this](const void* A, const void* B)
 	                            {
-		                            // @TODO
-		                            return KeyPropertyDescriptor->GetProperty()->Identical(A, B);
+		                            return KeyPropertyDescriptor->Identical(A, B);
 	                            });
 }
 
@@ -197,25 +182,21 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 		ScriptMapLayout,
 		[this](const void* ElementKey)
 		{
-			// @TODO
-			return KeyPropertyDescriptor->GetProperty()->GetValueTypeHash(ElementKey);
+			return KeyPropertyDescriptor->GetValueTypeHash(ElementKey);
 		},
 		[this](const void* A, const void* B)
 		{
-			// @TODO
-			return KeyPropertyDescriptor->GetProperty()->Identical(A, B);
+			return KeyPropertyDescriptor->Identical(A, B);
 		},
 		[this, InKey](void* NewElementKey)
 		{
-			// @TODO
-			KeyPropertyDescriptor->GetProperty()->InitializeValue_InContainer(NewElementKey);
+			KeyPropertyDescriptor->InitializeValue_InContainer(NewElementKey);
 
 			KeyPropertyDescriptor->Set(InKey, NewElementKey);
 		},
 		[this, InValue](void* NewElementValue)
 		{
-			// @TODO
-			ValuePropertyDescriptor->GetProperty()->InitializeValue_InContainer(NewElementValue);
+			ValuePropertyDescriptor->InitializeValue_InContainer(NewElementValue);
 
 			ValuePropertyDescriptor->Set(InValue, NewElementValue);
 		},
@@ -228,8 +209,7 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 			// @TODO
 			if (!KeyPropertyDescriptor->IsPrimitiveProperty())
 			{
-				// @TODO
-				KeyPropertyDescriptor->GetProperty()->DestroyValue(ElementKey);
+				KeyPropertyDescriptor->DestroyValue(ElementKey);
 			}
 		},
 		[this](void* ElementValue)
@@ -237,8 +217,7 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 			// @TODO
 			if (!ValuePropertyDescriptor->IsPrimitiveProperty())
 			{
-				// @TODO
-				ValuePropertyDescriptor->GetProperty()->DestroyValue(ElementValue);
+				ValuePropertyDescriptor->DestroyValue(ElementValue);
 			}
 		}
 	);

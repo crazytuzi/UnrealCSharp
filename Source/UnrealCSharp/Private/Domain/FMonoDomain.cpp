@@ -97,7 +97,8 @@ MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass, const int32 InParamC
 	{
 		if (const auto NewMonoObject = mono_object_new(Domain, InMonoClass))
 		{
-			if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_CTOR, InParamCount))
+			if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_OBJECT_CONSTRUCTOR,
+			                                                        InParamCount))
 			{
 				Runtime_Invoke(FoundMethod, NewMonoObject, InParams, nullptr);
 
@@ -299,11 +300,7 @@ void FMonoDomain::RegisterReflectionPropertyImplementation()
 
 	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Object)
 
-	// @TODO
-
 	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Array)
-
-	// @TODO
 
 	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Double)
 
@@ -317,13 +314,13 @@ void FMonoDomain::RegisterReflectionFunctionImplementation()
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_FUNCTION_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_CALL_REFLECTION_MEMBER_FUNCTION_IMPLEMENTATION))),
+				COMBINE_FUNCTION(FUNCTION_FUNCTION_REFLECTION_MEMBER_IMPLEMENTATION))),
 		static_cast<void*>(FFunctionImplementation::CallReflectionMemberFunctionImplementation));
 
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_FUNCTION_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_CALL_REFLECTION_STATIC_FUNCTION_IMPLEMENTATION))),
+				COMBINE_FUNCTION(FUNCTION_FUNCTION_REFLECTION_STATIC_IMPLEMENTATION))),
 		static_cast<void*>(FFunctionImplementation::CallReflectionStaticFunctionImplementation));
 }
 
@@ -332,14 +329,14 @@ void FMonoDomain::RegisterReflectionStructImplementation()
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_STRUCT), CLASS_STRUCT_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_REGISTER_STRUCT_IMPLEMENTATION))),
-		static_cast<void*>(FStructImplementation::RegisterStructImplementation));
+				COMBINE_FUNCTION(FUNCTION_STRUCT_REGISTER_IMPLEMENTATION))),
+		static_cast<void*>(FStructImplementation::Struct_RegisterImplementation));
 
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_STRUCT), CLASS_STRUCT_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_UNREGISTER_STRUCT_IMPLEMENTATION))),
-		static_cast<void*>(FStructImplementation::UnRegisterStructImplementation));
+				COMBINE_FUNCTION(FUNCTION_STRUCT_UNREGISTER_IMPLEMENTATION))),
+		static_cast<void*>(FStructImplementation::Struct_UnRegisterImplementation));
 }
 
 void FMonoDomain::RegisterReflectionContainerImplementation()
@@ -347,14 +344,14 @@ void FMonoDomain::RegisterReflectionContainerImplementation()
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_REGISTER_ARRAY_IMPLEMENTATION))),
-		static_cast<void*>(FArrayImplementation::RegisterArrayImplementation));
+				COMBINE_FUNCTION(FUNCTION_ARRAY_REGISTER_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_RegisterImplementation));
 
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_ARRAY_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_UNREGISTER_ARRAY_IMPLEMENTATION))),
-		static_cast<void*>(FArrayImplementation::UnRegisterArrayImplementation));
+				COMBINE_FUNCTION(FUNCTION_ARRAY_UNREGISTER_IMPLEMENTATION))),
+		static_cast<void*>(FArrayImplementation::Array_UnRegisterImplementation));
 
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
@@ -503,14 +500,14 @@ void FMonoDomain::RegisterReflectionContainerImplementation()
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_REGISTER_MAP_IMPLEMENTATION))),
-		static_cast<void*>(FMapImplementation::RegisterMapImplementation));
+				COMBINE_FUNCTION(FUNCTION_MAP_REGISTER_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_RegisterImplementation));
 
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_MAP_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_UNREGISTER_MAP_IMPLEMENTATION))),
-		static_cast<void*>(FMapImplementation::UnRegisterMapImplementation));
+				COMBINE_FUNCTION(FUNCTION_MAP_UNREGISTER_IMPLEMENTATION))),
+		static_cast<void*>(FMapImplementation::Map_UnRegisterImplementation));
 
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
@@ -569,14 +566,14 @@ void FMonoDomain::RegisterReflectionContainerImplementation()
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_REGISTER_SET_IMPLEMENTATION))),
-		static_cast<void*>(FSetImplementation::RegisterSetImplementation));
+				COMBINE_FUNCTION(FUNCTION_SET_REGISTER_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::Set_RegisterImplementation));
 
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
 			*(COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_SET_IMPLEMENTATION) +
-				COMBINE_FUNCTION(FUNCTION_UNREGISTER_SET_IMPLEMENTATION))),
-		static_cast<void*>(FSetImplementation::UnRegisterSetImplementation));
+				COMBINE_FUNCTION(FUNCTION_SET_UNREGISTER_IMPLEMENTATION))),
+		static_cast<void*>(FSetImplementation::Set_UnRegisterImplementation));
 
 	FMonoInternalCall::RegisterInternalCall(
 		TCHAR_TO_ANSI(
@@ -710,7 +707,7 @@ void FMonoDomain::RegisterLog()
 	{
 		if (const auto FoundMonoClass = Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LOG), CLASS_LOG))
 		{
-			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_SET_OUT, 0))
+			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_LOG_SET_OUT, 0))
 			{
 				Runtime_Invoke(FoundMethod, nullptr, nullptr, nullptr);
 			}

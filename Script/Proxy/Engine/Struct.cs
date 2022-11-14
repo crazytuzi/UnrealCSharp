@@ -13,8 +13,8 @@ namespace Script.Engine
         }
 
         private void RegisterStruct() =>
-            StructUtils.RegisterStruct(this, GetType().GetCustomAttribute<PathNameAttribute>(true).PathName);
+            StructUtils.Struct_Register(this, GetType().GetCustomAttribute<PathNameAttribute>(true).PathName);
 
-        ~UStruct() => StructUtils.UnRegisterStruct(this);
+        ~UStruct() => StructUtils.Struct_UnRegister(this);
     }
 }

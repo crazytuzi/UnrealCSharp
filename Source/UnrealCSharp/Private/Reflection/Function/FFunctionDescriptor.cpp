@@ -108,7 +108,7 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 		}
 		else
 		{
-			CSharpParams.Add(FMemory::Malloc(PropertyDescriptors[Index]->GetProperty()->GetSize()));
+			CSharpParams.Add(FMemory::Malloc(PropertyDescriptors[Index]->GetSize()));
 
 			PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
 			                                &CSharpParams[Index]);
@@ -210,7 +210,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 	{
 		const auto& PropertyDescriptor = PropertyDescriptors[Index];
 
-		PropertyDescriptor->GetProperty()->InitializeValue_InContainer(Params);
+		PropertyDescriptor->InitializeValue_InContainer(Params);
 
 		if (!OutPropertyIndexes.Contains(Index))
 		{
@@ -233,7 +233,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 
 	if (ReturnPropertyDescriptor != nullptr)
 	{
-		ReturnPropertyDescriptor->GetProperty()->InitializeValue_InContainer(Params);
+		ReturnPropertyDescriptor->InitializeValue_InContainer(Params);
 	}
 
 	if (bIsLocal)
@@ -254,7 +254,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR);
 
 			const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-				FoundObjectListClass, FUNCTION_ADD, 1);
+				FoundObjectListClass, FUNCTION_OBJECT_LIST_ADD, 1);
 
 			const auto NewObjectList = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
 				FoundObjectListClass);
@@ -283,8 +283,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 			*OutValue = NewObjectList;
 		}
 	}
-
-	if (bIsRemote && !bIsLocal)
+	else if (bIsRemote)
 	{
 		InObject->CallRemoteFunction(Function.Get(), Params, nullptr, nullptr);
 	}

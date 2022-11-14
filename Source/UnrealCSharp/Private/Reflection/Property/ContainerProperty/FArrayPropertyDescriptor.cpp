@@ -47,7 +47,8 @@ void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_CONTAINER_UTILS);
 
 			const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-				Class_Get_Method_From_Name(ContainerUtilsMonoClass,FUNCTION_MAKE_GENERIC_TYPE_INSTANCE, 2);
+				Class_Get_Method_From_Name(ContainerUtilsMonoClass,FUNCTION_CONTAINER_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
+				                           2);
 
 			const auto GenericClassMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
 				CreateGenericTypeMethod, nullptr, InParams, nullptr);
@@ -57,7 +58,7 @@ void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 
 			auto FoundArrayReflectionTypeParam = static_cast<void*>(FoundArrayReflectionType);
 
-			FArrayHelper* ArrayHelper = new FArrayHelper(ArrayProperty->Inner, Src);
+			const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, Src);
 
 			*Dest = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
 				GenericClassMonoClass, 1, &FoundArrayReflectionTypeParam));
@@ -69,14 +70,6 @@ void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 		{
 			*Dest = FCSharpEnvironment::GetEnvironment()->GetContainerObject(SrcArrayHelper);
 		}
-	}
-}
-
-void FArrayPropertyDescriptor::Get(void* Src, void* Dest) const
-{
-	if (ArrayProperty != nullptr)
-	{
-		Get(Src, static_cast<void**>(Dest));
 	}
 }
 

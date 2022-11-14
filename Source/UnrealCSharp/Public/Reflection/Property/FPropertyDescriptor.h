@@ -19,13 +19,24 @@ public:
 
 	virtual void Set(void* Src, void* Dest) const;
 
-	FProperty* GetProperty() const;
+public:
+	FORCEINLINE FProperty* GetProperty() const;
+
+	FORCEINLINE void DestroyProperty();
+
+public:
+	FORCEINLINE bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const;
 
 	template <typename ValueType>
-	FORCEINLINE ValueType* ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex = 0) const
-	{
-		return Property != nullptr ? Property->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex) : nullptr;
-	}
+	FORCEINLINE auto ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex = 0) const;
+
+	FORCEINLINE void DestroyValue(void* Dest) const;
+
+	FORCEINLINE void InitializeValue_InContainer(void* Dest) const;
+
+	FORCEINLINE int32 GetSize() const;
+
+	FORCEINLINE uint32 GetValueTypeHash(const void* Src) const;
 
 	virtual bool IsPrimitiveProperty() const;
 
@@ -97,3 +108,5 @@ protected:
 		FMulticastSparseDelegateProperty* MulticastSparseDelegateProperty;
 	};
 };
+
+#include "FPropertyDescriptor.inl"

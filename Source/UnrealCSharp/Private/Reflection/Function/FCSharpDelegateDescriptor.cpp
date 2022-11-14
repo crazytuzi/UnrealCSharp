@@ -19,7 +19,7 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 		{
 			if (OutPropertyIndexes.Contains(Index))
 			{
-				CSharpParams.Add(static_cast<uint8*>(InParams) + PropertyDescriptors[Index]->GetProperty()->GetSize());
+				CSharpParams.Add(static_cast<uint8*>(InParams) + PropertyDescriptors[Index]->GetSize());
 			}
 			else
 			{
@@ -31,7 +31,7 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 		}
 		else
 		{
-			CSharpParams.Add(FMemory::Malloc(PropertyDescriptors[Index]->GetProperty()->GetSize()));
+			CSharpParams.Add(FMemory::Malloc(PropertyDescriptors[Index]->GetSize()));
 
 			PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
 			                                &CSharpParams[Index]);
@@ -69,8 +69,7 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 				if (!OutPropertyDescriptor->IsPrimitiveProperty())
 				{
 					OutPropertyDescriptor->Set(CSharpParams[Index],
-					                           static_cast<uint8*>(InParams) + OutPropertyDescriptor->GetProperty()->
-					                           GetSize());
+					                           static_cast<uint8*>(InParams) + OutPropertyDescriptor->GetSize());
 				}
 			}
 		}
@@ -101,7 +100,7 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 	{
 		const auto& PropertyDescriptor = PropertyDescriptors[Index];
 
-		PropertyDescriptor->GetProperty()->InitializeValue_InContainer(Params);
+		PropertyDescriptor->InitializeValue_InContainer(Params);
 
 		if (!OutPropertyIndexes.Contains(Index))
 		{
@@ -124,7 +123,7 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 
 	if (ReturnPropertyDescriptor != nullptr)
 	{
-		ReturnPropertyDescriptor->GetProperty()->InitializeValue_InContainer(Params);
+		ReturnPropertyDescriptor->InitializeValue_InContainer(Params);
 	}
 
 	InScriptDelegate->ProcessDelegate<UObject>(Params);
@@ -143,7 +142,7 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR);
 
 		const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-			FoundObjectListClass, FUNCTION_ADD, 1);
+			FoundObjectListClass, FUNCTION_OBJECT_LIST_ADD, 1);
 
 		const auto NewObjectList = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundObjectListClass);
 
@@ -185,7 +184,7 @@ bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptD
 	{
 		const auto& PropertyDescriptor = PropertyDescriptors[Index];
 
-		PropertyDescriptor->GetProperty()->InitializeValue_InContainer(Params);
+		PropertyDescriptor->InitializeValue_InContainer(Params);
 
 		if (!OutPropertyIndexes.Contains(Index))
 		{
@@ -217,7 +216,7 @@ bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptD
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR);
 
 		const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-			FoundObjectListClass, FUNCTION_ADD, 1);
+			FoundObjectListClass, FUNCTION_OBJECT_LIST_ADD, 1);
 
 		const auto NewObjectList = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundObjectListClass);
 

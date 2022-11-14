@@ -13,14 +13,6 @@ void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 	}
 }
 
-void FObjectPropertyDescriptor::Get(void* Src, void* Dest) const
-{
-	if (ObjectProperty != nullptr)
-	{
-		Get(Src, static_cast<void**>(Dest));
-	}
-}
-
 void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (ObjectProperty != nullptr)

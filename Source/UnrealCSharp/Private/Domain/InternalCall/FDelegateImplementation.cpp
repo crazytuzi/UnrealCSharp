@@ -2,11 +2,11 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
 
-void FDelegateImplementation::Delegate_BindImplementation(const void* InAddress, MonoObject InDelegate)
+void FDelegateImplementation::Delegate_BindImplementation(const void* InAddress, MonoObject* InDelegate)
 {
 	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InAddress))
 	{
-		DelegateHelper->Bind(&InDelegate);
+		DelegateHelper->Bind(InDelegate);
 	}
 }
 

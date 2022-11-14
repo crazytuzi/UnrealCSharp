@@ -1,18 +1,13 @@
-﻿using System;
-using Script.Engine;
+﻿using Script.Engine;
 
 namespace Script.Reflection.Struct
 {
     public static class StructUtils
     {
-        public static void RegisterStruct(UStruct InStruct, string InStructName)
-        {
-            StructImplementation.RegisterStructImplementation(InStruct, InStructName);
-        }
+        public static void Struct_Register(UStruct InStruct, string InStructName) =>
+            StructImplementation.Struct_RegisterImplementation(InStruct, InStructName);
 
-        public static void UnRegisterStruct(UStruct InStruct)
-        {
-            StructImplementation.UnRegisterStructImplementation(InStruct);
-        }
+        public static void Struct_UnRegister(UStruct InStruct) =>
+            StructImplementation.Struct_UnRegisterImplementation(InStruct);
     }
 }

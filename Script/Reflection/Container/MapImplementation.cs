@@ -4,14 +4,14 @@ using Script.Engine;
 
 namespace Script.Reflection.Container
 {
-    public class MapImplementation
+    public static class MapImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void RegisterMapImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, Type InKeyType,
+        public static extern void Map_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, Type InKeyType,
             Type InValueType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UnRegisterMapImplementation<TKey, TValue>(TMap<TKey, TValue> InMap);
+        public static extern void Map_UnRegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Map_EmptyImplementation<TKey, TValue>(TMap<TKey, TValue> InMap,

@@ -6,13 +6,13 @@ namespace Script.Engine
 {
     public class TArray<T> : IEnumerable
     {
-        public TArray() => ArrayUtils.RegisterArray(this, typeof(T));
+        public TArray() => ArrayUtils.Array_Register(this, typeof(T));
 
         protected TArray(Type InValue)
         {
         }
 
-        ~TArray() => ArrayUtils.UnRegisterArray(this);
+        ~TArray() => ArrayUtils.Array_UnRegister(this);
 
         public IEnumerator GetEnumerator()
         {

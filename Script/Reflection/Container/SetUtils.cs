@@ -3,13 +3,13 @@ using Script.Engine;
 
 namespace Script.Reflection.Container
 {
-    public class SetUtils
+    public static class SetUtils
     {
-        public static void RegisterSet<T>(TSet<T> InSet, Type InType) =>
-            SetImplementation.RegisterSetImplementation(InSet, InType);
+        public static void Set_Register<T>(TSet<T> InSet, Type InType) =>
+            SetImplementation.Set_RegisterImplementation(InSet, InType);
 
-        public static void UnRegisterSet<T>(TSet<T> InSet) =>
-            SetImplementation.UnRegisterSetImplementation(InSet);
+        public static void Set_UnRegister<T>(TSet<T> InSet) =>
+            SetImplementation.Set_UnRegisterImplementation(InSet);
 
         public static void Set_Empty<T>(TSet<T> InSet, Int32 InExpectedNumElements) =>
             SetImplementation.Set_EmptyImplementation(InSet, InExpectedNumElements);

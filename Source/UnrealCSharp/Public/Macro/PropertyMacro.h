@@ -12,19 +12,19 @@
 
 #define NEW_PROPERTY_DESCRIPTOR(FPropertyType) NEW_PROPERTY_DESCRIPTOR_IMPLEMENTATION(FPropertyType, FPropertyType##Descriptor)
 
-#define GET_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) static void Get##PropertyType##PropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName, Type& OutValue);
+#define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) static void Get##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, Type& OutValue);
 
-#define SET_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) static void Set##PropertyType##PropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName, Type InValue);
+#define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) static void Set##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, Type InValue);
 
-#define PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) \
-	GET_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) \
-	SET_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type)
+#define PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) \
+	GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) \
+	SET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type)
 
-#define GET_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
-void FPropertyImplementation::Get##PropertyType##PropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName, Type& OutValue) \
+#define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
+void FPropertyImplementation::Get##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, Type& OutValue) \
 { \
 	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(&InMonoObject, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(InMonoObject, InStruct)) \
 	{ \
 		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor( \
@@ -35,11 +35,11 @@ void FPropertyImplementation::Get##PropertyType##PropertyImplementation(MonoObje
 	} \
 }
 
-#define SET_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
-void FPropertyImplementation::Set##PropertyType##PropertyImplementation(MonoObject InMonoObject, const UTF16CHAR* InPropertyName, Type InValue) \
+#define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
+void FPropertyImplementation::Set##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, Type InValue) \
 { \
 	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(&InMonoObject, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(InMonoObject, InStruct)) \
 	{ \
 		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor( \
@@ -50,9 +50,38 @@ void FPropertyImplementation::Set##PropertyType##PropertyImplementation(MonoObje
 	} \
 }
 
-#define PROPERTY_IMPLEMENTATION(PropertyType, Type) \
-	GET_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
-	SET_PROPERTY_IMPLEMENTATION(PropertyType, Type)
+#define PRIMITIVE_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
+	GET_PRIMITIVE_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
+	SET_PRIMITIVE_PROPERTY_IMPLEMENTATION(PropertyType, Type)
+
+#define GET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) static void Get##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, MonoObject** OutValue);
+
+#define SET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) SET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type)
+
+#define COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) \
+	GET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) \
+	SET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type)
+
+#define GET_COMPOUND_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
+void FPropertyImplementation::Get##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, MonoObject** OutValue) \
+{ \
+	UStruct* InStruct = nullptr; \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress(InMonoObject, InStruct)) \
+	{ \
+		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor( \
+			InStruct, PropertyName)) \
+		{ \
+			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), OutValue); \
+		} \
+	} \
+}
+
+#define SET_COMPOUND_PROPERTY_IMPLEMENTATION(PropertyType, Type) SET_PRIMITIVE_PROPERTY_IMPLEMENTATION(PropertyType, Type)
+
+#define COMPOUND_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
+	GET_COMPOUND_PROPERTY_IMPLEMENTATION(PropertyType, Type) \
+	SET_COMPOUND_PROPERTY_IMPLEMENTATION(PropertyType, Type)
 
 #define REGISTER_GET_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Type) \
 	FMonoInternalCall::RegisterInternalCall( \
