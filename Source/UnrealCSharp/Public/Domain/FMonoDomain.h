@@ -106,6 +106,8 @@ private:
 
 	void RegisterLog();
 
+	void RegisterBinding();
+
 private:
 	MonoDomain* Domain;
 

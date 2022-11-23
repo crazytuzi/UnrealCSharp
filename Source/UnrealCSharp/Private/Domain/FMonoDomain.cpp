@@ -1,4 +1,5 @@
 #include "Domain/FMonoDomain.h"
+#include "Binding/FBinding.h"
 #include "Domain/InternalCall/FArrayImplementation.h"
 #include "Domain/InternalCall/FDelegateImplementation.h"
 #include "Domain/InternalCall/FMonoInternalCall.h"
@@ -50,6 +51,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 	RegisterReflectionDelegateImplementation();
 
 	RegisterLog();
+
+	RegisterBinding();
 }
 
 void FMonoDomain::Deinitialize()
@@ -712,5 +715,13 @@ void FMonoDomain::RegisterLog()
 				Runtime_Invoke(FoundMethod, nullptr, nullptr, nullptr);
 			}
 		}
+	}
+}
+
+void FMonoDomain::RegisterBinding()
+{
+	for (const auto Binding : FBinding::Get().GetBinding())
+	{
+		FMonoInternalCall::RegisterInternalCall(TCHAR_TO_ANSI(*Binding.Key), Binding.Value);
 	}
 }
