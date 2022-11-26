@@ -9,6 +9,11 @@ FEngineListener::FEngineListener()
 	OnPostPIEStartedDelegateHandle = FEditorDelegates::PostPIEStarted.AddRaw(this, &FEngineListener::OnPostPIEStarted);
 
 	OnEndPIEDelegateHandle = FEditorDelegates::EndPIE.AddRaw(this, &FEngineListener::OnEndPIE);
+
+#else
+	OnPostEngineInitHandle = FCoreDelegates::OnPostEngineInit.AddRaw(this, &FEngineListener::OnPostEngineInit);
+
+	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
 #endif
 }
 
@@ -29,6 +34,17 @@ FEngineListener::~FEngineListener()
 	{
 		FEditorDelegates::EndPIE.Remove(OnEndPIEDelegateHandle);
 	}
+
+#else
+	if (OnPostEngineInitHandle.IsValid())
+	{
+		FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitHandle);
+	}
+
+	if (OnPreExitHandle.IsValid())
+	{
+		FCoreDelegates::OnPreExit.Remove(OnPreExitHandle);
+	}
 #endif
 }
 
@@ -43,6 +59,17 @@ void FEngineListener::OnPostPIEStarted(const bool)
 }
 
 void FEngineListener::OnEndPIE(const bool)
+{
+	FUnrealCSharpModule::Get().SetActive(false);
+}
+
+#else
+void FEngineListener::OnPostEngineInit()
+{
+	FUnrealCSharpModule::Get().SetActive(true);
+}
+
+void FEngineListener::OnPreExit()
 {
 	FUnrealCSharpModule::Get().SetActive(false);
 }

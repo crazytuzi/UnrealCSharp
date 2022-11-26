@@ -53,7 +53,14 @@ void FCSharpFunctionDescriptor::Deinitialize()
 				Class->RemoveFunctionFromFunctionMap(FunctionRemove);
 			}
 
-			FunctionRemove->MarkPendingKill();
+			if (FunctionRemove->IsRooted())
+			{
+				FunctionRemove->RemoveFromRoot();
+			}
+			else
+			{
+				FunctionRemove->MarkPendingKill();
+			}
 		}
 	}
 

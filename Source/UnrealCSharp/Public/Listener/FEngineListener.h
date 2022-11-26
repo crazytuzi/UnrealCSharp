@@ -14,6 +14,11 @@ private:
 	void OnPostPIEStarted(const bool);
 
 	void OnEndPIE(const bool);
+
+#else
+	void OnPostEngineInit();
+
+	void OnPreExit();
 #endif
 
 private:
@@ -23,5 +28,10 @@ private:
 	FDelegateHandle OnPostPIEStartedDelegateHandle;
 
 	FDelegateHandle OnEndPIEDelegateHandle;
+
+#else
+	FDelegateHandle OnPostEngineInitHandle;
+
+	FDelegateHandle OnPreExitHandle;
 #endif
 };
