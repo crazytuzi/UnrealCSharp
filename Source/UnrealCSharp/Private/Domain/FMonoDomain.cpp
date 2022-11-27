@@ -32,13 +32,17 @@ FMonoDomain::~FMonoDomain()
 
 void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 {
+	RegisterMonoTrace();
+
+#if !WITH_EDITOR
+	mono_set_dirs("Mono/lib", "Mono/etc");
+#endif
+
 	Domain = mono_jit_init(TCHAR_TO_ANSI(*Params.Domain));
 
 	Assembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*Params.Assembly));
 
 	Image = mono_assembly_get_image(Assembly);
-
-	RegisterMonoTrace();
 
 	RegisterReflectionPropertyImplementation();
 
