@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,8 +16,6 @@ public class Mono : ModuleRules
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
 			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-2.0-sgen.lib"));
-
-			Console.WriteLine(Path.GetFullPath(Path.Combine(ModuleDirectory, "..")));
 
 			if (!Target.bBuildEditor)
 			{
