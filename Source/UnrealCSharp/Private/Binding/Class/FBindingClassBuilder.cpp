@@ -1,13 +1,26 @@
 ﻿#include "Binding/Class/FBindingClassBuilder.h"
 #include "Binding/FBinding.h"
+#include "Macro/BindingMacro.h"
+#include "Macro/ClassMacro.h"
+#include "Macro/FunctionMacro.h"
+#include "Macro/NamespaceMacro.h"
 
-FBindingClassBuilder::FBindingClassBuilder()
+FBindingClassBuilder::FBindingClassBuilder(const FString& InClass):
+	Class(InClass)
 {
+}
+
+FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, const void* InGetMethod,
+                                                     const void* InSetMethod)
+{
+	return Function(BINDING_PROPERTY_GET + InName, InGetMethod).Function(BINDING_PROPERTY_SET + InName, InSetMethod);
 }
 
 FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, const void* InMethod)
 {
-	Functions.Emplace(InName, InMethod);
+	Functions.Emplace(
+		COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_BINDING), BINDING_CLASS_IMPLEMENTATION(Class)) +
+		COMBINE_FUNCTION(BINDING_COMBINE_FUNCTION(Class, InName)), InMethod);
 
 	return *this;
 }

@@ -19,3 +19,5 @@
 #define NAMESPACE_CONTAINER FString(TEXT("Reflection.Container"))
 
 #define NAMESPACE_DELEGATE FString(TEXT("Reflection.Delegate"))
+
+#define NAMESPACE_BINDING FString(TEXT("Binding"))
