@@ -150,7 +150,7 @@ mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* I
 		       : false;
 }
 
-MonoType* FMonoDomain::Class_Get_Type(MonoClass* InMonoClass)
+MonoType* FMonoDomain::Class_Get_Type(MonoClass* InMonoClass) const
 {
 	return InMonoClass != nullptr ? mono_class_get_type(InMonoClass) : nullptr;
 }
@@ -168,6 +168,13 @@ MonoClass* FMonoDomain::Type_Get_Class(MonoType* InMonoType)
 MonoReflectionType* FMonoDomain::Type_Get_Object(MonoType* InMonoType)
 {
 	return Domain != nullptr && InMonoType != nullptr ? mono_type_get_object(Domain, InMonoType) : nullptr;
+}
+
+MonoReflectionMethod* FMonoDomain::Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass)
+{
+	return Domain != nullptr && InMethod != nullptr && InMonoClass != nullptr
+		       ? mono_method_get_object(Domain, InMethod, InMonoClass)
+		       : nullptr;
 }
 
 MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams,
@@ -292,6 +299,8 @@ void FMonoDomain::RegisterReflectionPropertyImplementation()
 	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(UInt16)
 
 	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(UInt32)
+
+	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(UInt64)
 
 	REGISTER_PROPERTY_PROPERTY_IMPLEMENTATION_INTERNAL_CALL(Int8)
 

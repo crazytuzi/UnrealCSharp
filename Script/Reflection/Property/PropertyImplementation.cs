@@ -31,6 +31,14 @@ namespace Script.Reflection.Property
             out UInt32 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetUInt64PropertyImplementation(Object InMonoObject, string InPropertyName,
+            UInt64 InValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetUInt64PropertyImplementation(Object InMonoObject, string InPropertyName,
+            out UInt64 OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetInt16PropertyImplementation(Object InMonoObject, string InPropertyName,
             Int16 InValue);
 

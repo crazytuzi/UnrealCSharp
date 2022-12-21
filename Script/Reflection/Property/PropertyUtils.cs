@@ -23,6 +23,12 @@ namespace Script.Reflection.Property
         public static void SetProperty(Object InMonoObject, string InPropertyName, UInt32 InValue) =>
             PropertyImplementation.SetUInt32PropertyImplementation(InMonoObject, InPropertyName, InValue);
 
+        public static void GetProperty(Object InMonoObject, string InPropertyName, out UInt64 OutValue) =>
+            PropertyImplementation.GetUInt64PropertyImplementation(InMonoObject, InPropertyName, out OutValue);
+
+        public static void SetProperty(Object InMonoObject, string InPropertyName, UInt64 InValue) =>
+            PropertyImplementation.SetUInt64PropertyImplementation(InMonoObject, InPropertyName, InValue);
+
         public static void GetProperty(Object InMonoObject, string InPropertyName, out Int16 OutValue) =>
             PropertyImplementation.GetInt16PropertyImplementation(InMonoObject, InPropertyName, out OutValue);
 

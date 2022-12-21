@@ -41,13 +41,15 @@ public:
 
 	mono_bool Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass, mono_bool bCheckInterfaces);
 
-	MonoType* Class_Get_Type(MonoClass* InMonoClass);
+	MonoType* Class_Get_Type(MonoClass* InMonoClass) const;
 
 	MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType);
 
 	MonoClass* Type_Get_Class(MonoType* InMonoType);
 
 	MonoReflectionType* Type_Get_Object(MonoType* InMonoType);
+
+	MonoReflectionMethod* Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass);
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;
 
