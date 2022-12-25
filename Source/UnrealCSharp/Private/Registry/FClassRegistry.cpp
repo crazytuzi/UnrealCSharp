@@ -1,6 +1,6 @@
 ﻿#include "Registry/FClassRegistry.h"
+#include "Bridge/FTypeBridge.h"
 #include "Domain/FMonoDomain.h"
-#include "Macro/NamespaceMacro.h"
 
 FClassRegistry::FClassRegistry()
 {
@@ -51,13 +51,12 @@ FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDo
 		return *FoundClassDescriptor;
 	}
 
-	auto FoundMonoClass = InMonoDomain->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME), InStruct->GetPrefixCPP() + InStruct->GetName());
+	const auto FoundMonoClass = InMonoDomain->Class_From_Name(
+		FTypeBridge::GetClassNameSpace(InStruct), FTypeBridge::GetFullClass(InStruct));
 
 	if (FoundMonoClass == nullptr)
 	{
-		FoundMonoClass = InMonoDomain->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE), InStruct->GetPrefixCPP() + InStruct->GetName());
+		return nullptr;
 	}
 
 	const auto ClassDescriptor = new FClassDescriptor(InStruct, FoundMonoClass);

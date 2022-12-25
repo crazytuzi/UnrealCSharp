@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using Script.Common;
 
 namespace Script.Reflection.Function
 {

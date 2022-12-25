@@ -19,6 +19,16 @@
 			"Name": "UnrealCSharp",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "UnrealCSharpEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "Generator",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	]
 }

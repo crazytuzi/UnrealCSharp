@@ -1,4 +1,4 @@
-﻿namespace Script.Engine
+﻿namespace Script.Common
 {
     public class FText
     {

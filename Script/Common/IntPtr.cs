@@ -1,4 +1,4 @@
-﻿namespace Script.Reflection.Function
+﻿namespace Script.Common
 {
     public class IntPtr
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Script.Reflection.Container;
 
-namespace Script.Engine
+namespace Script.Common
 {
     public class TSet<T>
     {

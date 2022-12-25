@@ -1,7 +1,8 @@
 ﻿using System;
+using Script.CoreUObject;
 using Script.Reflection.Delegate;
 
-namespace Script.Engine
+namespace Script.Common
 {
     public class FRefMulticastDelegate : FMulticastDelegateBase
     {

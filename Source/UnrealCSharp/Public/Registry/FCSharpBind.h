@@ -51,6 +51,11 @@ private:
 	static void UpdateCallCSharpFunction(UFunction* InFunction);
 
 	static void UpdateCallCSharpFunctionFlags(UFunction* InFunctionCallLua);
+
+private:
+	static bool IsOverrideType(const FMonoDomain* InMonoDomain, MonoReflectionType* InMonoReflectionType);
+
+	static bool IsOverrideMethod(const FMonoDomain* InMonoDomain, MonoReflectionMethod* InMonoReflectionMethod);
 };
 
 #include "FCSharpBind.inl"

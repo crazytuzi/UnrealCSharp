@@ -1,7 +1,7 @@
 ﻿using System;
 using Script.Reflection.Delegate;
 
-namespace Script.Engine
+namespace Script.Common
 {
     public class FRefDelegate : FDelegateBase
     {

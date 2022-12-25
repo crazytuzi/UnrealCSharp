@@ -20,7 +20,7 @@ EPropertyType FTypeBridge::GetPropertyType(MonoClass* InMonoClass)
 	for (const auto& ManagedMonoClassPair : ManagedMonoClassMap)
 	{
 		if (const auto ManagedMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE), ManagedMonoClassPair.Key))
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), ManagedMonoClassPair.Key))
 		{
 			if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(
 				InMonoClass, ManagedMonoClass, false))
@@ -172,4 +172,160 @@ MonoClass* FTypeBridge::GetMonoClass(const FProperty* InProperty)
 
 	default: return nullptr;
 	}
+}
+
+FString FTypeBridge::GetFullClass(const UStruct* InStruct)
+{
+	if (InStruct == nullptr)
+	{
+		return TEXT("");
+	}
+
+	return FString::Printf(TEXT(
+		"%s%s"
+	),
+	                       InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""), *InStruct->GetName());
+}
+
+FString FTypeBridge::GetClassNameSpace(const UStruct* InStruct)
+{
+	if (InStruct == nullptr)
+	{
+		return TEXT("");
+	}
+
+	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
+
+	if (InStruct->IsNative())
+	{
+		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
+	}
+
+	return FString::Printf(TEXT(
+		"%s%s"
+	),
+	                       *NAMESPACE_ROOT,
+	                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
+}
+
+FString FTypeBridge::GetFullClass(const FDelegateProperty* InDelegateProperty)
+{
+	if (InDelegateProperty == nullptr)
+	{
+		return TEXT("");
+	}
+
+	const auto SignatureFunction = InDelegateProperty->SignatureFunction;
+
+	if (SignatureFunction == nullptr)
+	{
+		return TEXT("");
+	}
+
+	auto DelegateName = SignatureFunction->GetName();
+
+	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
+
+	return FString::Printf(TEXT(
+		"F%s"
+	),
+	                       *DelegateName);
+}
+
+FString FTypeBridge::GetClassNameSpace(const FDelegateProperty* InDelegateProperty)
+{
+	if (InDelegateProperty == nullptr)
+	{
+		return TEXT("");
+	}
+
+	const auto SignatureFunction = InDelegateProperty->SignatureFunction;
+
+	if (SignatureFunction == nullptr)
+	{
+		return TEXT("");
+	}
+
+	if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
+	{
+		return FString::Printf(TEXT(
+			"%s.%s"
+		),
+		                       *GetClassNameSpace(Class),
+		                       *SignatureFunction->GetOuter()->GetName());
+	}
+
+	if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
+	{
+		const auto ModuleName = Package->GetName().Replace(TEXT("/Script/"), TEXT("/"));
+
+		return FString::Printf(TEXT(
+			"%s%s"
+		),
+		                       *NAMESPACE_ROOT,
+		                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
+	}
+
+	return TEXT("");
+}
+
+FString FTypeBridge::GetFullClass(const FMulticastDelegateProperty* InMulticastDelegateProperty)
+{
+	if (InMulticastDelegateProperty == nullptr)
+	{
+		return TEXT("");
+	}
+
+	const auto SignatureFunction = InMulticastDelegateProperty->SignatureFunction;
+
+	if (SignatureFunction == nullptr)
+	{
+		return TEXT("");
+	}
+
+	auto DelegateName = SignatureFunction->GetName();
+
+	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
+
+	return FString::Printf(TEXT(
+		"F%s"
+	),
+	                       *DelegateName);
+}
+
+FString FTypeBridge::GetClassNameSpace(const FMulticastDelegateProperty* InMulticastDelegateProperty)
+{
+	if (InMulticastDelegateProperty == nullptr)
+	{
+		return TEXT("");
+	}
+
+	const auto SignatureFunction = InMulticastDelegateProperty->SignatureFunction;
+
+	if (SignatureFunction == nullptr)
+	{
+		return TEXT("");
+	}
+
+	if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
+	{
+		return FString::Printf(TEXT(
+			"%s.%s"
+		),
+		                       *GetClassNameSpace(Class),
+		                       *SignatureFunction->GetOuter()->GetName());
+	}
+
+	if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
+	{
+		const auto ModuleName = Package->GetName().Replace(TEXT("/Script/"), TEXT("/"));
+
+		return FString::Printf(TEXT(
+			"%s%s"
+		),
+		                       *NAMESPACE_ROOT,
+		                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
+	}
+
+	return TEXT("");
 }

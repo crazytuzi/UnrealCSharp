@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Reflection.Function;
+using Script.Common;
 
 namespace Script.Reflection.Delegate
 {

@@ -2,7 +2,7 @@
 using System.Collections;
 using Script.Reflection.Container;
 
-namespace Script.Engine
+namespace Script.Common
 {
     public class TArray<T> : IEnumerable
     {

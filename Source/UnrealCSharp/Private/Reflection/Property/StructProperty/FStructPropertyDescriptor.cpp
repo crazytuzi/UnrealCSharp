@@ -1,6 +1,6 @@
 ﻿#include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
+#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/NamespaceMacro.h"
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -10,16 +10,9 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 
 		if (SrcMonoObject == nullptr)
 		{
-			auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME),
-				StructProperty->Struct->GetPrefixCPP() + StructProperty->Struct->GetName());
-
-			if (FoundMonoClass == nullptr)
-			{
-				FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE),
-					StructProperty->Struct->GetPrefixCPP() + StructProperty->Struct->GetName());
-			}
+			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+				FTypeBridge::GetClassNameSpace(StructProperty->Struct),
+				FTypeBridge::GetFullClass(StructProperty->Struct));
 
 			auto InParams = static_cast<void*>(FoundMonoClass);
 

@@ -4,9 +4,7 @@
 
 #define NAMESPACE_ROOT FString(TEXT("Script"))
 
-#define NAMESPACE_ENGINE FString(TEXT("Engine"))
-
-#define NAMESPACE_GAME FString(TEXT("Game"))
+#define NAMESPACE_COMMON FString(TEXT("Common"))
 
 #define NAMESPACE_LOG FString(TEXT("Log"))
 

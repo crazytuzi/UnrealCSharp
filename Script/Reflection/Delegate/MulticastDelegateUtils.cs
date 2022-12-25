@@ -1,6 +1,6 @@
 ﻿using System;
-using Script.Engine;
-using Script.Reflection.Function;
+using Script.Common;
+using Script.CoreUObject;
 
 namespace Script.Reflection.Delegate
 {

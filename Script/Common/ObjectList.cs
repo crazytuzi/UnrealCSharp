@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Script.Reflection.Function
+namespace Script.Common
 {
     public class ObjectList
     {

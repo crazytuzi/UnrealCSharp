@@ -1,4 +1,7 @@
 ﻿#include "Registry/FCSharpBind.h"
+#include "Bridge/FTypeBridge.h"
+#include "Macro/ClassMacro.h"
+#include "Macro/FunctionMacro.h"
 #include "Macro/NamespaceMacro.h"
 #include "Reflection/Container/FArrayHelper.h"
 #include "Reflection/Container/FMapHelper.h"
@@ -115,7 +118,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 	if (const auto InClass = Cast<UClass>(InStruct))
 	{
 		if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME), InStruct->GetPrefixCPP() + InStruct->GetName()))
+			FTypeBridge::GetClassNameSpace(InStruct), FTypeBridge::GetFullClass(InStruct)))
 		{
 			TMap<FName, UFunction*> Functions;
 
@@ -135,14 +138,18 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 
 			for (const auto& FunctionPair : Functions)
 			{
-				if (InMonoDomain->Class_Get_Method_From_Name(FoundMonoClass, FunctionPair.Key.ToString(),
+				if (const auto FoundMonoMethod = InMonoDomain->Class_Get_Method_From_Name(FoundMonoClass, FunctionPair.Key.ToString(),
 				                                             FunctionPair.Value->ReturnValueOffset != MAX_uint16
 					                                             ? (FunctionPair.Value->NumParms > 0
 						                                                ? FunctionPair.Value->NumParms - 1
 						                                                : 0)
 					                                             : FunctionPair.Value->NumParms))
 				{
-					Bind(NewClassDescriptor, InClass, FunctionPair.Value);
+					if (IsOverrideMethod(InMonoDomain,
+					                     InMonoDomain->Method_Get_Object(FoundMonoMethod, FoundMonoClass)))
+					{
+						Bind(NewClassDescriptor, InClass, FunctionPair.Value);
+					}
 				}
 			}
 		}
@@ -264,12 +271,20 @@ bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, const UStruct* InStru
 		return true;
 	}
 
-	return InMonoDomain->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_GAME),
-			InStruct->GetPrefixCPP() + InStruct->GetName()) != nullptr ||
-		InMonoDomain->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE),
-			InStruct->GetPrefixCPP() + InStruct->GetName()) != nullptr;
+	if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(FTypeBridge::GetClassNameSpace(InStruct),
+	                                                              FTypeBridge::GetFullClass(InStruct)))
+	{
+		if (const auto FoundMonoType = InMonoDomain->Class_Get_Type(FoundMonoClass))
+		{
+			if (const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
+				FoundMonoType))
+			{
+				return IsOverrideType(InMonoDomain, FoundReflectionType);
+			}
+		}
+	}
+
+	return false;
 }
 
 UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor, UFunction* InFunction)
@@ -385,4 +400,56 @@ void FCSharpBind::UpdateCallCSharpFunctionFlags(UFunction* InFunctionCallLua)
 	}
 
 	InFunctionCallLua->FunctionFlags &= (~FUNC_Native);
+}
+
+bool FCSharpBind::IsOverrideType(const FMonoDomain* InMonoDomain, MonoReflectionType* InMonoReflectionType)
+{
+	if (InMonoDomain == nullptr || InMonoReflectionType == nullptr)
+	{
+		return false;
+	}
+
+	if (const auto UtilsMonoClass = InMonoDomain->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+	{
+		if (const auto IsOverrideTypeMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
+			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_TYPE, 1))
+		{
+			auto InParams = static_cast<void*>(InMonoReflectionType);
+
+			if (const auto IsOverrideTypeMonoObject = InMonoDomain->Runtime_Invoke(
+				IsOverrideTypeMonoMethod, nullptr, &InParams, nullptr))
+			{
+				return *static_cast<bool*>(InMonoDomain->Object_Unbox(IsOverrideTypeMonoObject));
+			}
+		}
+	}
+
+	return false;
+}
+
+bool FCSharpBind::IsOverrideMethod(const FMonoDomain* InMonoDomain, MonoReflectionMethod* InMonoReflectionMethod)
+{
+	if (InMonoDomain == nullptr || InMonoReflectionMethod == nullptr)
+	{
+		return false;
+	}
+
+	if (const auto UtilsMonoClass = InMonoDomain->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+	{
+		if (const auto IsOverrideMethodMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
+			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_METHOD, 1))
+		{
+			auto InParams = static_cast<void*>(InMonoReflectionMethod);
+
+			if (const auto IsOverrideMethodMonoObject = InMonoDomain->Runtime_Invoke(
+				IsOverrideMethodMonoMethod, nullptr, &InParams, nullptr))
+			{
+				return *static_cast<bool*>(InMonoDomain->Object_Unbox(IsOverrideMethodMonoObject));
+			}
+		}
+	}
+
+	return false;
 }

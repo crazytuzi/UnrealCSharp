@@ -1,5 +1,5 @@
 ﻿using System;
-using Script.Reflection.Function;
+using Script.Common;
 
 namespace Script.Reflection.Delegate
 {

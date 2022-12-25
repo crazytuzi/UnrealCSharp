@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Engine;
-using Script.Reflection.Function;
+using Script.Common;
+using Script.CoreUObject;
 
 namespace Script.Reflection.Delegate
 {

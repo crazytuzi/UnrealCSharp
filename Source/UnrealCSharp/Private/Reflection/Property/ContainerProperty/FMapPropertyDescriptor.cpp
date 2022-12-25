@@ -16,7 +16,7 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 		if (SrcMapProperty == nullptr)
 		{
 			const auto FoundMapMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE),CLASS_T_MAP);
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_T_MAP);
 
 			const auto FoundMapMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 				FoundMapMonoClass);

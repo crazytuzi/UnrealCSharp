@@ -34,6 +34,8 @@
 
 #define CLASS_F_TEXT FString(TEXT("FText"))
 
+#define CLASS_UTILS FString(TEXT("Utils"))
+
 #define CLASS_CONTAINER_UTILS FString(TEXT("ContainerUtils"))
 
 #define CLASS_MULTICAST_DELEGATE_UTILS FString(TEXT("MulticastDelegateUtils"))

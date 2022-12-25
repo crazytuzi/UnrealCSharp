@@ -136,10 +136,10 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 	if (OutPropertyIndexes.Num() > 0)
 	{
 		const auto FoundObjectListClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_OBJECT_LIST);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_OBJECT_LIST);
 
 		const auto FoundIntPtrClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_INT_PTR);
 
 		const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
 			FoundObjectListClass, FUNCTION_OBJECT_LIST_ADD, 1);
@@ -210,10 +210,10 @@ bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptD
 	if (OutPropertyIndexes.Num() > 0)
 	{
 		const auto FoundObjectListClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_OBJECT_LIST);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_OBJECT_LIST);
 
 		const auto FoundIntPtrClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_FUNCTION), CLASS_INT_PTR);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_INT_PTR);
 
 		const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
 			FoundObjectListClass, FUNCTION_OBJECT_LIST_ADD, 1);

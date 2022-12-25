@@ -16,7 +16,7 @@ void FSetPropertyDescriptor::Get(void* Src, void** Dest) const
 		if (SrcSetHelper == nullptr)
 		{
 			const auto FoundSetMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_ENGINE),CLASS_T_SET);
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_T_SET);
 
 			const auto FoundSetMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 				FoundSetMonoClass);
