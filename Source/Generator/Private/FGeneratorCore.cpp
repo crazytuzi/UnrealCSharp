@@ -1,5 +1,6 @@
 ﻿#include "FGeneratorCore.h"
 #include "FDelegateGenerator.h"
+#include "Misc/FileHelper.h"
 
 FString FGeneratorCore::GetBasePath()
 {
@@ -19,6 +20,15 @@ FString FGeneratorCore::GetModuleName(const UField* InField)
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}
+	else
+	{
+		auto Index = 0;
+
+		if (ModuleName.FindLastChar(TEXT('/'), Index))
+		{
+			ModuleName = ModuleName.Left(Index);
+		}
+	}
 
 	return ModuleName;
 }
@@ -30,16 +40,26 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 		return TEXT("");
 	}
 
-	const auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
+	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
+
+	if (InField->IsNative() == false)
+	{
+		auto Index = 0;
+
+		if (ModuleName.FindLastChar(TEXT('/'), Index))
+		{
+			ModuleName = ModuleName.Left(Index);
+		}
+	}
 
 	const auto PathName = FString::Printf(TEXT(
 		"%s%s"
 	),
-	                                      *InField->GetName(),
+	                                      *InField->GetName().Replace(TEXT("_C"),TEXT("")),
 	                                      InField->IsNative()
 		                                      ? TEXT("")
 		                                      : *FString::Printf(TEXT(
-			                                      ".%s_C"
+			                                      ".%s"
 		                                      ),
 		                                                         *InField->GetName()));
 
@@ -77,6 +97,15 @@ FString FGeneratorCore::GetClassNameSpace(const UStruct* InStruct)
 	if (InStruct->IsNative())
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
+	}
+	else
+	{
+		auto Index = 0;
+
+		if (ModuleName.FindLastChar(TEXT('/'), Index))
+		{
+			ModuleName = ModuleName.Left(Index);
+		}
 	}
 
 	return FString::Printf(TEXT(
@@ -591,7 +620,7 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 			return FString::Printf(TEXT(
 				"(Byte) %s"
 			),
-			                       *ByteProperty->GetName());
+			                       *GetName(ByteProperty->GetName()));
 		}
 	}
 
@@ -601,10 +630,10 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 			"(%s) %s"
 		),
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()),
-		                       *EnumProperty->GetName());
+		                       *GetName(EnumProperty->GetName()));
 	}
 
-	return Property->GetName();
+	return GetName(Property->GetName());
 }
 
 FString FGeneratorCore::GetReturnParamType(FProperty* Property)
@@ -644,6 +673,38 @@ FString FGeneratorCore::GetReturnParamName(FProperty* Property)
 	}
 
 	return TEXT("__ReturnValue");
+}
+
+FString FGeneratorCore::GetName(FString InName)
+{
+	static TSet<FName> KeyWords{TEXT("int")};
+
+	if (KeyWords.Contains(*InName))
+	{
+		return FString::Printf(TEXT("_%s"), *InName);
+	}
+
+	for (auto& Char : InName)
+	{
+		if (!(Char >= '0' && Char <= '9' || Char >= 'a' && Char <= 'z' || Char >= 'A' && Char <= 'Z'))
+		{
+			Char = '_';
+		}
+	}
+
+	if (InName.Len() > 0)
+	{
+		if (InName[0] >= '0' && InName[0] <= '9')
+		{
+			InName = FString::Printf(TEXT(
+				"_%s"
+			),
+			                         *InName
+			);
+		}
+	}
+
+	return InName;
 }
 
 bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& String)

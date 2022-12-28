@@ -1,5 +1,6 @@
 ﻿#include "FEnumGenerator.h"
 #include "FGeneratorCore.h"
+#include "Engine/UserDefinedEnum.h"
 
 void FEnumGenerator::Generator()
 {
@@ -15,6 +16,8 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	{
 		return;
 	}
+
+	auto UserDefinedEnum = Cast<UUserDefinedEnum>(InEnum);
 
 	FString UsingNameSpaceContent;
 
@@ -34,12 +37,17 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	{
 		auto EnumeratorString = InEnum->GetNameStringByIndex(Index);
 
+		if (UserDefinedEnum != nullptr)
+		{
+			EnumeratorString = InEnum->GetDisplayNameTextByIndex(Index).ToString();
+		}
+
 		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
 
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
 		),
-		                                     *EnumeratorString,
+		                                     *FGeneratorCore::GetName(EnumeratorString),
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
 	}
 

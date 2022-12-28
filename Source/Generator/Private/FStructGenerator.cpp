@@ -1,6 +1,8 @@
 ﻿#include "FStructGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
+#include "Engine/UserDefinedStruct.h"
+#include "Kismet2/StructureEditorUtils.h"
 
 void FStructGenerator::Generator()
 {
@@ -17,6 +19,15 @@ void FStructGenerator::Generator(UScriptStruct* InScriptStruct)
 		return;
 	}
 
+	auto ClassName = InScriptStruct->GetName();
+
+	if (ClassName.StartsWith(TEXT("STRUCT_REINST_")))
+	{
+		return;
+	}
+
+	auto UserDefinedStruct = Cast<UUserDefinedStruct>(InScriptStruct);
+
 	FString UsingNameSpaceContent;
 
 	auto NameSpaceContent = FGeneratorCore::GetClassNameSpace(InScriptStruct);
@@ -32,8 +43,6 @@ void FStructGenerator::Generator(UScriptStruct* InScriptStruct)
 	FString DestructorContent;
 
 	FString PropertyContent;
-
-	auto ClassName = InScriptStruct->GetName();
 
 	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
 
@@ -116,6 +125,12 @@ void FStructGenerator::Generator(UScriptStruct* InScriptStruct)
 
 		auto PropertyName = PropertyIterator->GetName();
 
+		if(UserDefinedStruct != nullptr)
+		{
+			PropertyName = FStructureEditorUtils::GetVariableFriendlyNameForProperty(
+				UserDefinedStruct, *PropertyIterator);
+		}
+
 		PropertyContent += FString::Printf(TEXT(
 			"\t\t%s %s %s\n"
 			"\t\t{\n"
@@ -131,7 +146,7 @@ void FStructGenerator::Generator(UScriptStruct* InScriptStruct)
 		),
 		                                   *PropertyAccessSpecifiers,
 		                                   *PropertyType,
-		                                   *PropertyName.Replace(TEXT(" "),TEXT("_")),
+		                                   *FGeneratorCore::GetName(PropertyName),
 		                                   *PropertyName,
 		                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 		                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),

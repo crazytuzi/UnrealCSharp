@@ -96,8 +96,13 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 			DelegateDeclarationBody += TEXT("ref ");
 		}
 
-		DelegateDeclarationBody += FGeneratorCore::GetPropertyType(DelegateParams[Index]) + TEXT(" ") +
-			DelegateParams[Index]->GetName() + (Index == DelegateParams.Num() - 1 ? TEXT("") : TEXT(", "));
+		DelegateDeclarationBody += FString::Printf(TEXT(
+			"%s %s%s"
+		),
+		                                           *FGeneratorCore::GetPropertyType(DelegateParams[Index]),
+		                                           *FGeneratorCore::GetName(DelegateParams[Index]->GetName()),
+		                                           Index == DelegateParams.Num() - 1 ? TEXT("") : TEXT(", ")
+		);
 	}
 
 	auto ExecuteFunctionDeclaration = FString::Printf(TEXT(
@@ -139,7 +144,8 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		ExecuteFunctionOutParams.Emplace(FString::Printf(TEXT(
 			"%s = %s;"
 		),
-		                                                 *DelegateParams[DelegateOutParamIndex[Index]]->GetName(),
+		                                                 *FGeneratorCore::GetName(
+			                                                 DelegateParams[DelegateOutParamIndex[Index]]->GetName()),
 		                                                 *FGeneratorCore::GetOutParamString(
 			                                                 DelegateParams[DelegateOutParamIndex[Index]], Index)));
 	}
@@ -209,7 +215,8 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		DelegateDeclarationContent = FString::Printf(TEXT(
 			"\t\tpublic delegate %s Delegate(%s);\n"
 		),
-		                                             *DelegateReturnType, *DelegateDeclarationBody);
+		                                             *DelegateReturnType,
+		                                             *DelegateDeclarationBody);
 
 		UsingNameSpaces.Add(FGeneratorCore::GetClassNameSpace(UObject::StaticClass()));
 	}
@@ -404,8 +411,13 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 			DelegateDeclarationBody += TEXT("ref ");
 		}
 
-		DelegateDeclarationBody += FGeneratorCore::GetPropertyType(DelegateParams[Index]) + TEXT(" ") +
-			DelegateParams[Index]->GetName() + (Index == DelegateParams.Num() - 1 ? TEXT("") : TEXT(", "));
+		DelegateDeclarationBody += FString::Printf(TEXT(
+			"%s %s%s"
+		),
+		                                           *FGeneratorCore::GetPropertyType(DelegateParams[Index]),
+		                                           *FGeneratorCore::GetName(DelegateParams[Index]->GetName()),
+		                                           Index == DelegateParams.Num() - 1 ? TEXT("") : TEXT(", ")
+		);
 	}
 
 	auto BroadcastFunctionDeclaration = FString::Printf(TEXT(
@@ -442,7 +454,8 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		BroadcastFunctionOutParams.Emplace(FString::Printf(TEXT(
 			"%s = %s;"
 		),
-		                                                   *DelegateParams[DelegateOutParamIndex[Index]]->GetName(),
+		                                                   *FGeneratorCore::GetName(
+			                                                   DelegateParams[DelegateOutParamIndex[Index]]->GetName()),
 		                                                   *FGeneratorCore::GetOutParamString(
 			                                                   DelegateParams[DelegateOutParamIndex[Index]], Index)));
 	}
@@ -529,7 +542,8 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		DelegateDeclarationContent = FString::Printf(TEXT(
 			"\t\tpublic delegate %s Delegate(%s);\n"
 		),
-		                                             *DelegateReturnType, *DelegateDeclarationBody);
+		                                             *DelegateReturnType,
+		                                             *DelegateDeclarationBody);
 
 		UsingNameSpaces.Add(FGeneratorCore::GetClassNameSpace(UObject::StaticClass()));
 	}

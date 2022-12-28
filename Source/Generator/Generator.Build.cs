@@ -38,6 +38,8 @@ public class Generator : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"UMGEditor",
+				"UnrealEd"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -17,6 +17,15 @@ void FClassGenerator::Generator(UClass* InClass)
 		return;
 	}
 
+	auto ClassName = InClass->GetName();
+
+	if (ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
+		ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")) ||
+		ClassName.StartsWith(TEXT("HOTRELOADED_")))
+	{
+		return;
+	}
+
 	FString UsingNameSpaceContent;
 
 	auto NameSpaceContent = FGeneratorCore::GetClassNameSpace(InClass);
@@ -36,8 +45,6 @@ void FClassGenerator::Generator(UClass* InClass)
 	FString InterfaceFunction;
 
 	FString IInterfaceContent;
-
-	auto ClassName = InClass->GetName();
 
 	auto bIsInterface = InClass->IsChildOf(UInterface::StaticClass());
 
@@ -110,7 +117,7 @@ void FClassGenerator::Generator(UClass* InClass)
 		),
 		                                   *PropertyAccessSpecifiers,
 		                                   *PropertyType,
-		                                   *PropertyName.Replace(TEXT(" "),TEXT("_")),
+		                                   *FGeneratorCore::GetName(PropertyName),
 		                                   *PropertyName,
 		                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 		                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
@@ -223,8 +230,12 @@ void FClassGenerator::Generator(UClass* InClass)
 				FunctionDeclarationBody += TEXT("out ");
 			}
 
-			FunctionDeclarationBody += FGeneratorCore::GetPropertyType(FunctionParams[Index]) + TEXT(" ") +
-				FunctionParams[Index]->GetName() + (Index == FunctionParams.Num() - 1 ? TEXT("") : TEXT(", "));
+			FunctionDeclarationBody += FString::Printf(TEXT(
+				"%s %s%s"),
+			                                           *FGeneratorCore::GetPropertyType(FunctionParams[Index]),
+			                                           *FGeneratorCore::GetName(FunctionParams[Index]->GetName()),
+			                                           Index == FunctionParams.Num() - 1 ? TEXT("") : TEXT(", ")
+			);
 		}
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
@@ -237,7 +248,7 @@ void FClassGenerator::Generator(UClass* InClass)
 		                                           *FunctionStatic,
 		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
 		                                           *FunctionReturnType,
-		                                           *FunctionName,
+		                                           *FGeneratorCore::GetName(FunctionName),
 		                                           *FunctionDeclarationBody
 		);
 
@@ -271,7 +282,7 @@ void FClassGenerator::Generator(UClass* InClass)
 					),
 					*FGeneratorCore::GetFullClass(InClass))
 				: TEXT("this"),
-			*FunctionIterator->GetName());
+			*FunctionName);
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 		{
@@ -297,7 +308,8 @@ void FClassGenerator::Generator(UClass* InClass)
 			FunctionOutParams.Emplace(FString::Printf(TEXT(
 				"%s = %s;"
 			),
-			                                          *FunctionParams[FunctionOutParamIndex[Index]]->GetName(),
+			                                          *FGeneratorCore::GetName(
+				                                          FunctionParams[FunctionOutParamIndex[Index]]->GetName()),
 			                                          *FGeneratorCore::GetOutParamString(
 				                                          FunctionParams[FunctionOutParamIndex[Index]], Index)));
 		}

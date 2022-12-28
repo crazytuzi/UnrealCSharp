@@ -45,5 +45,7 @@ public:
 
 	static FString GetReturnParamName(FProperty* Property);
 
+	static FString GetName(FString InName);
+
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 };

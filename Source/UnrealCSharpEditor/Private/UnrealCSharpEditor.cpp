@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UnrealCSharpEditor.h"
+#include "FBlueprintGenerator.h"
 #include "FClassGenerator.h"
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
@@ -53,6 +54,8 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	FStructGenerator::Generator();
 
 	FEnumGenerator::Generator();
+
+	FBlueprintGenerator::Generator();
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()
