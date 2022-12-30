@@ -135,6 +135,22 @@ void FClassGenerator::Generator(UClass* InClass)
 
 	TArray<FString> FunctionDeclarations;
 
+	FunctionContent = FString::Printf(TEXT(
+		"\t\tpublic%s static UClass StaticClass()\n"
+		"\t\t{\n"
+		"\t\t\tObjectImplementation.Object_StaticClassImplementation(\"%s\", out var __OutValue);\n"
+		"\n"
+		"\t\t\treturn __OutValue;\n"
+		"\t\t}\n"
+	),
+	                                  SuperClass != nullptr ? TEXT(" new") : TEXT(""),
+	                                  *PathNameAttributeContent
+	);
+
+	UsingNameSpaces.Add(TEXT("Script.Binding"));
+
+	UsingNameSpaces.Add(FGeneratorCore::GetClassNameSpace(UClass::StaticClass()));
+
 	for (TFieldIterator<UFunction> FunctionIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
 	                                                EFieldIteratorFlags::ExcludeDeprecated,
 	                                                EFieldIteratorFlags::IncludeInterfaces); FunctionIterator; ++
@@ -154,6 +170,11 @@ void FClassGenerator::Generator(UClass* InClass)
 		else
 		{
 			bHasFunction = true;
+
+			if (bIsInterface == false)
+			{
+				FunctionContent += "\n";
+			}
 		}
 
 		FString FunctionNew;
@@ -444,7 +465,7 @@ void FClassGenerator::Generator(UClass* InClass)
 	                               *SuperClassContent,
 	                               *InterfaceContent,
 	                               *PropertyContent,
-	                               bHasProperty == true && bHasFunction == true ? TEXT("\n") : TEXT(""),
+	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
 	                               *FunctionContent,
 	                               bIsInterface ? TEXT("\n") : TEXT(""),
 	                               *IInterfaceContent

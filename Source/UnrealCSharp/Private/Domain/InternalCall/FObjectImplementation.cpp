@@ -10,6 +10,7 @@ struct FRegisterUObject
 	FRegisterUObject()
 	{
 		TClassBuilder<UObject>()
+			.Function("StaticClass", static_cast<void*>(FObjectImplementation::Object_StaticClassImplementation))
 			.Function("GetClass", static_cast<void*>(FObjectImplementation::Object_GetClassImplementation))
 			.Function("GetName", static_cast<void*>(FObjectImplementation::Object_GetNameImplementation))
 			.Register();
@@ -17,6 +18,28 @@ struct FRegisterUObject
 };
 
 static FRegisterUObject RegisterUObject;
+
+void FObjectImplementation::Object_StaticClassImplementation(const UTF16CHAR* InClassName, MonoObject** OutValue)
+{
+	const auto ClassName = StringCast<TCHAR>(InClassName + 10).Get();
+
+	const auto InClass = LoadObject<UClass>(nullptr, ClassName);
+
+	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(InClass))
+	{
+		*OutValue = FoundMonoObject;
+	}
+	else
+	{
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+			FTypeBridge::GetClassNameSpace(UClass::StaticClass()),
+			FTypeBridge::GetFullClass(UClass::StaticClass()));
+
+		*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+
+		FCSharpEnvironment::GetEnvironment()->AddObjectReference(InClass, *OutValue);
+	}
+}
 
 void FObjectImplementation::Object_GetClassImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
