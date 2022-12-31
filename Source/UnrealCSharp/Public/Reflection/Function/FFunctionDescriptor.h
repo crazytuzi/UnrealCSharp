@@ -18,8 +18,6 @@ public:
 public:
 	virtual bool CallCSharp(FFrame& Stack, RESULT_DECL);
 
-	virtual bool CallUnreal(MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue);
-
 	virtual bool CallUnreal(UObject* InObject, MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue);
 
 private:

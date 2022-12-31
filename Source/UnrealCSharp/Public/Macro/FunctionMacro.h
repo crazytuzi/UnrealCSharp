@@ -6,9 +6,7 @@
 
 #define FUNCTION_LOG_SET_OUT FString(TEXT("SetOut"))
 
-#define FUNCTION_FUNCTION_REFLECTION_MEMBER_IMPLEMENTATION FString(TEXT("Function_ReflectionMemberImplementation"))
-
-#define FUNCTION_FUNCTION_REFLECTION_STATIC_IMPLEMENTATION FString(TEXT("Function_ReflectionStaticImplementation"))
+#define FUNCTION_FUNCTION_REFLECTION_IMPLEMENTATION FString(TEXT("Function_ReflectionImplementation"))
 
 #define FUNCTION_STRUCT_REGISTER_IMPLEMENTATION FString(TEXT("Struct_RegisterImplementation"))
 

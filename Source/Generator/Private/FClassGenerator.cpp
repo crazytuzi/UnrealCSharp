@@ -292,17 +292,10 @@ void FClassGenerator::Generator(UClass* InClass)
 
 		auto FunctionCallBody = FString::Printf(
 			TEXT(
-				"FunctionUtils.%s<%s>(%s, \"%s\", out var __ReturnValue, out var __OutValue"
+				"FunctionUtils.Function_Reflection<%s>(%s, \"%s\", out var __ReturnValue, out var __OutValue"
 			),
-			bIsStatic == true ? TEXT("Function_ReflectionStatic") : TEXT("Function_ReflectionMember"),
 			FunctionReturnParam != nullptr ? *FGeneratorCore::GetReturnParamType(FunctionReturnParam) : TEXT("Object"),
-			bIsStatic == true
-				? *FString::Printf(
-					TEXT(
-						"typeof(%s).GetCustomAttribute<PathNameAttribute>(true).PathName"
-					),
-					*FGeneratorCore::GetFullClass(InClass))
-				: TEXT("this"),
+			bIsStatic == true ? TEXT("StaticClass().GetDefaultObject()") : TEXT("this"),
 			*FunctionName);
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
