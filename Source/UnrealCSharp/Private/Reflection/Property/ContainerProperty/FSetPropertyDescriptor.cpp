@@ -16,7 +16,7 @@ void FSetPropertyDescriptor::Get(void* Src, void** Dest) const
 		if (SrcSetHelper == nullptr)
 		{
 			const auto FoundSetMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_T_SET);
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SET);
 
 			const auto FoundSetMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 				FoundSetMonoClass);
@@ -36,18 +36,18 @@ void FSetPropertyDescriptor::Get(void* Src, void** Dest) const
 
 			InParams[0] = FoundSetReflectionType;
 
-			const auto GenericReflectionTypeMonoSet = FCSharpEnvironment::GetEnvironment()->GetDomain()->Array_New(
+			const auto GenericReflectionTypeMonoArray = FCSharpEnvironment::GetEnvironment()->GetDomain()->Array_New(
 				FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Object_Class(), 1);
 
-			ARRAY_SET(GenericReflectionTypeMonoSet, MonoReflectionType*, 0, FoundGenericReflectionType);
+			ARRAY_SET(GenericReflectionTypeMonoArray, MonoReflectionType*, 0, FoundGenericReflectionType);
 
-			InParams[1] = GenericReflectionTypeMonoSet;
+			InParams[1] = GenericReflectionTypeMonoArray;
 
-			const auto ContainerUtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_CONTAINER_UTILS);
+			const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
 			const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-				Class_Get_Method_From_Name(ContainerUtilsMonoClass,FUNCTION_CONTAINER_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
+				Class_Get_Method_From_Name(UtilsMonoClass, FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
 				                           2);
 
 			const auto GenericClassMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(

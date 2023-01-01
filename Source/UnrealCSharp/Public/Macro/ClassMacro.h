@@ -36,8 +36,6 @@
 
 #define CLASS_UTILS FString(TEXT("Utils"))
 
-#define CLASS_CONTAINER_UTILS FString(TEXT("ContainerUtils"))
-
 #define CLASS_MULTICAST_DELEGATE_UTILS FString(TEXT("MulticastDelegateUtils"))
 
 #define CLASS_T_ARRAY FString(TEXT("TArray`1"))
@@ -45,3 +43,5 @@
 #define CLASS_T_MAP FString(TEXT("TMap`2"))
 
 #define CLASS_T_SET FString(TEXT("TSet`1"))
+
+#define CLASS_T_SUB_CLASS_OF FString(TEXT("TSubclassOf`1"))

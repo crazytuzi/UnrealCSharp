@@ -28,7 +28,7 @@ namespace Script.Reflection.Container
         public static extern Int32 Array_MaxImplementation<T>(TArray<T> InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_GetImplementation<T>(TArray<T> InArray, Int32 InIndex, out Object OutVlue);
+        public static extern void Array_GetImplementation<T>(TArray<T> InArray, Int32 InIndex, out Object OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Array_SetImplementation<T>(TArray<T> InArray, Int32 InIndex, T InValue);

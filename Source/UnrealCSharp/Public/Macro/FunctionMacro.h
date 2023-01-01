@@ -134,10 +134,14 @@
 
 #define FUNCTION_OBJECT_CONSTRUCTOR FString(".ctor")
 
-#define FUNCTION_CONTAINER_UTILS_GET_PATH_NAME FString(TEXT("GetPathName"))
+#define FUNCTION_UTILS_GET_PATH_NAME FString(TEXT("GetPathName"))
 
 #define FUNCTION_UTILS_IS_OVERRIDE_TYPE FString(TEXT("IsOverrideType"))
 
 #define FUNCTION_UTILS_IS_OVERRIDE_METHOD FString(TEXT("IsOverrideMethod"))
 
-#define FUNCTION_CONTAINER_UTILS_MAKE_GENERIC_TYPE_INSTANCE FString(TEXT("MakeGenericTypeInstance"))
+#define FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE FString(TEXT("MakeGenericTypeInstance"))
+
+#define FUNCTION_STATIC_CLASS FString(TEXT("StaticClass"))
+
+#define FUNCTION_SUB_CLASS_OF_GET FString(TEXT("Get"))

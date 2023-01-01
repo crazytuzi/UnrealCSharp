@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Script.Common;
+using Script.CoreUObject;
 
 namespace Script.Reflection.Property
 {
@@ -85,6 +86,14 @@ namespace Script.Reflection.Property
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetObjectPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
             T InValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetClassPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            out TSubclassOf<T> OutValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetClassPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            TSubclassOf<T> InValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetArrayPropertyImplementation<T>(Object InMonoObject, string InPropertyName,

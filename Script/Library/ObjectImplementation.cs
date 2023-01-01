@@ -4,7 +4,7 @@ using Script.CoreUObject;
 
 namespace Script.Binding
 {
-    public abstract class ObjectImplementation
+    public static class ObjectImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Object_StaticClassImplementation(string InClassName, out UClass OutValue);

@@ -113,9 +113,9 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FFloatProperty)
 
-	NEW_PROPERTY_DESCRIPTOR(FObjectProperty)
-
 	NEW_PROPERTY_DESCRIPTOR(FClassProperty)
+
+	NEW_PROPERTY_DESCRIPTOR(FObjectProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FNameProperty)
 

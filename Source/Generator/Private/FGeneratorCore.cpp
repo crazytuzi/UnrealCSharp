@@ -295,8 +295,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 
 	if (CastField<FFloatProperty>(Property)) return TEXT("Single");
 
-	// @TODO
-	if (CastField<FClassProperty>(Property)) return TEXT("Object");
+	if (const auto ClassProperty = CastField<FClassProperty>(Property))
+	{
+		return FString::Printf(TEXT(
+			"TSubclassOf<%s>"
+		),
+		                       *GetFullClass(ClassProperty->MetaClass)
+		);
+	}
 
 	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
 		return GetFullClass(
@@ -407,8 +413,10 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 
 	if (CastField<FFloatProperty>(Property)) return {TEXT("System")};
 
-	// @TODO
-	if (CastField<FClassProperty>(Property)) return {TEXT("System")};
+	if (const auto ClassProperty = CastField<FClassProperty>(Property))
+	{
+		return {TEXT("Script.Common"), GetClassNameSpace(ClassProperty->MetaClass)};
+	}
 
 	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
 		return {

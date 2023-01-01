@@ -18,5 +18,11 @@ namespace Script.Common
 
             return IsOverride != null && IsOverride.IsOverride;
         }
+        
+        static string GetPathName(Type InType) =>
+            InType.GetCustomAttribute<PathNameAttribute>(true).PathName;
+
+        public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InParam) =>
+            Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InParam));
     }
 }

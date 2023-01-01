@@ -58,11 +58,11 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
                                             const FFieldVariant& InOwner, const FName& InName,
                                             const EObjectFlags InObjectFlags)
 {
-	const auto ContainerUtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_CONTAINER_UTILS);
+	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
 	const auto GetPathNameMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-		ContainerUtilsMonoClass,FUNCTION_CONTAINER_UTILS_GET_PATH_NAME, 1);
+		UtilsMonoClass, FUNCTION_UTILS_GET_PATH_NAME, 1);
 
 	auto InParams = static_cast<void*>(InReflectionType);
 

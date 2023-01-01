@@ -40,7 +40,7 @@ namespace Script.Reflection.Container
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Map_GetImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, TKey InKey,
-            out Object OutVlue);
+            out Object OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Map_SetImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, TKey InKey,

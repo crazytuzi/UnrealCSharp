@@ -16,7 +16,7 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 		if (SrcMapProperty == nullptr)
 		{
 			const auto FoundMapMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_T_MAP);
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_MAP);
 
 			const auto FoundMapMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 				FoundMapMonoClass);
@@ -55,11 +55,11 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 
 			InParams[1] = GenericReflectionTypeMonoArray;
 
-			const auto ContainerUtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CONTAINER), CLASS_CONTAINER_UTILS);
+			const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
 			const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-				Class_Get_Method_From_Name(ContainerUtilsMonoClass,FUNCTION_CONTAINER_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
+				Class_Get_Method_From_Name(UtilsMonoClass, FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
 				                           2);
 
 			const auto GenericClassMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
