@@ -358,8 +358,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 	// @TODO
 	if (CastField<FMulticastSparseDelegateProperty>(Property)) return TEXT("Object");
 
-	// @TODO
-	if (CastField<FWeakObjectProperty>(Property)) return TEXT("Object");
+	if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
+	{
+		return FString::Printf(TEXT(
+			"TWeakObjectPtr<%s>"
+		),
+		                       *GetFullClass(WeakObjectProperty->PropertyClass)
+		);
+	}
 
 	// @TODO
 	if (CastField<FLazyObjectProperty>(Property)) return TEXT("Object");
@@ -478,8 +484,10 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	// @TODO
 	if (CastField<FMulticastSparseDelegateProperty>(Property)) return {TEXT("System")};
 
-	// @TODO
-	if (CastField<FWeakObjectProperty>(Property)) return {TEXT("System")};
+	if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
+	{
+		return {TEXT("Script.Common"), GetClassNameSpace(WeakObjectProperty->PropertyClass)};
+	}
 
 	// @TODO
 	if (CastField<FLazyObjectProperty>(Property)) return {TEXT("System")};

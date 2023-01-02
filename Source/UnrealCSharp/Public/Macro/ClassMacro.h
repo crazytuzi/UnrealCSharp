@@ -47,3 +47,5 @@
 #define CLASS_T_SUB_CLASS_OF FString(TEXT("TSubclassOf`1"))
 
 #define CLASS_T_SCRIPT_INTERFACE FString(TEXT("TScriptInterface`1"))
+
+#define CLASS_T_WEAK_OBJECT_PTR FString(TEXT("TWeakObjectPtr`1"))

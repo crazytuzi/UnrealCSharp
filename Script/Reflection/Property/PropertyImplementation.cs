@@ -112,6 +112,14 @@ namespace Script.Reflection.Property
             TArray<T> InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetWeakObjectPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            out TWeakObjectPtr<T> OutValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetWeakObjectPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            TWeakObjectPtr<T> InValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetDoublePropertyImplementation(Object InMonoObject, string InPropertyName,
             out Double OutValue);
 

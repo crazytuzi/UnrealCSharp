@@ -88,6 +88,14 @@ namespace Script.Reflection.Property
         public static void SetProperty<T>(Object InMonoObject, string InPropertyName, TArray<T> OutValue) =>
             PropertyImplementation.SetArrayPropertyImplementation(InMonoObject, InPropertyName, OutValue);
 
+        public static void GetProperty<T>(Object InMonoObject, string InPropertyName, out TWeakObjectPtr<T> OutValue)
+            where T : UObject =>
+            PropertyImplementation.GetWeakObjectPropertyImplementation(InMonoObject, InPropertyName, out OutValue);
+
+        public static void SetProperty<T>(Object InMonoObject, string InPropertyName, TWeakObjectPtr<T> OutValue)
+            where T : UObject =>
+            PropertyImplementation.SetWeakObjectPropertyImplementation(InMonoObject, InPropertyName, OutValue);
+
         public static void GetProperty(Object InMonoObject, string InPropertyName, out Double OutValue) =>
             PropertyImplementation.GetDoublePropertyImplementation(InMonoObject, InPropertyName, out OutValue);
 
