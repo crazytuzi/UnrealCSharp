@@ -13,7 +13,7 @@ void FClassPropertyDescriptor::Get(void* Src, void** Dest) const
 		const auto SrcClass = Cast<UClass>(ClassProperty->GetObjectPropertyValue(Src));
 
 		const auto FoundSubClassOfMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_T_SUB_CLASS_OF);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SUB_CLASS_OF);
 
 		const auto FoundSubClassOfMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 			FoundSubClassOfMonoClass);

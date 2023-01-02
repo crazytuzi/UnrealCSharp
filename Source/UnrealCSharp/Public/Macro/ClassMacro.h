@@ -45,3 +45,5 @@
 #define CLASS_T_SET FString(TEXT("TSet`1"))
 
 #define CLASS_T_SUB_CLASS_OF FString(TEXT("TSubclassOf`1"))
+
+#define CLASS_T_SCRIPT_INTERFACE FString(TEXT("TScriptInterface`1"))

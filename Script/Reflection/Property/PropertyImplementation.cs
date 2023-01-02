@@ -96,6 +96,14 @@ namespace Script.Reflection.Property
             TSubclassOf<T> InValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetInterfacePropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            out TScriptInterface<T> OutValue) where T : IInterface;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetInterfacePropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            TScriptInterface<T> InValue) where T : IInterface;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetArrayPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
             out TArray<T> OutValue);
 

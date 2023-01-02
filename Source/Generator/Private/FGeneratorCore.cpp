@@ -85,6 +85,14 @@ FString FGeneratorCore::GetFullClass(const UStruct* InStruct)
 	                       *InStruct->GetName());
 }
 
+FString FGeneratorCore::GetFullInterface(const UStruct* InStruct)
+{
+	return FString::Printf(TEXT(
+		"I%s"
+	),
+	                       *GetFullClass(InStruct).RightChop(1));
+}
+
 FString FGeneratorCore::GetClassNameSpace(const UStruct* InStruct)
 {
 	if (InStruct == nullptr)
@@ -312,8 +320,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 
 	if (const auto DelegateProperty = CastField<FDelegateProperty>(Property)) return GetFullClass(DelegateProperty);
 
-	// @TODO
-	if (CastField<FInterfaceProperty>(Property)) return TEXT("Object");
+	if (const auto InterfaceProperty = CastField<FInterfaceProperty>(Property))
+	{
+		return FString::Printf(TEXT(
+			"TScriptInterface<%s>"
+		),
+		                       *GetFullInterface(InterfaceProperty->InterfaceClass)
+		);
+	}
 
 	if (const auto StructProperty = CastField<FStructProperty>(Property)) return GetFullClass(StructProperty->Struct);
 
@@ -430,8 +444,10 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 			GetClassNameSpace(DelegateProperty)
 		};
 
-	// @TODO
-	if (CastField<FInterfaceProperty>(Property)) return {TEXT("System")};
+	if (const auto InterfaceProperty = CastField<FInterfaceProperty>(Property))
+	{
+		return {TEXT("Script.Common"), GetClassNameSpace(InterfaceProperty->InterfaceClass)};
+	}
 
 	if (const auto StructProperty = CastField<FStructProperty>(Property))
 		return {

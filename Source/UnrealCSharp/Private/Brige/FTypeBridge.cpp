@@ -187,6 +187,14 @@ FString FTypeBridge::GetFullClass(const UStruct* InStruct)
 	                       InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""), *InStruct->GetName());
 }
 
+FString FTypeBridge::GetFullInterface(const UStruct* InStruct)
+{
+	return FString::Printf(TEXT(
+		"I%s"
+	),
+	                       *GetFullClass(InStruct).RightChop(1));
+}
+
 FString FTypeBridge::GetClassNameSpace(const UStruct* InStruct)
 {
 	if (InStruct == nullptr)

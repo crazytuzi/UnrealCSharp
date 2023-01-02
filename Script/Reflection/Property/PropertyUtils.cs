@@ -74,6 +74,14 @@ namespace Script.Reflection.Property
             where T : UObject =>
             PropertyImplementation.SetClassPropertyImplementation(InMonoObject, InPropertyName, OutValue);
 
+        public static void GetProperty<T>(Object InMonoObject, string InPropertyName, out TScriptInterface<T> OutValue)
+            where T : IInterface =>
+            PropertyImplementation.GetInterfacePropertyImplementation(InMonoObject, InPropertyName, out OutValue);
+
+        public static void SetProperty<T>(Object InMonoObject, string InPropertyName, TScriptInterface<T> OutValue)
+            where T : IInterface =>
+            PropertyImplementation.SetInterfacePropertyImplementation(InMonoObject, InPropertyName, OutValue);
+
         public static void GetProperty<T>(Object InMonoObject, string InPropertyName, out TArray<T> OutValue) =>
             PropertyImplementation.GetArrayPropertyImplementation(InMonoObject, InPropertyName, out OutValue);
 

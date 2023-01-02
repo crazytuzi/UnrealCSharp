@@ -74,7 +74,7 @@ void FClassGenerator::Generator(UClass* InClass)
 		InterfaceContent = FString::Printf(TEXT(
 			", %s"
 		),
-		                                   *GetFullInterface(Interface.Class));
+		                                   *FGeneratorCore::GetFullInterface(Interface.Class));
 	}
 
 	auto bHasProperty = false;
@@ -408,12 +408,18 @@ void FClassGenerator::Generator(UClass* InClass)
 	if (bIsInterface == true)
 	{
 		IInterfaceContent = FString::Printf(TEXT(
-			"\tpublic interface %s\n"
+			"\tpublic interface %s%s\n"
 			"\t{\n"
 			"%s"
 			"\t}\n"
 		),
-		                                    *GetFullInterface(InClass),
+		                                    *FGeneratorCore::GetFullInterface(InClass),
+		                                    SuperClass != nullptr && SuperClass != UObject::StaticClass()
+			                                    ? *FString::Printf(TEXT(
+				                                    " : %s"
+			                                    ),
+			                                                       *FGeneratorCore::GetFullInterface(SuperClass))
+			                                    : TEXT(""),
 		                                    *InterfaceFunction);
 	}
 	else
@@ -471,12 +477,4 @@ void FClassGenerator::Generator(UClass* InClass)
 	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
-}
-
-FString FClassGenerator::GetFullInterface(const UStruct* InStruct)
-{
-	return FString::Printf(TEXT(
-		"I%s"
-	),
-	                       *FGeneratorCore::GetFullClass(InStruct).RightChop(1));
 }

@@ -145,3 +145,5 @@
 #define FUNCTION_STATIC_CLASS FString(TEXT("StaticClass"))
 
 #define FUNCTION_SUB_CLASS_OF_GET FString(TEXT("Get"))
+
+#define FUNCTION_SCRIPT_INTERFACE_GET FString(TEXT("Get"))

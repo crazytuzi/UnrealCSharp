@@ -11,6 +11,8 @@ public:
 
 	static FString GetFullClass(const UStruct* InStruct);
 
+	static FString GetFullInterface(const UStruct* InStruct);
+
 	static FString GetClassNameSpace(const UStruct* InStruct);
 
 	static FString GetFullClass(const FDelegateProperty* InDelegateProperty);
