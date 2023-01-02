@@ -120,6 +120,14 @@ namespace Script.Reflection.Property
             TWeakObjectPtr<T> InValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetLazyObjectPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            out TLazyObjectPtr<T> OutValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetLazyObjectPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            TLazyObjectPtr<T> InValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetDoublePropertyImplementation(Object InMonoObject, string InPropertyName,
             out Double OutValue);
 

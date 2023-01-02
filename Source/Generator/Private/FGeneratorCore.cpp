@@ -367,8 +367,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		);
 	}
 
-	// @TODO
-	if (CastField<FLazyObjectProperty>(Property)) return TEXT("Object");
+	if (const auto LazyObjectProperty = CastField<FLazyObjectProperty>(Property))
+	{
+		return FString::Printf(TEXT(
+			"TLazyObjectPtr<%s>"
+		),
+		                       *GetFullClass(LazyObjectProperty->PropertyClass)
+		);
+	}
 
 	// @TODO
 	if (CastField<FSoftObjectProperty>(Property)) return TEXT("Object");
@@ -489,8 +495,10 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 		return {TEXT("Script.Common"), GetClassNameSpace(WeakObjectProperty->PropertyClass)};
 	}
 
-	// @TODO
-	if (CastField<FLazyObjectProperty>(Property)) return {TEXT("System")};
+	if (const auto LazyObjectProperty = CastField<FLazyObjectProperty>(Property))
+	{
+		return {TEXT("Script.Common"), GetClassNameSpace(LazyObjectProperty->PropertyClass)};
+	}
 
 	// @TODO
 	if (CastField<FSoftObjectProperty>(Property)) return {TEXT("System")};

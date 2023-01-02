@@ -91,6 +91,6 @@ void FWeakObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcObject = FCSharpEnvironment::GetEnvironment()->GetObject(ReturnValue);
 
-		WeakObjectProperty->SetPropertyValue(Dest, SrcObject);
+		WeakObjectProperty->SetObjectPropertyValue(Dest, SrcObject);
 	}
 }

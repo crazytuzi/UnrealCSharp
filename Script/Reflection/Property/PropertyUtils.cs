@@ -96,6 +96,14 @@ namespace Script.Reflection.Property
             where T : UObject =>
             PropertyImplementation.SetWeakObjectPropertyImplementation(InMonoObject, InPropertyName, OutValue);
 
+        public static void GetProperty<T>(Object InMonoObject, string InPropertyName, out TLazyObjectPtr<T> OutValue)
+            where T : UObject =>
+            PropertyImplementation.GetLazyObjectPropertyImplementation(InMonoObject, InPropertyName, out OutValue);
+
+        public static void SetProperty<T>(Object InMonoObject, string InPropertyName, TLazyObjectPtr<T> OutValue)
+            where T : UObject =>
+            PropertyImplementation.SetLazyObjectPropertyImplementation(InMonoObject, InPropertyName, OutValue);
+
         public static void GetProperty(Object InMonoObject, string InPropertyName, out Double OutValue) =>
             PropertyImplementation.GetDoublePropertyImplementation(InMonoObject, InPropertyName, out OutValue);
 
