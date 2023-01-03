@@ -128,6 +128,14 @@ namespace Script.Reflection.Property
             TLazyObjectPtr<T> InValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetSoftObjectPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            out TSoftObjectPtr<T> OutValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetSoftObjectPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            TSoftObjectPtr<T> InValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void GetDoublePropertyImplementation(Object InMonoObject, string InPropertyName,
             out Double OutValue);
 

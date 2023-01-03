@@ -376,8 +376,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		);
 	}
 
-	// @TODO
-	if (CastField<FSoftObjectProperty>(Property)) return TEXT("Object");
+	if (const auto SoftObjectProperty = CastField<FSoftObjectProperty>(Property))
+	{
+		return FString::Printf(TEXT(
+			"TSoftObjectPtr<%s>"
+		),
+		                       *GetFullClass(SoftObjectProperty->PropertyClass)
+		);
+	}
 
 	if (CastField<FDoubleProperty>(Property)) return TEXT("Double");
 
@@ -500,8 +506,10 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 		return {TEXT("Script.Common"), GetClassNameSpace(LazyObjectProperty->PropertyClass)};
 	}
 
-	// @TODO
-	if (CastField<FSoftObjectProperty>(Property)) return {TEXT("System")};
+	if (const auto SoftObjectProperty = CastField<FSoftObjectProperty>(Property))
+	{
+		return {TEXT("Script.Common"), GetClassNameSpace(SoftObjectProperty->PropertyClass)};
+	}
 
 	if (CastField<FDoubleProperty>(Property)) return {TEXT("System")};
 

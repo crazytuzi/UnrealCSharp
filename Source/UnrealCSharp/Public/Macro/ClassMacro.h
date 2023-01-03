@@ -51,3 +51,5 @@
 #define CLASS_T_WEAK_OBJECT_PTR FString(TEXT("TWeakObjectPtr`1"))
 
 #define CLASS_T_LAZY_OBJECT_PTR FString(TEXT("TLazyObjectPtr`1"))
+
+#define CLASS_T_SOFT_OBJECT_PTR FString(TEXT("TSoftObjectPtr`1"))
