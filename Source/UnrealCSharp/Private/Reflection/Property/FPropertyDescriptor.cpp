@@ -28,6 +28,7 @@
 #include "Reflection/Property/PrimitiveProperty/FDoublePropertyDescriptor.h"
 #include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
 #include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
+#include "Reflection/Property/FieldPathProperty/FFieldPathPropertyDescriptor.h"
 
 EPropertyType FPropertyDescriptor::GetPropertyType(const FProperty* Property)
 {
@@ -88,6 +89,8 @@ EPropertyType FPropertyDescriptor::GetPropertyType(const FProperty* Property)
 		GET_PROPERTY_TYPE(FMapProperty, CPT_Map)
 
 		GET_PROPERTY_TYPE(FSetProperty, CPT_Set)
+
+		GET_PROPERTY_TYPE(FFieldPathProperty, CPT_FieldPath)
 	}
 
 	return CPT_None;
@@ -150,6 +153,8 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 	NEW_PROPERTY_DESCRIPTOR(FMapProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FSetProperty)
+
+	NEW_PROPERTY_DESCRIPTOR(FFieldPathProperty)
 
 	return nullptr;
 }

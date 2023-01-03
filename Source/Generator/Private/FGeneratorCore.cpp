@@ -352,12 +352,6 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		return GetFullClass(
 			MulticastDelegateProperty);
 
-	// @TODO
-	if (CastField<FMulticastInlineDelegateProperty>(Property)) return TEXT("Object");
-
-	// @TODO
-	if (CastField<FMulticastSparseDelegateProperty>(Property)) return TEXT("Object");
-
 	if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
 	{
 		return FString::Printf(TEXT(
@@ -412,8 +406,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		);
 	}
 
-	// @TODO
-	if (CastField<FFieldPathProperty>(Property)) return TEXT("Object");
+	if (const auto FieldPathProperty = CastField<FFieldPathProperty>(Property))
+	{
+		return FString::Printf(TEXT(
+			"TFieldPath<F%s>"
+		),
+		                       *FieldPathProperty->PropertyClass->GetName()
+		);
+	}
 
 	return TEXT("");
 }
@@ -490,12 +490,6 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 			GetClassNameSpace(MulticastDelegateProperty)
 		};
 
-	// @TODO
-	if (CastField<FMulticastInlineDelegateProperty>(Property)) return {TEXT("System")};
-
-	// @TODO
-	if (CastField<FMulticastSparseDelegateProperty>(Property)) return {TEXT("System")};
-
 	if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
 	{
 		return {TEXT("Script.Common"), GetClassNameSpace(WeakObjectProperty->PropertyClass)};
@@ -524,8 +518,7 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 		return
 			GetPropertyTypeNameSpace(SetProperty->ElementProp).Union({TEXT("Script.Common")});
 
-	// @TODO
-	if (CastField<FFieldPathProperty>(Property)) return {TEXT("System")};
+	if (CastField<FFieldPathProperty>(Property)) return {TEXT("Script.Common"), TEXT("Script.Reflection.Property")};
 
 	return {TEXT("")};
 }

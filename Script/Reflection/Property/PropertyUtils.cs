@@ -131,5 +131,13 @@ namespace Script.Reflection.Property
 
         public static void SetProperty<T>(Object InMonoObject, string InPropertyName, TSet<T> OutValue) =>
             PropertyImplementation.SetSetPropertyImplementation(InMonoObject, InPropertyName, OutValue);
+
+        public static void GetProperty<T>(Object InMonoObject, string InPropertyName, out TFieldPath<T> OutValue)
+            where T : FField =>
+            PropertyImplementation.GetFieldPathPropertyImplementation(InMonoObject, InPropertyName, out OutValue);
+
+        public static void SetProperty<T>(Object InMonoObject, string InPropertyName, TFieldPath<T> OutValue)
+            where T : FField =>
+            PropertyImplementation.SetFieldPathPropertyImplementation(InMonoObject, InPropertyName, OutValue);
     }
 }

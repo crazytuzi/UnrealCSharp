@@ -158,5 +158,13 @@ namespace Script.Reflection.Property
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetSetPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
             TSet<T> InValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void GetFieldPathPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            out TFieldPath<T> OutValue) where T : FField;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetFieldPathPropertyImplementation<T>(Object InMonoObject, string InPropertyName,
+            TFieldPath<T> InValue) where T : FField;
     }
 }
