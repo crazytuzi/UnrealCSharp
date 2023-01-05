@@ -7,7 +7,7 @@ struct FRegisterUClass
 {
 	FRegisterUClass()
 	{
-		TClassBuilder<UClass>()
+		TClassBuilder<UClass>(NAMESPACE_LIBRARY)
 			.Property("ClassDefaultObject",
 			          static_cast<void*>(FClassImplementation::Class_GetClassDefaultObjectImplementation), nullptr)
 			.Function("GetDefaultObject",

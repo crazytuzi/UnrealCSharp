@@ -2,7 +2,7 @@
 using Script.Common;
 using Script.CoreUObject;
 
-namespace Script.Binding
+namespace Script.Library
 {
     public static class ObjectImplementation
     {

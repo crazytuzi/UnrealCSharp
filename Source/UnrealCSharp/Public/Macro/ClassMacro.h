@@ -1,24 +1,8 @@
 ﻿#pragma once
 
-#define COMBINE_CLASS(A, B) A.Append(".").Append(B)
+#define COMBINE_CLASS(A, B) FString::Printf(TEXT("%s.%s"), *A, *B)
 
-#define CLASS_LOG FString(TEXT("Log"))
-
-#define CLASS_PROPERTY_IMPLEMENTATION FString(TEXT("PropertyImplementation"))
-
-#define CLASS_FUNCTION_IMPLEMENTATION FString(TEXT("FunctionImplementation"))
-
-#define CLASS_STRUCT_IMPLEMENTATION FString(TEXT("StructImplementation"))
-
-#define CLASS_ARRAY_IMPLEMENTATION FString(TEXT("ArrayImplementation"))
-
-#define CLASS_MAP_IMPLEMENTATION FString(TEXT("MapImplementation"))
-
-#define CLASS_SET_IMPLEMENTATION FString(TEXT("SetImplementation"))
-
-#define CLASS_DELEGATE_IMPLEMENTATION FString(TEXT("DelegateImplementation"))
-
-#define CLASS_MULTICAST_DELEGATE_IMPLEMENTATION FString(TEXT("MulticastDelegateImplementation"))
+#define CLASS_LOG_IMPLEMENTATION FString(TEXT("LogImplementation"))
 
 #define CLASS_INT_PTR FString(TEXT("IntPtr"))
 

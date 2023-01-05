@@ -1,7 +1,46 @@
 ﻿#include "Domain/InternalCall/FArrayImplementation.h"
+#include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FArrayHelper.h"
+
+struct FRegisterArray
+{
+	FRegisterArray()
+	{
+		FBindingClassBuilder(TEXT("Array"), NAMESPACE_CONTAINER)
+			.Function("Register", static_cast<void*>(FArrayImplementation::Array_RegisterImplementation))
+			.Function("UnRegister", static_cast<void*>(FArrayImplementation::Array_UnRegisterImplementation))
+			.Function("GetTypeSize", static_cast<void*>(FArrayImplementation::Array_GetTypeSizeImplementation))
+			.Function("GetSlack", static_cast<void*>(FArrayImplementation::Array_GetSlackImplementation))
+			.Function("IsValidIndex", static_cast<void*>(FArrayImplementation::Array_IsValidIndexImplementation))
+			.Function("Num", static_cast<void*>(FArrayImplementation::Array_NumImplementation))
+			.Function("Max", static_cast<void*>(FArrayImplementation::Array_MaxImplementation))
+			.Function("Get", static_cast<void*>(FArrayImplementation::Array_GetImplementation))
+			.Function("Set", static_cast<void*>(FArrayImplementation::Array_SetImplementation))
+			.Function("Find", static_cast<void*>(FArrayImplementation::Array_FindImplementation))
+			.Function("FindLast", static_cast<void*>(FArrayImplementation::Array_FindLastImplementation))
+			.Function("Contains", static_cast<void*>(FArrayImplementation::Array_ContainsImplementation))
+			.Function("AddUninitialized",
+			          static_cast<void*>(FArrayImplementation::Array_AddUninitializedImplementation))
+			.Function("InsertZeroed", static_cast<void*>(FArrayImplementation::Array_InsertZeroedImplementation))
+			.Function("InsertDefaulted", static_cast<void*>(FArrayImplementation::Array_InsertDefaultedImplementation))
+			.Function("RemoveAt", static_cast<void*>(FArrayImplementation::Array_RemoveAtImplementation))
+			.Function("Reset", static_cast<void*>(FArrayImplementation::Array_ResetImplementation))
+			.Function("Empty", static_cast<void*>(FArrayImplementation::Array_EmptyImplementation))
+			.Function("SetNum", static_cast<void*>(FArrayImplementation::Array_SetNumImplementation))
+			.Function("Add", static_cast<void*>(FArrayImplementation::Array_AddImplementation))
+			.Function("AddZeroed", static_cast<void*>(FArrayImplementation::Array_AddZeroedImplementation))
+			.Function("AddUnique", static_cast<void*>(FArrayImplementation::Array_AddUniqueImplementation))
+			.Function("RemoveSingle", static_cast<void*>(FArrayImplementation::Array_RemoveSingleImplementation))
+			.Function("Remove", static_cast<void*>(FArrayImplementation::Array_RemoveImplementation))
+			.Function("SwapMemory", static_cast<void*>(FArrayImplementation::Array_SwapMemoryImplementation))
+			.Function("Swap", static_cast<void*>(FArrayImplementation::Array_SwapImplementation))
+			.Register();
+	}
+};
+
+static FRegisterArray RegisterArray;
 
 void FArrayImplementation::Array_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 {

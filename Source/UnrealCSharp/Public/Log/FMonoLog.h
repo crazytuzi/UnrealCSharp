@@ -10,7 +10,7 @@ public:
 	static void MonoLog(const char* InLogDomain, const char* InLogLevel, const char* InMessage, mono_bool InFatal,
 	                    void* InUserdata);
 
-	static void LogImplementation(const UTF16CHAR* InBuffer, unsigned int InReadOffset);
+	static void Log_LogImplementation(const UTF16CHAR* InBuffer, unsigned int InReadOffset);
 
 private:
 	FMonoLog() = delete;

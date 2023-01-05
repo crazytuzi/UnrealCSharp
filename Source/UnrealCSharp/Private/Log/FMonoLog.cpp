@@ -1,5 +1,18 @@
 ﻿#include "Log/FMonoLog.h"
+#include "Binding/Class/FBindingClassBuilder.h"
 #include "Log/UnrealCSharpLog.h"
+
+struct FRegisterLog
+{
+	FRegisterLog()
+	{
+		FBindingClassBuilder(TEXT("Log"), NAMESPACE_LOG)
+			.Function("Log", static_cast<void*>(FMonoLog::Log_LogImplementation))
+			.Register();
+	}
+};
+
+static FRegisterLog RegisterLog;
 
 /**
 * https://github.com/mono-ue/UnrealEngine/blob/monoue/Engine/Plugins/MonoUE/Source/MonoRuntime/Private/MonoRuntime.cpp#L78
@@ -56,7 +69,7 @@ void FMonoLog::MonoLog(const char* InLogDomain, const char* InLogLevel, const ch
 /**
 * https://github.com/mono-ue/UnrealEngine/blob/monoue/Engine/Plugins/MonoUE/Source/MonoRuntime/Private/MonoLogTextWriter.cpp#L14
 */
-void FMonoLog::LogImplementation(const UTF16CHAR* InBuffer, const unsigned int InReadOffset)
+void FMonoLog::Log_LogImplementation(const UTF16CHAR* InBuffer, const unsigned int InReadOffset)
 {
 #if !NO_LOGGING
 	if (UE_LOG_ACTIVE(LogUnrealCSharp, Log))

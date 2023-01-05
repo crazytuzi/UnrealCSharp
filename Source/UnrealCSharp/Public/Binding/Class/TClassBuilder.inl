@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 template <typename T>
-TClassBuilder<T>::TClassBuilder():
-	FBindingClassBuilder(T::StaticClass()->GetName())
+TClassBuilder<T>::TClassBuilder(const FString& InNameSpace):
+	FBindingClassBuilder(T::StaticClass()->GetName(), InNameSpace)
 {
 }

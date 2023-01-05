@@ -1,6 +1,25 @@
 ﻿#include "Domain/InternalCall/FSetImplementation.h"
+#include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
+
+struct FRegisterSet
+{
+	FRegisterSet()
+	{
+		FBindingClassBuilder(TEXT("Set"), NAMESPACE_CONTAINER)
+			.Function("Register", static_cast<void*>(FSetImplementation::Set_RegisterImplementation))
+			.Function("UnRegister", static_cast<void*>(FSetImplementation::Set_UnRegisterImplementation))
+			.Function("Empty", static_cast<void*>(FSetImplementation::Set_EmptyImplementation))
+			.Function("Num", static_cast<void*>(FSetImplementation::Set_NumImplementation))
+			.Function("Add", static_cast<void*>(FSetImplementation::Set_AddImplementation))
+			.Function("Remove", static_cast<void*>(FSetImplementation::Set_RemoveImplementation))
+			.Function("Contains", static_cast<void*>(FSetImplementation::Set_ContainsImplementation))
+			.Register();
+	}
+};
+
+static FRegisterSet RegisterSet;
 
 void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 {

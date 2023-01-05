@@ -1,5 +1,5 @@
 ﻿using System;
-using Script.Binding;
+using Script.Library;
 
 namespace Script.CoreUObject
 {

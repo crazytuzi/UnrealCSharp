@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define COMBINE_NAMESPACE(A, B) A.Append(".").Append(B)
+#define COMBINE_NAMESPACE(A, B) FString::Printf(TEXT("%s.%s"), *A, *B)
 
 #define NAMESPACE_ROOT FString(TEXT("Script"))
 
@@ -19,3 +19,5 @@
 #define NAMESPACE_DELEGATE FString(TEXT("Reflection.Delegate"))
 
 #define NAMESPACE_BINDING FString(TEXT("Binding"))
+
+#define NAMESPACE_LIBRARY FString(TEXT("Library"))

@@ -1,6 +1,23 @@
 ﻿#include "Domain/InternalCall/FDelegateImplementation.h"
+#include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
+
+struct FRegisterDelegate
+{
+	FRegisterDelegate()
+	{
+		FBindingClassBuilder(TEXT("Delegate"), NAMESPACE_DELEGATE)
+			.Function("Bind", static_cast<void*>(FDelegateImplementation::Delegate_BindImplementation))
+			.Function("IsBound", static_cast<void*>(FDelegateImplementation::Delegate_IsBoundImplementation))
+			.Function("UnBind", static_cast<void*>(FDelegateImplementation::Delegate_UnBindImplementation))
+			.Function("Clear", static_cast<void*>(FDelegateImplementation::Delegate_ClearImplementation))
+			.Function("Execute", static_cast<void*>(FDelegateImplementation::Delegate_ExecuteImplementation))
+			.Register();
+	}
+};
+
+static FRegisterDelegate RegisterDelegate;
 
 void FDelegateImplementation::Delegate_BindImplementation(const void* InAddress, MonoObject* InDelegate)
 {

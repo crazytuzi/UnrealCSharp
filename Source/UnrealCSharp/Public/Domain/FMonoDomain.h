@@ -96,16 +96,6 @@ public:
 private:
 	void RegisterMonoTrace();
 
-	void RegisterReflectionPropertyImplementation();
-
-	void RegisterReflectionFunctionImplementation();
-
-	void RegisterReflectionStructImplementation();
-
-	void RegisterReflectionContainerImplementation();
-
-	void RegisterReflectionDelegateImplementation();
-
 	void RegisterLog();
 
 	void RegisterBinding();

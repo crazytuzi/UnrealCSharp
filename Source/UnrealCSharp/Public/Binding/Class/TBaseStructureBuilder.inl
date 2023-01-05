@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 template <typename T>
-TBaseStructureBuilder<T>::TBaseStructureBuilder():
-	FBindingClassBuilder(TBaseStructure<T>::Get()->GetName())
+TBaseStructureBuilder<T>::TBaseStructureBuilder(const FString& InNameSpace):
+	FBindingClassBuilder(TBaseStructure<T>::Get()->GetName(), InNameSpace)
 {
 }

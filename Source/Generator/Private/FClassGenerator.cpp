@@ -147,7 +147,7 @@ void FClassGenerator::Generator(UClass* InClass)
 	                                  *PathNameAttributeContent
 	);
 
-	UsingNameSpaces.Add(TEXT("Script.Binding"));
+	UsingNameSpaces.Add(TEXT("Script.Library"));
 
 	UsingNameSpaces.Add(FGeneratorCore::GetClassNameSpace(UClass::StaticClass()));
 

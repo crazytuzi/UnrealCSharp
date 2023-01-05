@@ -1,5 +1,18 @@
 ﻿#include "Domain/InternalCall/FFunctionImplementation.h"
+#include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
+
+struct FRegisterFunction
+{
+	FRegisterFunction()
+	{
+		FBindingClassBuilder(TEXT("Function"), NAMESPACE_FUNCTION)
+			.Function("Reflection", static_cast<void*>(FFunctionImplementation::Function_ReflectionImplementation))
+			.Register();
+	}
+};
+
+static FRegisterFunction RegisterFunction;
 
 void FFunctionImplementation::Function_ReflectionImplementation(
 	const MonoObject* InMonoObject, const UTF16CHAR* InFunctionName, MonoObject** ReturnValue, MonoObject** OutValue,

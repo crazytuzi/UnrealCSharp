@@ -1,6 +1,34 @@
 ﻿#include "Domain/InternalCall/FMulticastDelegateImplementation.h"
+#include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
+
+struct FRegisterMulticastDelegate
+{
+	FRegisterMulticastDelegate()
+	{
+		FBindingClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_DELEGATE)
+			.Function("IsBound",
+			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation))
+			.Function("Contains",
+			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation))
+			.Function("Add",
+			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_AddImplementation))
+			.Function("AddUnique",
+			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation))
+			.Function("Remove",
+			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation))
+			.Function("RemoveAll",
+			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation))
+			.Function("Clear",
+			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation))
+			.Function("Broadcast",
+			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation))
+			.Register();
+	}
+};
+
+static FRegisterMulticastDelegate RegisterMulticastDelegate;
 
 bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(const void* InAddress)
 {

@@ -1,7 +1,30 @@
 ﻿#include "Domain/InternalCall/FMapImplementation.h"
+#include "Binding/Class/FBindingClassBuilder.h"
 #include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FMapHelper.h"
+
+struct FRegisterMap
+{
+	FRegisterMap()
+	{
+		FBindingClassBuilder(TEXT("Map"), NAMESPACE_CONTAINER)
+			.Function("Register", static_cast<void*>(FMapImplementation::Map_RegisterImplementation))
+			.Function("UnRegister", static_cast<void*>(FMapImplementation::Map_UnRegisterImplementation))
+			.Function("Empty", static_cast<void*>(FMapImplementation::Map_EmptyImplementation))
+			.Function("Num", static_cast<void*>(FMapImplementation::Map_NumImplementation))
+			.Function("Add", static_cast<void*>(FMapImplementation::Map_AddImplementation))
+			.Function("Remove", static_cast<void*>(FMapImplementation::Map_RemoveImplementation))
+			.Function("FindKey", static_cast<void*>(FMapImplementation::Map_FindKeyImplementation))
+			.Function("Find", static_cast<void*>(FMapImplementation::Map_FindImplementation))
+			.Function("Contains", static_cast<void*>(FMapImplementation::Map_ContainsImplementation))
+			.Function("Get", static_cast<void*>(FMapImplementation::Map_GetImplementation))
+			.Function("Set", static_cast<void*>(FMapImplementation::Map_SetImplementation))
+			.Register();
+	}
+};
+
+static FRegisterMap RegisterMap;
 
 void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
                                                     MonoReflectionType* InValueReflectionType)
