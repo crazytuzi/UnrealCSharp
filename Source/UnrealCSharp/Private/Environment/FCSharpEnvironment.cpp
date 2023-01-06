@@ -153,6 +153,11 @@ bool FCSharpEnvironment::Bind(UObject* Object) const
 	return FCSharpBind::Bind(Domain, Object);
 }
 
+bool FCSharpEnvironment::Bind(UStruct* InStruct, const bool bNeedMonoClass) const
+{
+	return FCSharpBind::Bind(Domain, InStruct, bNeedMonoClass);
+}
+
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
                               MonoReflectionType* InValueReflectionType) const
 {

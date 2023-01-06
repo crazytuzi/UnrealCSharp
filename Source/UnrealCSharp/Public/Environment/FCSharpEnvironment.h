@@ -39,6 +39,8 @@ public:
 public:
 	bool Bind(UObject* Object) const;
 
+	bool Bind(UStruct* InStruct, bool bNeedMonoClass = true) const;
+
 	template <typename T>
 	auto Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const;
 

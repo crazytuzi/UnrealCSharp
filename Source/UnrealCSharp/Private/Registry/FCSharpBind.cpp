@@ -13,6 +13,16 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 	return BindImplementation(InMonoDomain, InObject);
 }
 
+bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool bNeedMonoClass)
+{
+	if (bNeedMonoClass && !CanBind(InMonoDomain, InStruct))
+	{
+		return false;
+	}
+
+	return BindImplementation(InMonoDomain, InStruct);
+}
+
 bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
                        MonoReflectionType* InValueReflectionType)
 {
@@ -22,16 +32,6 @@ bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflec
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName)
 {
 	return BindImplementation(InMonoDomain, InMonoObject, InStructName);
-}
-
-bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool bNeedMonoClass)
-{
-	if (bNeedMonoClass && !CanBind(InMonoDomain, InStruct))
-	{
-		return false;
-	}
-
-	return BindImplementation(InMonoDomain, InStruct);
 }
 
 bool FCSharpBind::Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction)
@@ -248,7 +248,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMo
 		return false;
 	}
 
-	if (!BindImplementation(InMonoDomain, InScriptStruct))
+	if (!Bind(InMonoDomain, InScriptStruct, false))
 	{
 		return false;
 	}
