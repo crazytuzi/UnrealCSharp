@@ -216,27 +216,6 @@ FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const UStruct* In
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetPropertyDescriptor(InPropertyName) : nullptr;
 }
 
-void* FCSharpEnvironment::GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct) const
-{
-	if (ObjectRegistry != nullptr)
-	{
-		if (const auto FoundObject = ObjectRegistry->GetAddress(InMonoObject, InStruct))
-		{
-			return FoundObject;
-		}
-	}
-
-	if (StructRegistry != nullptr)
-	{
-		if (const auto FoundStruct = StructRegistry->GetAddress(InMonoObject, InStruct))
-		{
-			return FoundStruct;
-		}
-	}
-
-	return nullptr;
-}
-
 bool FCSharpEnvironment::AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const
 {
 	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InObject, InMonoObject) : false;

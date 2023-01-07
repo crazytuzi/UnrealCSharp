@@ -65,6 +65,7 @@ public:
 	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, const FName& InPropertyName) const;
 
 public:
+	template<typename T>
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct) const;
 
 	bool AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const;

@@ -136,12 +136,12 @@ void FStructGenerator::Generator(UScriptStruct* InScriptStruct)
 			"\t\t{\n"
 			"\t\t\tget\n"
 			"\t\t\t{\n"
-			"\t\t\t\tPropertyUtils.GetProperty(this, \"%s\", out %s value);\n"
+			"\t\t\t\tPropertyUtils.GetStructProperty(this, \"%s\", out %s value);\n"
 			"\n"
 			"\t\t\t\treturn %s;\n"
 			"\t\t\t}\n"
 			"\n"
-			"\t\t\tset => PropertyUtils.SetProperty(this, \"%s\", %s);\n"
+			"\t\t\tset => PropertyUtils.SetStructProperty(this, \"%s\", %s);\n"
 			"\t\t}\n"
 		),
 		                                   *PropertyAccessSpecifiers,

@@ -6,6 +6,34 @@ auto FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InRe
 	return FCSharpBind::Bind<T>(InMonoObject, InReflectionType);
 }
 
+template <>
+inline void* FCSharpEnvironment::GetAddress<UObject>(const MonoObject* InMonoObject, UStruct*& InStruct) const
+{
+	if (ObjectRegistry != nullptr)
+	{
+		if (const auto FoundObject = ObjectRegistry->GetAddress(InMonoObject, InStruct))
+		{
+			return FoundObject;
+		}
+	}
+
+	return nullptr;
+}
+
+template <>
+inline void* FCSharpEnvironment::GetAddress<UScriptStruct>(const MonoObject* InMonoObject, UStruct*& InStruct) const
+{
+	if (StructRegistry != nullptr)
+	{
+		if (const auto FoundStruct = StructRegistry->GetAddress(InMonoObject, InStruct))
+		{
+			return FoundStruct;
+		}
+	}
+
+	return nullptr;
+}
+
 template <typename T>
 auto FCSharpEnvironment::GetContainer(const MonoObject* InMonoObject) const
 {
