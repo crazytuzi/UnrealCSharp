@@ -15,6 +15,8 @@ public:
 	void Deinitialize();
 
 public:
+	void* GetAddress(const MonoObject* InMonoObject);
+
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
 
 	MonoObject* GetObject(const UObject* InObject);

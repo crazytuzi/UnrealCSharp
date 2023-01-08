@@ -21,6 +21,16 @@ void FObjectRegistry::Deinitialize()
 	MonoObject2ObjectMap.Empty();
 }
 
+void* FObjectRegistry::GetAddress(const MonoObject* InMonoObject)
+{
+	if (const auto FoundObject = MonoObject2ObjectMap.Find(InMonoObject))
+	{
+		return *FoundObject;
+	}
+
+	return nullptr;
+}
+
 void* FObjectRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct)
 {
 	if (const auto FoundObject = MonoObject2ObjectMap.Find(InMonoObject))

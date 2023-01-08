@@ -31,18 +31,14 @@ void FStructRegistry::Deinitialize()
 	MonoObject2StructAddressMap.Empty();
 }
 
-MonoObject* FStructRegistry::GetObject(const void* InStruct)
+void* FStructRegistry::GetAddress(const MonoObject* InMonoObject)
 {
-	const auto FoundMonoObject = StructAddress2MonoObjectMap.Find(InStruct);
+	if (const auto FoundStructAddress = MonoObject2StructAddressMap.Find(InMonoObject))
+	{
+		return FoundStructAddress->Address;
+	}
 
-	return FoundMonoObject != nullptr ? *FoundMonoObject : nullptr;
-}
-
-void* FStructRegistry::GetStruct(const MonoObject* InMonoObject)
-{
-	const auto FoundStructAddress = MonoObject2StructAddressMap.Find(InMonoObject);
-
-	return FoundStructAddress != nullptr ? (*FoundStructAddress).Address : nullptr;
+	return nullptr;
 }
 
 void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct)
@@ -55,6 +51,20 @@ void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InSt
 	}
 
 	return nullptr;
+}
+
+MonoObject* FStructRegistry::GetObject(const void* InStruct)
+{
+	const auto FoundMonoObject = StructAddress2MonoObjectMap.Find(InStruct);
+
+	return FoundMonoObject != nullptr ? *FoundMonoObject : nullptr;
+}
+
+void* FStructRegistry::GetStruct(const MonoObject* InMonoObject)
+{
+	const auto FoundStructAddress = MonoObject2StructAddressMap.Find(InMonoObject);
+
+	return FoundStructAddress != nullptr ? (*FoundStructAddress).Address : nullptr;
 }
 
 bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject,
