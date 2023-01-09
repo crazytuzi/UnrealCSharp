@@ -177,7 +177,7 @@ void FStructGenerator::Generator(UScriptStruct* InScriptStruct)
 		"namespace %s\n"
 		"{\n"
 		"\t[PathName(\"%s\")]\n"
-		"\tpublic class %s%s\n"
+		"\tpublic partial class %s%s\n"
 		"\t{\n"
 		"%s"
 		"%s"
