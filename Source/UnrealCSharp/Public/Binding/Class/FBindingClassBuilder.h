@@ -1,11 +1,9 @@
 ﻿#pragma once
 
-#include "Macro/NamespaceMacro.h"
-
 class FBindingClassBuilder
 {
 public:
-	explicit FBindingClassBuilder(const FString& InClass, const FString& InNameSpace = NAMESPACE_BINDING);
+	explicit FBindingClassBuilder(const FString& InClass, const FString& InNameSpace);
 
 	virtual ~FBindingClassBuilder() = default;
 

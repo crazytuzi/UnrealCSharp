@@ -37,3 +37,7 @@
 #define CLASS_T_LAZY_OBJECT_PTR FString(TEXT("TLazyObjectPtr`1"))
 
 #define CLASS_T_SOFT_OBJECT_PTR FString(TEXT("TSoftObjectPtr`1"))
+
+#define CLASS_BASE_STRUCTURE(T) TBaseStructure<T>::Get()
+
+#define CLASS_BASE_STRUCTURE_NAME(T) FString::Printf(TEXT("F%s"), *CLASS_BASE_STRUCTURE(T)->GetName())

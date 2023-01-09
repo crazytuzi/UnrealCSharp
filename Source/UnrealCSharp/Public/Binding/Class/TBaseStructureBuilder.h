@@ -6,7 +6,7 @@ template <typename T>
 class TBaseStructureBuilder final : public FBindingClassBuilder
 {
 public:
-	explicit TBaseStructureBuilder(const FString& InNameSpace = NAMESPACE_BINDING);
+	explicit TBaseStructureBuilder(const FString& InNameSpace);
 };
 
 #include "TBaseStructureBuilder.inl"
