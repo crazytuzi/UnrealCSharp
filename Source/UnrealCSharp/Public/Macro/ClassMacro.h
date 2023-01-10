@@ -38,6 +38,6 @@
 
 #define CLASS_T_SOFT_OBJECT_PTR FString(TEXT("TSoftObjectPtr`1"))
 
-#define CLASS_BASE_STRUCTURE(T) TBaseStructure<T>::Get()
+#define CLASS_SCRIPT_STRUCT(T) TScriptStruct<T>::Get()
 
-#define CLASS_BASE_STRUCTURE_NAME(T) FString::Printf(TEXT("F%s"), *CLASS_BASE_STRUCTURE(T)->GetName())
+#define CLASS_SCRIPT_STRUCT_NAME(T) FString::Printf(TEXT("F%s"), *CLASS_SCRIPT_STRUCT(T)->GetName())

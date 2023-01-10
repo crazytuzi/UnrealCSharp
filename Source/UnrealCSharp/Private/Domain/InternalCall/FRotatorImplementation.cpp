@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FRotatorImplementation.h"
-#include "Binding/Class/TBaseStructureBuilder.h"
+#include "Binding/Class/TScriptStructBuilder.h"
 #include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
@@ -9,7 +9,7 @@ struct FRegisterRotator
 {
 	FRegisterRotator()
 	{
-		TBaseStructureBuilder<FRotator>(NAMESPACE_LIBRARY)
+		TScriptStructBuilder<FRotator>(NAMESPACE_LIBRARY)
 			.Function("Add", static_cast<void*>(FRotatorImplementation::Rotator_AddImplementation))
 			.Function("Subtract", static_cast<void*>(FRotatorImplementation::Rotator_SubtractImplementation))
 			.Function("Multiply", static_cast<void*>(FRotatorImplementation::Rotator_MultiplyImplementation))
@@ -69,8 +69,8 @@ void FRotatorImplementation::Rotator_AddImplementation(const MonoObject* A, cons
 		FCSharpEnvironment::GetEnvironment(), B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -101,8 +101,8 @@ void FRotatorImplementation::Rotator_SubtractImplementation(const MonoObject* A,
 		FCSharpEnvironment::GetEnvironment(), B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -130,8 +130,8 @@ void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* In
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -231,8 +231,8 @@ void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* In
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -259,8 +259,8 @@ void FRotatorImplementation::Rotator_GetInverseImplementation(const MonoObject* 
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -291,8 +291,8 @@ void FRotatorImplementation::Rotator_GridSnapImplementation(const MonoObject* In
 		FCSharpEnvironment::GetEnvironment(), RotGrid);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -319,8 +319,8 @@ void FRotatorImplementation::Rotator_VectorImplementation(const MonoObject* InMo
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FVector)),
-		CLASS_BASE_STRUCTURE_NAME(FVector));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -347,8 +347,8 @@ void FRotatorImplementation::Rotator_QuaternionImplementation(const MonoObject* 
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FQuat)),
-		CLASS_BASE_STRUCTURE_NAME(FQuat));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
+		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -377,8 +377,8 @@ void FRotatorImplementation::Rotator_EulerImplementation(const MonoObject* InMon
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FVector)),
-		CLASS_BASE_STRUCTURE_NAME(FVector));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -409,8 +409,8 @@ void FRotatorImplementation::Rotator_RotateVectorImplementation(const MonoObject
 		FCSharpEnvironment::GetEnvironment(), V);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FVector)),
-		CLASS_BASE_STRUCTURE_NAME(FVector));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -441,8 +441,8 @@ void FRotatorImplementation::Rotator_UnrotateVectorImplementation(const MonoObje
 		FCSharpEnvironment::GetEnvironment(), V);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FVector)),
-		CLASS_BASE_STRUCTURE_NAME(FVector));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -469,8 +469,8 @@ void FRotatorImplementation::Rotator_ClampImplementation(const MonoObject* InMon
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -497,8 +497,8 @@ void FRotatorImplementation::Rotator_GetNormalizedImplementation(const MonoObjec
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -526,8 +526,8 @@ void FRotatorImplementation::Rotator_GetDenormalizedImplementation(const MonoObj
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -564,8 +564,8 @@ void FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation(
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -611,8 +611,8 @@ void FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation(const Mo
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -639,8 +639,8 @@ void FRotatorImplementation::Rotator_SetClosestToMeImplementation(const MonoObje
 		FCSharpEnvironment::GetEnvironment(), InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -764,8 +764,8 @@ void FRotatorImplementation::Rotator_MakeFromEulerImplementation(const MonoObjec
 		FCSharpEnvironment::GetEnvironment(), Euler);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_BASE_STRUCTURE(FRotator)),
-		CLASS_BASE_STRUCTURE_NAME(FRotator));
+		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
