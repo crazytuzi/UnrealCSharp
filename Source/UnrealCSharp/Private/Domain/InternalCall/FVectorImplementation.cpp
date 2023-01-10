@@ -10,8 +10,6 @@ struct FRegisterVector
 	FRegisterVector()
 	{
 		TBaseStructureBuilder<FVector>(NAMESPACE_LIBRARY)
-			.Function("Register", static_cast<void*>(FVectorImplementation::Vector_RegisterImplementation))
-			.Function("UnRegister", static_cast<void*>(FVectorImplementation::Vector_UnRegisterImplementation))
 			.Function("CrossProduct", static_cast<void*>(FVectorImplementation::Vector_CrossProductImplementation))
 			.Function("DotProduct", static_cast<void*>(FVectorImplementation::Vector_DotProductImplementation))
 			.Function("Add", static_cast<void*>(FVectorImplementation::Vector_AddImplementation))
@@ -132,18 +130,6 @@ struct FRegisterVector
 };
 
 static FRegisterVector RegisterVector;
-
-void FVectorImplementation::Vector_RegisterImplementation(MonoObject* InMonoObject)
-{
-	const auto Vector = new FVector();
-
-	FCSharpEnvironment::GetEnvironment()->AddStructReference(CLASS_BASE_STRUCTURE(FVector), Vector, InMonoObject, true);
-}
-
-void FVectorImplementation::Vector_UnRegisterImplementation(MonoObject* InMonoObject)
-{
-	// @TODO
-}
 
 void FVectorImplementation::Vector_CrossProductImplementation(const MonoObject* A, const MonoObject* B,
                                                               MonoObject** OutValue)

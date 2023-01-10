@@ -5,10 +5,6 @@
 class FVectorImplementation
 {
 public:
-	static void Vector_RegisterImplementation(MonoObject* InMonoObject);
-
-	static void Vector_UnRegisterImplementation(MonoObject* InMonoObject);
-
 	static void Vector_CrossProductImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
 
 	static float Vector_DotProductImplementation(const MonoObject* A, const MonoObject* B);

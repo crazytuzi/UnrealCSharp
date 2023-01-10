@@ -1,6 +1,7 @@
 ﻿#include "Domain/InternalCall/FStructImplementation.h"
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Macro/NamespaceMacro.h"
 
 struct FRegisterStruct
 {
