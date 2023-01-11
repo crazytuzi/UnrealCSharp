@@ -78,13 +78,7 @@ void FRotatorImplementation::Rotator_AddImplementation(const MonoObject* A, cons
 
 	if (RotatorA != nullptr && RotatorB != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = RotatorA->operator+(*RotatorB);
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = RotatorA->operator+(*RotatorB);
 	}
 }
 
@@ -107,13 +101,7 @@ void FRotatorImplementation::Rotator_SubtractImplementation(const MonoObject* A,
 
 	if (RotatorA != nullptr && RotatorB != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = RotatorA->operator-(*RotatorB);
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = RotatorA->operator-(*RotatorB);
 	}
 }
 
@@ -134,13 +122,7 @@ void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* In
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Rotator->operator*(Scale);
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Rotator->operator*(Scale);
 	}
 }
 
@@ -225,13 +207,7 @@ void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* In
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Rotator->Add(DeltaPitch, DeltaYaw, DeltaRoll);
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Rotator->Add(DeltaPitch, DeltaYaw, DeltaRoll);
 	}
 }
 
@@ -251,13 +227,7 @@ void FRotatorImplementation::Rotator_GetInverseImplementation(const MonoObject* 
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Rotator->GetInverse();
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Rotator->GetInverse();
 	}
 }
 
@@ -280,13 +250,7 @@ void FRotatorImplementation::Rotator_GridSnapImplementation(const MonoObject* In
 
 	if (Rotator != nullptr && RotatorRotGrid != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Rotator->GridSnap(*RotatorRotGrid);
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Rotator->GridSnap(*RotatorRotGrid);
 	}
 }
 
@@ -306,13 +270,7 @@ void FRotatorImplementation::Rotator_VectorImplementation(const MonoObject* InMo
 
 	if (Rotator != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Rotator->Vector();
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Rotator->Vector();
 	}
 }
 
@@ -332,15 +290,7 @@ void FRotatorImplementation::Rotator_QuaternionImplementation(const MonoObject* 
 
 	if (Rotator != nullptr && OutQuat != nullptr)
 	{
-		const auto ResultQuat = Rotator->Quaternion();
-
-		OutQuat->X = ResultQuat.X;
-
-		OutQuat->Y = ResultQuat.Y;
-
-		OutQuat->Z = ResultQuat.Z;
-
-		OutQuat->W = ResultQuat.W;
+		*OutQuat = Rotator->Quaternion();
 	}
 }
 
@@ -360,13 +310,7 @@ void FRotatorImplementation::Rotator_EulerImplementation(const MonoObject* InMon
 
 	if (Rotator != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Rotator->Euler();
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Rotator->Euler();
 	}
 }
 
@@ -389,13 +333,7 @@ void FRotatorImplementation::Rotator_RotateVectorImplementation(const MonoObject
 
 	if (Rotator != nullptr && Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Rotator->RotateVector(*Vector);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Rotator->RotateVector(*Vector);
 	}
 }
 
@@ -418,13 +356,7 @@ void FRotatorImplementation::Rotator_UnrotateVectorImplementation(const MonoObje
 
 	if (Rotator != nullptr && Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Rotator->UnrotateVector(*Vector);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Rotator->UnrotateVector(*Vector);
 	}
 }
 
@@ -444,13 +376,7 @@ void FRotatorImplementation::Rotator_ClampImplementation(const MonoObject* InMon
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Rotator->Clamp();
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Rotator->Clamp();
 	}
 }
 
@@ -470,13 +396,7 @@ void FRotatorImplementation::Rotator_GetNormalizedImplementation(const MonoObjec
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Rotator->GetNormalized();
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Rotator->GetNormalized();
 	}
 }
 
@@ -497,13 +417,7 @@ void FRotatorImplementation::Rotator_GetDenormalizedImplementation(const MonoObj
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Rotator->GetDenormalized();
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Rotator->GetDenormalized();
 	}
 }
 
@@ -576,13 +490,7 @@ void FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation(const Mo
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Rotator->GetEquivalentRotator();
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Rotator->GetEquivalentRotator();
 	}
 }
 
@@ -721,12 +629,6 @@ void FRotatorImplementation::Rotator_MakeFromEulerImplementation(const MonoObjec
 
 	if (Vector != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = FRotator::MakeFromEuler(*Vector);
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = FRotator::MakeFromEuler(*Vector);
 	}
 }

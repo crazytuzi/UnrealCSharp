@@ -150,13 +150,7 @@ void FVectorImplementation::Vector_CrossProductImplementation(const MonoObject* 
 
 	if (VectorA != nullptr && VectorB != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = VectorA->operator^(*VectorB);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = VectorA->operator^(*VectorB);
 	}
 }
 
@@ -192,13 +186,7 @@ void FVectorImplementation::Vector_AddImplementation(const MonoObject* A, const 
 
 	if (VectorA != nullptr && VectorB != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = VectorA->operator+(*VectorB);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = VectorA->operator+(*VectorB);
 	}
 }
 
@@ -219,13 +207,7 @@ void FVectorImplementation::Vector_AddBiasImplementation(const MonoObject* InMon
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->operator+(Bias);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->operator+(Bias);
 	}
 }
 
@@ -248,13 +230,7 @@ void FVectorImplementation::Vector_SubtractImplementation(const MonoObject* A, c
 
 	if (VectorA != nullptr && VectorB != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = VectorA->operator-(*VectorB);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = VectorA->operator-(*VectorB);
 	}
 }
 
@@ -275,13 +251,7 @@ void FVectorImplementation::Vector_SubtractBiasImplementation(const MonoObject* 
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->operator-(Bias);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->operator-(Bias);
 	}
 }
 
@@ -304,13 +274,7 @@ void FVectorImplementation::Vector_MultiplyImplementation(const MonoObject* A, c
 
 	if (VectorA != nullptr && VectorB != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = VectorA->operator*(*VectorB);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = VectorA->operator*(*VectorB);
 	}
 }
 
@@ -331,13 +295,7 @@ void FVectorImplementation::Vector_MultiplyScaleImplementation(const MonoObject*
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->operator*(Scale);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->operator*(Scale);
 	}
 }
 
@@ -359,13 +317,7 @@ void FVectorImplementation::Vector_DivideImplementation(const MonoObject* A, con
 
 	if (VectorA != nullptr && VectorB != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = VectorA->operator/(*VectorB);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = VectorA->operator/(*VectorB);
 	}
 }
 
@@ -386,13 +338,7 @@ void FVectorImplementation::Vector_DivideScaleImplementation(const MonoObject* I
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->operator/(Scale);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->operator/(Scale);
 	}
 }
 
@@ -465,13 +411,7 @@ void FVectorImplementation::Vector_NegatedImplementation(const MonoObject* InMon
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->operator-();
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->operator-();
 	}
 }
 
@@ -660,13 +600,7 @@ void FVectorImplementation::Vector_GetUnsafeNormalImplementation(const MonoObjec
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetUnsafeNormal();
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetUnsafeNormal();
 	}
 }
 
@@ -687,13 +621,7 @@ void FVectorImplementation::Vector_GetSafeNormalImplementation(const MonoObject*
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetSafeNormal(Tolerance);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetSafeNormal(Tolerance);
 	}
 }
 
@@ -714,13 +642,7 @@ void FVectorImplementation::Vector_GetSafeNormal2DImplementation(const MonoObjec
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetSafeNormal2D(Tolerance);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetSafeNormal2D(Tolerance);
 	}
 }
 
@@ -761,13 +683,7 @@ void FVectorImplementation::Vector_GetSignVectorImplementation(const MonoObject*
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetSignVector();
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetSignVector();
 	}
 }
 
@@ -787,13 +703,7 @@ void FVectorImplementation::Vector_ProjectionImplementation(const MonoObject* In
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->Projection();
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->Projection();
 	}
 }
 
@@ -814,13 +724,7 @@ void FVectorImplementation::Vector_GetUnsafeNormal2DImplementation(const MonoObj
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetUnsafeNormal2D();
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetUnsafeNormal2D();
 	}
 }
 
@@ -841,13 +745,7 @@ void FVectorImplementation::Vector_GridSnapImplementation(const MonoObject* InMo
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GridSnap(GridSz);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GridSnap(GridSz);
 	}
 }
 
@@ -868,13 +766,7 @@ void FVectorImplementation::Vector_BoundToCubeImplementation(const MonoObject* I
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->BoundToCube(Radius);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->BoundToCube(Radius);
 	}
 }
 
@@ -899,13 +791,7 @@ void FVectorImplementation::Vector_BoundToBoxImplementation(const MonoObject* In
 
 	if (Vector != nullptr && VectorMin != nullptr && VectorMax != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->BoundToBox(*VectorMin, *VectorMax);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->BoundToBox(*VectorMin, *VectorMax);
 	}
 }
 
@@ -926,13 +812,7 @@ void FVectorImplementation::Vector_GetClampedToSizeImplementation(const MonoObje
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetClampedToSize(Min, Max);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetClampedToSize(Min, Max);
 	}
 }
 
@@ -953,13 +833,7 @@ void FVectorImplementation::Vector_GetClampedToSize2DImplementation(const MonoOb
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetClampedToSize2D(Min, Max);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetClampedToSize2D(Min, Max);
 	}
 }
 
@@ -980,13 +854,7 @@ void FVectorImplementation::Vector_GetClampedToMaxSizeImplementation(const MonoO
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetClampedToMaxSize(MaxSize);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetClampedToMaxSize(MaxSize);
 	}
 }
 
@@ -1007,13 +875,7 @@ void FVectorImplementation::Vector_GetClampedToMaxSize2DImplementation(const Mon
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->GetClampedToMaxSize2D(MaxSize);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->GetClampedToMaxSize2D(MaxSize);
 	}
 }
 
@@ -1046,13 +908,7 @@ void FVectorImplementation::Vector_ReciprocalImplementation(const MonoObject* In
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->Reciprocal();
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->Reciprocal();
 	}
 }
 
@@ -1088,13 +944,7 @@ void FVectorImplementation::Vector_MirrorByVectorImplementation(const MonoObject
 
 	if (Vector != nullptr && VectorMirrorNormal != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->MirrorByVector(*VectorMirrorNormal);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->MirrorByVector(*VectorMirrorNormal);
 	}
 }
 
@@ -1117,13 +967,7 @@ void FVectorImplementation::Vector_MirrorByPlaneImplementation(const MonoObject*
 
 	if (Vector != nullptr && PlanePlane != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->MirrorByPlane(*PlanePlane);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->MirrorByPlane(*PlanePlane);
 	}
 }
 
@@ -1146,13 +990,7 @@ void FVectorImplementation::Vector_RotateAngleAxisImplementation(const MonoObjec
 
 	if (Vector != nullptr && VectorAxis != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->RotateAngleAxis(AngleDeg, *VectorAxis);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->RotateAngleAxis(AngleDeg, *VectorAxis);
 	}
 }
 
@@ -1189,13 +1027,7 @@ void FVectorImplementation::Vector_ProjectOnToImplementation(const MonoObject* I
 
 	if (Vector != nullptr && VectorA != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->ProjectOnTo(*VectorA);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->ProjectOnTo(*VectorA);
 	}
 }
 
@@ -1218,13 +1050,7 @@ void FVectorImplementation::Vector_ProjectOnToNormalImplementation(const MonoObj
 
 	if (Vector != nullptr && VectorNormal != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = Vector->ProjectOnToNormal(*VectorNormal);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = Vector->ProjectOnToNormal(*VectorNormal);
 	}
 }
 
@@ -1245,13 +1071,7 @@ void FVectorImplementation::Vector_ToOrientationRotatorImplementation(const Mono
 
 	if (Vector != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Vector->ToOrientationRotator();
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Vector->ToOrientationRotator();
 	}
 }
 
@@ -1272,15 +1092,7 @@ void FVectorImplementation::Vector_ToOrientationQuatImplementation(const MonoObj
 
 	if (Vector != nullptr && OutQuat != nullptr)
 	{
-		const auto ResultQuat = Vector->ToOrientationQuat();
-
-		OutQuat->X = ResultQuat.X;
-
-		OutQuat->Y = ResultQuat.Y;
-
-		OutQuat->Z = ResultQuat.Z;
-
-		OutQuat->W = ResultQuat.W;
+		*OutQuat = Vector->ToOrientationQuat();
 	}
 }
 
@@ -1300,13 +1112,7 @@ void FVectorImplementation::Vector_RotationImplementation(const MonoObject* InMo
 
 	if (Vector != nullptr && OutRotator != nullptr)
 	{
-		const auto ResultRotator = Vector->Rotation();
-
-		OutRotator->Pitch = ResultRotator.Pitch;
-
-		OutRotator->Yaw = ResultRotator.Yaw;
-
-		OutRotator->Roll = ResultRotator.Roll;
+		*OutRotator = Vector->Rotation();
 	}
 }
 
@@ -1476,11 +1282,7 @@ void FVectorImplementation::Vector_UnitCartesianToSphericalImplementation(
 
 	if (Vector != nullptr && OutVector2D != nullptr)
 	{
-		const auto ResultVector2D = Vector->UnitCartesianToSpherical();
-
-		OutVector2D->X = ResultVector2D.X;
-
-		OutVector2D->Y = ResultVector2D.Y;
+		*OutVector2D = Vector->UnitCartesianToSpherical();
 	}
 }
 
@@ -1596,13 +1398,7 @@ void FVectorImplementation::Vector_PointPlaneProjectByPlaneImplementation(
 
 	if (VectorPoint != nullptr && PlanePlane != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = FVector::PointPlaneProject(*VectorPoint, *PlanePlane);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = FVector::PointPlaneProject(*VectorPoint, *PlanePlane);
 	}
 }
 
@@ -1630,13 +1426,7 @@ void FVectorImplementation::Vector_PointPlaneProjectByPointsImplementation(
 	if (VectorPoint != nullptr && VectorA != nullptr && VectorB != nullptr && VectorC != nullptr && OutVector !=
 		nullptr)
 	{
-		const auto ResultVector = FVector::PointPlaneProject(*VectorPoint, *VectorA, *VectorB, *VectorC);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = FVector::PointPlaneProject(*VectorPoint, *VectorA, *VectorB, *VectorC);
 	}
 }
 
@@ -1662,13 +1452,7 @@ void FVectorImplementation::Vector_PointPlaneProjectByPlaneBaseAndPlaneNormalImp
 
 	if (VectorPoint != nullptr && VectorPlaneBase != nullptr && VectorPlaneNormal != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = FVector::PointPlaneProject(*VectorPoint, *VectorPlaneBase, *VectorPlaneNormal);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = FVector::PointPlaneProject(*VectorPoint, *VectorPlaneBase, *VectorPlaneNormal);
 	}
 }
 
@@ -1692,13 +1476,7 @@ void FVectorImplementation::Vector_VectorPlaneProjectImplementation(const MonoOb
 
 	if (VectorV != nullptr && VectorPlaneNormal != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = FVector::VectorPlaneProject(*VectorV, *VectorPlaneNormal);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = FVector::VectorPlaneProject(*VectorV, *VectorPlaneNormal);
 	}
 }
 
@@ -1911,13 +1689,7 @@ void FVectorImplementation::Vector_RadiansToDegreesImplementation(const MonoObje
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = FVector::RadiansToDegrees(*Vector);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = FVector::RadiansToDegrees(*Vector);
 	}
 }
 
@@ -1937,12 +1709,6 @@ void FVectorImplementation::Vector_DegreesToRadiansImplementation(const MonoObje
 
 	if (Vector != nullptr && OutVector != nullptr)
 	{
-		const auto ResultVector = FVector::DegreesToRadians(*Vector);
-
-		OutVector->X = ResultVector.X;
-
-		OutVector->Y = ResultVector.Y;
-
-		OutVector->Z = ResultVector.Z;
+		*OutVector = FVector::DegreesToRadians(*Vector);
 	}
 }
