@@ -36,6 +36,12 @@ T* FCSharpEnvironment::TGetAddress<UScriptStruct, T>::operator()(const FCSharpEn
 	return nullptr;
 }
 
+template <typename T, typename U>
+U* FCSharpEnvironment::GetAddress(const MonoObject* InMonoObject) const
+{
+	return TGetAddress<T, U>()(this, InMonoObject);
+}
+
 template <>
 inline void* FCSharpEnvironment::GetAddress<UObject>(const MonoObject* InMonoObject, UStruct*& InStruct) const
 {

@@ -62,11 +62,9 @@ static FRegisterRotator RegisterRotator;
 
 void FRotatorImplementation::Rotator_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
 {
-	const auto RotatorA = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), A);
+	const auto RotatorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(A);
 
-	const auto RotatorB = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), B);
+	const auto RotatorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -76,8 +74,7 @@ void FRotatorImplementation::Rotator_AddImplementation(const MonoObject* A, cons
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (RotatorA != nullptr && RotatorB != nullptr && OutRotator != nullptr)
 	{
@@ -94,11 +91,9 @@ void FRotatorImplementation::Rotator_AddImplementation(const MonoObject* A, cons
 void FRotatorImplementation::Rotator_SubtractImplementation(const MonoObject* A, const MonoObject* B,
                                                             MonoObject** OutValue)
 {
-	const auto RotatorA = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), A);
+	const auto RotatorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(A);
 
-	const auto RotatorB = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), B);
+	const auto RotatorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -108,8 +103,7 @@ void FRotatorImplementation::Rotator_SubtractImplementation(const MonoObject* A,
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (RotatorA != nullptr && RotatorB != nullptr && OutRotator != nullptr)
 	{
@@ -126,8 +120,7 @@ void FRotatorImplementation::Rotator_SubtractImplementation(const MonoObject* A,
 void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* InMonoObject, const float Scale,
                                                             MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -137,8 +130,7 @@ void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* In
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
@@ -154,11 +146,9 @@ void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* In
 
 bool FRotatorImplementation::Rotator_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto RotatorA = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), A);
+	const auto RotatorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(A);
 
-	const auto RotatorB = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), B);
+	const auto RotatorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(B);
 
 	if (RotatorA != nullptr && RotatorB != nullptr)
 	{
@@ -170,11 +160,9 @@ bool FRotatorImplementation::Rotator_EqualityImplementation(const MonoObject* A,
 
 bool FRotatorImplementation::Rotator_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto RotatorA = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), A);
+	const auto RotatorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(A);
 
-	const auto RotatorB = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), B);
+	const auto RotatorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(B);
 
 	if (RotatorA != nullptr && RotatorB != nullptr)
 	{
@@ -186,8 +174,7 @@ bool FRotatorImplementation::Rotator_InequalityImplementation(const MonoObject* 
 
 bool FRotatorImplementation::Rotator_IsNearlyZeroImplementation(const MonoObject* InMonoObject, const float Tolerance)
 {
-	if (const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject))
+	if (const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject))
 	{
 		return Rotator->IsNearlyZero(Tolerance);
 	}
@@ -197,8 +184,7 @@ bool FRotatorImplementation::Rotator_IsNearlyZeroImplementation(const MonoObject
 
 bool FRotatorImplementation::Rotator_IsZeroImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject))
+	if (const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject))
 	{
 		return Rotator->IsZero();
 	}
@@ -209,11 +195,9 @@ bool FRotatorImplementation::Rotator_IsZeroImplementation(const MonoObject* InMo
 bool FRotatorImplementation::Rotator_EqualsImplementation(const MonoObject* A, const MonoObject* B,
                                                           const float Tolerance)
 {
-	const auto RotatorA = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), A);
+	const auto RotatorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(A);
 
-	const auto RotatorB = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), B);
+	const auto RotatorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(B);
 
 	if (RotatorA != nullptr && RotatorB != nullptr)
 	{
@@ -227,8 +211,7 @@ void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* In
                                                             const float DeltaYaw, const float DeltaRoll,
                                                             MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -238,8 +221,7 @@ void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* In
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
@@ -255,8 +237,7 @@ void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* In
 
 void FRotatorImplementation::Rotator_GetInverseImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -266,8 +247,7 @@ void FRotatorImplementation::Rotator_GetInverseImplementation(const MonoObject* 
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
@@ -284,11 +264,9 @@ void FRotatorImplementation::Rotator_GetInverseImplementation(const MonoObject* 
 void FRotatorImplementation::Rotator_GridSnapImplementation(const MonoObject* InMonoObject, const MonoObject* RotGrid,
                                                             MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
-	const auto RotatorRotGrid = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), RotGrid);
+	const auto RotatorRotGrid = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(RotGrid);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -298,8 +276,7 @@ void FRotatorImplementation::Rotator_GridSnapImplementation(const MonoObject* In
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && RotatorRotGrid != nullptr && OutRotator != nullptr)
 	{
@@ -315,8 +292,7 @@ void FRotatorImplementation::Rotator_GridSnapImplementation(const MonoObject* In
 
 void FRotatorImplementation::Rotator_VectorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
@@ -326,8 +302,7 @@ void FRotatorImplementation::Rotator_VectorImplementation(const MonoObject* InMo
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::TGetAddress<UScriptStruct, FVector>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Rotator != nullptr && OutVector != nullptr)
 	{
@@ -343,8 +318,7 @@ void FRotatorImplementation::Rotator_VectorImplementation(const MonoObject* InMo
 
 void FRotatorImplementation::Rotator_QuaternionImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
@@ -354,8 +328,7 @@ void FRotatorImplementation::Rotator_QuaternionImplementation(const MonoObject* 
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::TGetAddress<UScriptStruct, FQuat>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Rotator != nullptr && OutQuat != nullptr)
 	{
@@ -373,8 +346,7 @@ void FRotatorImplementation::Rotator_QuaternionImplementation(const MonoObject* 
 
 void FRotatorImplementation::Rotator_EulerImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
@@ -384,8 +356,7 @@ void FRotatorImplementation::Rotator_EulerImplementation(const MonoObject* InMon
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::TGetAddress<UScriptStruct, FVector>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Rotator != nullptr && OutVector != nullptr)
 	{
@@ -402,11 +373,9 @@ void FRotatorImplementation::Rotator_EulerImplementation(const MonoObject* InMon
 void FRotatorImplementation::Rotator_RotateVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
                                                                 MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::TGetAddress<UScriptStruct, FVector>()(
-		FCSharpEnvironment::GetEnvironment(), V);
+	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(V);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
@@ -416,8 +385,7 @@ void FRotatorImplementation::Rotator_RotateVectorImplementation(const MonoObject
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::TGetAddress<UScriptStruct, FVector>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Rotator != nullptr && Vector != nullptr && OutVector != nullptr)
 	{
@@ -434,11 +402,9 @@ void FRotatorImplementation::Rotator_RotateVectorImplementation(const MonoObject
 void FRotatorImplementation::Rotator_UnrotateVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
                                                                   MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::TGetAddress<UScriptStruct, FVector>()(
-		FCSharpEnvironment::GetEnvironment(), V);
+	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(V);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
@@ -448,8 +414,7 @@ void FRotatorImplementation::Rotator_UnrotateVectorImplementation(const MonoObje
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::TGetAddress<UScriptStruct, FVector>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Rotator != nullptr && Vector != nullptr && OutVector != nullptr)
 	{
@@ -465,8 +430,7 @@ void FRotatorImplementation::Rotator_UnrotateVectorImplementation(const MonoObje
 
 void FRotatorImplementation::Rotator_ClampImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -476,8 +440,7 @@ void FRotatorImplementation::Rotator_ClampImplementation(const MonoObject* InMon
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
@@ -493,8 +456,7 @@ void FRotatorImplementation::Rotator_ClampImplementation(const MonoObject* InMon
 
 void FRotatorImplementation::Rotator_GetNormalizedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -504,8 +466,7 @@ void FRotatorImplementation::Rotator_GetNormalizedImplementation(const MonoObjec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
@@ -522,8 +483,7 @@ void FRotatorImplementation::Rotator_GetNormalizedImplementation(const MonoObjec
 void FRotatorImplementation::Rotator_GetDenormalizedImplementation(const MonoObject* InMonoObject,
                                                                    MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -533,8 +493,7 @@ void FRotatorImplementation::Rotator_GetDenormalizedImplementation(const MonoObj
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
@@ -550,8 +509,7 @@ void FRotatorImplementation::Rotator_GetDenormalizedImplementation(const MonoObj
 
 void FRotatorImplementation::Rotator_NormalizeImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject))
+	if (const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject))
 	{
 		Rotator->Normalize();
 	}
@@ -560,8 +518,7 @@ void FRotatorImplementation::Rotator_NormalizeImplementation(const MonoObject* I
 void FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation(
 	const MonoObject* InMonoObject, MonoObject** Winding, MonoObject** Remainder)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -571,15 +528,15 @@ void FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation(
 
 	*Winding = NewMonoObject1;
 
-	const auto OutWindingRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject1);
+	const auto OutWindingRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(
+		NewMonoObject1);
 
 	const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
 	*Remainder = NewMonoObject2;
 
-	const auto OutRemainderRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject2);
+	const auto OutRemainderRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(
+		NewMonoObject2);
 
 	if (Rotator != nullptr && OutWindingRotator != nullptr && OutRemainderRotator != nullptr)
 	{
@@ -590,11 +547,9 @@ void FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation(
 float FRotatorImplementation::Rotator_GetManhattanDistanceImplementation(
 	const MonoObject* InMonoObject, const MonoObject* Rotator)
 {
-	const auto RotatorA = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto RotatorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
-	const auto RotatorB = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), Rotator);
+	const auto RotatorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(Rotator);
 
 	if (RotatorA != nullptr && RotatorB != nullptr)
 	{
@@ -607,8 +562,7 @@ float FRotatorImplementation::Rotator_GetManhattanDistanceImplementation(
 void FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation(const MonoObject* InMonoObject,
                                                                         MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -618,8 +572,7 @@ void FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation(const Mo
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
@@ -635,8 +588,7 @@ void FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation(const Mo
 
 void FRotatorImplementation::Rotator_SetClosestToMeImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -646,8 +598,7 @@ void FRotatorImplementation::Rotator_SetClosestToMeImplementation(const MonoObje
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Rotator != nullptr && OutRotator != nullptr)
 	{
@@ -657,8 +608,7 @@ void FRotatorImplementation::Rotator_SetClosestToMeImplementation(const MonoObje
 
 void FRotatorImplementation::Rotator_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	if (Rotator != nullptr)
 	{
@@ -680,8 +630,7 @@ void FRotatorImplementation::Rotator_ToStringImplementation(const MonoObject* In
 void FRotatorImplementation::Rotator_ToCompactStringImplementation(const MonoObject* InMonoObject,
                                                                    MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	if (Rotator != nullptr)
 	{
@@ -703,8 +652,7 @@ void FRotatorImplementation::Rotator_ToCompactStringImplementation(const MonoObj
 bool FRotatorImplementation::Rotator_InitFromStringImplementation(const MonoObject* InMonoObject,
                                                                   MonoObject* InSourceString)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	if (Rotator != nullptr && InSourceString != nullptr)
 	{
@@ -717,8 +665,7 @@ bool FRotatorImplementation::Rotator_InitFromStringImplementation(const MonoObje
 
 bool FRotatorImplementation::Rotator_ContainsNaNImplementation(const MonoObject* InMonoObject)
 {
-	const auto Rotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(InMonoObject);
 
 	if (Rotator != nullptr)
 	{
@@ -760,8 +707,7 @@ float FRotatorImplementation::Rotator_DecompressAxisFromShortImplementation(cons
 
 void FRotatorImplementation::Rotator_MakeFromEulerImplementation(const MonoObject* Euler, MonoObject** OutValue)
 {
-	const auto Vector = FCSharpEnvironment::TGetAddress<UScriptStruct, FVector>()(
-		FCSharpEnvironment::GetEnvironment(), Euler);
+	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Euler);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
@@ -771,8 +717,7 @@ void FRotatorImplementation::Rotator_MakeFromEulerImplementation(const MonoObjec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::TGetAddress<UScriptStruct, FRotator>()(
-		FCSharpEnvironment::GetEnvironment(), NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Vector != nullptr && OutRotator != nullptr)
 	{

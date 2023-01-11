@@ -65,27 +65,11 @@ public:
 	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, const FName& InPropertyName) const;
 
 public:
-	template <typename T, typename U>
-	class TGetAddress
-	{
-	};
-
-	template <typename T>
-	class TGetAddress<UObject, T>
-	{
-	public:
-		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
-	};
-
-	template <typename T>
-	class TGetAddress<UScriptStruct, T>
-	{
-	public:
-		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
-	};
-	
 	template<typename T>
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct) const;
+
+	template <typename T, typename U>
+	U* GetAddress(const MonoObject* InMonoObject) const;
 
 	bool AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const;
 
@@ -147,6 +131,26 @@ public:
 
 	bool AddBindingReference(void* InBinding, MonoObject* InMonoObject) const;
 
+private:
+	template <typename T, typename U>
+	class TGetAddress
+	{
+	};
+
+	template <typename T>
+	class TGetAddress<UObject, T>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
+	};
+
+	template <typename T>
+	class TGetAddress<UScriptStruct, T>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
+	};
+	
 private:
 	static FCSharpEnvironment* Environment;
 
