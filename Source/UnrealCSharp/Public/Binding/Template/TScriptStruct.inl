@@ -197,3 +197,9 @@ struct TScriptStruct<FTestUninitializedScriptStructMembersTest>
 {
 	static UScriptStruct* Get() { return TBaseStructure<FTestUninitializedScriptStructMembersTest>::Get(); }
 };
+
+template <>
+struct TScriptStruct<FMatrix>
+{
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(TEXT("Matrix")); }
+};
