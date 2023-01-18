@@ -203,3 +203,9 @@ struct TScriptStruct<FMatrix>
 {
 	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(TEXT("Matrix")); }
 };
+
+template <>
+struct TScriptStruct<FIntPoint>
+{
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(TEXT("IntPoint")); }
+};
