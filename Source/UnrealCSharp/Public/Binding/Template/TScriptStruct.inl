@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "TScriptStructName.inl"
+
 static UScriptStruct* StaticGetBaseStructureInternal(const FName& Name)
 {
 	static auto CoreUObjectPkg = FindObjectChecked<UPackage>(nullptr, TEXT("/Script/CoreUObject"));
@@ -201,11 +203,11 @@ struct TScriptStruct<FTestUninitializedScriptStructMembersTest>
 template <>
 struct TScriptStruct<FMatrix>
 {
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(TEXT("Matrix")); }
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FMatrix>::Get()); }
 };
 
 template <>
 struct TScriptStruct<FIntPoint>
 {
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(TEXT("IntPoint")); }
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FIntPoint>::Get()); }
 };

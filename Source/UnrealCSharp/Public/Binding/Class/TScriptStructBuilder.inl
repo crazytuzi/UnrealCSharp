@@ -4,6 +4,6 @@
 
 template <typename T>
 TScriptStructBuilder<T>::TScriptStructBuilder(const FString& InNameSpace):
-	FBindingClassBuilder(TScriptStruct<T>::Get()->GetName(), InNameSpace)
+	FBindingClassBuilder(TScriptStructName<T>::Get(), InNameSpace)
 {
 }
