@@ -39,7 +39,7 @@ private:
 	static bool BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName);
 
 private:
-	static bool CanBind(const FMonoDomain* InMonoDomain, const UStruct* InStruct);
+	static bool CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct);
 
 private:
 	static UFunction* GetOriginalFunction(FClassDescriptor* InClassDescriptor, UFunction* InFunction);
@@ -56,6 +56,9 @@ private:
 	static bool IsOverrideType(const FMonoDomain* InMonoDomain, MonoReflectionType* InMonoReflectionType);
 
 	static bool IsOverrideMethod(const FMonoDomain* InMonoDomain, MonoReflectionMethod* InMonoReflectionMethod);
+
+private:
+	static TSet<TWeakObjectPtr<UStruct>> NotOverrideTypes;
 };
 
 #include "FCSharpBind.inl"

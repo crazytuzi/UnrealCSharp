@@ -8,6 +8,8 @@
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
 
+TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
+
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 {
 	return BindImplementation(InMonoDomain, InObject);
@@ -17,6 +19,8 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool 
 {
 	if (bNeedMonoClass && !CanBind(InMonoDomain, InStruct))
 	{
+		NotOverrideTypes.Add(InStruct);
+		
 		return false;
 	}
 
@@ -264,8 +268,13 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMo
 	return true;
 }
 
-bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, const UStruct* InStruct)
+bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct)
 {
+	if (NotOverrideTypes.Contains(InStruct))
+	{
+		return false;
+	}
+	
 	if (FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(InStruct))
 	{
 		return true;
