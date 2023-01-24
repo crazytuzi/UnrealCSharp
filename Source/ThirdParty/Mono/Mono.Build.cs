@@ -17,23 +17,20 @@ public class Mono : ModuleRules
 		{
 			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-2.0-sgen.lib"));
 
-			if (!Target.bBuildEditor)
+			RuntimeDependencies.Add("$(BinaryOutputDir)/mono-2.0-sgen.dll",
+				Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-2.0-sgen.dll"));
+
+			var Files = GetFiles(Path.Combine(LibraryPath, "mono"))
+				.Union(GetFiles(Path.Combine(ModuleDirectory, "etc")));
+
+			foreach (var File in Files)
 			{
-				RuntimeDependencies.Add("$(TargetOutputDir)/mono-2.0-sgen.dll",
-					Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-2.0-sgen.dll"));
+				var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
 
-				var Files = GetFiles(Path.Combine(LibraryPath, "mono"))
-					.Union(GetFiles(Path.Combine(ModuleDirectory, "etc")));
+				var DestPath = File.Substring(ModuleLastDirectory.Length + 1,
+					File.Length - ModuleLastDirectory.Length - 1);
 
-				foreach (var File in Files)
-				{
-					var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
-
-					var DestPath = File.Substring(ModuleLastDirectory.Length + 1,
-						File.Length - ModuleLastDirectory.Length - 1);
-
-					RuntimeDependencies.Add("$(TargetOutputDir)/" + DestPath, File);
-				}
+				RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
 			}
 		}
 	}

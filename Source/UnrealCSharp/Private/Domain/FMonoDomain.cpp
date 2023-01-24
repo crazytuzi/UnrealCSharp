@@ -26,7 +26,18 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 {
 	RegisterMonoTrace();
 
-#if !WITH_EDITOR
+#if WITH_EDITOR
+	auto MonoDir = FString::Printf(
+		TEXT("%s/Binaries/%s"),
+		*FPaths::ProjectDir(),
+#if PLATFORM_WINDOWS
+		TEXT("Win64")
+#endif
+	);
+
+	mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/lib"))),
+	              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/etc"))));
+#else
 	mono_set_dirs("Mono/lib", "Mono/etc");
 #endif
 
