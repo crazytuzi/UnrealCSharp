@@ -211,3 +211,9 @@ struct TScriptStruct<FIntPoint>
 {
 	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FIntPoint>::Get()); }
 };
+
+template <>
+struct TScriptStruct<FTimespan>
+{
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FTimespan>::Get()); }
+};

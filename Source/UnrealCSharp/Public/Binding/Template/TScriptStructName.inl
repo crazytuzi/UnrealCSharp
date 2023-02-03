@@ -193,3 +193,9 @@ struct TScriptStructName<FIntPoint>
 {
 	static FString Get() { return TEXT("IntPoint"); }
 };
+
+template <>
+struct TScriptStructName<FTimespan>
+{
+	static FString Get() { return TEXT("Timespan"); }
+};
