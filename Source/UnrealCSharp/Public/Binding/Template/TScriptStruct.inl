@@ -217,3 +217,9 @@ struct TScriptStruct<FTimespan>
 {
 	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FTimespan>::Get()); }
 };
+
+template <>
+struct TScriptStruct<FAssetBundleEntry>
+{
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FAssetBundleEntry>::Get()); }
+};

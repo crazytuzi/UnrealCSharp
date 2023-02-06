@@ -199,3 +199,9 @@ struct TScriptStructName<FTimespan>
 {
 	static FString Get() { return TEXT("Timespan"); }
 };
+
+template <>
+struct TScriptStructName<FAssetBundleEntry>
+{
+	static FString Get() { return TEXT("AssetBundleEntry"); }
+};
