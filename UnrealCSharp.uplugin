@@ -29,6 +29,11 @@
 			"Name": "Generator",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "Compiler",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	]
 }
