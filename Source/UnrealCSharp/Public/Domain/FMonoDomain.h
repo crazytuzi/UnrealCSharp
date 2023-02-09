@@ -101,6 +101,8 @@ private:
 	void RegisterBinding();
 
 private:
+	static MonoDomain* RootDomain;
+	
 	MonoDomain* Domain;
 
 	MonoAssembly* Assembly;

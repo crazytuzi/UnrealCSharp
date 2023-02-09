@@ -9,6 +9,8 @@
 #include "mono/metadata/assembly.h"
 #include "mono/utils/mono-logger.h"
 
+MonoDomain* FMonoDomain::RootDomain = nullptr;
+
 FMonoDomain::FMonoDomain(const FMonoDomainInitializeParams& Params):
 	Domain(nullptr),
 	Assembly(nullptr),
@@ -26,23 +28,30 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 {
 	RegisterMonoTrace();
 
+	if (RootDomain == nullptr)
+	{
 #if WITH_EDITOR
-	auto MonoDir = FString::Printf(
-		TEXT("%s/Binaries/%s"),
-		*FPaths::ProjectDir(),
+		auto MonoDir = FString::Printf(TEXT(
+			"%s/Binaries/%s"),
+		                               *FPaths::ProjectDir(),
 #if PLATFORM_WINDOWS
-		TEXT("Win64")
+		                               TEXT("Win64")
 #endif
-	);
+		);
 
-	mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/lib"))),
-	              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/etc"))));
+		mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/lib"))),
+		              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/etc"))));
 #else
-	mono_set_dirs("Mono/lib", "Mono/etc");
+		mono_set_dirs("Mono/lib", "Mono/etc");
 #endif
 
-	Domain = mono_jit_init(TCHAR_TO_ANSI(*Params.Domain));
+		RootDomain = mono_jit_init(nullptr);
+	}
 
+	Domain = mono_domain_create_appdomain(TCHAR_TO_ANSI(*Params.Domain), nullptr);
+
+	mono_domain_set(Domain, false);
+	
 	Assembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*Params.Assembly));
 
 	Image = mono_assembly_get_image(Assembly);
@@ -54,23 +63,15 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 
 void FMonoDomain::Deinitialize()
 {
-	if (Image != nullptr)
-	{
-		mono_image_close(Image);
+	Image = nullptr;
 
-		Image = nullptr;
-	}
-
-	if (Assembly != nullptr)
-	{
-		mono_assembly_name_free(mono_assembly_get_name(Assembly));
-
-		Assembly = nullptr;
-	}
+	Assembly = nullptr;
 
 	if (Domain != nullptr)
 	{
-		mono_jit_cleanup(Domain);
+		mono_domain_set(RootDomain, true);
+
+		mono_domain_unload(Domain);
 
 		Domain = nullptr;
 	}

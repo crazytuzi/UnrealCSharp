@@ -154,7 +154,7 @@ private:
 private:
 	static FCSharpEnvironment* Environment;
 
-	static FMonoDomain* Domain;
+	FMonoDomain* Domain;
 
 private:
 	FDelegateHandle OnUnrealCSharpModuleInActiveDelegateHandle;

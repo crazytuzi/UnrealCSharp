@@ -5,8 +5,6 @@
 
 FCSharpEnvironment* FCSharpEnvironment::Environment = nullptr;
 
-FMonoDomain* FCSharpEnvironment::Domain = nullptr;
-
 FCSharpEnvironment::FCSharpEnvironment()
 {
 	Initialize();
@@ -19,6 +17,12 @@ FCSharpEnvironment::~FCSharpEnvironment()
 
 void FCSharpEnvironment::Initialize()
 {
+	Domain = new FMonoDomain({
+		"",
+		FPaths::ConvertRelativePathToFull(
+			FPaths::Combine(FPaths::ProjectContentDir(), NAMESPACE_ROOT, NAMESPACE_ROOT + ".dll"))
+	});
+	
 	ClassRegistry = new FClassRegistry();
 
 	ObjectRegistry = new FObjectRegistry();
@@ -83,6 +87,13 @@ void FCSharpEnvironment::Deinitialize()
 
 		ClassRegistry = nullptr;
 	}
+
+	if (Domain != nullptr)
+	{
+		delete Domain;
+
+		Domain = nullptr;
+	}
 }
 
 FCSharpEnvironment* FCSharpEnvironment::GetEnvironment()
@@ -90,15 +101,6 @@ FCSharpEnvironment* FCSharpEnvironment::GetEnvironment()
 	if (Environment == nullptr)
 	{
 		Environment = new FCSharpEnvironment();
-
-		if (Domain == nullptr)
-		{
-			Domain = new FMonoDomain({
-				"",
-				FPaths::ConvertRelativePathToFull(
-					FPaths::Combine(FPaths::ProjectContentDir(), NAMESPACE_ROOT, NAMESPACE_ROOT + ".dll"))
-			});
-		}
 
 		return Environment;
 	}
