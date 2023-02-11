@@ -10,7 +10,7 @@ void FClassGenerator::Generator()
 	}
 }
 
-void FClassGenerator::Generator(UClass* InClass)
+void FClassGenerator::Generator(const UClass* InClass)
 {
 	if (InClass == nullptr)
 	{
@@ -156,6 +156,11 @@ void FClassGenerator::Generator(UClass* InClass)
 	                                                EFieldIteratorFlags::IncludeInterfaces); FunctionIterator; ++
 	     FunctionIterator)
 	{
+		if (FunctionIterator->HasAnyFunctionFlags(FUNC_Delegate))
+		{
+			continue;
+		}
+
 		if (bHasFunction == true)
 		{
 			if (bIsInterface == true)
@@ -247,14 +252,26 @@ void FClassGenerator::Generator(UClass* InClass)
 				CPF_ConstParm))
 			{
 				FunctionOutParamIndex.Emplace(Index);
+			}
+		}
 
+		auto bGeneratorFunctionDefaultParam = GeneratorFunctionDefaultParam(FunctionOutParamIndex);
+
+		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
+		{
+			if (FunctionOutParamIndex.Contains(Index))
+			{
 				FunctionDeclarationBody += TEXT("out ");
 			}
 
 			FunctionDeclarationBody += FString::Printf(TEXT(
-				"%s %s%s"),
+				"%s %s%s%s"),
 			                                           *FGeneratorCore::GetPropertyType(FunctionParams[Index]),
 			                                           *FGeneratorCore::GetName(FunctionParams[Index]->GetName()),
+			                                           bGeneratorFunctionDefaultParam
+				                                           ? *GetFunctionDefaultParam(
+					                                           *FunctionIterator, FunctionParams[Index])
+				                                           : TEXT(""),
 			                                           Index == FunctionParams.Num() - 1 ? TEXT("") : TEXT(", ")
 			);
 		}
@@ -477,4 +494,236 @@ void FClassGenerator::Generator(UClass* InClass)
 	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
+}
+
+bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& FunctionOutParamIndex)
+{
+	return FunctionOutParamIndex.Num() == 0 ||
+		FunctionOutParamIndex[FunctionOutParamIndex.Num() - 1] == FunctionOutParamIndex.Num() - 1;
+}
+
+FString FClassGenerator::GetFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
+{
+	if (InFunction == nullptr || InProperty == nullptr)
+	{
+		return TEXT("");
+	}
+
+	if (!InFunction->HasAnyFunctionFlags(FUNC_BlueprintCallable))
+	{
+		return TEXT("");
+	}
+
+	if (Cast<UBlueprintGeneratedClass>(InFunction->GetOuter()))
+	{
+		return GetBlueprintFunctionDefaultParam(InFunction, InProperty);
+	}
+
+	return GetCppFunctionDefaultParam(InFunction, InProperty);
+}
+
+FString FClassGenerator::GetCppFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
+{
+	const auto Key = FString::Printf(TEXT("CPP_Default_%s"), *InProperty->GetName());
+
+	if (!InFunction->HasMetaData(*Key))
+	{
+		return TEXT("");
+	}
+
+	const auto MetaData = InFunction->GetMetaData(*Key);
+
+	if (const auto ByteProperty = CastField<FByteProperty>(InProperty))
+	{
+		if (ByteProperty->Enum != nullptr)
+		{
+			if (MetaData.StartsWith("Type::"))
+			{
+				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
+				                       *MetaData.Right(MetaData.Len() - 6));
+			}
+			else
+			{
+				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
+			}
+		}
+		else
+		{
+			return FString::Printf(TEXT(" = %s"), *MetaData);
+		}
+	}
+
+	if (CastField<FIntProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), *MetaData);
+	}
+
+	if (CastField<FInt64Property>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), *MetaData);
+	}
+
+	if (CastField<FBoolProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), *MetaData);
+	}
+
+	if (CastField<FFloatProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %sf"), *MetaData);
+	}
+
+	if (CastField<FClassProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FObjectProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FNameProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FStructProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (const auto EnumProperty = CastField<FEnumProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s.%s"), *EnumProperty->GetEnum()->GetName(), *MetaData);
+	}
+
+	if (CastField<FStrProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FTextProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FSoftObjectProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	return TEXT("");
+}
+
+FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
+{
+	if (InProperty->HasAnyPropertyFlags(CPF_OutParm) && !InProperty->HasAnyPropertyFlags(CPF_ConstParm))
+	{
+		return TEXT("");
+	}
+
+	const auto Key = InProperty->GetName();
+
+	const auto MetaData = InFunction->GetMetaData(*Key);
+
+	if (const auto ByteProperty = CastField<FByteProperty>(InProperty))
+	{
+		if (ByteProperty->Enum != nullptr)
+		{
+			return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
+		}
+		else
+		{
+			return FString::Printf(TEXT(" = %s"), MetaData.IsEmpty() ? TEXT("0") : *MetaData);
+		}
+	}
+
+	if (CastField<FIntProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), MetaData.IsEmpty() ? TEXT("0") : *MetaData);
+	}
+
+	if (CastField<FInt64Property>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), MetaData.IsEmpty() ? TEXT("0") : *MetaData);
+	}
+
+	if (CastField<FBoolProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), MetaData.IsEmpty() ? TEXT("false") : *MetaData);
+	}
+
+	if (CastField<FFloatProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %sf"), MetaData.IsEmpty() ? TEXT("0") : *MetaData);
+	}
+
+	if (CastField<FClassProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FObjectProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FNameProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FStructProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FArrayProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FStrProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FTextProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FSoftObjectProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FMapProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FSetProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	return TEXT("");
 }

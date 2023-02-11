@@ -12,7 +12,7 @@ void FStructGenerator::Generator()
 	}
 }
 
-void FStructGenerator::Generator(UScriptStruct* InScriptStruct)
+void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 {
 	if (InScriptStruct == nullptr)
 	{

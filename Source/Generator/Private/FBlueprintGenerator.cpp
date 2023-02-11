@@ -22,24 +22,35 @@ void FBlueprintGenerator::Generator()
 
 	AssetRegistryModule.Get().GetAssets(Filter, OutAssetData);
 
-	for (auto AssetData : OutAssetData)
+	for (const auto& AssetData : OutAssetData)
 	{
-		if (const auto Blueprint = LoadObject<UBlueprint>(nullptr, *AssetData.ObjectPath.ToString()))
+		if (AssetData.AssetClass == UBlueprint::StaticClass()->GetFName() ||
+			AssetData.AssetClass == UWidgetBlueprint::StaticClass()->GetFName())
 		{
-			if (const auto Class = Cast<UClass>(Blueprint->GeneratedClass))
+			if (const auto Blueprint = LoadObject<
+				UBlueprint>(nullptr, *AssetData.ObjectPath.ToString()))
 			{
-				FClassGenerator::Generator(Class);
+				if (const auto Class = Cast<UClass>(Blueprint->GeneratedClass))
+				{
+					FClassGenerator::Generator(Class);
+				}
 			}
 		}
-		else if (const auto UserDefinedStruct = LoadObject<UUserDefinedStruct>(
-			nullptr, *AssetData.ObjectPath.ToString()))
+		else if (AssetData.AssetClass == UUserDefinedStruct::StaticClass()->GetFName())
 		{
-			FStructGenerator::Generator(UserDefinedStruct);
+			if (const auto UserDefinedStruct = LoadObject<
+				UUserDefinedStruct>(nullptr, *AssetData.ObjectPath.ToString()))
+			{
+				FStructGenerator::Generator(UserDefinedStruct);
+			}
 		}
-		else if (const auto UserDefinedEnum = LoadObject<UUserDefinedEnum>(
-			nullptr, *AssetData.ObjectPath.ToString()))
+		else if (AssetData.AssetClass == UUserDefinedEnum::StaticClass()->GetFName())
 		{
-			FEnumGenerator::Generator(UserDefinedEnum);
+			if (const auto UserDefinedEnum = LoadObject<
+				UUserDefinedEnum>(nullptr, *AssetData.ObjectPath.ToString()))
+			{
+				FEnumGenerator::Generator(UserDefinedEnum);
+			}
 		}
 	}
 }
