@@ -27,6 +27,8 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	const auto FullClassContent = FGeneratorCore::GetFullClass(InEnum);
 
+	FString UnderlyingType = TEXT("int");
+
 	FString EnumeratorContent;
 
 	auto ClassName = InEnum->GetName();
@@ -43,6 +45,11 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		}
 
 		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
+
+		if(EnumeratorValue > MAX_int32)
+		{
+			UnderlyingType = TEXT("long");
+		}
 
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
@@ -64,7 +71,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		"namespace %s\n"
 		"{\n"
 		"\t[PathName(\"%s\")]\n"
-		"\tpublic enum %s\n"
+		"\tpublic enum %s : %s\n"
 		"\t{\n"
 		"%s"
 		"\t}\n"
@@ -74,6 +81,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	                                     *NameSpaceContent,
 	                                     *PathNameAttributeContent,
 	                                     *FullClassContent,
+										 *UnderlyingType,
 	                                     *EnumeratorContent
 	);
 
