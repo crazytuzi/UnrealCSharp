@@ -2,6 +2,19 @@
 
 #include "CoreMinimal.h"
 
+enum class EEnumUnderlyingType
+{
+	None,
+	Int8,
+	UInt8,
+	Int16,
+	UInt16,
+	Int,
+	UInt32,
+	Int64,
+	UInt64
+};
+
 class FEnumGenerator
 {
 public:
@@ -9,11 +22,14 @@ public:
 
 	static GENERATOR_API void Generator(const UEnum* InEnum);
 
+	static void AddEnumUnderlyingType(const UEnum* InEnum, const FNumericProperty* InNumericProperty);
 
-	static GENERATOR_API void EmplaceEnumUnderlyingCache(const UEnum* Enum, FNumericProperty* Property);
+	// @TODO
+	static GENERATOR_API void EmptyEnumUnderlyingType();
 
-	static GENERATOR_API FFieldClass* GetEnumUnderlyingCache(const UEnum* Enum);
-	
-	static GENERATOR_API void ClearEnumUnderlyingCache();
-	
+private:
+	static FString GetEnumUnderlyingTypeName(const UEnum* InEnum);
+
+private:
+	static TMap<const UEnum*, EEnumUnderlyingType> EnumUnderlyingType;
 };
