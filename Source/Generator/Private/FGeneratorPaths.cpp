@@ -45,7 +45,7 @@ FString FGeneratorPaths::GetGenerationPath(const FString& InternalScriptPath)
 	check(InternalScriptPath[0] == TEXT('/'));
 	if(InternalScriptPath.StartsWith(TEXT("/Game/")))
 	{
-		return GetGameManagedPath();
+		return GetGameManagedProxyPath();
 	}
 	else
 	{
