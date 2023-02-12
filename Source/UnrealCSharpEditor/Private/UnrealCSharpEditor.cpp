@@ -60,7 +60,9 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	FEnumGenerator::Generator();
 	
 	FBlueprintGenerator::Generator();
-
+	
+	FEnumGenerator::ClearEnumUnderlyingCache();
+	
 	FSolutionGenerator::Generator();
 	
 	GWarn->EndSlowTask();
