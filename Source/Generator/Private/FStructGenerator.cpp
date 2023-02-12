@@ -1,6 +1,7 @@
 ﻿#include "FStructGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
+#include "FGeneratorPaths.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
 
@@ -201,7 +202,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto ModuleName = FGeneratorCore::GetModuleName(InScriptStruct);
 
-	auto DirectoryName = FPaths::Combine(FGeneratorCore::GetBasePath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InScriptStruct->GetPackage()->GetName()), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 

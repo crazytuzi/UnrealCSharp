@@ -2,10 +2,6 @@
 #include "FDelegateGenerator.h"
 #include "Misc/FileHelper.h"
 
-FString FGeneratorCore::GetBasePath()
-{
-	return FPaths::Combine(FPaths::ProjectDir(), TEXT("Script"), TEXT("Proxy"));
-}
 
 FString FGeneratorCore::GetModuleName(const UField* InField)
 {

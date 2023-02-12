@@ -3,7 +3,6 @@
 class FGeneratorCore
 {
 public:
-	static FString GetBasePath();
 
 	static FString GetModuleName(const UField* InField);
 
