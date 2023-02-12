@@ -54,7 +54,6 @@ void FSolutionGenerator::Generator()
 	
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
-	PlatformFile.CopyDirectoryTree(*(FGeneratorPaths::GetUEManagedPath() / TEXT("Script")), *(PluginDir / TEXT("Script")), true);
-
+	PlatformFile.CopyDirectoryTree(*(FGeneratorPaths::GetUEManagedPath()), *(PluginDir / TEXT("Script")), true);
 	
 }
