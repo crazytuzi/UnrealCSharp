@@ -56,6 +56,8 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	FEnumGenerator::Generator();
 
 	FBlueprintGenerator::Generator();
+
+	FEnumGenerator::ClearEnumUnderlyingCache();
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()

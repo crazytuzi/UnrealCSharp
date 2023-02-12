@@ -1,5 +1,6 @@
 ﻿#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
+#include "FEnumGenerator.h"
 #include "FGeneratorCore.h"
 
 void FClassGenerator::Generator()
@@ -84,7 +85,12 @@ void FClassGenerator::Generator(const UClass* InClass)
 	     PropertyIterator)
 	{
 		FDelegateGenerator::Generator(*PropertyIterator);
-
+		
+		if(FEnumProperty* EnumProperty = Cast<FEnumProperty>(*PropertyIterator))
+		{
+			FEnumGenerator::EmplaceEnumUnderlyingCache(EnumProperty->GetEnum(), EnumProperty->GetUnderlyingProperty());
+		}
+		
 		if (bHasProperty == true)
 		{
 			PropertyContent += "\n";
