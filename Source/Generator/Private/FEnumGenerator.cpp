@@ -56,7 +56,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
 
-	auto EnumFieldClass = GetEnumUnderlyingCacheSize(InEnum);
+	auto EnumFieldClass = GetEnumUnderlyingCache(InEnum);
 	
 	FString UnderlyingType;
 
@@ -140,7 +140,7 @@ void FEnumGenerator::EmplaceEnumUnderlyingCache(const UEnum* Enum, FNumericPrope
 	EnumSizeCache.Add(Enum, Property->GetClass());
 }
 
-FFieldClass* FEnumGenerator::GetEnumUnderlyingCacheSize(const UEnum* Enum)
+FFieldClass* FEnumGenerator::GetEnumUnderlyingCache(const UEnum* Enum)
 {
 	if(EnumSizeCache.Contains(Enum))
 	{

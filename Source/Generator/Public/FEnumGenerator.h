@@ -10,9 +10,9 @@ public:
 	static GENERATOR_API void Generator(const UEnum* InEnum);
 
 
-	static void EmplaceEnumUnderlyingCache(const UEnum* Enum, FNumericProperty* Property);
+	static GENERATOR_API void EmplaceEnumUnderlyingCache(const UEnum* Enum, FNumericProperty* Property);
 
-	static FFieldClass* GetEnumUnderlyingCacheSize(const UEnum* Enum);
+	static GENERATOR_API FFieldClass* GetEnumUnderlyingCache(const UEnum* Enum);
 	
 	static GENERATOR_API void ClearEnumUnderlyingCache();
 	
