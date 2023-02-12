@@ -1,5 +1,6 @@
 ﻿#include "FStructGenerator.h"
 #include "FDelegateGenerator.h"
+#include "FEnumGenerator.h"
 #include "FGeneratorCore.h"
 #include "FGeneratorPaths.h"
 #include "Engine/UserDefinedStruct.h"
@@ -109,6 +110,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	{
 		FDelegateGenerator::Generator(*PropertyIterator);
 
+		if(FEnumProperty* EnumProperty = Cast<FEnumProperty>(*PropertyIterator))
+		{
+			FEnumGenerator::EmplaceEnumUnderlyingCache(EnumProperty->GetEnum(), EnumProperty->GetUnderlyingProperty());
+		}
+		
 		if (bHasProperty == true)
 		{
 			PropertyContent += "\n";
