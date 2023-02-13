@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Listener/FEditorListener.h"
 #include "Modules/ModuleManager.h"
 
 class FToolBarBuilder;
@@ -26,4 +27,6 @@ private:
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;
+
+	FEditorListener EditorListener;
 };

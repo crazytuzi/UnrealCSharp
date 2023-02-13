@@ -25,7 +25,8 @@ public class UnrealCSharpEditor : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core", 
+				"DirectoryWatcher"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -42,7 +43,11 @@ public class UnrealCSharpEditor : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"Generator"
+				"Generator",
+				"Compiler",
+				"MainFrame", 
+				"UnrealCSharpCore", 
+				"UMGEditor"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -1,6 +1,5 @@
 ﻿#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
-#include "FEnumGenerator.h"
 #include "FGeneratorCore.h"
 #include "FGeneratorPaths.h"
 
@@ -87,11 +86,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 	{
 		FDelegateGenerator::Generator(*PropertyIterator);
 		
-		if(FEnumProperty* EnumProperty = Cast<FEnumProperty>(*PropertyIterator))
-		{
-			FEnumGenerator::EmplaceEnumUnderlyingCache(EnumProperty->GetEnum(), EnumProperty->GetUnderlyingProperty());
-		}
-		
 		if (bHasProperty == true)
 		{
 			PropertyContent += "\n";
@@ -101,13 +95,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 			bHasProperty = true;
 		}
 
-		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
-
 		FString PropertyAccessSpecifiers = TEXT("public");
 
 		auto PropertyType = FGeneratorCore::GetPropertyType(*PropertyIterator);
 
 		auto PropertyName = PropertyIterator->GetName();
+
+		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
 		PropertyContent += FString::Printf(TEXT(
 			"\t\t%s %s %s\n"

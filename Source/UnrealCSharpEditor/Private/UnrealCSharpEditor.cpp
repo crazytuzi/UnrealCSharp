@@ -3,6 +3,7 @@
 #include "UnrealCSharpEditor.h"
 #include "FBlueprintGenerator.h"
 #include "FClassGenerator.h"
+#include "FCSharpCompiler.h"
 #include "FEnumGenerator.h"
 #include "FGeneratorPaths.h"
 #include "FStructGenerator.h"
@@ -63,11 +64,15 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	FEnumGenerator::Generator();
 	
 	FBlueprintGenerator::Generator();
-	
-	FEnumGenerator::ClearEnumUnderlyingCache();
-	
+
+	FEnumGenerator::EmptyEnumUnderlyingType();
+
 	FSolutionGenerator::Generator();
 	
+	CollectGarbage(RF_NoFlags, true);
+
+	FCSharpCompiler::Get().Compile();
+
 	GWarn->EndSlowTask();
 }
 

@@ -3,6 +3,8 @@
 #include "FGeneratorPaths.h"
 #include "Engine/UserDefinedEnum.h"
 
+TMap<const UEnum*, EEnumUnderlyingType> FEnumGenerator::EnumUnderlyingType;
+
 void FEnumGenerator::Generator()
 {
 	for (TObjectIterator<UEnum> EnumIterator; EnumIterator; ++EnumIterator)
@@ -11,29 +13,6 @@ void FEnumGenerator::Generator()
 	}
 }
 
-static bool GetUnderlyingTypeName(const FFieldClass* Class, FString& Name)
-{
-	static TMap<FFieldClass*, FString> Map
-	{
-		{ FInt8Property::StaticClass()   , TEXT("sbyte")  },
-		{ FByteProperty::StaticClass()   , TEXT("byte")   },
-		{ FInt16Property::StaticClass()  , TEXT("short")  },
-		{ FUInt16Property::StaticClass() , TEXT("ushort") },
-		{ FIntProperty::StaticClass()    , TEXT("int")    },
-		{ FUInt32Property::StaticClass() , TEXT("uint")   },
-		{ FInt64Property::StaticClass()  , TEXT("long")   },
-		{ FUInt64Property::StaticClass() , TEXT("ulong")  },
-	};
-
-	if(Map.Contains(Class))
-	{
-		Name = Map[Class];
-		
-		return true;
-	}
-
-	return false;
-}
 void FEnumGenerator::Generator(const UEnum* InEnum)
 {
 	if (InEnum == nullptr)
@@ -55,34 +34,24 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	auto ClassName = InEnum->GetName();
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
 
-	auto EnumFieldClass = GetEnumUnderlyingCache(InEnum);
-	
-	FString UnderlyingType;
-
-	if(!GetUnderlyingTypeName(EnumFieldClass, UnderlyingType))
-	{
-		GetUnderlyingTypeName(FInt64Property::StaticClass(), UnderlyingType);
-	}
-	
 	for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
 	{
 		auto EnumeratorString = InEnum->GetNameStringByIndex(Index);
 
-		// Skip auto generation
-		if(EnumeratorString.EndsWith(TEXT("_MAX")))
+		if (EnumeratorString.EndsWith(TEXT("_MAX")))
 		{
 			continue;
 		}
-		
+
 		if (UserDefinedEnum != nullptr)
 		{
 			EnumeratorString = InEnum->GetDisplayNameTextByIndex(Index).ToString();
 		}
 
 		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
-		
+
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
 		),
@@ -97,8 +66,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		),
 		                                         *UsingNameSpace);
 	}
-	
-	
+
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
 		"namespace %s\n"
@@ -114,7 +82,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	                                     *NameSpaceContent,
 	                                     *PathNameAttributeContent,
 	                                     *FullClassContent,
-	                                     *UnderlyingType,
+	                                     *GetEnumUnderlyingTypeName(InEnum),
 	                                     *EnumeratorContent
 	);
 
@@ -127,31 +95,80 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
 
-static TMap<const UEnum*, FFieldClass*> EnumSizeCache;
-
-void FEnumGenerator::EmplaceEnumUnderlyingCache(const UEnum* Enum, FNumericProperty* Property)
+void FEnumGenerator::AddEnumUnderlyingType(const UEnum* InEnum, const FNumericProperty* InNumericProperty)
 {
-	check(Enum && Property);
-	
-	if(EnumSizeCache.Contains(Enum))
+	if (InEnum == nullptr || InNumericProperty == nullptr)
 	{
 		return;
 	}
-	
-	EnumSizeCache.Add(Enum, Property->GetClass());
-}
 
-FFieldClass* FEnumGenerator::GetEnumUnderlyingCache(const UEnum* Enum)
-{
-	if(EnumSizeCache.Contains(Enum))
+	if (EnumUnderlyingType.Contains(InEnum))
 	{
-		return EnumSizeCache[Enum];
+		return;
 	}
-	
-	return nullptr;
+
+	auto UnderlyingType = EEnumUnderlyingType::None;
+
+	if (CastField<FInt8Property>(InNumericProperty))
+	{
+		UnderlyingType = EEnumUnderlyingType::Int8;
+	}
+	else if (CastField<FByteProperty>(InNumericProperty))
+	{
+		UnderlyingType = EEnumUnderlyingType::UInt8;
+	}
+	else if (CastField<FInt16Property>(InNumericProperty))
+	{
+		UnderlyingType = EEnumUnderlyingType::Int16;
+	}
+	else if (CastField<FUInt16Property>(InNumericProperty))
+	{
+		UnderlyingType = EEnumUnderlyingType::UInt16;
+	}
+	else if (CastField<FIntProperty>(InNumericProperty))
+	{
+		UnderlyingType = EEnumUnderlyingType::Int;
+	}
+	else if (CastField<FUInt32Property>(InNumericProperty))
+	{
+		UnderlyingType = EEnumUnderlyingType::UInt32;
+	}
+	else if (CastField<FInt64Property>(InNumericProperty))
+	{
+		UnderlyingType = EEnumUnderlyingType::Int64;
+	}
+	else if (CastField<FUInt64Property>(InNumericProperty))
+	{
+		UnderlyingType = EEnumUnderlyingType::UInt64;
+	}
+
+	EnumUnderlyingType.Emplace(InEnum, UnderlyingType);
 }
 
-void FEnumGenerator::ClearEnumUnderlyingCache()
+void FEnumGenerator::EmptyEnumUnderlyingType()
 {
-	EnumSizeCache.Reset();
+	EnumUnderlyingType.Empty();
+}
+
+FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
+{
+	static TMap<EEnumUnderlyingType, FString> EnumUnderlyingTypeName
+	{
+		{EEnumUnderlyingType::None, TEXT("UInt64")},
+		{EEnumUnderlyingType::Int8, TEXT("SByte")},
+		{EEnumUnderlyingType::UInt8, TEXT("Byte")},
+		{EEnumUnderlyingType::Int16, TEXT("Int16")},
+		{EEnumUnderlyingType::UInt16, TEXT("UInt16")},
+		{EEnumUnderlyingType::Int, TEXT("Int32")},
+		{EEnumUnderlyingType::UInt32, TEXT("UInt32")},
+		{EEnumUnderlyingType::Int64, TEXT("Int64")},
+		{EEnumUnderlyingType::UInt64, TEXT("UInt64")}
+	};
+
+	if (const auto FoundEnumUnderlyingType = EnumUnderlyingType.Find(InEnum))
+	{
+		return EnumUnderlyingTypeName[*FoundEnumUnderlyingType];
+	}
+
+	return TEXT("Int64");
 }
