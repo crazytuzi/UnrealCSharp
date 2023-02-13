@@ -1,9 +1,9 @@
 ﻿#include "Domain/InternalCall/FVectorImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterVector
 {
@@ -139,7 +139,7 @@ void FVectorImplementation::Vector_CrossProductImplementation(const MonoObject* 
 	const auto VectorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -175,7 +175,7 @@ void FVectorImplementation::Vector_AddImplementation(const MonoObject* A, const 
 	const auto VectorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -196,7 +196,7 @@ void FVectorImplementation::Vector_AddBiasImplementation(const MonoObject* InMon
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -219,7 +219,7 @@ void FVectorImplementation::Vector_SubtractImplementation(const MonoObject* A, c
 	const auto VectorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -240,7 +240,7 @@ void FVectorImplementation::Vector_SubtractBiasImplementation(const MonoObject* 
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -263,7 +263,7 @@ void FVectorImplementation::Vector_MultiplyImplementation(const MonoObject* A, c
 	const auto VectorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -284,7 +284,7 @@ void FVectorImplementation::Vector_MultiplyScaleImplementation(const MonoObject*
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -306,7 +306,7 @@ void FVectorImplementation::Vector_DivideImplementation(const MonoObject* A, con
 	const auto VectorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -327,7 +327,7 @@ void FVectorImplementation::Vector_DivideScaleImplementation(const MonoObject* I
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -400,7 +400,7 @@ void FVectorImplementation::Vector_NegatedImplementation(const MonoObject* InMon
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -589,7 +589,7 @@ void FVectorImplementation::Vector_GetUnsafeNormalImplementation(const MonoObjec
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -610,7 +610,7 @@ void FVectorImplementation::Vector_GetSafeNormalImplementation(const MonoObject*
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -631,7 +631,7 @@ void FVectorImplementation::Vector_GetSafeNormal2DImplementation(const MonoObjec
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -652,7 +652,7 @@ void FVectorImplementation::Vector_ToDirectionAndLengthImplementation(const Mono
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -672,7 +672,7 @@ void FVectorImplementation::Vector_GetSignVectorImplementation(const MonoObject*
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -692,7 +692,7 @@ void FVectorImplementation::Vector_ProjectionImplementation(const MonoObject* In
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -713,7 +713,7 @@ void FVectorImplementation::Vector_GetUnsafeNormal2DImplementation(const MonoObj
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -734,7 +734,7 @@ void FVectorImplementation::Vector_GridSnapImplementation(const MonoObject* InMo
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -755,7 +755,7 @@ void FVectorImplementation::Vector_BoundToCubeImplementation(const MonoObject* I
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -780,7 +780,7 @@ void FVectorImplementation::Vector_BoundToBoxImplementation(const MonoObject* In
 	const auto VectorMax = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Max);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -801,7 +801,7 @@ void FVectorImplementation::Vector_GetClampedToSizeImplementation(const MonoObje
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -822,7 +822,7 @@ void FVectorImplementation::Vector_GetClampedToSize2DImplementation(const MonoOb
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -843,7 +843,7 @@ void FVectorImplementation::Vector_GetClampedToMaxSizeImplementation(const MonoO
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -864,7 +864,7 @@ void FVectorImplementation::Vector_GetClampedToMaxSize2DImplementation(const Mon
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -897,7 +897,7 @@ void FVectorImplementation::Vector_ReciprocalImplementation(const MonoObject* In
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -933,7 +933,7 @@ void FVectorImplementation::Vector_MirrorByVectorImplementation(const MonoObject
 		UScriptStruct, FVector>(MirrorNormal);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -956,7 +956,7 @@ void FVectorImplementation::Vector_MirrorByPlaneImplementation(const MonoObject*
 	const auto PlanePlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(Plane);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -979,7 +979,7 @@ void FVectorImplementation::Vector_RotateAngleAxisImplementation(const MonoObjec
 	const auto VectorAxis = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Axis);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1016,7 +1016,7 @@ void FVectorImplementation::Vector_ProjectOnToImplementation(const MonoObject* I
 	const auto VectorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(A);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1039,7 +1039,7 @@ void FVectorImplementation::Vector_ProjectOnToNormalImplementation(const MonoObj
 	const auto VectorNormal = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Normal);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1060,7 +1060,7 @@ void FVectorImplementation::Vector_ToOrientationRotatorImplementation(const Mono
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
 		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1081,7 +1081,7 @@ void FVectorImplementation::Vector_ToOrientationQuatImplementation(const MonoObj
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1101,7 +1101,7 @@ void FVectorImplementation::Vector_RotationImplementation(const MonoObject* InMo
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
 		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1122,7 +1122,7 @@ void FVectorImplementation::Vector_FindBestAxisVectorsImplementation(const MonoO
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1271,7 +1271,7 @@ void FVectorImplementation::Vector_UnitCartesianToSphericalImplementation(
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1302,7 +1302,7 @@ void FVectorImplementation::Vector_CreateOrthonormalBasisImplementation(MonoObje
                                                                         MonoObject** ZAxis)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1387,7 +1387,7 @@ void FVectorImplementation::Vector_PointPlaneProjectByPlaneImplementation(
 	const auto PlanePlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(Plane);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1414,7 +1414,7 @@ void FVectorImplementation::Vector_PointPlaneProjectByPointsImplementation(
 	const auto VectorC = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(C);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1441,7 +1441,7 @@ void FVectorImplementation::Vector_PointPlaneProjectByPlaneBaseAndPlaneNormalImp
 		UScriptStruct, FVector>(PlaneNormal);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1465,7 +1465,7 @@ void FVectorImplementation::Vector_VectorPlaneProjectImplementation(const MonoOb
 		UScriptStruct, FVector>(PlaneNormal);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1678,7 +1678,7 @@ void FVectorImplementation::Vector_RadiansToDegreesImplementation(const MonoObje
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(RadVector);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -1698,7 +1698,7 @@ void FVectorImplementation::Vector_DegreesToRadiansImplementation(const MonoObje
 	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(DegVector);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);

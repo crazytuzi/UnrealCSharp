@@ -1,9 +1,9 @@
 ﻿#include "Domain/InternalCall/FBox2DImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterBox2D
 {
@@ -76,7 +76,7 @@ void FBox2DImplementation::Box2D_AddVector2DImplementation(const MonoObject* A, 
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector2D>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FBox2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FBox2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FBox2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -98,7 +98,7 @@ void FBox2DImplementation::Box2D_AddImplementation(const MonoObject* A, const Mo
 	const auto Box2DB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FBox2D>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FBox2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FBox2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FBox2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -119,7 +119,7 @@ void FBox2DImplementation::Box2D_GetReferenceImplementation(const MonoObject* In
 	const auto Box2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FBox2D>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -168,7 +168,7 @@ void FBox2DImplementation::Box2D_ExpandByImplementation(const MonoObject* InMono
 	const auto Box2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FBox2D>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FBox2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FBox2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FBox2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -200,7 +200,7 @@ void FBox2DImplementation::Box2D_GetCenterImplementation(const MonoObject* InMon
 	const auto Box2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FBox2D>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -221,7 +221,7 @@ void FBox2DImplementation::Box2D_GetCenterAndExtentsImplementation(const MonoObj
 	const auto Box2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FBox2D>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
 
 	const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -252,7 +252,7 @@ void FBox2DImplementation::Box2D_GetClosestPointToImplementation(const MonoObjec
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector2D>(Point);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -272,7 +272,7 @@ void FBox2DImplementation::Box2D_GetExtentImplementation(const MonoObject* InMon
 	const auto Box2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FBox2D>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -292,7 +292,7 @@ void FBox2DImplementation::Box2D_GetSizeImplementation(const MonoObject* InMonoO
 	const auto Box2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FBox2D>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -368,7 +368,7 @@ void FBox2DImplementation::Box2D_ShiftByImplementation(const MonoObject* InMonoO
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector2D>(Offset);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FBox2D)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FBox2D)),
 		CLASS_SCRIPT_STRUCT_NAME(FBox2D));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);

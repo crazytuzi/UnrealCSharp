@@ -2,6 +2,7 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
+#include "Macro/NamespaceMacro.h"
 
 struct FRegisterMulticastDelegate
 {

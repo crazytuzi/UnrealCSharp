@@ -1,6 +1,5 @@
 ﻿#include "Domain/InternalCall/FPrimaryAssetTypeImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"

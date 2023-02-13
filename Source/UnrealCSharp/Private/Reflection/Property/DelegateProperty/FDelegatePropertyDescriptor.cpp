@@ -1,7 +1,7 @@
 ﻿#include "Reflection/Property/DelegateProperty/FDelegatePropertyDescriptor.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -16,7 +16,8 @@ void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 			MonoClassName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
 
 			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FTypeBridge::GetClassNameSpace(DelegateProperty), FTypeBridge::GetFullClass(DelegateProperty));
+				FUnrealCSharpFunctionLibrary::GetClassNameSpace(DelegateProperty),
+				FUnrealCSharpFunctionLibrary::GetFullClass(DelegateProperty));
 
 			const auto DelegateHelper = new FDelegateHelper(static_cast<FScriptDelegate*>(Src),
 			                                                DelegateProperty->SignatureFunction);

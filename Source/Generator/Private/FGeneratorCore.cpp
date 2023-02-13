@@ -2,37 +2,7 @@
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Misc/FileHelper.h"
-
-FString FGeneratorCore::GetBasePath()
-{
-	return FPaths::Combine(FPaths::ProjectDir(), TEXT("Script"), TEXT("Proxy"));
-}
-
-FString FGeneratorCore::GetModuleName(const UField* InField)
-{
-	if (InField == nullptr)
-	{
-		return TEXT("");
-	}
-
-	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
-
-	if (InField->IsNative())
-	{
-		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
-	}
-	else
-	{
-		auto Index = 0;
-
-		if (ModuleName.FindLastChar(TEXT('/'), Index))
-		{
-			ModuleName = ModuleName.Left(Index);
-		}
-	}
-
-	return ModuleName;
-}
+#include "FUnrealCSharpFunctionLibrary.h"
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -72,58 +42,6 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 	                       *PathName);
 }
 
-FString FGeneratorCore::GetFullClass(const UStruct* InStruct)
-{
-	if (InStruct == nullptr)
-	{
-		return TEXT("");
-	}
-
-	return FString::Printf(TEXT(
-		"%s%s"
-	),
-	                       InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""),
-	                       *InStruct->GetName());
-}
-
-FString FGeneratorCore::GetFullInterface(const UStruct* InStruct)
-{
-	return FString::Printf(TEXT(
-		"I%s"
-	),
-	                       *GetFullClass(InStruct).RightChop(1));
-}
-
-FString FGeneratorCore::GetClassNameSpace(const UStruct* InStruct)
-{
-	if (InStruct == nullptr)
-	{
-		return TEXT("");
-	}
-
-	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
-
-	if (InStruct->IsNative())
-	{
-		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
-	}
-	else
-	{
-		auto Index = 0;
-
-		if (ModuleName.FindLastChar(TEXT('/'), Index))
-		{
-			ModuleName = ModuleName.Left(Index);
-		}
-	}
-
-	return FString::Printf(TEXT(
-		"%s%s"
-	),
-	                       TEXT("Script"),
-	                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
-}
-
 FString FGeneratorCore::GetFullClass(const UEnum* InEnum)
 {
 	if (InEnum == nullptr)
@@ -155,136 +73,14 @@ FString FGeneratorCore::GetClassNameSpace(const UEnum* InStruct)
 	                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
 }
 
-FString FGeneratorCore::GetFullClass(const FDelegateProperty* InDelegateProperty)
-{
-	if (InDelegateProperty == nullptr)
-	{
-		return TEXT("");
-	}
-
-	const auto SignatureFunction = InDelegateProperty->SignatureFunction;
-
-	if (SignatureFunction == nullptr)
-	{
-		return TEXT("");
-	}
-
-	auto DelegateName = SignatureFunction->GetName();
-
-	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
-
-	return FString::Printf(TEXT(
-		"F%s"
-	),
-	                       *DelegateName);
-}
-
-FString FGeneratorCore::GetClassNameSpace(const FDelegateProperty* InDelegateProperty)
-{
-	if (InDelegateProperty == nullptr)
-	{
-		return TEXT("");
-	}
-
-	const auto SignatureFunction = InDelegateProperty->SignatureFunction;
-
-	if (SignatureFunction == nullptr)
-	{
-		return TEXT("");
-	}
-
-	if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
-	{
-		return FString::Printf(TEXT(
-			"%s.%s"
-		),
-		                       *GetClassNameSpace(Class),
-		                       *SignatureFunction->GetOuter()->GetName());
-	}
-
-	if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
-	{
-		const auto ModuleName = Package->GetName().Replace(TEXT("/Script/"), TEXT("/"));
-
-		return FString::Printf(TEXT(
-			"%s%s"
-		),
-		                       TEXT("Script"),
-		                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
-	}
-
-	return TEXT("");
-}
-
-FString FGeneratorCore::GetFullClass(const FMulticastDelegateProperty* InMulticastDelegateProperty)
-{
-	if (InMulticastDelegateProperty == nullptr)
-	{
-		return TEXT("");
-	}
-
-	const auto SignatureFunction = InMulticastDelegateProperty->SignatureFunction;
-
-	if (SignatureFunction == nullptr)
-	{
-		return TEXT("");
-	}
-
-	auto DelegateName = SignatureFunction->GetName();
-
-	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
-
-	return FString::Printf(TEXT(
-		"F%s"
-	),
-	                       *DelegateName);
-}
-
-FString FGeneratorCore::GetClassNameSpace(const FMulticastDelegateProperty* InMulticastDelegateProperty)
-{
-	if (InMulticastDelegateProperty == nullptr)
-	{
-		return TEXT("");
-	}
-
-	const auto SignatureFunction = InMulticastDelegateProperty->SignatureFunction;
-
-	if (SignatureFunction == nullptr)
-	{
-		return TEXT("");
-	}
-
-	if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
-	{
-		return FString::Printf(TEXT(
-			"%s.%s"
-		),
-		                       *GetClassNameSpace(Class),
-		                       *SignatureFunction->GetOuter()->GetName());
-	}
-
-	if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
-	{
-		const auto ModuleName = Package->GetName().Replace(TEXT("/Script/"), TEXT("/"));
-
-		return FString::Printf(TEXT(
-			"%s%s"
-		),
-		                       TEXT("Script"),
-		                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
-	}
-
-	return TEXT("");
-}
-
 FString FGeneratorCore::GetPropertyType(FProperty* Property)
 {
 	if (Property == nullptr) return "";
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
-		return ByteProperty->Enum != nullptr
-			       ? GetFullClass(ByteProperty->Enum)
-			       : TEXT("Byte");
+	{
+		return ByteProperty->Enum != nullptr ? GetFullClass(ByteProperty->Enum) : TEXT("Byte");
+	}
 
 	if (CastField<FUInt16Property>(Property)) return TEXT("UInt16");
 
@@ -309,28 +105,35 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		return FString::Printf(TEXT(
 			"TSubclassOf<%s>"
 		),
-		                       *GetFullClass(ClassProperty->MetaClass)
+		                       *FUnrealCSharpFunctionLibrary::GetFullClass(ClassProperty->MetaClass)
 		);
 	}
 
 	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
-		return GetFullClass(
-			ObjectProperty->PropertyClass);
+	{
+		return FUnrealCSharpFunctionLibrary::GetFullClass(ObjectProperty->PropertyClass);
+	}
 
 	if (CastField<FNameProperty>(Property)) return TEXT("FName");
 
-	if (const auto DelegateProperty = CastField<FDelegateProperty>(Property)) return GetFullClass(DelegateProperty);
+	if (const auto DelegateProperty = CastField<FDelegateProperty>(Property))
+	{
+		return FUnrealCSharpFunctionLibrary::GetFullClass(DelegateProperty);
+	}
 
 	if (const auto InterfaceProperty = CastField<FInterfaceProperty>(Property))
 	{
 		return FString::Printf(TEXT(
 			"TScriptInterface<%s>"
 		),
-		                       *GetFullInterface(InterfaceProperty->InterfaceClass)
+		                       *FUnrealCSharpFunctionLibrary::GetFullInterface(InterfaceProperty->InterfaceClass)
 		);
 	}
 
-	if (const auto StructProperty = CastField<FStructProperty>(Property)) return GetFullClass(StructProperty->Struct);
+	if (const auto StructProperty = CastField<FStructProperty>(Property))
+	{
+		return FUnrealCSharpFunctionLibrary::GetFullClass(StructProperty->Struct);
+	}
 
 	if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
 	{
@@ -355,15 +158,16 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 	if (CastField<FTextProperty>(Property)) return TEXT("FText");
 
 	if (const auto MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(Property))
-		return GetFullClass(
-			MulticastDelegateProperty);
+	{
+		return FUnrealCSharpFunctionLibrary::GetFullClass(MulticastDelegateProperty);
+	}
 
 	if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
 	{
 		return FString::Printf(TEXT(
 			"TWeakObjectPtr<%s>"
 		),
-		                       *GetFullClass(WeakObjectProperty->PropertyClass)
+		                       *FUnrealCSharpFunctionLibrary::GetFullClass(WeakObjectProperty->PropertyClass)
 		);
 	}
 
@@ -372,7 +176,7 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		return FString::Printf(TEXT(
 			"TLazyObjectPtr<%s>"
 		),
-		                       *GetFullClass(LazyObjectProperty->PropertyClass)
+		                       *FUnrealCSharpFunctionLibrary::GetFullClass(LazyObjectProperty->PropertyClass)
 		);
 	}
 
@@ -381,7 +185,7 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		return FString::Printf(TEXT(
 			"TSoftObjectPtr<%s>"
 		),
-		                       *GetFullClass(SoftObjectProperty->PropertyClass)
+		                       *FUnrealCSharpFunctionLibrary::GetFullClass(SoftObjectProperty->PropertyClass)
 		);
 	}
 
@@ -429,9 +233,9 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	if (Property == nullptr) return {""};
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
-		return {
-			ByteProperty->Enum != nullptr ? GetClassNameSpace(ByteProperty->Enum) : TEXT("System")
-		};
+	{
+		return {ByteProperty->Enum != nullptr ? GetClassNameSpace(ByteProperty->Enum) : TEXT("System")};
+	}
 
 	if (CastField<FUInt16Property>(Property)) return {TEXT("System")};
 
@@ -453,77 +257,86 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 
 	if (const auto ClassProperty = CastField<FClassProperty>(Property))
 	{
-		return {TEXT("Script.Common"), GetClassNameSpace(ClassProperty->MetaClass)};
+		return {TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(ClassProperty->MetaClass)};
 	}
 
 	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
-		return {
-			GetClassNameSpace(ObjectProperty->PropertyClass)
-		};
+	{
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(ObjectProperty->PropertyClass)};
+	}
 
 	if (CastField<FNameProperty>(Property)) return {TEXT("Script.Common")};
 
 	if (const auto DelegateProperty = CastField<FDelegateProperty>(Property))
-		return {
-			GetClassNameSpace(DelegateProperty)
-		};
+	{
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(DelegateProperty)};
+	}
 
 	if (const auto InterfaceProperty = CastField<FInterfaceProperty>(Property))
 	{
-		return {TEXT("Script.Common"), GetClassNameSpace(InterfaceProperty->InterfaceClass)};
+		return {
+			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(InterfaceProperty->InterfaceClass)
+		};
 	}
 
 	if (const auto StructProperty = CastField<FStructProperty>(Property))
-		return {
-			GetClassNameSpace(StructProperty->Struct)
-		};
+	{
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(StructProperty->Struct)};
+	}
 
 	if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
-		return
-			GetPropertyTypeNameSpace(ArrayProperty->Inner).Union({TEXT("Script.Common")});
+	{
+		return GetPropertyTypeNameSpace(ArrayProperty->Inner).Union({TEXT("Script.Common")});
+	}
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-		return {
-			GetClassNameSpace(EnumProperty->GetEnum()),
-			TEXT("System")
-		};
+	{
+		return {GetClassNameSpace(EnumProperty->GetEnum()), TEXT("System")};
+	}
 
 	if (CastField<FStrProperty>(Property)) return {"Script.Common"};
 
 	if (CastField<FTextProperty>(Property)) return {"Script.Common"};
 
 	if (const auto MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(Property))
-		return {
-			GetClassNameSpace(MulticastDelegateProperty)
-		};
+	{
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(MulticastDelegateProperty)};
+	}
 
 	if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
 	{
-		return {TEXT("Script.Common"), GetClassNameSpace(WeakObjectProperty->PropertyClass)};
+		return {
+			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(WeakObjectProperty->PropertyClass)
+		};
 	}
 
 	if (const auto LazyObjectProperty = CastField<FLazyObjectProperty>(Property))
 	{
-		return {TEXT("Script.Common"), GetClassNameSpace(LazyObjectProperty->PropertyClass)};
+		return {
+			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(LazyObjectProperty->PropertyClass)
+		};
 	}
 
 	if (const auto SoftObjectProperty = CastField<FSoftObjectProperty>(Property))
 	{
-		return {TEXT("Script.Common"), GetClassNameSpace(SoftObjectProperty->PropertyClass)};
+		return {
+			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(SoftObjectProperty->PropertyClass)
+		};
 	}
 
 	if (CastField<FDoubleProperty>(Property)) return {TEXT("System")};
 
 	if (const auto MapProperty = CastField<FMapProperty>(Property))
-		return
-			GetPropertyTypeNameSpace(MapProperty->KeyProp).Union(GetPropertyTypeNameSpace(MapProperty->ValueProp)).
-			                                               Union({
-				                                               TEXT("Script.Common")
-			                                               });
+	{
+		return GetPropertyTypeNameSpace(MapProperty->KeyProp).
+		       Union(GetPropertyTypeNameSpace(MapProperty->ValueProp)).
+		       Union({TEXT("Script.Common")});
+	}
 
 	if (const auto SetProperty = CastField<FSetProperty>(Property))
-		return
-			GetPropertyTypeNameSpace(SetProperty->ElementProp).Union({TEXT("Script.Common")});
+	{
+		return GetPropertyTypeNameSpace(SetProperty->ElementProp).Union({TEXT("Script.Common")});
+	}
 
 	if (CastField<FFieldPathProperty>(Property)) return {TEXT("Script.Common"), TEXT("Script.Reflection.Property")};
 

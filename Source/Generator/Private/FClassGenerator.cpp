@@ -1,6 +1,7 @@
 ﻿#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 void FClassGenerator::Generator()
 {
@@ -28,11 +29,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	FString UsingNameSpaceContent;
 
-	auto NameSpaceContent = FGeneratorCore::GetClassNameSpace(InClass);
+	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass);
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InClass);
 
-	auto FullClassContent = FGeneratorCore::GetFullClass(InClass);
+	auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InClass);
 
 	FString SuperClassContent;
 
@@ -54,7 +55,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	if (SuperClass != nullptr)
 	{
-		auto SuperClassNameSpace = FGeneratorCore::GetClassNameSpace(SuperClass);
+		auto SuperClassNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass);
 
 		if (NameSpaceContent != SuperClassNameSpace)
 		{
@@ -64,17 +65,17 @@ void FClassGenerator::Generator(const UClass* InClass)
 		SuperClassContent = FString::Printf(TEXT(
 			" : %s"
 		),
-		                                    *FGeneratorCore::GetFullClass(SuperClass));
+		                                    *FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass));
 	}
 
 	for (auto Interface : InClass->Interfaces)
 	{
-		UsingNameSpaces.Add(FGeneratorCore::GetClassNameSpace(Interface.Class));
+		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(Interface.Class));
 
 		InterfaceContent = FString::Printf(TEXT(
 			", %s"
 		),
-		                                   *FGeneratorCore::GetFullInterface(Interface.Class));
+		                                   *FUnrealCSharpFunctionLibrary::GetFullInterface(Interface.Class));
 	}
 
 	auto bHasProperty = false;
@@ -149,7 +150,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	UsingNameSpaces.Add(TEXT("Script.Library"));
 
-	UsingNameSpaces.Add(FGeneratorCore::GetClassNameSpace(UClass::StaticClass()));
+	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()));
 
 	for (TFieldIterator<UFunction> FunctionIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
 	                                                EFieldIteratorFlags::ExcludeDeprecated,
@@ -430,12 +431,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 			"%s"
 			"\t}\n"
 		),
-		                                    *FGeneratorCore::GetFullInterface(InClass),
+		                                    *FUnrealCSharpFunctionLibrary::GetFullInterface(InClass),
 		                                    SuperClass != nullptr && SuperClass != UObject::StaticClass()
 			                                    ? *FString::Printf(TEXT(
 				                                    " : %s"
 			                                    ),
-			                                                       *FGeneratorCore::GetFullInterface(SuperClass))
+			                                                       *FUnrealCSharpFunctionLibrary::GetFullInterface(
+				                                                       SuperClass))
 			                                    : TEXT(""),
 		                                    *InterfaceFunction);
 	}
@@ -487,9 +489,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                               *IInterfaceContent
 	);
 
-	auto ModuleName = FGeneratorCore::GetModuleName(InClass);
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InClass);
 
-	auto DirectoryName = FPaths::Combine(FGeneratorCore::GetBasePath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 

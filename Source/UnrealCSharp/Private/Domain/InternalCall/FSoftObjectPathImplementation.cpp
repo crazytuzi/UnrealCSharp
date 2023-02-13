@@ -1,9 +1,9 @@
 ﻿#include "Domain/InternalCall/FSoftObjectPathImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterSoftObjectPath
 {
@@ -377,7 +377,7 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetOrCreateIDForObjectImpleme
 	const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FSoftObjectPath)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FSoftObjectPath)),
 		CLASS_SCRIPT_STRUCT_NAME(FSoftObjectPath));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);

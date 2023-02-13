@@ -2,6 +2,7 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
+#include "Macro/NamespaceMacro.h"
 
 struct FRegisterDelegate
 {

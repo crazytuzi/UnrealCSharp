@@ -1,10 +1,10 @@
 ﻿#include "Reflection/Property/ObjectProperty/FWeakObjectPropertyDescriptor.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/MonoMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -20,8 +20,8 @@ void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 			Type_Get_Object(FoundWeakObjectPtrMonoType);
 
 		const auto FoundGenericMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			FTypeBridge::GetClassNameSpace(WeakObjectProperty->PropertyClass),
-			FTypeBridge::GetFullClass(WeakObjectProperty->PropertyClass));
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(WeakObjectProperty->PropertyClass),
+			FUnrealCSharpFunctionLibrary::GetFullClass(WeakObjectProperty->PropertyClass));
 
 		const auto FoundGenericMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 			FoundGenericMonoClass);
@@ -60,8 +60,8 @@ void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 		if (FoundMonoObject == nullptr)
 		{
 			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FTypeBridge::GetClassNameSpace(SrcObject->GetClass()),
-				FTypeBridge::GetFullClass(SrcObject->GetClass()));
+				FUnrealCSharpFunctionLibrary::GetClassNameSpace(SrcObject->GetClass()),
+				FUnrealCSharpFunctionLibrary::GetFullClass(SrcObject->GetClass()));
 
 			FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 

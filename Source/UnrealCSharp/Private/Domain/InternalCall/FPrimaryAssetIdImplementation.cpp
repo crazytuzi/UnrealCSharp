@@ -1,9 +1,9 @@
 ﻿#include "Domain/InternalCall/FPrimaryAssetIdImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterPrimaryAssetId
 {
@@ -36,7 +36,7 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplement
 	MonoObject* TypeAndName, MonoObject** OutValue)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
 		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -55,7 +55,7 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImpleme
 	MonoObject** OutValue)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
 		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -109,7 +109,7 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation(
 void FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation(MonoObject* String, MonoObject** OutValue)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
 		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);

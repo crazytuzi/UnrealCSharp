@@ -1,10 +1,10 @@
 ﻿#include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/MonoMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -22,8 +22,8 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 			Type_Get_Object(FoundScriptInterfaceMonoType);
 
 		const auto FoundGenericMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			FTypeBridge::GetClassNameSpace(InterfaceProperty->InterfaceClass),
-			FTypeBridge::GetFullInterface(InterfaceProperty->InterfaceClass));
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InterfaceProperty->InterfaceClass),
+			FUnrealCSharpFunctionLibrary::GetFullInterface(InterfaceProperty->InterfaceClass));
 
 		const auto FoundGenericMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
 			FoundGenericMonoClass);
@@ -56,8 +56,8 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 			GenericClassMonoObject);
 
 		const auto SrcMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			FTypeBridge::GetClassNameSpace(SrcClass),
-			FTypeBridge::GetFullClass(SrcClass));
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(SrcClass),
+			FUnrealCSharpFunctionLibrary::GetFullClass(SrcClass));
 
 		const auto StaticClassMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
 			Class_Get_Method_From_Name(SrcMonoClass, FUNCTION_STATIC_CLASS, 0);

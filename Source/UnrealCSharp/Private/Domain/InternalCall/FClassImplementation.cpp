@@ -1,7 +1,8 @@
 ﻿#include "Domain/InternalCall/FClassImplementation.h"
 #include "Binding/Class/TClassBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterUClass
 {
@@ -32,8 +33,8 @@ void FClassImplementation::Class_GetClassDefaultObjectImplementation(const MonoO
 		else
 		{
 			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FTypeBridge::GetClassNameSpace(UObject::StaticClass()),
-				FTypeBridge::GetFullClass(UObject::StaticClass()));
+				FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
+				FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass()));
 
 			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
@@ -56,8 +57,8 @@ void FClassImplementation::Class_GetDefaultObjectImplementation(const MonoObject
 		else
 		{
 			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FTypeBridge::GetClassNameSpace(UObject::StaticClass()),
-				FTypeBridge::GetFullClass(UObject::StaticClass()));
+				FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
+				FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass()));
 
 			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
