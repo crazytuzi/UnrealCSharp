@@ -1,5 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System;
+using System.IO;
 using UnrealBuildTool;
 
 public class Generator : ModuleRules
@@ -51,5 +53,15 @@ public class Generator : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
+
+		var intermediate = Path.Combine(this.PluginDirectory, "Intermediate");
+
+		if (!Directory.Exists(intermediate))
+			Directory.CreateDirectory(intermediate);
+		
+		var txtFile = Path.Combine(intermediate, "GameModules.txt");
+
+		File.WriteAllText(txtFile, string.Join('\n', Target.ExtraModuleNames));	
+
 	}
 }

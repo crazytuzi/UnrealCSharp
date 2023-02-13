@@ -20,6 +20,7 @@ void FCSharpEnvironment::Initialize()
 	Domain = new FMonoDomain({
 		"",
 		FPaths::ConvertRelativePathToFull(
+			//FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Managed/Debug/netstandard2.0/Game-Managed.dll")))
 			FPaths::Combine(FPaths::ProjectContentDir(), NAMESPACE_ROOT, NAMESPACE_ROOT + ".dll"))
 	});
 	

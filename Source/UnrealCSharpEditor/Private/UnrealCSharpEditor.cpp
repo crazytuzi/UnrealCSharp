@@ -4,6 +4,7 @@
 #include "FBlueprintGenerator.h"
 #include "FClassGenerator.h"
 #include "FEnumGenerator.h"
+#include "FGeneratorPaths.h"
 #include "FStructGenerator.h"
 #include "FSolutionGenerator.h"
 #include "UnrealCSharpEditorStyle.h"
@@ -52,6 +53,8 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 void FUnrealCSharpEditorModule::PluginButtonClicked()
 {
 	GWarn->BeginSlowTask(FText::FromString(TEXT("Generating C# Code...")), true);
+
+	FScopedGeneratorPathsCache PathsCache;
 	
 	FClassGenerator::Generator();
 
