@@ -55,8 +55,6 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 {
 	GWarn->BeginSlowTask(FText::FromString(TEXT("Generating C# Code...")), true);
 
-	FScopedGeneratorPathsCache PathsCache;
-	
 	FClassGenerator::Generator();
 
 	FStructGenerator::Generator();

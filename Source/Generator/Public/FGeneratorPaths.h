@@ -22,14 +22,5 @@ public:
 	static GENERATOR_API FString GetGameManagedProxyPath();
 	
 	static GENERATOR_API FString GetGenerationPath(const FString& InternalScriptPath);
-
-	static GENERATOR_API void BeginCache();
-
-	static GENERATOR_API void EndCache();
-};
-
-struct FScopedGeneratorPathsCache
-{
-	FScopedGeneratorPathsCache() { FGeneratorPaths::BeginCache(); }
-	~FScopedGeneratorPathsCache() { FGeneratorPaths::EndCache(); }
+	
 };
