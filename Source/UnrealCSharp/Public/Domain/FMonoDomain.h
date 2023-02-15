@@ -93,6 +93,14 @@ public:
 
 	MonoClass* Get_Double_Class() const;
 
+	uint32 GCHandle_New(MonoObject* InMonoObject, mono_bool bPinned);
+
+	uint32 GCHandle_New_WeakRef(MonoObject* InMonoObject, mono_bool bTrackResurrection);
+
+	MonoObject* GCHandle_Get_Target(uint32 InGCHandle);
+
+	void GCHandle_Free(uint32 InGCHandle);
+
 private:
 	void RegisterMonoTrace();
 

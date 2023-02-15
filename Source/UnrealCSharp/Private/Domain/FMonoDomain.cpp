@@ -8,6 +8,7 @@
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
 #include "mono/utils/mono-logger.h"
+#include "mono/metadata/mono-gc.h"
 
 MonoDomain* FMonoDomain::RootDomain = nullptr;
 
@@ -275,6 +276,26 @@ MonoClass* FMonoDomain::Get_Enum_Class() const
 MonoClass* FMonoDomain::Get_Double_Class() const
 {
 	return mono_get_double_class();
+}
+
+uint32 FMonoDomain::GCHandle_New(MonoObject* InMonoObject, const mono_bool bPinned)
+{
+	return mono_gchandle_new(InMonoObject, bPinned);
+}
+
+uint32 FMonoDomain::GCHandle_New_WeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
+{
+	return mono_gchandle_new_weakref(InMonoObject, bTrackResurrection);
+}
+
+MonoObject* FMonoDomain::GCHandle_Get_Target(const uint32 InGCHandle)
+{
+	return mono_gchandle_get_target(InGCHandle);
+}
+
+void FMonoDomain::GCHandle_Free(const uint32 InGCHandle)
+{
+	mono_gchandle_free(InGCHandle);
 }
 
 void FMonoDomain::RegisterMonoTrace()
