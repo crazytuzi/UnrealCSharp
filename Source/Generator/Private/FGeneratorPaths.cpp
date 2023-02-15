@@ -1,7 +1,10 @@
 #include "FGeneratorPaths.h"
 
 #include "Misc/FileHelper.h"
+
+#if PLATFORM_WINDOWS
 #include "Windows/LiveCoding/Public/ILiveCodingModule.h"
+#endif
 
 FString FGeneratorPaths::GetManagedBaseName()
 {
@@ -50,15 +53,21 @@ static TArray<FString>& GetGameModuleList()
 
 	if(GameModuleList.IsEmpty())
 	{
+#if PLATFORM_WINDOWS
+		
 		ILiveCodingModule* LiveCoding = static_cast<ILiveCodingModule*>(FModuleManager::Get().LoadModule(TEXT("LiveCoding")));
 
-		if(LiveCoding)
+		static bool bInitedLiveCoding = false;
+		
+		if(!bInitedLiveCoding && LiveCoding)
 		{
 			LiveCoding->GetOnPatchCompleteDelegate().AddLambda([]()
 			{
 				GameModuleList.Empty();
 			});
+			bInitedLiveCoding = true;
 		}
+#endif
 		
 		// Scan
 		auto TxtFile = FPaths::Combine(FPaths::ProjectPluginsDir(), TEXT("UnrealCSharp"), TEXT("Intermediate"), TEXT("GameModules.txt"));
