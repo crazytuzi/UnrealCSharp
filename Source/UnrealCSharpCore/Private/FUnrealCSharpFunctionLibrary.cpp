@@ -1,14 +1,14 @@
 ﻿#include "FUnrealCSharpFunctionLibrary.h"
 
-FString FUnrealCSharpFunctionLibrary::GetProxyPath()
-{
-	return FPaths::Combine(FPaths::ProjectDir(), TEXT("Script"), TEXT("Proxy"));
-}
-
-FString FUnrealCSharpFunctionLibrary::GetGamePath()
-{
-	return FPaths::Combine(FPaths::ProjectDir(), TEXT("Script"), TEXT("Game"));
-}
+// FString FUnrealCSharpFunctionLibrary::GetProxyPath()
+// {
+// 	return FPaths::Combine(FPaths::ProjectDir(), TEXT("Script"), TEXT("Proxy"));
+// }
+//
+// FString FUnrealCSharpFunctionLibrary::GetGamePath()
+// {
+// 	return FPaths::Combine(FPaths::ProjectDir(), TEXT("Script"), TEXT("Game"));
+// }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
@@ -213,8 +213,8 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 FString FUnrealCSharpFunctionLibrary::GetFileName(const UField* InField)
 {
 	auto ModuleName = GetModuleName(InField);
-
-	auto DirectoryName = FPaths::Combine(GetProxyPath(), ModuleName);
+	
+	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InField->GetPackage()->GetName()), ModuleName);
 
 	return FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
 			"%s.cs"
@@ -228,7 +228,7 @@ FString FUnrealCSharpFunctionLibrary::GetOldFileName(const UField* InField, cons
 {
 	auto ModuleName = GetModuleName(InField);
 
-	auto DirectoryName = FPaths::Combine(GetProxyPath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InField->GetPackage()->GetName()), ModuleName);
 
 	return FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
 			"%s.cs"

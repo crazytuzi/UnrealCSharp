@@ -15,12 +15,16 @@ FCSharpEnvironment::~FCSharpEnvironment()
 	Deinitialize();
 }
 
+
+
 void FCSharpEnvironment::Initialize()
 {
 	Domain = new FMonoDomain({
 		"",
-		FPaths::ConvertRelativePathToFull(
-			FPaths::Combine(FPaths::ProjectContentDir(), NAMESPACE_ROOT, NAMESPACE_ROOT + ".dll"))
+		{
+			GetManagedDir() / TEXT("UE-Managed.dll"),
+			GetManagedDir() / TEXT("Game-Managed.dll")
+		}
 	});
 	
 	ClassRegistry = new FClassRegistry();
@@ -260,6 +264,11 @@ bool FCSharpEnvironment::RemoveStructReference(const void* InStruct) const
 bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InMonoObject) : false;
+}
+
+FString FCSharpEnvironment::GetManagedDir()
+{
+	return FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Managed/Debug/netstandard2.0")));
 }
 
 MonoObject* FCSharpEnvironment::GetContainerObject(const void* InContainer) const

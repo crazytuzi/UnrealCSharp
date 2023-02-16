@@ -1,6 +1,8 @@
 ﻿#include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
+#include "FGeneratorPaths.h"
 #include "FUnrealCSharpFunctionLibrary.h"
+
 
 void FDelegateGenerator::Generator(FProperty* InProperty)
 {
@@ -321,7 +323,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	auto ModuleName = GetModuleName(InDelegateProperty);
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InDelegateProperty->GetOutermost()->GetName()), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, DelegateName) + TEXT(".cs");
 
@@ -660,7 +662,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	auto ModuleName = GetModuleName(InMulticastDelegateProperty);
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InMulticastDelegateProperty->GetOutermost()->GetName()), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, DelegateName) + TEXT(".cs");
 

@@ -1,6 +1,7 @@
 ﻿#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
+#include "FGeneratorPaths.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 
 void FClassGenerator::Generator()
@@ -490,8 +491,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 	);
 
 	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InClass);
-
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
+	
+	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InClass->GetPackage()->GetName()), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 

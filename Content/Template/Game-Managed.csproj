@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<TargetFramework>netstandard2.0</TargetFramework>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	<BaseIntermediateOutputPath>..\..\Intermediate\Managed</BaseIntermediateOutputPath>
+	<BaseOutputPath>..\..\Content\Managed</BaseOutputPath>
+	<RootNamespace>$(MSBuildProjectName.Substring(0, $(MSBuildProjectName.IndexOf('-'))).Replace(" ", "_"))</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UE-Managed\UE-Managed.csproj" />
+  </ItemGroup>
+</Project>

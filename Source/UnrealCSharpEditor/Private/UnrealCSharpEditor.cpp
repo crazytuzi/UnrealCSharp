@@ -5,11 +5,14 @@
 #include "FClassGenerator.h"
 #include "FCSharpCompiler.h"
 #include "FEnumGenerator.h"
+#include "FGeneratorPaths.h"
 #include "FStructGenerator.h"
+#include "FSolutionGenerator.h"
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Misc/MessageDialog.h"
 #include "ToolMenus.h"
+#include "Misc/FeedbackContext.h"
 
 static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 
@@ -50,19 +53,25 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 
 void FUnrealCSharpEditorModule::PluginButtonClicked()
 {
+	GWarn->BeginSlowTask(FText::FromString(TEXT("Generating C# Code...")), true);
+
 	FClassGenerator::Generator();
 
 	FStructGenerator::Generator();
 
 	FEnumGenerator::Generator();
-
+	
 	FBlueprintGenerator::Generator();
 
 	FEnumGenerator::EmptyEnumUnderlyingType();
 
+	FSolutionGenerator::Generator();
+	
 	CollectGarbage(RF_NoFlags, true);
 
 	FCSharpCompiler::Get().Compile();
+
+	GWarn->EndSlowTask();
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()
