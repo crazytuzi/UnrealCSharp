@@ -1,13 +1,11 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "FGeneratorPaths.h"
 
 class UNREALCSHARPCORE_API FUnrealCSharpFunctionLibrary
 {
 public:
-	static FString GetProxyPath();
-
-	static FString GetGamePath();
 
 	static FString GetModuleName(const UField* InField);
 

@@ -5,22 +5,22 @@
 class FGeneratorPaths
 {
 public:
-	static GENERATOR_API FString GetManagedBaseName();
+	static UNREALCSHARPCORE_API FString GetManagedBaseName();
 	
-	static GENERATOR_API FString GetManagedBasePath();
+	static UNREALCSHARPCORE_API FString GetManagedBasePath();
 
-	static GENERATOR_API FString GetUEManagedProjectName();
+	static UNREALCSHARPCORE_API FString GetUEManagedProjectName();
 	
-	static GENERATOR_API FString GetUEManagedPath();
+	static UNREALCSHARPCORE_API FString GetUEManagedPath();
 	
-	static GENERATOR_API FString GetUEManagedProxyPath();
+	static UNREALCSHARPCORE_API FString GetUEManagedProxyPath();
 
-	static GENERATOR_API FString GetGameManagedProjectName();
+	static UNREALCSHARPCORE_API FString GetGameManagedProjectName();
 
-	static GENERATOR_API FString GetGameManagedPath();
+	static UNREALCSHARPCORE_API FString GetGameManagedPath();
 
-	static GENERATOR_API FString GetGameManagedProxyPath();
+	static UNREALCSHARPCORE_API FString GetGameManagedProxyPath();
 	
-	static GENERATOR_API FString GetGenerationPath(const FString& InternalScriptPath);
+	static UNREALCSHARPCORE_API FString GetGenerationPath(const FString& InternalScriptPath);
 	
 };

@@ -6,11 +6,11 @@ struct FMonoDomainInitializeParams
 {
 	FString Domain;
 
-	FString Assembly;
+	TArray<FString> Assemblies;
 
-	FMonoDomainInitializeParams(const FString& InDomain, const FString& InAssembly):
+	FMonoDomainInitializeParams(const FString& InDomain, const TArray<FString>& InAssemblies):
 		Domain(InDomain),
-		Assembly(InAssembly)
+		Assemblies(InAssemblies)
 	{
 	}
 };
@@ -113,7 +113,7 @@ private:
 	
 	MonoDomain* Domain;
 
-	MonoAssembly* Assembly;
+	TArray<MonoAssembly*> Assemblies;
 
-	MonoImage* Image;
+	TArray<MonoImage*> Images;
 };

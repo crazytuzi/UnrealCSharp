@@ -91,6 +91,7 @@ public:
 
 	bool RemoveStructReference(const MonoObject* InMonoObject) const;
 
+	FString GetManagedDir();
 public:
 	template <typename T>
 	auto GetContainer(const MonoObject* InMonoObject) const;
