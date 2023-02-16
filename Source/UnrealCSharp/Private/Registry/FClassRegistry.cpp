@@ -1,6 +1,6 @@
 ﻿#include "Registry/FClassRegistry.h"
-#include "Bridge/FTypeBridge.h"
 #include "Domain/FMonoDomain.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 FClassRegistry::FClassRegistry()
 {
@@ -52,7 +52,8 @@ FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDo
 	}
 
 	const auto FoundMonoClass = InMonoDomain->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(InStruct), FTypeBridge::GetFullClass(InStruct));
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
+		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct));
 
 	if (FoundMonoClass == nullptr)
 	{

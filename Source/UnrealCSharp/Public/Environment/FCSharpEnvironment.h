@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Domain/FMonoDomain.h"
-#include "Registry/FBindingRegistry.h"
 #include "Registry/FClassRegistry.h"
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FCSharpBind.h"
@@ -125,12 +124,6 @@ public:
 	template <typename T>
 	auto RemoveDelegateReference(const void* InDelegate) const;
 
-public:
-	template <typename T>
-	auto GetBinding(const MonoObject* InMonoObject) const;
-
-	bool AddBindingReference(void* InBinding, MonoObject* InMonoObject) const;
-
 private:
 	template <typename T, typename U>
 	class TGetAddress
@@ -169,8 +162,6 @@ private:
 	FContainerRegistry* ContainerRegistry;
 
 	FDelegateRegistry* DelegateRegistry;
-
-	FBindingRegistry* BindingRegistry;
 };
 
 #include "FCSharpEnvironment.inl"

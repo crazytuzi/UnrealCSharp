@@ -1,6 +1,7 @@
 ﻿#include "Domain/InternalCall/FPropertyImplementation.h"
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Macro/NamespaceMacro.h"
 
 struct FRegisterProperty
 {

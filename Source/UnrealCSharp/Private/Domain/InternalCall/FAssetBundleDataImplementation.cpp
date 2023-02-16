@@ -1,9 +1,9 @@
 ﻿#include "Domain/InternalCall/FAssetBundleDataImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterAssetBundleData
 {
@@ -62,7 +62,7 @@ void FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation(
 		UScriptStruct, FAssetBundleData>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FAssetBundleEntry)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FAssetBundleEntry)),
 		CLASS_SCRIPT_STRUCT_NAME(FAssetBundleEntry));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);

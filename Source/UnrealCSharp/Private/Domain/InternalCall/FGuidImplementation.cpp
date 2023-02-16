@@ -1,9 +1,9 @@
 ﻿#include "Domain/InternalCall/FGuidImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterGuid
 {
@@ -174,7 +174,7 @@ void FGuidImplementation::Guid_ToStringImplementation(const MonoObject* InMonoOb
 void FGuidImplementation::Guid_NewGuidImplementation(MonoObject** OutValue)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FGuid)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FGuid)),
 		CLASS_SCRIPT_STRUCT_NAME(FGuid));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -192,7 +192,7 @@ void FGuidImplementation::Guid_NewGuidImplementation(MonoObject** OutValue)
 bool FGuidImplementation::Guid_ParseImplementation(MonoObject* GuidString, MonoObject** OutGuid)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FGuid)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FGuid)),
 		CLASS_SCRIPT_STRUCT_NAME(FGuid));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);

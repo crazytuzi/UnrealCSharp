@@ -1,9 +1,9 @@
 ﻿#include "Domain/InternalCall/FLinearColorImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterLinearColor
 {
@@ -75,7 +75,7 @@ void FLinearColorImplementation::LinearColor_ToRGBEImplementation(const MonoObje
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -95,7 +95,7 @@ void FLinearColorImplementation::LinearColor_FromSRGBColorImplementation(const M
 	const auto InColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FColor>(Color);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -117,7 +117,7 @@ void FLinearColorImplementation::LinearColor_FromPow22ColorImplementation(
 	const auto InColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FColor>(Color);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -154,7 +154,7 @@ void FLinearColorImplementation::LinearColor_AddImplementation(const MonoObject*
 	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -178,7 +178,7 @@ void FLinearColorImplementation::LinearColor_SubtractImplementation(const MonoOb
 	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -202,7 +202,7 @@ void FLinearColorImplementation::LinearColor_MultiplyImplementation(const MonoOb
 	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -225,7 +225,7 @@ void FLinearColorImplementation::LinearColor_MultiplyScalarImplementation(
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -249,7 +249,7 @@ void FLinearColorImplementation::LinearColor_DivideImplementation(const MonoObje
 	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -272,7 +272,7 @@ void FLinearColorImplementation::LinearColor_DivideScalarImplementation(const Mo
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -295,7 +295,7 @@ void FLinearColorImplementation::LinearColor_GetClampedImplementation(const Mono
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -361,7 +361,7 @@ void FLinearColorImplementation::LinearColor_CopyWithNewOpacityImplementation(
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -381,7 +381,7 @@ void FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation(const ui
                                                                         MonoObject** OutValue)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -400,7 +400,7 @@ void FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation(const ui
 void FLinearColorImplementation::LinearColor_MakeRandomColorImplementation(MonoObject** OutValue)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -420,7 +420,7 @@ void FLinearColorImplementation::LinearColor_MakeFromColorTemperatureImplementat
 	const float Temp, MonoObject** OutValue)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -457,7 +457,7 @@ void FLinearColorImplementation::LinearColor_LinearRGBToHSVImplementation(
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -480,7 +480,7 @@ void FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation(
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -504,7 +504,7 @@ void FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation(const Mo
 	const auto LinearColorTo = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(To);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -527,7 +527,7 @@ void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoOb
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -549,7 +549,7 @@ void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -571,7 +571,7 @@ void FLinearColorImplementation::LinearColor_ToFColorImplementation(const MonoOb
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -593,7 +593,7 @@ void FLinearColorImplementation::LinearColor_DesaturateImplementation(const Mono
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);

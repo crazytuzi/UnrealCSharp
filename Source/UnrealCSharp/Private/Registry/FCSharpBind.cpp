@@ -1,5 +1,4 @@
 ﻿#include "Registry/FCSharpBind.h"
-#include "Bridge/FTypeBridge.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/NamespaceMacro.h"
@@ -7,6 +6,7 @@
 #include "Reflection/Container/FMapHelper.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 
@@ -122,7 +122,8 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 	if (const auto InClass = Cast<UClass>(InStruct))
 	{
 		if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
-			FTypeBridge::GetClassNameSpace(InStruct), FTypeBridge::GetFullClass(InStruct)))
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))
 		{
 			TMap<FName, UFunction*> Functions;
 
@@ -280,8 +281,9 @@ bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct)
 		return true;
 	}
 
-	if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(FTypeBridge::GetClassNameSpace(InStruct),
-	                                                              FTypeBridge::GetFullClass(InStruct)))
+	if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
+		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))
 	{
 		if (const auto FoundMonoType = InMonoDomain->Class_Get_Type(FoundMonoClass))
 		{

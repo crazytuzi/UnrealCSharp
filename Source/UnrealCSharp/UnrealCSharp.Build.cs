@@ -38,7 +38,8 @@ public class UnrealCSharp : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
+				"SlateCore", 
+				"UnrealCSharpCore",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

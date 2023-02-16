@@ -1,9 +1,9 @@
 ﻿#include "Domain/InternalCall/FFrameTimeImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterFrameTime
 {
@@ -44,7 +44,7 @@ void FFrameTimeImplementation::FrameTime_GetFrameImplementation(const MonoObject
 	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -78,7 +78,7 @@ void FFrameTimeImplementation::FrameTime_FloorToFrameImplementation(const MonoOb
 	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -100,7 +100,7 @@ void FFrameTimeImplementation::FrameTime_CeilToFrameImplementation(const MonoObj
 	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -122,7 +122,7 @@ void FFrameTimeImplementation::FrameTime_RoundToFrameImplementation(const MonoOb
 	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -153,7 +153,7 @@ double FFrameTimeImplementation::FrameTime_AsDecimalImplementation(const MonoObj
 void FFrameTimeImplementation::FrameTime_FromDecimalImplementation(const double InDecimalFrame, MonoObject** OutValue)
 {
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -261,7 +261,7 @@ void FFrameTimeImplementation::FrameTime_AddImplementation(const MonoObject* A, 
 	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -285,7 +285,7 @@ void FFrameTimeImplementation::FrameTime_SubtractImplementation(const MonoObject
 	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -309,7 +309,7 @@ void FFrameTimeImplementation::FrameTime_RemainderImplementation(const MonoObjec
 	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -330,7 +330,7 @@ void FFrameTimeImplementation::FrameTime_NegatedImplementation(const MonoObject*
 	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -352,7 +352,7 @@ void FFrameTimeImplementation::FrameTime_MultiplyImplementation(const MonoObject
 	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
@@ -374,7 +374,7 @@ void FFrameTimeImplementation::FrameTime_DivideImplementation(const MonoObject* 
 	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FTypeBridge::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);

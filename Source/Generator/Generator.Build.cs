@@ -41,7 +41,8 @@ public class Generator : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UMGEditor",
-				"UnrealEd"
+				"UnrealEd", 
+				"UnrealCSharpCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

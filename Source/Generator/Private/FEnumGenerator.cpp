@@ -2,6 +2,7 @@
 #include "FGeneratorCore.h"
 #include "FGeneratorPaths.h"
 #include "Engine/UserDefinedEnum.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 TMap<const UEnum*, EEnumUnderlyingType> FEnumGenerator::EnumUnderlyingType;
 
@@ -86,7 +87,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	                                     *EnumeratorContent
 	);
 
-	auto ModuleName = FGeneratorCore::GetModuleName(InEnum);
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InEnum);
 
 	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InEnum->GetPackage()->GetName()), ModuleName);
 

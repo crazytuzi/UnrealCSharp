@@ -4,6 +4,7 @@
 #include "FGeneratorPaths.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 void FStructGenerator::Generator()
 {
@@ -31,11 +32,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	FString UsingNameSpaceContent;
 
-	auto NameSpaceContent = FGeneratorCore::GetClassNameSpace(InScriptStruct);
+	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct);
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InScriptStruct);
 
-	auto FullClassContent = FGeneratorCore::GetFullClass(InScriptStruct);
+	auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct);
 
 	FString SuperStructContent;
 
@@ -51,7 +52,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	if (SuperStruct != nullptr)
 	{
-		auto SuperStructNameSpace = FGeneratorCore::GetClassNameSpace(SuperStruct);
+		auto SuperStructNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperStruct);
 
 		if (NameSpaceContent != SuperStructNameSpace)
 		{
@@ -61,7 +62,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		SuperStructContent = FString::Printf(TEXT(
 			" : %s"
 		),
-		                                     *FGeneratorCore::GetFullClass(SuperStruct));
+		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(SuperStruct));
 
 		ConstructorContent = FString::Printf(TEXT(
 			"\t\tpublic %s()\n"
@@ -72,8 +73,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\t\t{\n"
 			"\t\t}\n"
 		),
-		                                     *FGeneratorCore::GetFullClass(InScriptStruct),
-		                                     *FGeneratorCore::GetFullClass(InScriptStruct)
+		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct),
+		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct)
 		);
 	}
 	else
@@ -86,14 +87,14 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\t\t{\n"
 			"\t\t}\n"
 		),
-		                                     *FGeneratorCore::GetFullClass(InScriptStruct),
-		                                     *FGeneratorCore::GetFullClass(InScriptStruct)
+		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct),
+		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct)
 		);
 
 		DestructorContent = FString::Printf(TEXT(
 			"\t\t~%s() => StructUtils.Struct_UnRegister(this);\n"
 		),
-		                                    *FGeneratorCore::GetFullClass(InScriptStruct)
+		                                    *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct)
 		);
 
 		UsingNameSpaces.Add(TEXT("System.Reflection"));
@@ -200,8 +201,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *PropertyContent
 	);
 
-	auto ModuleName = FGeneratorCore::GetModuleName(InScriptStruct);
-
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InScriptStruct);
+	
 	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InScriptStruct->GetPackage()->GetName()), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");

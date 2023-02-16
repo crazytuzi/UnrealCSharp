@@ -1,6 +1,8 @@
 ﻿#include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
 #include "FGeneratorPaths.h"
+#include "FUnrealCSharpFunctionLibrary.h"
+
 
 void FDelegateGenerator::Generator(FProperty* InProperty)
 {
@@ -30,7 +32,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	FString UsingNameSpaceContent;
 
-	auto NameSpaceContent = FGeneratorCore::GetClassNameSpace(InDelegateProperty);
+	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InDelegateProperty);
 
 	FString FullClassContent;
 
@@ -46,7 +48,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common"), TEXT("Script.Reflection.Delegate")};
 
-	FullClassContent = FGeneratorCore::GetFullClass(InDelegateProperty);
+	FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InDelegateProperty);
 
 	auto DelegateFullName = FullClassContent;
 
@@ -219,7 +221,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		                                             *DelegateReturnType,
 		                                             *DelegateDeclarationBody);
 
-		UsingNameSpaces.Add(FGeneratorCore::GetClassNameSpace(UObject::StaticClass()));
+		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 	}
 	else
 	{
@@ -320,7 +322,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	);
 
 	auto ModuleName = GetModuleName(InDelegateProperty);
-	
+
 	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InDelegateProperty->GetOutermost()->GetName()), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, DelegateName) + TEXT(".cs");
@@ -339,7 +341,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	FString UsingNameSpaceContent;
 
-	auto NameSpaceContent = FGeneratorCore::GetClassNameSpace(InMulticastDelegateProperty);
+	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InMulticastDelegateProperty);
 
 	FString FullClassContent;
 
@@ -361,7 +363,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common"), TEXT("Script.Reflection.Delegate")};
 
-	FullClassContent = FGeneratorCore::GetFullClass(InMulticastDelegateProperty);
+	FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InMulticastDelegateProperty);
 
 	auto DelegateFullName = FullClassContent;
 
@@ -546,7 +548,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		                                             *DelegateReturnType,
 		                                             *DelegateDeclarationBody);
 
-		UsingNameSpaces.Add(FGeneratorCore::GetClassNameSpace(UObject::StaticClass()));
+		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 	}
 	else
 	{
@@ -674,7 +676,7 @@ FString FDelegateGenerator::GetModuleName(const FDelegateProperty* InDelegatePro
 		return TEXT("");
 	}
 
-	return FGeneratorCore::GetModuleName(InDelegateProperty->SignatureFunction);
+	return FUnrealCSharpFunctionLibrary::GetModuleName(InDelegateProperty->SignatureFunction);
 }
 
 FString FDelegateGenerator::GetModuleName(const FMulticastDelegateProperty* InMulticastDelegateProperty)
@@ -684,5 +686,5 @@ FString FDelegateGenerator::GetModuleName(const FMulticastDelegateProperty* InMu
 		return TEXT("");
 	}
 
-	return FGeneratorCore::GetModuleName(InMulticastDelegateProperty->SignatureFunction);
+	return FUnrealCSharpFunctionLibrary::GetModuleName(InMulticastDelegateProperty->SignatureFunction);
 }

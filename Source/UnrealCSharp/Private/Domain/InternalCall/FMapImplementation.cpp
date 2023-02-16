@@ -1,8 +1,8 @@
 ﻿#include "Domain/InternalCall/FMapImplementation.h"
 #include "Binding/Class/FBindingClassBuilder.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FMapHelper.h"
+#include "Macro/NamespaceMacro.h"
 
 struct FRegisterMap
 {
