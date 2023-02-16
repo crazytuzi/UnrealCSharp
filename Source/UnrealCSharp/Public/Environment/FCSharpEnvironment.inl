@@ -111,9 +111,3 @@ auto FCSharpEnvironment::RemoveDelegateReference(const void* InDelegate) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InDelegate) : nullptr;
 }
-
-template <typename T>
-auto FCSharpEnvironment::GetBinding(const MonoObject* InMonoObject) const
-{
-	return BindingRegistry != nullptr ? BindingRegistry->GetBinding<T>(InMonoObject) : nullptr;
-}
