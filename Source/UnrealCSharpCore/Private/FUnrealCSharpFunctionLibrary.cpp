@@ -1,14 +1,6 @@
 ﻿#include "FUnrealCSharpFunctionLibrary.h"
-
-// FString FUnrealCSharpFunctionLibrary::GetProxyPath()
-// {
-// 	return FPaths::Combine(FPaths::ProjectDir(), TEXT("Script"), TEXT("Proxy"));
-// }
-//
-// FString FUnrealCSharpFunctionLibrary::GetGamePath()
-// {
-// 	return FPaths::Combine(FPaths::ProjectDir(), TEXT("Script"), TEXT("Game"));
-// }
+#include "Macro.h"
+#include "Misc/FileHelper.h"
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
@@ -213,8 +205,8 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 FString FUnrealCSharpFunctionLibrary::GetFileName(const UField* InField)
 {
 	auto ModuleName = GetModuleName(InField);
-	
-	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InField->GetPackage()->GetName()), ModuleName);
+
+	auto DirectoryName = FPaths::Combine(GetGenerationPath(InField), ModuleName);
 
 	return FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
 			"%s.cs"
@@ -228,7 +220,7 @@ FString FUnrealCSharpFunctionLibrary::GetOldFileName(const UField* InField, cons
 {
 	auto ModuleName = GetModuleName(InField);
 
-	auto DirectoryName = FPaths::Combine(FGeneratorPaths::GetGenerationPath(InField->GetPackage()->GetName()), ModuleName);
+	auto DirectoryName = FPaths::Combine(GetGenerationPath(InField), ModuleName);
 
 	return FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
 			"%s.cs"
@@ -236,4 +228,98 @@ FString FUnrealCSharpFunctionLibrary::GetOldFileName(const UField* InField, cons
 	                                                         *FPaths::Combine(DirectoryName,
 	                                                                          OldName))
 	);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetBaseName()
+{
+	return TEXT("Script");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetBasePath()
+{
+	return FPaths::Combine(FPaths::ProjectDir(), GetBaseName());
+}
+
+FString FUnrealCSharpFunctionLibrary::GetUEProjectName()
+{
+	return TEXT("UE");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetUEPath()
+{
+	return FPaths::Combine(GetBasePath(), GetUEProjectName());
+}
+
+FString FUnrealCSharpFunctionLibrary::GetUEProxyPath()
+{
+	return FPaths::Combine(GetUEPath(), TEXT("Proxy"));
+}
+
+FString FUnrealCSharpFunctionLibrary::GetGameProjectName()
+{
+	return TEXT("Game");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetGamePath()
+{
+	return FPaths::Combine(GetBasePath(), GetGameProjectName());
+}
+
+FString FUnrealCSharpFunctionLibrary::GetGameProxyPath()
+{
+	return FPaths::Combine(GetGamePath(), TEXT("Proxy"));
+}
+
+FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const UField* InField)
+{
+	if (InField == nullptr || InField->GetPackage() == nullptr)
+	{
+		return TEXT("");
+	}
+
+	return GetGenerationPath(InField->GetPackage()->GetName());
+}
+
+FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptPath)
+{
+	if (InScriptPath.IsEmpty() || !InScriptPath.StartsWith(TEXT("/")))
+	{
+		return TEXT("");
+	}
+
+	TArray<FString> Splits;
+
+	InScriptPath.ParseIntoArray(Splits, TEXT("/"));
+
+	const auto& GameModuleList = GetGameModuleList();
+
+	if (GameModuleList.Contains(Splits[0]) || (Splits[0] == TEXT("Script") && GameModuleList.Contains(Splits[1])))
+	{
+		return GetGameProxyPath();
+	}
+	else
+	{
+		return GetUEProxyPath();
+	}
+}
+
+FString FUnrealCSharpFunctionLibrary::GetScriptPath()
+{
+	return FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), SCRIPT));
+}
+
+TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
+{
+	static TArray<FString> GameModuleList;
+
+	if (GameModuleList.Num() == 0)
+	{
+		FFileHelper::LoadFileToStringArray(GameModuleList,
+		                                   *FPaths::Combine(FPaths::ProjectPluginsDir(), TEXT("UnrealCSharp"),
+		                                                    TEXT("Intermediate"), TEXT("GameModules.txt")));
+
+		GameModuleList.Add(TEXT("Game"));
+	}
+
+	return GameModuleList;
 }

@@ -1,59 +1,39 @@
 #include "FSolutionGenerator.h"
-#include "FGeneratorCore.h"
-#include "FGeneratorPaths.h"
-#include "HAL/IPlatformFileModule.h"
+#include "Macro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 void FSolutionGenerator::Generator()
 {
-	auto PluginDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectPluginsDir() / TEXT("UnrealCSharp"));
-	
-	auto PluginContentDir = PluginDir / TEXT("Content");
+	const auto PluginPath = FPaths::ConvertRelativePathToFull(FPaths::ProjectPluginsDir() / PLUGIN_NAME);
 
-	auto TemplateDir = PluginContentDir / TEXT("Template");
+	const auto TemplatePath = PluginPath / TEMPLATE;
 
-	// UE-Managed.csproj
-	
-	auto UECsprojFilename = FGeneratorPaths::GetUEManagedProjectName() + TEXT(".csproj");
-	
-	auto UECsrojFullFilePath = FPaths::Combine(FGeneratorPaths::GetUEManagedPath(), UECsprojFilename);
+	CopyTemplate(
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetUEPath(),
+		                FUnrealCSharpFunctionLibrary::GetUEProjectName() + PROJECT_SUFFIX),
+		TemplatePath / FUnrealCSharpFunctionLibrary::GetUEProjectName() + PROJECT_SUFFIX);
 
-	auto& FileManager = IFileManager::Get();
-	
-	if(!FileManager.FileExists(*UECsrojFullFilePath))
-	{
-		FString TemplatePath = TemplateDir / UECsprojFilename;
-		
-		FileManager.Copy(*UECsrojFullFilePath, *TemplatePath);
-	}
+	CopyTemplate(
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGamePath(),
+		                FUnrealCSharpFunctionLibrary::GetGameProjectName() + PROJECT_SUFFIX),
+		TemplatePath / FUnrealCSharpFunctionLibrary::GetGameProjectName() + PROJECT_SUFFIX);
 
-	// Game-Managed.csproj
-	
-	auto GameCsprojFilename = FGeneratorPaths::GetGameManagedProjectName() + TEXT(".csproj");
-	
-	auto GameCsprojFullFilePath = FPaths::Combine(FGeneratorPaths::GetGameManagedPath(), GameCsprojFilename);
+	CopyTemplate(
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetBasePath(),
+		                FUnrealCSharpFunctionLibrary::GetBaseName() + SOLUTION_SUFFIX),
+		TemplatePath / FUnrealCSharpFunctionLibrary::GetBaseName() + SOLUTION_SUFFIX);
 
-	if(!FileManager.FileExists(*GameCsprojFullFilePath))
-	{
-		FString TemplatePath = TemplateDir / GameCsprojFilename;
-		
-		FileManager.Copy(*GameCsprojFullFilePath, *TemplatePath);
-	}
-
-	// Script.sln
-	
-	auto SlnFilename = FGeneratorPaths::GetManagedBaseName() + TEXT(".sln");
-	
-	auto SlnFullFilePath = FPaths::Combine(FGeneratorPaths::GetManagedBasePath(), SlnFilename);
-
-	if(!FileManager.FileExists(*SlnFullFilePath))
-	{
-		FString TemplatePath = TemplateDir / SlnFilename;
-		
-		FileManager.Copy(*SlnFullFilePath, *TemplatePath);
-	}
-	
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
-	PlatformFile.CopyDirectoryTree(*(FGeneratorPaths::GetUEManagedPath()), *(PluginDir / TEXT("Script")), true);
-	
+	PlatformFile.CopyDirectoryTree(*(FUnrealCSharpFunctionLibrary::GetUEPath()), *(PluginPath / SCRIPT), true);
+}
+
+void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src)
+{
+	auto& FileManager = IFileManager::Get();
+
+	if (!FileManager.FileExists(*Dest))
+	{
+		FileManager.Copy(*Dest, *Src);
+	}
 }

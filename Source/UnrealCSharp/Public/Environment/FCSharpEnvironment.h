@@ -64,7 +64,7 @@ public:
 	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, const FName& InPropertyName) const;
 
 public:
-	template<typename T>
+	template <typename T>
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct) const;
 
 	template <typename T, typename U>
@@ -91,7 +91,6 @@ public:
 
 	bool RemoveStructReference(const MonoObject* InMonoObject) const;
 
-	FString GetManagedDir();
 public:
 	template <typename T>
 	auto GetContainer(const MonoObject* InMonoObject) const;
@@ -144,7 +143,7 @@ private:
 	public:
 		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
 	};
-	
+
 private:
 	static FCSharpEnvironment* Environment;
 

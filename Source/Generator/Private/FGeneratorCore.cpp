@@ -4,32 +4,6 @@
 #include "Misc/FileHelper.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 
-// FString FGeneratorCore::GetModuleName(const UField* InField)
-// {
-// 	if (InField == nullptr)
-// 	{
-// 		return TEXT("");
-// 	}
-//
-// 	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
-//
-// 	if (InField->IsNative())
-// 	{
-// 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
-// 	}
-// 	else
-// 	{
-// 		auto Index = 0;
-//
-// 		if (ModuleName.FindLastChar(TEXT('/'), Index))
-// 		{
-// 			ModuleName = ModuleName.Left(Index);
-// 		}
-// 	}
-//
-// 	return ModuleName;
-// }
-
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
 	if (InField == nullptr)

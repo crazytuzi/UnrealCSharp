@@ -1,6 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-using System;
 using System.IO;
 using UnrealBuildTool;
 
@@ -55,14 +54,13 @@ public class Generator : ModuleRules
 			}
 			);
 
-		var intermediate = Path.Combine(this.PluginDirectory, "Intermediate");
+		var Intermediate = Path.Combine(PluginDirectory, "Intermediate");
 
-		if (!Directory.Exists(intermediate))
-			Directory.CreateDirectory(intermediate);
-		
-		var txtFile = Path.Combine(intermediate, "GameModules.txt");
+		if (!Directory.Exists(Intermediate))
+		{
+			Directory.CreateDirectory(Intermediate);
+		}
 
-		File.WriteAllText(txtFile, string.Join('\n', Target.ExtraModuleNames));	
-
+		File.WriteAllText(Path.Combine(Intermediate, "GameModules.txt"), string.Join("\n", Target.ExtraModuleNames));	
 	}
 }

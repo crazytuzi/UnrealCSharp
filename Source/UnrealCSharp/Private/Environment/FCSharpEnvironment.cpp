@@ -1,7 +1,7 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
+#include "Macro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
-#include "Macro/NamespaceMacro.h"
-#include "mono/metadata/object.h"
 
 FCSharpEnvironment* FCSharpEnvironment::Environment = nullptr;
 
@@ -15,18 +15,18 @@ FCSharpEnvironment::~FCSharpEnvironment()
 	Deinitialize();
 }
 
-
-
 void FCSharpEnvironment::Initialize()
 {
 	Domain = new FMonoDomain({
 		"",
 		{
-			GetManagedDir() / TEXT("UE-Managed.dll"),
-			GetManagedDir() / TEXT("Game-Managed.dll")
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
+			DLL_SUFFIX,
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
+			DLL_SUFFIX
 		}
 	});
-	
+
 	ClassRegistry = new FClassRegistry();
 
 	ObjectRegistry = new FObjectRegistry();
@@ -264,11 +264,6 @@ bool FCSharpEnvironment::RemoveStructReference(const void* InStruct) const
 bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InMonoObject) : false;
-}
-
-FString FCSharpEnvironment::GetManagedDir()
-{
-	return FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), TEXT("Managed/Debug/netstandard2.0")));
 }
 
 MonoObject* FCSharpEnvironment::GetContainerObject(const void* InContainer) const

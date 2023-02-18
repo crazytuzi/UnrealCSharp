@@ -110,7 +110,7 @@ private:
 
 private:
 	static MonoDomain* RootDomain;
-	
+
 	MonoDomain* Domain;
 
 	TArray<MonoAssembly*> Assemblies;

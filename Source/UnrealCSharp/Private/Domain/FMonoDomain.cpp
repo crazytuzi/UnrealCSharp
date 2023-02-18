@@ -51,15 +51,15 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 
 	mono_domain_set(Domain, false);
 
-	for (auto& AssemblyPath : Params.Assemblies)
+	for (const auto& AssemblyPath : Params.Assemblies)
 	{
 		auto Assembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*AssemblyPath));
 
 		Assemblies.Add(Assembly);
-		
+
 		Images.Add(mono_assembly_get_image(Assembly));
 	}
-	
+
 	RegisterLog();
 
 	RegisterBinding();
@@ -127,9 +127,10 @@ void FMonoDomain::Runtime_Object_Init(MonoObject* InMonoObject) const
 
 MonoClass* FMonoDomain::Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName) const
 {
-	for (auto Image : Images)
+	for (const auto& Image : Images)
 	{
-		if(auto Class = mono_class_from_name(Image, TCHAR_TO_ANSI(*InNameSpace), TCHAR_TO_ANSI(*InMonoClassName)))
+		if (const auto& Class = mono_class_from_name(Image, TCHAR_TO_ANSI(*InNameSpace),
+		                                             TCHAR_TO_ANSI(*InMonoClassName)))
 		{
 			return Class;
 		}
@@ -140,11 +141,11 @@ MonoClass* FMonoDomain::Class_From_Name(const FString& InNameSpace, const FStrin
 MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
                                                     const int32 InParamCount) const
 {
-	if(!InMonoClass)
+	if (InMonoClass == nullptr)
 	{
 		return nullptr;
 	}
-	
+
 	return mono_class_get_method_from_name(InMonoClass, TCHAR_TO_ANSI(*InFunctionName), InParamCount);
 }
 
@@ -322,7 +323,8 @@ void FMonoDomain::RegisterLog()
 {
 	if (Domain != nullptr)
 	{
-		if (const auto FoundMonoClass = Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LOG), CLASS_LOG_IMPLEMENTATION))
+		if (const auto FoundMonoClass = Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LOG), CLASS_LOG_IMPLEMENTATION))
 		{
 			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_LOG_SET_OUT, 0))
 			{
