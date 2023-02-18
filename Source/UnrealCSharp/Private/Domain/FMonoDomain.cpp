@@ -135,6 +135,7 @@ MonoClass* FMonoDomain::Class_From_Name(const FString& InNameSpace, const FStrin
 			return Class;
 		}
 	}
+
 	return nullptr;
 }
 
