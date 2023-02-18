@@ -110,12 +110,12 @@ FString FNameEncode::Decode(const FString& Name)
 			check(i + 3 >= Name.Len() || Name[i + 3] != ESCAPE_END_SYMBOL);
 
 			auto Hex = HexToByte(GetData(Name) + i + 2);
-			
-			if(Hex == ESCAPE_HEAD_NUMBER)
+
+			if (Hex == ESCAPE_HEAD_NUMBER)
 			{
 				// do nothing.
 			}
-			else if(Hex == '_')
+			else if (Hex == '_')
 			{
 				Ret.AppendChars(ESCAPE_SYMBOL, ESCAPE_SYMBOL_LEN);
 			}
@@ -131,6 +131,14 @@ FString FNameEncode::Decode(const FString& Name)
 		}
 	}
 	return Ret;
+}
+
+void FNameEncode::Decode(TArray<FString>& Names)
+{
+	for (auto& Name : Names)
+	{
+		Name = Decode(Name);
+	}
 }
 
 /*
