@@ -29,7 +29,7 @@ FEditorListener::FEditorListener()
 	auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(TEXT("DirectoryWatcher"));
 
 	DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
-		FUnrealCSharpFunctionLibrary::GetGamePath(),
+		FUnrealCSharpFunctionLibrary::GetBasePath(),
 		IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
 		OnDirectoryChangedDelegateHandle,
 		IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
@@ -44,7 +44,7 @@ FEditorListener::~FEditorListener()
 			TEXT("DirectoryWatcher"));
 
 		DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
-			FUnrealCSharpFunctionLibrary::GetGamePath(), OnDirectoryChangedDelegateHandle);
+			FUnrealCSharpFunctionLibrary::GetBasePath(), OnDirectoryChangedDelegateHandle);
 	}
 
 	if (OnMainFrameCreationFinishedDelegateHandle.IsValid())

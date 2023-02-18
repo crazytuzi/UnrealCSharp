@@ -202,7 +202,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InScriptStruct);
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InScriptStruct), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 

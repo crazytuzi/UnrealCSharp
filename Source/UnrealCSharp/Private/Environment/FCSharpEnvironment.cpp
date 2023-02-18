@@ -1,7 +1,7 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
+#include "Macro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
-#include "Macro/NamespaceMacro.h"
-#include "mono/metadata/object.h"
 
 FCSharpEnvironment* FCSharpEnvironment::Environment = nullptr;
 
@@ -19,10 +19,14 @@ void FCSharpEnvironment::Initialize()
 {
 	Domain = new FMonoDomain({
 		"",
-		FPaths::ConvertRelativePathToFull(
-			FPaths::Combine(FPaths::ProjectContentDir(), NAMESPACE_ROOT, NAMESPACE_ROOT + ".dll"))
+		{
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
+			DLL_SUFFIX,
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
+			DLL_SUFFIX
+		}
 	});
-	
+
 	ClassRegistry = new FClassRegistry();
 
 	ObjectRegistry = new FObjectRegistry();

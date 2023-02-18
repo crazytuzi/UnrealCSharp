@@ -88,7 +88,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InEnum);
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InEnum), ModuleName);
 
 	const auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 

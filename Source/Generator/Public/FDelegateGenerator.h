@@ -15,4 +15,6 @@ private:
 	static FString GetModuleName(const FDelegateProperty* InDelegateProperty);
 
 	static FString GetModuleName(const FMulticastDelegateProperty* InMulticastDelegateProperty);
+
+	static FString GetGenerationPath(const FField* InField);
 };

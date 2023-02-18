@@ -39,6 +39,8 @@
 *.VC.db
 *.VC.opendb
 
+!/Template/*
+
 # Precompiled Assets
 SourceArt/**/*.png
 SourceArt/**/*.tga

@@ -6,6 +6,7 @@
 #include "FCSharpCompiler.h"
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
+#include "FSolutionGenerator.h"
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Misc/MessageDialog.h"
@@ -59,6 +60,8 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	FBlueprintGenerator::Generator();
 
 	FEnumGenerator::EmptyEnumUnderlyingType();
+
+	FSolutionGenerator::Generator();
 
 	CollectGarbage(RF_NoFlags, true);
 

@@ -13,9 +13,7 @@
 MonoDomain* FMonoDomain::RootDomain = nullptr;
 
 FMonoDomain::FMonoDomain(const FMonoDomainInitializeParams& Params):
-	Domain(nullptr),
-	Assembly(nullptr),
-	Image(nullptr)
+	Domain(nullptr)
 {
 	Initialize(Params);
 }
@@ -52,10 +50,15 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 	Domain = mono_domain_create_appdomain(TCHAR_TO_ANSI(*Params.Domain), nullptr);
 
 	mono_domain_set(Domain, false);
-	
-	Assembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*Params.Assembly));
 
-	Image = mono_assembly_get_image(Assembly);
+	for (const auto& AssemblyPath : Params.Assemblies)
+	{
+		auto Assembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*AssemblyPath));
+
+		Assemblies.Add(Assembly);
+
+		Images.Add(mono_assembly_get_image(Assembly));
+	}
 
 	RegisterLog();
 
@@ -64,9 +67,9 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 
 void FMonoDomain::Deinitialize()
 {
-	Image = nullptr;
+	Images.Reset();
 
-	Assembly = nullptr;
+	Assemblies.Reset();
 
 	if (Domain != nullptr)
 	{
@@ -124,17 +127,27 @@ void FMonoDomain::Runtime_Object_Init(MonoObject* InMonoObject) const
 
 MonoClass* FMonoDomain::Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName) const
 {
-	return Image != nullptr
-		       ? mono_class_from_name(Image, TCHAR_TO_ANSI(*InNameSpace), TCHAR_TO_ANSI(*InMonoClassName))
-		       : nullptr;
+	for (const auto& Image : Images)
+	{
+		if (const auto& Class = mono_class_from_name(Image, TCHAR_TO_ANSI(*InNameSpace),
+		                                             TCHAR_TO_ANSI(*InMonoClassName)))
+		{
+			return Class;
+		}
+	}
+
+	return nullptr;
 }
 
 MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
                                                     const int32 InParamCount) const
 {
-	return InMonoClass != nullptr
-		       ? mono_class_get_method_from_name(InMonoClass, TCHAR_TO_ANSI(*InFunctionName), InParamCount)
-		       : nullptr;
+	if (InMonoClass == nullptr)
+	{
+		return nullptr;
+	}
+
+	return mono_class_get_method_from_name(InMonoClass, TCHAR_TO_ANSI(*InFunctionName), InParamCount);
 }
 
 mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
@@ -311,7 +324,8 @@ void FMonoDomain::RegisterLog()
 {
 	if (Domain != nullptr)
 	{
-		if (const auto FoundMonoClass = Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LOG), CLASS_LOG_IMPLEMENTATION))
+		if (const auto FoundMonoClass = Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LOG), CLASS_LOG_IMPLEMENTATION))
 		{
 			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_LOG_SET_OUT, 0))
 			{

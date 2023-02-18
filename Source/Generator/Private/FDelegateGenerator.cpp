@@ -321,7 +321,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	auto ModuleName = GetModuleName(InDelegateProperty);
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(GetGenerationPath(InDelegateProperty), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, DelegateName) + TEXT(".cs");
 
@@ -660,7 +660,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	auto ModuleName = GetModuleName(InMulticastDelegateProperty);
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(GetGenerationPath(InMulticastDelegateProperty), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, DelegateName) + TEXT(".cs");
 
@@ -685,4 +685,14 @@ FString FDelegateGenerator::GetModuleName(const FMulticastDelegateProperty* InMu
 	}
 
 	return FUnrealCSharpFunctionLibrary::GetModuleName(InMulticastDelegateProperty->SignatureFunction);
+}
+
+FString FDelegateGenerator::GetGenerationPath(const FField* InField)
+{
+	if (InField == nullptr || InField->GetOutermost() == nullptr)
+	{
+		return TEXT("");
+	}
+
+	return FUnrealCSharpFunctionLibrary::GetGenerationPath(InField->GetOutermost()->GetName());
 }

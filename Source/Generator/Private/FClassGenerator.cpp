@@ -491,7 +491,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InClass);
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetProxyPath(), ModuleName);
+	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InClass), ModuleName);
 
 	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 
