@@ -18,5 +18,15 @@ namespace Script.CoreUObject
 
             return OutValue;
         }
+
+        public virtual FString ToFString()
+        {
+            return GetName();
+        }
+
+        public override string ToString()
+        {
+            return ToFString().ToString();
+        }
     }
 }
