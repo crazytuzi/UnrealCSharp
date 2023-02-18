@@ -538,7 +538,7 @@ FString FGeneratorCore::GetReturnParamName(FProperty* Property)
 
 FString FGeneratorCore::GetName(FString InName)
 {
-	static TSet<FName> KeyWords{
+	static TSet<FString> KeyWords{
 		TEXT("abstract"), TEXT("as"),
 		TEXT("base"), TEXT("bool"), TEXT("break"), TEXT("byte"),
 		TEXT("case"), TEXT("catch"), TEXT("char"), TEXT("checked"), TEXT("class"), TEXT("const"), TEXT("continue"),
@@ -560,7 +560,7 @@ FString FGeneratorCore::GetName(FString InName)
 		TEXT("while")
 	};
 
-	if (KeyWords.Contains(*InName))
+	if (KeyWords.Contains(InName))
 	{
 		return FString::Printf(TEXT("@%s"), *InName);
 	}
