@@ -3,6 +3,7 @@
 #include "FEnumGenerator.h"
 #include "Misc/FileHelper.h"
 #include "FUnrealCSharpFunctionLibrary.h"
+#include <ctype.h>
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -538,7 +539,12 @@ FString FGeneratorCore::GetReturnParamName(FProperty* Property)
 
 FString FGeneratorCore::GetName(FString InName)
 {
-	static TSet<FString> KeyWords{
+	if(InName.IsEmpty())
+	{
+		return InName;
+	}
+	
+	static TSet<FName> KeyWords{
 		TEXT("abstract"), TEXT("as"),
 		TEXT("base"), TEXT("bool"), TEXT("break"), TEXT("byte"),
 		TEXT("case"), TEXT("catch"), TEXT("char"), TEXT("checked"), TEXT("class"), TEXT("const"), TEXT("continue"),
@@ -560,7 +566,7 @@ FString FGeneratorCore::GetName(FString InName)
 		TEXT("while")
 	};
 
-	if (KeyWords.Contains(InName))
+	if (KeyWords.Contains(*InName) && ::islower(InName[0]))
 	{
 		return FString::Printf(TEXT("@%s"), *InName);
 	}
