@@ -329,6 +329,8 @@ TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
 		FJsonSerializer::Deserialize(JsonReader, JsonObj);
 		
 		JsonObj->TryGetStringArrayField(TEXT("GameModules"), GameModuleList);
+
+		GameModuleList.Add(TEXT("Game"));
 	}
 	
 	return GameModuleList;
