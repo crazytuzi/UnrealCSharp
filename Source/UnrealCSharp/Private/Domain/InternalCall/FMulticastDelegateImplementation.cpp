@@ -31,10 +31,10 @@ struct FRegisterMulticastDelegate
 
 static FRegisterMulticastDelegate RegisterMulticastDelegate;
 
-bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(const void* InAddress)
+bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-		FMulticastDelegateHelper>(InAddress))
+		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->IsBound();
 	}
@@ -43,10 +43,10 @@ bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(c
 }
 
 bool FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation(
-	const void* InAddress, MonoObject* InDelegate)
+	const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-		FMulticastDelegateHelper>(InAddress))
+		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Contains(InDelegate);
 	}
@@ -55,59 +55,59 @@ bool FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation(
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_AddImplementation(
-	const void* InAddress, MonoObject* InDelegate)
+	const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-		FMulticastDelegateHelper>(InAddress))
+		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Add(InDelegate);
 	}
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation(
-	const void* InAddress, MonoObject* InDelegate)
+	const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-		FMulticastDelegateHelper>(InAddress))
+		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->AddUnique(InDelegate);
 	}
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation(
-	const void* InAddress, MonoObject* InDelegate)
+	const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-		FMulticastDelegateHelper>(InAddress))
+		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Remove(InDelegate);
 	}
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation(
-	const void* InAddress, MonoObject* InMonoObject)
+	const MonoObject* InMonoObject, MonoObject* InObject)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-		FMulticastDelegateHelper>(InAddress))
+		FMulticastDelegateHelper>(InMonoObject))
 	{
-		return MulticastDelegateHelper->RemoveAll(InMonoObject);
+		return MulticastDelegateHelper->RemoveAll(InObject);
 	}
 }
 
-void FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation(const void* InAddress)
+void FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-		FMulticastDelegateHelper>(InAddress))
+		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Clear();
 	}
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation(
-	const void* InAddress, MonoObject** OutValue, MonoArray* InValue)
+	const MonoObject* InMonoObject, MonoObject** OutValue, MonoArray* InValue)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-		FMulticastDelegateHelper>(InAddress))
+		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Broadcast(OutValue, InValue);
 	}

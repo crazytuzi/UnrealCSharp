@@ -6,34 +6,34 @@ namespace Script.Reflection.Delegate
 {
     public static class MulticastDelegateUtils
     {
-        public static unsafe Boolean MulticastDelegate_IsBound(void* InAddress) =>
-            MulticastDelegateImplementation.MulticastDelegate_IsBoundImplementation(InAddress);
+        public static Boolean MulticastDelegate_IsBound(FDelegateBase InMonoObject) =>
+            MulticastDelegateImplementation.MulticastDelegate_IsBoundImplementation(InMonoObject);
 
-        public static unsafe Boolean MulticastDelegate_Contains<T>(void* InAddress, T InMulticastDelegate)
+        public static Boolean MulticastDelegate_Contains<T>(FDelegateBase InMonoObject, T InMulticastDelegate)
             where T : System.Delegate =>
-            MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(InAddress, InMulticastDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(InMonoObject, InMulticastDelegate);
 
-        public static unsafe void MulticastDelegate_Add<T>(void* InAddress, T InMulticastDelegate)
+        public static void MulticastDelegate_Add<T>(FDelegateBase InMonoObject, T InMulticastDelegate)
             where T : System.Delegate =>
-            MulticastDelegateImplementation.MulticastDelegate_AddImplementation(InAddress, InMulticastDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_AddImplementation(InMonoObject, InMulticastDelegate);
 
-        public static unsafe void MulticastDelegate_AddUnique<T>(void* InAddress, T InMulticastDelegate)
+        public static void MulticastDelegate_AddUnique<T>(FDelegateBase InMonoObject, T InMulticastDelegate)
             where T : System.Delegate =>
-            MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(InAddress, InMulticastDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(InMonoObject, InMulticastDelegate);
 
-        public static unsafe void MulticastDelegate_Remove<T>(void* InAddress, T InMulticastDelegate)
+        public static void MulticastDelegate_Remove<T>(FDelegateBase InMonoObject, T InMulticastDelegate)
             where T : System.Delegate =>
-            MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(InAddress, InMulticastDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(InMonoObject, InMulticastDelegate);
 
-        public static unsafe void MulticastDelegate_RemoveAll(void* InAddress, UObject InObject) =>
-            MulticastDelegateImplementation.MulticastDelegate_RemoveAllImplementation(InAddress, InObject);
+        public static void MulticastDelegate_RemoveAll(FDelegateBase InMonoObject, UObject InObject) =>
+            MulticastDelegateImplementation.MulticastDelegate_RemoveAllImplementation(InMonoObject, InObject);
 
-        public static unsafe void MulticastDelegate_Clear(void* InAddress) =>
-            MulticastDelegateImplementation.MulticastDelegate_ClearImplementation(InAddress);
+        public static void MulticastDelegate_Clear(FDelegateBase InMonoObject) =>
+            MulticastDelegateImplementation.MulticastDelegate_ClearImplementation(InMonoObject);
 
-        public static unsafe void
-            MulticastDelegate_Broadcast(void* InAddress, out ObjectList OutValue, params Object[] InValue) =>
-            MulticastDelegateImplementation.MulticastDelegate_BroadcastImplementation(InAddress, out OutValue, InValue);
+        public static void
+            MulticastDelegate_Broadcast(FDelegateBase InMonoObject, out ObjectList OutValue, params Object[] InValue) =>
+            MulticastDelegateImplementation.MulticastDelegate_BroadcastImplementation(InMonoObject, out OutValue, InValue);
 
         private static Object MulticastDelegate_GetTarget(System.Delegate InDelegate) => InDelegate.Target;
 

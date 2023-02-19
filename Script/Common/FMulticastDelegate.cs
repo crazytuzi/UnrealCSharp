@@ -4,35 +4,35 @@ using Script.Reflection.Delegate;
 
 namespace Script.Common
 {
-    public class FMulticastDelegate<T> : FMulticastDelegateBase where T : Delegate
+    public class FMulticastDelegate<T> : FDelegateBase where T : Delegate
     {
-        public unsafe Boolean IsBound() => MulticastDelegateUtils.MulticastDelegate_IsBound(Address);
+        public Boolean IsBound() => MulticastDelegateUtils.MulticastDelegate_IsBound(this);
 
-        public unsafe Boolean Contains(UObject _, T InDelegate) =>
-            MulticastDelegateUtils.MulticastDelegate_Contains(Address, InDelegate);
+        public Boolean Contains(UObject _, T InDelegate) =>
+            MulticastDelegateUtils.MulticastDelegate_Contains(this, InDelegate);
 
-        public unsafe Boolean Contains(T InDelegate) =>
-            MulticastDelegateUtils.MulticastDelegate_Contains(Address, InDelegate);
+        public Boolean Contains(T InDelegate) =>
+            MulticastDelegateUtils.MulticastDelegate_Contains(this, InDelegate);
 
-        public unsafe void Add(UObject _, T InDelegate) =>
-            MulticastDelegateUtils.MulticastDelegate_Add(Address, InDelegate);
+        public void Add(UObject _, T InDelegate) =>
+            MulticastDelegateUtils.MulticastDelegate_Add(this, InDelegate);
 
-        public unsafe void Add(T InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(Address, InDelegate);
+        public void Add(T InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(this, InDelegate);
 
-        public unsafe void AddUnique(UObject _, T InDelegate) =>
-            MulticastDelegateUtils.MulticastDelegate_AddUnique(Address, InDelegate);
+        public void AddUnique(UObject _, T InDelegate) =>
+            MulticastDelegateUtils.MulticastDelegate_AddUnique(this, InDelegate);
 
-        public unsafe void AddUnique(T InDelegate) =>
-            MulticastDelegateUtils.MulticastDelegate_AddUnique(Address, InDelegate);
+        public void AddUnique(T InDelegate) =>
+            MulticastDelegateUtils.MulticastDelegate_AddUnique(this, InDelegate);
 
-        public unsafe void Remove(UObject _, T InDelegate) =>
-            MulticastDelegateUtils.MulticastDelegate_Remove(Address, InDelegate);
+        public void Remove(UObject _, T InDelegate) =>
+            MulticastDelegateUtils.MulticastDelegate_Remove(this, InDelegate);
 
-        public unsafe void Remove(T InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(Address, InDelegate);
+        public void Remove(T InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(this, InDelegate);
 
-        public unsafe void RemoveAll(UObject InObject) =>
-            MulticastDelegateUtils.MulticastDelegate_RemoveAll(Address, InObject);
+        public void RemoveAll(UObject InObject) =>
+            MulticastDelegateUtils.MulticastDelegate_RemoveAll(this, InObject);
 
-        public unsafe void Clear() => MulticastDelegateUtils.MulticastDelegate_Clear(Address);
+        public void Clear() => MulticastDelegateUtils.MulticastDelegate_Clear(this);
     }
 }

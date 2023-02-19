@@ -7,9 +7,9 @@ void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (DelegateProperty != nullptr)
 	{
-		const auto SrcDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDelegateObject(Src);
 
-		if (SrcDelegateHelper == nullptr)
+		if (SrcMonoObject == nullptr)
 		{
 			auto MonoClassName = DelegateProperty->SignatureFunction->GetName();
 
@@ -22,16 +22,11 @@ void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 			const auto DelegateHelper = new FDelegateHelper(static_cast<FScriptDelegate*>(Src),
 			                                                DelegateProperty->SignatureFunction);
 
-			void* Param[1] = {Src};
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
-			*Dest = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass, 1, Param);
+			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(Src, DelegateHelper, SrcMonoObject);
+		}
 
-			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(Src, DelegateHelper,
-			                                                           static_cast<MonoObject*>(*Dest));
-		}
-		else
-		{
-			*Dest = FCSharpEnvironment::GetEnvironment()->GetDelegateObject(SrcDelegateHelper);
-		}
+		*Dest = SrcMonoObject;
 	}
 }

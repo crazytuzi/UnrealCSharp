@@ -19,13 +19,17 @@ void FDelegateRegistry::Deinitialize()
 	// @TODO
 }
 
-bool FDelegateRegistry::AddReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject)
+bool FDelegateRegistry::AddReference(void* InDelegate, FDelegateBaseHelper* InDelegateBaseHelper,
+                                     MonoObject* InMonoObject)
 {
-	Address2DelegateMap.Emplace(InAddress, InDelegate);
+	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
 
-	Delegate2MonoObjectMap.Emplace(InDelegate, InMonoObject);
+	DelegateAddress2GarbageCollectionHandle.Emplace(FDelegateAddress{InDelegate, InDelegateBaseHelper},
+	                                                GarbageCollectionHandle);
 
-	MonoObject2DelegateMap.Emplace(InMonoObject, InDelegate);
+	GarbageCollectionHandle2DelegateAddress.Emplace(GarbageCollectionHandle,
+	                                                FDelegateAddress{InDelegate, InDelegateBaseHelper});
 
 	return true;
 }

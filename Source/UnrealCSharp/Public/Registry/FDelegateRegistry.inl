@@ -1,53 +1,66 @@
 ﻿#pragma once
 
-template <typename T>
-auto FDelegateRegistry::GetDelegate(const void* InAddress)
+static bool operator==(const FDelegateAddress& A, const FDelegateAddress& B)
 {
-	const auto FoundDelegate = Address2DelegateMap.Find(InAddress);
+	return A.Address == B.Address;
+}
 
-	return FoundDelegate != nullptr ? static_cast<T*>(*FoundDelegate) : nullptr;
+static bool operator==(const FDelegateAddress& A, const void* B)
+{
+	return A.Address == B;
+}
+
+static uint32 GetTypeHash(const FDelegateAddress& InDelegateAddress)
+{
+	return GetTypeHash(InDelegateAddress.Address);
+}
+
+template <typename T>
+auto FDelegateRegistry::GetDelegate(const void* InDelegate)
+{
+	for (const auto Pair : DelegateAddress2GarbageCollectionHandle)
+	{
+		if (Pair.Key == InDelegate)
+		{
+			return static_cast<T*>(Pair.Key.DelegateBaseHelper);
+		}
+	}
+
+	return static_cast<T*>(nullptr);
+}
+
+template <typename T>
+auto FDelegateRegistry::GetDelegate(const MonoObject* InMonoObject)
+{
+	const auto FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InMonoObject);
+
+	return FoundDelegateAddress != nullptr ? static_cast<T*>(FoundDelegateAddress->DelegateBaseHelper) : nullptr;
 }
 
 template <typename T>
 auto FDelegateRegistry::GetObject(const T* InDelegate)
 {
-	const auto FoundMonoObject = Delegate2MonoObjectMap.Find(InDelegate);
+	for (const auto Pair : DelegateAddress2GarbageCollectionHandle)
+	{
+		if (Pair.Key == InDelegate)
+		{
+			return static_cast<MonoObject*>(Pair.Value);
+		}
+	}
 
-	return FoundMonoObject != nullptr ? *FoundMonoObject : nullptr;
+	return static_cast<MonoObject*>(nullptr);
 }
 
 template <typename T>
 auto FDelegateRegistry::RemoveReference(const MonoObject* InMonoObject)
 {
-	if (const auto FoundDelegate = MonoObject2DelegateMap.Find(InMonoObject))
+	if (const auto FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InMonoObject))
 	{
-		Delegate2MonoObjectMap.Remove(FoundDelegate);
+		DelegateAddress2GarbageCollectionHandle.Remove(*FoundDelegateAddress);
 
-		delete static_cast<T*>(*FoundDelegate);
+		delete static_cast<T*>(*FoundDelegateAddress->DelegateBaseHelper);
 
-		MonoObject2DelegateMap.Remove(InMonoObject);
-
-		return true;
-	}
-
-	return false;
-}
-
-template <typename T>
-auto FDelegateRegistry::RemoveReference(const void* InAddress)
-{
-	if (const auto FoundDelegate = Address2DelegateMap.Find(InAddress))
-	{
-		Address2DelegateMap.Remove(InAddress);
-
-		if (const auto FoundMonoObject = Delegate2MonoObjectMap.Find(FoundDelegate))
-		{
-			MonoObject2DelegateMap.Remove(*FoundMonoObject);
-		}
-
-		Delegate2MonoObjectMap.Remove(FoundDelegate);
-
-		delete static_cast<T*>(*FoundDelegate);
+		GarbageCollectionHandle2DelegateAddress.Remove(InMonoObject);
 
 		return true;
 	}

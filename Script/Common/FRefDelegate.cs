@@ -5,10 +5,10 @@ namespace Script.Common
 {
     public class FRefDelegate : FDelegateBase
     {
-        public unsafe Boolean IsBound() => DelegateUtils.Delegate_IsBound(Address);
+        public Boolean IsBound() => DelegateUtils.Delegate_IsBound(this);
 
-        public unsafe void Unbind() => DelegateUtils.Delegate_UnBind(Address);
+        public void Unbind() => DelegateUtils.Delegate_UnBind(this);
 
-        public unsafe void Clear() => DelegateUtils.Delegate_Clear(Address);
+        public void Clear() => DelegateUtils.Delegate_Clear(this);
     }
 }
