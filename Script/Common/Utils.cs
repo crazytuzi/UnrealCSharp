@@ -7,16 +7,12 @@ namespace Script.Common
     {
         static Boolean IsOverrideType(Type InType)
         {
-            var IsOverride = InType.GetCustomAttribute<IsOverrideAttribute>(true);
-
-            return IsOverride != null && IsOverride.IsOverride;
+            return InType.IsDefined(typeof(IsOverrideAttribute), true);
         }
         
         static Boolean IsOverrideMethod(MethodInfo InMethodInfo)
         {
-            var IsOverride = InMethodInfo.GetCustomAttribute<IsOverrideAttribute>(true);
-
-            return IsOverride != null && IsOverride.IsOverride;
+            return InMethodInfo.IsDefined(typeof(IsOverrideAttribute), true);
         }
         
         static string GetPathName(Type InType) =>
