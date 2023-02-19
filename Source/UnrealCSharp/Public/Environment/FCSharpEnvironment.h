@@ -112,11 +112,12 @@ public:
 
 public:
 	template <typename T>
-	auto GetDelegate(const void* InAddress) const;
+	auto GetDelegate(const MonoObject* InMonoObject) const;
 
 	MonoObject* GetDelegateObject(const void* InDelegate) const;
 
-	bool AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const;
+	bool AddDelegateReference(void* InDelegate, FDelegateBaseHelper* InDelegateBaseHelper,
+	                          MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto RemoveDelegateReference(const MonoObject* InMonoObject) const;

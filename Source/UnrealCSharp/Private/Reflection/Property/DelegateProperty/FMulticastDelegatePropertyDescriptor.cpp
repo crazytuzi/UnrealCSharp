@@ -7,10 +7,9 @@ void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (MulticastDelegateProperty != nullptr)
 	{
-		const auto SrcMulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
-			FMulticastDelegateHelper>(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDelegateObject(Src);
 
-		if (SrcMulticastDelegateHelper == nullptr)
+		if (SrcMonoObject == nullptr)
 		{
 			auto MonoClassName = MulticastDelegateProperty->SignatureFunction->GetName();
 
@@ -23,16 +22,11 @@ void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 			const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
 				static_cast<FMulticastScriptDelegate*>(Src), MulticastDelegateProperty->SignatureFunction);
 
-			void* Param[1] = {Src};
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
-			*Dest = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass, 1, Param);
+			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(Src, MulticastDelegateHelper, SrcMonoObject);
+		}
 
-			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(Src, MulticastDelegateHelper,
-			                                                           static_cast<MonoObject*>(*Dest));
-		}
-		else
-		{
-			*Dest = FCSharpEnvironment::GetEnvironment()->GetDelegateObject(SrcMulticastDelegateHelper);
-		}
+		*Dest = SrcMonoObject;
 	}
 }

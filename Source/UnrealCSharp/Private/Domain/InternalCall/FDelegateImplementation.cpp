@@ -20,17 +20,17 @@ struct FRegisterDelegate
 
 static FRegisterDelegate RegisterDelegate;
 
-void FDelegateImplementation::Delegate_BindImplementation(const void* InAddress, MonoObject* InDelegate)
+void FDelegateImplementation::Delegate_BindImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InAddress))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InMonoObject))
 	{
 		DelegateHelper->Bind(InDelegate);
 	}
 }
 
-bool FDelegateImplementation::Delegate_IsBoundImplementation(const void* InAddress)
+bool FDelegateImplementation::Delegate_IsBoundImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InAddress))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InMonoObject))
 	{
 		return DelegateHelper->IsBound();
 	}
@@ -38,26 +38,26 @@ bool FDelegateImplementation::Delegate_IsBoundImplementation(const void* InAddre
 	return false;
 }
 
-void FDelegateImplementation::Delegate_UnBindImplementation(const void* InAddress)
+void FDelegateImplementation::Delegate_UnBindImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InAddress))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InMonoObject))
 	{
 		DelegateHelper->UnBind();
 	}
 }
 
-void FDelegateImplementation::Delegate_ClearImplementation(const void* InAddress)
+void FDelegateImplementation::Delegate_ClearImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InAddress))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InMonoObject))
 	{
 		DelegateHelper->Clear();
 	}
 }
 
-void FDelegateImplementation::Delegate_ExecuteImplementation(const void* InAddress, MonoObject** ReturnValue,
+void FDelegateImplementation::Delegate_ExecuteImplementation(const MonoObject* InMonoObject, MonoObject** ReturnValue,
                                                              MonoObject** OutValue, MonoArray* InValue)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InAddress))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InMonoObject))
 	{
 		DelegateHelper->Execute(ReturnValue, OutValue, InValue);
 	}

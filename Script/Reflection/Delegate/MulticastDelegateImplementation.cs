@@ -8,32 +8,32 @@ namespace Script.Reflection.Delegate
     public static class MulticastDelegateImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe Boolean MulticastDelegate_IsBoundImplementation(void* InAddress);
+        public static extern Boolean MulticastDelegate_IsBoundImplementation(FDelegateBase InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe Boolean MulticastDelegate_ContainsImplementation<T>(void* InAddress,
+        public static extern Boolean MulticastDelegate_ContainsImplementation<T>(FDelegateBase InMonoObject,
             T InMulticastDelegate) where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe void MulticastDelegate_AddImplementation<T>(void* InAddress, T InMulticastDelegate)
+        public static extern void MulticastDelegate_AddImplementation<T>(FDelegateBase InMonoObject, T InMulticastDelegate)
             where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe void MulticastDelegate_AddUniqueImplementation<T>(void* InAddress,
+        public static extern void MulticastDelegate_AddUniqueImplementation<T>(FDelegateBase InMonoObject,
             T InMulticastDelegate) where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe void MulticastDelegate_RemoveImplementation<T>(void* InAddress,
+        public static extern void MulticastDelegate_RemoveImplementation<T>(FDelegateBase InMonoObject,
             T InMulticastDelegate) where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe void MulticastDelegate_RemoveAllImplementation(void* InAddress, UObject InObject);
+        public static extern void MulticastDelegate_RemoveAllImplementation(FDelegateBase InMonoObject, UObject InObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe void MulticastDelegate_ClearImplementation(void* InAddress);
+        public static extern void MulticastDelegate_ClearImplementation(FDelegateBase InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern unsafe void MulticastDelegate_BroadcastImplementation(void* InAddress,
+        public static extern void MulticastDelegate_BroadcastImplementation(FDelegateBase InMonoObject,
             out ObjectList OutValue, params Object[] InValue);
     }
 }

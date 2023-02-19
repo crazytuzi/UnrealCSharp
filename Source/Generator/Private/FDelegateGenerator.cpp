@@ -36,8 +36,6 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	FString SuperClassContent;
 
-	FString ConstructorContent;
-
 	FString BindFunctionContent;
 
 	FString ExecuteFunctionContent;
@@ -51,11 +49,6 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	auto DelegateFullName = FullClassContent;
 
 	auto DelegateName = DelegateFullName.RightChop(1);
-
-	ConstructorContent = FString::Printf(TEXT(
-		"private unsafe %s(void* InAddress) => Address = InAddress;\n"
-	),
-	                                     *DelegateFullName);
 
 	TArray<FProperty*> DelegateParams;
 
@@ -106,15 +99,28 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		);
 	}
 
+	auto bIsSafeExecuteFunction = true;
+
+	for (auto Index = 0; Index < DelegateOutParamIndex.Num(); ++Index)
+	{
+		if (!FGeneratorCore::IsSafeProperty(DelegateParams[DelegateOutParamIndex[Index]]))
+		{
+			bIsSafeExecuteFunction = false;
+
+			break;
+		}
+	}
+
 	auto ExecuteFunctionDeclaration = FString::Printf(TEXT(
-		"public unsafe %s Execute(%s)\n"
+		"public %s%s Execute(%s)\n"
 	),
+	                                                  bIsSafeExecuteFunction == true ? TEXT("") : TEXT("unsafe "),
 	                                                  *DelegateReturnType,
 	                                                  *DelegateDeclarationBody
 	);
 
 	auto ExecuteFunctionCallBody = FString::Printf(TEXT(
-		"DelegateUtils.Delegate_Execute<%s>(Address, out var __ReturnValue, out var __OutValue"
+		"DelegateUtils.Delegate_Execute<%s>(this, out var __ReturnValue, out var __OutValue"
 	),
 	                                               DelegateReturnParam != nullptr
 		                                               ? *FGeneratorCore::GetReturnParamType(DelegateReturnParam)
@@ -131,17 +137,10 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	ExecuteFunctionCallBody += TEXT(");");
 
-	auto bIsSafeExecuteFunction = true;
-
 	TArray<FString> ExecuteFunctionOutParams;
 
 	for (auto Index = 0; Index < DelegateOutParamIndex.Num(); ++Index)
 	{
-		if (bIsSafeExecuteFunction == true)
-		{
-			bIsSafeExecuteFunction = FGeneratorCore::IsSafeProperty(DelegateParams[DelegateOutParamIndex[Index]]);
-		}
-
 		ExecuteFunctionOutParams.Emplace(FString::Printf(TEXT(
 			"%s = %s;"
 		),
@@ -208,9 +207,9 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		SuperClassContent = TEXT("FRefDelegate");
 
 		BindFunctionContent = TEXT(
-			"\t\tpublic unsafe void Bind(UObject InObject, Delegate InDelegate) => DelegateUtils.Delegate_Bind(Address, InDelegate);\n"
+			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => DelegateUtils.Delegate_Bind(this, InDelegate);\n"
 			"\n"
-			"\t\tpublic unsafe void Bind(Delegate InDelegate) => DelegateUtils.Delegate_Bind(Address, InDelegate);\n"
+			"\t\tpublic void Bind(Delegate InDelegate) => DelegateUtils.Delegate_Bind(this, InDelegate);\n"
 		);
 
 		DelegateDeclarationContent = FString::Printf(TEXT(
@@ -296,9 +295,6 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		"{\n"
 		"\tpublic class %s : %s\n"
 		"\t{\n"
-		"\t\t"
-		"%s"
-		"\n"
 		"%s"
 		"%s"
 		"%s"
@@ -311,7 +307,6 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *NameSpaceContent,
 	                               *FullClassContent,
 	                               *SuperClassContent,
-	                               *ConstructorContent,
 	                               *BindFunctionContent,
 	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
 	                               *ExecuteFunctionContent,
@@ -345,8 +340,6 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	FString SuperClassContent;
 
-	FString ConstructorContent;
-
 	FString ContainsFunctionContent;
 
 	FString AddFunctionContent;
@@ -366,11 +359,6 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	auto DelegateFullName = FullClassContent;
 
 	auto DelegateName = DelegateFullName.RightChop(1);
-
-	ConstructorContent = FString::Printf(TEXT(
-		"private unsafe %s(void* InAddress) => Address = InAddress;\n"
-	),
-	                                     *DelegateFullName);
 
 	TArray<FProperty*> DelegateParams;
 
@@ -421,15 +409,28 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		);
 	}
 
+	auto bIsSafeBroadcastFunction = true;
+
+	for (auto Index = 0; Index < DelegateOutParamIndex.Num(); ++Index)
+	{
+		if (!FGeneratorCore::IsSafeProperty(DelegateParams[DelegateOutParamIndex[Index]]))
+		{
+			bIsSafeBroadcastFunction = false;
+
+			break;
+		}
+	}
+
 	auto BroadcastFunctionDeclaration = FString::Printf(TEXT(
-		"public unsafe %s Broadcast(%s)\n"
+		"public %s%s Broadcast(%s)\n"
 	),
+	                                                    bIsSafeBroadcastFunction == true ? TEXT("") : TEXT("unsafe "),
 	                                                    *DelegateReturnType,
 	                                                    *DelegateDeclarationBody
 	);
 
 	auto BroadcastFunctionCallBody = FString(TEXT(
-		"MulticastDelegateUtils.MulticastDelegate_Broadcast(Address, out var __OutValue"));
+		"MulticastDelegateUtils.MulticastDelegate_Broadcast(this, out var __OutValue"));
 
 	for (auto Index = 0; Index < DelegateParams.Num(); ++Index)
 	{
@@ -441,17 +442,10 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	BroadcastFunctionCallBody += TEXT(");");
 
-	auto bIsSafeBroadcastFunction = true;
-
 	TArray<FString> BroadcastFunctionOutParams;
 
 	for (auto Index = 0; Index < DelegateOutParamIndex.Num(); ++Index)
 	{
-		if (bIsSafeBroadcastFunction == true)
-		{
-			bIsSafeBroadcastFunction = FGeneratorCore::IsSafeProperty(DelegateParams[DelegateOutParamIndex[Index]]);
-		}
-
 		BroadcastFunctionOutParams.Emplace(FString::Printf(TEXT(
 			"%s = %s;"
 		),
@@ -517,27 +511,27 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		SuperClassContent = TEXT("FRefMulticastDelegate");
 
 		ContainsFunctionContent = TEXT(
-			"\t\tpublic unsafe Boolean Contains(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Contains(Address, InDelegate);\n"
+			"\t\tpublic Boolean Contains(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Contains(this, InDelegate);\n"
 			"\n"
-			"\t\tpublic unsafe Boolean Contains(Delegate InDelegate)=> MulticastDelegateUtils.MulticastDelegate_Contains(Address, InDelegate);\n"
+			"\t\tpublic Boolean Contains(Delegate InDelegate)=> MulticastDelegateUtils.MulticastDelegate_Contains(this, InDelegate);\n"
 		);
 
 		AddFunctionContent = TEXT(
-			"\t\tpublic unsafe void Add(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(Address, InDelegate);\n"
+			"\t\tpublic void Add(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(this, InDelegate);\n"
 			"\n"
-			"\t\tpublic unsafe void Add(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(Address, InDelegate);\n"
+			"\t\tpublic void Add(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(this, InDelegate);\n"
 		);
 
 		AddUniqueFunctionContent = TEXT(
-			"\t\tpublic unsafe void AddUnique(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(Address, InDelegate);\n"
+			"\t\tpublic void AddUnique(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(this, InDelegate);\n"
 			"\n"
-			"\t\tpublic unsafe void AddUnique(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(Address, InDelegate);\n"
+			"\t\tpublic void AddUnique(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(this, InDelegate);\n"
 		);
 
 		RemoveFunctionContent = TEXT(
-			"\t\tpublic unsafe void Remove(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(Address, InDelegate);\n"
+			"\t\tpublic void Remove(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(this, InDelegate);\n"
 			"\n"
-			"\t\tpublic unsafe void Remove(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(Address, InDelegate);\n"
+			"\t\tpublic void Remove(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(this, InDelegate);\n"
 		);
 
 		DelegateDeclarationContent = FString::Printf(TEXT(
@@ -623,9 +617,6 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		"{\n"
 		"\tpublic class %s : %s\n"
 		"\t{\n"
-		"\t\t"
-		"%s"
-		"\n"
 		"%s"
 		"%s"
 		"%s"
@@ -644,7 +635,6 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *NameSpaceContent,
 	                               *FullClassContent,
 	                               *SuperClassContent,
-	                               *ConstructorContent,
 	                               *ContainsFunctionContent,
 	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
 	                               *AddFunctionContent,

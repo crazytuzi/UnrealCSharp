@@ -1,6 +1,21 @@
 ﻿#pragma once
 
+#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
+#include "Reflection/Delegate/FDelegateBaseHelper.h"
 #include "mono/metadata/object-forward.h"
+
+struct FDelegateAddress
+{
+	void* Address;
+
+	FDelegateBaseHelper* DelegateBaseHelper;
+};
+
+static bool operator==(const FDelegateAddress& A, const FDelegateAddress& B);
+
+static bool operator==(const FDelegateAddress& A, const void* B);
+
+static uint32 GetTypeHash(const FDelegateAddress& InDelegateAddress);
 
 class FDelegateRegistry
 {
@@ -16,25 +31,23 @@ public:
 
 public:
 	template <typename T>
-	auto GetDelegate(const void* InAddress);
+	auto GetDelegate(const void* InDelegate);
+
+	template <typename T>
+	auto GetDelegate(const MonoObject* InMonoObject);
 
 	template <typename T>
 	auto GetObject(const T* InDelegate);
 
-	bool AddReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject);
+	bool AddReference(void* InDelegate, FDelegateBaseHelper* InDelegateBaseHelper, MonoObject* InMonoObject);
 
 	template <typename T>
 	auto RemoveReference(const MonoObject* InMonoObject);
 
-	template <typename T>
-	auto RemoveReference(const void* InAddress);
-
 private:
-	TMap<MonoObject*, void*> MonoObject2DelegateMap;
+	TGarbageCollectionHandleMapping<FDelegateAddress> GarbageCollectionHandle2DelegateAddress;
 
-	TMap<void*, MonoObject*> Delegate2MonoObjectMap;
-
-	TMap<void*, void*> Address2DelegateMap;
+	TMap<FDelegateAddress, TGarbageCollectionHandle<>> DelegateAddress2GarbageCollectionHandle;
 };
 
 #include "FDelegateRegistry.inl"

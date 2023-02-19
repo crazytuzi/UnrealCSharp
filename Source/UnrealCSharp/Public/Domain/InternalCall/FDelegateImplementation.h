@@ -5,14 +5,14 @@
 class FDelegateImplementation
 {
 public:
-	static void Delegate_BindImplementation(const void* InAddress, MonoObject* InDelegate);
+	static void Delegate_BindImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
 
-	static bool Delegate_IsBoundImplementation(const void* InAddress);
+	static bool Delegate_IsBoundImplementation(const MonoObject* InMonoObject);
 
-	static void Delegate_UnBindImplementation(const void* InAddress);
+	static void Delegate_UnBindImplementation(const MonoObject* InMonoObject);
 
-	static void Delegate_ClearImplementation(const void* InAddress);
+	static void Delegate_ClearImplementation(const MonoObject* InMonoObject);
 
-	static void Delegate_ExecuteImplementation(const void* InAddress, MonoObject** ReturnValue, MonoObject** OutValue,
+	static void Delegate_ExecuteImplementation(const MonoObject* InMonoObject, MonoObject** ReturnValue, MonoObject** OutValue,
 	                                           MonoArray* InValue);
 };

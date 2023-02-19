@@ -39,7 +39,7 @@ public:
 
 	void Remove(MonoObject* InMulticastDelegate);
 
-	void RemoveAll(MonoObject* InMonoObject);
+	void RemoveAll(MonoObject* InObject);
 
 	void Clear();
 

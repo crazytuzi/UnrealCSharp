@@ -1,13 +1,14 @@
 ﻿#pragma once
 
+#include "FDelegateBaseHelper.h"
 #include "MulticastDelegateHandler.h"
 
-class FMulticastDelegateHelper
+class FMulticastDelegateHelper final : public FDelegateBaseHelper
 {
 public:
 	FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction);
 
-	~FMulticastDelegateHelper();
+	virtual ~FMulticastDelegateHelper() override;
 
 public:
 	void Initialize();
@@ -25,7 +26,7 @@ public:
 
 	void Remove(MonoObject* InMulticastDelegate) const;
 
-	void RemoveAll(MonoObject* InMonoObject) const;
+	void RemoveAll(MonoObject* InObject) const;
 
 	void Clear() const;
 
