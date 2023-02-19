@@ -1,5 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System;
+using System.IO;
+using EpicGames.Core;
 using UnrealBuildTool;
 
 public class UnrealCSharpCore : ModuleRules
@@ -38,6 +41,7 @@ public class UnrealCSharpCore : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"Json"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
@@ -49,5 +53,26 @@ public class UnrealCSharpCore : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
+		
+		var ProjectDir = Path.GetDirectoryName(Target.ProjectFile?.FullName);
+		
+		var Intermediate = Path.Combine(ProjectDir, "Intermediate");
+
+		var JsonFullFilename = Path.Combine(Intermediate, "UnrealCSharp_GameModules.json");
+		
+		if (!Directory.Exists(Intermediate))
+		{
+			Directory.CreateDirectory(Intermediate);
+		}
+
+		Console.WriteLine("UnrealCSharp :Write json to: " + JsonFullFilename);
+		
+		using (var Writer = new JsonWriter(JsonFullFilename))
+		{
+			Writer.WriteObjectStart();
+			Writer.WriteStringArrayField("GameModules", Target.ExtraModuleNames);
+			Writer.WriteObjectEnd();
+		}
+
 	}
 }
