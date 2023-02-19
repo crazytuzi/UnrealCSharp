@@ -312,13 +312,28 @@ TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
 {
 	static TArray<FString> GameModuleList;
 
+#if UE_ARRAY_IS_EMPTY
+	if (GameModuleList.IsEmpty())
+#else
 	if (GameModuleList.Num() == 0)
+#endif
 	{
-		FFileHelper::LoadFileToStringArray(GameModuleList,
-		                                   *FPaths::Combine(FPaths::ProjectPluginsDir(), TEXT("UnrealCSharp"),
-		                                                    TEXT("Intermediate"), TEXT("GameModules.txt")));
+		const auto& FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_GameModules.json"));
 
-		GameModuleList.Add(TEXT("Game"));
+		FString JsonStr;
+
+		if (FFileHelper::LoadFileToString(JsonStr, *FilePath))
+		{
+			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
+
+			TSharedPtr<FJsonObject> JsonObj;
+
+			FJsonSerializer::Deserialize(JsonReader, JsonObj);
+
+			JsonObj->TryGetStringArrayField(TEXT("GameModules"), GameModuleList);
+
+			GameModuleList.Add(TEXT("Game"));
+		}
 	}
 
 	return GameModuleList;

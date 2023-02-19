@@ -39,6 +39,11 @@
 			"Name": "UnrealCSharpCore",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "CrossVersion",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	]
 }
