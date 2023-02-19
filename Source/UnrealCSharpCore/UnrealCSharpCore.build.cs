@@ -2,7 +2,11 @@
 
 using System;
 using System.IO;
+#if UE_5_0_OR_LATER
 using EpicGames.Core;
+#else
+using Tools.DotNETCommon;
+#endif
 using UnrealBuildTool;
 
 public class UnrealCSharpCore : ModuleRules
@@ -10,6 +14,8 @@ public class UnrealCSharpCore : ModuleRules
 	public UnrealCSharpCore(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+
+		bEnableUndefinedIdentifierWarnings = false;
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
@@ -41,7 +47,8 @@ public class UnrealCSharpCore : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"Json"
+				"Json",
+				"CrossVersion"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
@@ -53,26 +60,30 @@ public class UnrealCSharpCore : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
-		
-		var ProjectDir = Path.GetDirectoryName(Target.ProjectFile?.FullName);
-		
-		var Intermediate = Path.Combine(ProjectDir, "Intermediate");
+
+#if UE_5_0_OR_LATER
+		var ProjectPath = Path.GetDirectoryName(Target.ProjectFile?.FullName);
+#else
+		var ProjectPath = Path.GetDirectoryName(Target.ProjectFile.FullName);
+
+		if (ProjectPath == null) return;
+#endif
+		var Intermediate = Path.Combine(ProjectPath, "Intermediate");
 
 		var JsonFullFilename = Path.Combine(Intermediate, "UnrealCSharp_GameModules.json");
-		
+
 		if (!Directory.Exists(Intermediate))
 		{
 			Directory.CreateDirectory(Intermediate);
 		}
 
-		Console.WriteLine("UnrealCSharp :Write json to: " + JsonFullFilename);
-		
 		using (var Writer = new JsonWriter(JsonFullFilename))
 		{
 			Writer.WriteObjectStart();
+
 			Writer.WriteStringArrayField("GameModules", Target.ExtraModuleNames);
+
 			Writer.WriteObjectEnd();
 		}
-
 	}
 }
