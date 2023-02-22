@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
 #include "mono/metadata/object-forward.h"
 
 class FStructRegistry
@@ -41,7 +42,7 @@ public:
 	bool RemoveReference(const MonoObject* InMonoObject);
 
 private:
-	TMap<MonoObject*, FStructAddress> MonoObject2StructAddressMap;
+	TGarbageCollectionHandleMapping<FStructAddress> GarbageCollectionHandle2StructAddress;
 
-	TMap<void*, MonoObject*> StructAddress2MonoObjectMap;
+	TMap<void*, TGarbageCollectionHandle<>> StructAddress2GarbageCollectionHandle;
 };
