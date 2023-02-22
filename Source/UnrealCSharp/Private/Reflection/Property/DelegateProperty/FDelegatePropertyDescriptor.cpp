@@ -24,7 +24,14 @@ void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(Src, DelegateHelper, SrcMonoObject);
+			const auto OwnerObject = reinterpret_cast<UObject*>(static_cast<uint8*>(Src) - DelegateProperty->
+				GetOffset_ForInternal());
+
+			const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetGarbageCollectionHandle(
+				OwnerObject);
+
+			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(OwnerGarbageCollectionHandle, Src,
+			                                                           DelegateHelper, SrcMonoObject);
 		}
 
 		*Dest = SrcMonoObject;

@@ -7,6 +7,10 @@ template <typename T>
 class TGarbageCollectionHandleMapping
 {
 public:
+	T& operator[](const TGarbageCollectionHandle<>& InKey);
+
+	const T& operator[](const TGarbageCollectionHandle<>& InKey) const;
+
 	void Empty();
 
 	T& Emplace(TGarbageCollectionHandle<>&& InKey, T&& InValue);
@@ -16,6 +20,10 @@ public:
 	int32 Remove(const MonoObject* InKey);
 
 	T* Find(const MonoObject* InMonoObject);
+
+	T* Find(const TGarbageCollectionHandle<>& InKey);
+
+	bool Contains(const TGarbageCollectionHandle<>& InKey) const;
 
 public:
 	TMap<TGarbageCollectionHandle<>, T>& Get();

@@ -99,15 +99,3 @@ auto FCSharpEnvironment::GetDelegate(const MonoObject* InMonoObject) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->GetDelegate<T>(InMonoObject) : nullptr;
 }
-
-template <typename T>
-auto FCSharpEnvironment::RemoveDelegateReference(const MonoObject* InMonoObject) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InMonoObject) : nullptr;
-}
-
-template <typename T>
-auto FCSharpEnvironment::RemoveDelegateReference(const void* InDelegate) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InDelegate) : nullptr;
-}

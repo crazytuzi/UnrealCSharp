@@ -24,7 +24,14 @@ void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(Src, MulticastDelegateHelper, SrcMonoObject);
+			const auto OwnerObject = reinterpret_cast<UObject*>(static_cast<uint8*>(Src) - MulticastDelegateProperty->
+				GetOffset_ForInternal());
+
+			const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetGarbageCollectionHandle(
+				OwnerObject);
+
+			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(OwnerGarbageCollectionHandle, Src,
+			                                                           MulticastDelegateHelper, SrcMonoObject);
 		}
 
 		*Dest = SrcMonoObject;

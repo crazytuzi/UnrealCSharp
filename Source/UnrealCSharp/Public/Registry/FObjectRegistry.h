@@ -24,6 +24,8 @@ public:
 
 	UObject* GetObject(const MonoObject* InMonoObject);
 
+	TGarbageCollectionHandle<> GetGarbageCollectionHandle(const UObject* InObject);
+
 public:
 	bool AddReference(UObject* InObject, MonoObject* InMonoObject);
 

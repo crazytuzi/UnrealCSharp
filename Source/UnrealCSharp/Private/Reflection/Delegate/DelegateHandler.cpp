@@ -15,13 +15,6 @@ void UDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 	}
 }
 
-void UDelegateHandler::BeginDestroy()
-{
-	Deinitialize();
-
-	Super::BeginDestroy();
-}
-
 void UDelegateHandler::CSharpCallBack()
 {
 }
