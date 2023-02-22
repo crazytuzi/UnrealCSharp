@@ -31,18 +31,15 @@ public:
 
 public:
 	template <typename T>
-	auto GetDelegate(const void* InDelegate);
-
-	template <typename T>
 	auto GetDelegate(const MonoObject* InMonoObject);
 
 	template <typename T>
 	auto GetObject(const T* InDelegate);
 
-	bool AddReference(void* InDelegate, FDelegateBaseHelper* InDelegateBaseHelper, MonoObject* InMonoObject);
+	bool AddReference(const TGarbageCollectionHandle<>& InOwner, void* InDelegate,
+	                  FDelegateBaseHelper* InDelegateBaseHelper, MonoObject* InMonoObject);
 
-	template <typename T>
-	auto RemoveReference(const MonoObject* InMonoObject);
+	bool RemoveReference(const TGarbageCollectionHandle<>& InGarbageCollectionHandle);
 
 private:
 	TGarbageCollectionHandleMapping<FDelegateAddress> GarbageCollectionHandle2DelegateAddress;

@@ -18,8 +18,6 @@ class UNREALCSHARP_API UMulticastDelegateHandler final : public UObject
 public:
 	virtual void ProcessEvent(UFunction* Function, void* Parms) override;
 
-	virtual void BeginDestroy() override;
-
 	UFUNCTION()
 	void CSharpCallBack();
 

@@ -24,6 +24,8 @@ void FMulticastDelegateHelper::Deinitialize()
 {
 	if (MulticastDelegateHandler != nullptr)
 	{
+		MulticastDelegateHandler->Deinitialize();
+		
 		MulticastDelegateHandler->RemoveFromRoot();
 
 		MulticastDelegateHandler = nullptr;

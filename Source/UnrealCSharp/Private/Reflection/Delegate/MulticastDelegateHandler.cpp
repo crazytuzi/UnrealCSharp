@@ -25,13 +25,6 @@ void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 	}
 }
 
-void UMulticastDelegateHandler::BeginDestroy()
-{
-	Deinitialize();
-
-	Super::BeginDestroy();
-}
-
 void UMulticastDelegateHandler::CSharpCallBack()
 {
 }

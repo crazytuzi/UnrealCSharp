@@ -6,6 +6,8 @@ template <typename T = uint32>
 class TGarbageCollectionHandle
 {
 public:
+	TGarbageCollectionHandle();
+
 	TGarbageCollectionHandle(const T& InHandle);
 
 	operator T() const;

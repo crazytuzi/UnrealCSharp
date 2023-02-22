@@ -16,20 +16,6 @@ static uint32 GetTypeHash(const FDelegateAddress& InDelegateAddress)
 }
 
 template <typename T>
-auto FDelegateRegistry::GetDelegate(const void* InDelegate)
-{
-	for (const auto Pair : DelegateAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InDelegate)
-		{
-			return static_cast<T*>(Pair.Key.DelegateBaseHelper);
-		}
-	}
-
-	return static_cast<T*>(nullptr);
-}
-
-template <typename T>
 auto FDelegateRegistry::GetDelegate(const MonoObject* InMonoObject)
 {
 	const auto FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InMonoObject);
@@ -49,21 +35,4 @@ auto FDelegateRegistry::GetObject(const T* InDelegate)
 	}
 
 	return static_cast<MonoObject*>(nullptr);
-}
-
-template <typename T>
-auto FDelegateRegistry::RemoveReference(const MonoObject* InMonoObject)
-{
-	if (const auto FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InMonoObject))
-	{
-		DelegateAddress2GarbageCollectionHandle.Remove(*FoundDelegateAddress);
-
-		delete static_cast<T*>(*FoundDelegateAddress->DelegateBaseHelper);
-
-		GarbageCollectionHandle2DelegateAddress.Remove(InMonoObject);
-
-		return true;
-	}
-
-	return false;
 }

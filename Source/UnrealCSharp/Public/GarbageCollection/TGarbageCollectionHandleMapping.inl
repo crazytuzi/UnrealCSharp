@@ -1,6 +1,18 @@
 ﻿#pragma once
 
 template <typename T>
+T& TGarbageCollectionHandleMapping<T>::operator[](const TGarbageCollectionHandle<>& InKey)
+{
+	return GarbageCollectionHandle2T[InKey];
+}
+
+template <typename T>
+const T& TGarbageCollectionHandleMapping<T>::operator[](const TGarbageCollectionHandle<>& InKey) const
+{
+	return GarbageCollectionHandle2T[InKey];
+}
+
+template <typename T>
 void TGarbageCollectionHandleMapping<T>::Empty()
 {
 	GarbageCollectionHandle2T.Empty();
@@ -44,6 +56,18 @@ T* TGarbageCollectionHandleMapping<T>::Find(const MonoObject* InMonoObject)
 	}
 
 	return nullptr;
+}
+
+template <typename T>
+T* TGarbageCollectionHandleMapping<T>::Find(const TGarbageCollectionHandle<>& InKey)
+{
+	return GarbageCollectionHandle2T.Find(InKey);
+}
+
+template <typename T>
+bool TGarbageCollectionHandleMapping<T>::Contains(const TGarbageCollectionHandle<>& InKey) const
+{
+	return GarbageCollectionHandle2T.Contains(InKey);
 }
 
 template <typename T>
