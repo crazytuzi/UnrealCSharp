@@ -9,7 +9,7 @@ FReferenceRegistry::~FReferenceRegistry()
 		for (const auto& Reference : Pair.Value)
 		{
 			FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(
-				static_cast<TGarbageCollectionHandle<>>(*Reference));
+				static_cast<FGarbageCollectionHandle>(*Reference));
 
 			delete Reference;
 		}
@@ -18,7 +18,7 @@ FReferenceRegistry::~FReferenceRegistry()
 	ReferenceRelationship.Empty();
 }
 
-bool FReferenceRegistry::AddReference(const TGarbageCollectionHandle<>& InOwner, FReference* InReference)
+bool FReferenceRegistry::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference)
 {
 	if (!ReferenceRelationship.Contains(InOwner))
 	{
@@ -30,14 +30,14 @@ bool FReferenceRegistry::AddReference(const TGarbageCollectionHandle<>& InOwner,
 	return true;
 }
 
-bool FReferenceRegistry::RemoveReference(const TGarbageCollectionHandle<>& InOwner)
+bool FReferenceRegistry::RemoveReference(const FGarbageCollectionHandle& InOwner)
 {
 	if (const auto FoundReferences = ReferenceRelationship.Find(InOwner))
 	{
 		for (const auto& Reference : *FoundReferences)
 		{
 			FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(
-				static_cast<TGarbageCollectionHandle<>>(*Reference));
+				static_cast<FGarbageCollectionHandle>(*Reference));
 
 			delete Reference;
 		}

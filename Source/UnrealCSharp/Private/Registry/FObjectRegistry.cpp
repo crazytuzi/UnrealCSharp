@@ -58,11 +58,11 @@ UObject* FObjectRegistry::GetObject(const MonoObject* InMonoObject)
 	return static_cast<UObject*>(GetAddress(InMonoObject));
 }
 
-TGarbageCollectionHandle<> FObjectRegistry::GetGarbageCollectionHandle(const UObject* InObject)
+FGarbageCollectionHandle FObjectRegistry::GetGarbageCollectionHandle(const UObject* InObject)
 {
 	const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(InObject);
 
-	return FoundGarbageCollectionHandle != nullptr ? *FoundGarbageCollectionHandle : TGarbageCollectionHandle<>();
+	return FoundGarbageCollectionHandle != nullptr ? *FoundGarbageCollectionHandle : FGarbageCollectionHandle();
 }
 
 bool FObjectRegistry::AddReference(UObject* InObject, MonoObject* InMonoObject)

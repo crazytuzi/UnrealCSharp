@@ -8,6 +8,7 @@
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 
 class FCSharpEnvironment
 {
@@ -77,7 +78,7 @@ public:
 
 	UObject* GetObject(const MonoObject* InMonoObject) const;
 
-	TGarbageCollectionHandle<> GetGarbageCollectionHandle(const UObject* InObject) const;
+	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject) const;
 
 	bool RemoveObjectReference(const UObject* InObject) const;
 
@@ -119,10 +120,10 @@ public:
 
 	MonoObject* GetDelegateObject(const void* InDelegate) const;
 
-	bool AddDelegateReference(const TGarbageCollectionHandle<>& InOwner, void* InDelegate,
+	bool AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InDelegate,
 	                          FDelegateBaseHelper* InDelegateBaseHelper, MonoObject* InMonoObject) const;
 
-	bool RemoveDelegateReference(const TGarbageCollectionHandle<>& InGarbageCollectionHandle) const;
+	bool RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 	
 private:
 	template <typename T, typename U>
@@ -145,9 +146,9 @@ private:
 	};
 
 public:
-	bool AddReference(const TGarbageCollectionHandle<>& InOwner, class FReference* InReference) const;
+	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference) const;
 
-	bool RemoveReference(const TGarbageCollectionHandle<>& InOwner) const;
+	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
 
 private:
 	static FCSharpEnvironment* Environment;
