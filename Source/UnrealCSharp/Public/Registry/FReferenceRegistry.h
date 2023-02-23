@@ -10,9 +10,9 @@ public:
 	~FReferenceRegistry();
 
 public:
-	bool AddReference(const TGarbageCollectionHandle<>& InOwner, class FReference* InReference);
+	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference);
 
-	bool RemoveReference(const TGarbageCollectionHandle<>& InOwner);
+	bool RemoveReference(const FGarbageCollectionHandle& InOwner);
 
 private:
 	TGarbageCollectionHandleMapping<TSet<class FReference*>> ReferenceRelationship;

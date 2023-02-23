@@ -44,5 +44,5 @@ public:
 private:
 	TGarbageCollectionHandleMapping<FStructAddress> GarbageCollectionHandle2StructAddress;
 
-	TMap<void*, TGarbageCollectionHandle<>> StructAddress2GarbageCollectionHandle;
+	TMap<void*, FGarbageCollectionHandle> StructAddress2GarbageCollectionHandle;
 };

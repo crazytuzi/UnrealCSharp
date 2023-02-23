@@ -1,13 +1,13 @@
 ﻿#pragma once
 
 template <typename T>
-T& TGarbageCollectionHandleMapping<T>::operator[](const TGarbageCollectionHandle<>& InKey)
+T& TGarbageCollectionHandleMapping<T>::operator[](const FGarbageCollectionHandle& InKey)
 {
 	return GarbageCollectionHandle2T[InKey];
 }
 
 template <typename T>
-const T& TGarbageCollectionHandleMapping<T>::operator[](const TGarbageCollectionHandle<>& InKey) const
+const T& TGarbageCollectionHandleMapping<T>::operator[](const FGarbageCollectionHandle& InKey) const
 {
 	return GarbageCollectionHandle2T[InKey];
 }
@@ -19,13 +19,13 @@ void TGarbageCollectionHandleMapping<T>::Empty()
 }
 
 template <typename T>
-T& TGarbageCollectionHandleMapping<T>::Emplace(TGarbageCollectionHandle<>&& InKey, T&& InValue)
+T& TGarbageCollectionHandleMapping<T>::Emplace(FGarbageCollectionHandle&& InKey, T&& InValue)
 {
-	return GarbageCollectionHandle2T.Emplace(Forward<TGarbageCollectionHandle<>>(InKey), Forward<T>(InValue));
+	return GarbageCollectionHandle2T.Emplace(Forward<FGarbageCollectionHandle>(InKey), Forward<T>(InValue));
 }
 
 template <typename T>
-int32 TGarbageCollectionHandleMapping<T>::Remove(const TGarbageCollectionHandle<>& InKey)
+int32 TGarbageCollectionHandleMapping<T>::Remove(const FGarbageCollectionHandle& InKey)
 {
 	return GarbageCollectionHandle2T.Remove(InKey);
 }
@@ -59,19 +59,19 @@ T* TGarbageCollectionHandleMapping<T>::Find(const MonoObject* InMonoObject)
 }
 
 template <typename T>
-T* TGarbageCollectionHandleMapping<T>::Find(const TGarbageCollectionHandle<>& InKey)
+T* TGarbageCollectionHandleMapping<T>::Find(const FGarbageCollectionHandle& InKey)
 {
 	return GarbageCollectionHandle2T.Find(InKey);
 }
 
 template <typename T>
-bool TGarbageCollectionHandleMapping<T>::Contains(const TGarbageCollectionHandle<>& InKey) const
+bool TGarbageCollectionHandleMapping<T>::Contains(const FGarbageCollectionHandle& InKey) const
 {
 	return GarbageCollectionHandle2T.Contains(InKey);
 }
 
 template <typename T>
-TMap<TGarbageCollectionHandle<>, T>& TGarbageCollectionHandleMapping<T>::Get()
+TMap<FGarbageCollectionHandle, T>& TGarbageCollectionHandleMapping<T>::Get()
 {
 	return GarbageCollectionHandle2T;
 }

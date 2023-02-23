@@ -24,7 +24,7 @@ public:
 
 	UObject* GetObject(const MonoObject* InMonoObject);
 
-	TGarbageCollectionHandle<> GetGarbageCollectionHandle(const UObject* InObject);
+	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject);
 
 public:
 	bool AddReference(UObject* InObject, MonoObject* InMonoObject);
@@ -36,5 +36,5 @@ public:
 private:
 	TGarbageCollectionHandleMapping<UObject*> GarbageCollectionHandle2Object;
 
-	TMap<UObject*, TGarbageCollectionHandle<>> Object2GarbageCollectionHandleMap;
+	TMap<UObject*, FGarbageCollectionHandle> Object2GarbageCollectionHandleMap;
 };

@@ -2,7 +2,7 @@
 
 #include "mono/metadata/object-forward.h"
 
-template <typename T = uint32>
+template <typename T>
 class TGarbageCollectionHandle
 {
 public:

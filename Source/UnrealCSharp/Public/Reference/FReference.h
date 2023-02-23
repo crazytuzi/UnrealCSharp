@@ -1,17 +1,17 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandle.h"
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 
 class FReference
 {
 public:
-	explicit FReference(const TGarbageCollectionHandle<>& InGarbageCollectionHandle);
+	explicit FReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 	virtual ~FReference();
 
 public:
-	explicit operator TGarbageCollectionHandle<>() const;
+	explicit operator FGarbageCollectionHandle() const;
 
 protected:
-	TGarbageCollectionHandle<> GarbageCollectionHandle;
+	FGarbageCollectionHandle GarbageCollectionHandle;
 };

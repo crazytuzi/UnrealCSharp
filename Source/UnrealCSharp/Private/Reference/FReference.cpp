@@ -1,6 +1,6 @@
 ﻿#include "Reference/FReference.h"
 
-FReference::FReference(const TGarbageCollectionHandle<>& InGarbageCollectionHandle):
+FReference::FReference(const FGarbageCollectionHandle& InGarbageCollectionHandle):
 	GarbageCollectionHandle(InGarbageCollectionHandle)
 {
 }
@@ -10,7 +10,7 @@ FReference::~FReference()
 	FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(GarbageCollectionHandle);
 }
 
-FReference::operator TGarbageCollectionHandle<>() const
+FReference::operator FGarbageCollectionHandle() const
 {
 	return GarbageCollectionHandle;
 }

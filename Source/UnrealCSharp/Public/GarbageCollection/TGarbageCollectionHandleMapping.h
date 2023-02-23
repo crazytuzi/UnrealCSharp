@@ -1,35 +1,35 @@
 ﻿#pragma once
 
-#include "TGarbageCollectionHandle.h"
+#include "FGarbageCollectionHandle.h"
 #include "mono/metadata/object-forward.h"
 
 template <typename T>
 class TGarbageCollectionHandleMapping
 {
 public:
-	T& operator[](const TGarbageCollectionHandle<>& InKey);
+	T& operator[](const FGarbageCollectionHandle& InKey);
 
-	const T& operator[](const TGarbageCollectionHandle<>& InKey) const;
+	const T& operator[](const FGarbageCollectionHandle& InKey) const;
 
 	void Empty();
 
-	T& Emplace(TGarbageCollectionHandle<>&& InKey, T&& InValue);
+	T& Emplace(FGarbageCollectionHandle&& InKey, T&& InValue);
 
-	int32 Remove(const TGarbageCollectionHandle<>& InKey);
+	int32 Remove(const FGarbageCollectionHandle& InKey);
 
 	int32 Remove(const MonoObject* InKey);
 
 	T* Find(const MonoObject* InMonoObject);
 
-	T* Find(const TGarbageCollectionHandle<>& InKey);
+	T* Find(const FGarbageCollectionHandle& InKey);
 
-	bool Contains(const TGarbageCollectionHandle<>& InKey) const;
+	bool Contains(const FGarbageCollectionHandle& InKey) const;
 
 public:
-	TMap<TGarbageCollectionHandle<>, T>& Get();
+	TMap<FGarbageCollectionHandle, T>& Get();
 
 private:
-	TMap<TGarbageCollectionHandle<>, T> GarbageCollectionHandle2T;
+	TMap<FGarbageCollectionHandle, T> GarbageCollectionHandle2T;
 };
 
 #include "TGarbageCollectionHandleMapping.inl"

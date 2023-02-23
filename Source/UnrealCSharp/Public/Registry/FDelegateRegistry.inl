@@ -22,17 +22,3 @@ auto FDelegateRegistry::GetDelegate(const MonoObject* InMonoObject)
 
 	return FoundDelegateAddress != nullptr ? static_cast<T*>(FoundDelegateAddress->DelegateBaseHelper) : nullptr;
 }
-
-template <typename T>
-auto FDelegateRegistry::GetObject(const T* InDelegate)
-{
-	for (const auto Pair : DelegateAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InDelegate)
-		{
-			return static_cast<MonoObject*>(Pair.Value);
-		}
-	}
-
-	return static_cast<MonoObject*>(nullptr);
-}
