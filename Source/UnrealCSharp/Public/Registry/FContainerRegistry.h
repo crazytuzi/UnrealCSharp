@@ -1,6 +1,21 @@
 ﻿#pragma once
 
+#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
+#include "Reflection/Container/FContainerHelper.h"
 #include "mono/metadata/object-forward.h"
+
+struct FContainerAddress
+{
+	void* Address;
+
+	FContainerHelper* ContainerHelper;
+};
+
+static bool operator==(const FContainerAddress& A, const FContainerAddress& B);
+
+static bool operator==(const FContainerAddress& A, const void* B);
+
+static uint32 GetTypeHash(const FContainerAddress& InContainerAddress);
 
 class FContainerRegistry
 {
@@ -21,25 +36,21 @@ public:
 	template <typename T>
 	auto GetContainer(const void* InAddress);
 
-	template <typename T>
-	auto GetObject(const T* InContainer);
+	MonoObject* GetObject(const void* InAddress);
 
 	bool AddReference(void* InContainer, MonoObject* InMonoObject);
 
-	bool AddReference(void* InAddress, void* InContainer, MonoObject* InMonoObject);
+	bool AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
+	                  MonoObject* InMonoObject);
 
-	template <typename T>
-	auto RemoveReference(const MonoObject* InMonoObject);
+	bool RemoveReference(const MonoObject* InMonoObject);
 
-	template <typename T>
-	auto RemoveReference(const void* InAddress);
+	bool RemoveReference(const void* InAddress);
 
 private:
-	TMap<MonoObject*, void*> MonoObject2ContainerMap;
+	TGarbageCollectionHandleMapping<FContainerAddress> GarbageCollectionHandle2ContainerAddress;
 
-	TMap<void*, MonoObject*> Container2MonoObjectMap;
-
-	TMap<void*, void*> Address2ContainerMap;
+	TMap<FContainerAddress, FGarbageCollectionHandle> ContainerAddress2GarbageCollectionHandle;
 };
 
 #include "FContainerRegistry.inl"

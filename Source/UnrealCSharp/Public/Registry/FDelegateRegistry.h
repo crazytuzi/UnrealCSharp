@@ -33,10 +33,10 @@ public:
 	template <typename T>
 	auto GetDelegate(const MonoObject* InMonoObject);
 
-	MonoObject* GetObject(const void* InDelegate);
+	MonoObject* GetObject(const void* InAddress);
 
-	bool AddReference(const FGarbageCollectionHandle& InOwner, void* InDelegate,
-	                  FDelegateBaseHelper* InDelegateBaseHelper, MonoObject* InMonoObject);
+	bool AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
+	                  MonoObject* InMonoObject);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 

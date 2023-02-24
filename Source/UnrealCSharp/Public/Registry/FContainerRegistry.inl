@@ -1,64 +1,40 @@
 ﻿#pragma once
 
+static bool operator==(const FContainerAddress& A, const FContainerAddress& B)
+{
+	return A.Address == B.Address && A.ContainerHelper == B.ContainerHelper;
+}
+
+static bool operator==(const FContainerAddress& A, const void* B)
+{
+	return A.Address == B;
+}
+
+static uint32 GetTypeHash(const FContainerAddress& InContainerAddress)
+{
+	return GetTypeHash(InContainerAddress.Address != nullptr
+		                   ? InContainerAddress.Address
+		                   : InContainerAddress.ContainerHelper);
+}
+
 template <typename T>
 auto FContainerRegistry::GetContainer(const MonoObject* InMonoObject)
 {
-	const auto FoundContainer = MonoObject2ContainerMap.Find(InMonoObject);
+	const auto FoundContainerAddress = GarbageCollectionHandle2ContainerAddress.Find(InMonoObject);
 
-	return FoundContainer != nullptr ? static_cast<T*>(*FoundContainer) : nullptr;
+	return FoundContainerAddress != nullptr ? static_cast<T*>(FoundContainerAddress->ContainerHelper) : nullptr;
 }
 
 template <typename T>
 auto FContainerRegistry::GetContainer(const void* InAddress)
 {
-	const auto FoundContainer = Address2ContainerMap.Find(InAddress);
-
-	return FoundContainer != nullptr ? static_cast<T*>(*FoundContainer) : nullptr;
-}
-
-template <typename T>
-auto FContainerRegistry::GetObject(const T* InContainer)
-{
-	const auto FoundMonoObject = Container2MonoObjectMap.Find(InContainer);
-
-	return FoundMonoObject != nullptr ? *FoundMonoObject : nullptr;
-}
-
-template <typename T>
-auto FContainerRegistry::RemoveReference(const MonoObject* InMonoObject)
-{
-	if (const auto FoundContainer = MonoObject2ContainerMap.Find(InMonoObject))
+	for (const auto& Pair : ContainerAddress2GarbageCollectionHandle)
 	{
-		Container2MonoObjectMap.Remove(FoundContainer);
-
-		delete static_cast<T*>(*FoundContainer);
-
-		MonoObject2ContainerMap.Remove(InMonoObject);
-
-		return true;
-	}
-
-	return false;
-}
-
-template <typename T>
-auto FContainerRegistry::RemoveReference(const void* InAddress)
-{
-	if (const auto FoundContainer = Address2ContainerMap.Find(InAddress))
-	{
-		Address2ContainerMap.Remove(InAddress);
-
-		if (const auto FoundMonoObject = Container2MonoObjectMap.Find(FoundContainer))
+		if (Pair.Key == InAddress)
 		{
-			MonoObject2ContainerMap.Remove(*FoundMonoObject);
+			return static_cast<T*>(Pair.Key.ContainerHelper);
 		}
-
-		Container2MonoObjectMap.Remove(FoundContainer);
-
-		delete static_cast<T*>(*FoundContainer);
-
-		return true;
 	}
 
-	return false;
+	return static_cast<T*>(nullptr);
 }

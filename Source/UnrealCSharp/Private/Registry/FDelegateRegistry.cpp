@@ -34,11 +34,11 @@ void FDelegateRegistry::Deinitialize()
 	DelegateAddress2GarbageCollectionHandle.Empty();
 }
 
-MonoObject* FDelegateRegistry::GetObject(const void* InDelegate)
+MonoObject* FDelegateRegistry::GetObject(const void* InAddress)
 {
-	for (const auto Pair : DelegateAddress2GarbageCollectionHandle)
+	for (const auto& Pair : DelegateAddress2GarbageCollectionHandle)
 	{
-		if (Pair.Key == InDelegate)
+		if (Pair.Key == InAddress)
 		{
 			return Pair.Value;
 		}
@@ -47,25 +47,26 @@ MonoObject* FDelegateRegistry::GetObject(const void* InDelegate)
 	return nullptr;
 }
 
-bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InDelegate,
-                                     FDelegateBaseHelper* InDelegateBaseHelper,
+bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
                                      MonoObject* InMonoObject)
 {
 	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New(
 		InMonoObject, false);
 
-	DelegateAddress2GarbageCollectionHandle.Emplace(FDelegateAddress{InDelegate, InDelegateBaseHelper},
-	                                                GarbageCollectionHandle);
+	DelegateAddress2GarbageCollectionHandle.Emplace(
+		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
 
 	GarbageCollectionHandle2DelegateAddress.Emplace(GarbageCollectionHandle,
-	                                                FDelegateAddress{InDelegate, InDelegateBaseHelper});
+	                                                FDelegateAddress{
+		                                                InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
+	                                                });
 
 	return FCSharpEnvironment::GetEnvironment()->AddReference(InOwner, new FDelegateReference(GarbageCollectionHandle));
 }
 
 bool FDelegateRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	if (const auto FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InGarbageCollectionHandle))
+	if (const auto& FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InGarbageCollectionHandle))
 	{
 		if (FoundDelegateAddress->DelegateBaseHelper != nullptr)
 		{

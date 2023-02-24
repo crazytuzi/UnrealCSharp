@@ -102,26 +102,25 @@ public:
 	template <typename T>
 	auto GetContainer(const void* InAddress) const;
 
-	MonoObject* GetContainerObject(const void* InContainer) const;
+	MonoObject* GetContainerObject(const void* InAddress) const;
 
 	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject) const;
 
-	bool AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const;
+	bool AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
+	                           MonoObject* InMonoObject) const;
 
-	template <typename T>
-	auto RemoveContainerReference(const MonoObject* InMonoObject) const;
+	bool RemoveContainerReference(const MonoObject* InMonoObject) const;
 
-	template <typename T>
-	auto RemoveContainerReference(const void* InContainer) const;
+	bool RemoveContainerReference(const void* InAddress) const;
 
 public:
 	template <typename T>
 	auto GetDelegate(const MonoObject* InMonoObject) const;
 
-	MonoObject* GetDelegateObject(const void* InDelegate) const;
+	MonoObject* GetDelegateObject(const void* InAddress) const;
 
-	bool AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InDelegate,
-	                          FDelegateBaseHelper* InDelegateBaseHelper, MonoObject* InMonoObject) const;
+	bool AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
+	                          MonoObject* InMonoObject) const;
 
 	bool RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 	
