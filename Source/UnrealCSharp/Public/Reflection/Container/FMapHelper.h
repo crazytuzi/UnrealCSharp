@@ -1,8 +1,9 @@
 ﻿#pragma once
 
+#include "FContainerHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-class FMapHelper final
+class FMapHelper final : public FContainerHelper
 {
 public:
 	explicit FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData = nullptr);

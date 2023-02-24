@@ -36,9 +36,6 @@ bool FReferenceRegistry::RemoveReference(const FGarbageCollectionHandle& InOwner
 	{
 		for (const auto& Reference : *FoundReferences)
 		{
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(
-				static_cast<FGarbageCollectionHandle>(*Reference));
-
 			delete Reference;
 		}
 

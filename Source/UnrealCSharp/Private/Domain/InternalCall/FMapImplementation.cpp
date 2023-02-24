@@ -1,6 +1,7 @@
 ﻿#include "Domain/InternalCall/FMapImplementation.h"
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FMapHelper.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -34,7 +35,7 @@ void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject, Mo
 
 void FMapImplementation::Map_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference<FMapHelper>(InMonoObject);
+	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(InMonoObject);
 }
 
 void FMapImplementation::Map_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)

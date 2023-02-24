@@ -69,7 +69,7 @@ bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, void* InStruct
                                    const bool bNeedFree)
 {
 	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
-		InMonoObject, true);
+		InMonoObject, false);
 
 	StructAddress2GarbageCollectionHandle.Emplace(InStruct, GarbageCollectionHandle);
 

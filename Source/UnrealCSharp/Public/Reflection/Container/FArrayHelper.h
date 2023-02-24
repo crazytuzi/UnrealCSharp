@@ -1,8 +1,9 @@
 ﻿#pragma once
 
+#include "FContainerHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-class FArrayHelper final
+class FArrayHelper final : public FContainerHelper
 {
 public:
 	explicit FArrayHelper(FProperty* InProperty, void* InData = nullptr);

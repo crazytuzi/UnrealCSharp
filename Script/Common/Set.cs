@@ -7,7 +7,7 @@ namespace Script.Common
     {
         public TSet() => SetUtils.Set_Register(this, typeof(T));
 
-        protected TSet(Type InValue)
+        public TSet(Type InValue)
         {
         }
 
