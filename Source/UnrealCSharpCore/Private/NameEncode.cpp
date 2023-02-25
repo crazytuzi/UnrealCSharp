@@ -2,30 +2,18 @@
 
 #include <ctype.h>
 
-#define ESCAPE_SYMBOL TEXT("__")
+#define ESCAPE_SYMBOL_FIRST TEXT('_')
+#define ESCAPE_SYMBOL_SECOND TEXT('h')
+#define ESCAPE_SYMBOL TEXT("_h")
 #define ESCAPE_SYMBOL_LEN 2
 #define ESCAPE_END_SYMBOL TEXT('_')
-#define ESCAPE_HEAD_NUMBER 1
+
+#define ESCAPE_HEAD_NUMBER 0x01
 #define ESCAPE_HEAD_NUMBER_SYMBOL TEXT("01")
 
 #define ESCAPE_UNICODE_IDENT_LE TEXT('u')
 #define ESCAPE_UNICODE_IDENT_BE TEXT('U')
 #define ESCAPE_UNICODE_IDENT (IsLittleEndian() ? ESCAPE_UNICODE_IDENT_LE : ESCAPE_UNICODE_IDENT_BE)
-
-/*
- * 转义规则：
- * 对在a-z A-Z 0-9 _ 以外 并在[0, 127]的ascii范围内的可见字符进行转义
- * 转义结果为 双下划綫开头+ascii码+单下划线结尾，如字符 - 会被转换为 __2D_
- * 双下划綫 __ 会被视作转义符，对后面的内容进行转义
- * 如原字符串中存在转义符 __ ，那么会将双下划綫转义为下划线的ascii码， 字符串 __ 转换为 __5F_
- * 以数字开头的字符串，将会在前面添加__01_转义，如 3DWidget 转换为 __01_3DWidget
- * 单下划线不会被转义
- * 支持为宽字符转义，需bEncodeWideString为true。例 技能3 将会被转义为 __u8062___uFD80_3
- *
- * 总结：
- * 只使用a-z A-Z 0-9 _ 和非ascii字符 将不会被转义，可选非ascii字符转义
- * ascii的特殊符号 一个以上连续的下划线 和数字开头的名字会被转义
- */
 
 
 static inline bool ShouldEscape(int C)
@@ -69,15 +57,28 @@ static uint8 HexToByte(const TCHAR* Str)
 
 FString FNameEncode::Encode(const FString& Name, bool bEncodeWideString)
 {
+	constexpr int kNormal = 1;
+	constexpr int kEscapeChar = 2;
+	constexpr int kUnicodeString = 3;
+
 	FString Ret;
 	Ret.Reserve(Name.Len() + 4);
-	int LastIndex = Name.Len() - 1;
+	
+	const int LastIndex = Name.Len() - 1;
+
+	int LastState = kNormal;
+
 	for (int i = 0; i < Name.Len(); ++i)
 	{
 		const auto C = Name[i];
 
-		// escape __
-		bool bEscapeSymbol = C == TEXT('_') && i != LastIndex && Name[i + 1] == TEXT('_');
+		if(C == ESCAPE_HEAD_NUMBER)
+		{
+			UE_LOG(LogTemp, Error, TEXT("string contains illegal characters: %s"), *Name);
+			return {};
+		}
+		
+		bool bEscapeSymbol = C == ESCAPE_SYMBOL_FIRST && i != LastIndex && Name[i + 1] == ESCAPE_SYMBOL_SECOND;
 		bool bDigitHead = i == 0 && ::isdigit(C);
 
 		if (bDigitHead)
@@ -86,6 +87,7 @@ FString FNameEncode::Encode(const FString& Name, bool bEncodeWideString)
 			Ret.AppendChars(ESCAPE_HEAD_NUMBER_SYMBOL, 2);
 			Ret.AppendChar(ESCAPE_END_SYMBOL);
 			Ret.AppendChar(C);
+			LastState = kEscapeChar;
 		}
 		else if (bEscapeSymbol || ShouldEscape(C))
 		{
@@ -93,17 +95,23 @@ FString FNameEncode::Encode(const FString& Name, bool bEncodeWideString)
 			TCHAR Hex[2];
 			ByteToHex(C, Hex);
 			Ret.AppendChars(Hex, 2);
-			Ret.AppendChar(ESCAPE_END_SYMBOL);
+
 			if (bEscapeSymbol) //skip escape symbol
 			{
 				++i;
 			}
+
+			Ret.AppendChar(ESCAPE_END_SYMBOL);
+			LastState = kEscapeChar;
 		}
 		else if (bEncodeWideString && C > 0x7F)
 		{
-			Ret.AppendChars(ESCAPE_SYMBOL, ESCAPE_SYMBOL_LEN);
-			// add endian info
-			Ret.AppendChar(ESCAPE_UNICODE_IDENT);
+			if (LastState != kUnicodeString)
+			{
+				Ret.AppendChars(ESCAPE_SYMBOL, ESCAPE_SYMBOL_LEN);
+				// add endian info
+				Ret.AppendChar(ESCAPE_UNICODE_IDENT);
+			}
 
 			unsigned short _C = static_cast<unsigned short>(C);
 			unsigned char* P = reinterpret_cast<unsigned char*>(&_C);
@@ -113,12 +121,24 @@ FString FNameEncode::Encode(const FString& Name, bool bEncodeWideString)
 			ByteToHex(P[1], Hex + 2);
 
 			Ret.AppendChars(Hex, 4);
-			Ret.AppendChar(ESCAPE_END_SYMBOL);
+
+			const bool bNext = bEncodeWideString && i != LastIndex && Name[i + 1] > 0x7F;
+			if (bNext)
+			{
+				// next
+			}
+			else
+			{
+				Ret.AppendChar(ESCAPE_END_SYMBOL);
+			}
+
+			LastState = kUnicodeString;
 		}
 		else
 		{
 			// a-z A-Z 0-9 _
 			Ret.AppendChar(C);
+			LastState = kNormal;
 		}
 	}
 
@@ -129,7 +149,7 @@ void FNameEncode::Encode(TArray<FString>& Names)
 {
 	for (auto& Name : Names)
 	{
-		Encode(Name);
+		Name = Encode(Name);
 	}
 }
 
@@ -149,19 +169,22 @@ FString FNameEncode::Decode(const FString& Name)
 
 	bool UnicodeStringCtx_LE = true;
 	bool UnicodeStringCtx_Collected = false;
-	unsigned char UnicodeStringCtx_CollectedByte {};
-	
-	
+	unsigned char UnicodeStringCtx_CollectedByte{};
+
+
 	for (int i = 0; i < Name.Len(); ++i)
 	{
 		const auto C = Name[i];
 
 		switch (State)
 		{
-
 		case kNormal:
 			{
-				const bool bEscape = C == TEXT('_') && i < LastIndex - 1 && Name[i + 1] == TEXT('_');
+				const bool bEscape =
+					C == ESCAPE_SYMBOL_FIRST &&
+					i < LastIndex - 1 &&
+					Name[i + 1] == ESCAPE_SYMBOL_SECOND;
+				
 				if (bEscape)
 				{
 					State = kEscapeChar;
@@ -181,7 +204,8 @@ FString FNameEncode::Decode(const FString& Name)
 					break;
 				}
 				auto Hex = HexToByte(GetData(Name) + i);
-				if (Hex == ESCAPE_HEAD_NUMBER)
+				
+				if (i == 2 /* hex start offset */ && Hex == ESCAPE_HEAD_NUMBER)
 				{
 					// do nothing.
 				}
@@ -198,18 +222,18 @@ FString FNameEncode::Decode(const FString& Name)
 				State = kNormal;
 			}
 			break;
-			
+
 		case kUnicodeString:
 			{
-				if(i + 1 >= Name.Len())
+				if (i + 1 >= Name.Len())
 				{
-					UE_LOG(LogTemp, Error, TEXT("Decode failed. %s"), *Name);
+					UE_LOG(LogTemp, Error, TEXT("decode failed. %s"), *Name);
 					return {};
 				}
 
 				unsigned char Byte = HexToByte(GetData(Name) + i);
 
-				if(!UnicodeStringCtx_Collected)
+				if (!UnicodeStringCtx_Collected)
 				{
 					UnicodeStringCtx_CollectedByte = Byte;
 					UnicodeStringCtx_Collected = true;
@@ -217,25 +241,28 @@ FString FNameEncode::Decode(const FString& Name)
 					break;
 				}
 				UnicodeStringCtx_Collected = false;
-				
+
 				short WideChar;
 				unsigned char* P = reinterpret_cast<unsigned char*>(&WideChar);
 
 				P[0] = UnicodeStringCtx_CollectedByte;
 				P[1] = Byte;
-				
+
 				// endian mismatch
 				if (IsLittleEndian() && !UnicodeStringCtx_LE)
 				{
-					::Swap(P[0], P[1]);
+					const auto Temp = P[0];
+					P[0] = P[1];
+					P[1] = Temp;
 				}
 
 				++i;
 
-				// peek
-				if (i != LastIndex && Name[i+1] != ESCAPE_END_SYMBOL)
+				// peek next
+				if (i != LastIndex && Name[i + 1] != ESCAPE_END_SYMBOL)
 				{
 					// next
+					Ret.AppendChar(WideChar);
 				}
 				else
 				{
@@ -245,7 +272,7 @@ FString FNameEncode::Decode(const FString& Name)
 				}
 			}
 			break;
-
+		default: ;
 		}
 	}
 
@@ -256,7 +283,7 @@ void FNameEncode::Decode(TArray<FString>& Names)
 {
 	for (auto& Name : Names)
 	{
-		Decode(Name);
+		Name = Decode(Name);
 	}
 }
 
@@ -284,7 +311,7 @@ void FNameEncode::UnitTest()
 	auto v1r = Decode(v1);
 	check(v1s == v1r);
 
-	FString v2s = TEXT("__01_3DWidget");
+	FString v2s = TEXT("_h01_3DWidget");
 	auto v2 = Encode(v2s);
 	auto v2r = Decode(v2);
 	check(v2s == v2r);
@@ -333,5 +360,16 @@ void FNameEncode::UnitTest()
 	auto v11 = Encode(v11s);
 	auto v11r = Decode(v11);
 	check(v11s == v11r);
+
+	FString v12s = TEXT("___啊___的___3__@_");
+	auto v12 = Encode(v12s, true);
+	auto v12r = Decode(v12);
+	check(v12s == v12r);
+
+	FString v13s = TEXT("___啊_h_h__h___hhhh_h-__hh@h__h@_");
+	auto v13 = Encode(v13s, true);
+	auto v13r = Decode(v13);
+	check(v13s == v13r);
+	
 }
 */
