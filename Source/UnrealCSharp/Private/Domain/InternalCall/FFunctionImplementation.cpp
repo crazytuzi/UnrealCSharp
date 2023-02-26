@@ -15,13 +15,14 @@ struct FRegisterFunction
 
 static FRegisterFunction RegisterFunction;
 
-void FFunctionImplementation::Function_ReflectionImplementation(
-	const MonoObject* InMonoObject, const UTF16CHAR* InFunctionName, MonoObject** ReturnValue, MonoObject** OutValue,
-	MonoArray* InValue)
+void FFunctionImplementation::Function_ReflectionImplementation(const MonoObject* InMonoObject,
+                                                                MonoString* InFunctionName, MonoObject** ReturnValue,
+                                                                MonoObject** OutValue, MonoArray* InValue)
 {
 	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject))
 	{
-		const auto FunctionName = StringCast<TCHAR>(InFunctionName + 10).Get();
+		const auto FunctionName = FName(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InFunctionName));
 
 		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment()->GetFunctionDescriptor(
 			FoundObject->GetClass(), FunctionName))

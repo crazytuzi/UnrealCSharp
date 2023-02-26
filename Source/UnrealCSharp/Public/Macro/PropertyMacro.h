@@ -10,17 +10,18 @@
 
 #define NEW_PROPERTY_DESCRIPTOR(FPropertyType) NEW_PROPERTY_DESCRIPTOR_IMPLEMENTATION(FPropertyType, FPropertyType##Descriptor)
 
-#define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, Type& OutValue);
+#define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, Type& OutValue);
 
-#define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Set##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, Type InValue);
+#define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Set##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, Type InValue);
 
 #define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType, Type) \
-void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, Type& OutValue) \
+void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, Type& OutValue) \
 { \
 	UStruct* InStruct = nullptr; \
 	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress<##TemplateType##>(InMonoObject, InStruct)) \
 	{ \
-		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
+		const auto PropertyName = FName( \
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InPropertyName)); \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor( \
 			InStruct, PropertyName)) \
 		{ \
@@ -30,12 +31,13 @@ void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyIm
 }
 
 #define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType, Type) \
-void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, Type InValue) \
+void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, Type InValue) \
 { \
 	UStruct* InStruct = nullptr; \
 	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress<##TemplateType##>(InMonoObject, InStruct)) \
 	{ \
-		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
+		const auto PropertyName = FName( \
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InPropertyName)); \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor( \
 			InStruct, PropertyName)) \
 		{ \
@@ -45,12 +47,13 @@ void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyIm
 }
 
 #define GET_COMPOUND_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType, Type) \
-void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, MonoObject** OutValue) \
+void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, MonoObject** OutValue) \
 { \
 	UStruct* InStruct = nullptr; \
 	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment()->GetAddress<##TemplateType##>(InMonoObject, InStruct)) \
 	{ \
-		const auto PropertyName = StringCast<TCHAR>(InPropertyName + 10).Get(); \
+		const auto PropertyName = FName( \
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InPropertyName)); \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment()->GetPropertyDescriptor( \
 			InStruct, PropertyName)) \
 		{ \
@@ -59,7 +62,7 @@ void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyIm
 	} \
 }
 
-#define GET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, const UTF16CHAR* InPropertyName, MonoObject** OutValue);
+#define GET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, MonoObject** OutValue);
 
 #define OBJECT_GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Object, PropertyType, Type)
 

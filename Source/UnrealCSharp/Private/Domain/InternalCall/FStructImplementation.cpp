@@ -16,9 +16,10 @@ struct FRegisterStruct
 
 static FRegisterStruct RegisterStruct;
 
-void FStructImplementation::Struct_RegisterImplementation(MonoObject* InMonoObject, const UTF16CHAR* InStructName)
+void FStructImplementation::Struct_RegisterImplementation(MonoObject* InMonoObject, MonoString* InStructName)
 {
-	const auto StructName = StringCast<TCHAR>(InStructName + 10).Get();
+	const auto StructName = UTF8_TO_TCHAR(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InStructName));
 
 	FCSharpEnvironment::GetEnvironment()->Bind(InMonoObject, StructName);
 }
