@@ -9,7 +9,7 @@ namespace Script.Common
         {
             return InType.IsDefined(typeof(IsOverrideAttribute), true);
         }
-        
+
         static Boolean IsOverrideMethod(MethodInfo InMethodInfo)
         {
             return InMethodInfo.IsDefined(typeof(IsOverrideAttribute), true);
