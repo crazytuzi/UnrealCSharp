@@ -19,9 +19,10 @@ struct FRegisterUObject
 
 static FRegisterUObject RegisterUObject;
 
-void FObjectImplementation::Object_StaticClassImplementation(const UTF16CHAR* InClassName, MonoObject** OutValue)
+void FObjectImplementation::Object_StaticClassImplementation(MonoString* InClassName, MonoObject** OutValue)
 {
-	const auto ClassName = StringCast<TCHAR>(InClassName + 10).Get();
+	const auto ClassName =
+		UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InClassName));
 
 	const auto InClass = LoadObject<UClass>(nullptr, ClassName);
 
