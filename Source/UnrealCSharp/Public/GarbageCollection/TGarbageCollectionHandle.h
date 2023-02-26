@@ -2,10 +2,12 @@
 
 #include "mono/metadata/object-forward.h"
 
-template <typename T = uint32>
+template <typename T>
 class TGarbageCollectionHandle
 {
 public:
+	TGarbageCollectionHandle();
+
 	TGarbageCollectionHandle(const T& InHandle);
 
 	operator T() const;

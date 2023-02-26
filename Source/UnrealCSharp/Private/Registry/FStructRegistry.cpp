@@ -1,4 +1,5 @@
 ﻿#include "Registry/FStructRegistry.h"
+#include "Environment/FCSharpEnvironment.h"
 
 FStructRegistry::FStructRegistry()
 {
@@ -16,34 +17,33 @@ void FStructRegistry::Initialize()
 
 void FStructRegistry::Deinitialize()
 {
-	for (auto& MonoObject2StructAddress : MonoObject2StructAddressMap)
+	for (auto& Pair : GarbageCollectionHandle2StructAddress.Get())
 	{
-		if (MonoObject2StructAddress.Value.bNeedFree)
-		{
-			FMemory::Free(MonoObject2StructAddress.Value.Address);
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(Pair.Key);
 
-			MonoObject2StructAddress.Value.Address = nullptr;
+		if (Pair.Value.bNeedFree)
+		{
+			FMemory::Free(Pair.Value.Address);
+
+			Pair.Value.Address = nullptr;
 		}
 	}
 
-	StructAddress2MonoObjectMap.Empty();
+	GarbageCollectionHandle2StructAddress.Empty();
 
-	MonoObject2StructAddressMap.Empty();
+	StructAddress2GarbageCollectionHandle.Empty();
 }
 
 void* FStructRegistry::GetAddress(const MonoObject* InMonoObject)
 {
-	if (const auto FoundStructAddress = MonoObject2StructAddressMap.Find(InMonoObject))
-	{
-		return FoundStructAddress->Address;
-	}
+	const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InMonoObject);
 
-	return nullptr;
+	return FoundStructAddress != nullptr ? FoundStructAddress->Address : nullptr;
 }
 
 void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct)
 {
-	if (const auto FoundStructAddress = MonoObject2StructAddressMap.Find(InMonoObject))
+	if (const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InMonoObject))
 	{
 		InStruct = FoundStructAddress->ScriptStruct;
 
@@ -55,65 +55,59 @@ void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InSt
 
 MonoObject* FStructRegistry::GetObject(const void* InStruct)
 {
-	const auto FoundMonoObject = StructAddress2MonoObjectMap.Find(InStruct);
+	const auto FoundGarbageCollectionHandle = StructAddress2GarbageCollectionHandle.Find(InStruct);
 
-	return FoundMonoObject != nullptr ? *FoundMonoObject : nullptr;
+	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
 }
 
 void* FStructRegistry::GetStruct(const MonoObject* InMonoObject)
 {
-	const auto FoundStructAddress = MonoObject2StructAddressMap.Find(InMonoObject);
-
-	return FoundStructAddress != nullptr ? (*FoundStructAddress).Address : nullptr;
+	return GetAddress(InMonoObject);
 }
 
 bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject,
                                    const bool bNeedFree)
 {
-	StructAddress2MonoObjectMap.Emplace(InStruct, InMonoObject);
+	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, false);
 
-	MonoObject2StructAddressMap.Emplace(InMonoObject, FStructAddress{InStruct, InScriptStruct, bNeedFree});
+	StructAddress2GarbageCollectionHandle.Emplace(InStruct, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2StructAddress.Emplace(GarbageCollectionHandle,
+	                                              FStructAddress{InStruct, InScriptStruct, bNeedFree});
 
 	return true;
 }
 
 bool FStructRegistry::RemoveReference(const void* InStruct)
 {
-	if (const auto FoundMonoObject = StructAddress2MonoObjectMap.Find(InStruct))
+	if (const auto FoundGarbageCollectionHandle = StructAddress2GarbageCollectionHandle.Find(InStruct))
 	{
-		if (const auto FoundStructAddress = MonoObject2StructAddressMap.Find(*FoundMonoObject))
-		{
-			if (FoundStructAddress->bNeedFree)
-			{
-				FMemory::Free(FoundStructAddress->Address);
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(*FoundGarbageCollectionHandle);
 
-				FoundStructAddress->Address = nullptr;
-			}
-		}
-
-		StructAddress2MonoObjectMap.Remove(InStruct);
-
-		MonoObject2StructAddressMap.Remove(*FoundMonoObject);
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 bool FStructRegistry::RemoveReference(const MonoObject* InMonoObject)
 {
-	if (const auto FoundStructAddress = MonoObject2StructAddressMap.Find(InMonoObject))
+	if (const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InMonoObject))
 	{
+		StructAddress2GarbageCollectionHandle.Remove(FoundStructAddress->Address);
+
 		if (FoundStructAddress->bNeedFree)
 		{
 			FMemory::Free(FoundStructAddress->Address);
 
 			FoundStructAddress->Address = nullptr;
-
-			MonoObject2StructAddressMap.Remove(InMonoObject);
-
-			StructAddress2MonoObjectMap.Remove(FoundStructAddress);
 		}
+
+		GarbageCollectionHandle2StructAddress.Remove(InMonoObject);
+
+		return true;
 	}
 
-	return true;
+	return false;
 }

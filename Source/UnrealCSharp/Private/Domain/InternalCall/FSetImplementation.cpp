@@ -29,7 +29,7 @@ void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject, Mo
 
 void FSetImplementation::Set_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference<FSetHelper>(InMonoObject);
+	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(InMonoObject);
 }
 
 void FSetImplementation::Set_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)

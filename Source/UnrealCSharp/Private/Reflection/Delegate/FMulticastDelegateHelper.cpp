@@ -24,6 +24,8 @@ void FMulticastDelegateHelper::Deinitialize()
 {
 	if (MulticastDelegateHandler != nullptr)
 	{
+		MulticastDelegateHandler->Deinitialize();
+		
 		MulticastDelegateHandler->RemoveFromRoot();
 
 		MulticastDelegateHandler = nullptr;
@@ -64,11 +66,11 @@ void FMulticastDelegateHelper::Remove(MonoObject* InMulticastDelegate) const
 	}
 }
 
-void FMulticastDelegateHelper::RemoveAll(MonoObject* InMonoObject) const
+void FMulticastDelegateHelper::RemoveAll(MonoObject* InObject) const
 {
 	if (MulticastDelegateHandler != nullptr)
 	{
-		MulticastDelegateHandler->RemoveAll(InMonoObject);
+		MulticastDelegateHandler->RemoveAll(InObject);
 	}
 }
 

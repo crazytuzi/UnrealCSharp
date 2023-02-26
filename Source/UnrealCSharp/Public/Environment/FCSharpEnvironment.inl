@@ -83,31 +83,7 @@ auto FCSharpEnvironment::GetContainer(const void* InAddress) const
 }
 
 template <typename T>
-auto FCSharpEnvironment::RemoveContainerReference(const MonoObject* InMonoObject) const
+auto FCSharpEnvironment::GetDelegate(const MonoObject* InMonoObject) const
 {
-	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference<T>(InMonoObject) : nullptr;
-}
-
-template <typename T>
-auto FCSharpEnvironment::RemoveContainerReference(const void* InContainer) const
-{
-	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference<T>(InContainer) : nullptr;
-}
-
-template <typename T>
-auto FCSharpEnvironment::GetDelegate(const void* InAddress) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->GetDelegate<T>(InAddress) : nullptr;
-}
-
-template <typename T>
-auto FCSharpEnvironment::RemoveDelegateReference(const MonoObject* InMonoObject) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InMonoObject) : nullptr;
-}
-
-template <typename T>
-auto FCSharpEnvironment::RemoveDelegateReference(const void* InDelegate) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference<T>(InDelegate) : nullptr;
+	return DelegateRegistry != nullptr ? DelegateRegistry->GetDelegate<T>(InMonoObject) : nullptr;
 }

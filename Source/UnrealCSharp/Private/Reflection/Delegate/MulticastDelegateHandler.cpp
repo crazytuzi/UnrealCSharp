@@ -25,13 +25,6 @@ void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 	}
 }
 
-void UMulticastDelegateHandler::BeginDestroy()
-{
-	Deinitialize();
-
-	Super::BeginDestroy();
-}
-
 void UMulticastDelegateHandler::CSharpCallBack()
 {
 }
@@ -179,9 +172,9 @@ void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 	}
 }
 
-void UMulticastDelegateHandler::RemoveAll(MonoObject* InMonoObject)
+void UMulticastDelegateHandler::RemoveAll(MonoObject* InObject)
 {
-	Delegates.RemoveAll([InMonoObject](MonoObject* Element)
+	Delegates.RemoveAll([InObject](MonoObject* Element)
 	{
 		if (Element == nullptr)
 		{
@@ -201,7 +194,7 @@ void UMulticastDelegateHandler::RemoveAll(MonoObject* InMonoObject)
 				const auto TargetMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
 					FoundMonoMethod, nullptr, Params, nullptr);
 
-				return TargetMonoObject == InMonoObject ? true : false;
+				return TargetMonoObject == InObject ? true : false;
 			}
 		}
 

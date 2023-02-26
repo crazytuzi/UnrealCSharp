@@ -5,20 +5,20 @@ namespace Script.Reflection.Delegate
 {
     public static class DelegateUtils
     {
-        public static unsafe void Delegate_Bind<T>(void* InAddress, T InDelegate) where T : System.Delegate =>
-            DelegateImplementation.Delegate_BindImplementation(InAddress, InDelegate);
+        public static void Delegate_Bind<T>(FDelegateBase InMonoObject, T InDelegate) where T : System.Delegate =>
+            DelegateImplementation.Delegate_BindImplementation(InMonoObject, InDelegate);
 
-        public static unsafe Boolean Delegate_IsBound(void* InAddress) =>
-            DelegateImplementation.Delegate_IsBoundImplementation(InAddress);
+        public static Boolean Delegate_IsBound(FDelegateBase InMonoObject) =>
+            DelegateImplementation.Delegate_IsBoundImplementation(InMonoObject);
 
-        public static unsafe void Delegate_UnBind(void* InAddress) =>
-            DelegateImplementation.Delegate_UnBindImplementation(InAddress);
+        public static void Delegate_UnBind(FDelegateBase InMonoObject) =>
+            DelegateImplementation.Delegate_UnBindImplementation(InMonoObject);
 
-        public static unsafe void Delegate_Clear(void* InAddress) =>
-            DelegateImplementation.Delegate_ClearImplementation(InAddress);
+        public static void Delegate_Clear(FDelegateBase InMonoObject) =>
+            DelegateImplementation.Delegate_ClearImplementation(InMonoObject);
 
-        public static unsafe void Delegate_Execute<T>(void* InAddress, out T ReturnValue, out ObjectList OutValue,
+        public static void Delegate_Execute<T>(FDelegateBase InMonoObject, out T ReturnValue, out ObjectList OutValue,
             params Object[] InValue) =>
-            DelegateImplementation.Delegate_ExecuteImplementation(InAddress, out ReturnValue, out OutValue, InValue);
+            DelegateImplementation.Delegate_ExecuteImplementation(InMonoObject, out ReturnValue, out OutValue, InValue);
     }
 }

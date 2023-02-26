@@ -29,6 +29,8 @@ void FCSharpEnvironment::Initialize()
 
 	ClassRegistry = new FClassRegistry();
 
+	ReferenceRegistry = new FReferenceRegistry();
+
 	ObjectRegistry = new FObjectRegistry();
 
 	StructRegistry = new FStructRegistry();
@@ -74,6 +76,13 @@ void FCSharpEnvironment::Deinitialize()
 		delete ObjectRegistry;
 
 		ObjectRegistry = nullptr;
+	}
+
+	if (ReferenceRegistry != nullptr)
+	{
+		delete ReferenceRegistry;
+
+		ReferenceRegistry = nullptr;
 	}
 
 	if (ClassRegistry != nullptr)
@@ -228,6 +237,13 @@ UObject* FCSharpEnvironment::GetObject(const MonoObject* InMonoObject) const
 	return ObjectRegistry != nullptr ? ObjectRegistry->GetObject(InMonoObject) : nullptr;
 }
 
+FGarbageCollectionHandle FCSharpEnvironment::GetGarbageCollectionHandle(const UObject* InObject) const
+{
+	return ObjectRegistry != nullptr
+		       ? ObjectRegistry->GetGarbageCollectionHandle(InObject)
+		       : FGarbageCollectionHandle();
+}
+
 bool FCSharpEnvironment::RemoveObjectReference(const UObject* InObject) const
 {
 	return ObjectRegistry != nullptr ? ObjectRegistry->RemoveReference(InObject) : false;
@@ -266,9 +282,9 @@ bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) c
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InMonoObject) : false;
 }
 
-MonoObject* FCSharpEnvironment::GetContainerObject(const void* InContainer) const
+MonoObject* FCSharpEnvironment::GetContainerObject(const void* InAddress) const
 {
-	return ContainerRegistry != nullptr ? ContainerRegistry->GetObject(InContainer) : nullptr;
+	return ContainerRegistry != nullptr ? ContainerRegistry->GetObject(InAddress) : nullptr;
 }
 
 bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* InMonoObject) const
@@ -276,19 +292,48 @@ bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* In
 	return ContainerRegistry != nullptr ? ContainerRegistry->AddReference(InContainer, InMonoObject) : false;
 }
 
-bool FCSharpEnvironment::AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const
+bool FCSharpEnvironment::AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress,
+                                               void* InContainer, MonoObject* InMonoObject) const
 {
 	return ContainerRegistry != nullptr
-		       ? ContainerRegistry->AddReference(InAddress, InContainer, InMonoObject)
+		       ? ContainerRegistry->AddReference(InOwner, InAddress, InContainer, InMonoObject)
 		       : false;
 }
 
-MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InDelegate) const
+bool FCSharpEnvironment::RemoveContainerReference(const MonoObject* InMonoObject) const
 {
-	return DelegateRegistry != nullptr ? DelegateRegistry->GetObject(InDelegate) : nullptr;
+	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InMonoObject) : nullptr;
 }
 
-bool FCSharpEnvironment::AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const
+bool FCSharpEnvironment::RemoveContainerReference(const void* InAddress) const
 {
-	return DelegateRegistry != nullptr ? DelegateRegistry->AddReference(InAddress, InDelegate, InMonoObject) : false;
+	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InAddress) : nullptr;
+}
+
+MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InAddress) const
+{
+	return DelegateRegistry != nullptr ? DelegateRegistry->GetObject(InAddress) : nullptr;
+}
+
+bool FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress,
+                                              void* InDelegate, MonoObject* InMonoObject) const
+{
+	return DelegateRegistry != nullptr
+		       ? DelegateRegistry->AddReference(InOwner, InAddress, InDelegate, InMonoObject)
+		       : false;
+}
+
+bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+{
+	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InGarbageCollectionHandle) : false;
+}
+
+bool FCSharpEnvironment::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference) const
+{
+	return ReferenceRegistry != nullptr ? ReferenceRegistry->AddReference(InOwner, InReference) : false;
+}
+
+bool FCSharpEnvironment::RemoveReference(const FGarbageCollectionHandle& InOwner) const
+{
+	return ReferenceRegistry != nullptr ? ReferenceRegistry->RemoveReference(InOwner) : false;
 }

@@ -8,7 +8,7 @@ namespace Script.Common
     {
         public TArray() => ArrayUtils.Array_Register(this, typeof(T));
 
-        protected TArray(Type InValue)
+        public TArray(Type InValue)
         {
         }
 

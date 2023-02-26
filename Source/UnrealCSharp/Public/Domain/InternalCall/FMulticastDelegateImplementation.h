@@ -5,20 +5,20 @@
 class FMulticastDelegateImplementation
 {
 public:
-	static bool MulticastDelegate_IsBoundImplementation(const void* InAddress);
+	static bool MulticastDelegate_IsBoundImplementation(const MonoObject* InMonoObject);
 
-	static bool MulticastDelegate_ContainsImplementation(const void* InAddress, MonoObject* InDelegate);
+	static bool MulticastDelegate_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
 
-	static void MulticastDelegate_AddImplementation(const void* InAddress, MonoObject* InDelegate);
+	static void MulticastDelegate_AddImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
 
-	static void MulticastDelegate_AddUniqueImplementation(const void* InAddress, MonoObject* InDelegate);
+	static void MulticastDelegate_AddUniqueImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
 
-	static void MulticastDelegate_RemoveImplementation(const void* InAddress, MonoObject* InDelegate);
+	static void MulticastDelegate_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
 
-	static void MulticastDelegate_RemoveAllImplementation(const void* InAddress, MonoObject* InMonoObject);
+	static void MulticastDelegate_RemoveAllImplementation(const MonoObject* InMonoObject, MonoObject* InObject);
 
-	static void MulticastDelegate_ClearImplementation(const void* InAddress);
+	static void MulticastDelegate_ClearImplementation(const MonoObject* InMonoObject);
 
-	static void MulticastDelegate_BroadcastImplementation(const void* InAddress, MonoObject** OutValue,
+	static void MulticastDelegate_BroadcastImplementation(const MonoObject* InMonoObject, MonoObject** OutValue,
 	                                                      MonoArray* InValue);
 };

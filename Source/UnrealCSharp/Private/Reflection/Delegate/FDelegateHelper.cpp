@@ -23,6 +23,8 @@ void FDelegateHelper::Deinitialize()
 {
 	if (DelegateHandler != nullptr)
 	{
+		DelegateHandler->Deinitialize();
+		
 		DelegateHandler->RemoveFromRoot();
 
 		DelegateHandler = nullptr;

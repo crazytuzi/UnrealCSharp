@@ -5,8 +5,10 @@
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FCSharpBind.h"
 #include "Registry/FDelegateRegistry.h"
+#include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 
 class FCSharpEnvironment
 {
@@ -76,6 +78,8 @@ public:
 
 	UObject* GetObject(const MonoObject* InMonoObject) const;
 
+	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject) const;
+
 	bool RemoveObjectReference(const UObject* InObject) const;
 
 	bool RemoveObjectReference(const MonoObject* InMonoObject) const;
@@ -98,32 +102,28 @@ public:
 	template <typename T>
 	auto GetContainer(const void* InAddress) const;
 
-	MonoObject* GetContainerObject(const void* InContainer) const;
+	MonoObject* GetContainerObject(const void* InAddress) const;
 
 	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject) const;
 
-	bool AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const;
+	bool AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
+	                           MonoObject* InMonoObject) const;
 
-	template <typename T>
-	auto RemoveContainerReference(const MonoObject* InMonoObject) const;
+	bool RemoveContainerReference(const MonoObject* InMonoObject) const;
 
-	template <typename T>
-	auto RemoveContainerReference(const void* InContainer) const;
+	bool RemoveContainerReference(const void* InAddress) const;
 
 public:
 	template <typename T>
-	auto GetDelegate(const void* InAddress) const;
+	auto GetDelegate(const MonoObject* InMonoObject) const;
 
-	MonoObject* GetDelegateObject(const void* InDelegate) const;
+	MonoObject* GetDelegateObject(const void* InAddress) const;
 
-	bool AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const;
+	bool AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
+	                          MonoObject* InMonoObject) const;
 
-	template <typename T>
-	auto RemoveDelegateReference(const MonoObject* InMonoObject) const;
-
-	template <typename T>
-	auto RemoveDelegateReference(const void* InDelegate) const;
-
+	bool RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+	
 private:
 	template <typename T, typename U>
 	class TGetAddress
@@ -144,6 +144,11 @@ private:
 		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
 	};
 
+public:
+	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference) const;
+
+	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
+
 private:
 	static FCSharpEnvironment* Environment;
 
@@ -154,6 +159,8 @@ private:
 
 private:
 	FClassRegistry* ClassRegistry;
+
+	FReferenceRegistry* ReferenceRegistry;
 
 	FObjectRegistry* ObjectRegistry;
 

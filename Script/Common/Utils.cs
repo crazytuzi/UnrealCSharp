@@ -9,7 +9,7 @@ namespace Script.Common
         {
             return InType.IsDefined(typeof(IsOverrideAttribute), true);
         }
-        
+
         static Boolean IsOverrideMethod(MethodInfo InMethodInfo)
         {
             return InMethodInfo.IsDefined(typeof(IsOverrideAttribute), true);
@@ -18,7 +18,8 @@ namespace Script.Common
         static string GetPathName(Type InType) =>
             InType.GetCustomAttribute<PathNameAttribute>(true).PathName;
 
-        public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InParam) =>
-            Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InParam));
+        public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments,
+            Object[] InParams) =>
+            Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments), InParams);
     }
 }

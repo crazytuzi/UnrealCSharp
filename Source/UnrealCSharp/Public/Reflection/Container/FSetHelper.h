@@ -1,8 +1,9 @@
 ﻿#pragma once
 
+#include "FContainerHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-class FSetHelper final
+class FSetHelper final : public FContainerHelper
 {
 public:
 	explicit FSetHelper(FProperty* InProperty, void* InData = nullptr);

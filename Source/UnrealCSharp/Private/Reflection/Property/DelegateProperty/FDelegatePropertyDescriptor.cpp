@@ -7,9 +7,9 @@ void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (DelegateProperty != nullptr)
 	{
-		const auto SrcDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDelegateObject(Src);
 
-		if (SrcDelegateHelper == nullptr)
+		if (SrcMonoObject == nullptr)
 		{
 			auto MonoClassName = DelegateProperty->SignatureFunction->GetName();
 
@@ -22,16 +22,18 @@ void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 			const auto DelegateHelper = new FDelegateHelper(static_cast<FScriptDelegate*>(Src),
 			                                                DelegateProperty->SignatureFunction);
 
-			void* Param[1] = {Src};
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
 
-			*Dest = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass, 1, Param);
+			const auto OwnerObject = reinterpret_cast<UObject*>(static_cast<uint8*>(Src) - DelegateProperty->
+				GetOffset_ForInternal());
 
-			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(Src, DelegateHelper,
-			                                                           static_cast<MonoObject*>(*Dest));
+			const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetGarbageCollectionHandle(
+				OwnerObject);
+
+			FCSharpEnvironment::GetEnvironment()->AddDelegateReference(OwnerGarbageCollectionHandle, Src,
+			                                                           DelegateHelper, SrcMonoObject);
 		}
-		else
-		{
-			*Dest = FCSharpEnvironment::GetEnvironment()->GetDelegateObject(SrcDelegateHelper);
-		}
+
+		*Dest = SrcMonoObject;
 	}
 }

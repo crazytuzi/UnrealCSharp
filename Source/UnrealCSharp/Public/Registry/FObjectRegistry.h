@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
 #include "mono/metadata/object-forward.h"
 
 class FObjectRegistry
@@ -23,6 +24,8 @@ public:
 
 	UObject* GetObject(const MonoObject* InMonoObject);
 
+	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject);
+
 public:
 	bool AddReference(UObject* InObject, MonoObject* InMonoObject);
 
@@ -31,7 +34,7 @@ public:
 	bool RemoveReference(const MonoObject* InMonoObject);
 
 private:
-	TMap<MonoObject*, UObject*> MonoObject2ObjectMap;
+	TGarbageCollectionHandleMapping<UObject*> GarbageCollectionHandle2Object;
 
-	TMap<UObject*, MonoObject*> Object2MonoObjectMap;
+	TMap<UObject*, FGarbageCollectionHandle> Object2GarbageCollectionHandleMap;
 };

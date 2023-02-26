@@ -50,7 +50,7 @@ void FArrayImplementation::Array_RegisterImplementation(MonoObject* InMonoObject
 
 void FArrayImplementation::Array_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference<FArrayHelper>(InMonoObject);
+	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(InMonoObject);
 }
 
 int32 FArrayImplementation::Array_GetTypeSizeImplementation(const MonoObject* InMonoObject)

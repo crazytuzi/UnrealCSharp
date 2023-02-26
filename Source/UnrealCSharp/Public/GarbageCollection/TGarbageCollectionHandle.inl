@@ -4,6 +4,12 @@
 #include "Environment/FCSharpEnvironment.h"
 
 template <typename T>
+TGarbageCollectionHandle<T>::TGarbageCollectionHandle():
+	Handle(T())
+{
+}
+
+template <typename T>
 TGarbageCollectionHandle<T>::TGarbageCollectionHandle(const T& InHandle):
 	Handle(InHandle)
 {

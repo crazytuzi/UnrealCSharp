@@ -7,7 +7,7 @@ namespace Script.Common
     {
         public TMap() => MapUtils.Map_Register(this, typeof(TKey), typeof(TValue));
 
-        protected TMap(Type InKeyType, Type InValueType)
+        public TMap(Type InKeyType, Type InValueType)
         {
         }
 

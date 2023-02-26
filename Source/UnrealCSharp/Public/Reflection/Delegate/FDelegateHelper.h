@@ -1,13 +1,14 @@
 ﻿#pragma once
 
+#include "FDelegateBaseHelper.h"
 #include "DelegateHandler.h"
 
-class FDelegateHelper
+class FDelegateHelper final : public FDelegateBaseHelper
 {
 public:
 	FDelegateHelper(FScriptDelegate* InDelegate, UFunction* InSignatureFunction);
 
-	~FDelegateHelper();
+	virtual ~FDelegateHelper() override;
 
 public:
 	void Initialize();

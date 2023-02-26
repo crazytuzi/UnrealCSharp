@@ -4,13 +4,13 @@ using Script.Reflection.Delegate;
 
 namespace Script.Common
 {
-    public class FRefMulticastDelegate : FMulticastDelegateBase
+    public class FRefMulticastDelegate : FDelegateBase
     {
-        public unsafe Boolean IsBound() => MulticastDelegateUtils.MulticastDelegate_IsBound(Address);
+        public Boolean IsBound() => MulticastDelegateUtils.MulticastDelegate_IsBound(this);
 
-        public unsafe void RemoveAll(UObject InObject) =>
-            MulticastDelegateUtils.MulticastDelegate_RemoveAll(Address, InObject);
+        public void RemoveAll(UObject InObject) =>
+            MulticastDelegateUtils.MulticastDelegate_RemoveAll(this, InObject);
 
-        public unsafe void Clear() => MulticastDelegateUtils.MulticastDelegate_Clear(Address);
+        public void Clear() => MulticastDelegateUtils.MulticastDelegate_Clear(this);
     }
 }
