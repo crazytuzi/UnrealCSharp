@@ -18,6 +18,8 @@ public:
 
 	bool operator!=(const TGarbageCollectionHandle& Other) const;
 
+	bool IsValid();
+
 private:
 	T Handle;
 };

@@ -78,8 +78,6 @@ public:
 
 	UObject* GetObject(const MonoObject* InMonoObject) const;
 
-	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject) const;
-
 	bool RemoveObjectReference(const UObject* InObject) const;
 
 	bool RemoveObjectReference(const MonoObject* InMonoObject) const;
@@ -94,6 +92,8 @@ public:
 	bool RemoveStructReference(const void* InStruct) const;
 
 	bool RemoveStructReference(const MonoObject* InMonoObject) const;
+
+	FGarbageCollectionHandle GetGarbageCollectionHandle(void* InAddress, int32 InOffset) const;
 
 public:
 	template <typename T>

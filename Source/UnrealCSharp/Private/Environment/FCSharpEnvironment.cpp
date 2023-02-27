@@ -237,13 +237,6 @@ UObject* FCSharpEnvironment::GetObject(const MonoObject* InMonoObject) const
 	return ObjectRegistry != nullptr ? ObjectRegistry->GetObject(InMonoObject) : nullptr;
 }
 
-FGarbageCollectionHandle FCSharpEnvironment::GetGarbageCollectionHandle(const UObject* InObject) const
-{
-	return ObjectRegistry != nullptr
-		       ? ObjectRegistry->GetGarbageCollectionHandle(InObject)
-		       : FGarbageCollectionHandle();
-}
-
 bool FCSharpEnvironment::RemoveObjectReference(const UObject* InObject) const
 {
 	return ObjectRegistry != nullptr ? ObjectRegistry->RemoveReference(InObject) : false;
@@ -280,6 +273,25 @@ bool FCSharpEnvironment::RemoveStructReference(const void* InStruct) const
 bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InMonoObject) : false;
+}
+
+FGarbageCollectionHandle FCSharpEnvironment::GetGarbageCollectionHandle(void* InAddress, const int32 InOffset) const
+{
+	const auto Owner = static_cast<uint8*>(InAddress) - InOffset;
+
+	auto OwnerGarbageCollectionHandle = ObjectRegistry != nullptr
+		                                    ? ObjectRegistry->GetGarbageCollectionHandle(
+			                                    reinterpret_cast<UObject*>(Owner))
+		                                    : FGarbageCollectionHandle();
+
+	if (!OwnerGarbageCollectionHandle.IsValid())
+	{
+		OwnerGarbageCollectionHandle = StructRegistry != nullptr
+			                               ? StructRegistry->GetGarbageCollectionHandle(Owner)
+			                               : FGarbageCollectionHandle();
+	}
+
+	return OwnerGarbageCollectionHandle;
 }
 
 MonoObject* FCSharpEnvironment::GetContainerObject(const void* InAddress) const
