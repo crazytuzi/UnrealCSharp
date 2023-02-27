@@ -198,11 +198,16 @@ void FCSharpEnvironment::DeleteClassDescriptor(const UStruct* InStruct) const
 	}
 }
 
-FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const UStruct* InStruct,
+FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(UStruct* InStruct,
                                                                const FName& InFunctionName) const
 {
-	const auto FoundClassDescriptor = GetClassDescriptor(InStruct);
+	auto FoundClassDescriptor = GetClassDescriptor(InStruct);
 
+	if(!FoundClassDescriptor)
+	{
+		FoundClassDescriptor = NewClassDescriptor(Domain, InStruct);
+	}
+	
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetFunctionDescriptor(InFunctionName) : nullptr;
 }
 

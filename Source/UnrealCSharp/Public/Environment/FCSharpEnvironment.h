@@ -59,7 +59,7 @@ public:
 
 	void DeleteClassDescriptor(const UStruct* InStruct) const;
 
-	FFunctionDescriptor* GetFunctionDescriptor(const UStruct* InStruct, const FName& InFunctionName) const;
+	FFunctionDescriptor* GetFunctionDescriptor(UStruct* InStruct, const FName& InFunctionName) const;
 
 	FFunctionDescriptor* GetFunctionDescriptor(const FName& InClassName, const FName& InFunctionName) const;
 
