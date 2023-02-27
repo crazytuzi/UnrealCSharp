@@ -91,11 +91,8 @@ MonoObject* FArrayPropertyDescriptor::Object_New(void* InAddress) const
 
 	const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, InAddress);
 
-	const auto OwnerObject = reinterpret_cast<UObject*>(static_cast<uint8*>(InAddress) - ArrayProperty->
-		GetOffset_ForInternal());
-
-	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->
-		GetGarbageCollectionHandle(OwnerObject);
+	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetGarbageCollectionHandle(
+		InAddress, ArrayProperty->GetOffset_ForInternal());
 
 	FCSharpEnvironment::GetEnvironment()->AddContainerReference(OwnerGarbageCollectionHandle, InAddress, ArrayHelper,
 	                                                            Object);

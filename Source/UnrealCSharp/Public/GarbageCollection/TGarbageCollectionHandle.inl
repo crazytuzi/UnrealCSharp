@@ -38,3 +38,9 @@ bool TGarbageCollectionHandle<T>::operator!=(const TGarbageCollectionHandle& Oth
 {
 	return !(*this == Other);
 }
+
+template <typename T>
+bool TGarbageCollectionHandle<T>::IsValid()
+{
+	return Handle != T();
+}

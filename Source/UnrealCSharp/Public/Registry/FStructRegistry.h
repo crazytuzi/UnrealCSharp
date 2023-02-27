@@ -34,6 +34,8 @@ public:
 
 	void* GetStruct(const MonoObject* InMonoObject);
 
+	FGarbageCollectionHandle GetGarbageCollectionHandle(const void* InStruct);
+
 public:
 	bool AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject, bool bNeedFree = true);
 

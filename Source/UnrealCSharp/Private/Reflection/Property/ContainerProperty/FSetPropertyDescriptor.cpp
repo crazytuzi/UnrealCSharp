@@ -92,11 +92,8 @@ MonoObject* FSetPropertyDescriptor::Object_New(void* InAddress) const
 	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
 		GenericClassMonoClass, 1, &FoundSetReflectionTypeParam);
 
-	const auto OwnerObject = reinterpret_cast<UObject*>(static_cast<uint8*>(InAddress) - SetProperty->
-		GetOffset_ForInternal());
-
-	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->
-		GetGarbageCollectionHandle(OwnerObject);
+	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetGarbageCollectionHandle(
+		InAddress, SetProperty->GetOffset_ForInternal());
 
 	FCSharpEnvironment::GetEnvironment()->AddContainerReference(OwnerGarbageCollectionHandle, InAddress, SetHelper,
 	                                                            Object);
