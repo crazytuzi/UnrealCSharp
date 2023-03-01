@@ -8,7 +8,9 @@
 #include "Reflection/Function/FCSharpInvoker.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 
+#if !WITH_EDITOR
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
+#endif
 
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 {
@@ -19,7 +21,9 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool 
 {
 	if (bNeedMonoClass && !CanBind(InMonoDomain, InStruct))
 	{
+#if !WITH_EDITOR
 		NotOverrideTypes.Add(InStruct);
+#endif
 		
 		return false;
 	}
@@ -271,10 +275,12 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMo
 
 bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct)
 {
+#if !WITH_EDITOR
 	if (NotOverrideTypes.Contains(InStruct))
 	{
 		return false;
 	}
+#endif
 	
 	if (FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(InStruct))
 	{
