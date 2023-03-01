@@ -57,8 +57,10 @@ private:
 
 	static bool IsOverrideMethod(const FMonoDomain* InMonoDomain, MonoReflectionMethod* InMonoReflectionMethod);
 
+#if !WITH_EDITOR
 private:
 	static TSet<TWeakObjectPtr<UStruct>> NotOverrideTypes;
+#endif
 };
 
 #include "FCSharpBind.inl"

@@ -1,4 +1,5 @@
 ﻿#include "Reflection/Property/ObjectProperty/FObjectPropertyDescriptor.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 #include "Environment/FCSharpEnvironment.h"
 
 void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
@@ -7,7 +8,18 @@ void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 	{
 		const auto SrcObject = ObjectProperty->GetObjectPropertyValue(Src);
 
-		const auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(SrcObject);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(SrcObject);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+				FUnrealCSharpFunctionLibrary::GetClassNameSpace(SrcObject->GetClass()),
+				FUnrealCSharpFunctionLibrary::GetFullClass(SrcObject->GetClass()));
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+
+			FCSharpEnvironment::GetEnvironment()->Bind(SrcObject->GetClass(), false);
+		}
 
 		*Dest = SrcMonoObject;
 	}
