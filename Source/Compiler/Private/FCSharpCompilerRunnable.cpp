@@ -104,7 +104,7 @@ void FCSharpCompilerRunnable::Compile()
 	FPlatformFileManager::Get().Get().GetPlatformFile().DeleteFile(*OutFile);
 
 	const auto CompileParam = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-		"%sScript\\Script.csproj /build \"Debug\" /Out %s"
+		"%sScript\\Game\\Game.csproj /build \"Debug\" /Out %s"
 	),
 		*FPaths::ProjectDir(),
 		*OutFile
