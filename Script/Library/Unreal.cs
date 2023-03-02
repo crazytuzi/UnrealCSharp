@@ -36,5 +36,13 @@ namespace Script.Library
 
             return OutValue;
         }
+
+        // @TODO
+        public static T LoadObject<T>(UObject Outer, string Name) where T : UObject
+        {
+            UnrealImplementation.Unreal_LoadObjectImplementation<T>(Outer, Name, out var OutValue);
+
+            return OutValue;
+        }
     }
 }

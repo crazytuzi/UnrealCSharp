@@ -13,4 +13,6 @@ public:
 
 	static void Unreal_DuplicateObjectImplementation(const MonoObject* SourceObject, const MonoObject* Outer,
 	                                                 MonoObject* Name, MonoObject** OutValue);
+
+	static void Unreal_LoadObjectImplementation(const MonoObject* Outer, MonoString* Name, MonoObject** OutValue);
 };
