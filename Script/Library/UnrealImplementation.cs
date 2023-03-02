@@ -13,5 +13,9 @@ namespace Script.Library
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Unreal_NewObjectWithClassNameImplementation<T>(UObject Outer, string Class,
             FName Name, out T OutValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Unreal_DuplicateObjectImplementation<T>(UObject SourceObject, UObject Outer,
+            FName Name, out T OutValue) where T : UObject;
     }
 }

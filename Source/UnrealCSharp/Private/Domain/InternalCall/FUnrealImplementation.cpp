@@ -12,6 +12,8 @@ struct FRegisterUnreal
 			          static_cast<void*>(FUnrealImplementation::Unreal_NewObjectImplementation))
 			.Function("NewObjectWithClassName",
 			          static_cast<void*>(FUnrealImplementation::Unreal_NewObjectWithClassNameImplementation))
+			.Function("DuplicateObject",
+			          static_cast<void*>(FUnrealImplementation::Unreal_DuplicateObjectImplementation))
 
 			.Register();
 	}
@@ -47,6 +49,22 @@ void FUnrealImplementation::Unreal_NewObjectWithClassNameImplementation(const Mo
 		FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(Name,nullptr))));
 
 	const auto Object = NewObject<UObject>(ObjectOuter, ObjectClass, ObjectName);
+
+	*OutValue = FCSharpEnvironment::GetEnvironment()->GetObject(Object);
+}
+
+void FUnrealImplementation::Unreal_DuplicateObjectImplementation(const MonoObject* SourceObject,
+                                                                 const MonoObject* Outer, MonoObject* Name,
+                                                                 MonoObject** OutValue)
+{
+	const auto ObjectSourceObject = FCSharpEnvironment::GetEnvironment()->GetObject(SourceObject);
+
+	const auto ObjectOuter = FCSharpEnvironment::GetEnvironment()->GetObject(Outer);
+
+	const auto ObjectName = FName(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(Name,nullptr))));
+
+	const auto Object = DuplicateObject<UObject>(ObjectSourceObject, ObjectOuter, ObjectName);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment()->GetObject(Object);
 }

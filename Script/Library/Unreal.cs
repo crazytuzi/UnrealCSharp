@@ -29,5 +29,12 @@ namespace Script.Library
 
             return OutValue;
         }
+
+        public static T DuplicateObject<T>(UObject SourceObject, UObject Outer, FName Name) where T : UObject
+        {
+            UnrealImplementation.Unreal_DuplicateObjectImplementation<T>(SourceObject, Outer, Name, out var OutValue);
+
+            return OutValue;
+        }
     }
 }
