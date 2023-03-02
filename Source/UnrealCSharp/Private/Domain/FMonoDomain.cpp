@@ -2,6 +2,7 @@
 #include "Binding/FBinding.h"
 #include "Domain/InternalCall/FMonoInternalCall.h"
 #include "Log/FMonoLog.h"
+#include "UnrealCSharpSettings.h"
 #include "Macro/NamespaceMacro.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
@@ -9,6 +10,7 @@
 #include "mono/metadata/assembly.h"
 #include "mono/utils/mono-logger.h"
 #include "mono/metadata/mono-gc.h"
+#include "mono/metadata/mono-debug.h"
 
 MonoDomain* FMonoDomain::RootDomain = nullptr;
 
@@ -43,7 +45,19 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 #else
 		mono_set_dirs("Mono/lib", "Mono/etc");
 #endif
-
+		
+		const auto& Settings = *GetDefault<UnrealCSharpSettings>();
+		if (Settings.bDebug)
+		{
+			const auto debug_cfg = FString::Printf(
+				TEXT("--debugger-agent=transport=dt_socket,server=y,address=%s:%d"), *Settings.IP, Settings.uPort);
+			char* options[] = {
+				"--soft-breakpoints",
+				TCHAR_TO_ANSI(*debug_cfg)
+			}; // 参数
+			mono_jit_parse_options(sizeof(options) / sizeof(char*), options);
+			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		}
 		RootDomain = mono_jit_init(nullptr);
 	}
 

@@ -40,6 +40,7 @@ public class UnrealCSharp : ModuleRules
 				"Slate",
 				"SlateCore", 
 				"UnrealCSharpCore",
+				"UnrealCSharpEditor",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

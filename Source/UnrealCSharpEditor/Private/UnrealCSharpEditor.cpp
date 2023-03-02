@@ -7,10 +7,12 @@
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
 #include "FSolutionGenerator.h"
+#include "ISettingsModule.h"
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Misc/MessageDialog.h"
 #include "ToolMenus.h"
+#include "UnrealCSharpSettings.h"
 
 static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 
@@ -22,7 +24,7 @@ void FUnrealCSharpEditorModule::StartupModule()
 	
 	FUnrealCSharpEditorStyle::Initialize();
 	FUnrealCSharpEditorStyle::ReloadTextures();
-
+	RegisterSettings();
 	FUnrealCSharpEditorCommands::Register();
 	
 	PluginCommands = MakeShareable(new FUICommandList);
@@ -93,6 +95,28 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 	}
 }
 
+void FUnrealCSharpEditorModule::RegisterSettings()
+{
+	#if WITH_EDITOR
+	ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+	if (!SettingsModule)
+		return;
+
+	const auto Section = SettingsModule->RegisterSettings("Project", "Plugins", "UnrealCSharp",
+														  LOCTEXT("UnrealCSharpEditorSettingsName", "UnrealCSharp"),
+														  LOCTEXT("UnrealCSharpEditorSettingsDescription", "UnrealCSharp Runtime Settings"),
+														  GetMutableDefault<UnrealCSharpSettings>());
+	// Section->OnModified().BindRaw(this, &FUnrealCSharpModule::OnSettingsModified);
+	#endif
+
+#if ENGINE_MAJOR_VERSION >=5 && !WITH_EDITOR
+	// UE5下打包后没有从{PROJECT}/Config/DefaultUnrealCSharp.ini加载，这里强制刷新一下
+	FString UnrealCSharpIni = TEXT("UnrealCSharp");
+	GConfig->LoadGlobalIniFile(UnrealCSharpIni, *UnrealCSharpIni, nullptr, true);
+	UUnrealCSharpSettings::StaticClass()->GetDefaultObject()->ReloadConfig();
+#endif
+
+}
 #undef LOCTEXT_NAMESPACE
 	
 IMPLEMENT_MODULE(FUnrealCSharpEditorModule, UnrealCSharpEditor)
