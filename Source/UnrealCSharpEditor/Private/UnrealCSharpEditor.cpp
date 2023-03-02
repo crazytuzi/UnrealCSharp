@@ -21,12 +21,12 @@ static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 void FUnrealCSharpEditorModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	
+
 	FUnrealCSharpEditorStyle::Initialize();
 	FUnrealCSharpEditorStyle::ReloadTextures();
 	RegisterSettings();
 	FUnrealCSharpEditorCommands::Register();
-	
+
 	PluginCommands = MakeShareable(new FUICommandList);
 
 	PluginCommands->MapAction(
@@ -34,7 +34,8 @@ void FUnrealCSharpEditorModule::StartupModule()
 		FExecuteAction::CreateRaw(this, &FUnrealCSharpEditorModule::PluginButtonClicked),
 		FCanExecuteAction());
 
-	UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
+	UToolMenus::RegisterStartupCallback(
+		FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
 }
 
 void FUnrealCSharpEditorModule::ShutdownModule()
@@ -88,7 +89,8 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 		{
 			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection("Settings");
 			{
-				FToolMenuEntry& Entry = Section.AddEntry(FToolMenuEntry::InitToolBarButton(FUnrealCSharpEditorCommands::Get().PluginAction));
+				FToolMenuEntry& Entry = Section.AddEntry(
+					FToolMenuEntry::InitToolBarButton(FUnrealCSharpEditorCommands::Get().PluginAction));
 				Entry.SetCommandList(PluginCommands);
 			}
 		}
@@ -97,26 +99,25 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 
 void FUnrealCSharpEditorModule::RegisterSettings()
 {
-	#if WITH_EDITOR
+#if WITH_EDITOR
 	ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings");
 	if (!SettingsModule)
 		return;
 
 	const auto Section = SettingsModule->RegisterSettings("Project", "Plugins", "UnrealCSharp",
-														  LOCTEXT("UnrealCSharpEditorSettingsName", "UnrealCSharp"),
-														  LOCTEXT("UnrealCSharpEditorSettingsDescription", "UnrealCSharp Runtime Settings"),
-														  GetMutableDefault<UnrealCSharpSettings>());
-	// Section->OnModified().BindRaw(this, &FUnrealCSharpModule::OnSettingsModified);
-	#endif
+	                                                      LOCTEXT("UnrealCSharpEditorSettingsName", "UnrealCSharp"),
+	                                                      LOCTEXT("UnrealCSharpEditorSettingsDescription",
+	                                                              "UnrealCSharp Runtime Settings"),
+	                                                      GetMutableDefault<UnrealCSharpSettings>());
+#endif
 
 #if ENGINE_MAJOR_VERSION >=5 && !WITH_EDITOR
-	// UE5下打包后没有从{PROJECT}/Config/DefaultUnrealCSharp.ini加载，这里强制刷新一下
+	// UE5强制重载ini
 	FString UnrealCSharpIni = TEXT("UnrealCSharp");
 	GConfig->LoadGlobalIniFile(UnrealCSharpIni, *UnrealCSharpIni, nullptr, true);
 	UUnrealCSharpSettings::StaticClass()->GetDefaultObject()->ReloadConfig();
 #endif
-
 }
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FUnrealCSharpEditorModule, UnrealCSharpEditor)
