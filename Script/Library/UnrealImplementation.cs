@@ -11,11 +11,14 @@ namespace Script.Library
             out T OutValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Unreal_NewObjectWithClassNameImplementation<T>(UObject Outer, string Class,
+        public static extern void Unreal_DuplicateObjectImplementation<T>(UObject SourceObject, UObject Outer,
             FName Name, out T OutValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Unreal_DuplicateObjectImplementation<T>(UObject SourceObject, UObject Outer,
-            FName Name, out T OutValue) where T : UObject;
+        public static extern void Unreal_LoadObjectImplementation<T>(UObject Outer, string Name, out T OutValue)
+            where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Unreal_LoadClassImplementation(UObject Outer, string Name, out UClass OutValue);
     }
 }

@@ -15,8 +15,8 @@ namespace Script.Library
 
         public static T NewObject<T>(UObject Outer) where T : UObject
         {
-            UnrealImplementation.Unreal_NewObjectWithClassNameImplementation<T>(Outer, Utils.GetPathName(typeof(T)), "",
-                out var OutValue);
+            UnrealImplementation.Unreal_NewObjectImplementation<T>(Outer,
+                LoadClass(Outer, Utils.GetPathName(typeof(T))), "", out var OutValue);
 
             return OutValue;
         }
@@ -24,8 +24,8 @@ namespace Script.Library
         // @TODO
         public static T NewObject<T>(UObject Outer, FName Name) where T : UObject
         {
-            UnrealImplementation.Unreal_NewObjectWithClassNameImplementation<T>(Outer, Utils.GetPathName(typeof(T)),
-                Name, out var OutValue);
+            UnrealImplementation.Unreal_NewObjectImplementation<T>(Outer,
+                LoadClass(Outer, Utils.GetPathName(typeof(T))), Name, out var OutValue);
 
             return OutValue;
         }
@@ -33,6 +33,22 @@ namespace Script.Library
         public static T DuplicateObject<T>(UObject SourceObject, UObject Outer, FName Name) where T : UObject
         {
             UnrealImplementation.Unreal_DuplicateObjectImplementation<T>(SourceObject, Outer, Name, out var OutValue);
+
+            return OutValue;
+        }
+
+        // @TODO
+        public static T LoadObject<T>(UObject Outer, string Name) where T : UObject
+        {
+            UnrealImplementation.Unreal_LoadObjectImplementation<T>(Outer, Name, out var OutValue);
+
+            return OutValue;
+        }
+
+        // @TODO
+        public static UClass LoadClass(UObject Outer, string Name)
+        {
+            UnrealImplementation.Unreal_LoadClassImplementation(Outer, Name, out var OutValue);
 
             return OutValue;
         }
