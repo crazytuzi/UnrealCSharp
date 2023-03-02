@@ -15,7 +15,7 @@ namespace Script.Common
             return InMethodInfo.IsDefined(typeof(IsOverrideAttribute), true);
         }
         
-        static string GetPathName(Type InType) =>
+        public static string GetPathName(Type InType) =>
             InType.GetCustomAttribute<PathNameAttribute>(true).PathName;
 
         public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments,
