@@ -71,11 +71,11 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FString ToString()
+        public override string ToString()
         {
             ColorImplementation.Color_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public Boolean InitFromString(FString InSourceString) =>
