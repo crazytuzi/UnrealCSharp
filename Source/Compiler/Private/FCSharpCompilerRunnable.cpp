@@ -107,7 +107,8 @@ void FCSharpCompilerRunnable::Compile()
 		"%sScript\\Game\\Game.csproj /build \"Debug\" /Out %s"
 	),
 		*FPaths::ProjectDir(),
-		*OutFile
+		*OutFile,
+		*FPaths::ProjectDir()
 	));
 
 	void* ReadPipe = nullptr;
@@ -117,7 +118,6 @@ void FCSharpCompilerRunnable::Compile()
 	auto OutProcessID = 0u;
 
 	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
-
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*CompileTool,
 		*CompileParam,
@@ -150,6 +150,41 @@ void FCSharpCompilerRunnable::Compile()
 			FFileHelper::LoadFileToString(Result, *OutFile);
 
 			// @TODO
+		}
+	}
+	Pdb2Mdb();
+}
+
+void FCSharpCompilerRunnable::Pdb2Mdb()
+{
+	// pdb file to mdb file, used for mono remote debugger
+	auto OutProcessID = 0u;
+	void* ReadPipe = nullptr;
+	void* WritePipe = nullptr;
+	
+	const auto MonoExe = L"C:\\Program Files\\Mono\\bin\\mono.exe";
+	const auto Pdb2Mdb = L"C:\\Program Files\\Mono\\lib\\mono\\4.5\\pdb2mdb.exe";
+	const auto Pdb2MdbParams = {
+		FString::Printf( TEXT("\"%s\" %sContent\\Script\\Game.dll"), Pdb2Mdb, *FPaths::ProjectDir()),
+		FString::Printf(TEXT("\"%s\" %sContent\\Script\\UE.dll"), Pdb2Mdb, *FPaths::ProjectDir())
+	};
+	for (auto& Param : Pdb2MdbParams)
+	{
+		auto ProcPdb2Mdb = FPlatformProcess::CreateProc(
+			MonoExe,
+			*Param,
+			false,
+			true,
+			true,
+			&OutProcessID,
+			1,
+			nullptr,
+			WritePipe,
+			ReadPipe);
+
+		while (ProcPdb2Mdb.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+		{
+			FPlatformProcess::Sleep(0.01f);
 		}
 	}
 }

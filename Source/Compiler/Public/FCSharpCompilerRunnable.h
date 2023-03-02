@@ -26,6 +26,7 @@ private:
 
 	static FString GetCompileTool(const FString& ProductLineVersion = FString("2019"));
 
+	static void Pdb2Mdb();
 private:
 	static FString CompileTool;
 
