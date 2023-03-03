@@ -73,13 +73,13 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 			ModuleName = ModuleName.Left(Index);
 		}
 	}
-	
+
 	TArray<FString> Splits;
-	
+
 	ModuleName.ParseIntoArray(Splits, TEXT("/"));
-	
+
 	FNameEncode::Encode(Splits);
-	
+
 	ModuleName = FString::Join(Splits, TEXT("."));
 
 	return FString::Printf(TEXT(
