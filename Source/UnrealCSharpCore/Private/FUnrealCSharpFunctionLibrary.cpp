@@ -1,6 +1,7 @@
 ﻿#include "FUnrealCSharpFunctionLibrary.h"
 #include "Macro.h"
 #include "Misc/FileHelper.h"
+#include "NameEncode.h"
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
@@ -35,19 +36,19 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 		return TEXT("");
 	}
 
-	return FString::Printf(TEXT(
+	return FNameEncode::Encode(FString::Printf(TEXT(
 		"%s%s"
 	),
 	                       InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""),
-	                       *InStruct->GetName());
+	                       *InStruct->GetName()));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
 {
-	return FString::Printf(TEXT(
+	return FNameEncode::Encode(FString::Printf(TEXT(
 		"I%s"
 	),
-	                       *GetFullClass(InStruct).RightChop(1));
+	                       *GetFullClass(InStruct).RightChop(1)));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
@@ -73,11 +74,19 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 		}
 	}
 
+	TArray<FString> Splits;
+
+	ModuleName.ParseIntoArray(Splits, TEXT("/"));
+
+	FNameEncode::Encode(Splits);
+
+	ModuleName = FString::Join(Splits, TEXT("."));
+
 	return FString::Printf(TEXT(
-		"%s%s"
+		"%s.%s"
 	),
 	                       TEXT("Script"),
-	                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
+	                       *ModuleName);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullClass(const FDelegateProperty* InDelegateProperty)
