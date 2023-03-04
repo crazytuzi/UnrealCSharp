@@ -229,11 +229,11 @@ namespace Script.CoreUObject
         public Boolean ContainsNaN() =>
             QuatImplementation.Quat_ContainsNaNImplementation(this);
 
-        public FString ToString()
+        public override string ToString()
         {
             QuatImplementation.Quat_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public Boolean InitFromString(FString InSourceString) =>

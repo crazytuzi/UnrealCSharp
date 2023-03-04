@@ -101,11 +101,11 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FString ToString()
+        public override string ToString()
         {
             Box2DImplementation.Box2D_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
     }
 }

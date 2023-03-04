@@ -249,11 +249,11 @@ namespace Script.CoreUObject
         // @TOOD
         // Mirror
 
-        public FString ToString()
+        public override string ToString()
         {
             MatrixImplementation.Matrix_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public UInt32 ComputeHash() =>

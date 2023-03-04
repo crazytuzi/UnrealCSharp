@@ -22,11 +22,11 @@ namespace Script.CoreUObject
         public Boolean IsValid() =>
             PrimaryAssetTypeImplementation.PrimaryAssetType_IsValidImplementation(this);
 
-        public FString ToString()
+        public override string ToString()
         {
             PrimaryAssetTypeImplementation.PrimaryAssetType_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         // @TODO

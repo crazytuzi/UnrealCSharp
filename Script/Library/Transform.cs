@@ -16,11 +16,11 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FString ToString()
+        public override string ToString()
         {
             TransformImplementation.Transform_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public Boolean InitFromString(FString InSourceString) =>

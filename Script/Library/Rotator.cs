@@ -149,11 +149,11 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FString ToString()
+        public override string ToString()
         {
             RotatorImplementation.Rotator_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public FString ToCompactString()

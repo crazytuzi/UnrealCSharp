@@ -361,11 +361,11 @@ namespace Script.CoreUObject
         public Boolean ContainsNaN() =>
             VectorImplementation.Vector_ContainsNaNImplementation(this);
 
-        public FString ToString()
+        public override string ToString()
         {
             VectorImplementation.Vector_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public FText ToText()

@@ -127,11 +127,11 @@ namespace Script.CoreUObject
         public Boolean IsZero() =>
             TimespanImplementation.Timespan_IsZeroImplementation(this);
 
-        public FString ToString()
+        public override string ToString()
         {
             TimespanImplementation.Timespan_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         // @TODO
