@@ -92,11 +92,11 @@ namespace Script.CoreUObject
         public Boolean IsUnit3(Single LengthSquaredTolerance) =>
             Vector4Implementation.Vector4_IsUnit3Implementation(this, LengthSquaredTolerance);
 
-        public FString ToString()
+        public override string ToString()
         {
             Vector4Implementation.Vector4_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public Boolean InitFromString(FString InSourceString) =>

@@ -6,11 +6,11 @@ namespace Script.CoreUObject
 {
     public partial class FSoftObjectPath
     {
-        public FString ToString()
+        public override string ToString()
         {
             SoftObjectPathImplementation.SoftObjectPath_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public FName GetAssetPathName()

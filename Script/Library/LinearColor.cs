@@ -187,11 +187,11 @@ namespace Script.CoreUObject
         public Single GetLuminance() =>
             LinearColorImplementation.LinearColor_GetLuminanceImplementation(this);
 
-        public FString ToString()
+        public override string ToString()
         {
             LinearColorImplementation.LinearColor_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public Boolean InitFromString(FString InSourceString) =>

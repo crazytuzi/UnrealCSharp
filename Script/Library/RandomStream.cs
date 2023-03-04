@@ -75,11 +75,11 @@ namespace Script.CoreUObject
         // @TODO
         // ExportTextItem
 
-        public FString ToString()
+        public override string ToString()
         {
             RandomStreamImplementation.RandomStream_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
     }
 }

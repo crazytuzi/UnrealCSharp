@@ -43,11 +43,11 @@ namespace Script.CoreUObject
         public Boolean IsValid() =>
             GuidImplementation.Guid_IsValidImplementation(this);
 
-        public FString ToString()
+        public override string ToString()
         {
             GuidImplementation.Guid_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         // @TODO

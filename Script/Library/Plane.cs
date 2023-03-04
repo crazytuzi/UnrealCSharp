@@ -27,7 +27,7 @@ namespace Script.CoreUObject
             PlaneImplementation.Plane_PlaneDotImplementation(this, P);
 
         // @TODO SMALL_NUMBER
-        public Boolean Normalize(Single Tolerance) =>
+        public new Boolean Normalize(Single Tolerance) =>
             PlaneImplementation.Plane_NormalizeImplementation(this, Tolerance);
 
         public FPlane Flip()

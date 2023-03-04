@@ -25,11 +25,11 @@ namespace Script.CoreUObject
         public Boolean IsValid() =>
             PrimaryAssetIdImplementation.PrimaryAssetId_IsValidImplementation(this);
 
-        public FString ToString()
+        public override string ToString()
         {
             PrimaryAssetIdImplementation.PrimaryAssetId_ToStringImplementation(this, out var OutValue);
 
-            return OutValue;
+            return OutValue.ToString();
         }
 
         public static FPrimaryAssetId FromString(FString String)
