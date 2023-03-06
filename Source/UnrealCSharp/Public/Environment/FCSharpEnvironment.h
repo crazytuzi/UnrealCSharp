@@ -78,6 +78,9 @@ public:
 
 	UObject* GetObject(const MonoObject* InMonoObject) const;
 
+	template <typename T>
+	T* GetObject(const MonoObject* InMonoObject) const;
+
 	bool RemoveObjectReference(const UObject* InObject) const;
 
 	bool RemoveObjectReference(const MonoObject* InMonoObject) const;

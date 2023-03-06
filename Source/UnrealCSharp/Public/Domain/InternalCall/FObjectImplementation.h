@@ -10,4 +10,6 @@ public:
 	static void Object_GetClassImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
 	static void Object_GetNameImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+
+	static void Object_GetWorldImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 };
