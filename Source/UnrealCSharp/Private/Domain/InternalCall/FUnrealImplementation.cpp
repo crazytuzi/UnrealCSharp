@@ -27,7 +27,7 @@ void FUnrealImplementation::Unreal_NewObjectImplementation(const MonoObject* Out
 {
 	const auto ObjectOuter = FCSharpEnvironment::GetEnvironment()->GetObject(Outer);
 
-	const auto ObjectClass = Cast<UClass>(FCSharpEnvironment::GetEnvironment()->GetObject(Class));
+	const auto ObjectClass = FCSharpEnvironment::GetEnvironment()->GetObject<UClass>(Class);
 
 	const auto ObjectName = FName(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
 		FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(Name,nullptr))));

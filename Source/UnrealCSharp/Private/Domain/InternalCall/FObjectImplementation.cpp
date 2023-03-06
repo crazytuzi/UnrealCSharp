@@ -5,9 +5,9 @@
 #include "Macro/NamespaceMacro.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 
-struct FRegisterUObject
+struct FRegisterObject
 {
-	FRegisterUObject()
+	FRegisterObject()
 	{
 		TClassBuilder<UObject>(NAMESPACE_LIBRARY)
 			.Function("StaticClass", static_cast<void*>(FObjectImplementation::Object_StaticClassImplementation))
@@ -18,7 +18,7 @@ struct FRegisterUObject
 	}
 };
 
-static FRegisterUObject RegisterUObject;
+static FRegisterObject RegisterObject;
 
 void FObjectImplementation::Object_StaticClassImplementation(MonoString* InClassName, MonoObject** OutValue)
 {

@@ -22,7 +22,7 @@ static FRegisterUClass RegisterUClass;
 void FClassImplementation::Class_GetClassDefaultObjectImplementation(const MonoObject* InMonoObject,
                                                                      MonoObject** OutValue)
 {
-	if (const auto FoundClass = Cast<UClass>(FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject)))
+	if (const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetObject<UClass>(InMonoObject))
 	{
 		const auto Object = FoundClass->ClassDefaultObject;
 
@@ -46,7 +46,7 @@ void FClassImplementation::Class_GetClassDefaultObjectImplementation(const MonoO
 void FClassImplementation::Class_GetDefaultObjectImplementation(const MonoObject* InMonoObject,
                                                                 const bool bCreateIfNeeded, MonoObject** OutValue)
 {
-	if (const auto FoundClass = Cast<UClass>(FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject)))
+	if (const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetObject<UClass>(InMonoObject))
 	{
 		const auto Object = FoundClass->GetDefaultObject(bCreateIfNeeded);
 

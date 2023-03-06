@@ -86,7 +86,7 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto ReturnValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
 			FoundMonoMethod, SrcMonoObject, nullptr, nullptr);
 
-		const auto SrcClass = Cast<UClass>(FCSharpEnvironment::GetEnvironment()->GetObject(ReturnValue));
+		const auto SrcClass = FCSharpEnvironment::GetEnvironment()->GetObject<UClass>(ReturnValue);
 
 		ClassProperty->SetObjectPropertyValue(Dest, SrcClass);
 	}

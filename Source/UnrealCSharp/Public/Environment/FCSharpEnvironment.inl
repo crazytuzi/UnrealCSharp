@@ -71,6 +71,12 @@ inline void* FCSharpEnvironment::GetAddress<UScriptStruct>(const MonoObject* InM
 }
 
 template <typename T>
+T* FCSharpEnvironment::GetObject(const MonoObject* InMonoObject) const
+{
+	return Cast<T>(GetObject(InMonoObject));
+}
+
+template <typename T>
 auto FCSharpEnvironment::GetContainer(const MonoObject* InMonoObject) const
 {
 	return ContainerRegistry != nullptr ? ContainerRegistry->GetContainer<T>(InMonoObject) : nullptr;

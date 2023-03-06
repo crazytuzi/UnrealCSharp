@@ -22,7 +22,7 @@ static FRegisterSoftClassPath RegisterSoftClassPath;
 void FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForObjectImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto FoundClass = Cast<UClass>(FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject));
+	const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetObject<UClass>(InMonoObject);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FSoftClassPath)),
