@@ -1,5 +1,6 @@
 ﻿using Script.Library;
 using Script.Common;
+using Script.Engine;
 
 namespace Script.CoreUObject
 {
@@ -15,6 +16,13 @@ namespace Script.CoreUObject
         public FString GetName()
         {
             ObjectImplementation.Object_GetNameImplementation(this, out var OutValue);
+
+            return OutValue;
+        }
+
+        public UWorld GetWorld()
+        {
+            ObjectImplementation.Object_GetWorldImplementation(this, out var OutValue);
 
             return OutValue;
         }

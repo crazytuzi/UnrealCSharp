@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using Script.Engine;
 
 namespace Script.Library
 {
@@ -14,5 +15,8 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Object_GetNameImplementation(UObject InObject, out FString OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Object_GetWorldImplementation(UObject InObject, out UWorld OutValue);
     }
 }
