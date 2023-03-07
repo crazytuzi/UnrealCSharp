@@ -113,7 +113,7 @@ void FObjectImplementation::Object_GetWorldImplementation(const MonoObject* InMo
 
 			FCSharpEnvironment::GetEnvironment()->Bind(Class, false);
 
-			FCSharpEnvironment::GetEnvironment()->AddObjectReference(Class, FoundMonoObject);
+			FCSharpEnvironment::GetEnvironment()->AddObjectReference(World, FoundMonoObject);
 		}
 
 		*OutValue = FoundMonoObject;

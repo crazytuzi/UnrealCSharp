@@ -17,3 +17,9 @@ struct TClassName<UClass>
 {
 	static FString Get() { return TEXT("Class"); }
 };
+
+template <>
+struct TClassName<UWorld>
+{
+	static FString Get() { return TEXT("World"); }
+};
