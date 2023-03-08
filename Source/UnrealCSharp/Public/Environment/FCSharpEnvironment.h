@@ -4,6 +4,7 @@
 #include "Registry/FClassRegistry.h"
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FCSharpBind.h"
+#include "Registry/FMultiRegistry.h"
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
@@ -148,6 +149,19 @@ private:
 	};
 
 public:
+	TSubclassOf<UObject> GetMulti(const MonoObject* InMonoObject) const;
+
+	MonoObject* GetMultiObject(const void* InAddress) const;
+
+	bool AddMultiReference(MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass) const;
+
+	bool AddMultiReference(void* InAddress, MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass) const;
+
+	bool RemoveMultiReference(const MonoObject* InMonoObject) const;
+
+	bool RemoveMultiReference(const void* InAddress) const;
+
+public:
 	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference) const;
 
 	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
@@ -172,6 +186,8 @@ private:
 	FContainerRegistry* ContainerRegistry;
 
 	FDelegateRegistry* DelegateRegistry;
+
+	FMultiRegistry* MultiRegistry;
 };
 
 #include "FCSharpEnvironment.inl"

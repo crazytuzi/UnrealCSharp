@@ -39,6 +39,8 @@ void FCSharpEnvironment::Initialize()
 
 	DelegateRegistry = new FDelegateRegistry();
 
+	MultiRegistry = new FMultiRegistry();
+
 	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
 		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
@@ -48,6 +50,13 @@ void FCSharpEnvironment::Deinitialize()
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
 		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+	}
+
+	if (MultiRegistry != nullptr)
+	{
+		delete MultiRegistry;
+
+		MultiRegistry = nullptr;
 	}
 
 	if (DelegateRegistry != nullptr)
@@ -338,6 +347,37 @@ bool FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& In
 bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InGarbageCollectionHandle) : false;
+}
+
+TSubclassOf<UObject> FCSharpEnvironment::GetMulti(const MonoObject* InMonoObject) const
+{
+	return MultiRegistry != nullptr ? MultiRegistry->GetMulti(InMonoObject) : TSubclassOf<UObject>();
+}
+
+MonoObject* FCSharpEnvironment::GetMultiObject(const void* InAddress) const
+{
+	return MultiRegistry != nullptr ? MultiRegistry->GetObject(InAddress) : nullptr;
+}
+
+bool FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass) const
+{
+	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InMonoObject, InClass) : false;
+}
+
+bool FCSharpEnvironment::AddMultiReference(void* InAddress, MonoObject* InMonoObject,
+                                           const TSubclassOf<UObject>& InClass) const
+{
+	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InAddress, InMonoObject, InClass) : false;
+}
+
+bool FCSharpEnvironment::RemoveMultiReference(const MonoObject* InMonoObject) const
+{
+	return MultiRegistry != nullptr ? MultiRegistry->RemoveReference(InMonoObject) : false;
+}
+
+bool FCSharpEnvironment::RemoveMultiReference(const void* InAddress) const
+{
+	return MultiRegistry != nullptr ? MultiRegistry->RemoveReference(InAddress) : false;
 }
 
 bool FCSharpEnvironment::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference) const
