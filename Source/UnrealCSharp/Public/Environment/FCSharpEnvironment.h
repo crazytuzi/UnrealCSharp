@@ -71,16 +71,14 @@ public:
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct) const;
 
 	template <typename T, typename U>
-	U* GetAddress(const MonoObject* InMonoObject) const;
+	auto GetAddress(const MonoObject* InMonoObject) const;
 
 	bool AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const;
 
 	MonoObject* GetObject(const UObject* InObject) const;
 
-	UObject* GetObject(const MonoObject* InMonoObject) const;
-
-	template <typename T>
-	T* GetObject(const MonoObject* InMonoObject) const;
+	template <typename T = UObject>
+	auto GetObject(const MonoObject* InMonoObject) const;
 
 	bool RemoveObjectReference(const UObject* InObject) const;
 
@@ -149,17 +147,23 @@ private:
 	};
 
 public:
-	TSubclassOf<UObject> GetMulti(const MonoObject* InMonoObject) const;
+	template <typename T>
+	auto GetMulti(const MonoObject* InMonoObject) const;
 
-	MonoObject* GetMultiObject(const void* InAddress) const;
+	template <typename T>
+	auto GetMultiObject(const void* InAddress) const;
 
-	bool AddMultiReference(MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass) const;
+	template <typename T>
+	auto AddMultiReference(MonoObject* InMonoObject, const T& InValue) const;
 
-	bool AddMultiReference(void* InAddress, MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass) const;
+	template <typename T>
+	auto AddMultiReference(void* InAddress, MonoObject* InMonoObject, const T& InValue) const;
 
-	bool RemoveMultiReference(const MonoObject* InMonoObject) const;
+	template <typename T>
+	auto RemoveMultiReference(const MonoObject* InMonoObject) const;
 
-	bool RemoveMultiReference(const void* InAddress) const;
+	template <typename T>
+	auto RemoveMultiReference(const void* InAddress) const;
 
 public:
 	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference) const;

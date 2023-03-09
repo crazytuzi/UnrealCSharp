@@ -10,68 +10,14 @@ void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (WeakObjectProperty != nullptr)
 	{
-		const auto FoundWeakObjectPtrMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_WEAK_OBJECT_PTR);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetMultiObject<TWeakObjectPtr<UObject>>(Src);
 
-		const auto FoundWeakObjectPtrMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
-			FoundWeakObjectPtrMonoClass);
-
-		const auto FoundWeakObjectPtrReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-			Type_Get_Object(FoundWeakObjectPtrMonoType);
-
-		const auto FoundGenericMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(WeakObjectProperty->PropertyClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(WeakObjectProperty->PropertyClass));
-
-		const auto FoundGenericMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
-			FoundGenericMonoClass);
-
-		const auto FoundGenericReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
-			FoundGenericMonoType);
-
-		void* InParams[2];
-
-		InParams[0] = FoundWeakObjectPtrReflectionType;
-
-		const auto GenericReflectionTypeMonoArray = FCSharpEnvironment::GetEnvironment()->GetDomain()->Array_New(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Object_Class(), 1);
-
-		ARRAY_SET(GenericReflectionTypeMonoArray, MonoReflectionType*, 0, FoundGenericReflectionType);
-
-		InParams[1] = GenericReflectionTypeMonoArray;
-
-		const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
-
-		const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-			Class_Get_Method_From_Name(UtilsMonoClass, FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
-			                           2);
-
-		const auto GenericClassMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-			CreateGenericTypeMethod, nullptr, InParams, nullptr);
-
-		const auto GenericClassMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Get_Class(
-			GenericClassMonoObject);
-
-		const auto SrcObject = WeakObjectProperty->GetObjectPropertyValue(Src);
-
-		auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(SrcObject);
-
-		if (FoundMonoObject == nullptr)
+		if (SrcMonoObject == nullptr)
 		{
-			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FUnrealCSharpFunctionLibrary::GetClassNameSpace(SrcObject->GetClass()),
-				FUnrealCSharpFunctionLibrary::GetFullClass(SrcObject->GetClass()));
-
-			FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-			FCSharpEnvironment::GetEnvironment()->AddObjectReference(SrcObject, FoundMonoObject);
+			SrcMonoObject = Object_New(Src);
 		}
 
-		auto GenericClassMonoClassParam = static_cast<void*>(FoundMonoObject);
-
-		*Dest = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
-			GenericClassMonoClass, 1, &GenericClassMonoClassParam));
+		*Dest = SrcMonoObject;
 	}
 }
 
@@ -81,16 +27,70 @@ void FWeakObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Get_Class(SrcMonoObject);
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment()->GetMulti<TWeakObjectPtr<UObject>>(SrcMonoObject);
 
-		const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-			SrcMonoClass, FUNCTION_WEAK_OBJECT_PTR_GET, 0);
+		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TWeakObjectPtr<UObject>>(Dest);
 
-		const auto ReturnValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-			FoundMonoMethod, SrcMonoObject, nullptr, nullptr);
+		WeakObjectProperty->SetObjectPropertyValue(Dest, SrcMulti.Get());
 
-		const auto SrcObject = FCSharpEnvironment::GetEnvironment()->GetObject(ReturnValue);
-
-		WeakObjectProperty->SetObjectPropertyValue(Dest, SrcObject);
+		Object_New(Dest);
 	}
+}
+
+MonoObject* FWeakObjectPropertyDescriptor::Object_New(void* InAddress) const
+{
+	const auto SrcObject = WeakObjectProperty->GetObjectPropertyValue(InAddress);
+
+	const auto FoundWeakObjectPtrMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_WEAK_OBJECT_PTR);
+
+	const auto FoundWeakObjectPtrMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
+		FoundWeakObjectPtrMonoClass);
+
+	const auto FoundWeakObjectPtrReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+		Type_Get_Object(FoundWeakObjectPtrMonoType);
+
+	const auto FoundGenericMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(WeakObjectProperty->PropertyClass),
+		FUnrealCSharpFunctionLibrary::GetFullClass(WeakObjectProperty->PropertyClass));
+
+	const auto FoundGenericMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(
+		FoundGenericMonoClass);
+
+	const auto FoundGenericReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
+		FoundGenericMonoType);
+
+	void* InParams[3];
+
+	InParams[0] = FoundWeakObjectPtrReflectionType;
+
+	const auto GenericReflectionTypeMonoArray = FCSharpEnvironment::GetEnvironment()->GetDomain()->Array_New(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Object_Class(), 1);
+
+	ARRAY_SET(GenericReflectionTypeMonoArray, MonoReflectionType*, 0, FoundGenericReflectionType);
+
+	InParams[1] = GenericReflectionTypeMonoArray;
+
+	InParams[2] = FoundWeakObjectPtrReflectionType;
+
+	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
+
+	const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+	                                                                           Class_Get_Method_From_Name(
+		                                                                           UtilsMonoClass,
+		                                                                           FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
+		                                                                           3);
+
+	const auto GenericClassMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+		CreateGenericTypeMethod, nullptr, InParams, nullptr);
+
+	const auto GenericClassMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Get_Class(
+		GenericClassMonoObject);
+
+	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(GenericClassMonoClass);
+
+	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TWeakObjectPtr<UObject>>(InAddress, Object, SrcObject);
+
+	return Object;
 }

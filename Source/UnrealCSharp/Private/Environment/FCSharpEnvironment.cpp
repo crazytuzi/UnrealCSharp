@@ -241,11 +241,6 @@ MonoObject* FCSharpEnvironment::GetObject(const UObject* InObject) const
 	return ObjectRegistry != nullptr ? ObjectRegistry->GetObject(InObject) : nullptr;
 }
 
-UObject* FCSharpEnvironment::GetObject(const MonoObject* InMonoObject) const
-{
-	return ObjectRegistry != nullptr ? ObjectRegistry->GetObject(InMonoObject) : nullptr;
-}
-
 bool FCSharpEnvironment::RemoveObjectReference(const UObject* InObject) const
 {
 	return ObjectRegistry != nullptr ? ObjectRegistry->RemoveReference(InObject) : false;
@@ -347,37 +342,6 @@ bool FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& In
 bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InGarbageCollectionHandle) : false;
-}
-
-TSubclassOf<UObject> FCSharpEnvironment::GetMulti(const MonoObject* InMonoObject) const
-{
-	return MultiRegistry != nullptr ? MultiRegistry->GetMulti(InMonoObject) : TSubclassOf<UObject>();
-}
-
-MonoObject* FCSharpEnvironment::GetMultiObject(const void* InAddress) const
-{
-	return MultiRegistry != nullptr ? MultiRegistry->GetObject(InAddress) : nullptr;
-}
-
-bool FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass) const
-{
-	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InMonoObject, InClass) : false;
-}
-
-bool FCSharpEnvironment::AddMultiReference(void* InAddress, MonoObject* InMonoObject,
-                                           const TSubclassOf<UObject>& InClass) const
-{
-	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InAddress, InMonoObject, InClass) : false;
-}
-
-bool FCSharpEnvironment::RemoveMultiReference(const MonoObject* InMonoObject) const
-{
-	return MultiRegistry != nullptr ? MultiRegistry->RemoveReference(InMonoObject) : false;
-}
-
-bool FCSharpEnvironment::RemoveMultiReference(const void* InAddress) const
-{
-	return MultiRegistry != nullptr ? MultiRegistry->RemoveReference(InAddress) : false;
 }
 
 bool FCSharpEnvironment::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference) const

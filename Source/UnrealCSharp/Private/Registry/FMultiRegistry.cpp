@@ -21,32 +21,18 @@ void FMultiRegistry::Deinitialize()
 	SubclassOfAddress2GarbageCollectionHandle.Empty();
 }
 
-TSubclassOf<UObject> FMultiRegistry::GetMulti(const MonoObject* InMonoObject)
-{
-	const auto FoundSubclassOfAddress = GarbageCollectionHandle2SubclassOfAddress.Find(InMonoObject);
-
-	return FoundSubclassOfAddress != nullptr ? FoundSubclassOfAddress->Class : TSubclassOf<UObject>();
-}
-
-MonoObject* FMultiRegistry::GetObject(const void* InAddress) const
-{
-	const auto FoundGarbageCollectionHandle = SubclassOfAddress2GarbageCollectionHandle.Find(InAddress);
-
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
-}
-
-bool FMultiRegistry::AddReference(MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass)
+bool FMultiRegistry::AddReference(MonoObject* InMonoObject, const FSubclassOfAddress::Type& InValue)
 {
 	const auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
 		InMonoObject, true);
 
 	GarbageCollectionHandle2SubclassOfAddress.Emplace(GarbageCollectionHandle,
-	                                                  FSubclassOfAddress{nullptr, InClass});
+	                                                  FSubclassOfAddress{nullptr, InValue});
 
 	return true;
 }
 
-bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass)
+bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, const FSubclassOfAddress::Type& InValue)
 {
 	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
 		InMonoObject, true);
@@ -54,38 +40,31 @@ bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, con
 	SubclassOfAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
 
 	GarbageCollectionHandle2SubclassOfAddress.Emplace(GarbageCollectionHandle,
-	                                                  FSubclassOfAddress{InAddress, InClass});
+	                                                  FSubclassOfAddress{InAddress, InValue});
 
 	return true;
 }
 
-bool FMultiRegistry::RemoveReference(const MonoObject* InMonoObject)
+bool FMultiRegistry::AddReference(MonoObject* InMonoObject, const FWeakObjectPtrAddress::Type& InValue)
 {
-	if (const auto FoundSubclassOfAddress = GarbageCollectionHandle2SubclassOfAddress.Find(InMonoObject))
-	{
-		SubclassOfAddress2GarbageCollectionHandle.Remove(FoundSubclassOfAddress->Address);
+	const auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
 
-		GarbageCollectionHandle2SubclassOfAddress.Remove(InMonoObject);
+	GarbageCollectionHandle2WeakObjectPtrAddress.Emplace(GarbageCollectionHandle,
+	                                                     FWeakObjectPtrAddress{nullptr, InValue});
 
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
-bool FMultiRegistry::RemoveReference(const void* InAddress)
+bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, const FWeakObjectPtrAddress::Type& InValue)
 {
-	for (const auto& Pair : SubclassOfAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InAddress)
-		{
-			SubclassOfAddress2GarbageCollectionHandle.Remove(Pair.Key);
+	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
 
-			GarbageCollectionHandle2SubclassOfAddress.Remove(Pair.Value);
+	WeakObjectPtrAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
 
-			return true;
-		}
-	}
+	GarbageCollectionHandle2WeakObjectPtrAddress.Emplace(GarbageCollectionHandle,
+	                                                     FWeakObjectPtrAddress{InAddress, InValue});
 
-	return false;
+	return true;
 }
