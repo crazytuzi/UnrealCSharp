@@ -1,4 +1,5 @@
 ﻿using Script.CoreUObject;
+using Script.Library;
 
 namespace Script.Common
 {
@@ -8,10 +9,18 @@ namespace Script.Common
         {
         }
 
-        public TWeakObjectPtr(T InObject) => Value = InObject;
+        ~TWeakObjectPtr() => WeakObjectPtrImplementation.WeakObjectPtr_UnRegisterImplementation(this);
 
-        public T Get() => Value;
+        public TWeakObjectPtr(T InObject) =>
+            WeakObjectPtrImplementation.WeakObjectPtr_RegisterImplementation(this, InObject);
 
-        private readonly T Value;
+        public static implicit operator TWeakObjectPtr<T>(T InObject) => new TWeakObjectPtr<T>(InObject);
+
+        public T Get()
+        {
+            WeakObjectPtrImplementation.WeakObjectPtr_GetImplementation(this, out var OutValue);
+
+            return OutValue;
+        }
     }
 }

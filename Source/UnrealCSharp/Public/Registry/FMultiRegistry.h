@@ -6,12 +6,19 @@
 class FMultiRegistry
 {
 public:
-	struct FSubclassOfAddress
+	template <typename T>
+	struct TMultiAddress
 	{
+		typedef T Type;
+
 		void* Address;
 
-		TSubclassOf<UObject> Class;
+		Type Value;
 	};
+
+	typedef TMultiAddress<TSubclassOf<UObject>> FSubclassOfAddress;
+
+	typedef TMultiAddress<TWeakObjectPtr<UObject>> FWeakObjectPtrAddress;
 
 public:
 	FMultiRegistry();
@@ -24,21 +31,35 @@ public:
 	void Deinitialize();
 
 public:
-	TSubclassOf<UObject> GetMulti(const MonoObject* InMonoObject);
+	template <typename T>
+	auto GetMulti(const MonoObject* InMonoObject);
 
-	MonoObject* GetObject(const void* InAddress) const;
+	template <typename T>
+	auto GetObject(const void* InAddress) const;
 
 public:
-	bool AddReference(MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass);
+	bool AddReference(MonoObject* InMonoObject, const FSubclassOfAddress::Type& InValue);
 
-	bool AddReference(void* InAddress, MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass);
+	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FSubclassOfAddress::Type& InValue);
 
-	bool RemoveReference(const MonoObject* InMonoObject);
+	bool AddReference(MonoObject* InMonoObject, const FWeakObjectPtrAddress::Type& InValue);
 
-	bool RemoveReference(const void* InAddress);
+	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FWeakObjectPtrAddress::Type& InValue);
+
+	template <typename T>
+	auto RemoveReference(const MonoObject* InMonoObject);
+
+	template <typename T>
+	auto RemoveReference(const void* InAddress);
 
 private:
 	TGarbageCollectionHandleMapping<FSubclassOfAddress> GarbageCollectionHandle2SubclassOfAddress;
 
 	TMap<void*, FGarbageCollectionHandle> SubclassOfAddress2GarbageCollectionHandle;
+
+	TGarbageCollectionHandleMapping<FWeakObjectPtrAddress> GarbageCollectionHandle2WeakObjectPtrAddress;
+
+	TMap<void*, FGarbageCollectionHandle> WeakObjectPtrAddress2GarbageCollectionHandle;
 };
+
+#include "FMultiRegistry.inl"
