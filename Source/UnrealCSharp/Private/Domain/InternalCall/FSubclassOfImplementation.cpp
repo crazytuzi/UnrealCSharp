@@ -2,6 +2,7 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
+#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterSubclassOf
 {
@@ -12,6 +13,8 @@ struct FRegisterSubclassOf
 			          static_cast<void*>(FSubclassOfImplementation::SubclassOf_RegisterImplementation))
 			.Function("UnRegister",
 			          static_cast<void*>(FSubclassOfImplementation::SubclassOf_UnRegisterImplementation))
+			.Function("Get",
+			          static_cast<void*>(FSubclassOfImplementation::SubclassOf_GetImplementation))
 			.Register();
 	}
 };
@@ -28,4 +31,27 @@ void FSubclassOfImplementation::SubclassOf_RegisterImplementation(MonoObject* In
 void FSubclassOfImplementation::SubclassOf_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
 	FCSharpEnvironment::GetEnvironment()->RemoveMultiReference(InMonoObject);
+}
+
+void FSubclassOfImplementation::SubclassOf_GetImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+{
+	const auto Multi = FCSharpEnvironment::GetEnvironment()->GetMulti(InMonoObject);
+
+	auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(Multi);
+
+	if (FoundMonoObject == nullptr)
+	{
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()),
+			FUnrealCSharpFunctionLibrary::GetFullClass(UClass::StaticClass()));
+
+		FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+
+		// @TODO	
+		FCSharpEnvironment::GetEnvironment()->Bind(UClass::StaticClass(), false);
+
+		FCSharpEnvironment::GetEnvironment()->AddObjectReference(Multi, FoundMonoObject);
+	}
+
+	*OutValue = FoundMonoObject;
 }

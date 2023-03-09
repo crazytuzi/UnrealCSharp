@@ -88,22 +88,7 @@ MonoObject* FClassPropertyDescriptor::Object_New(void* InAddress) const
 	const auto GenericClassMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Get_Class(
 		GenericClassMonoObject);
 
-	const auto SrcMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(SrcClass),
-		FUnrealCSharpFunctionLibrary::GetFullClass(SrcClass));
-
-	const auto StaticClassMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-	                                                                         Class_Get_Method_From_Name(
-		                                                                         SrcMonoClass, FUNCTION_STATIC_CLASS,
-		                                                                         0);
-
-	const auto ReturnValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-		StaticClassMonoMethod, nullptr, nullptr, nullptr);
-
-	auto GenericClassMonoClassParam = static_cast<void*>(ReturnValue);
-
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
-		GenericClassMonoClass, 1, &GenericClassMonoClassParam);
+	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(GenericClassMonoClass);
 
 	FCSharpEnvironment::GetEnvironment()->AddMultiReference(InAddress, Object, SrcClass);
 
