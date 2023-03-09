@@ -12,5 +12,9 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SubclassOf_UnRegisterImplementation<T>(TSubclassOf<T> InSubclassOf) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SubclassOf_GetImplementation<T>(TSubclassOf<T> InSubclassOf, out UClass OutValue)
+            where T : UObject;
     }
 }

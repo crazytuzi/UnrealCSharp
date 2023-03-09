@@ -1,4 +1,5 @@
-﻿using Script.CoreUObject;
+﻿using System;
+using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Common
@@ -11,19 +12,15 @@ namespace Script.Common
 
         ~TSubclassOf() => SubclassOfImplementation.SubclassOf_UnRegisterImplementation(this);
 
-        public TSubclassOf(UClass InClass) => Value = InClass;
+        public TSubclassOf(UClass InClass) => SubclassOfImplementation.SubclassOf_RegisterImplementation(this, InClass);
 
-        public static implicit operator TSubclassOf<T>(UClass InClass)
+        public static implicit operator TSubclassOf<T>(UClass InClass) => new TSubclassOf<T>(InClass);
+
+        public UClass Get()
         {
-            var SubclassOf = new TSubclassOf<T>(InClass);
+            SubclassOfImplementation.SubclassOf_GetImplementation(this, out var OutValue);
 
-            SubclassOfImplementation.SubclassOf_RegisterImplementation(SubclassOf, InClass);
-
-            return SubclassOf;
+            return OutValue;
         }
-
-        public UClass Get() => Value;
-
-        private readonly UClass Value;
     }
 }
