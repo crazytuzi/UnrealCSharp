@@ -38,7 +38,7 @@ MonoObject* FMultiRegistry::GetObject(const void* InAddress) const
 bool FMultiRegistry::AddReference(MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass)
 {
 	const auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
-		InMonoObject, false);
+		InMonoObject, true);
 
 	GarbageCollectionHandle2SubclassOfAddress.Emplace(GarbageCollectionHandle,
 	                                                  FSubclassOfAddress{nullptr, InClass});
@@ -49,7 +49,7 @@ bool FMultiRegistry::AddReference(MonoObject* InMonoObject, const TSubclassOf<UO
 bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, const TSubclassOf<UObject>& InClass)
 {
 	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
-		InMonoObject, false);
+		InMonoObject, true);
 
 	SubclassOfAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
 

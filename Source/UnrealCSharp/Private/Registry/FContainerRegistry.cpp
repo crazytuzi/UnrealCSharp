@@ -50,7 +50,7 @@ MonoObject* FContainerRegistry::GetObject(const void* InAddress)
 bool FContainerRegistry::AddReference(void* InContainer, MonoObject* InMonoObject)
 {
 	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
-		InMonoObject, false);
+		InMonoObject, true);
 
 	ContainerAddress2GarbageCollectionHandle.Emplace(
 		FContainerAddress{nullptr, static_cast<FContainerHelper*>(InContainer)}, GarbageCollectionHandle);
