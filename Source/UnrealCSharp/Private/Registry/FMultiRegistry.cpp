@@ -68,3 +68,27 @@ bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, con
 
 	return true;
 }
+
+bool FMultiRegistry::AddReference(MonoObject* InMonoObject, const FLazyObjectPtrAddress::Type& InValue)
+{
+	const auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
+
+	GarbageCollectionHandle2LazyObjectPtrAddress.Emplace(GarbageCollectionHandle,
+	                                                     FLazyObjectPtrAddress{nullptr, InValue});
+
+	return true;
+}
+
+bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, const FLazyObjectPtrAddress::Type& InValue)
+{
+	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
+
+	LazyObjectPtrAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2LazyObjectPtrAddress.Emplace(GarbageCollectionHandle,
+	                                                     FLazyObjectPtrAddress{InAddress, InValue});
+
+	return true;
+}

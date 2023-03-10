@@ -1,4 +1,5 @@
 ﻿using Script.CoreUObject;
+using Script.Library;
 
 namespace Script.Common
 {
@@ -8,10 +9,18 @@ namespace Script.Common
         {
         }
 
-        public TLazyObjectPtr(T InObject) => Value = InObject;
+        ~TLazyObjectPtr() => LazyObjectPtrImplementation.LazyObjectPtr_UnRegisterImplementation(this);
 
-        public T Get() => Value;
+        public TLazyObjectPtr(T InObject) =>
+            LazyObjectPtrImplementation.LazyObjectPtr_RegisterImplementation(this, InObject);
 
-        private readonly T Value;
+        public static implicit operator TLazyObjectPtr<T>(T InObject) => new TLazyObjectPtr<T>(InObject);
+
+        public T Get()
+        {
+            LazyObjectPtrImplementation.LazyObjectPtr_GetImplementation(this, out var OutValue);
+
+            return OutValue;
+        }
     }
 }
