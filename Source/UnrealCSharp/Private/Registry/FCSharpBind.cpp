@@ -19,6 +19,11 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool bNeedMonoClass)
 {
+	if (FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(InStruct))
+	{
+		return true;
+	}
+	
 	if (bNeedMonoClass && !CanBind(InMonoDomain, InStruct))
 	{
 #if !WITH_EDITOR
@@ -282,11 +287,6 @@ bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct)
 	}
 #endif
 	
-	if (FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(InStruct))
-	{
-		return true;
-	}
-
 	if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
 		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))
