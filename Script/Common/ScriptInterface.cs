@@ -1,4 +1,5 @@
 ﻿using Script.CoreUObject;
+using Script.Library;
 
 namespace Script.Common
 {
@@ -8,10 +9,18 @@ namespace Script.Common
         {
         }
 
-        public TScriptInterface(UClass InClass) => Value = InClass;
+        ~TScriptInterface() => ScriptInterfaceImplementation.ScriptInterface_UnRegisterImplementation(this);
 
-        public UClass Get() => Value;
+        public TScriptInterface(T InObject) =>
+            ScriptInterfaceImplementation.ScriptInterface_RegisterImplementation(this, InObject);
 
-        private readonly UClass Value;
+        public static implicit operator TScriptInterface<T>(T InObject) => new TScriptInterface<T>(InObject);
+
+        public U GetObject<U>() where U : UObject
+        {
+            ScriptInterfaceImplementation.ScriptInterface_GetObjectImplementation<T, U>(this, out var OutValue);
+
+            return OutValue;
+        }
     }
 }

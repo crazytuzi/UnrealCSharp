@@ -116,3 +116,28 @@ bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, con
 
 	return true;
 }
+
+bool FMultiRegistry::AddReference(MonoObject* InMonoObject, const FScriptInterfaceAddress::Type& InValue)
+{
+	const auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
+
+	GarbageCollectionHandle2ScriptInterfaceAddress.Emplace(GarbageCollectionHandle,
+	                                                       FScriptInterfaceAddress{nullptr, InValue});
+
+	return true;
+}
+
+bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject,
+                                  const FScriptInterfaceAddress::Type& InValue)
+{
+	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
+
+	ScriptInterfaceAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2ScriptInterfaceAddress.Emplace(GarbageCollectionHandle,
+	                                                       FScriptInterfaceAddress{InAddress, InValue});
+
+	return true;
+}

@@ -107,7 +107,8 @@ auto FCSharpEnvironment::GetMultiObject(const void* InAddress) const
 }
 
 template <>
-inline auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject, const TSubclassOf<UObject>& InValue) const
+inline auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject,
+                                                  const TSubclassOf<UObject>& InValue) const
 {
 	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InMonoObject, InValue) : false;
 }
@@ -129,6 +130,13 @@ inline auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject,
 template <>
 inline auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject,
                                                   const TSoftObjectPtr<UObject>& InValue) const
+{
+	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InMonoObject, InValue) : false;
+}
+
+template <>
+inline auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject,
+                                                  const TScriptInterface<IInterface>& InValue) const
 {
 	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InMonoObject, InValue) : false;
 }
@@ -157,6 +165,13 @@ inline auto FCSharpEnvironment::AddMultiReference(void* InAddress, MonoObject* I
 template <>
 inline auto FCSharpEnvironment::AddMultiReference(void* InAddress, MonoObject* InMonoObject,
                                                   const TSoftObjectPtr<UObject>& InValue) const
+{
+	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InAddress, InMonoObject, InValue) : false;
+}
+
+template <>
+inline auto FCSharpEnvironment::AddMultiReference(void* InAddress, MonoObject* InMonoObject,
+                                                  const TScriptInterface<IInterface>& InValue) const
 {
 	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InAddress, InMonoObject, InValue) : false;
 }

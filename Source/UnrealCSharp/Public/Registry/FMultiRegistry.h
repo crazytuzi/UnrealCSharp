@@ -24,6 +24,8 @@ public:
 
 	typedef TMultiAddress<TSoftObjectPtr<UObject>> FSoftObjectPtrAddress;
 
+	typedef TMultiAddress<TScriptInterface<IInterface>> FScriptInterfaceAddress;
+
 public:
 	FMultiRegistry();
 
@@ -58,6 +60,10 @@ public:
 
 	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FSoftObjectPtrAddress::Type& InValue);
 
+	bool AddReference(MonoObject* InMonoObject, const FScriptInterfaceAddress::Type& InValue);
+
+	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FScriptInterfaceAddress::Type& InValue);
+
 	template <typename T>
 	auto RemoveReference(const MonoObject* InMonoObject);
 
@@ -80,6 +86,10 @@ private:
 	TGarbageCollectionHandleMapping<FSoftObjectPtrAddress> GarbageCollectionHandle2SoftObjectPtrAddress;
 
 	TMap<void*, FGarbageCollectionHandle> SoftObjectPtrAddress2GarbageCollectionHandle;
+
+	TGarbageCollectionHandleMapping<FScriptInterfaceAddress> GarbageCollectionHandle2ScriptInterfaceAddress;
+
+	TMap<void*, FGarbageCollectionHandle> ScriptInterfaceAddress2GarbageCollectionHandle;
 };
 
 #include "FMultiRegistry.inl"
