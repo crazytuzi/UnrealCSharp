@@ -92,3 +92,27 @@ bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, con
 
 	return true;
 }
+
+bool FMultiRegistry::AddReference(MonoObject* InMonoObject, const FSoftObjectPtrAddress::Type& InValue)
+{
+	const auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
+
+	GarbageCollectionHandle2SoftObjectPtrAddress.Emplace(GarbageCollectionHandle,
+	                                                     FSoftObjectPtrAddress{nullptr, InValue});
+
+	return true;
+}
+
+bool FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject, const FSoftObjectPtrAddress::Type& InValue)
+{
+	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
+		InMonoObject, true);
+
+	SoftObjectPtrAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2SoftObjectPtrAddress.Emplace(GarbageCollectionHandle,
+	                                                     FSoftObjectPtrAddress{InAddress, InValue});
+
+	return true;
+}

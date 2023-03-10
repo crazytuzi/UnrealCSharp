@@ -22,6 +22,8 @@ public:
 
 	typedef TMultiAddress<TLazyObjectPtr<UObject>> FLazyObjectPtrAddress;
 
+	typedef TMultiAddress<TSoftObjectPtr<UObject>> FSoftObjectPtrAddress;
+
 public:
 	FMultiRegistry();
 
@@ -52,6 +54,10 @@ public:
 
 	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FLazyObjectPtrAddress::Type& InValue);
 
+	bool AddReference(MonoObject* InMonoObject, const FSoftObjectPtrAddress::Type& InValue);
+
+	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FSoftObjectPtrAddress::Type& InValue);
+
 	template <typename T>
 	auto RemoveReference(const MonoObject* InMonoObject);
 
@@ -70,6 +76,10 @@ private:
 	TGarbageCollectionHandleMapping<FLazyObjectPtrAddress> GarbageCollectionHandle2LazyObjectPtrAddress;
 
 	TMap<void*, FGarbageCollectionHandle> LazyObjectPtrAddress2GarbageCollectionHandle;
+
+	TGarbageCollectionHandleMapping<FSoftObjectPtrAddress> GarbageCollectionHandle2SoftObjectPtrAddress;
+
+	TMap<void*, FGarbageCollectionHandle> SoftObjectPtrAddress2GarbageCollectionHandle;
 };
 
 #include "FMultiRegistry.inl"
