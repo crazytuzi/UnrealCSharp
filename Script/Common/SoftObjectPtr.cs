@@ -1,4 +1,5 @@
 ﻿using Script.CoreUObject;
+using Script.Library;
 
 namespace Script.Common
 {
@@ -8,10 +9,18 @@ namespace Script.Common
         {
         }
 
-        public TSoftObjectPtr(T InObject) => Value = InObject;
+        ~TSoftObjectPtr() => SoftObjectPtrImplementation.SoftObjectPtr_UnRegisterImplementation(this);
 
-        public T Get() => Value;
+        public TSoftObjectPtr(T InObject) =>
+            SoftObjectPtrImplementation.SoftObjectPtr_RegisterImplementation(this, InObject);
 
-        private readonly T Value;
+        public static implicit operator TSoftObjectPtr<T>(T InObject) => new TSoftObjectPtr<T>(InObject);
+
+        public T Get()
+        {
+            SoftObjectPtrImplementation.SoftObjectPtr_GetImplementation(this, out var OutValue);
+
+            return OutValue;
+        }
     }
 }
