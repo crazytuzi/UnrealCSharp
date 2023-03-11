@@ -4,6 +4,7 @@
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
 #include "FUnrealCSharpFunctionLibrary.h"
+#include "CrossVersion/Public/UEVersion.h"
 
 struct FRegisterLinearColor
 {
@@ -616,7 +617,11 @@ float FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation(con
 
 	if (LinearColor != nullptr)
 	{
+#if UE_GETLUMINANCE
+		return LinearColor->GetLuminance();
+#else
 		return LinearColor->ComputeLuminance();
+#endif
 	}
 
 	return 0.f;
