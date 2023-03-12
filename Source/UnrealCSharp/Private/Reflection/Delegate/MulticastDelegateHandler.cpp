@@ -6,6 +6,7 @@
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "Template/TGetArrayLength.h"
 
 void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 {
@@ -68,13 +69,13 @@ bool UMulticastDelegateHandler::Contains(MonoObject* InMulticastDelegate) const
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),CLASS_MULTICAST_DELEGATE_UTILS))
 	{
+		void* Params[2];
+
 		if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-			FoundMonoClass,FUNCTION_MULTICAST_DELEGATE_EQUALS, 2))
+			FoundMonoClass, FUNCTION_MULTICAST_DELEGATE_EQUALS, TGetArrayLength(Params)))
 		{
 			for (const auto Delegate : Delegates)
 			{
-				void* Params[2];
-
 				Params[0] = Delegate;
 
 				Params[1] = InMulticastDelegate;
@@ -136,13 +137,13 @@ void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),CLASS_MULTICAST_DELEGATE_UTILS))
 	{
+		void* Params[2];
+
 		if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-			FoundMonoClass,FUNCTION_MULTICAST_DELEGATE_EQUALS, 2))
+			FoundMonoClass, FUNCTION_MULTICAST_DELEGATE_EQUALS, TGetArrayLength(Params)))
 		{
 			for (const auto Delegate : Delegates)
 			{
-				void* Params[2];
-
 				Params[0] = Delegate;
 
 				Params[1] = InMulticastDelegate;
@@ -184,15 +185,14 @@ void UMulticastDelegateHandler::RemoveAll(MonoObject* InObject)
 		if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DELEGATE),CLASS_MULTICAST_DELEGATE_UTILS))
 		{
+			auto Params = static_cast<void*>(Element);
+
 			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-				Class_Get_Method_From_Name(FoundMonoClass,FUNCTION_MULTICAST_DELEGATE_GET_TARGET, 1))
+				Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_MULTICAST_DELEGATE_GET_TARGET,
+				                           TGetArrayLength(Params)))
 			{
-				void* Params[1];
-
-				Params[0] = Element;
-
 				const auto TargetMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-					FoundMonoMethod, nullptr, Params, nullptr);
+					FoundMonoMethod, nullptr, &Params, nullptr);
 
 				return TargetMonoObject == InObject ? true : false;
 			}

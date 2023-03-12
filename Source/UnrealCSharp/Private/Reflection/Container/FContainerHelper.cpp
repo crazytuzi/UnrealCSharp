@@ -5,6 +5,7 @@
 #include "Macro/FunctionMacro.h"
 #include "Macro/NamespaceMacro.h"
 #include "Macro/PropertyMacro.h"
+#include "Template/TGetArrayLength.h"
 
 FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
                                      const FName& InName, const EObjectFlags InObjectFlags)
@@ -61,10 +62,10 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
-	const auto GetPathNameMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-		UtilsMonoClass, FUNCTION_UTILS_GET_PATH_NAME, 1);
-
 	auto InParams = static_cast<void*>(InReflectionType);
+
+	const auto GetPathNameMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+		UtilsMonoClass, FUNCTION_UTILS_GET_PATH_NAME, TGetArrayLength(InParams));
 
 	const auto PathNameMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
 		GetPathNameMonoMethod, nullptr, &InParams, nullptr);
