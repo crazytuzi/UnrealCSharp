@@ -1,5 +1,4 @@
-﻿using System;
-using Script.CoreUObject;
+﻿using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Common
