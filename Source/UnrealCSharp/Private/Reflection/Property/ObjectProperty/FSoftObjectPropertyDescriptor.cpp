@@ -61,7 +61,7 @@ MonoObject* FSoftObjectPropertyDescriptor::Object_New(void* InAddress) const
 	const auto FoundGenericReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
 		FoundGenericMonoType);
 
-	void* InParams[3];
+	void* InParams[2];
 
 	InParams[0] = FoundSoftObjectPtrReflectionType;
 
@@ -71,8 +71,6 @@ MonoObject* FSoftObjectPropertyDescriptor::Object_New(void* InAddress) const
 	ARRAY_SET(GenericReflectionTypeMonoArray, MonoReflectionType*, 0, FoundGenericReflectionType);
 
 	InParams[1] = GenericReflectionTypeMonoArray;
-
-	InParams[2] = FoundSoftObjectPtrReflectionType;
 
 	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
