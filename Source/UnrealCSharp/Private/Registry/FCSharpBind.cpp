@@ -7,6 +7,7 @@
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
 #include "FUnrealCSharpFunctionLibrary.h"
+#include "Template/TGetArrayLength.h"
 
 #if !WITH_EDITOR
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
@@ -429,11 +430,11 @@ bool FCSharpBind::IsOverrideType(const FMonoDomain* InMonoDomain, MonoReflection
 	if (const auto UtilsMonoClass = InMonoDomain->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
 	{
-		if (const auto IsOverrideTypeMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
-			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_TYPE, 1))
-		{
-			auto InParams = static_cast<void*>(InMonoReflectionType);
+		auto InParams = static_cast<void*>(InMonoReflectionType);
 
+		if (const auto IsOverrideTypeMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
+			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_TYPE, TGetArrayLength(InParams)))
+		{
 			if (const auto IsOverrideTypeMonoObject = InMonoDomain->Runtime_Invoke(
 				IsOverrideTypeMonoMethod, nullptr, &InParams, nullptr))
 			{
@@ -455,11 +456,11 @@ bool FCSharpBind::IsOverrideMethod(const FMonoDomain* InMonoDomain, MonoReflecti
 	if (const auto UtilsMonoClass = InMonoDomain->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
 	{
-		if (const auto IsOverrideMethodMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
-			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_METHOD, 1))
-		{
-			auto InParams = static_cast<void*>(InMonoReflectionMethod);
+		auto InParams = static_cast<void*>(InMonoReflectionMethod);
 
+		if (const auto IsOverrideMethodMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
+			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_METHOD, TGetArrayLength(InParams)))
+		{
 			if (const auto IsOverrideMethodMonoObject = InMonoDomain->Runtime_Invoke(
 				IsOverrideMethodMonoMethod, nullptr, &InParams, nullptr))
 			{

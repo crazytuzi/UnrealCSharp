@@ -6,6 +6,7 @@
 #include "Macro/MonoMacro.h"
 #include "Macro/NamespaceMacro.h"
 #include "Reflection/Container/FMapHelper.h"
+#include "Template/TGetArrayLength.h"
 
 void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -85,11 +86,8 @@ MonoObject* FMapPropertyDescriptor::Object_New(void* InAddress) const
 	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
-	const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-	                                                                           Class_Get_Method_From_Name(
-		                                                                           UtilsMonoClass,
-		                                                                           FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
-		                                                                           3);
+	const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+		UtilsMonoClass, FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE, TGetArrayLength(InParams));
 
 	const auto GenericClassMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
 		CreateGenericTypeMethod, nullptr, InParams, nullptr);

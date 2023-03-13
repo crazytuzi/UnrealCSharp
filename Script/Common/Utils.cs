@@ -21,5 +21,8 @@ namespace Script.Common
         public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments,
             Object[] InParams) =>
             Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments), InParams);
+
+        public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments) =>
+            Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments));
     }
 }

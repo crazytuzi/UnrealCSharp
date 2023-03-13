@@ -5,6 +5,7 @@
 #include "Macro/MonoMacro.h"
 #include "Macro/NamespaceMacro.h"
 #include "FUnrealCSharpFunctionLibrary.h"
+#include "Template/TGetArrayLength.h"
 
 void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -60,7 +61,7 @@ MonoObject* FWeakObjectPropertyDescriptor::Object_New(void* InAddress) const
 	const auto FoundGenericReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
 		FoundGenericMonoType);
 
-	void* InParams[3];
+	void* InParams[2];
 
 	InParams[0] = FoundWeakObjectPtrReflectionType;
 
@@ -71,16 +72,11 @@ MonoObject* FWeakObjectPropertyDescriptor::Object_New(void* InAddress) const
 
 	InParams[1] = GenericReflectionTypeMonoArray;
 
-	InParams[2] = FoundWeakObjectPtrReflectionType;
-
 	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
-	const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-	                                                                           Class_Get_Method_From_Name(
-		                                                                           UtilsMonoClass,
-		                                                                           FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE,
-		                                                                           3);
+	const auto CreateGenericTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+		UtilsMonoClass, FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE, TGetArrayLength(InParams));
 
 	const auto GenericClassMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
 		CreateGenericTypeMethod, nullptr, InParams, nullptr);
