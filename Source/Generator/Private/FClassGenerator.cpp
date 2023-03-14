@@ -85,7 +85,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	     PropertyIterator)
 	{
 		FDelegateGenerator::Generator(*PropertyIterator);
-		
+
 		if (bHasProperty == true)
 		{
 			PropertyContent += "\n";
@@ -245,6 +245,37 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		auto FunctionName = FunctionIterator->GetName();
 
+		auto FunctionComment = FunctionIterator->GetMetaData(TEXT("Comment"));
+
+		if (!FunctionComment.IsEmpty())
+		{
+			FunctionComment = FString::Printf(TEXT(
+				"\t\t%s"
+			),
+			                                  *FunctionComment
+			);
+
+			FunctionComment = FunctionComment.Replace(TEXT("\n"), TEXT("\n\t\t"));
+
+			FunctionComment = FunctionComment.Replace(TEXT("\n\t\t\t"), TEXT("\n\t\t"));
+
+			if (FunctionComment.EndsWith(TEXT("\t")))
+			{
+				FunctionComment.RemoveAt(FunctionComment.Len() - 2, 2);
+			}
+			else if (FunctionComment.EndsWith(TEXT("\t\t")))
+			{
+				FunctionComment.RemoveAt(FunctionComment.Len() - 4, 4);
+			}
+
+			if (!FunctionComment.EndsWith(TEXT("\n")))
+			{
+				FunctionComment = FString::Printf(TEXT(
+					"%s\n"
+				), *FunctionComment);
+			}
+		}
+
 		FString FunctionDeclarationBody;
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
@@ -365,9 +396,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionTab = TEXT("\t\t\t");
 
 			FunctionStringFormat = TEXT(
-				"\t\t{0}\n"
+				"{0}"
+				"\t\t{1}\n"
 				"\t\t{\n"
-				"{1}"
+				"{2}"
 				"\t\t}\n"
 			);
 		}
@@ -378,11 +410,12 @@ void FClassGenerator::Generator(const UClass* InClass)
 			UsingNameSpaces.Add(TEXT("IntPtr = Script.Common.IntPtr"));
 
 			FunctionStringFormat = TEXT(
-				"\t\t{0}\n"
+				"{0}"
+				"\t\t{1}\n"
 				"\t\t{\n"
 				"\t\t\tunsafe\n"
 				"\t\t\t{\n"
-				"{1}"
+				"{2}"
 				"\t\t\t}\n"
 				"\t\t}\n"
 			);
@@ -418,7 +451,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 				                                                  *FunctionTab,
 				                                                  *FunctionReturnParamBody));
 
-		FStringFormatOrderedArguments StringFormatArgs{FunctionDeclaration, FunctionImplementationBody};
+		FStringFormatOrderedArguments StringFormatArgs{
+			FunctionComment, FunctionDeclaration, FunctionImplementationBody
+		};
 
 		FunctionContent += FString::Format(*FunctionStringFormat, StringFormatArgs);
 	}
