@@ -1,6 +1,6 @@
 ﻿#include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Bridge/FTypeBridge.h"
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -10,9 +10,7 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 
 		if (SrcMonoObject == nullptr)
 		{
-			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FUnrealCSharpFunctionLibrary::GetClassNameSpace(StructProperty->Struct),
-				FUnrealCSharpFunctionLibrary::GetFullClass(StructProperty->Struct));
+			const auto FoundMonoClass = FTypeBridge::GetMonoClass(StructProperty);
 
 			auto InParams = static_cast<void*>(FoundMonoClass);
 
