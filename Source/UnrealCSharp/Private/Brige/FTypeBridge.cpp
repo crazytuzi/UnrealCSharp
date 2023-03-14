@@ -102,11 +102,6 @@ MonoClass* FTypeBridge::GetMonoClass(FProperty* InProperty)
 		return FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Int64_Class();
 	}
 
-	if (CastField<FInt64Property>(InProperty))
-	{
-		return FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Int64_Class();
-	}
-
 	if (CastField<FBoolProperty>(InProperty))
 	{
 		return FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Boolean_Class();
