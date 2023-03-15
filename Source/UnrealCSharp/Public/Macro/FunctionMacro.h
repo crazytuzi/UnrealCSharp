@@ -20,6 +20,8 @@
 
 #define FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE FString(TEXT("MakeGenericTypeInstance"))
 
+#define FUNCTION_UTILS_GET_GENERIC_ARGUMENTS FString(TEXT("GetGenericArguments"))
+
 #define FUNCTION_STATIC_CLASS FString(TEXT("StaticClass"))
 
 #define FUNCTION_SUB_CLASS_OF_GET FString(TEXT("Get"))

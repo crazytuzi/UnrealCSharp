@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "mono/metadata/object.h"
+#include "mono/metadata/object-forward.h"
 
 class FSetImplementation
 {
 public:
-	static void Set_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
+	static void Set_RegisterImplementation(MonoObject* InMonoObject);
 
 	static void Set_UnRegisterImplementation(const MonoObject* InMonoObject);
 

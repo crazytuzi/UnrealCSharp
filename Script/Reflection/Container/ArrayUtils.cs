@@ -5,8 +5,8 @@ namespace Script.Reflection.Container
 {
     public static class ArrayUtils
     {
-        public static void Array_Register<T>(TArray<T> InArray, Type InType) =>
-            ArrayImplementation.Array_RegisterImplementation(InArray, InType);
+        public static void Array_Register<T>(TArray<T> InArray) =>
+            ArrayImplementation.Array_RegisterImplementation(InArray);
 
         public static void Array_UnRegister<T>(TArray<T> InArray) =>
             ArrayImplementation.Array_UnRegisterImplementation(InArray);

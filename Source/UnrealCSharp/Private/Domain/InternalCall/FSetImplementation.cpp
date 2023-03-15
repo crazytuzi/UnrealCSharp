@@ -3,6 +3,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
 #include "Macro/NamespaceMacro.h"
+#include "Bridge/FTypeBridge.h"
 
 struct FRegisterSet
 {
@@ -22,9 +23,10 @@ struct FRegisterSet
 
 static FRegisterSet RegisterSet;
 
-void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
+void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->Bind<FSetHelper>(InMonoObject, InReflectionType);
+	FCSharpEnvironment::GetEnvironment()->Bind<FSetHelper>(InMonoObject,
+	                                                       FTypeBridge::GetGenericArgument(InMonoObject, 0));
 }
 
 void FSetImplementation::Set_UnRegisterImplementation(const MonoObject* InMonoObject)

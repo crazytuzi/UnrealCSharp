@@ -27,10 +27,11 @@ struct FRegisterMap
 
 static FRegisterMap RegisterMap;
 
-void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
-                                                    MonoReflectionType* InValueReflectionType)
+void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->Bind(InMonoObject, InKeyReflectionType, InValueReflectionType);
+	FCSharpEnvironment::GetEnvironment()->Bind(InMonoObject,
+	                                           FTypeBridge::GetGenericArgument(InMonoObject, 0),
+	                                           FTypeBridge::GetGenericArgument(InMonoObject, 1));
 }
 
 void FMapImplementation::Map_UnRegisterImplementation(const MonoObject* InMonoObject)

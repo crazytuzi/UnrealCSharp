@@ -1,12 +1,11 @@
 ﻿#pragma once
 
-#include "mono/metadata/object.h"
+#include "mono/metadata/object-forward.h"
 
 class FMapImplementation
 {
 public:
-	static void Map_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
-	                                       MonoReflectionType* InValueReflectionType);
+	static void Map_RegisterImplementation(MonoObject* InMonoObject);
 
 	static void Map_UnRegisterImplementation(const MonoObject* InMonoObject);
 

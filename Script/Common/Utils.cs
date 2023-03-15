@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Script.Common
 {
-    public class Utils
+    public static class Utils
     {
         static Boolean IsOverrideType(Type InType)
         {
@@ -24,5 +24,10 @@ namespace Script.Common
 
         public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments) =>
             Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments));
+
+        public static Type[] GetGenericArguments(Type InType)
+        {
+            return InType.GetGenericArguments();
+        }
     }
 }

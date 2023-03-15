@@ -5,8 +5,8 @@ namespace Script.Reflection.Container
 {
     public static class SetUtils
     {
-        public static void Set_Register<T>(TSet<T> InSet, Type InType) =>
-            SetImplementation.Set_RegisterImplementation(InSet, InType);
+        public static void Set_Register<T>(TSet<T> InSet) =>
+            SetImplementation.Set_RegisterImplementation(InSet);
 
         public static void Set_UnRegister<T>(TSet<T> InSet) =>
             SetImplementation.Set_UnRegisterImplementation(InSet);

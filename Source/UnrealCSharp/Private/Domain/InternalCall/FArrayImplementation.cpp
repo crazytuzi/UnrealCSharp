@@ -43,9 +43,10 @@ struct FRegisterArray
 
 static FRegisterArray RegisterArray;
 
-void FArrayImplementation::Array_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
+void FArrayImplementation::Array_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->Bind<FArrayHelper>(InMonoObject, InReflectionType);
+	FCSharpEnvironment::GetEnvironment()->Bind<FArrayHelper>(InMonoObject,
+	                                                         FTypeBridge::GetGenericArgument(InMonoObject, 0));
 }
 
 void FArrayImplementation::Array_UnRegisterImplementation(const MonoObject* InMonoObject)
