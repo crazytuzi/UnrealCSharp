@@ -5,10 +5,6 @@ class FGeneratorCore
 public:
 	static FString GetPathNameAttribute(const UField* InField);
 
-	static FString GetFullClass(const UEnum* InEnum);
-
-	static FString GetClassNameSpace(const UEnum* InStruct);
-
 	static FString GetPropertyType(FProperty* Property);
 
 	static TSet<FString> GetPropertyTypeNameSpace(FProperty* Property);

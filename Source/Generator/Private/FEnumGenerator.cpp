@@ -24,11 +24,11 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	FString UsingNameSpaceContent;
 
-	const auto NameSpaceContent = FGeneratorCore::GetClassNameSpace(InEnum);
+	const auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum);
 
 	const auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InEnum);
 
-	const auto FullClassContent = FGeneratorCore::GetFullClass(InEnum);
+	const auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InEnum);
 
 	FString EnumeratorContent;
 

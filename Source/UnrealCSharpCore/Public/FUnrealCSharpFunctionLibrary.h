@@ -13,6 +13,10 @@ public:
 
 	static FString GetClassNameSpace(const UStruct* InStruct);
 
+	static FString GetFullClass(const UEnum* InEnum);
+
+	static FString GetClassNameSpace(const UEnum* InStruct);
+
 	static FString GetFullClass(const FDelegateProperty* InDelegateProperty);
 
 	static FString GetClassNameSpace(const FDelegateProperty* InDelegateProperty);

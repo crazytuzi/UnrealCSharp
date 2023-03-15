@@ -8,10 +8,6 @@
 
 #define CLASS_OBJECT_LIST FString(TEXT("ObjectList"))
 
-#define CLASS_U_OBJECT FString(TEXT("UObject"))
-
-#define CLASS_U_STRUCT FString(TEXT("UStruct"))
-
 #define CLASS_F_STRING FString(TEXT("FString"))
 
 #define CLASS_F_NAME FString(TEXT("FName"))

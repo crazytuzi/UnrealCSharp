@@ -89,6 +89,37 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 	                       *ModuleName);
 }
 
+FString FUnrealCSharpFunctionLibrary::GetFullClass(const UEnum* InEnum)
+{
+	if (InEnum == nullptr)
+	{
+		return TEXT("");
+	}
+
+	return InEnum->GetName();
+}
+
+FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InStruct)
+{
+	if (InStruct == nullptr)
+	{
+		return "";
+	}
+
+	FString ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
+
+	if (InStruct->IsNative())
+	{
+		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
+	}
+
+	return FString::Printf(TEXT(
+		"%s%s"
+	),
+	                       TEXT("Script"),
+	                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
+}
+
 FString FUnrealCSharpFunctionLibrary::GetFullClass(const FDelegateProperty* InDelegateProperty)
 {
 	if (InDelegateProperty == nullptr)
