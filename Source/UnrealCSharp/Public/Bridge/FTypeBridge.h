@@ -5,7 +5,7 @@
 class FTypeBridge
 {
 public:
-	static EPropertyType GetPropertyType(MonoClass* InMonoClass);
+	static EPropertyType GetPropertyType(MonoReflectionType* InReflectionType);
 
 	static MonoClass* GetMonoClass(FProperty* InProperty);
 
@@ -44,13 +44,21 @@ public:
 	static MonoClass* GetMonoClass(const FSetProperty* InProperty);
 
 public:
-	static MonoReflectionType* GetGenericArgument(MonoObject* InMonoObject, int32 InIndex);
+	static MonoReflectionType* GetGenericArgument(MonoObject* InMonoObject, int32 InIndex = 0);
 
-	static MonoReflectionType* GetGenericArgument(MonoClass* InMonoClass, int32 InIndex);
+	static MonoReflectionType* GetGenericArgument(MonoClass* InMonoClass, int32 InIndex = 0);
+
+	static MonoReflectionType* GetGenericArgument(MonoType* InMonoType, int32 InIndex = 0);
+
+	static MonoReflectionType* GetGenericArgument(MonoReflectionType* InReflectionType, int32 InIndex = 0);
 
 	static MonoArray* GetGenericArguments(MonoObject* InMonoObject);
 
 	static MonoArray* GetGenericArguments(MonoClass* InMonoClass);
+
+	static MonoArray* GetGenericArguments(MonoType* InMonoType);
+
+	static MonoArray* GetGenericArguments(MonoReflectionType* InReflectionType);
 
 private:
 	static MonoClass* GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* InTypeMonoClass);

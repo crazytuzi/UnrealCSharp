@@ -30,7 +30,7 @@ static FRegisterMap RegisterMap;
 void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject)
 {
 	FCSharpEnvironment::GetEnvironment()->Bind(InMonoObject,
-	                                           FTypeBridge::GetGenericArgument(InMonoObject, 0),
+	                                           FTypeBridge::GetGenericArgument(InMonoObject),
 	                                           FTypeBridge::GetGenericArgument(InMonoObject, 1));
 }
 
@@ -81,14 +81,14 @@ void FMapImplementation::Map_FindKeyImplementation(const MonoObject* InMonoObjec
 	{
 		const auto Key = MapHelper->FindKey(&InValue);
 
-		if (MapHelper->IsKeyPrimitiveProperty())
+		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
 			*OutKey = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(MapHelper->GetKeyProperty()), Key);
+				FTypeBridge::GetMonoClass(MapHelper->GetKeyPropertyDescriptor()->GetProperty()), Key);
 		}
 		else
 		{
-			*OutKey = static_cast<MonoObject*>(Key);
+			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(OutKey));
 		}
 	}
 }
@@ -99,14 +99,14 @@ void FMapImplementation::Map_FindImplementation(const MonoObject* InMonoObject, 
 	{
 		const auto Value = MapHelper->Find(&InKey);
 
-		if (MapHelper->IsValuePrimitiveProperty())
+		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 		{
 			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(MapHelper->GetValueProperty()), Value);
+				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
 		}
 		else
 		{
-			*OutValue = static_cast<MonoObject*>(Value);
+			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
 		}
 	}
 }
@@ -127,14 +127,14 @@ void FMapImplementation::Map_GetImplementation(const MonoObject* InMonoObject, v
 	{
 		const auto Value = MapHelper->Get(&InKey);
 
-		if (MapHelper->IsValuePrimitiveProperty())
+		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 		{
 			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(MapHelper->GetValueProperty()), Value);
+				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
 		}
 		else
 		{
-			*OutValue = static_cast<MonoObject*>(Value);
+			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
 		}
 	}
 }

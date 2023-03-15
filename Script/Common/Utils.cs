@@ -29,5 +29,10 @@ namespace Script.Common
         {
             return InType.GetGenericArguments();
         }
+        
+        public static Boolean IsSubclassOf(Type A, Type B)
+        {
+            return A.IsGenericType ? A.GetGenericTypeDefinition() == B : A.IsSubclassOf(B);
+        }
     }
 }

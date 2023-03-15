@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#define CPT_CLASS_REFERENCE CPT_Unused_Index_19
+
 #define CPT_ENUM CPT_Unused_Index_21
 
 #define CPT_ARRAY CPT_Unused_Index_22

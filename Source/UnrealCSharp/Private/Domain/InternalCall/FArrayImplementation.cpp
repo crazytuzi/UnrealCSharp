@@ -46,7 +46,7 @@ static FRegisterArray RegisterArray;
 void FArrayImplementation::Array_RegisterImplementation(MonoObject* InMonoObject)
 {
 	FCSharpEnvironment::GetEnvironment()->Bind<FArrayHelper>(InMonoObject,
-	                                                         FTypeBridge::GetGenericArgument(InMonoObject, 0));
+	                                                         FTypeBridge::GetGenericArgument(InMonoObject));
 }
 
 void FArrayImplementation::Array_UnRegisterImplementation(const MonoObject* InMonoObject)
@@ -111,14 +111,14 @@ void FArrayImplementation::Array_GetImplementation(const MonoObject* InMonoObjec
 	{
 		const auto Value = ArrayHelper->Get(InIndex);
 
-		if (ArrayHelper->IsPrimitiveProperty())
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
 			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(ArrayHelper->GetInnerProperty()), Value);
+				FTypeBridge::GetMonoClass(ArrayHelper->GetInnerPropertyDescriptor()->GetProperty()), Value);
 		}
 		else
 		{
-			*OutValue = static_cast<MonoObject*>(Value);
+			ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
 		}
 	}
 }

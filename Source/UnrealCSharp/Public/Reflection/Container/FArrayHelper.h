@@ -64,9 +64,7 @@ public:
 
 	void Swap(int32 InFirstIndexToSwap, int32 InSecondIndexToSwap) const;
 
-	bool IsPrimitiveProperty() const;
-
-	FProperty* GetInnerProperty() const;
+	FPropertyDescriptor* GetInnerPropertyDescriptor() const;
 
 	FScriptArray* GetScriptArray() const;
 

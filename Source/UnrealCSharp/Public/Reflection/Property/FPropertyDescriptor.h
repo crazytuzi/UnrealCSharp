@@ -17,6 +17,8 @@ public:
 
 	virtual void Get(void* Src, void* Dest) const;
 
+	virtual void Set(void** Src, void* Dest) const;
+
 	virtual void Set(void* Src, void* Dest) const;
 
 public:

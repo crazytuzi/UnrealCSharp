@@ -10,12 +10,7 @@
 FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
                                      const FName& InName, const EObjectFlags InObjectFlags)
 {
-	const auto InMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
-		InReflectionType);
-
-	const auto InMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Class(InMonoType);
-
-	const auto PropertyType = FTypeBridge::GetPropertyType(InMonoClass);
+	const auto PropertyType = FTypeBridge::GetPropertyType(InReflectionType);
 
 	switch (PropertyType)
 	{
@@ -36,6 +31,8 @@ FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const
 	case CPT_Bool: return new FBoolProperty(InOwner, InName, InObjectFlags);
 
 	case CPT_Float: return new FFloatProperty(InOwner, InName, InObjectFlags);
+
+	case CPT_CLASS_REFERENCE: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
 
 	case CPT_ObjectReference: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
 
@@ -59,6 +56,64 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
                                             const FFieldVariant& InOwner, const FName& InName,
                                             const EObjectFlags InObjectFlags)
 {
+	switch (InPropertyType)
+	{
+	case CPT_CLASS_REFERENCE:
+		{
+			const auto PathName = GetGenericPathName(InReflectionType);
+
+			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
+
+			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
+
+			ClassProperty->MetaClass = InClass;
+
+			return ClassProperty;
+		};
+	case CPT_ObjectReference:
+		{
+			const auto PathName = GetPathName(InReflectionType);
+
+			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
+
+			const auto ObjectProperty = new FObjectProperty(InOwner, InName, InObjectFlags, 0, EPropertyFlags::CPF_None,
+			                                                InClass);
+
+			return ObjectProperty;
+		};
+
+	case CPT_Struct:
+		{
+			const auto PathName = GetPathName(InReflectionType);
+
+			const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *FString(PathName));
+
+			const auto StructProperty = new FStructProperty(InOwner, InName, InObjectFlags);
+
+			StructProperty->Struct = InScriptStruct;
+
+			return StructProperty;
+		}
+
+	case CPT_ENUM:
+		{
+			const auto PathName = GetPathName(InReflectionType);
+
+			const auto InEnum = LoadObject<UEnum>(nullptr, *FString(PathName));
+
+			const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
+
+			EnumProperty->SetEnum(InEnum);
+
+			return EnumProperty;
+		}
+
+	default: return nullptr;
+	}
+}
+
+FString FContainerHelper::GetPathName(MonoReflectionType* InReflectionType)
+{
 	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
@@ -73,44 +128,10 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 	const auto PathNameMonoString = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(
 		PathNameMonoObject, nullptr);
 
-	const auto PathName = FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(PathNameMonoString);
+	return FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(PathNameMonoString);
+}
 
-	switch (InPropertyType)
-	{
-	case CPT_ObjectReference:
-		{
-			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
-
-			const auto ObjectProperty = new FObjectProperty(InOwner, InName, InObjectFlags, 0, EPropertyFlags::CPF_None,
-			                                                InClass);
-
-			ObjectProperty->PropertyClass = InClass;
-
-			return ObjectProperty;
-		};
-
-	case CPT_Struct:
-		{
-			const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *FString(PathName));
-
-			const auto StructProperty = new FStructProperty(InOwner, InName, InObjectFlags);
-
-			StructProperty->Struct = InScriptStruct;
-
-			return StructProperty;
-		}
-
-	case CPT_ENUM:
-		{
-			const auto InEnum = LoadObject<UEnum>(nullptr, *FString(PathName));
-
-			const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
-
-			EnumProperty->SetEnum(InEnum);
-
-			return EnumProperty;
-		}
-
-	default: return nullptr;
-	}
+FString FContainerHelper::GetGenericPathName(MonoReflectionType* InReflectionType)
+{
+	return GetPathName(FTypeBridge::GetGenericArgument(InReflectionType));
 }
