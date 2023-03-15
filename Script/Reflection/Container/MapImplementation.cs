@@ -7,8 +7,7 @@ namespace Script.Reflection.Container
     public static class MapImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Map_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, Type InKeyType,
-            Type InValueType);
+        public static extern void Map_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Map_UnRegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap);

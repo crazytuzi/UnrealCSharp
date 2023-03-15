@@ -5,8 +5,8 @@ namespace Script.Reflection.Container
 {
     public static class MapUtils
     {
-        public static void Map_Register<TKey, TValue>(TMap<TKey, TValue> InMap, Type InKeyType, Type InValueType) =>
-            MapImplementation.Map_RegisterImplementation(InMap, InKeyType, InValueType);
+        public static void Map_Register<TKey, TValue>(TMap<TKey, TValue> InMap) =>
+            MapImplementation.Map_RegisterImplementation(InMap);
 
         public static void Map_UnRegister<TKey, TValue>(TMap<TKey, TValue> InMap) =>
             MapImplementation.Map_UnRegisterImplementation(InMap);

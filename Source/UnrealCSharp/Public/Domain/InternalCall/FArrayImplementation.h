@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "mono/metadata/object.h"
+#include "mono/metadata/object-forward.h"
 
 class FArrayImplementation
 {
 public:
-	static void Array_RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
+	static void Array_RegisterImplementation(MonoObject* InMonoObject);
 
 	static void Array_UnRegisterImplementation(const MonoObject* InMonoObject);
 

@@ -43,6 +43,15 @@ public:
 
 	static MonoClass* GetMonoClass(const FSetProperty* InProperty);
 
+public:
+	static MonoReflectionType* GetGenericArgument(MonoObject* InMonoObject, int32 InIndex);
+
+	static MonoReflectionType* GetGenericArgument(MonoClass* InMonoClass, int32 InIndex);
+
+	static MonoArray* GetGenericArguments(MonoObject* InMonoObject);
+
+	static MonoArray* GetGenericArguments(MonoClass* InMonoClass);
+
 private:
 	static MonoClass* GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* InTypeMonoClass);
 

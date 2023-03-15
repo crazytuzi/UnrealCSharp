@@ -7,7 +7,7 @@ namespace Script.Reflection.Container
     public static class SetImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Set_RegisterImplementation<T>(TSet<T> InSet, Type InType);
+        public static extern void Set_RegisterImplementation<T>(TSet<T> InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Set_UnRegisterImplementation<T>(TSet<T> InSet);

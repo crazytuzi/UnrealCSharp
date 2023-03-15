@@ -5,7 +5,7 @@ namespace Script.Common
 {
     public class TMap<TKey, TValue>
     {
-        public TMap() => MapUtils.Map_Register(this, typeof(TKey), typeof(TValue));
+        public TMap() => MapUtils.Map_Register(this);
 
         public TMap(Type InKeyType, Type InValueType)
         {

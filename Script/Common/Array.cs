@@ -6,7 +6,7 @@ namespace Script.Common
 {
     public class TArray<T> : IEnumerable
     {
-        public TArray() => ArrayUtils.Array_Register(this, typeof(T));
+        public TArray() => ArrayUtils.Array_Register(this);
 
         public TArray(Type InValue)
         {
