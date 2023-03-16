@@ -10,13 +10,6 @@
 
 EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 {
-	static TMap<FString, EPropertyType> ManagedMonoClassMap
-	{
-		{CLASS_F_NAME, CPT_Name},
-		{CLASS_F_STRING, CPT_String},
-		{CLASS_F_TEXT, CPT_Text}
-	};
-
 	const auto InMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
 		InReflectionType);
 
@@ -57,6 +50,15 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
 			return CPT_ObjectReference;
+		}
+	}
+
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME))
+	{
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		{
+			return CPT_Name;
 		}
 	}
 
