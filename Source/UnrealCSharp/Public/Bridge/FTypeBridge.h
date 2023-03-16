@@ -67,4 +67,9 @@ private:
 
 	static MonoClass* GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* InTypeMonoClassArray,
 	                               MonoArray* InParamsArray);
+
+private:
+	static MonoMethod* GetIsSubclassOfMethod(int32 InParamCount);
+
+	static bool IsSubclassOf(MonoReflectionType* InReflectionType, MonoClass* InMonoClass);
 };

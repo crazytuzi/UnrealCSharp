@@ -14,7 +14,7 @@ namespace Script.Common
         {
             return InMethodInfo.IsDefined(typeof(IsOverrideAttribute), true);
         }
-        
+
         public static string GetPathName(Type InType) =>
             InType.GetCustomAttribute<PathNameAttribute>(true).PathName;
 
@@ -29,10 +29,10 @@ namespace Script.Common
         {
             return InType.GetGenericArguments();
         }
-        
+
         public static Boolean IsSubclassOf(Type A, Type B)
         {
-            return A.IsGenericType ? A.GetGenericTypeDefinition() == B : A.IsSubclassOf(B);
+            return A.IsGenericType ? A.GetGenericTypeDefinition() == B : A == B || A.IsSubclassOf(B);
         }
     }
 }

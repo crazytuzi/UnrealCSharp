@@ -22,14 +22,6 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 
 	const auto InMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Class(InMonoType);
 
-	void* InParams[2] = {InReflectionType};
-
-	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
-
-	const auto IsSubclassOfMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-		UtilsMonoClass, FUNCTION_UTILS_IS_SUBCLASS_OF, TGetArrayLength(InParams));
-
 	// @TODO
 	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Byte_Class()) return CPT_Byte;
 
@@ -49,23 +41,22 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 
 	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Single_Class()) return CPT_Float;
 
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SUB_CLASS_OF))
 	{
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SUB_CLASS_OF);
-	
-		const auto FoundMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(FoundMonoClass);
-	
-		const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
-			FoundMonoType);
-	
-		InParams[1] = FoundReflectionType;
-	
-		const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-			IsSubclassOfMethod, nullptr, InParams, nullptr);
-	
-		if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(ResultMonoObject)))
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
 			return CPT_CLASS_REFERENCE;
+		}
+	}
+
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
+		FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass())))
+	{
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		{
+			return CPT_ObjectReference;
 		}
 	}
 
@@ -498,7 +489,9 @@ MonoClass* FTypeBridge::GetMonoClass(const FSetProperty* InProperty)
 
 MonoReflectionType* FTypeBridge::GetGenericArgument(MonoObject* InMonoObject, const int32 InIndex)
 {
-	return ARRAY_GET(GetGenericArguments(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Get_Class(InMonoObject)), MonoReflectionType*, InIndex);
+	return ARRAY_GET(
+		GetGenericArguments(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Get_Class(InMonoObject)),
+		MonoReflectionType*, InIndex);
 }
 
 MonoReflectionType* FTypeBridge::GetGenericArgument(MonoClass* InMonoClass, const int32 InIndex)
@@ -538,10 +531,12 @@ MonoArray* FTypeBridge::GetGenericArguments(MonoReflectionType* InReflectionType
 
 	auto InParams = static_cast<void*>(InReflectionType);
 
-	const auto GetGenericArgumentsMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-		UtilsMonoClass, FUNCTION_UTILS_GET_GENERIC_ARGUMENTS, TGetArrayLength(InParams));
+	const auto GetGenericArgumentsMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+		Class_Get_Method_From_Name(
+			UtilsMonoClass, FUNCTION_UTILS_GET_GENERIC_ARGUMENTS, TGetArrayLength(InParams));
 
-	return reinterpret_cast<MonoArray*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(GetGenericArgumentsMethod, nullptr, &InParams, nullptr));
+	return reinterpret_cast<MonoArray*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+		GetGenericArgumentsMethod, nullptr, &InParams, nullptr));
 }
 
 MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* InTypeMonoClass)
@@ -646,4 +641,37 @@ MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* I
 		CreateGenericTypeMethod, nullptr, InParams, nullptr);
 
 	return FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Get_Class(GenericClassMonoObject);
+}
+
+MonoMethod* FTypeBridge::GetIsSubclassOfMethod(const int32 InParamCount)
+{
+	static MonoMethod* IsSubclassOfMethod = nullptr;
+
+	if (IsSubclassOfMethod == nullptr)
+	{
+		const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
+
+		IsSubclassOfMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+			UtilsMonoClass, FUNCTION_UTILS_IS_SUBCLASS_OF, InParamCount);
+	}
+
+	return IsSubclassOfMethod;
+}
+
+bool FTypeBridge::IsSubclassOf(MonoReflectionType* InReflectionType, MonoClass* InMonoClass)
+{
+	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(InMonoClass);
+
+	const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
+		FoundMonoType);
+
+	void* InParams[2] = {InReflectionType, FoundReflectionType};
+
+	const auto FoundIsSubclassOfMethod = GetIsSubclassOfMethod(TGetArrayLength(InParams));
+
+	const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+		FoundIsSubclassOfMethod, nullptr, InParams, nullptr);
+
+	return *static_cast<bool*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(ResultMonoObject));
 }

@@ -76,8 +76,9 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 
 			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
 
-			const auto ObjectProperty = new FObjectProperty(InOwner, InName, InObjectFlags, 0, EPropertyFlags::CPF_None,
-			                                                InClass);
+			const auto ObjectProperty = new FObjectProperty(InOwner, InName, InObjectFlags);
+
+			ObjectProperty->PropertyClass = InClass;
 
 			return ObjectProperty;
 		};
