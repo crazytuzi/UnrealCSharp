@@ -26,7 +26,7 @@ static FRegisterSet RegisterSet;
 void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject)
 {
 	FCSharpEnvironment::GetEnvironment()->Bind<FSetHelper>(InMonoObject,
-	                                                       FTypeBridge::GetGenericArgument(InMonoObject, 0));
+	                                                       FTypeBridge::GetGenericArgument(InMonoObject));
 }
 
 void FSetImplementation::Set_UnRegisterImplementation(const MonoObject* InMonoObject)

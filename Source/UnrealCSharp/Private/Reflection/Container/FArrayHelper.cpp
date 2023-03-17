@@ -100,7 +100,14 @@ void FArrayHelper::Set(const int32 Index, void* InValue) const
 
 	if (ScriptArrayHelper.IsValidIndex(Index))
 	{
-		InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
+		if (InnerPropertyDescriptor->IsPrimitiveProperty())
+		{
+			InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
+		}
+		else
+		{
+			InnerPropertyDescriptor->Set(static_cast<void**>(InValue), ScriptArrayHelper.GetRawPtr(Index));
+		}
 	}
 }
 
@@ -193,7 +200,7 @@ void FArrayHelper::Reset(const int32 InNewSize) const
 	ScriptArrayHelper.Resize(InNewSize);
 }
 
-void FArrayHelper::Empty(int32 InSlack) const
+void FArrayHelper::Empty(const int32 InSlack) const
 {
 	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
@@ -220,7 +227,14 @@ int32 FArrayHelper::Add(void* InValue) const
 
 	const auto Index = ScriptArrayHelper.AddUninitializedValue();
 
-	InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
+	if (InnerPropertyDescriptor->IsPrimitiveProperty())
+	{
+		InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
+	}
+	else
+	{
+		InnerPropertyDescriptor->Set(static_cast<void**>(InValue), ScriptArrayHelper.GetRawPtr(Index));
+	}
 
 	return Index;
 }
@@ -286,14 +300,9 @@ void FArrayHelper::Swap(const int32 InFirstIndexToSwap, const int32 InSecondInde
 	ScriptArray->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap, InnerPropertyDescriptor->GetSize());
 }
 
-bool FArrayHelper::IsPrimitiveProperty() const
+FPropertyDescriptor* FArrayHelper::GetInnerPropertyDescriptor() const
 {
-	return InnerPropertyDescriptor->IsPrimitiveProperty();
-}
-
-FProperty* FArrayHelper::GetInnerProperty() const
-{
-	return InnerPropertyDescriptor->GetProperty();
+	return InnerPropertyDescriptor;
 }
 
 FScriptArray* FArrayHelper::GetScriptArray() const

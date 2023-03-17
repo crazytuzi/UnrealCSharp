@@ -34,13 +34,9 @@ public:
 
 	void Set(void* InKey, void* InValue) const;
 
-	bool IsKeyPrimitiveProperty() const;
+	FPropertyDescriptor* GetKeyPropertyDescriptor() const;
 
-	bool IsValuePrimitiveProperty() const;
-
-	FProperty* GetKeyProperty() const;
-
-	FProperty* GetValueProperty() const;
+	FPropertyDescriptor* GetValuePropertyDescriptor() const;
 
 	FScriptMap* GetScriptMap() const;
 

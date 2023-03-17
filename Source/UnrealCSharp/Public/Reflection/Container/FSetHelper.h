@@ -26,8 +26,6 @@ public:
 
 	bool Contains(const void* InKey) const;
 
-	bool IsPrimitiveProperty() const;
-
 	FProperty* GetElementProperty() const;
 
 	FScriptSet* GetScriptSet() const;

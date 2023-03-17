@@ -192,17 +192,38 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 		{
 			KeyPropertyDescriptor->InitializeValue_InContainer(NewElementKey);
 
-			KeyPropertyDescriptor->Set(InKey, NewElementKey);
+			if (KeyPropertyDescriptor->IsPrimitiveProperty())
+			{
+				KeyPropertyDescriptor->Set(InKey, NewElementKey);
+			}
+			else
+			{
+				KeyPropertyDescriptor->Set(static_cast<void**>(InKey), NewElementKey);
+			}
 		},
 		[this, InValue](void* NewElementValue)
 		{
 			ValuePropertyDescriptor->InitializeValue_InContainer(NewElementValue);
 
-			ValuePropertyDescriptor->Set(InValue, NewElementValue);
+			if (ValuePropertyDescriptor->IsPrimitiveProperty())
+			{
+				ValuePropertyDescriptor->Set(InValue, NewElementValue);
+			}
+			else
+			{
+				ValuePropertyDescriptor->Set(static_cast<void**>(InValue), NewElementValue);
+			}
 		},
 		[this, InValue](void* ExistingElementValue)
 		{
-			ValuePropertyDescriptor->Set(InValue, ExistingElementValue);
+			if (ValuePropertyDescriptor->IsPrimitiveProperty())
+			{
+				ValuePropertyDescriptor->Set(InValue, ExistingElementValue);
+			}
+			else
+			{
+				ValuePropertyDescriptor->Set(static_cast<void**>(InValue), ExistingElementValue);
+			}
 		},
 		[this](void* ElementKey)
 		{
@@ -223,24 +244,14 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 	);
 }
 
-bool FMapHelper::IsKeyPrimitiveProperty() const
+FPropertyDescriptor* FMapHelper::GetKeyPropertyDescriptor() const
 {
-	return KeyPropertyDescriptor->IsPrimitiveProperty();
+	return KeyPropertyDescriptor;
 }
 
-bool FMapHelper::IsValuePrimitiveProperty() const
+FPropertyDescriptor* FMapHelper::GetValuePropertyDescriptor() const
 {
-	return ValuePropertyDescriptor->IsPrimitiveProperty();
-}
-
-FProperty* FMapHelper::GetKeyProperty() const
-{
-	return KeyPropertyDescriptor->GetProperty();
-}
-
-FProperty* FMapHelper::GetValueProperty() const
-{
-	return ValuePropertyDescriptor->GetProperty();
+	return ValuePropertyDescriptor;
 }
 
 FScriptMap* FMapHelper::GetScriptMap() const

@@ -84,7 +84,14 @@ void FSetHelper::Add(void* InValue) const
 	               {
 		               ElementPropertyDescriptor->InitializeValue_InContainer(NewElement);
 
-		               ElementPropertyDescriptor->Set(InValue, NewElement);
+		               if (ElementPropertyDescriptor->IsPrimitiveProperty())
+		               {
+			               ElementPropertyDescriptor->Set(InValue, NewElement);
+		               }
+		               else
+		               {
+			               ElementPropertyDescriptor->Set(static_cast<void**>(InValue), NewElement);
+		               }
 	               },
 	               [this](void* Element)
 	               {
@@ -141,11 +148,6 @@ bool FSetHelper::Contains(const void* InKey) const
 		                            return ElementPropertyDescriptor->Identical(A, B);
 	                            }
 	) != INDEX_NONE;
-}
-
-bool FSetHelper::IsPrimitiveProperty() const
-{
-	return ElementPropertyDescriptor->IsPrimitiveProperty();
 }
 
 FProperty* FSetHelper::GetElementProperty() const
