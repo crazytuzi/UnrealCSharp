@@ -62,6 +62,15 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 		}
 	}
 
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SCRIPT_INTERFACE))
+	{
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		{
+			return CPT_Interface;
+		}
+	}
+
 	if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(
 		InMonoClass, FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Enum_Class(), false))
 	{
