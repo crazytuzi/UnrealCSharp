@@ -32,6 +32,8 @@ void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
 			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(SrcObject, nullptr));
 
+		NameProperty->InitializeValue(Dest);
+		
 		NameProperty->SetPropertyValue(Dest, SrcValue);
 	}
 }
