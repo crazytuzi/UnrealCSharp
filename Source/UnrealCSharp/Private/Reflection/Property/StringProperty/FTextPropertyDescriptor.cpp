@@ -18,6 +18,11 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest) const
 	}
 }
 
+void FTextPropertyDescriptor::Set(void** Src, void* Dest) const
+{
+	Set(*reinterpret_cast<MonoObject**>(Src), Dest);
+}
+
 void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (TextProperty != nullptr)
@@ -26,6 +31,8 @@ void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
 			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(SrcObject, nullptr));
+
+		TextProperty->InitializeValue(Dest);
 
 		TextProperty->SetPropertyValue(Dest, FText::FromString(SrcValue));
 	}
