@@ -10,13 +10,6 @@
 
 EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 {
-	static TMap<FString, EPropertyType> ManagedMonoClassMap
-	{
-		{CLASS_F_NAME, CPT_Name},
-		{CLASS_F_STRING, CPT_String},
-		{CLASS_F_TEXT, CPT_Text}
-	};
-
 	const auto InMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
 		InReflectionType);
 
@@ -60,10 +53,37 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 		}
 	}
 
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME))
+	{
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		{
+			return CPT_Name;
+		}
+	}
+
 	if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(
 		InMonoClass, FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Enum_Class(), false))
 	{
 		return CPT_ENUM;
+	}
+
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING))
+	{
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		{
+			return CPT_String;
+		}
+	}
+
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT))
+	{
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		{
+			return CPT_Text;
+		}
 	}
 
 	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Double_Class()) return CPT_Double;
