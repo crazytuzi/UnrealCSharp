@@ -162,6 +162,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
+		if (SuperClass != nullptr && SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
+		{
+			continue;
+		}
+
 		if (bHasFunction == true)
 		{
 			if (bIsInterface == true)
