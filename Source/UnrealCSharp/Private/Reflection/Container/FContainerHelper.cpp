@@ -38,6 +38,8 @@ FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const
 
 	case CPT_Name: return new FNameProperty(InOwner, InName, InObjectFlags);
 
+	case CPT_Interface: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+
 	case CPT_Struct: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
 
 	case CPT_ENUM: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
@@ -69,7 +71,8 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			ClassProperty->MetaClass = InClass;
 
 			return ClassProperty;
-		};
+		}
+
 	case CPT_ObjectReference:
 		{
 			const auto PathName = GetPathName(InReflectionType);
@@ -81,7 +84,20 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			ObjectProperty->PropertyClass = InClass;
 
 			return ObjectProperty;
-		};
+		}
+
+	case CPT_Interface:
+		{
+			const auto PathName = GetGenericPathName(InReflectionType);
+
+			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
+
+			const auto InterfaceProperty = new FInterfaceProperty(InOwner, InName, InObjectFlags);
+
+			InterfaceProperty->InterfaceClass = InClass;
+
+			return InterfaceProperty;
+		}
 
 	case CPT_Struct:
 		{

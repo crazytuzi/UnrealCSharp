@@ -162,6 +162,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
+		if (SuperClass != nullptr && SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
+		{
+			continue;
+		}
+
 		if (bHasFunction == true)
 		{
 			if (bIsInterface == true)
@@ -461,11 +466,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 	if (bIsInterface == true)
 	{
 		IInterfaceContent = FString::Printf(TEXT(
+			"\t[PathName(\"%s\")]\n"
 			"\tpublic interface %s%s\n"
 			"\t{\n"
 			"%s"
 			"\t}\n"
 		),
+		                                    *PathNameAttributeContent,
 		                                    *FUnrealCSharpFunctionLibrary::GetFullInterface(InClass),
 		                                    SuperClass != nullptr && SuperClass != UObject::StaticClass()
 			                                    ? *FString::Printf(TEXT(

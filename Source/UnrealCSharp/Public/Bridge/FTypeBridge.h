@@ -69,7 +69,5 @@ private:
 	                               MonoArray* InParamsArray);
 
 private:
-	static MonoMethod* GetIsSubclassOfMethod(int32 InParamCount);
-
 	static bool IsSubclassOf(MonoReflectionType* InReflectionType, MonoClass* InMonoClass);
 };
