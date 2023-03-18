@@ -28,6 +28,8 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 
 		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TScriptInterface<IInterface>>(Dest);
 
+		InterfaceProperty->InitializeValue(Dest);
+		
 		InterfaceProperty->SetPropertyValue(Dest, SrcMulti.GetObject());
 
 		Object_New(Dest);

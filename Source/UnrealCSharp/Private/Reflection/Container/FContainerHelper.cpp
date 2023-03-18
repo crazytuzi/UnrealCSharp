@@ -52,6 +52,8 @@ FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const
 
 	case CPT_LazyObjectReference: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
 
+	case CPT_SoftObjectReference: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+
 	case CPT_Double: return new FDoubleProperty(InOwner, InName, InObjectFlags);
 
 	default: return nullptr;
@@ -153,6 +155,19 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			LazyObjectProperty->PropertyClass = InClass;
 
 			return LazyObjectProperty;
+		}
+
+	case CPT_SoftObjectReference:
+		{
+			const auto PathName = GetGenericPathName(InReflectionType);
+
+			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
+
+			const auto SoftObjectProperty = new FSoftObjectProperty(InOwner, InName, InObjectFlags);
+
+			SoftObjectProperty->PropertyClass = InClass;
+
+			return SoftObjectProperty;
 		}
 
 	default: return nullptr;

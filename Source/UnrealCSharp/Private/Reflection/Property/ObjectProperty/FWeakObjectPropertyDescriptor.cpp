@@ -27,6 +27,8 @@ void FWeakObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TWeakObjectPtr<UObject>>(Dest);
 
+		WeakObjectProperty->InitializeValue(Dest);
+		
 		WeakObjectProperty->SetObjectPropertyValue(Dest, SrcMulti.Get());
 
 		Object_New(Dest);
