@@ -98,6 +98,15 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 		}
 	}
 
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_LAZY_OBJECT_PTR))
+	{
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		{
+			return CPT_LazyObjectReference;
+		}
+	}
+
 	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Double_Class()) return CPT_Double;
 
 	return CPT_None;
