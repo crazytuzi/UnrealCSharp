@@ -48,6 +48,8 @@ FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const
 
 	case CPT_Text: return new FTextProperty(InOwner, InName, InObjectFlags);
 
+	case CPT_WeakObjectReference: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+
 	case CPT_Double: return new FDoubleProperty(InOwner, InName, InObjectFlags);
 
 	default: return nullptr;
@@ -123,6 +125,19 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			EnumProperty->SetEnum(InEnum);
 
 			return EnumProperty;
+		}
+
+	case CPT_WeakObjectReference:
+		{
+			const auto PathName = GetGenericPathName(InReflectionType);
+
+			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
+
+			const auto WeakObjectProperty = new FWeakObjectProperty(InOwner, InName, InObjectFlags);
+
+			WeakObjectProperty->PropertyClass = InClass;
+
+			return WeakObjectProperty;
 		}
 
 	default: return nullptr;
