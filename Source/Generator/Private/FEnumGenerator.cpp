@@ -47,7 +47,14 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 		if (UserDefinedEnum != nullptr)
 		{
-			EnumeratorString = InEnum->GetDisplayNameTextByIndex(Index).ToString();
+			if (UserDefinedEnum->HasMetaData(TEXT("DisplayName"), Index))
+			{
+				EnumeratorString = UserDefinedEnum->GetMetaData(TEXT("DisplayName"), Index);
+			}
+			else
+			{
+				EnumeratorString = FName::NameToDisplayString(EnumeratorString, false);
+			}
 		}
 
 		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
