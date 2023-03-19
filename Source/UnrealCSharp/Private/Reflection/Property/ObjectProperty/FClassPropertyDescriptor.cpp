@@ -27,6 +27,8 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TSubclassOf<UObject>>(Dest);
 
+		ClassProperty->InitializeValue(Dest);
+		
 		ClassProperty->SetObjectPropertyValue(Dest, SrcMulti);
 
 		Object_New(Dest);
