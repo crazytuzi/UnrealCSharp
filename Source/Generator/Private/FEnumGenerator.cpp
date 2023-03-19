@@ -2,6 +2,7 @@
 #include "FGeneratorCore.h"
 #include "Engine/UserDefinedEnum.h"
 #include "FUnrealCSharpFunctionLibrary.h"
+#include "NameEncode.h"
 
 TMap<const UEnum*, EEnumUnderlyingType> FEnumGenerator::EnumUnderlyingType;
 
@@ -47,7 +48,14 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 		if (UserDefinedEnum != nullptr)
 		{
-			EnumeratorString = InEnum->GetDisplayNameTextByIndex(Index).ToString();
+			if (UserDefinedEnum->HasMetaData(TEXT("DisplayName"), Index))
+			{
+				EnumeratorString = UserDefinedEnum->GetMetaData(TEXT("DisplayName"), Index);
+			}
+			else
+			{
+				EnumeratorString = FName::NameToDisplayString(EnumeratorString, false);
+			}
 		}
 
 		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
@@ -55,7 +63,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
 		),
-		                                     *FGeneratorCore::GetName(EnumeratorString),
+		                                     *FNameEncode::Encode(FGeneratorCore::GetName(EnumeratorString)),
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
 	}
 
