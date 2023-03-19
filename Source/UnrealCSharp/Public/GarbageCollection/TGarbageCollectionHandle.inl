@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "GarbageCollection/TGarbageCollectionHandle.h"
-#include "Environment/FCSharpEnvironment.h"
 
 template <typename T>
 TGarbageCollectionHandle<T>::TGarbageCollectionHandle():
@@ -43,4 +42,23 @@ template <typename T>
 bool TGarbageCollectionHandle<T>::IsValid()
 {
 	return Handle != T();
+}
+
+template <typename T>
+TGarbageCollectionHandle<T> TGarbageCollectionHandle<T>::NewRef(MonoObject* InMonoObject, const mono_bool bPinned)
+{
+	return FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New(InMonoObject, bPinned);
+}
+
+template <typename T>
+TGarbageCollectionHandle<T> TGarbageCollectionHandle<T>::NewWeakRef(MonoObject* InMonoObject,
+                                                                    const mono_bool bTrackResurrection)
+{
+	return FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(InMonoObject, bTrackResurrection);
+}
+
+template <typename T>
+void TGarbageCollectionHandle<T>::Free(const TGarbageCollectionHandle& InGarbageCollectionHandle)
+{
+	return FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(InGarbageCollectionHandle);
 }

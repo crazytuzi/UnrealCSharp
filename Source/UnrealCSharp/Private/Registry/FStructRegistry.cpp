@@ -19,7 +19,7 @@ void FStructRegistry::Deinitialize()
 {
 	for (auto& Pair : GarbageCollectionHandle2StructAddress.Get())
 	{
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(Pair.Key);
+		FGarbageCollectionHandle::Free(Pair.Key);
 
 		if (Pair.Value.bNeedFree)
 		{
@@ -75,12 +75,11 @@ FGarbageCollectionHandle FStructRegistry::GetGarbageCollectionHandle(const void*
 bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject,
                                    const bool bNeedFree)
 {
-	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
-		InMonoObject, true);
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
 
 	StructAddress2GarbageCollectionHandle.Emplace(InStruct, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2StructAddress.Emplace(GarbageCollectionHandle,
+	GarbageCollectionHandle2StructAddress.Emplace(MoveTemp(GarbageCollectionHandle),
 	                                              FStructAddress{InStruct, InScriptStruct, bNeedFree});
 
 	return true;
@@ -90,7 +89,7 @@ bool FStructRegistry::RemoveReference(const void* InStruct)
 {
 	if (const auto FoundGarbageCollectionHandle = StructAddress2GarbageCollectionHandle.Find(InStruct))
 	{
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(*FoundGarbageCollectionHandle);
+		FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
 
 		return true;
 	}
