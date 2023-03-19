@@ -1,9 +1,11 @@
 ﻿#pragma once
 
+#include "Bridge/EPropertyTypeExtent.h"
+
 class FPropertyDescriptor
 {
 public:
-	static EPropertyType GetPropertyType(const FProperty* Property);
+	static EPropertyTypeExtent GetPropertyType(const FProperty* Property);
 
 	static FPropertyDescriptor* Factory(FProperty* InProperty);
 

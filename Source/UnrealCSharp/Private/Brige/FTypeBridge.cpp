@@ -2,13 +2,12 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Macro/PropertyMacro.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/MonoMacro.h"
 #include "Template/TGetArrayLength.h"
 
-EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
+EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 {
 	const auto InMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
 		InReflectionType);
@@ -16,30 +15,57 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	const auto InMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Class(InMonoType);
 
 	// @TODO
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Byte_Class()) return CPT_Byte;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Byte_Class())
+	{
+		return EPropertyTypeExtent::Byte;
+	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_UInt16_Class()) return CPT_UInt16;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_UInt16_Class())
+	{
+		return EPropertyTypeExtent::UInt16;
+	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_UInt32_Class()) return CPT_UInt32;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_UInt32_Class())
+	{
+		return EPropertyTypeExtent::UInt32;
+	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Byte_Class()) return CPT_Int8;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Byte_Class())
+	{
+		return EPropertyTypeExtent::Int8;
+	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Int16_Class()) return CPT_Int16;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Int16_Class())
+	{
+		return EPropertyTypeExtent::Int16;
+	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Int32_Class()) return CPT_Int;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Int32_Class())
+	{
+		return EPropertyTypeExtent::Int;
+	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Int64_Class()) return CPT_Int64;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Int64_Class())
+	{
+		return EPropertyTypeExtent::Int64;
+	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Boolean_Class()) return CPT_Bool;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Boolean_Class())
+	{
+		return EPropertyTypeExtent::Bool;
+	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Single_Class()) return CPT_Float;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Single_Class())
+	{
+		return EPropertyTypeExtent::Float;
+	}
 
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SUB_CLASS_OF))
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_CLASS_REFERENCE;
+			return EPropertyTypeExtent::ClassReference;
 		}
 	}
 
@@ -49,7 +75,7 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_ObjectReference;
+			return EPropertyTypeExtent::ObjectReference;
 		}
 	}
 
@@ -58,7 +84,7 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_Name;
+			return EPropertyTypeExtent::Name;
 		}
 	}
 
@@ -67,7 +93,7 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_Interface;
+			return EPropertyTypeExtent::Interface;
 		}
 	}
 
@@ -76,7 +102,7 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_String;
+			return EPropertyTypeExtent::String;
 		}
 	}
 
@@ -85,7 +111,7 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_Text;
+			return EPropertyTypeExtent::Text;
 		}
 	}
 
@@ -94,7 +120,7 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_WeakObjectReference;
+			return EPropertyTypeExtent::WeakObjectReference;
 		}
 	}
 
@@ -103,7 +129,7 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_LazyObjectReference;
+			return EPropertyTypeExtent::LazyObjectReference;
 		}
 	}
 
@@ -112,13 +138,16 @@ EPropertyType FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
 		{
-			return CPT_SoftObjectReference;
+			return EPropertyTypeExtent::SoftObjectReference;
 		}
 	}
 
-	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Double_Class()) return CPT_Double;
+	if (InMonoClass == FCSharpEnvironment::GetEnvironment()->GetDomain()->Get_Double_Class())
+	{
+		return EPropertyTypeExtent::Double;
+	}
 
-	return CPT_None;
+	return EPropertyTypeExtent::None;
 }
 
 MonoClass* FTypeBridge::GetMonoClass(FProperty* InProperty)
