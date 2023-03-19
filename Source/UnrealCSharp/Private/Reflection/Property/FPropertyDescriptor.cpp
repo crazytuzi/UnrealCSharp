@@ -30,70 +30,70 @@
 #include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 #include "Reflection/Property/FieldPathProperty/FFieldPathPropertyDescriptor.h"
 
-EPropertyType FPropertyDescriptor::GetPropertyType(const FProperty* Property)
+EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Property)
 {
 	if (Property != nullptr)
 	{
-		GET_PROPERTY_TYPE(FByteProperty, CPT_Byte)
+		GET_PROPERTY_TYPE(FByteProperty, EPropertyTypeExtent::Byte)
 
-		GET_PROPERTY_TYPE(FUInt16Property, CPT_UInt16)
+		GET_PROPERTY_TYPE(FUInt16Property, EPropertyTypeExtent::UInt16)
 
-		GET_PROPERTY_TYPE(FUInt32Property, CPT_UInt32)
+		GET_PROPERTY_TYPE(FUInt32Property, EPropertyTypeExtent::UInt32)
 
-		GET_PROPERTY_TYPE(FInt8Property, CPT_Int8)
+		GET_PROPERTY_TYPE(FInt8Property, EPropertyTypeExtent::Int8)
 
-		GET_PROPERTY_TYPE(FInt16Property, CPT_Int16)
+		GET_PROPERTY_TYPE(FInt16Property, EPropertyTypeExtent::Int16)
 
-		GET_PROPERTY_TYPE(FIntProperty, CPT_Int)
+		GET_PROPERTY_TYPE(FIntProperty, EPropertyTypeExtent::Int)
 
-		GET_PROPERTY_TYPE(FInt64Property, CPT_Int64)
+		GET_PROPERTY_TYPE(FInt64Property, EPropertyTypeExtent::Int64)
 
-		GET_PROPERTY_TYPE(FBoolProperty, CPT_Bool)
+		GET_PROPERTY_TYPE(FBoolProperty, EPropertyTypeExtent::Bool)
 
-		GET_PROPERTY_TYPE(FFloatProperty, CPT_Float)
+		GET_PROPERTY_TYPE(FFloatProperty, EPropertyTypeExtent::Float)
 
-		GET_PROPERTY_TYPE(FClassProperty, CPT_ObjectReference)
+		GET_PROPERTY_TYPE(FClassProperty, EPropertyTypeExtent::ClassReference)
 
-		GET_PROPERTY_TYPE(FObjectProperty, CPT_ObjectReference)
+		GET_PROPERTY_TYPE(FObjectProperty, EPropertyTypeExtent::ObjectReference)
 
-		GET_PROPERTY_TYPE(FNameProperty, CPT_Name)
+		GET_PROPERTY_TYPE(FNameProperty, EPropertyTypeExtent::Name)
 
-		GET_PROPERTY_TYPE(FDelegateProperty, CPT_Delegate)
+		GET_PROPERTY_TYPE(FDelegateProperty, EPropertyTypeExtent::Delegate)
 
-		GET_PROPERTY_TYPE(FInterfaceProperty, CPT_Interface)
+		GET_PROPERTY_TYPE(FInterfaceProperty, EPropertyTypeExtent::Interface)
 
-		GET_PROPERTY_TYPE(FStructProperty, CPT_Struct)
+		GET_PROPERTY_TYPE(FStructProperty, EPropertyTypeExtent::Struct)
 
-		GET_PROPERTY_TYPE(FArrayProperty, CPT_ARRAY)
+		GET_PROPERTY_TYPE(FArrayProperty, EPropertyTypeExtent::Array)
 
-		GET_PROPERTY_TYPE(FEnumProperty, CPT_ENUM)
+		GET_PROPERTY_TYPE(FEnumProperty, EPropertyTypeExtent::Enum)
 
-		GET_PROPERTY_TYPE(FStrProperty, CPT_String)
+		GET_PROPERTY_TYPE(FStrProperty, EPropertyTypeExtent::String)
 
-		GET_PROPERTY_TYPE(FTextProperty, CPT_Text)
+		GET_PROPERTY_TYPE(FTextProperty, EPropertyTypeExtent::Text)
 
-		GET_PROPERTY_TYPE(FMulticastDelegateProperty, CPT_MulticastDelegate)
+		GET_PROPERTY_TYPE(FMulticastDelegateProperty, EPropertyTypeExtent::MulticastDelegate)
 
-		GET_PROPERTY_TYPE(FMulticastInlineDelegateProperty, CPT_MulticastDelegate)
+		GET_PROPERTY_TYPE(FMulticastInlineDelegateProperty, EPropertyTypeExtent::MulticastDelegate)
 
-		GET_PROPERTY_TYPE(FMulticastSparseDelegateProperty, CPT_MulticastDelegate)
+		GET_PROPERTY_TYPE(FMulticastSparseDelegateProperty, EPropertyTypeExtent::MulticastDelegate)
 
-		GET_PROPERTY_TYPE(FWeakObjectProperty, CPT_WeakObjectReference)
+		GET_PROPERTY_TYPE(FWeakObjectProperty, EPropertyTypeExtent::WeakObjectReference)
 
-		GET_PROPERTY_TYPE(FLazyObjectProperty, CPT_LazyObjectReference)
+		GET_PROPERTY_TYPE(FLazyObjectProperty, EPropertyTypeExtent::LazyObjectReference)
 
-		GET_PROPERTY_TYPE(FSoftObjectProperty, CPT_SoftObjectReference)
+		GET_PROPERTY_TYPE(FSoftObjectProperty, EPropertyTypeExtent::SoftObjectReference)
 
-		GET_PROPERTY_TYPE(FDoubleProperty, CPT_Double)
+		GET_PROPERTY_TYPE(FDoubleProperty, EPropertyTypeExtent::Double)
 
-		GET_PROPERTY_TYPE(FMapProperty, CPT_Map)
+		GET_PROPERTY_TYPE(FMapProperty, EPropertyTypeExtent::Map)
 
-		GET_PROPERTY_TYPE(FSetProperty, CPT_Set)
+		GET_PROPERTY_TYPE(FSetProperty, EPropertyTypeExtent::Set)
 
-		GET_PROPERTY_TYPE(FFieldPathProperty, CPT_FieldPath)
+		GET_PROPERTY_TYPE(FFieldPathProperty, EPropertyTypeExtent::FieldPath)
 	}
 
-	return CPT_None;
+	return EPropertyTypeExtent::None;
 }
 
 FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)

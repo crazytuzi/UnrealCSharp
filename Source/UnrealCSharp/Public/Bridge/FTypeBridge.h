@@ -1,11 +1,12 @@
 ﻿#pragma once
 
+#include "EPropertyTypeExtent.h"
 #include "mono/metadata/object.h"
 
 class FTypeBridge
 {
 public:
-	static EPropertyType GetPropertyType(MonoReflectionType* InReflectionType);
+	static EPropertyTypeExtent GetPropertyType(MonoReflectionType* InReflectionType);
 
 	static MonoClass* GetMonoClass(FProperty* InProperty);
 

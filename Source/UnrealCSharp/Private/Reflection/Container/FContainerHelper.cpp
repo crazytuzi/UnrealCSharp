@@ -4,7 +4,6 @@
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Macro/PropertyMacro.h"
 #include "Template/TGetArrayLength.h"
 
 FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
@@ -14,59 +13,83 @@ FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const
 
 	switch (PropertyType)
 	{
-	case CPT_Byte: return new FByteProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Byte: return new FByteProperty(InOwner, InName, InObjectFlags);
 
-	case CPT_UInt16: return new FUInt16Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::UInt16: return new FUInt16Property(InOwner, InName, InObjectFlags);
 
-	case CPT_UInt32: return new FUInt32Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::UInt32: return new FUInt32Property(InOwner, InName, InObjectFlags);
 
-	case CPT_Int8: return new FInt8Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Int8: return new FInt8Property(InOwner, InName, InObjectFlags);
 
-	case CPT_Int16: return new FInt16Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Int16: return new FInt16Property(InOwner, InName, InObjectFlags);
 
-	case CPT_Int: return new FIntProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Int: return new FIntProperty(InOwner, InName, InObjectFlags);
 
-	case CPT_Int64: return new FInt64Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Int64: return new FInt64Property(InOwner, InName, InObjectFlags);
 
-	case CPT_Bool: return new FBoolProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Bool: return new FBoolProperty(InOwner, InName, InObjectFlags);
 
-	case CPT_Float: return new FFloatProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Float: return new FFloatProperty(InOwner, InName, InObjectFlags);
 
-	case CPT_CLASS_REFERENCE: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::ClassReference:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
 
-	case CPT_ObjectReference: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::ObjectReference:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
 
-	case CPT_Name: return new FNameProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Name: return new FNameProperty(InOwner, InName, InObjectFlags);
 
-	case CPT_Interface: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Interface:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
 
-	case CPT_Struct: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Struct:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
 
-	case CPT_ENUM: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Enum:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
 
-	case CPT_String: return new FStrProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::String: return new FStrProperty(InOwner, InName, InObjectFlags);
 
-	case CPT_Text: return new FTextProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Text: return new FTextProperty(InOwner, InName, InObjectFlags);
 
-	case CPT_WeakObjectReference: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::WeakObjectReference:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
 
-	case CPT_LazyObjectReference: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::LazyObjectReference:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
 
-	case CPT_SoftObjectReference: return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::SoftObjectReference:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
 
-	case CPT_Double: return new FDoubleProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Double: return new FDoubleProperty(InOwner, InName, InObjectFlags);
 
 	default: return nullptr;
 	}
 }
 
-FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, MonoReflectionType* InReflectionType,
-                                            const FFieldVariant& InOwner, const FName& InName,
-                                            const EObjectFlags InObjectFlags)
+FProperty* FContainerHelper::ManagedFactory(const EPropertyTypeExtent InPropertyType,
+                                            MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
+                                            const FName& InName, const EObjectFlags InObjectFlags)
 {
 	switch (InPropertyType)
 	{
-	case CPT_CLASS_REFERENCE:
+	case EPropertyTypeExtent::ClassReference:
 		{
 			const auto PathName = GetGenericPathName(InReflectionType);
 
@@ -79,7 +102,7 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			return ClassProperty;
 		}
 
-	case CPT_ObjectReference:
+	case EPropertyTypeExtent::ObjectReference:
 		{
 			const auto PathName = GetPathName(InReflectionType);
 
@@ -92,7 +115,7 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			return ObjectProperty;
 		}
 
-	case CPT_Interface:
+	case EPropertyTypeExtent::Interface:
 		{
 			const auto PathName = GetGenericPathName(InReflectionType);
 
@@ -105,7 +128,7 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			return InterfaceProperty;
 		}
 
-	case CPT_Struct:
+	case EPropertyTypeExtent::Struct:
 		{
 			const auto PathName = GetPathName(InReflectionType);
 
@@ -118,7 +141,7 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			return StructProperty;
 		}
 
-	case CPT_ENUM:
+	case EPropertyTypeExtent::Enum:
 		{
 			const auto PathName = GetPathName(InReflectionType);
 
@@ -131,7 +154,7 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			return EnumProperty;
 		}
 
-	case CPT_WeakObjectReference:
+	case EPropertyTypeExtent::WeakObjectReference:
 		{
 			const auto PathName = GetGenericPathName(InReflectionType);
 
@@ -144,7 +167,7 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			return WeakObjectProperty;
 		}
 
-	case CPT_LazyObjectReference:
+	case EPropertyTypeExtent::LazyObjectReference:
 		{
 			const auto PathName = GetGenericPathName(InReflectionType);
 
@@ -157,7 +180,7 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyType InPropertyType, 
 			return LazyObjectProperty;
 		}
 
-	case CPT_SoftObjectReference:
+	case EPropertyTypeExtent::SoftObjectReference:
 		{
 			const auto PathName = GetGenericPathName(InReflectionType);
 
