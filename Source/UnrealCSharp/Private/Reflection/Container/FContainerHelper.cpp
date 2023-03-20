@@ -19,6 +19,8 @@ FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const
 
 	case EPropertyTypeExtent::UInt32: return new FUInt32Property(InOwner, InName, InObjectFlags);
 
+	case EPropertyTypeExtent::UInt64: return new FUInt64Property(InOwner, InName, InObjectFlags);
+
 	case EPropertyTypeExtent::Int8: return new FInt8Property(InOwner, InName, InObjectFlags);
 
 	case EPropertyTypeExtent::Int16: return new FInt16Property(InOwner, InName, InObjectFlags);
