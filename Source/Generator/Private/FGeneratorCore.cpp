@@ -151,6 +151,15 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		);
 	}
 
+	if (const auto SoftClassProperty = CastField<FSoftClassProperty>(Property))
+	{
+		return FString::Printf(TEXT(
+			"TSoftClassPtr<%s>"
+		),
+		                       *FUnrealCSharpFunctionLibrary::GetFullClass(SoftClassProperty->MetaClass)
+		);
+	}
+
 	if (const auto SoftObjectProperty = CastField<FSoftObjectProperty>(Property))
 	{
 		return FString::Printf(TEXT(
@@ -289,6 +298,13 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	{
 		return {
 			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(LazyObjectProperty->PropertyClass)
+		};
+	}
+
+	if (const auto SoftClassProperty = CastField<FSoftClassProperty>(Property))
+	{
+		return {
+			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(SoftClassProperty->MetaClass)
 		};
 	}
 

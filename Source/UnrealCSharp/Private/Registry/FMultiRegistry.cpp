@@ -35,4 +35,8 @@ void FMultiRegistry::Deinitialize()
 	GarbageCollectionHandle2ScriptInterfaceAddress.Empty();;
 
 	ScriptInterfaceAddress2GarbageCollectionHandle.Empty();;
+
+	GarbageCollectionHandle2SoftClassPtrAddress.Empty();
+
+	SoftClassPtrAddress2GarbageCollectionHandle.Empty();
 }

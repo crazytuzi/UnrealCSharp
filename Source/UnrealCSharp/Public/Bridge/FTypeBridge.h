@@ -38,6 +38,8 @@ public:
 
 	static MonoClass* GetMonoClass(const FLazyObjectProperty* InProperty);
 
+	static MonoClass* GetMonoClass(const FSoftClassProperty* InProperty);
+
 	static MonoClass* GetMonoClass(const FSoftObjectProperty* InProperty);
 
 	static MonoClass* GetMonoClass(const FMapProperty* InProperty);

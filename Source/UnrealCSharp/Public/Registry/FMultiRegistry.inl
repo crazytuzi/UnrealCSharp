@@ -43,6 +43,14 @@ inline auto FMultiRegistry::GetMulti<FMultiRegistry::FScriptInterfaceAddress::Ty
 }
 
 template <>
+inline auto FMultiRegistry::GetMulti<FMultiRegistry::FSoftClassPtrAddress::Type>(const MonoObject* InMonoObject)
+{
+	const auto FoundSoftClassPtrAddress = GarbageCollectionHandle2SoftClassPtrAddress.Find(InMonoObject);
+
+	return FoundSoftClassPtrAddress != nullptr ? FoundSoftClassPtrAddress->Value : FSoftClassPtrAddress::Type();
+}
+
+template <>
 inline auto FMultiRegistry::GetObject<FMultiRegistry::FSubclassOfAddress::Type>(const void* InAddress) const
 {
 	const auto FoundGarbageCollectionHandle = SubclassOfAddress2GarbageCollectionHandle.Find(InAddress);
@@ -78,6 +86,14 @@ template <>
 inline auto FMultiRegistry::GetObject<FMultiRegistry::FScriptInterfaceAddress::Type>(const void* InAddress) const
 {
 	const auto FoundGarbageCollectionHandle = ScriptInterfaceAddress2GarbageCollectionHandle.Find(InAddress);
+
+	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
+}
+
+template <>
+inline auto FMultiRegistry::GetObject<FMultiRegistry::FSoftClassPtrAddress::Type>(const void* InAddress) const
+{
+	const auto FoundGarbageCollectionHandle = SoftClassPtrAddress2GarbageCollectionHandle.Find(InAddress);
 
 	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
 }
@@ -133,6 +149,17 @@ inline auto FMultiRegistry::AddReference(MonoObject* InMonoObject, const FScript
 
 	GarbageCollectionHandle2ScriptInterfaceAddress.Emplace(MoveTemp(GarbageCollectionHandle),
 	                                                       FScriptInterfaceAddress{nullptr, InValue});
+
+	return true;
+}
+
+template <>
+inline auto FMultiRegistry::AddReference(MonoObject* InMonoObject, const FSoftClassPtrAddress::Type& InValue)
+{
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+
+	GarbageCollectionHandle2SoftClassPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
+	                                                    FSoftClassPtrAddress{nullptr, InValue});
 
 	return true;
 }
@@ -209,6 +236,20 @@ inline auto FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObje
 }
 
 template <>
+inline auto FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject,
+                                         const FSoftClassPtrAddress::Type& InValue)
+{
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+
+	SoftClassPtrAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2SoftClassPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
+	                                                    FSoftClassPtrAddress{InAddress, InValue});
+
+	return true;
+}
+
+template <>
 inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSubclassOfAddress::Type>(const MonoObject* InMonoObject)
 {
 	if (const auto FoundSubclassOfAddress = GarbageCollectionHandle2SubclassOfAddress.Find(InMonoObject))
@@ -277,6 +318,21 @@ inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FScriptInterfaceAddr
 		ScriptInterfaceAddress2GarbageCollectionHandle.Remove(FoundScriptInterfaceAddress->Address);
 
 		GarbageCollectionHandle2ScriptInterfaceAddress.Remove(InMonoObject);
+
+		return true;
+	}
+
+	return false;
+}
+
+template <>
+inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSoftClassPtrAddress::Type>(const MonoObject* InMonoObject)
+{
+	if (const auto FoundSoftClassPtrAddress = GarbageCollectionHandle2SoftClassPtrAddress.Find(InMonoObject))
+	{
+		SoftClassPtrAddress2GarbageCollectionHandle.Remove(FoundSoftClassPtrAddress->Address);
+
+		GarbageCollectionHandle2SoftClassPtrAddress.Remove(InMonoObject);
 
 		return true;
 	}
@@ -366,6 +422,24 @@ inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FScriptInterfaceAddr
 			ScriptInterfaceAddress2GarbageCollectionHandle.Remove(Pair.Key);
 
 			GarbageCollectionHandle2ScriptInterfaceAddress.Remove(Pair.Value);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+template <>
+inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSoftClassPtrAddress::Type>(const void* InAddress)
+{
+	for (const auto& Pair : SoftClassPtrAddress2GarbageCollectionHandle)
+	{
+		if (Pair.Key == InAddress)
+		{
+			SoftClassPtrAddress2GarbageCollectionHandle.Remove(Pair.Key);
+
+			GarbageCollectionHandle2SoftClassPtrAddress.Remove(Pair.Value);
 
 			return true;
 		}

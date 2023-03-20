@@ -134,6 +134,15 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SOFT_CLASS_PTR))
+	{
+		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		{
+			return EPropertyTypeExtent::SoftClassReference;
+		}
+	}
+
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SOFT_OBJECT_PTR))
 	{
 		if (IsSubclassOf(InReflectionType, FoundMonoClass))
@@ -272,6 +281,11 @@ MonoClass* FTypeBridge::GetMonoClass(FProperty* InProperty)
 	if (const auto LazyObjectProperty = CastField<FLazyObjectProperty>(InProperty))
 	{
 		return GetMonoClass(LazyObjectProperty);
+	}
+
+	if (const auto SoftClassProperty = CastField<FSoftClassProperty>(InProperty))
+	{
+		return GetMonoClass(SoftClassProperty);
 	}
 
 	if (const auto SoftObjectProperty = CastField<FSoftObjectProperty>(InProperty))
@@ -481,6 +495,23 @@ MonoClass* FTypeBridge::GetMonoClass(const FLazyObjectProperty* InProperty)
 		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->PropertyClass),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->PropertyClass));
+
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+	}
+
+	return nullptr;
+}
+
+MonoClass* FTypeBridge::GetMonoClass(const FSoftClassProperty* InProperty)
+{
+	if (InProperty != nullptr)
+	{
+		const auto FoundGenericMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SOFT_CLASS_PTR);
+
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->MetaClass),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->MetaClass));
 
 		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
