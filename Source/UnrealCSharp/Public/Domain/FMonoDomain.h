@@ -49,6 +49,8 @@ public:
 
 	MonoReflectionType* Type_Get_Object(MonoType* InMonoType);
 
+	MonoType* Type_Get_Underlying_Type(MonoType* InMonoType) const;
+
 	MonoReflectionMethod* Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass);
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;

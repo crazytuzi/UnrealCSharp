@@ -63,7 +63,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
 		),
-		                                     *FNameEncode::Encode(FGeneratorCore::GetName(EnumeratorString)),
+		                                     *FGeneratorCore::GetName(FNameEncode::Encode(EnumeratorString)),
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
 	}
 
