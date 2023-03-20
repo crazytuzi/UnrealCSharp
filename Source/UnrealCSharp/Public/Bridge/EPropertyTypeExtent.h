@@ -33,6 +33,7 @@ enum class EPropertyTypeExtent
 	Set = CPT_Set,
 	FieldPath = CPT_FieldPath,
 	ClassReference = CPT_MAX + 1,
-	Array = CPT_MAX + 2,
-	Enum = CPT_MAX + 3,
+	Array,
+	Enum,
+	SoftClassReference,
 };

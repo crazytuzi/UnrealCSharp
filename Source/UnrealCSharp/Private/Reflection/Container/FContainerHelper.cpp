@@ -72,6 +72,11 @@ FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const
 			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
 		}
 
+	case EPropertyTypeExtent::SoftClassReference:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
+
 	case EPropertyTypeExtent::SoftObjectReference:
 		{
 			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
@@ -178,6 +183,19 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyTypeExtent InProperty
 			LazyObjectProperty->PropertyClass = InClass;
 
 			return LazyObjectProperty;
+		}
+
+	case EPropertyTypeExtent::SoftClassReference:
+		{
+			const auto PathName = GetGenericPathName(InReflectionType);
+
+			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
+
+			const auto SoftClassProperty = new FSoftClassProperty(InOwner, InName, InObjectFlags);
+
+			SoftClassProperty->MetaClass = InClass;
+
+			return SoftClassProperty;
 		}
 
 	case EPropertyTypeExtent::SoftObjectReference:

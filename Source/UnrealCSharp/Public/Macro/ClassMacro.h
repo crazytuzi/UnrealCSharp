@@ -34,6 +34,8 @@
 
 #define CLASS_T_SOFT_OBJECT_PTR FString(TEXT("TSoftObjectPtr`1"))
 
+#define CLASS_T_SOFT_CLASS_PTR FString(TEXT("TSoftClassPtr`1"))
+
 #define CLASS_SCRIPT_STRUCT(T) TScriptStruct<T>::Get()
 
 #define CLASS_SCRIPT_STRUCT_NAME(T) FString::Printf(TEXT("F%s"), *CLASS_SCRIPT_STRUCT(T)->GetName())

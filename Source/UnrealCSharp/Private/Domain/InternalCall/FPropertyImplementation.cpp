@@ -72,6 +72,10 @@ struct FRegisterProperty
 			          static_cast<void*>(FPropertyImplementation::Property_GetObjectLazyObjectPropertyImplementation))
 			.Function("SetObjectLazyObjectProperty",
 			          static_cast<void*>(FPropertyImplementation::Property_SetObjectLazyObjectPropertyImplementation))
+			.Function("GetObjectSoftClassProperty",
+			          static_cast<void*>(FPropertyImplementation::Property_GetObjectSoftClassPropertyImplementation))
+			.Function("SetObjectSoftClassProperty",
+			          static_cast<void*>(FPropertyImplementation::Property_SetObjectSoftClassPropertyImplementation))
 			.Function("GetObjectSoftObjectProperty",
 			          static_cast<void*>(FPropertyImplementation::Property_GetObjectSoftObjectPropertyImplementation))
 			.Function("SetObjectSoftObjectProperty",
@@ -156,6 +160,10 @@ struct FRegisterProperty
 			          static_cast<void*>(FPropertyImplementation::Property_GetStructLazyObjectPropertyImplementation))
 			.Function("SetStructLazyObjectProperty",
 			          static_cast<void*>(FPropertyImplementation::Property_SetStructLazyObjectPropertyImplementation))
+			.Function("GetStructSoftClassProperty",
+			          static_cast<void*>(FPropertyImplementation::Property_GetStructSoftClassPropertyImplementation))
+			.Function("SetStructSoftClassProperty",
+			          static_cast<void*>(FPropertyImplementation::Property_SetStructSoftClassPropertyImplementation))
 			.Function("GetStructSoftObjectProperty",
 			          static_cast<void*>(FPropertyImplementation::Property_GetStructSoftObjectPropertyImplementation))
 			.Function("SetStructSoftObjectProperty",
@@ -214,6 +222,8 @@ OBJECT_COMPOUND_PROPERTY_IMPLEMENTATION(WeakObject, MonoObject)
 
 OBJECT_COMPOUND_PROPERTY_IMPLEMENTATION(LazyObject, MonoObject)
 
+OBJECT_COMPOUND_PROPERTY_IMPLEMENTATION(SoftClass, MonoObject)
+
 OBJECT_COMPOUND_PROPERTY_IMPLEMENTATION(SoftObject, MonoObject)
 
 OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Double, double)
@@ -255,6 +265,8 @@ STRUCT_COMPOUND_PROPERTY_IMPLEMENTATION(Array, MonoObject)
 STRUCT_COMPOUND_PROPERTY_IMPLEMENTATION(WeakObject, MonoObject)
 
 STRUCT_COMPOUND_PROPERTY_IMPLEMENTATION(LazyObject, MonoObject)
+
+STRUCT_COMPOUND_PROPERTY_IMPLEMENTATION(SoftClass, MonoObject)
 
 STRUCT_COMPOUND_PROPERTY_IMPLEMENTATION(SoftObject, MonoObject)
 

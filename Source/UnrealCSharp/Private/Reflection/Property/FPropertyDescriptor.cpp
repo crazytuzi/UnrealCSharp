@@ -24,6 +24,7 @@
 #include "Reflection/Property/DelegateProperty/FMulticastSparseDelegatePropertyDescriptor.h"
 #include "Reflection/Property/ObjectProperty/FWeakObjectPropertyDescriptor.h"
 #include "Reflection/Property/ObjectProperty/FLazyObjectPropertyDescriptor.h"
+#include "Reflection/Property/ObjectProperty/FSoftClassPropertyDescriptor.h"
 #include "Reflection/Property/ObjectProperty/FSoftObjectPropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FDoublePropertyDescriptor.h"
 #include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
@@ -81,6 +82,8 @@ EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Proper
 		GET_PROPERTY_TYPE(FWeakObjectProperty, EPropertyTypeExtent::WeakObjectReference)
 
 		GET_PROPERTY_TYPE(FLazyObjectProperty, EPropertyTypeExtent::LazyObjectReference)
+
+		GET_PROPERTY_TYPE(FSoftClassProperty, EPropertyTypeExtent::SoftClassReference)
 
 		GET_PROPERTY_TYPE(FSoftObjectProperty, EPropertyTypeExtent::SoftObjectReference)
 
@@ -145,6 +148,8 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 	NEW_PROPERTY_DESCRIPTOR(FWeakObjectProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FLazyObjectProperty)
+
+	NEW_PROPERTY_DESCRIPTOR(FSoftClassProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FSoftObjectProperty)
 

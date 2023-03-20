@@ -139,6 +139,17 @@ namespace Script.Reflection.Property
                 InPropertyName, OutValue);
 
         public static void GetObjectProperty<T>(Object InMonoObject, string InPropertyName,
+            out TSoftClassPtr<T> OutValue)
+            where T : UObject =>
+            PropertyImplementation.Property_GetObjectSoftClassPropertyImplementation(InMonoObject,
+                InPropertyName, out OutValue);
+
+        public static void SetObjectProperty<T>(Object InMonoObject, string InPropertyName, TSoftClassPtr<T> OutValue)
+            where T : UObject =>
+            PropertyImplementation.Property_SetObjectSoftClassPropertyImplementation(InMonoObject,
+                InPropertyName, OutValue);
+
+        public static void GetObjectProperty<T>(Object InMonoObject, string InPropertyName,
             out TSoftObjectPtr<T> OutValue)
             where T : UObject =>
             PropertyImplementation.Property_GetObjectSoftObjectPropertyImplementation(InMonoObject,
@@ -315,6 +326,17 @@ namespace Script.Reflection.Property
         public static void SetStructProperty<T>(Object InMonoObject, string InPropertyName, TLazyObjectPtr<T> OutValue)
             where T : UObject =>
             PropertyImplementation.Property_SetStructLazyObjectPropertyImplementation(InMonoObject,
+                InPropertyName, OutValue);
+
+        public static void GetStructProperty<T>(Object InMonoObject, string InPropertyName,
+            out TSoftClassPtr<T> OutValue)
+            where T : UObject =>
+            PropertyImplementation.Property_GetStructSoftClassPropertyImplementation(InMonoObject,
+                InPropertyName, out OutValue);
+
+        public static void SetStructProperty<T>(Object InMonoObject, string InPropertyName, TSoftClassPtr<T> OutValue)
+            where T : UObject =>
+            PropertyImplementation.Property_SetStructSoftClassPropertyImplementation(InMonoObject,
                 InPropertyName, OutValue);
 
         public static void GetStructProperty<T>(Object InMonoObject, string InPropertyName,

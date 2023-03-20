@@ -26,6 +26,8 @@ public:
 
 	typedef TMultiAddress<TScriptInterface<IInterface>> FScriptInterfaceAddress;
 
+	typedef TMultiAddress<TSoftClassPtr<UObject>> FSoftClassPtrAddress;
+
 public:
 	FMultiRegistry();
 
@@ -76,6 +78,10 @@ private:
 	TGarbageCollectionHandleMapping<FScriptInterfaceAddress> GarbageCollectionHandle2ScriptInterfaceAddress;
 
 	TMap<void*, FGarbageCollectionHandle> ScriptInterfaceAddress2GarbageCollectionHandle;
+
+	TGarbageCollectionHandleMapping<FSoftClassPtrAddress> GarbageCollectionHandle2SoftClassPtrAddress;
+
+	TMap<void*, FGarbageCollectionHandle> SoftClassPtrAddress2GarbageCollectionHandle;
 };
 
 #include "FMultiRegistry.inl"

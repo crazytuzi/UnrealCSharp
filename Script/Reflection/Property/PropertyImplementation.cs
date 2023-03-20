@@ -158,6 +158,16 @@ namespace Script.Reflection.Property
             TLazyObjectPtr<T> InValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_GetObjectSoftClassPropertyImplementation<T>(Object InMonoObject,
+            string InPropertyName,
+            out TSoftClassPtr<T> OutValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_SetObjectSoftClassPropertyImplementation<T>(Object InMonoObject,
+            string InPropertyName,
+            TSoftClassPtr<T> InValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetObjectSoftObjectPropertyImplementation<T>(Object InMonoObject,
             string InPropertyName,
             out TSoftObjectPtr<T> OutValue) where T : UObject;
@@ -356,6 +366,16 @@ namespace Script.Reflection.Property
         public static extern void Property_SetStructLazyObjectPropertyImplementation<T>(Object InMonoObject,
             string InPropertyName,
             TLazyObjectPtr<T> InValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_GetStructSoftClassPropertyImplementation<T>(Object InMonoObject,
+            string InPropertyName,
+            out TSoftClassPtr<T> OutValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_SetStructSoftClassPropertyImplementation<T>(Object InMonoObject,
+            string InPropertyName,
+            TSoftClassPtr<T> InValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetStructSoftObjectPropertyImplementation<T>(Object InMonoObject,
