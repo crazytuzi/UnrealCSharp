@@ -8,8 +8,7 @@ FReferenceRegistry::~FReferenceRegistry()
 	{
 		for (const auto& Reference : Pair.Value)
 		{
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(
-				static_cast<FGarbageCollectionHandle>(*Reference));
+			FGarbageCollectionHandle::Free(static_cast<FGarbageCollectionHandle>(*Reference));
 
 			delete Reference;
 		}

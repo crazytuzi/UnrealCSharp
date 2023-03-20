@@ -20,6 +20,13 @@ public:
 
 	bool IsValid();
 
+public:
+	static TGarbageCollectionHandle NewRef(MonoObject* InMonoObject, mono_bool bPinned);
+
+	static TGarbageCollectionHandle NewWeakRef(MonoObject* InMonoObject, mono_bool bTrackResurrection);
+
+	static void Free(const TGarbageCollectionHandle& InGarbageCollectionHandle);
+
 private:
 	T Handle;
 };

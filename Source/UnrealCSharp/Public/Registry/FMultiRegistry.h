@@ -44,25 +44,11 @@ public:
 	auto GetObject(const void* InAddress) const;
 
 public:
-	bool AddReference(MonoObject* InMonoObject, const FSubclassOfAddress::Type& InValue);
+	template <typename T>
+	auto AddReference(MonoObject* InMonoObject, const T& InValue);
 
-	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FSubclassOfAddress::Type& InValue);
-
-	bool AddReference(MonoObject* InMonoObject, const FWeakObjectPtrAddress::Type& InValue);
-
-	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FWeakObjectPtrAddress::Type& InValue);
-
-	bool AddReference(MonoObject* InMonoObject, const FLazyObjectPtrAddress::Type& InValue);
-
-	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FLazyObjectPtrAddress::Type& InValue);
-
-	bool AddReference(MonoObject* InMonoObject, const FSoftObjectPtrAddress::Type& InValue);
-
-	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FSoftObjectPtrAddress::Type& InValue);
-
-	bool AddReference(MonoObject* InMonoObject, const FScriptInterfaceAddress::Type& InValue);
-
-	bool AddReference(void* InAddress, MonoObject* InMonoObject, const FScriptInterfaceAddress::Type& InValue);
+	template <typename T>
+	auto AddReference(void* InAddress, MonoObject* InMonoObject, const T& InValue);
 
 	template <typename T>
 	auto RemoveReference(const MonoObject* InMonoObject);
