@@ -24,7 +24,7 @@
 
 #define FUNCTION_UTILS_IS_SUBCLASS_OF FString(TEXT("IsSubclassOf"))
 
-#define FUNCTION_STATIC_CLASS FString(TEXT("StaticClass"))
+#define FUNCTION_STATIC_STRUCT FString(TEXT("StaticStruct"))
 
 #define FUNCTION_SUB_CLASS_OF_GET FString(TEXT("Get"))
 
