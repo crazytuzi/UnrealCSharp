@@ -43,8 +43,6 @@ void FObjectImplementation::Object_StaticClassImplementation(MonoString* InClass
 		FCSharpEnvironment::GetEnvironment()->AddObjectReference(InClass, FoundMonoObject);
 	}
 
-	FCSharpEnvironment::GetEnvironment()->AddObjectReference(InClass, FoundMonoObject);
-
 	*OutValue = FoundMonoObject;
 }
 
