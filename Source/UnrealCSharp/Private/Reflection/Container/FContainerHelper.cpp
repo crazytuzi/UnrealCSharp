@@ -19,6 +19,8 @@ FProperty* FContainerHelper::Factory(MonoReflectionType* InReflectionType, const
 
 	case EPropertyTypeExtent::UInt32: return new FUInt32Property(InOwner, InName, InObjectFlags);
 
+	case EPropertyTypeExtent::UInt64: return new FUInt64Property(InOwner, InName, InObjectFlags);
+
 	case EPropertyTypeExtent::Int8: return new FInt8Property(InOwner, InName, InObjectFlags);
 
 	case EPropertyTypeExtent::Int16: return new FInt16Property(InOwner, InName, InObjectFlags);
@@ -154,7 +156,23 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyTypeExtent InProperty
 
 			const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
 
+			const auto InType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
+				InReflectionType);
+
+			const auto UnderlyingType = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+			                                                                  Type_Get_Underlying_Type(InType);
+
+			const auto UnderlyingReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
+				UnderlyingType);
+
+			const auto UnderlyingProperty = Factory(UnderlyingReflectionType, EnumProperty, "",
+			                                        EObjectFlags::RF_NoFlags);
+
+			EnumProperty->ElementSize = UnderlyingProperty->ElementSize;
+
 			EnumProperty->SetEnum(InEnum);
+
+			EnumProperty->AddCppProperty(UnderlyingProperty);
 
 			return EnumProperty;
 		}

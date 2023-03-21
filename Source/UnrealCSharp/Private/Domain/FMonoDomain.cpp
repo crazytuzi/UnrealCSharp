@@ -178,6 +178,11 @@ MonoReflectionType* FMonoDomain::Type_Get_Object(MonoType* InMonoType)
 	return Domain != nullptr && InMonoType != nullptr ? mono_type_get_object(Domain, InMonoType) : nullptr;
 }
 
+MonoType* FMonoDomain::Type_Get_Underlying_Type(MonoType* InMonoType) const
+{
+	return mono_type_get_underlying_type(InMonoType);
+}
+
 MonoReflectionMethod* FMonoDomain::Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass)
 {
 	return Domain != nullptr && InMethod != nullptr && InMonoClass != nullptr
