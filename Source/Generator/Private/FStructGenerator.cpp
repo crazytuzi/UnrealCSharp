@@ -80,13 +80,14 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	{
 		ConstructorContent = FString::Printf(TEXT(
 			"\t\tpublic %s() => "
-			"StructUtils.Struct_Register(this, GetType().GetCustomAttribute<PathNameAttribute>(true).PathName);\n"
+			"StructUtils.Struct_Register(this, \"%s\");\n"
 			"\n"
 			"\t\tprotected %s(Type InValue)\n"
 			"\t\t{\n"
 			"\t\t}\n"
 		),
 		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct),
+		                                     *PathNameAttributeContent,
 		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct)
 		);
 
@@ -95,11 +96,23 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		),
 		                                    *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct)
 		);
-
-		UsingNameSpaces.Add(TEXT("System.Reflection"));
-
-		UsingNameSpaces.Add(TEXT("Script.Reflection.Struct"));
 	}
+
+	auto StaticStructContent = FString::Printf(TEXT(
+		"\t\tpublic%s static UScriptStruct StaticStruct()\n"
+		"\t\t{\n"
+		"\t\t\tStructUtils.Struct_StaticStruct(\"%s\", out var __OutValue);\n"
+		"\n"
+		"\t\t\treturn __OutValue;\n"
+		"\t\t}\n"
+	),
+	                                           SuperStruct != nullptr ? TEXT(" new") : TEXT(""),
+	                                           *PathNameAttributeContent
+	);
+
+	UsingNameSpaces.Add(TEXT("Script.Reflection.Struct"));
+
+	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UScriptStruct::StaticClass()));
 
 	auto bHasProperty = false;
 
@@ -180,6 +193,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"\t[PathName(\"%s\")]\n"
 		"\tpublic partial class %s%s\n"
 		"\t{\n"
+		"%s\n"
 		"%s"
 		"%s"
 		"%s"
@@ -193,6 +207,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *PathNameAttributeContent,
 	                               *FullClassContent,
 	                               *SuperStructContent,
+	                               *StaticStructContent,
 	                               *ConstructorContent,
 	                               ConstructorContent.IsEmpty() == true ? TEXT("") : TEXT("\n"),
 	                               *DestructorContent,

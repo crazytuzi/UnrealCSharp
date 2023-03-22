@@ -143,6 +143,8 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyTypeExtent InProperty
 
 			const auto StructProperty = new FStructProperty(InOwner, InName, InObjectFlags);
 
+			StructProperty->ElementSize = InScriptStruct->GetStructureSize();
+
 			StructProperty->Struct = InScriptStruct;
 
 			return StructProperty;

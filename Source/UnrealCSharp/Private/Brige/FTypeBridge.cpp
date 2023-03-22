@@ -107,6 +107,19 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 		return EPropertyTypeExtent::Enum;
 	}
 
+	if (const auto InType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
+		InReflectionType))
+	{
+		if (const auto InClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Class(InType))
+		{
+			if (const auto FoundMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+				InClass, FUNCTION_STATIC_STRUCT, 0))
+			{
+				return EPropertyTypeExtent::Struct;
+			}
+		}
+	}
+
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING))
 	{
