@@ -64,37 +64,36 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(SuperStruct));
 
 		ConstructorContent = FString::Printf(TEXT(
-			"\t\tpublic %s()\n"
-			"\t\t{\n"
-			"\t\t}\n"
+			"\t\tpublic %s() : base(typeof(%s)) => StructUtils.Struct_Register(this, \"%s\");\n"
 			"\n"
 			"\t\tprotected %s(Type InValue) : base(InValue)\n"
 			"\t\t{\n"
 			"\t\t}\n"
 		),
-		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct),
-		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct)
+		                                     *FullClassContent,
+		                                     *FullClassContent,
+		                                     *PathNameAttributeContent,
+		                                     *FullClassContent
 		);
 	}
 	else
 	{
 		ConstructorContent = FString::Printf(TEXT(
-			"\t\tpublic %s() => "
-			"StructUtils.Struct_Register(this, \"%s\");\n"
+			"\t\tpublic %s() => StructUtils.Struct_Register(this, \"%s\");\n"
 			"\n"
 			"\t\tprotected %s(Type InValue)\n"
 			"\t\t{\n"
 			"\t\t}\n"
 		),
-		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct),
+		                                     *FullClassContent,
 		                                     *PathNameAttributeContent,
-		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct)
+		                                     *FullClassContent
 		);
 
 		DestructorContent = FString::Printf(TEXT(
-			"\t\t~%s() => StructUtils.Struct_UnRegister(this);\n"
+			"\n\t\t~%s() => StructUtils.Struct_UnRegister(this);\n"
 		),
-		                                    *FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct)
+		                                    *FullClassContent
 		);
 	}
 
@@ -139,7 +138,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
-		if(UserDefinedStruct != nullptr)
+		if (UserDefinedStruct != nullptr)
 		{
 			PropertyName = FStructureEditorUtils::GetVariableFriendlyNameForProperty(
 				UserDefinedStruct, *PropertyIterator);
@@ -198,7 +197,6 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"%s"
 		"%s"
 		"%s"
-		"%s"
 		"\t}\n"
 		"}"
 	),
@@ -209,7 +207,6 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *SuperStructContent,
 	                               *StaticStructContent,
 	                               *ConstructorContent,
-	                               ConstructorContent.IsEmpty() == true ? TEXT("") : TEXT("\n"),
 	                               *DestructorContent,
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
 	                               *PropertyContent

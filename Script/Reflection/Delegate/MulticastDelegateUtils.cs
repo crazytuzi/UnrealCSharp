@@ -1,6 +1,7 @@
 ﻿using System;
 using Script.Common;
 using Script.CoreUObject;
+using Script.Library;
 
 namespace Script.Reflection.Delegate
 {
@@ -34,9 +35,5 @@ namespace Script.Reflection.Delegate
         public static void
             MulticastDelegate_Broadcast(FDelegateBase InMonoObject, out ObjectList OutValue, params Object[] InValue) =>
             MulticastDelegateImplementation.MulticastDelegate_BroadcastImplementation(InMonoObject, out OutValue, InValue);
-
-        private static Object MulticastDelegate_GetTarget(System.Delegate InDelegate) => InDelegate.Target;
-
-        private static Boolean MulticastDelegate_Equals(System.Delegate A, System.Delegate B) => A == B;
     }
 }

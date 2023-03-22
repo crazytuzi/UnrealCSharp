@@ -7,7 +7,7 @@ struct FRegisterFunction
 {
 	FRegisterFunction()
 	{
-		FBindingClassBuilder(TEXT("Function"), NAMESPACE_FUNCTION)
+		FBindingClassBuilder(TEXT("Function"), NAMESPACE_LIBRARY)
 			.Function("Reflection", static_cast<void*>(FFunctionImplementation::Function_ReflectionImplementation))
 			.Register();
 	}

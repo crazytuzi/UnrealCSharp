@@ -2,8 +2,6 @@
 
 #define COMBINE_CLASS(A, B) FString::Printf(TEXT("%s.%s"), *A, *B)
 
-#define CLASS_LOG_IMPLEMENTATION FString(TEXT("LogImplementation"))
-
 #define CLASS_INT_PTR FString(TEXT("IntPtr"))
 
 #define CLASS_OBJECT_LIST FString(TEXT("ObjectList"))

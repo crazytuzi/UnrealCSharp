@@ -72,5 +72,5 @@ private:
 	                               MonoArray* InParamsArray);
 
 private:
-	static bool IsSubclassOf(MonoReflectionType* InReflectionType, MonoClass* InMonoClass);
+	static MonoReflectionType* GetType(MonoReflectionType* InReflectionType);
 };

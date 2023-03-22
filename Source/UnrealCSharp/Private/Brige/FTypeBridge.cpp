@@ -9,6 +9,8 @@
 
 EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 {
+	InReflectionType = GetType(InReflectionType);
+
 	const auto InMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
 		InReflectionType);
 
@@ -67,7 +69,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SUB_CLASS_OF))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::ClassReference;
 		}
@@ -77,7 +79,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
 		FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass())))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::ObjectReference;
 		}
@@ -86,7 +88,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::Name;
 		}
@@ -95,7 +97,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SCRIPT_INTERFACE))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::Interface;
 		}
@@ -112,7 +114,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	{
 		if (const auto InClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Class(InType))
 		{
-			if (const auto FoundMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+			if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
 				InClass, FUNCTION_STATIC_STRUCT, 0))
 			{
 				return EPropertyTypeExtent::Struct;
@@ -123,7 +125,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::String;
 		}
@@ -132,7 +134,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::Text;
 		}
@@ -141,7 +143,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_WEAK_OBJECT_PTR))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::WeakObjectReference;
 		}
@@ -150,7 +152,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_LAZY_OBJECT_PTR))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::LazyObjectReference;
 		}
@@ -159,7 +161,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SOFT_CLASS_PTR))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::SoftClassReference;
 		}
@@ -168,7 +170,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SOFT_OBJECT_PTR))
 	{
-		if (IsSubclassOf(InReflectionType, FoundMonoClass))
+		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::SoftObjectReference;
 		}
@@ -776,23 +778,16 @@ MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* I
 	return FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Get_Class(GenericClassMonoObject);
 }
 
-bool FTypeBridge::IsSubclassOf(MonoReflectionType* InReflectionType, MonoClass* InMonoClass)
+MonoReflectionType* FTypeBridge::GetType(MonoReflectionType* InReflectionType)
 {
-	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(InMonoClass);
-
-	const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
-		FoundMonoType);
-
-	void* InParams[2] = {InReflectionType, FoundReflectionType};
+	auto InParams = static_cast<void*>(InReflectionType);
 
 	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
-	const auto IsSubclassOfMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
-		UtilsMonoClass, FUNCTION_UTILS_IS_SUBCLASS_OF, TGetArrayLength(InParams));
+	const auto GetTypeMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+		UtilsMonoClass, FUNCTION_UTILS_GET_TYPE, TGetArrayLength(InParams));
 
-	const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-		IsSubclassOfMethod, nullptr, InParams, nullptr);
-
-	return *static_cast<bool*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(ResultMonoObject));
+	return reinterpret_cast<MonoReflectionType*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+		GetTypeMethod, nullptr, &InParams, nullptr));
 }
