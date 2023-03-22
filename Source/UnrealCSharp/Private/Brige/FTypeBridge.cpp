@@ -79,7 +79,8 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
 		FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass())))
 	{
-		if (FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		if (InMonoClass == FoundMonoClass || FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Is_Subclass_Of(
+			InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::ObjectReference;
 		}

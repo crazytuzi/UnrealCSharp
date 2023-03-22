@@ -258,3 +258,27 @@ FScriptMap* FMapHelper::GetScriptMap() const
 {
 	return ScriptMap;
 }
+
+int32 FMapHelper::GetMaxIndex() const
+{
+	return ScriptMap->GetMaxIndex();
+}
+
+bool FMapHelper::IsValidIndex(const int32 InIndex) const
+{
+	return ScriptMap->IsValidIndex(InIndex);
+}
+
+void* FMapHelper::GetEnumeratorKey(const int32 InIndex) const
+{
+	return ScriptMap->IsValidIndex(InIndex)
+		       ? static_cast<uint8*>(ScriptMap->GetData(InIndex, ScriptMapLayout))
+		       : nullptr;
+}
+
+void* FMapHelper::GetEnumeratorValue(const int32 InIndex) const
+{
+	return ScriptMap->IsValidIndex(InIndex)
+		       ? static_cast<uint8*>(ScriptMap->GetData(InIndex, ScriptMapLayout)) + ScriptMapLayout.ValueOffset
+		       : nullptr;
+}

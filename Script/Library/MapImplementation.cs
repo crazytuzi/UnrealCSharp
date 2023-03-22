@@ -44,5 +44,22 @@ namespace Script.Library
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Map_SetImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, TKey InKey,
             TValue InValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Int32 Map_GetMaxIndexImplementation<TKey, TValue>(TMap<TKey, TValue> InMap);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean Map_IsValidIndexImplementation<TKey, TValue>(TMap<TKey, TValue> InMap,
+            Int32 InIndex);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Map_GetEnumeratorKeyImplementation<TKey, TValue>(TMap<TKey, TValue> InMap,
+            Int32 InIndex,
+            out Object OutKey);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Map_GetEnumeratorValueImplementation<TKey, TValue>(TMap<TKey, TValue> InMap,
+            Int32 InIndex,
+            out Object OutValue);
     }
 }

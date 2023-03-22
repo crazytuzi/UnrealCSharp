@@ -40,6 +40,14 @@ public:
 
 	FScriptMap* GetScriptMap() const;
 
+	int32 GetMaxIndex() const;
+
+	bool IsValidIndex(int32 InIndex) const;
+
+	void* GetEnumeratorKey(int32 InIndex) const;
+
+	void* GetEnumeratorValue(int32 InIndex) const;
+
 private:
 	FPropertyDescriptor* KeyPropertyDescriptor;
 

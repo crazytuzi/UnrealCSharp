@@ -50,5 +50,25 @@ namespace Script.Reflection.Container
 
         public static void Map_Set<TKey, TValue>(TMap<TKey, TValue> InMap, TKey InKey, TValue InValue) =>
             MapImplementation.Map_SetImplementation(InMap, InKey, InValue);
+
+        public static Int32 Map_GetMaxIndex<TKey, TValue>(TMap<TKey, TValue> InMap) =>
+            MapImplementation.Map_GetMaxIndexImplementation(InMap);
+
+        public static Boolean Map_IsValidIndex<TKey, TValue>(TMap<TKey, TValue> InMap, Int32 InIndex) =>
+            MapImplementation.Map_IsValidIndexImplementation(InMap, InIndex);
+
+        public static TKey Map_GetEnumeratorKey<TKey, TValue>(TMap<TKey, TValue> InMap, Int32 InIndex)
+        {
+            MapImplementation.Map_GetEnumeratorKeyImplementation(InMap, InIndex, out var OutKey);
+
+            return (TKey) OutKey;
+        }
+
+        public static TValue Map_GetEnumeratorValue<TKey, TValue>(TMap<TKey, TValue> InMap, Int32 InIndex)
+        {
+            MapImplementation.Map_GetEnumeratorValueImplementation(InMap, InIndex, out var OutValue);
+
+            return (TValue) OutValue;
+        }
     }
 }
