@@ -9,7 +9,7 @@ struct FRegisterMap
 {
 	FRegisterMap()
 	{
-		FBindingClassBuilder(TEXT("Map"), NAMESPACE_CONTAINER)
+		FBindingClassBuilder(TEXT("Map"), NAMESPACE_LIBRARY)
 			.Function("Register", static_cast<void*>(FMapImplementation::Map_RegisterImplementation))
 			.Function("UnRegister", static_cast<void*>(FMapImplementation::Map_UnRegisterImplementation))
 			.Function("Empty", static_cast<void*>(FMapImplementation::Map_EmptyImplementation))

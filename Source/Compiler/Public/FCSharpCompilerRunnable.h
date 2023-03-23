@@ -24,7 +24,7 @@ private:
 
 	static void Compile();
 
-	static FString GetCompileTool(const FString& ProductLineVersion = FString("2019"));
+	static FString GetCompileTool(const FString& ProductLineVersion = FString("2022"));
 
 private:
 	static FString CompileTool;

@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 
-namespace Script.Reflection.Container
+namespace Script.Library
 {
     public static class MapImplementation
     {

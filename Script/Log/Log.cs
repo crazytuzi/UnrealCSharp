@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
+using Script.Library;
 
 namespace Script.Log
 {
     /**
     * https://github.com/mono-ue/UnrealEngine/blob/monoue/Engine/Plugins/MonoUE/Managed/MonoBindings/LogTextWriter.cs
     */
-    sealed class LogImplementation : TextWriter
+    sealed class Log : TextWriter
     {
         private sealed class StringWrapper : IList<char>
         {
@@ -90,13 +90,13 @@ namespace Script.Log
 
         private uint _writeIndex;
 
-        private LogImplementation()
+        private Log()
         {
         }
 
-        private static TextWriter Create()
+        public static TextWriter Create()
         {
-            return Synchronized(new LogImplementation());
+            return Synchronized(new Log());
         }
 
         public override Encoding Encoding => Encoding.Default;
@@ -163,7 +163,7 @@ namespace Script.Log
             {
                 _storage[_writeIndex] = '\0';
 
-                Log_LogImplementation(_storage, _readIndex);
+                LogImplementation.Log_LogImplementation(_storage, _readIndex);
             }
             else
             {
@@ -175,7 +175,7 @@ namespace Script.Log
 
                 _tempStorage[firstBlockCount + _writeIndex] = '\0';
 
-                Log_LogImplementation(_tempStorage, 0);
+                LogImplementation.Log_LogImplementation(_tempStorage, 0);
             }
 
             _readIndex = _writeIndex;
@@ -189,14 +189,6 @@ namespace Script.Log
             {
                 InternalFlush(true);
             }
-        }
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void Log_LogImplementation(char[] InBuffer, uint InReadOffset);
-
-        public static void SetOut()
-        {
-            Console.SetOut(Create());
         }
     }
 }

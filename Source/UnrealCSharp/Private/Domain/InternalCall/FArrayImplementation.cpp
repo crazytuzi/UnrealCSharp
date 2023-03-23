@@ -9,7 +9,7 @@ struct FRegisterArray
 {
 	FRegisterArray()
 	{
-		FBindingClassBuilder(TEXT("Array"), NAMESPACE_CONTAINER)
+		FBindingClassBuilder(TEXT("Array"), NAMESPACE_LIBRARY)
 			.Function("Register", static_cast<void*>(FArrayImplementation::Array_RegisterImplementation))
 			.Function("UnRegister", static_cast<void*>(FArrayImplementation::Array_UnRegisterImplementation))
 			.Function("GetTypeSize", static_cast<void*>(FArrayImplementation::Array_GetTypeSizeImplementation))

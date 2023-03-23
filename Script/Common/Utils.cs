@@ -5,12 +5,12 @@ namespace Script.Common
 {
     public static class Utils
     {
-        static Boolean IsOverrideType(Type InType)
+        private static Boolean IsOverrideType(Type InType)
         {
             return InType.IsDefined(typeof(IsOverrideAttribute), true);
         }
 
-        static Boolean IsOverrideMethod(MethodInfo InMethodInfo)
+        private static Boolean IsOverrideMethod(MethodInfo InMethodInfo)
         {
             return InMethodInfo.IsDefined(typeof(IsOverrideAttribute), true);
         }
@@ -18,21 +18,30 @@ namespace Script.Common
         public static string GetPathName(Type InType) =>
             InType.GetCustomAttribute<PathNameAttribute>(true).PathName;
 
-        public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments,
+        private static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments,
             Object[] InParams) =>
             Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments), InParams);
 
-        public static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments) =>
+        private static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments) =>
             Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments));
 
-        public static Type[] GetGenericArguments(Type InType)
+        private static Type[] GetGenericArguments(Type InType)
         {
             return InType.GetGenericArguments();
         }
 
-        public static Boolean IsSubclassOf(Type A, Type B)
+        private static Type GetType(Type InType)
         {
-            return A.IsGenericType ? A.GetGenericTypeDefinition() == B : A == B || A.IsSubclassOf(B);
+            return InType.IsGenericType ? InType.GetGenericTypeDefinition() : InType;
+        }
+
+        private static Object MulticastDelegate_GetTarget(System.Delegate InDelegate) => InDelegate.Target;
+
+        private static Boolean MulticastDelegate_Equals(System.Delegate A, System.Delegate B) => A == B;
+
+        private static void SetOut()
+        {
+            Console.SetOut(Log.Log.Create());
         }
     }
 }

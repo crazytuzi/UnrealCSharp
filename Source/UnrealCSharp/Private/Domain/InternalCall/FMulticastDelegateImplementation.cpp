@@ -8,7 +8,7 @@ struct FRegisterMulticastDelegate
 {
 	FRegisterMulticastDelegate()
 	{
-		FBindingClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_DELEGATE)
+		FBindingClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_LIBRARY)
 			.Function("IsBound",
 			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation))
 			.Function("Contains",

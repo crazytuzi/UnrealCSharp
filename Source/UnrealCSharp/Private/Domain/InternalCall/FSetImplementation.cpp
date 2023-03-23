@@ -9,7 +9,7 @@ struct FRegisterSet
 {
 	FRegisterSet()
 	{
-		FBindingClassBuilder(TEXT("Set"), NAMESPACE_CONTAINER)
+		FBindingClassBuilder(TEXT("Set"), NAMESPACE_LIBRARY)
 			.Function("Register", static_cast<void*>(FSetImplementation::Set_RegisterImplementation))
 			.Function("UnRegister", static_cast<void*>(FSetImplementation::Set_UnRegisterImplementation))
 			.Function("Empty", static_cast<void*>(FSetImplementation::Set_EmptyImplementation))

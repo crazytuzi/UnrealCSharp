@@ -8,7 +8,7 @@ struct FRegisterDelegate
 {
 	FRegisterDelegate()
 	{
-		FBindingClassBuilder(TEXT("Delegate"), NAMESPACE_DELEGATE)
+		FBindingClassBuilder(TEXT("Delegate"), NAMESPACE_LIBRARY)
 			.Function("Bind", static_cast<void*>(FDelegateImplementation::Delegate_BindImplementation))
 			.Function("IsBound", static_cast<void*>(FDelegateImplementation::Delegate_IsBoundImplementation))
 			.Function("UnBind", static_cast<void*>(FDelegateImplementation::Delegate_UnBindImplementation))

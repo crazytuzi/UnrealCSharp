@@ -2,8 +2,9 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using Script.Reflection.Property;
 
-namespace Script.Reflection.Property
+namespace Script.Library
 {
     public static class PropertyImplementation
     {

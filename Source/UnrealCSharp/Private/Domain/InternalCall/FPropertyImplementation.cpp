@@ -7,7 +7,7 @@ struct FRegisterProperty
 {
 	FRegisterProperty()
 	{
-		FBindingClassBuilder(TEXT("Property"), NAMESPACE_PROPERTY)
+		FBindingClassBuilder(TEXT("Property"), NAMESPACE_LIBRARY)
 			.Function("GetObjectByteProperty",
 			          static_cast<void*>(FPropertyImplementation::Property_GetObjectBytePropertyImplementation))
 			.Function("SetObjectByteProperty",
