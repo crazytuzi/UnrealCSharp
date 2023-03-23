@@ -100,14 +100,7 @@ void FArrayHelper::Set(const int32 Index, void* InValue) const
 
 	if (ScriptArrayHelper.IsValidIndex(Index))
 	{
-		if (InnerPropertyDescriptor->IsPrimitiveProperty())
-		{
-			InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
-		}
-		else
-		{
-			InnerPropertyDescriptor->Set(static_cast<void**>(InValue), ScriptArrayHelper.GetRawPtr(Index));
-		}
+		InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
 	}
 }
 
@@ -227,14 +220,7 @@ int32 FArrayHelper::Add(void* InValue) const
 
 	const auto Index = ScriptArrayHelper.AddUninitializedValue();
 
-	if (InnerPropertyDescriptor->IsPrimitiveProperty())
-	{
-		InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
-	}
-	else
-	{
-		InnerPropertyDescriptor->Set(static_cast<void**>(InValue), ScriptArrayHelper.GetRawPtr(Index));
-	}
+	InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
 
 	return Index;
 }

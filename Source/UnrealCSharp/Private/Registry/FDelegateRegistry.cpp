@@ -1,5 +1,6 @@
 ﻿#include "Registry/FDelegateRegistry.h"
 #include "Reference/FDelegateReference.h"
+#include "Environment/FCSharpEnvironment.h"
 
 FDelegateRegistry::FDelegateRegistry()
 {

@@ -21,13 +21,13 @@ public:
 
 	static void Array_GetImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject** OutValue);
 
-	static void Array_SetImplementation(const MonoObject* InMonoObject, int32 InIndex, void* InValue);
+	static void Array_SetImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject* InValue);
 
-	static int32 Array_FindImplementation(const MonoObject* InMonoObject, void* InValue);
+	static int32 Array_FindImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
-	static int32 Array_FindLastImplementation(const MonoObject* InMonoObject, void* InValue);
+	static int32 Array_FindLastImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
-	static bool Array_ContainsImplementation(const MonoObject* InMonoObject, void* InValue);
+	static bool Array_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
 	static int32 Array_AddUninitializedImplementation(const MonoObject* InMonoObject, int32 InCount);
 
@@ -44,15 +44,15 @@ public:
 
 	static void Array_SetNumImplementation(const MonoObject* InMonoObject, int32 InNewNum, bool bAllowShrinking);
 
-	static int32 Array_AddImplementation(const MonoObject* InMonoObject, void* InValue);
+	static int32 Array_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
 	static int32 Array_AddZeroedImplementation(const MonoObject* InMonoObject, int32 InCount);
 
-	static int32 Array_AddUniqueImplementation(const MonoObject* InMonoObject, void* InValue);
+	static int32 Array_AddUniqueImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
-	static int32 Array_RemoveSingleImplementation(const MonoObject* InMonoObject, const void* InValue);
+	static int32 Array_RemoveSingleImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
-	static int32 Array_RemoveImplementation(const MonoObject* InMonoObject, const void* InValue);
+	static int32 Array_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
 	static void Array_SwapMemoryImplementation(const MonoObject* InMonoObject, int32 InFirstIndexToSwap,
 	                                           int32 InSecondIndexToSwap);
