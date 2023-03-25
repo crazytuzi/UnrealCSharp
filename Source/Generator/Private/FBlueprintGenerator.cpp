@@ -13,9 +13,11 @@ void FBlueprintGenerator::Generator()
 
 	FARFilter Filter;
 
-	Filter.ClassNames = {
-		UBlueprint::StaticClass()->GetFName(), UWidgetBlueprint::StaticClass()->GetFName(),
-		UUserDefinedStruct::StaticClass()->GetFName(), UUserDefinedEnum::StaticClass()->GetFName()
+	Filter.ClassPaths = {
+		UBlueprint::StaticClass()->GetClassPathName(),
+		UWidgetBlueprint::StaticClass()->GetClassPathName(),
+		UUserDefinedStruct::StaticClass()->GetClassPathName(),
+		UUserDefinedEnum::StaticClass()->GetClassPathName()
 	};
 
 	TArray<FAssetData> OutAssetData;
