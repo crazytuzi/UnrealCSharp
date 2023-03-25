@@ -21,6 +21,11 @@ struct FRegisterMap
 			.Function("Contains", static_cast<void*>(FMapImplementation::Map_ContainsImplementation))
 			.Function("Get", static_cast<void*>(FMapImplementation::Map_GetImplementation))
 			.Function("Set", static_cast<void*>(FMapImplementation::Map_SetImplementation))
+			.Function("GetMaxIndex", static_cast<void*>(FMapImplementation::Map_GetMaxIndexImplementation))
+			.Function("IsValidIndex", static_cast<void*>(FMapImplementation::Map_IsValidIndexImplementation))
+			.Function("GetEnumeratorKey", static_cast<void*>(FMapImplementation::Map_GetEnumeratorKeyImplementation))
+			.Function("GetEnumeratorValue",
+			          static_cast<void*>(FMapImplementation::Map_GetEnumeratorValueImplementation))
 			.Register();
 	}
 };
@@ -144,5 +149,63 @@ void FMapImplementation::Map_SetImplementation(const MonoObject* InMonoObject, v
 	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
 	{
 		MapHelper->Set(&InKey, &InValue);
+	}
+}
+
+int32 FMapImplementation::Map_GetMaxIndexImplementation(const MonoObject* InMonoObject)
+{
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	{
+		return MapHelper->GetMaxIndex();
+	}
+
+	return 0;
+}
+
+bool FMapImplementation::Map_IsValidIndexImplementation(const MonoObject* InMonoObject, const int32 InIndex)
+{
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	{
+		return MapHelper->IsValidIndex(InIndex);
+	}
+
+	return false;
+}
+
+void FMapImplementation::Map_GetEnumeratorKeyImplementation(const MonoObject* InMonoObject, const int32 InIndex,
+                                                            MonoObject** OutKey)
+{
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	{
+		const auto Key = MapHelper->GetEnumeratorKey(InIndex);
+
+		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			*OutKey = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+				FTypeBridge::GetMonoClass(MapHelper->GetKeyPropertyDescriptor()->GetProperty()), Key);
+		}
+		else
+		{
+			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(OutKey));
+		}
+	}
+}
+
+void FMapImplementation::Map_GetEnumeratorValueImplementation(const MonoObject* InMonoObject, const int32 InIndex,
+                                                              MonoObject** OutValue)
+{
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	{
+		const auto Value = MapHelper->GetEnumeratorValue(InIndex);
+
+		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
+		{
+			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
+		}
+		else
+		{
+			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
+		}
 	}
 }

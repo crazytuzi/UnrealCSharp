@@ -26,4 +26,13 @@ public:
 	static void Map_GetImplementation(const MonoObject* InMonoObject, void* InKey, MonoObject** OutValue);
 
 	static void Map_SetImplementation(const MonoObject* InMonoObject, void* InKey, void* InValue);
+
+	static int32 Map_GetMaxIndexImplementation(const MonoObject* InMonoObject);
+
+	static bool Map_IsValidIndexImplementation(const MonoObject* InMonoObject, int32 InIndex);
+
+	static void Map_GetEnumeratorKeyImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject** OutKey);
+
+	static void Map_GetEnumeratorValueImplementation(const MonoObject* InMonoObject, int32 InIndex,
+	                                                 MonoObject** OutValue);
 };

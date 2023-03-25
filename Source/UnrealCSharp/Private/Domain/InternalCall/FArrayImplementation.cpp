@@ -123,39 +123,68 @@ void FArrayImplementation::Array_GetImplementation(const MonoObject* InMonoObjec
 	}
 }
 
-void FArrayImplementation::Array_SetImplementation(const MonoObject* InMonoObject, const int32 InIndex, void* InValue)
+void FArrayImplementation::Array_SetImplementation(const MonoObject* InMonoObject, const int32 InIndex,
+                                                   MonoObject* InValue)
 {
 	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
 	{
-		ArrayHelper->Set(InIndex, &InValue);
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			ArrayHelper->Set(InIndex, FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			ArrayHelper->Set(InIndex, InValue);
+		}
 	}
 }
 
-int32 FArrayImplementation::Array_FindImplementation(const MonoObject* InMonoObject, void* InValue)
+int32 FArrayImplementation::Array_FindImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
 	{
-		return ArrayHelper->Find(&InValue);
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return ArrayHelper->Find(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return ArrayHelper->Find(InValue);
+		}
 	}
 
 	return 0;
 }
 
-int32 FArrayImplementation::Array_FindLastImplementation(const MonoObject* InMonoObject, void* InValue)
+int32 FArrayImplementation::Array_FindLastImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
 	{
-		return ArrayHelper->FindLast(&InValue);
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return ArrayHelper->FindLast(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return ArrayHelper->FindLast(InValue);
+		}
 	}
 
 	return 0;
 }
 
-bool FArrayImplementation::Array_ContainsImplementation(const MonoObject* InMonoObject, void* InValue)
+bool FArrayImplementation::Array_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
 	{
-		return ArrayHelper->Contains(&InValue);
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return ArrayHelper->Contains(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return ArrayHelper->Contains(InValue);
+		}
 	}
 
 	return false;
@@ -223,11 +252,18 @@ void FArrayImplementation::Array_SetNumImplementation(const MonoObject* InMonoOb
 	}
 }
 
-int32 FArrayImplementation::Array_AddImplementation(const MonoObject* InMonoObject, void* InValue)
+int32 FArrayImplementation::Array_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
 	{
-		return ArrayHelper->Add(&InValue);
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return ArrayHelper->Add(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return ArrayHelper->Add(InValue);
+		}
 	}
 
 	return 0;
@@ -243,31 +279,52 @@ int32 FArrayImplementation::Array_AddZeroedImplementation(const MonoObject* InMo
 	return 0;
 }
 
-int32 FArrayImplementation::Array_AddUniqueImplementation(const MonoObject* InMonoObject, void* InValue)
+int32 FArrayImplementation::Array_AddUniqueImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
 	{
-		return ArrayHelper->AddUnique(&InValue);
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return ArrayHelper->AddUnique(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return ArrayHelper->AddUnique(InValue);
+		}
 	}
 
 	return 0;
 }
 
-int32 FArrayImplementation::Array_RemoveSingleImplementation(const MonoObject* InMonoObject, const void* InValue)
+int32 FArrayImplementation::Array_RemoveSingleImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
 	{
-		return ArrayHelper->RemoveSingle(&InValue);
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return ArrayHelper->RemoveSingle(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return ArrayHelper->RemoveSingle(InValue);
+		}
 	}
 
 	return 0;
 }
 
-int32 FArrayImplementation::Array_RemoveImplementation(const MonoObject* InMonoObject, const void* InValue)
+int32 FArrayImplementation::Array_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
 	{
-		return ArrayHelper->Remove(&InValue);
+		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return ArrayHelper->Remove(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return ArrayHelper->Remove(InValue);
+		}
 	}
 
 	return 0;

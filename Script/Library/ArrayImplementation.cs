@@ -31,16 +31,16 @@ namespace Script.Library
         public static extern void Array_GetImplementation<T>(TArray<T> InArray, Int32 InIndex, out Object OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_SetImplementation<T>(TArray<T> InArray, Int32 InIndex, T InValue);
+        public static extern void Array_SetImplementation<T>(TArray<T> InArray, Int32 InIndex, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_FindImplementation<T>(TArray<T> InArray, T InValue);
+        public static extern Int32 Array_FindImplementation<T>(TArray<T> InArray, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_FindLastImplementation<T>(TArray<T> InArray, T InValue);
+        public static extern Int32 Array_FindLastImplementation<T>(TArray<T> InArray, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Array_ContainsImplementation<T>(TArray<T> InArray, T InValue);
+        public static extern Boolean Array_ContainsImplementation<T>(TArray<T> InArray, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Array_AddUninitializedImplementation<T>(TArray<T> InArray, Int32 InCount);
@@ -67,19 +67,19 @@ namespace Script.Library
             Boolean bAllowShrinking);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_AddImplementation<T>(TArray<T> InArray, T InValue);
+        public static extern Int32 Array_AddImplementation<T>(TArray<T> InArray, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Array_AddZeroedImplementation<T>(TArray<T> InArray, Int32 InCount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_AddUniqueImplementation<T>(TArray<T> InArray, T InValue);
+        public static extern Int32 Array_AddUniqueImplementation<T>(TArray<T> InArray, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_RemoveSingleImplementation<T>(TArray<T> InArray, T InValue);
+        public static extern Int32 Array_RemoveSingleImplementation<T>(TArray<T> InArray, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_RemoveImplementation<T>(TArray<T> InArray, T InValue);
+        public static extern Int32 Array_RemoveImplementation<T>(TArray<T> InArray, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Array_SwapMemoryImplementation<T>(TArray<T> InArray, Int32 InFirstIndexToSwap,
