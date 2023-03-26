@@ -40,7 +40,8 @@ public class Generator : ModuleRules
 				"SlateCore",
 				"UMGEditor",
 				"UnrealEd", 
-				"UnrealCSharpCore"
+				"UnrealCSharpCore",
+				"CrossVersion"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
