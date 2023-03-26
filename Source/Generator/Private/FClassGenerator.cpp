@@ -616,7 +616,12 @@ FString FClassGenerator::GetCppFunctionDefaultParam(const UFunction* InFunction,
 	{
 		return FString::Printf(TEXT(" = %sf"), *MetaData);
 	}
-
+	
+	if (CastField<FDoubleProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), *MetaData);
+	}
+	
 	if (CastField<FClassProperty>(InProperty))
 	{
 		return FString::Printf(TEXT(" = null"));
