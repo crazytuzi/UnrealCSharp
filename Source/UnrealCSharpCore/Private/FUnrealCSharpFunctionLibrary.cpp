@@ -112,6 +112,10 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InStruct)
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}
+	else
+	{
+		ModuleName = ModuleName.Replace(*("/" + InStruct->GetName()), TEXT(""));
+	}
 
 	return FString::Printf(TEXT(
 		"%s%s"
