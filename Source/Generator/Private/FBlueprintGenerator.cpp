@@ -6,6 +6,7 @@
 #include "Engine/UserDefinedEnum.h"
 #include "Engine/UserDefinedStruct.h"
 #include "UMGEditor/Public/WidgetBlueprint.h"
+#include "UEVersion.h"
 
 void FBlueprintGenerator::Generator()
 {
@@ -13,10 +14,17 @@ void FBlueprintGenerator::Generator()
 
 	FARFilter Filter;
 
+#if UE_FILTER_CLASS_PATHS
+	Filter.ClassPaths = {
+		UBlueprint::StaticClass()->GetClassPathName(), UWidgetBlueprint::StaticClass()->GetClassPathName(),
+		UUserDefinedStruct::StaticClass()->GetClassPathName(), UUserDefinedEnum::StaticClass()->GetClassPathName()
+	};
+#else
 	Filter.ClassNames = {
 		UBlueprint::StaticClass()->GetFName(), UWidgetBlueprint::StaticClass()->GetFName(),
 		UUserDefinedStruct::StaticClass()->GetFName(), UUserDefinedEnum::StaticClass()->GetFName()
 	};
+#endif
 
 	TArray<FAssetData> OutAssetData;
 
