@@ -21,8 +21,6 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		return;
 	}
 
-	auto UserDefinedEnum = Cast<UUserDefinedEnum>(InEnum);
-
 	FString UsingNameSpaceContent;
 
 	const auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum);
@@ -39,26 +37,14 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
 	{
-		auto EnumeratorString = InEnum->GetNameStringByIndex(Index);
-
-		if (EnumeratorString.EndsWith(TEXT("_MAX")))
-		{
-			continue;
-		}
-
-		if (UserDefinedEnum != nullptr)
-		{
-			if (UserDefinedEnum->HasMetaData(TEXT("DisplayName"), Index))
-			{
-				EnumeratorString = UserDefinedEnum->GetMetaData(TEXT("DisplayName"), Index);
-			}
-			else
-			{
-				EnumeratorString = FName::NameToDisplayString(EnumeratorString, false);
-			}
-		}
-
 		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
+
+		if (EnumeratorValue == InEnum->GetMaxEnumValue())
+		{
+			break;
+		}
+
+		const auto& EnumeratorString = InEnum->GetNameStringByIndex(Index);
 
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
