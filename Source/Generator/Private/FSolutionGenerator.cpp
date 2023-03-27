@@ -23,10 +23,6 @@ void FSolutionGenerator::Generator()
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetBasePath(),
 		                FUnrealCSharpFunctionLibrary::GetBaseName() + SOLUTION_SUFFIX),
 		TemplatePath / FUnrealCSharpFunctionLibrary::GetBaseName() + SOLUTION_SUFFIX);
-
-	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-
-	PlatformFile.CopyDirectoryTree(*(FUnrealCSharpFunctionLibrary::GetUEPath()), *(PluginPath / SCRIPT), true);
 }
 
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src)

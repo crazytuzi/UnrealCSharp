@@ -7,4 +7,7 @@
     <OutputPath>..\..\Content\Script</OutputPath>
     <DefineConstants>$(DefineConstants);</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Plugins/UnrealCSharp/Script/**"></Compile>
+  </ItemGroup>
 </Project>
