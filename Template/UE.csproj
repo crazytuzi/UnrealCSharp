@@ -5,5 +5,6 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>Script</RootNamespace>
     <OutputPath>..\..\Content\Script</OutputPath>
+    <DefineConstants>$(DefineConstants);</DefineConstants>
   </PropertyGroup>
 </Project>

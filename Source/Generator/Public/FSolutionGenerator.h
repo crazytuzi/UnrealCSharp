@@ -9,4 +9,6 @@ public:
 
 private:
 	static void CopyTemplate(const FString& Dest, const FString& Src);
+
+	static void CopyCSProj(const FString& Dest, const FString& Src);
 };
