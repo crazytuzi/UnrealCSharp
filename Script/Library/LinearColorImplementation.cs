@@ -101,8 +101,10 @@ namespace Script.Library
         public static extern void LinearColor_DesaturateImplementation(FLinearColor InLinearColor, Single Desaturation,
             out FLinearColor OutValue);
 
+#if !UE_5_0_OR_LATER
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Single LinearColor_ComputeLuminanceImplementation(FLinearColor InLinearColor);
+#endif
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Single LinearColor_GetMaxImplementation(FLinearColor InLinearColor);

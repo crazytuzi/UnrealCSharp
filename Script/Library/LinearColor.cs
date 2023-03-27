@@ -172,8 +172,10 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
+#if !UE_5_0_OR_LATER
         public Single ComputeLuminance() =>
             LinearColorImplementation.LinearColor_ComputeLuminanceImplementation(this);
+#endif
 
         public Single GetMax() =>
             LinearColorImplementation.LinearColor_GetMaxImplementation(this);

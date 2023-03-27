@@ -52,8 +52,10 @@ struct FRegisterLinearColor
 			.Function("ToFColor", static_cast<void*>(FLinearColorImplementation::LinearColor_ToFColorImplementation))
 			.Function("Desaturate",
 			          static_cast<void*>(FLinearColorImplementation::LinearColor_DesaturateImplementation))
+#if UE_LINEAR_COLOR_COMPUTE_LUMINANCE
 			.Function("ComputeLuminance",
 			          static_cast<void*>(FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation))
+#endif
 			.Function("GetMax", static_cast<void*>(FLinearColorImplementation::LinearColor_GetMaxImplementation))
 			.Function("IsAlmostBlack",
 			          static_cast<void*>(FLinearColorImplementation::LinearColor_IsAlmostBlackImplementation))
@@ -609,6 +611,7 @@ void FLinearColorImplementation::LinearColor_DesaturateImplementation(const Mono
 	}
 }
 
+#if UE_LINEAR_COLOR_COMPUTE_LUMINANCE
 float FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation(const MonoObject* InMonoObject)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
@@ -621,6 +624,7 @@ float FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation(con
 
 	return 0.f;
 }
+#endif
 
 float FLinearColorImplementation::LinearColor_GetMaxImplementation(const MonoObject* InMonoObject)
 {

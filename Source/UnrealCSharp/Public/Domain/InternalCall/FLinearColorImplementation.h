@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "UEVersion.h"
 #include "mono/metadata/object-forward.h"
 
 class FLinearColorImplementation
@@ -63,7 +64,9 @@ public:
 	static void LinearColor_DesaturateImplementation(const MonoObject* InMonoObject, float Desaturation,
 	                                                 MonoObject** OutValue);
 
+#if UE_LINEAR_COLOR_COMPUTE_LUMINANCE
 	static float LinearColor_ComputeLuminanceImplementation(const MonoObject* InMonoObject);
+#endif
 
 	static float LinearColor_GetMaxImplementation(const MonoObject* InMonoObject);
 
