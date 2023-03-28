@@ -34,7 +34,7 @@ void FUnrealImplementation::Unreal_NewObjectImplementation(const MonoObject* Out
 
 	const auto Object = NewObject<UObject>(ObjectOuter, ObjectClass, ObjectName);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment()->GetObject(Object);
+	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Object);
 }
 
 void FUnrealImplementation::Unreal_DuplicateObjectImplementation(const MonoObject* SourceObject,
@@ -50,7 +50,7 @@ void FUnrealImplementation::Unreal_DuplicateObjectImplementation(const MonoObjec
 
 	const auto Object = DuplicateObject<UObject>(ObjectSourceObject, ObjectOuter, ObjectName);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment()->GetObject(Object);
+	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Object);
 }
 
 void FUnrealImplementation::Unreal_LoadObjectImplementation(const MonoObject* Outer, MonoString* Name,
@@ -62,7 +62,7 @@ void FUnrealImplementation::Unreal_LoadObjectImplementation(const MonoObject* Ou
 
 	const auto Object = LoadObject<UObject>(ObjectOuter, ObjectName);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment()->GetObject(Object);
+	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Object);
 }
 
 void FUnrealImplementation::Unreal_LoadClassImplementation(const MonoObject* Outer, MonoString* Name,
@@ -72,7 +72,7 @@ void FUnrealImplementation::Unreal_LoadClassImplementation(const MonoObject* Out
 
 	const auto ObjectName = UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(Name));
 
-	const auto Object = LoadClass<UObject>(ObjectOuter, ObjectName);
+	const auto Class = LoadClass<UObject>(ObjectOuter, ObjectName);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment()->GetObject(Object);
+	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Class);
 }

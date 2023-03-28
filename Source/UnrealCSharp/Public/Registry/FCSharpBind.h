@@ -8,9 +8,11 @@
 class FCSharpBind
 {
 public:
-	static bool Bind(FMonoDomain* InMonoDomain, UObject* InObject);
+	static MonoObject* Bind(FMonoDomain* InMonoDomain, UObject* InObject);
 
-	static bool Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, bool bNeedMonoClass = true);
+	static bool Bind(FMonoDomain* InMonoDomain, UObject* InObject, bool bNeedMonoClass);
+
+	static bool Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, bool bNeedMonoClass);
 
 	template <typename T>
 	static auto Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
@@ -24,7 +26,7 @@ private:
 	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
 private:
-	static bool BindImplementation(FMonoDomain* InMonoDomain, UObject* InObject);
+	static bool BindImplementation(FMonoDomain* InMonoDomain, UObject* InObject, bool bNeedMonoClass);
 
 	static bool BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruct);
 

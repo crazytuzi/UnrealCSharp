@@ -2,7 +2,6 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterStruct
 {
@@ -25,23 +24,7 @@ void FStructImplementation::Struct_StaticStructImplementation(MonoString* InStru
 
 	const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName);
 
-	auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(InStruct);
-
-	if (FoundMonoObject == nullptr)
-	{
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(UScriptStruct::StaticClass()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(UScriptStruct::StaticClass()));
-
-		FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-		// @TODO	
-		FCSharpEnvironment::GetEnvironment()->Bind(UScriptStruct::StaticClass(), false);
-
-		FCSharpEnvironment::GetEnvironment()->AddObjectReference(InStruct, FoundMonoObject);
-	}
-
-	*OutValue = FoundMonoObject;
+	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(InStruct);
 }
 
 void FStructImplementation::Struct_RegisterImplementation(MonoObject* InMonoObject, MonoString* InStructName)

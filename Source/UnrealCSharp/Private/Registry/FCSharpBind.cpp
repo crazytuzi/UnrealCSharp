@@ -13,9 +13,19 @@
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 #endif
 
-bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
+MonoObject* FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 {
-	return BindImplementation(InMonoDomain, InObject);
+	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(InObject))
+	{
+		return FoundMonoObject;
+	}
+
+	return Bind(InMonoDomain, InObject, false) ? FCSharpEnvironment::GetEnvironment()->GetObject(InObject) : nullptr;
+}
+
+bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject, const bool bNeedMonoClass)
+{
+	return BindImplementation(InMonoDomain, InObject, bNeedMonoClass);
 }
 
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool bNeedMonoClass)
@@ -53,7 +63,7 @@ bool FCSharpBind::Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFu
 	return BindImplementation(InClassDescriptor, InClass, InFunction);
 }
 
-bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObject)
+bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObject, const bool bNeedMonoClass)
 {
 	if (InMonoDomain == nullptr || InObject == nullptr)
 	{
@@ -67,7 +77,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObjec
 		return false;
 	}
 
-	if (!Bind(InMonoDomain, InClass))
+	if (!Bind(InMonoDomain, InClass, bNeedMonoClass))
 	{
 		return false;
 	}

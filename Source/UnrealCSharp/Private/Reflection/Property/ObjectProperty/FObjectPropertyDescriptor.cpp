@@ -8,18 +8,7 @@ void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 	{
 		const auto SrcObject = ObjectProperty->GetObjectPropertyValue(Src);
 
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(SrcObject);
-
-		if (SrcMonoObject == nullptr)
-		{
-			const auto FoundMonoClass = FTypeBridge::GetMonoClass(ObjectProperty);
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-			FCSharpEnvironment::GetEnvironment()->Bind(ObjectProperty->PropertyClass, false);
-		}
-
-		*Dest = SrcMonoObject;
+		*Dest = FCSharpEnvironment::GetEnvironment()->Bind(SrcObject);;
 	}
 }
 
