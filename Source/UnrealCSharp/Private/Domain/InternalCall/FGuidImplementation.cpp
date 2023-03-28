@@ -203,9 +203,9 @@ bool FGuidImplementation::Guid_ParseImplementation(MonoObject* GuidString, MonoO
 
 	if (Guid != nullptr)
 	{
-		return FGuid::Parse(FString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			                    FCSharpEnvironment::GetEnvironment()->GetDomain()->
-			                                                          Object_To_String(GuidString, nullptr))), *Guid);
+		return FGuid::Parse(FString(UTF8_TO_TCHAR(
+			                    FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::
+				                    GetEnvironment()->GetDomain()->Object_To_String(GuidString, nullptr)))), *Guid);
 	}
 
 	return false;

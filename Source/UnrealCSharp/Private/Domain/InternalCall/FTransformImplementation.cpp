@@ -207,8 +207,9 @@ bool FTransformImplementation::Transform_InitFromStringImplementation(const Mono
 
 	if (Transform != nullptr && InSourceString != nullptr)
 	{
-		return Transform->InitFromString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InSourceString, nullptr)));
+		return Transform->InitFromString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InSourceString, nullptr))));
 	}
 
 	return false;

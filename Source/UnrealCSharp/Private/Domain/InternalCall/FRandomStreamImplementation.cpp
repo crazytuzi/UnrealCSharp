@@ -66,8 +66,9 @@ void FRandomStreamImplementation::RandomStream_InitializeNameImplementation(
 
 	if (RandomStream != nullptr)
 	{
-		return RandomStream->Initialize(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InName, nullptr)));
+		return RandomStream->Initialize(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InName, nullptr))));
 	}
 }
 

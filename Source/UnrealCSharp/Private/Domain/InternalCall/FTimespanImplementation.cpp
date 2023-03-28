@@ -676,9 +676,10 @@ bool FTimespanImplementation::Timespan_ParseImplementation(MonoObject* TimespanS
 
 	if (OutTimespan != nullptr)
 	{
-		return FTimespan::Parse(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			                        FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(
-				                        TimespanString, nullptr)), *OutTimespan);
+		return FTimespan::Parse(
+			UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+					GetDomain()->Object_To_String(TimespanString, nullptr))), *OutTimespan);
 	}
 
 	return false;

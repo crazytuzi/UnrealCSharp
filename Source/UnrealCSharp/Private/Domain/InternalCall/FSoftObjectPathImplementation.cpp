@@ -212,8 +212,9 @@ void FSoftObjectPathImplementation::SoftObjectPath_SetPathNameImplementation(
 
 	if (SoftObjectPath != nullptr && Path != nullptr)
 	{
-		return SoftObjectPath->SetPath(FName(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(Path, nullptr))));
+		return SoftObjectPath->SetPath(FName(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(Path, nullptr)))));
 	}
 }
 
@@ -225,8 +226,9 @@ void FSoftObjectPathImplementation::SoftObjectPath_SetPathStringImplementation(
 
 	if (SoftObjectPath != nullptr && Path != nullptr)
 	{
-		return SoftObjectPath->SetPath(FString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(Path, nullptr))));
+		return SoftObjectPath->SetPath(FString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(Path, nullptr)))));
 	}
 }
 
@@ -395,8 +397,9 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetOrCreateIDForObjectImpleme
 
 void FSoftObjectPathImplementation::SoftObjectPath_AddPIEPackageNameImplementation(MonoObject* NewPIEPackageName)
 {
-	FSoftObjectPath::AddPIEPackageName(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(NewPIEPackageName, nullptr)));
+	FSoftObjectPath::AddPIEPackageName(UTF8_TO_TCHAR(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			GetDomain()->Object_To_String(NewPIEPackageName, nullptr))));
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_ClearPIEPackageNamesImplementation()

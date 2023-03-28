@@ -74,9 +74,9 @@ void FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation(
 
 	if (AssetBundleData != nullptr && OutAssetBundleEntry != nullptr)
 	{
-		*OutAssetBundleEntry = *AssetBundleData->FindEntry(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(SearchName, nullptr)));
+		*OutAssetBundleEntry = *AssetBundleData->FindEntry(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(SearchName, nullptr))));
 	}
 }
 
@@ -92,9 +92,9 @@ void FAssetBundleDataImplementation::AssetBundleData_AddBundleAssetImplementatio
 	if (AssetBundleData != nullptr && SoftObjectPath != nullptr)
 	{
 		AssetBundleData->AddBundleAsset(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(BundleName, nullptr)),
-			*SoftObjectPath);
+			UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+					GetDomain()->Object_To_String(BundleName, nullptr))), *SoftObjectPath);
 	}
 }
 

@@ -709,8 +709,9 @@ bool FLinearColorImplementation::LinearColor_InitFromStringImplementation(
 
 	if (LinearColor != nullptr && InSourceString != nullptr)
 	{
-		return LinearColor->InitFromString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InSourceString, nullptr)));
+		return LinearColor->InitFromString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InSourceString, nullptr))));
 	}
 
 	return false;
