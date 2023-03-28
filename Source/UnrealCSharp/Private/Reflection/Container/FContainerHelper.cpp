@@ -251,7 +251,7 @@ FString FContainerHelper::GetPathName(MonoReflectionType* InReflectionType)
 	const auto PathNameMonoString = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(
 		PathNameMonoObject, nullptr);
 
-	return FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(PathNameMonoString);
+	return UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(PathNameMonoString));
 }
 
 FString FContainerHelper::GetGenericPathName(MonoReflectionType* InReflectionType)

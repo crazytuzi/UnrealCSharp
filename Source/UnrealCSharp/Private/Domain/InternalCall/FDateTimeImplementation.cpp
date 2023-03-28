@@ -649,9 +649,10 @@ bool FDateTimeImplementation::DateTime_ParseImplementation(MonoObject* DateTimeS
 
 	if (OutDateTime != nullptr)
 	{
-		return FDateTime::Parse(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			                        FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(
-				                        DateTimeString, nullptr)), *OutDateTime);
+		return FDateTime::Parse(
+			UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+					GetDomain()->Object_To_String(DateTimeString, nullptr))), *OutDateTime);
 	}
 
 	return false;
@@ -671,9 +672,10 @@ bool FDateTimeImplementation::DateTime_ParseHttpDateImplementation(MonoObject* H
 
 	if (OutDateTime != nullptr)
 	{
-		return FDateTime::ParseHttpDate(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			                                FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(
-				                                HttpDate, nullptr)), *OutDateTime);
+		return FDateTime::ParseHttpDate(
+			UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+					GetDomain()->Object_To_String(HttpDate, nullptr))), *OutDateTime);
 	}
 
 	return false;

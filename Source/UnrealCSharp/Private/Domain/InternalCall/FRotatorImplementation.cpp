@@ -564,8 +564,9 @@ bool FRotatorImplementation::Rotator_InitFromStringImplementation(const MonoObje
 
 	if (Rotator != nullptr && InSourceString != nullptr)
 	{
-		return Rotator->InitFromString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InSourceString, nullptr)));
+		return Rotator->InitFromString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InSourceString, nullptr))));
 	}
 
 	return false;

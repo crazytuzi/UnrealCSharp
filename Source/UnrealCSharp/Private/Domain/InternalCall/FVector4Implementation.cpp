@@ -378,8 +378,9 @@ bool FVector4Implementation::Vector4_InitFromStringImplementation(const MonoObje
 
 	if (Vector4 != nullptr && InSourceString != nullptr)
 	{
-		return Vector4->InitFromString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InSourceString, nullptr)));
+		return Vector4->InitFromString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InSourceString, nullptr))));
 	}
 
 	return false;

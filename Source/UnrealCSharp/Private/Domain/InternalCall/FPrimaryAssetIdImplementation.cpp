@@ -46,9 +46,9 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplement
 	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment()->GetAddress<
 		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
 
-	*OutPrimaryAssetId = FPrimaryAssetId::ParseTypeAndName(FName(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(TypeAndName, nullptr))));
+	*OutPrimaryAssetId = FPrimaryAssetId::ParseTypeAndName(FName(UTF8_TO_TCHAR(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			GetDomain()->Object_To_String(TypeAndName, nullptr)))));
 }
 
 void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImplementation(MonoObject* TypeAndName,
@@ -65,9 +65,9 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImpleme
 	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment()->GetAddress<
 		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
 
-	*OutPrimaryAssetId = FPrimaryAssetId::ParseTypeAndName(FString(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(TypeAndName, nullptr))));
+	*OutPrimaryAssetId = FPrimaryAssetId::ParseTypeAndName(FString(UTF8_TO_TCHAR(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			GetDomain()->Object_To_String(TypeAndName, nullptr)))));
 }
 
 bool FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation(const MonoObject* InMonoObject)
@@ -119,9 +119,9 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation(Mono
 	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment()->GetAddress<
 		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
 
-	*OutPrimaryAssetId = FPrimaryAssetId::FromString(FString(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(String, nullptr))));
+	*OutPrimaryAssetId = FPrimaryAssetId::FromString(FString(UTF8_TO_TCHAR(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			GetDomain()->Object_To_String(String, nullptr)))));
 }
 
 bool FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation(const MonoObject* A, const MonoObject* B)

@@ -764,8 +764,9 @@ bool FVector2DImplementation::Vector2D_InitFromStringImplementation(const MonoOb
 
 	if (Vector2D != nullptr && InSourceString != nullptr)
 	{
-		return Vector2D->InitFromString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InSourceString, nullptr)));
+		return Vector2D->InitFromString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InSourceString, nullptr))));
 	}
 
 	return false;

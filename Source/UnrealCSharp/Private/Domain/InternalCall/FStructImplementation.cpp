@@ -19,8 +19,8 @@ static FRegisterStruct RegisterStruct;
 
 void FStructImplementation::Struct_StaticStructImplementation(MonoString* InStructName, MonoObject** OutValue)
 {
-	const auto StructName =
-		UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InStructName));
+	const auto StructName = UTF8_TO_TCHAR(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InStructName));
 
 	const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName);
 

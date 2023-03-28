@@ -93,8 +93,9 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeCultureImplement
 
 	if (PolyglotTextData != nullptr)
 	{
-		PolyglotTextData->SetNativeCulture(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InNativeCulture, nullptr)));
+		PolyglotTextData->SetNativeCulture(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InNativeCulture, nullptr))));
 	}
 }
 
@@ -153,10 +154,12 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetIdentityImplementation
 	if (PolyglotTextData != nullptr)
 	{
 		PolyglotTextData->SetIdentity(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InNamespace, nullptr)),
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InKey, nullptr)));
+			UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+					GetDomain()->Object_To_String(InNamespace, nullptr))),
+			UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+					GetDomain()->Object_To_String(InKey, nullptr))));
 	}
 }
 
@@ -247,8 +250,9 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeStringImplementa
 
 	if (PolyglotTextData != nullptr)
 	{
-		PolyglotTextData->SetNativeString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InNativeString, nullptr)));
+		PolyglotTextData->SetNativeString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InNativeString, nullptr))));
 	}
 }
 
@@ -284,10 +288,12 @@ void FPolyglotTextDataImplementation::PolyglotTextData_AddLocalizedStringImpleme
 	if (PolyglotTextData != nullptr)
 	{
 		PolyglotTextData->AddLocalizedString(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InCulture, nullptr)),
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InLocalizedString, nullptr)));
+			UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+					GetDomain()->Object_To_String(InCulture, nullptr))),
+			UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+					GetDomain()->Object_To_String(InLocalizedString, nullptr))));
 	}
 }
 
@@ -299,8 +305,9 @@ void FPolyglotTextDataImplementation::PolyglotTextData_RemoveLocalizedStringImpl
 
 	if (PolyglotTextData != nullptr)
 	{
-		PolyglotTextData->RemoveLocalizedString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InCulture, nullptr)));
+		PolyglotTextData->RemoveLocalizedString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InCulture, nullptr))));
 	}
 }
 
@@ -313,8 +320,9 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImpleme
 	FString String;
 
 	const auto Result = PolyglotTextData->GetLocalizedString(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InCulture, nullptr)), String);
+		UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InCulture, nullptr))), String);
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);

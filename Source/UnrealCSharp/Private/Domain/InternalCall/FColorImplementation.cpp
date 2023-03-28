@@ -99,8 +99,9 @@ void FColorImplementation::Color_FromRGBEImplementation(const MonoObject* InMono
 
 void FColorImplementation::Color_FromHexImplementation(MonoObject* HexString, MonoObject** OutValue)
 {
-	const auto String = FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(HexString, nullptr));
+	const auto String = UTF8_TO_TCHAR(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			GetDomain()->Object_To_String(HexString, nullptr)));
 
 	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
@@ -264,8 +265,9 @@ bool FColorImplementation::Color_InitFromStringImplementation(const MonoObject* 
 
 	if (Color != nullptr && InSourceString != nullptr)
 	{
-		return Color->InitFromString(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(InSourceString, nullptr)));
+		return Color->InitFromString(UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(InSourceString, nullptr))));
 	}
 
 	return false;

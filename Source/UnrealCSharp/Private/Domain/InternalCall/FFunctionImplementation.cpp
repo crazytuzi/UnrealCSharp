@@ -22,7 +22,7 @@ void FFunctionImplementation::Function_ReflectionImplementation(const MonoObject
 	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject))
 	{
 		const auto FunctionName = FName(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InFunctionName));
+			UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InFunctionName)));
 
 		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment()->GetFunctionDescriptor(
 			FoundObject->GetClass(), FunctionName))
