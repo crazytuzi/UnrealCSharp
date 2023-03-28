@@ -39,9 +39,11 @@ public:
 	void OnUnrealCSharpModuleInActive();
 
 public:
-	bool Bind(UObject* Object) const;
+	MonoObject* Bind(UObject* Object) const;
 
-	bool Bind(UStruct* InStruct, bool bNeedMonoClass = true) const;
+	bool Bind(UObject* Object, bool bNeedMonoClass) const;
+
+	bool Bind(UStruct* InStruct, bool bNeedMonoClass) const;
 
 	template <typename T>
 	auto Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const;

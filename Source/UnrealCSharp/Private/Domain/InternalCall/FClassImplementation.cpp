@@ -2,7 +2,6 @@
 #include "Binding/Class/TClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterUClass
 {
@@ -26,22 +25,7 @@ void FClassImplementation::Class_GetClassDefaultObjectImplementation(const MonoO
 	{
 		const auto Object = FoundClass->ClassDefaultObject;
 
-		auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(Object);
-
-		if (FoundMonoObject == nullptr)
-		{
-			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FUnrealCSharpFunctionLibrary::GetClassNameSpace(Object->GetClass()),
-				FUnrealCSharpFunctionLibrary::GetFullClass(Object->GetClass()));
-
-			FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-			FCSharpEnvironment::GetEnvironment()->Bind(Object->GetClass(), false);
-
-			FCSharpEnvironment::GetEnvironment()->AddObjectReference(Object, FoundMonoObject);
-		}
-
-		*OutValue = FoundMonoObject;
+		*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Object);
 	}
 }
 
@@ -52,21 +36,6 @@ void FClassImplementation::Class_GetDefaultObjectImplementation(const MonoObject
 	{
 		const auto Object = FoundClass->GetDefaultObject(bCreateIfNeeded);
 
-		auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(Object);
-
-		if (FoundMonoObject == nullptr)
-		{
-			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FUnrealCSharpFunctionLibrary::GetClassNameSpace(Object->GetClass()),
-				FUnrealCSharpFunctionLibrary::GetFullClass(Object->GetClass()));
-
-			FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-			FCSharpEnvironment::GetEnvironment()->Bind(Object->GetClass(), false);
-
-			FCSharpEnvironment::GetEnvironment()->AddObjectReference(Object, FoundMonoObject);
-		}
-
-		*OutValue = FoundMonoObject;
+		*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Object);
 	}
 }

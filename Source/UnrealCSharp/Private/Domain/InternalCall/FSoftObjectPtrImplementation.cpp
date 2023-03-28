@@ -2,7 +2,6 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterSoftObjectPtr
 {
@@ -39,20 +38,5 @@ void FSoftObjectPtrImplementation::SoftObjectPtr_GetImplementation(const MonoObj
 {
 	const auto Multi = FCSharpEnvironment::GetEnvironment()->GetMulti<TSoftObjectPtr<UObject>>(InMonoObject);
 
-	auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(Multi.Get());
-
-	if (FoundMonoObject == nullptr)
-	{
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(Multi->GetClass()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(Multi->GetClass()));
-
-		FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-		FCSharpEnvironment::GetEnvironment()->Bind(Multi->GetClass(), false);
-
-		FCSharpEnvironment::GetEnvironment()->AddObjectReference(Multi.Get(), FoundMonoObject);
-	}
-
-	*OutValue = FoundMonoObject;
+	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Multi.Get());
 }

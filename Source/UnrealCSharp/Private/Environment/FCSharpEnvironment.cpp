@@ -130,7 +130,7 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 {
 	if (const auto InObject = static_cast<UObject*>(const_cast<UObjectBase*>(Object)))
 	{
-		Bind(InObject);
+		Bind(InObject, true);
 	}
 }
 
@@ -163,9 +163,14 @@ void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 	}
 }
 
-bool FCSharpEnvironment::Bind(UObject* Object) const
+MonoObject* FCSharpEnvironment::Bind(UObject* Object) const
 {
 	return FCSharpBind::Bind(Domain, Object);
+}
+
+bool FCSharpEnvironment::Bind(UObject* Object, const bool bNeedMonoClass) const
+{
+	return FCSharpBind::Bind(Domain, Object, bNeedMonoClass);
 }
 
 bool FCSharpEnvironment::Bind(UStruct* InStruct, const bool bNeedMonoClass) const

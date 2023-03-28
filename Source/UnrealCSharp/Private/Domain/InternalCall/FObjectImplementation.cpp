@@ -3,7 +3,6 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterObject
 {
@@ -27,23 +26,7 @@ void FObjectImplementation::Object_StaticClassImplementation(MonoString* InClass
 
 	const auto InClass = LoadObject<UClass>(nullptr, ClassName);
 
-	auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(InClass);
-
-	if (FoundMonoObject == nullptr)
-	{
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(UClass::StaticClass()));
-
-		FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-		// @TODO	
-		FCSharpEnvironment::GetEnvironment()->Bind(UClass::StaticClass(), false);
-
-		FCSharpEnvironment::GetEnvironment()->AddObjectReference(InClass, FoundMonoObject);
-	}
-
-	*OutValue = FoundMonoObject;
+	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(InClass);
 }
 
 void FObjectImplementation::Object_GetClassImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
@@ -52,23 +35,7 @@ void FObjectImplementation::Object_GetClassImplementation(const MonoObject* InMo
 	{
 		const auto Class = FoundObject->GetClass();
 
-		auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(Class);
-
-		if (FoundMonoObject == nullptr)
-		{
-			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()),
-				FUnrealCSharpFunctionLibrary::GetFullClass(UClass::StaticClass()));
-
-			FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-			// @TODO	
-			FCSharpEnvironment::GetEnvironment()->Bind(UClass::StaticClass(), false);
-
-			FCSharpEnvironment::GetEnvironment()->AddObjectReference(Class, FoundMonoObject);
-		}
-
-		*OutValue = FoundMonoObject;
+		*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Class);
 	}
 }
 
@@ -97,23 +64,6 @@ void FObjectImplementation::Object_GetWorldImplementation(const MonoObject* InMo
 	{
 		const auto World = FoundObject->GetWorld();
 
-		auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(World);
-
-		if (FoundMonoObject == nullptr)
-		{
-			const auto Class = World != nullptr ? World->GetClass() : nullptr;
-
-			const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-				FUnrealCSharpFunctionLibrary::GetClassNameSpace(Class),
-				FUnrealCSharpFunctionLibrary::GetFullClass(Class));
-
-			FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-			FCSharpEnvironment::GetEnvironment()->Bind(Class, false);
-
-			FCSharpEnvironment::GetEnvironment()->AddObjectReference(World, FoundMonoObject);
-		}
-
-		*OutValue = FoundMonoObject;
+		*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(World);
 	}
 }

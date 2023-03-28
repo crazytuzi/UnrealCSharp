@@ -2,7 +2,6 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterScriptInterface
 {
@@ -39,20 +38,5 @@ void FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation(con
 {
 	const auto Multi = FCSharpEnvironment::GetEnvironment()->GetMulti<TScriptInterface<IInterface>>(InMonoObject);
 
-	auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(Multi.GetObject());
-
-	if (FoundMonoObject == nullptr)
-	{
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(Multi.GetObject()->GetClass()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(Multi.GetObject()->GetClass()));
-
-		FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
-
-		FCSharpEnvironment::GetEnvironment()->Bind(Multi.GetObject()->GetClass(), false);
-
-		FCSharpEnvironment::GetEnvironment()->AddObjectReference(Multi.GetObject(), FoundMonoObject);
-	}
-
-	*OutValue = FoundMonoObject;
+	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Multi.GetObject());
 }
