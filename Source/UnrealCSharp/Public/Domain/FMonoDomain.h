@@ -53,9 +53,15 @@ public:
 
 	MonoReflectionMethod* Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass);
 
+	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams) const;
+
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;
 
+	MonoObject* Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams);
+
 	MonoObject* Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams, MonoObject** InExc);
+
+	void Unhandled_Exception(MonoObject* InException) const;
 
 	MonoClass* Object_Get_Class(MonoObject* InMonoObject);
 

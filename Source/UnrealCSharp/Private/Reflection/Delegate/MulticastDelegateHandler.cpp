@@ -81,7 +81,7 @@ bool UMulticastDelegateHandler::Contains(MonoObject* InMulticastDelegate) const
 				Params[1] = InMulticastDelegate;
 
 				const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-					FoundMonoMethod, nullptr, Params, nullptr);
+					FoundMonoMethod, nullptr, Params);
 
 				if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
 					ResultMonoObject)))
@@ -149,7 +149,7 @@ void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 				Params[1] = InMulticastDelegate;
 
 				const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-					FoundMonoMethod, nullptr, Params, nullptr);
+					FoundMonoMethod, nullptr, Params);
 
 				if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
 					ResultMonoObject)))
@@ -192,7 +192,7 @@ void UMulticastDelegateHandler::RemoveAll(MonoObject* InObject)
 				                           TGetArrayLength(Params)))
 			{
 				const auto TargetMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-					FoundMonoMethod, nullptr, &Params, nullptr);
+					FoundMonoMethod, nullptr, &Params);
 
 				return TargetMonoObject == InObject ? true : false;
 			}

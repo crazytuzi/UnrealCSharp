@@ -127,7 +127,7 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 				                           PropertyDescriptors.Num()))
 			{
 				const auto ReturnValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-					FoundMonoMethod, FoundMonoObject, CSharpParams.GetData(), nullptr);
+					FoundMonoMethod, FoundMonoObject, CSharpParams.GetData());
 
 				if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 				{
@@ -266,7 +266,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 					}
 
 					FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-						FoundAddMethod, NewObjectList, Value, nullptr);
+						FoundAddMethod, NewObjectList, Value);
 				}
 			}
 

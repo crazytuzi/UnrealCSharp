@@ -105,7 +105,7 @@ MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass, const int32 InParamC
 			if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_OBJECT_CONSTRUCTOR,
 			                                                        InParamCount))
 			{
-				Runtime_Invoke(FoundMethod, NewMonoObject, InParams, nullptr);
+				Runtime_Invoke(FoundMethod, NewMonoObject, InParams);
 
 				return NewMonoObject;
 			}
@@ -190,15 +190,52 @@ MonoReflectionMethod* FMonoDomain::Method_Get_Object(MonoMethod* InMethod, MonoC
 		       : nullptr;
 }
 
+MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams) const
+{
+	MonoObject* Exception = nullptr;
+
+	const auto ReturnValue = Runtime_Invoke(InFunction, InMonoObject, InParams, &Exception);
+
+	if (Exception != nullptr)
+	{
+		Unhandled_Exception(Exception);
+
+		return nullptr;
+	}
+
+	return ReturnValue;
+}
+
 MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams,
                                         MonoObject** InExc) const
 {
 	return InFunction != nullptr ? mono_runtime_invoke(InFunction, InMonoObject, InParams, InExc) : nullptr;
 }
 
+MonoObject* FMonoDomain::Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams)
+{
+	MonoObject* Exception = nullptr;
+
+	const auto ReturnValue = Runtime_Delegate_Invoke(InDelegate, InParams, &Exception);
+
+	if (Exception != nullptr)
+	{
+		Unhandled_Exception(Exception);
+
+		return nullptr;
+	}
+
+	return ReturnValue;
+}
+
 MonoObject* FMonoDomain::Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams, MonoObject** InExc)
 {
 	return InDelegate != nullptr ? mono_runtime_delegate_invoke(InDelegate, InParams, InExc) : nullptr;
+}
+
+void FMonoDomain::Unhandled_Exception(MonoObject* InException) const
+{
+	mono_unhandled_exception(InException);
 }
 
 MonoClass* FMonoDomain::Object_Get_Class(MonoObject* InMonoObject)
@@ -334,7 +371,7 @@ void FMonoDomain::RegisterLog()
 		{
 			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_SET_OUT, 0))
 			{
-				Runtime_Invoke(FoundMethod, nullptr, nullptr, nullptr);
+				Runtime_Invoke(FoundMethod, nullptr, nullptr);
 			}
 		}
 	}

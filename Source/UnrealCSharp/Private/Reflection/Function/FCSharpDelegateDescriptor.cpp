@@ -41,7 +41,7 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 	}
 
 	const auto ReturnValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Delegate_Invoke(
-		InDelegate, CSharpParams.GetData(), nullptr);
+		InDelegate, CSharpParams.GetData());
 
 	if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 	{
@@ -163,7 +163,7 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 				}
 
 				FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-					FoundAddMethod, NewObjectList, Value, nullptr);
+					FoundAddMethod, NewObjectList, Value);
 			}
 		}
 
@@ -237,7 +237,7 @@ bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptD
 				}
 
 				FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-					FoundAddMethod, NewObjectList, Value, nullptr);
+					FoundAddMethod, NewObjectList, Value);
 			}
 		}
 

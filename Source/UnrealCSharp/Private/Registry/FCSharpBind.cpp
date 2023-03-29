@@ -446,7 +446,7 @@ bool FCSharpBind::IsOverrideType(const FMonoDomain* InMonoDomain, MonoReflection
 			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_TYPE, TGetArrayLength(InParams)))
 		{
 			if (const auto IsOverrideTypeMonoObject = InMonoDomain->Runtime_Invoke(
-				IsOverrideTypeMonoMethod, nullptr, &InParams, nullptr))
+				IsOverrideTypeMonoMethod, nullptr, &InParams))
 			{
 				return *static_cast<bool*>(InMonoDomain->Object_Unbox(IsOverrideTypeMonoObject));
 			}
@@ -472,7 +472,7 @@ bool FCSharpBind::IsOverrideMethod(const FMonoDomain* InMonoDomain, MonoReflecti
 			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_METHOD, TGetArrayLength(InParams)))
 		{
 			if (const auto IsOverrideMethodMonoObject = InMonoDomain->Runtime_Invoke(
-				IsOverrideMethodMonoMethod, nullptr, &InParams, nullptr))
+				IsOverrideMethodMonoMethod, nullptr, &InParams))
 			{
 				return *static_cast<bool*>(InMonoDomain->Object_Unbox(IsOverrideMethodMonoObject));
 			}
