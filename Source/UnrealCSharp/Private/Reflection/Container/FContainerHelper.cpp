@@ -246,7 +246,7 @@ FString FContainerHelper::GetPathName(MonoReflectionType* InReflectionType)
 		UtilsMonoClass, FUNCTION_UTILS_GET_PATH_NAME, TGetArrayLength(InParams));
 
 	const auto PathNameMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
-		GetPathNameMonoMethod, nullptr, &InParams, nullptr);
+		GetPathNameMonoMethod, nullptr, &InParams);
 
 	const auto PathNameMonoString = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(
 		PathNameMonoObject, nullptr);
