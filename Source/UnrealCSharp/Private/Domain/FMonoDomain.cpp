@@ -322,7 +322,7 @@ void FMonoDomain::RegisterMonoTrace()
 
 	mono_trace_set_print_handler(FMonoLog::MonoPrintf);
 
-	mono_trace_set_printerr_handler(FMonoLog::MonoPrintf);
+	mono_trace_set_printerr_handler(FMonoLog::MonoPrintfError);
 }
 
 void FMonoDomain::RegisterLog()

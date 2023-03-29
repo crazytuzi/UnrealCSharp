@@ -7,13 +7,24 @@
 void FMonoLog::MonoPrintf(const char* InString, const mono_bool IsStdout)
 {
 #if !NO_LOGGING
-	if (0 == FCStringAnsi::Strncmp("The assembly mscorlib.dll was not found or could not be loaded", InString, 62))
-	{
-		UE_LOG(LogUnrealCSharp, Fatal, TEXT("%s"), ANSI_TO_TCHAR(InString));
-	}
 	if (UE_LOG_ACTIVE(LogUnrealCSharp, Log))
 	{
 		UE_LOG(LogUnrealCSharp, Log, TEXT("%s"), ANSI_TO_TCHAR(InString));
+
+		if (!IsStdout)
+		{
+			GLog->Flush();
+		}
+	}
+#endif
+}
+
+void FMonoLog::MonoPrintfError(const char* InString, const mono_bool IsStdout)
+{
+#if !NO_LOGGING
+	if (UE_LOG_ACTIVE(LogUnrealCSharp, Error))
+	{
+		UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), ANSI_TO_TCHAR(InString));
 
 		if (!IsStdout)
 		{
