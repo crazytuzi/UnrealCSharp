@@ -1,4 +1,6 @@
 ﻿#include "FCSharpCompilerRunnable.h"
+#include "FUnrealCSharpFunctionLibrary.h"
+#include "Macro.h"
 
 FString FCSharpCompilerRunnable::CompileTool;
 
@@ -90,6 +92,8 @@ void FCSharpCompilerRunnable::DoWork()
 
 	Compile();
 
+	Pdb2Mdb();
+
 	bIsCompiling = false;
 }
 
@@ -107,8 +111,7 @@ void FCSharpCompilerRunnable::Compile()
 		"%sScript\\Game\\Game.csproj /build \"Debug\" /Out %s"
 	),
 		*FPaths::ProjectDir(),
-		*OutFile,
-		*FPaths::ProjectDir()
+		*OutFile
 	));
 
 	void* ReadPipe = nullptr;
@@ -118,6 +121,7 @@ void FCSharpCompilerRunnable::Compile()
 	auto OutProcessID = 0u;
 
 	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*CompileTool,
 		*CompileParam,
@@ -152,27 +156,46 @@ void FCSharpCompilerRunnable::Compile()
 			// @TODO
 		}
 	}
-	Pdb2Mdb();
 }
 
 void FCSharpCompilerRunnable::Pdb2Mdb()
 {
-	// pdb file to mdb file, used for mono remote debugger
 	auto OutProcessID = 0u;
+
 	void* ReadPipe = nullptr;
+
 	void* WritePipe = nullptr;
-	
-	const auto MonoExe = L"C:\\Program Files\\Mono\\bin\\mono.exe";
-	const auto Pdb2Mdb = L"C:\\Program Files\\Mono\\lib\\mono\\4.5\\pdb2mdb.exe";
-	const auto Pdb2MdbParams = {
-		FString::Printf( TEXT("\"%s\" %sContent\\Script\\Game.dll"), Pdb2Mdb, *FPaths::ProjectDir()),
-		FString::Printf(TEXT("\"%s\" %sContent\\Script\\UE.dll"), Pdb2Mdb, *FPaths::ProjectDir())
+
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+
+	static auto Pdb2MdbPath = TEXT("C:\\Program Files\\Mono\\lib\\mono\\4.5\\pdb2mdb.exe");
+
+	const auto Pdb2MdbTasks = {
+		FString::Printf(TEXT(
+			"\"%s\" %s\\%s\\%s%s"
+		),
+		                Pdb2MdbPath,
+		                *FPaths::ProjectContentDir(),
+		                *SCRIPT,
+		                *FUnrealCSharpFunctionLibrary::GetGameProjectName(),
+		                *DLL_SUFFIX),
+		FString::Printf(TEXT(
+			"\"%s\" %s\\%s\\%s%s"
+		),
+		                Pdb2MdbPath,
+		                *FPaths::ProjectContentDir(),
+		                *SCRIPT,
+		                *FUnrealCSharpFunctionLibrary::GetUEProjectName(),
+		                *DLL_SUFFIX),
 	};
-	for (auto& Param : Pdb2MdbParams)
+
+	for (const auto& Params : Pdb2MdbTasks)
 	{
-		auto ProcPdb2Mdb = FPlatformProcess::CreateProc(
-			MonoExe,
-			*Param,
+		static auto MonoPath = TEXT("C:\\Program Files\\Mono\\bin\\mono.exe");
+
+		auto ProcessHandle = FPlatformProcess::CreateProc(
+			MonoPath,
+			*Params,
 			false,
 			true,
 			true,
@@ -182,7 +205,7 @@ void FCSharpCompilerRunnable::Pdb2Mdb()
 			WritePipe,
 			ReadPipe);
 
-		while (ProcPdb2Mdb.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+		while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
 		{
 			FPlatformProcess::Sleep(0.01f);
 		}

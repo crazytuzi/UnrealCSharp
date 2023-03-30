@@ -38,7 +38,8 @@ public class Compiler : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"Json"
+				"Json",
+				"UnrealCSharpCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

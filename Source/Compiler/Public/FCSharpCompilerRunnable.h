@@ -24,9 +24,10 @@ private:
 
 	static void Compile();
 
+	static void Pdb2Mdb();
+
 	static FString GetCompileTool(const FString& ProductLineVersion = FString("2022"));
 
-	static void Pdb2Mdb();
 private:
 	static FString CompileTool;
 
