@@ -1,6 +1,7 @@
 ﻿#include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
+#include "UEVersion.h"
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -29,8 +30,18 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TScriptInterface<IInterface>>(Dest);
 
 		InterfaceProperty->InitializeValue(Dest);
-		
+
+#if UE_INTERFACE_PROPERTY_SET_PROPERTY_VALUE
 		InterfaceProperty->SetPropertyValue(Dest, SrcMulti.GetObject());
+#else
+		const auto Interface = static_cast<FScriptInterface*>(Dest);
+
+		const auto Object = SrcMulti.GetObject();
+
+		Interface->SetObject(Object);
+
+		Interface->SetInterface(Object ? Object->GetInterfaceAddress(InterfaceProperty->InterfaceClass) : nullptr);
+#endif
 
 		Object_New(Dest);
 	}
