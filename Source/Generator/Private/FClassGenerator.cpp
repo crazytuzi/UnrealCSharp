@@ -670,6 +670,11 @@ FString FClassGenerator::GetCppFunctionDefaultParam(const UFunction* InFunction,
 		return FString::Printf(TEXT(" = null"));
 	}
 
+	if (CastField<FDoubleProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), *MetaData);
+	}
+
 	return TEXT("");
 }
 
@@ -767,6 +772,11 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	if (CastField<FSoftObjectProperty>(InProperty))
 	{
 		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FDoubleProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s"), MetaData.IsEmpty() ? TEXT("0") : *MetaData);
 	}
 
 	if (CastField<FMapProperty>(InProperty))
