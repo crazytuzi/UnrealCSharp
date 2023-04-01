@@ -152,9 +152,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()));
 
+	TArray<UFunction*> Functions;
+
 	for (TFieldIterator<UFunction> FunctionIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
-	                                                EFieldIteratorFlags::ExcludeDeprecated,
-	                                                EFieldIteratorFlags::IncludeInterfaces); FunctionIterator; ++
+	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 	     FunctionIterator)
 	{
 		if (FunctionIterator->HasAnyFunctionFlags(FUNC_Delegate))
@@ -167,6 +168,26 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
+		Functions.Add(*FunctionIterator);
+	}
+
+	for (const auto InInterface : InClass->Interfaces)
+	{
+		if (SuperClass != nullptr && SuperClass->ImplementsInterface(InInterface.Class))
+		{
+			continue;
+		}
+
+		for (TFieldIterator<UFunction> FunctionIterator(InInterface.Class, EFieldIteratorFlags::IncludeSuper,
+		                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
+		     FunctionIterator)
+		{
+			Functions.Add(*FunctionIterator);
+		}
+	}
+
+	for (const auto Function : Functions)
+	{
 		if (bHasFunction == true)
 		{
 			if (bIsInterface == true)
@@ -194,20 +215,22 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FString FunctionAccessSpecifiers;
 
+		auto FunctionName = Function->GetName();
+
 		if (bIsInterface == false)
 		{
 			FunctionAccessSpecifiers = TEXT("public");
 
 			if (SuperClass != nullptr)
 			{
-				if (SuperClass->FindFunctionByName(*FunctionIterator->GetName()))
+				if (SuperClass->FindFunctionByName(*FunctionName))
 				{
 					FunctionNew = TEXT("new");
 				}
 			}
 		}
 
-		auto bIsStatic = FunctionIterator->HasAnyFunctionFlags(FUNC_Static);
+		auto bIsStatic = Function->HasAnyFunctionFlags(FUNC_Static);
 
 		if (bIsStatic == true)
 		{
@@ -224,7 +247,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FProperty* FunctionReturnParam = nullptr;
 
-		for (TFieldIterator<FProperty> ParamIterator(*FunctionIterator); ParamIterator && (ParamIterator->PropertyFlags
+		for (TFieldIterator<FProperty> ParamIterator(Function); ParamIterator && (ParamIterator->PropertyFlags
 			     & CPF_Parm); ++ParamIterator)
 		{
 			FDelegateGenerator::Generator(*ParamIterator);
@@ -248,9 +271,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionReturnType = FGeneratorCore::GetPropertyType(FunctionReturnParam);
 		}
 
-		auto FunctionName = FunctionIterator->GetName();
-
-		auto FunctionComment = FunctionIterator->GetMetaData(TEXT("Comment"));
+		auto FunctionComment = Function->GetMetaData(TEXT("Comment"));
 
 		if (!FunctionComment.IsEmpty())
 		{
@@ -307,7 +328,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                           *FGeneratorCore::GetName(FunctionParams[Index]->GetName()),
 			                                           bGeneratorFunctionDefaultParam
 				                                           ? *GetFunctionDefaultParam(
-					                                           *FunctionIterator, FunctionParams[Index])
+					                                           Function, FunctionParams[Index])
 				                                           : TEXT(""),
 			                                           Index == FunctionParams.Num() - 1 ? TEXT("") : TEXT(", ")
 			);
