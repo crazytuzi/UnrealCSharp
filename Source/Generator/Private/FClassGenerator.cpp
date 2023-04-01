@@ -152,349 +152,336 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()));
 
-	auto proc = [&](TFieldIterator<UFunction> FunctionIterator)
+	TArray<UFunction*> Functions;
+
+	for (TFieldIterator<UFunction> FunctionIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
+	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
+	     FunctionIterator)
 	{
-		for (; FunctionIterator; ++FunctionIterator)
-		{
-			if (FunctionIterator->HasAnyFunctionFlags(FUNC_Delegate))
-			{
-				continue;
-			}
-			if (ClassName.Contains("AudioComponent"))
-			{
-				printf("---");
-			}
-			if (SuperClass != nullptr && SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
-			{
-				continue;
-			}
-
-			if (bHasFunction == true)
-			{
-				if (bIsInterface == true)
-				{
-					InterfaceFunction += "\n";
-				}
-				else
-				{
-					FunctionContent += "\n";
-				}
-			}
-			else
-			{
-				bHasFunction = true;
-
-				if (bIsInterface == false)
-				{
-					FunctionContent += "\n";
-				}
-			}
-
-			FString FunctionNew;
-
-			FString FunctionStatic;
-
-			FString FunctionAccessSpecifiers;
-
-			if (bIsInterface == false)
-			{
-				FunctionAccessSpecifiers = TEXT("public");
-
-				if (SuperClass != nullptr)
-				{
-					if (SuperClass->FindFunctionByName(*FunctionIterator->GetName()))
-					{
-						FunctionNew = TEXT("new");
-					}
-				}
-			}
-
-			auto bIsStatic = FunctionIterator->HasAnyFunctionFlags(FUNC_Static);
-
-			if (bIsStatic == true)
-			{
-				FunctionStatic = TEXT("static");
-
-				UsingNameSpaces.Add(TEXT("System.Reflection"));
-
-				UsingNameSpaces.Add(TEXT("Script.Reflection.Struct"));
-			}
-
-			TArray<FProperty*> FunctionParams;
-
-			TArray<int32> FunctionOutParamIndex;
-
-			FProperty* FunctionReturnParam = nullptr;
-
-			for (TFieldIterator<FProperty> ParamIterator(*FunctionIterator); ParamIterator && (ParamIterator->
-				     PropertyFlags
-				     & CPF_Parm); ++ParamIterator)
-			{
-				FDelegateGenerator::Generator(*ParamIterator);
-
-				if (ParamIterator->HasAnyPropertyFlags(CPF_ReturnParm))
-				{
-					FunctionReturnParam = *ParamIterator;
-				}
-				else
-				{
-					FunctionParams.Emplace(*ParamIterator);
-				}
-
-				UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*ParamIterator));
-			}
-
-			FString FunctionReturnType = TEXT("void");
-
-			if (FunctionReturnParam != nullptr)
-			{
-				FunctionReturnType = FGeneratorCore::GetPropertyType(FunctionReturnParam);
-			}
-
-			auto FunctionName = FunctionIterator->GetName();
-
-			auto FunctionComment = FunctionIterator->GetMetaData(TEXT("Comment"));
-
-			if (!FunctionComment.IsEmpty())
-			{
-				FunctionComment = FString::Printf(TEXT(
-					"\t\t%s"
-				),
-				                                  *FunctionComment
-				);
-
-				FunctionComment = FunctionComment.Replace(TEXT("\n"), TEXT("\n\t\t"));
-
-				FunctionComment = FunctionComment.Replace(TEXT("\n\t\t\t"), TEXT("\n\t\t"));
-
-				if (FunctionComment.EndsWith(TEXT("\t")))
-				{
-					FunctionComment.RemoveAt(FunctionComment.Len() - 2, 2);
-				}
-				else if (FunctionComment.EndsWith(TEXT("\t\t")))
-				{
-					FunctionComment.RemoveAt(FunctionComment.Len() - 4, 4);
-				}
-
-				if (!FunctionComment.EndsWith(TEXT("\n")))
-				{
-					FunctionComment = FString::Printf(TEXT(
-						"%s\n"
-					), *FunctionComment);
-				}
-			}
-
-			FString FunctionDeclarationBody;
-
-			for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
-			{
-				if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->
-					HasAnyPropertyFlags(
-						CPF_ConstParm | CPF_ReferenceParm))
-				{
-					FunctionOutParamIndex.Emplace(Index);
-				}
-			}
-
-			auto bGeneratorFunctionDefaultParam = GeneratorFunctionDefaultParam(FunctionOutParamIndex);
-
-			for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
-			{
-				if (FunctionOutParamIndex.Contains(Index))
-				{
-					FunctionDeclarationBody += TEXT("out ");
-				}
-
-				FunctionDeclarationBody += FString::Printf(TEXT(
-					"%s %s%s%s"),
-				                                           *FGeneratorCore::GetPropertyType(FunctionParams[Index]),
-				                                           *FGeneratorCore::GetName(FunctionParams[Index]->GetName()),
-				                                           bGeneratorFunctionDefaultParam
-					                                           ? *GetFunctionDefaultParam(
-						                                           *FunctionIterator, FunctionParams[Index])
-					                                           : TEXT(""),
-				                                           Index == FunctionParams.Num() - 1 ? TEXT("") : TEXT(", ")
-				);
-			}
-
-			auto FunctionDeclaration = FString::Printf(TEXT(
-				"%s%s%s%s%s%s%s %s(%s)"
-			),
-			                                           *FunctionAccessSpecifiers,
-			                                           bIsInterface == true ? TEXT("") : TEXT(" "),
-			                                           *FunctionNew,
-			                                           FunctionNew.IsEmpty() == true ? TEXT("") : TEXT(" "),
-			                                           *FunctionStatic,
-			                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
-			                                           *FunctionReturnType,
-			                                           *FGeneratorCore::GetName(FunctionName),
-			                                           *FunctionDeclarationBody
-			);
-
-			if (FunctionDeclarations.Contains(FunctionDeclaration))
-			{
-				continue;
-			}
-
-			FunctionDeclarations.Emplace(FunctionDeclaration);
-
-			if (bIsInterface == true)
-			{
-				InterfaceFunction += FString::Printf(TEXT(
-					"\t\t%s;\n"
-				),
-				                                     *FunctionDeclaration);
-
-				continue;
-			}
-
-			auto FunctionCallBody = FString::Printf(
-				TEXT(
-					"FunctionUtils.Function_Reflection<%s>(%s, \"%s\", out var __ReturnValue, out var __OutValue"
-				),
-				FunctionReturnParam != nullptr
-					? *FGeneratorCore::GetReturnParamType(FunctionReturnParam)
-					: TEXT("Object"),
-				bIsStatic == true ? TEXT("StaticClass().GetDefaultObject()") : TEXT("this"),
-				*FunctionName);
-
-			for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
-			{
-				if (FunctionOutParamIndex.Contains(Index) == false)
-				{
-					FunctionCallBody += ", " + FGeneratorCore::GetParamName(FunctionParams[Index]);
-				}
-			}
-
-			FunctionCallBody += TEXT(");");
-
-			auto bIsSafeFunction = true;
-
-			TArray<FString> FunctionOutParams;
-
-			for (auto Index = 0; Index < FunctionOutParamIndex.Num(); ++Index)
-			{
-				if (bIsSafeFunction == true)
-				{
-					bIsSafeFunction = FGeneratorCore::IsSafeProperty(FunctionParams[FunctionOutParamIndex[Index]]);
-				}
-
-				FunctionOutParams.Emplace(FString::Printf(TEXT(
-					"%s = %s;"
-				),
-				                                          *FGeneratorCore::GetName(
-					                                          FunctionParams[FunctionOutParamIndex[Index]]->GetName()),
-				                                          *FGeneratorCore::GetOutParamString(
-					                                          FunctionParams[FunctionOutParamIndex[Index]], Index)));
-			}
-
-			FString FunctionReturnParamBody;
-
-			if (FunctionReturnParam != nullptr)
-			{
-				FunctionReturnParamBody = FString::Printf(TEXT(
-					"return %s;"
-				),
-				                                          *FGeneratorCore::GetReturnParamName(FunctionReturnParam));
-			}
-
-			FString FunctionTab;
-
-			FString FunctionStringFormat;
-
-			if (bIsSafeFunction == true)
-			{
-				FunctionTab = TEXT("\t\t\t");
-
-				FunctionStringFormat = TEXT(
-					"{0}"
-					"\t\t{1}\n"
-					"\t\t{\n"
-					"{2}"
-					"\t\t}\n"
-				);
-			}
-			else
-			{
-				FunctionTab = TEXT("\t\t\t\t");
-
-				UsingNameSpaces.Add(TEXT("IntPtr = Script.Common.IntPtr"));
-
-				FunctionStringFormat = TEXT(
-					"{0}"
-					"\t\t{1}\n"
-					"\t\t{\n"
-					"\t\t\tunsafe\n"
-					"\t\t\t{\n"
-					"{2}"
-					"\t\t\t}\n"
-					"\t\t}\n"
-				);
-			}
-
-			FString FunctionOutParamBody;
-
-			for (auto FunctionOutParam : FunctionOutParams)
-			{
-				FunctionOutParamBody += FString::Printf(TEXT(
-					"\n%s%s\n"
-				),
-				                                        *FunctionTab,
-				                                        *FunctionOutParam);
-			}
-
-			auto FunctionImplementationBody = FString::Printf(TEXT(
-				"%s%s\n"
-				"%s"
-				"%s"
-				"%s"
-			),
-			                                                  *FunctionTab,
-			                                                  *FunctionCallBody,
-			                                                  *FunctionOutParamBody,
-			                                                  FunctionReturnParamBody.IsEmpty() ? TEXT("") : TEXT("\n"),
-			                                                  FunctionReturnParamBody.IsEmpty()
-				                                                  ? TEXT("")
-				                                                  : *FString::Printf(
-					                                                  TEXT(
-						                                                  "%s%s\n"
-					                                                  ),
-					                                                  *FunctionTab,
-					                                                  *FunctionReturnParamBody));
-
-			FStringFormatOrderedArguments StringFormatArgs{
-				FunctionComment, FunctionDeclaration, FunctionImplementationBody
-			};
-
-			FunctionContent += FString::Format(*FunctionStringFormat, StringFormatArgs);
-		}
-	};
-	proc(TFieldIterator<UFunction>(
-		InClass,
-		EFieldIteratorFlags::ExcludeSuper,
-		EFieldIteratorFlags::ExcludeDeprecated,
-		EFieldIteratorFlags::IncludeInterfaces));
-
-	for (auto InInterface : InClass->Interfaces)
-	{
-		if (InInterface.Class->Children != nullptr)
+		if (FunctionIterator->HasAnyFunctionFlags(FUNC_Delegate))
 		{
 			continue;
 		}
-		auto InSuperClass = InInterface.Class->GetSuperClass();
-		while (InSuperClass->Children == nullptr && InSuperClass->GetSuperClass())
+
+		if (SuperClass != nullptr && SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
 		{
-			InSuperClass = InSuperClass->GetSuperClass();
+			continue;
 		}
-		if (InSuperClass != nullptr)
+
+		Functions.Add(*FunctionIterator);
+	}
+
+	for (const auto InInterface : InClass->Interfaces)
+	{
+		if (SuperClass != nullptr && SuperClass->ImplementsInterface(InInterface.Class))
 		{
-			proc(TFieldIterator<UFunction>(
-					InSuperClass,
-					EFieldIteratorFlags::ExcludeSuper,
-					EFieldIteratorFlags::ExcludeDeprecated,
-					EFieldIteratorFlags::IncludeInterfaces)
+			continue;
+		}
+
+		for (TFieldIterator<UFunction> FunctionIterator(InInterface.Class, EFieldIteratorFlags::IncludeSuper,
+		                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
+		     FunctionIterator)
+		{
+			Functions.Add(*FunctionIterator);
+		}
+	}
+
+	for (const auto Function : Functions)
+	{
+		if (bHasFunction == true)
+		{
+			if (bIsInterface == true)
+			{
+				InterfaceFunction += "\n";
+			}
+			else
+			{
+				FunctionContent += "\n";
+			}
+		}
+		else
+		{
+			bHasFunction = true;
+
+			if (bIsInterface == false)
+			{
+				FunctionContent += "\n";
+			}
+		}
+
+		FString FunctionNew;
+
+		FString FunctionStatic;
+
+		FString FunctionAccessSpecifiers;
+
+		auto FunctionName = Function->GetName();
+
+		if (bIsInterface == false)
+		{
+			FunctionAccessSpecifiers = TEXT("public");
+
+			if (SuperClass != nullptr)
+			{
+				if (SuperClass->FindFunctionByName(*FunctionName))
+				{
+					FunctionNew = TEXT("new");
+				}
+			}
+		}
+
+		auto bIsStatic = Function->HasAnyFunctionFlags(FUNC_Static);
+
+		if (bIsStatic == true)
+		{
+			FunctionStatic = TEXT("static");
+
+			UsingNameSpaces.Add(TEXT("System.Reflection"));
+
+			UsingNameSpaces.Add(TEXT("Script.Reflection.Struct"));
+		}
+
+		TArray<FProperty*> FunctionParams;
+
+		TArray<int32> FunctionOutParamIndex;
+
+		FProperty* FunctionReturnParam = nullptr;
+
+		for (TFieldIterator<FProperty> ParamIterator(Function); ParamIterator && (ParamIterator->PropertyFlags
+			     & CPF_Parm); ++ParamIterator)
+		{
+			FDelegateGenerator::Generator(*ParamIterator);
+
+			if (ParamIterator->HasAnyPropertyFlags(CPF_ReturnParm))
+			{
+				FunctionReturnParam = *ParamIterator;
+			}
+			else
+			{
+				FunctionParams.Emplace(*ParamIterator);
+			}
+
+			UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*ParamIterator));
+		}
+
+		FString FunctionReturnType = TEXT("void");
+
+		if (FunctionReturnParam != nullptr)
+		{
+			FunctionReturnType = FGeneratorCore::GetPropertyType(FunctionReturnParam);
+		}
+
+		auto FunctionComment = Function->GetMetaData(TEXT("Comment"));
+
+		if (!FunctionComment.IsEmpty())
+		{
+			FunctionComment = FString::Printf(TEXT(
+				"\t\t%s"
+			),
+			                                  *FunctionComment
+			);
+
+			FunctionComment = FunctionComment.Replace(TEXT("\n"), TEXT("\n\t\t"));
+
+			FunctionComment = FunctionComment.Replace(TEXT("\n\t\t\t"), TEXT("\n\t\t"));
+
+			if (FunctionComment.EndsWith(TEXT("\t")))
+			{
+				FunctionComment.RemoveAt(FunctionComment.Len() - 2, 2);
+			}
+			else if (FunctionComment.EndsWith(TEXT("\t\t")))
+			{
+				FunctionComment.RemoveAt(FunctionComment.Len() - 4, 4);
+			}
+
+			if (!FunctionComment.EndsWith(TEXT("\n")))
+			{
+				FunctionComment = FString::Printf(TEXT(
+					"%s\n"
+				), *FunctionComment);
+			}
+		}
+
+		FString FunctionDeclarationBody;
+
+		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
+		{
+			if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->HasAnyPropertyFlags(
+				CPF_ConstParm))
+			{
+				FunctionOutParamIndex.Emplace(Index);
+			}
+		}
+
+		auto bGeneratorFunctionDefaultParam = GeneratorFunctionDefaultParam(FunctionOutParamIndex);
+
+		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
+		{
+			if (FunctionOutParamIndex.Contains(Index))
+			{
+				FunctionDeclarationBody += TEXT("out ");
+			}
+
+			FunctionDeclarationBody += FString::Printf(TEXT(
+				"%s %s%s%s"),
+			                                           *FGeneratorCore::GetPropertyType(FunctionParams[Index]),
+			                                           *FGeneratorCore::GetName(FunctionParams[Index]->GetName()),
+			                                           bGeneratorFunctionDefaultParam
+				                                           ? *GetFunctionDefaultParam(
+					                                           Function, FunctionParams[Index])
+				                                           : TEXT(""),
+			                                           Index == FunctionParams.Num() - 1 ? TEXT("") : TEXT(", ")
 			);
 		}
+
+		auto FunctionDeclaration = FString::Printf(TEXT(
+			"%s%s%s%s%s%s%s %s(%s)"
+		),
+		                                           *FunctionAccessSpecifiers,
+		                                           bIsInterface == true ? TEXT("") : TEXT(" "),
+		                                           *FunctionNew,
+		                                           FunctionNew.IsEmpty() == true ? TEXT("") : TEXT(" "),
+		                                           *FunctionStatic,
+		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
+		                                           *FunctionReturnType,
+		                                           *FGeneratorCore::GetName(FunctionName),
+		                                           *FunctionDeclarationBody
+		);
+
+		if (FunctionDeclarations.Contains(FunctionDeclaration))
+		{
+			continue;
+		}
+
+		FunctionDeclarations.Emplace(FunctionDeclaration);
+
+		if (bIsInterface == true)
+		{
+			InterfaceFunction += FString::Printf(TEXT(
+				"\t\t%s;\n"
+			),
+			                                     *FunctionDeclaration);
+
+			continue;
+		}
+
+		auto FunctionCallBody = FString::Printf(
+			TEXT(
+				"FunctionUtils.Function_Reflection<%s>(%s, \"%s\", out var __ReturnValue, out var __OutValue"
+			),
+			FunctionReturnParam != nullptr ? *FGeneratorCore::GetReturnParamType(FunctionReturnParam) : TEXT("Object"),
+			bIsStatic == true ? TEXT("StaticClass().GetDefaultObject()") : TEXT("this"),
+			*FunctionName);
+
+		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
+		{
+			if (FunctionOutParamIndex.Contains(Index) == false)
+			{
+				FunctionCallBody += ", " + FGeneratorCore::GetParamName(FunctionParams[Index]);
+			}
+		}
+
+		FunctionCallBody += TEXT(");");
+
+		auto bIsSafeFunction = true;
+
+		TArray<FString> FunctionOutParams;
+
+		for (auto Index = 0; Index < FunctionOutParamIndex.Num(); ++Index)
+		{
+			if (bIsSafeFunction == true)
+			{
+				bIsSafeFunction = FGeneratorCore::IsSafeProperty(FunctionParams[FunctionOutParamIndex[Index]]);
+			}
+
+			FunctionOutParams.Emplace(FString::Printf(TEXT(
+				"%s = %s;"
+			),
+			                                          *FGeneratorCore::GetName(
+				                                          FunctionParams[FunctionOutParamIndex[Index]]->GetName()),
+			                                          *FGeneratorCore::GetOutParamString(
+				                                          FunctionParams[FunctionOutParamIndex[Index]], Index)));
+		}
+
+		FString FunctionReturnParamBody;
+
+		if (FunctionReturnParam != nullptr)
+		{
+			FunctionReturnParamBody = FString::Printf(TEXT(
+				"return %s;"
+			),
+			                                          *FGeneratorCore::GetReturnParamName(FunctionReturnParam));
+		}
+
+		FString FunctionTab;
+
+		FString FunctionStringFormat;
+
+		if (bIsSafeFunction == true)
+		{
+			FunctionTab = TEXT("\t\t\t");
+
+			FunctionStringFormat = TEXT(
+				"{0}"
+				"\t\t{1}\n"
+				"\t\t{\n"
+				"{2}"
+				"\t\t}\n"
+			);
+		}
+		else
+		{
+			FunctionTab = TEXT("\t\t\t\t");
+
+			UsingNameSpaces.Add(TEXT("IntPtr = Script.Common.IntPtr"));
+
+			FunctionStringFormat = TEXT(
+				"{0}"
+				"\t\t{1}\n"
+				"\t\t{\n"
+				"\t\t\tunsafe\n"
+				"\t\t\t{\n"
+				"{2}"
+				"\t\t\t}\n"
+				"\t\t}\n"
+			);
+		}
+
+		FString FunctionOutParamBody;
+
+		for (auto FunctionOutParam : FunctionOutParams)
+		{
+			FunctionOutParamBody += FString::Printf(TEXT(
+				"\n%s%s\n"
+			),
+			                                        *FunctionTab,
+			                                        *FunctionOutParam);
+		}
+
+		auto FunctionImplementationBody = FString::Printf(TEXT(
+			"%s%s\n"
+			"%s"
+			"%s"
+			"%s"
+		),
+		                                                  *FunctionTab,
+		                                                  *FunctionCallBody,
+		                                                  *FunctionOutParamBody,
+		                                                  FunctionReturnParamBody.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                                  FunctionReturnParamBody.IsEmpty()
+			                                                  ? TEXT("")
+			                                                  : *FString::Printf(
+				                                                  TEXT(
+					                                                  "%s%s\n"
+				                                                  ),
+				                                                  *FunctionTab,
+				                                                  *FunctionReturnParamBody));
+
+		FStringFormatOrderedArguments StringFormatArgs{
+			FunctionComment, FunctionDeclaration, FunctionImplementationBody
+		};
+
+		FunctionContent += FString::Format(*FunctionStringFormat, StringFormatArgs);
 	}
 
 	if (bIsInterface == true)
