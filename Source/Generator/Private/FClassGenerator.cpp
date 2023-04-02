@@ -307,7 +307,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 		{
 			if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->HasAnyPropertyFlags(
-				CPF_ConstParm))
+				CPF_ConstParm | CPF_ReferenceParm))
 			{
 				FunctionOutParamIndex.Emplace(Index);
 			}
