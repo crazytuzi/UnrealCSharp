@@ -231,13 +231,15 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 	{
 		if (InMulticastDelegateProperty->IsNative())
 		{
-			return FString::Printf(TEXT("%s.%s"),
-				*FUnrealCSharpFunctionLibrary::GetClassNameSpace(Class),
-				*SignatureFunction->GetOuter()->GetName());
+			return FString::Printf(TEXT(
+				"%s.%s"
+			),
+			                       *GetClassNameSpace(Class),
+			                       *SignatureFunction->GetOuter()->GetName());
 		}
 		else
 		{
-			return *FUnrealCSharpFunctionLibrary::GetClassNameSpace(Class);
+			return *GetClassNameSpace(Class);
 		}
 	}
 
