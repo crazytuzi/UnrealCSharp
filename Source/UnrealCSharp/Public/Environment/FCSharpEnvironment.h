@@ -38,6 +38,8 @@ public:
 
 	void OnUnrealCSharpModuleInActive();
 
+	void OnAsyncLoadingFlushUpdate();
+
 public:
 	MonoObject* Bind(UObject* Object) const;
 
@@ -127,7 +129,7 @@ public:
 	                          MonoObject* InMonoObject) const;
 
 	bool RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-	
+
 private:
 	template <typename T, typename U>
 	class TGetAddress
@@ -179,6 +181,11 @@ private:
 
 private:
 	FDelegateHandle OnUnrealCSharpModuleInActiveDelegateHandle;
+
+private:
+	FCriticalSection CriticalSection;
+
+	TArray<FWeakObjectPtr> AsyncLoadingObjectArray;
 
 private:
 	FClassRegistry* ClassRegistry;

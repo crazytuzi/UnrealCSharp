@@ -21,6 +21,8 @@ private:
 	void OnPreExit();
 #endif
 
+	void OnAsyncLoadingFlushUpdate();
+
 private:
 #if WITH_EDITOR
 	FDelegateHandle OnPreBeginPIEDelegateHandle;
@@ -34,4 +36,6 @@ private:
 
 	FDelegateHandle OnPreExitHandle;
 #endif
+
+	FDelegateHandle OnAsyncLoadingFlushUpdateHandle;
 };
