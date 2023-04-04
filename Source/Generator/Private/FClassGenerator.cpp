@@ -245,6 +245,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		TArray<int32> FunctionOutParamIndex;
 
+		TArray<int32> FunctionRefParamIndex;
+
 		FProperty* FunctionReturnParam = nullptr;
 
 		for (TFieldIterator<FProperty> ParamIterator(Function); ParamIterator && (ParamIterator->PropertyFlags
@@ -304,22 +306,44 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FString FunctionDeclarationBody;
 
+		TArray<int32> FunctionOutParamIndexMapping;
+
+		FunctionOutParamIndexMapping.AddDefaulted(FunctionParams.Num());
+
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 		{
 			if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->HasAnyPropertyFlags(
-				CPF_ConstParm | CPF_ReferenceParm))
+				CPF_ConstParm))
 			{
-				FunctionOutParamIndex.Emplace(Index);
+				if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_ReferenceParm))
+				{
+					FunctionOutParamIndexMapping[FunctionParams.Num() - 1 - FunctionRefParamIndex.Num()] =
+						FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();
+
+					FunctionRefParamIndex.Emplace(Index);
+				}
+				else
+				{
+					FunctionOutParamIndexMapping[FunctionOutParamIndex.Num()] =
+						FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();
+
+					FunctionOutParamIndex.Emplace(Index);
+				}
 			}
 		}
 
-		auto bGeneratorFunctionDefaultParam = GeneratorFunctionDefaultParam(FunctionOutParamIndex);
+		auto bGeneratorFunctionDefaultParam = GeneratorFunctionDefaultParam(
+			FunctionOutParamIndex, FunctionRefParamIndex);
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 		{
 			if (FunctionOutParamIndex.Contains(Index))
 			{
 				FunctionDeclarationBody += TEXT("out ");
+			}
+			else if (FunctionRefParamIndex.Contains(Index))
+			{
+				FunctionDeclarationBody += TEXT("ref ");
 			}
 
 			FunctionDeclarationBody += FString::Printf(TEXT(
@@ -400,7 +424,26 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                          *FGeneratorCore::GetName(
 				                                          FunctionParams[FunctionOutParamIndex[Index]]->GetName()),
 			                                          *FGeneratorCore::GetOutParamString(
-				                                          FunctionParams[FunctionOutParamIndex[Index]], Index)));
+				                                          FunctionParams[FunctionOutParamIndex[Index]],
+				                                          FunctionOutParamIndexMapping[Index])));
+		}
+
+		for (auto Index = 0; Index < FunctionRefParamIndex.Num(); ++Index)
+		{
+			if (bIsSafeFunction == true)
+			{
+				bIsSafeFunction = FGeneratorCore::IsSafeProperty(FunctionParams[FunctionRefParamIndex[Index]]);
+			}
+
+			FunctionOutParams.Emplace(FString::Printf(TEXT(
+				"%s = %s;"
+			),
+			                                          *FGeneratorCore::GetName(
+				                                          FunctionParams[FunctionRefParamIndex[Index]]->GetName()),
+			                                          *FGeneratorCore::GetOutParamString(
+				                                          FunctionParams[FunctionRefParamIndex[Index]],
+				                                          FunctionOutParamIndexMapping[FunctionParams.Num() - 1 -
+					                                          Index])));
 		}
 
 		FString FunctionReturnParamBody;
@@ -561,10 +604,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
 
-bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& FunctionOutParamIndex)
+bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& InFunctionOutParamIndex,
+                                                    const TArray<int32>& InFunctionRefParamIndex)
 {
-	return FunctionOutParamIndex.Num() == 0 ||
-		FunctionOutParamIndex[FunctionOutParamIndex.Num() - 1] == FunctionOutParamIndex.Num() - 1;
+	return InFunctionOutParamIndex.Num() == 0 && InFunctionRefParamIndex.Num() == 0 ||
+	(InFunctionOutParamIndex.Num() > InFunctionRefParamIndex.Num()
+		 ? InFunctionOutParamIndex[InFunctionOutParamIndex.Num() - 1] == InFunctionOutParamIndex.Num() - 1
+		 : InFunctionRefParamIndex[InFunctionRefParamIndex.Num() - 1] == InFunctionRefParamIndex.Num() - 1);
 }
 
 FString FClassGenerator::GetFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
