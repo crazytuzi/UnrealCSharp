@@ -1,6 +1,5 @@
 ﻿#include "Listener/FEngineListener.h"
 #include "UnrealCSharp.h"
-#include "Environment/FCSharpEnvironment.h"
 
 FEngineListener::FEngineListener()
 {
@@ -16,9 +15,6 @@ FEngineListener::FEngineListener()
 
 	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
 #endif
-
-	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
-		this, &FEngineListener::OnAsyncLoadingFlushUpdate);
 }
 
 FEngineListener::~FEngineListener()
@@ -50,11 +46,6 @@ FEngineListener::~FEngineListener()
 		FCoreDelegates::OnPreExit.Remove(OnPreExitHandle);
 	}
 #endif
-
-	if (OnAsyncLoadingFlushUpdateHandle.IsValid())
-	{
-		FCoreDelegates::OnAsyncLoadingFlush.Remove(OnAsyncLoadingFlushUpdateHandle);
-	}
 }
 
 #if WITH_EDITOR
@@ -83,8 +74,3 @@ void FEngineListener::OnPreExit()
 	FUnrealCSharpModule::Get().SetActive(false);
 }
 #endif
-
-void FEngineListener::OnAsyncLoadingFlushUpdate()
-{
-	FCSharpEnvironment::GetEnvironment()->OnAsyncLoadingFlushUpdate();
-}
