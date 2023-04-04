@@ -114,8 +114,6 @@ FCSharpEnvironment* FCSharpEnvironment::GetEnvironment()
 	if (Environment == nullptr)
 	{
 		Environment = new FCSharpEnvironment();
-
-		return Environment;
 	}
 
 	return Environment;
@@ -130,7 +128,16 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 {
 	if (const auto InObject = static_cast<UObject*>(const_cast<UObjectBase*>(Object)))
 	{
-		Bind(InObject, true);
+		if (IsInGameThread())
+		{
+			Bind(InObject, true);
+		}
+		else
+		{
+			FScopeLock Lock(&CriticalSection);
+
+			AsyncLoadingObjectArray.Add(InObject);
+		}
 	}
 }
 
@@ -160,6 +167,63 @@ void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 		delete Environment;
 
 		Environment = nullptr;
+	}
+}
+
+void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
+{
+	TArray<int32> RemovedIndexes;
+
+	TArray<UObject*> PendingBindObjects;
+
+	{
+		TArray<FWeakObjectPtr> LocalAsyncLoadingObjectArray;
+
+		{
+			FScopeLock Lock(&CriticalSection);
+
+			LocalAsyncLoadingObjectArray.Append(AsyncLoadingObjectArray);
+		}
+
+		for (auto i = LocalAsyncLoadingObjectArray.Num() - 1; i >= 0; --i)
+		{
+			auto ObjectPtr = LocalAsyncLoadingObjectArray[i];
+
+			if (!ObjectPtr.IsValid())
+			{
+				RemovedIndexes.Add(i);
+
+				continue;
+			}
+
+			auto Object = ObjectPtr.Get();
+
+			if (Object->HasAnyFlags(RF_NeedPostLoad)
+				|| Object->HasAnyInternalFlags(EInternalObjectFlags::AsyncLoading | EInternalObjectFlags::Async)
+				|| Object->GetClass()->HasAnyInternalFlags(
+					EInternalObjectFlags::AsyncLoading | EInternalObjectFlags::Async))
+			{
+				continue;
+			}
+
+			PendingBindObjects.Add(Object);
+
+			RemovedIndexes.Add(i);
+		}
+	}
+
+	{
+		FScopeLock Lock(&CriticalSection);
+
+		for (auto i = 0; i < RemovedIndexes.Num(); ++i)
+		{
+			AsyncLoadingObjectArray.RemoveAt(RemovedIndexes[i]);
+		}
+	}
+
+	for (auto i = 0; i < PendingBindObjects.Num(); ++i)
+	{
+		Bind(PendingBindObjects[i], true);
 	}
 }
 
