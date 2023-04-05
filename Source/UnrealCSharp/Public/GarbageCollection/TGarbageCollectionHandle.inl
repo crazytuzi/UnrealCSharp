@@ -39,7 +39,7 @@ bool TGarbageCollectionHandle<T>::operator!=(const TGarbageCollectionHandle& Oth
 }
 
 template <typename T>
-bool TGarbageCollectionHandle<T>::IsValid()
+bool TGarbageCollectionHandle<T>::IsValid() const
 {
 	return Handle != T();
 }

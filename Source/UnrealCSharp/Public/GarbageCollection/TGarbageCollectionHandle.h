@@ -18,7 +18,7 @@ public:
 
 	bool operator!=(const TGarbageCollectionHandle& Other) const;
 
-	bool IsValid();
+	bool IsValid() const;
 
 public:
 	static TGarbageCollectionHandle NewRef(MonoObject* InMonoObject, mono_bool bPinned);
