@@ -11,6 +11,7 @@
 #include "UnrealCSharpEditorCommands.h"
 #include "Misc/MessageDialog.h"
 #include "ToolMenus.h"
+#include "Internationalization/Culture.h"
 
 static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 
@@ -51,6 +52,15 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 
 void FUnrealCSharpEditorModule::PluginButtonClicked()
 {
+	static FString DefaultCultureName = TEXT("en");
+
+	const auto CurrentCultureName = FInternationalization::Get().GetCurrentCulture().Get().GetName();
+
+	if (!CurrentCultureName.Equals(DefaultCultureName))
+	{
+		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
+	}
+	
 	FClassGenerator::Generator();
 
 	FStructGenerator::Generator();
@@ -60,6 +70,11 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	FBlueprintGenerator::Generator();
 
 	FEnumGenerator::EmptyEnumUnderlyingType();
+
+	if (!CurrentCultureName.Equals(DefaultCultureName))
+	{
+		FInternationalization::Get().SetCurrentCulture(CurrentCultureName);
+	}
 
 	FSolutionGenerator::Generator();
 

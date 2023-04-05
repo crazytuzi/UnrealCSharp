@@ -2,6 +2,7 @@
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
 #include "FUnrealCSharpFunctionLibrary.h"
+#include "Engine/UserDefinedEnum.h"
 
 void FClassGenerator::Generator()
 {
@@ -760,7 +761,16 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	{
 		if (ByteProperty->Enum != nullptr)
 		{
-			return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
+			if (const auto UserDefinedEnum = Cast<UUserDefinedEnum>(ByteProperty->Enum))
+			{
+				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
+				                       *UserDefinedEnum->GetDisplayNameTextByIndex(
+					                       UserDefinedEnum->GetIndexByNameString(MetaData)).ToString());
+			}
+			else
+			{
+				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
+			}
 		}
 		else
 		{

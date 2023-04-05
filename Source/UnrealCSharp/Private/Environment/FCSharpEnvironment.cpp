@@ -50,6 +50,8 @@ void FCSharpEnvironment::Initialize()
 
 void FCSharpEnvironment::Deinitialize()
 {
+	AsyncLoadingObjectArray.Empty();
+
 	if (OnAsyncLoadingFlushUpdateHandle.IsValid())
 	{
 		FCoreDelegates::OnAsyncLoadingFlushUpdate.Remove(OnAsyncLoadingFlushUpdateHandle);
