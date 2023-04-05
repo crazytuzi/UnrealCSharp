@@ -64,8 +64,15 @@ MonoObject* FMapPropertyDescriptor::Object_New(void* InAddress) const
 	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetGarbageCollectionHandle(
 		InAddress, MapProperty->GetOffset_ForInternal());
 
-	FCSharpEnvironment::GetEnvironment()->AddContainerReference(OwnerGarbageCollectionHandle, InAddress, MapHelper,
-	                                                            Object);
+	if (OwnerGarbageCollectionHandle.IsValid())
+	{
+		FCSharpEnvironment::GetEnvironment()->AddContainerReference(OwnerGarbageCollectionHandle, InAddress, MapHelper,
+		                                                            Object);
+	}
+	else
+	{
+		FCSharpEnvironment::GetEnvironment()->AddContainerReference(MapHelper, Object);
+	}
 
 	return Object;
 }
