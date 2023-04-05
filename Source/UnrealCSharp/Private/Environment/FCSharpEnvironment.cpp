@@ -43,10 +43,18 @@ void FCSharpEnvironment::Initialize()
 
 	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
 		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
+
+	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
+		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
 }
 
 void FCSharpEnvironment::Deinitialize()
 {
+	if (OnAsyncLoadingFlushUpdateHandle.IsValid())
+	{
+		FCoreDelegates::OnAsyncLoadingFlushUpdate.Remove(OnAsyncLoadingFlushUpdateHandle);
+	}
+
 	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
 	{
 		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);

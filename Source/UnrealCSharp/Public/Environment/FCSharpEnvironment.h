@@ -182,6 +182,8 @@ private:
 private:
 	FDelegateHandle OnUnrealCSharpModuleInActiveDelegateHandle;
 
+	FDelegateHandle OnAsyncLoadingFlushUpdateHandle;
+
 private:
 	FCriticalSection CriticalSection;
 
