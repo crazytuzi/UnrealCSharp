@@ -17,6 +17,10 @@ struct FRegisterSet
 			.Function("Add", static_cast<void*>(FSetImplementation::Set_AddImplementation))
 			.Function("Remove", static_cast<void*>(FSetImplementation::Set_RemoveImplementation))
 			.Function("Contains", static_cast<void*>(FSetImplementation::Set_ContainsImplementation))
+			.Function("ToArray",static_cast<void*>(FSetImplementation::Set_ToArrayImplementation))
+			.Function("Find",static_cast<void*>(FSetImplementation::Set_FindImplementation))
+			.Function("GetMaxIndex",static_cast<void*>(FSetImplementation::Set_GetMaxIndexImplementation))
+			.Function("Union",static_cast<void*>(FSetImplementation::Set_UnionImplementation))
 			.Register();
 	}
 };
@@ -78,4 +82,45 @@ bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObje
 	}
 
 	return false;
+}
+
+TArray<FProperty*> FSetImplementation::Set_ToArrayImplementation(const MonoObject* InMonoObject)
+{
+	TArray<FProperty*> Array;
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		Array=SetHelper->ToArray();
+	}
+	
+	return Array;
+}
+
+void FSetImplementation::Set_FindImplementation(const MonoObject* InMonoObject, int32 Index,void* Value)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		SetHelper->Find(Index,Value);
+	}
+}
+
+int32 FSetImplementation::Set_GetMaxIndexImplementation(const MonoObject* InMonoObject)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		return SetHelper->GetMaxIndex();
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+TSet<void*> FSetImplementation::Set_UnionImplementation(const MonoObject* InMonoObject,TSet<void*> OtherSet)
+{
+	TSet<void*> NewSet;
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		NewSet= SetHelper->Union(OtherSet);
+	}
+	return NewSet;
 }

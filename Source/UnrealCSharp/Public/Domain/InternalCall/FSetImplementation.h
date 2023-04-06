@@ -18,4 +18,13 @@ public:
 	static int32 Set_RemoveImplementation(const MonoObject* InMonoObject, void* InKey);
 
 	static bool Set_ContainsImplementation(const MonoObject* InMonoObject, const void* InKey);
+
+	static TArray<FProperty*> Set_ToArrayImplementation(const MonoObject* InMonoObject);
+
+	static void  Set_FindImplementation(const MonoObject* InMonoObject,int32 Index,void* Value);
+	
+	static int32 Set_GetMaxIndexImplementation(const MonoObject* InMonoObject);
+	
+	static TSet<void*> Set_UnionImplementation(const MonoObject* InMonoObject,TSet<void*> OtherSet);
+
 };

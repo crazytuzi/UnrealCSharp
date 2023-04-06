@@ -63,13 +63,72 @@ void FSetHelper::Empty(const int32 InExpectedNumElements) const
 	ScriptSet->Empty(InExpectedNumElements, ScriptSetLayout);
 }
 
+
 int32 FSetHelper::Num() const
 {
 	return ScriptSet->Num();
 }
 
+int32 FSetHelper::GetMaxIndex() const
+{
+	return ScriptSet->GetMaxIndex();
+}
+
+void FSetHelper::Find(int32 SetIndex,void* InValue) const
+{
+	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+	{
+		if (ScriptSet->IsValidIndex(SetIndex))
+		{
+			if(Index==SetIndex)
+			{
+				const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
+				InValue=Data;
+			}
+		}
+	}
+}
+
+TArray<FProperty*> FSetHelper::ToArray() const
+{
+	TArray<FProperty*> Result;
+	
+	Result.Reserve(ScriptSet->Num());
+	
+	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+	{
+		if (ScriptSet->IsValidIndex(Index))
+		{
+			const auto Data = static_cast<FProperty*>(ScriptSet->GetData(Index, ScriptSetLayout));
+			Result.Add(Data);
+		}
+	}
+	return Result;
+}
+
+TSet<void*> FSetHelper::Union(TSet<void*> OtherSet) const 
+{
+	TSet<void*> NewSet;
+
+	NewSet.Reserve(ScriptSet->GetMaxIndex()+OtherSet.GetMaxIndex());
+	
+	for(int i=0;i<ScriptSet->GetMaxIndex();i++)
+	{
+		const auto Data = static_cast<uint8*>(ScriptSet->GetData(i, ScriptSetLayout));
+		NewSet.Add(Data);
+	}
+	
+	// for(int i=0;i<OtherSet.GetMaxIndex();i++)
+	// {
+	// 	NewSet.Add(OtherSet[i]);
+	// }
+	
+	return NewSet;
+}
+
 void FSetHelper::Add(void* InValue) const
 {
+
 	ScriptSet->Add(InValue,
 	               ScriptSetLayout,
 	               [this](const void* Element)
