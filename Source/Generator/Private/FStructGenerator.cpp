@@ -136,11 +136,13 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 		auto PropertyName = PropertyIterator->GetName();
 
+		auto VariableFriendlyPropertyName = PropertyName;
+
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
 		if (UserDefinedStruct != nullptr)
 		{
-			PropertyName = FStructureEditorUtils::GetVariableFriendlyNameForProperty(
+			VariableFriendlyPropertyName = FStructureEditorUtils::GetVariableFriendlyNameForProperty(
 				UserDefinedStruct, *PropertyIterator);
 		}
 
@@ -159,7 +161,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		),
 		                                   *PropertyAccessSpecifiers,
 		                                   *PropertyType,
-		                                   *FGeneratorCore::GetName(PropertyName),
+		                                   *FGeneratorCore::GetName(VariableFriendlyPropertyName),
 		                                   *PropertyName,
 		                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 		                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
