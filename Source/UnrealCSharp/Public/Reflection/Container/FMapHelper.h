@@ -27,7 +27,7 @@ public:
 	void* FindKey(const void* InValue) const;
 
 	void* Find(const void* InKey) const;
-
+	
 	bool Contains(const void* InKey) const;
 
 	void* Get(const void* InKey) const;
