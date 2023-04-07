@@ -15,11 +15,6 @@ void FPropertyDescriptor::DestroyProperty()
 	}
 }
 
-bool FPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
-{
-	return Property->Identical(A, B, PortFlags);
-}
-
 template <typename ValueType>
 auto FPropertyDescriptor::ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex) const
 {

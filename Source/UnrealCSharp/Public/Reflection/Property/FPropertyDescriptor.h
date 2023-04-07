@@ -29,7 +29,7 @@ public:
 	FORCEINLINE void DestroyProperty();
 
 public:
-	FORCEINLINE bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const;
+	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const;
 
 	template <typename ValueType>
 	FORCEINLINE auto ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex = 0) const;

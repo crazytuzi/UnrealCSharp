@@ -35,6 +35,21 @@ void FSoftClassPropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
+bool FSoftClassPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (SoftClassProperty != nullptr)
+	{
+		const auto ClassA = SoftClassProperty->GetObjectPropertyValue(A);
+
+		const auto ClassB = FCSharpEnvironment::GetEnvironment()->GetMulti<TSoftClassPtr<UObject>>(
+			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
+
+		return SoftClassProperty->StaticIdentical(ClassA, ClassB, PortFlags);
+	}
+
+	return false;
+}
+
 MonoObject* FSoftClassPropertyDescriptor::Object_New(void* InAddress) const
 {
 	const auto SrcClass = Cast<UClass>(SoftClassProperty->GetObjectPropertyValue(InAddress));

@@ -32,6 +32,21 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
+bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (StructProperty != nullptr)
+	{
+		const auto StructA = StructProperty->ContainerPtrToValuePtr<void>(A);
+
+		const auto StructB = FCSharpEnvironment::GetEnvironment()->GetStruct(
+			static_cast<MonoObject*>(const_cast<void*>(B)));
+
+		return StructProperty->Identical(StructA, StructB, PortFlags);
+	}
+
+	return false;
+}
+
 MonoObject* FStructPropertyDescriptor::Object_New(void* InAddress) const
 {
 	const auto FoundMonoClass = FTypeBridge::GetMonoClass(StructProperty);

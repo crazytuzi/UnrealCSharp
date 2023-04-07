@@ -38,3 +38,19 @@ void FStrPropertyDescriptor::Set(void* Src, void* Dest) const
 		StrProperty->SetPropertyValue(Dest, SrcValue);
 	}
 }
+
+bool FStrPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (StrProperty != nullptr)
+	{
+		const auto StringA = StrProperty->GetPropertyValue(A);
+
+		const auto StringB = UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr)));
+
+		return StringA == StringB;
+	}
+
+	return false;
+}

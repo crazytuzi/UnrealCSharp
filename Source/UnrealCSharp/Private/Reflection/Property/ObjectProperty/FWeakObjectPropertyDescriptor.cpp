@@ -28,11 +28,26 @@ void FWeakObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TWeakObjectPtr<UObject>>(Dest);
 
 		WeakObjectProperty->InitializeValue(Dest);
-		
+
 		WeakObjectProperty->SetObjectPropertyValue(Dest, SrcMulti.Get());
 
 		Object_New(Dest);
 	}
+}
+
+bool FWeakObjectPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (WeakObjectProperty != nullptr)
+	{
+		const auto ObjectA = WeakObjectProperty->GetObjectPropertyValue(A);
+
+		const auto ObjectB = FCSharpEnvironment::GetEnvironment()->GetMulti<TWeakObjectPtr<UObject>>(
+			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
+
+		return WeakObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
+	}
+
+	return false;
 }
 
 MonoObject* FWeakObjectPropertyDescriptor::Object_New(void* InAddress) const
