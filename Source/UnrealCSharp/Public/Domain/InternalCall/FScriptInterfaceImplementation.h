@@ -5,7 +5,8 @@
 class FScriptInterfaceImplementation
 {
 public:
-	static void ScriptInterface_RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject);
+	static void ScriptInterface_RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject,
+	                                                   MonoString* InInterfaceName);
 
 	static void ScriptInterface_UnRegisterImplementation(const MonoObject* InMonoObject);
 
