@@ -29,12 +29,16 @@ public:
 	FORCEINLINE void DestroyProperty();
 
 public:
+	FORCEINLINE int32 GetElementSize() const;
+
+	FORCEINLINE EPropertyFlags GetPropertyFlags() const;
+
 	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const;
 
 	template <typename ValueType>
 	FORCEINLINE auto ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex = 0) const;
 
-	FORCEINLINE void DestroyValue(void* Dest) const;
+	virtual void DestroyValue(void* Dest) const;
 
 	FORCEINLINE void InitializeValue_InContainer(void* Dest) const;
 
