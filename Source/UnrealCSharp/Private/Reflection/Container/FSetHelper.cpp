@@ -74,19 +74,19 @@ int32 FSetHelper::GetMaxIndex() const
 	return ScriptSet->GetMaxIndex();
 }
 
-void FSetHelper::Find(int32 SetIndex,void* InValue) const
+int32 FSetHelper::Find(void* Value) const
 {
-	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
-	{
-		if (ScriptSet->IsValidIndex(SetIndex))
-		{
-			if(Index==SetIndex)
-			{
-				const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
-				InValue=Data;
-			}
-		}
-	}
+	const auto Index = ScriptSet->FindIndex(Value,
+											ScriptSetLayout,
+											[this](const void* Element)
+											{
+												return ElementPropertyDescriptor->GetValueTypeHash(Element);
+											},
+											[this](const void* A, const void* B)
+											{
+												return ElementPropertyDescriptor->Identical(A, B);
+											});
+	return Index;
 }
 
 TArray<FProperty*> FSetHelper::ToArray() const
@@ -126,9 +126,35 @@ TSet<void*> FSetHelper::Union(TSet<void*> OtherSet) const
 	return NewSet;
 }
 
+void* FSetHelper::Get(int32 Index) const 
+{
+	auto ScriptArrayHelper = CreateHelperFormElementProperty();
+
+	if (ScriptArrayHelper.IsValidIndex(Index))
+	{
+		return ScriptArrayHelper.GetElementPtr(Index);
+	}
+
+	else
+	{
+		return  nullptr;
+	}
+	
+}
+
+void FSetHelper::Set(int32  Index,void* InValue) const 
+{
+	auto ScriptArrayHelper = CreateHelperFormElementProperty();
+
+	if (ScriptArrayHelper.IsValidIndex(Index))
+	{
+		ElementPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetElementPtr(Index));
+	}
+}
+
+
 void FSetHelper::Add(void* InValue) const
 {
-
 	ScriptSet->Add(InValue,
 	               ScriptSetLayout,
 	               [this](const void* Element)
@@ -207,6 +233,11 @@ bool FSetHelper::Contains(const void* InKey) const
 		                            return ElementPropertyDescriptor->Identical(A, B);
 	                            }
 	) != INDEX_NONE;
+}
+
+FPropertyDescriptor* FSetHelper::GetElementPropertyDescriptor() const
+{
+	return ElementPropertyDescriptor;
 }
 
 FProperty* FSetHelper::GetElementProperty() const

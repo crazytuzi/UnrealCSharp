@@ -26,5 +26,20 @@ namespace Script.Reflection.Container
 
         public static Boolean Set_Contains<T>(TSet<T> InSet, T InValue) =>
             SetImplementation.Set_ContainsImplementation(InSet, InValue);
+        
+	    public static Int32 Set_Find<T>(TSet<T>InSet,T Value)=>
+            SetImplementation.Set_FindImplementation(InSet,Value);
+        
+	    public static  Int32  Set_GetMaxIndex<T>(TSet<T>InSet)=>
+            SetImplementation.Set_GetMaxIndexImplementation(InSet);
+
+        public static T Set_Get<T>(TSet<T> InSet, Int32 Index)
+        {
+            SetImplementation.Set_GetImplementation(InSet, Index, out var OutValue);
+
+            return (T) OutValue;
+        }
+        public static  void  Set_Set<T>(TSet<T>InSet, Int32 Index, T Value)=>
+            SetImplementation.Set_SetImplementation(InSet,Index,Value);
     }
 }
