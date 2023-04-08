@@ -30,6 +30,25 @@ public:
 
 	FScriptSet* GetScriptSet() const;
 
+	int32 Find(const void* InValue) const;
+
+	TArray<FProperty*> ToArray()const;
+	
+	int32 GetMaxIndex() const;
+
+	TSet<void*> Union(TSet<void*> OtherSet) const;
+
+	void* Get(int32 Index) const;
+
+	void Set(int32 Index,void* InValue) const;
+
+	FPropertyDescriptor* GetElementPropertyDescriptor() const ;
+
+	FORCEINLINE FScriptSetHelper CreateHelperFormElementProperty() const
+	{
+		return FScriptSetHelper::CreateHelperFormElementProperty(ElementPropertyDescriptor->GetProperty(), ScriptSet);
+	}
+
 private:
 	FPropertyDescriptor* ElementPropertyDescriptor;
 
