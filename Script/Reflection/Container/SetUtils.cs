@@ -26,14 +26,15 @@ namespace Script.Reflection.Container
 
         public static Boolean Set_Contains<T>(TSet<T> InSet, T InValue) =>
             SetImplementation.Set_ContainsImplementation(InSet, InValue);
-        
-        public static T Set_Get<T>(TSet<T> InSet, Int32 Index)
+
+        public static Boolean Set_IsValidIndex<T>(TSet<T> InSet, Int32 InIndex) =>
+            SetImplementation.Set_IsValidIndexImplementation(InSet, InIndex);
+
+        public static T Set_GetEnumerator<T>(TSet<T> InSet, Int32 Index)
         {
-            SetImplementation.Set_GetImplementation(InSet, Index, out var OutValue);
+            SetImplementation.Set_GetEnumeratorImplementation(InSet, Index, out var OutValue);
 
             return (T) OutValue;
         }
-        public static  void  Set_Set<T>(TSet<T>InSet, Int32 Index, T Value)=>
-            SetImplementation.Set_SetImplementation(InSet,Index,Value);
     }
 }

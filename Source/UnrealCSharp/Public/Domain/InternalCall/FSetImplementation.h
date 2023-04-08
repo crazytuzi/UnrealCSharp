@@ -18,9 +18,8 @@ public:
 	static int32 Set_RemoveImplementation(const MonoObject* InMonoObject, void* InKey);
 
 	static bool Set_ContainsImplementation(const MonoObject* InMonoObject, const void* InKey);
-	
-	static void Set_GetImplementation(const MonoObject* InMonoObject,int32 Index, MonoObject** OutValue);
 
-	static void Set_SetImplementation(const MonoObject* InMonoObject,int32 Index,MonoObject* InValue);
-	
+	static bool Set_IsValidIndexImplementation(const MonoObject* InMonoObject, int32 InIndex);
+
+	static void Set_GetEnumeratorImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject** OutValue);
 };
