@@ -12,5 +12,6 @@ public:
 
 	virtual void Set(void* Src, void* Dest) const override;
 
+public:
 	virtual bool IsPrimitiveProperty() const override;
 };

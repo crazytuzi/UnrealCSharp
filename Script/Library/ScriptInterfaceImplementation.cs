@@ -8,7 +8,7 @@ namespace Script.Library
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void ScriptInterface_RegisterImplementation<T>(TScriptInterface<T> InScriptInterface,
-            T InObject) where T : IInterface;
+            T InObject, string InInterfaceName) where T : IInterface;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void ScriptInterface_UnRegisterImplementation<T>(TScriptInterface<T> InScriptInterface)

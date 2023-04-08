@@ -28,11 +28,26 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TSubclassOf<UObject>>(Dest);
 
 		ClassProperty->InitializeValue(Dest);
-		
+
 		ClassProperty->SetObjectPropertyValue(Dest, SrcMulti);
 
 		Object_New(Dest);
 	}
+}
+
+bool FClassPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (ClassProperty != nullptr)
+	{
+		const auto ClassA = Cast<UClass>(ClassProperty->GetObjectPropertyValue(A));
+
+		const auto ClassB = FCSharpEnvironment::GetEnvironment()->GetMulti<TSubclassOf<UObject>>(
+			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
+
+		return ClassProperty->StaticIdentical(ClassA, ClassB, PortFlags);
+	}
+
+	return false;
 }
 
 MonoObject* FClassPropertyDescriptor::Object_New(void* InAddress) const

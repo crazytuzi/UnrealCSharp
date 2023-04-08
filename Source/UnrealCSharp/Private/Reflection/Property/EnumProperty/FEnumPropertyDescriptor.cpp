@@ -16,6 +16,10 @@ void FEnumPropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
+void FEnumPropertyDescriptor::DestroyValue(void* Dest) const
+{
+}
+
 bool FEnumPropertyDescriptor::IsPrimitiveProperty() const
 {
 	return true;

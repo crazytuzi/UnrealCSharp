@@ -34,7 +34,23 @@ void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 				GetDomain()->Object_To_String(SrcObject, nullptr)));
 
 		NameProperty->InitializeValue(Dest);
-		
+
 		NameProperty->SetPropertyValue(Dest, SrcValue);
 	}
+}
+
+bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (NameProperty != nullptr)
+	{
+		const auto StringA = NameProperty->GetPropertyValue(A).ToString();
+
+		const auto StringB = UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr)));
+
+		return StringA == StringB;
+	}
+
+	return false;
 }

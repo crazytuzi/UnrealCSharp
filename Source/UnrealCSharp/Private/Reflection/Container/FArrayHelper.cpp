@@ -178,7 +178,17 @@ void FArrayHelper::RemoveAt(const int32 InIndex, const int32 InCount, const bool
 {
 	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	ScriptArrayHelper.RemoveValues(InIndex, InCount);
+	auto Dest = ScriptArrayHelper.GetRawPtr(InIndex);
+
+	if (!(InnerPropertyDescriptor->GetPropertyFlags() & (CPF_IsPlainOldData | CPF_NoDestructor)))
+	{
+		for (auto Index = 0; Index < InCount; ++Index, Dest += InnerPropertyDescriptor->GetElementSize())
+		{
+			InnerPropertyDescriptor->DestroyValue(Dest);
+		}
+	}
+
+	ScriptArray->Remove(InIndex, InCount, InnerPropertyDescriptor->GetElementSize());
 
 	if (bAllowShrinking)
 	{

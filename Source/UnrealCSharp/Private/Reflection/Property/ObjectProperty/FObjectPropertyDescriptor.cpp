@@ -1,5 +1,4 @@
 ﻿#include "Reflection/Property/ObjectProperty/FObjectPropertyDescriptor.h"
-#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 
 void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
@@ -25,4 +24,19 @@ void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		ObjectProperty->SetObjectPropertyValue(Dest, SrcObject);
 	}
+}
+
+bool FObjectPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (ObjectProperty != nullptr)
+	{
+		const auto ObjectA = ObjectProperty->GetObjectPropertyValue(A);
+
+		const auto ObjectB = FCSharpEnvironment::GetEnvironment()->GetObject(
+			static_cast<MonoObject*>(const_cast<void*>(B)));
+
+		return ObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
+	}
+
+	return false;
 }

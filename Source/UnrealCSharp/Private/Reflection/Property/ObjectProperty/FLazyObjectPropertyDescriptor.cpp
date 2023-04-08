@@ -28,11 +28,26 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TLazyObjectPtr<UObject>>(Dest);
 
 		LazyObjectProperty->InitializeValue(Dest);
-		
+
 		LazyObjectProperty->SetObjectPropertyValue(Dest, SrcMulti.Get());
 
 		Object_New(Dest);
 	}
+}
+
+bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	if (LazyObjectProperty != nullptr)
+	{
+		const auto ObjectA = LazyObjectProperty->GetObjectPropertyValue(A);
+
+		const auto ObjectB = FCSharpEnvironment::GetEnvironment()->GetMulti<TLazyObjectPtr<UObject>>(
+			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
+
+		return LazyObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
+	}
+
+	return false;
 }
 
 MonoObject* FLazyObjectPropertyDescriptor::Object_New(void* InAddress) const

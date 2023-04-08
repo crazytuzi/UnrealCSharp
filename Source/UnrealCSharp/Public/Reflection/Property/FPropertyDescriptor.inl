@@ -15,20 +15,20 @@ void FPropertyDescriptor::DestroyProperty()
 	}
 }
 
-bool FPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+int32 FPropertyDescriptor::GetElementSize() const
 {
-	return Property->Identical(A, B, PortFlags);
+	return Property != nullptr ? Property->ElementSize : 0;
+}
+
+EPropertyFlags FPropertyDescriptor::GetPropertyFlags() const
+{
+	return Property != nullptr ? Property->PropertyFlags : EPropertyFlags::CPF_None;
 }
 
 template <typename ValueType>
 auto FPropertyDescriptor::ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex) const
 {
 	return Property->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex);
-}
-
-void FPropertyDescriptor::DestroyValue(void* Dest) const
-{
-	Property->DestroyValue(Dest);
 }
 
 void FPropertyDescriptor::InitializeValue_InContainer(void* Dest) const

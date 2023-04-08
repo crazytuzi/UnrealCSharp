@@ -20,12 +20,24 @@ struct FRegisterScriptInterface
 
 static FRegisterScriptInterface RegisterScriptInterface;
 
-void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(MonoObject* InMonoObject,
-                                                                            const MonoObject* InObject)
+void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(
+	MonoObject* InMonoObject, const MonoObject* InObject, MonoString* InInterfaceName)
 {
 	const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InObject);
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TScriptInterface<IInterface>>(InMonoObject, FoundObject);
+	const auto InterfaceName = UTF8_TO_TCHAR(
+		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InInterfaceName));
+
+	const auto InterfaceClass = LoadClass<UInterface>(nullptr, InterfaceName);
+
+	TScriptInterface<IInterface> ScriptInterface;
+
+	ScriptInterface.SetObject(FoundObject);
+
+	ScriptInterface.SetInterface(static_cast<IInterface*>(FoundObject->GetInterfaceAddress(InterfaceClass)));
+
+	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TScriptInterface<
+		IInterface>>(InMonoObject, ScriptInterface);
 }
 
 void FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation(const MonoObject* InMonoObject)

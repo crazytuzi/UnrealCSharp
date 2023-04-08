@@ -187,6 +187,16 @@ void FPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 }
 
+bool FPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
+{
+	return Property->Identical(A, B, PortFlags);
+}
+
+void FPropertyDescriptor::DestroyValue(void* Dest) const
+{
+	Property->DestroyValue(Dest);
+}
+
 bool FPropertyDescriptor::IsPrimitiveProperty() const
 {
 	return false;
