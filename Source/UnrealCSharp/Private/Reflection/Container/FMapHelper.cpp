@@ -25,8 +25,10 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 
 		ValuePropertyDescriptor = FPropertyDescriptor::Factory(InValueProperty);
 
-		ScriptMapLayout = FScriptMap::GetScriptLayout(InKeyProperty->GetSize(), InKeyProperty->GetMinAlignment(),
-		                                              InValueProperty->GetSize(), InValueProperty->GetMinAlignment());
+		ScriptMapLayout = FScriptMap::GetScriptLayout(KeyPropertyDescriptor->GetSize(),
+		                                              KeyPropertyDescriptor->GetMinAlignment(),
+		                                              ValuePropertyDescriptor->GetSize(),
+		                                              ValuePropertyDescriptor->GetMinAlignment());
 	}
 }
 
@@ -94,38 +96,37 @@ int32 FMapHelper::Remove(const void* InKey) const
 
 	do
 	{
-		const auto Index = ScriptMap->FindPairIndex(InKey,
-		                                            ScriptMapLayout,
-		                                            [this](const void* ElementKey)
-		                                            {
-			                                            return KeyPropertyDescriptor->GetValueTypeHash(ElementKey);
-		                                            },
-		                                            [this](const void* A, const void* B)
-		                                            {
-			                                            return KeyPropertyDescriptor->Identical(A, B);
-		                                            }
-		);
+		auto KeyIndex = static_cast<int32>(INDEX_NONE);
 
-		if (Index == INDEX_NONE)
+		for (auto Index = 0; Index < ScriptMap->GetMaxIndex(); ++Index)
+		{
+			if (ScriptMap->IsValidIndex(Index))
+			{
+				const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
+
+				if (KeyPropertyDescriptor->Identical(Data, InKey))
+				{
+					KeyIndex = Index;
+
+					break;
+				}
+			}
+		}
+
+		if (KeyIndex == INDEX_NONE)
 		{
 			break;
 		}
 
 		++Count;
 
-		const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
+		const auto Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
 
-		if (!KeyPropertyDescriptor->IsPrimitiveProperty())
-		{
-			KeyPropertyDescriptor->DestroyValue(Data);
-		}
+		KeyPropertyDescriptor->DestroyValue(Data);
 
-		if (!ValuePropertyDescriptor->IsPrimitiveProperty())
-		{
-			ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
-		}
+		ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
 
-		ScriptMap->RemoveAt(Index, ScriptMapLayout);
+		ScriptMap->RemoveAt(KeyIndex, ScriptMapLayout);
 	}
 	while (true);
 
@@ -162,86 +163,64 @@ bool FMapHelper::Contains(const void* InKey) const
 
 void* FMapHelper::Get(const void* InKey) const
 {
-	return ScriptMap->FindValue(InKey,
-	                            ScriptMapLayout,
-	                            [this](const void* ElementKey)
-	                            {
-		                            return KeyPropertyDescriptor->GetValueTypeHash(ElementKey);
-	                            },
-	                            [this](const void* A, const void* B)
-	                            {
-		                            return KeyPropertyDescriptor->Identical(A, B);
-	                            });
+	for (auto Index = 0; Index < ScriptMap->GetMaxIndex(); ++Index)
+	{
+		if (ScriptMap->IsValidIndex(Index))
+		{
+			const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
+
+			if (KeyPropertyDescriptor->Identical(Data, InKey))
+			{
+				return Data + ScriptMapLayout.ValueOffset;
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 void FMapHelper::Set(void* InKey, void* InValue) const
 {
-	ScriptMap->Add(
-		InKey,
-		InValue,
-		ScriptMapLayout,
-		[this](const void* ElementKey)
-		{
-			return KeyPropertyDescriptor->GetValueTypeHash(ElementKey);
-		},
-		[this](const void* A, const void* B)
-		{
-			return KeyPropertyDescriptor->Identical(A, B);
-		},
-		[this, InKey](void* NewElementKey)
-		{
-			KeyPropertyDescriptor->InitializeValue_InContainer(NewElementKey);
+	auto KeyIndex = static_cast<int32>(INDEX_NONE);
 
-			if (KeyPropertyDescriptor->IsPrimitiveProperty())
-			{
-				KeyPropertyDescriptor->Set(InKey, NewElementKey);
-			}
-			else
-			{
-				KeyPropertyDescriptor->Set(static_cast<void**>(InKey), NewElementKey);
-			}
-		},
-		[this, InValue](void* NewElementValue)
+	for (auto Index = 0; Index < ScriptMap->GetMaxIndex(); ++Index)
+	{
+		if (ScriptMap->IsValidIndex(Index))
 		{
-			ValuePropertyDescriptor->InitializeValue_InContainer(NewElementValue);
+			const auto Data = static_cast<uint8*>(ScriptMap->GetData(Index, ScriptMapLayout));
 
-			if (ValuePropertyDescriptor->IsPrimitiveProperty())
+			if (KeyPropertyDescriptor->Identical(Data, InKey))
 			{
-				ValuePropertyDescriptor->Set(InValue, NewElementValue);
-			}
-			else
-			{
-				ValuePropertyDescriptor->Set(static_cast<void**>(InValue), NewElementValue);
-			}
-		},
-		[this, InValue](void* ExistingElementValue)
-		{
-			if (ValuePropertyDescriptor->IsPrimitiveProperty())
-			{
-				ValuePropertyDescriptor->Set(InValue, ExistingElementValue);
-			}
-			else
-			{
-				ValuePropertyDescriptor->Set(static_cast<void**>(InValue), ExistingElementValue);
-			}
-		},
-		[this](void* ElementKey)
-		{
-			// @TODO
-			if (!KeyPropertyDescriptor->IsPrimitiveProperty())
-			{
-				KeyPropertyDescriptor->DestroyValue(ElementKey);
-			}
-		},
-		[this](void* ElementValue)
-		{
-			// @TODO
-			if (!ValuePropertyDescriptor->IsPrimitiveProperty())
-			{
-				ValuePropertyDescriptor->DestroyValue(ElementValue);
+				KeyIndex = Index;
+
+				break;
 			}
 		}
-	);
+	}
+
+	uint8* Data = nullptr;
+
+	if (KeyIndex == INDEX_NONE)
+	{
+		KeyIndex = ScriptMap->AddUninitialized(ScriptMapLayout);
+
+		Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
+
+		KeyPropertyDescriptor->Set(InKey, Data);
+
+		ScriptMap->Rehash(ScriptMapLayout, [=](const void* Src)
+		{
+			return KeyPropertyDescriptor->GetValueTypeHash(Src);
+		});
+	}
+	else
+	{
+		Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
+
+		ValuePropertyDescriptor->DestroyValue(Data + ScriptMapLayout.ValueOffset);
+	}
+
+	ValuePropertyDescriptor->Set(InValue, Data + ScriptMapLayout.ValueOffset);
 }
 
 FPropertyDescriptor* FMapHelper::GetKeyPropertyDescriptor() const
