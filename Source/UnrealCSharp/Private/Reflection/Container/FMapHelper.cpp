@@ -207,6 +207,11 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 		Data = static_cast<uint8*>(ScriptMap->GetData(KeyIndex, ScriptMapLayout));
 
 		KeyPropertyDescriptor->Set(InKey, Data);
+
+		ScriptMap->Rehash(ScriptMapLayout, [=](const void* Src)
+		{
+			return KeyPropertyDescriptor->GetValueTypeHash(Src);
+		});
 	}
 	else
 	{
