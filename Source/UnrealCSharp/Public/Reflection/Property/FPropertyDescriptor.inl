@@ -28,20 +28,28 @@ EPropertyFlags FPropertyDescriptor::GetPropertyFlags() const
 template <typename ValueType>
 auto FPropertyDescriptor::ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex) const
 {
-	return Property->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex);
+	return Property != nullptr ? Property->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex) : nullptr;
 }
 
 void FPropertyDescriptor::InitializeValue_InContainer(void* Dest) const
 {
-	Property->InitializeValue_InContainer(Dest);
+	if (Property != nullptr)
+	{
+		Property->InitializeValue_InContainer(Dest);
+	}
 }
 
 int32 FPropertyDescriptor::GetSize() const
 {
-	return Property->GetSize();
+	return Property != nullptr ? Property->GetSize() : 0;
+}
+
+int32 FPropertyDescriptor::GetMinAlignment() const
+{
+	return Property != nullptr ? Property->GetMinAlignment() : 0;
 }
 
 uint32 FPropertyDescriptor::GetValueTypeHash(const void* Src) const
 {
-	return Property->GetValueTypeHash(Src);
+	return Property != nullptr ? Property->GetValueTypeHash(Src) : 0u;
 }

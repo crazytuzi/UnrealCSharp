@@ -44,6 +44,8 @@ public:
 
 	FORCEINLINE int32 GetSize() const;
 
+	FORCEINLINE int32 GetMinAlignment() const;
+
 	FORCEINLINE uint32 GetValueTypeHash(const void* Src) const;
 
 	virtual bool IsPrimitiveProperty() const;
