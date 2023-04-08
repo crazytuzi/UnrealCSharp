@@ -1,9 +1,10 @@
 ﻿using System;
 using Script.Reflection.Container;
-
+using System.Collections;
+using System.Collections.Generic;
 namespace Script.Common
 {
-    public class TSet<T>
+    public class TSet<T>:IEnumerable
     {
         public TSet() => SetUtils.Set_Register(this);
 
@@ -11,6 +12,16 @@ namespace Script.Common
         {
         }
 
+        public IEnumerator  GetEnumerator()
+        {
+
+            for (var Index = 0; Index < Num(); Index++)
+            {
+                yield return this[Index];
+            }
+        }
+       
+    
         ~TSet() => SetUtils.Set_UnRegister(this);
 
         public void Empty(Int32 InExpectedNumElements = 0) => SetUtils.Set_Empty(this, InExpectedNumElements);
@@ -22,5 +33,12 @@ namespace Script.Common
         public Int32 Remove(T InValue) => SetUtils.Set_Remove(this, InValue);
 
         public Boolean Contains(T InValue) => SetUtils.Set_Contains(this, InValue);
+        
+        public T this[Int32 InIndex]
+        {
+            get => SetUtils.Set_Get(this, InIndex);
+
+            set => SetUtils.Set_Set(this, InIndex, value);
+        }
     }
 }

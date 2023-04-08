@@ -26,10 +26,20 @@ public:
 
 	bool Contains(const void* InKey) const;
 
+	void* Get(int32 Index) const;
+
+	void Set(int32 Index,void* InValue) const;
+
 	FProperty* GetElementProperty() const;
 
 	FScriptSet* GetScriptSet() const;
 
+	FORCEINLINE FScriptSetHelper CreateHelperFormElementProperty() const
+	{
+		return FScriptSetHelper::CreateHelperFormElementProperty(ElementPropertyDescriptor->GetProperty(), ScriptSet);
+	}
+
+	FPropertyDescriptor* GetElementPropertyDescriptor() const ;
 private:
 	FPropertyDescriptor* ElementPropertyDescriptor;
 

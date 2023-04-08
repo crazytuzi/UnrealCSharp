@@ -26,5 +26,13 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Set_ContainsImplementation<T>(TSet<T> InSet, T InValue);
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern T Set_GetImplementation<T>(TSet<T>InSet, Int32 Index,out Object OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Int32 Set_SetImplementation<T>(TSet<T>InSet,Int32 Index,T Value);
+        
+        
     }
 }

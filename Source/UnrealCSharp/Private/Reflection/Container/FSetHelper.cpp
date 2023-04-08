@@ -150,6 +150,37 @@ bool FSetHelper::Contains(const void* InKey) const
 	) != INDEX_NONE;
 }
 
+void* FSetHelper::Get(int32 Index) const 
+{
+	auto ScriptArrayHelper = CreateHelperFormElementProperty();
+
+	if (ScriptArrayHelper.IsValidIndex(Index))
+	{
+		return ScriptArrayHelper.GetElementPtr(Index);
+	}
+
+	else
+	{
+		return  nullptr;
+	}
+
+}
+
+void FSetHelper::Set(int32  Index,void* InValue) const 
+{
+	auto ScriptArrayHelper = CreateHelperFormElementProperty();
+
+	if (ScriptArrayHelper.IsValidIndex(Index))
+	{
+		ElementPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetElementPtr(Index));
+	}
+}
+
+FPropertyDescriptor* FSetHelper::GetElementPropertyDescriptor() const
+{
+	return ElementPropertyDescriptor;
+}
+
 FProperty* FSetHelper::GetElementProperty() const
 {
 	return ElementPropertyDescriptor->GetProperty();

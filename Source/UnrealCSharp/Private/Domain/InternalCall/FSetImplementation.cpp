@@ -17,6 +17,8 @@ struct FRegisterSet
 			.Function("Add", static_cast<void*>(FSetImplementation::Set_AddImplementation))
 			.Function("Remove", static_cast<void*>(FSetImplementation::Set_RemoveImplementation))
 			.Function("Contains", static_cast<void*>(FSetImplementation::Set_ContainsImplementation))
+			.Function("Get",static_cast<void*>(FSetImplementation::Set_GetImplementation))
+			.Function("Set",static_cast<void*>(FSetImplementation::Set_SetImplementation))
 			.Register();
 	}
 };
@@ -78,4 +80,30 @@ bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObje
 	}
 
 	return false;
+}
+
+void FSetImplementation::Set_GetImplementation(const MonoObject* InMonoObject, int32 Index ,MonoObject** OutValue)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		const auto Value = SetHelper->Get(Index);
+
+		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+				FTypeBridge::GetMonoClass(SetHelper->GetElementPropertyDescriptor()->GetProperty()), Value);
+		}
+		else
+		{
+			SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
+		}
+	}
+}
+
+void FSetImplementation::Set_SetImplementation(const MonoObject* InMonoObject, int32 Index, MonoObject* InValue)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		SetHelper->Set(Index, &InValue);
+	}
 }
