@@ -150,12 +150,24 @@ bool FSetHelper::Contains(const void* InKey) const
 	) != INDEX_NONE;
 }
 
-FProperty* FSetHelper::GetElementProperty() const
+FPropertyDescriptor* FSetHelper::GetElementPropertyDescriptor() const
 {
-	return ElementPropertyDescriptor->GetProperty();
+	return ElementPropertyDescriptor;
 }
 
 FScriptSet* FSetHelper::GetScriptSet() const
 {
 	return ScriptSet;
+}
+
+bool FSetHelper::IsValidIndex(const int32 InIndex) const
+{
+	return ScriptSet->IsValidIndex(InIndex);
+}
+
+void* FSetHelper::GetEnumerator(const int32 InIndex) const
+{
+	return ScriptSet->IsValidIndex(InIndex)
+		       ? static_cast<uint8*>(ScriptSet->GetData(InIndex, ScriptSetLayout))
+		       : nullptr;
 }

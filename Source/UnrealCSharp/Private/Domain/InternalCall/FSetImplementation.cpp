@@ -17,6 +17,8 @@ struct FRegisterSet
 			.Function("Add", static_cast<void*>(FSetImplementation::Set_AddImplementation))
 			.Function("Remove", static_cast<void*>(FSetImplementation::Set_RemoveImplementation))
 			.Function("Contains", static_cast<void*>(FSetImplementation::Set_ContainsImplementation))
+			.Function("IsValidIndex", static_cast<void*>(FSetImplementation::Set_IsValidIndexImplementation))
+			.Function("GetEnumerator", static_cast<void*>(FSetImplementation::Set_GetEnumeratorImplementation))
 			.Register();
 	}
 };
@@ -78,4 +80,33 @@ bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObje
 	}
 
 	return false;
+}
+
+bool FSetImplementation::Set_IsValidIndexImplementation(const MonoObject* InMonoObject, const int32 InIndex)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		return SetHelper->IsValidIndex(InIndex);
+	}
+
+	return false;
+}
+
+void FSetImplementation::Set_GetEnumeratorImplementation(const MonoObject* InMonoObject, const int32 InIndex,
+                                                         MonoObject** OutValue)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		const auto Value = SetHelper->GetEnumerator(InIndex);
+
+		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+				FTypeBridge::GetMonoClass(SetHelper->GetElementPropertyDescriptor()->GetProperty()), Value);
+		}
+		else
+		{
+			SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
+		}
+	}
 }

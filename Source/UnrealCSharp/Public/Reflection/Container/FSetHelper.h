@@ -26,9 +26,13 @@ public:
 
 	bool Contains(const void* InKey) const;
 
-	FProperty* GetElementProperty() const;
+	FPropertyDescriptor* GetElementPropertyDescriptor() const;
 
 	FScriptSet* GetScriptSet() const;
+
+	bool IsValidIndex(int32 InIndex) const;
+
+	void* GetEnumerator(int32 InIndex) const;
 
 private:
 	FPropertyDescriptor* ElementPropertyDescriptor;

@@ -26,5 +26,11 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Set_ContainsImplementation<T>(TSet<T> InSet, T InValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean Set_IsValidIndexImplementation<T>(TSet<T> InSet, Int32 InIndex);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern T Set_GetEnumeratorImplementation<T>(TSet<T> InSet, Int32 Index, out Object OutValue);
     }
 }

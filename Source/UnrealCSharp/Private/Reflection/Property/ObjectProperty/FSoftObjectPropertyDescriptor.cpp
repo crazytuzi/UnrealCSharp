@@ -1,6 +1,7 @@
 ﻿#include "Reflection/Property/ObjectProperty/FSoftObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
+#include "UEVersion.h"
 
 void FSoftObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -44,7 +45,11 @@ bool FSoftObjectPropertyDescriptor::Identical(const void* A, const void* B, uint
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment()->GetMulti<TSoftObjectPtr<UObject>>(
 			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
 
+#if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
 		return SoftObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
+#else
+		return ObjectA == ObjectB;
+#endif
 	}
 
 	return false;
