@@ -26,6 +26,8 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		FCSharpEnvironment::GetEnvironment()->RemoveStructReference(Dest);
 
+		StructProperty->InitializeValue(Dest);
+
 		StructProperty->CopySingleValue(Dest, SrcStruct);
 
 		Object_New(Dest);

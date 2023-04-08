@@ -23,6 +23,8 @@ void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcObject = FCSharpEnvironment::GetEnvironment()->GetObject(static_cast<MonoObject*>(Src));
 
+		ObjectProperty->InitializeValue(Dest);
+
 		ObjectProperty->SetObjectPropertyValue(Dest, SrcObject);
 	}
 }

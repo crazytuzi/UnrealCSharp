@@ -29,6 +29,8 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(Dest);
 
+		ArrayProperty->InitializeValue(Dest);
+
 		ArrayProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptArray());
 
 		Object_New(Dest);

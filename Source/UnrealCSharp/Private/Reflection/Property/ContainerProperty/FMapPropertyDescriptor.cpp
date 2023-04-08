@@ -29,6 +29,8 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(Dest);
 
+		MapProperty->InitializeValue(Dest);
+
 		MapProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptMap());
 
 		Object_New(Dest);

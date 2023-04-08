@@ -29,7 +29,9 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(Dest);
 
-		MapProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
+		SetProperty->InitializeValue(Dest);
+
+		SetProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
 
 		Object_New(Dest);
 	}
