@@ -28,10 +28,10 @@ FCSharpCompiler& FCSharpCompiler::Get()
 
 void FCSharpCompiler::Compile() const
 {
-	// if (Runnable != nullptr)
-	// {
-	// 	Runnable->EnqueueTask();
-	// }
+	if (Runnable != nullptr)
+	{
+		Runnable->EnqueueTask();
+	}
 }
 
 bool FCSharpCompiler::IsCompiling() const
