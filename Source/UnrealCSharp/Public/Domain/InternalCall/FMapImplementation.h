@@ -13,19 +13,19 @@ public:
 
 	static int32 Map_NumImplementation(const MonoObject* InMonoObject);
 
-	static void Map_AddImplementation(const MonoObject* InMonoObject, void* InKey, void* InValue);
+	static void Map_AddImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject* InValue);
 
-	static int32 Map_RemoveImplementation(const MonoObject* InMonoObject, void* InKey);
+	static int32 Map_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InKey);
 
-	static void Map_FindKeyImplementation(const MonoObject* InMonoObject, void* InValue, MonoObject** OutKey);
+	static void Map_FindKeyImplementation(const MonoObject* InMonoObject, MonoObject* InValue, MonoObject** OutKey);
 
-	static void Map_FindImplementation(const MonoObject* InMonoObject, void* InKey, MonoObject** OutValue);
+	static void Map_FindImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject** OutValue);
 
-	static bool Map_ContainsImplementation(const MonoObject* InMonoObject, const void* InKey);
+	static bool Map_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InKey);
 
-	static void Map_GetImplementation(const MonoObject* InMonoObject, void* InKey, MonoObject** OutValue);
+	static void Map_GetImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject** OutValue);
 
-	static void Map_SetImplementation(const MonoObject* InMonoObject, void* InKey, void* InValue);
+	static void Map_SetImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject* InValue);
 
 	static int32 Map_GetMaxIndexImplementation(const MonoObject* InMonoObject);
 
