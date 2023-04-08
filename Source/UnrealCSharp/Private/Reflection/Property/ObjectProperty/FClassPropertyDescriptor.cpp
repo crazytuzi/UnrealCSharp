@@ -1,6 +1,7 @@
 ﻿#include "Reflection/Property/ObjectProperty/FClassPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
+#include "UEVersion.h"
 
 void FClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -44,7 +45,11 @@ bool FClassPropertyDescriptor::Identical(const void* A, const void* B, const uin
 		const auto ClassB = FCSharpEnvironment::GetEnvironment()->GetMulti<TSubclassOf<UObject>>(
 			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
 
+#if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
 		return ClassProperty->StaticIdentical(ClassA, ClassB, PortFlags);
+#else
+		return ClassA == ClassB;
+#endif
 	}
 
 	return false;
