@@ -24,7 +24,7 @@ public:
 
 	int32 Remove(const void* InValue) const;
 
-	bool Contains(const void* InKey) const;
+	bool Contains(const void* InValue) const;
 
 	FPropertyDescriptor* GetElementPropertyDescriptor() const;
 
