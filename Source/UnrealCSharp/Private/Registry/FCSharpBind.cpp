@@ -34,13 +34,13 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool 
 	{
 		return true;
 	}
-	
+
 	if (bNeedMonoClass && !CanBind(InMonoDomain, InStruct))
 	{
 #if !WITH_EDITOR
 		NotOverrideTypes.Add(InStruct);
 #endif
-		
+
 		return false;
 	}
 
@@ -163,12 +163,13 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 
 			for (const auto& FunctionPair : Functions)
 			{
-				if (const auto FoundMonoMethod = InMonoDomain->Class_Get_Method_From_Name(FoundMonoClass, FunctionPair.Key.ToString(),
-				                                             FunctionPair.Value->ReturnValueOffset != MAX_uint16
-					                                             ? (FunctionPair.Value->NumParms > 0
-						                                                ? FunctionPair.Value->NumParms - 1
-						                                                : 0)
-					                                             : FunctionPair.Value->NumParms))
+				if (const auto FoundMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
+					FoundMonoClass, FunctionPair.Key.ToString(),
+					FunctionPair.Value->ReturnValueOffset != MAX_uint16
+						? (FunctionPair.Value->NumParms > 0
+							   ? FunctionPair.Value->NumParms - 1
+							   : 0)
+						: FunctionPair.Value->NumParms))
 				{
 					if (IsOverrideMethod(InMonoDomain,
 					                     InMonoDomain->Method_Get_Object(FoundMonoMethod, FoundMonoClass)))
@@ -284,7 +285,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMo
 
 	InScriptStruct->InitializeStruct(Structure);
 
-	FCSharpEnvironment::GetEnvironment()->AddStructReference(InScriptStruct, Structure, InMonoObject);
+	FCSharpEnvironment::GetEnvironment()->AddStructReference(InScriptStruct, nullptr, Structure, InMonoObject);
 
 	return true;
 }
@@ -297,7 +298,7 @@ bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct)
 		return false;
 	}
 #endif
-	
+
 	if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
 		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))

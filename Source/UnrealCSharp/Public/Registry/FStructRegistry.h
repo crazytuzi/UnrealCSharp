@@ -3,13 +3,22 @@
 #include "GarbageCollection/TGarbageCollectionHandleMapping.h"
 #include "mono/metadata/object-forward.h"
 
+struct FStructAddressBase
+{
+	void* Owner;
+
+	void* Address;
+};
+
+static bool operator==(const FStructAddressBase& A, const FStructAddressBase& B);
+
+static uint32 GetTypeHash(const FStructAddressBase& InStructAddressBase);
+
 class FStructRegistry
 {
-public:
-	struct FStructAddress
+private:
+	struct FStructAddress : FStructAddressBase
 	{
-		void* Address;
-
 		UScriptStruct* ScriptStruct;
 
 		bool bNeedFree;
@@ -30,21 +39,24 @@ public:
 
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
 
-	MonoObject* GetObject(const void* InStruct);
+	MonoObject* GetObject(const void* InOwner, const void* InStruct);
 
 	void* GetStruct(const MonoObject* InMonoObject);
 
-	FGarbageCollectionHandle GetGarbageCollectionHandle(const void* InStruct);
+	FGarbageCollectionHandle GetGarbageCollectionHandle(const void* InOwner, const void* InStruct);
 
 public:
-	bool AddReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject, bool bNeedFree = true);
+	bool AddReference(UScriptStruct* InScriptStruct, const void* InOwner, const void* InStruct,
+	                  MonoObject* InMonoObject, bool bNeedFree = true);
 
-	bool RemoveReference(const void* InStruct);
+	bool RemoveReference(const void* InOwner, const void* InStruct);
 
 	bool RemoveReference(const MonoObject* InMonoObject);
 
 private:
 	TGarbageCollectionHandleMapping<FStructAddress> GarbageCollectionHandle2StructAddress;
 
-	TMap<void*, FGarbageCollectionHandle> StructAddress2GarbageCollectionHandle;
+	TMap<FStructAddressBase, FGarbageCollectionHandle> StructAddress2GarbageCollectionHandle;
 };
+
+#include "FStructRegistry.inl"

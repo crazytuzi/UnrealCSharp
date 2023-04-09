@@ -12,6 +12,8 @@ void FPrimitivePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
+		Property->InitializeValue(Dest);
+
 		Property->CopySingleValue(Dest, Src);
 	}
 }

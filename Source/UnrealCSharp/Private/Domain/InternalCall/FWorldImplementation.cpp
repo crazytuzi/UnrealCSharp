@@ -29,6 +29,6 @@ void FWorldImplementation::World_SpawnActorImplementation(const MonoObject* InMo
 
 		const auto Actor = FoundWorld->SpawnActor(FoundClass, FoundTransform);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment()->GetObject(Actor);
+		*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Actor);
 	}
 }

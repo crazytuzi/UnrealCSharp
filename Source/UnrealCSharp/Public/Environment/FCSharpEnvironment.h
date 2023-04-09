@@ -88,14 +88,14 @@ public:
 
 	bool RemoveObjectReference(const MonoObject* InMonoObject) const;
 
-	bool AddStructReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject,
-	                        bool bNeedFree = true) const;
+	bool AddStructReference(UScriptStruct* InScriptStruct, const void* InOwner, const void* InStruct,
+	                        MonoObject* InMonoObject, bool bNeedFree = true) const;
 
-	MonoObject* GetObject(const void* InStruct) const;
+	MonoObject* GetObject(const void* InOwner, const void* InStruct) const;
 
 	void* GetStruct(const MonoObject* InMonoObject) const;
 
-	bool RemoveStructReference(const void* InStruct) const;
+	bool RemoveStructReference(const void* InOwner, const void* InStruct) const;
 
 	bool RemoveStructReference(const MonoObject* InMonoObject) const;
 

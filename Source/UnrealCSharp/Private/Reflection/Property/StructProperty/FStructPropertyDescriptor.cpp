@@ -7,7 +7,7 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (StructProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(GetOwner(Src), Src);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -24,7 +24,9 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcStruct = FCSharpEnvironment::GetEnvironment()->GetStruct(static_cast<MonoObject*>(Src));
 
-		FCSharpEnvironment::GetEnvironment()->RemoveStructReference(Dest);
+		FCSharpEnvironment::GetEnvironment()->RemoveStructReference(GetOwner(Dest), Dest);
+
+		StructProperty->InitializeValue(Dest);
 
 		StructProperty->CopySingleValue(Dest, SrcStruct);
 
@@ -47,6 +49,16 @@ bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const ui
 	return false;
 }
 
+void* FStructPropertyDescriptor::GetOwner(void* InAddress) const
+{
+	if (StructProperty != nullptr)
+	{
+		return static_cast<uint8*>(InAddress) - StructProperty->GetOffset_ForInternal();
+	}
+
+	return nullptr;
+}
+
 MonoObject* FStructPropertyDescriptor::Object_New(void* InAddress) const
 {
 	const auto FoundMonoClass = FTypeBridge::GetMonoClass(StructProperty);
@@ -58,7 +70,8 @@ MonoObject* FStructPropertyDescriptor::Object_New(void* InAddress) const
 
 	FCSharpEnvironment::GetEnvironment()->Bind(StructProperty->Struct, false);
 
-	FCSharpEnvironment::GetEnvironment()->AddStructReference(StructProperty->Struct, InAddress, Object, false);
+	FCSharpEnvironment::GetEnvironment()->AddStructReference(StructProperty->Struct, GetOwner(InAddress), InAddress,
+	                                                         Object, false);
 
 	return Object;
 }

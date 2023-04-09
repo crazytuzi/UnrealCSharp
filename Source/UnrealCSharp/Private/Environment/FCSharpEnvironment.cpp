@@ -330,17 +330,17 @@ bool FCSharpEnvironment::RemoveObjectReference(const MonoObject* InMonoObject) c
 	return ObjectRegistry != nullptr ? ObjectRegistry->RemoveReference(InMonoObject) : false;
 }
 
-bool FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, void* InStruct, MonoObject* InMonoObject,
-                                            const bool bNeedFree) const
+bool FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, const void* InOwner, const void* InStruct,
+                                            MonoObject* InMonoObject, const bool bNeedFree) const
 {
 	return StructRegistry != nullptr
-		       ? StructRegistry->AddReference(InScriptStruct, InStruct, InMonoObject, bNeedFree)
+		       ? StructRegistry->AddReference(InScriptStruct, InOwner, InStruct, InMonoObject, bNeedFree)
 		       : false;
 }
 
-MonoObject* FCSharpEnvironment::GetObject(const void* InStruct) const
+MonoObject* FCSharpEnvironment::GetObject(const void* InOwner, const void* InStruct) const
 {
-	return StructRegistry != nullptr ? StructRegistry->GetObject(InStruct) : nullptr;
+	return StructRegistry != nullptr ? StructRegistry->GetObject(InOwner, InStruct) : nullptr;
 }
 
 void* FCSharpEnvironment::GetStruct(const MonoObject* InMonoObject) const
@@ -348,9 +348,9 @@ void* FCSharpEnvironment::GetStruct(const MonoObject* InMonoObject) const
 	return StructRegistry != nullptr ? StructRegistry->GetStruct(InMonoObject) : nullptr;
 }
 
-bool FCSharpEnvironment::RemoveStructReference(const void* InStruct) const
+bool FCSharpEnvironment::RemoveStructReference(const void* InOwner, const void* InStruct) const
 {
-	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InStruct) : false;
+	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InOwner, InStruct) : false;
 }
 
 bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) const
@@ -370,7 +370,7 @@ FGarbageCollectionHandle FCSharpEnvironment::GetGarbageCollectionHandle(void* In
 	if (!OwnerGarbageCollectionHandle.IsValid())
 	{
 		OwnerGarbageCollectionHandle = StructRegistry != nullptr
-			                               ? StructRegistry->GetGarbageCollectionHandle(Owner)
+			                               ? StructRegistry->GetGarbageCollectionHandle(InAddress, Owner)
 			                               : FGarbageCollectionHandle();
 	}
 
