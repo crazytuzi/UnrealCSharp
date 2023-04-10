@@ -9,6 +9,12 @@ auto FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectio
 }
 
 template <typename T>
+auto FCSharpBind::Bind(MonoObject* InMonoObject)
+{
+	return BindImplementation<T>(InMonoObject);
+}
+
+template <typename T>
 auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 {
 	const auto Property = FContainerHelper::Factory(InReflectionType, nullptr, "", EObjectFlags::RF_Transient);
@@ -18,6 +24,14 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 	const auto ContainerHelper = new T(Property);
 
 	FCSharpEnvironment::GetEnvironment()->AddContainerReference(ContainerHelper, InMonoObject);
+
+	return true;
+}
+
+template <typename T>
+auto FCSharpBind::BindImplementation(MonoObject* InMonoObject)
+{
+	// @TODO
 
 	return true;
 }

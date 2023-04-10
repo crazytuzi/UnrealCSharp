@@ -81,6 +81,27 @@ bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, vo
 	return FCSharpEnvironment::GetEnvironment()->AddReference(InOwner, new FDelegateReference(GarbageCollectionHandle));
 }
 
+bool FDelegateRegistry::RemoveReference(const MonoObject* InMonoObject)
+{
+	if (const auto& FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InMonoObject))
+	{
+		if (FoundDelegateAddress->DelegateBaseHelper != nullptr)
+		{
+			delete FoundDelegateAddress->DelegateBaseHelper;
+
+			FoundDelegateAddress->DelegateBaseHelper = nullptr;
+		}
+
+		DelegateAddress2GarbageCollectionHandle.Remove(*FoundDelegateAddress);
+
+		GarbageCollectionHandle2DelegateAddress.Remove(InMonoObject);
+
+		return true;
+	}
+
+	return false;
+}
+
 bool FDelegateRegistry::RemoveReference(const void* InAddress)
 {
 	for (auto& Pair : DelegateAddress2GarbageCollectionHandle)

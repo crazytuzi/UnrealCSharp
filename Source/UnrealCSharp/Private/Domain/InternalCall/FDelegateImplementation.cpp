@@ -9,6 +9,8 @@ struct FRegisterDelegate
 	FRegisterDelegate()
 	{
 		FBindingClassBuilder(TEXT("Delegate"), NAMESPACE_LIBRARY)
+			.Function("Register", static_cast<void*>(FDelegateImplementation::Delegate_RegisterImplementation))
+			.Function("UnRegister", static_cast<void*>(FDelegateImplementation::Delegate_UnRegisterImplementation))
 			.Function("Bind", static_cast<void*>(FDelegateImplementation::Delegate_BindImplementation))
 			.Function("IsBound", static_cast<void*>(FDelegateImplementation::Delegate_IsBoundImplementation))
 			.Function("UnBind", static_cast<void*>(FDelegateImplementation::Delegate_UnBindImplementation))
@@ -19,6 +21,16 @@ struct FRegisterDelegate
 };
 
 static FRegisterDelegate RegisterDelegate;
+
+void FDelegateImplementation::Delegate_RegisterImplementation(MonoObject* InMonoObject)
+{
+	FCSharpEnvironment::GetEnvironment()->Bind<FDelegateHelper>(InMonoObject);
+}
+
+void FDelegateImplementation::Delegate_UnRegisterImplementation(const MonoObject* InMonoObject)
+{
+	FCSharpEnvironment::GetEnvironment()->RemoveDelegateReference(InMonoObject);
+}
 
 void FDelegateImplementation::Delegate_BindImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate)
 {

@@ -55,6 +55,9 @@ public:
 
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
 
+	template <typename T>
+	auto Bind(MonoObject* InMonoObject) const;
+
 public:
 	FClassDescriptor* GetClassDescriptor(const UStruct* InStruct) const;
 
@@ -129,6 +132,8 @@ public:
 
 	bool AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
 	                          MonoObject* InMonoObject) const;
+
+	bool RemoveDelegateReference(const MonoObject* InMonoObject) const;
 
 	bool RemoveDelegateReference(const void* InAddress) const;
 

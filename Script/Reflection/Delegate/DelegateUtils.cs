@@ -6,6 +6,12 @@ namespace Script.Reflection.Delegate
 {
     public static class DelegateUtils
     {
+        public static void Delegate_Register(FDelegateBase InMonoObject) =>
+            DelegateImplementation.Delegate_RegisterImplementation(InMonoObject);
+
+        public static void Delegate_UnRegister(FDelegateBase InMonoObject) =>
+            DelegateImplementation.Delegate_UnRegisterImplementation(InMonoObject);
+
         public static void Delegate_Bind<T>(FDelegateBase InMonoObject, T InDelegate) where T : System.Delegate =>
             DelegateImplementation.Delegate_BindImplementation(InMonoObject, InDelegate);
 
