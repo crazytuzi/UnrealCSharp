@@ -54,29 +54,50 @@ int32 FSetImplementation::Set_NumImplementation(const MonoObject* InMonoObject)
 	return 0;
 }
 
-void FSetImplementation::Set_AddImplementation(const MonoObject* InMonoObject, void* InElement)
+void FSetImplementation::Set_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
 	{
-		return SetHelper->Add(&InElement);
+		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			SetHelper->Add(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			SetHelper->Add(InValue);
+		}
 	}
 }
 
-int32 FSetImplementation::Set_RemoveImplementation(const MonoObject* InMonoObject, void* InKey)
+int32 FSetImplementation::Set_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
 	{
-		return SetHelper->Remove(&InKey);
+		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return SetHelper->Remove(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return SetHelper->Remove(InValue);
+		}
 	}
 
 	return 0;
 }
 
-bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObject, const void* InKey)
+bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
 	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
 	{
-		return SetHelper->Contains(&InKey);
+		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
+		{
+			return SetHelper->Contains(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+		}
+		else
+		{
+			return SetHelper->Contains(InValue);
+		}
 	}
 
 	return false;

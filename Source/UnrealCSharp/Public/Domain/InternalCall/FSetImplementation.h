@@ -13,11 +13,11 @@ public:
 
 	static int32 Set_NumImplementation(const MonoObject* InMonoObject);
 
-	static void Set_AddImplementation(const MonoObject* InMonoObject, void* InElement);
+	static void Set_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
-	static int32 Set_RemoveImplementation(const MonoObject* InMonoObject, void* InKey);
+	static int32 Set_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
-	static bool Set_ContainsImplementation(const MonoObject* InMonoObject, const void* InKey);
+	static bool Set_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
 	static bool Set_IsValidIndexImplementation(const MonoObject* InMonoObject, int32 InIndex);
 

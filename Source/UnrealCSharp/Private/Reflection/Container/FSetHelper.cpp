@@ -6,8 +6,6 @@ FSetHelper::FSetHelper(FProperty* InProperty, void* InData):
 	ScriptSet(nullptr),
 	bNeedFree(false)
 {
-	ElementPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
-
 	if (InData != nullptr)
 	{
 		bNeedFree = false;
@@ -23,7 +21,10 @@ FSetHelper::FSetHelper(FProperty* InProperty, void* InData):
 
 	if (InProperty != nullptr)
 	{
-		ScriptSetLayout = FScriptSet::GetScriptLayout(InProperty->GetSize(), InProperty->GetMinAlignment());
+		ElementPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
+
+		ScriptSetLayout = FScriptSet::GetScriptLayout(ElementPropertyDescriptor->GetSize(),
+		                                              ElementPropertyDescriptor->GetMinAlignment());
 	}
 }
 
@@ -70,84 +71,87 @@ int32 FSetHelper::Num() const
 
 void FSetHelper::Add(void* InValue) const
 {
-	ScriptSet->Add(InValue,
-	               ScriptSetLayout,
-	               [this](const void* Element)
-	               {
-		               return ElementPropertyDescriptor->GetValueTypeHash(Element);
-	               },
-	               [this](const void* A, const void* B)
-	               {
-		               return ElementPropertyDescriptor->Identical(A, B);
-	               },
-	               [this, InValue](void* NewElement)
-	               {
-		               ElementPropertyDescriptor->InitializeValue_InContainer(NewElement);
+	auto ValueIndex = static_cast<int32>(INDEX_NONE);
 
-		               if (ElementPropertyDescriptor->IsPrimitiveProperty())
-		               {
-			               ElementPropertyDescriptor->Set(InValue, NewElement);
-		               }
-		               else
-		               {
-			               ElementPropertyDescriptor->Set(static_cast<void**>(InValue), NewElement);
-		               }
-	               },
-	               [this](void* Element)
-	               {
-		               if (!ElementPropertyDescriptor->IsPrimitiveProperty())
-		               {
-			               ElementPropertyDescriptor->DestroyValue(Element);
-		               }
-	               }
-	);
+	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+	{
+		if (ScriptSet->IsValidIndex(Index))
+		{
+			const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
+
+			if (ElementPropertyDescriptor->Identical(Data, InValue))
+			{
+				ValueIndex = Index;
+
+				break;
+			}
+		}
+	}
+
+	if (ValueIndex == INDEX_NONE)
+	{
+		ValueIndex = ScriptSet->AddUninitialized(ScriptSetLayout);
+
+		const auto Data = static_cast<uint8*>(ScriptSet->GetData(ValueIndex, ScriptSetLayout));
+
+		ElementPropertyDescriptor->Set(InValue, Data);
+
+		ScriptSet->Rehash(ScriptSetLayout, [=](const void* Src)
+		{
+			return ElementPropertyDescriptor->GetValueTypeHash(Src);
+		});
+	}
 }
 
 int32 FSetHelper::Remove(const void* InValue) const
 {
-	const auto Index = ScriptSet->FindIndex(InValue,
-	                                        ScriptSetLayout,
-	                                        [this](const void* Element)
-	                                        {
-		                                        return ElementPropertyDescriptor->GetValueTypeHash(Element);
-	                                        },
-	                                        [this](const void* A, const void* B)
-	                                        {
-		                                        return ElementPropertyDescriptor->Identical(A, B);
-	                                        }
-	);
+	auto ValueIndex = static_cast<int32>(INDEX_NONE);
 
-	if (Index == INDEX_NONE)
+	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+	{
+		if (ScriptSet->IsValidIndex(Index))
+		{
+			const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
+
+			if (ElementPropertyDescriptor->Identical(Data, InValue))
+			{
+				ValueIndex = Index;
+
+				break;
+			}
+		}
+	}
+
+	if (ValueIndex == INDEX_NONE)
 	{
 		return 0;
 	}
 
-	// @TODO
-	if (!ElementPropertyDescriptor->IsPrimitiveProperty())
-	{
-		const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
+	const auto Data = static_cast<uint8*>(ScriptSet->GetData(ValueIndex, ScriptSetLayout));
 
-		ElementPropertyDescriptor->DestroyValue(Data);
-	}
+	ElementPropertyDescriptor->DestroyValue(Data);
 
-	ScriptSet->RemoveAt(Index, ScriptSetLayout);
+	ScriptSet->RemoveAt(ValueIndex, ScriptSetLayout);
 
 	return 1;
 }
 
-bool FSetHelper::Contains(const void* InKey) const
+bool FSetHelper::Contains(const void* InValue) const
 {
-	return ScriptSet->FindIndex(InKey,
-	                            ScriptSetLayout,
-	                            [this](const void* Element)
-	                            {
-		                            return ElementPropertyDescriptor->GetValueTypeHash(Element);
-	                            },
-	                            [this](const void* A, const void* B)
-	                            {
-		                            return ElementPropertyDescriptor->Identical(A, B);
-	                            }
-	) != INDEX_NONE;
+	for (auto Index = 0; Index < ScriptSet->GetMaxIndex(); ++Index)
+	{
+		if (ScriptSet->IsValidIndex(Index))
+		{
+			const auto Data = static_cast<uint8*>(ScriptSet->GetData(Index, ScriptSetLayout));
+
+			if (ElementPropertyDescriptor->Identical(Data, InValue))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 FPropertyDescriptor* FSetHelper::GetElementPropertyDescriptor() const
