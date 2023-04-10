@@ -8,6 +8,12 @@ struct FStructAddressBase
 	void* Owner;
 
 	void* Address;
+
+	FStructAddressBase(void* InOwner, void* InAddress):
+		Owner(InOwner),
+		Address(InAddress)
+	{
+	}
 };
 
 static bool operator==(const FStructAddressBase& A, const FStructAddressBase& B);
@@ -22,6 +28,13 @@ private:
 		UScriptStruct* ScriptStruct;
 
 		bool bNeedFree;
+
+		FStructAddress(void* InOwner, void* InAddress, UScriptStruct* InScriptStruct, const bool InbNeedFree):
+			FStructAddressBase(InOwner, InAddress),
+			ScriptStruct(InScriptStruct),
+			bNeedFree(InbNeedFree)
+		{
+		}
 	};
 
 public:
