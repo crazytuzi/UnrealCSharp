@@ -8,6 +8,8 @@ using EpicGames.Core;
 using Tools.DotNETCommon;
 #endif
 using UnrealBuildTool;
+using System.Collections.Generic;
+using System.Linq;
 
 public class UnrealCSharpCore : ModuleRules
 {
@@ -77,11 +79,22 @@ public class UnrealCSharpCore : ModuleRules
 			Directory.CreateDirectory(Intermediate);
 		}
 
+		var GameModules = new List<string>();
+
+		var ProjectPlugins =
+			Plugins.ReadProjectPlugins(
+				new DirectoryReference(Path.GetFullPath(Path.Combine(PluginDirectory, "../../"))));
+
+		foreach (var ProjectPlugin in ProjectPlugins)
+		{
+			GameModules.Add(ProjectPlugin.Name);
+		}
+
 		using (var Writer = new JsonWriter(JsonFullFilename))
 		{
 			Writer.WriteObjectStart();
 
-			Writer.WriteStringArrayField("GameModules", Target.ExtraModuleNames);
+			Writer.WriteStringArrayField("GameModules", GameModules.Union(Target.ExtraModuleNames));
 
 			Writer.WriteObjectEnd();
 		}
