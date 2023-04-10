@@ -10,6 +10,8 @@
 #include "mono/utils/mono-logger.h"
 #include "mono/metadata/mono-gc.h"
 #include "mono/metadata/mono-debug.h"
+#include "mono/metadata/class.h"
+#include "mono/metadata/reflection.h"
 
 MonoDomain* FMonoDomain::RootDomain = nullptr;
 
@@ -39,15 +41,15 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 #endif
 		);
 
-		mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/lib"))),
-		              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/etc"))));
+		mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono\\lib\\net7.0"))),
+		              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT(""))));
 #else
-		mono_set_dirs("Mono/lib", "Mono/etc");
+		mono_set_dirs("Mono\\lib\\net7.0", "");
 #endif
 
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
-		RootDomain = mono_jit_init(nullptr);
+		RootDomain = mono_jit_init("UnrealCSharp");
 	}
 
 	Domain = mono_domain_create_appdomain(TCHAR_TO_ANSI(*Params.Domain), nullptr);
