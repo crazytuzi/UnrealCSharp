@@ -1,5 +1,6 @@
 ﻿#include "Registry/FContainerRegistry.h"
 #include "Reference/FContainerReference.h"
+#include "Environment/FCSharpEnvironment.h"
 
 FContainerRegistry::FContainerRegistry()
 {
@@ -26,7 +27,7 @@ void FContainerRegistry::Deinitialize()
 			Pair.Value.ContainerHelper = nullptr;
 		}
 
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(Pair.Key);
+		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
 	GarbageCollectionHandle2ContainerAddress.Empty();
@@ -49,13 +50,12 @@ MonoObject* FContainerRegistry::GetObject(const void* InAddress)
 
 bool FContainerRegistry::AddReference(void* InContainer, MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
-		InMonoObject, true);
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
 	ContainerAddress2GarbageCollectionHandle.Emplace(
 		FContainerAddress{nullptr, static_cast<FContainerHelper*>(InContainer)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2ContainerAddress.Emplace(GarbageCollectionHandle,
+	GarbageCollectionHandle2ContainerAddress.Emplace(MoveTemp(GarbageCollectionHandle),
 	                                                 FContainerAddress{
 		                                                 nullptr, static_cast<FContainerHelper*>(InContainer)
 	                                                 });
@@ -66,13 +66,12 @@ bool FContainerRegistry::AddReference(void* InContainer, MonoObject* InMonoObjec
 bool FContainerRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
                                       MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New(
-		InMonoObject, false);
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, false);
 
 	ContainerAddress2GarbageCollectionHandle.Emplace(
 		FContainerAddress{InAddress, static_cast<FContainerHelper*>(InContainer)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2ContainerAddress.Emplace(GarbageCollectionHandle,
+	GarbageCollectionHandle2ContainerAddress.Emplace(MoveTemp(GarbageCollectionHandle),
 	                                                 FContainerAddress{
 		                                                 InAddress, static_cast<FContainerHelper*>(InContainer)
 	                                                 });
