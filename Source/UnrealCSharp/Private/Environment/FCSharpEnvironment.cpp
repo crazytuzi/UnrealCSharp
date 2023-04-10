@@ -410,12 +410,24 @@ MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InAddress) const
 	return DelegateRegistry != nullptr ? DelegateRegistry->GetObject(InAddress) : nullptr;
 }
 
+bool FCSharpEnvironment::AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const
+{
+	return DelegateRegistry != nullptr
+		       ? DelegateRegistry->AddReference(InAddress, InDelegate, InMonoObject)
+		       : false;
+}
+
 bool FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress,
                                               void* InDelegate, MonoObject* InMonoObject) const
 {
 	return DelegateRegistry != nullptr
 		       ? DelegateRegistry->AddReference(InOwner, InAddress, InDelegate, InMonoObject)
 		       : false;
+}
+
+bool FCSharpEnvironment::RemoveDelegateReference(const void* InAddress) const
+{
+	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InAddress) : false;
 }
 
 bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const

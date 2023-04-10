@@ -35,8 +35,12 @@ public:
 
 	MonoObject* GetObject(const void* InAddress);
 
+	bool AddReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject);
+
 	bool AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
 	                  MonoObject* InMonoObject);
+
+	bool RemoveReference(const void* InAddress);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 

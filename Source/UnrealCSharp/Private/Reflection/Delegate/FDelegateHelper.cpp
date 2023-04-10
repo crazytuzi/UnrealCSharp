@@ -3,7 +3,7 @@
 FDelegateHelper::FDelegateHelper(FScriptDelegate* InDelegate, UFunction* InSignatureFunction):
 	DelegateHandler(nullptr)
 {
-	DelegateHandler = NewObject<UDelegateHandler>();
+	DelegateHandler = NewObject<UDelegateHandler>(GWorld);
 
 	DelegateHandler->AddToRoot();
 
@@ -24,7 +24,7 @@ void FDelegateHelper::Deinitialize()
 	if (DelegateHandler != nullptr)
 	{
 		DelegateHandler->Deinitialize();
-		
+
 		DelegateHandler->RemoveFromRoot();
 
 		DelegateHandler = nullptr;
@@ -66,4 +66,14 @@ void FDelegateHelper::Execute(MonoObject** ReturnValue, MonoObject** OutValue, M
 	{
 		DelegateHandler->Execute(ReturnValue, OutValue, InValue);
 	}
+}
+
+UObject* FDelegateHelper::GetUObject() const
+{
+	return DelegateHandler != nullptr ? DelegateHandler->GetUObject() : nullptr;
+}
+
+FName FDelegateHelper::GetFunctionName() const
+{
+	return DelegateHandler != nullptr ? DelegateHandler->GetFunctionName() : NAME_None;
 }
