@@ -26,6 +26,10 @@ public:
 
 	void Execute(MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue) const;
 
+	UObject* GetUObject() const;
+
+	FName GetFunctionName() const;
+
 private:
 	UDelegateHandler* DelegateHandler;
 };

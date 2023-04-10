@@ -97,3 +97,13 @@ void UDelegateHandler::Execute(MonoObject** ReturnValue, MonoObject** OutValue, 
 		}
 	}
 }
+
+UObject* UDelegateHandler::GetUObject() const
+{
+	return ScriptDelegate != nullptr ? ScriptDelegate->GetUObject() : nullptr;
+}
+
+FName UDelegateHandler::GetFunctionName() const
+{
+	return ScriptDelegate != nullptr ? ScriptDelegate->GetFunctionName() : NAME_None;
+}
