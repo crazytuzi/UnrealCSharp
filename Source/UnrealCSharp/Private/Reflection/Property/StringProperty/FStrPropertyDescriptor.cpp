@@ -18,11 +18,6 @@ void FStrPropertyDescriptor::Get(void* Src, void** Dest) const
 	}
 }
 
-void FStrPropertyDescriptor::Set(void** Src, void* Dest) const
-{
-	Set(*reinterpret_cast<MonoObject**>(Src), Dest);
-}
-
 void FStrPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (StrProperty != nullptr)

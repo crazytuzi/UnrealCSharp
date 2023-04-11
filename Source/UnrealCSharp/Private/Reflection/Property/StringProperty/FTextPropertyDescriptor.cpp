@@ -18,11 +18,6 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest) const
 	}
 }
 
-void FTextPropertyDescriptor::Set(void** Src, void* Dest) const
-{
-	Set(*reinterpret_cast<MonoObject**>(Src), Dest);
-}
-
 void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (TextProperty != nullptr)

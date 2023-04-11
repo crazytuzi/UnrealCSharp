@@ -7,7 +7,7 @@ FReference::FReference(const FGarbageCollectionHandle& InGarbageCollectionHandle
 
 FReference::~FReference()
 {
-	FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(GarbageCollectionHandle);
+	FGarbageCollectionHandle::Free(GarbageCollectionHandle);
 }
 
 FReference::operator FGarbageCollectionHandle() const

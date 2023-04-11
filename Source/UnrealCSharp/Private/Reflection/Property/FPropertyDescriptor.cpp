@@ -179,10 +179,6 @@ void FPropertyDescriptor::Get(void* Src, void* Dest) const
 	Get(Src, static_cast<void**>(Dest));
 }
 
-void FPropertyDescriptor::Set(void** Src, void* Dest) const
-{
-}
-
 void FPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 }
