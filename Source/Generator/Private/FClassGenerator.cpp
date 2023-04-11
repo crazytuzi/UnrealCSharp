@@ -3,6 +3,9 @@
 #include "FGeneratorCore.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
+#include "Misc/FileHelper.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 
 void FClassGenerator::Generator()
 {
@@ -35,6 +38,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InClass);
 
 	auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InClass);
+
+	const auto& OverrideFunctions = GetOverrideFunctions(NameSpaceContent, FullClassContent);
 
 	FString SuperClassContent;
 
@@ -165,6 +170,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		if (SuperClass != nullptr && SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
+		{
+			continue;
+		}
+
+		if (OverrideFunctions.Contains(FunctionIterator->GetName()))
 		{
 			continue;
 		}
@@ -867,4 +877,41 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	}
 
 	return TEXT("");
+}
+
+TArray<FString> FClassGenerator::GetOverrideFunctions(const FString& InNameSpace, const FString& InClass)
+{
+	const auto FileName = FString::Printf(TEXT(
+		"%s/%s.%s.json"
+	),
+	                                      *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+	                                      *InNameSpace,
+	                                      *InClass
+	);
+
+	auto& FileManager = IFileManager::Get();
+
+	if (!FileManager.FileExists(*FileName))
+	{
+		return {};
+	}
+
+	FString JsonStr;
+
+	if (FFileHelper::LoadFileToString(JsonStr, *FileName))
+	{
+		TSharedPtr<FJsonObject> JsonObj;
+
+		TArray<FString> OverrideFunctions;
+
+		const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
+
+		FJsonSerializer::Deserialize(JsonReader, JsonObj);
+
+		JsonObj->TryGetStringArrayField(TEXT("Override"), OverrideFunctions);
+
+		return OverrideFunctions;
+	}
+
+	return {};
 }
