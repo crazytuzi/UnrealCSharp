@@ -37,6 +37,15 @@ namespace Script.Common
 
         private Boolean IsValidIndex(Int32 InIndex) => SetUtils.Set_IsValidIndex(this, InIndex);
 
-        private T this[Int32 InIndex] => SetUtils.Set_GetEnumerator(this, InIndex);
+        public T this[Int32 InIndex]
+        {
+            get => SetUtils.Set_GetEnumerator(this, InIndex);
+
+            set => SetUtils.Set_SetEnumerator(this, InIndex, value);
+
+            //set => SetUtils.Set_SetEnumerator(this, InIndex, value);
+        }
+
+        public Int32 GetMaxIndex() => SetUtils.Set_GetMaxIndex(this);
     }
 }

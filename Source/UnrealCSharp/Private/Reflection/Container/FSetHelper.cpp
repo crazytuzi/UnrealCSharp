@@ -1,4 +1,6 @@
 ﻿#include "Reflection/Container/FSetHelper.h"
+
+#include "AITypes.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
 FSetHelper::FSetHelper(FProperty* InProperty, void* InData):
@@ -175,3 +177,19 @@ void* FSetHelper::GetEnumerator(const int32 InIndex) const
 		       ? static_cast<uint8*>(ScriptSet->GetData(InIndex, ScriptSetLayout))
 		       : nullptr;
 }
+
+void FSetHelper::SetEnumerator(int32 Index,void* Value) const
+{
+	auto ScriptSetHelper = CreateHelperFormInnerProperty();
+	
+	if(ScriptSetHelper.IsValidIndex(Index))
+	{
+		ElementPropertyDescriptor->Set(Value,ScriptSetHelper.GetElementPtr(Index));
+	}
+}
+
+int32 FSetHelper::GetMaxIndex() const
+{
+	return ScriptSet->GetMaxIndex();
+}
+

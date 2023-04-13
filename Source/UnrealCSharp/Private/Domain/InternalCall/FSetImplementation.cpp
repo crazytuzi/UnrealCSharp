@@ -19,6 +19,8 @@ struct FRegisterSet
 			.Function("Contains", static_cast<void*>(FSetImplementation::Set_ContainsImplementation))
 			.Function("IsValidIndex", static_cast<void*>(FSetImplementation::Set_IsValidIndexImplementation))
 			.Function("GetEnumerator", static_cast<void*>(FSetImplementation::Set_GetEnumeratorImplementation))
+			.Function("SetEnumerator", static_cast<void*>(FSetImplementation::Set_SetEnumeratorImplementation))
+			.Function("GetMaxIndex", static_cast<void*>(FSetImplementation::Set_GetMaxIndexImplementation))
 			.Register();
 	}
 };
@@ -131,3 +133,22 @@ void FSetImplementation::Set_GetEnumeratorImplementation(const MonoObject* InMon
 		}
 	}
 }
+
+void FSetImplementation::Set_SetEnumeratorImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject* Value)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		SetHelper->SetEnumerator(InIndex, &Value);
+	}
+}
+
+int32 FSetImplementation::Set_GetMaxIndexImplementation(const MonoObject* InMonoObject)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		return SetHelper->GetMaxIndex();
+	}
+
+	return 0;
+}
+

@@ -22,4 +22,8 @@ public:
 	static bool Set_IsValidIndexImplementation(const MonoObject* InMonoObject, int32 InIndex);
 
 	static void Set_GetEnumeratorImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject** OutValue);
+
+	static void Set_SetEnumeratorImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject* Value);
+	
+	static int32 Set_GetMaxIndexImplementation(const MonoObject* InMonoObject);
 };
