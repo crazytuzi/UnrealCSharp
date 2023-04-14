@@ -18,4 +18,6 @@ private:
 	static FString GetCppFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty);
 
 	static FString GetBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty);
+
+	static TArray<FString> GetOverrideFunctions(const FString& InNameSpace, const FString& InClass);
 };

@@ -10,4 +10,6 @@
 
 #define SCRIPT FString(TEXT("Script"))
 
+#define CODE_ANALYSIS FString(TEXT("CodeAnalysis"))
+
 #define TEMPLATE FString(TEXT("Template"))

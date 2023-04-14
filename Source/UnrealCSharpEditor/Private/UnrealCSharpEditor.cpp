@@ -12,6 +12,7 @@
 #include "Misc/MessageDialog.h"
 #include "ToolMenus.h"
 #include "Internationalization/Culture.h"
+#include "FCodeAnalysis.h"
 
 static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 
@@ -60,7 +61,9 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	{
 		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
 	}
-	
+
+	FCodeAnalysis::CodeAnalysis();
+
 	FClassGenerator::Generator();
 
 	FStructGenerator::Generator();
