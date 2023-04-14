@@ -220,15 +220,19 @@ void FClassGenerator::Generator(const UClass* InClass)
 			}
 		}
 
-		FString FunctionNew;
-
 		FString FunctionStatic;
 
 		FString FunctionAccessSpecifiers;
 
+		FString FunctionPolymorphism = TEXT("virtual");
+
 		auto FunctionName = Function->GetName();
 
-		if (bIsInterface == false)
+		if (bIsInterface == true)
+		{
+			FunctionPolymorphism = TEXT("");
+		}
+		else
 		{
 			FunctionAccessSpecifiers = TEXT("public");
 
@@ -236,7 +240,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			{
 				if (SuperClass->FindFunctionByName(*FunctionName))
 				{
-					FunctionNew = TEXT("new");
+					FunctionPolymorphism = TEXT("override");
 				}
 			}
 		}
@@ -246,6 +250,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 		if (bIsStatic == true)
 		{
 			FunctionStatic = TEXT("static");
+
+			FunctionPolymorphism = TEXT("");
 
 			UsingNameSpaces.Add(TEXT("System.Reflection"));
 
@@ -370,12 +376,15 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
-			"%s%s%s%s%s%s%s %s(%s)"
+			"%s%s%s%s%s %s(%s)"
 		),
 		                                           *FunctionAccessSpecifiers,
-		                                           bIsInterface == true ? TEXT("") : TEXT(" "),
-		                                           *FunctionNew,
-		                                           FunctionNew.IsEmpty() == true ? TEXT("") : TEXT(" "),
+		                                           FunctionPolymorphism.IsEmpty()
+			                                           ? TEXT(" ")
+			                                           : *FString::Printf(TEXT(
+				                                           " %s "
+			                                           ),
+			                                                              *FunctionPolymorphism),
 		                                           *FunctionStatic,
 		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
 		                                           *FunctionReturnType,
