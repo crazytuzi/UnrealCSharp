@@ -123,7 +123,7 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 			Stack.Object->GetClass())->GetMonoClass())
 		{
 			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
-				Class_Get_Method_From_Name(FoundMonoClass, TCHAR_TO_UTF8(*Stack.Node->GetName()),
+				Parent_Class_Get_Method_From_Name(FoundMonoClass, TCHAR_TO_UTF8(*Stack.Node->GetName()),
 				                           PropertyDescriptors.Num()))
 			{
 				const auto ReturnValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
