@@ -15,10 +15,19 @@ FClassDescriptor::~FClassDescriptor()
 
 void FClassDescriptor::Initialize()
 {
+	if (const auto Class = Cast<UClass>(Struct))
+	{
+		Class->ClearFunctionMapsCaches();
+	}
 }
 
 void FClassDescriptor::Deinitialize()
 {
+	if (const auto Class = Cast<UClass>(Struct))
+	{
+		Class->ClearFunctionMapsCaches();
+	}
+
 	for (auto& FunctionDescriptorPair : FunctionDescriptorMap)
 	{
 		delete FunctionDescriptorPair.Value;
