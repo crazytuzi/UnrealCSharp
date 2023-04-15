@@ -34,7 +34,8 @@ public:
 	static FString GetBasePath();
 
 	static FString GetUEProjectName();
-
+	static FString GetUtilProjectName();
+	
 	static FString GetUEPath();
 
 	static FString GetUEProxyPath();

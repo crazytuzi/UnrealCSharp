@@ -300,6 +300,11 @@ FString FUnrealCSharpFunctionLibrary::GetUEProjectName()
 	return TEXT("UE");
 }
 
+FString FUnrealCSharpFunctionLibrary::GetUtilProjectName()
+{
+	return TEXT("Util");
+}
+
 FString FUnrealCSharpFunctionLibrary::GetUEPath()
 {
 	return FPaths::Combine(GetBasePath(), GetUEProjectName());
