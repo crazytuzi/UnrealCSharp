@@ -3,6 +3,7 @@
 #include "Reflection/Property/PrimitiveProperty/FBytePropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FUInt16PropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FUInt32PropertyDescriptor.h"
+#include "Reflection/Property/PrimitiveProperty/FUInt64PropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FInt8PropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FInt16PropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FIntPropertyDescriptor.h"
@@ -30,7 +31,6 @@
 #include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
 #include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 #include "Reflection/Property/FieldPathProperty/FFieldPathPropertyDescriptor.h"
-#include "Reflection/Property/PrimitiveProperty/FUInt64PropertyDescriptor.h"
 
 EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Property)
 {
@@ -41,7 +41,7 @@ EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Proper
 		GET_PROPERTY_TYPE(FUInt16Property, EPropertyTypeExtent::UInt16)
 
 		GET_PROPERTY_TYPE(FUInt32Property, EPropertyTypeExtent::UInt32)
-		
+
 		GET_PROPERTY_TYPE(FUInt64Property, EPropertyTypeExtent::UInt64)
 
 		GET_PROPERTY_TYPE(FInt8Property, EPropertyTypeExtent::Int8)
