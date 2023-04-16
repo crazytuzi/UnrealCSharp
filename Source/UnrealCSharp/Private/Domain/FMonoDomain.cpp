@@ -20,8 +20,7 @@ MonoAssembly* FMonoDomain::AssemblyUtilAssembly = nullptr;
 
 MonoImage* FMonoDomain::AssemblyUtilImage = nullptr;
 
-FMonoDomain::FMonoDomain(const FMonoDomainInitializeParams& Params):
-	Domain(nullptr)
+FMonoDomain::FMonoDomain(const FMonoDomainInitializeParams& Params)
 {
 	Initialize(Params);
 }
@@ -46,10 +45,10 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 #endif
 		);
 
-		mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/lib"))),
-		              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/etc"))));
+		mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono\\lib\\net7.0"))),
+		              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT(""))));
 #else
-		mono_set_dirs("Mono/lib", "Mono/etc");
+		mono_set_dirs("Mono\\lib\\net7.0", "");
 #endif
 
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
