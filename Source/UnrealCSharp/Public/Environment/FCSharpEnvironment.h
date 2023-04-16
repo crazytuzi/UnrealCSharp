@@ -125,8 +125,12 @@ public:
 
 	MonoObject* GetDelegateObject(const void* InAddress) const;
 
+	bool AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const;
+
 	bool AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
 	                          MonoObject* InMonoObject) const;
+
+	bool RemoveDelegateReference(const void* InAddress) const;
 
 	bool RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 

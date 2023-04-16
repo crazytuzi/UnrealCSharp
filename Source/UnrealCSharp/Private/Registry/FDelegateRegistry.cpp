@@ -27,7 +27,7 @@ void FDelegateRegistry::Deinitialize()
 			Pair.Value.DelegateBaseHelper = nullptr;
 		}
 
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(Pair.Key);
+		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
 	GarbageCollectionHandle2DelegateAddress.Empty();
@@ -48,21 +48,61 @@ MonoObject* FDelegateRegistry::GetObject(const void* InAddress)
 	return nullptr;
 }
 
-bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
-                                     MonoObject* InMonoObject)
+bool FDelegateRegistry::AddReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New(
-		InMonoObject, false);
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, false);
 
 	DelegateAddress2GarbageCollectionHandle.Emplace(
 		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2DelegateAddress.Emplace(GarbageCollectionHandle,
+	GarbageCollectionHandle2DelegateAddress.Emplace(MoveTemp(GarbageCollectionHandle),
+	                                                FDelegateAddress{
+		                                                InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
+	                                                });
+
+	return true;
+}
+
+bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
+                                     MonoObject* InMonoObject)
+{
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, false);
+
+	DelegateAddress2GarbageCollectionHandle.Emplace(
+		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2DelegateAddress.Emplace(MoveTemp(GarbageCollectionHandle),
 	                                                FDelegateAddress{
 		                                                InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
 	                                                });
 
 	return FCSharpEnvironment::GetEnvironment()->AddReference(InOwner, new FDelegateReference(GarbageCollectionHandle));
+}
+
+bool FDelegateRegistry::RemoveReference(const void* InAddress)
+{
+	for (auto& Pair : DelegateAddress2GarbageCollectionHandle)
+	{
+		if (Pair.Key == InAddress)
+		{
+			if (Pair.Key.DelegateBaseHelper != nullptr)
+			{
+				delete Pair.Key.DelegateBaseHelper;
+
+				Pair.Key.DelegateBaseHelper = nullptr;
+			}
+
+			FGarbageCollectionHandle::Free(Pair.Value);
+
+			GarbageCollectionHandle2DelegateAddress.Remove(Pair.Value);
+
+			DelegateAddress2GarbageCollectionHandle.Remove(Pair.Key);
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool FDelegateRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)

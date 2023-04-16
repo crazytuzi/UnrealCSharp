@@ -230,6 +230,22 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, cons
 	return mono_class_get_method_from_name(InMonoClass, TCHAR_TO_ANSI(*InFunctionName), InParamCount);
 }
 
+MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
+                                                           const int32 InParamCount) const
+{
+	while (InMonoClass != nullptr)
+	{
+		if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, InFunctionName, InParamCount))
+		{
+			return FoundMethod;
+		}
+
+		InMonoClass = mono_class_get_parent(InMonoClass);
+	}
+
+	return nullptr;
+}
+
 mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
                                             mono_bool bCheckInterfaces)
 {

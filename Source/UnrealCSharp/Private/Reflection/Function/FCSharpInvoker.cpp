@@ -34,6 +34,7 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 			}
 		}
 	}
+
 	if (FunctionDescriptor == nullptr)
 	{
 		FunctionDescriptor = FCSharpEnvironment::GetEnvironment()->GetFunctionDescriptor(

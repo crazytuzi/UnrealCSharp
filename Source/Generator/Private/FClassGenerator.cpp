@@ -3,6 +3,9 @@
 #include "FGeneratorCore.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
+#include "Misc/FileHelper.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 
 void FClassGenerator::Generator()
 {
@@ -35,6 +38,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InClass);
 
 	auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InClass);
+
+	const auto& OverrideFunctions = GetOverrideFunctions(NameSpaceContent, FullClassContent);
 
 	FString SuperClassContent;
 
@@ -169,6 +174,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
+		if (OverrideFunctions.Contains(FunctionIterator->GetName()))
+		{
+			continue;
+		}
+
 		Functions.Add(*FunctionIterator);
 	}
 
@@ -210,15 +220,19 @@ void FClassGenerator::Generator(const UClass* InClass)
 			}
 		}
 
-		FString FunctionNew;
-
 		FString FunctionStatic;
 
 		FString FunctionAccessSpecifiers;
 
+		FString FunctionPolymorphism = TEXT("virtual");
+
 		auto FunctionName = Function->GetName();
 
-		if (bIsInterface == false)
+		if (bIsInterface == true)
+		{
+			FunctionPolymorphism = TEXT("");
+		}
+		else
 		{
 			FunctionAccessSpecifiers = TEXT("public");
 
@@ -226,7 +240,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			{
 				if (SuperClass->FindFunctionByName(*FunctionName))
 				{
-					FunctionNew = TEXT("new");
+					FunctionPolymorphism = TEXT("override");
 				}
 			}
 		}
@@ -236,6 +250,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 		if (bIsStatic == true)
 		{
 			FunctionStatic = TEXT("static");
+
+			FunctionPolymorphism = TEXT("");
 
 			UsingNameSpaces.Add(TEXT("System.Reflection"));
 
@@ -360,12 +376,15 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
-			"%s%s%s%s%s%s%s %s(%s)"
+			"%s%s%s%s%s %s(%s)"
 		),
 		                                           *FunctionAccessSpecifiers,
-		                                           bIsInterface == true ? TEXT("") : TEXT(" "),
-		                                           *FunctionNew,
-		                                           FunctionNew.IsEmpty() == true ? TEXT("") : TEXT(" "),
+		                                           FunctionPolymorphism.IsEmpty()
+			                                           ? TEXT(" ")
+			                                           : *FString::Printf(TEXT(
+				                                           " %s "
+			                                           ),
+			                                                              *FunctionPolymorphism),
 		                                           *FunctionStatic,
 		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
 		                                           *FunctionReturnType,
@@ -867,4 +886,41 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	}
 
 	return TEXT("");
+}
+
+TArray<FString> FClassGenerator::GetOverrideFunctions(const FString& InNameSpace, const FString& InClass)
+{
+	const auto FileName = FString::Printf(TEXT(
+		"%s/%s.%s.json"
+	),
+	                                      *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+	                                      *InNameSpace,
+	                                      *InClass
+	);
+
+	auto& FileManager = IFileManager::Get();
+
+	if (!FileManager.FileExists(*FileName))
+	{
+		return {};
+	}
+
+	FString JsonStr;
+
+	if (FFileHelper::LoadFileToString(JsonStr, *FileName))
+	{
+		TSharedPtr<FJsonObject> JsonObj;
+
+		TArray<FString> OverrideFunctions;
+
+		const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
+
+		FJsonSerializer::Deserialize(JsonReader, JsonObj);
+
+		JsonObj->TryGetStringArrayField(TEXT("Override"), OverrideFunctions);
+
+		return OverrideFunctions;
+	}
+
+	return {};
 }
