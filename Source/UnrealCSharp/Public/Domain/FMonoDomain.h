@@ -39,9 +39,6 @@ public:
 	MonoMethod* Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                       int32 InParamCount) const;
 
-	MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
-	                                              int32 InParamCount) const;
-
 	mono_bool Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass, mono_bool bCheckInterfaces);
 
 	MonoType* Class_Get_Type(MonoClass* InMonoClass) const;
@@ -111,6 +108,12 @@ public:
 	MonoObject* GCHandle_Get_Target(uint32 InGCHandle);
 
 	void GCHandle_Free(uint32 InGCHandle);
+
+public:
+	MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
+	                                              int32 InParamCount) const;
+
+	MonoString* GetTraceback() const;
 
 private:
 	void RegisterMonoTrace();

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Reflection;
+using System.Diagnostics;
+using System.Text;
 
 namespace Script.Common
 {
@@ -42,6 +44,26 @@ namespace Script.Common
         private static void SetOut()
         {
             Console.SetOut(Log.Log.Create());
+        }
+
+        private static string GetTraceback()
+        {
+            var Traceback = new StringBuilder();
+
+            var Trace = new StackTrace();
+
+            var Frames = Trace.GetFrames();
+
+            foreach (var Frame in Frames)
+            {
+                Traceback.Append(String.Format("at {0}.{1} in {2}:{3}\r\n",
+                    Frame.GetMethod().DeclaringType.FullName,
+                    Frame.GetMethod().Name,
+                    Frame.GetFileName(),
+                    Frame.GetFileLineNumber()));
+            }
+
+            return Traceback.ToString();
         }
     }
 }

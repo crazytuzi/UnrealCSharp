@@ -24,4 +24,6 @@
 
 #define FUNCTION_UTILS_MULTICAST_DELEGATE_EQUALS FString(TEXT("MulticastDelegate_Equals"))
 
+#define FUNCTION_UTILS_GET_TRACEBACK FString(TEXT("GetTraceback"))
+
 #define FUNCTION_STATIC_STRUCT FString(TEXT("StaticStruct"))
