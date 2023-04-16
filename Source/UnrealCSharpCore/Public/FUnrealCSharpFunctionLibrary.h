@@ -42,8 +42,12 @@ public:
 
 	static FString GetGameProjectName();
 
+	static FString GetUtilName();
+	
 	static FString GetGamePath();
 
+	static FString GetUtilPath();
+	
 	static FString GetGameProxyPath();
 
 	static FString GetGenerationPath(const UField* InField);
