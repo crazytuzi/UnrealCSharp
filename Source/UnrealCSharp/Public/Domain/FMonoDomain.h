@@ -1,19 +1,21 @@
 #pragma once
 
 #include "mono/metadata/appdomain.h"
-#include <unordered_map>
+
 struct FMonoDomainInitializeParams
 {
 	FString Domain;
-	FString UtilPath;
+
+	FString AssemblyUtil;
+
 	TArray<FString> Assemblies;
 
-	FMonoDomainInitializeParams(const FString& InDomain, const FString& UtilPath, const TArray<FString>& InAssemblies):
+	FMonoDomainInitializeParams(const FString& InDomain, const FString& InAssemblyUtil,
+	                            const TArray<FString>& InAssemblies):
 		Domain(InDomain),
-		Assemblies(InAssemblies),
-		UtilPath(UtilPath)
+		AssemblyUtil(InAssemblyUtil),
+		Assemblies(InAssemblies)
 	{
-		
 	}
 };
 
@@ -112,12 +114,6 @@ public:
 
 	MonoObject* GCHandle_Get_Target(uint32 InGCHandle);
 
-	MonoGCHandle LoadLibrary(FString Path);
-
-	void UnloadLibrary(MonoGCHandle GCHandle);
-	void InitAssemblayLoadContext();
-	void UninitAssemblayLoadContext();
-	
 	void GCHandle_Free(uint32 InGCHandle);
 
 private:
@@ -127,12 +123,27 @@ private:
 
 	void RegisterBinding();
 
+	void InitializeAssembly(const TArray<FString>& InAssemblies);
+
+	void DeinitializeAssembly();
+
+	void InitializeAssemblyLoadContext() const;
+
+	void DeinitializeAssemblyLoadContext();
+
+	void LoadAssembly(const TArray<FString>& InAssemblies);
+
+	void UnloadAssembly();
+
 private:
-	static MonoDomain* RootDomain;
-	static MonoAssembly* UtilAssembly;
-	static MonoImage* UtilImage;
-	// MonoDomain* Domain;
-	TArray<MonoGCHandle> AssemblieHandles;
+	static MonoDomain* Domain;
+
+	static MonoAssembly* AssemblyUtilAssembly;
+
+	static MonoImage* AssemblyUtilImage;
+
+	TArray<MonoGCHandle> AssemblyGCHandles;
+
 	TArray<MonoAssembly*> Assemblies;
 
 	TArray<MonoImage*> Images;

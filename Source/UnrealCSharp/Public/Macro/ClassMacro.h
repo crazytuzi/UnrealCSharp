@@ -14,6 +14,8 @@
 
 #define CLASS_UTILS FString(TEXT("Utils"))
 
+#define CLASS_ASSEMBLY_UTIL FString(TEXT("AssemblyUtil"))
+
 #define CLASS_MULTICAST_DELEGATE_UTILS FString(TEXT("MulticastDelegateUtils"))
 
 #define CLASS_T_ARRAY FString(TEXT("TArray`1"))

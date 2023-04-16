@@ -10,6 +10,5 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../Plugins/UnrealCSharp/Script/UE/**"></Compile>
-    <Compile Remove="../../Plugins/UnrealCSharp/Script/CodeAnalysis/**"></Compile>
   </ItemGroup>
 </Project>
