@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UE", "UE\UE.csproj", "{7AF881DC-664B-4AF7-BCB6-8FA8CC5E8780}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Game", "Game\Game.csproj", "{A2B210E9-51AE-490B-8B87-F8492CB2A417}"
+
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyUtil", "AssemblyUtil\AssemblyUtil.csproj", "{3BFB7C65-5C07-4422-B67C-B4DA5A20EFA8}"
 EndProject
 Global

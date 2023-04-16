@@ -389,6 +389,16 @@ FString FUnrealCSharpFunctionLibrary::GetGameProxyPath()
 	return FPaths::Combine(GetGamePath(), TEXT("Proxy"));
 }
 
+FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
+{
+	return TEXT("AssemblyUtil");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath()
+{
+	return FPaths::Combine(GetBasePath(), GetAssemblyUtilProjectName());
+}
+
 FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const UField* InField)
 {
 	if (InField == nullptr || InField->GetPackage() == nullptr)
