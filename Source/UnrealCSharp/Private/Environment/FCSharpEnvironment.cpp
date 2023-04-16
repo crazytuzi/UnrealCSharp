@@ -2,6 +2,20 @@
 #include "Macro.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
+#if WITH_EDITOR
+#include <signal.h>
+#endif
+
+#if WITH_EDITOR
+void SignalHandler(int32)
+{
+	UE_LOG(LogTemp, Error, TEXT("%s"),
+	       UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
+		       FCSharpEnvironment::GetEnvironment()->GetDomain()->GetTraceback())));
+
+	GLog->Flush();
+}
+#endif
 
 FCSharpEnvironment* FCSharpEnvironment::Environment = nullptr;
 
@@ -46,6 +60,30 @@ void FCSharpEnvironment::Initialize()
 
 	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
 		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
+
+#if WITH_EDITOR
+	static TSet<int32> SignalTypes = {
+		// interrupt
+		SIGINT,
+		// illegal instruction - invalid function image
+		SIGILL,
+		// floating point exception
+		SIGFPE,
+		// segment violation
+		SIGSEGV,
+		// Software termination signal from kill
+		SIGTERM,
+		// Ctrl-Break sequence
+		SIGBREAK,
+		// abnormal termination triggered by abort call
+		SIGABRT,
+	};
+
+	for (const auto SignalType : SignalTypes)
+	{
+		signal(SignalType, SignalHandler);
+	}
+#endif
 }
 
 void FCSharpEnvironment::Deinitialize()
