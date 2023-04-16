@@ -3,6 +3,7 @@
 #include "Reflection/Property/PrimitiveProperty/FBytePropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FUInt16PropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FUInt32PropertyDescriptor.h"
+#include "Reflection/Property/PrimitiveProperty/FUInt64PropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FInt8PropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FInt16PropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FIntPropertyDescriptor.h"
@@ -40,6 +41,8 @@ EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Proper
 		GET_PROPERTY_TYPE(FUInt16Property, EPropertyTypeExtent::UInt16)
 
 		GET_PROPERTY_TYPE(FUInt32Property, EPropertyTypeExtent::UInt32)
+
+		GET_PROPERTY_TYPE(FUInt64Property, EPropertyTypeExtent::UInt64)
 
 		GET_PROPERTY_TYPE(FInt8Property, EPropertyTypeExtent::Int8)
 
@@ -106,6 +109,8 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 	NEW_PROPERTY_DESCRIPTOR(FUInt16Property)
 
 	NEW_PROPERTY_DESCRIPTOR(FUInt32Property)
+
+	NEW_PROPERTY_DESCRIPTOR(FUInt64Property)
 
 	NEW_PROPERTY_DESCRIPTOR(FInt8Property)
 
