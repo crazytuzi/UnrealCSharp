@@ -15,13 +15,21 @@ public class Mono : ModuleRules
 
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-2.0-sgen.lib"));
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "coreclr.import.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-component-debugger-static.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-component-diagnostics_tracing-static.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-component-hot_reload-static.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-profiler-aot.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "monosgen-2.0.lib"));
 
-			RuntimeDependencies.Add("$(BinaryOutputDir)/mono-2.0-sgen.dll",
-				Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-2.0-sgen.dll"));
+            RuntimeDependencies.Add("$(BinaryOutputDir)/coreclr.dll",
+				Path.Combine(LibraryPath, Target.Platform.ToString(), "coreclr.dll"));
+            RuntimeDependencies.Add("$(BinaryOutputDir)/System.Private.CoreLib.dll",
+                Path.Combine(LibraryPath, Target.Platform.ToString(), "System.Private.CoreLib.dll"));
+            RuntimeDependencies.Add("$(BinaryOutputDir)/mono-sgen.pdb",
+                Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-sgen.pdb"));
 
-			var Files = GetFiles(Path.Combine(LibraryPath, "mono"))
-				.Union(GetFiles(Path.Combine(ModuleDirectory, "etc")));
+            var Files = GetFiles(Path.Combine(LibraryPath, "net7.0"));
 
 			foreach (var File in Files)
 			{

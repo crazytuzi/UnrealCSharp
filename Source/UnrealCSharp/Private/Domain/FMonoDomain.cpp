@@ -10,11 +10,15 @@
 #include "mono/utils/mono-logger.h"
 #include "mono/metadata/mono-gc.h"
 #include "mono/metadata/mono-debug.h"
+#include "mono/metadata/class.h"
+#include "mono/metadata/reflection.h"
+
 
 MonoDomain* FMonoDomain::RootDomain = nullptr;
+MonoAssembly* FMonoDomain::UtilAssembly = nullptr;
+MonoImage* FMonoDomain::UtilImage = nullptr;
 
-FMonoDomain::FMonoDomain(const FMonoDomainInitializeParams& Params):
-	Domain(nullptr)
+FMonoDomain::FMonoDomain(const FMonoDomainInitializeParams& Params)
 {
 	Initialize(Params);
 }
@@ -39,27 +43,36 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 #endif
 		);
 
-		mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/lib"))),
-		              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono/etc"))));
+		mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono\\lib\\net7.0"))),
+		              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT(""))));
 #else
-		mono_set_dirs("Mono/lib", "Mono/etc");
+		mono_set_dirs("Mono\\lib\\net7.0", "");
 #endif
 
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
-		RootDomain = mono_jit_init(nullptr);
+		RootDomain = mono_jit_init("UnrealCSharp");
+		mono_domain_set(RootDomain, false);
 	}
-
-	Domain = mono_domain_create_appdomain(TCHAR_TO_ANSI(*Params.Domain), nullptr);
-
-	mono_domain_set(Domain, false);
-
+	if (UtilAssembly == nullptr)
+	{
+		UtilAssembly = mono_domain_assembly_open(RootDomain, TCHAR_TO_ANSI(*Params.UtilPath));
+		check(UtilAssembly);
+	}
+	if (UtilImage == nullptr)
+	{
+		UtilImage = mono_assembly_get_image(UtilAssembly);
+		check(UtilImage);
+	}
+	InitAssemblayLoadContext();
+	
 	for (const auto& AssemblyPath : Params.Assemblies)
 	{
-		auto Assembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*AssemblyPath));
-
+		auto gchandle = LoadLibrary(TCHAR_TO_ANSI(*AssemblyPath));
+		AssemblieHandles.Add(gchandle);
+		auto ReflectionAssembly = (MonoReflectionAssembly*)mono_gchandle_get_target_v2(gchandle);
+		auto Assembly = mono_reflection_assembly_get_assembly(ReflectionAssembly);
 		Assemblies.Add(Assembly);
-
 		Images.Add(mono_assembly_get_image(Assembly));
 	}
 
@@ -72,23 +85,87 @@ void FMonoDomain::Deinitialize()
 {
 	Images.Reset();
 
-	Assemblies.Reset();
-
-	if (Domain != nullptr)
+	for(auto image : Images)
 	{
-		mono_domain_set(RootDomain, true);
-
-		mono_domain_unload(Domain);
-
-		Domain = nullptr;
+		mono_image_close(image);
 	}
+	for (auto handle : AssemblieHandles)
+	{
+		UnloadLibrary(handle);
+	}
+	Assemblies.Reset();
+	AssemblieHandles.Reset();
+	Images.Reset();
+	UninitAssemblayLoadContext();
+
+}
+
+
+
+MonoGCHandle FMonoDomain::LoadLibrary(FString Path)
+{
+	static MonoMethod* LoadLibraryMethod = nullptr;
+	if (UtilImage == nullptr)
+		return nullptr;
+	if (LoadLibraryMethod == nullptr)
+	{
+		auto* Class = mono_class_from_name(UtilImage, "Util", "AssemblyUtil");
+		if (Class == nullptr)
+			return nullptr;
+		LoadLibraryMethod = mono_class_get_method_from_name(Class, "LoadLibrary", 1);
+		
+	};
+	if (LoadLibraryMethod == nullptr)
+		return nullptr;
+	void* args[1];
+	args[0] = (void*)mono_string_new(RootDomain, TCHAR_TO_ANSI(*Path));
+	MonoObject* Result = mono_runtime_invoke(LoadLibraryMethod, nullptr, args, nullptr);
+	if (Result == nullptr)
+		return nullptr;
+	MonoGCHandle Handle = mono_gchandle_new_v2(Result, true);
+	return Handle;
+}
+
+void FMonoDomain::UnloadLibrary(MonoGCHandle GCHandle)
+{
+	mono_gchandle_free_v2(GCHandle);
+}
+
+void FMonoDomain::InitAssemblayLoadContext()
+{
+	static MonoMethod* InitAlcMethod = nullptr;
+	if (InitAlcMethod == nullptr)
+	{
+		auto* Class = mono_class_from_name(UtilImage, "Util", "AssemblyUtil");
+		if (Class == nullptr)
+			return;
+		InitAlcMethod = mono_class_get_method_from_name(Class, "InitAssemblyLoadContext", 0);
+	}
+	if (InitAlcMethod == nullptr)
+		return;
+	mono_runtime_invoke(InitAlcMethod, nullptr, nullptr, nullptr);
+}
+void FMonoDomain::UninitAssemblayLoadContext()
+{
+	
+	static MonoMethod* UninitAlcMethod = nullptr;
+	if (UninitAlcMethod == nullptr)
+	{
+		auto* Class = mono_class_from_name(UtilImage, "Util", "AssemblyUtil");
+		if (Class == nullptr)
+			return;
+		UninitAlcMethod = mono_class_get_method_from_name(Class, "UninitAssemblyLoadContext", 0);
+	}
+	if (UninitAlcMethod == nullptr)
+		return;
+	mono_runtime_invoke(UninitAlcMethod, nullptr, nullptr, nullptr);
 }
 
 MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass) const
 {
-	if (Domain != nullptr && InMonoClass != nullptr)
+	if (RootDomain != nullptr && InMonoClass != nullptr)
 	{
-		if (const auto NewMonoObject = mono_object_new(Domain, InMonoClass))
+		if (const auto NewMonoObject = mono_object_new(RootDomain, InMonoClass))
 		{
 			Runtime_Object_Init(NewMonoObject);
 
@@ -101,9 +178,9 @@ MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass) const
 
 MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass, const int32 InParamCount, void** InParams) const
 {
-	if (Domain != nullptr && InMonoClass != nullptr)
+	if (RootDomain != nullptr && InMonoClass != nullptr)
 	{
-		if (const auto NewMonoObject = mono_object_new(Domain, InMonoClass))
+		if (const auto NewMonoObject = mono_object_new(RootDomain, InMonoClass))
 		{
 			if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_OBJECT_CONSTRUCTOR,
 			                                                        InParamCount))
@@ -194,7 +271,7 @@ MonoClass* FMonoDomain::Type_Get_Class(MonoType* InMonoType)
 
 MonoReflectionType* FMonoDomain::Type_Get_Object(MonoType* InMonoType)
 {
-	return Domain != nullptr && InMonoType != nullptr ? mono_type_get_object(Domain, InMonoType) : nullptr;
+	return RootDomain != nullptr && InMonoType != nullptr ? mono_type_get_object(RootDomain, InMonoType) : nullptr;
 }
 
 MonoType* FMonoDomain::Type_Get_Underlying_Type(MonoType* InMonoType) const
@@ -204,8 +281,8 @@ MonoType* FMonoDomain::Type_Get_Underlying_Type(MonoType* InMonoType) const
 
 MonoReflectionMethod* FMonoDomain::Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass)
 {
-	return Domain != nullptr && InMethod != nullptr && InMonoClass != nullptr
-		       ? mono_method_get_object(Domain, InMethod, InMonoClass)
+	return RootDomain != nullptr && InMethod != nullptr && InMonoClass != nullptr
+		       ? mono_method_get_object(RootDomain, InMethod, InMonoClass)
 		       : nullptr;
 }
 
@@ -264,7 +341,7 @@ MonoClass* FMonoDomain::Object_Get_Class(MonoObject* InMonoObject)
 
 MonoObject* FMonoDomain::Value_Box(MonoClass* InMonoClass, void* InValue) const
 {
-	return Domain != nullptr && InMonoClass != nullptr ? mono_value_box(Domain, InMonoClass, InValue) : nullptr;
+	return RootDomain != nullptr && InMonoClass != nullptr ? mono_value_box(RootDomain, InMonoClass, InValue) : nullptr;
 }
 
 void* FMonoDomain::Object_Unbox(MonoObject* InMonoObject) const
@@ -274,7 +351,7 @@ void* FMonoDomain::Object_Unbox(MonoObject* InMonoObject) const
 
 MonoString* FMonoDomain::String_New(const char* InText) const
 {
-	return Domain != nullptr && InText != nullptr ? mono_string_new(Domain, InText) : nullptr;
+	return RootDomain != nullptr && InText != nullptr ? mono_string_new(RootDomain, InText) : nullptr;
 }
 
 MonoString* FMonoDomain::Object_To_String(MonoObject* InMonoObject, MonoObject** InExc) const
@@ -289,7 +366,7 @@ char* FMonoDomain::String_To_UTF8(MonoString* InMonoString) const
 
 MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
 {
-	return mono_array_new(Domain, InMonoClass, InNum);
+	return mono_array_new(RootDomain, InMonoClass, InNum);
 }
 
 MonoClass* FMonoDomain::Get_Byte_Class() const
@@ -383,7 +460,7 @@ void FMonoDomain::RegisterMonoTrace()
 
 void FMonoDomain::RegisterLog()
 {
-	if (Domain != nullptr)
+	if (RootDomain != nullptr)
 	{
 		if (const auto FoundMonoClass = Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))

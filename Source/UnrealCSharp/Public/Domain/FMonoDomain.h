@@ -1,17 +1,19 @@
 #pragma once
 
 #include "mono/metadata/appdomain.h"
-
+#include <unordered_map>
 struct FMonoDomainInitializeParams
 {
 	FString Domain;
-
+	FString UtilPath;
 	TArray<FString> Assemblies;
 
-	FMonoDomainInitializeParams(const FString& InDomain, const TArray<FString>& InAssemblies):
+	FMonoDomainInitializeParams(const FString& InDomain, const FString& UtilPath, const TArray<FString>& InAssemblies):
 		Domain(InDomain),
-		Assemblies(InAssemblies)
+		Assemblies(InAssemblies),
+		UtilPath(UtilPath)
 	{
+		
 	}
 };
 
@@ -110,6 +112,12 @@ public:
 
 	MonoObject* GCHandle_Get_Target(uint32 InGCHandle);
 
+	MonoGCHandle LoadLibrary(FString Path);
+
+	void UnloadLibrary(MonoGCHandle GCHandle);
+	void InitAssemblayLoadContext();
+	void UninitAssemblayLoadContext();
+	
 	void GCHandle_Free(uint32 InGCHandle);
 
 private:
@@ -121,9 +129,10 @@ private:
 
 private:
 	static MonoDomain* RootDomain;
-
-	MonoDomain* Domain;
-
+	static MonoAssembly* UtilAssembly;
+	static MonoImage* UtilImage;
+	// MonoDomain* Domain;
+	TArray<MonoGCHandle> AssemblieHandles;
 	TArray<MonoAssembly*> Assemblies;
 
 	TArray<MonoImage*> Images;
