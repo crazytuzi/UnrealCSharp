@@ -37,20 +37,15 @@ public:
 	static FString GetBasePath();
 
 	static FString GetUEProjectName();
-	static FString GetUtilProjectName();
-	
+
 	static FString GetUEPath();
 
 	static FString GetUEProxyPath();
 
 	static FString GetGameProjectName();
 
-	static FString GetUtilName();
-	
 	static FString GetGamePath();
 
-	static FString GetUtilPath();
-	
 	static FString GetGameProxyPath();
 
 	static FString GetGenerationPath(const UField* InField);

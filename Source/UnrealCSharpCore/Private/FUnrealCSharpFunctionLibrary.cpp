@@ -364,11 +364,6 @@ FString FUnrealCSharpFunctionLibrary::GetUEProjectName()
 	return TEXT("UE");
 }
 
-FString FUnrealCSharpFunctionLibrary::GetUtilProjectName()
-{
-	return TEXT("Util");
-}
-
 FString FUnrealCSharpFunctionLibrary::GetUEPath()
 {
 	return FPaths::Combine(GetBasePath(), GetUEProjectName());
@@ -384,19 +379,11 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectName()
 	return TEXT("Game");
 }
 
-FString FUnrealCSharpFunctionLibrary::GetUtilName()
-{
-	return TEXT("Util");
-}
 FString FUnrealCSharpFunctionLibrary::GetGamePath()
 {
 	return FPaths::Combine(GetBasePath(), GetGameProjectName());
 }
 
-FString FUnrealCSharpFunctionLibrary::GetUtilPath()
-{
-	return FPaths::Combine(GetBasePath(), GetUtilName());
-}
 FString FUnrealCSharpFunctionLibrary::GetGameProxyPath()
 {
 	return FPaths::Combine(GetGamePath(), TEXT("Proxy"));
