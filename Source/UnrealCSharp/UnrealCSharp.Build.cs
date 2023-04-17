@@ -26,6 +26,7 @@ public class UnrealCSharp : ModuleRules
 			new string[]
 			{
 				"Core",
+				"Engine",
 				// ... add other public dependencies that you statically link with here ...
 				"Mono",
 				"CrossVersion"
@@ -37,7 +38,6 @@ public class UnrealCSharp : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
 				"Slate",
 				"SlateCore", 
 				"UnrealCSharpCore",

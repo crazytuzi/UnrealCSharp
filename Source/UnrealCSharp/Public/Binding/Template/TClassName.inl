@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Kismet/DataTableFunctionLibrary.h"
+
 template <class T>
 struct TClassName
 {
@@ -22,4 +24,10 @@ template <>
 struct TClassName<UWorld>
 {
 	static FString Get() { return TEXT("World"); }
+};
+
+template <>
+struct TClassName<UDataTableFunctionLibrary>
+{
+	static FString Get() { return TEXT("DataTableFunctionLibrary"); }
 };
