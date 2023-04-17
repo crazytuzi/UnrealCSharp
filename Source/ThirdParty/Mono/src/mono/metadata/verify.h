@@ -23,7 +23,7 @@ typedef enum {
 	MONO_VERIFY_NOT_VERIFIABLE = 8,
 
 	/*OR it with other flags*/
-
+	
 	/* Abort the verification if the code is not verifiable.
 	 * The standard behavior is to abort if the code is not valid.
 	 * */
@@ -56,9 +56,9 @@ typedef struct {
 } MonoVerifyInfoExtended;
 
 
-MONO_API MONO_RT_EXTERNAL_ONLY GSList* mono_method_verify       (MonoMethod *method, int level);
-MONO_API MONO_RT_EXTERNAL_ONLY void    mono_free_verify_list    (GSList *list);
-MONO_API MONO_RT_EXTERNAL_ONLY char*   mono_verify_corlib       (void);
+MONO_API GSList* mono_method_verify       (MonoMethod *method, int level);
+MONO_API void    mono_free_verify_list    (GSList *list);
+MONO_API char*   mono_verify_corlib       (void);
 
 MONO_END_DECLS
 
