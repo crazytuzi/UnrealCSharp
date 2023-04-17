@@ -10,15 +10,8 @@
 #include "mono/utils/mono-logger.h"
 #include "mono/metadata/mono-gc.h"
 #include "mono/metadata/mono-debug.h"
-#include "mono/metadata/class.h"
-#include "mono/metadata/reflection.h"
-#include "Template/TGetArrayLength.h"
 
-MonoDomain* FMonoDomain::Domain = nullptr;
-
-MonoAssembly* FMonoDomain::AssemblyUtilAssembly = nullptr;
-
-MonoImage* FMonoDomain::AssemblyUtilImage = nullptr;
+MonoDomain* FMonoDomain::RootDomain = nullptr;
 
 FMonoDomain::FMonoDomain(const FMonoDomainInitializeParams& Params):
 	Domain(nullptr)
@@ -35,7 +28,7 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 {
 	RegisterMonoTrace();
 
-	if (Domain == nullptr)
+	if (RootDomain == nullptr)
 	{
 #if WITH_EDITOR
 		auto MonoDir = FString::Printf(TEXT(
@@ -54,22 +47,21 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
-		Domain = mono_jit_init("UnrealCSharp");
-
-		mono_domain_set(Domain, false);
+		RootDomain = mono_jit_init(nullptr);
 	}
 
-	if (AssemblyUtilAssembly == nullptr)
+	Domain = mono_domain_create_appdomain(TCHAR_TO_ANSI(*Params.Domain), nullptr);
+
+	mono_domain_set(Domain, false);
+
+	for (const auto& AssemblyPath : Params.Assemblies)
 	{
-		AssemblyUtilAssembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*Params.AssemblyUtil));
-	}
+		auto Assembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*AssemblyPath));
 
-	if (AssemblyUtilImage == nullptr)
-	{
-		AssemblyUtilImage = mono_assembly_get_image(AssemblyUtilAssembly);
-	}
+		Assemblies.Add(Assembly);
 
-	InitializeAssembly(Params.Assemblies);
+		Images.Add(mono_assembly_get_image(Assembly));
+	}
 
 	RegisterLog();
 
@@ -78,9 +70,18 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 
 void FMonoDomain::Deinitialize()
 {
-	UnloadAssembly();
+	Images.Reset();
 
-	DeinitializeAssembly();
+	Assemblies.Reset();
+
+	if (Domain != nullptr)
+	{
+		mono_domain_set(RootDomain, true);
+
+		mono_domain_unload(Domain);
+
+		Domain = nullptr;
+	}
 }
 
 MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass) const
@@ -401,98 +402,4 @@ void FMonoDomain::RegisterBinding()
 	{
 		FMonoInternalCall::RegisterInternalCall(TCHAR_TO_ANSI(*Binding.Key), Binding.Value);
 	}
-}
-
-void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
-{
-	InitializeAssemblyLoadContext();
-
-	LoadAssembly(InAssemblies);
-}
-
-void FMonoDomain::DeinitializeAssembly()
-{
-	UnloadAssembly();
-
-	DeinitializeAssemblyLoadContext();
-}
-
-void FMonoDomain::InitializeAssemblyLoadContext() const
-{
-	if (const auto AssemblyUtilMonoClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),
-	                                                            TCHAR_TO_ANSI(*CLASS_ASSEMBLY_UTIL)))
-	{
-		if (const auto InitializeMonoMethod = Class_Get_Method_From_Name(
-			AssemblyUtilMonoClass, FUNCTION_ASSEMBLY_UTIL_INITIALIZE, 0))
-		{
-			Runtime_Invoke(InitializeMonoMethod, nullptr, nullptr, nullptr);
-		}
-	}
-}
-
-void FMonoDomain::DeinitializeAssemblyLoadContext()
-{
-	if (const auto AssemblyUtilMonoClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),
-	                                                            TCHAR_TO_ANSI(*CLASS_ASSEMBLY_UTIL)))
-	{
-		if (const auto DeinitializeMonoMethod = Class_Get_Method_From_Name(
-			AssemblyUtilMonoClass, FUNCTION_ASSEMBLY_UTIL_DEINITIALIZE, 0))
-		{
-			Runtime_Invoke(DeinitializeMonoMethod, nullptr, nullptr, nullptr);
-		}
-	}
-}
-
-void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
-{
-	if (const auto AssemblyUtilMonoClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),
-	                                                            TCHAR_TO_ANSI(*CLASS_ASSEMBLY_UTIL)))
-	{
-		void* Params[1];
-
-		if (const auto LoadMonoMethod = Class_Get_Method_From_Name(AssemblyUtilMonoClass, FUNCTION_ASSEMBLY_UTIL_LOAD,
-		                                                           TGetArrayLength(Params)))
-		{
-			for (const auto& AssemblyPath : InAssemblies)
-			{
-				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
-
-				if (auto Result = Runtime_Invoke(LoadMonoMethod, nullptr, Params, nullptr))
-				{
-					// @TODO
-					auto GCHandle = mono_gchandle_new_v2(Result, true);
-
-					AssemblyGCHandles.Add(GCHandle);
-
-					// @TODO
-					const auto ReflectionAssembly = (MonoReflectionAssembly*)mono_gchandle_get_target_v2(GCHandle);
-
-					auto Assembly = mono_reflection_assembly_get_assembly(ReflectionAssembly);
-
-					Assemblies.Add(Assembly);
-
-					Images.Add(mono_assembly_get_image(Assembly));
-				}
-			}
-		}
-	}
-}
-
-void FMonoDomain::UnloadAssembly()
-{
-	for (const auto GCHandle : AssemblyGCHandles)
-	{
-		mono_gchandle_free_v2(GCHandle);
-	}
-
-	AssemblyGCHandles.Reset();
-
-	for (const auto& Image : Images)
-	{
-		mono_image_close(Image);
-	}
-
-	Images.Reset();
-
-	Assemblies.Reset();
 }

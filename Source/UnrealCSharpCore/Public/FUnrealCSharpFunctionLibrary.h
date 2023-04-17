@@ -48,10 +48,6 @@ public:
 
 	static FString GetGameProxyPath();
 
-	static FString GetAssemblyUtilProjectName();
-
-	static FString GetAssemblyUtilPath();
-
 	static FString GetGenerationPath(const UField* InField);
 
 	static FString GetGenerationPath(const FString& InScriptPath);
