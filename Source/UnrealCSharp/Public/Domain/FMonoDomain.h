@@ -6,10 +6,14 @@ struct FMonoDomainInitializeParams
 {
 	FString Domain;
 
+	FString AssemblyUtil;
+
 	TArray<FString> Assemblies;
 
-	FMonoDomainInitializeParams(const FString& InDomain, const TArray<FString>& InAssemblies):
+	FMonoDomainInitializeParams(const FString& InDomain, const FString& InAssemblyUtil,
+	                            const TArray<FString>& InAssemblies):
 		Domain(InDomain),
+		AssemblyUtil(InAssemblyUtil),
 		Assemblies(InAssemblies)
 	{
 	}
@@ -119,10 +123,26 @@ private:
 
 	void RegisterBinding();
 
-private:
-	static MonoDomain* RootDomain;
+	void InitializeAssembly(const TArray<FString>& InAssemblies);
 
-	MonoDomain* Domain;
+	void DeinitializeAssembly();
+
+	void InitializeAssemblyLoadContext() const;
+
+	void DeinitializeAssemblyLoadContext();
+
+	void LoadAssembly(const TArray<FString>& InAssemblies);
+
+	void UnloadAssembly();
+
+private:
+	static MonoDomain* Domain;
+
+	static MonoAssembly* AssemblyUtilAssembly;
+
+	static MonoImage* AssemblyUtilImage;
+
+	TArray<MonoGCHandle> AssemblyGCHandles;
 
 	TArray<MonoAssembly*> Assemblies;
 
