@@ -26,4 +26,10 @@
 
 #define FUNCTION_UTILS_GET_TRACEBACK FString(TEXT("GetTraceback"))
 
+#define FUNCTION_ASSEMBLY_UTIL_INITIALIZE FString(TEXT("Initialize"))
+
+#define FUNCTION_ASSEMBLY_UTIL_DEINITIALIZE FString(TEXT("Deinitialize"))
+
+#define FUNCTION_ASSEMBLY_UTIL_LOAD FString(TEXT("Load"))
+
 #define FUNCTION_STATIC_STRUCT FString(TEXT("StaticStruct"))

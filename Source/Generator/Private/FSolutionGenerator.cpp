@@ -19,6 +19,11 @@ void FSolutionGenerator::Generator()
 		                FUnrealCSharpFunctionLibrary::GetGameProjectName() + PROJECT_SUFFIX),
 		TemplatePath / FUnrealCSharpFunctionLibrary::GetGameProjectName() + PROJECT_SUFFIX);
 
+	CopyCSProj(
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath(),
+		                FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + PROJECT_SUFFIX),
+		TemplatePath / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + PROJECT_SUFFIX);
+
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetBasePath(),
 		                FUnrealCSharpFunctionLibrary::GetBaseName() + SOLUTION_SUFFIX),
