@@ -151,22 +151,6 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, cons
 	return mono_class_get_method_from_name(InMonoClass, TCHAR_TO_ANSI(*InFunctionName), InParamCount);
 }
 
-MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
-                                                           const int32 InParamCount) const
-{
-	while (InMonoClass != nullptr)
-	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, InFunctionName, InParamCount))
-		{
-			return FoundMethod;
-		}
-
-		InMonoClass = mono_class_get_parent(InMonoClass);
-	}
-
-	return nullptr;
-}
-
 mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
                                             mono_bool bCheckInterfaces)
 {
@@ -368,6 +352,39 @@ MonoObject* FMonoDomain::GCHandle_Get_Target(const uint32 InGCHandle)
 void FMonoDomain::GCHandle_Free(const uint32 InGCHandle)
 {
 	mono_gchandle_free(InGCHandle);
+}
+
+MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
+                                                           const int32 InParamCount) const
+{
+	while (InMonoClass != nullptr)
+	{
+		if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, InFunctionName, InParamCount))
+		{
+			return FoundMethod;
+		}
+
+		InMonoClass = mono_class_get_parent(InMonoClass);
+	}
+
+	return nullptr;
+}
+
+MonoString* FMonoDomain::GetTraceback() const
+{
+	if (Domain != nullptr)
+	{
+		if (const auto FoundMonoClass = Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+		{
+			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_GET_TRACEBACK, 0))
+			{
+				return reinterpret_cast<MonoString*>(Runtime_Invoke(FoundMethod, nullptr, nullptr));
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 void FMonoDomain::RegisterMonoTrace()
