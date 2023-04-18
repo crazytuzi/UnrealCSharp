@@ -22,6 +22,20 @@ struct FRegisterDelegate
 
 static FRegisterDelegate RegisterDelegate;
 
+template <>
+auto FCSharpBind::BindImplementation<FDelegateHelper>(MonoObject* InMonoObject)
+{
+	if (FCSharpEnvironment::GetEnvironment()->GetDelegate<FDelegateHelper>(InMonoObject) == nullptr)
+	{
+		const auto FuncObj = NewObject<UDelegateHandler>();
+		FuncObj->AddToRoot();
+		const auto DelegateHelper = new FDelegateHelper(new FScriptDelegate(), FuncObj->FindFunction("CSharpCallBack"));
+		FCSharpEnvironment::GetEnvironment()->Bind(FuncObj);
+		FCSharpEnvironment::GetEnvironment()->AddDelegateReference(FuncObj, DelegateHelper, InMonoObject);
+	}
+	return true;
+}
+
 void FDelegateImplementation::Delegate_RegisterImplementation(MonoObject* InMonoObject)
 {
 	FCSharpEnvironment::GetEnvironment()->Bind<FDelegateHelper>(InMonoObject);
