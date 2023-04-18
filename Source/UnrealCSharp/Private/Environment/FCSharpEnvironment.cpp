@@ -2,6 +2,7 @@
 #include "Macro.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
+#include "Log/UnrealCSharpLog.h"
 #if WITH_EDITOR
 #include <signal.h>
 #endif
@@ -9,7 +10,7 @@
 #if WITH_EDITOR
 void SignalHandler(int32)
 {
-	UE_LOG(LogTemp, Error, TEXT("%s"),
+	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
 	       UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
 		       FCSharpEnvironment::GetEnvironment()->GetDomain()->GetTraceback())));
 
