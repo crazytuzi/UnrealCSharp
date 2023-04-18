@@ -41,6 +41,8 @@ public:
 
 	FName GetFunctionName() const;
 
+	UFunction* GetCallBack() const;
+
 private:
 	FScriptDelegate* ScriptDelegate;
 

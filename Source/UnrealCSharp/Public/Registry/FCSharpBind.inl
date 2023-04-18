@@ -31,7 +31,13 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 template <typename T>
 auto FCSharpBind::BindImplementation(MonoObject* InMonoObject)
 {
-	// @TODO
+	const auto Object = NewObject<typename T::UHandlerType>();
+
+	Object->AddToRoot();
+
+	const auto DelegateHelper = new T(new FScriptDelegate(), Object->GetCallBack());
+
+	FCSharpEnvironment::GetEnvironment()->AddDelegateReference(Object, DelegateHelper, InMonoObject);
 
 	return true;
 }

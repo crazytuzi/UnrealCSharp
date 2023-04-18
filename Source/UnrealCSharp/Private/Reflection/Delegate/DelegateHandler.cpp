@@ -2,7 +2,7 @@
 
 void UDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 {
-	if (Function != nullptr && Function->GetName() == "CSharpCallBack")
+	if (Function != nullptr && Function->GetName() == TEXT("CSharpCallBack"))
 	{
 		if (DelegateDescriptor != nullptr && Delegate != nullptr)
 		{
@@ -52,7 +52,7 @@ void UDelegateHandler::Bind(MonoObject* InDelegate)
 	{
 		if (!ScriptDelegate->IsBound())
 		{
-			ScriptDelegate->BindUFunction(this, "CSharpCallBack");
+			ScriptDelegate->BindUFunction(this, TEXT("CSharpCallBack"));
 		}
 	}
 
@@ -106,4 +106,9 @@ UObject* UDelegateHandler::GetUObject() const
 FName UDelegateHandler::GetFunctionName() const
 {
 	return ScriptDelegate != nullptr ? ScriptDelegate->GetFunctionName() : NAME_None;
+}
+
+UFunction* UDelegateHandler::GetCallBack() const
+{
+	return FindFunction(TEXT("CSharpCallBack"));
 }
