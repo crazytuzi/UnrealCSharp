@@ -35,7 +35,7 @@ namespace Script.CoreUObject
         
         public Boolean IsValid()
         {
-            return UKismetSystemLibrary.IsValid(this);
+            return ObjectImplementation.Object_IsValidImplementation(this);
         }
     }
 }
