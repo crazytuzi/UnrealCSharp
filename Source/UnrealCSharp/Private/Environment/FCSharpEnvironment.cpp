@@ -3,11 +3,8 @@
 #include "FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
-#if WITH_EDITOR
 #include <signal.h>
-#endif
 
-#if WITH_EDITOR
 void SignalHandler(int32)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
@@ -16,7 +13,6 @@ void SignalHandler(int32)
 
 	GLog->Flush();
 }
-#endif
 
 FCSharpEnvironment* FCSharpEnvironment::Environment = nullptr;
 
@@ -62,7 +58,6 @@ void FCSharpEnvironment::Initialize()
 	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
 		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
 
-#if WITH_EDITOR
 	static TSet<int32> SignalTypes = {
 		// interrupt
 		SIGINT,
@@ -84,7 +79,6 @@ void FCSharpEnvironment::Initialize()
 	{
 		signal(SignalType, SignalHandler);
 	}
-#endif
 }
 
 void FCSharpEnvironment::Deinitialize()
