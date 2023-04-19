@@ -7,6 +7,12 @@ namespace Script.Library
     public static class DelegateImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Delegate_RegisterImplementation(FDelegateBase InMonoObject);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Delegate_UnRegisterImplementation(FDelegateBase InMonoObject);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Delegate_BindImplementation<T>(FDelegateBase InMonoObject, T InDelegate)
             where T : System.Delegate;
 

@@ -7,6 +7,12 @@ auto FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InRe
 }
 
 template <typename T>
+auto FCSharpEnvironment::Bind(MonoObject* InMonoObject) const
+{
+	return FCSharpBind::Bind<T>(InMonoObject);
+}
+
+template <typename T>
 T* FCSharpEnvironment::TGetAddress<UObject, T>::operator()(const FCSharpEnvironment* InEnvironment,
                                                            const MonoObject* InMonoObject) const
 {

@@ -56,6 +56,23 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	FProperty* DelegateReturnParam = nullptr;
 
+	const auto ConstructorContent = FString::Printf(TEXT(
+		"\t\tpublic %s() => DelegateUtils.Delegate_Register(this);\n"
+		"\n"
+		"\t\tprivate %s(Type InValue)\n"
+		"\t\t{\n"
+		"\t\t}\n"
+	),
+	                                                *FullClassContent,
+	                                                *FullClassContent
+	);
+
+	const auto DestructorContent = FString::Printf(TEXT(
+		"\n\t\t~%s() => DelegateUtils.Delegate_UnRegister(this);\n"
+	),
+	                                               *FullClassContent
+	);
+
 	for (TFieldIterator<FProperty> ParamIterator(SignatureFunction); ParamIterator && (ParamIterator->PropertyFlags &
 		     CPF_Parm); ++ParamIterator)
 	{
@@ -297,6 +314,9 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		"\t{\n"
 		"%s"
 		"%s"
+		"\n"
+		"%s"
+		"%s"
 		"%s"
 		"%s"
 		"%s"
@@ -307,6 +327,8 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *NameSpaceContent,
 	                               *FullClassContent,
 	                               *SuperClassContent,
+	                               *ConstructorContent,
+	                               *DestructorContent,
 	                               *BindFunctionContent,
 	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
 	                               *ExecuteFunctionContent,

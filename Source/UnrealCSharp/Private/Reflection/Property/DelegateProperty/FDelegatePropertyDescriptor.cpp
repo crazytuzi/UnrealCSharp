@@ -2,6 +2,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Bridge/FTypeBridge.h"
+#include "Template/TGetArrayLength.h"
 
 void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -46,7 +47,14 @@ MonoObject* FDelegatePropertyDescriptor::Object_New(void* InAddress) const
 	const auto DelegateHelper = new FDelegateHelper(DelegateProperty->GetPropertyValuePtr(InAddress),
 	                                                DelegateProperty->SignatureFunction);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(FoundMonoClass);
+
+	const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(FoundMonoType);
+
+	auto InParams = static_cast<void*>(FoundReflectionType);
+
+	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
 	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetGarbageCollectionHandle(
 		InAddress, DelegateProperty->GetOffset_ForInternal());
