@@ -27,7 +27,7 @@ void FDelegateRegistry::Deinitialize()
 			Pair.Value.DelegateBaseHelper = nullptr;
 		}
 
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(Pair.Key);
+		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
 	GarbageCollectionHandle2DelegateAddress.Empty();
@@ -50,13 +50,12 @@ MonoObject* FDelegateRegistry::GetObject(const void* InAddress)
 
 bool FDelegateRegistry::AddReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New_WeakRef(
-		InMonoObject, false);
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, false);
 
 	DelegateAddress2GarbageCollectionHandle.Emplace(
 		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2DelegateAddress.Emplace(GarbageCollectionHandle,
+	GarbageCollectionHandle2DelegateAddress.Emplace(MoveTemp(GarbageCollectionHandle),
 	                                                FDelegateAddress{
 		                                                InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
 	                                                });
@@ -67,13 +66,12 @@ bool FDelegateRegistry::AddReference(void* InAddress, void* InDelegate, MonoObje
 bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
                                      MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_New(
-		InMonoObject, false);
+	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, false);
 
 	DelegateAddress2GarbageCollectionHandle.Emplace(
 		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2DelegateAddress.Emplace(GarbageCollectionHandle,
+	GarbageCollectionHandle2DelegateAddress.Emplace(MoveTemp(GarbageCollectionHandle),
 	                                                FDelegateAddress{
 		                                                InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
 	                                                });
@@ -115,7 +113,7 @@ bool FDelegateRegistry::RemoveReference(const void* InAddress)
 				Pair.Key.DelegateBaseHelper = nullptr;
 			}
 
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->GCHandle_Free(Pair.Value);
+			FGarbageCollectionHandle::Free(Pair.Value);
 
 			GarbageCollectionHandle2DelegateAddress.Remove(Pair.Value);
 

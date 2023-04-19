@@ -12,11 +12,6 @@ void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 	}
 }
 
-void FObjectPropertyDescriptor::Set(void** Src, void* Dest) const
-{
-	Set(*reinterpret_cast<MonoObject**>(Src), Dest);
-}
-
 void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (ObjectProperty != nullptr)

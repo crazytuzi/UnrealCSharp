@@ -5,6 +5,9 @@
 class UNREALCSHARPCORE_API FUnrealCSharpFunctionLibrary
 {
 public:
+	static FString GetCompileTool(const FString& ProductLineVersion = FString("2022"));
+
+public:
 	static FString GetModuleName(const UField* InField);
 
 	static FString GetFullClass(const UStruct* InStruct);
@@ -45,11 +48,17 @@ public:
 
 	static FString GetGameProxyPath();
 
+	static FString GetAssemblyUtilProjectName();
+
+	static FString GetAssemblyUtilPath();
+
 	static FString GetGenerationPath(const UField* InField);
 
 	static FString GetGenerationPath(const FString& InScriptPath);
 
 	static FString GetScriptPath();
+
+	static FString GetCodeAnalysisPath();
 
 private:
 	static TArray<FString>& GetGameModuleList();

@@ -3,6 +3,70 @@
 #include "Misc/FileHelper.h"
 #include "NameEncode.h"
 
+FString FUnrealCSharpFunctionLibrary::GetCompileTool(const FString& ProductLineVersion)
+{
+	static FString CompileTool;
+
+	if (!CompileTool.IsEmpty())
+	{
+		return CompileTool;
+	}
+
+	void* ReadPipe = nullptr;
+
+	void* WritePipe = nullptr;
+
+	auto OutProcessID = 0u;
+
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+
+	const auto ProcessHandle = FPlatformProcess::CreateProc(
+		TEXT("C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe"),
+		TEXT("-legacy -prerelease -format json"),
+		false,
+		true,
+		true,
+		&OutProcessID,
+		1,
+		nullptr,
+		WritePipe,
+		ReadPipe);
+
+	FString Result;
+
+	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	{
+		FPlatformProcess::Sleep(0.01f);
+
+		auto Line = FPlatformProcess::ReadPipe(ReadPipe);
+
+		if (Line.Len() > 0)
+		{
+			Result += Line;
+		}
+	}
+
+	Result = Result.Replace(TEXT("\r\n"), TEXT(""));
+
+	TArray<TSharedPtr<FJsonValue>> OutArray;
+
+	const auto Reader = TJsonReaderFactory<>::Create(Result);
+
+	FJsonSerializer::Deserialize(Reader, OutArray);
+
+	for (const auto& Elem : OutArray)
+	{
+		if (Elem->AsObject()->GetObjectField("catalog")->GetStringField("productLineVersion") == ProductLineVersion)
+		{
+			CompileTool = Elem->AsObject()->GetStringField("productPath");
+
+			return CompileTool;
+		}
+	}
+
+	return TEXT("");
+}
+
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
 	if (InField == nullptr)
@@ -39,8 +103,8 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 	return FNameEncode::Encode(FString::Printf(TEXT(
 		"%s%s"
 	),
-	                       InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""),
-	                       *InStruct->GetName()));
+	                                           InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""),
+	                                           *InStruct->GetName()));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
@@ -48,7 +112,7 @@ FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
 	return FNameEncode::Encode(FString::Printf(TEXT(
 		"I%s"
 	),
-	                       *GetFullClass(InStruct).RightChop(1)));
+	                                           *GetFullClass(InStruct).RightChop(1)));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
@@ -325,6 +389,16 @@ FString FUnrealCSharpFunctionLibrary::GetGameProxyPath()
 	return FPaths::Combine(GetGamePath(), TEXT("Proxy"));
 }
 
+FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
+{
+	return TEXT("AssemblyUtil");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath()
+{
+	return FPaths::Combine(GetBasePath(), GetAssemblyUtilProjectName());
+}
+
 FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const UField* InField)
 {
 	if (InField == nullptr || InField->GetPackage() == nullptr)
@@ -361,6 +435,11 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 FString FUnrealCSharpFunctionLibrary::GetScriptPath()
 {
 	return FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), SCRIPT));
+}
+
+FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
+{
+	return FPaths::Combine(FPaths::ProjectIntermediateDir(), CODE_ANALYSIS);
 }
 
 TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()

@@ -12,7 +12,7 @@ FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 
 bool FCSharpCompilerRunnable::Init()
 {
-	CompileTool = GetCompileTool();
+	CompileTool = FUnrealCSharpFunctionLibrary::GetCompileTool();
 
 	Event = FPlatformProcess::CreateSynchEvent(true);
 
@@ -210,59 +210,4 @@ void FCSharpCompilerRunnable::Pdb2Mdb()
 			FPlatformProcess::Sleep(0.01f);
 		}
 	}
-}
-
-FString FCSharpCompilerRunnable::GetCompileTool(const FString& ProductLineVersion)
-{
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
-
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
-
-	const auto ProcessHandle = FPlatformProcess::CreateProc(
-		TEXT("C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe"),
-		TEXT("-legacy -prerelease -format json"),
-		false,
-		true,
-		true,
-		&OutProcessID,
-		1,
-		nullptr,
-		WritePipe,
-		ReadPipe);
-
-	FString Result;
-
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
-	{
-		FPlatformProcess::Sleep(0.01f);
-
-		auto Line = FPlatformProcess::ReadPipe(ReadPipe);
-
-		if (Line.Len() > 0)
-		{
-			Result += Line;
-		}
-	}
-
-	Result = Result.Replace(TEXT("\r\n"), TEXT(""));
-
-	TArray<TSharedPtr<FJsonValue>> OutArray;
-
-	const auto Reader = TJsonReaderFactory<>::Create(Result);
-
-	FJsonSerializer::Deserialize(Reader, OutArray);
-
-	for (const auto& Elem : OutArray)
-	{
-		if (Elem->AsObject()->GetObjectField("catalog")->GetStringField("productLineVersion") == ProductLineVersion)
-		{
-			return Elem->AsObject()->GetStringField("productPath");
-		}
-	}
-
-	return TEXT("");
 }
