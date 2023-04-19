@@ -40,6 +40,8 @@ public:
 	bool AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
 	                  MonoObject* InMonoObject);
 
+	bool RemoveReference(const MonoObject* InMonoObject);
+
 	bool RemoveReference(const void* InAddress);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);

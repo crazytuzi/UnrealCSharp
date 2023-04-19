@@ -6,6 +6,9 @@
 class FDelegateHelper final : public FDelegateBaseHelper
 {
 public:
+	typedef UDelegateHandler UHandlerType;
+
+public:
 	FDelegateHelper(FScriptDelegate* InDelegate, UFunction* InSignatureFunction);
 
 	virtual ~FDelegateHelper() override;

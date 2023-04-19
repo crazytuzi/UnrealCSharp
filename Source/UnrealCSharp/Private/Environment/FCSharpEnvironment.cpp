@@ -460,6 +460,11 @@ bool FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& In
 		       : false;
 }
 
+bool FCSharpEnvironment::RemoveDelegateReference(const MonoObject* InMonoObject) const
+{
+	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InMonoObject) : false;
+}
+
 bool FCSharpEnvironment::RemoveDelegateReference(const void* InAddress) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InAddress) : false;

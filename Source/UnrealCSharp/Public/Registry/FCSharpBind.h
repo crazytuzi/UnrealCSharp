@@ -22,6 +22,9 @@ public:
 
 	static bool Bind(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName);
 
+	template <typename T>
+	static auto Bind(MonoObject* InMonoObject);
+
 private:
 	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
@@ -39,6 +42,9 @@ private:
 	                               MonoReflectionType* InValueReflectionType);
 
 	static bool BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName);
+
+	template <typename T>
+	static auto BindImplementation(MonoObject* InMonoObject);
 
 private:
 	static bool CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct);
