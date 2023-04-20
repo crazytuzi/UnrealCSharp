@@ -20,6 +20,8 @@ public:
 
 	int32 Num() const;
 
+	int32 GetMaxIndex() const;
+
 	void Add(void* InValue) const;
 
 	int32 Remove(const void* InValue) const;

@@ -14,6 +14,7 @@ struct FRegisterSet
 			.Function("UnRegister", static_cast<void*>(FSetImplementation::Set_UnRegisterImplementation))
 			.Function("Empty", static_cast<void*>(FSetImplementation::Set_EmptyImplementation))
 			.Function("Num", static_cast<void*>(FSetImplementation::Set_NumImplementation))
+			.Function("GetMaxIndex", static_cast<void*>(FSetImplementation::Set_GetMaxIndexImplementation))
 			.Function("Add", static_cast<void*>(FSetImplementation::Set_AddImplementation))
 			.Function("Remove", static_cast<void*>(FSetImplementation::Set_RemoveImplementation))
 			.Function("Contains", static_cast<void*>(FSetImplementation::Set_ContainsImplementation))
@@ -49,6 +50,16 @@ int32 FSetImplementation::Set_NumImplementation(const MonoObject* InMonoObject)
 	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
 	{
 		return SetHelper->Num();
+	}
+
+	return 0;
+}
+
+int32 FSetImplementation::Set_GetMaxIndexImplementation(const MonoObject* InMonoObject)
+{
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	{
+		return SetHelper->GetMaxIndex();
 	}
 
 	return 0;
