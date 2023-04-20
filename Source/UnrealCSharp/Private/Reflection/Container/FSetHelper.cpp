@@ -1,4 +1,6 @@
 ﻿#include "Reflection/Container/FSetHelper.h"
+
+#include "AITypes.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
 FSetHelper::FSetHelper(FProperty* InProperty, void* InData):
@@ -67,6 +69,11 @@ void FSetHelper::Empty(const int32 InExpectedNumElements) const
 int32 FSetHelper::Num() const
 {
 	return ScriptSet->Num();
+}
+
+int32 FSetHelper::GetMaxIndex() const
+{
+	return ScriptSet->GetMaxIndex();
 }
 
 void FSetHelper::Add(void* InValue) const

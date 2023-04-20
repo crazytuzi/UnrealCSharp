@@ -13,6 +13,8 @@ public:
 
 	static int32 Set_NumImplementation(const MonoObject* InMonoObject);
 
+	static int32 Set_GetMaxIndexImplementation(const MonoObject* InMonoObject);
+
 	static void Set_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
 	static int32 Set_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
