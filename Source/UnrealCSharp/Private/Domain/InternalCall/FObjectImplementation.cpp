@@ -75,5 +75,6 @@ bool FObjectImplementation::Object_IsValidImplementation(const MonoObject* InMon
 	{
 		return IsValid(FoundObject);
 	}
+
 	return false;
 }

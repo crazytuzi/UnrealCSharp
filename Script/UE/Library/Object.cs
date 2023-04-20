@@ -32,7 +32,7 @@ namespace Script.CoreUObject
         {
             return GetName().ToString();
         }
-        
+
         public Boolean IsValid()
         {
             return ObjectImplementation.Object_IsValidImplementation(this);

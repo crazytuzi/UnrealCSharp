@@ -18,7 +18,7 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Object_GetWorldImplementation(UObject InObject, out UWorld OutValue);
-        
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool Object_IsValidImplementation(UObject InObject);
     }
