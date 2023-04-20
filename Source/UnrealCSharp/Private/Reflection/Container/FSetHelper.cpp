@@ -71,6 +71,11 @@ int32 FSetHelper::Num() const
 	return ScriptSet->Num();
 }
 
+int32 FSetHelper::GetMaxIndex() const
+{
+	return ScriptSet->GetMaxIndex();
+}
+
 void FSetHelper::Add(void* InValue) const
 {
 	auto ValueIndex = static_cast<int32>(INDEX_NONE);
@@ -177,19 +182,3 @@ void* FSetHelper::GetEnumerator(const int32 InIndex) const
 		       ? static_cast<uint8*>(ScriptSet->GetData(InIndex, ScriptSetLayout))
 		       : nullptr;
 }
-
-void FSetHelper::SetEnumerator(int32 Index,void* Value) const
-{
-	auto ScriptSetHelper = CreateHelperFormInnerProperty();
-	
-	if(ScriptSetHelper.IsValidIndex(Index))
-	{
-		ElementPropertyDescriptor->Set(Value,ScriptSetHelper.GetElementPtr(Index));
-	}
-}
-
-int32 FSetHelper::GetMaxIndex() const
-{
-	return ScriptSet->GetMaxIndex();
-}
-

@@ -13,6 +13,8 @@ public:
 
 	static int32 Set_NumImplementation(const MonoObject* InMonoObject);
 
+	static int32 Set_GetMaxIndexImplementation(const MonoObject* InMonoObject);
+
 	static void Set_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
 
 	static int32 Set_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue);
@@ -22,8 +24,4 @@ public:
 	static bool Set_IsValidIndexImplementation(const MonoObject* InMonoObject, int32 InIndex);
 
 	static void Set_GetEnumeratorImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject** OutValue);
-
-	static void Set_SetEnumeratorImplementation(const MonoObject* InMonoObject, int32 InIndex, MonoObject* Value);
-	
-	static int32 Set_GetMaxIndexImplementation(const MonoObject* InMonoObject);
 };

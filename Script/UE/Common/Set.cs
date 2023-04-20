@@ -29,6 +29,8 @@ namespace Script.Common
 
         public Int32 Num() => SetUtils.Set_Num(this);
 
+        public Int32 GetMaxIndex() => SetUtils.Set_GetMaxIndex(this);
+
         public void Add(T InValue) => SetUtils.Set_Add(this, InValue);
 
         public Int32 Remove(T InValue) => SetUtils.Set_Remove(this, InValue);
@@ -37,15 +39,6 @@ namespace Script.Common
 
         private Boolean IsValidIndex(Int32 InIndex) => SetUtils.Set_IsValidIndex(this, InIndex);
 
-        public T this[Int32 InIndex]
-        {
-            get => SetUtils.Set_GetEnumerator(this, InIndex);
-
-            set => SetUtils.Set_SetEnumerator(this, InIndex, value);
-
-            //set => SetUtils.Set_SetEnumerator(this, InIndex, value);
-        }
-
-        public Int32 GetMaxIndex() => SetUtils.Set_GetMaxIndex(this);
+        private T this[Int32 InIndex] => SetUtils.Set_GetEnumerator(this, InIndex);
     }
 }

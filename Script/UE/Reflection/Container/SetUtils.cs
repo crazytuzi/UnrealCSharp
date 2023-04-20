@@ -18,6 +18,9 @@ namespace Script.Reflection.Container
         public static Int32 Set_Num<T>(TSet<T> InSet) =>
             SetImplementation.Set_NumImplementation(InSet);
 
+        public static Int32 Set_GetMaxIndex<T>(TSet<T> InSet) =>
+            SetImplementation.Set_GetMaxIndexImplementation(InSet);
+
         public static void Set_Add<T>(TSet<T> InSet, T InValue) =>
             SetImplementation.Set_AddImplementation(InSet, InValue);
 
@@ -36,11 +39,5 @@ namespace Script.Reflection.Container
 
             return (T) OutValue;
         }
-        
-        public static void Set_SetEnumerator<T>(TSet<T> InSet, Int32 InIndex,T value) =>
-            SetImplementation.Set_SetEnumeratorImplementation(InSet, InIndex,value);
-        
-        public static Int32 Set_GetMaxIndex<T>(TSet<T> InSet) =>
-            SetImplementation.Set_GetMaxIndexImplementation(InSet);
     }
 }
