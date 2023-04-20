@@ -13,6 +13,7 @@ struct FRegisterObject
 			.Function("GetClass", static_cast<void*>(FObjectImplementation::Object_GetClassImplementation))
 			.Function("GetName", static_cast<void*>(FObjectImplementation::Object_GetNameImplementation))
 			.Function("GetWorld", static_cast<void*>(FObjectImplementation::Object_GetWorldImplementation))
+			.Function("IsValid", static_cast<void*>(FObjectImplementation::Object_IsValidImplementation))
 			.Register();
 	}
 };
@@ -66,4 +67,14 @@ void FObjectImplementation::Object_GetWorldImplementation(const MonoObject* InMo
 
 		*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(World);
 	}
+}
+
+bool FObjectImplementation::Object_IsValidImplementation(const MonoObject* InMonoObject)
+{
+	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject))
+	{
+		return IsValid(FoundObject);
+	}
+
+	return false;
 }
