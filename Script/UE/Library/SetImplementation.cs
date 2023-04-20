@@ -32,5 +32,12 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern T Set_GetEnumeratorImplementation<T>(TSet<T> InSet, Int32 Index, out Object OutValue);
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Set_SetEnumeratorImplementation<T>(TSet<T> InSet, Int32 Index, T OutValue);
+        
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Int32 Set_GetMaxIndexImplementation<T>(TSet<T> InSet);
+        
     }
 }

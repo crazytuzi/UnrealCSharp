@@ -29,10 +29,19 @@ public:
 	FPropertyDescriptor* GetElementPropertyDescriptor() const;
 
 	FScriptSet* GetScriptSet() const;
+	
+	FORCEINLINE FScriptSetHelper CreateHelperFormInnerProperty() const
+	{
+		return FScriptSetHelper::CreateHelperFormElementProperty(ElementPropertyDescriptor->GetProperty(), ScriptSet);
+	}
 
 	bool IsValidIndex(int32 InIndex) const;
 
 	void* GetEnumerator(int32 InIndex) const;
+
+	void SetEnumerator(int32 Index,void* Value) const;
+	
+	int32 GetMaxIndex() const;
 
 private:
 	FPropertyDescriptor* ElementPropertyDescriptor;
