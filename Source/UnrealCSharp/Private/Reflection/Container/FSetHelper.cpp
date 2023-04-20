@@ -1,6 +1,4 @@
 ﻿#include "Reflection/Container/FSetHelper.h"
-
-#include "AITypes.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
 FSetHelper::FSetHelper(FProperty* InProperty, void* InData):
