@@ -20,15 +20,15 @@ static FRegisterWorld RegisterWorld;
 void FWorldImplementation::World_SpawnActorImplementation(const MonoObject* InMonoObject, const MonoObject* Class,
                                                           const MonoObject* Transform, MonoObject** OutValue)
 {
-	if (const auto FoundWorld = FCSharpEnvironment::GetEnvironment()->GetObject<UWorld>(InMonoObject))
+	if (const auto FoundWorld = FCSharpEnvironment::GetEnvironment().GetObject<UWorld>(InMonoObject))
 	{
-		const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetObject<UClass>(Class);
+		const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(Class);
 
-		const auto FoundTransform = FCSharpEnvironment::GetEnvironment()->GetAddress<
+		const auto FoundTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
 			UScriptStruct, FTransform>(Transform);
 
 		const auto Actor = FoundWorld->SpawnActor(FoundClass, FoundTransform);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Actor);
+		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Actor);
 	}
 }

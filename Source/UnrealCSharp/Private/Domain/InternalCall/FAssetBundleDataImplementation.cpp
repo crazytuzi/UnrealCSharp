@@ -29,9 +29,9 @@ static FRegisterAssetBundleData RegisterAssetBundleData;
 
 bool FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto AssetBundleDataA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FAssetBundleData>(A);
+	const auto AssetBundleDataA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(A);
 
-	const auto AssetBundleDataB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FAssetBundleData>(B);
+	const auto AssetBundleDataB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(B);
 
 	if (AssetBundleDataA != nullptr && AssetBundleDataB != nullptr)
 	{
@@ -43,9 +43,9 @@ bool FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation(cons
 
 bool FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto AssetBundleDataA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FAssetBundleData>(A);
+	const auto AssetBundleDataA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(A);
 
-	const auto AssetBundleDataB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FAssetBundleData>(B);
+	const auto AssetBundleDataB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(B);
 
 	if (AssetBundleDataA != nullptr && AssetBundleDataB != nullptr)
 	{
@@ -58,24 +58,24 @@ bool FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation(co
 void FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation(
 	const MonoObject* InMonoObject, MonoObject* SearchName, MonoObject** OutValue)
 {
-	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleData>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FAssetBundleEntry)),
 		CLASS_SCRIPT_STRUCT_NAME(FAssetBundleEntry));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutAssetBundleEntry = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutAssetBundleEntry = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleEntry>(NewMonoObject);
 
 	if (AssetBundleData != nullptr && OutAssetBundleEntry != nullptr)
 	{
 		*OutAssetBundleEntry = *AssetBundleData->FindEntry(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(SearchName, nullptr))));
 	}
 }
@@ -83,24 +83,24 @@ void FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation(
 void FAssetBundleDataImplementation::AssetBundleData_AddBundleAssetImplementation(
 	const MonoObject* InMonoObject, MonoObject* BundleName, const MonoObject* AssetPath)
 {
-	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleData>(InMonoObject);
 
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (AssetBundleData != nullptr && SoftObjectPath != nullptr)
 	{
 		AssetBundleData->AddBundleAsset(
 			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 					GetDomain()->Object_To_String(BundleName, nullptr))), *SoftObjectPath);
 	}
 }
 
 void FAssetBundleDataImplementation::AssetBundleData_ResetImplementation(const MonoObject* InMonoObject)
 {
-	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleData>(InMonoObject);
 
 	if (AssetBundleData != nullptr)
@@ -112,20 +112,20 @@ void FAssetBundleDataImplementation::AssetBundleData_ResetImplementation(const M
 void FAssetBundleDataImplementation::AssetBundleData_ToDebugStringImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleData>(InMonoObject);
 
 	if (AssetBundleData != nullptr)
 	{
 		const auto ResultString = AssetBundleData->ToDebugString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;

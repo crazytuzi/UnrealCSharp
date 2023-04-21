@@ -7,7 +7,7 @@ void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (LazyObjectProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetMultiObject<TLazyObjectPtr<UObject>>(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TLazyObjectPtr<UObject>>(Src);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -24,9 +24,9 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcMulti = FCSharpEnvironment::GetEnvironment()->GetMulti<TLazyObjectPtr<UObject>>(SrcMonoObject);
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TLazyObjectPtr<UObject>>(Dest);
+		FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(Dest);
 
 		LazyObjectProperty->InitializeValue(Dest);
 
@@ -42,7 +42,7 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 	{
 		const auto ObjectA = LazyObjectProperty->GetObjectPropertyValue(A);
 
-		const auto ObjectB = FCSharpEnvironment::GetEnvironment()->GetMulti<TLazyObjectPtr<UObject>>(
+		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
 			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
 
 #if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
@@ -61,9 +61,9 @@ MonoObject* FLazyObjectPropertyDescriptor::Object_New(void* InAddress) const
 
 	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(LazyObjectProperty);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(GenericClassMonoClass);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TLazyObjectPtr<UObject>>(InAddress, Object, SrcObject);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(InAddress, Object, SrcObject);
 
 	return Object;
 }

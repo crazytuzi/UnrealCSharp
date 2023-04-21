@@ -8,22 +8,34 @@
 void SignalHandler(int32)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
-	       UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-		       FCSharpEnvironment::GetEnvironment()->GetDomain()->GetTraceback())));
+	       UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback())));
 
 	GLog->Flush();
 }
 
-FCSharpEnvironment* FCSharpEnvironment::Environment = nullptr;
+FCSharpEnvironment FCSharpEnvironment::Environment;
 
 FCSharpEnvironment::FCSharpEnvironment()
 {
-	Initialize();
+	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.AddRaw(
+		this, &FCSharpEnvironment::OnUnrealCSharpModuleActive);
+
+	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
+		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
 
 FCSharpEnvironment::~FCSharpEnvironment()
 {
-	Deinitialize();
+	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
+	{
+		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+	}
+
+	if (OnUnrealCSharpModuleActiveDelegateHandle.IsValid())
+	{
+		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.Remove(OnUnrealCSharpModuleActiveDelegateHandle);
+	}
 }
 
 void FCSharpEnvironment::Initialize()
@@ -53,9 +65,6 @@ void FCSharpEnvironment::Initialize()
 	DelegateRegistry = new FDelegateRegistry();
 
 	MultiRegistry = new FMultiRegistry();
-
-	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
-		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 
 	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
 		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
@@ -90,11 +99,6 @@ void FCSharpEnvironment::Deinitialize()
 	if (OnAsyncLoadingFlushUpdateHandle.IsValid())
 	{
 		FCoreDelegates::OnAsyncLoadingFlushUpdate.Remove(OnAsyncLoadingFlushUpdateHandle);
-	}
-
-	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
-	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
 	}
 
 	if (MultiRegistry != nullptr)
@@ -154,13 +158,8 @@ void FCSharpEnvironment::Deinitialize()
 	}
 }
 
-FCSharpEnvironment* FCSharpEnvironment::GetEnvironment()
+FCSharpEnvironment& FCSharpEnvironment::GetEnvironment()
 {
-	if (Environment == nullptr)
-	{
-		Environment = new FCSharpEnvironment();
-	}
-
 	return Environment;
 }
 
@@ -205,14 +204,14 @@ void FCSharpEnvironment::OnUObjectArrayShutdown()
 {
 }
 
+void FCSharpEnvironment::OnUnrealCSharpModuleActive()
+{
+	Initialize();
+}
+
 void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 {
-	if (Environment != nullptr)
-	{
-		delete Environment;
-
-		Environment = nullptr;
-	}
+	Deinitialize();
 }
 
 void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()

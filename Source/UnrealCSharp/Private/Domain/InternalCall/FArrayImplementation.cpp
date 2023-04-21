@@ -45,18 +45,18 @@ static FRegisterArray RegisterArray;
 
 void FArrayImplementation::Array_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->Bind<FArrayHelper>(InMonoObject,
+	FCSharpEnvironment::GetEnvironment().Bind<FArrayHelper>(InMonoObject,
 	                                                         FTypeBridge::GetGenericArgument(InMonoObject));
 }
 
 void FArrayImplementation::Array_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(InMonoObject);
+	FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
 }
 
 int32 FArrayImplementation::Array_GetTypeSizeImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->GetTypeSize();
 	}
@@ -66,7 +66,7 @@ int32 FArrayImplementation::Array_GetTypeSizeImplementation(const MonoObject* In
 
 int32 FArrayImplementation::Array_GetSlackImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->GetSlack();
 	}
@@ -76,7 +76,7 @@ int32 FArrayImplementation::Array_GetSlackImplementation(const MonoObject* InMon
 
 bool FArrayImplementation::Array_IsValidIndexImplementation(const MonoObject* InMonoObject, const int32 InIndex)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->IsValidIndex(InIndex);
 	}
@@ -86,7 +86,7 @@ bool FArrayImplementation::Array_IsValidIndexImplementation(const MonoObject* In
 
 int32 FArrayImplementation::Array_NumImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->Num();
 	}
@@ -96,7 +96,7 @@ int32 FArrayImplementation::Array_NumImplementation(const MonoObject* InMonoObje
 
 int32 FArrayImplementation::Array_MaxImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->Max();
 	}
@@ -107,13 +107,13 @@ int32 FArrayImplementation::Array_MaxImplementation(const MonoObject* InMonoObje
 void FArrayImplementation::Array_GetImplementation(const MonoObject* InMonoObject, const int32 InIndex,
                                                    MonoObject** OutValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		const auto Value = ArrayHelper->Get(InIndex);
 
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 				FTypeBridge::GetMonoClass(ArrayHelper->GetInnerPropertyDescriptor()->GetProperty()), Value);
 		}
 		else
@@ -126,11 +126,11 @@ void FArrayImplementation::Array_GetImplementation(const MonoObject* InMonoObjec
 void FArrayImplementation::Array_SetImplementation(const MonoObject* InMonoObject, const int32 InIndex,
                                                    MonoObject* InValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			ArrayHelper->Set(InIndex, FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			ArrayHelper->Set(InIndex, FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -141,11 +141,11 @@ void FArrayImplementation::Array_SetImplementation(const MonoObject* InMonoObjec
 
 int32 FArrayImplementation::Array_FindImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return ArrayHelper->Find(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return ArrayHelper->Find(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -158,11 +158,11 @@ int32 FArrayImplementation::Array_FindImplementation(const MonoObject* InMonoObj
 
 int32 FArrayImplementation::Array_FindLastImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return ArrayHelper->FindLast(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return ArrayHelper->FindLast(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -175,11 +175,11 @@ int32 FArrayImplementation::Array_FindLastImplementation(const MonoObject* InMon
 
 bool FArrayImplementation::Array_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return ArrayHelper->Contains(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return ArrayHelper->Contains(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -192,7 +192,7 @@ bool FArrayImplementation::Array_ContainsImplementation(const MonoObject* InMono
 
 int32 FArrayImplementation::Array_AddUninitializedImplementation(const MonoObject* InMonoObject, const int32 InCount)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->AddUninitialized(InCount);
 	}
@@ -203,7 +203,7 @@ int32 FArrayImplementation::Array_AddUninitializedImplementation(const MonoObjec
 void FArrayImplementation::Array_InsertZeroedImplementation(const MonoObject* InMonoObject, const int32 InIndex,
                                                             const int32 InCount)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		ArrayHelper->InsertZeroed(InIndex, InCount);
 	}
@@ -212,7 +212,7 @@ void FArrayImplementation::Array_InsertZeroedImplementation(const MonoObject* In
 void FArrayImplementation::Array_InsertDefaultedImplementation(const MonoObject* InMonoObject, const int32 InIndex,
                                                                const int32 InCount)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		ArrayHelper->InsertDefaulted(InIndex, InCount);
 	}
@@ -221,7 +221,7 @@ void FArrayImplementation::Array_InsertDefaultedImplementation(const MonoObject*
 void FArrayImplementation::Array_RemoveAtImplementation(const MonoObject* InMonoObject, const int32 InIndex,
                                                         const int32 InCount, const bool bAllowShrinking)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		ArrayHelper->RemoveAt(InIndex, InCount, bAllowShrinking);
 	}
@@ -229,7 +229,7 @@ void FArrayImplementation::Array_RemoveAtImplementation(const MonoObject* InMono
 
 void FArrayImplementation::Array_ResetImplementation(const MonoObject* InMonoObject, const int32 InNewSize)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->Reset(InNewSize);
 	}
@@ -237,7 +237,7 @@ void FArrayImplementation::Array_ResetImplementation(const MonoObject* InMonoObj
 
 void FArrayImplementation::Array_EmptyImplementation(const MonoObject* InMonoObject, const int32 InSlack)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->Empty(InSlack);
 	}
@@ -246,7 +246,7 @@ void FArrayImplementation::Array_EmptyImplementation(const MonoObject* InMonoObj
 void FArrayImplementation::Array_SetNumImplementation(const MonoObject* InMonoObject, const int32 InNewNum,
                                                       const bool bAllowShrinking)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->SetNum(InNewNum, bAllowShrinking);
 	}
@@ -254,11 +254,11 @@ void FArrayImplementation::Array_SetNumImplementation(const MonoObject* InMonoOb
 
 int32 FArrayImplementation::Array_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return ArrayHelper->Add(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return ArrayHelper->Add(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -271,7 +271,7 @@ int32 FArrayImplementation::Array_AddImplementation(const MonoObject* InMonoObje
 
 int32 FArrayImplementation::Array_AddZeroedImplementation(const MonoObject* InMonoObject, const int32 InCount)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->AddZeroed(InCount);
 	}
@@ -281,11 +281,11 @@ int32 FArrayImplementation::Array_AddZeroedImplementation(const MonoObject* InMo
 
 int32 FArrayImplementation::Array_AddUniqueImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return ArrayHelper->AddUnique(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return ArrayHelper->AddUnique(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -298,11 +298,11 @@ int32 FArrayImplementation::Array_AddUniqueImplementation(const MonoObject* InMo
 
 int32 FArrayImplementation::Array_RemoveSingleImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return ArrayHelper->RemoveSingle(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return ArrayHelper->RemoveSingle(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -315,11 +315,11 @@ int32 FArrayImplementation::Array_RemoveSingleImplementation(const MonoObject* I
 
 int32 FArrayImplementation::Array_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return ArrayHelper->Remove(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return ArrayHelper->Remove(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -334,7 +334,7 @@ void FArrayImplementation::Array_SwapMemoryImplementation(const MonoObject* InMo
                                                           const int32 InFirstIndexToSwap,
                                                           const int32 InSecondIndexToSwap)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap);
 	}
@@ -343,7 +343,7 @@ void FArrayImplementation::Array_SwapMemoryImplementation(const MonoObject* InMo
 void FArrayImplementation::Array_SwapImplementation(const MonoObject* InMonoObject, const int32 InFirstIndexToSwap,
                                                     const int32 InSecondIndexToSwap)
 {
-	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(InMonoObject))
+	if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InMonoObject))
 	{
 		return ArrayHelper->Swap(InFirstIndexToSwap, InSecondIndexToSwap);
 	}

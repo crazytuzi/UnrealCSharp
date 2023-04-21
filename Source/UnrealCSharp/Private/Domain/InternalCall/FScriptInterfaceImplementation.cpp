@@ -23,10 +23,10 @@ static FRegisterScriptInterface RegisterScriptInterface;
 void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(
 	MonoObject* InMonoObject, const MonoObject* InObject, MonoString* InInterfaceName)
 {
-	const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InObject);
+	const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
 	const auto InterfaceName = UTF8_TO_TCHAR(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InInterfaceName));
+		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InInterfaceName));
 
 	const auto InterfaceClass = LoadClass<UInterface>(nullptr, InterfaceName);
 
@@ -36,19 +36,19 @@ void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(
 
 	ScriptInterface.SetInterface(static_cast<IInterface*>(FoundObject->GetInterfaceAddress(InterfaceClass)));
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TScriptInterface<
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<
 		IInterface>>(InMonoObject, ScriptInterface);
 }
 
 void FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TScriptInterface<IInterface>>(InMonoObject);
+	FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(InMonoObject);
 }
 
 void FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation(const MonoObject* InMonoObject,
                                                                              MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment()->GetMulti<TScriptInterface<IInterface>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(InMonoObject);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Multi.GetObject());
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi.GetObject());
 }

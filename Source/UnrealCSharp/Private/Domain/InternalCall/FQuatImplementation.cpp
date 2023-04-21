@@ -80,19 +80,19 @@ static FRegisterQuat RegisterQuat;
 
 void FQuatImplementation::Quat_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
 {
-	const auto QuatA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(A);
+	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
-	const auto QuatB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(B);
+	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (QuatA != nullptr && QuatB != nullptr && OutQuat != nullptr)
 	{
@@ -102,19 +102,19 @@ void FQuatImplementation::Quat_AddImplementation(const MonoObject* A, const Mono
 
 void FQuatImplementation::Quat_SubtractImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
 {
-	const auto QuatA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(A);
+	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
-	const auto QuatB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(B);
+	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (QuatA != nullptr && QuatB != nullptr && OutQuat != nullptr)
 	{
@@ -124,9 +124,9 @@ void FQuatImplementation::Quat_SubtractImplementation(const MonoObject* A, const
 
 bool FQuatImplementation::Quat_EqualsImplementation(const MonoObject* A, const MonoObject* B, const float Tolerance)
 {
-	const auto QuatA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(A);
+	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
-	const auto QuatB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(B);
+	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
 
 	if (QuatA != nullptr && QuatB != nullptr)
 	{
@@ -138,7 +138,7 @@ bool FQuatImplementation::Quat_EqualsImplementation(const MonoObject* A, const M
 
 bool FQuatImplementation::Quat_IsIdentityImplementation(const MonoObject* InMonoObject, const float Tolerance)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
 	if (Quat != nullptr)
 	{
@@ -150,19 +150,19 @@ bool FQuatImplementation::Quat_IsIdentityImplementation(const MonoObject* InMono
 
 void FQuatImplementation::Quat_MultiplyImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
 {
-	const auto QuatA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(A);
+	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
-	const auto QuatB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(B);
+	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (QuatA != nullptr && QuatB != nullptr && OutQuat != nullptr)
 	{
@@ -173,19 +173,19 @@ void FQuatImplementation::Quat_MultiplyImplementation(const MonoObject* A, const
 void FQuatImplementation::Quat_MultiplyVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
                                                             MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(V);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -196,19 +196,19 @@ void FQuatImplementation::Quat_MultiplyVectorImplementation(const MonoObject* In
 void FQuatImplementation::Quat_MultiplyMatrixImplementation(const MonoObject* InMonoObject, const MonoObject* M,
                                                             MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto Matrix = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FMatrix>(M);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(M);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FMatrix)),
 		CLASS_SCRIPT_STRUCT_NAME(FMatrix));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutMatrix = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FMatrix>(NewMonoObject);
+	const auto OutMatrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(NewMonoObject);
 
 	if (Quat != nullptr && OutMatrix != nullptr)
 	{
@@ -219,17 +219,17 @@ void FQuatImplementation::Quat_MultiplyMatrixImplementation(const MonoObject* In
 void FQuatImplementation::Quat_MultiplyScaleImplementation(const MonoObject* InMonoObject, const float Scale,
                                                            MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat != nullptr && OutQuat != nullptr)
 	{
@@ -240,17 +240,17 @@ void FQuatImplementation::Quat_MultiplyScaleImplementation(const MonoObject* InM
 void FQuatImplementation::Quat_DivideImplementation(const MonoObject* InMonoObject, const float Scale,
                                                     MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat != nullptr && OutQuat != nullptr)
 	{
@@ -261,9 +261,9 @@ void FQuatImplementation::Quat_DivideImplementation(const MonoObject* InMonoObje
 bool FQuatImplementation::Quat_IdenticalImplementation(const MonoObject* InMonoObject, const MonoObject* Q,
                                                        const uint32 PortFlags)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto QuatQ = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Q);
+	const auto QuatQ = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q);
 
 	if (Quat != nullptr && QuatQ != nullptr)
 	{
@@ -275,9 +275,9 @@ bool FQuatImplementation::Quat_IdenticalImplementation(const MonoObject* InMonoO
 
 bool FQuatImplementation::Quat_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto QuatA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(A);
+	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
-	const auto QuatB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(B);
+	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
 
 	if (QuatA != nullptr && QuatB != nullptr)
 	{
@@ -289,9 +289,9 @@ bool FQuatImplementation::Quat_EqualityImplementation(const MonoObject* A, const
 
 bool FQuatImplementation::Quat_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto QuatA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(A);
+	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
-	const auto QuatB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(B);
+	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
 
 	if (QuatA != nullptr && QuatB != nullptr)
 	{
@@ -303,9 +303,9 @@ bool FQuatImplementation::Quat_InequalityImplementation(const MonoObject* A, con
 
 float FQuatImplementation::Quat_DotProductImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto QuatA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(A);
+	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
-	const auto QuatB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(B);
+	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
 
 	if (QuatA != nullptr && QuatB != nullptr)
 	{
@@ -317,17 +317,17 @@ float FQuatImplementation::Quat_DotProductImplementation(const MonoObject* A, co
 
 void FQuatImplementation::Quat_MakeFromEulerImplementation(const MonoObject* Euler, MonoObject** OutValue)
 {
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Euler);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Euler);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Vector != nullptr && OutQuat != nullptr)
 	{
@@ -337,17 +337,17 @@ void FQuatImplementation::Quat_MakeFromEulerImplementation(const MonoObject* Eul
 
 void FQuatImplementation::Quat_EulerImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -357,7 +357,7 @@ void FQuatImplementation::Quat_EulerImplementation(const MonoObject* InMonoObjec
 
 void FQuatImplementation::Quat_NormalizeImplementation(const MonoObject* InMonoObject, const float Tolerance)
 {
-	if (const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject))
+	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
 		Quat->Normalize(Tolerance);
 	}
@@ -366,17 +366,17 @@ void FQuatImplementation::Quat_NormalizeImplementation(const MonoObject* InMonoO
 void FQuatImplementation::Quat_GetNormalizedImplementation(const MonoObject* InMonoObject, const float Tolerance,
                                                            MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat != nullptr && OutQuat != nullptr)
 	{
@@ -386,7 +386,7 @@ void FQuatImplementation::Quat_GetNormalizedImplementation(const MonoObject* InM
 
 bool FQuatImplementation::Quat_IsNormalizedImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject))
+	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
 		return Quat->IsNormalized();
 	}
@@ -396,7 +396,7 @@ bool FQuatImplementation::Quat_IsNormalizedImplementation(const MonoObject* InMo
 
 float FQuatImplementation::Quat_SizeImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject))
+	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
 		return Quat->Size();
 	}
@@ -406,7 +406,7 @@ float FQuatImplementation::Quat_SizeImplementation(const MonoObject* InMonoObjec
 
 float FQuatImplementation::Quat_SizeSquaredImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject))
+	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
 		return Quat->SizeSquared();
 	}
@@ -416,7 +416,7 @@ float FQuatImplementation::Quat_SizeSquaredImplementation(const MonoObject* InMo
 
 float FQuatImplementation::Quat_GetAngleImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject))
+	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
 		return Quat->GetAngle();
 	}
@@ -427,17 +427,17 @@ float FQuatImplementation::Quat_GetAngleImplementation(const MonoObject* InMonoO
 void FQuatImplementation::Quat_ToAxisAndAngleImplementation(const MonoObject* InMonoObject, MonoObject** Axis,
                                                             float& Angle)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*Axis = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -448,25 +448,25 @@ void FQuatImplementation::Quat_ToAxisAndAngleImplementation(const MonoObject* In
 void FQuatImplementation::Quat_ToSwingTwistImplementation(const MonoObject* InMonoObject, const MonoObject* InTwistAxis,
                                                           MonoObject** OutSwing, MonoObject** OutTwist)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(InTwistAxis);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InTwistAxis);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutSwing = NewMonoObject1;
 
-	const auto OutSwingQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject1);
+	const auto OutSwingQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject1);
 
-	const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutTwist = NewMonoObject2;
 
-	const auto OutTwistQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject2);
+	const auto OutTwistQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject2);
 
 	if (Quat != nullptr && Vector != nullptr && OutSwingQuat != nullptr && OutTwistQuat != nullptr)
 	{
@@ -476,9 +476,9 @@ void FQuatImplementation::Quat_ToSwingTwistImplementation(const MonoObject* InMo
 
 float FQuatImplementation::Quat_GetTwistAngleImplementation(const MonoObject* InMonoObject, const MonoObject* TwistAxis)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(TwistAxis);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(TwistAxis);
 
 	if (Quat != nullptr)
 	{
@@ -491,19 +491,19 @@ float FQuatImplementation::Quat_GetTwistAngleImplementation(const MonoObject* In
 void FQuatImplementation::Quat_RotateVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
                                                           MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(V);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && Vector != nullptr && OutVector != nullptr)
 	{
@@ -514,19 +514,19 @@ void FQuatImplementation::Quat_RotateVectorImplementation(const MonoObject* InMo
 void FQuatImplementation::Quat_UnrotateVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
                                                             MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(V);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && Vector != nullptr && OutVector != nullptr)
 	{
@@ -536,17 +536,17 @@ void FQuatImplementation::Quat_UnrotateVectorImplementation(const MonoObject* In
 
 void FQuatImplementation::Quat_LogImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat != nullptr && OutQuat != nullptr)
 	{
@@ -556,17 +556,17 @@ void FQuatImplementation::Quat_LogImplementation(const MonoObject* InMonoObject,
 
 void FQuatImplementation::Quat_ExpImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat != nullptr && OutQuat != nullptr)
 	{
@@ -576,17 +576,17 @@ void FQuatImplementation::Quat_ExpImplementation(const MonoObject* InMonoObject,
 
 void FQuatImplementation::Quat_InverseImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat != nullptr && OutQuat != nullptr)
 	{
@@ -597,9 +597,9 @@ void FQuatImplementation::Quat_InverseImplementation(const MonoObject* InMonoObj
 void FQuatImplementation::Quat_EnforceShortestArcWithImplementation(const MonoObject* InMonoObject,
                                                                     const MonoObject* OtherQuat)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto QuatOther = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(OtherQuat);
+	const auto QuatOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(OtherQuat);
 
 	if (Quat != nullptr && QuatOther != nullptr)
 	{
@@ -609,17 +609,17 @@ void FQuatImplementation::Quat_EnforceShortestArcWithImplementation(const MonoOb
 
 void FQuatImplementation::Quat_GetAxisXImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -629,17 +629,17 @@ void FQuatImplementation::Quat_GetAxisXImplementation(const MonoObject* InMonoOb
 
 void FQuatImplementation::Quat_GetAxisYImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -649,17 +649,17 @@ void FQuatImplementation::Quat_GetAxisYImplementation(const MonoObject* InMonoOb
 
 void FQuatImplementation::Quat_GetAxisZImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -669,17 +669,17 @@ void FQuatImplementation::Quat_GetAxisZImplementation(const MonoObject* InMonoOb
 
 void FQuatImplementation::Quat_GetForwardVectorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -689,17 +689,17 @@ void FQuatImplementation::Quat_GetForwardVectorImplementation(const MonoObject* 
 
 void FQuatImplementation::Quat_GetRightVectorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -709,17 +709,17 @@ void FQuatImplementation::Quat_GetRightVectorImplementation(const MonoObject* In
 
 void FQuatImplementation::Quat_GetUpVectorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -729,17 +729,17 @@ void FQuatImplementation::Quat_GetUpVectorImplementation(const MonoObject* InMon
 
 void FQuatImplementation::Quat_VectorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -749,17 +749,17 @@ void FQuatImplementation::Quat_VectorImplementation(const MonoObject* InMonoObje
 
 void FQuatImplementation::Quat_RotatorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
 		CLASS_SCRIPT_STRUCT_NAME(FRotator));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FRotator>(NewMonoObject);
+	const auto OutRotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(NewMonoObject);
 
 	if (Quat != nullptr && OutRotator != nullptr)
 	{
@@ -769,17 +769,17 @@ void FQuatImplementation::Quat_RotatorImplementation(const MonoObject* InMonoObj
 
 void FQuatImplementation::Quat_GetRotationAxisImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Quat != nullptr && OutVector != nullptr)
 	{
@@ -789,9 +789,9 @@ void FQuatImplementation::Quat_GetRotationAxisImplementation(const MonoObject* I
 
 float FQuatImplementation::Quat_AngularDistanceImplementation(const MonoObject* InMonoObject, const MonoObject* Q)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
-	const auto QuatQ = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Q);
+	const auto QuatQ = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q);
 
 	if (Quat != nullptr && QuatQ != nullptr)
 	{
@@ -803,7 +803,7 @@ float FQuatImplementation::Quat_AngularDistanceImplementation(const MonoObject* 
 
 bool FQuatImplementation::Quat_ContainsNaNImplementation(const MonoObject* InMonoObject)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
 	if (Quat != nullptr)
 	{
@@ -815,19 +815,19 @@ bool FQuatImplementation::Quat_ContainsNaNImplementation(const MonoObject* InMon
 
 void FQuatImplementation::Quat_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
 	if (Quat != nullptr)
 	{
 		const auto ResultString = Quat->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -836,12 +836,12 @@ void FQuatImplementation::Quat_ToStringImplementation(const MonoObject* InMonoOb
 
 bool FQuatImplementation::Quat_InitFromStringImplementation(const MonoObject* InMonoObject, MonoObject* InSourceString)
 {
-	const auto Quat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(InMonoObject);
+	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
 	if (Quat != nullptr && InSourceString != nullptr)
 	{
 		return Quat->InitFromString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InSourceString, nullptr))));
 	}
 
@@ -851,19 +851,19 @@ bool FQuatImplementation::Quat_InitFromStringImplementation(const MonoObject* In
 void FQuatImplementation::Quat_FindBetweenImplementation(const MonoObject* Vector1, const MonoObject* Vector2,
                                                          MonoObject** OutValue)
 {
-	const auto VectorV1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Vector1);
+	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Vector1);
 
-	const auto VectorV2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Vector2);
+	const auto VectorV2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Vector2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (VectorV1 != nullptr && VectorV2 != nullptr && OutQuat != nullptr)
 	{
@@ -874,19 +874,19 @@ void FQuatImplementation::Quat_FindBetweenImplementation(const MonoObject* Vecto
 void FQuatImplementation::Quat_FindBetweenNormalsImplementation(const MonoObject* Normal1, const MonoObject* Normal2,
                                                                 MonoObject** OutValue)
 {
-	const auto Vector1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Normal1);
+	const auto Vector1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Normal1);
 
-	const auto Vector2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Normal2);
+	const auto Vector2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Normal2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Vector1 != nullptr && Vector2 != nullptr && OutQuat != nullptr)
 	{
@@ -897,19 +897,19 @@ void FQuatImplementation::Quat_FindBetweenNormalsImplementation(const MonoObject
 void FQuatImplementation::Quat_FindBetweenVectorsImplementation(const MonoObject* Vector1, const MonoObject* Vector2,
                                                                 MonoObject** OutValue)
 {
-	const auto VectorV1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Vector1);
+	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Vector1);
 
-	const auto VectorV2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Vector2);
+	const auto VectorV2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Vector2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (VectorV1 != nullptr && VectorV2 != nullptr && OutQuat != nullptr)
 	{
@@ -919,9 +919,9 @@ void FQuatImplementation::Quat_FindBetweenVectorsImplementation(const MonoObject
 
 float FQuatImplementation::Quat_ErrorImplementation(const MonoObject* Q1, const MonoObject* Q2)
 {
-	const auto Quat1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Q1);
+	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q1);
 
-	const auto Quat2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Q2);
+	const auto Quat2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q2);
 
 	if (Quat1 != nullptr && Quat2 != nullptr)
 	{
@@ -933,9 +933,9 @@ float FQuatImplementation::Quat_ErrorImplementation(const MonoObject* Q1, const 
 
 float FQuatImplementation::Quat_ErrorAutoNormalizeImplementation(const MonoObject* Q1, const MonoObject* Q2)
 {
-	const auto Quat1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Q1);
+	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q1);
 
-	const auto Quat2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Q2);
+	const auto Quat2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q2);
 
 	if (Quat1 != nullptr && Quat2 != nullptr)
 	{
@@ -948,19 +948,19 @@ float FQuatImplementation::Quat_ErrorAutoNormalizeImplementation(const MonoObjec
 void FQuatImplementation::Quat_FastLerpImplementation(const MonoObject* A, const MonoObject* B, const float Alpha,
                                                       MonoObject** OutValue)
 {
-	const auto QuatA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(A);
+	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
-	const auto QuatB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(B);
+	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (QuatA != nullptr && QuatB != nullptr && OutQuat != nullptr)
 	{
@@ -972,23 +972,23 @@ void FQuatImplementation::Quat_FastBilerpImplementation(const MonoObject* P00, c
                                                         const MonoObject* P01, const MonoObject* P11, const float FracX,
                                                         const float FracY, MonoObject** OutValue)
 {
-	const auto QuatP00 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(P00);
+	const auto QuatP00 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(P00);
 
-	const auto QuatP10 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(P10);
+	const auto QuatP10 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(P10);
 
-	const auto QuatP01 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(P01);
+	const auto QuatP01 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(P01);
 
-	const auto QuatP11 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(P11);
+	const auto QuatP11 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(P11);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (QuatP00 != nullptr && QuatP10 != nullptr && QuatP01 != nullptr && QuatP11 != nullptr && OutQuat != nullptr)
 	{
@@ -999,19 +999,19 @@ void FQuatImplementation::Quat_FastBilerpImplementation(const MonoObject* P00, c
 void FQuatImplementation::Quat_Slerp_NotNormalizedImplementation(const MonoObject* Quat1, const MonoObject* Quat2,
                                                                  const float Slerp, MonoObject** OutValue)
 {
-	const auto QuatQ1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Quat1);
+	const auto QuatQ1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Quat1);
 
-	const auto QuatQ2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Quat2);
+	const auto QuatQ2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Quat2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (QuatQ1 != nullptr && QuatQ2 != nullptr && OutQuat != nullptr)
 	{
@@ -1022,19 +1022,19 @@ void FQuatImplementation::Quat_Slerp_NotNormalizedImplementation(const MonoObjec
 void FQuatImplementation::Quat_SlerpImplementation(const MonoObject* Quat1, const MonoObject* Quat2, const float Slerp,
                                                    MonoObject** OutValue)
 {
-	const auto QuatQ1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Quat1);
+	const auto QuatQ1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Quat1);
 
-	const auto QuatQ2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(Quat2);
+	const auto QuatQ2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Quat2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (QuatQ1 != nullptr && QuatQ2 != nullptr && OutQuat != nullptr)
 	{
@@ -1045,19 +1045,19 @@ void FQuatImplementation::Quat_SlerpImplementation(const MonoObject* Quat1, cons
 void FQuatImplementation::Quat_SlerpFullPath_NotNormalizedImplementation(
 	const MonoObject* quat1, const MonoObject* quat2, const float Alpha, MonoObject** OutValue)
 {
-	const auto Quat1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(quat1);
+	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat1);
 
-	const auto Quat2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(quat2);
+	const auto Quat2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat1 != nullptr && Quat2 != nullptr && OutQuat != nullptr)
 	{
@@ -1068,19 +1068,19 @@ void FQuatImplementation::Quat_SlerpFullPath_NotNormalizedImplementation(
 void FQuatImplementation::Quat_SlerpFullPathImplementation(const MonoObject* quat1, const MonoObject* quat2,
                                                            const float Alpha, MonoObject** OutValue)
 {
-	const auto Quat1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(quat1);
+	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat1);
 
-	const auto Quat2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(quat2);
+	const auto Quat2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat1 != nullptr && Quat2 != nullptr && OutQuat != nullptr)
 	{
@@ -1092,23 +1092,23 @@ void FQuatImplementation::Quat_SquadImplementation(const MonoObject* quat1, cons
                                                    const MonoObject* quat2, const MonoObject* tang2, const float Alpha,
                                                    MonoObject** OutValue)
 {
-	const auto Quat1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(quat1);
+	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat1);
 
-	const auto Tang1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(tang1);
+	const auto Tang1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(tang1);
 
-	const auto Quat2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(quat2);
+	const auto Quat2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat2);
 
-	const auto Tang2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(tang2);
+	const auto Tang2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(tang2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat1 != nullptr && Tang1 != nullptr && Quat2 != nullptr && Tang2 != nullptr && OutQuat != nullptr)
 	{
@@ -1120,23 +1120,23 @@ void FQuatImplementation::Quat_SquadFullPathImplementation(const MonoObject* qua
                                                            const MonoObject* quat2, const MonoObject* tang2,
                                                            const float Alpha, MonoObject** OutValue)
 {
-	const auto Quat1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(quat1);
+	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat1);
 
-	const auto Tang1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(tang1);
+	const auto Tang1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(tang1);
 
-	const auto Quat2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(quat2);
+	const auto Quat2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat2);
 
-	const auto Tang2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(tang2);
+	const auto Tang2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(tang2);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (Quat1 != nullptr && Tang1 != nullptr && Quat2 != nullptr && Tang2 != nullptr && OutQuat != nullptr)
 	{
@@ -1148,21 +1148,21 @@ void FQuatImplementation::Quat_CalcTangentsImplementation(const MonoObject* Prev
                                                           const MonoObject* NextP, const float Tension,
                                                           MonoObject** OutValue)
 {
-	const auto QuatPrevP = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(PrevP);
+	const auto QuatPrevP = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(PrevP);
 
-	const auto QuatP = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(P);
+	const auto QuatP = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(P);
 
-	const auto QuatNextP = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NextP);
+	const auto QuatNextP = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NextP);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
 		CLASS_SCRIPT_STRUCT_NAME(FQuat));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
 
 	if (QuatPrevP != nullptr && QuatP != nullptr && QuatNextP != nullptr && OutQuat != nullptr)
 	{

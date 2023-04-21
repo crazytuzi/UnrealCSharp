@@ -7,7 +7,7 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (InterfaceProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetMultiObject<TScriptInterface<IInterface>>(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(Src);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -24,10 +24,10 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcMulti = FCSharpEnvironment::GetEnvironment()->GetMulti<TScriptInterface<IInterface>>(
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 			SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TScriptInterface<IInterface>>(Dest);
+		FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(Dest);
 
 		InterfaceProperty->InitializeValue(Dest);
 
@@ -53,7 +53,7 @@ bool FInterfacePropertyDescriptor::Identical(const void* A, const void* B, const
 	{
 		const auto InterfaceA = static_cast<FScriptInterface*>(const_cast<void*>(A));
 
-		const auto InterfaceB = FCSharpEnvironment::GetEnvironment()->GetMulti<TScriptInterface<IInterface>>(
+		const auto InterfaceB = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 			static_cast<MonoObject*>(const_cast<void*>(B)));
 
 		return InterfaceProperty->Identical(InterfaceA, &InterfaceB, PortFlags);
@@ -68,7 +68,7 @@ MonoObject* FInterfacePropertyDescriptor::Object_New(void* InAddress) const
 
 	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(InterfaceProperty);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(GenericClassMonoClass);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
 	TScriptInterface<IInterface> ScriptInterface;
 
@@ -76,7 +76,7 @@ MonoObject* FInterfacePropertyDescriptor::Object_New(void* InAddress) const
 
 	ScriptInterface.SetInterface(static_cast<IInterface*>(SrcObject->GetInterface()));
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TScriptInterface<IInterface>>(
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
 		InAddress, Object, ScriptInterface);
 
 	return Object;

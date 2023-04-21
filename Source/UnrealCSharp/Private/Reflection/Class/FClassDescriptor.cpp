@@ -88,7 +88,7 @@ FPropertyDescriptor* FClassDescriptor::GetPropertyDescriptor(const FName& InProp
 
 	if (Struct != nullptr)
 	{
-		if (const auto FoundClassDescriptor = FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(
+		if (const auto FoundClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
 			Struct->GetSuperStruct()))
 		{
 			return FoundClassDescriptor->GetPropertyDescriptor(InPropertyName);

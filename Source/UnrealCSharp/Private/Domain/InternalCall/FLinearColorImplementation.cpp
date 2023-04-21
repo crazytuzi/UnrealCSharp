@@ -73,18 +73,18 @@ static FRegisterLinearColor RegisterLinearColor;
 
 void FLinearColorImplementation::LinearColor_ToRGBEImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
 
 	if (LinearColor != nullptr && OutColor != nullptr)
 	{
@@ -94,17 +94,17 @@ void FLinearColorImplementation::LinearColor_ToRGBEImplementation(const MonoObje
 
 void FLinearColorImplementation::LinearColor_FromSRGBColorImplementation(const MonoObject* Color, MonoObject** OutValue)
 {
-	const auto InColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FColor>(Color);
+	const auto InColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(Color);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (InColor != nullptr && OutLinearColor != nullptr)
@@ -116,17 +116,17 @@ void FLinearColorImplementation::LinearColor_FromSRGBColorImplementation(const M
 void FLinearColorImplementation::LinearColor_FromPow22ColorImplementation(
 	const MonoObject* Color, MonoObject** OutValue)
 {
-	const auto InColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FColor>(Color);
+	const auto InColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(Color);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (InColor != nullptr && OutLinearColor != nullptr)
@@ -137,7 +137,7 @@ void FLinearColorImplementation::LinearColor_FromPow22ColorImplementation(
 
 float FLinearColorImplementation::LinearColor_ComponentImplementation(const MonoObject* InMonoObject, const int32 Index)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	if (LinearColor != nullptr)
@@ -151,19 +151,19 @@ float FLinearColorImplementation::LinearColor_ComponentImplementation(const Mono
 void FLinearColorImplementation::LinearColor_AddImplementation(const MonoObject* A, const MonoObject* B,
                                                                MonoObject** OutValue)
 {
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(A);
+	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
+	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColorA != nullptr && LinearColorB != nullptr && OutLinearColor != nullptr)
@@ -175,19 +175,19 @@ void FLinearColorImplementation::LinearColor_AddImplementation(const MonoObject*
 void FLinearColorImplementation::LinearColor_SubtractImplementation(const MonoObject* A, const MonoObject* B,
                                                                     MonoObject** OutValue)
 {
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(A);
+	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
+	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColorA != nullptr && LinearColorB != nullptr && OutLinearColor != nullptr)
@@ -199,19 +199,19 @@ void FLinearColorImplementation::LinearColor_SubtractImplementation(const MonoOb
 void FLinearColorImplementation::LinearColor_MultiplyImplementation(const MonoObject* A, const MonoObject* B,
                                                                     MonoObject** OutValue)
 {
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(A);
+	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
+	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColorA != nullptr && LinearColorB != nullptr && OutLinearColor != nullptr)
@@ -223,18 +223,18 @@ void FLinearColorImplementation::LinearColor_MultiplyImplementation(const MonoOb
 void FLinearColorImplementation::LinearColor_MultiplyScalarImplementation(
 	const MonoObject* InMonoObject, const float Scalar, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColor != nullptr && OutLinearColor != nullptr)
@@ -246,19 +246,19 @@ void FLinearColorImplementation::LinearColor_MultiplyScalarImplementation(
 void FLinearColorImplementation::LinearColor_DivideImplementation(const MonoObject* A, const MonoObject* B,
                                                                   MonoObject** OutValue)
 {
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(A);
+	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
+	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColorA != nullptr && LinearColorB != nullptr && OutLinearColor != nullptr)
@@ -270,18 +270,18 @@ void FLinearColorImplementation::LinearColor_DivideImplementation(const MonoObje
 void FLinearColorImplementation::LinearColor_DivideScalarImplementation(const MonoObject* InMonoObject,
                                                                         const float Scalar, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColor != nullptr && OutLinearColor != nullptr)
@@ -293,18 +293,18 @@ void FLinearColorImplementation::LinearColor_DivideScalarImplementation(const Mo
 void FLinearColorImplementation::LinearColor_GetClampedImplementation(const MonoObject* InMonoObject, const float InMin,
                                                                       const float InMax, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColor != nullptr && OutLinearColor != nullptr)
@@ -315,9 +315,9 @@ void FLinearColorImplementation::LinearColor_GetClampedImplementation(const Mono
 
 bool FLinearColorImplementation::LinearColor_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(A);
+	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
+	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
 
 	if (LinearColorA != nullptr && LinearColorB != nullptr)
 	{
@@ -329,9 +329,9 @@ bool FLinearColorImplementation::LinearColor_EqualityImplementation(const MonoOb
 
 bool FLinearColorImplementation::LinearColor_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(A);
+	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
+	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
 
 	if (LinearColorA != nullptr && LinearColorB != nullptr)
 	{
@@ -344,9 +344,9 @@ bool FLinearColorImplementation::LinearColor_InequalityImplementation(const Mono
 bool FLinearColorImplementation::LinearColor_EqualsImplementation(const MonoObject* A, const MonoObject* B,
                                                                   const float Tolerance)
 {
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(A);
+	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(B);
+	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
 
 	if (LinearColorA != nullptr && LinearColorB != nullptr)
 	{
@@ -359,18 +359,18 @@ bool FLinearColorImplementation::LinearColor_EqualsImplementation(const MonoObje
 void FLinearColorImplementation::LinearColor_CopyWithNewOpacityImplementation(
 	const MonoObject* InMonoObject, const float NewOpacicty, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColor != nullptr && OutLinearColor != nullptr)
@@ -382,15 +382,15 @@ void FLinearColorImplementation::LinearColor_CopyWithNewOpacityImplementation(
 void FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation(const uint8 H, const uint8 S, const uint8 V,
                                                                         MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (OutLinearColor != nullptr)
@@ -401,15 +401,15 @@ void FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation(const ui
 
 void FLinearColorImplementation::LinearColor_MakeRandomColorImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (OutLinearColor != nullptr)
@@ -421,15 +421,15 @@ void FLinearColorImplementation::LinearColor_MakeRandomColorImplementation(MonoO
 void FLinearColorImplementation::LinearColor_MakeFromColorTemperatureImplementation(
 	const float Temp, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (OutLinearColor != nullptr)
@@ -440,9 +440,9 @@ void FLinearColorImplementation::LinearColor_MakeFromColorTemperatureImplementat
 
 float FLinearColorImplementation::LinearColor_DistImplementation(const MonoObject* V1, const MonoObject* V2)
 {
-	const auto LinearColorV1 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(V1);
+	const auto LinearColorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(V1);
 
-	const auto LinearColorV2 = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(V2);
+	const auto LinearColorV2 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(V2);
 
 	if (LinearColorV1 != nullptr && LinearColorV2 != nullptr)
 	{
@@ -455,18 +455,18 @@ float FLinearColorImplementation::LinearColor_DistImplementation(const MonoObjec
 void FLinearColorImplementation::LinearColor_LinearRGBToHSVImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (OutLinearColor != nullptr)
@@ -478,18 +478,18 @@ void FLinearColorImplementation::LinearColor_LinearRGBToHSVImplementation(
 void FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (OutLinearColor != nullptr)
@@ -501,19 +501,19 @@ void FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation(
 void FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation(const MonoObject* From, const MonoObject* To,
                                                                         const float Progress, MonoObject** OutValue)
 {
-	const auto LinearColorFrom = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(From);
+	const auto LinearColorFrom = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(From);
 
-	const auto LinearColorTo = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(To);
+	const auto LinearColorTo = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(To);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColorFrom != nullptr && LinearColorTo != nullptr && OutLinearColor != nullptr)
@@ -525,18 +525,18 @@ void FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation(const Mo
 void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoObject* InMonoObject,
                                                                     MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
 
 	if (LinearColor != nullptr && OutColor != nullptr)
 	{
@@ -547,18 +547,18 @@ void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoOb
 void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
 
 	if (LinearColor != nullptr && OutColor != nullptr)
 	{
@@ -569,18 +569,18 @@ void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
 void FLinearColorImplementation::LinearColor_ToFColorImplementation(const MonoObject* InMonoObject, const bool bSRGB,
                                                                     MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
 
 	if (LinearColor != nullptr && OutColor != nullptr)
 	{
@@ -591,18 +591,18 @@ void FLinearColorImplementation::LinearColor_ToFColorImplementation(const MonoOb
 void FLinearColorImplementation::LinearColor_DesaturateImplementation(const MonoObject* InMonoObject,
                                                                       const float Desaturation, MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
 		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FLinearColor>(
+	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
 		NewMonoObject);
 
 	if (LinearColor != nullptr && OutLinearColor != nullptr)
@@ -614,7 +614,7 @@ void FLinearColorImplementation::LinearColor_DesaturateImplementation(const Mono
 #if UE_LINEAR_COLOR_COMPUTE_LUMINANCE
 float FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation(const MonoObject* InMonoObject)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	if (LinearColor != nullptr)
@@ -628,7 +628,7 @@ float FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation(con
 
 float FLinearColorImplementation::LinearColor_GetMaxImplementation(const MonoObject* InMonoObject)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	if (LinearColor != nullptr)
@@ -641,7 +641,7 @@ float FLinearColorImplementation::LinearColor_GetMaxImplementation(const MonoObj
 
 bool FLinearColorImplementation::LinearColor_IsAlmostBlackImplementation(const MonoObject* InMonoObject)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	if (LinearColor != nullptr)
@@ -654,7 +654,7 @@ bool FLinearColorImplementation::LinearColor_IsAlmostBlackImplementation(const M
 
 float FLinearColorImplementation::LinearColor_GetMinImplementation(const MonoObject* InMonoObject)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	if (LinearColor != nullptr)
@@ -667,7 +667,7 @@ float FLinearColorImplementation::LinearColor_GetMinImplementation(const MonoObj
 
 float FLinearColorImplementation::LinearColor_GetLuminanceImplementation(const MonoObject* InMonoObject)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	if (LinearColor != nullptr)
@@ -681,20 +681,20 @@ float FLinearColorImplementation::LinearColor_GetLuminanceImplementation(const M
 void FLinearColorImplementation::LinearColor_ToStringImplementation(const MonoObject* InMonoObject,
                                                                     MonoObject** OutValue)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	if (LinearColor != nullptr)
 	{
 		const auto ResultString = LinearColor->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -704,13 +704,13 @@ void FLinearColorImplementation::LinearColor_ToStringImplementation(const MonoOb
 bool FLinearColorImplementation::LinearColor_InitFromStringImplementation(
 	const MonoObject* InMonoObject, MonoObject* InSourceString)
 {
-	const auto LinearColor = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FLinearColor>(InMonoObject);
 
 	if (LinearColor != nullptr && InSourceString != nullptr)
 	{
 		return LinearColor->InitFromString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InSourceString, nullptr))));
 	}
 

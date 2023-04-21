@@ -33,7 +33,7 @@ static FRegisterMulticastDelegate RegisterMulticastDelegate;
 
 bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->IsBound();
@@ -45,7 +45,7 @@ bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(c
 bool FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation(
 	const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
-	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Contains(InDelegate);
@@ -57,7 +57,7 @@ bool FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation(
 void FMulticastDelegateImplementation::MulticastDelegate_AddImplementation(
 	const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
-	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Add(InDelegate);
@@ -67,7 +67,7 @@ void FMulticastDelegateImplementation::MulticastDelegate_AddImplementation(
 void FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation(
 	const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
-	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->AddUnique(InDelegate);
@@ -77,7 +77,7 @@ void FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation
 void FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation(
 	const MonoObject* InMonoObject, MonoObject* InDelegate)
 {
-	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Remove(InDelegate);
@@ -87,7 +87,7 @@ void FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation(
 void FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation(
 	const MonoObject* InMonoObject, MonoObject* InObject)
 {
-	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->RemoveAll(InObject);
@@ -96,7 +96,7 @@ void FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation
 
 void FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Clear();
@@ -106,7 +106,7 @@ void FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation(con
 void FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue, MonoArray* InValue)
 {
-	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment()->GetDelegate<
+	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 		FMulticastDelegateHelper>(InMonoObject))
 	{
 		return MulticastDelegateHelper->Broadcast(OutValue, InValue);

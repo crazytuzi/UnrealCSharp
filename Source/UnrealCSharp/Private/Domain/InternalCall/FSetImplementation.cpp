@@ -28,18 +28,18 @@ static FRegisterSet RegisterSet;
 
 void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->Bind<FSetHelper>(InMonoObject,
+	FCSharpEnvironment::GetEnvironment().Bind<FSetHelper>(InMonoObject,
 	                                                       FTypeBridge::GetGenericArgument(InMonoObject));
 }
 
 void FSetImplementation::Set_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(InMonoObject);
+	FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
 }
 
 void FSetImplementation::Set_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
 	{
 		SetHelper->Empty(InExpectedNumElements);
 	}
@@ -47,7 +47,7 @@ void FSetImplementation::Set_EmptyImplementation(const MonoObject* InMonoObject,
 
 int32 FSetImplementation::Set_NumImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
 	{
 		return SetHelper->Num();
 	}
@@ -57,7 +57,7 @@ int32 FSetImplementation::Set_NumImplementation(const MonoObject* InMonoObject)
 
 int32 FSetImplementation::Set_GetMaxIndexImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
 	{
 		return SetHelper->GetMaxIndex();
 	}
@@ -67,11 +67,11 @@ int32 FSetImplementation::Set_GetMaxIndexImplementation(const MonoObject* InMono
 
 void FSetImplementation::Set_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
 	{
 		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			SetHelper->Add(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			SetHelper->Add(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -82,11 +82,11 @@ void FSetImplementation::Set_AddImplementation(const MonoObject* InMonoObject, M
 
 int32 FSetImplementation::Set_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
 	{
 		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return SetHelper->Remove(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return SetHelper->Remove(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -99,11 +99,11 @@ int32 FSetImplementation::Set_RemoveImplementation(const MonoObject* InMonoObjec
 
 bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
 	{
 		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return SetHelper->Contains(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue));
+			return SetHelper->Contains(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
 		}
 		else
 		{
@@ -116,7 +116,7 @@ bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObje
 
 bool FSetImplementation::Set_IsValidIndexImplementation(const MonoObject* InMonoObject, const int32 InIndex)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
 	{
 		return SetHelper->IsValidIndex(InIndex);
 	}
@@ -127,13 +127,13 @@ bool FSetImplementation::Set_IsValidIndexImplementation(const MonoObject* InMono
 void FSetImplementation::Set_GetEnumeratorImplementation(const MonoObject* InMonoObject, const int32 InIndex,
                                                          MonoObject** OutValue)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
 	{
 		const auto Value = SetHelper->GetEnumerator(InIndex);
 
 		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 				FTypeBridge::GetMonoClass(SetHelper->GetElementPropertyDescriptor()->GetProperty()), Value);
 		}
 		else

@@ -7,7 +7,7 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (StructProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(GetOwner(Src), Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(GetOwner(Src), Src);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -22,9 +22,9 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (StructProperty != nullptr)
 	{
-		const auto SrcStruct = FCSharpEnvironment::GetEnvironment()->GetStruct(static_cast<MonoObject*>(Src));
+		const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(static_cast<MonoObject*>(Src));
 
-		FCSharpEnvironment::GetEnvironment()->RemoveStructReference(GetOwner(Dest), Dest);
+		FCSharpEnvironment::GetEnvironment().RemoveStructReference(GetOwner(Dest), Dest);
 
 		StructProperty->InitializeValue(Dest);
 
@@ -40,7 +40,7 @@ bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const ui
 	{
 		const auto StructA = StructProperty->ContainerPtrToValuePtr<void>(A);
 
-		const auto StructB = FCSharpEnvironment::GetEnvironment()->GetStruct(
+		const auto StructB = FCSharpEnvironment::GetEnvironment().GetStruct(
 			static_cast<MonoObject*>(const_cast<void*>(B)));
 
 		return StructProperty->Identical(StructA, StructB, PortFlags);
@@ -65,12 +65,12 @@ MonoObject* FStructPropertyDescriptor::Object_New(void* InAddress) const
 
 	auto InParams = static_cast<void*>(FoundMonoClass);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 		FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
-	FCSharpEnvironment::GetEnvironment()->Bind(StructProperty->Struct, false);
+	FCSharpEnvironment::GetEnvironment().Bind(StructProperty->Struct, false);
 
-	FCSharpEnvironment::GetEnvironment()->AddStructReference(StructProperty->Struct, GetOwner(InAddress), InAddress,
+	FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, GetOwner(InAddress), InAddress,
 	                                                         Object, false);
 
 	return Object;

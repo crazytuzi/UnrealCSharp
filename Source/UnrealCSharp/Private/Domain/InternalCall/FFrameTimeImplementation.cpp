@@ -41,17 +41,17 @@ static FRegisterFrameTime RegisterFrameTime;
 
 void FFrameTimeImplementation::FrameTime_GetFrameImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameTime != nullptr && OutFrameNumber != nullptr)
@@ -62,7 +62,7 @@ void FFrameTimeImplementation::FrameTime_GetFrameImplementation(const MonoObject
 
 float FFrameTimeImplementation::FrameTime_GetSubFrameImplementation(const MonoObject* InMonoObject)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	if (FrameTime != nullptr)
 	{
@@ -75,17 +75,17 @@ float FFrameTimeImplementation::FrameTime_GetSubFrameImplementation(const MonoOb
 void FFrameTimeImplementation::FrameTime_FloorToFrameImplementation(const MonoObject* InMonoObject,
                                                                     MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameTime != nullptr && OutFrameNumber != nullptr)
@@ -97,17 +97,17 @@ void FFrameTimeImplementation::FrameTime_FloorToFrameImplementation(const MonoOb
 void FFrameTimeImplementation::FrameTime_CeilToFrameImplementation(const MonoObject* InMonoObject,
                                                                    MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameTime != nullptr && OutFrameNumber != nullptr)
@@ -119,17 +119,17 @@ void FFrameTimeImplementation::FrameTime_CeilToFrameImplementation(const MonoObj
 void FFrameTimeImplementation::FrameTime_RoundToFrameImplementation(const MonoObject* InMonoObject,
                                                                     MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameTime != nullptr && OutFrameNumber != nullptr)
@@ -140,7 +140,7 @@ void FFrameTimeImplementation::FrameTime_RoundToFrameImplementation(const MonoOb
 
 double FFrameTimeImplementation::FrameTime_AsDecimalImplementation(const MonoObject* InMonoObject)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
 	if (FrameTime != nullptr)
 	{
@@ -152,15 +152,15 @@ double FFrameTimeImplementation::FrameTime_AsDecimalImplementation(const MonoObj
 
 void FFrameTimeImplementation::FrameTime_FromDecimalImplementation(const double InDecimalFrame, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameTime>(NewMonoObject);
 
 	if (OutFrameTime != nullptr)
@@ -171,9 +171,9 @@ void FFrameTimeImplementation::FrameTime_FromDecimalImplementation(const double 
 
 bool FFrameTimeImplementation::FrameTime_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr)
 	{
@@ -185,9 +185,9 @@ bool FFrameTimeImplementation::FrameTime_EqualityImplementation(const MonoObject
 
 bool FFrameTimeImplementation::FrameTime_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr)
 	{
@@ -199,9 +199,9 @@ bool FFrameTimeImplementation::FrameTime_InequalityImplementation(const MonoObje
 
 bool FFrameTimeImplementation::FrameTime_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr)
 	{
@@ -213,9 +213,9 @@ bool FFrameTimeImplementation::FrameTime_GreaterThanImplementation(const MonoObj
 
 bool FFrameTimeImplementation::FrameTime_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr)
 	{
@@ -227,9 +227,9 @@ bool FFrameTimeImplementation::FrameTime_GreaterThanOrEqualImplementation(const 
 
 bool FFrameTimeImplementation::FrameTime_LessThanImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr)
 	{
@@ -241,9 +241,9 @@ bool FFrameTimeImplementation::FrameTime_LessThanImplementation(const MonoObject
 
 bool FFrameTimeImplementation::FrameTime_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr)
 	{
@@ -256,19 +256,19 @@ bool FFrameTimeImplementation::FrameTime_LessThanOrEqualImplementation(const Mon
 void FFrameTimeImplementation::FrameTime_AddImplementation(const MonoObject* A, const MonoObject* B,
                                                            MonoObject** OutValue)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameTime>(NewMonoObject);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr && OutFrameTime != nullptr)
@@ -280,19 +280,19 @@ void FFrameTimeImplementation::FrameTime_AddImplementation(const MonoObject* A, 
 void FFrameTimeImplementation::FrameTime_SubtractImplementation(const MonoObject* A, const MonoObject* B,
                                                                 MonoObject** OutValue)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameTime>(NewMonoObject);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr && OutFrameTime != nullptr)
@@ -304,19 +304,19 @@ void FFrameTimeImplementation::FrameTime_SubtractImplementation(const MonoObject
 void FFrameTimeImplementation::FrameTime_RemainderImplementation(const MonoObject* A, const MonoObject* B,
                                                                  MonoObject** OutValue)
 {
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(A);
+	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(B);
+	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameTime>(NewMonoObject);
 
 	if (FrameTimeA != nullptr && FrameTimeB != nullptr && OutFrameTime != nullptr)
@@ -327,17 +327,17 @@ void FFrameTimeImplementation::FrameTime_RemainderImplementation(const MonoObjec
 
 void FFrameTimeImplementation::FrameTime_NegatedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameTime>(NewMonoObject);
 
 	if (FrameTime != nullptr && OutFrameTime != nullptr)
@@ -349,17 +349,17 @@ void FFrameTimeImplementation::FrameTime_NegatedImplementation(const MonoObject*
 void FFrameTimeImplementation::FrameTime_MultiplyImplementation(const MonoObject* InMonoObject, const float Scalar,
                                                                 MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameTime>(NewMonoObject);
 
 	if (FrameTime != nullptr && OutFrameTime != nullptr)
@@ -371,17 +371,17 @@ void FFrameTimeImplementation::FrameTime_MultiplyImplementation(const MonoObject
 void FFrameTimeImplementation::FrameTime_DivideImplementation(const MonoObject* InMonoObject, const float Scalar,
                                                               MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FFrameTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutFrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameTime>(NewMonoObject);
 
 	if (FrameTime != nullptr && OutFrameTime != nullptr)

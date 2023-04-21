@@ -158,13 +158,13 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyTypeExtent InProperty
 
 			const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
 
-			const auto InType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Reflection_Type_Get_Type(
+			const auto InType = FCSharpEnvironment::GetEnvironment().GetDomain()->Reflection_Type_Get_Type(
 				InReflectionType);
 
-			const auto UnderlyingType = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+			const auto UnderlyingType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 			                                                                  Type_Get_Underlying_Type(InType);
 
-			const auto UnderlyingReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
+			const auto UnderlyingReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
 				UnderlyingType);
 
 			const auto UnderlyingProperty = Factory(UnderlyingReflectionType, EnumProperty, "",
@@ -237,21 +237,21 @@ FProperty* FContainerHelper::ManagedFactory(const EPropertyTypeExtent InProperty
 
 FString FContainerHelper::GetPathName(MonoReflectionType* InReflectionType)
 {
-	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
 	auto InParams = static_cast<void*>(InReflectionType);
 
-	const auto GetPathNameMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+	const auto GetPathNameMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Method_From_Name(
 		UtilsMonoClass, FUNCTION_UTILS_GET_PATH_NAME, TGetArrayLength(InParams));
 
-	const auto PathNameMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+	const auto PathNameMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
 		GetPathNameMonoMethod, nullptr, &InParams);
 
-	const auto PathNameMonoString = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_To_String(
+	const auto PathNameMonoString = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_To_String(
 		PathNameMonoObject, nullptr);
 
-	return UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(PathNameMonoString));
+	return UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(PathNameMonoString));
 }
 
 FString FContainerHelper::GetGenericPathName(MonoReflectionType* InReflectionType)

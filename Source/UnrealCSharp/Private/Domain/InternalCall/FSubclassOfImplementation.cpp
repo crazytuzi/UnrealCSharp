@@ -22,19 +22,19 @@ static FRegisterSubclassOf RegisterSubclassOf;
 
 void FSubclassOfImplementation::SubclassOf_RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InClass)
 {
-	const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetObject<UClass>(InClass);
+	const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TSubclassOf<UObject>>(InMonoObject, FoundClass);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(InMonoObject, FoundClass);
 }
 
 void FSubclassOfImplementation::SubclassOf_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TSubclassOf<UObject>>(InMonoObject);
+	FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(InMonoObject);
 }
 
 void FSubclassOfImplementation::SubclassOf_GetImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment()->GetMulti<TSubclassOf<UObject>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InMonoObject);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Multi.Get());
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi.Get());
 }

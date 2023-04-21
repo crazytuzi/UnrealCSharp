@@ -74,19 +74,19 @@ static FRegisterDateTime RegisterDateTime;
 void FDateTimeImplementation::DateTime_AddTimespanImplementation(const MonoObject* A, const MonoObject* B,
                                                                  MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto Timespan = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FTimespan>(B);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (DateTime != nullptr && Timespan != nullptr && OutDateTime != nullptr)
 	{
@@ -96,9 +96,9 @@ void FDateTimeImplementation::DateTime_AddTimespanImplementation(const MonoObjec
 
 void FDateTimeImplementation::DateTime_AddDateTimeImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(B);
+	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
 	if (DateTimeA != nullptr && DateTimeB != nullptr)
 	{
@@ -109,19 +109,19 @@ void FDateTimeImplementation::DateTime_AddDateTimeImplementation(const MonoObjec
 void FDateTimeImplementation::DateTime_SubtractDateTimeImplementation(const MonoObject* A, const MonoObject* B,
                                                                       MonoObject** OutValue)
 {
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(B);
+	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
 		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
 
 	if (DateTimeA != nullptr && DateTimeB != nullptr && OutTimespan != nullptr)
 	{
@@ -132,19 +132,19 @@ void FDateTimeImplementation::DateTime_SubtractDateTimeImplementation(const Mono
 void FDateTimeImplementation::DateTime_SubtractTimespanImplementation(const MonoObject* A, const MonoObject* B,
                                                                       MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto Timespan = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FTimespan>(B);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (DateTime != nullptr && Timespan != nullptr && OutDateTime != nullptr)
 	{
@@ -154,9 +154,9 @@ void FDateTimeImplementation::DateTime_SubtractTimespanImplementation(const Mono
 
 bool FDateTimeImplementation::DateTime_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(B);
+	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
 	if (DateTimeA != nullptr && DateTimeB != nullptr)
 	{
@@ -168,9 +168,9 @@ bool FDateTimeImplementation::DateTime_EqualityImplementation(const MonoObject* 
 
 bool FDateTimeImplementation::DateTime_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(B);
+	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
 	if (DateTimeA != nullptr && DateTimeB != nullptr)
 	{
@@ -182,9 +182,9 @@ bool FDateTimeImplementation::DateTime_InequalityImplementation(const MonoObject
 
 bool FDateTimeImplementation::DateTime_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(B);
+	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
 	if (DateTimeA != nullptr && DateTimeB != nullptr)
 	{
@@ -196,9 +196,9 @@ bool FDateTimeImplementation::DateTime_GreaterThanImplementation(const MonoObjec
 
 bool FDateTimeImplementation::DateTime_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(B);
+	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
 	if (DateTimeA != nullptr && DateTimeB != nullptr)
 	{
@@ -210,9 +210,9 @@ bool FDateTimeImplementation::DateTime_GreaterThanOrEqualImplementation(const Mo
 
 bool FDateTimeImplementation::DateTime_LessThanImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(B);
+	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
 	if (DateTimeA != nullptr && DateTimeB != nullptr)
 	{
@@ -224,9 +224,9 @@ bool FDateTimeImplementation::DateTime_LessThanImplementation(const MonoObject* 
 
 bool FDateTimeImplementation::DateTime_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(A);
+	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(B);
+	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
 	if (DateTimeA != nullptr && DateTimeB != nullptr)
 	{
@@ -238,17 +238,17 @@ bool FDateTimeImplementation::DateTime_LessThanOrEqualImplementation(const MonoO
 
 void FDateTimeImplementation::DateTime_GetDatePartImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (DateTime != nullptr && OutDateTime != nullptr)
 	{
@@ -259,7 +259,7 @@ void FDateTimeImplementation::DateTime_GetDatePartImplementation(const MonoObjec
 void FDateTimeImplementation::DateTime_GetDateComponentsImplementation(const MonoObject* InMonoObject, int32& OutYear,
                                                                        int32& OutMonth, int32& OutDay)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -269,7 +269,7 @@ void FDateTimeImplementation::DateTime_GetDateComponentsImplementation(const Mon
 
 int32 FDateTimeImplementation::DateTime_GetDayImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -281,7 +281,7 @@ int32 FDateTimeImplementation::DateTime_GetDayImplementation(const MonoObject* I
 
 int32 FDateTimeImplementation::DateTime_GetDayOfYearImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -293,7 +293,7 @@ int32 FDateTimeImplementation::DateTime_GetDayOfYearImplementation(const MonoObj
 
 int32 FDateTimeImplementation::DateTime_GetHourImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -305,7 +305,7 @@ int32 FDateTimeImplementation::DateTime_GetHourImplementation(const MonoObject* 
 
 int32 FDateTimeImplementation::DateTime_GetHour12Implementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -317,7 +317,7 @@ int32 FDateTimeImplementation::DateTime_GetHour12Implementation(const MonoObject
 
 double FDateTimeImplementation::DateTime_GetJulianDayImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -329,7 +329,7 @@ double FDateTimeImplementation::DateTime_GetJulianDayImplementation(const MonoOb
 
 double FDateTimeImplementation::DateTime_GetModifiedJulianDayImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -341,7 +341,7 @@ double FDateTimeImplementation::DateTime_GetModifiedJulianDayImplementation(cons
 
 int32 FDateTimeImplementation::DateTime_GetMillisecondImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -353,7 +353,7 @@ int32 FDateTimeImplementation::DateTime_GetMillisecondImplementation(const MonoO
 
 int32 FDateTimeImplementation::DateTime_GetMinuteImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -365,7 +365,7 @@ int32 FDateTimeImplementation::DateTime_GetMinuteImplementation(const MonoObject
 
 int32 FDateTimeImplementation::DateTime_GetMonthImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -377,7 +377,7 @@ int32 FDateTimeImplementation::DateTime_GetMonthImplementation(const MonoObject*
 
 int32 FDateTimeImplementation::DateTime_GetSecondImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -389,7 +389,7 @@ int32 FDateTimeImplementation::DateTime_GetSecondImplementation(const MonoObject
 
 int64 FDateTimeImplementation::DateTime_GetTicksImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -401,17 +401,17 @@ int64 FDateTimeImplementation::DateTime_GetTicksImplementation(const MonoObject*
 
 void FDateTimeImplementation::DateTime_GetTimeOfDayImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
 		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
 
 	if (DateTime != nullptr && OutTimespan != nullptr)
 	{
@@ -421,7 +421,7 @@ void FDateTimeImplementation::DateTime_GetTimeOfDayImplementation(const MonoObje
 
 int32 FDateTimeImplementation::DateTime_GetYearImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -433,7 +433,7 @@ int32 FDateTimeImplementation::DateTime_GetYearImplementation(const MonoObject* 
 
 bool FDateTimeImplementation::DateTime_IsAfternoonImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -445,7 +445,7 @@ bool FDateTimeImplementation::DateTime_IsAfternoonImplementation(const MonoObjec
 
 bool FDateTimeImplementation::DateTime_IsMorningImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -457,19 +457,19 @@ bool FDateTimeImplementation::DateTime_IsMorningImplementation(const MonoObject*
 
 void FDateTimeImplementation::DateTime_ToHttpDateImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
 		const auto ResultString = DateTime->ToHttpDate();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -478,19 +478,19 @@ void FDateTimeImplementation::DateTime_ToHttpDateImplementation(const MonoObject
 
 void FDateTimeImplementation::DateTime_ToIso8601Implementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
 		const auto ResultString = DateTime->ToIso8601();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -499,19 +499,19 @@ void FDateTimeImplementation::DateTime_ToIso8601Implementation(const MonoObject*
 
 void FDateTimeImplementation::DateTime_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
 		const auto ResultString = DateTime->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -520,7 +520,7 @@ void FDateTimeImplementation::DateTime_ToStringImplementation(const MonoObject* 
 
 int64 FDateTimeImplementation::DateTime_ToUnixTimestampImplementation(const MonoObject* InMonoObject)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
 	if (DateTime != nullptr)
 	{
@@ -542,15 +542,15 @@ int32 FDateTimeImplementation::DateTime_DaysInYearImplementation(const int32 Yea
 
 void FDateTimeImplementation::DateTime_FromJulianDayImplementation(const double JulianDay, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
@@ -560,15 +560,15 @@ void FDateTimeImplementation::DateTime_FromJulianDayImplementation(const double 
 
 void FDateTimeImplementation::DateTime_FromUnixTimestampImplementation(const int64 UnixTime, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
@@ -583,15 +583,15 @@ bool FDateTimeImplementation::DateTime_IsLeapYearImplementation(const int32 Year
 
 void FDateTimeImplementation::DateTime_MaxValueImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
@@ -601,15 +601,15 @@ void FDateTimeImplementation::DateTime_MaxValueImplementation(MonoObject** OutVa
 
 void FDateTimeImplementation::DateTime_MinValueImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
@@ -619,15 +619,15 @@ void FDateTimeImplementation::DateTime_MinValueImplementation(MonoObject** OutVa
 
 void FDateTimeImplementation::DateTime_NowImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
@@ -637,21 +637,21 @@ void FDateTimeImplementation::DateTime_NowImplementation(MonoObject** OutValue)
 
 bool FDateTimeImplementation::DateTime_ParseImplementation(MonoObject* DateTimeString, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
 		return FDateTime::Parse(
 			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 					GetDomain()->Object_To_String(DateTimeString, nullptr))), *OutDateTime);
 	}
 
@@ -660,21 +660,21 @@ bool FDateTimeImplementation::DateTime_ParseImplementation(MonoObject* DateTimeS
 
 bool FDateTimeImplementation::DateTime_ParseHttpDateImplementation(MonoObject* HttpDate, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
 		return FDateTime::ParseHttpDate(
 			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 					GetDomain()->Object_To_String(HttpDate, nullptr))), *OutDateTime);
 	}
 
@@ -683,15 +683,15 @@ bool FDateTimeImplementation::DateTime_ParseHttpDateImplementation(MonoObject* H
 
 void FDateTimeImplementation::DateTime_TodayImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
@@ -701,15 +701,15 @@ void FDateTimeImplementation::DateTime_TodayImplementation(MonoObject** OutValue
 
 void FDateTimeImplementation::DateTime_UtcNowImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
 		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutDateTime = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
+	const auto OutDateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(NewMonoObject);
 
 	if (OutDateTime != nullptr)
 	{
