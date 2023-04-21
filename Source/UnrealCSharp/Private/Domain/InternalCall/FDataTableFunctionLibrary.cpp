@@ -25,10 +25,19 @@ bool FDataTableFunctionLibraryImplementation::DataTableFunctionLibrary_GetDataTa
 
 	if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<UDataTable>(Table))
 	{
+#if UE_OBJECT_PTR
 		FCSharpEnvironment::GetEnvironment().Bind(DataTable->RowStruct.Get(), false);
+#else
+		FCSharpEnvironment::GetEnvironment().Bind(DataTable->RowStruct, false);
+#endif
 
+#if UE_OBJECT_PTR
 		if (const auto ClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
 			DataTable->RowStruct.Get()))
+#else
+		if (const auto ClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
+			DataTable->RowStruct))
+#endif
 		{
 			*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(ClassDescriptor->GetMonoClass());
 
