@@ -126,6 +126,7 @@ private:
 
 	void RegisterBinding();
 
+	void RegisterSyncContext();
 	void InitializeAssembly(const TArray<FString>& InAssemblies);
 
 	void DeinitializeAssembly();
@@ -134,11 +135,14 @@ private:
 
 	void DeinitializeAssemblyLoadContext();
 
+	void Tick(float DeltaTick);
+	void UnregisterSyncContext() const;
 	void LoadAssembly(const TArray<FString>& InAssemblies);
 
 	void UnloadAssembly();
 
 private:
+	FDelegateHandle TickHandle;
 	static MonoDomain* Domain;
 
 	static MonoAssembly* AssemblyUtilAssembly;

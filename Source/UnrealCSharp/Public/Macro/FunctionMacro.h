@@ -33,3 +33,8 @@
 #define FUNCTION_ASSEMBLY_UTIL_LOAD FString(TEXT("Load"))
 
 #define FUNCTION_STATIC_STRUCT FString(TEXT("StaticStruct"))
+
+
+#define FUNCTION_UTILS_INIT_SYNC_CONTEXT FString(TEXT("InitSyncContext"))
+#define FUNCTION_UTILS_FINI_SYNC_CONTEXT FString(TEXT("FiniSyncContext"))
+#define FUNCTION_UTILS_FINI_GLOBAL_TICK FString(TEXT("GlobalTick"))
