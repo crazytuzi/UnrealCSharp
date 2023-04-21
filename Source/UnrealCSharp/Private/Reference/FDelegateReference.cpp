@@ -2,5 +2,5 @@
 
 FDelegateReference::~FDelegateReference()
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveDelegateReference(GarbageCollectionHandle);
+	FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(GarbageCollectionHandle);
 }

@@ -2,5 +2,5 @@
 
 FContainerReference::~FContainerReference()
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(GarbageCollectionHandle);
+	FCSharpEnvironment::GetEnvironment().RemoveContainerReference(GarbageCollectionHandle);
 }

@@ -7,7 +7,7 @@ void FClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (ClassProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetMultiObject<TSubclassOf<UObject>>(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(Src);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -24,9 +24,9 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcMulti = FCSharpEnvironment::GetEnvironment()->GetMulti<TSubclassOf<UObject>>(SrcMonoObject);
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TSubclassOf<UObject>>(Dest);
+		FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(Dest);
 
 		ClassProperty->InitializeValue(Dest);
 
@@ -42,7 +42,7 @@ bool FClassPropertyDescriptor::Identical(const void* A, const void* B, const uin
 	{
 		const auto ClassA = Cast<UClass>(ClassProperty->GetObjectPropertyValue(A));
 
-		const auto ClassB = FCSharpEnvironment::GetEnvironment()->GetMulti<TSubclassOf<UObject>>(
+		const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
 			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
 
 #if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
@@ -61,9 +61,9 @@ MonoObject* FClassPropertyDescriptor::Object_New(void* InAddress) const
 
 	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(ClassProperty);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(GenericClassMonoClass);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TSubclassOf<UObject>>(InAddress, Object, SrcClass);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(InAddress, Object, SrcClass);
 
 	return Object;
 }

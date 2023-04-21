@@ -15,12 +15,12 @@ TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 
 MonoObject* FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
 {
-	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment()->GetObject(InObject))
+	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 	{
 		return FoundMonoObject;
 	}
 
-	return Bind(InMonoDomain, InObject, false) ? FCSharpEnvironment::GetEnvironment()->GetObject(InObject) : nullptr;
+	return Bind(InMonoDomain, InObject, false) ? FCSharpEnvironment::GetEnvironment().GetObject(InObject) : nullptr;
 }
 
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject, const bool bNeedMonoClass)
@@ -30,7 +30,7 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject, const bool 
 
 bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool bNeedMonoClass)
 {
-	if (FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(InStruct))
+	if (FCSharpEnvironment::GetEnvironment().GetClassDescriptor(InStruct))
 	{
 		return true;
 	}
@@ -82,7 +82,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObjec
 		return false;
 	}
 
-	const auto FoundClassDescriptor = FCSharpEnvironment::GetEnvironment()->GetClassDescriptor(InClass);
+	const auto FoundClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(InClass);
 
 	if (FoundClassDescriptor == nullptr)
 	{
@@ -98,7 +98,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObjec
 
 	const auto NewMonoObject = InMonoDomain->Object_New(FoundMonoClass);
 
-	FCSharpEnvironment::GetEnvironment()->AddObjectReference(InObject, NewMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddObjectReference(InObject, NewMonoObject);
 
 	return true;
 }
@@ -119,7 +119,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 		SuperStruct = SuperStruct->GetSuperStruct();
 	}
 
-	const auto NewClassDescriptor = FCSharpEnvironment::GetEnvironment()->NewClassDescriptor(InMonoDomain, InStruct);
+	const auto NewClassDescriptor = FCSharpEnvironment::GetEnvironment().NewClassDescriptor(InMonoDomain, InStruct);
 
 	if (NewClassDescriptor == nullptr)
 	{
@@ -260,7 +260,7 @@ bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 
 	const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty);
 
-	FCSharpEnvironment::GetEnvironment()->AddContainerReference(MapHelper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, InMonoObject);
 
 	return true;
 }
@@ -285,7 +285,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMo
 
 	InScriptStruct->InitializeStruct(Structure);
 
-	FCSharpEnvironment::GetEnvironment()->AddStructReference(InScriptStruct, nullptr, Structure, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddStructReference(InScriptStruct, nullptr, Structure, InMonoObject);
 
 	return true;
 }
@@ -305,7 +305,7 @@ bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct)
 	{
 		if (const auto FoundMonoType = InMonoDomain->Class_Get_Type(FoundMonoClass))
 		{
-			if (const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(
+			if (const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
 				FoundMonoType))
 			{
 				return IsOverrideType(InMonoDomain, FoundReflectionType);

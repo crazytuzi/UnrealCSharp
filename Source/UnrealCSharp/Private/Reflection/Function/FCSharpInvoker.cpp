@@ -21,7 +21,7 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 		{
 			Function = Stack.CurrentNativeFunction;
 
-			FunctionDescriptor = FCSharpEnvironment::GetEnvironment()->GetFunctionDescriptor(
+			FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor(
 				Cast<UClass>(Function->GetOuter()), Function->GetFName());
 		}
 		else
@@ -37,7 +37,7 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 
 	if (FunctionDescriptor == nullptr)
 	{
-		FunctionDescriptor = FCSharpEnvironment::GetEnvironment()->GetFunctionDescriptor(
+		FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor(
 			Cast<UClass>(Function->GetOuter()), Function->GetFName());
 	}
 

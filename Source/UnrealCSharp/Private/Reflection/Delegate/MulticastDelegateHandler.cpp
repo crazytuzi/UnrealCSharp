@@ -66,12 +66,12 @@ bool UMulticastDelegateHandler::IsBound() const
 
 bool UMulticastDelegateHandler::Contains(MonoObject* InMulticastDelegate) const
 {
-	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
 	{
 		void* Params[2];
 
-		if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+		if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Method_From_Name(
 			FoundMonoClass, FUNCTION_UTILS_MULTICAST_DELEGATE_GET_TARGET, TGetArrayLength(Params)))
 		{
 			for (const auto Delegate : Delegates)
@@ -80,10 +80,10 @@ bool UMulticastDelegateHandler::Contains(MonoObject* InMulticastDelegate) const
 
 				Params[1] = InMulticastDelegate;
 
-				const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+				const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
 					FoundMonoMethod, nullptr, Params);
 
-				if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
+				if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
 					ResultMonoObject)))
 				{
 					return true;
@@ -134,12 +134,12 @@ void UMulticastDelegateHandler::AddUnique(MonoObject* InMulticastDelegate)
 
 void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 {
-	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
 	{
 		void* Params[2];
 
-		if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Method_From_Name(
+		if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Method_From_Name(
 			FoundMonoClass, FUNCTION_UTILS_MULTICAST_DELEGATE_EQUALS, TGetArrayLength(Params)))
 		{
 			for (const auto Delegate : Delegates)
@@ -148,10 +148,10 @@ void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 
 				Params[1] = InMulticastDelegate;
 
-				const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+				const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
 					FoundMonoMethod, nullptr, Params);
 
-				if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(
+				if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
 					ResultMonoObject)))
 				{
 					Delegates.Remove(Delegate);
@@ -182,16 +182,16 @@ void UMulticastDelegateHandler::RemoveAll(MonoObject* InObject)
 			return true;
 		}
 
-		if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
 		{
 			auto Params = static_cast<void*>(Element);
 
-			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment()->GetDomain()->
+			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_MULTICAST_DELEGATE_GET_TARGET,
 				                           TGetArrayLength(Params)))
 			{
-				const auto TargetMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Runtime_Invoke(
+				const auto TargetMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
 					FoundMonoMethod, nullptr, &Params);
 
 				return TargetMonoObject == InObject ? true : false;

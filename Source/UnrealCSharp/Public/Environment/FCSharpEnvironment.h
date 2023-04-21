@@ -24,7 +24,7 @@ public:
 	void Deinitialize();
 
 public:
-	static FCSharpEnvironment* GetEnvironment();
+	static FCSharpEnvironment& GetEnvironment();
 
 public:
 	FMonoDomain* GetDomain() const;
@@ -35,6 +35,8 @@ public:
 	void NotifyUObjectDeleted(const class UObjectBase* Object, int32 Index);
 
 	void OnUObjectArrayShutdown();
+
+	void OnUnrealCSharpModuleActive();
 
 	void OnUnrealCSharpModuleInActive();
 
@@ -184,11 +186,13 @@ public:
 	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
 
 private:
-	static FCSharpEnvironment* Environment;
+	static FCSharpEnvironment Environment;
 
 	FMonoDomain* Domain;
 
 private:
+	FDelegateHandle OnUnrealCSharpModuleActiveDelegateHandle;
+
 	FDelegateHandle OnUnrealCSharpModuleInActiveDelegateHandle;
 
 	FDelegateHandle OnAsyncLoadingFlushUpdateHandle;

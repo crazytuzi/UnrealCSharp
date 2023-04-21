@@ -76,7 +76,7 @@ bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, vo
 		                                                InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
 	                                                });
 
-	return FCSharpEnvironment::GetEnvironment()->AddReference(InOwner, new FDelegateReference(GarbageCollectionHandle));
+	return FCSharpEnvironment::GetEnvironment().AddReference(InOwner, new FDelegateReference(GarbageCollectionHandle));
 }
 
 bool FDelegateRegistry::RemoveReference(const MonoObject* InMonoObject)

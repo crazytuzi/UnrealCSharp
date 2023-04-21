@@ -76,7 +76,7 @@ bool FContainerRegistry::AddReference(const FGarbageCollectionHandle& InOwner, v
 		                                                 InAddress, static_cast<FContainerHelper*>(InContainer)
 	                                                 });
 
-	return FCSharpEnvironment::GetEnvironment()->
+	return FCSharpEnvironment::GetEnvironment().
 		AddReference(InOwner, new FContainerReference(GarbageCollectionHandle));
 }
 

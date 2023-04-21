@@ -8,7 +8,7 @@ void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (ArrayProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetContainerObject(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(Src);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -25,9 +25,9 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment()->GetContainer<FArrayHelper>(SrcMonoObject);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(Dest);
+		FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
 
 		ArrayProperty->InitializeValue(Dest);
 
@@ -43,28 +43,28 @@ MonoObject* FArrayPropertyDescriptor::Object_New(void* InAddress) const
 
 	const auto FoundMonoClass = FTypeBridge::GetMonoClass(ArrayProperty->Inner);
 
-	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_Get_Type(FoundMonoClass);
+	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(FoundMonoClass);
 
-	const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment()->GetDomain()->Type_Get_Object(FoundMonoType);
+	const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(FoundMonoType);
 
 	auto InParams = static_cast<void*>(FoundReflectionType);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 		GenericClassMonoClass, TGetArrayLength(InParams), &InParams);
 
 	const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, InAddress);
 
-	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment()->GetGarbageCollectionHandle(
+	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 		InAddress, ArrayProperty->GetOffset_ForInternal());
 
 	if (OwnerGarbageCollectionHandle.IsValid())
 	{
-		FCSharpEnvironment::GetEnvironment()->AddContainerReference(OwnerGarbageCollectionHandle, InAddress,
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress,
 		                                                            ArrayHelper, Object);
 	}
 	else
 	{
-		FCSharpEnvironment::GetEnvironment()->AddContainerReference(ArrayHelper, Object);
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Object);
 	}
 
 	return Object;

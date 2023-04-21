@@ -7,7 +7,7 @@ void FSoftObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (SoftObjectProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetMultiObject<TSoftObjectPtr<UObject>>(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftObjectPtr<UObject>>(Src);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -24,9 +24,9 @@ void FSoftObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcMulti = FCSharpEnvironment::GetEnvironment()->GetMulti<TSoftObjectPtr<UObject>>(SrcMonoObject);
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<UObject>>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TSoftObjectPtr<UObject>>(Dest);
+		FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftObjectPtr<UObject>>(Dest);
 
 		SoftObjectProperty->InitializeValue(Dest);
 
@@ -42,7 +42,7 @@ bool FSoftObjectPropertyDescriptor::Identical(const void* A, const void* B, uint
 	{
 		const auto ObjectA = SoftObjectProperty->GetObjectPropertyValue(A);
 
-		const auto ObjectB = FCSharpEnvironment::GetEnvironment()->GetMulti<TSoftObjectPtr<UObject>>(
+		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<UObject>>(
 			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
 
 #if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
@@ -61,9 +61,9 @@ MonoObject* FSoftObjectPropertyDescriptor::Object_New(void* InAddress) const
 
 	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(SoftObjectProperty);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(GenericClassMonoClass);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TSoftObjectPtr<UObject>>(InAddress, Object, SrcObject);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>>(InAddress, Object, SrcObject);
 
 	return Object;
 }

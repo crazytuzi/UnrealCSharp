@@ -23,20 +23,20 @@ static FRegisterSoftClassPtr RegisterSoftClassPtr;
 void FSoftClassPtrImplementation::SoftClassPtr_RegisterImplementation(MonoObject* InMonoObject,
                                                                       const MonoObject* InClass)
 {
-	const auto FoundClass = FCSharpEnvironment::GetEnvironment()->GetObject<UClass>(InClass);
+	const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TSoftClassPtr<UObject>>(InMonoObject, FoundClass);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(InMonoObject, FoundClass);
 }
 
 void FSoftClassPtrImplementation::SoftClassPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TSoftClassPtr<UObject>>(InMonoObject);
+	FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(InMonoObject);
 }
 
 void FSoftClassPtrImplementation::SoftClassPtr_GetImplementation(const MonoObject* InMonoObject,
                                                                  MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment()->GetMulti<TSoftClassPtr<UObject>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InMonoObject);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Multi.Get());
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi.Get());
 }

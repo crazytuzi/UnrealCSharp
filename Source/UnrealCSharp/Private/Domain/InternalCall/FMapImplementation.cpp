@@ -34,19 +34,19 @@ static FRegisterMap RegisterMap;
 
 void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->Bind(InMonoObject,
+	FCSharpEnvironment::GetEnvironment().Bind(InMonoObject,
 	                                           FTypeBridge::GetGenericArgument(InMonoObject),
 	                                           FTypeBridge::GetGenericArgument(InMonoObject, 1));
 }
 
 void FMapImplementation::Map_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveContainerReference(InMonoObject);
+	FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
 }
 
 void FMapImplementation::Map_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		return MapHelper->Empty(InExpectedNumElements);
 	}
@@ -54,7 +54,7 @@ void FMapImplementation::Map_EmptyImplementation(const MonoObject* InMonoObject,
 
 int32 FMapImplementation::Map_NumImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		return MapHelper->Num();
 	}
@@ -64,7 +64,7 @@ int32 FMapImplementation::Map_NumImplementation(const MonoObject* InMonoObject)
 
 void FMapImplementation::Map_AddImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject* InValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		auto Key = static_cast<void*>(InKey);
 
@@ -72,12 +72,12 @@ void FMapImplementation::Map_AddImplementation(const MonoObject* InMonoObject, M
 
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			Key = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InKey);
+			Key = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey);
 		}
 
 		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 		{
-			Value = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue);
+			Value = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
 		}
 
 		MapHelper->Add(Key, Value);
@@ -86,11 +86,11 @@ void FMapImplementation::Map_AddImplementation(const MonoObject* InMonoObject, M
 
 int32 FMapImplementation::Map_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return MapHelper->Remove(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InKey));
+			return MapHelper->Remove(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey));
 		}
 		else
 		{
@@ -104,20 +104,20 @@ int32 FMapImplementation::Map_RemoveImplementation(const MonoObject* InMonoObjec
 void FMapImplementation::Map_FindKeyImplementation(const MonoObject* InMonoObject, MonoObject* InValue,
                                                    MonoObject** OutKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		auto Value = static_cast<void*>(InValue);
 
 		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 		{
-			Value = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue);
+			Value = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
 		}
 
 		const auto Key = MapHelper->FindKey(Value);
 
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			*OutKey = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+			*OutKey = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 				FTypeBridge::GetMonoClass(MapHelper->GetKeyPropertyDescriptor()->GetProperty()), Key);
 		}
 		else
@@ -130,20 +130,20 @@ void FMapImplementation::Map_FindKeyImplementation(const MonoObject* InMonoObjec
 void FMapImplementation::Map_FindImplementation(const MonoObject* InMonoObject, MonoObject* InKey,
                                                 MonoObject** OutValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		auto Key = static_cast<void*>(InKey);
 
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			Key = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InKey);
+			Key = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey);
 		}
 
 		const auto Value = MapHelper->Find(Key);
 
 		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 		{
-			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
 		}
 		else
@@ -155,11 +155,11 @@ void FMapImplementation::Map_FindImplementation(const MonoObject* InMonoObject, 
 
 bool FMapImplementation::Map_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			return MapHelper->Contains(FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InKey));
+			return MapHelper->Contains(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey));
 		}
 		else
 		{
@@ -172,20 +172,20 @@ bool FMapImplementation::Map_ContainsImplementation(const MonoObject* InMonoObje
 
 void FMapImplementation::Map_GetImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject** OutValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		auto Key = static_cast<void*>(InKey);
 
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			Key = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InKey);
+			Key = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey);
 		}
 
 		const auto Value = MapHelper->Get(Key);
 
 		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 		{
-			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
 		}
 		else
@@ -197,7 +197,7 @@ void FMapImplementation::Map_GetImplementation(const MonoObject* InMonoObject, M
 
 void FMapImplementation::Map_SetImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject* InValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		auto Key = static_cast<void*>(InKey);
 
@@ -205,12 +205,12 @@ void FMapImplementation::Map_SetImplementation(const MonoObject* InMonoObject, M
 
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			Key = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InKey);
+			Key = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey);
 		}
 
 		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 		{
-			Value = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_Unbox(InValue);
+			Value = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
 		}
 
 		MapHelper->Set(Key, Value);
@@ -219,7 +219,7 @@ void FMapImplementation::Map_SetImplementation(const MonoObject* InMonoObject, M
 
 int32 FMapImplementation::Map_GetMaxIndexImplementation(const MonoObject* InMonoObject)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		return MapHelper->GetMaxIndex();
 	}
@@ -229,7 +229,7 @@ int32 FMapImplementation::Map_GetMaxIndexImplementation(const MonoObject* InMono
 
 bool FMapImplementation::Map_IsValidIndexImplementation(const MonoObject* InMonoObject, const int32 InIndex)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		return MapHelper->IsValidIndex(InIndex);
 	}
@@ -240,13 +240,13 @@ bool FMapImplementation::Map_IsValidIndexImplementation(const MonoObject* InMono
 void FMapImplementation::Map_GetEnumeratorKeyImplementation(const MonoObject* InMonoObject, const int32 InIndex,
                                                             MonoObject** OutKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		const auto Key = MapHelper->GetEnumeratorKey(InIndex);
 
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
-			*OutKey = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+			*OutKey = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 				FTypeBridge::GetMonoClass(MapHelper->GetKeyPropertyDescriptor()->GetProperty()), Key);
 		}
 		else
@@ -259,13 +259,13 @@ void FMapImplementation::Map_GetEnumeratorKeyImplementation(const MonoObject* In
 void FMapImplementation::Map_GetEnumeratorValueImplementation(const MonoObject* InMonoObject, const int32 InIndex,
                                                               MonoObject** OutValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment()->GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
 	{
 		const auto Value = MapHelper->GetEnumeratorValue(InIndex);
 
 		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 		{
-			*OutValue = FCSharpEnvironment::GetEnvironment()->GetDomain()->Value_Box(
+			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
 		}
 		else

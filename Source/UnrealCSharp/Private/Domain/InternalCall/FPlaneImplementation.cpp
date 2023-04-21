@@ -35,7 +35,7 @@ static FRegisterPlane RegisterPlane;
 
 bool FPlaneImplementation::Plane_IsValidImplementation(const MonoObject* InMonoObject)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
 	if (Plane != nullptr)
 	{
@@ -47,17 +47,17 @@ bool FPlaneImplementation::Plane_IsValidImplementation(const MonoObject* InMonoO
 
 void FPlaneImplementation::Plane_GetOriginImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
 		CLASS_SCRIPT_STRUCT_NAME(FVector));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (Plane != nullptr && OutVector != nullptr)
 	{
@@ -67,9 +67,9 @@ void FPlaneImplementation::Plane_GetOriginImplementation(const MonoObject* InMon
 
 float FPlaneImplementation::Plane_PlaneDotImplementation(const MonoObject* InMonoObject, const MonoObject* P)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(P);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(P);
 
 	if (Plane != nullptr && Vector != nullptr)
 	{
@@ -81,7 +81,7 @@ float FPlaneImplementation::Plane_PlaneDotImplementation(const MonoObject* InMon
 
 bool FPlaneImplementation::Plane_NormalizeImplementation(const MonoObject* InMonoObject, const float Tolerance)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
 	if (Plane != nullptr)
 	{
@@ -93,17 +93,17 @@ bool FPlaneImplementation::Plane_NormalizeImplementation(const MonoObject* InMon
 
 void FPlaneImplementation::Plane_FlipImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPlane)),
 		CLASS_SCRIPT_STRUCT_NAME(FPlane));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(NewMonoObject);
+	const auto OutPlane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(NewMonoObject);
 
 	if (Plane != nullptr && OutPlane != nullptr)
 	{
@@ -114,19 +114,19 @@ void FPlaneImplementation::Plane_FlipImplementation(const MonoObject* InMonoObje
 void FPlaneImplementation::Plane_TransformByImplementation(const MonoObject* InMonoObject, const MonoObject* M,
                                                            MonoObject** OutValue)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
-	const auto Matrix = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FMatrix>(M);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(M);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPlane)),
 		CLASS_SCRIPT_STRUCT_NAME(FPlane));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(NewMonoObject);
+	const auto OutPlane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(NewMonoObject);
 
 	if (Plane != nullptr && Matrix != nullptr && OutPlane != nullptr)
 	{
@@ -138,21 +138,21 @@ void FPlaneImplementation::Plane_TransformByUsingAdjointTImplementation(const Mo
                                                                         const MonoObject* M, const float DetM,
                                                                         const MonoObject* TA, MonoObject** OutValue)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
-	const auto MatrixM = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FMatrix>(M);
+	const auto MatrixM = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(M);
 
-	const auto MatrixTA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FMatrix>(TA);
+	const auto MatrixTA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(TA);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPlane)),
 		CLASS_SCRIPT_STRUCT_NAME(FPlane));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(NewMonoObject);
+	const auto OutPlane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(NewMonoObject);
 
 	if (Plane != nullptr && MatrixM != nullptr && MatrixTA != nullptr && OutPlane != nullptr)
 	{
@@ -162,9 +162,9 @@ void FPlaneImplementation::Plane_TransformByUsingAdjointTImplementation(const Mo
 
 bool FPlaneImplementation::Plane_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(A);
+	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
 
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(B);
+	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
 
 	if (PlaneA != nullptr && PlaneB != nullptr)
 	{
@@ -176,9 +176,9 @@ bool FPlaneImplementation::Plane_EqualityImplementation(const MonoObject* A, con
 
 bool FPlaneImplementation::Plane_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(A);
+	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
 
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(B);
+	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
 
 	if (PlaneA != nullptr && PlaneB != nullptr)
 	{
@@ -190,9 +190,9 @@ bool FPlaneImplementation::Plane_InequalityImplementation(const MonoObject* A, c
 
 bool FPlaneImplementation::Plane_EqualsImplementation(const MonoObject* A, const MonoObject* B, const float Tolerance)
 {
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(A);
+	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
 
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(B);
+	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
 
 	if (PlaneA != nullptr && PlaneB != nullptr)
 	{
@@ -204,9 +204,9 @@ bool FPlaneImplementation::Plane_EqualsImplementation(const MonoObject* A, const
 
 float FPlaneImplementation::Plane_DotProductImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(A);
+	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
 
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(B);
+	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
 
 	if (PlaneA != nullptr && PlaneB != nullptr)
 	{
@@ -218,19 +218,19 @@ float FPlaneImplementation::Plane_DotProductImplementation(const MonoObject* A, 
 
 void FPlaneImplementation::Plane_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
 {
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(A);
+	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
 
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(B);
+	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPlane)),
 		CLASS_SCRIPT_STRUCT_NAME(FPlane));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(NewMonoObject);
+	const auto OutPlane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(NewMonoObject);
 
 	if (PlaneA != nullptr && PlaneB != nullptr && OutPlane != nullptr)
 	{
@@ -240,19 +240,19 @@ void FPlaneImplementation::Plane_AddImplementation(const MonoObject* A, const Mo
 
 void FPlaneImplementation::Plane_SubtractImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
 {
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(A);
+	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
 
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(B);
+	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPlane)),
 		CLASS_SCRIPT_STRUCT_NAME(FPlane));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(NewMonoObject);
+	const auto OutPlane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(NewMonoObject);
 
 	if (PlaneA != nullptr && PlaneB != nullptr && OutPlane != nullptr)
 	{
@@ -263,17 +263,17 @@ void FPlaneImplementation::Plane_SubtractImplementation(const MonoObject* A, con
 void FPlaneImplementation::Plane_DivideImplementation(const MonoObject* InMonoObject, const float Scale,
                                                       MonoObject** OutValue)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPlane)),
 		CLASS_SCRIPT_STRUCT_NAME(FPlane));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(NewMonoObject);
+	const auto OutPlane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(NewMonoObject);
 
 	if (Plane != nullptr && OutPlane != nullptr)
 	{
@@ -284,17 +284,17 @@ void FPlaneImplementation::Plane_DivideImplementation(const MonoObject* InMonoOb
 void FPlaneImplementation::Plane_MultiplyImplementation(const MonoObject* InMonoObject, const float Scale,
                                                         MonoObject** OutValue)
 {
-	const auto Plane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(InMonoObject);
+	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPlane)),
 		CLASS_SCRIPT_STRUCT_NAME(FPlane));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPlane = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPlane>(NewMonoObject);
+	const auto OutPlane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(NewMonoObject);
 
 	if (Plane != nullptr && OutPlane != nullptr)
 	{

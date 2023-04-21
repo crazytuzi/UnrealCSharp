@@ -7,7 +7,7 @@ void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (SoftClassProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment()->GetMultiObject<TSoftClassPtr<UObject>>(Src);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftClassPtr<UObject>>(Src);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -24,9 +24,9 @@ void FSoftClassPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcMulti = FCSharpEnvironment::GetEnvironment()->GetMulti<TSoftClassPtr<UObject>>(SrcMonoObject);
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TSoftClassPtr<UObject>>(Dest);
+		FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(Dest);
 
 		SoftClassProperty->InitializeValue(Dest);
 
@@ -42,7 +42,7 @@ bool FSoftClassPropertyDescriptor::Identical(const void* A, const void* B, const
 	{
 		const auto ClassA = SoftClassProperty->GetObjectPropertyValue(A);
 
-		const auto ClassB = FCSharpEnvironment::GetEnvironment()->GetMulti<TSoftClassPtr<UObject>>(
+		const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
 			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
 
 #if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
@@ -61,9 +61,9 @@ MonoObject* FSoftClassPropertyDescriptor::Object_New(void* InAddress) const
 
 	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(SoftClassProperty);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(GenericClassMonoClass);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TSoftClassPtr<UObject>>(InAddress, Object, SrcClass);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(InAddress, Object, SrcClass);
 
 	return Object;
 }

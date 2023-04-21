@@ -64,20 +64,20 @@ static FRegisterPolyglotTextData RegisterPolyglotTextData;
 bool FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutFailureReason)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	FText Text;
 
 	const auto Result = PolyglotTextData->IsValid(&Text);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT);
 
-	auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+	auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 		TCHAR_TO_UTF8(*Text.ToString())));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 		FoundMonoClass, 1, &NewMonoString);
 
 	*OutFailureReason = NewMonoObject;
@@ -88,13 +88,13 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation(
 void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeCultureImplementation(
 	const MonoObject* InMonoObject, MonoObject* InNativeCulture)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		PolyglotTextData->SetNativeCulture(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InNativeCulture, nullptr))));
 	}
 }
@@ -102,20 +102,20 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeCultureImplement
 void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeCultureImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		const auto ResultString = PolyglotTextData->GetNativeCulture();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -125,20 +125,20 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeCultureImplement
 void FPolyglotTextDataImplementation::PolyglotTextData_ResolveNativeCultureImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		const auto ResultString = PolyglotTextData->ResolveNativeCulture();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -148,17 +148,17 @@ void FPolyglotTextDataImplementation::PolyglotTextData_ResolveNativeCultureImple
 void FPolyglotTextDataImplementation::PolyglotTextData_SetIdentityImplementation(
 	const MonoObject* InMonoObject, MonoObject* InNamespace, MonoObject* InKey)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		PolyglotTextData->SetIdentity(
 			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 					GetDomain()->Object_To_String(InNamespace, nullptr))),
 			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 					GetDomain()->Object_To_String(InKey, nullptr))));
 	}
 }
@@ -166,7 +166,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetIdentityImplementation
 void FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutNamespace, MonoObject** OutKey)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
@@ -175,19 +175,19 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation
 
 		PolyglotTextData->GetIdentity(StringOutNamespace, StringOutKey);
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString1 = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString1 = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*StringOutNamespace)));
 
-		auto NewMonoString2 = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString2 = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*StringOutKey)));
 
-		const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString1);
 
-		const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString2);
 
 		*OutNamespace = NewMonoObject1;
@@ -199,20 +199,20 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation
 void FPolyglotTextDataImplementation::PolyglotTextData_GetNamespaceImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		const auto ResultString = PolyglotTextData->GetNamespace();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -222,20 +222,20 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNamespaceImplementatio
 void FPolyglotTextDataImplementation::PolyglotTextData_GetKeyImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		const auto ResultString = PolyglotTextData->GetKey();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -245,13 +245,13 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetKeyImplementation(
 void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeStringImplementation(
 	const MonoObject* InMonoObject, MonoObject* InNativeString)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		PolyglotTextData->SetNativeString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InNativeString, nullptr))));
 	}
 }
@@ -259,20 +259,20 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeStringImplementa
 void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeStringImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		const auto ResultString = PolyglotTextData->GetNativeString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -282,17 +282,17 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeStringImplementa
 void FPolyglotTextDataImplementation::PolyglotTextData_AddLocalizedStringImplementation(
 	const MonoObject* InMonoObject, MonoObject* InCulture, MonoObject* InLocalizedString)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		PolyglotTextData->AddLocalizedString(
 			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 					GetDomain()->Object_To_String(InCulture, nullptr))),
 			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 					GetDomain()->Object_To_String(InLocalizedString, nullptr))));
 	}
 }
@@ -300,13 +300,13 @@ void FPolyglotTextDataImplementation::PolyglotTextData_AddLocalizedStringImpleme
 void FPolyglotTextDataImplementation::PolyglotTextData_RemoveLocalizedStringImplementation(
 	const MonoObject* InMonoObject, MonoObject* InCulture)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		PolyglotTextData->RemoveLocalizedString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InCulture, nullptr))));
 	}
 }
@@ -314,23 +314,23 @@ void FPolyglotTextDataImplementation::PolyglotTextData_RemoveLocalizedStringImpl
 bool FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImplementation(
 	const MonoObject* InMonoObject, MonoObject* InCulture, MonoObject** OutLocalizedString)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	FString String;
 
 	const auto Result = PolyglotTextData->GetLocalizedString(
 		UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InCulture, nullptr))), String);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
 
-	auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+	auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 		TCHAR_TO_UTF8(*String)));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 		FoundMonoClass, 1, &NewMonoString);
 
 	*OutLocalizedString = NewMonoObject;
@@ -341,7 +341,7 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImpleme
 void FPolyglotTextDataImplementation::PolyglotTextData_ClearLocalizedStringsImplementation(
 	const MonoObject* InMonoObject)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
@@ -353,7 +353,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_ClearLocalizedStringsImpl
 void FPolyglotTextDataImplementation::PolyglotTextData_SetIsMinimalPatchImplementation(
 	const MonoObject* InMonoObject, const bool InIsMinimalPatch)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
@@ -364,7 +364,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetIsMinimalPatchImplemen
 
 bool FPolyglotTextDataImplementation::PolyglotTextData_GetIsMinimalPatchImplementation(const MonoObject* InMonoObject)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
@@ -378,20 +378,20 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_GetIsMinimalPatchImplemen
 void FPolyglotTextDataImplementation::PolyglotTextData_GetTextImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPolyglotTextData>(InMonoObject);
 
 	if (PolyglotTextData != nullptr)
 	{
 		const auto ResultString = PolyglotTextData->GetText();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString.ToString())));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;

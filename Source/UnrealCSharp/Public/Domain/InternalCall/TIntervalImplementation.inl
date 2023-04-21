@@ -7,7 +7,7 @@
 template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_SizeImplementation(const MonoObject* InMonoObject)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (Interval != nullptr)
 	{
@@ -20,7 +20,7 @@ auto TIntervalImplementation<T, U>::Interval_SizeImplementation(const MonoObject
 template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_IsValidImplementation(const MonoObject* InMonoObject)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (Interval != nullptr)
 	{
@@ -33,7 +33,7 @@ auto TIntervalImplementation<T, U>::Interval_IsValidImplementation(const MonoObj
 template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_ContainsImplementation(const MonoObject* InMonoObject, const U Element)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (Interval != nullptr)
 	{
@@ -46,7 +46,7 @@ auto TIntervalImplementation<T, U>::Interval_ContainsImplementation(const MonoOb
 template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_ExpandImplementation(const MonoObject* InMonoObject, const U ExpandAmount)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (Interval != nullptr)
 	{
@@ -57,7 +57,7 @@ auto TIntervalImplementation<T, U>::Interval_ExpandImplementation(const MonoObje
 template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_IncludeImplementation(const MonoObject* InMonoObject, const U X)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (Interval != nullptr)
 	{
@@ -69,7 +69,7 @@ template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_InterpolateImplementation(const MonoObject* InMonoObject,
                                                                        const float Alpha)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (Interval != nullptr)
 	{
@@ -83,19 +83,19 @@ template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_IntersectImplementation(const MonoObject* A, const MonoObject* B,
                                                                      MonoObject** OutValue)
 {
-	const auto IntervalA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(A);
+	const auto IntervalA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
-	const auto IntervalB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(B);
+	const auto IntervalB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
 		CLASS_SCRIPT_STRUCT_NAME(T));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutInterval = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutInterval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (IntervalA != nullptr && IntervalB != nullptr && OutInterval != nullptr)
 	{
