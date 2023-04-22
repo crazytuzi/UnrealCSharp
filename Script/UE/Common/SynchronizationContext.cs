@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Script.Common;
@@ -21,7 +22,7 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
         Context = null;
     }
 
-    public static void Ticker()
+    public static void Tick(Single DeltaTime)
     {
         Context?.Tick();
     }

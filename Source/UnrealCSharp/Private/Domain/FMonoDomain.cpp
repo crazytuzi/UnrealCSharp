@@ -86,6 +86,31 @@ void FMonoDomain::Deinitialize()
 	DeinitializeAssembly();
 }
 
+void FMonoDomain::Tick(float DeltaTime)
+{
+	if (const auto SynchronizationContextClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
+	{
+		auto InParams = static_cast<void*>(&DeltaTime);
+
+		if (const auto TickMonoMethod = Class_Get_Method_From_Name(
+			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICK, TGetArrayLength(InParams)))
+		{
+			Runtime_Invoke(TickMonoMethod, nullptr, &InParams);
+		}
+	}
+}
+
+bool FMonoDomain::IsTickable() const
+{
+	return FTickableGameObject::IsTickable();
+}
+
+TStatId FMonoDomain::GetStatId() const
+{
+	RETURN_QUICK_DECLARE_CYCLE_STAT(FMonoDomain, STATGROUP_Tickables);
+}
+
 MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass) const
 {
 	if (Domain != nullptr && InMonoClass != nullptr)
@@ -426,7 +451,7 @@ void FMonoDomain::RegisterBinding()
 void FMonoDomain::InitializeSynchronizationContext()
 {
 	if (const auto SynchronizationContextClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_SYNCHRONIZATION_CONTEXT))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
 	{
 		if (const auto InitializeMonoMethod = Class_Get_Method_From_Name(
 			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE, 0))
@@ -434,34 +459,12 @@ void FMonoDomain::InitializeSynchronizationContext()
 			Runtime_Invoke(InitializeMonoMethod, nullptr, nullptr, nullptr);
 		}
 	}
-
-	TickHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float)
-	{
-		if (const auto SynchronizationContextClass = Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_SYNCHRONIZATION_CONTEXT))
-		{
-			if (const auto TickerMonoMethod = Class_Get_Method_From_Name(
-				SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICKER, 0))
-			{
-				Runtime_Invoke(TickerMonoMethod, nullptr, nullptr, nullptr);
-
-				return true;
-			}
-		}
-
-		return false;
-	}));
 }
 
 void FMonoDomain::DeinitializeSynchronizationContext() const
 {
-	if (TickHandle.IsValid())
-	{
-		FTicker::GetCoreTicker().RemoveTicker(TickHandle);
-	}
-
 	if (const auto SynchronizationContextClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_SYNCHRONIZATION_CONTEXT))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
 	{
 		if (const auto DeinitializeMonoMethod = Class_Get_Method_From_Name(
 			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_DEINITIALIZE, 0))
