@@ -28,12 +28,17 @@ FEditorListener::FEditorListener()
 
 	auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(TEXT("DirectoryWatcher"));
 
-	DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
-		FUnrealCSharpFunctionLibrary::GetBasePath(),
-		IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
-		OnDirectoryChangedDelegateHandle,
-		IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
-	);
+	const auto& ChangedDirectories = FUnrealCSharpFunctionLibrary::GetChangedDirectories();
+
+	for (const auto& Directory : ChangedDirectories)
+	{
+		DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
+			Directory,
+			IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
+			OnDirectoryChangedDelegateHandle,
+			IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
+		);
+	}
 }
 
 FEditorListener::~FEditorListener()
@@ -43,8 +48,13 @@ FEditorListener::~FEditorListener()
 		auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
 			TEXT("DirectoryWatcher"));
 
-		DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
-			FUnrealCSharpFunctionLibrary::GetBasePath(), OnDirectoryChangedDelegateHandle);
+		const auto& ChangedDirectories = FUnrealCSharpFunctionLibrary::GetChangedDirectories();
+
+		for (const auto& Directory : ChangedDirectories)
+		{
+			DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
+				Directory, OnDirectoryChangedDelegateHandle);
+		}
 	}
 
 	if (OnMainFrameCreationFinishedDelegateHandle.IsValid())

@@ -442,6 +442,35 @@ FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
 	return FPaths::Combine(FPaths::ProjectIntermediateDir(), CODE_ANALYSIS);
 }
 
+TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
+{
+	const auto& GamePath = GetGamePath();
+
+	TArray<FString> Directories;
+
+	const auto& IgnoreDirectories = TArray<FString>{
+		FPaths::Combine(GamePath, TEXT("Proxy")),
+		FPaths::Combine(GamePath, TEXT("obj")),
+		FPaths::Combine(GamePath, TEXT(".vs"))
+	};
+
+	IFileManager::Get().IterateDirectory(
+		*GamePath, [&Directories, &IgnoreDirectories](const TCHAR* FilenameOrDirectory, const bool bIsDirectory)
+		{
+			if (bIsDirectory)
+			{
+				if (!IgnoreDirectories.Contains(FilenameOrDirectory))
+				{
+					Directories.Add(FilenameOrDirectory);
+				}
+			}
+
+			return true;
+		});
+
+	return Directories;
+}
+
 TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
 {
 	static TArray<FString> GameModuleList;

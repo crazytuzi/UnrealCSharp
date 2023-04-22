@@ -60,6 +60,8 @@ public:
 
 	static FString GetCodeAnalysisPath();
 
+	static TArray<FString> GetChangedDirectories();
+
 private:
 	static TArray<FString>& GetGameModuleList();
 };
