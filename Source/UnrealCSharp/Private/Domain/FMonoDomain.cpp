@@ -73,13 +73,42 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 	RegisterLog();
 
 	RegisterBinding();
+
+	InitializeSynchronizationContext();
 }
 
 void FMonoDomain::Deinitialize()
 {
+	DeinitializeSynchronizationContext();
+
 	UnloadAssembly();
 
 	DeinitializeAssembly();
+}
+
+void FMonoDomain::Tick(float DeltaTime)
+{
+	if (const auto SynchronizationContextClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
+	{
+		auto InParams = static_cast<void*>(&DeltaTime);
+
+		if (const auto TickMonoMethod = Class_Get_Method_From_Name(
+			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICK, TGetArrayLength(InParams)))
+		{
+			Runtime_Invoke(TickMonoMethod, nullptr, &InParams);
+		}
+	}
+}
+
+bool FMonoDomain::IsTickable() const
+{
+	return FTickableGameObject::IsTickable();
+}
+
+TStatId FMonoDomain::GetStatId() const
+{
+	RETURN_QUICK_DECLARE_CYCLE_STAT(FMonoDomain, STATGROUP_Tickables);
 }
 
 MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass) const
@@ -416,6 +445,32 @@ void FMonoDomain::RegisterBinding()
 	for (const auto Binding : FBinding::Get().GetBinding())
 	{
 		FMonoInternalCall::RegisterInternalCall(TCHAR_TO_ANSI(*Binding.Key), Binding.Value);
+	}
+}
+
+void FMonoDomain::InitializeSynchronizationContext()
+{
+	if (const auto SynchronizationContextClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
+	{
+		if (const auto InitializeMonoMethod = Class_Get_Method_From_Name(
+			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE, 0))
+		{
+			Runtime_Invoke(InitializeMonoMethod, nullptr, nullptr, nullptr);
+		}
+	}
+}
+
+void FMonoDomain::DeinitializeSynchronizationContext() const
+{
+	if (const auto SynchronizationContextClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
+	{
+		if (const auto DeinitializeMonoMethod = Class_Get_Method_From_Name(
+			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_DEINITIALIZE, 0))
+		{
+			Runtime_Invoke(DeinitializeMonoMethod, nullptr, nullptr, nullptr);
+		}
 	}
 }
 

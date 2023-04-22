@@ -34,9 +34,6 @@ public class Mono : ModuleRules
 			RuntimeDependencies.Add("$(BinaryOutputDir)/coreclr.dll",
 				Path.Combine(LibraryPath, Target.Platform.ToString(), "coreclr.dll"));
 
-			RuntimeDependencies.Add("$(BinaryOutputDir)/System.Private.CoreLib.dll",
-				Path.Combine(LibraryPath, Target.Platform.ToString(), "System.Private.CoreLib.dll"));
-
 			RuntimeDependencies.Add("$(BinaryOutputDir)/mono-sgen.pdb",
 				Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-sgen.pdb"));
 

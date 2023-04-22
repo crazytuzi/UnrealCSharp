@@ -19,7 +19,7 @@ struct FMonoDomainInitializeParams
 	}
 };
 
-class FMonoDomain
+class FMonoDomain : public FTickableGameObject
 {
 public:
 	explicit FMonoDomain(const FMonoDomainInitializeParams& Params);
@@ -30,6 +30,13 @@ public:
 	void Initialize(const FMonoDomainInitializeParams& Params);
 
 	void Deinitialize();
+
+public:
+	virtual void Tick(float DeltaTime) override;
+
+	virtual bool IsTickable() const override;
+
+	virtual TStatId GetStatId() const override;
 
 public:
 	MonoObject* Object_New(MonoClass* InMonoClass) const;
@@ -125,6 +132,10 @@ private:
 	void RegisterLog();
 
 	void RegisterBinding();
+
+	void InitializeSynchronizationContext();
+
+	void DeinitializeSynchronizationContext() const;
 
 	void InitializeAssembly(const TArray<FString>& InAssemblies);
 

@@ -16,6 +16,8 @@
 
 #define CLASS_ASSEMBLY_UTIL FString(TEXT("AssemblyUtil"))
 
+#define CLASS_SYNCHRONIZATION_CONTEXT FString(TEXT("SynchronizationContext"))
+
 #define CLASS_MULTICAST_DELEGATE_UTILS FString(TEXT("MulticastDelegateUtils"))
 
 #define CLASS_T_ARRAY FString(TEXT("TArray`1"))
