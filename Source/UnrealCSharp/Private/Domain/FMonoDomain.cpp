@@ -74,17 +74,16 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& Params)
 
 	RegisterBinding();
 
-	RegisterSyncContext();
+	InitializeSynchronizationContext();
 }
 
 void FMonoDomain::Deinitialize()
 {
-	UnregisterSyncContext();
+	DeinitializeSynchronizationContext();
 
 	UnloadAssembly();
 
 	DeinitializeAssembly();
-
 }
 
 MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass) const
@@ -424,6 +423,53 @@ void FMonoDomain::RegisterBinding()
 	}
 }
 
+void FMonoDomain::InitializeSynchronizationContext()
+{
+	if (const auto SynchronizationContextClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_SYNCHRONIZATION_CONTEXT))
+	{
+		if (const auto InitializeMonoMethod = Class_Get_Method_From_Name(
+			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE, 0))
+		{
+			Runtime_Invoke(InitializeMonoMethod, nullptr, nullptr, nullptr);
+		}
+	}
+
+	TickHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float)
+	{
+		if (const auto SynchronizationContextClass = Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_SYNCHRONIZATION_CONTEXT))
+		{
+			if (const auto TickerMonoMethod = Class_Get_Method_From_Name(
+				SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICKER, 0))
+			{
+				Runtime_Invoke(TickerMonoMethod, nullptr, nullptr, nullptr);
+
+				return true;
+			}
+		}
+
+		return false;
+	}));
+}
+
+void FMonoDomain::DeinitializeSynchronizationContext() const
+{
+	if (TickHandle.IsValid())
+	{
+		FTicker::GetCoreTicker().RemoveTicker(TickHandle);
+	}
+
+	if (const auto SynchronizationContextClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON),CLASS_SYNCHRONIZATION_CONTEXT))
+	{
+		if (const auto DeinitializeMonoMethod = Class_Get_Method_From_Name(
+			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_DEINITIALIZE, 0))
+		{
+			Runtime_Invoke(DeinitializeMonoMethod, nullptr, nullptr, nullptr);
+		}
+	}
+}
 
 void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 {
@@ -463,45 +509,6 @@ void FMonoDomain::DeinitializeAssemblyLoadContext()
 			Runtime_Invoke(DeinitializeMonoMethod, nullptr, nullptr, nullptr);
 		}
 	}
-}
-
-void FMonoDomain::RegisterSyncContext()
-{
-	const auto SyncContextClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),TCHAR_TO_ANSI(*CLASS_SYNC_CONTEXT));
-	if (SyncContextClass == nullptr)
-		return;
-	const auto InitSyncContextMethod = Class_Get_Method_From_Name(SyncContextClass, FUNCTION_UTILS_INIT_SYNC_CONTEXT, 0);
-	if (InitSyncContextMethod == nullptr)
-		return;
-	Runtime_Invoke(InitSyncContextMethod, nullptr, nullptr, nullptr);
-
-	
-	TickHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda( [=](float deltaTime) -> bool
-	{
-		const auto SyncContextClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT), TCHAR_TO_ANSI(*CLASS_SYNC_CONTEXT));
-		if (SyncContextClass == nullptr)
-			return true;
-		const auto TickMethod = Class_Get_Method_From_Name(SyncContextClass, FUNCTION_UTILS_FINI_GLOBAL_TICK, 0);
-		if (TickMethod == nullptr)
-			return true;
-		Runtime_Invoke(TickMethod, nullptr, nullptr, nullptr);
-		return true;
-	}));
-}
-
-
-void FMonoDomain::UnregisterSyncContext() const
-{
-	FTicker::GetCoreTicker().RemoveTicker(TickHandle);
-	const auto SyncContextClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),TCHAR_TO_ANSI(*CLASS_SYNC_CONTEXT));
-	if (SyncContextClass == nullptr)
-	{
-		return;
-	}
-	const auto FiniSyncContextMethod = Class_Get_Method_From_Name(SyncContextClass, FUNCTION_UTILS_FINI_SYNC_CONTEXT, 0);
-	if (FiniSyncContextMethod == nullptr)
-		return;
-	Runtime_Invoke(FiniSyncContextMethod, nullptr, nullptr, nullptr);
 }
 
 void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)

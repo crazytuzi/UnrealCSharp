@@ -16,9 +16,7 @@
 
 #define CLASS_ASSEMBLY_UTIL FString(TEXT("AssemblyUtil"))
 
-
-#define CLASS_SYNC_CONTEXT FString(TEXT("UnrealCSharpSyncContext"))
-
+#define CLASS_SYNCHRONIZATION_CONTEXT FString(TEXT("SynchronizationContext"))
 
 #define CLASS_MULTICAST_DELEGATE_UTILS FString(TEXT("MulticastDelegateUtils"))
 
