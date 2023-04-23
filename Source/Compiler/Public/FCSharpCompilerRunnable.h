@@ -27,8 +27,6 @@ private:
 	static void Pdb2Mdb();
 
 private:
-	static FString CompileTool;
-
 	TQueue<bool> Tasks;
 
 	FCriticalSection CriticalSection;

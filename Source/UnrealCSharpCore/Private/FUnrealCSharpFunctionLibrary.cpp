@@ -3,68 +3,9 @@
 #include "Misc/FileHelper.h"
 #include "NameEncode.h"
 
-FString FUnrealCSharpFunctionLibrary::GetCompileTool(const FString& ProductLineVersion)
+FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
-	static FString CompileTool;
-
-	if (!CompileTool.IsEmpty())
-	{
-		return CompileTool;
-	}
-
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
-
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
-
-	const auto ProcessHandle = FPlatformProcess::CreateProc(
-		TEXT("C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe"),
-		TEXT("-legacy -prerelease -format json"),
-		false,
-		true,
-		true,
-		&OutProcessID,
-		1,
-		nullptr,
-		WritePipe,
-		ReadPipe);
-
-	FString Result;
-
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
-	{
-		FPlatformProcess::Sleep(0.01f);
-
-		auto Line = FPlatformProcess::ReadPipe(ReadPipe);
-
-		if (Line.Len() > 0)
-		{
-			Result += Line;
-		}
-	}
-
-	Result = Result.Replace(TEXT("\r\n"), TEXT(""));
-
-	TArray<TSharedPtr<FJsonValue>> OutArray;
-
-	const auto Reader = TJsonReaderFactory<>::Create(Result);
-
-	FJsonSerializer::Deserialize(Reader, OutArray);
-
-	for (const auto& Elem : OutArray)
-	{
-		if (Elem->AsObject()->GetObjectField("catalog")->GetStringField("productLineVersion") == ProductLineVersion)
-		{
-			CompileTool = Elem->AsObject()->GetStringField("productPath");
-
-			return CompileTool;
-		}
-	}
-
-	return TEXT("");
+	return TEXT("dotnet");
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)

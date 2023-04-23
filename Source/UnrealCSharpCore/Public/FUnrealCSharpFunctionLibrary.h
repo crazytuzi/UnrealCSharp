@@ -5,7 +5,7 @@
 class UNREALCSHARPCORE_API FUnrealCSharpFunctionLibrary
 {
 public:
-	static FString GetCompileTool(const FString& ProductLineVersion = FString("2022"));
+	static FString GetDotNet();
 
 public:
 	static FString GetModuleName(const UField* InField);
