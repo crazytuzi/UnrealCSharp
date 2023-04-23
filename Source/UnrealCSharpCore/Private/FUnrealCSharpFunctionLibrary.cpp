@@ -385,7 +385,7 @@ FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
 
 TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
-	const auto& GamePath = GetGamePath();
+	static auto GamePath = GetGamePath();
 
 	TArray<FString> Directories;
 
@@ -422,7 +422,7 @@ TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
 	if (GameModuleList.Num() == 0)
 #endif
 	{
-		const auto& FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_GameModules.json"));
+		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_GameModules.json"));
 
 		FString JsonStr;
 
