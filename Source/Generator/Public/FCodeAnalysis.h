@@ -9,6 +9,4 @@ private:
 	static void Compile();
 
 	static void Analysis();
-
-	static FString GetProgram();
 };
