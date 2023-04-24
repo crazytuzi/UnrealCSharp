@@ -57,7 +57,7 @@ namespace CodeAnalysis
 
             var Root = (CompilationUnitSyntax) Tree.GetRoot();
 
-            foreach (NamespaceDeclarationSyntax NamespaceDeclaration in Root.Members)
+            foreach (BaseNamespaceDeclarationSyntax NamespaceDeclaration in Root.Members)
             {
                 foreach (ClassDeclarationSyntax ClassDeclaration in NamespaceDeclaration.Members)
                 {
