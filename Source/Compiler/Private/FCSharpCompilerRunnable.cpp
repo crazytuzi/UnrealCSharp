@@ -2,8 +2,6 @@
 #include "FUnrealCSharpFunctionLibrary.h"
 #include "Macro.h"
 
-FString FCSharpCompilerRunnable::CompileTool;
-
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
 	bIsCompiling(false)
@@ -12,8 +10,6 @@ FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 
 bool FCSharpCompilerRunnable::Init()
 {
-	CompileTool = FUnrealCSharpFunctionLibrary::GetCompileTool();
-
 	Event = FPlatformProcess::CreateSynchEvent(true);
 
 	return FRunnable::Init();
@@ -99,26 +95,28 @@ void FCSharpCompilerRunnable::DoWork()
 
 void FCSharpCompilerRunnable::Compile()
 {
-	const auto OutFile = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-		"%sScript\\Script.log"
-	),
-	                                                                       *FPaths::ProjectDir()
-	));
+	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-	FPlatformFileManager::Get().Get().GetPlatformFile().DeleteFile(*OutFile);
-
-	const auto CompileParam = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-		"%sScript\\Game\\Game.csproj /build \"Debug\" /Out %s"
+	const auto OutDirectory = FString::Printf(TEXT(
+		"%sScript"
 	),
-		*FPaths::ProjectDir(),
-		*OutFile
-	));
+	                                          *FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir())
+	);
+
+	const auto CompileParam = FString::Printf(TEXT(
+		"publish %sScript/Game/Game.csproj --nologo -c Debug -o %s"
+	),
+	                                          *FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()),
+	                                          *OutDirectory
+	);
 
 	void* ReadPipe = nullptr;
 
 	void* WritePipe = nullptr;
 
 	auto OutProcessID = 0u;
+
+	FString Result;
 
 	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
 
@@ -137,6 +135,8 @@ void FCSharpCompilerRunnable::Compile()
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
 	{
 		FPlatformProcess::Sleep(0.01f);
+
+		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
 	}
 
 	auto ReturnCode = 0;
@@ -149,13 +149,13 @@ void FCSharpCompilerRunnable::Compile()
 		}
 		else
 		{
-			FString Result;
-
-			FFileHelper::LoadFileToString(Result, *OutFile);
-
 			// @TODO
 		}
 	}
+
+	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+	FPlatformProcess::CloseProc(ProcessHandle);
 }
 
 void FCSharpCompilerRunnable::Pdb2Mdb()

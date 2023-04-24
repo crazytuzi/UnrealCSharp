@@ -18,23 +18,25 @@ void FCodeAnalysis::CodeAnalysis()
 
 void FCodeAnalysis::Compile()
 {
+	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
+
 	const auto CodeAnalysisPath = FPaths::ConvertRelativePathToFull(
 		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, CODE_ANALYSIS));
 
-	const auto CompileTool = FUnrealCSharpFunctionLibrary::GetCompileTool();
-
-	const auto CompileParam = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-		"%s\\%s.csproj /build \"Debug\""
+	const auto CompileParam = FString::Printf(TEXT(
+		"build %s/%s.csproj --nologo -c Debug"
 	),
-		*CodeAnalysisPath,
-		*CODE_ANALYSIS
-	));
+	                                          *CodeAnalysisPath,
+	                                          *CODE_ANALYSIS
+	);
 
 	void* ReadPipe = nullptr;
 
 	void* WritePipe = nullptr;
 
 	auto OutProcessID = 0u;
+
+	FString Result;
 
 	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
 
@@ -53,6 +55,8 @@ void FCodeAnalysis::Compile()
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
 	{
 		FPlatformProcess::Sleep(0.01f);
+
+		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
 	}
 
 	auto ReturnCode = 0;
@@ -68,6 +72,10 @@ void FCodeAnalysis::Compile()
 			// @TODO
 		}
 	}
+
+	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+	FPlatformProcess::CloseProc(ProcessHandle);
 }
 
 void FCodeAnalysis::Analysis()
