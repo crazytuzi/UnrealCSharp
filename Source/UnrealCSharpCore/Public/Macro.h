@@ -12,4 +12,6 @@
 
 #define CODE_ANALYSIS FString(TEXT("CodeAnalysis"))
 
+#define ASSEMBLY_UTIL FString(TEXT("AssemblyUtil"))
+
 #define TEMPLATE FString(TEXT("Template"))

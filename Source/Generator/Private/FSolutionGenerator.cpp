@@ -5,6 +5,8 @@
 
 void FSolutionGenerator::Generator()
 {
+	Compile();
+
 	const auto PluginPath = FPaths::ConvertRelativePathToFull(FPaths::ProjectPluginsDir() / PLUGIN_NAME);
 
 	const auto TemplatePath = PluginPath / TEMPLATE;
@@ -19,15 +21,72 @@ void FSolutionGenerator::Generator()
 		                FUnrealCSharpFunctionLibrary::GetGameProjectName() + PROJECT_SUFFIX),
 		TemplatePath / FUnrealCSharpFunctionLibrary::GetGameProjectName() + PROJECT_SUFFIX);
 
-	CopyCSProj(
-		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath(),
-		                FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + PROJECT_SUFFIX),
-		TemplatePath / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + PROJECT_SUFFIX);
-
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetBasePath(),
 		                FUnrealCSharpFunctionLibrary::GetBaseName() + SOLUTION_SUFFIX),
 		TemplatePath / FUnrealCSharpFunctionLibrary::GetBaseName() + SOLUTION_SUFFIX);
+}
+
+void FSolutionGenerator::Compile()
+{
+	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
+
+	const auto CodeAnalysisPath = FPaths::ConvertRelativePathToFull(
+		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, ASSEMBLY_UTIL));
+
+	const auto CompileParam = FString::Printf(TEXT(
+		"build %s/%s.csproj --nologo -c Debug"
+	),
+	                                          *CodeAnalysisPath,
+	                                          *ASSEMBLY_UTIL
+	);
+
+	void* ReadPipe = nullptr;
+
+	void* WritePipe = nullptr;
+
+	auto OutProcessID = 0u;
+
+	FString Result;
+
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+
+	auto ProcessHandle = FPlatformProcess::CreateProc(
+		*CompileTool,
+		*CompileParam,
+		false,
+		true,
+		true,
+		&OutProcessID,
+		1,
+		nullptr,
+		WritePipe,
+		ReadPipe);
+
+	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	{
+		FPlatformProcess::Sleep(0.01f);
+
+		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
+	}
+
+	auto ReturnCode = 0;
+
+	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	{
+		if (ReturnCode == 0)
+		{
+			// @TODO
+		}
+		else
+		{
+			// @TODO
+		}
+	}
+
+	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+	FPlatformProcess::CloseProc(ProcessHandle);
 }
 
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src)
