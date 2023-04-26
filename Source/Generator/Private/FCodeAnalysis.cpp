@@ -4,14 +4,7 @@
 
 void FCodeAnalysis::CodeAnalysis()
 {
-	const auto Program = GetProgram();
-
-	auto& FileManager = IFileManager::Get();
-
-	if (!FileManager.FileExists(*Program))
-	{
-		Compile();
-	}
+	Compile();
 
 	Analysis();
 }
@@ -80,7 +73,13 @@ void FCodeAnalysis::Compile()
 
 void FCodeAnalysis::Analysis()
 {
-	const auto Program = GetProgram();
+	const auto Program = FPaths::ConvertRelativePathToFull(
+		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, CODE_ANALYSIS,
+		                FString::Printf(TEXT(
+			                "%s.exe"
+		                ),
+		                                *CODE_ANALYSIS
+		                )));
 
 	const auto CompileParam = FString::Printf(TEXT(
 		"%s %s"
@@ -127,18 +126,4 @@ void FCodeAnalysis::Analysis()
 			// @TODO
 		}
 	}
-}
-
-FString FCodeAnalysis::GetProgram()
-{
-	return FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, CODE_ANALYSIS,
-		                TEXT("bin"),
-		                TEXT("Debug"),
-		                TEXT("net7.0"),
-		                FString::Printf(TEXT(
-			                "%s.exe"
-		                ),
-		                                *CODE_ANALYSIS
-		                )));
 }
