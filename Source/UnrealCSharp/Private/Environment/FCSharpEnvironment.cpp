@@ -2,7 +2,7 @@
 #include "Macro.h"
 #include "FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
-#include "Log/UnrealCSharpLog.h"
+#include "UnrealCSharpLog.h"
 #include <signal.h>
 
 void SignalHandler(int32)

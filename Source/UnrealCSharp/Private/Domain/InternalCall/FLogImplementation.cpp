@@ -1,6 +1,6 @@
 ﻿#include "Domain/InternalCall/FLogImplementation.h"
 #include "Binding/Class/FBindingClassBuilder.h"
-#include "Log/UnrealCSharpLog.h"
+#include "UnrealCSharpLog.h"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterLog
