@@ -1,5 +1,6 @@
 ﻿#include "Reflection/Container/FArrayHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
+#include "UEVersion.h"
 
 FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData):
 	InnerPropertyDescriptor(nullptr),
@@ -164,7 +165,11 @@ int32 FArrayHelper::AddUninitialized(const int32 InCount) const
 
 void FArrayHelper::InsertZeroed(const int32 InIndex, const int32 InCount) const
 {
+#if STD_CPP_DEFAULT_NEW_ALIGNMENT
+	ScriptArray->InsertZeroed(InIndex, InCount, InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+#else
 	ScriptArray->InsertZeroed(InIndex, InCount, InnerPropertyDescriptor->GetSize());
+#endif
 }
 
 void FArrayHelper::InsertDefaulted(const int32 InIndex, const int32 InCount) const
@@ -188,11 +193,19 @@ void FArrayHelper::RemoveAt(const int32 InIndex, const int32 InCount, const bool
 		}
 	}
 
+#if STD_CPP_DEFAULT_NEW_ALIGNMENT
+	ScriptArray->Remove(InIndex, InCount, InnerPropertyDescriptor->GetElementSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+#else
 	ScriptArray->Remove(InIndex, InCount, InnerPropertyDescriptor->GetElementSize());
+#endif
 
 	if (bAllowShrinking)
 	{
+#if STD_CPP_DEFAULT_NEW_ALIGNMENT
+		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+#else
 		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize());
+#endif
 	}
 }
 
@@ -220,7 +233,11 @@ void FArrayHelper::SetNum(const int32 InNewNum, const bool bAllowShrinking) cons
 
 	if (bAllowShrinking)
 	{
+#if STD_CPP_DEFAULT_NEW_ALIGNMENT
+		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+#else
 		ScriptArray->Shrink(InnerPropertyDescriptor->GetSize());
+#endif
 	}
 }
 
@@ -237,7 +254,11 @@ int32 FArrayHelper::Add(void* InValue) const
 
 int32 FArrayHelper::AddZeroed(const int32 InCount) const
 {
+#if STD_CPP_DEFAULT_NEW_ALIGNMENT
+	return ScriptArray->AddZeroed(InCount, InnerPropertyDescriptor->GetSize(), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+#else
 	return ScriptArray->AddZeroed(InCount, InnerPropertyDescriptor->GetSize());
+#endif
 }
 
 int32 FArrayHelper::AddUnique(void* InValue) const
