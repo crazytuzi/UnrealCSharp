@@ -1,10 +1,11 @@
 ﻿using System;
 using Script.Reflection.Container;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Script.Common
 {
-    public class TSet<T> : IEnumerable
+    public class TSet<T> : IEnumerable<T>
     {
         public TSet() => SetUtils.Set_Register(this);
 
@@ -12,7 +13,18 @@ namespace Script.Common
         {
         }
 
-        public IEnumerator GetEnumerator()
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (var Index = 0; Index < Num(); Index++)
+            {
+                if (IsValidIndex(Index))
+                {
+                    yield return this[Index];
+                }
+            }
+        }
+        IEnumerator IEnumerable.GetEnumerator()
         {
             for (var Index = 0; Index < Num(); Index++)
             {
@@ -38,6 +50,7 @@ namespace Script.Common
         public Boolean Contains(T InValue) => SetUtils.Set_Contains(this, InValue);
 
         private Boolean IsValidIndex(Int32 InIndex) => SetUtils.Set_IsValidIndex(this, InIndex);
+
 
         private T this[Int32 InIndex] => SetUtils.Set_GetEnumerator(this, InIndex);
     }
