@@ -32,7 +32,8 @@ void FBlueprintGenerator::Generator()
 
 	for (const auto& AssetData : OutAssetData)
 	{
-		auto AssetName = AssetData.AssetClass != "None" ? AssetData.AssetClass : AssetData.GetClass()->GetFName();
+		const auto& AssetName = AssetData.GetClass()->GetFName();
+
 		if (AssetName == UBlueprint::StaticClass()->GetFName() ||
 			AssetName == UWidgetBlueprint::StaticClass()->GetFName())
 		{
