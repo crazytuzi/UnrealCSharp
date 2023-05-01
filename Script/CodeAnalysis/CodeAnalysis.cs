@@ -108,7 +108,8 @@ namespace CodeAnalysis
                             if (Functions.Count > 0)
                             {
                                 var FileName = Path.Combine(InPathName,
-                                    String.Format("{0}.{1}.json", NamespaceDeclaration.Name, ClassDeclaration.Identifier));
+                                    String.Format("{0}.{1}.json", NamespaceDeclaration.Name,
+                                        ClassDeclaration.Identifier));
 
                                 var Value = String.Format("{{\"Override\":{0}}}", JsonSerializer.Serialize(Functions));
 
@@ -117,7 +118,6 @@ namespace CodeAnalysis
                         }
                     }
                 }
-               
             }
         }
     }
