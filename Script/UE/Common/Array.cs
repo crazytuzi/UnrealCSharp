@@ -13,6 +13,8 @@ namespace Script.Common
         {
         }
 
+        ~TArray() => ArrayUtils.Array_UnRegister(this);
+
         public IEnumerator<T> GetEnumerator()
         {
             for (var Index = 0; Index < Num(); Index++)
@@ -28,8 +30,6 @@ namespace Script.Common
                 yield return this[Index];
             }
         }
-        ~TArray() => ArrayUtils.Array_UnRegister(this);
-
 
         public Int32 GetTypeSize() => ArrayUtils.Array_GetTypeSize(this);
 
@@ -87,7 +87,5 @@ namespace Script.Common
 
         public void Swap(Int32 InFirstIndexToSwap, Int32 InSecondIndexToSwap) =>
             ArrayUtils.Array_Swap(this, InFirstIndexToSwap, InSecondIndexToSwap);
-
-
     }
 }

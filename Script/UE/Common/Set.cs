@@ -13,6 +13,7 @@ namespace Script.Common
         {
         }
 
+        ~TSet() => SetUtils.Set_UnRegister(this);
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -24,6 +25,7 @@ namespace Script.Common
                 }
             }
         }
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             for (var Index = 0; Index < Num(); Index++)
@@ -34,8 +36,6 @@ namespace Script.Common
                 }
             }
         }
-
-        ~TSet() => SetUtils.Set_UnRegister(this);
 
         public void Empty(Int32 InExpectedNumElements = 0) => SetUtils.Set_Empty(this, InExpectedNumElements);
 
@@ -50,7 +50,6 @@ namespace Script.Common
         public Boolean Contains(T InValue) => SetUtils.Set_Contains(this, InValue);
 
         private Boolean IsValidIndex(Int32 InIndex) => SetUtils.Set_IsValidIndex(this, InIndex);
-
 
         private T this[Int32 InIndex] => SetUtils.Set_GetEnumerator(this, InIndex);
     }
