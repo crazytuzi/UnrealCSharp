@@ -46,7 +46,12 @@ struct FRegisterLinearColor
 			          static_cast<void*>(FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation))
 			.Function("LerpUsingHSV",
 			          static_cast<void*>(FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation))
+#if UE_LINEAR_COLOR_QUANTIZE_FLOOR
+			.Function("QuantizeFloor",
+			          static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeFloorImplementation))
+#else
 			.Function("Quantize", static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeImplementation))
+#endif
 			.Function("QuantizeRound",
 			          static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeRoundImplementation))
 			.Function("ToFColor", static_cast<void*>(FLinearColorImplementation::LinearColor_ToFColorImplementation))
@@ -522,6 +527,29 @@ void FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation(const Mo
 	}
 }
 
+#if UE_LINEAR_COLOR_QUANTIZE_FLOOR
+void FLinearColorImplementation::LinearColor_QuantizeFloorImplementation(const MonoObject* InMonoObject,
+                                                                         MonoObject** OutValue)
+{
+	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FLinearColor>(InMonoObject);
+
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
+		CLASS_SCRIPT_STRUCT_NAME(FColor));
+
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+	*OutValue = NewMonoObject;
+
+	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
+
+	if (LinearColor != nullptr && OutColor != nullptr)
+	{
+		*OutColor = LinearColor->QuantizeFloor();
+	}
+}
+#else
 void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoObject* InMonoObject,
                                                                     MonoObject** OutValue)
 {
@@ -543,6 +571,7 @@ void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoOb
 		*OutColor = LinearColor->Quantize();
 	}
 }
+#endif
 
 void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
