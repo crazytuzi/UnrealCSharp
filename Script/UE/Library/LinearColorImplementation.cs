@@ -86,8 +86,14 @@ namespace Script.Library
         public static extern void LinearColor_LerpUsingHSVImplementation(FLinearColor From, FLinearColor To,
             Single Progress, out FLinearColor OutValue);
 
+#if UE_5_0_OR_LATER
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void LinearColor_QuantizeFloorImplementation(FLinearColor InLinearColor,
+            out FColor OutValue);
+#else
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void LinearColor_QuantizeImplementation(FLinearColor InLinearColor, out FColor OutValue);
+#endif
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void LinearColor_QuantizeRoundImplementation(FLinearColor InLinearColor,

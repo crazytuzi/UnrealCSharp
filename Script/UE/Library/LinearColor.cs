@@ -144,12 +144,21 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
+#if UE_5_0_OR_LATER
+        public FColor QuantizeFloor()
+        {
+            LinearColorImplementation.LinearColor_QuantizeFloorImplementation(this, out var OutValue);
+
+            return OutValue;
+        }
+#else
         public FColor Quantize()
         {
             LinearColorImplementation.LinearColor_QuantizeImplementation(this, out var OutValue);
 
             return OutValue;
         }
+#endif
 
         public FColor QuantizeRound()
         {
