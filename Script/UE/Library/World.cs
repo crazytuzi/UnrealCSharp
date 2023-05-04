@@ -12,5 +12,11 @@ namespace Script.Engine
 
             return OutValue;
         }
+        public T SpawnActor<T>(FTransform Transform) where T : UObject, IStaticClass
+        {
+            WorldImplementation.World_SpawnActorImplementation<T>(this, T.StaticClass(), Transform, out var OutValue);
+
+            return OutValue;
+        }
     }
 }
