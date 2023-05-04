@@ -13,19 +13,17 @@ namespace Script.Library
             return OutValue;
         }
 
-        public static T NewObject<T>(UObject Outer) where T : UObject
+        public static T NewObject<T>(UObject Outer) where T : UObject, IStaticClass
         {
-            UnrealImplementation.Unreal_NewObjectImplementation<T>(Outer,
-                LoadClass(Outer, Utils.GetPathName(typeof(T))), "", out var OutValue);
+            UnrealImplementation.Unreal_NewObjectImplementation<T>(Outer, T.StaticClass(), "", out var OutValue);
 
             return OutValue;
         }
 
         // @TODO
-        public static T NewObject<T>(UObject Outer, FName Name) where T : UObject
+        public static T NewObject<T>(UObject Outer, FName Name) where T : UObject, IStaticClass
         {
-            UnrealImplementation.Unreal_NewObjectImplementation<T>(Outer,
-                LoadClass(Outer, Utils.GetPathName(typeof(T))), Name, out var OutValue);
+            UnrealImplementation.Unreal_NewObjectImplementation<T>(Outer, T.StaticClass(), Name, out var OutValue);
 
             return OutValue;
         }

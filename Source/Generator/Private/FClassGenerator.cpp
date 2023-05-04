@@ -69,9 +69,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		SuperClassContent = FString::Printf(TEXT(
-			" : %s"
+			" : %s, IStaticClass"
 		),
 		                                    *FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass));
+	}
+	else
+	{
+		SuperClassContent = ": IStaticClass";
 	}
 
 	for (auto Interface : InClass->Interfaces)
