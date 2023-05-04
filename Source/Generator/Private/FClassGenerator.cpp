@@ -73,7 +73,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 		),
 		                                    *FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass));
 	}
-	else {
+	else
+	{
 		SuperClassContent = ": IStaticClass";
 	}
 
