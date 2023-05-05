@@ -50,10 +50,17 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 			                        ? UserDefinedEnum->GetDisplayNameTextByIndex(Index).ToString()
 			                        : InEnum->GetNameStringByIndex(Index);
 
+		auto EnumItemName = FGeneratorCore::GetName(FNameEncode::Encode(EnumeratorString));
+		if (InEnum->GetName() == TEXT("ECollisionChannel"))
+		{
+			UCollisionProfile *CollisionProfile = UCollisionProfile::Get();
+			EnumItemName = CollisionProfile->ReturnChannelNameFromContainerIndex(Index).ToString();
+		}
+
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
 		),
-		                                     *FGeneratorCore::GetName(FNameEncode::Encode(EnumeratorString)),
+		                                     *EnumItemName,
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
 	}
 
