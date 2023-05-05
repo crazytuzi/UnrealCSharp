@@ -1,4 +1,4 @@
-#include "NameEncode.h"
+#include "Common/NameEncode.h"
 
 #define ESCAPE_SYMBOL_FIRST TEXT('_')
 #define ESCAPE_SYMBOL_SECOND TEXT('h')

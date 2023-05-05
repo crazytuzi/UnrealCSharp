@@ -1,7 +1,7 @@
 ﻿#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Misc/FileHelper.h"
 #include "Serialization/JsonReader.h"

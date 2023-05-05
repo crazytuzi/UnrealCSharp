@@ -1,9 +1,9 @@
 ﻿#include "Reflection/Function/FCSharpDelegateDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "CoreMacro/MonoMacro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
-#include "Macro/MonoMacro.h"
-#include "Macro/NamespaceMacro.h"
 
 bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InParams)
 {

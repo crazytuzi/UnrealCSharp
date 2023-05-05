@@ -1,6 +1,7 @@
 ﻿#include "Domain/InternalCall/FObjectImplementation.h"
 #include "Binding/Class/TClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
 

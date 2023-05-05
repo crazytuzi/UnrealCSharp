@@ -1,6 +1,6 @@
 ﻿#include "FCodeAnalysis.h"
-#include "FUnrealCSharpFunctionLibrary.h"
-#include "Macro.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 
 void FCodeAnalysis::CodeAnalysis()
 {

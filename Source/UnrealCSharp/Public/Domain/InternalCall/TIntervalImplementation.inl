@@ -1,8 +1,7 @@
 ﻿#pragma once
 
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_SizeImplementation(const MonoObject* InMonoObject)

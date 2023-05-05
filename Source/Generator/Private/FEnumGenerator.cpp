@@ -1,8 +1,8 @@
 ﻿#include "FEnumGenerator.h"
 #include "FGeneratorCore.h"
 #include "Engine/UserDefinedEnum.h"
-#include "FUnrealCSharpFunctionLibrary.h"
-#include "NameEncode.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Common/NameEncode.h"
 
 TMap<const UEnum*, EEnumUnderlyingType> FEnumGenerator::EnumUnderlyingType;
 

@@ -1,6 +1,6 @@
 ﻿#include "Registry/FClassRegistry.h"
-#include "Domain/FMonoDomain.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Domain/FDomain.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 FClassRegistry::FClassRegistry()
 {
@@ -42,7 +42,7 @@ FClassDescriptor* FClassRegistry::GetClassDescriptor(const FName& InClassName)
 	return InClass != nullptr ? GetClassDescriptor(InClass) : nullptr;
 }
 
-FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDomain, UStruct* InStruct)
+FClassDescriptor* FClassRegistry::NewClassDescriptor(const FDomain* InDomain, UStruct* InStruct)
 {
 	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct);
 
@@ -51,7 +51,7 @@ FClassDescriptor* FClassRegistry::NewClassDescriptor(const FMonoDomain* InMonoDo
 		return *FoundClassDescriptor;
 	}
 
-	const auto FoundMonoClass = InMonoDomain->Class_From_Name(
+	const auto FoundMonoClass = InDomain->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
 		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct));
 

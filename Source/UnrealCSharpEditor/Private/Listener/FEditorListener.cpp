@@ -5,7 +5,7 @@
 #include "FCSharpCompiler.h"
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "WidgetBlueprint.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/UserDefinedEnum.h"

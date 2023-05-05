@@ -1,41 +1,41 @@
 ﻿#include "Registry/FCSharpBind.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
-#include "Macro/NamespaceMacro.h"
 #include "Reflection/Container/FArrayHelper.h"
 #include "Reflection/Container/FMapHelper.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Template/TGetArrayLength.h"
 
 #if !WITH_EDITOR
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 #endif
 
-MonoObject* FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject)
+MonoObject* FCSharpBind::Bind(FDomain* InDomain, UObject* InObject)
 {
 	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 	{
 		return FoundMonoObject;
 	}
 
-	return Bind(InMonoDomain, InObject, false) ? FCSharpEnvironment::GetEnvironment().GetObject(InObject) : nullptr;
+	return Bind(InDomain, InObject, false) ? FCSharpEnvironment::GetEnvironment().GetObject(InObject) : nullptr;
 }
 
-bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UObject* InObject, const bool bNeedMonoClass)
+bool FCSharpBind::Bind(FDomain* InDomain, UObject* InObject, const bool bNeedMonoClass)
 {
-	return BindImplementation(InMonoDomain, InObject, bNeedMonoClass);
+	return BindImplementation(InDomain, InObject, bNeedMonoClass);
 }
 
-bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool bNeedMonoClass)
+bool FCSharpBind::Bind(FDomain* InDomain, UStruct* InStruct, const bool bNeedMonoClass)
 {
 	if (FCSharpEnvironment::GetEnvironment().GetClassDescriptor(InStruct))
 	{
 		return true;
 	}
 
-	if (bNeedMonoClass && !CanBind(InMonoDomain, InStruct))
+	if (bNeedMonoClass && !CanBind(InDomain, InStruct))
 	{
 #if !WITH_EDITOR
 		NotOverrideTypes.Add(InStruct);
@@ -44,7 +44,7 @@ bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, UStruct* InStruct, const bool 
 		return false;
 	}
 
-	return BindImplementation(InMonoDomain, InStruct);
+	return BindImplementation(InDomain, InStruct);
 }
 
 bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
@@ -53,9 +53,9 @@ bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflec
 	return BindImplementation(InMonoObject, InKeyReflectionType, InValueReflectionType);
 }
 
-bool FCSharpBind::Bind(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName)
+bool FCSharpBind::Bind(FDomain* InDomain, MonoObject* InMonoObject, const FName& InStructName)
 {
-	return BindImplementation(InMonoDomain, InMonoObject, InStructName);
+	return BindImplementation(InDomain, InMonoObject, InStructName);
 }
 
 bool FCSharpBind::Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction)
@@ -63,9 +63,9 @@ bool FCSharpBind::Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFu
 	return BindImplementation(InClassDescriptor, InClass, InFunction);
 }
 
-bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObject, const bool bNeedMonoClass)
+bool FCSharpBind::BindImplementation(FDomain* InDomain, UObject* InObject, const bool bNeedMonoClass)
 {
-	if (InMonoDomain == nullptr || InObject == nullptr)
+	if (InDomain == nullptr || InObject == nullptr)
 	{
 		return false;
 	}
@@ -77,7 +77,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObjec
 		return false;
 	}
 
-	if (!Bind(InMonoDomain, InClass, bNeedMonoClass))
+	if (!Bind(InDomain, InClass, bNeedMonoClass))
 	{
 		return false;
 	}
@@ -96,16 +96,16 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UObject* InObjec
 		return false;
 	}
 
-	const auto NewMonoObject = InMonoDomain->Object_New(FoundMonoClass);
+	const auto NewMonoObject = InDomain->Object_New(FoundMonoClass);
 
 	FCSharpEnvironment::GetEnvironment().AddObjectReference(InObject, NewMonoObject);
 
 	return true;
 }
 
-bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruct)
+bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 {
-	if (InMonoDomain == nullptr || InStruct == nullptr)
+	if (InDomain == nullptr || InStruct == nullptr)
 	{
 		return false;
 	}
@@ -114,12 +114,12 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 
 	while (SuperStruct != nullptr)
 	{
-		Bind(InMonoDomain, SuperStruct, false);
+		Bind(InDomain, SuperStruct, false);
 
 		SuperStruct = SuperStruct->GetSuperStruct();
 	}
 
-	const auto NewClassDescriptor = FCSharpEnvironment::GetEnvironment().NewClassDescriptor(InMonoDomain, InStruct);
+	const auto NewClassDescriptor = FCSharpEnvironment::GetEnvironment().NewClassDescriptor(InDomain, InStruct);
 
 	if (NewClassDescriptor == nullptr)
 	{
@@ -141,7 +141,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 
 	if (const auto InClass = Cast<UClass>(InStruct))
 	{
-		if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
+		if (const auto FoundMonoClass = InDomain->Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))
 		{
@@ -163,7 +163,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 
 			for (const auto& FunctionPair : Functions)
 			{
-				if (const auto FoundMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
+				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
 					FoundMonoClass, FunctionPair.Key.ToString(),
 					FunctionPair.Value->ReturnValueOffset != MAX_uint16
 						? (FunctionPair.Value->NumParms > 0
@@ -171,8 +171,8 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, UStruct* InStruc
 							   : 0)
 						: FunctionPair.Value->NumParms))
 				{
-					if (IsOverrideMethod(InMonoDomain,
-					                     InMonoDomain->Method_Get_Object(FoundMonoMethod, FoundMonoClass)))
+					if (IsOverrideMethod(InDomain,
+					                     InDomain->Method_Get_Object(FoundMonoMethod, FoundMonoClass)))
 					{
 						Bind(NewClassDescriptor, InClass, FunctionPair.Value);
 					}
@@ -265,16 +265,16 @@ bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 	return true;
 }
 
-bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMonoObject, const FName& InStructName)
+bool FCSharpBind::BindImplementation(FDomain* InDomain, MonoObject* InMonoObject, const FName& InStructName)
 {
 	const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *InStructName.ToString());
 
-	if (InMonoDomain == nullptr || InScriptStruct == nullptr)
+	if (InDomain == nullptr || InScriptStruct == nullptr)
 	{
 		return false;
 	}
 
-	if (!Bind(InMonoDomain, InScriptStruct, false))
+	if (!Bind(InDomain, InScriptStruct, false))
 	{
 		return false;
 	}
@@ -290,7 +290,7 @@ bool FCSharpBind::BindImplementation(FMonoDomain* InMonoDomain, MonoObject* InMo
 	return true;
 }
 
-bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct)
+bool FCSharpBind::CanBind(const FDomain* InDomain, UStruct* InStruct)
 {
 #if !WITH_EDITOR
 	if (NotOverrideTypes.Contains(InStruct))
@@ -299,16 +299,16 @@ bool FCSharpBind::CanBind(const FMonoDomain* InMonoDomain, UStruct* InStruct)
 	}
 #endif
 
-	if (const auto FoundMonoClass = InMonoDomain->Class_From_Name(
+	if (const auto FoundMonoClass = InDomain->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
 		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))
 	{
-		if (const auto FoundMonoType = InMonoDomain->Class_Get_Type(FoundMonoClass))
+		if (const auto FoundMonoType = InDomain->Class_Get_Type(FoundMonoClass))
 		{
 			if (const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
 				FoundMonoType))
 			{
-				return IsOverrideType(InMonoDomain, FoundReflectionType);
+				return IsOverrideType(InDomain, FoundReflectionType);
 			}
 		}
 	}
@@ -431,25 +431,25 @@ void FCSharpBind::UpdateCallCSharpFunctionFlags(UFunction* InFunctionCallLua)
 	InFunctionCallLua->FunctionFlags &= (~FUNC_Native);
 }
 
-bool FCSharpBind::IsOverrideType(const FMonoDomain* InMonoDomain, MonoReflectionType* InMonoReflectionType)
+bool FCSharpBind::IsOverrideType(const FDomain* InDomain, MonoReflectionType* InMonoReflectionType)
 {
-	if (InMonoDomain == nullptr || InMonoReflectionType == nullptr)
+	if (InDomain == nullptr || InMonoReflectionType == nullptr)
 	{
 		return false;
 	}
 
-	if (const auto UtilsMonoClass = InMonoDomain->Class_From_Name(
+	if (const auto UtilsMonoClass = InDomain->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
 	{
 		auto InParams = static_cast<void*>(InMonoReflectionType);
 
-		if (const auto IsOverrideTypeMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
+		if (const auto IsOverrideTypeMonoMethod = InDomain->Class_Get_Method_From_Name(
 			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_TYPE, TGetArrayLength(InParams)))
 		{
-			if (const auto IsOverrideTypeMonoObject = InMonoDomain->Runtime_Invoke(
+			if (const auto IsOverrideTypeMonoObject = InDomain->Runtime_Invoke(
 				IsOverrideTypeMonoMethod, nullptr, &InParams))
 			{
-				return *static_cast<bool*>(InMonoDomain->Object_Unbox(IsOverrideTypeMonoObject));
+				return *static_cast<bool*>(InDomain->Object_Unbox(IsOverrideTypeMonoObject));
 			}
 		}
 	}
@@ -457,25 +457,25 @@ bool FCSharpBind::IsOverrideType(const FMonoDomain* InMonoDomain, MonoReflection
 	return false;
 }
 
-bool FCSharpBind::IsOverrideMethod(const FMonoDomain* InMonoDomain, MonoReflectionMethod* InMonoReflectionMethod)
+bool FCSharpBind::IsOverrideMethod(const FDomain* InDomain, MonoReflectionMethod* InMonoReflectionMethod)
 {
-	if (InMonoDomain == nullptr || InMonoReflectionMethod == nullptr)
+	if (InDomain == nullptr || InMonoReflectionMethod == nullptr)
 	{
 		return false;
 	}
 
-	if (const auto UtilsMonoClass = InMonoDomain->Class_From_Name(
+	if (const auto UtilsMonoClass = InDomain->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
 	{
 		auto InParams = static_cast<void*>(InMonoReflectionMethod);
 
-		if (const auto IsOverrideMethodMonoMethod = InMonoDomain->Class_Get_Method_From_Name(
+		if (const auto IsOverrideMethodMonoMethod = InDomain->Class_Get_Method_From_Name(
 			UtilsMonoClass,FUNCTION_UTILS_IS_OVERRIDE_METHOD, TGetArrayLength(InParams)))
 		{
-			if (const auto IsOverrideMethodMonoObject = InMonoDomain->Runtime_Invoke(
+			if (const auto IsOverrideMethodMonoObject = InDomain->Runtime_Invoke(
 				IsOverrideMethodMonoMethod, nullptr, &InParams))
 			{
-				return *static_cast<bool*>(InMonoDomain->Object_Unbox(IsOverrideMethodMonoObject));
+				return *static_cast<bool*>(InDomain->Object_Unbox(IsOverrideMethodMonoObject));
 			}
 		}
 	}

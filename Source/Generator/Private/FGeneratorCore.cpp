@@ -2,7 +2,7 @@
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Misc/FileHelper.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {

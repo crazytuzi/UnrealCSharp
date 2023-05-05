@@ -3,7 +3,8 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/NamespaceMacro.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterSoftObjectPath
 {

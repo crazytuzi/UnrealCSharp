@@ -1,9 +1,9 @@
 ﻿#include "Binding/Class/FBindingClassBuilder.h"
 #include "Binding/FBinding.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
-#include "Macro/NamespaceMacro.h"
+#include "Macro/ClassMacro.h"
 
 FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, const FString& InNameSpace):
 	Class(InClass),
