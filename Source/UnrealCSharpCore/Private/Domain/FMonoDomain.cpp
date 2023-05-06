@@ -151,6 +151,16 @@ mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* I
 		       : false;
 }
 
+const char* FMonoDomain::Class_Get_Name(MonoClass* InMonoClass)
+{
+	return InMonoClass != nullptr ? mono_class_get_name(InMonoClass) : nullptr;
+}
+
+MonoClass* FMonoDomain::Class_Get_Parent(MonoClass* InMonoClass)
+{
+	return InMonoClass != nullptr ? mono_class_get_parent(InMonoClass) : nullptr;
+}
+
 MonoType* FMonoDomain::Class_Get_Type(MonoClass* InMonoClass)
 {
 	return InMonoClass != nullptr ? mono_class_get_type(InMonoClass) : nullptr;
@@ -261,9 +271,14 @@ char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
 	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
 }
 
-MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, uint32 InNum)
+MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
 {
 	return mono_array_new(Domain, InMonoClass, InNum);
+}
+
+uint64 FMonoDomain::Array_Length(MonoArray* InMonoArray)
+{
+	return InMonoArray != nullptr ? mono_array_length(InMonoArray) : 0u;
 }
 
 MonoClass* FMonoDomain::Get_Byte_Class()

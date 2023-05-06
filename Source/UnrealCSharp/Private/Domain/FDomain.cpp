@@ -90,6 +90,16 @@ mono_bool FDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSup
 	return FMonoDomain::Class_Is_Subclass_Of(InMonoClass, InSuperMonoClass, bCheckInterfaces);
 }
 
+const char* FDomain::Class_Get_Name(MonoClass* InMonoClass) const
+{
+	return FMonoDomain::Class_Get_Name(InMonoClass);
+}
+
+MonoClass* FDomain::Class_Get_Parent(MonoClass* InMonoClass) const
+{
+	return FMonoDomain::Class_Get_Parent(InMonoClass);
+}
+
 MonoType* FDomain::Class_Get_Type(MonoClass* InMonoClass) const
 {
 	return FMonoDomain::Class_Get_Type(InMonoClass);
@@ -179,6 +189,11 @@ char* FDomain::String_To_UTF8(MonoString* InMonoString) const
 MonoArray* FDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum) const
 {
 	return FMonoDomain::Array_New(InMonoClass, InNum);
+}
+
+uint64 FDomain::Array_Length(MonoArray* InMonoArray) const
+{
+	return FMonoDomain::Array_Length(InMonoArray);
 }
 
 MonoClass* FDomain::Get_Byte_Class() const

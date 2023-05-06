@@ -43,6 +43,10 @@ public:
 	static UNREALCSHARPCORE_API mono_bool Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
 	                                                           mono_bool bCheckInterfaces);
 
+	static UNREALCSHARPCORE_API const char* Class_Get_Name(MonoClass* InMonoClass);
+
+	static UNREALCSHARPCORE_API MonoClass* Class_Get_Parent(MonoClass* InMonoClass);
+
 	static UNREALCSHARPCORE_API MonoType* Class_Get_Type(MonoClass* InMonoClass);
 
 	static UNREALCSHARPCORE_API MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType);
@@ -80,6 +84,8 @@ public:
 	static UNREALCSHARPCORE_API char* String_To_UTF8(MonoString* InMonoString);
 
 	static UNREALCSHARPCORE_API MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum);
+
+	static UNREALCSHARPCORE_API uint64 Array_Length(MonoArray* InMonoArray);
 
 	static UNREALCSHARPCORE_API MonoClass* Get_Byte_Class();
 
