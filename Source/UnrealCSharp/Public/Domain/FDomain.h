@@ -36,6 +36,10 @@ public:
 	mono_bool Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
 	                               mono_bool bCheckInterfaces) const;
 
+	const char* Class_Get_Name(MonoClass* InMonoClass) const;
+
+	MonoClass* Class_Get_Parent(MonoClass* InMonoClass) const;
+
 	MonoType* Class_Get_Type(MonoClass* InMonoClass) const;
 
 	MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType) const;
@@ -71,6 +75,8 @@ public:
 	char* String_To_UTF8(MonoString* InMonoString) const;
 
 	MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum) const;
+
+	uint64 Array_Length(MonoArray* InMonoArray) const;
 
 	MonoClass* Get_Byte_Class() const;
 
