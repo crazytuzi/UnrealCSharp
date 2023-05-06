@@ -1,6 +1,6 @@
 ﻿#include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 void FDelegateGenerator::Generator(FProperty* InProperty)
 {

@@ -1,8 +1,8 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
-#include "Macro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
-#include "UnrealCSharpLog.h"
+#include "Log/UnrealCSharpLog.h"
 #include <signal.h>
 
 void SignalHandler(int32)
@@ -40,7 +40,7 @@ FCSharpEnvironment::~FCSharpEnvironment()
 
 void FCSharpEnvironment::Initialize()
 {
-	Domain = new FMonoDomain({
+	Domain = new FDomain({
 		"",
 		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
 		DLL_SUFFIX,
@@ -163,7 +163,7 @@ FCSharpEnvironment& FCSharpEnvironment::GetEnvironment()
 	return Environment;
 }
 
-FMonoDomain* FCSharpEnvironment::GetDomain() const
+FDomain* FCSharpEnvironment::GetDomain() const
 {
 	return Domain;
 }
@@ -307,9 +307,9 @@ FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const FName& InClassNam
 	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InClassName) : nullptr;
 }
 
-FClassDescriptor* FCSharpEnvironment::NewClassDescriptor(const FMonoDomain* InMonoDomain, UStruct* InStruct) const
+FClassDescriptor* FCSharpEnvironment::NewClassDescriptor(const FDomain* InDomain, UStruct* InStruct) const
 {
-	return ClassRegistry != nullptr ? ClassRegistry->NewClassDescriptor(InMonoDomain, InStruct) : nullptr;
+	return ClassRegistry != nullptr ? ClassRegistry->NewClassDescriptor(InDomain, InStruct) : nullptr;
 }
 
 void FCSharpEnvironment::DeleteClassDescriptor(const UStruct* InStruct) const

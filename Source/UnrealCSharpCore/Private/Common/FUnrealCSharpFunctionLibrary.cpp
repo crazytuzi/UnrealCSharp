@@ -1,7 +1,7 @@
-﻿#include "FUnrealCSharpFunctionLibrary.h"
-#include "Macro.h"
+﻿#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 #include "Misc/FileHelper.h"
-#include "NameEncode.h"
+#include "Common/NameEncode.h"
 
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {

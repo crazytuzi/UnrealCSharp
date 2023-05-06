@@ -2,6 +2,7 @@
 #include "Binding/Class/TScriptStructBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Internationalization/PolyglotTextData.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
 

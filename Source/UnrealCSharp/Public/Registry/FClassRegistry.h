@@ -19,7 +19,7 @@ public:
 
 	FClassDescriptor* GetClassDescriptor(const FName& InClassName);
 
-	FClassDescriptor* NewClassDescriptor(const class FMonoDomain* InMonoDomain, UStruct* InStruct);
+	FClassDescriptor* NewClassDescriptor(const class FDomain* InDomain, UStruct* InStruct);
 
 	void DeleteClassDescriptor(const UStruct* InStruct);
 

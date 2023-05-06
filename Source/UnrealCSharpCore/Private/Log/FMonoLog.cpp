@@ -1,10 +1,10 @@
 ﻿#include "Log/FMonoLog.h"
-#include "UnrealCSharpLog.h"
+#include "Log/UnrealCSharpLog.h"
 
 /**
 * https://github.com/mono-ue/UnrealEngine/blob/monoue/Engine/Plugins/MonoUE/Source/MonoRuntime/Private/MonoRuntime.cpp#L78
 */
-void FMonoLog::MonoPrintf(const char* InString, const mono_bool IsStdout)
+void FMonoLog::Printf(const char* InString, const mono_bool IsStdout)
 {
 #if !NO_LOGGING
 	if (UE_LOG_ACTIVE(LogUnrealCSharp, Log))
@@ -19,7 +19,7 @@ void FMonoLog::MonoPrintf(const char* InString, const mono_bool IsStdout)
 #endif
 }
 
-void FMonoLog::MonoPrintfError(const char* InString, const mono_bool IsStdout)
+void FMonoLog::PrintfError(const char* InString, const mono_bool IsStdout)
 {
 #if !NO_LOGGING
 	if (UE_LOG_ACTIVE(LogUnrealCSharp, Error))
@@ -37,7 +37,7 @@ void FMonoLog::MonoPrintfError(const char* InString, const mono_bool IsStdout)
 /**
 * https://github.com/mono-ue/UnrealEngine/blob/monoue/Engine/Plugins/MonoUE/Source/MonoRuntime/Private/MonoRuntime.cpp#L97
 */
-void FMonoLog::MonoLog(const char* InLogDomain, const char* InLogLevel, const char* InMessage, const mono_bool InFatal,
+void FMonoLog::Log(const char* InLogDomain, const char* InLogLevel, const char* InMessage, const mono_bool InFatal,
                        void* InUserdata)
 {
 #if !NO_LOGGING

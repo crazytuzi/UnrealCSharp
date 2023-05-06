@@ -3,9 +3,9 @@
 
 #include "Reflection/Delegate/MulticastDelegateHandler.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
-#include "Macro/NamespaceMacro.h"
 #include "Template/TGetArrayLength.h"
 
 void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)

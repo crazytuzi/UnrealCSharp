@@ -3,7 +3,7 @@
 #include "FGeneratorCore.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 void FStructGenerator::Generator()
 {

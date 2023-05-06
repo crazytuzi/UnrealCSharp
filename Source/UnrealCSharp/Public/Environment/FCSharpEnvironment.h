@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Domain/FMonoDomain.h"
+#include "Domain/FDomain.h"
 #include "Registry/FClassRegistry.h"
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FCSharpBind.h"
@@ -27,7 +27,7 @@ public:
 	static FCSharpEnvironment& GetEnvironment();
 
 public:
-	FMonoDomain* GetDomain() const;
+	FDomain* GetDomain() const;
 
 public:
 	void NotifyUObjectCreated(const class UObjectBase* Object, int32 Index);
@@ -65,7 +65,7 @@ public:
 
 	FClassDescriptor* GetClassDescriptor(const FName& InClassName) const;
 
-	FClassDescriptor* NewClassDescriptor(const FMonoDomain* InMonoDomain, UStruct* InStruct) const;
+	FClassDescriptor* NewClassDescriptor(const FDomain* InDomain, UStruct* InStruct) const;
 
 	void DeleteClassDescriptor(const UStruct* InStruct) const;
 
@@ -188,7 +188,7 @@ public:
 private:
 	static FCSharpEnvironment Environment;
 
-	FMonoDomain* Domain;
+	FDomain* Domain;
 
 private:
 	FDelegateHandle OnUnrealCSharpModuleActiveDelegateHandle;

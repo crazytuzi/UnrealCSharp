@@ -1,6 +1,6 @@
 #include "FSolutionGenerator.h"
-#include "Macro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
 
 void FSolutionGenerator::Generator()

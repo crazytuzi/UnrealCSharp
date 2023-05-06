@@ -1,6 +1,6 @@
 ﻿#include "FCSharpCompilerRunnable.h"
-#include "FUnrealCSharpFunctionLibrary.h"
-#include "Macro.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 #include "UEVersion.h"
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():

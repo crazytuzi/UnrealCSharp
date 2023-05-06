@@ -29,7 +29,8 @@ public class UnrealCSharp : ModuleRules
 				"Engine",
 				// ... add other public dependencies that you statically link with here ...
 				"Mono",
-				"CrossVersion"
+				"CrossVersion",
+				"UnrealCSharpCore"
 			}
 			);
 			
@@ -39,8 +40,7 @@ public class UnrealCSharp : ModuleRules
 			{
 				"CoreUObject",
 				"Slate",
-				"SlateCore", 
-				"UnrealCSharpCore",
+				"SlateCore",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
