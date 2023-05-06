@@ -4,6 +4,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Misc/FileHelper.h"
+#include "Mixin/CSharpGeneratedClass.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -18,6 +19,11 @@ void FClassGenerator::Generator()
 void FClassGenerator::Generator(const UClass* InClass)
 {
 	if (InClass == nullptr)
+	{
+		return;
+	}
+
+	if (Cast<UCSharpGeneratedClass>(InClass))
 	{
 		return;
 	}

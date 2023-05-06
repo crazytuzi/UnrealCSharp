@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Diagnostics;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Script.Common
 {
@@ -64,6 +65,21 @@ namespace Script.Common
             }
 
             return Traceback.ToString();
+        }
+
+        public static Type[] GetTypesWithAttribute(Type InAttributeType, Assembly InAssembly)
+        {
+            var List = new List<Type>();
+
+            foreach (var Type in InAssembly.GetTypes())
+            {
+                if (Type.IsDefined(InAttributeType, false))
+                {
+                    List.Add(Type);
+                }
+            }
+
+            return List.ToArray();
         }
     }
 }

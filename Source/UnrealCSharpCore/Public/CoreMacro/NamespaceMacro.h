@@ -5,3 +5,5 @@
 #define NAMESPACE_ROOT FString(TEXT("Script"))
 
 #define NAMESPACE_COMMON FString(TEXT("Common"))
+
+#define NAMESPACE_MIXIN FString(TEXT("Mixin"))

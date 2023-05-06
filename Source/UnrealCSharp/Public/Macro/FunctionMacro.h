@@ -4,8 +4,6 @@
 
 #define FUNCTION_OBJECT_LIST_ADD FString(TEXT("Add"))
 
-#define FUNCTION_UTILS_GET_PATH_NAME FString(TEXT("GetPathName"))
-
 #define FUNCTION_UTILS_IS_OVERRIDE_TYPE FString(TEXT("IsOverrideType"))
 
 #define FUNCTION_UTILS_IS_OVERRIDE_METHOD FString(TEXT("IsOverrideMethod"))

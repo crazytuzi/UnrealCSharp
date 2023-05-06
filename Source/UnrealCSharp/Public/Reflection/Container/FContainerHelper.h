@@ -14,6 +14,7 @@ private:
 	                                 const FFieldVariant& InOwner, const FName& InName,
 	                                 const EObjectFlags InObjectFlags);
 
+	// @TODO
 	static FString GetPathName(MonoReflectionType* InReflectionType);
 
 	static FString GetGenericPathName(MonoReflectionType* InReflectionType);
