@@ -50,18 +50,34 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 			                        ? UserDefinedEnum->GetDisplayNameTextByIndex(Index).ToString()
 			                        : InEnum->GetNameStringByIndex(Index);
 
-		auto EnumItemName = FGeneratorCore::GetName(FNameEncode::Encode(EnumeratorString));
-		if (InEnum->GetName() == TEXT("ECollisionChannel"))
-		{
-			UCollisionProfile *CollisionProfile = UCollisionProfile::Get();
-			EnumItemName = CollisionProfile->ReturnChannelNameFromContainerIndex(Index).ToString();
-		}
-
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
 		),
-		                                     *EnumItemName,
+		                                     *FGeneratorCore::GetName(FNameEncode::Encode(EnumeratorString)),
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
+	}
+
+	if (InEnum->GetName() == TEXT("ECollisionChannel"))
+	{
+		EnumeratorContent = "";
+		
+		UCollisionProfile *CollisionProfile = UCollisionProfile::Get();
+		
+		for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
+		{
+			const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
+
+			if (EnumeratorValue == InEnum->GetMaxEnumValue())
+			{
+				break;
+			}
+			
+			EnumeratorContent += FString::Printf(TEXT(
+				"\t\t%s = %lld%s\n"
+			),
+												 *CollisionProfile->ReturnChannelNameFromContainerIndex(Index).ToString(),
+												 EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
+		}
 	}
 
 	for (auto UsingNameSpace : UsingNameSpaces)
