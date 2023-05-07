@@ -69,17 +69,17 @@ namespace Script.Common
 
         public static Type[] GetTypesWithAttribute(Type InAttributeType, Assembly InAssembly)
         {
-            var List = new List<Type>();
+            var Types = new List<Type>();
 
             foreach (var Type in InAssembly.GetTypes())
             {
                 if (Type.IsDefined(InAttributeType, false))
                 {
-                    List.Add(Type);
+                    Types.Add(Type);
                 }
             }
 
-            return List.ToArray();
+            return Types.ToArray();
         }
     }
 }

@@ -42,6 +42,16 @@ public:
 
 	MonoType* Class_Get_Type(MonoClass* InMonoClass) const;
 
+	MonoClassField* Class_Get_Fields(MonoClass* InMonoClass, void** InIterator) const;
+
+	MonoCustomAttrInfo* Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField) const;
+
+	mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass) const;
+
+	const char* Field_Get_Name(MonoClassField* InMonoClassField) const;
+
+	MonoType* Field_Get_Type(MonoClassField* InMonoClassField) const;
+
 	MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType) const;
 
 	MonoClass* Type_Get_Class(MonoType* InMonoType) const;

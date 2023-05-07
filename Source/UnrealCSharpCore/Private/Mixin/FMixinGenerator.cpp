@@ -68,6 +68,13 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
+	const auto Outer = UObject::StaticClass()->GetPackage();
+
+	if (LoadClass<UObject>(Outer, *FString(ClassName)))
+	{
+		return;
+	}
+
 	const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass);
 
 	const auto ParentMonoType = FMonoDomain::Class_Get_Type(ParentMonoClass);
@@ -77,8 +84,6 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 	const auto ParentPathName = FTypeBridge::GetPathName(ParentMonoReflectionType);
 
 	const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName);
-
-	const auto Outer = UObject::StaticClass()->GetPackage();
 
 	auto Class = NewObject<UCSharpGeneratedClass>(Outer, ClassName, RF_Public);
 
@@ -104,9 +109,58 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 
 	Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
 
+	// @TODO
+	GeneratorProperty(InMonoClass, Class);
+
 	Class->Bind();
 
 	Class->StaticLink(true);
 
+	Class->AssembleReferenceTokenStream();
+
 	(void)Class->GetDefaultObject();
+}
+
+void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGeneratedClass* InClass)
+{
+	if (InMonoClass == nullptr || InClass == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_MIXIN), CLASS_U_PROPERTY_ATTRIBUTE);
+
+	void* Iterator = nullptr;
+
+	while (const auto Field = FMonoDomain::Class_Get_Fields(InMonoClass, &Iterator))
+	{
+		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Field(InMonoClass, Field))
+		{
+			if (FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			{
+				const auto FieldName = FMonoDomain::Field_Get_Name(Field);
+
+				const auto FieldType = FMonoDomain::Field_Get_Type(Field);
+
+				const auto ReflectionType = FMonoDomain::Type_Get_Object(FieldType);
+
+#if WITH_EDITOR
+				FBPVariableDescription BPVariableDescription;
+
+				BPVariableDescription.VarName = FieldName;
+
+				BPVariableDescription.VarGuid = FGuid::NewGuid();
+
+				Cast<UBlueprint>(InClass->ClassGeneratedBy)->NewVariables.Add(BPVariableDescription);
+#endif
+
+				const auto Property = FTypeBridge::Factory(ReflectionType, InClass, FieldName, EObjectFlags::RF_Public);
+
+				Property->SetPropertyFlags(CPF_BlueprintVisible);
+
+				InClass->AddCppProperty(Property);
+			}
+		}
+	}
 }

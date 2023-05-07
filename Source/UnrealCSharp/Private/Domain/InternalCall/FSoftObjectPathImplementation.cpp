@@ -1,9 +1,10 @@
 ﻿#include "Domain/InternalCall/FSoftObjectPathImplementation.h"
 #include "Binding/Class/TScriptStructBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "CoreMacro/ClassMacro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "CoreMacro/NamespaceMacro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterSoftObjectPath

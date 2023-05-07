@@ -9,4 +9,6 @@ public:
 
 private:
 	static void Generator(MonoClass* InMonoClass);
+
+	static void GeneratorProperty(MonoClass* InMonoClass, class UCSharpGeneratedClass* InClass);
 };
