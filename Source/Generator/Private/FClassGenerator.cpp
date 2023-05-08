@@ -680,16 +680,15 @@ FString FClassGenerator::GetCppFunctionDefaultParam(const UFunction* InFunction,
 			else
 			{
 				const auto EnumName = ByteProperty->Enum->GetName();
-				
-				if(EnumName == TEXT("ECollisionChannel"))
+
+				// @TODO
+				if (EnumName == TEXT("ECollisionChannel"))
 				{
-					UCollisionProfile* CollisionProfile = UCollisionProfile::Get();
-			
-					auto CollisionName = CollisionProfile->ReturnChannelNameFromContainerIndex(ByteProperty->Enum->GetIndexByName(*MetaData));
-			
-					return FString::Printf(TEXT(" = %s.%s"), *EnumName, *CollisionName.ToString());
+					return FString::Printf(TEXT(" = %s.%s"), *EnumName,
+					                       *UCollisionProfile::Get()->ReturnChannelNameFromContainerIndex(
+						                       ByteProperty->Enum->GetIndexByName(*MetaData)).ToString());
 				}
-				
+
 				return FString::Printf(TEXT(" = %s.%s"), *EnumName, *MetaData);
 			}
 		}

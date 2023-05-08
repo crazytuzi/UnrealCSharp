@@ -12,6 +12,8 @@ void FEnumGenerator::Generator()
 	{
 		Generator(*EnumIterator);
 	}
+
+	GeneratorCollisionChannel();
 }
 
 void FEnumGenerator::Generator(const UEnum* InEnum)
@@ -55,29 +57,6 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		),
 		                                     *FGeneratorCore::GetName(FNameEncode::Encode(EnumeratorString)),
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
-	}
-
-	if (InEnum->GetName() == TEXT("ECollisionChannel"))
-	{
-		EnumeratorContent = "";
-		
-		UCollisionProfile *CollisionProfile = UCollisionProfile::Get();
-		
-		for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
-		{
-			const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
-
-			if (EnumeratorValue == InEnum->GetMaxEnumValue())
-			{
-				break;
-			}
-			
-			EnumeratorContent += FString::Printf(TEXT(
-				"\t\t%s = %lld%s\n"
-			),
-												 *CollisionProfile->ReturnChannelNameFromContainerIndex(Index).ToString(),
-												 EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
-		}
 	}
 
 	for (auto UsingNameSpace : UsingNameSpaces)
@@ -169,6 +148,83 @@ void FEnumGenerator::AddEnumUnderlyingType(const UEnum* InEnum, const FNumericPr
 void FEnumGenerator::EmptyEnumUnderlyingType()
 {
 	EnumUnderlyingType.Empty();
+}
+
+void FEnumGenerator::GeneratorCollisionChannel()
+{
+	const auto InEnum = LoadObject<UEnum>(UCollisionProfile::StaticClass()->GetPackage(), TEXT("ECollisionChannel"));
+
+	if (InEnum == nullptr)
+	{
+		return;
+	}
+
+	FString UsingNameSpaceContent;
+
+	const auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum);
+
+	const auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InEnum);
+
+	const auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InEnum);
+
+	FString EnumeratorContent;
+
+	auto ClassName = InEnum->GetName();
+
+	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
+
+	const auto CollisionProfile = UCollisionProfile::Get();
+
+	for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
+	{
+		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
+
+		if (EnumeratorValue == InEnum->GetMaxEnumValue())
+		{
+			break;
+		}
+
+		EnumeratorContent += FString::Printf(TEXT(
+			"\t\t%s = %lld%s\n"
+		),
+		                                     *CollisionProfile->ReturnChannelNameFromContainerIndex(Index).ToString(),
+		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
+	}
+
+	for (auto UsingNameSpace : UsingNameSpaces)
+	{
+		UsingNameSpaceContent += FString::Printf(TEXT(
+			"using %s;\n"
+		),
+		                                         *UsingNameSpace);
+	}
+
+	const auto Content = FString::Printf(TEXT(
+		"%s\n"
+		"namespace %s\n"
+		"{\n"
+		"\t[PathName(\"%s\")]\n"
+		"\tpublic enum %s : %s\n"
+		"\t{\n"
+		"%s"
+		"\t}\n"
+		"}"
+	),
+	                                     *UsingNameSpaceContent,
+	                                     *NameSpaceContent,
+	                                     *PathNameAttributeContent,
+	                                     *FullClassContent,
+	                                     *GetEnumUnderlyingTypeName(InEnum),
+	                                     *EnumeratorContent
+	);
+
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InEnum);
+
+	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InEnum), ModuleName);
+
+	const auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
+
+	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
 
 FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
