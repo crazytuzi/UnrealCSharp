@@ -105,7 +105,7 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 
 	Class->SetSuperStruct(ParentClass);
 
-	Class->ClassFlags |= ParentClass->ClassFlags & (CLASS_Inherit | CLASS_ScriptInherit | CLASS_CompiledFromBlueprint);
+	Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 
 	Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
 
@@ -145,18 +145,9 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 
 				const auto ReflectionType = FMonoDomain::Type_Get_Object(FieldType);
 
-#if WITH_EDITOR
-				FBPVariableDescription BPVariableDescription;
-
-				BPVariableDescription.VarName = FieldName;
-
-				BPVariableDescription.VarGuid = FGuid::NewGuid();
-
-				Cast<UBlueprint>(InClass->ClassGeneratedBy)->NewVariables.Add(BPVariableDescription);
-#endif
-
 				const auto Property = FTypeBridge::Factory(ReflectionType, InClass, FieldName, EObjectFlags::RF_Public);
 
+				// @TODO
 				Property->SetPropertyFlags(CPF_BlueprintVisible);
 
 				InClass->AddCppProperty(Property);
