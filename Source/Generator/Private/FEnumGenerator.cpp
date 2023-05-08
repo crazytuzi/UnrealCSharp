@@ -57,6 +57,29 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
 	}
 
+	if (InEnum->GetName() == TEXT("ECollisionChannel"))
+	{
+		EnumeratorContent = "";
+		
+		UCollisionProfile *CollisionProfile = UCollisionProfile::Get();
+		
+		for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
+		{
+			const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
+
+			if (EnumeratorValue == InEnum->GetMaxEnumValue())
+			{
+				break;
+			}
+			
+			EnumeratorContent += FString::Printf(TEXT(
+				"\t\t%s = %lld%s\n"
+			),
+												 *CollisionProfile->ReturnChannelNameFromContainerIndex(Index).ToString(),
+												 EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
+		}
+	}
+
 	for (auto UsingNameSpace : UsingNameSpaces)
 	{
 		UsingNameSpaceContent += FString::Printf(TEXT(
