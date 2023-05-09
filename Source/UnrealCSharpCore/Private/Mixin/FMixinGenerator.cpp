@@ -112,6 +112,9 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 	// @TODO
 	GeneratorProperty(InMonoClass, Class);
 
+	// @TODO
+	GeneratorFunction(InMonoClass, Class);
+
 	Class->Bind();
 
 	Class->StaticLink(true);
@@ -145,12 +148,106 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 
 				const auto ReflectionType = FMonoDomain::Type_Get_Object(FieldType);
 
+#if WITH_EDITOR
+				FBPVariableDescription BPVariableDescription;
+
+				BPVariableDescription.VarName = FieldName;
+
+				BPVariableDescription.VarGuid = FGuid::NewGuid();
+
+				Cast<UBlueprint>(InClass->ClassGeneratedBy)->NewVariables.Add(BPVariableDescription);
+#endif
+
 				const auto Property = FTypeBridge::Factory(ReflectionType, InClass, FieldName, EObjectFlags::RF_Public);
 
 				// @TODO
 				Property->SetPropertyFlags(CPF_BlueprintVisible);
 
 				InClass->AddCppProperty(Property);
+			}
+		}
+	}
+}
+
+void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGeneratedClass* InClass)
+{
+	if (InMonoClass == nullptr || InClass == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_MIXIN), CLASS_U_FUNCTION_ATTRIBUTE);
+
+	void* MethodIterator = nullptr;
+
+	while (const auto Method = FMonoDomain::Class_Get_Methods(InMonoClass, &MethodIterator))
+	{
+		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Method(Method))
+		{
+			if (FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			{
+				const auto MethodName = FMonoDomain::Method_Get_Name(Method);
+
+				const auto Signature = FMonoDomain::Method_Signature(Method);
+
+				void* ParamIterator = nullptr;
+
+				const auto ParamCount = FMonoDomain::Signature_Get_Param_Count(Signature);
+
+				const auto ParamNames = static_cast<const char**>(FMemory_Alloca(ParamCount * sizeof(const char*)));
+
+				FMonoDomain::Method_Get_Param_Names(Method, ParamNames);
+
+				auto ParamIndex = 0;
+
+				TArray<TPair<const char*, MonoReflectionType*>> Params;
+
+				while (const auto Param = FMonoDomain::Signature_Get_Params(Signature, &ParamIterator))
+				{
+					Params.Add({ParamNames[ParamIndex++], FMonoDomain::Type_Get_Object(Param)});
+				}
+
+				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
+
+				// @TODO
+				Function->FunctionFlags = FUNC_Public | FUNC_BlueprintCallable;
+
+				Function->MinAlignment = 1;
+
+				if (const auto ReturnParamType = FMonoDomain::Signature_Get_Return_Type(Signature))
+				{
+					const auto ReturnParamReflectionType = FMonoDomain::Type_Get_Object(ReturnParamType);
+
+					const auto Property = FTypeBridge::Factory(ReturnParamReflectionType, Function, "",
+					                                           RF_Public | RF_Transient);
+
+					Property->SetPropertyFlags(CPF_Parm | CPF_ReturnParm);
+
+					Function->AddCppProperty(Property);
+				}
+
+				for (auto Index = Params.Num() - 1; Index >= 0; --Index)
+				{
+					const auto Property = FTypeBridge::Factory(Params[Index].Value, Function, Params[Index].Key,
+					                                           RF_Public | RF_Transient);
+
+					Property->SetPropertyFlags(CPF_Parm);
+
+					Function->AddCppProperty(Property);
+				}
+
+				Function->Bind();
+
+				Function->StaticLink(true);
+
+				Function->Next = InClass->Children;
+
+				InClass->Children = Function;
+
+				InClass->AddFunctionToFunctionMap(Function, MethodName);
+
+				Function->AddToRoot();
 			}
 		}
 	}
