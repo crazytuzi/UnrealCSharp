@@ -2,6 +2,7 @@
 #include "Binding/Class/TScriptStructBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/ClassMacro.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -50,9 +51,8 @@ struct FRegisterLinearColor
 #if UE_LINEAR_COLOR_QUANTIZE_FLOOR
 			.Function("QuantizeFloor",
 			          static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeFloorImplementation))
-#else
-			.Function("Quantize", static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeImplementation))
 #endif
+			.Function("Quantize", static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeImplementation))
 			.Function("QuantizeRound",
 			          static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeRoundImplementation))
 			.Function("ToFColor", static_cast<void*>(FLinearColorImplementation::LinearColor_ToFColorImplementation))
@@ -550,7 +550,8 @@ void FLinearColorImplementation::LinearColor_QuantizeFloorImplementation(const M
 		*OutColor = LinearColor->QuantizeFloor();
 	}
 }
-#else
+#endif
+
 void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoObject* InMonoObject,
                                                                     MonoObject** OutValue)
 {
@@ -572,7 +573,6 @@ void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoOb
 		*OutColor = LinearColor->Quantize();
 	}
 }
-#endif
 
 void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
