@@ -2,6 +2,7 @@
 #include "CoreMacro/Macro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
+#include "Mixin/CSharpGeneratedClass.h"
 
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
@@ -65,7 +66,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 
 	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
 
-	if (InStruct->IsNative())
+	if (InStruct->IsNative() || Cast<UCSharpGeneratedClass>(InStruct))
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}

@@ -49,6 +49,18 @@ public:
 
 	static UNREALCSHARPCORE_API MonoType* Class_Get_Type(MonoClass* InMonoClass);
 
+	static UNREALCSHARPCORE_API MonoClassField* Class_Get_Fields(MonoClass* InMonoClass, void** InIterator);
+
+	static UNREALCSHARPCORE_API MonoCustomAttrInfo* Custom_Attrs_From_Field(
+		MonoClass* InMonoClass, MonoClassField* InMonoClassField);
+
+	static UNREALCSHARPCORE_API mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo,
+	                                                            MonoClass* InMonoClass);
+
+	static UNREALCSHARPCORE_API const char* Field_Get_Name(MonoClassField* InMonoClassField);
+
+	static UNREALCSHARPCORE_API MonoType* Field_Get_Type(MonoClassField* InMonoClassField);
+
 	static UNREALCSHARPCORE_API MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType);
 
 	static UNREALCSHARPCORE_API MonoClass* Type_Get_Class(MonoType* InMonoType);

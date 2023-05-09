@@ -3,6 +3,7 @@
 #include "FEnumGenerator.h"
 #include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Mixin/CSharpGeneratedClass.h"
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -13,7 +14,7 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 
 	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
 
-	if (InField->IsNative() == false)
+	if (InField->IsNative() == false || Cast<UCSharpGeneratedClass>(InField))
 	{
 		auto Index = 0;
 
