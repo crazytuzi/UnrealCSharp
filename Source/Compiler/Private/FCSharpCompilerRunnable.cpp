@@ -2,6 +2,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "UEVersion.h"
+#include "Mixin/FMixinGenerator.h"
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
@@ -94,6 +95,11 @@ void FCSharpCompilerRunnable::DoWork()
 	Compile();
 
 	Pdb2Mdb();
+
+	AsyncTask(ENamedThreads::GameThread, []
+	{
+		FMixinGenerator::Generator();
+	});
 
 	bIsCompiling = false;
 }

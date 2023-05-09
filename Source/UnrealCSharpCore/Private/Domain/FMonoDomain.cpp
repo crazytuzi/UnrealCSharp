@@ -166,6 +166,31 @@ MonoType* FMonoDomain::Class_Get_Type(MonoClass* InMonoClass)
 	return InMonoClass != nullptr ? mono_class_get_type(InMonoClass) : nullptr;
 }
 
+MonoClassField* FMonoDomain::Class_Get_Fields(MonoClass* InMonoClass, void** InIterator)
+{
+	return InMonoClass != nullptr ? mono_class_get_fields(InMonoClass, InIterator) : nullptr;
+}
+
+MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField)
+{
+	return InMonoClass != nullptr && InMonoClassField != nullptr ? mono_custom_attrs_from_field(InMonoClass, InMonoClassField) : nullptr;
+}
+
+mono_bool FMonoDomain::Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
+{
+	return InMonoCustomAttrInfo != nullptr && InMonoClass != nullptr ? mono_custom_attrs_has_attr(InMonoCustomAttrInfo, InMonoClass):false;
+}
+
+const char* FMonoDomain::Field_Get_Name(MonoClassField* InMonoClassField)
+{
+	return InMonoClassField != nullptr ? mono_field_get_name(InMonoClassField) : nullptr;
+}
+
+MonoType* FMonoDomain::Field_Get_Type(MonoClassField* InMonoClassField)
+{
+	return InMonoClassField != nullptr ? mono_field_get_type(InMonoClassField) : nullptr;
+}
+
 MonoType* FMonoDomain::Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType)
 {
 	return InMonoReflectionType != nullptr ? mono_reflection_type_get_type(InMonoReflectionType) : nullptr;

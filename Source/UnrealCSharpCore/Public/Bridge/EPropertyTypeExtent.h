@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-enum class EPropertyTypeExtent
+UNREALCSHARPCORE_API enum class EPropertyTypeExtent
 {
 	None = CPT_None,
 	Byte = CPT_Byte,

@@ -249,12 +249,12 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
                                      MonoReflectionType* InValueReflectionType)
 {
-	const auto KeyProperty = FContainerHelper::Factory(InKeyReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+	const auto KeyProperty = FTypeBridge::Factory(InKeyReflectionType, nullptr, "", EObjectFlags::RF_Transient);
 
 	KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
 	const auto ValueProperty =
-		FContainerHelper::Factory(InValueReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+		FTypeBridge::Factory(InValueReflectionType, nullptr, "", EObjectFlags::RF_Transient);
 
 	ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
