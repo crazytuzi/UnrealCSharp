@@ -17,9 +17,9 @@ void FMixinGenerator::Generator()
 		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
 		DLL_SUFFIX,
 		{
-			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
-			DLL_SUFFIX,
 			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
+			DLL_SUFFIX,
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
 			DLL_SUFFIX
 		}
 	});
@@ -35,7 +35,7 @@ void FMixinGenerator::Generator()
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
 	// @TODO
-	void* InParams[2] = {AttributeMonoReflectionType, mono_gchandle_get_target_v2(FMonoDomain::AssemblyGCHandles[0])};
+	void* InParams[2] = {AttributeMonoReflectionType, mono_gchandle_get_target_v2(FMonoDomain::AssemblyGCHandles[1])};
 
 	const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
 		UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
@@ -211,7 +211,7 @@ void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGenerated
 				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
 
 				// @TODO
-				Function->FunctionFlags = FUNC_Public | FUNC_BlueprintCallable;
+				Function->FunctionFlags = FUNC_Public | FUNC_BlueprintCallable | FUNC_BlueprintEvent;
 
 				Function->MinAlignment = 1;
 
