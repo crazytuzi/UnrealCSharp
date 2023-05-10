@@ -3,3 +3,6 @@
 FUnrealCSharpModuleDelegates::FOnUnrealCSharpModuleActive FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive;
 
 FUnrealCSharpModuleDelegates::FOnUnrealCSharpModuleInActive FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive;
+
+FUnrealCSharpModuleDelegates::FOnCSharpEnvironmentInitialize
+FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize;
