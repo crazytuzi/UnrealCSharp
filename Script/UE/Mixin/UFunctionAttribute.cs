@@ -1,9 +1,10 @@
 ﻿using System;
+using Script.Common;
 
 namespace Script.Mixin
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class UFunctionAttribute : Attribute
+    public class UFunctionAttribute : IsOverrideAttribute
     {
     }
 }
