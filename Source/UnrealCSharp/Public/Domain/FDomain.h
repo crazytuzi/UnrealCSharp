@@ -44,13 +44,29 @@ public:
 
 	MonoClassField* Class_Get_Fields(MonoClass* InMonoClass, void** InIterator) const;
 
+	MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator) const;
+
 	MonoCustomAttrInfo* Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField) const;
+
+	MonoCustomAttrInfo* Custom_Attrs_From_Method(MonoMethod* InMonoMethod) const;
 
 	mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass) const;
 
 	const char* Field_Get_Name(MonoClassField* InMonoClassField) const;
 
 	MonoType* Field_Get_Type(MonoClassField* InMonoClassField) const;
+
+	const char* Method_Get_Name(MonoMethod* InMonoMethod) const;
+
+	void Method_Get_Param_Names(MonoMethod* InMonoMethod, const char** InNames) const;
+
+	MonoMethodSignature* Method_Signature(MonoMethod* InMonoMethod) const;
+
+	uint32_t Signature_Get_Param_Count(MonoMethodSignature* InMonoMethodSignature) const;
+
+	MonoType* Signature_Get_Params(MonoMethodSignature* InMonoMethodSignature, void** InIterator) const;
+
+	MonoType* Signature_Get_Return_Type(MonoMethodSignature* InMonoMethodSignature) const;
 
 	MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType) const;
 

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/BlueprintGeneratedClass.h"
+#include "UObject/Class.h"
 #include "CSharpGeneratedClass.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UNREALCSHARPCORE_API UCSharpGeneratedClass : public UBlueprintGeneratedClass
+class UNREALCSHARPCORE_API UCSharpGeneratedClass : public UClass
 {
 	GENERATED_BODY()
 	
