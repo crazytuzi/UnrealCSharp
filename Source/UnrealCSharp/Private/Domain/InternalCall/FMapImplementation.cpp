@@ -35,13 +35,13 @@ static FRegisterMap RegisterMap;
 void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject)
 {
 	FCSharpEnvironment::GetEnvironment().Bind(InMonoObject,
-	                                           FTypeBridge::GetGenericArgument(InMonoObject),
-	                                           FTypeBridge::GetGenericArgument(InMonoObject, 1));
+	                                          FTypeBridge::GetGenericArgument(InMonoObject),
+	                                          FTypeBridge::GetGenericArgument(InMonoObject, 1));
 }
 
 void FMapImplementation::Map_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+	(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
 }
 
 void FMapImplementation::Map_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)

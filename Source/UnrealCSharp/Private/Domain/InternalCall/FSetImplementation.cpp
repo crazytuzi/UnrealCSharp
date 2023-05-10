@@ -29,12 +29,12 @@ static FRegisterSet RegisterSet;
 void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject)
 {
 	FCSharpEnvironment::GetEnvironment().Bind<FSetHelper>(InMonoObject,
-	                                                       FTypeBridge::GetGenericArgument(InMonoObject));
+	                                                      FTypeBridge::GetGenericArgument(InMonoObject));
 }
 
 void FSetImplementation::Set_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+	(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
 }
 
 void FSetImplementation::Set_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)

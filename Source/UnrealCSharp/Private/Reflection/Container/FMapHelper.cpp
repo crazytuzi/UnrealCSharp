@@ -198,7 +198,7 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 		}
 	}
 
-	uint8* Data = nullptr;
+	uint8* Data;
 
 	if (KeyIndex == INDEX_NONE)
 	{

@@ -7,7 +7,7 @@ class FDomain final : public FTickableGameObject
 public:
 	explicit FDomain(const FMonoDomainInitializeParams& InParams);
 
-	~FDomain();
+	virtual ~FDomain() override;
 
 public:
 	void Initialize(const FMonoDomainInitializeParams& InParams);
