@@ -38,6 +38,7 @@ public class UnrealCSharpCore : ModuleRules
 			{
 				"Core",
 				"Mono",
+				"DirectoryWatcher"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

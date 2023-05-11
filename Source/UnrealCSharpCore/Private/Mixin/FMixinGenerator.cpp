@@ -59,6 +59,38 @@ void FMixinGenerator::Generator()
 	FMonoDomain::Deinitialize();
 }
 
+void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
+{
+	FMonoDomain::Initialize({
+		"",
+		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
+		DLL_SUFFIX,
+		{
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
+			DLL_SUFFIX,
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
+			DLL_SUFFIX
+		}
+	});
+
+	for (const auto& Data : FileChangeData)
+	{
+		if (FPaths::GetExtension(Data.Filename) == TEXT("cs"))
+		{
+			auto Filename = FPaths::GetBaseFilename(Data.Filename);
+
+			if (const auto Class = LoadClass<UObject>(UObject::StaticClass()->GetPackage(), *FString(Filename)))
+			{
+				Generator(FMonoDomain::Class_From_Name(
+					FUnrealCSharpFunctionLibrary::GetClassNameSpace(Class),
+					FUnrealCSharpFunctionLibrary::GetFullClass(Class)));
+			}
+		}
+	}
+
+	FMonoDomain::Deinitialize();
+}
+
 void FMixinGenerator::Generator(MonoClass* InMonoClass)
 {
 	if (InMonoClass == nullptr)
@@ -69,11 +101,6 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
 	const auto Outer = UObject::StaticClass()->GetPackage();
-
-	if (LoadClass<UObject>(Outer, *FString(ClassName)))
-	{
-		return;
-	}
 
 	const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass);
 

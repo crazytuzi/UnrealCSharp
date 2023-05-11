@@ -83,6 +83,24 @@ void FCSharpCompilerRunnable::EnqueueTask()
 	Event->Trigger();
 }
 
+void FCSharpCompilerRunnable::EnqueueTask(const TArray<FFileChangeData>& FileChangeData)
+{
+	{
+		FScopeLock ScopeLock(&CriticalSection);
+
+		if (!Tasks.IsEmpty())
+		{
+			Tasks.Empty();
+		}
+
+		FileChanges.Append(FileChangeData);
+
+		Tasks.Enqueue(true);
+	}
+
+	Event->Trigger();
+}
+
 bool FCSharpCompilerRunnable::IsCompiling() const
 {
 	return bIsCompiling == true || !Tasks.IsEmpty();
@@ -96,9 +114,11 @@ void FCSharpCompilerRunnable::DoWork()
 
 	Pdb2Mdb();
 
-	AsyncTask(ENamedThreads::GameThread, []
+	AsyncTask(ENamedThreads::GameThread, [this]
 	{
-		FMixinGenerator::Generator();
+		FMixinGenerator::Generator(FileChanges);
+
+		FileChanges.Empty();
 	});
 
 	bIsCompiling = false;
