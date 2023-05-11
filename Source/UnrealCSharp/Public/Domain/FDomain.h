@@ -44,9 +44,13 @@ public:
 
 	MonoClassField* Class_Get_Fields(MonoClass* InMonoClass, void** InIterator) const;
 
+	MonoProperty* Class_Get_Properties(MonoClass* InMonoClass, void** InIterator) const;
+
 	MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator) const;
 
 	MonoCustomAttrInfo* Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField) const;
+
+	MonoCustomAttrInfo* Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty) const;
 
 	MonoCustomAttrInfo* Custom_Attrs_From_Method(MonoMethod* InMonoMethod) const;
 
@@ -55,6 +59,10 @@ public:
 	const char* Field_Get_Name(MonoClassField* InMonoClassField) const;
 
 	MonoType* Field_Get_Type(MonoClassField* InMonoClassField) const;
+
+	const char* Property_Get_Name(MonoProperty* InMonoProperty) const;
+
+	MonoMethod* Property_Get_Get_Method(MonoProperty* InMonoProperty) const;
 
 	const char* Method_Get_Name(MonoMethod* InMonoMethod) const;
 
@@ -138,6 +146,8 @@ public:
 
 	MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                              int32 InParamCount) const;
+
+	MonoType* Property_Get_Type(MonoProperty* InMonoProperty) const;
 
 public:
 	void InitializeSynchronizationContext();

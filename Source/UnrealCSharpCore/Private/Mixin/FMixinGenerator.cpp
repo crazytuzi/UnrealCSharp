@@ -136,34 +136,35 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 
 	void* Iterator = nullptr;
 
-	while (const auto Field = FMonoDomain::Class_Get_Fields(InMonoClass, &Iterator))
+	while (const auto Property = FMonoDomain::Class_Get_Properties(InMonoClass, &Iterator))
 	{
-		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Field(InMonoClass, Field))
+		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Property(InMonoClass, Property))
 		{
 			if (FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
 			{
-				const auto FieldName = FMonoDomain::Field_Get_Name(Field);
+				const auto PropertyName = FMonoDomain::Property_Get_Name(Property);
 
-				const auto FieldType = FMonoDomain::Field_Get_Type(Field);
+				const auto PropertyType = FMonoDomain::Property_Get_Type(Property);
 
-				const auto ReflectionType = FMonoDomain::Type_Get_Object(FieldType);
+				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
 
 #if WITH_EDITOR
 				FBPVariableDescription BPVariableDescription;
 
-				BPVariableDescription.VarName = FieldName;
+				BPVariableDescription.VarName = PropertyName;
 
 				BPVariableDescription.VarGuid = FGuid::NewGuid();
 
 				Cast<UBlueprint>(InClass->ClassGeneratedBy)->NewVariables.Add(BPVariableDescription);
 #endif
 
-				const auto Property = FTypeBridge::Factory(ReflectionType, InClass, FieldName, EObjectFlags::RF_Public);
+				const auto CppProperty = FTypeBridge::Factory(ReflectionType, InClass, PropertyName,
+				                                              EObjectFlags::RF_Public);
 
 				// @TODO
-				Property->SetPropertyFlags(CPF_BlueprintVisible);
+				CppProperty->SetPropertyFlags(CPF_BlueprintVisible | CPF_Edit);
 
-				InClass->AddCppProperty(Property);
+				InClass->AddCppProperty(CppProperty);
 			}
 		}
 	}

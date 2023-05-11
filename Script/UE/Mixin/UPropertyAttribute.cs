@@ -2,7 +2,7 @@
 
 namespace Script.Mixin
 {
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class UPropertyAttribute : Attribute
     {
     }
