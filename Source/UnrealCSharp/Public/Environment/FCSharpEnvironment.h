@@ -9,6 +9,7 @@
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
+#include "Registry/FMixinRegistry.h"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
 
 class FCSharpEnvironment
@@ -216,6 +217,8 @@ private:
 	FDelegateRegistry* DelegateRegistry;
 
 	FMultiRegistry* MultiRegistry;
+
+	FMixinRegistry* MixinRegistry;
 };
 
 #include "FCSharpEnvironment.inl"

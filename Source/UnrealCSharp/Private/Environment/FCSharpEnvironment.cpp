@@ -66,6 +66,8 @@ void FCSharpEnvironment::Initialize()
 
 	MultiRegistry = new FMultiRegistry();
 
+	MixinRegistry = new FMixinRegistry();
+
 	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
 		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
 
@@ -90,6 +92,8 @@ void FCSharpEnvironment::Initialize()
 	{
 		signal(SignalType, SignalHandler);
 	}
+
+	FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Broadcast();
 }
 
 void FCSharpEnvironment::Deinitialize()
@@ -99,6 +103,13 @@ void FCSharpEnvironment::Deinitialize()
 	if (OnAsyncLoadingFlushUpdateHandle.IsValid())
 	{
 		FCoreDelegates::OnAsyncLoadingFlushUpdate.Remove(OnAsyncLoadingFlushUpdateHandle);
+	}
+
+	if (MixinRegistry != nullptr)
+	{
+		delete MixinRegistry;
+
+		MixinRegistry = nullptr;
 	}
 
 	if (MultiRegistry != nullptr)
