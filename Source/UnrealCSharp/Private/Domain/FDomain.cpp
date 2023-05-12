@@ -110,6 +110,11 @@ MonoClassField* FDomain::Class_Get_Fields(MonoClass* InMonoClass, void** InItera
 	return FMonoDomain::Class_Get_Fields(InMonoClass, InIterator);
 }
 
+MonoProperty* FDomain::Class_Get_Properties(MonoClass* InMonoClass, void** InIterator) const
+{
+	return FMonoDomain::Class_Get_Properties(InMonoClass, InIterator);
+}
+
 MonoMethod* FDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator) const
 {
 	return FMonoDomain::Class_Get_Methods(InMonoClass, InIterator);
@@ -118,6 +123,11 @@ MonoMethod* FDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator
 MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField) const
 {
 	return FMonoDomain::Custom_Attrs_From_Field(InMonoClass, InMonoClassField);
+}
+
+MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty) const
+{
+	return FMonoDomain::Custom_Attrs_From_Property(InMonoClass, InMonoProperty);
 }
 
 MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Method(MonoMethod* InMonoMethod) const
@@ -138,6 +148,16 @@ const char* FDomain::Field_Get_Name(MonoClassField* InMonoClassField) const
 MonoType* FDomain::Field_Get_Type(MonoClassField* InMonoClassField) const
 {
 	return FMonoDomain::Field_Get_Type(InMonoClassField);
+}
+
+const char* FDomain::Property_Get_Name(MonoProperty* InMonoProperty) const
+{
+	return FMonoDomain::Property_Get_Name(InMonoProperty);
+}
+
+MonoMethod* FDomain::Property_Get_Get_Method(MonoProperty* InMonoProperty) const
+{
+	return FMonoDomain::Property_Get_Get_Method(InMonoProperty);
 }
 
 const char* FDomain::Method_Get_Name(MonoMethod* InMonoMethod) const
@@ -345,6 +365,11 @@ MonoMethod* FDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, c
                                                        const int32 InParamCount) const
 {
 	return FMonoDomain::Parent_Class_Get_Method_From_Name(InMonoClass, InFunctionName, InParamCount);
+}
+
+MonoType* FDomain::Property_Get_Type(MonoProperty* InMonoProperty) const
+{
+	return FMonoDomain::Property_Get_Type(InMonoProperty);
 }
 
 void FDomain::InitializeSynchronizationContext()

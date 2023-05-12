@@ -49,9 +49,13 @@ public:
 
 	static MonoClassField* Class_Get_Fields(MonoClass* InMonoClass, void** InIterator);
 
+	static MonoProperty* Class_Get_Properties(MonoClass* InMonoClass, void** InIterator);
+
 	static MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator);
 
 	static MonoCustomAttrInfo* Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField);
+
+	static MonoCustomAttrInfo* Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty);
 
 	static MonoCustomAttrInfo* Custom_Attrs_From_Method(MonoMethod* InMonoMethod);
 
@@ -60,6 +64,10 @@ public:
 	static const char* Field_Get_Name(MonoClassField* InMonoClassField);
 
 	static MonoType* Field_Get_Type(MonoClassField* InMonoClassField);
+
+	static const char* Property_Get_Name(MonoProperty* InMonoProperty);
+
+	static MonoMethod* Property_Get_Get_Method(MonoProperty* InMonoProperty);
 
 	static const char* Method_Get_Name(MonoMethod* InMonoMethod);
 
@@ -144,6 +152,8 @@ public:
 public:
 	static MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                                     int32 InParamCount);
+
+	static MonoType* Property_Get_Type(MonoProperty* InMonoProperty);
 
 public:
 	static void InitializeAssembly(const TArray<FString>& InAssemblies);

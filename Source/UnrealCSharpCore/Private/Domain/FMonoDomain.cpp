@@ -171,6 +171,11 @@ MonoClassField* FMonoDomain::Class_Get_Fields(MonoClass* InMonoClass, void** InI
 	return InMonoClass != nullptr ? mono_class_get_fields(InMonoClass, InIterator) : nullptr;
 }
 
+MonoProperty* FMonoDomain::Class_Get_Properties(MonoClass* InMonoClass, void** InIterator)
+{
+	return InMonoClass != nullptr ? mono_class_get_properties(InMonoClass, InIterator) : nullptr;
+}
+
 MonoMethod* FMonoDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator)
 {
 	return InMonoClass != nullptr ? mono_class_get_methods(InMonoClass, InIterator) : nullptr;
@@ -180,6 +185,13 @@ MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Field(MonoClass* InMonoClass,
 {
 	return InMonoClass != nullptr && InMonoClassField != nullptr
 		       ? mono_custom_attrs_from_field(InMonoClass, InMonoClassField)
+		       : nullptr;
+}
+
+MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty)
+{
+	return InMonoClass != nullptr && InMonoProperty != nullptr
+		       ? mono_custom_attrs_from_property(InMonoClass, InMonoProperty)
 		       : nullptr;
 }
 
@@ -203,6 +215,16 @@ const char* FMonoDomain::Field_Get_Name(MonoClassField* InMonoClassField)
 MonoType* FMonoDomain::Field_Get_Type(MonoClassField* InMonoClassField)
 {
 	return InMonoClassField != nullptr ? mono_field_get_type(InMonoClassField) : nullptr;
+}
+
+const char* FMonoDomain::Property_Get_Name(MonoProperty* InMonoProperty)
+{
+	return InMonoProperty != nullptr ? mono_property_get_name(InMonoProperty) : nullptr;
+}
+
+MonoMethod* FMonoDomain::Property_Get_Get_Method(MonoProperty* InMonoProperty)
+{
+	return InMonoProperty != nullptr ? mono_property_get_get_method(InMonoProperty) : nullptr;
 }
 
 const char* FMonoDomain::Method_Get_Name(MonoMethod* InMonoMethod)
@@ -444,6 +466,19 @@ MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClas
 		}
 
 		InMonoClass = mono_class_get_parent(InMonoClass);
+	}
+
+	return nullptr;
+}
+
+MonoType* FMonoDomain::Property_Get_Type(MonoProperty* InMonoProperty)
+{
+	if (const auto Method = Property_Get_Get_Method(InMonoProperty))
+	{
+		if (const auto Signature = Method_Signature(Method))
+		{
+			return Signature_Get_Return_Type(Signature);
+		}
 	}
 
 	return nullptr;
