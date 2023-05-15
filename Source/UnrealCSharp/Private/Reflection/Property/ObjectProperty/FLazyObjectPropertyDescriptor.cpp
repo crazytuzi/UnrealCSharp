@@ -26,7 +26,7 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(Dest);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(Dest);
 
 		LazyObjectProperty->InitializeValue(Dest);
 

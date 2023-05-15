@@ -27,7 +27,7 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
 
 		SetProperty->InitializeValue(Dest);
 
@@ -60,7 +60,7 @@ MonoObject* FSetPropertyDescriptor::Object_New(void* InAddress) const
 	if (OwnerGarbageCollectionHandle.IsValid())
 	{
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, SetHelper,
-		                                                            Object);
+		                                                           Object);
 	}
 	else
 	{

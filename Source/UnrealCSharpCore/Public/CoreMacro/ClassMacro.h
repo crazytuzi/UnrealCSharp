@@ -10,6 +10,8 @@
 
 #define CLASS_U_PROPERTY_ATTRIBUTE FString(TEXT("UPropertyAttribute"))
 
+#define CLASS_U_FUNCTION_ATTRIBUTE FString(TEXT("UFunctionAttribute"))
+
 #define CLASS_F_STRING FString(TEXT("FString"))
 
 #define CLASS_F_NAME FString(TEXT("FName"))

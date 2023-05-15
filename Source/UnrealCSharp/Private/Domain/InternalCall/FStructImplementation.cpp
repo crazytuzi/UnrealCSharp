@@ -37,5 +37,5 @@ void FStructImplementation::Struct_RegisterImplementation(MonoObject* InMonoObje
 
 void FStructImplementation::Struct_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveStructReference(InMonoObject);
+	(void)FCSharpEnvironment::GetEnvironment().RemoveStructReference(InMonoObject);
 }

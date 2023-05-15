@@ -29,7 +29,7 @@ void FDelegateImplementation::Delegate_RegisterImplementation(MonoObject* InMono
 
 void FDelegateImplementation::Delegate_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InMonoObject);
+	(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InMonoObject);
 }
 
 void FDelegateImplementation::Delegate_BindImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate)

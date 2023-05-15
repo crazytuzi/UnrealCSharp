@@ -27,7 +27,7 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
 
 		ArrayProperty->InitializeValue(Dest);
 
@@ -60,7 +60,7 @@ MonoObject* FArrayPropertyDescriptor::Object_New(void* InAddress) const
 	if (OwnerGarbageCollectionHandle.IsValid())
 	{
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress,
-		                                                            ArrayHelper, Object);
+		                                                           ArrayHelper, Object);
 	}
 	else
 	{

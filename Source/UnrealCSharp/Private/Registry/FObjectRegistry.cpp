@@ -86,7 +86,7 @@ bool FObjectRegistry::RemoveReference(const UObject* InObject)
 
 		FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
 
-		FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
 
 		return true;
 	}
@@ -102,7 +102,7 @@ bool FObjectRegistry::RemoveReference(const MonoObject* InMonoObject)
 		{
 			FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
 
-			FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
+			(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
 		}
 
 		GarbageCollectionHandle2Object.Remove(InMonoObject);
