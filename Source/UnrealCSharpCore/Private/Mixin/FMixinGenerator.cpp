@@ -79,11 +79,25 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 		{
 			auto Filename = FPaths::GetBaseFilename(Data.Filename);
 
-			if (const auto Class = LoadClass<UObject>(UObject::StaticClass()->GetPackage(), *FString(Filename)))
+			if (auto Class = LoadClass<UObject>(UObject::StaticClass()->GetPackage(), *FString(Filename)))
 			{
 				Generator(FMonoDomain::Class_From_Name(
 					FUnrealCSharpFunctionLibrary::GetClassNameSpace(Class),
 					FUnrealCSharpFunctionLibrary::GetFullClass(Class)));
+
+				Class = LoadClass<UObject>(UObject::StaticClass()->GetPackage(), *FString(Filename));
+
+				for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
+				{
+					if (ClassIterator->IsChildOf(Class))
+					{
+						ClassIterator->UpdateCustomPropertyListForPostConstruction();
+
+						ClassIterator->Bind();
+
+						ClassIterator->StaticLink(true);
+					}
+				}
 			}
 		}
 	}
