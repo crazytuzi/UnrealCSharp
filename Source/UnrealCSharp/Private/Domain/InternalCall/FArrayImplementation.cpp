@@ -4,6 +4,7 @@
 #include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FArrayHelper.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterArray
 {
@@ -51,7 +52,10 @@ void FArrayImplementation::Array_RegisterImplementation(MonoObject* InMonoObject
 
 void FArrayImplementation::Array_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [this, InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+	});
 }
 
 int32 FArrayImplementation::Array_GetTypeSizeImplementation(const MonoObject* InMonoObject)
