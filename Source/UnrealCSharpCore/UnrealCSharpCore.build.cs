@@ -37,12 +37,21 @@ public class UnrealCSharpCore : ModuleRules
 			new string[]
 			{
 				"Core",
-				"Mono",
-				"DirectoryWatcher"
+				"Mono"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
-			
+
+		if (Target.bBuildEditor)
+		{
+			PublicDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"DirectoryWatcher"
+					// ... add other public dependencies that you statically link with here ...
+				}
+			);
+		}
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]

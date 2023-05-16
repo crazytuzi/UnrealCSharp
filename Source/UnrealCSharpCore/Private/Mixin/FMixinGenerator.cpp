@@ -59,6 +59,7 @@ void FMixinGenerator::Generator()
 	FMonoDomain::Deinitialize();
 }
 
+#if WITH_EDITOR
 void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 {
 	FMonoDomain::Initialize({
@@ -104,6 +105,7 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 
 	FMonoDomain::Deinitialize();
 }
+#endif
 
 void FMixinGenerator::Generator(MonoClass* InMonoClass)
 {
