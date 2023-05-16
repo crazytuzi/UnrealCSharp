@@ -30,7 +30,7 @@ void FDelegateImplementation::Delegate_RegisterImplementation(MonoObject* InMono
 
 void FDelegateImplementation::Delegate_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	AsyncTask(ENamedThreads::GameThread, [this, InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
 	{
 		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InMonoObject);
 	});

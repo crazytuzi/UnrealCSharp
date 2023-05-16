@@ -43,7 +43,7 @@ void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(
 
 void FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	AsyncTask(ENamedThreads::GameThread, [this, InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
 	{
 		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(InMonoObject);
 	});

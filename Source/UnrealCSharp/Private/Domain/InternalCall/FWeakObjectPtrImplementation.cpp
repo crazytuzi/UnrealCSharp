@@ -31,7 +31,7 @@ void FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation(MonoObje
 
 void FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	AsyncTask(ENamedThreads::GameThread, [this, InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
 	{
 		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(InMonoObject);
 	});

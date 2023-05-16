@@ -30,7 +30,7 @@ void FSubclassOfImplementation::SubclassOf_RegisterImplementation(MonoObject* In
 
 void FSubclassOfImplementation::SubclassOf_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	AsyncTask(ENamedThreads::GameThread, [this, InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
 	{
 		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(InMonoObject);
 	});

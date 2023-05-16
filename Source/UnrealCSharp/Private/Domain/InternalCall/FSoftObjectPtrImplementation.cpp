@@ -31,7 +31,7 @@ void FSoftObjectPtrImplementation::SoftObjectPtr_RegisterImplementation(MonoObje
 
 void FSoftObjectPtrImplementation::SoftObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	AsyncTask(ENamedThreads::GameThread, [this, InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
 	{
 		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftObjectPtr<UObject>>(InMonoObject);
 	});
