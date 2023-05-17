@@ -84,6 +84,8 @@ public:
 
 	MonoType* Type_Get_Underlying_Type(MonoType* InMonoType) const;
 
+	mono_bool Type_Is_ByRef(MonoType* InMonoType) const;
+
 	MonoReflectionMethod* Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass) const;
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams) const;

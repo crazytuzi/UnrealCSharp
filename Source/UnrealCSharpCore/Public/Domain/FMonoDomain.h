@@ -89,6 +89,8 @@ public:
 
 	static MonoType* Type_Get_Underlying_Type(MonoType* InMonoType);
 
+	static mono_bool Type_Is_ByRef(MonoType* InMonoType);
+
 	static MonoReflectionMethod* Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass);
 
 	static MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams);

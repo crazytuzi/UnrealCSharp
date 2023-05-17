@@ -195,6 +195,15 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 
 void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGeneratedClass* InClass)
 {
+	struct FParamDescriptor
+	{
+		MonoReflectionType* ReflectionType;
+
+		FName Name;
+
+		bool bIsRef;
+	};
+
 	if (InMonoClass == nullptr || InClass == nullptr)
 	{
 		return;
@@ -225,11 +234,15 @@ void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGenerated
 
 				auto ParamIndex = 0;
 
-				TArray<TPair<const char*, MonoReflectionType*>> Params;
+				TArray<FParamDescriptor> ParamDescriptors;
 
 				while (const auto Param = FMonoDomain::Signature_Get_Params(Signature, &ParamIterator))
 				{
-					Params.Add({ParamNames[ParamIndex++], FMonoDomain::Type_Get_Object(Param)});
+					ParamDescriptors.Add({
+						FMonoDomain::Type_Get_Object(Param),
+						ParamNames[ParamIndex++],
+						!!FMonoDomain::Type_Is_ByRef(Param)
+					});
 				}
 
 				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
@@ -251,12 +264,19 @@ void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGenerated
 					Function->AddCppProperty(Property);
 				}
 
-				for (auto Index = Params.Num() - 1; Index >= 0; --Index)
+				for (auto Index = ParamDescriptors.Num() - 1; Index >= 0; --Index)
 				{
-					const auto Property = FTypeBridge::Factory(Params[Index].Value, Function, Params[Index].Key,
+					const auto Property = FTypeBridge::Factory(ParamDescriptors[Index].ReflectionType,
+					                                           Function,
+					                                           ParamDescriptors[Index].Name,
 					                                           RF_Public | RF_Transient);
 
 					Property->SetPropertyFlags(CPF_Parm);
+
+					if (ParamDescriptors[Index].bIsRef)
+					{
+						Property->SetPropertyFlags(CPF_OutParm);
+					}
 
 					Function->AddCppProperty(Property);
 				}

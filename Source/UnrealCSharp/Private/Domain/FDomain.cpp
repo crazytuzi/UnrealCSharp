@@ -210,6 +210,11 @@ MonoType* FDomain::Type_Get_Underlying_Type(MonoType* InMonoType) const
 	return FMonoDomain::Type_Get_Underlying_Type(InMonoType);
 }
 
+mono_bool FDomain::Type_Is_ByRef(MonoType* InMonoType) const
+{
+	return FMonoDomain::Type_Is_ByRef(InMonoType);
+}
+
 MonoReflectionMethod* FDomain::Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass) const
 {
 	return FMonoDomain::Method_Get_Object(InMethod, InMonoClass);

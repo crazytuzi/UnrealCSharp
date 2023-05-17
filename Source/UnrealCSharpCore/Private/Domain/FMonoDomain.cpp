@@ -280,6 +280,11 @@ MonoType* FMonoDomain::Type_Get_Underlying_Type(MonoType* InMonoType)
 	return mono_type_get_underlying_type(InMonoType);
 }
 
+mono_bool FMonoDomain::Type_Is_ByRef(MonoType* InMonoType)
+{
+	return mono_type_is_byref(InMonoType);
+}
+
 MonoReflectionMethod* FMonoDomain::Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass)
 {
 	return Domain != nullptr && InMethod != nullptr && InMonoClass != nullptr
