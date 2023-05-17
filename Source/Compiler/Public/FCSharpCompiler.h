@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "IDirectoryWatcher.h"
+
 class COMPILER_API FCSharpCompiler
 {
 public:
@@ -12,6 +14,8 @@ public:
 
 public:
 	void Compile() const;
+
+	void Compile(const TArray<FFileChangeData>& FileChangeData) const;
 
 	bool IsCompiling() const;
 
