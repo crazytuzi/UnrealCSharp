@@ -4,6 +4,7 @@
 #include "Reflection/Container/FSetHelper.h"
 #include "Macro/NamespaceMacro.h"
 #include "Bridge/FTypeBridge.h"
+#include "Async/Async.h"
 
 struct FRegisterSet
 {
@@ -34,7 +35,10 @@ void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject)
 
 void FSetImplementation::Set_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+	});
 }
 
 void FSetImplementation::Set_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)

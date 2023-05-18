@@ -4,6 +4,7 @@
 #include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FMapHelper.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterMap
 {
@@ -41,7 +42,10 @@ void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject)
 
 void FMapImplementation::Map_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+	});
 }
 
 void FMapImplementation::Map_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)

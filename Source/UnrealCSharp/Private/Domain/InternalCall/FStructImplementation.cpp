@@ -2,6 +2,7 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterStruct
 {
@@ -37,5 +38,8 @@ void FStructImplementation::Struct_RegisterImplementation(MonoObject* InMonoObje
 
 void FStructImplementation::Struct_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	(void)FCSharpEnvironment::GetEnvironment().RemoveStructReference(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveStructReference(InMonoObject);
+	});
 }

@@ -85,17 +85,7 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 
 	const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName);
 
-	auto Class = NewObject<UCSharpGeneratedClass>(Outer, ClassName, RF_Public);
-
-	// @TODO
-	const auto Blueprint = NewObject<UBlueprint>(Outer);
-
-	Blueprint->AddToRoot();
-
-	Blueprint->GeneratedClass = Class;
-#if WITH_EDITOR
-	Class->ClassGeneratedBy = Blueprint;
-#endif
+	const auto Class = NewObject<UCSharpGeneratedClass>(Outer, ClassName, RF_Public);
 
 	Class->PropertyLink = ParentClass->PropertyLink;
 
@@ -147,16 +137,6 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 				const auto PropertyType = FMonoDomain::Property_Get_Type(Property);
 
 				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
-
-#if WITH_EDITOR
-				FBPVariableDescription BPVariableDescription;
-
-				BPVariableDescription.VarName = PropertyName;
-
-				BPVariableDescription.VarGuid = FGuid::NewGuid();
-
-				Cast<UBlueprint>(InClass->ClassGeneratedBy)->NewVariables.Add(BPVariableDescription);
-#endif
 
 				const auto CppProperty = FTypeBridge::Factory(ReflectionType, InClass, PropertyName,
 				                                              EObjectFlags::RF_Public);
