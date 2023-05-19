@@ -61,6 +61,54 @@ void FMixinGenerator::Generator()
 	FMonoDomain::Deinitialize();
 }
 
+#if WITH_EDITOR
+void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
+{
+	FMonoDomain::Initialize({
+		"",
+		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
+		DLL_SUFFIX,
+		{
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
+			DLL_SUFFIX,
+			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
+			DLL_SUFFIX
+		}
+	});
+
+	for (const auto& Data : FileChangeData)
+	{
+		if (FPaths::GetExtension(Data.Filename) == TEXT("cs"))
+		{
+			auto Filename = FPaths::GetBaseFilename(Data.Filename);
+
+			if (auto Class = LoadClass<UObject>(UObject::StaticClass()->GetPackage(), *FString(Filename)))
+			{
+				Generator(FMonoDomain::Class_From_Name(
+					FUnrealCSharpFunctionLibrary::GetClassNameSpace(Class),
+					FUnrealCSharpFunctionLibrary::GetFullClass(Class)));
+
+				Class = LoadClass<UObject>(UObject::StaticClass()->GetPackage(), *FString(Filename));
+
+				for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
+				{
+					if (ClassIterator->IsChildOf(Class))
+					{
+						ClassIterator->UpdateCustomPropertyListForPostConstruction();
+
+						ClassIterator->Bind();
+
+						ClassIterator->StaticLink(true);
+					}
+				}
+			}
+		}
+	}
+
+	FMonoDomain::Deinitialize();
+}
+#endif
+
 void FMixinGenerator::Generator(MonoClass* InMonoClass)
 {
 	if (InMonoClass == nullptr)
@@ -71,11 +119,6 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
 	const auto Outer = UObject::StaticClass()->GetPackage();
-
-	if (LoadClass<UObject>(Outer, *FString(ClassName)))
-	{
-		return;
-	}
 
 	const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass);
 
@@ -154,6 +197,15 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 
 void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGeneratedClass* InClass)
 {
+	struct FParamDescriptor
+	{
+		MonoReflectionType* ReflectionType;
+
+		FName Name;
+
+		bool bIsRef;
+	};
+
 	if (InMonoClass == nullptr || InClass == nullptr)
 	{
 		return;
@@ -184,11 +236,15 @@ void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGenerated
 
 				auto ParamIndex = 0;
 
-				TArray<TPair<const char*, MonoReflectionType*>> Params;
+				TArray<FParamDescriptor> ParamDescriptors;
 
 				while (const auto Param = FMonoDomain::Signature_Get_Params(Signature, &ParamIterator))
 				{
-					Params.Add({ParamNames[ParamIndex++], FMonoDomain::Type_Get_Object(Param)});
+					ParamDescriptors.Add({
+						FMonoDomain::Type_Get_Object(Param),
+						ParamNames[ParamIndex++],
+						!!FMonoDomain::Type_Is_ByRef(Param)
+					});
 				}
 
 				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
@@ -210,12 +266,19 @@ void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGenerated
 					Function->AddCppProperty(Property);
 				}
 
-				for (auto Index = Params.Num() - 1; Index >= 0; --Index)
+				for (auto Index = ParamDescriptors.Num() - 1; Index >= 0; --Index)
 				{
-					const auto Property = FTypeBridge::Factory(Params[Index].Value, Function, Params[Index].Key,
+					const auto Property = FTypeBridge::Factory(ParamDescriptors[Index].ReflectionType,
+					                                           Function,
+					                                           ParamDescriptors[Index].Name,
 					                                           RF_Public | RF_Transient);
 
 					Property->SetPropertyFlags(CPF_Parm);
+
+					if (ParamDescriptors[Index].bIsRef)
+					{
+						Property->SetPropertyFlags(CPF_OutParm);
+					}
 
 					Function->AddCppProperty(Property);
 				}
