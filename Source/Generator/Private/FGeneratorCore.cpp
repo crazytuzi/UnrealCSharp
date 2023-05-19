@@ -4,6 +4,7 @@
 #include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Mixin/CSharpGeneratedClass.h"
+#include "Mixin/CSharpBlueprintGeneratedClass.h"
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -14,7 +15,9 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 
 	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
 
-	if (InField->IsNative() == false || Cast<UCSharpGeneratedClass>(InField))
+	if (InField->IsNative() == false ||
+		Cast<UCSharpGeneratedClass>(InField) ||
+		Cast<UCSharpBlueprintGeneratedClass>(InField))
 	{
 		auto Index = 0;
 

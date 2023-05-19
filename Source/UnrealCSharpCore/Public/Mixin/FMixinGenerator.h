@@ -17,7 +17,7 @@ public:
 private:
 	static void Generator(MonoClass* InMonoClass);
 
-	static void GeneratorProperty(MonoClass* InMonoClass, class UCSharpGeneratedClass* InClass);
+	static void GeneratorProperty(MonoClass* InMonoClass, class UClass* InClass);
 
-	static void GeneratorFunction(MonoClass* InMonoClass, class UCSharpGeneratedClass* InClass);
+	static void GeneratorFunction(MonoClass* InMonoClass, class UClass* InClass);
 };

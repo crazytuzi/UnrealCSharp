@@ -51,6 +51,15 @@ public class UnrealCSharpCore : ModuleRules
 					// ... add other public dependencies that you statically link with here ...
 				}
 			);
+			
+			PrivateDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"BlueprintGraph",
+					"UnrealEd"
+					// ... add other public dependencies that you statically link with here ...
+				}
+			);
 		}
 		
 		PrivateDependencyModuleNames.AddRange(
