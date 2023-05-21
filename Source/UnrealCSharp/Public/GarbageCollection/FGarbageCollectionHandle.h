@@ -2,4 +2,6 @@
 
 #include "TGarbageCollectionHandle.h"
 
-using FGarbageCollectionHandle = TGarbageCollectionHandle<uint32>;
+using GarbageCollectionHandleType = MonoGCHandle;
+
+using FGarbageCollectionHandle = TGarbageCollectionHandle<GarbageCollectionHandleType>;

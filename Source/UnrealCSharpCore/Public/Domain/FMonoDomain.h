@@ -89,6 +89,8 @@ public:
 
 	static MonoType* Type_Get_Underlying_Type(MonoType* InMonoType);
 
+	static mono_bool Type_Is_ByRef(MonoType* InMonoType);
+
 	static MonoReflectionMethod* Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass);
 
 	static MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams);
@@ -148,6 +150,14 @@ public:
 	static MonoObject* GCHandle_Get_Target(uint32 InGCHandle);
 
 	static void GCHandle_Free(uint32 InGCHandle);
+
+	static MonoGCHandle GCHandle_New_V2(MonoObject* InMonoObject, mono_bool bPinned);
+
+	static MonoGCHandle GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, mono_bool bTrackResurrection);
+
+	static MonoObject* GCHandle_Get_Target_V2(MonoGCHandle InGCHandle);
+
+	static void GCHandle_Free_V2(MonoGCHandle InGCHandle);
 
 public:
 	static MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,

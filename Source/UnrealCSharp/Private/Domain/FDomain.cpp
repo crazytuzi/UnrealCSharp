@@ -85,7 +85,7 @@ MonoMethod* FDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, const FS
 }
 
 mono_bool FDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
-                                        mono_bool bCheckInterfaces) const
+                                        const mono_bool bCheckInterfaces) const
 {
 	return FMonoDomain::Class_Is_Subclass_Of(InMonoClass, InSuperMonoClass, bCheckInterfaces);
 }
@@ -208,6 +208,11 @@ MonoReflectionType* FDomain::Type_Get_Object(MonoType* InMonoType) const
 MonoType* FDomain::Type_Get_Underlying_Type(MonoType* InMonoType) const
 {
 	return FMonoDomain::Type_Get_Underlying_Type(InMonoType);
+}
+
+mono_bool FDomain::Type_Is_ByRef(MonoType* InMonoType) const
+{
+	return FMonoDomain::Type_Is_ByRef(InMonoType);
 }
 
 MonoReflectionMethod* FDomain::Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass) const
@@ -359,6 +364,26 @@ MonoObject* FDomain::GCHandle_Get_Target(const uint32 InGCHandle) const
 void FDomain::GCHandle_Free(const uint32 InGCHandle) const
 {
 	FMonoDomain::GCHandle_Free(InGCHandle);
+}
+
+MonoGCHandle FDomain::GCHandle_New_V2(MonoObject* InMonoObject, const mono_bool bPinned) const
+{
+	return FMonoDomain::GCHandle_New_V2(InMonoObject, bPinned);
+}
+
+MonoGCHandle FDomain::GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, const mono_bool bTrackResurrection) const
+{
+	return FMonoDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
+}
+
+MonoObject* FDomain::GCHandle_Get_Target_V2(const MonoGCHandle InGCHandle) const
+{
+	return FMonoDomain::GCHandle_Get_Target_V2(InGCHandle);
+}
+
+void FDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle) const
+{
+	return FMonoDomain::GCHandle_Free_V2(InGCHandle);
 }
 
 MonoMethod* FDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,

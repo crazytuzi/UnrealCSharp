@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "IDirectoryWatcher.h"
+
 class FCSharpCompilerRunnable final : public FRunnable
 {
 public:
@@ -17,6 +19,8 @@ public:
 public:
 	void EnqueueTask();
 
+	void EnqueueTask(const TArray<FFileChangeData>& FileChangeData);
+
 	bool IsCompiling() const;
 
 private:
@@ -28,6 +32,8 @@ private:
 
 private:
 	TQueue<bool> Tasks;
+
+	TArray<FFileChangeData> FileChanges;
 
 	FCriticalSection CriticalSection;
 

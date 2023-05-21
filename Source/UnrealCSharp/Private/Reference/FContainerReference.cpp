@@ -3,5 +3,6 @@
 
 FContainerReference::~FContainerReference()
 {
-	(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(GarbageCollectionHandle);
+	(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(
+		static_cast<GarbageCollectionHandleType>(GarbageCollectionHandle));
 }

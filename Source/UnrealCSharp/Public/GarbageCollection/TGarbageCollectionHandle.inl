@@ -23,7 +23,7 @@ TGarbageCollectionHandle<T>::operator T() const
 template <typename T>
 TGarbageCollectionHandle<T>::operator MonoObject*() const
 {
-	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_Get_Target(Handle);
+	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_Get_Target_V2(Handle);
 }
 
 template <typename T>
@@ -47,18 +47,18 @@ bool TGarbageCollectionHandle<T>::IsValid() const
 template <typename T>
 TGarbageCollectionHandle<T> TGarbageCollectionHandle<T>::NewRef(MonoObject* InMonoObject, const mono_bool bPinned)
 {
-	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_New(InMonoObject, bPinned);
+	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_New_V2(InMonoObject, bPinned);
 }
 
 template <typename T>
 TGarbageCollectionHandle<T> TGarbageCollectionHandle<T>::NewWeakRef(MonoObject* InMonoObject,
                                                                     const mono_bool bTrackResurrection)
 {
-	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_New_WeakRef(InMonoObject, bTrackResurrection);
+	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
 }
 
 template <typename T>
 void TGarbageCollectionHandle<T>::Free(const TGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_Free(InGarbageCollectionHandle);
+	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_Free_V2(InGarbageCollectionHandle);
 }
