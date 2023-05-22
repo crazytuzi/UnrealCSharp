@@ -27,7 +27,7 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
 
 		MapProperty->InitializeValue(Dest);
 
@@ -69,7 +69,7 @@ MonoObject* FMapPropertyDescriptor::Object_New(void* InAddress) const
 	if (OwnerGarbageCollectionHandle.IsValid())
 	{
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, MapHelper,
-		                                                            Object);
+		                                                           Object);
 	}
 	else
 	{

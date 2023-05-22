@@ -30,7 +30,7 @@ void FLazyObjectPtrImplementation::LazyObjectPtr_RegisterImplementation(MonoObje
 
 void FLazyObjectPtrImplementation::LazyObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(InMonoObject);
+	(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(InMonoObject);
 }
 
 void FLazyObjectPtrImplementation::LazyObjectPtr_GetImplementation(const MonoObject* InMonoObject,

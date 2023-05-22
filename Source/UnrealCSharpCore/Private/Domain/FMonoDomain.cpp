@@ -89,7 +89,7 @@ MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass)
 	return nullptr;
 }
 
-MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass, int32 InParamCount, void** InParams)
+MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass, const int32 InParamCount, void** InParams)
 {
 	if (Domain != nullptr && InMonoClass != nullptr)
 	{
@@ -144,7 +144,7 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, cons
 }
 
 mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
-                                            mono_bool bCheckInterfaces)
+                                            const mono_bool bCheckInterfaces)
 {
 	return InMonoClass != nullptr && InSuperMonoClass != nullptr
 		       ? mono_class_is_subclass_of(InMonoClass, InSuperMonoClass, bCheckInterfaces)
@@ -440,12 +440,12 @@ MonoClass* FMonoDomain::Get_Double_Class()
 	return mono_get_double_class();
 }
 
-uint32 FMonoDomain::GCHandle_New(MonoObject* InMonoObject, mono_bool bPinned)
+uint32 FMonoDomain::GCHandle_New(MonoObject* InMonoObject, const mono_bool bPinned)
 {
 	return mono_gchandle_new(InMonoObject, bPinned);
 }
 
-uint32 FMonoDomain::GCHandle_New_WeakRef(MonoObject* InMonoObject, mono_bool bTrackResurrection)
+uint32 FMonoDomain::GCHandle_New_WeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
 {
 	return mono_gchandle_new_weakref(InMonoObject, bTrackResurrection);
 }
@@ -460,6 +460,26 @@ void FMonoDomain::GCHandle_Free(const uint32 InGCHandle)
 	mono_gchandle_free(InGCHandle);
 }
 
+MonoGCHandle FMonoDomain::GCHandle_New_V2(MonoObject* InMonoObject, const mono_bool bPinned)
+{
+	return mono_gchandle_new_v2(InMonoObject, bPinned);
+}
+
+MonoGCHandle FMonoDomain::GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
+{
+	return mono_gchandle_new_weakref_v2(InMonoObject, bTrackResurrection);
+}
+
+MonoObject* FMonoDomain::GCHandle_Get_Target_V2(const MonoGCHandle InGCHandle)
+{
+	return mono_gchandle_get_target_v2(InGCHandle);
+}
+
+void FMonoDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
+{
+	return mono_gchandle_free_v2(InGCHandle);
+}
+
 MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
                                                            const int32 InParamCount)
 {
@@ -470,7 +490,7 @@ MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClas
 			return FoundMethod;
 		}
 
-		InMonoClass = mono_class_get_parent(InMonoClass);
+		InMonoClass = Class_Get_Parent(InMonoClass);
 	}
 
 	return nullptr;
@@ -543,15 +563,13 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 			{
 				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
 
-				if (auto Result = Runtime_Invoke(LoadMonoMethod, nullptr, Params, nullptr))
+				if (const auto Result = Runtime_Invoke(LoadMonoMethod, nullptr, Params, nullptr))
 				{
-					// @TODO
-					auto GCHandle = mono_gchandle_new_v2(Result, true);
+					auto GCHandle = GCHandle_New_V2(Result, true);
 
 					AssemblyGCHandles.Add(GCHandle);
 
-					// @TODO
-					const auto ReflectionAssembly = (MonoReflectionAssembly*)mono_gchandle_get_target_v2(GCHandle);
+					const auto ReflectionAssembly = (MonoReflectionAssembly*)GCHandle_Get_Target_V2(GCHandle);
 
 					auto Assembly = mono_reflection_assembly_get_assembly(ReflectionAssembly);
 
@@ -568,7 +586,7 @@ void FMonoDomain::UnloadAssembly()
 {
 	for (const auto GCHandle : AssemblyGCHandles)
 	{
-		mono_gchandle_free_v2(GCHandle);
+		GCHandle_Free_V2(GCHandle);
 	}
 
 	AssemblyGCHandles.Reset();
@@ -599,10 +617,9 @@ void FMonoDomain::RegisterLog()
 		if (const auto FoundMonoClass = Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
 		{
-			if (const auto FoundMethod = mono_class_get_method_from_name(
-				FoundMonoClass, TCHAR_TO_ANSI(*FUNCTION_UTILS_SET_OUT), 0))
+			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_SET_OUT, 0))
 			{
-				mono_runtime_invoke(FoundMethod, nullptr, nullptr, nullptr);
+				Runtime_Invoke(FoundMethod, nullptr, nullptr, nullptr);
 			}
 		}
 	}

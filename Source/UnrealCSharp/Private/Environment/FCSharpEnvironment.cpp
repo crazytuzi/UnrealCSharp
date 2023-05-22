@@ -206,7 +206,7 @@ void FCSharpEnvironment::NotifyUObjectDeleted(const UObjectBase* Object, int32 I
 		}
 		else
 		{
-			RemoveObjectReference(InObject);
+			(void)RemoveObjectReference(InObject);
 		}
 	}
 }

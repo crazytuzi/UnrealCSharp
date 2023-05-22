@@ -1,6 +1,6 @@
 ﻿#include "Registry/FCSharpBind.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "Macro/ClassMacro.h"
+#include "CoreMacro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Reflection/Container/FArrayHelper.h"
 #include "Reflection/Container/FMapHelper.h"

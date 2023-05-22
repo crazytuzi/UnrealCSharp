@@ -26,7 +26,7 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(Dest);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(Dest);
 
 		ClassProperty->InitializeValue(Dest);
 

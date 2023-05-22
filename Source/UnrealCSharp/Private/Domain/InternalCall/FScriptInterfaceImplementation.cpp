@@ -2,6 +2,7 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterScriptInterface
 {
@@ -42,7 +43,10 @@ void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(
 
 void FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(InMonoObject);
+	});
 }
 
 void FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation(const MonoObject* InMonoObject,

@@ -49,8 +49,10 @@ void FMixinRegistry::RegisterMixin() const
 	const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
 
-	// @TODO
-	void* InParams[2] = {AttributeMonoReflectionType, mono_gchandle_get_target_v2(FMonoDomain::AssemblyGCHandles[1])};
+	void* InParams[2] = {
+		AttributeMonoReflectionType,
+		FMonoDomain::GCHandle_Get_Target_V2(FMonoDomain::AssemblyGCHandles[1])
+	};
 
 	const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
 		UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));

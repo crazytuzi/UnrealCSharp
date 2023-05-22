@@ -1,6 +1,7 @@
 ﻿#include "Reference/FDelegateReference.h"
+#include "Environment/FCSharpEnvironment.h"
 
 FDelegateReference::~FDelegateReference()
 {
-	FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(GarbageCollectionHandle);
+	(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(GarbageCollectionHandle);
 }

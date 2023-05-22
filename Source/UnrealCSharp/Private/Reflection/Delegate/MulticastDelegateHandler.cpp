@@ -4,7 +4,7 @@
 #include "Reflection/Delegate/MulticastDelegateHandler.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "Macro/ClassMacro.h"
+#include "CoreMacro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Template/TGetArrayLength.h"
 

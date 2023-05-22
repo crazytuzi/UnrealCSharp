@@ -7,7 +7,7 @@ class FDomain final : public FTickableGameObject
 public:
 	explicit FDomain(const FMonoDomainInitializeParams& InParams);
 
-	~FDomain();
+	virtual ~FDomain() override;
 
 public:
 	void Initialize(const FMonoDomainInitializeParams& InParams);
@@ -145,6 +145,14 @@ public:
 	MonoObject* GCHandle_Get_Target(uint32 InGCHandle) const;
 
 	void GCHandle_Free(uint32 InGCHandle) const;
+
+	MonoGCHandle GCHandle_New_V2(MonoObject* InMonoObject, mono_bool bPinned) const;
+
+	MonoGCHandle GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, mono_bool bTrackResurrection) const;
+
+	MonoObject* GCHandle_Get_Target_V2(MonoGCHandle InGCHandle) const;
+
+	void GCHandle_Free_V2(MonoGCHandle InGCHandle) const;
 
 	MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                              int32 InParamCount) const;
