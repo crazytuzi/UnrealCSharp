@@ -3,6 +3,7 @@
 #include "CoreMacro/Macro.h"
 #include "Domain/FMonoDomain.h"
 #include "Mixin/FMixinClassGenerator.h"
+#include "Mixin/FMixinGeneratorCore.h"
 
 void FMixinGenerator::Generator()
 {
@@ -45,13 +46,13 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 			auto Filename = FPaths::GetBaseFilename(Data.Filename);
 
 			// @TODO
-			if (auto Class = LoadClass<UObject>(UObject::StaticClass()->GetPackage(), *FString(Filename)))
+			if (auto Class = LoadClass<UObject>(FMixinGeneratorCore::GetOuter(), *FString(Filename)))
 			{
 				FMixinClassGenerator::Generator(FMonoDomain::Class_From_Name(
-					FUnrealCSharpFunctionLibrary::GetClassNameSpace(Class),
+					FMixinGeneratorCore::GetClassNameSpace(),
 					FUnrealCSharpFunctionLibrary::GetFullClass(Class)));
 
-				Class = LoadClass<UObject>(UObject::StaticClass()->GetPackage(), *FString(Filename));
+				Class = LoadClass<UObject>(FMixinGeneratorCore::GetOuter(), *FString(Filename));
 
 				for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
 				{
@@ -68,7 +69,7 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 			else
 			{
 				FMixinClassGenerator::Generator(FMonoDomain::Class_From_Name(
-					FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
+					FMixinGeneratorCore::GetClassNameSpace(),
 					Filename));
 			}
 		}

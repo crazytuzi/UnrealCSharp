@@ -61,7 +61,7 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass)
 
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
-	const auto Outer = UObject::StaticClass()->GetPackage();
+	const auto Outer = FMixinGeneratorCore::GetOuter();
 
 	const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass);
 

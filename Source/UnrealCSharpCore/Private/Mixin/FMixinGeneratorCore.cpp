@@ -2,6 +2,17 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyAttributeMacro.h"
 #include "Domain/FMonoDomain.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+
+UPackage* FMixinGeneratorCore::GetOuter()
+{
+	return UObject::StaticClass()->GetPackage();
+}
+
+FString FMixinGeneratorCore::GetClassNameSpace()
+{
+	return FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass());
+}
 
 void FMixinGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {

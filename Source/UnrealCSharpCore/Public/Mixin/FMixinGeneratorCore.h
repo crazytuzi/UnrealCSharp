@@ -5,6 +5,10 @@
 class FMixinGeneratorCore
 {
 public:
+	static UPackage* GetOuter();
+
+	static FString GetClassNameSpace();
+
 	static void SetPropertyFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 private:
