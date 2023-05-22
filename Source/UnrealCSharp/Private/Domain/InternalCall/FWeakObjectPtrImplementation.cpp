@@ -2,6 +2,7 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterWeakObjectPtr
 {
@@ -30,7 +31,10 @@ void FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation(MonoObje
 
 void FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(InMonoObject);
+	});
 }
 
 void FWeakObjectPtrImplementation::WeakObjectPtr_GetImplementation(const MonoObject* InMonoObject,

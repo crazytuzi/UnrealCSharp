@@ -28,6 +28,8 @@ public:
 	static GENERATOR_API void EmptyEnumUnderlyingType();
 
 private:
+	static void GeneratorCollisionChannel();
+
 	static FString GetEnumUnderlyingTypeName(const UEnum* InEnum);
 
 private:

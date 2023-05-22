@@ -2,6 +2,7 @@
 #include "Binding/Class/FBindingClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterSubclassOf
 {
@@ -29,7 +30,10 @@ void FSubclassOfImplementation::SubclassOf_RegisterImplementation(MonoObject* In
 
 void FSubclassOfImplementation::SubclassOf_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(InMonoObject);
+	});
 }
 
 void FSubclassOfImplementation::SubclassOf_GetImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)

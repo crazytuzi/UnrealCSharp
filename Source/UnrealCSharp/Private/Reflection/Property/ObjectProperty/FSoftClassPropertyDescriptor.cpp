@@ -26,7 +26,7 @@ void FSoftClassPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(Dest);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(Dest);
 
 		SoftClassProperty->InitializeValue(Dest);
 

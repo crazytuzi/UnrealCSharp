@@ -5,6 +5,7 @@
 #include "Engine/UserDefinedEnum.h"
 #include "Misc/FileHelper.h"
 #include "Mixin/CSharpGeneratedClass.h"
+#include "Mixin/CSharpBlueprintGeneratedClass.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -23,7 +24,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
-	if (Cast<UCSharpGeneratedClass>(InClass))
+	if (Cast<UCSharpGeneratedClass>(InClass) || Cast<UCSharpBlueprintGeneratedClass>(InClass))
 	{
 		return;
 	}
@@ -685,7 +686,17 @@ FString FClassGenerator::GetCppFunctionDefaultParam(const UFunction* InFunction,
 			}
 			else
 			{
-				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
+				const auto EnumName = ByteProperty->Enum->GetName();
+
+				// @TODO
+				if (EnumName == TEXT("ECollisionChannel"))
+				{
+					return FString::Printf(TEXT(" = %s.%s"), *EnumName,
+					                       *UCollisionProfile::Get()->ReturnChannelNameFromContainerIndex(
+						                       ByteProperty->Enum->GetIndexByName(*MetaData)).ToString());
+				}
+
+				return FString::Printf(TEXT(" = %s.%s"), *EnumName, *MetaData);
 			}
 		}
 		else

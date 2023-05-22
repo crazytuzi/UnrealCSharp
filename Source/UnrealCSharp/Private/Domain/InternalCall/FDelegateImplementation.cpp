@@ -3,6 +3,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterDelegate
 {
@@ -29,7 +30,10 @@ void FDelegateImplementation::Delegate_RegisterImplementation(MonoObject* InMono
 
 void FDelegateImplementation::Delegate_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InMonoObject);
+	});
 }
 
 void FDelegateImplementation::Delegate_BindImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate)

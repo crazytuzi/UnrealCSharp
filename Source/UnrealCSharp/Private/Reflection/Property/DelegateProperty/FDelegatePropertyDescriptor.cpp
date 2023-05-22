@@ -28,7 +28,7 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 			FDelegateHelper>(SrcMonoObject);
 
-		FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(Dest);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(Dest);
 
 		DelegateProperty->InitializeValue(Dest);
 
@@ -62,7 +62,7 @@ MonoObject* FDelegatePropertyDescriptor::Object_New(void* InAddress) const
 	if (OwnerGarbageCollectionHandle.IsValid())
 	{
 		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerGarbageCollectionHandle, InAddress,
-		                                                           DelegateHelper, Object);
+		                                                          DelegateHelper, Object);
 	}
 	else
 	{
