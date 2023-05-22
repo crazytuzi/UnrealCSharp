@@ -5,6 +5,7 @@
 #include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/FunctionMacro.h"
+#include "CoreMacro/PropertyAttributeMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Mixin/CSharpGeneratedClass.h"
 #include "Template/TGetArrayLength.h"
@@ -173,7 +174,7 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 	{
 		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Property(InMonoClass, Property))
 		{
-			if (FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
 			{
 				const auto PropertyName = FMonoDomain::Property_Get_Name(Property);
 
@@ -184,8 +185,7 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 				const auto CppProperty = FTypeBridge::Factory(ReflectionType, InClass, PropertyName,
 				                                              EObjectFlags::RF_Public);
 
-				// @TODO
-				CppProperty->SetPropertyFlags(CPF_BlueprintVisible | CPF_Edit);
+				SetPropertyFlags(CppProperty, Attrs);
 
 				InClass->AddCppProperty(CppProperty);
 			}
@@ -218,7 +218,7 @@ void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGenerated
 	{
 		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Method(Method))
 		{
-			if (FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
 			{
 				const auto MethodName = FMonoDomain::Method_Get_Name(Method);
 
@@ -295,4 +295,33 @@ void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGenerated
 			}
 		}
 	}
+}
+
+void FMixinGenerator::SetPropertyFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	if (InProperty == nullptr || InMonoCustomAttrInfo == nullptr)
+	{
+		return;
+	}
+
+	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_ANYWHERE_ATTRIBUTE))
+	{
+		InProperty->SetPropertyFlags(CPF_Edit);
+	}
+
+	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_READ_WRITE_ATTRIBUTE))
+	{
+		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
+	}
+}
+
+bool FMixinGenerator::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName)
+{
+	if (const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_MIXIN), InAttributeName))
+	{
+		return !!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass);
+	}
+
+	return false;
 }
