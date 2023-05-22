@@ -4,6 +4,7 @@
 #include "Domain/FMonoDomain.h"
 #include "Mixin/FMixinClassGenerator.h"
 #include "Mixin/FMixinGeneratorCore.h"
+#include "Mixin/FMixinStructGenerator.h"
 
 void FMixinGenerator::Generator()
 {
@@ -20,6 +21,8 @@ void FMixinGenerator::Generator()
 	});
 
 	FMixinClassGenerator::Generator();
+
+	FMixinStructGenerator::Generator();
 
 	FMonoDomain::Deinitialize();
 }
