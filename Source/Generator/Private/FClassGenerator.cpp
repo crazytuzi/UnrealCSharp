@@ -5,6 +5,7 @@
 #include "Engine/UserDefinedEnum.h"
 #include "Misc/FileHelper.h"
 #include "Mixin/CSharpGeneratedClass.h"
+#include "Mixin/CSharpBlueprintGeneratedClass.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -23,7 +24,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
-	if (Cast<UCSharpGeneratedClass>(InClass))
+	if (Cast<UCSharpGeneratedClass>(InClass) || Cast<UCSharpBlueprintGeneratedClass>(InClass))
 	{
 		return;
 	}

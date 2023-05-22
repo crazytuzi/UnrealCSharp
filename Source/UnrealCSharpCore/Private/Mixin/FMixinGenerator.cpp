@@ -8,8 +8,13 @@
 #include "CoreMacro/PropertyAttributeMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Mixin/CSharpGeneratedClass.h"
+#include "Mixin/CSharpBlueprintGeneratedClass.h"
 #include "Template/TGetArrayLength.h"
 #include "Bridge/FTypeBridge.h"
+#if WITH_EDITOR
+#include "BlueprintActionDatabase.h"
+#include "Editor.h"
+#endif
 
 void FMixinGenerator::Generator()
 {
@@ -101,6 +106,12 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 					}
 				}
 			}
+			else
+			{
+				Generator(FMonoDomain::Class_From_Name(
+					FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
+					Filename));
+			}
 		}
 	}
 
@@ -129,7 +140,35 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 
 	const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName);
 
-	const auto Class = NewObject<UCSharpGeneratedClass>(Outer, ClassName, RF_Public);
+	UClass* Class = nullptr;
+
+	if (Cast<UBlueprintGeneratedClass>(ParentClass))
+	{
+		Class = NewObject<UCSharpBlueprintGeneratedClass>(Outer, ClassName, RF_Public);
+
+		Cast<UCSharpBlueprintGeneratedClass>(Class)->UpdateCustomPropertyListForPostConstruction();
+
+		// @TODO
+		const auto Blueprint = NewObject<UBlueprint>(Class);
+
+		Blueprint->AddToRoot();
+
+		Blueprint->SkeletonGeneratedClass = Class;
+
+		Blueprint->GeneratedClass = Class;
+
+#if WITH_EDITOR
+		Class->ClassGeneratedBy = Blueprint;
+#endif
+
+		Class->ClassFlags |= ParentClass->ClassFlags;
+	}
+	else
+	{
+		Class = NewObject<UCSharpGeneratedClass>(Outer, ClassName, RF_Public);
+
+		Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
+	}
 
 	Class->PropertyLink = ParentClass->PropertyLink;
 
@@ -138,8 +177,6 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 	Class->ClassConfigName = ParentClass->ClassConfigName;
 
 	Class->SetSuperStruct(ParentClass);
-
-	Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 
 	Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
 
@@ -156,9 +193,20 @@ void FMixinGenerator::Generator(MonoClass* InMonoClass)
 	Class->AssembleReferenceTokenStream();
 
 	(void)Class->GetDefaultObject();
+
+#if WITH_EDITOR
+	if (GEditor)
+	{
+		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
+
+		ActionDatabase.ClearAssetActions(Class);
+
+		ActionDatabase.RefreshClassActions(Class);
+	}
+#endif
 }
 
-void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGeneratedClass* InClass)
+void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* InClass)
 {
 	if (InMonoClass == nullptr || InClass == nullptr)
 	{
@@ -193,7 +241,7 @@ void FMixinGenerator::GeneratorProperty(MonoClass* InMonoClass, UCSharpGenerated
 	}
 }
 
-void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UCSharpGeneratedClass* InClass)
+void FMixinGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)
 {
 	struct FParamDescriptor
 	{
