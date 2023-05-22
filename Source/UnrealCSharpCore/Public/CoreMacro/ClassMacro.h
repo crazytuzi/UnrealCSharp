@@ -8,8 +8,6 @@
 
 #define CLASS_U_CLASS_ATTRIBUTE FString(TEXT("UClassAttribute"))
 
-#define CLASS_U_PROPERTY_ATTRIBUTE FString(TEXT("UPropertyAttribute"))
-
 #define CLASS_U_FUNCTION_ATTRIBUTE FString(TEXT("UFunctionAttribute"))
 
 #define CLASS_F_STRING FString(TEXT("FString"))

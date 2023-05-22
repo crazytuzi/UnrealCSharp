@@ -4,6 +4,7 @@
 #include "IDirectoryWatcher.h"
 #endif
 #include "mono/metadata/object-forward.h"
+#include "mono/metadata/details/reflection-types.h"
 
 class FMixinGenerator
 {
@@ -20,4 +21,8 @@ private:
 	static void GeneratorProperty(MonoClass* InMonoClass, class UClass* InClass);
 
 	static void GeneratorFunction(MonoClass* InMonoClass, class UClass* InClass);
+
+	static void SetPropertyFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
 };
