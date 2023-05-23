@@ -3,6 +3,9 @@
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
 #include "Mixin/CSharpGeneratedClass.h"
+#include "Mixin/CSharpBlueprintGeneratedClass.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
@@ -66,7 +69,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 
 	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
 
-	if (InStruct->IsNative() || Cast<UCSharpGeneratedClass>(InStruct))
+	if (InStruct->IsNative() || Cast<UCSharpGeneratedClass>(InStruct) || Cast<UCSharpBlueprintGeneratedClass>(InStruct))
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}
