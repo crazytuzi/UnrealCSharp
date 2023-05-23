@@ -53,6 +53,8 @@ public:
 
 	static MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator);
 
+	static MonoCustomAttrInfo* Custom_Attrs_From_Class(MonoClass* InMonoClass);
+
 	static MonoCustomAttrInfo* Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField);
 
 	static MonoCustomAttrInfo* Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty);

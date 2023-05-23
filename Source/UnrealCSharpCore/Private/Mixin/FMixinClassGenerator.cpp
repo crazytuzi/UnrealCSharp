@@ -52,7 +52,7 @@ void FMixinClassGenerator::Generator()
 	}
 }
 
-void FMixinClassGenerator::Generator(MonoClass* InMonoClass)
+void FMixinClassGenerator::Generator(MonoClass* InMonoClass, const bool bReInstance)
 {
 	if (InMonoClass == nullptr)
 	{
@@ -62,6 +62,13 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass)
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
 	const auto Outer = FMixinGeneratorCore::GetOuter();
+
+	auto bExisted = false;
+
+	if (bReInstance)
+	{
+		bExisted = LoadObject<UClass>(Outer, *FString(ClassName)) != nullptr;
+	}
 
 	const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass);
 
@@ -137,6 +144,36 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass)
 		ActionDatabase.RefreshClassActions(Class);
 	}
 #endif
+
+	if (bReInstance == true && bExisted == true)
+	{
+		ReInstance(Class);
+	}
+}
+
+bool FMixinClassGenerator::IsMixinClass(MonoClass* InMonoClass)
+{
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_MIXIN), CLASS_U_CLASS_ATTRIBUTE);
+
+	const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
+
+	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
+}
+
+void FMixinClassGenerator::ReInstance(const UClass* InClass)
+{
+	for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
+	{
+		if (ClassIterator->IsChildOf(InClass))
+		{
+			ClassIterator->UpdateCustomPropertyListForPostConstruction();
+
+			ClassIterator->Bind();
+
+			ClassIterator->StaticLink(true);
+		}
+	}
 }
 
 void FMixinClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* InClass)
