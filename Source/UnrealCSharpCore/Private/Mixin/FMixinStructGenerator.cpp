@@ -71,7 +71,7 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass)
 				{
 					const auto ParentPathName = FTypeBridge::GetPathName(ParentMonoReflectionType);
 
-					if (const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName))
+					if (const auto ParentClass = LoadObject<UScriptStruct>(nullptr, *ParentPathName))
 					{
 						Class->SetSuperStruct(ParentClass);
 					}
