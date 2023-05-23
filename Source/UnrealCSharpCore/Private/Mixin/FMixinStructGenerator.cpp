@@ -9,6 +9,10 @@
 #include "Mixin/CSharpScriptStruct.h"
 #include "Mixin/FMixinGeneratorCore.h"
 #include "Template/TGetArrayLength.h"
+#if WITH_EDITOR
+#include "BlueprintActionDatabase.h"
+#include "Kismet2/BlueprintEditorUtils.h"
+#endif
 
 void FMixinStructGenerator::Generator()
 {
@@ -152,6 +156,15 @@ bool FMixinStructGenerator::IsMixinStruct(MonoClass* InMonoClass)
 void FMixinStructGenerator::ReInstance(UScriptStruct* InScriptStruct,
                                        const TArray<FBPVariableDescriptionIndex>& InBPVariableDescriptionIndex)
 {
+#if WITH_EDITOR
+	if (GEditor)
+	{
+		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
+
+		ActionDatabase.RefreshAssetActions(InScriptStruct);
+	}
+#endif
+
 	for (const auto BPVariableDescriptionIndex : InBPVariableDescriptionIndex)
 	{
 		auto Blueprint = BPVariableDescriptionIndex.Blueprint;
@@ -169,6 +182,10 @@ void FMixinStructGenerator::ReInstance(UScriptStruct* InScriptStruct,
 
 					SkeletonGeneratedClass->StaticLink(true);
 				}
+
+#if WITH_EDITOR
+				FBlueprintEditorUtils::RefreshAllNodes(Blueprint.Get());
+#endif
 			}
 		}
 	}
