@@ -10,7 +10,6 @@
 #include "Mixin/FMixinGeneratorCore.h"
 #include "Template/TGetArrayLength.h"
 #if WITH_EDITOR
-#include "BlueprintActionDatabase.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #endif
 
@@ -62,13 +61,18 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 
 	const auto Outer = UObject::StaticClass()->GetPackage();
 
+#if WITH_EDITOR
 	auto bExisted = false;
 
-	TArray<FBPVariableDescriptionIndex> BPVariableDescriptionIndex;
+	TArray<UBlueprint*> Blueprints;
+#endif
 
-	if (bReInstance)
+	auto ScriptStruct = LoadObject<UCSharpScriptStruct>(Outer, *FString(ClassName));
+
+	if (ScriptStruct != nullptr)
 	{
-		if (const auto Class = LoadObject<UScriptStruct>(Outer, *FString(ClassName)))
+#if WITH_EDITOR
+		if (bReInstance)
 		{
 			bExisted = true;
 
@@ -79,26 +83,27 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 				{
 					if (const auto StructProperty = CastField<FStructProperty>(*It))
 					{
-						if (StructProperty->Struct == Class)
+						if (StructProperty->Struct == ScriptStruct)
 						{
 							if (const auto ClassGeneratedBy = Cast<UBlueprint>(ClassIterator->ClassGeneratedBy))
 							{
-								for (auto Index = 0; Index < ClassGeneratedBy->NewVariables.Num(); ++Index)
-								{
-									if (ClassGeneratedBy->NewVariables[Index].VarType.PinSubCategoryObject == Class)
-									{
-										BPVariableDescriptionIndex.Add({ClassGeneratedBy, Index});
-									}
-								}
+								Blueprints.Add(ClassGeneratedBy);
 							}
+
+							break;
 						}
 					}
 				}
 			}
 		}
-	}
+#endif
 
-	const auto Class = NewObject<UCSharpScriptStruct>(Outer, ClassName, RF_Public);
+		ScriptStruct->DestroyChildPropertiesAndResetPropertyLinks();
+	}
+	else
+	{
+		ScriptStruct = NewObject<UCSharpScriptStruct>(Outer, ClassName, RF_Public);
+	}
 
 	if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
 	{
@@ -112,7 +117,7 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 
 					if (const auto ParentClass = LoadObject<UScriptStruct>(nullptr, *ParentPathName))
 					{
-						Class->SetSuperStruct(ParentClass);
+						ScriptStruct->SetSuperStruct(ParentClass);
 					}
 				}
 			}
@@ -121,26 +126,28 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 
 	// @TODO
 #if WITH_EDITOR
-	Class->SetMetaData(FBlueprintMetadata::MD_AllowableBlueprintVariableType, TEXT("true"));
+	ScriptStruct->SetMetaData(FBlueprintMetadata::MD_AllowableBlueprintVariableType, TEXT("true"));
 #endif
 
-	GeneratorProperty(InMonoClass, Class);
+	GeneratorProperty(InMonoClass, ScriptStruct);
 
-	Class->Bind();
+	ScriptStruct->Bind();
 
-	Class->StaticLink(true);
+	ScriptStruct->StaticLink(true);
 
-	if (Class->GetPropertiesSize() == 0)
+	if (ScriptStruct->GetPropertiesSize() == 0)
 	{
-		Class->SetPropertiesSize(1);
+		ScriptStruct->SetPropertiesSize(1);
 	}
 
-	Class->StructFlags = STRUCT_Native;
+	ScriptStruct->StructFlags = STRUCT_Native;
 
+#if WITH_EDITOR
 	if (bReInstance == true && bExisted == true)
 	{
-		ReInstance(Class, BPVariableDescriptionIndex);
+		ReInstance(ScriptStruct, Blueprints);
 	}
+#endif
 }
 
 bool FMixinStructGenerator::IsMixinStruct(MonoClass* InMonoClass)
@@ -153,43 +160,23 @@ bool FMixinStructGenerator::IsMixinStruct(MonoClass* InMonoClass)
 	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
 }
 
-void FMixinStructGenerator::ReInstance(UScriptStruct* InScriptStruct,
-                                       const TArray<FBPVariableDescriptionIndex>& InBPVariableDescriptionIndex)
+#if WITH_EDITOR
+void FMixinStructGenerator::ReInstance(UScriptStruct* InScriptStruct, const TArray<UBlueprint*>& InBlueprints)
 {
-#if WITH_EDITOR
-	if (GEditor)
+	for (const auto Blueprint : InBlueprints)
 	{
-		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
-
-		ActionDatabase.RefreshAssetActions(InScriptStruct);
-	}
-#endif
-
-	for (const auto BPVariableDescriptionIndex : InBPVariableDescriptionIndex)
-	{
-		auto Blueprint = BPVariableDescriptionIndex.Blueprint;
-
-		if (Blueprint.IsValid())
+		if (const auto SkeletonGeneratedClass = Cast<UBlueprintGeneratedClass>(
+			Blueprint->SkeletonGeneratedClass))
 		{
-			if (Blueprint->NewVariables.IsValidIndex(BPVariableDescriptionIndex.Index))
-			{
-				Blueprint->NewVariables[BPVariableDescriptionIndex.Index].VarType.PinSubCategoryObject = InScriptStruct;
+			SkeletonGeneratedClass->Bind();
 
-				if (const auto SkeletonGeneratedClass = Cast<UBlueprintGeneratedClass>(
-					Blueprint->SkeletonGeneratedClass))
-				{
-					SkeletonGeneratedClass->Bind();
-
-					SkeletonGeneratedClass->StaticLink(true);
-				}
-
-#if WITH_EDITOR
-				FBlueprintEditorUtils::RefreshAllNodes(Blueprint.Get());
-#endif
-			}
+			SkeletonGeneratedClass->StaticLink(true);
 		}
+
+		FBlueprintEditorUtils::RefreshExternalBlueprintDependencyNodes(Blueprint, InScriptStruct);
 	}
 }
+#endif
 
 void FMixinStructGenerator::GeneratorProperty(MonoClass* InMonoClass, UScriptStruct* InScriptStruct)
 {

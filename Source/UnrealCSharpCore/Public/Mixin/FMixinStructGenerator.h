@@ -4,14 +4,6 @@
 
 class FMixinStructGenerator
 {
-private:
-	struct FBPVariableDescriptionIndex
-	{
-		TWeakObjectPtr<UBlueprint> Blueprint;
-
-		int32 Index;
-	};
-
 public:
 	static void Generator();
 
@@ -20,8 +12,9 @@ public:
 	static bool IsMixinStruct(MonoClass* InMonoClass);
 
 private:
-	static void ReInstance(UScriptStruct* InScriptStruct,
-	                       const TArray<FBPVariableDescriptionIndex>& InBPVariableDescriptionIndex);
+#if WITH_EDITOR
+	static void ReInstance(UScriptStruct* InScriptStruct, const TArray<UBlueprint*>& InBlueprints);
+#endif
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);
 };
