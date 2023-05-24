@@ -3,8 +3,9 @@
 #include "CoreMacro/Macro.h"
 #include "Domain/FMonoDomain.h"
 #include "Mixin/FMixinClassGenerator.h"
-#include "Mixin/FMixinGeneratorCore.h"
 #include "Mixin/FMixinStructGenerator.h"
+#include "Mixin/FMixinEnumGenerator.h"
+#include "Mixin/FMixinGeneratorCore.h"
 
 void FMixinGenerator::Generator()
 {
@@ -23,6 +24,8 @@ void FMixinGenerator::Generator()
 	FMixinClassGenerator::Generator();
 
 	FMixinStructGenerator::Generator();
+
+	FMixinEnumGenerator::Generator();
 
 	FMonoDomain::Deinitialize();
 }
