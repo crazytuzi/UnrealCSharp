@@ -181,6 +181,11 @@ MonoMethod* FMonoDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIter
 	return InMonoClass != nullptr ? mono_class_get_methods(InMonoClass, InIterator) : nullptr;
 }
 
+MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Class(MonoClass* InMonoClass)
+{
+	return InMonoClass != nullptr ? mono_custom_attrs_from_class(InMonoClass) : nullptr;
+}
+
 MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField)
 {
 	return InMonoClass != nullptr && InMonoClassField != nullptr

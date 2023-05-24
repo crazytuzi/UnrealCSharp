@@ -120,6 +120,11 @@ MonoMethod* FDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator
 	return FMonoDomain::Class_Get_Methods(InMonoClass, InIterator);
 }
 
+MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Class(MonoClass* InMonoClass) const
+{
+	return FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
+}
+
 MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField) const
 {
 	return FMonoDomain::Custom_Attrs_From_Field(InMonoClass, InMonoClassField);
