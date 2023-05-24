@@ -12,7 +12,9 @@ public:
 	static bool IsMixinClass(MonoClass* InMonoClass);
 
 private:
-	static void ReInstance(const UClass* InClass);
+#if WITH_EDITOR
+	static void ReInstance(UClass* InClass);
+#endif
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UClass* InClass);
 

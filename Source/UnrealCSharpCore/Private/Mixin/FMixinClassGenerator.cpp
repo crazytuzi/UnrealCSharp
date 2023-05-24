@@ -63,13 +63,6 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass, const bool bReInsta
 
 	const auto Outer = FMixinGeneratorCore::GetOuter();
 
-	auto bExisted = false;
-
-	if (bReInstance)
-	{
-		bExisted = LoadObject<UClass>(Outer, *FString(ClassName)) != nullptr;
-	}
-
 	const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass);
 
 	const auto ParentMonoType = FMonoDomain::Class_Get_Type(ParentMonoClass);
@@ -80,34 +73,45 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass, const bool bReInsta
 
 	const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName);
 
-	UClass* Class;
+	auto Class = LoadObject<UClass>(Outer, *FString(ClassName));
 
-	if (Cast<UBlueprintGeneratedClass>(ParentClass))
+	if (Class != nullptr)
 	{
-		Class = NewObject<UCSharpBlueprintGeneratedClass>(Outer, ClassName, RF_Public);
+		Class->PurgeClass(false);
 
-		Cast<UCSharpBlueprintGeneratedClass>(Class)->UpdateCustomPropertyListForPostConstruction();
-
-		// @TODO
-		const auto Blueprint = NewObject<UBlueprint>(Class);
-
-		Blueprint->AddToRoot();
-
-		Blueprint->SkeletonGeneratedClass = Class;
-
-		Blueprint->GeneratedClass = Class;
-
-#if WITH_EDITOR
-		Class->ClassGeneratedBy = Blueprint;
-#endif
-
-		Class->ClassFlags |= ParentClass->ClassFlags;
+		if (!Cast<UBlueprintGeneratedClass>(ParentClass))
+		{
+			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
+		}
 	}
 	else
 	{
-		Class = NewObject<UCSharpGeneratedClass>(Outer, ClassName, RF_Public);
+		if (Cast<UBlueprintGeneratedClass>(ParentClass))
+		{
+			Class = NewObject<UCSharpBlueprintGeneratedClass>(Outer, ClassName, RF_Public);
 
-		Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
+			Cast<UCSharpBlueprintGeneratedClass>(Class)->UpdateCustomPropertyListForPostConstruction();
+
+			const auto Blueprint = NewObject<UBlueprint>(Class);
+
+			Blueprint->AddToRoot();
+
+			Blueprint->SkeletonGeneratedClass = Class;
+
+			Blueprint->GeneratedClass = Class;
+
+#if WITH_EDITOR
+			Class->ClassGeneratedBy = Blueprint;
+#endif
+
+			Class->ClassFlags |= ParentClass->ClassFlags;
+		}
+		else
+		{
+			Class = NewObject<UCSharpGeneratedClass>(Outer, ClassName, RF_Public);
+
+			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
+		}
 	}
 
 	Class->PropertyLink = ParentClass->PropertyLink;
@@ -120,10 +124,8 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass, const bool bReInsta
 
 	Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
 
-	// @TODO
 	GeneratorProperty(InMonoClass, Class);
 
-	// @TODO
 	GeneratorFunction(InMonoClass, Class);
 
 	Class->Bind();
@@ -135,20 +137,11 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass, const bool bReInsta
 	(void)Class->GetDefaultObject();
 
 #if WITH_EDITOR
-	if (GEditor)
-	{
-		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
-
-		ActionDatabase.ClearAssetActions(Class);
-
-		ActionDatabase.RefreshClassActions(Class);
-	}
-#endif
-
-	if (bReInstance == true && bExisted == true)
+	if (bReInstance == true)
 	{
 		ReInstance(Class);
 	}
+#endif
 }
 
 bool FMixinClassGenerator::IsMixinClass(MonoClass* InMonoClass)
@@ -161,20 +154,29 @@ bool FMixinClassGenerator::IsMixinClass(MonoClass* InMonoClass)
 	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
 }
 
-void FMixinClassGenerator::ReInstance(const UClass* InClass)
+#if WITH_EDITOR
+void FMixinClassGenerator::ReInstance(UClass* InClass)
 {
+	if (GEditor)
+	{
+		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
+
+		ActionDatabase.ClearAssetActions(InClass);
+
+		ActionDatabase.RefreshClassActions(InClass);
+	}
+
 	for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
 	{
 		if (ClassIterator->IsChildOf(InClass))
 		{
-			ClassIterator->UpdateCustomPropertyListForPostConstruction();
-
 			ClassIterator->Bind();
 
 			ClassIterator->StaticLink(true);
 		}
 	}
 }
+#endif
 
 void FMixinClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* InClass)
 {
@@ -206,6 +208,34 @@ void FMixinClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* InC
 				FMixinGeneratorCore::SetPropertyFlags(CppProperty, Attrs);
 
 				InClass->AddCppProperty(CppProperty);
+
+#if WITH_EDITOR
+				if (const auto ClassGeneratedBy = Cast<UBlueprint>(InClass->ClassGeneratedBy))
+				{
+					auto bExisted = false;
+
+					for (const auto& Variable : ClassGeneratedBy->NewVariables)
+					{
+						if (Variable.VarName == PropertyName)
+						{
+							bExisted = true;
+
+							break;
+						}
+					}
+
+					if (!bExisted)
+					{
+						FBPVariableDescription BPVariableDescription;
+
+						BPVariableDescription.VarName = PropertyName;
+
+						BPVariableDescription.VarGuid = FGuid::NewGuid();
+
+						ClassGeneratedBy->NewVariables.Add(BPVariableDescription);
+					}
+				}
+#endif
 			}
 		}
 	}
