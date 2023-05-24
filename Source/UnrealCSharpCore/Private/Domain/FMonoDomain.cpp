@@ -24,6 +24,8 @@ TArray<MonoAssembly*> FMonoDomain::Assemblies;
 
 TArray<MonoImage*> FMonoDomain::Images;
 
+bool FMonoDomain::bLoadSucceed;
+
 void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 {
 	RegisterMonoTrace();
@@ -566,6 +568,11 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 		{
 			for (const auto& AssemblyPath : InAssemblies)
 			{
+				if (!FPaths::FileExists(AssemblyPath))
+				{
+					continue;;
+				}
+
 				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
 
 				if (const auto Result = Runtime_Invoke(LoadMonoMethod, nullptr, Params, nullptr))
@@ -585,6 +592,8 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 			}
 		}
 	}
+
+	bLoadSucceed = Assemblies.Num() == InAssemblies.Num();
 }
 
 void FMonoDomain::UnloadAssembly()

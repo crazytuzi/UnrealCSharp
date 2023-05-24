@@ -197,4 +197,6 @@ public:
 	static TArray<MonoAssembly*> Assemblies;
 
 	static TArray<MonoImage*> Images;
+
+	static bool bLoadSucceed;
 };

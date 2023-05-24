@@ -20,9 +20,12 @@ void FMixinGenerator::Generator()
 		}
 	});
 
-	FMixinClassGenerator::Generator();
+	if (FMonoDomain::bLoadSucceed)
+	{
+		FMixinClassGenerator::Generator();
 
-	FMixinStructGenerator::Generator();
+		FMixinStructGenerator::Generator();
+	}
 
 	FMonoDomain::Deinitialize();
 }
