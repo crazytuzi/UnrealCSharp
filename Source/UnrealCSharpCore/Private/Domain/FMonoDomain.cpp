@@ -224,6 +224,14 @@ MonoType* FMonoDomain::Field_Get_Type(MonoClassField* InMonoClassField)
 	return InMonoClassField != nullptr ? mono_field_get_type(InMonoClassField) : nullptr;
 }
 
+MonoObject* FMonoDomain::Field_Get_Value_Object(MonoDomain* InMonoDomain, MonoClassField* InMonoClassField,
+                                                MonoObject* InMonoObject)
+{
+	return InMonoDomain != nullptr && InMonoClassField != nullptr && InMonoObject != nullptr
+		       ? mono_field_get_value_object(InMonoDomain, InMonoClassField, InMonoObject)
+		       : nullptr;
+}
+
 const char* FMonoDomain::Property_Get_Name(MonoProperty* InMonoProperty)
 {
 	return InMonoProperty != nullptr ? mono_property_get_name(InMonoProperty) : nullptr;

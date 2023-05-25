@@ -155,6 +155,12 @@ MonoType* FDomain::Field_Get_Type(MonoClassField* InMonoClassField) const
 	return FMonoDomain::Field_Get_Type(InMonoClassField);
 }
 
+MonoObject* FDomain::Field_Get_Value_Object(MonoDomain* InMonoDomain, MonoClassField* InMonoClassField,
+                                            MonoObject* InMonoObject) const
+{
+	return FMonoDomain::Field_Get_Value_Object(InMonoDomain, InMonoClassField, InMonoObject);
+}
+
 const char* FDomain::Property_Get_Name(MonoProperty* InMonoProperty) const
 {
 	return FMonoDomain::Property_Get_Name(InMonoProperty);
