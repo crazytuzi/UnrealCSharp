@@ -13,7 +13,7 @@ public:
 
 private:
 #if WITH_EDITOR
-	static void ReInstance(UEnum* InEnum);
+	static void ReInstance(const TArray<UBlueprint*>& InBlueprints);
 #endif
 
 	static void GeneratorEnumerator(MonoClass* InMonoClass, UEnum* InEnum);

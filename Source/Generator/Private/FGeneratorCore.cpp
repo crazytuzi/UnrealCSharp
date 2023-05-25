@@ -6,6 +6,7 @@
 #include "Mixin/CSharpGeneratedClass.h"
 #include "Mixin/CSharpBlueprintGeneratedClass.h"
 #include "Mixin/CSharpScriptStruct.h"
+#include "Mixin/CSharpEnum.h"
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -19,7 +20,8 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 	if (InField->IsNative() == false ||
 		Cast<UCSharpGeneratedClass>(InField) ||
 		Cast<UCSharpBlueprintGeneratedClass>(InField) ||
-		Cast<UCSharpScriptStruct>(InField))
+		Cast<UCSharpScriptStruct>(InField) ||
+		Cast<UCSharpEnum>(InField))
 	{
 		auto Index = 0;
 

@@ -61,6 +61,10 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 				{
 					FMixinStructGenerator::Generator(MonoClass, true);
 				}
+				else if (FMixinEnumGenerator::IsMixinEnum(MonoClass))
+				{
+					FMixinEnumGenerator::Generator(MonoClass, true);
+				}
 			}
 		}
 	}

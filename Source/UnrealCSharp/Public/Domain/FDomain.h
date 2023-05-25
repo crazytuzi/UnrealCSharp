@@ -62,6 +62,9 @@ public:
 
 	MonoType* Field_Get_Type(MonoClassField* InMonoClassField) const;
 
+	MonoObject* Field_Get_Value_Object(MonoDomain* InMonoDomain, MonoClassField* InMonoClassField,
+	                                   MonoObject* InMonoObject) const;
+
 	const char* Property_Get_Name(MonoProperty* InMonoProperty) const;
 
 	MonoMethod* Property_Get_Get_Method(MonoProperty* InMonoProperty) const;

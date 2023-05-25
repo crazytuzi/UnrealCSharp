@@ -6,6 +6,9 @@
 #include "Domain/FMonoDomain.h"
 #include "Mixin/CSharpEnum.h"
 #include "Template/TGetArrayLength.h"
+#if WITH_EDITOR
+#include "Kismet2/BlueprintEditorUtils.h"
+#endif
 
 void FMixinEnumGenerator::Generator()
 {
@@ -55,14 +58,54 @@ void FMixinEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInstan
 
 	const auto Outer = UObject::StaticClass()->GetPackage();
 
+#if WITH_EDITOR
+	auto bExisted = false;
+
+	TArray<UBlueprint*> Blueprints;
+#endif
+
 	auto Enum = LoadObject<UCSharpEnum>(Outer, *FString(ClassName));
 
 	if (Enum != nullptr)
 	{
+#if WITH_EDITOR
 		if (bReInstance)
 		{
-			// @TODO
+			bExisted = true;
+
+			for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
+			{
+				for (TFieldIterator<FProperty> It(*ClassIterator, EFieldIteratorFlags::ExcludeSuper,
+				                                  EFieldIteratorFlags::ExcludeDeprecated); It; ++It)
+				{
+					if (const auto EnumProperty = CastField<FEnumProperty>(*It))
+					{
+						if (EnumProperty->GetEnum() == Enum)
+						{
+							if (const auto ClassGeneratedBy = Cast<UBlueprint>(ClassIterator->ClassGeneratedBy))
+							{
+								Blueprints.Add(ClassGeneratedBy);
+							}
+
+							break;
+						}
+					}
+					else if (const auto ByteProperty = CastField<FByteProperty>(*It))
+					{
+						if (ByteProperty->Enum == Enum)
+						{
+							if (const auto ClassGeneratedBy = Cast<UBlueprint>(ClassIterator->ClassGeneratedBy))
+							{
+								Blueprints.Add(ClassGeneratedBy);
+							}
+
+							break;
+						}
+					}
+				}
+			}
 		}
+#endif
 	}
 	else
 	{
@@ -79,9 +122,9 @@ void FMixinEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInstan
 	GeneratorEnumerator(InMonoClass, Enum);
 
 #if WITH_EDITOR
-	if (bReInstance)
+	if (bReInstance == true && bExisted == true)
 	{
-		ReInstance(Enum);
+		ReInstance(Blueprints);
 	}
 #endif
 }
@@ -97,9 +140,12 @@ bool FMixinEnumGenerator::IsMixinEnum(MonoClass* InMonoClass)
 }
 
 #if WITH_EDITOR
-void FMixinEnumGenerator::ReInstance(UEnum* InEnum)
+void FMixinEnumGenerator::ReInstance(const TArray<UBlueprint*>& InBlueprints)
 {
-	// @TODO
+	for (const auto Blueprint : InBlueprints)
+	{
+		FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+	}
 }
 #endif
 
