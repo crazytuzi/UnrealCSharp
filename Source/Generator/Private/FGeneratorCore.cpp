@@ -636,13 +636,19 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 		));
 	}
 
-	static auto Blueprint = FString::Printf(TEXT(
-		"%s.Game."
+	static auto GameRoot = FString::Printf(TEXT(
+		"%s.Game"
 	),
-	                                        *SCRIPT
+	                                       *SCRIPT
 	);
 
-	if (InModule.StartsWith(Blueprint))
+	static auto Game = FString::Printf(TEXT(
+		"%s.Game."
+	),
+	                                   *SCRIPT
+	);
+
+	if (InModule == GameRoot || InModule.StartsWith(Game))
 	{
 		return true;
 	}
