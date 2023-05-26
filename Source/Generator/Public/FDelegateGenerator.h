@@ -11,8 +11,4 @@ private:
 	static void Generator(FDelegateProperty* InDelegateProperty);
 
 	static void Generator(FMulticastDelegateProperty* InMulticastDelegateProperty);
-
-	static FString GetModuleName(const FDelegateProperty* InDelegateProperty);
-
-	static FString GetModuleName(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 };

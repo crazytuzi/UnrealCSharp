@@ -1,6 +1,7 @@
 ﻿#include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 
 void FDelegateGenerator::Generator(FProperty* InProperty)
 {
@@ -336,7 +337,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *DelegateDeclarationContent
 	);
 
-	auto ModuleName = GetModuleName(InDelegateProperty);
+	auto ModuleName = NameSpaceContent.Replace(*SCRIPT, TEXT("")).Replace(TEXT("."), TEXT("/"));
 
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(InDelegateProperty->SignatureFunction), ModuleName);
@@ -671,7 +672,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *DelegateDeclarationContent
 	);
 
-	auto ModuleName = GetModuleName(InMulticastDelegateProperty);
+	auto ModuleName = NameSpaceContent.Replace(*SCRIPT, TEXT("")).Replace(TEXT("."), TEXT("/"));
 
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(InMulticastDelegateProperty->SignatureFunction), ModuleName);
@@ -679,24 +680,4 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	auto FileName = FPaths::Combine(DirectoryName, DelegateName) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
-}
-
-FString FDelegateGenerator::GetModuleName(const FDelegateProperty* InDelegateProperty)
-{
-	if (InDelegateProperty == nullptr)
-	{
-		return TEXT("");
-	}
-
-	return FUnrealCSharpFunctionLibrary::GetModuleName(InDelegateProperty->SignatureFunction);
-}
-
-FString FDelegateGenerator::GetModuleName(const FMulticastDelegateProperty* InMulticastDelegateProperty)
-{
-	if (InMulticastDelegateProperty == nullptr)
-	{
-		return TEXT("");
-	}
-
-	return FUnrealCSharpFunctionLibrary::GetModuleName(InMulticastDelegateProperty->SignatureFunction);
 }
