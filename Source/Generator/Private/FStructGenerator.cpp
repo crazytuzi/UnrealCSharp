@@ -4,6 +4,7 @@
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Mixin/CSharpScriptStruct.h"
 
 void FStructGenerator::Generator()
 {
@@ -16,6 +17,11 @@ void FStructGenerator::Generator()
 void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 {
 	if (InScriptStruct == nullptr)
+	{
+		return;
+	}
+
+	if (Cast<UCSharpScriptStruct>(InScriptStruct))
 	{
 		return;
 	}

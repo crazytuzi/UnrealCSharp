@@ -3,6 +3,8 @@
 #include "CoreMacro/Macro.h"
 #include "Domain/FMonoDomain.h"
 #include "Mixin/FMixinClassGenerator.h"
+#include "Mixin/FMixinStructGenerator.h"
+#include "Mixin/FMixinEnumGenerator.h"
 #include "Mixin/FMixinGeneratorCore.h"
 
 void FMixinGenerator::Generator()
@@ -19,7 +21,14 @@ void FMixinGenerator::Generator()
 		}
 	});
 
-	FMixinClassGenerator::Generator();
+	if (FMonoDomain::bLoadSucceed)
+	{
+		FMixinClassGenerator::Generator();
+
+		FMixinStructGenerator::Generator();
+	}
+
+	FMixinEnumGenerator::Generator();
 
 	FMonoDomain::Deinitialize();
 }
@@ -45,32 +54,20 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 		{
 			auto Filename = FPaths::GetBaseFilename(Data.Filename);
 
-			// @TODO
-			if (auto Class = LoadClass<UObject>(FMixinGeneratorCore::GetOuter(), *FString(Filename)))
+			if (const auto MonoClass = FMonoDomain::Class_From_Name(FMixinGeneratorCore::GetClassNameSpace(), Filename))
 			{
-				FMixinClassGenerator::Generator(FMonoDomain::Class_From_Name(
-					FMixinGeneratorCore::GetClassNameSpace(),
-					FUnrealCSharpFunctionLibrary::GetFullClass(Class)));
-
-				Class = LoadClass<UObject>(FMixinGeneratorCore::GetOuter(), *FString(Filename));
-
-				for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
+				if (FMixinClassGenerator::IsMixinClass(MonoClass))
 				{
-					if (ClassIterator->IsChildOf(Class))
-					{
-						ClassIterator->UpdateCustomPropertyListForPostConstruction();
-
-						ClassIterator->Bind();
-
-						ClassIterator->StaticLink(true);
-					}
+					FMixinClassGenerator::Generator(MonoClass, true);
 				}
-			}
-			else
-			{
-				FMixinClassGenerator::Generator(FMonoDomain::Class_From_Name(
-					FMixinGeneratorCore::GetClassNameSpace(),
-					Filename));
+				else if (FMixinStructGenerator::IsMixinStruct(MonoClass))
+				{
+					FMixinStructGenerator::Generator(MonoClass, true);
+				}
+				else if (FMixinEnumGenerator::IsMixinEnum(MonoClass))
+				{
+					FMixinEnumGenerator::Generator(MonoClass, true);
+				}
 			}
 		}
 	}

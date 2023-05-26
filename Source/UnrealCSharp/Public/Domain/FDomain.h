@@ -48,6 +48,8 @@ public:
 
 	MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator) const;
 
+	MonoCustomAttrInfo* Custom_Attrs_From_Class(MonoClass* InMonoClass) const;
+
 	MonoCustomAttrInfo* Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField) const;
 
 	MonoCustomAttrInfo* Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty) const;
@@ -59,6 +61,9 @@ public:
 	const char* Field_Get_Name(MonoClassField* InMonoClassField) const;
 
 	MonoType* Field_Get_Type(MonoClassField* InMonoClassField) const;
+
+	MonoObject* Field_Get_Value_Object(MonoDomain* InMonoDomain, MonoClassField* InMonoClassField,
+	                                   MonoObject* InMonoObject) const;
 
 	const char* Property_Get_Name(MonoProperty* InMonoProperty) const;
 

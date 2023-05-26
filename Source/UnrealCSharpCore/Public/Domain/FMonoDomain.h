@@ -53,6 +53,8 @@ public:
 
 	static MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator);
 
+	static MonoCustomAttrInfo* Custom_Attrs_From_Class(MonoClass* InMonoClass);
+
 	static MonoCustomAttrInfo* Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField);
 
 	static MonoCustomAttrInfo* Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty);
@@ -64,6 +66,9 @@ public:
 	static const char* Field_Get_Name(MonoClassField* InMonoClassField);
 
 	static MonoType* Field_Get_Type(MonoClassField* InMonoClassField);
+
+	static MonoObject* Field_Get_Value_Object(MonoDomain* InMonoDomain, MonoClassField* InMonoClassField,
+	                                          MonoObject* InMonoObject);
 
 	static const char* Property_Get_Name(MonoProperty* InMonoProperty);
 
@@ -195,4 +200,6 @@ public:
 	static TArray<MonoAssembly*> Assemblies;
 
 	static TArray<MonoImage*> Images;
+
+	static bool bLoadSucceed;
 };

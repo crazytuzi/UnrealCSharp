@@ -120,6 +120,11 @@ MonoMethod* FDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator
 	return FMonoDomain::Class_Get_Methods(InMonoClass, InIterator);
 }
 
+MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Class(MonoClass* InMonoClass) const
+{
+	return FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
+}
+
 MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField) const
 {
 	return FMonoDomain::Custom_Attrs_From_Field(InMonoClass, InMonoClassField);
@@ -148,6 +153,12 @@ const char* FDomain::Field_Get_Name(MonoClassField* InMonoClassField) const
 MonoType* FDomain::Field_Get_Type(MonoClassField* InMonoClassField) const
 {
 	return FMonoDomain::Field_Get_Type(InMonoClassField);
+}
+
+MonoObject* FDomain::Field_Get_Value_Object(MonoDomain* InMonoDomain, MonoClassField* InMonoClassField,
+                                            MonoObject* InMonoObject) const
+{
+	return FMonoDomain::Field_Get_Value_Object(InMonoDomain, InMonoClassField, InMonoObject);
 }
 
 const char* FDomain::Property_Get_Name(MonoProperty* InMonoProperty) const
