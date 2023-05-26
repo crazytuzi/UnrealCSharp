@@ -28,4 +28,6 @@ public:
 	static FString GetName(FString InName);
 
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
+
+	static bool IsSupportedModule(const FString& InModule);
 };
