@@ -8,6 +8,10 @@
 
 #define CLASS_U_CLASS_ATTRIBUTE FString(TEXT("UClassAttribute"))
 
+#define CLASS_U_STRUCT_ATTRIBUTE FString(TEXT("UStructAttribute"))
+
+#define CLASS_U_ENUM_ATTRIBUTE FString(TEXT("UEnumAttribute"))
+
 #define CLASS_U_FUNCTION_ATTRIBUTE FString(TEXT("UFunctionAttribute"))
 
 #define CLASS_F_STRING FString(TEXT("FString"))

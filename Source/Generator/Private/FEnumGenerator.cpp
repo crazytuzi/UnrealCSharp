@@ -3,6 +3,7 @@
 #include "Engine/UserDefinedEnum.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Common/NameEncode.h"
+#include "Mixin/CSharpEnum.h"
 
 TMap<const UEnum*, EEnumUnderlyingType> FEnumGenerator::EnumUnderlyingType;
 
@@ -19,6 +20,11 @@ void FEnumGenerator::Generator()
 void FEnumGenerator::Generator(const UEnum* InEnum)
 {
 	if (InEnum == nullptr)
+	{
+		return;
+	}
+
+	if (Cast<UCSharpEnum>(InEnum))
 	{
 		return;
 	}

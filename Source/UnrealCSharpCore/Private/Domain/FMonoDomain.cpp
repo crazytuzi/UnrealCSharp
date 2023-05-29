@@ -24,6 +24,8 @@ TArray<MonoAssembly*> FMonoDomain::Assemblies;
 
 TArray<MonoImage*> FMonoDomain::Images;
 
+bool FMonoDomain::bLoadSucceed;
+
 void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 {
 	RegisterMonoTrace();
@@ -181,6 +183,11 @@ MonoMethod* FMonoDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIter
 	return InMonoClass != nullptr ? mono_class_get_methods(InMonoClass, InIterator) : nullptr;
 }
 
+MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Class(MonoClass* InMonoClass)
+{
+	return InMonoClass != nullptr ? mono_custom_attrs_from_class(InMonoClass) : nullptr;
+}
+
 MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField)
 {
 	return InMonoClass != nullptr && InMonoClassField != nullptr
@@ -215,6 +222,14 @@ const char* FMonoDomain::Field_Get_Name(MonoClassField* InMonoClassField)
 MonoType* FMonoDomain::Field_Get_Type(MonoClassField* InMonoClassField)
 {
 	return InMonoClassField != nullptr ? mono_field_get_type(InMonoClassField) : nullptr;
+}
+
+MonoObject* FMonoDomain::Field_Get_Value_Object(MonoDomain* InMonoDomain, MonoClassField* InMonoClassField,
+                                                MonoObject* InMonoObject)
+{
+	return InMonoDomain != nullptr && InMonoClassField != nullptr && InMonoObject != nullptr
+		       ? mono_field_get_value_object(InMonoDomain, InMonoClassField, InMonoObject)
+		       : nullptr;
 }
 
 const char* FMonoDomain::Property_Get_Name(MonoProperty* InMonoProperty)
@@ -561,6 +576,11 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 		{
 			for (const auto& AssemblyPath : InAssemblies)
 			{
+				if (!FPaths::FileExists(AssemblyPath))
+				{
+					continue;;
+				}
+
 				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
 
 				if (const auto Result = Runtime_Invoke(LoadMonoMethod, nullptr, Params, nullptr))
@@ -580,6 +600,8 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 			}
 		}
 	}
+
+	bLoadSucceed = Assemblies.Num() == InAssemblies.Num();
 }
 
 void FMonoDomain::UnloadAssembly()

@@ -4,6 +4,8 @@
 #include "Common/NameEncode.h"
 #include "Mixin/CSharpGeneratedClass.h"
 #include "Mixin/CSharpBlueprintGeneratedClass.h"
+#include "Mixin/CSharpScriptStruct.h"
+#include "Mixin/CSharpEnum.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -69,7 +71,10 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 
 	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
 
-	if (InStruct->IsNative() || Cast<UCSharpGeneratedClass>(InStruct) || Cast<UCSharpBlueprintGeneratedClass>(InStruct))
+	if (InStruct->IsNative() ||
+		Cast<UCSharpGeneratedClass>(InStruct) ||
+		Cast<UCSharpBlueprintGeneratedClass>(InStruct) ||
+		Cast<UCSharpScriptStruct>(InStruct))
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}
@@ -117,7 +122,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InStruct)
 
 	FString ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
 
-	if (InStruct->IsNative())
+	if (InStruct->IsNative() || Cast<UCSharpEnum>(InStruct))
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}
