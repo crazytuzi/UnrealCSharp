@@ -103,6 +103,8 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 	else
 	{
 		ScriptStruct = NewObject<UCSharpScriptStruct>(Outer, ClassName, RF_Public);
+
+		ScriptStruct->AddToRoot();
 	}
 
 	if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
