@@ -31,7 +31,7 @@ void* FObjectRegistry::GetAddress(const MonoObject* InMonoObject)
 {
 	const auto FoundObject = GarbageCollectionHandle2Object.Find(InMonoObject);
 
-	return FoundObject != nullptr ? *FoundObject : nullptr;
+	return FoundObject != nullptr ? const_cast<UObject*>(FoundObject->Get()) : nullptr;
 }
 
 void* FObjectRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct)
@@ -40,7 +40,7 @@ void* FObjectRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InSt
 	{
 		InStruct = (*FoundObject)->GetClass();
 
-		return *FoundObject;
+		return const_cast<UObject*>(FoundObject->Get());
 	}
 
 	return nullptr;
