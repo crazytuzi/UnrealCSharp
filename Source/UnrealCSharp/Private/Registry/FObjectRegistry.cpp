@@ -17,7 +17,7 @@ void FObjectRegistry::Initialize()
 
 void FObjectRegistry::Deinitialize()
 {
-	for (const auto& Pair : GarbageCollectionHandle2Object.Get())
+	for (auto& Pair : GarbageCollectionHandle2Object.Get())
 	{
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}

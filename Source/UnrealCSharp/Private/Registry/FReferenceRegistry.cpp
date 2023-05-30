@@ -8,7 +8,9 @@ FReferenceRegistry::~FReferenceRegistry()
 	{
 		for (const auto& Reference : Pair.Value)
 		{
-			FGarbageCollectionHandle::Free(static_cast<FGarbageCollectionHandle>(*Reference));
+			auto GarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(*Reference);
+
+			FGarbageCollectionHandle::Free(GarbageCollectionHandle);
 
 			delete Reference;
 		}
