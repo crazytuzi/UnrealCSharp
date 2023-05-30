@@ -4,9 +4,12 @@ void UDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 {
 	if (Function != nullptr && Function->GetName() == TEXT("CSharpCallBack"))
 	{
-		if (DelegateDescriptor != nullptr && Delegate != nullptr)
+		if (DelegateDescriptor != nullptr)
 		{
-			DelegateDescriptor->CallDelegate(Delegate, Parms);
+			if (const auto Delegate = static_cast<MonoObject*>(DelegateGarbageCollectionHandle))
+			{
+				DelegateDescriptor->CallDelegate(Delegate, Parms);
+			}
 		}
 	}
 	else
@@ -28,7 +31,10 @@ void UDelegateHandler::Initialize(FScriptDelegate* InScriptDelegate, UFunction* 
 
 void UDelegateHandler::Deinitialize()
 {
-	Delegate = nullptr;
+	if (DelegateGarbageCollectionHandle.IsValid())
+	{
+		FGarbageCollectionHandle::Free(DelegateGarbageCollectionHandle);
+	}
 
 	if (ScriptDelegate != nullptr)
 	{
@@ -56,7 +62,7 @@ void UDelegateHandler::Bind(MonoObject* InDelegate)
 		}
 	}
 
-	Delegate = InDelegate;
+	DelegateGarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InDelegate, false);
 }
 
 bool UDelegateHandler::IsBound() const
@@ -71,7 +77,10 @@ void UDelegateHandler::UnBind()
 		ScriptDelegate->Unbind();
 	}
 
-	Delegate = nullptr;
+	if (DelegateGarbageCollectionHandle.IsValid())
+	{
+		FGarbageCollectionHandle::Free(DelegateGarbageCollectionHandle);
+	}
 }
 
 void UDelegateHandler::Clear()
@@ -81,7 +90,10 @@ void UDelegateHandler::Clear()
 		ScriptDelegate->Clear();
 	}
 
-	Delegate = nullptr;
+	if (DelegateGarbageCollectionHandle.IsValid())
+	{
+		FGarbageCollectionHandle::Free(DelegateGarbageCollectionHandle);
+	}
 }
 
 void UDelegateHandler::Execute(MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue) const
