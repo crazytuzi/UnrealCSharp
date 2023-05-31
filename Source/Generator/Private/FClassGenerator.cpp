@@ -220,6 +220,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 		     FunctionIterator)
 		{
+			if (OverrideFunctions.Contains(FunctionIterator->GetName()))
+			{
+				continue;
+			}
+
 			Functions.Add(*FunctionIterator);
 		}
 	}
