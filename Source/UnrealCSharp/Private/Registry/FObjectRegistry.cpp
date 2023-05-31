@@ -17,7 +17,7 @@ void FObjectRegistry::Initialize()
 
 void FObjectRegistry::Deinitialize()
 {
-	for (const auto& Pair : GarbageCollectionHandle2Object.Get())
+	for (auto& Pair : GarbageCollectionHandle2Object.Get())
 	{
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}
@@ -84,7 +84,7 @@ bool FObjectRegistry::RemoveReference(const UObject* InObject)
 
 		GarbageCollectionHandle2Object.Remove(*FoundGarbageCollectionHandle);
 
-		FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
+		FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle, false);
 
 		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
 
@@ -100,7 +100,7 @@ bool FObjectRegistry::RemoveReference(const MonoObject* InMonoObject)
 	{
 		if (const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(*FoundObject))
 		{
-			FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
+			FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle, false);
 
 			(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
 		}

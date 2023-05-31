@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Reflection/Function/FCSharpDelegateDescriptor.h"
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "MulticastDelegateHandler.generated.h"
 
 /**
@@ -50,5 +51,5 @@ private:
 
 	FScriptDelegate ScriptDelegate;
 
-	TArray<MonoObject*> Delegates;
+	TArray<FGarbageCollectionHandle> DelegateGarbageCollectionHandles;
 };

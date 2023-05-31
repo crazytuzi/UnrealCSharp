@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Reflection/Function/FCSharpDelegateDescriptor.h"
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "DelegateHandler.generated.h"
 
 /**
@@ -48,5 +49,5 @@ private:
 
 	FCSharpDelegateDescriptor* DelegateDescriptor;
 
-	MonoObject* Delegate;
+	FGarbageCollectionHandle DelegateGarbageCollectionHandle;
 };
