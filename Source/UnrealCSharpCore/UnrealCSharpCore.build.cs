@@ -70,7 +70,7 @@ public class UnrealCSharpCore : ModuleRules
 				"Slate",
 				"SlateCore",
 				"Json",
-				"CrossVersion"
+				"CrossVersion", "DatasmithMax2016"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

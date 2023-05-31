@@ -111,7 +111,7 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass)
 
 	Class->SetSuperStruct(ParentClass);
 
-	Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
+	//Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
 
 	// @TODO
 	GeneratorProperty(InMonoClass, Class);
