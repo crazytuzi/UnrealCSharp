@@ -113,7 +113,7 @@ bool FDelegateRegistry::RemoveReference(const void* InAddress)
 				Pair.Key.DelegateBaseHelper = nullptr;
 			}
 
-			FGarbageCollectionHandle::Free(Pair.Value);
+			FGarbageCollectionHandle::Free(Pair.Value, false);
 
 			GarbageCollectionHandle2DelegateAddress.Remove(Pair.Value);
 
