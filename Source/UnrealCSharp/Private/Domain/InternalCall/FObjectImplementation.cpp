@@ -3,7 +3,10 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/ClassMacro.h"
+#include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
+
+BINDING_CLASS(UObject);
 
 struct FRegisterObject
 {

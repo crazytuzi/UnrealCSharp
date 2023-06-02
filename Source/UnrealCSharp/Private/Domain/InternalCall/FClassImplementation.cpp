@@ -1,7 +1,10 @@
 ﻿#include "Domain/InternalCall/FClassImplementation.h"
 #include "Binding/Class/TClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
+
+BINDING_CLASS(UClass);
 
 struct FRegisterUClass
 {
