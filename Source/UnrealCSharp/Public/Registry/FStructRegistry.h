@@ -25,7 +25,7 @@ class FStructRegistry
 private:
 	struct FStructAddress : FStructAddressBase
 	{
-		UScriptStruct* ScriptStruct;
+		TWeakObjectPtr<UScriptStruct> ScriptStruct;
 
 		bool bNeedFree;
 

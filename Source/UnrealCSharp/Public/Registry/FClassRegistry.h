@@ -24,5 +24,5 @@ public:
 	void DeleteClassDescriptor(const UStruct* InStruct);
 
 private:
-	TMap<UStruct*, FClassDescriptor*> ClassDescriptorMap;
+	TMap<TWeakObjectPtr<const UStruct>, FClassDescriptor*> ClassDescriptorMap;
 };

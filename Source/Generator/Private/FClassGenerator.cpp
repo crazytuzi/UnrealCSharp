@@ -8,6 +8,7 @@
 #include "Mixin/CSharpBlueprintGeneratedClass.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "Animation/AnimBlueprintGeneratedClass.h"
 
 void FClassGenerator::Generator()
 {
@@ -29,6 +30,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
+	if (Cast<UAnimBlueprintGeneratedClass>(InClass))
+	{
+		return;
+	}
+
 	auto ClassName = InClass->GetName();
 
 	if (ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
@@ -41,6 +47,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FString UsingNameSpaceContent;
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass);
+
+	if (!FGeneratorCore::IsSupportedModule(NameSpaceContent))
+	{
+		return;
+	}
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InClass);
 
@@ -69,6 +80,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 	if (SuperClass != nullptr)
 	{
 		auto SuperClassNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass);
+
+		if (!FGeneratorCore::IsSupportedModule(SuperClassNameSpace))
+		{
+			return;
+		}
 
 		if (NameSpaceContent != SuperClassNameSpace)
 		{

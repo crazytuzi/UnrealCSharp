@@ -58,7 +58,12 @@ TGarbageCollectionHandle<T> TGarbageCollectionHandle<T>::NewWeakRef(MonoObject* 
 }
 
 template <typename T>
-void TGarbageCollectionHandle<T>::Free(const TGarbageCollectionHandle& InGarbageCollectionHandle)
+void TGarbageCollectionHandle<T>::Free(TGarbageCollectionHandle& InGarbageCollectionHandle, const bool bReset)
 {
-	return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_Free_V2(InGarbageCollectionHandle);
+	FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_Free_V2(InGarbageCollectionHandle);
+
+	if (bReset)
+	{
+		InGarbageCollectionHandle = T();
+	}
 }

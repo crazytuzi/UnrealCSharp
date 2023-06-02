@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "Binding/Template/TClassName.inl"
 
 template <typename T>

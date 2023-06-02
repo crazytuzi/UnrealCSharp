@@ -39,6 +39,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct);
 
+	if (!FGeneratorCore::IsSupportedModule(NameSpaceContent))
+	{
+		return;
+	}
+
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InScriptStruct);
 
 	auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct);
@@ -58,6 +63,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	if (SuperStruct != nullptr)
 	{
 		auto SuperStructNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperStruct);
+
+		if (!FGeneratorCore::IsSupportedModule(SuperStructNameSpace))
+		{
+			return;
+		}
 
 		if (NameSpaceContent != SuperStructNameSpace)
 		{

@@ -25,7 +25,7 @@ public:
 
 	static TGarbageCollectionHandle NewWeakRef(MonoObject* InMonoObject, mono_bool bTrackResurrection);
 
-	static void Free(const TGarbageCollectionHandle& InGarbageCollectionHandle);
+	static void Free(TGarbageCollectionHandle& InGarbageCollectionHandle, bool bReset = true);
 
 private:
 	T Handle;

@@ -45,7 +45,7 @@ void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InSt
 {
 	if (const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InMonoObject))
 	{
-		InStruct = FoundStructAddress->ScriptStruct;
+		InStruct = FoundStructAddress->ScriptStruct.Get();
 
 		return FoundStructAddress->Address;
 	}

@@ -35,6 +35,11 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	const auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum);
 
+	if (!FGeneratorCore::IsSupportedModule(NameSpaceContent))
+	{
+		return;
+	}
+
 	const auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InEnum);
 
 	const auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InEnum);
