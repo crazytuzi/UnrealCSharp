@@ -13,6 +13,11 @@ namespace CodeAnalysis
 
             var OutputPathName = args[1];
 
+            if (!Directory.Exists(OutputPathName))
+            {
+                Directory.CreateDirectory(OutputPathName);
+            }
+
             foreach (var Item in Directory.GetFiles(OutputPathName))
             {
                 File.Delete(Item);
@@ -55,7 +60,7 @@ namespace CodeAnalysis
         {
             var Tree = CSharpSyntaxTree.ParseText(InContent);
 
-            var Root = (CompilationUnitSyntax) Tree.GetRoot();
+            var Root = (CompilationUnitSyntax)Tree.GetRoot();
 
             foreach (var RootMember in Root.Members)
             {
