@@ -84,8 +84,10 @@ void FCodeAnalysis::Analysis()
 	const auto CompileParam = FString::Printf(TEXT(
 		"%s %s"
 	),
-	                                          *FUnrealCSharpFunctionLibrary::GetGamePath(),
-	                                          *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
+	                                          *FPaths::ConvertRelativePathToFull(
+		                                          FUnrealCSharpFunctionLibrary::GetGamePath()),
+	                                          *FPaths::ConvertRelativePathToFull(
+		                                          FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath())
 	);
 
 	void* ReadPipe = nullptr;

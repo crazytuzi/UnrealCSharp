@@ -110,6 +110,8 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass, const bool bReInsta
 		{
 			Class = NewObject<UCSharpGeneratedClass>(Outer, ClassName, RF_Public);
 
+			Class->AddToRoot();
+
 			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 		}
 	}
