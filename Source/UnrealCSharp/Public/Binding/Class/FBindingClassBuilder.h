@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-class FBindingClassBuilder
+class UNREALCSHARP_API FBindingClassBuilder
 {
 public:
 	explicit FBindingClassBuilder(const FString& InClass, const FString& InNameSpace);

@@ -18,3 +18,9 @@ struct TClassName<Class> \
 #define BINDING_PROPERTY_SET FString(TEXT("Set"))
 
 #define BINDING_PROPERTY_GET FString(TEXT("Get"))
+
+#define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set
+
+#define BINDING_PROPERTY_BUILDER_GET(Property) TPropertyBuilder<decltype(Property), Property>::Get
+
+#define BINDING_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), BINDING_PROPERTY_BUILDER_SET(Property)

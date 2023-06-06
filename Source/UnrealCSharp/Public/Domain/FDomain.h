@@ -2,7 +2,7 @@
 
 #include "Domain/FMonoDomain.h"
 
-class FDomain final : public FTickableGameObject
+class UNREALCSHARP_API FDomain final : public FTickableGameObject
 {
 public:
 	explicit FDomain(const FMonoDomainInitializeParams& InParams);
