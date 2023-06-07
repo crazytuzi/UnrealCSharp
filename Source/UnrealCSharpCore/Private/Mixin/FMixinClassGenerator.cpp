@@ -124,7 +124,9 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass, const bool bReInsta
 
 	Class->SetSuperStruct(ParentClass);
 
+#if UE_CLASS_ADD_REFERENCED_OBJECTS
 	Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
+#endif
 
 	GeneratorProperty(InMonoClass, Class);
 
