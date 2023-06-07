@@ -8,6 +8,7 @@
 #include "Mixin/CSharpBlueprintGeneratedClass.h"
 #include "Mixin/CSharpScriptStruct.h"
 #include "Mixin/CSharpEnum.h"
+#include "UEVersion.h"
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -612,7 +613,11 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 {
 	static TArray<FString> Modules;
 
+#if UE_ARRAY_IS_EMPTY
 	if (Modules.IsEmpty())
+#else
+	if (Modules.Num() == 0)
+#endif
 	{
 		const auto File = FPaths::ConvertRelativePathToFull(FPaths::Combine(
 			FPaths::ProjectPluginsDir(), PLUGIN_NAME, CONFIG, FString::Printf(TEXT(
