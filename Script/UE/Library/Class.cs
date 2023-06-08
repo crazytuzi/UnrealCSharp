@@ -11,7 +11,7 @@ namespace Script.CoreUObject
             {
                 ClassImplementation.Class_GetClassDefaultObjectImplementation(this, out var __OutValue);
 
-                return __OutValue;
+                return (UObject)__OutValue;
             }
         }
 
