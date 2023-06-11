@@ -12,7 +12,7 @@
 #include "Registry/FMixinRegistry.h"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
 
-class FCSharpEnvironment
+class UNREALCSHARP_API FCSharpEnvironment
 {
 public:
 	FCSharpEnvironment();

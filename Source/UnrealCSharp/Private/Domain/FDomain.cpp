@@ -2,7 +2,7 @@
 #include "Binding/FBinding.h"
 #include "Domain/InternalCall/FMonoInternalCall.h"
 #include "Log/FMonoLog.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/FunctionMacro.h"

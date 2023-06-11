@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FSoftObjectPathImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TScriptStructBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/NamespaceMacro.h"

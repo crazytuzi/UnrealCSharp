@@ -1,7 +1,7 @@
 ﻿#include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FMapHelper.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 #include "Bridge/FTypeBridge.h"
 
 void FMapPropertyDescriptor::Get(void* Src, void** Dest) const

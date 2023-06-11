@@ -3,7 +3,7 @@
 #include "GarbageCollection/TGarbageCollectionHandleMapping.h"
 #include "mono/metadata/object-forward.h"
 
-class FObjectRegistry
+class UNREALCSHARP_API FObjectRegistry
 {
 public:
 	FObjectRegistry();

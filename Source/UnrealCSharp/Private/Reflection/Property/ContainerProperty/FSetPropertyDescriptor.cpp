@@ -1,7 +1,7 @@
 ﻿#include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 #include "Bridge/FTypeBridge.h"
 
 void FSetPropertyDescriptor::Get(void* Src, void** Dest) const

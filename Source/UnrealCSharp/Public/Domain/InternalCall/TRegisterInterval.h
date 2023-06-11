@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TScriptStructBuilder.inl"
 #include "Domain/InternalCall/TIntervalImplementation.h"
 #include "Macro/NamespaceMacro.h"
 

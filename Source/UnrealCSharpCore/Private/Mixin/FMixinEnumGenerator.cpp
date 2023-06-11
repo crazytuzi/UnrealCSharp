@@ -5,7 +5,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Mixin/CSharpEnum.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 #if WITH_EDITOR
 #include "Kismet2/BlueprintEditorUtils.h"
 #endif

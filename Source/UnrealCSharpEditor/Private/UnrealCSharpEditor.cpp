@@ -7,6 +7,7 @@
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
 #include "FSolutionGenerator.h"
+#include "FBindingGenerator.h"
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Misc/MessageDialog.h"
@@ -84,6 +85,8 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	CollectGarbage(RF_NoFlags, true);
 
 	FCSharpCompiler::Get().Compile();
+
+	FBindingGenerator::Generator();
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()
