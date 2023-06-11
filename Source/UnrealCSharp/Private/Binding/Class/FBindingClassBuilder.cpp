@@ -2,7 +2,6 @@
 #include "Binding/FBinding.h"
 #include "Binding/FBindingClass.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/BindingMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/ClassMacro.h"
 
@@ -13,6 +12,7 @@ FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, const FString
 {
 }
 
+#if WITH_TYPE_INFO
 FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, FTypeInfo* InTypeInfo,
                                            const FString& InImplementationNameSpace):
 	Class(InClass),
@@ -20,15 +20,23 @@ FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, FTypeInfo* In
 	ImplementationNameSpace(InImplementationNameSpace)
 {
 }
+#endif
 
+#if WITH_TYPE_INFO
 FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, const void* InGetMethod,
                                                      const void* InSetMethod, FTypeInfo* InTypeInfo)
+#else
+FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, const void* InGetMethod,
+													 const void* InSetMethod)
+#endif
 {
+#if WITH_TYPE_INFO
 	if (InTypeInfo != nullptr)
 	{
 		FBindingClass::GetClass(Class, COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace), TypeInfo)->
 			BindingProperty(InName, InTypeInfo, InGetMethod, InSetMethod);
 	}
+#endif
 
 	return Function(BINDING_PROPERTY_GET + InName, InGetMethod).Function(BINDING_PROPERTY_SET + InName, InSetMethod);
 }
