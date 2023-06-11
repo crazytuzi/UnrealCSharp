@@ -1,6 +1,6 @@
 ﻿#include "Domain/InternalCall/FDataTableFunctionLibrary.h"
 #include "Binding/Class/FBindingClassBuilder.h"
-#include "Binding/Class/TClassBuilder.h"
+#include "Binding/Class/TClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Macro/BindingMacro.h"

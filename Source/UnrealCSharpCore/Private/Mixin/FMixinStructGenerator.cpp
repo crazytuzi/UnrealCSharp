@@ -8,7 +8,7 @@
 #include "Domain/FMonoDomain.h"
 #include "Mixin/CSharpScriptStruct.h"
 #include "Mixin/FMixinGeneratorCore.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 #if WITH_EDITOR
 #include "Kismet2/BlueprintEditorUtils.h"
 #endif

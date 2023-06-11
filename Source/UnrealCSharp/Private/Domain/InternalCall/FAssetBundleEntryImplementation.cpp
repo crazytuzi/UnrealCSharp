@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FAssetBundleEntryImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TScriptStructBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 

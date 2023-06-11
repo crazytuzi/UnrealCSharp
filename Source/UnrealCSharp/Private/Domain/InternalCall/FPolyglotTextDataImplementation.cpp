@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FPolyglotTextDataImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TScriptStructBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Internationalization/PolyglotTextData.h"
 #include "CoreMacro/NamespaceMacro.h"

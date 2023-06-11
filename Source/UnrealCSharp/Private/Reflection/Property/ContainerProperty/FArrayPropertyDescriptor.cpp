@@ -1,7 +1,7 @@
 ﻿#include "Reflection/Property/ContainerProperty/FArrayPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FArrayHelper.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 #include "Bridge/FTypeBridge.h"
 
 void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const

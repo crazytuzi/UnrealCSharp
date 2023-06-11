@@ -1,6 +1,6 @@
 ﻿#include "Domain/InternalCall/FClassImplementation.h"
-#include "Binding/Class/TClassBuilder.h"
-#include "Binding/Property/TPropertyBuilder.h"
+#include "Binding/Class/TClassBuilder.inl"
+#include "Binding/Property/TPropertyBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"

@@ -339,6 +339,11 @@ FString FUnrealCSharpFunctionLibrary::GetGameProxyPath()
 	return FPaths::Combine(GetGamePath(), TEXT("Proxy"));
 }
 
+FString FUnrealCSharpFunctionLibrary::GetBindingPath()
+{
+	return TEXT("Binding");
+}
+
 FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
 {
 	return TEXT("AssemblyUtil");

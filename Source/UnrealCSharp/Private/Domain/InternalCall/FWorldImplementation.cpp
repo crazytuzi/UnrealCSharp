@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FWorldImplementation.h"
-#include "Binding/Class/TClassBuilder.h"
+#include "Binding/Class/TClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"

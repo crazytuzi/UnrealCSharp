@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FMatrixImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TScriptStructBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/ClassMacro.h"

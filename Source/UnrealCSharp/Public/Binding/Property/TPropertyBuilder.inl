@@ -1,12 +1,18 @@
 #pragma once
 
-#include "TPropertyGetClass.h"
+#include "TPropertyGetClass.inl"
+#include "Binding/TypeInfo/FTypeInfo.h"
+#include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Environment/FCSharpEnvironment.h"
 
-template <typename Class, typename Result, Result Class::* Member>
-class TPrimitivePropertyBuilder
+template <typename T, T, typename Enable = void>
+struct TPropertyBuilder
 {
-public:
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPrimitivePropertyBuilder
+{
 	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
 	{
 		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
@@ -25,24 +31,28 @@ public:
 				Object_Unbox(InValue);
 		}
 	}
+
+	static FTypeInfo* TypeInfo()
+	{
+		return TTypeInfo<Result, Result>::Get();
+	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-class TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int32>::Value>::type> :
-	public TPrimitivePropertyBuilder<Class, int32, Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int32>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, int32, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-class TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, float>::Value>::type> :
-	public TPrimitivePropertyBuilder<Class, float, Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, float>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, float, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-class TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsDerivedFrom<Result, UObject*>::Value>::type>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsDerivedFrom<Result, UObject*>::Value>::Type>
 {
-public:
 	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
@@ -58,5 +68,10 @@ public:
 			FoundObject->*Member = FCSharpEnvironment::GetEnvironment().GetObject
 				<typename TRemovePointer<Result>::Type>(InValue);
 		}
+	}
+
+	static FTypeInfo* TypeInfo()
+	{
+		return TTypeInfo<Result, Result>::Get();
 	}
 };

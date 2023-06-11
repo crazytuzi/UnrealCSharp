@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TScriptStructBuilder.inl"
 #include "Domain/InternalCall/TRangeImplementation.h"
 #include "Macro/NamespaceMacro.h"
 
