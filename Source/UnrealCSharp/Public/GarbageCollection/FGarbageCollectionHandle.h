@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "TGarbageCollectionHandle.h"
+#include "TGarbageCollectionHandle.inl"
 #include "mono/utils/mono-forward.h"
 
 using GarbageCollectionHandleType = MonoGCHandle;
