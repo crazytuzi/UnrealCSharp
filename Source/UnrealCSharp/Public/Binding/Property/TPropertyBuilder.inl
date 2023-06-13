@@ -39,14 +39,62 @@ struct TPrimitivePropertyBuilder
 };
 
 template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint8>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint16>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint32>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint64>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int8>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int16>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int32>::Value>::Type> :
-	TPrimitivePropertyBuilder<Class, int32, Member>
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int64>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, bool>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, float>::Value>::Type> :
-	TPrimitivePropertyBuilder<Class, float, Member>
+	TPrimitivePropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -74,4 +122,10 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsDerivedFr
 	{
 		return TTypeInfo<Result, Result>::Get();
 	}
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, double>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
 };

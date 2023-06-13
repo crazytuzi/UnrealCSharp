@@ -322,6 +322,11 @@ MonoClass* FDomain::Get_UInt64_Class() const
 	return FMonoDomain::Get_UInt64_Class();
 }
 
+MonoClass* FDomain::Get_SByte_Class() const
+{
+	return FMonoDomain::Get_SByte_Class();
+}
+
 MonoClass* FDomain::Get_Int16_Class() const
 {
 	return FMonoDomain::Get_Int16_Class();

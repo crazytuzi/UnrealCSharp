@@ -420,6 +420,11 @@ MonoClass* FMonoDomain::Get_UInt64_Class()
 	return mono_get_uint64_class();
 }
 
+MonoClass* FMonoDomain::Get_SByte_Class()
+{
+	return mono_get_sbyte_class();
+}
+
 MonoClass* FMonoDomain::Get_Int16_Class()
 {
 	return mono_get_int16_class();
