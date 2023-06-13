@@ -82,11 +82,11 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 
 	FSolutionGenerator::Generator();
 
+	FBindingGenerator::Generator();
+
 	CollectGarbage(RF_NoFlags, true);
 
 	FCSharpCompiler::Get().Compile();
-
-	FBindingGenerator::Generator();
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()

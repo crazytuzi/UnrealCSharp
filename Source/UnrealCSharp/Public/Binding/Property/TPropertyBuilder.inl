@@ -99,7 +99,8 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsDerivedFrom<Result, UObject*>::Value>::Type>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsDerivedFrom<
+	                        typename TRemovePointer<Result>::Type, UObject>::Value>::Type>
 {
 	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
 	{
