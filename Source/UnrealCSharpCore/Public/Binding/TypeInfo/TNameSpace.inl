@@ -14,9 +14,9 @@ struct TNameSpace<T, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<T
 private:
 	struct FInner final : FNameSpace
 	{
-		virtual FString Get() const override
+		virtual TArray<FString, TInlineAllocator<2>> Get() const override
 		{
-			return FUnrealCSharpFunctionLibrary::GetClassNameSpace(TRemovePointer<T>::Type::StaticClass());
+			return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(TRemovePointer<T>::Type::StaticClass())};
 		}
 	};
 
