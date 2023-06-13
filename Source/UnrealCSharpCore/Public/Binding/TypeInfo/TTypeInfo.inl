@@ -3,6 +3,7 @@
 #include "FTypeInfo.h"
 #include "Binding/TypeInfo/TNameSpace.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/ClassMacro.h"
 
 template <typename T, typename Enable = void>
 struct TTypeInfo
@@ -224,9 +225,8 @@ template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>::Value, T>::Type>
 {
 private:
-	class FInner final : public FPrimitiveTypeInfo
+	struct FInner final : FTypeInfo
 	{
-	public:
 		virtual FString GetClass() const override
 		{
 			return FUnrealCSharpFunctionLibrary::GetFullClass(TRemovePointer<T>::Type::StaticClass());
@@ -235,6 +235,69 @@ private:
 		virtual FNameSpace* GetNameSpace() const override
 		{
 			return TNameSpace<T, T>::Get();
+		}
+	};
+
+public:
+	static FTypeInfo* Get()
+	{
+		static FInner Instance;
+
+		return &Instance;
+	}
+};
+
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
+{
+private:
+	struct FInner final : FStringTypeInfo
+	{
+		virtual FString GetClass() const override
+		{
+			return CLASS_F_NAME;
+		}
+	};
+
+public:
+	static FTypeInfo* Get()
+	{
+		static FInner Instance;
+
+		return &Instance;
+	}
+};
+
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type>
+{
+private:
+	struct FInner final : FStringTypeInfo
+	{
+		virtual FString GetClass() const override
+		{
+			return CLASS_F_STRING;
+		}
+	};
+
+public:
+	static FTypeInfo* Get()
+	{
+		static FInner Instance;
+
+		return &Instance;
+	}
+};
+
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type>
+{
+private:
+	struct FInner final : FStringTypeInfo
+	{
+		virtual FString GetClass() const override
+		{
+			return CLASS_F_TEXT;
 		}
 	};
 
