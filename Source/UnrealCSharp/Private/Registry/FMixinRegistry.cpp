@@ -5,7 +5,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 
 FMixinRegistry::FMixinRegistry()
 {

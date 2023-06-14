@@ -7,7 +7,7 @@
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 
 #if !WITH_EDITOR
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;

@@ -1,7 +1,7 @@
 ﻿#include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 {

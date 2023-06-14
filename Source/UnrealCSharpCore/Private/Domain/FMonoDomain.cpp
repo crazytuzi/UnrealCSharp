@@ -3,7 +3,7 @@
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"

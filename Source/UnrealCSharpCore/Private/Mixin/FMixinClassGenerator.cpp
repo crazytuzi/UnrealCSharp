@@ -9,7 +9,7 @@
 #include "Mixin/CSharpBlueprintGeneratedClass.h"
 #include "Mixin/CSharpGeneratedClass.h"
 #include "Mixin/FMixinGeneratorCore.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"

@@ -1,8 +1,12 @@
 ﻿#include "Domain/InternalCall/FDataTableFunctionLibrary.h"
 #include "Binding/Class/FBindingClassBuilder.h"
-#include "Binding/Class/TClassBuilder.h"
+#include "Binding/Class/TClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "Kismet/DataTableFunctionLibrary.h"
+#include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
+
+BINDING_CLASS(UDataTableFunctionLibrary);
 
 struct FRegisterDataTableFunctionLibrary
 {

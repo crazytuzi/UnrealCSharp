@@ -5,7 +5,7 @@
 #include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Domain/FMonoDomain.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 
 EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 {

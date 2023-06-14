@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
+#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
 #include "Reflection/Container/FContainerHelper.h"
 #include "mono/metadata/object-forward.h"
 

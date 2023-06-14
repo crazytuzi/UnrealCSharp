@@ -48,6 +48,8 @@ public:
 
 	static FString GetGameProxyPath();
 
+	static FString GetBindingPath();
+
 	static FString GetAssemblyUtilProjectName();
 
 	static FString GetAssemblyUtilPath();

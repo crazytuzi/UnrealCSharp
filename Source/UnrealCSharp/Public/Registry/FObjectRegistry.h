@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
+#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
 #include "mono/metadata/object-forward.h"
 
-class FObjectRegistry
+class UNREALCSHARP_API FObjectRegistry
 {
 public:
 	FObjectRegistry();

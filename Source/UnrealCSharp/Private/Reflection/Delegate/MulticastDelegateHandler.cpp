@@ -6,7 +6,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 
 void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 {

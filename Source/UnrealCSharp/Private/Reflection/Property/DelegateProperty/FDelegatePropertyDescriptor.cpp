@@ -2,7 +2,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Bridge/FTypeBridge.h"
-#include "Template/TGetArrayLength.h"
+#include "Template/TGetArrayLength.inl"
 
 void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
