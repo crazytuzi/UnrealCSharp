@@ -222,7 +222,10 @@ public:
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TAnd<
+	                                       TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
+	                                       TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
+                 ::Type>
 {
 private:
 	struct FInner final : FTypeInfo
@@ -251,7 +254,7 @@ template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
 {
 private:
-	struct FInner final : FStringTypeInfo
+	struct FInner final : FCommonTypeInfo
 	{
 		virtual FString GetClass() const override
 		{
@@ -272,7 +275,7 @@ template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type>
 {
 private:
-	struct FInner final : FStringTypeInfo
+	struct FInner final : FCommonTypeInfo
 	{
 		virtual FString GetClass() const override
 		{
@@ -293,7 +296,7 @@ template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type>
 {
 private:
-	struct FInner final : FStringTypeInfo
+	struct FInner final : FCommonTypeInfo
 	{
 		virtual FString GetClass() const override
 		{
@@ -320,6 +323,32 @@ private:
 		virtual FString GetClass() const override
 		{
 			return TEXT("Double");
+		}
+	};
+
+public:
+	static FTypeInfo* Get()
+	{
+		static FInner Instance;
+
+		return &Instance;
+	}
+};
+
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type>
+{
+private:
+	struct FInner final : FTypeInfo
+	{
+		virtual FString GetClass() const override
+		{
+			return TEXT("TSubclassOf<UObject>");
+		}
+
+		virtual FNameSpace* GetNameSpace() const override
+		{
+			return TNameSpace<T, T>::Get();
 		}
 	};
 
