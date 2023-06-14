@@ -134,6 +134,8 @@ public:
 
 	static MonoClass* Get_UInt64_Class();
 
+	static MonoClass* Get_SByte_Class();
+
 	static MonoClass* Get_Int16_Class();
 
 	static MonoClass* Get_Int32_Class();

@@ -35,7 +35,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 	for (const auto& Property : InClass.GetProperties())
 	{
-		UsingNameSpaces.Add(Property.TypeInfo->GetNameSpace()->Get());
+		UsingNameSpaces.Append(Property.TypeInfo->GetNameSpace()->Get());
 
 		auto PropertyName = Property.Name;
 
@@ -101,7 +101,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 		}
 	}
 
-	UsingNameSpaces.Remove(NameSpaceContent);
+	UsingNameSpaces.Remove(NameSpaceContent[0]);
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{
@@ -122,13 +122,13 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 		"}"
 	),
 	                               *UsingNameSpaceContent,
-	                               *NameSpaceContent,
+	                               *NameSpaceContent[0],
 	                               *FullClassContent,
 	                               *PropertyContent
 	);
 
 	auto DirectoryName = FPaths::Combine(
-		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent.Replace(TEXT("."), TEXT("/"))),
+		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent[0].Replace(TEXT("."), TEXT("/"))),
 		FUnrealCSharpFunctionLibrary::GetBindingPath());
 
 	const auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
@@ -144,7 +144,9 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 
 	auto ImplementationNameSpaceContent = InClass.GetImplementationNameSpace();
 
-	TSet<FString> UsingNameSpaces = {TEXT("System"), TEXT("System.Runtime.CompilerServices"), NameSpaceContent};
+	TSet<FString> UsingNameSpaces = {TEXT("System"), TEXT("System.Runtime.CompilerServices")};
+
+	UsingNameSpaces.Append(NameSpaceContent);
 
 	auto FullClassContent = InClass.GetTypeInfo().TypeInfo->GetClass();
 
@@ -237,7 +239,7 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 	);
 
 	auto DirectoryName = FPaths::Combine(
-		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent.Replace(TEXT("."), TEXT("/"))),
+		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent[0].Replace(TEXT("."), TEXT("/"))),
 		FUnrealCSharpFunctionLibrary::GetBindingPath());
 
 	const auto FileName = FPaths::Combine(DirectoryName, ClassImplementationContent) + TEXT(".cs");
