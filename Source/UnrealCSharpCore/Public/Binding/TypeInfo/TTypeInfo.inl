@@ -4,6 +4,7 @@
 #include "Binding/TypeInfo/TNameSpace.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/ClassMacro.h"
+#include "Template/TTemplateTypeTraits.inl"
 
 template <typename T, typename Enable = void>
 struct TTypeInfo
@@ -336,14 +337,19 @@ public:
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type>
 {
 private:
 	struct FInner final : FTypeInfo
 	{
 		virtual FString GetClass() const override
 		{
-			return TEXT("TSubclassOf<UObject>");
+			return FString::Printf(TEXT(
+				"TSubclassOf<%s>"
+			),
+			                       *FUnrealCSharpFunctionLibrary::GetFullClass(
+				                       TTemplateTypeTraits<T>::Type::StaticClass())
+			);
 		}
 
 		virtual FNameSpace* GetNameSpace() const override
@@ -359,4 +365,10 @@ public:
 
 		return &Instance;
 	}
+};
+
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type> :
+	TTypeInfo<TSubclassOf<UObject>, TSubclassOf<UObject>>
+{
 };

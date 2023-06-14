@@ -5,6 +5,7 @@
 #include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
+#include "Template/TTemplateTypeTraits.inl"
 
 template <typename T, T, typename Enable = void>
 struct TPropertyBuilder
@@ -253,6 +254,52 @@ struct TPropertyBuilder<Result Class::*, Member,
 				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 					FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
 					FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass()));
+
+				const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+
+				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+
+				FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
+					FoundObject->*Member, SrcMonoObject, FoundObject->*Member);
+			}
+
+			*OutValue = SrcMonoObject;
+		}
+	}
+
+	static void Set(const MonoObject* InMonoObject, const MonoObject* InValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			FoundObject->*Member = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InValue);
+		}
+	}
+
+	static FTypeInfo* TypeInfo()
+	{
+		return TTypeInfo<Result, Result>::Get();
+	}
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member,
+                        typename TEnableIf<TIsTSubclassOf<Result>::Value>::Type>
+{
+	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(
+				FoundObject->*Member);
+
+			if (SrcMonoObject == nullptr)
+			{
+				const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
+					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SUB_CLASS_OF);
+
+				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+					FUnrealCSharpFunctionLibrary::GetClassNameSpace(TTemplateTypeTraits<Result>::Type::StaticClass()),
+					FUnrealCSharpFunctionLibrary::GetFullClass(TTemplateTypeTraits<Result>::Type::StaticClass()));
 
 				const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 
