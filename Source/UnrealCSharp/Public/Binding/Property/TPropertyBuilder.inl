@@ -6,6 +6,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
 #include "Template/TTemplateTypeTraits.inl"
+#include "Template/TIsTScriptInterface.inl"
 
 template <typename T, T, typename Enable = void>
 struct TPropertyBuilder
@@ -187,6 +188,76 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 			FoundObject->*Member = Result(UTF8_TO_TCHAR(
 				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 					GetDomain()->Object_To_String(InValue, nullptr))));
+		}
+	}
+
+	static FTypeInfo* TypeInfo()
+	{
+		return TTypeInfo<Result, Result>::Get();
+	}
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member,
+                        typename TEnableIf<TIsTScriptInterface<Result>::Value>::Type>
+{
+	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(
+				(FoundObject->*Member).GetInterface());
+
+			if (SrcMonoObject == nullptr)
+			{
+				const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
+					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SCRIPT_INTERFACE);
+
+				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+					FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+						TTemplateTypeTraits<Result>::Type::UClassType::StaticClass()),
+					FUnrealCSharpFunctionLibrary::GetFullInterface(
+						TTemplateTypeTraits<Result>::Type::UClassType::StaticClass()));
+
+				const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+
+				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+
+				const auto Object = (FoundObject->*Member).GetObject();
+
+				TScriptInterface<IInterface> ScriptInterface;
+
+				ScriptInterface.SetObject(Object);
+
+				ScriptInterface.SetInterface(Object
+					                             ? static_cast<IInterface*>(Object->GetInterfaceAddress(
+						                             TTemplateTypeTraits<Result>::Type::UClassType::StaticClass()))
+					                             : nullptr);
+
+				FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
+					(FoundObject->*Member).GetInterface(), SrcMonoObject, ScriptInterface);
+			}
+
+			*OutValue = SrcMonoObject;
+		}
+	}
+
+	static void Set(const MonoObject* InMonoObject, const MonoObject* InValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(InValue);
+
+			const auto Object = SrcMulti.GetObject();
+
+			(FoundObject->*Member).SetObject(Object);
+
+			(FoundObject->*Member).SetInterface(Object
+				                                    ? static_cast<typename TTemplateTypeTraits<Result>::Type*>(Object->
+					                                    GetInterfaceAddress(
+						                                    TTemplateTypeTraits<
+							                                    Result>::Type::UClassType::StaticClass()))
+				                                    : nullptr);
 		}
 	}
 

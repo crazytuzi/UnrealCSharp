@@ -3,6 +3,7 @@
 #include "FNameSpace.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Template/TTemplateTypeTraits.inl"
+#include "Template/TIsTScriptInterface.inl"
 
 template <typename T, typename Enable = void>
 struct TNameSpace
@@ -21,6 +22,31 @@ private:
 		virtual TArray<FString, TInlineAllocator<2>> Get() const override
 		{
 			return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(TRemovePointer<T>::Type::StaticClass())};
+		}
+	};
+
+public:
+	static FNameSpace* Get()
+	{
+		static FInner Instance;
+
+		return &Instance;
+	}
+};
+
+template <typename T>
+struct TNameSpace<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type>
+{
+private:
+	struct FInner final : FNameSpace
+	{
+		virtual TArray<FString, TInlineAllocator<2>> Get() const override
+		{
+			return {
+				FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+					TTemplateTypeTraits<T>::Type::UClassType::StaticClass()),
+				FCommonNameSpace::Instance.Get()[0]
+			};
 		}
 	};
 

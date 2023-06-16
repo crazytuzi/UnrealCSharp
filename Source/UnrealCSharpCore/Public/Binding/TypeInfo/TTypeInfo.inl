@@ -5,6 +5,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/ClassMacro.h"
 #include "Template/TTemplateTypeTraits.inl"
+#include "Template/TIsTScriptInterface.inl"
 
 template <typename T, typename Enable = void>
 struct TTypeInfo
@@ -260,6 +261,37 @@ private:
 		virtual FString GetClass() const override
 		{
 			return CLASS_F_NAME;
+		}
+	};
+
+public:
+	static FTypeInfo* Get()
+	{
+		static FInner Instance;
+
+		return &Instance;
+	}
+};
+
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type>
+{
+private:
+	struct FInner final : FTypeInfo
+	{
+		virtual FString GetClass() const override
+		{
+			return FString::Printf(TEXT(
+				"TScriptInterface<%s>"
+			),
+			                       *FUnrealCSharpFunctionLibrary::GetFullInterface(
+				                       TTemplateTypeTraits<T>::Type::UClassType::StaticClass())
+			);
+		}
+
+		virtual FNameSpace* GetNameSpace() const override
+		{
+			return TNameSpace<T, T>::Get();
 		}
 	};
 
