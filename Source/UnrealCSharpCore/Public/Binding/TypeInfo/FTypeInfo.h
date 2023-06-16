@@ -15,18 +15,14 @@ struct FPrimitiveTypeInfo : FTypeInfo
 {
 	virtual FNameSpace* GetNameSpace() const override
 	{
-		static FPrimitiveNameSpace Instance;
-
-		return &Instance;
+		return &FPrimitiveNameSpace::Instance;
 	}
 };
 
-struct FStringTypeInfo : FTypeInfo
+struct FCommonTypeInfo : FTypeInfo
 {
 	virtual FNameSpace* GetNameSpace() const override
 	{
-		static FStringNameSpace Instance;
-
-		return &Instance;
+		return &FCommonNameSpace::Instance;
 	}
 };

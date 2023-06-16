@@ -16,15 +16,15 @@ struct FPrimitiveNameSpace final : FNameSpace
 		return {TEXT("System")};
 	}
 
-	static FPrimitiveNameSpace Instance;
+	static UNREALCSHARPCORE_API FPrimitiveNameSpace Instance;
 };
 
-struct FStringNameSpace final : FNameSpace
+struct FCommonNameSpace final : FNameSpace
 {
 	virtual TArray<FString, TInlineAllocator<2>> Get() const override
 	{
 		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON)};
 	}
 
-	static FStringNameSpace Instance;
+	static UNREALCSHARPCORE_API FCommonNameSpace Instance;
 };
