@@ -129,6 +129,8 @@ public:
 
 	MonoClass* Get_UInt64_Class() const;
 
+	MonoClass* Get_SByte_Class() const;
+
 	MonoClass* Get_Int16_Class() const;
 
 	MonoClass* Get_Int32_Class() const;
