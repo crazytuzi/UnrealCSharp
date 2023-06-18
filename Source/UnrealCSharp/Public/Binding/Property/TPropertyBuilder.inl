@@ -8,6 +8,7 @@
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
 #include "Template/TIsTLazyObjectPtr.inl"
+#include "Template/TIsTSoftObjectPtr.inl"
 
 template <typename T, T, typename Enable = void>
 struct TPropertyBuilder
@@ -390,6 +391,55 @@ struct TPropertyBuilder<Result Class::*, Member,
 		{
 			FoundObject->*Member = Cast<typename TTemplateTypeTraits<Result>::Type>(
 				FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(InValue).Get());
+		}
+	}
+
+	static FTypeInfo* TypeInfo()
+	{
+		return TTypeInfo<Result, Result>::Get();
+	}
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member,
+                        typename TEnableIf<TIsTSoftObjectPtr<Result>::Value>::Type>
+{
+	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftObjectPtr<UObject>>(
+				(FoundObject->*Member).Get());
+
+			if (SrcMonoObject == nullptr)
+			{
+				const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
+					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SOFT_OBJECT_PTR);
+
+				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+					FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+						TTemplateTypeTraits<Result>::Type::StaticClass()),
+					FUnrealCSharpFunctionLibrary::GetFullClass(
+						TTemplateTypeTraits<Result>::Type::StaticClass()));
+
+				const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+
+				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+
+				FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>>(
+					(FoundObject->*Member).Get(), SrcMonoObject, FoundObject->*Member);
+			}
+
+			*OutValue = SrcMonoObject;
+		}
+	}
+
+	static void Set(const MonoObject* InMonoObject, const MonoObject* InValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			FoundObject->*Member = Cast<typename TTemplateTypeTraits<Result>::Type>(
+				FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<UObject>>(InValue).Get());
 		}
 	}
 
