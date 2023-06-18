@@ -6,6 +6,7 @@
 #include "CoreMacro/ClassMacro.h"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
+#include "Template/TIsTWeakObjectPtr.inl"
 
 template <typename T, typename Enable = void>
 struct TTypeInfo
