@@ -8,6 +8,7 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
+#include "Template/TIsUStruct.inl"
 
 template <typename T, typename Enable = void>
 struct TNameSpace
@@ -51,6 +52,27 @@ private:
 					TTemplateTypeTraits<T>::Type::UClassType::StaticClass()),
 				FCommonNameSpace::Instance.Get()[0]
 			};
+		}
+	};
+
+public:
+	static FNameSpace* Get()
+	{
+		static FInner Instance;
+
+		return &Instance;
+	}
+};
+
+template <typename T>
+struct TNameSpace<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
+{
+private:
+	struct FInner final : FNameSpace
+	{
+		virtual TArray<FString, TInlineAllocator<2>> Get() const override
+		{
+			return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(T::StaticStruct())};
 		}
 	};
 
