@@ -5,11 +5,13 @@
 #include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
+#include "Template/TGetArrayLength.inl"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
+#include "Template/TIsUStruct.inl"
 
 template <typename T, T, typename Enable = void>
 struct TPropertyBuilder
@@ -261,6 +263,52 @@ struct TPropertyBuilder<Result Class::*, Member,
 						                                    TTemplateTypeTraits<
 							                                    Result>::Type::UClassType::StaticClass()))
 				                                    : nullptr);
+		}
+	}
+
+	static FTypeInfo* TypeInfo()
+	{
+		return TTypeInfo<Result, Result>::Get();
+	}
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsUStruct<Result>::Value>::Type>
+{
+	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, &(FoundObject->*Member));
+
+			if (SrcMonoObject == nullptr)
+			{
+				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+					FUnrealCSharpFunctionLibrary::GetClassNameSpace(Result::StaticStruct()),
+					FUnrealCSharpFunctionLibrary::GetFullClass(Result::StaticStruct()));
+
+				auto InParams = static_cast<void*>(FoundMonoClass);
+
+				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+					FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+				FCSharpEnvironment::GetEnvironment().Bind(Result::StaticStruct(), false);
+
+				FCSharpEnvironment::GetEnvironment().AddStructReference(Result::StaticStruct(), nullptr,
+				                                                        &(FoundObject->*Member), SrcMonoObject, false);
+			}
+
+			*OutValue = SrcMonoObject;
+		}
+	}
+
+	static void Set(const MonoObject* InMonoObject, const MonoObject* InValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+
+			Result::StaticStruct()->CopyScriptStruct(&(FoundObject->*Member), SrcStruct);
 		}
 	}
 
