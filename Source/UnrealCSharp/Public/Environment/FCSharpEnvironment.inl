@@ -103,35 +103,39 @@ auto FCSharpEnvironment::GetDelegate(const MonoObject* InMonoObject) const
 template <typename T>
 auto FCSharpEnvironment::GetMulti(const MonoObject* InMonoObject) const
 {
-	return MultiRegistry != nullptr ? MultiRegistry->GetMulti<T>(InMonoObject) : T();
+	return MultiRegistry != nullptr
+		       ? FMultiRegistry::TMultiRegistry<T, T>::GetMulti(MultiRegistry, InMonoObject)
+		       : nullptr;
 }
 
 template <typename T>
 auto FCSharpEnvironment::GetMultiObject(const void* InAddress) const
 {
-	return MultiRegistry != nullptr ? MultiRegistry->GetObject<T>(InAddress) : nullptr;
+	return MultiRegistry != nullptr
+		       ? FMultiRegistry::TMultiRegistry<T, T>::GetObject(MultiRegistry, InAddress)
+		       : nullptr;
 }
 
 template <typename T>
-auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject, const T& InValue) const
+auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject, void* InValue, const bool bNeedFree) const
 {
-	return MultiRegistry != nullptr ? MultiRegistry->AddReference<T>(InMonoObject, InValue) : nullptr;
-}
-
-template <typename T>
-auto FCSharpEnvironment::AddMultiReference(void* InAddress, MonoObject* InMonoObject, const T& InValue) const
-{
-	return MultiRegistry != nullptr ? MultiRegistry->AddReference(InAddress, InMonoObject, InValue) : false;
+	return MultiRegistry != nullptr
+		       ? FMultiRegistry::TMultiRegistry<T, T>::AddReference(MultiRegistry, InMonoObject, InValue, bNeedFree)
+		       : false;
 }
 
 template <typename T>
 auto FCSharpEnvironment::RemoveMultiReference(const MonoObject* InMonoObject) const
 {
-	return MultiRegistry != nullptr ? MultiRegistry->RemoveReference<T>(InMonoObject) : false;
+	return MultiRegistry != nullptr
+		       ? FMultiRegistry::TMultiRegistry<T, T>::RemoveReference(MultiRegistry, InMonoObject)
+		       : false;
 }
 
 template <typename T>
 auto FCSharpEnvironment::RemoveMultiReference(const void* InAddress) const
 {
-	return MultiRegistry != nullptr ? MultiRegistry->RemoveReference<T>(InAddress) : false;
+	return MultiRegistry != nullptr
+		       ? FMultiRegistry::TMultiRegistry<T, T>::RemoveReference(MultiRegistry, InAddress)
+		       : false;
 }

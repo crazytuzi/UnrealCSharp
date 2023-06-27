@@ -30,20 +30,20 @@ void FSoftObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		SoftObjectProperty->InitializeValue(Dest);
 
-		SoftObjectProperty->SetObjectPropertyValue(Dest, SrcMulti.Get());
+		SoftObjectProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
 
 		Object_New(Dest);
 	}
 }
 
-bool FSoftObjectPropertyDescriptor::Identical(const void* A, const void* B, uint32 PortFlags) const
+bool FSoftObjectPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
 	if (SoftObjectProperty != nullptr)
 	{
 		const auto ObjectA = SoftObjectProperty->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<UObject>>(
-			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
+			static_cast<MonoObject*>(const_cast<void*>(B)))->Get();
 
 #if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
 		return SoftObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
@@ -57,13 +57,11 @@ bool FSoftObjectPropertyDescriptor::Identical(const void* A, const void* B, uint
 
 MonoObject* FSoftObjectPropertyDescriptor::Object_New(void* InAddress) const
 {
-	const auto SrcObject = SoftObjectProperty->GetObjectPropertyValue(InAddress);
-
 	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(SoftObjectProperty);
 
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>>(InAddress, Object, SrcObject);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>>(Object, InAddress, false);
 
 	return Object;
 }

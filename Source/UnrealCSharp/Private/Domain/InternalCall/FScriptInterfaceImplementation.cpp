@@ -26,19 +26,9 @@ void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(
 {
 	const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
-	const auto InterfaceName = UTF8_TO_TCHAR(
-		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InInterfaceName));
+	const auto ScriptInterface = new TScriptInterface<IInterface>(FoundObject);
 
-	const auto InterfaceClass = LoadClass<UInterface>(nullptr, InterfaceName);
-
-	TScriptInterface<IInterface> ScriptInterface;
-
-	ScriptInterface.SetObject(FoundObject);
-
-	ScriptInterface.SetInterface(static_cast<IInterface*>(FoundObject->GetInterfaceAddress(InterfaceClass)));
-
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<
-		IInterface>>(InMonoObject, ScriptInterface);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(InMonoObject, ScriptInterface);
 }
 
 void FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation(const MonoObject* InMonoObject)
@@ -54,5 +44,5 @@ void FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation(con
 {
 	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(InMonoObject);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi.GetObject());
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject());
 }

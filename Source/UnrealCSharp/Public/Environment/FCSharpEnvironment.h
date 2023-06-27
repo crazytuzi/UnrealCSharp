@@ -170,10 +170,7 @@ public:
 	auto GetMultiObject(const void* InAddress) const;
 
 	template <typename T>
-	auto AddMultiReference(MonoObject* InMonoObject, const T& InValue) const;
-
-	template <typename T>
-	auto AddMultiReference(void* InAddress, MonoObject* InMonoObject, const T& InValue) const;
+	auto AddMultiReference(MonoObject* InMonoObject, void* InValue, bool bNeedFree = true) const;
 
 	template <typename T>
 	auto RemoveMultiReference(const MonoObject* InMonoObject) const;

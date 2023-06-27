@@ -1,449 +1,174 @@
 ﻿#pragma once
 
-template <>
-inline auto FMultiRegistry::GetMulti<FMultiRegistry::FSubclassOfAddress::Type>(const MonoObject* InMonoObject)
+template <
+	typename Class,
+	typename AddressResult,
+	typename FMultiRegistry::TMultiMapping<AddressResult>::GarbageCollectionHandle2Address Class::*
+	GarbageCollectionHandle2AddressMember,
+	typename FMultiRegistry::TMultiMapping<AddressResult>::Address2GarbageCollectionHandle Class::*
+	Address2GarbageCollectionHandleMember
+>
+struct FMultiRegistry::TMultiRegistryImplementation<
+		typename FMultiRegistry::TMultiMapping<AddressResult>::GarbageCollectionHandle2Address Class::*,
+		GarbageCollectionHandle2AddressMember,
+		AddressResult,
+		typename FMultiRegistry::TMultiMapping<AddressResult>::Address2GarbageCollectionHandle Class::*,
+		Address2GarbageCollectionHandleMember
+	>
 {
-	const auto FoundSubclassOfAddress = GarbageCollectionHandle2SubclassOfAddress.Find(InMonoObject);
-
-	return FoundSubclassOfAddress != nullptr ? FoundSubclassOfAddress->Value : FSubclassOfAddress::Type();
-}
-
-template <>
-inline auto FMultiRegistry::GetMulti<FMultiRegistry::FWeakObjectPtrAddress::Type>(const MonoObject* InMonoObject)
-{
-	const auto FoundWeakObjectPtrAddress = GarbageCollectionHandle2WeakObjectPtrAddress.Find(InMonoObject);
-
-	return FoundWeakObjectPtrAddress != nullptr ? FoundWeakObjectPtrAddress->Value : FWeakObjectPtrAddress::Type();
-}
-
-template <>
-inline auto FMultiRegistry::GetMulti<FMultiRegistry::FLazyObjectPtrAddress::Type>(const MonoObject* InMonoObject)
-{
-	const auto FoundLazyObjectPtrAddress = GarbageCollectionHandle2LazyObjectPtrAddress.Find(InMonoObject);
-
-	return FoundLazyObjectPtrAddress != nullptr ? FoundLazyObjectPtrAddress->Value : FLazyObjectPtrAddress::Type();
-}
-
-template <>
-inline auto FMultiRegistry::GetMulti<FMultiRegistry::FSoftObjectPtrAddress::Type>(const MonoObject* InMonoObject)
-{
-	const auto FoundSoftObjectPtrAddress = GarbageCollectionHandle2SoftObjectPtrAddress.Find(InMonoObject);
-
-	return FoundSoftObjectPtrAddress != nullptr ? FoundSoftObjectPtrAddress->Value : FSoftObjectPtrAddress::Type();
-}
-
-template <>
-inline auto FMultiRegistry::GetMulti<FMultiRegistry::FScriptInterfaceAddress::Type>(const MonoObject* InMonoObject)
-{
-	const auto FoundScriptInterfaceAddress = GarbageCollectionHandle2ScriptInterfaceAddress.Find(InMonoObject);
-
-	return FoundScriptInterfaceAddress != nullptr
-		       ? FoundScriptInterfaceAddress->Value
-		       : FScriptInterfaceAddress::Type();
-}
-
-template <>
-inline auto FMultiRegistry::GetMulti<FMultiRegistry::FSoftClassPtrAddress::Type>(const MonoObject* InMonoObject)
-{
-	const auto FoundSoftClassPtrAddress = GarbageCollectionHandle2SoftClassPtrAddress.Find(InMonoObject);
-
-	return FoundSoftClassPtrAddress != nullptr ? FoundSoftClassPtrAddress->Value : FSoftClassPtrAddress::Type();
-}
-
-template <>
-inline auto FMultiRegistry::GetObject<FMultiRegistry::FSubclassOfAddress::Type>(const void* InAddress) const
-{
-	const auto FoundGarbageCollectionHandle = SubclassOfAddress2GarbageCollectionHandle.Find(InAddress);
-
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
-}
-
-template <>
-inline auto FMultiRegistry::GetObject<FMultiRegistry::FWeakObjectPtrAddress::Type>(const void* InAddress) const
-{
-	const auto FoundGarbageCollectionHandle = WeakObjectPtrAddress2GarbageCollectionHandle.Find(InAddress);
-
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
-}
-
-template <>
-inline auto FMultiRegistry::GetObject<FMultiRegistry::FLazyObjectPtrAddress::Type>(const void* InAddress) const
-{
-	const auto FoundGarbageCollectionHandle = LazyObjectPtrAddress2GarbageCollectionHandle.Find(InAddress);
-
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
-}
-
-template <>
-inline auto FMultiRegistry::GetObject<FMultiRegistry::FSoftObjectPtrAddress::Type>(const void* InAddress) const
-{
-	const auto FoundGarbageCollectionHandle = SoftObjectPtrAddress2GarbageCollectionHandle.Find(InAddress);
-
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
-}
-
-template <>
-inline auto FMultiRegistry::GetObject<FMultiRegistry::FScriptInterfaceAddress::Type>(const void* InAddress) const
-{
-	const auto FoundGarbageCollectionHandle = ScriptInterfaceAddress2GarbageCollectionHandle.Find(InAddress);
-
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
-}
-
-template <>
-inline auto FMultiRegistry::GetObject<FMultiRegistry::FSoftClassPtrAddress::Type>(const void* InAddress) const
-{
-	const auto FoundGarbageCollectionHandle = SoftClassPtrAddress2GarbageCollectionHandle.Find(InAddress);
-
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(MonoObject* InMonoObject, const FSubclassOfAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	GarbageCollectionHandle2SubclassOfAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                  FSubclassOfAddress{nullptr, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(MonoObject* InMonoObject, const FWeakObjectPtrAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	GarbageCollectionHandle2WeakObjectPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                     FWeakObjectPtrAddress{nullptr, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(MonoObject* InMonoObject, const FLazyObjectPtrAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	GarbageCollectionHandle2LazyObjectPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                     FLazyObjectPtrAddress{nullptr, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(MonoObject* InMonoObject, const FSoftObjectPtrAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	GarbageCollectionHandle2SoftObjectPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                     FSoftObjectPtrAddress{nullptr, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(MonoObject* InMonoObject, const FScriptInterfaceAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	GarbageCollectionHandle2ScriptInterfaceAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                       FScriptInterfaceAddress{nullptr, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(MonoObject* InMonoObject, const FSoftClassPtrAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	GarbageCollectionHandle2SoftClassPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                    FSoftClassPtrAddress{nullptr, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject,
-                                         const FSubclassOfAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	SubclassOfAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
-
-	GarbageCollectionHandle2SubclassOfAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                  FSubclassOfAddress{InAddress, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject,
-                                         const FWeakObjectPtrAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	WeakObjectPtrAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
-
-	GarbageCollectionHandle2WeakObjectPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                     FWeakObjectPtrAddress{InAddress, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject,
-                                         const FLazyObjectPtrAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	LazyObjectPtrAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
-
-	GarbageCollectionHandle2LazyObjectPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                     FLazyObjectPtrAddress{InAddress, InValue});
-
-	return true;
-}
-
-
-template <>
-inline auto FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject,
-                                         const FSoftObjectPtrAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	SoftObjectPtrAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
-
-	GarbageCollectionHandle2SoftObjectPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                     FSoftObjectPtrAddress{InAddress, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject,
-                                         const FScriptInterfaceAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	ScriptInterfaceAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
-
-	GarbageCollectionHandle2ScriptInterfaceAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                       FScriptInterfaceAddress{InAddress, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::AddReference(void* InAddress, MonoObject* InMonoObject,
-                                         const FSoftClassPtrAddress::Type& InValue)
-{
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	SoftClassPtrAddress2GarbageCollectionHandle.Emplace(InAddress, GarbageCollectionHandle);
-
-	GarbageCollectionHandle2SoftClassPtrAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                    FSoftClassPtrAddress{InAddress, InValue});
-
-	return true;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSubclassOfAddress::Type>(const MonoObject* InMonoObject)
-{
-	if (const auto FoundSubclassOfAddress = GarbageCollectionHandle2SubclassOfAddress.Find(InMonoObject))
+	static typename AddressResult::Type* GetMulti(Class* InRegistry, const MonoObject* InMonoObject)
 	{
-		SubclassOfAddress2GarbageCollectionHandle.Remove(FoundSubclassOfAddress->Address);
+		const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(InMonoObject);
 
-		GarbageCollectionHandle2SubclassOfAddress.Remove(InMonoObject);
+		return FoundAddress != nullptr ? static_cast<typename AddressResult::Type*>(FoundAddress->Value) : nullptr;
+	}
+
+	static MonoObject* GetObject(Class* InRegistry, const void* InAddress)
+	{
+		const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandleMember).Find(InAddress);
+
+		return FoundGarbageCollectionHandle != nullptr
+			       ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle)
+			       : nullptr;
+	}
+
+	static bool AddReference(Class* InRegistry, MonoObject* InMonoObject, void* InValue, bool bNeedFree = true)
+	{
+		auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+
+		(InRegistry->*Address2GarbageCollectionHandleMember).Emplace(InValue, GarbageCollectionHandle);
+
+		(InRegistry->*GarbageCollectionHandle2AddressMember).Emplace(
+			MoveTemp(GarbageCollectionHandle),
+			AddressResult{nullptr, static_cast<typename AddressResult::Type*>(InValue), bNeedFree});
 
 		return true;
 	}
 
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FWeakObjectPtrAddress::Type>(const MonoObject* InMonoObject)
-{
-	if (const auto FoundWeakObjectPtrAddress = GarbageCollectionHandle2WeakObjectPtrAddress.Find(InMonoObject))
+	static bool RemoveReference(Class* InRegistry, const MonoObject* InMonoObject)
 	{
-		WeakObjectPtrAddress2GarbageCollectionHandle.Remove(FoundWeakObjectPtrAddress->Address);
-
-		GarbageCollectionHandle2WeakObjectPtrAddress.Remove(InMonoObject);
-
-		return true;
-	}
-
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FLazyObjectPtrAddress::Type>(const MonoObject* InMonoObject)
-{
-	if (const auto FoundLazyObjectPtrAddress = GarbageCollectionHandle2LazyObjectPtrAddress.Find(InMonoObject))
-	{
-		LazyObjectPtrAddress2GarbageCollectionHandle.Remove(FoundLazyObjectPtrAddress->Address);
-
-		GarbageCollectionHandle2LazyObjectPtrAddress.Remove(InMonoObject);
-
-		return true;
-	}
-
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSoftObjectPtrAddress::Type>(const MonoObject* InMonoObject)
-{
-	if (const auto FoundSoftObjectPtrAddress = GarbageCollectionHandle2SoftObjectPtrAddress.Find(InMonoObject))
-	{
-		SoftObjectPtrAddress2GarbageCollectionHandle.Remove(FoundSoftObjectPtrAddress->Address);
-
-		GarbageCollectionHandle2SoftObjectPtrAddress.Remove(InMonoObject);
-
-		return true;
-	}
-
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FScriptInterfaceAddress::Type>(
-	const MonoObject* InMonoObject)
-{
-	if (const auto FoundScriptInterfaceAddress = GarbageCollectionHandle2ScriptInterfaceAddress.Find(InMonoObject))
-	{
-		ScriptInterfaceAddress2GarbageCollectionHandle.Remove(FoundScriptInterfaceAddress->Address);
-
-		GarbageCollectionHandle2ScriptInterfaceAddress.Remove(InMonoObject);
-
-		return true;
-	}
-
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSoftClassPtrAddress::Type>(const MonoObject* InMonoObject)
-{
-	if (const auto FoundSoftClassPtrAddress = GarbageCollectionHandle2SoftClassPtrAddress.Find(InMonoObject))
-	{
-		SoftClassPtrAddress2GarbageCollectionHandle.Remove(FoundSoftClassPtrAddress->Address);
-
-		GarbageCollectionHandle2SoftClassPtrAddress.Remove(InMonoObject);
-
-		return true;
-	}
-
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSubclassOfAddress::Type>(const void* InAddress)
-{
-	for (const auto& Pair : SubclassOfAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InAddress)
+		if (const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(InMonoObject))
 		{
-			SubclassOfAddress2GarbageCollectionHandle.Remove(Pair.Key);
+			(InRegistry->*Address2GarbageCollectionHandleMember).Remove(FoundAddress->Address);
 
-			GarbageCollectionHandle2SubclassOfAddress.Remove(Pair.Value);
+			if (FoundAddress->bNeedFree)
+			{
+				FMemory::Free(FoundAddress->Address);
+
+				FoundAddress->Address = nullptr;
+			}
+
+			(InRegistry->*GarbageCollectionHandle2AddressMember).Remove(InMonoObject);
 
 			return true;
 		}
+
+		return false;
 	}
 
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FWeakObjectPtrAddress::Type>(const void* InAddress)
-{
-	for (const auto& Pair : WeakObjectPtrAddress2GarbageCollectionHandle)
+	static bool RemoveReference(Class* InRegistry, const void* InAddress)
 	{
-		if (Pair.Key == InAddress)
+		if (const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandleMember).
+			Find(InAddress))
 		{
-			WeakObjectPtrAddress2GarbageCollectionHandle.Remove(Pair.Key);
+			if (const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(
+				FoundGarbageCollectionHandle))
+			{
+				FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
 
-			GarbageCollectionHandle2WeakObjectPtrAddress.Remove(Pair.Value);
+				(InRegistry->*Address2GarbageCollectionHandleMember).Remove(FoundAddress->Address);
 
-			return true;
+				if (FoundAddress->bNeedFree)
+				{
+					FMemory::Free(FoundAddress->Address);
+
+					FoundAddress->Address = nullptr;
+				}
+
+				(InRegistry->*GarbageCollectionHandle2AddressMember).Remove(FoundGarbageCollectionHandle);
+
+				return true;
+			}
 		}
+
+		return false;
 	}
+};
 
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FLazyObjectPtrAddress::Type>(const void* InAddress)
+template <typename T>
+struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
+	                                      FMultiRegistry::FSubclassOfAddress::TIsType<T>::Value, T>::Type> :
+	TMultiRegistryImplementation<
+		decltype(&FMultiRegistry::GarbageCollectionHandle2SubclassOfAddress),
+		&FMultiRegistry::GarbageCollectionHandle2SubclassOfAddress,
+		FSubclassOfAddress,
+		decltype(&FMultiRegistry::SubclassOfAddress2GarbageCollectionHandle),
+		&FMultiRegistry::SubclassOfAddress2GarbageCollectionHandle
+	>
 {
-	for (const auto& Pair : LazyObjectPtrAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InAddress)
-		{
-			LazyObjectPtrAddress2GarbageCollectionHandle.Remove(Pair.Key);
+};
 
-			GarbageCollectionHandle2LazyObjectPtrAddress.Remove(Pair.Value);
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSoftObjectPtrAddress::Type>(const void* InAddress)
+template <typename T>
+struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
+	                                      FMultiRegistry::FWeakObjectPtrAddress::TIsType<T>::Value, T>::Type> :
+	TMultiRegistryImplementation<
+		decltype(&FMultiRegistry::GarbageCollectionHandle2WeakObjectPtrAddress),
+		&FMultiRegistry::GarbageCollectionHandle2WeakObjectPtrAddress,
+		FWeakObjectPtrAddress,
+		decltype(&FMultiRegistry::WeakObjectPtrAddress2GarbageCollectionHandle),
+		&FMultiRegistry::WeakObjectPtrAddress2GarbageCollectionHandle
+	>
 {
-	for (const auto& Pair : SoftObjectPtrAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InAddress)
-		{
-			SoftObjectPtrAddress2GarbageCollectionHandle.Remove(Pair.Key);
+};
 
-			GarbageCollectionHandle2SoftObjectPtrAddress.Remove(Pair.Value);
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FScriptInterfaceAddress::Type>(const void* InAddress)
+template <typename T>
+struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
+	                                      FMultiRegistry::FLazyObjectPtrAddress::TIsType<T>::Value, T>::Type> :
+	TMultiRegistryImplementation<
+		decltype(&FMultiRegistry::GarbageCollectionHandle2LazyObjectPtrAddress),
+		&FMultiRegistry::GarbageCollectionHandle2LazyObjectPtrAddress,
+		FLazyObjectPtrAddress,
+		decltype(&FMultiRegistry::LazyObjectPtrAddress2GarbageCollectionHandle),
+		&FMultiRegistry::LazyObjectPtrAddress2GarbageCollectionHandle
+	>
 {
-	for (const auto& Pair : ScriptInterfaceAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InAddress)
-		{
-			ScriptInterfaceAddress2GarbageCollectionHandle.Remove(Pair.Key);
+};
 
-			GarbageCollectionHandle2ScriptInterfaceAddress.Remove(Pair.Value);
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
-template <>
-inline auto FMultiRegistry::RemoveReference<FMultiRegistry::FSoftClassPtrAddress::Type>(const void* InAddress)
+template <typename T>
+struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
+	                                      FMultiRegistry::FSoftObjectPtrAddress::TIsType<T>::Value, T>::Type> :
+	TMultiRegistryImplementation<
+		decltype(&FMultiRegistry::GarbageCollectionHandle2SoftObjectPtrAddress),
+		&FMultiRegistry::GarbageCollectionHandle2SoftObjectPtrAddress,
+		FSoftObjectPtrAddress,
+		decltype(&FMultiRegistry::SoftObjectPtrAddress2GarbageCollectionHandle),
+		&FMultiRegistry::SoftObjectPtrAddress2GarbageCollectionHandle
+	>
 {
-	for (const auto& Pair : SoftClassPtrAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InAddress)
-		{
-			SoftClassPtrAddress2GarbageCollectionHandle.Remove(Pair.Key);
+};
 
-			GarbageCollectionHandle2SoftClassPtrAddress.Remove(Pair.Value);
+template <typename T>
+struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
+	                                      FMultiRegistry::FScriptInterfaceAddress::TIsType<T>::Value, T>::Type> :
+	TMultiRegistryImplementation<
+		decltype(&FMultiRegistry::GarbageCollectionHandle2ScriptInterfaceAddress),
+		&FMultiRegistry::GarbageCollectionHandle2ScriptInterfaceAddress,
+		FScriptInterfaceAddress,
+		decltype(&FMultiRegistry::ScriptInterfaceAddress2GarbageCollectionHandle),
+		&FMultiRegistry::ScriptInterfaceAddress2GarbageCollectionHandle
+	>
+{
+};
 
-			return true;
-		}
-	}
-
-	return false;
-}
+template <typename T>
+struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
+	                                      FMultiRegistry::FSoftClassPtrAddress::TIsType<T>::Value, T>::Type> :
+	TMultiRegistryImplementation<
+		decltype(&FMultiRegistry::GarbageCollectionHandle2SoftClassPtrAddress),
+		&FMultiRegistry::GarbageCollectionHandle2SoftClassPtrAddress,
+		FSoftClassPtrAddress,
+		decltype(&FMultiRegistry::SoftClassPtrAddress2GarbageCollectionHandle),
+		&FMultiRegistry::SoftClassPtrAddress2GarbageCollectionHandle
+	>
+{
+};

@@ -30,7 +30,7 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		LazyObjectProperty->InitializeValue(Dest);
 
-		LazyObjectProperty->SetObjectPropertyValue(Dest, SrcMulti.Get());
+		LazyObjectProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
 
 		Object_New(Dest);
 	}
@@ -43,7 +43,7 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 		const auto ObjectA = LazyObjectProperty->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
-			static_cast<MonoObject*>(const_cast<void*>(B))).Get();
+			static_cast<MonoObject*>(const_cast<void*>(B)))->Get();
 
 #if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
 		return LazyObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
@@ -57,13 +57,11 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 
 MonoObject* FLazyObjectPropertyDescriptor::Object_New(void* InAddress) const
 {
-	const auto SrcObject = LazyObjectProperty->GetObjectPropertyValue(InAddress);
-
 	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(LazyObjectProperty);
 
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(InAddress, Object, SrcObject);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(Object, InAddress, false);
 
 	return Object;
 }
