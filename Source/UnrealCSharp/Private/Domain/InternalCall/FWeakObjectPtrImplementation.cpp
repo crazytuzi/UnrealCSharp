@@ -26,7 +26,9 @@ void FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation(MonoObje
 {
 	const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(InMonoObject, FoundObject);
+	const auto WeakObjectPtr = new TWeakObjectPtr<UObject>(FoundObject);
+
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(InMonoObject, WeakObjectPtr);
 }
 
 void FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
@@ -42,5 +44,5 @@ void FWeakObjectPtrImplementation::WeakObjectPtr_GetImplementation(const MonoObj
 {
 	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(InMonoObject);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi.Get());
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 }

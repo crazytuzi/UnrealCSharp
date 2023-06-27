@@ -25,7 +25,9 @@ void FLazyObjectPtrImplementation::LazyObjectPtr_RegisterImplementation(MonoObje
 {
 	const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(InMonoObject, FoundObject);
+	const auto LazyObjectPtr = new TLazyObjectPtr<UObject>(FoundObject);
+
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(InMonoObject, LazyObjectPtr);
 }
 
 void FLazyObjectPtrImplementation::LazyObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
@@ -38,5 +40,5 @@ void FLazyObjectPtrImplementation::LazyObjectPtr_GetImplementation(const MonoObj
 {
 	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(InMonoObject);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi.Get());
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 }
