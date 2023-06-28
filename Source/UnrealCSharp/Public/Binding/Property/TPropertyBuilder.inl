@@ -78,7 +78,8 @@ struct TMultiPropertyBuilder :
 
 				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
-				FCSharpEnvironment::GetEnvironment().AddMultiReference<Result>(SrcMonoObject, &(FoundObject->*Member));
+				FCSharpEnvironment::GetEnvironment().AddMultiReference<Result>(
+					SrcMonoObject, &(FoundObject->*Member), false);
 			}
 
 			*OutValue = SrcMonoObject;
@@ -266,7 +267,7 @@ struct TPropertyBuilder<Result Class::*, Member,
 				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
 				FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
-					SrcMonoObject, &(FoundObject->*Member));
+					SrcMonoObject, &(FoundObject->*Member), false);
 			}
 
 			*OutValue = SrcMonoObject;
@@ -373,7 +374,7 @@ struct TPropertyBuilder<Result Class::*, Member,
 				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
 				FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(
-					SrcMonoObject, &(FoundObject->*Member));
+					SrcMonoObject, &(FoundObject->*Member), false);
 			}
 
 			*OutValue = SrcMonoObject;
@@ -427,7 +428,7 @@ struct TPropertyBuilder<Result Class::*, Member,
 				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
 
 				FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
-					SrcMonoObject, &(FoundObject->*Member));
+					SrcMonoObject, &(FoundObject->*Member), false);
 			}
 
 			*OutValue = SrcMonoObject;
