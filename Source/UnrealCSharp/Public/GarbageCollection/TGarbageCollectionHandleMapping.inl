@@ -7,12 +7,17 @@ template <typename T>
 class TGarbageCollectionHandleMapping
 {
 public:
-	T& operator[](const FGarbageCollectionHandle& InKey)
+	typedef FGarbageCollectionHandle Key;
+
+	typedef T Value;
+
+public:
+	Value& operator[](const Key& InKey)
 	{
 		return GarbageCollectionHandle2T[InKey];
 	}
 
-	const T& operator[](const FGarbageCollectionHandle& InKey) const
+	const Value& operator[](const Key& InKey) const
 	{
 		return GarbageCollectionHandle2T[InKey];
 	}
@@ -22,12 +27,12 @@ public:
 		GarbageCollectionHandle2T.Empty();
 	}
 
-	T& Emplace(FGarbageCollectionHandle&& InKey, T&& InValue)
+	Value& Emplace(Key&& InKey, T&& InValue)
 	{
-		return GarbageCollectionHandle2T.Emplace(Forward<FGarbageCollectionHandle>(InKey), Forward<T>(InValue));
+		return GarbageCollectionHandle2T.Emplace(Forward<Key>(InKey), Forward<T>(InValue));
 	}
 
-	int32 Remove(const FGarbageCollectionHandle& InKey)
+	int32 Remove(const Key& InKey)
 	{
 		return GarbageCollectionHandle2T.Remove(InKey);
 	}
@@ -45,7 +50,7 @@ public:
 		return 0;
 	}
 
-	T* Find(const MonoObject* InMonoObject)
+	Value* Find(const MonoObject* InMonoObject)
 	{
 		for (auto& Pair : GarbageCollectionHandle2T)
 		{
@@ -58,22 +63,22 @@ public:
 		return nullptr;
 	}
 
-	T* Find(const FGarbageCollectionHandle& InKey)
+	Value* Find(const Key& InKey)
 	{
 		return GarbageCollectionHandle2T.Find(InKey);
 	}
 
-	bool Contains(const FGarbageCollectionHandle& InKey) const
+	bool Contains(const Key& InKey) const
 	{
 		return GarbageCollectionHandle2T.Contains(InKey);
 	}
 
 public:
-	TMap<FGarbageCollectionHandle, T>& Get()
+	TMap<Key, Value>& Get()
 	{
 		return GarbageCollectionHandle2T;
 	}
 
 private:
-	TMap<FGarbageCollectionHandle, T> GarbageCollectionHandle2T;
+	TMap<Key, Value> GarbageCollectionHandle2T;
 };
