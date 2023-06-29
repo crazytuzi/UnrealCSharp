@@ -4,8 +4,6 @@
 #include "Binding/TypeInfo/FTypeInfo.h"
 #include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
-#include "Variable/Constexpr.h"
 #include "Template/TGetArrayLength.inl"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
@@ -37,7 +35,7 @@ struct TPrimitivePropertyBuilder :
 		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
 			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				(FCSharpEnvironment::GetEnvironment().GetDomain()->*TPropertyGetClass<Result>::GetClass)(),
+				TPropertyGetClass<Result, Result>::GetClass(),
 				&(FoundObject->*Member));
 		}
 	}
@@ -52,7 +50,7 @@ struct TPrimitivePropertyBuilder :
 	}
 };
 
-template <typename Class, typename Result, Result Class::* Member, const char* ClassName>
+template <typename Class, typename Result, Result Class::* Member>
 struct TMultiPropertyBuilder :
 	TTypePropertyBuilder<Class, Result, Member>
 {
@@ -65,18 +63,9 @@ struct TMultiPropertyBuilder :
 
 			if (SrcMonoObject == nullptr)
 			{
-				const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), ClassName);
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
 
-				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-					FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-						TTemplateTypeTraits<Result>::Type::StaticClass()),
-					FUnrealCSharpFunctionLibrary::GetFullClass(
-						TTemplateTypeTraits<Result>::Type::StaticClass()));
-
-				const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 				FCSharpEnvironment::GetEnvironment().AddMultiReference<Result>(
 					SrcMonoObject, &(FoundObject->*Member), false);
@@ -189,8 +178,7 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME);
+			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
 
 			auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 				TCHAR_TO_UTF8(*(FoundObject->*Member).ToString())));
@@ -218,8 +206,7 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
 
 			auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 				TCHAR_TO_UTF8(*(FoundObject->*Member))));
@@ -242,37 +229,8 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTScriptInterface<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member, CLASS_T_SCRIPT_INTERFACE>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
-	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
-	{
-		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
-		{
-			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(
-				&(FoundObject->*Member));
-
-			if (SrcMonoObject == nullptr)
-			{
-				const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SCRIPT_INTERFACE);
-
-				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-					FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-						TTemplateTypeTraits<Result>::Type::UClassType::StaticClass()),
-					FUnrealCSharpFunctionLibrary::GetFullInterface(
-						TTemplateTypeTraits<Result>::Type::UClassType::StaticClass()));
-
-				const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
-
-				FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
-					SrcMonoObject, &(FoundObject->*Member), false);
-			}
-
-			*OutValue = SrcMonoObject;
-		}
-	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
@@ -287,9 +245,7 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsUStruct<R
 
 			if (SrcMonoObject == nullptr)
 			{
-				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-					FUnrealCSharpFunctionLibrary::GetClassNameSpace(Result::StaticStruct()),
-					FUnrealCSharpFunctionLibrary::GetFullClass(Result::StaticStruct()));
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
 
 				auto InParams = static_cast<void*>(FoundMonoClass);
 
@@ -325,8 +281,7 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT);
+			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
 
 			auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 				TCHAR_TO_UTF8(*(FoundObject->*Member).ToString())));
@@ -349,50 +304,21 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTWeakObjectPtr<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member, CLASS_T_WEAK_OBJECT_PTR>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
-	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
-	{
-		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
-		{
-			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TWeakObjectPtr<UObject>>(
-				&(FoundObject->*Member));
-
-			if (SrcMonoObject == nullptr)
-			{
-				const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_WEAK_OBJECT_PTR);
-
-				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-					FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-						TTemplateTypeTraits<Result>::Type < 0 > ::StaticClass()),
-					FUnrealCSharpFunctionLibrary::GetFullClass(
-						TTemplateTypeTraits<Result>::Type < 0 > ::StaticClass()));
-
-				const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
-
-				FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(
-					SrcMonoObject, &(FoundObject->*Member), false);
-			}
-
-			*OutValue = SrcMonoObject;
-		}
-	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTLazyObjectPtr<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member, CLASS_T_LAZY_OBJECT_PTR>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSoftObjectPtr<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member, CLASS_T_SOFT_OBJECT_PTR>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -400,6 +326,20 @@ template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, double>::Value>::Type> :
 	TPrimitivePropertyBuilder<Class, Result, Member>
 {
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member,
+                        typename TEnableIf<TIsTSubclassOf<Result>::Value>::Type> :
+	TMultiPropertyBuilder<Class, Result, Member>
+{
+	static void Set(const MonoObject* InMonoObject, const MonoObject* InValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			FoundObject->*Member = FCSharpEnvironment::GetEnvironment().GetMulti<Result>(InValue)->Get();
+		}
+	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
@@ -416,16 +356,9 @@ struct TPropertyBuilder<Result Class::*, Member,
 
 			if (SrcMonoObject == nullptr)
 			{
-				const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SUB_CLASS_OF);
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
 
-				const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-					FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
-					FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass()));
-
-				const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 				FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
 					SrcMonoObject, &(FoundObject->*Member), false);
@@ -446,21 +379,7 @@ struct TPropertyBuilder<Result Class::*, Member,
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTSubclassOf<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member, CLASS_T_SUB_CLASS_OF>
-{
-	static void Set(const MonoObject* InMonoObject, const MonoObject* InValue)
-	{
-		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
-		{
-			FoundObject->*Member = FCSharpEnvironment::GetEnvironment().GetMulti<Result>(InValue)->Get();
-		}
-	}
-};
-
-template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSoftClassPtr<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member, CLASS_T_SOFT_CLASS_PTR>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
