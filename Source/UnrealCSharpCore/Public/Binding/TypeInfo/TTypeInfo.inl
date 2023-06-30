@@ -4,6 +4,7 @@
 #include "Binding/TypeInfo/TNameSpace.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/ClassMacro.h"
+#include "Variable/Constexpr.h"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
 #include "Template/TIsTWeakObjectPtr.inl"
@@ -18,249 +19,118 @@ struct TTypeInfo
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type>
+struct TNameSpaceInner : FTypeInfo
 {
-private:
-	struct FInner final : FPrimitiveTypeInfo
+	virtual FNameSpace* GetNameSpace() const override
 	{
-		virtual FString GetClass() const override
-		{
-			return TEXT("Byte");
-		}
-	};
+		return TNameSpace<T, T>::Get();
+	}
+};
 
-public:
+template <typename T>
+struct TInstanceTypeInfo
+{
 	static FTypeInfo* Get()
 	{
-		static FInner Instance;
+		static typename T::FInner Instance;
 
 		return &Instance;
 	}
 };
 
-template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type>
+template <const char* ClassName>
+struct TPrimitiveTypeInfo :
+	TInstanceTypeInfo<TPrimitiveTypeInfo<ClassName>>
 {
-private:
 	struct FInner final : FPrimitiveTypeInfo
 	{
 		virtual FString GetClass() const override
 		{
-			return TEXT("UInt16");
+			return ClassName;
 		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_UINT8>
 {
-private:
-	struct FInner final : FPrimitiveTypeInfo
-	{
-		virtual FString GetClass() const override
-		{
-			return TEXT("UInt32");
-		}
-	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_UINT16>
 {
-private:
-	struct FInner final : FPrimitiveTypeInfo
-	{
-		virtual FString GetClass() const override
-		{
-			return TEXT("UInt64");
-		}
-	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_UINT32>
 {
-private:
-	struct FInner final : FPrimitiveTypeInfo
-	{
-		virtual FString GetClass() const override
-		{
-			return TEXT("SByte");
-		}
-	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_UINT64>
 {
-private:
-	struct FInner final : FPrimitiveTypeInfo
-	{
-		virtual FString GetClass() const override
-		{
-			return TEXT("Int16");
-		}
-	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_INT8>
 {
-private:
-	struct FInner final : FPrimitiveTypeInfo
-	{
-		virtual FString GetClass() const override
-		{
-			return TEXT("Int32");
-		}
-	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_INT16>
 {
-private:
-	struct FInner final : FPrimitiveTypeInfo
-	{
-		virtual FString GetClass() const override
-		{
-			return TEXT("Int64");
-		}
-	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_INT32>
 {
-private:
-	struct FInner final : FPrimitiveTypeInfo
-	{
-		virtual FString GetClass() const override
-		{
-			return TEXT("Boolean");
-		}
-	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_INT64>
 {
-private:
-	class FInner final : public FPrimitiveTypeInfo
-	{
-	public:
-		virtual FString GetClass() const override
-		{
-			return TEXT("Single");
-		}
-	};
+};
 
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_BOOL>
+{
+};
 
-		return &Instance;
-	}
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_FLOAT>
+{
 };
 
 template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TAnd<
 	                                       TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
 	                                       TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
-                 ::Type>
+                 ::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
-	struct FInner final : FTypeInfo
+	struct FInner final : TNameSpaceInner<T>
 	{
 		virtual FString GetClass() const override
 		{
 			return FUnrealCSharpFunctionLibrary::GetFullClass(TRemovePointer<T>::Type::StaticClass());
 		}
-
-		virtual FNameSpace* GetNameSpace() const override
-		{
-			return TNameSpace<T, T>::Get();
-		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
 	struct FInner final : FCommonTypeInfo
 	{
 		virtual FString GetClass() const override
@@ -268,21 +138,13 @@ private:
 			return CLASS_F_NAME;
 		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
-	struct FInner final : FTypeInfo
+	struct FInner final : TNameSpaceInner<T>
 	{
 		virtual FString GetClass() const override
 		{
@@ -293,52 +155,26 @@ private:
 				                       TTemplateTypeTraits<T>::Type::UClassType::StaticClass())
 			);
 		}
-
-		virtual FNameSpace* GetNameSpace() const override
-		{
-			return TNameSpace<T, T>::Get();
-		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
-	struct FInner final : FTypeInfo
+	struct FInner final : TNameSpaceInner<T>
 	{
 		virtual FString GetClass() const override
 		{
 			return *FUnrealCSharpFunctionLibrary::GetFullClass(T::StaticStruct());
 		}
-
-		virtual FNameSpace* GetNameSpace() const override
-		{
-			return TNameSpace<T, T>::Get();
-		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
 	struct FInner final : FCommonTypeInfo
 	{
 		virtual FString GetClass() const override
@@ -346,20 +182,12 @@ private:
 			return CLASS_F_STRING;
 		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
 	struct FInner final : FCommonTypeInfo
 	{
 		virtual FString GetClass() const override
@@ -367,21 +195,13 @@ private:
 			return CLASS_F_TEXT;
 		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
-	struct FInner final : FTypeInfo
+	struct FInner final : TNameSpaceInner<T>
 	{
 		virtual FString GetClass() const override
 		{
@@ -392,27 +212,14 @@ private:
 				                       TTemplateTypeTraits<T>::Type < 0 > ::StaticClass())
 			);
 		}
-
-		virtual FNameSpace* GetNameSpace() const override
-		{
-			return TNameSpace<T, T>::Get();
-		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
-	struct FInner final : FTypeInfo
+	struct FInner final : TNameSpaceInner<T>
 	{
 		virtual FString GetClass() const override
 		{
@@ -423,27 +230,14 @@ private:
 				                       TTemplateTypeTraits<T>::Type::StaticClass())
 			);
 		}
-
-		virtual FNameSpace* GetNameSpace() const override
-		{
-			return TNameSpace<T, T>::Get();
-		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
-	struct FInner final : FTypeInfo
+	struct FInner final : TNameSpaceInner<T>
 	{
 		virtual FString GetClass() const override
 		{
@@ -454,49 +248,20 @@ private:
 				                       TTemplateTypeTraits<T>::Type::StaticClass())
 			);
 		}
-
-		virtual FNameSpace* GetNameSpace() const override
-		{
-			return TNameSpace<T, T>::Get();
-		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type> final :
+	TPrimitiveTypeInfo<CLASS_DOUBLE>
 {
-private:
-	class FInner final : public FPrimitiveTypeInfo
-	{
-	public:
-		virtual FString GetClass() const override
-		{
-			return TEXT("Double");
-		}
-	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
-	struct FInner final : FTypeInfo
+	struct FInner final : TNameSpaceInner<T>
 	{
 		virtual FString GetClass() const override
 		{
@@ -507,33 +272,20 @@ private:
 				                       TTemplateTypeTraits<T>::Type::StaticClass())
 			);
 		}
-
-		virtual FNameSpace* GetNameSpace() const override
-		{
-			return TNameSpace<T, T>::Get();
-		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type> :
+struct TTypeInfo<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type> final :
 	TTypeInfo<TSubclassOf<UObject>, TSubclassOf<UObject>>
 {
 };
 
 template <typename T>
-struct TTypeInfo<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type>
+struct TTypeInfo<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
-private:
-	struct FInner final : FTypeInfo
+	struct FInner final : TNameSpaceInner<T>
 	{
 		virtual FString GetClass() const override
 		{
@@ -544,18 +296,25 @@ private:
 				                       TTemplateTypeTraits<T>::Type::StaticClass())
 			);
 		}
+	};
+};
 
-		virtual FNameSpace* GetNameSpace() const override
+template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
+{
+	struct FInner final : TNameSpaceInner<T>
+	{
+		virtual FString GetClass() const override
 		{
-			return TNameSpace<T, T>::Get();
+			return FString::Printf(TEXT(
+				"TArray<%s>"
+			),
+			                       *TTypeInfo<
+				                       typename TTemplateTypeTraits<T>::template Type<0>,
+				                       typename TTemplateTypeTraits<T>::template Type<0>>
+			                       ::Get()->GetClass()
+			);
 		}
 	};
-
-public:
-	static FTypeInfo* Get()
-	{
-		static FInner Instance;
-
-		return &Instance;
-	}
 };

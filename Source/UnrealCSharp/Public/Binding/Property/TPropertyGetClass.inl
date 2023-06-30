@@ -4,6 +4,7 @@
 #include "Domain/FMonoDomain.h"
 #include "Variable/Constexpr.h"
 #include "Bridge/FTypeBridge.h"
+#include "CoreMacro/MonoMacro.h"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
 #include "Template/TIsTLazyObjectPtr.inl"
@@ -125,6 +126,22 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Typ
 };
 
 template <typename T>
+struct TPropertyGetClass<T, typename TEnableIf<TAnd<
+	                                               TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
+	                                               TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
+                         ::Type>
+{
+	static MonoClass* GetClass()
+	{
+		return FMonoDomain::Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+				TRemovePointer<T>::Type::StaticClass()),
+			FUnrealCSharpFunctionLibrary::GetFullClass(
+				TRemovePointer<T>::Type::StaticClass()));
+	}
+};
+
+template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
 {
 	static MonoClass* GetClass()
@@ -237,5 +254,31 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Ty
 	static MonoClass* GetClass()
 	{
 		return FMonoDomain::Get_Double_Class();
+	}
+};
+
+template <typename T>
+struct TPropertyGetClass<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type>
+{
+	static MonoClass* GetClass()
+	{
+		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_ARRAY);
+
+		const auto FoundMonoClass = TPropertyGetClass<
+				typename TTemplateTypeTraits<T>::template Type<0>,
+				typename TTemplateTypeTraits<T>::template Type<0>>
+			::GetClass();
+
+		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);
+
+		const auto FoundReflectionType = FMonoDomain::Type_Get_Object(FoundMonoType);
+
+		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
+			FMonoDomain::Get_Object_Class(), 1);
+
+		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+
+		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass, ReflectionTypeMonoArray);
 	}
 };

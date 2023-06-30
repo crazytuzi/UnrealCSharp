@@ -4,6 +4,7 @@
 #include "Binding/TypeInfo/FTypeInfo.h"
 #include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reflection/Container/FArrayHelper.h"
 #include "Template/TGetArrayLength.inl"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
@@ -382,4 +383,69 @@ struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSoftClassPtr<Result>::Value>::Type> :
 	TMultiPropertyBuilder<Class, Result, Member>
 {
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member,
+                        typename TEnableIf<TIsTArray<Result>::Value>::Type> :
+	TTypePropertyBuilder<Class, Result, Member>
+{
+	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(&(FoundObject->*Member));
+
+			if (SrcMonoObject == nullptr)
+			{
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
+
+				const auto FoundPropertyMonoClass = TPropertyGetClass<
+						typename TTemplateTypeTraits<Result>::template Type<0>,
+						typename TTemplateTypeTraits<Result>::template Type<0>>
+					::GetClass();
+
+				const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+					FoundPropertyMonoClass);
+
+				const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+					Type_Get_Object(FoundPropertyMonoType);
+
+				auto InParams = static_cast<void*>(FoundPropertyMonoClass);
+
+				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+					FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+				const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+				                                           EObjectFlags::RF_Transient);
+
+				Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+				const auto ArrayHelper = new FArrayHelper(Property, &(FoundObject->*Member));
+
+				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
+					GetGarbageCollectionHandle(
+						FoundObject, 0);
+
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(
+					OwnerGarbageCollectionHandle, &(FoundObject->*Member),
+					ArrayHelper, SrcMonoObject);
+			}
+
+			*OutValue = SrcMonoObject;
+		}
+	}
+
+	static void Set(const MonoObject* InMonoObject, const MonoObject* InValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InValue);
+
+			FoundObject->*Member = Result(
+				static_cast<typename TTemplateTypeTraits<Result>::template Type<0>*>
+				(SrcContainer->GetScriptArray()->GetData()),
+				SrcContainer->Num());
+		}
+	}
 };
