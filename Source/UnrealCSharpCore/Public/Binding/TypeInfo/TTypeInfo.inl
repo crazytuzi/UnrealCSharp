@@ -51,6 +51,27 @@ struct TPrimitiveTypeInfo :
 	};
 };
 
+template <typename T, const char* ClassName>
+struct TMultiTypeInfo :
+	TInstanceTypeInfo<TMultiTypeInfo<T, ClassName>>
+{
+	struct FInner final : TNameSpaceInner<T>
+	{
+		virtual FString GetClass() const override
+		{
+			return FString::Printf(TEXT(
+				"%s<%s>"
+			),
+			                       ClassName,
+			                       *TTypeInfo<
+				                       typename TTemplateTypeTraits<T>::Type,
+				                       typename TTemplateTypeTraits<T>::Type>
+			                       ::Get()->GetClass()
+			);
+		}
+	};
+};
+
 template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> final :
 	TPrimitiveTypeInfo<CLASS_UINT8>
@@ -114,7 +135,10 @@ struct TTypeInfo<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type> final
 template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TAnd<
 	                                       TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
-	                                       TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
+	                                       TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>,
+	                                       TNot<TIsDerivedFrom<typename TRemovePointer<T>::Type, UInterface>>
+                                       >::Value,
+                                       T>
                  ::Type> final :
 	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
@@ -141,6 +165,19 @@ struct TTypeInfo<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type> final
 };
 
 template <typename T>
+struct TTypeInfo<T, typename TEnableIf<TIsDerivedFrom<T, UInterface>::Value, T>::Type> final :
+	TInstanceTypeInfo<TTypeInfo<T, T>>
+{
+	struct FInner final : FCommonTypeInfo
+	{
+		virtual FString GetClass() const override
+		{
+			return FUnrealCSharpFunctionLibrary::GetFullInterface(T::StaticClass());
+		}
+	};
+};
+
+template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type> final :
 	TInstanceTypeInfo<TTypeInfo<T, T>>
 {
@@ -149,10 +186,13 @@ struct TTypeInfo<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type> 
 		virtual FString GetClass() const override
 		{
 			return FString::Printf(TEXT(
-				"TScriptInterface<%s>"
+				"%s<%s>"
 			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullInterface(
-				                       TTemplateTypeTraits<T>::Type::UClassType::StaticClass())
+			                       CLASS_T_SCRIPT_INTERFACE,
+			                       *TTypeInfo<
+				                       typename TTemplateTypeTraits<T>::Type::UClassType,
+				                       typename TTemplateTypeTraits<T>::Type::UClassType>
+			                       ::Get()->GetClass()
 			);
 		}
 	};
@@ -206,10 +246,13 @@ struct TTypeInfo<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type> fi
 		virtual FString GetClass() const override
 		{
 			return FString::Printf(TEXT(
-				"TWeakObjectPtr<%s>"
+				"%s<%s>"
 			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullClass(
-				                       TTemplateTypeTraits<T>::Type < 0 > ::StaticClass())
+			                       CLASS_T_WEAK_OBJECT_PTR,
+			                       *TTypeInfo<
+				                       typename TTemplateTypeTraits<T>::template Type<0>,
+				                       typename TTemplateTypeTraits<T>::template Type<0>>
+			                       ::Get()->GetClass()
 			);
 		}
 	};
@@ -217,38 +260,14 @@ struct TTypeInfo<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type> fi
 
 template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type> final :
-	TInstanceTypeInfo<TTypeInfo<T, T>>
+	TMultiTypeInfo<T, CLASS_T_LAZY_OBJECT_PTR>
 {
-	struct FInner final : TNameSpaceInner<T>
-	{
-		virtual FString GetClass() const override
-		{
-			return FString::Printf(TEXT(
-				"TLazyObjectPtr<%s>"
-			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullClass(
-				                       TTemplateTypeTraits<T>::Type::StaticClass())
-			);
-		}
-	};
 };
 
 template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> final :
-	TInstanceTypeInfo<TTypeInfo<T, T>>
+	TMultiTypeInfo<T, CLASS_T_SOFT_OBJECT_PTR>
 {
-	struct FInner final : TNameSpaceInner<T>
-	{
-		virtual FString GetClass() const override
-		{
-			return FString::Printf(TEXT(
-				"TSoftObjectPtr<%s>"
-			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullClass(
-				                       TTemplateTypeTraits<T>::Type::StaticClass())
-			);
-		}
-	};
 };
 
 template <typename T>
@@ -259,20 +278,8 @@ struct TTypeInfo<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type> fina
 
 template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
-	TInstanceTypeInfo<TTypeInfo<T, T>>
+	TMultiTypeInfo<T, CLASS_T_SUB_CLASS_OF>
 {
-	struct FInner final : TNameSpaceInner<T>
-	{
-		virtual FString GetClass() const override
-		{
-			return FString::Printf(TEXT(
-				"TSubclassOf<%s>"
-			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullClass(
-				                       TTemplateTypeTraits<T>::Type::StaticClass())
-			);
-		}
-	};
 };
 
 template <typename T>
@@ -283,20 +290,8 @@ struct TTypeInfo<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type,
 
 template <typename T>
 struct TTypeInfo<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
-	TInstanceTypeInfo<TTypeInfo<T, T>>
+	TMultiTypeInfo<T, CLASS_T_SOFT_CLASS_PTR>
 {
-	struct FInner final : TNameSpaceInner<T>
-	{
-		virtual FString GetClass() const override
-		{
-			return FString::Printf(TEXT(
-				"TSoftClassPtr<%s>"
-			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullClass(
-				                       TTemplateTypeTraits<T>::Type::StaticClass())
-			);
-		}
-	};
 };
 
 template <typename T>
