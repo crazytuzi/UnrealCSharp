@@ -210,6 +210,27 @@ struct TName<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type>
 };
 
 template <typename T>
+struct TName<T, typename TEnableIf<TIsTMap<T>::Value, T>::Type>
+{
+	static FString Get()
+	{
+		return FString::Printf(TEXT(
+			"%s<%s, %s>"
+		),
+		                       *TGeneric<T, T>::GetTemplateName(),
+		                       *TName<
+			                       typename TTemplateTypeTraits<T>::template Type<0>,
+			                       typename TTemplateTypeTraits<T>::template Type<0>>
+		                       ::Get(),
+		                       *TName<
+			                       typename TTemplateTypeTraits<T>::template Type<1>,
+			                       typename TTemplateTypeTraits<T>::template Type<1>>
+		                       ::Get()
+		);
+	}
+};
+
+template <typename T>
 struct TName<T, typename TEnableIf<TIsTSet<T>::Value, T>::Type> :
 	TGenericName<T, typename TTemplateTypeTraits<T>::template Type<0>>
 {

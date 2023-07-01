@@ -187,7 +187,7 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		FDelegateGenerator::Generator(MapProperty->ValueProp);
 
 		return FString::Printf(TEXT(
-			"TMap<%s,%s>"
+			"TMap<%s, %s>"
 		),
 		                       *GetPropertyType(MapProperty->KeyProp),
 		                       *GetPropertyType(MapProperty->ValueProp)

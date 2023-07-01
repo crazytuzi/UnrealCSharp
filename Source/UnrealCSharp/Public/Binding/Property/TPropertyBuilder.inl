@@ -6,6 +6,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FArrayHelper.h"
 #include "Reflection/Container/FSetHelper.h"
+#include "Reflection/Container/FMapHelper.h"
 #include "Template/TGetArrayLength.inl"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
@@ -328,6 +329,99 @@ template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, double>::Value>::Type> :
 	TPrimitivePropertyBuilder<Class, Result, Member>
 {
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member,
+                        typename TEnableIf<TIsTMap<Result>::Value>::Type> :
+	TTypePropertyBuilder<Class, Result, Member>
+{
+	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(&(FoundObject->*Member));
+
+			if (SrcMonoObject == nullptr)
+			{
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::Get();
+
+				const auto FoundKeyPropertyMonoClass = TPropertyGetClass<
+						typename TTemplateTypeTraits<Result>::template Type<0>,
+						typename TTemplateTypeTraits<Result>::template Type<0>>
+					::Get();
+
+				const auto FoundKeyPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+					FoundKeyPropertyMonoClass);
+
+				const auto FoundKeyPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+					Type_Get_Object(FoundKeyPropertyMonoType);
+
+				const auto FoundValuePropertyMonoClass = TPropertyGetClass<
+						typename TTemplateTypeTraits<Result>::template Type<1>,
+						typename TTemplateTypeTraits<Result>::template Type<1>>
+					::Get();
+
+				const auto FoundValuePropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+					Class_Get_Type(
+						FoundValuePropertyMonoClass);
+
+				const auto FoundValuePropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+					Type_Get_Object(FoundValuePropertyMonoType);
+
+				void* InParams[2] = {FoundKeyPropertyReflectionType, FoundValuePropertyReflectionType};
+
+				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+					FoundMonoClass, TGetArrayLength(InParams), InParams);
+
+				const auto KeyProperty = FTypeBridge::Factory(FoundKeyPropertyReflectionType, nullptr, "",
+				                                              EObjectFlags::RF_Transient);
+
+				KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+				const auto ValueProperty = FTypeBridge::Factory(FoundValuePropertyReflectionType, nullptr, "",
+				                                                EObjectFlags::RF_Transient);
+
+				ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+				const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty, &(FoundObject->*Member));
+
+				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
+					GetGarbageCollectionHandle(
+						FoundObject, 0);
+
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(
+					OwnerGarbageCollectionHandle, &(FoundObject->*Member),
+					MapHelper, SrcMonoObject);
+			}
+
+			*OutValue = SrcMonoObject;
+		}
+	}
+
+	static void Set(const MonoObject* InMonoObject, const MonoObject* InValue)
+	{
+		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		{
+			(FoundObject->*Member).Reset();
+
+			const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InValue);
+
+			for (auto Index = 0; Index < SrcContainer->GetMaxIndex(); ++Index)
+			{
+				if (SrcContainer->IsValidIndex(Index))
+				{
+					(FoundObject->*Member)
+						[
+							*static_cast<typename TTemplateTypeTraits<Result>::template Type<0>*>
+							(SrcContainer->GetEnumeratorKey(Index))
+						]
+						= *static_cast<typename TTemplateTypeTraits<Result>::template Type<1>*>
+						(SrcContainer->GetEnumeratorValue(Index));
+				}
+			}
+		}
+	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>

@@ -82,6 +82,21 @@ struct TGeneric<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> :
 };
 
 template <typename T>
+struct TGeneric<T, typename TEnableIf<TIsTMap<T>::Value, T>::Type> :
+	FGenericNameSpace
+{
+	static FString GetTemplateName()
+	{
+		return TEMPLATE_T_MAP;
+	}
+
+	static FString GetGenericName()
+	{
+		return GENERIC_T_MAP;
+	}
+};
+
+template <typename T>
 struct TGeneric<T, typename TEnableIf<TIsTSet<T>::Value, T>::Type> :
 	FGenericNameSpace
 {
