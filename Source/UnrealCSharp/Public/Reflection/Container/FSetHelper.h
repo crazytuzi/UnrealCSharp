@@ -3,7 +3,7 @@
 #include "FContainerHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-class FSetHelper final : public FContainerHelper
+class UNREALCSHARP_API FSetHelper final : public FContainerHelper
 {
 public:
 	explicit FSetHelper(FProperty* InProperty, void* InData = nullptr);

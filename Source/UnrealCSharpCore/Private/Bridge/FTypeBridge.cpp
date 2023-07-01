@@ -603,7 +603,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FSetProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SET);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SET);
 
 		const auto FoundMonoClass = GetMonoClass(InProperty->ElementProp);
 

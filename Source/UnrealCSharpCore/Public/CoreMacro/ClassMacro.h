@@ -28,7 +28,9 @@
 
 #define CLASS_T_MAP FString(TEXT("TMap`2"))
 
-#define CLASS_T_SET FString(TEXT("TSet`1"))
+#define TEMPLATE_T_SET FString(TEXT("TSet"))
+
+#define GENERIC_T_SET COMBINE_GENERIC(TEMPLATE_T_SET, FString(TEXT("1")))
 
 #define TEMPLATE_T_SUB_CLASS_OF FString(TEXT("TSubclassOf"))
 

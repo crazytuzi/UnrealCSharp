@@ -210,6 +210,12 @@ struct TName<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type>
 };
 
 template <typename T>
+struct TName<T, typename TEnableIf<TIsTSet<T>::Value, T>::Type> :
+	TGenericName<T, typename TTemplateTypeTraits<T>::template Type<0>>
+{
+};
+
+template <typename T>
 struct TName<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
 	TGenericName<T>
 {
@@ -222,13 +228,13 @@ struct TName<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UCl
 };
 
 template <typename T>
-struct TName<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
-	TGenericName<T>
+struct TName<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> :
+	TGenericName<T, typename TTemplateTypeTraits<T>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TName<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> :
-	TGenericName<T, typename TTemplateTypeTraits<T>::template Type<0>>
+struct TName<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
+	TGenericName<T>
 {
 };

@@ -82,6 +82,21 @@ struct TGeneric<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> :
 };
 
 template <typename T>
+struct TGeneric<T, typename TEnableIf<TIsTSet<T>::Value, T>::Type> :
+	FGenericNameSpace
+{
+	static FString GetTemplateName()
+	{
+		return TEMPLATE_T_SET;
+	}
+
+	static FString GetGenericName()
+	{
+		return GENERIC_T_SET;
+	}
+};
+
+template <typename T>
 struct TGeneric<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
 	FGenericNameSpace
 {
@@ -97,21 +112,6 @@ struct TGeneric<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
-	FGenericNameSpace
-{
-	static FString GetTemplateName()
-	{
-		return TEMPLATE_T_SOFT_CLASS_PTR;
-	}
-
-	static FString GetGenericName()
-	{
-		return GENERIC_T_SOFT_CLASS_PTR;
-	}
-};
-
-template <typename T>
 struct TGeneric<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> :
 	FGenericNameSpace
 {
@@ -123,5 +123,20 @@ struct TGeneric<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> :
 	static FString GetGenericName()
 	{
 		return GENERIC_T_ARRAY;
+	}
+};
+
+template <typename T>
+struct TGeneric<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
+	FGenericNameSpace
+{
+	static FString GetTemplateName()
+	{
+		return TEMPLATE_T_SOFT_CLASS_PTR;
+	}
+
+	static FString GetGenericName()
+	{
+		return GENERIC_T_SOFT_CLASS_PTR;
 	}
 };
