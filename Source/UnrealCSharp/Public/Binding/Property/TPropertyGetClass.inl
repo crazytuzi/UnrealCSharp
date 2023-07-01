@@ -1,10 +1,9 @@
 ﻿#pragma once
 
-#include "CoreMacro/ClassMacro.h"
 #include "Domain/FMonoDomain.h"
-#include "Variable/Constexpr.h"
 #include "Bridge/FTypeBridge.h"
 #include "CoreMacro/MonoMacro.h"
+#include "Binding/TypeInfo/TGeneric.inl"
 #include "Template/TTemplateTypeTraits.inl"
 #include "Template/TIsTScriptInterface.inl"
 #include "Template/TIsTLazyObjectPtr.inl"
@@ -17,19 +16,15 @@ struct TPropertyGetClass
 {
 };
 
-template <typename T, const char* ClassName>
+template <typename T, typename Type = typename TTemplateTypeTraits<T>::Type>
 struct TMultiPropertyGetClass
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), ClassName);
+			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-				TTemplateTypeTraits<T>::Type::StaticClass()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(
-				TTemplateTypeTraits<T>::Type::StaticClass()));
+		const auto FoundMonoClass = TPropertyGetClass<Type, Type>::Get();
 
 		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
@@ -38,7 +33,7 @@ struct TMultiPropertyGetClass
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_Byte_Class();
 	}
@@ -47,7 +42,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Typ
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_UInt16_Class();
 	}
@@ -56,7 +51,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Ty
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_UInt32_Class();
 	}
@@ -65,7 +60,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Ty
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_UInt64_Class();
 	}
@@ -74,7 +69,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Ty
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_SByte_Class();
 	}
@@ -83,7 +78,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_Int16_Class();
 	}
@@ -92,7 +87,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Typ
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_Int32_Class();
 	}
@@ -101,7 +96,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Typ
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_Int64_Class();
 	}
@@ -110,7 +105,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Typ
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_Boolean_Class();
 	}
@@ -119,7 +114,7 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_Single_Class();
 	}
@@ -131,108 +126,84 @@ struct TPropertyGetClass<T, typename TEnableIf<TAnd<
 	                                               TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
                          ::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
-		return FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-				TRemovePointer<T>::Type::StaticClass()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(
-				TRemovePointer<T>::Type::StaticClass()));
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
 };
 
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
-		return FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME);
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
 };
 
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
-		return FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
 };
 
 template <typename T>
-struct TPropertyGetClass<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type>
+struct TPropertyGetClass<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type> :
+	TMultiPropertyGetClass<T>
 {
-	static MonoClass* GetClass()
-	{
-		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_SCRIPT_INTERFACE);
-
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-				TTemplateTypeTraits<T>::Type::UClassType::StaticClass()),
-			FUnrealCSharpFunctionLibrary::GetFullInterface(
-				TTemplateTypeTraits<T>::Type::UClassType::StaticClass()));
-
-		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
-	}
 };
 
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
-		return FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(T::StaticStruct()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(T::StaticStruct()));
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
 };
 
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
-		return FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT);
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
 };
 
 template <typename T>
-struct TPropertyGetClass<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type>
+struct TPropertyGetClass<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type> :
+	TMultiPropertyGetClass<T, typename TTemplateTypeTraits<T>::template Type<0>>
 {
-	static MonoClass* GetClass()
-	{
-		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_WEAK_OBJECT_PTR);
-
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-				TTemplateTypeTraits<T>::Type < 0 > ::StaticClass()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(
-				TTemplateTypeTraits<T>::Type < 0 > ::StaticClass()));
-
-		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
-	}
 };
 
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type> :
-	TMultiPropertyGetClass<T, CLASS_T_LAZY_OBJECT_PTR>
+	TMultiPropertyGetClass<T>
 {
 };
 
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> :
-	TMultiPropertyGetClass<T, CLASS_T_SOFT_OBJECT_PTR>
+	TMultiPropertyGetClass<T>
 {
 };
 
 template <typename T>
+struct TPropertyGetClass<T, typename TEnableIf<TIsIInterface<T>::Value, T>::Type>
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+
+template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
-	TMultiPropertyGetClass<T, CLASS_T_SUB_CLASS_OF>
+	TMultiPropertyGetClass<T>
 {
 };
 
@@ -244,14 +215,14 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<typename TRemovePointer<T
 
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
-	TMultiPropertyGetClass<T, CLASS_T_SOFT_CLASS_PTR>
+	TMultiPropertyGetClass<T>
 {
 };
 
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		return FMonoDomain::Get_Double_Class();
 	}
@@ -260,15 +231,15 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Ty
 template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type>
 {
-	static MonoClass* GetClass()
+	static MonoClass* Get()
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_T_ARRAY);
+			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
 		const auto FoundMonoClass = TPropertyGetClass<
 				typename TTemplateTypeTraits<T>::template Type<0>,
 				typename TTemplateTypeTraits<T>::template Type<0>>
-			::GetClass();
+			::Get();
 
 		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);
 

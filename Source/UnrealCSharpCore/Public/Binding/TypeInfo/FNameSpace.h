@@ -2,29 +2,18 @@
 
 #include "CoreMacro/NamespaceMacro.h"
 
-struct FNameSpace
+struct FPrimitiveNameSpace
 {
-	virtual ~FNameSpace() = default;
-
-	virtual TArray<FString> Get() const = 0;
-};
-
-struct FPrimitiveNameSpace final : FNameSpace
-{
-	virtual TArray<FString> Get() const override
+	static TArray<FString> Get()
 	{
 		return {TEXT("System")};
 	}
-
-	static UNREALCSHARPCORE_API FPrimitiveNameSpace Instance;
 };
 
-struct FCommonNameSpace final : FNameSpace
+struct FCommonNameSpace
 {
-	virtual TArray<FString> Get() const override
+	static TArray<FString> Get()
 	{
 		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON)};
 	}
-
-	static UNREALCSHARPCORE_API FCommonNameSpace Instance;
 };

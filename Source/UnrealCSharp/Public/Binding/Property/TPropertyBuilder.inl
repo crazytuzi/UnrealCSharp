@@ -23,7 +23,7 @@ struct TTypePropertyBuilder
 {
 	static FTypeInfo* TypeInfo()
 	{
-		return TTypeInfo<Result, Result>::Get();
+		return TTypeInfo<Result>::Get();
 	}
 };
 
@@ -36,7 +36,7 @@ struct TPrimitivePropertyBuilder :
 		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
 			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				TPropertyGetClass<Result, Result>::GetClass(),
+				TPropertyGetClass<Result, Result>::Get(),
 				&(FoundObject->*Member));
 		}
 	}
@@ -64,7 +64,7 @@ struct TMultiPropertyBuilder :
 
 			if (SrcMonoObject == nullptr)
 			{
-				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::Get();
 
 				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -179,7 +179,7 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
+			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::Get();
 
 			auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 				TCHAR_TO_UTF8(*(FoundObject->*Member).ToString())));
@@ -207,7 +207,7 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
+			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::Get();
 
 			auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 				TCHAR_TO_UTF8(*(FoundObject->*Member))));
@@ -246,7 +246,7 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsUStruct<R
 
 			if (SrcMonoObject == nullptr)
 			{
-				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::Get();
 
 				auto InParams = static_cast<void*>(FoundMonoClass);
 
@@ -282,7 +282,7 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Resu
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
+			const auto FoundMonoClass = TPropertyGetClass<Result, Result>::Get();
 
 			auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 				TCHAR_TO_UTF8(*(FoundObject->*Member).ToString())));
@@ -357,7 +357,7 @@ struct TPropertyBuilder<Result Class::*, Member,
 
 			if (SrcMonoObject == nullptr)
 			{
-				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::Get();
 
 				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -398,12 +398,12 @@ struct TPropertyBuilder<Result Class::*, Member,
 
 			if (SrcMonoObject == nullptr)
 			{
-				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::GetClass();
+				const auto FoundMonoClass = TPropertyGetClass<Result, Result>::Get();
 
 				const auto FoundPropertyMonoClass = TPropertyGetClass<
 						typename TTemplateTypeTraits<Result>::template Type<0>,
 						typename TTemplateTypeTraits<Result>::template Type<0>>
-					::GetClass();
+					::Get();
 
 				const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
 					FoundPropertyMonoClass);
