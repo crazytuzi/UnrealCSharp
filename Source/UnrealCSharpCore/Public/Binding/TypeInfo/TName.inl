@@ -255,6 +255,15 @@ struct TName<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> :
 };
 
 template <typename T>
+struct TName<T, typename TEnableIf<TIsEnum<T>::Value, T>::Type>
+{
+	static FString Get()
+	{
+		return FUnrealCSharpFunctionLibrary::GetFullClass(StaticEnum<T>());
+	}
+};
+
+template <typename T>
 struct TName<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
 	TGenericName<T>
 {

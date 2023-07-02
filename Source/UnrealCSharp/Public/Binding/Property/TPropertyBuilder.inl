@@ -612,6 +612,13 @@ struct TPropertyBuilder<Result Class::*, Member,
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
+                        typename TEnableIf<TIsEnum<Result>::Value>::Type> :
+	TPrimitivePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSoftClassPtr<Result>::Value>::Type> :
 	TMultiPropertyBuilder<Class, Result, Member>
 {

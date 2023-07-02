@@ -313,6 +313,15 @@ struct TPropertyGetClass<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type>
 };
 
 template <typename T>
+struct TPropertyGetClass<T, typename TEnableIf<TIsEnum<T>::Value, T>::Type>
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+
+template <typename T>
 struct TPropertyGetClass<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
 	TMultiPropertyGetClass<T>
 {

@@ -211,6 +211,15 @@ struct TNameSpace<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> final :
 };
 
 template <typename T>
+struct TNameSpace<T, typename TEnableIf<TIsEnum<T>::Value, T>::Type>
+{
+	static TArray<FString> Get()
+	{
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(StaticEnum<T>())};
+	}
+};
+
+template <typename T>
 struct TNameSpace<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> final :
 	TGenericNameSpace<T>
 {
