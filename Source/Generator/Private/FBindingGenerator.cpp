@@ -25,9 +25,9 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 	TSet<FString> UsingNameSpaces{InClass.GetImplementationNameSpace()};
 
-	auto NameSpaceContent = InClass.GetTypeInfo().TypeInfo->GetNameSpace()->Get();
+	auto NameSpaceContent = InClass.GetTypeInfo().TypeInfo->GetNameSpace();
 
-	auto FullClassContent = InClass.GetTypeInfo().TypeInfo->GetClass();
+	auto FullClassContent = InClass.GetTypeInfo().TypeInfo->GetName();
 
 	auto ClassContent = BINDING_REMOVE_PREFIX_CLASS(FullClassContent);
 
@@ -35,11 +35,11 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 	for (const auto& Property : InClass.GetProperties())
 	{
-		UsingNameSpaces.Append(Property.TypeInfo->GetNameSpace()->Get());
+		UsingNameSpaces.Append(Property.TypeInfo->GetNameSpace());
 
 		auto PropertyName = Property.Name;
 
-		auto PropertyType = Property.TypeInfo->GetClass();
+		auto PropertyType = Property.TypeInfo->GetName();
 
 		FString PropertyGetContent;
 
@@ -140,7 +140,7 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 {
 	FString UsingNameSpaceContent;
 
-	auto NameSpaceContent = InClass.GetTypeInfo().TypeInfo->GetNameSpace()->Get();
+	auto NameSpaceContent = InClass.GetTypeInfo().TypeInfo->GetNameSpace();
 
 	auto ImplementationNameSpaceContent = InClass.GetImplementationNameSpace();
 
@@ -148,7 +148,7 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 
 	UsingNameSpaces.Append(NameSpaceContent);
 
-	auto FullClassContent = InClass.GetTypeInfo().TypeInfo->GetClass();
+	auto FullClassContent = InClass.GetTypeInfo().TypeInfo->GetName();
 
 	auto ClassContent = BINDING_REMOVE_PREFIX_CLASS(FullClassContent);
 
@@ -160,7 +160,7 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 	{
 		auto PropertyName = Property.Name;
 
-		auto PropertyType = Property.TypeInfo->GetClass();
+		auto PropertyType = Property.TypeInfo->GetName();
 
 		FString GetFunctionContent;
 
