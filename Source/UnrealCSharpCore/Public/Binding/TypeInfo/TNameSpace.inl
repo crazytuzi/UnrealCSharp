@@ -168,6 +168,31 @@ struct TNameSpace<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type> fin
 };
 
 template <typename T>
+struct TNameSpace<T, typename TEnableIf<TIsTMap<T>::Value, T>::Type>
+{
+	static TArray<FString> Get()
+	{
+		return TArrayBuilder<FString>()
+		       .Append(TNameSpace<
+				       typename TTemplateTypeTraits<T>::template Type<0>,
+				       typename TTemplateTypeTraits<T>::template Type<0>>
+			       ::Get())
+		       .Append(TNameSpace<
+				       typename TTemplateTypeTraits<T>::template Type<1>,
+				       typename TTemplateTypeTraits<T>::template Type<1>>
+			       ::Get())
+		       .Add(TGeneric<T, T>::GetNameSpace())
+		       .Build();
+	}
+};
+
+template <typename T>
+struct TNameSpace<T, typename TEnableIf<TIsTSet<T>::Value, T>::Type> final :
+	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
+{
+};
+
+template <typename T>
 struct TNameSpace<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
 	TGenericNameSpace<T>
 {
@@ -180,13 +205,22 @@ struct TNameSpace<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> final :
-	TGenericNameSpace<T>
+struct TNameSpace<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> final :
+	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> final :
-	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
+struct TNameSpace<T, typename TEnableIf<TIsEnum<T>::Value, T>::Type>
+{
+	static TArray<FString> Get()
+	{
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(StaticEnum<T>())};
+	}
+};
+
+template <typename T>
+struct TNameSpace<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> final :
+	TGenericNameSpace<T>
 {
 };
