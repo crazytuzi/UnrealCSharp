@@ -104,7 +104,7 @@ template <typename T>
 auto FCSharpEnvironment::GetMulti(const MonoObject* InMonoObject) const
 {
 	return MultiRegistry != nullptr
-		       ? FMultiRegistry::TMultiRegistry<T, T>::GetMulti(MultiRegistry, InMonoObject)
+		       ? (T*)FMultiRegistry::TMultiRegistry<T, T>::GetMulti(MultiRegistry, InMonoObject)
 		       : nullptr;
 }
 
