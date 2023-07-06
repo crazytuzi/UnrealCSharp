@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "CoreMacro/BindingMacro.h"
+#include "Binding/Function/TFunctionBuilder.inl"
+#include "Binding/Function/FFunctionPointer.h"
 
 #define WITH_TYPE_INFO WITH_EDITOR
 
@@ -32,3 +34,9 @@ struct TClassName<Class> \
 #else
 #define BINDING_READONLY_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), nullptr
 #endif
+
+#define BINDING_FUNCTION(Function, ...) \
+	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
+	{ \
+		TFunctionBuilder<decltype(Function), Function>::Invoke(BINDING_FUNCTION_PARAM); \
+	}).Value.Pointer
