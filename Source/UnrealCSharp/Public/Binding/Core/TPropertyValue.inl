@@ -14,7 +14,7 @@
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsUStruct.inl"
 
-template <typename T, typename Enable = void, bool bIsExisted = false>
+template <typename T, typename Enable = void>
 struct TPropertyValue
 {
 };
@@ -28,111 +28,104 @@ struct TPrimitivePropertyValue
 			TPropertyClass<T, T>::Get(), InMember);
 	}
 
-	static T* Set(MonoObject* InValue)
+	static T Set(MonoObject* InValue)
 	{
-		return (T*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
+		return *(T*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
 	}
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TMultiPropertyValue
 {
 	static MonoObject* Get(T* InMember)
 	{
-		if constexpr (bIsExisted == true)
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<T>(InMember);
+
+		if (SrcMonoObject == nullptr)
 		{
-			return FCSharpEnvironment::GetEnvironment().GetMultiObject<T>(InMember);
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<T>(
+				SrcMonoObject, InMember, false);
 		}
-		else
-		{
-			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<T>(InMember);
 
-			if (SrcMonoObject == nullptr)
-			{
-				const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-				FCSharpEnvironment::GetEnvironment().AddMultiReference<T>(
-					SrcMonoObject, InMember, false);
-			}
-
-			return SrcMonoObject;
-		}
+		return SrcMonoObject;
 	}
 
-	static T* Set(const MonoObject* InValue)
+	static T Set(const MonoObject* InValue)
 	{
-		return (T*)FCSharpEnvironment::GetEnvironment().GetMulti<T>(InValue);
+		return *FCSharpEnvironment::GetEnvironment().GetMulti<T>(InValue);
 	}
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
                       typename TEnableIf<TAnd<
 	                                         TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
 	                                         TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
-                      ::Type, bIsExisted>
+                      ::Type>
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -145,8 +138,8 @@ struct TPropertyValue<T,
 	}
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type, bIsExisted>
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -158,51 +151,44 @@ struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type, 
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass, 1, &NewMonoString);
 	}
 
-	static T* Set(MonoObject* InValue)
+	static T Set(MonoObject* InValue)
 	{
-		return (T*)UTF8_TO_TCHAR(
+		return T(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(InValue, nullptr)));
+				GetDomain()->Object_To_String(InValue, nullptr))));
 	}
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type, bIsExisted> :
-	TMultiPropertyValue<T, bIsExisted>
+                      typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type> :
+	TMultiPropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type, bIsExisted>
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 {
 	static MonoObject* Get(T* InMember)
 	{
-		if constexpr (bIsExisted == true)
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
+
+		if (SrcMonoObject == nullptr)
 		{
-			return FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			auto InParams = static_cast<void*>(FoundMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+			FCSharpEnvironment::GetEnvironment().Bind(T::StaticStruct(), false);
+
+			FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), nullptr,
+			                                                        InMember, SrcMonoObject, false);
 		}
-		else
-		{
-			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
 
-			if (SrcMonoObject == nullptr)
-			{
-				const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
-				auto InParams = static_cast<void*>(FoundMonoClass);
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-					FoundMonoClass, TGetArrayLength(InParams), &InParams);
-
-				FCSharpEnvironment::GetEnvironment().Bind(T::StaticStruct(), false);
-
-				FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), nullptr,
-				                                                        InMember, SrcMonoObject, false);
-			}
-
-			return SrcMonoObject;
-		}
+		return SrcMonoObject;
 	}
 
 	static T Set(const MonoObject* InValue)
@@ -215,38 +201,31 @@ struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type, bIsE
 
 		return Value;
 	}
-
-	static void Set(const MonoObject* InValue, T* InMember)
-	{
-		const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
-
-		T::StaticStruct()->CopyScriptStruct(InMember, SrcStruct);
-	}
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type, bIsExisted>
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type>
 {
-	static MonoObject* Get(const T* InMember)
+	static MonoObject* Get(T* InMember)
 	{
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(InMember)));
+			TCHAR_TO_UTF8(InMember->operator*())));
 
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass, 1, &NewMonoString);
 	}
 
-	static T* Set(MonoObject* InValue)
+	static T Set(MonoObject* InValue)
 	{
-		return (T*)UTF8_TO_TCHAR(
+		return T(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(InValue, nullptr)));
+				GetDomain()->Object_To_String(InValue, nullptr))));
 	}
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type, bIsExisted>
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type>
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -266,102 +245,92 @@ struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type, 
 	}
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type, bIsExisted> :
-	TMultiPropertyValue<T, bIsExisted>
+                      typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type> :
+	TMultiPropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type, bIsExisted> :
-	TMultiPropertyValue<T, bIsExisted>
+                      typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type> :
+	TMultiPropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type, bIsExisted> :
-	TMultiPropertyValue<T, bIsExisted>
+                      typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> :
+	TMultiPropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
-struct TPropertyValue<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type, bIsExisted> :
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTMap<T>::Value, T>::Type, bIsExisted>
+                      typename TEnableIf<TIsTMap<T>::Value, T>::Type>
 {
 	static MonoObject* Get(T* InMember, MonoObject* InMonoObject)
 	{
-		if constexpr (bIsExisted == true)
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+
+		if (SrcMonoObject == nullptr)
 		{
-			return FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			const auto FoundKeyPropertyMonoClass = TPropertyClass<
+					typename TTemplateTypeTraits<T>::template Type<0>,
+					typename TTemplateTypeTraits<T>::template Type<0>>
+				::Get();
+
+			const auto FoundKeyPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+				FoundKeyPropertyMonoClass);
+
+			const auto FoundKeyPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+				Type_Get_Object(FoundKeyPropertyMonoType);
+
+			const auto FoundValuePropertyMonoClass = TPropertyClass<
+					typename TTemplateTypeTraits<T>::template Type<1>,
+					typename TTemplateTypeTraits<T>::template Type<1>>
+				::Get();
+
+			const auto FoundValuePropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+				Class_Get_Type(FoundValuePropertyMonoClass);
+
+			const auto FoundValuePropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+				Type_Get_Object(FoundValuePropertyMonoType);
+
+			void* InParams[2] = {FoundKeyPropertyReflectionType, FoundValuePropertyReflectionType};
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), InParams);
+
+			const auto KeyProperty = FTypeBridge::Factory(FoundKeyPropertyReflectionType, nullptr, "",
+			                                              EObjectFlags::RF_Transient);
+
+			KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+			const auto ValueProperty = FTypeBridge::Factory(FoundValuePropertyReflectionType, nullptr, "",
+			                                                EObjectFlags::RF_Transient);
+
+			ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty, InMember);
+
+			const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
+				GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject), 0);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
+			                                                           MapHelper, SrcMonoObject);
 		}
-		else
-		{
-			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
 
-			if (SrcMonoObject == nullptr)
-			{
-				const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
-				const auto FoundKeyPropertyMonoClass = TPropertyClass<
-						typename TTemplateTypeTraits<T>::template Type<0>,
-						typename TTemplateTypeTraits<T>::template Type<0>>
-					::Get();
-
-				const auto FoundKeyPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
-					FoundKeyPropertyMonoClass);
-
-				const auto FoundKeyPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Type_Get_Object(FoundKeyPropertyMonoType);
-
-				const auto FoundValuePropertyMonoClass = TPropertyClass<
-						typename TTemplateTypeTraits<T>::template Type<1>,
-						typename TTemplateTypeTraits<T>::template Type<1>>
-					::Get();
-
-				const auto FoundValuePropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Class_Get_Type(
-						FoundValuePropertyMonoClass);
-
-				const auto FoundValuePropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Type_Get_Object(FoundValuePropertyMonoType);
-
-				void* InParams[2] = {FoundKeyPropertyReflectionType, FoundValuePropertyReflectionType};
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-					FoundMonoClass, TGetArrayLength(InParams), InParams);
-
-				const auto KeyProperty = FTypeBridge::Factory(FoundKeyPropertyReflectionType, nullptr, "",
-				                                              EObjectFlags::RF_Transient);
-
-				KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
-
-				const auto ValueProperty = FTypeBridge::Factory(FoundValuePropertyReflectionType, nullptr, "",
-				                                                EObjectFlags::RF_Transient);
-
-				ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
-
-				const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty, InMember);
-
-				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(
-						InMonoObject, 0);
-
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(
-					OwnerGarbageCollectionHandle, InMember,
-					MapHelper, SrcMonoObject);
-			}
-
-			return SrcMonoObject;
-		}
+		return SrcMonoObject;
 	}
 
 	static T Set(const MonoObject* InValue)
@@ -386,78 +355,51 @@ struct TPropertyValue<T,
 
 		return Value;
 	}
-
-	static void Set(const MonoObject* InValue, T* InMember)
-	{
-		InMember->Reset();
-
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InValue);
-
-		for (auto Index = 0; Index < SrcContainer->GetMaxIndex(); ++Index)
-		{
-			if (SrcContainer->IsValidIndex(Index))
-			{
-				InMember->operator[](*static_cast<typename TTemplateTypeTraits<T>::template Type<0>*>
-						(SrcContainer->GetEnumeratorKey(Index)))
-					= *static_cast<typename TTemplateTypeTraits<T>::template Type<1>*>
-					(SrcContainer->GetEnumeratorValue(Index));
-			}
-		}
-	}
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTSet<T>::Value, T>::Type, bIsExisted>
+                      typename TEnableIf<TIsTSet<T>::Value, T>::Type>
 {
 	static MonoObject* Get(T* InMember, MonoObject* InMonoObject)
 	{
-		if constexpr (bIsExisted == true)
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+
+		if (SrcMonoObject == nullptr)
 		{
-			return FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			const auto FoundPropertyMonoClass = TPropertyClass<
+					typename TTemplateTypeTraits<T>::template Type<0>,
+					typename TTemplateTypeTraits<T>::template Type<0>>
+				::Get();
+
+			const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+				FoundPropertyMonoClass);
+
+			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+				Type_Get_Object(FoundPropertyMonoType);
+
+			auto InParams = static_cast<void*>(FoundPropertyMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+			                                           EObjectFlags::RF_Transient);
+
+			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+			const auto SetHelper = new FSetHelper(Property, InMember);
+
+			const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
+				GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject), 0);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
+			                                                           SetHelper, SrcMonoObject);
 		}
-		else
-		{
-			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
 
-			if (SrcMonoObject == nullptr)
-			{
-				const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
-				const auto FoundPropertyMonoClass = TPropertyClass<
-						typename TTemplateTypeTraits<T>::template Type<0>,
-						typename TTemplateTypeTraits<T>::template Type<0>>
-					::Get();
-
-				const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
-					FoundPropertyMonoClass);
-
-				const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Type_Get_Object(FoundPropertyMonoType);
-
-				auto InParams = static_cast<void*>(FoundPropertyMonoClass);
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-					FoundMonoClass, TGetArrayLength(InParams), &InParams);
-
-				const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
-				                                           EObjectFlags::RF_Transient);
-
-				Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
-
-				const auto SetHelper = new FSetHelper(Property, InMember);
-
-				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(
-						InMonoObject, 0);
-
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(
-					OwnerGarbageCollectionHandle, InMember,
-					SetHelper, SrcMonoObject);
-			}
-
-			return SrcMonoObject;
-		}
+		return SrcMonoObject;
 	}
 
 	static T Set(const MonoObject* InValue)
@@ -478,58 +420,34 @@ struct TPropertyValue<T,
 
 		return Value;
 	}
-
-	static void Set(const MonoObject* InValue, T* InMember)
-	{
-		InMember->Reset();
-
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InValue);
-
-		for (auto Index = 0; Index < SrcContainer->GetMaxIndex(); ++Index)
-		{
-			if (SrcContainer->IsValidIndex(Index))
-			{
-				InMember->Add(
-					*static_cast<typename TTemplateTypeTraits<T>::template Type<0>*>(SrcContainer->
-						GetEnumerator(Index)));
-			}
-		}
-	}
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type, bIsExisted> :
-	TMultiPropertyValue<T, bIsExisted>
+                      typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
+	TMultiPropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type, bIsExisted>
+                      typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type>
 {
 	static MonoObject* Get(T* InMember)
 	{
-		if constexpr (bIsExisted == true)
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InMember);
+
+		if (SrcMonoObject == nullptr)
 		{
-			return FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InMember);
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
+				SrcMonoObject, InMember, false);
 		}
-		else
-		{
-			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InMember);
 
-			if (SrcMonoObject == nullptr)
-			{
-				const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-				FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
-					SrcMonoObject, InMember, false);
-			}
-
-			return SrcMonoObject;
-		}
+		return SrcMonoObject;
 	}
 
 	static T Set(const MonoObject* InValue)
@@ -539,58 +457,49 @@ struct TPropertyValue<T,
 };
 
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTArray<T>::Value, T>::Type, bIsExisted>
+                      typename TEnableIf<TIsTArray<T>::Value, T>::Type>
 {
 	static MonoObject* Get(T* InMember, MonoObject* InMonoObject)
 	{
-		if constexpr (bIsExisted == true)
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+
+		if (SrcMonoObject == nullptr)
 		{
-			return FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			const auto FoundPropertyMonoClass = TPropertyClass<
+					typename TTemplateTypeTraits<T>::template Type<0>,
+					typename TTemplateTypeTraits<T>::template Type<0>>
+				::Get();
+
+			const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+				FoundPropertyMonoClass);
+
+			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+				Type_Get_Object(FoundPropertyMonoType);
+
+			auto InParams = static_cast<void*>(FoundPropertyMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+			                                           EObjectFlags::RF_Transient);
+
+			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+			const auto ArrayHelper = new FArrayHelper(Property, InMember);
+
+			const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
+				GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject), 0);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
+			                                                           ArrayHelper, SrcMonoObject);
 		}
-		else
-		{
-			auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
 
-			if (SrcMonoObject == nullptr)
-			{
-				const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
-				const auto FoundPropertyMonoClass = TPropertyClass<
-						typename TTemplateTypeTraits<T>::template Type<0>,
-						typename TTemplateTypeTraits<T>::template Type<0>>
-					::Get();
-
-				const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
-					FoundPropertyMonoClass);
-
-				const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Type_Get_Object(FoundPropertyMonoType);
-
-				auto InParams = static_cast<void*>(FoundPropertyMonoClass);
-
-				SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-					FoundMonoClass, TGetArrayLength(InParams), &InParams);
-
-				const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
-				                                           EObjectFlags::RF_Transient);
-
-				Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
-
-				const auto ArrayHelper = new FArrayHelper(Property, InMember);
-
-				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(
-						InMonoObject, 0);
-
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(
-					OwnerGarbageCollectionHandle, InMember,
-					ArrayHelper, SrcMonoObject);
-			}
-
-			return SrcMonoObject;
-		}
+		return SrcMonoObject;
 	}
 
 	static T Set(const MonoObject* InValue)
@@ -602,32 +511,18 @@ struct TPropertyValue<T,
 			(SrcContainer->GetScriptArray()->GetData()),
 			SrcContainer->Num());
 	}
-
-	static void Set(const MonoObject* InValue, T* InMember)
-	{
-		InMember->Reset();
-
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InValue);
-
-		for (auto Index = 0; Index < SrcContainer->Num(); ++Index)
-		{
-			InMember->Add(
-				*static_cast<typename TTemplateTypeTraits<T>::template Type<0>*>(SrcContainer->
-					Get(Index)));
-		}
-	}
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsEnum<T>::Value, T>::Type, bIsExisted> :
+                      typename TEnableIf<TIsEnum<T>::Value, T>::Type> :
 	TPrimitivePropertyValue<T>
 {
 };
 
-template <typename T, bool bIsExisted>
+template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type, bIsExisted> :
-	TMultiPropertyValue<T, bIsExisted>
+                      typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
+	TMultiPropertyValue<T>
 {
 };

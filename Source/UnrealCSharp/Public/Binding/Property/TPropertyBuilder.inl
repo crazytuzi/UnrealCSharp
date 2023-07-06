@@ -25,7 +25,7 @@ struct TTypePropertyBuilder
 	{
 		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			*OutValue = TPropertyValue<Result, Result, false>::Get(&(FoundObject->*Member));
+			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member));
 		}
 	}
 
@@ -33,7 +33,7 @@ struct TTypePropertyBuilder
 	{
 		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			FoundObject->*Member = *TPropertyValue<Result, Result, false>::Set(InValue);
+			FoundObject->*Member = TPropertyValue<Result, Result>::Set(InValue);
 		}
 	}
 
@@ -51,15 +51,7 @@ struct TContainerPropertyBuilder :
 	{
 		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			*OutValue = TPropertyValue<Result, Result, false>::Get(&(FoundObject->*Member), InMonoObject);
-		}
-	}
-
-	static void Set(const MonoObject* InMonoObject, MonoObject* InValue)
-	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
-		{
-			TPropertyValue<Result, Result, false>::Set(InValue, &(FoundObject->*Member));
+			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InMonoObject);
 		}
 	}
 };
@@ -132,13 +124,6 @@ struct TPropertyBuilder<Result Class::*, Member,
                         ::Type> :
 	TTypePropertyBuilder<Class, Result, Member>
 {
-	static void Set(const MonoObject* InMonoObject, MonoObject* InValue)
-	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
-		{
-			FoundObject->*Member = TPropertyValue<Result, Result, false>::Set(InValue);
-		}
-	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
@@ -158,13 +143,6 @@ template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsUStruct<Result>::Value>::Type> :
 	TTypePropertyBuilder<Class, Result, Member>
 {
-	static void Set(const MonoObject* InMonoObject, MonoObject* InValue)
-	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
-		{
-			TPropertyValue<Result, Result, false>::Set(InValue, &(FoundObject->*Member));
-		}
-	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
@@ -177,13 +155,6 @@ template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, FText>::Value>::Type> :
 	TTypePropertyBuilder<Class, Result, Member>
 {
-	static void Set(const MonoObject* InMonoObject, MonoObject* InValue)
-	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
-		{
-			FoundObject->*Member = TPropertyValue<Result, Result, false>::Set(InValue);
-		}
-	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
@@ -239,13 +210,6 @@ struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsSame<typename TRemovePointer<Result>::Type, UClass>::Value>::Type> :
 	TTypePropertyBuilder<Class, Result, Member>
 {
-	static void Set(const MonoObject* InMonoObject, MonoObject* InValue)
-	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
-		{
-			FoundObject->*Member = TPropertyValue<Result, Result, false>::Set(InValue);
-		}
-	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
