@@ -9,7 +9,7 @@ class TClassBuilder final : public FBindingClassBuilder
 {
 public:
 	explicit TClassBuilder(const FString& InImplementationNameSpace):
-#if WITH_TYPE_INFO
+#if WITH_PROPERTY_INFO
 		FBindingClassBuilder(TClassName<T>::Get(), TTypeInfo<T>::Get(), InImplementationNameSpace)
 #else
 		FBindingClassBuilder(TClassName<T>::Get(), InImplementationNameSpace)

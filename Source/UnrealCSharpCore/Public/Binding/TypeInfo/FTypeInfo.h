@@ -6,5 +6,7 @@ struct FTypeInfo
 
 	virtual FString GetName() const = 0;
 
-	virtual TArray<FString> GetNameSpace() const = 0;
+	virtual const TArray<FString>& GetNameSpace() const = 0;
+
+	virtual bool IsOut() const = 0;
 };
