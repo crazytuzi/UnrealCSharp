@@ -19,7 +19,7 @@ struct TPropertyBuilder
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TTypePropertyBuilder
+struct TPropertyInfoBuilder
 {
 	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
 	{
@@ -37,7 +37,7 @@ struct TTypePropertyBuilder
 		}
 	}
 
-	static FTypeInfo* TypeInfo()
+	static FTypeInfo* Info()
 	{
 		return TTypeInfo<Result>::Get();
 	}
@@ -45,7 +45,7 @@ struct TTypePropertyBuilder
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TContainerPropertyBuilder :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 	static void Get(MonoObject* InMonoObject, MonoObject** OutValue)
 	{
@@ -58,61 +58,61 @@ struct TContainerPropertyBuilder :
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint8>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint16>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint32>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint64>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int8>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int16>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int32>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int64>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, bool>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, float>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
@@ -122,65 +122,65 @@ struct TPropertyBuilder<Result Class::*, Member,
 	                        TIsDerivedFrom<typename TRemovePointer<Result>::Type, UObject>,
 	                        TNot<TIsSame<typename TRemovePointer<Result>::Type, UClass>>>::Value>
                         ::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, FName>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTScriptInterface<Result>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsUStruct<Result>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, FString>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, FText>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTWeakObjectPtr<Result>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTLazyObjectPtr<Result>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSoftObjectPtr<Result>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, double>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
@@ -201,14 +201,14 @@ struct TPropertyBuilder<Result Class::*, Member,
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSubclassOf<Result>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsSame<typename TRemovePointer<Result>::Type, UClass>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
@@ -222,13 +222,13 @@ struct TPropertyBuilder<Result Class::*, Member,
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsEnum<Result>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSoftClassPtr<Result>::Value>::Type> :
-	TTypePropertyBuilder<Class, Result, Member>
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };

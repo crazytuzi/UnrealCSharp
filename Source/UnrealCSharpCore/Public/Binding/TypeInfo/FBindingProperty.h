@@ -12,14 +12,27 @@ enum class EBindingPropertyAccess
 
 struct FBindingProperty : FBindingTypeInfo
 {
-	FString Name;
-
-	EBindingPropertyAccess Access;
-
 	FBindingProperty() = default;
 
 	FBindingProperty(FTypeInfo* InTypeInfo, const FString& InName, const EBindingPropertyAccess& InAccess):
-		FBindingTypeInfo{InTypeInfo}, Name(InName), Access(InAccess)
+		FBindingTypeInfo{InTypeInfo},
+		Name(InName),
+		Access(InAccess)
 	{
 	}
+
+	FString GetPropertyName() const
+	{
+		return Name;
+	}
+
+	EBindingPropertyAccess GetAccess() const
+	{
+		return Access;
+	}
+
+private:
+	FString Name;
+
+	EBindingPropertyAccess Access;
 };

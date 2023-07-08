@@ -12,7 +12,7 @@ FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, const FString
 {
 }
 
-#if WITH_TYPE_INFO
+#if WITH_PROPERTY_INFO
 FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, FTypeInfo* InTypeInfo,
                                            const FString& InImplementationNameSpace):
 	Class(InClass),
@@ -22,7 +22,7 @@ FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, FTypeInfo* In
 }
 #endif
 
-#if WITH_TYPE_INFO
+#if WITH_PROPERTY_INFO
 FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, const void* InGetMethod,
                                                      const void* InSetMethod, FTypeInfo* InTypeInfo)
 #else
@@ -30,7 +30,7 @@ FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, cons
 													 const void* InSetMethod)
 #endif
 {
-#if WITH_TYPE_INFO
+#if WITH_PROPERTY_INFO
 	if (InTypeInfo != nullptr)
 	{
 		FBindingClass::GetClass(Class, COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace), TypeInfo)->
@@ -41,8 +41,21 @@ FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, cons
 	return Function(BINDING_PROPERTY_GET + InName, InGetMethod).Function(BINDING_PROPERTY_SET + InName, InSetMethod);
 }
 
+#if WITH_FUNCTION_INFO
+FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, const void* InMethod,
+                                                     FFunctionInfo* InFunctionInfo)
+#else
 FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, const void* InMethod)
+#endif
 {
+#if WITH_FUNCTION_INFO
+	if (InFunctionInfo != nullptr)
+	{
+		FBindingClass::GetClass(Class, COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace), TypeInfo)->
+			BindingFunction(InName, InFunctionInfo);
+	}
+#endif
+
 	Functions.Emplace(
 		COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace), BINDING_CLASS_IMPLEMENTATION(Class)) +
 		COMBINE_FUNCTION(BINDING_COMBINE_FUNCTION(Class, InName)), InMethod);

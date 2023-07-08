@@ -9,12 +9,20 @@ struct TTypeInfo final : FTypeInfo
 {
 	virtual FString GetName() const override
 	{
-		return TName<T, T>::Get();
+		return TName<typename TRemoveReference<T>::Type, typename TRemoveReference<T>::Type>::Get();
 	}
 
-	virtual TArray<FString> GetNameSpace() const override
+	virtual const TArray<FString>& GetNameSpace() const override
 	{
-		return TNameSpace<T, T>::Get();
+		static auto Instance = TNameSpace<typename TRemoveReference<T>::Type, typename TRemoveReference<
+			                                  T>::Type>::Get();
+
+		return Instance;
+	}
+
+	virtual bool IsOut() const override
+	{
+		return TAnd<TNot<TIsConst<T>>, TIsReferenceType<T>>::Value;
 	}
 
 	static FTypeInfo* Get()
@@ -22,5 +30,29 @@ struct TTypeInfo final : FTypeInfo
 		static TTypeInfo Instance;
 
 		return &Instance;
+	}
+};
+
+template <>
+struct TTypeInfo<void> final : FTypeInfo
+{
+	virtual FString GetName() const override
+	{
+		return {};
+	}
+
+	virtual const TArray<FString>& GetNameSpace() const override
+	{
+		return {};
+	}
+
+	virtual bool IsOut() const override
+	{
+		return false;
+	}
+
+	static FTypeInfo* Get()
+	{
+		return nullptr;
 	}
 };
