@@ -6,9 +6,9 @@
 #include "Environment/FCSharpEnvironment.h"
 
 template <typename Type>
-struct TOutArgument
+struct TOutValue
 {
-	explicit TOutArgument(MonoObject** InOutValue, Type& InArgument):
+	explicit TOutValue(MonoObject** InOutValue, Type& InArgument):
 		OutValue(InOutValue),
 		Argument(InArgument)
 	{

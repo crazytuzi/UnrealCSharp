@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FFunctionInfo.h"
-#include "TTypeInfo.inl"
+#include "Binding/TypeInfo/TTypeInfo.inl"
 
 template <bool bIsStatic, typename Result, typename... Args>
 struct TFunctionInfo final : FFunctionInfo

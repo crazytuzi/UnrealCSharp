@@ -1,8 +1,8 @@
 #pragma once
 
-#include "TInArgument.inl"
-#include "TOutArgument.inl"
-#include "TReturnArgument.inl"
+#include "TInValue.inl"
+#include "TOutValue.inl"
+#include "TReturnValue.inl"
 #include "Environment/FCSharpEnvironment.h"
 
 #ifndef BINDING_FUNCTION_SIGNATURE
@@ -29,20 +29,20 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 	template <typename Function, SIZE_T... Index>
 	static void Call(Function InFunction, TIntegerSequence<SIZE_T, Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		TTuple<TInArgument<Args>...> InArgument(Get(InValue, Index)...);
+		TTuple<TInValue<Args>...> Argument(Get(InValue, Index)...);
 
 		if constexpr (TIsSame<Result, void>::Value)
 		{
-			InFunction(Forward<Args>(InArgument.template Get<Index>().Get())...);
+			InFunction(Forward<Args>(Argument.template Get<Index>().Get())...);
 		}
 		else
 		{
-			*ReturnValue = TReturnArgument<Result>(Forward<Result>(
-					InFunction(Forward<Args>(InArgument.template Get<Index>().Get())...)))
+			*ReturnValue = TReturnValue<Result>(Forward<Result>(
+					InFunction(Forward<Args>(Argument.template Get<Index>().Get())...)))
 				.Get();
 		}
 
-		TOutArgument(OutValue, InArgument).template Get<0, Args...>();
+		TOutValue(OutValue, Argument).template Get<0, Args...>();
 	}
 
 	template <typename Class, typename Function, SIZE_T... Index>
@@ -50,20 +50,20 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 	{
 		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
 		{
-			TTuple<TInArgument<Args>...> InArgument(Get(InValue, Index)...);
+			TTuple<TInValue<Args>...> Argument(Get(InValue, Index)...);
 
 			if constexpr (TIsSame<Result, void>::Value)
 			{
-				(FoundObject->*InFunction)(Forward<Args>(InArgument.template Get<Index>().Get())...);
+				(FoundObject->*InFunction)(Forward<Args>(Argument.template Get<Index>().Get())...);
 			}
 			else
 			{
-				*ReturnValue = TReturnArgument<Result>(Forward<Result>(
-						(FoundObject->*InFunction)(Forward<Args>(InArgument.template Get<Index>().Get())...)))
+				*ReturnValue = TReturnValue<Result>(Forward<Result>(
+						(FoundObject->*InFunction)(Forward<Args>(Argument.template Get<Index>().Get())...)))
 					.Get();
 			}
 
-			TOutArgument(OutValue, InArgument).template Get<0, Args...>();
+			TOutValue(OutValue, Argument).template Get<0, Args...>();
 		}
 	}
 };

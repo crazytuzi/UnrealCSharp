@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TFunctionHelper.inl"
-#include "Binding/TypeInfo/TFunctionInfo.inl"
+#include "Binding/Function/TFunctionInfo.inl"
 
 template <typename T, T>
 struct TFunctionBuilder

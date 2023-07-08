@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FTypeInfo.h"
+#include "Binding/TypeInfo/FTypeInfo.h"
 
 struct FFunctionInfo
 {

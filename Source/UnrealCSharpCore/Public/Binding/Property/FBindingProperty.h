@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "FBindingTypeInfo.h"
+#include "Binding/TypeInfo/FBindingTypeInfo.h"
 
 enum class EBindingPropertyAccess
 {

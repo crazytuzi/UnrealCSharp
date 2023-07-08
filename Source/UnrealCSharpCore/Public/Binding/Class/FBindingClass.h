@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Binding/TypeInfo/FBindingProperty.h"
-#include "Binding/TypeInfo/FBindingFunction.h"
+#include "Binding/Property/FBindingProperty.h"
+#include "Binding/Function/FBindingFunction.h"
 
 class UNREALCSHARPCORE_API FBindingClass
 {

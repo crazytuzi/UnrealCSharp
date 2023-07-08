@@ -1,6 +1,6 @@
 ﻿#include "Binding/Class/FBindingClassBuilder.h"
 #include "Binding/FBinding.h"
-#include "Binding/FBindingClass.h"
+#include "Binding/Class/FBindingClass.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/ClassMacro.h"
