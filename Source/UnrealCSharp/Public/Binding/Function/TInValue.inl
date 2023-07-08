@@ -17,7 +17,7 @@ struct TPrimitiveInValue
 	{
 	}
 
-	Type Get() const
+	Type& Get()
 	{
 		return Value;
 	}
