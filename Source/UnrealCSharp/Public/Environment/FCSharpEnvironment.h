@@ -116,7 +116,7 @@ public:
 
 	MonoObject* GetContainerObject(const void* InAddress) const;
 
-	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject) const;
+	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject, void* InAddress = nullptr) const;
 
 	bool AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
 	                           MonoObject* InMonoObject) const;

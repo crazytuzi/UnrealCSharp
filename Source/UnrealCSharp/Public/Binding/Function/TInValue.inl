@@ -37,6 +37,35 @@ private:
 };
 
 template <typename T>
+struct TContainerInValue
+{
+	using Type = typename TDecay<T>::Type;
+
+	explicit TContainerInValue(MonoObject* InMonoObject):
+		Value{TPropertyValue<Type, Type>::Set(InMonoObject)}
+	{
+	}
+
+	Type& Get()
+	{
+		return Value;
+	}
+
+	MonoObject* Set()
+	{
+		return TPropertyValue<Type, Type>::Get(new Type(Value));
+	}
+
+	constexpr bool IsOut() const
+	{
+		return TAnd<TNot<TIsConst<T>>, TIsReferenceType<T>>::Value;
+	}
+
+private:
+	Type Value;
+};
+
+template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
 	TPrimitiveInValue<T>
 {
@@ -111,4 +140,25 @@ struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, double>:
 	TPrimitiveInValue<T>
 {
 	using TPrimitiveInValue<T>::TPrimitiveInValue;
+};
+
+template <typename T>
+struct TInValue<T, typename TEnableIf<TIsTMap<typename TDecay<T>::Type>::Value>::Type> :
+	TContainerInValue<T>
+{
+	using TContainerInValue<T>::TContainerInValue;
+};
+
+template <typename T>
+struct TInValue<T, typename TEnableIf<TIsTSet<typename TDecay<T>::Type>::Value>::Type> :
+	TContainerInValue<T>
+{
+	using TContainerInValue<T>::TContainerInValue;
+};
+
+template <typename T>
+struct TInValue<T, typename TEnableIf<TIsTArray<typename TDecay<T>::Type>::Value>::Type> :
+	TContainerInValue<T>
+{
+	using TContainerInValue<T>::TContainerInValue;
 };

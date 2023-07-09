@@ -1,14 +1,14 @@
 ﻿#include "Reflection/Container/FSetHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-FSetHelper::FSetHelper(FProperty* InProperty, void* InData):
+FSetHelper::FSetHelper(FProperty* InProperty, void* InData, const bool InbNeedFree):
 	ElementPropertyDescriptor(nullptr),
 	ScriptSet(nullptr),
 	bNeedFree(false)
 {
 	if (InData != nullptr)
 	{
-		bNeedFree = false;
+		bNeedFree = InbNeedFree;
 
 		ScriptSet = static_cast<FScriptSet*>(InData);
 	}
