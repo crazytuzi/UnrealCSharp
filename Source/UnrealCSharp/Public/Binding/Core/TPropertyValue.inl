@@ -37,7 +37,7 @@ struct TPrimitivePropertyValue
 template <typename T>
 struct TMultiPropertyValue
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<T>(InMember);
 
@@ -48,7 +48,7 @@ struct TMultiPropertyValue
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<T>(
-				SrcMonoObject, InMember, false);
+				SrcMonoObject, InMember, bNeedFree);
 		}
 
 		return SrcMonoObject;
