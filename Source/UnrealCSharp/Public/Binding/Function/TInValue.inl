@@ -176,10 +176,31 @@ struct TInValue<T,
 };
 
 template <typename T>
+struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FName>::Value>::Type> :
+	TSingleInValue<T>
+{
+	using TSingleInValue<T>::TSingleInValue;
+};
+
+template <typename T>
 struct TInValue<T, typename TEnableIf<TIsTScriptInterface<typename TDecay<T>::Type>::Value>::Type> :
 	TMultiInValue<T>
 {
 	using TMultiInValue<T>::TMultiInValue;
+};
+
+template <typename T>
+struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FString>::Value>::Type> :
+	TSingleInValue<T>
+{
+	using TSingleInValue<T>::TSingleInValue;
+};
+
+template <typename T>
+struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FText>::Value>::Type> :
+	TSingleInValue<T>
+{
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>

@@ -146,10 +146,31 @@ struct TReturnValue<T,
 };
 
 template <typename T>
+struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FName>::Value>::Type> :
+	TSingleReturnValue<T>
+{
+	using TSingleReturnValue<T>::TSingleReturnValue;
+};
+
+template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsTScriptInterface<typename TDecay<T>::Type>::Value>::Type> :
 	TMultiReturnValue<T>
 {
 	using TMultiReturnValue<T>::TMultiReturnValue;
+};
+
+template <typename T>
+struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FString>::Value>::Type> :
+	TSingleReturnValue<T>
+{
+	using TSingleReturnValue<T>::TSingleReturnValue;
+};
+
+template <typename T>
+struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FText>::Value>::Type> :
+	TSingleReturnValue<T>
+{
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
