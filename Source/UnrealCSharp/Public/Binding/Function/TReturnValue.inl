@@ -8,11 +8,11 @@ struct TReturnValue
 };
 
 template <typename T>
-struct TPrimitiveReturnValue
+struct TSingleReturnValue
 {
 	using Type = typename TDecay<T>::Type;
 
-	explicit TPrimitiveReturnValue(Type&& InValue):
+	explicit TSingleReturnValue(Type&& InValue):
 		Object{TPropertyValue<Type, Type>::Get(&InValue)}
 	{
 	}
@@ -66,72 +66,83 @@ private:
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint16>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint32>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint64>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int8>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int16>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int32>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int64>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, bool>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, float>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
+};
+
+template <typename T>
+struct TReturnValue<T,
+                    typename TEnableIf<TAnd<
+	                    TIsDerivedFrom<typename TRemovePointer<typename TDecay<T>::Type>::Type, UObject>,
+	                    TNot<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>>::Value>
+                    ::Type> :
+	TSingleReturnValue<T>
+{
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
@@ -164,9 +175,9 @@ struct TReturnValue<T, typename TEnableIf<TIsTSoftObjectPtr<typename TDecay<T>::
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, double>::Value>::Type> :
-	TPrimitiveReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
@@ -185,6 +196,14 @@ struct TReturnValue<T, typename TEnableIf<TIsTSet<typename TDecay<T>::Type>::Val
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsTSubclassOf<typename TDecay<T>::Type>::Value>::Type> :
+	TMultiReturnValue<T>
+{
+	using TMultiReturnValue<T>::TMultiReturnValue;
+};
+
+template <typename T>
+struct TReturnValue<T, typename TEnableIf<TIsSame<
+	                    typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>::Value>::Type> :
 	TMultiReturnValue<T>
 {
 	using TMultiReturnValue<T>::TMultiReturnValue;

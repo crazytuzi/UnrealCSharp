@@ -8,11 +8,11 @@ struct TInValue
 };
 
 template <typename T>
-struct TPrimitiveInValue
+struct TSingleInValue
 {
 	using Type = typename TDecay<T>::Type;
 
-	explicit TPrimitiveInValue(MonoObject* InMonoObject):
+	explicit TSingleInValue(MonoObject* InMonoObject):
 		Value{TPropertyValue<Type, Type>::Set(InMonoObject)}
 	{
 	}
@@ -96,72 +96,83 @@ private:
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint16>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint32>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint64>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int8>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int16>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int32>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int64>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, bool>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, float>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
+};
+
+template <typename T>
+struct TInValue<T,
+                typename TEnableIf<TAnd<
+	                TIsDerivedFrom<typename TRemovePointer<typename TDecay<T>::Type>::Type, UObject>,
+	                TNot<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>>::Value>
+                ::Type> :
+	TSingleInValue<T>
+{
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
@@ -194,9 +205,9 @@ struct TInValue<T, typename TEnableIf<TIsTSoftObjectPtr<typename TDecay<T>::Type
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, double>::Value>::Type> :
-	TPrimitiveInValue<T>
+	TSingleInValue<T>
 {
-	using TPrimitiveInValue<T>::TPrimitiveInValue;
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>
@@ -215,6 +226,14 @@ struct TInValue<T, typename TEnableIf<TIsTSet<typename TDecay<T>::Type>::Value>:
 
 template <typename T>
 struct TInValue<T, typename TEnableIf<TIsTSubclassOf<typename TDecay<T>::Type>::Value>::Type> :
+	TMultiInValue<T>
+{
+	using TMultiInValue<T>::TMultiInValue;
+};
+
+template <typename T>
+struct TInValue<T, typename TEnableIf<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type,
+                                              UClass>::Value>::Type> :
 	TMultiInValue<T>
 {
 	using TMultiInValue<T>::TMultiInValue;

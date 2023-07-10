@@ -447,7 +447,7 @@ template <typename T>
 struct TPropertyValue<T,
                       typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InMember);
 
@@ -458,7 +458,7 @@ struct TPropertyValue<T,
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
-				SrcMonoObject, InMember, false);
+				SrcMonoObject, InMember, bNeedFree);
 		}
 
 		return SrcMonoObject;
