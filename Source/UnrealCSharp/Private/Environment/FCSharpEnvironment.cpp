@@ -427,9 +427,9 @@ MonoObject* FCSharpEnvironment::GetContainerObject(const void* InAddress) const
 	return ContainerRegistry != nullptr ? ContainerRegistry->GetObject(InAddress) : nullptr;
 }
 
-bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* InMonoObject) const
+bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* InMonoObject, void* InAddress) const
 {
-	return ContainerRegistry != nullptr ? ContainerRegistry->AddReference(InContainer, InMonoObject) : false;
+	return ContainerRegistry != nullptr ? ContainerRegistry->AddReference(InContainer, InMonoObject, InAddress) : false;
 }
 
 bool FCSharpEnvironment::AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress,

@@ -2,7 +2,7 @@
 #include "Reflection/Property/FPropertyDescriptor.h"
 #include "UEVersion.h"
 
-FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData):
+FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData, const bool InbNeedFree):
 	InnerPropertyDescriptor(nullptr),
 	ScriptArray(nullptr),
 	bNeedFree(false)
@@ -11,7 +11,7 @@ FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData):
 
 	if (InData != nullptr)
 	{
-		bNeedFree = false;
+		bNeedFree = InbNeedFree;
 
 		ScriptArray = static_cast<FScriptArray*>(InData);
 	}
