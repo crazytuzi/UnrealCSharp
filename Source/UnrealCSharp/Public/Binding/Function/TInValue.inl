@@ -8,11 +8,13 @@ struct TInValue
 };
 
 template <typename T>
-struct TSingleInValue
+struct TBaseInValue
 {
 	using Type = typename TDecay<T>::Type;
 
-	explicit TSingleInValue(MonoObject* InMonoObject):
+	TBaseInValue() = default;
+
+	explicit TBaseInValue(MonoObject* InMonoObject):
 		Value{TPropertyValue<Type, Type>::Set(InMonoObject)}
 	{
 	}
@@ -32,66 +34,47 @@ struct TSingleInValue
 		return TAnd<TNot<TIsConst<T>>, TIsReferenceType<T>>::Value;
 	}
 
-private:
+protected:
 	Type Value;
 };
 
 template <typename T>
-struct TContainerInValue
+struct TSingleInValue :
+	TBaseInValue<T>
 {
-	using Type = typename TDecay<T>::Type;
-
-	explicit TContainerInValue(MonoObject* InMonoObject):
-		Value{TPropertyValue<Type, Type>::Set(InMonoObject)}
-	{
-	}
-
-	Type& Get()
-	{
-		return Value;
-	}
-
-	MonoObject* Set()
-	{
-		return TPropertyValue<Type, Type>::Get(new Type(Value));
-	}
-
-	constexpr bool IsOut() const
-	{
-		return TAnd<TNot<TIsConst<T>>, TIsReferenceType<T>>::Value;
-	}
-
-private:
-	Type Value;
+	using TBaseInValue<T>::TBaseInValue;
 };
 
 template <typename T>
-struct TMultiInValue
+struct TContainerInValue :
+	TBaseInValue<T>
 {
-	using Type = typename TDecay<T>::Type;
+	using Super = TBaseInValue<T>;
 
-	explicit TMultiInValue(MonoObject* InMonoObject):
-		Value{TPropertyValue<Type, Type>::Set(InMonoObject)}
-	{
-	}
+	using Super::TBaseInValue;
 
-	Type& Get()
-	{
-		return Value;
-	}
+	using Type = typename Super::Type;
 
 	MonoObject* Set()
 	{
-		return TPropertyValue<Type, Type>::Get(new Type(Value), true);
+		return TPropertyValue<Type, Type>::Get(new Type(Super::Value));
 	}
+};
 
-	constexpr bool IsOut() const
+template <typename T>
+struct TMultiInValue :
+	TBaseInValue<T>
+{
+	using Super = TBaseInValue<T>;
+
+	using Super::TBaseInValue;
+
+	using Type = typename Super::Type;
+
+	MonoObject* Set()
 	{
-		return TAnd<TNot<TIsConst<T>>, TIsReferenceType<T>>::Value;
+		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
 	}
-
-private:
-	Type Value;
 };
 
 template <typename T>

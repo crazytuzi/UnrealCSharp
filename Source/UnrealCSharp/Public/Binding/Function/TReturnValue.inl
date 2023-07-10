@@ -8,11 +8,16 @@ struct TReturnValue
 };
 
 template <typename T>
-struct TSingleReturnValue
+struct TBaseReturnValue
 {
 	using Type = typename TDecay<T>::Type;
 
-	explicit TSingleReturnValue(Type&& InValue):
+	explicit TBaseReturnValue(MonoObject* InObject):
+		Object(InObject)
+	{
+	}
+
+	explicit TBaseReturnValue(Type&& InValue):
 		Object{TPropertyValue<Type, Type>::Get(&InValue)}
 	{
 	}
@@ -22,46 +27,43 @@ struct TSingleReturnValue
 		return Object;
 	}
 
-private:
+protected:
 	MonoObject* Object;
 };
 
 template <typename T>
-struct TContainerReturnValue
+struct TSingleReturnValue :
+	TBaseReturnValue<T>
 {
-	using Type = typename TDecay<T>::Type;
+	using TBaseReturnValue<T>::TBaseReturnValue;
+};
+
+template <typename T>
+struct TContainerReturnValue :
+	TBaseReturnValue<T>
+{
+	using Super = TBaseReturnValue<T>;
+
+	using Type = typename Super::Type;
 
 	explicit TContainerReturnValue(Type&& InValue):
-		Object{TPropertyValue<Type, Type>::Get(new Type(InValue))}
+		Super(TPropertyValue<Type, Type>::Get(new Type(InValue)))
 	{
 	}
-
-	MonoObject* Get() const
-	{
-		return Object;
-	}
-
-private:
-	MonoObject* Object;
 };
 
 template <typename T>
-struct TMultiReturnValue
+struct TMultiReturnValue :
+	TBaseReturnValue<T>
 {
-	using Type = typename TDecay<T>::Type;
+	using Super = TBaseReturnValue<T>;
+
+	using Type = typename Super::Type;
 
 	explicit TMultiReturnValue(Type&& InValue):
-		Object{TPropertyValue<Type, Type>::Get(new Type(InValue), true)}
+		Super(TPropertyValue<Type, Type>::Get(new Type(InValue), true))
 	{
 	}
-
-	MonoObject* Get() const
-	{
-		return Object;
-	}
-
-private:
-	MonoObject* Object;
 };
 
 template <typename T>
