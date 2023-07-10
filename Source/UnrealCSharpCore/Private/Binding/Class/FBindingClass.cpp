@@ -1,4 +1,4 @@
-#include "Binding/FBindingClass.h"
+#include "Binding/Class/FBindingClass.h"
 
 TMap<FString, FBindingClass> FBindingClass::Classes;
 
@@ -33,6 +33,11 @@ const TArray<FBindingProperty>& FBindingClass::GetProperties() const
 	return Properties;
 }
 
+const TArray<FBindingFunction>& FBindingClass::GetFunctions() const
+{
+	return Functions;
+}
+
 void FBindingClass::BindingProperty(const FString& InName, FTypeInfo* InTypeInfo,
                                     const void* InGetMethod, const void* InSetMethod)
 {
@@ -41,10 +46,18 @@ void FBindingClass::BindingProperty(const FString& InName, FTypeInfo* InTypeInfo
 		InName,
 		static_cast<EBindingPropertyAccess>(
 			static_cast<int32>((InGetMethod != nullptr
-			                                                        ? EBindingPropertyAccess::OnlyRead
-			                                                        : EBindingPropertyAccess::None)) +
+				                    ? EBindingPropertyAccess::OnlyRead
+				                    : EBindingPropertyAccess::None)) +
 			static_cast<int32>(InSetMethod != nullptr
 				                   ? EBindingPropertyAccess::OnlyWrite
 				                   : EBindingPropertyAccess::None))
+	);
+}
+
+void FBindingClass::BindingFunction(const FString& InName, FFunctionInfo* InTypeInfo)
+{
+	Functions.Emplace(
+		InTypeInfo,
+		InName
 	);
 }

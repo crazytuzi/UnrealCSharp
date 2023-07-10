@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Binding/FBindingClass.h"
+#include "Binding/Class/FBindingClass.h"
 
 class FBindingGenerator
 {

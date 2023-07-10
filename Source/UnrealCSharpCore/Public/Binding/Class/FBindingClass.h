@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Binding/TypeInfo/FBindingProperty.h"
+#include "Binding/Property/FBindingProperty.h"
+#include "Binding/Function/FBindingFunction.h"
 
 class UNREALCSHARPCORE_API FBindingClass
 {
@@ -23,9 +24,13 @@ public:
 
 	const TArray<FBindingProperty>& GetProperties() const;
 
+	const TArray<FBindingFunction>& GetFunctions() const;
+
 public:
 	void BindingProperty(const FString& InName, FTypeInfo* InTypeInfo, const void* InGetMethod,
 	                     const void* InSetMethod);
+
+	void BindingFunction(const FString& InName, FFunctionInfo* InTypeInfo);
 
 private:
 	static TMap<FString, FBindingClass> Classes;
@@ -35,4 +40,6 @@ private:
 	FBindingTypeInfo TypeInfo;
 
 	TArray<FBindingProperty> Properties;
+
+	TArray<FBindingFunction> Functions;
 };

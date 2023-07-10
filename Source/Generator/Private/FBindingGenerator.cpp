@@ -1,6 +1,5 @@
 #include "FBindingGenerator.h"
 #include "FGeneratorCore.h"
-#include "Binding/FBindingClass.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BindingMacro.h"
 
@@ -25,31 +24,33 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 	TSet<FString> UsingNameSpaces{InClass.GetImplementationNameSpace()};
 
-	auto NameSpaceContent = InClass.GetTypeInfo().TypeInfo->GetNameSpace();
+	const auto& NameSpaceContent = InClass.GetTypeInfo().GetNameSpace();
 
-	auto FullClassContent = InClass.GetTypeInfo().TypeInfo->GetName();
+	auto FullClassContent = InClass.GetTypeInfo().GetName();
 
 	auto ClassContent = BINDING_REMOVE_PREFIX_CLASS(FullClassContent);
 
 	FString PropertyContent;
 
+	FString FunctionContent;
+
 	for (const auto& Property : InClass.GetProperties())
 	{
-		UsingNameSpaces.Append(Property.TypeInfo->GetNameSpace());
+		UsingNameSpaces.Append(Property.GetNameSpace());
 
-		auto PropertyName = Property.Name;
+		auto PropertyName = Property.GetPropertyName();
 
-		auto PropertyType = Property.TypeInfo->GetName();
+		auto PropertyType = Property.GetName();
 
 		FString PropertyGetContent;
 
 		FString PropertySetContent;
 
-		const auto bRead = (static_cast<int32>(Property.Access) &
+		const auto bRead = (static_cast<int32>(Property.GetAccess()) &
 				static_cast<int32>(EBindingPropertyAccess::OnlyRead))
 			== static_cast<int32>(EBindingPropertyAccess::OnlyRead);
 
-		const auto bWrite = (static_cast<int32>(Property.Access) &
+		const auto bWrite = (static_cast<int32>(Property.GetAccess()) &
 				static_cast<int32>(EBindingPropertyAccess::OnlyWrite))
 			== static_cast<int32>(EBindingPropertyAccess::OnlyWrite);
 
@@ -101,6 +102,143 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 		}
 	}
 
+	for (const auto& Function : InClass.GetFunctions())
+	{
+		FString FunctionStatic = Function.IsStatic() ? TEXT("static") : TEXT("");
+
+		FString FunctionAccessSpecifiers = TEXT("public");
+
+		const auto& Params = Function.GetParams();
+
+		for (auto Param : Params)
+		{
+			UsingNameSpaces.Append(Param->GetNameSpace());
+		}
+
+		FString FunctionReturnType = TEXT("void");
+
+		if (Function.GetReturn() != nullptr)
+		{
+			FunctionReturnType = Function.GetReturn()->GetName();
+		}
+
+		FString FunctionDeclarationBody;
+
+		TArray<int32> FunctionOutParamIndex;
+
+		TArray<FString> FunctionParamName;
+
+		for (auto Index = 0; Index < Params.Num(); ++Index)
+		{
+			if (Params[Index]->IsOut())
+			{
+				FunctionOutParamIndex.Add(Index);
+
+				FunctionDeclarationBody += TEXT("ref ");
+
+				FunctionParamName.Add(FString::Printf(TEXT(
+					"OutValue%d"
+				),
+				                                      FunctionOutParamIndex.Num()
+				));
+			}
+			else
+			{
+				FunctionParamName.Add(FString::Printf(TEXT(
+					"InValue%d"
+				),
+				                                      Index - FunctionOutParamIndex.Num()
+				));
+			}
+
+			FunctionDeclarationBody += FString::Printf(TEXT(
+				"%s %s%s"
+			),
+			                                           *Params[Index]->GetName(),
+			                                           *FunctionParamName[Index],
+			                                           Index == Params.Num() - 1 ? TEXT("") : TEXT(", ")
+			);
+		}
+
+		auto FunctionDeclaration = FString::Printf(TEXT(
+			"%s %s%s%s %s(%s)"
+		),
+		                                           *FunctionAccessSpecifiers,
+		                                           *FunctionStatic,
+		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
+		                                           *FunctionReturnType,
+		                                           *Function.GetFunctionName(),
+		                                           *FunctionDeclarationBody
+		);
+
+		auto FunctionCallBody = FString::Printf(TEXT(
+			"\t\t\t%s.%s(%s, out var __ReturnValue, out var __OutValue"
+		),
+		                                        *BINDING_CLASS_IMPLEMENTATION(ClassContent),
+		                                        *BINDING_COMBINE_FUNCTION(ClassContent, Function.GetFunctionName()),
+		                                        Function.IsStatic() == true ? TEXT("null") : TEXT("this")
+		);
+
+		for (auto Index = 0; Index < Params.Num(); ++Index)
+		{
+			FunctionCallBody += FString::Printf(TEXT(
+				", %s"
+			),
+			                                    *FunctionParamName[Index]
+			);
+		}
+
+		FunctionCallBody += TEXT(");\n");
+
+		FString FunctionReturnParamBody;
+
+		if (Function.GetReturn() != nullptr)
+		{
+			FunctionReturnParamBody = FString::Printf(TEXT(
+				"\t\t\treturn (%s) __ReturnValue;"
+			),
+			                                          *FunctionReturnType
+			);
+		}
+
+		FString FunctionOutParamBody;
+
+		for (auto Index = 0; Index < FunctionOutParamIndex.Num(); ++Index)
+		{
+			FunctionOutParamBody += FString::Printf(TEXT(
+				"\n\t\t\t%s = (%s)__OutValue.Value[%d];\n"
+			),
+			                                        *FunctionParamName[FunctionOutParamIndex[Index]],
+			                                        *Params[FunctionOutParamIndex[Index]]->GetName(),
+			                                        Index
+			);
+		}
+
+		auto FunctionImplementationBody = FString::Printf(TEXT(
+			"%s"
+			"%s"
+			"%s"
+			"%s"
+		),
+		                                                  *FunctionCallBody,
+		                                                  *FunctionOutParamBody,
+		                                                  FunctionReturnParamBody.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                                  *FunctionReturnParamBody
+		);
+
+		FunctionContent += FString::Printf(TEXT(
+			"%s"
+			"\t\t%s\n"
+			"\t\t{\n"
+			"%s"
+			"\n\t\t}\n"
+		),
+		                                   FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                   *FunctionDeclaration,
+		                                   *FunctionImplementationBody
+		);
+	}
+
 	UsingNameSpaces.Remove(NameSpaceContent[0]);
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)
@@ -118,13 +256,17 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 		"\tpublic partial class %s\n"
 		"\t{\n"
 		"%s"
+		"%s"
+		"%s"
 		"\t}\n"
 		"}"
 	),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent[0],
 	                               *FullClassContent,
-	                               *PropertyContent
+	                               *PropertyContent,
+	                               FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
+	                               *FunctionContent
 	);
 
 	auto DirectoryName = FPaths::Combine(
@@ -140,7 +282,7 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 {
 	FString UsingNameSpaceContent;
 
-	auto NameSpaceContent = InClass.GetTypeInfo().TypeInfo->GetNameSpace();
+	auto NameSpaceContent = InClass.GetTypeInfo().GetNameSpace();
 
 	auto ImplementationNameSpaceContent = InClass.GetImplementationNameSpace();
 
@@ -148,7 +290,7 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 
 	UsingNameSpaces.Append(NameSpaceContent);
 
-	auto FullClassContent = InClass.GetTypeInfo().TypeInfo->GetName();
+	auto FullClassContent = InClass.GetTypeInfo().GetName();
 
 	auto ClassContent = BINDING_REMOVE_PREFIX_CLASS(FullClassContent);
 
@@ -158,19 +300,19 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 
 	for (const auto& Property : InClass.GetProperties())
 	{
-		auto PropertyName = Property.Name;
+		auto PropertyName = Property.GetPropertyName();
 
-		auto PropertyType = Property.TypeInfo->GetName();
+		auto PropertyType = Property.GetName();
 
 		FString GetFunctionContent;
 
 		FString SetFunctionContent;
 
-		const auto bRead = (static_cast<int32>(Property.Access) &
+		const auto bRead = (static_cast<int32>(Property.GetAccess()) &
 				static_cast<int32>(EBindingPropertyAccess::OnlyRead))
 			== static_cast<int32>(EBindingPropertyAccess::OnlyRead);
 
-		const auto bWrite = (static_cast<int32>(Property.Access) &
+		const auto bWrite = (static_cast<int32>(Property.GetAccess()) &
 				static_cast<int32>(EBindingPropertyAccess::OnlyWrite))
 			== static_cast<int32>(EBindingPropertyAccess::OnlyWrite);
 
@@ -212,6 +354,34 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 			                                   *SetFunctionContent
 			);
 		}
+	}
+
+	for (const auto& Function : InClass.GetFunctions())
+	{
+		FString FunctionAccessSpecifiers = TEXT("public");
+
+		UsingNameSpaces.Add("Script.Common");
+
+		for (auto Param : Function.GetParams())
+		{
+			UsingNameSpaces.Append(Param->GetNameSpace());
+		}
+
+		auto FunctionDeclaration = FString::Printf(TEXT(
+			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
+			"\t\tpublic static extern void %s(%s InObject, out Object ReturnValue, out ObjectList OutValue, params Object[] InValue);\n"
+		),
+		                                           *BINDING_COMBINE_FUNCTION(ClassContent, Function.GetFunctionName()),
+		                                           *FullClassContent
+		);
+
+		FunctionContent += FString::Printf(TEXT(
+			"%s"
+			"%s"
+		),
+		                                   FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                   *FunctionDeclaration
+		);
 	}
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)
