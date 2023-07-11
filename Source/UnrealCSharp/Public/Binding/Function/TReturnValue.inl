@@ -162,6 +162,20 @@ struct TReturnValue<T, typename TEnableIf<TIsTScriptInterface<typename TDecay<T>
 };
 
 template <typename T>
+struct TReturnValue<T, typename TEnableIf<TIsUStruct<typename TDecay<T>::Type>::Value>::Type> :
+	TBaseReturnValue<T>
+{
+	using Super = TBaseReturnValue<T>;
+
+	using Type = typename Super::Type;
+
+	explicit TReturnValue(Type&& InValue):
+		Super(TPropertyValue<Type, Type>::Get(new Type(InValue), true))
+	{
+	}
+};
+
+template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FString>::Value>::Type> :
 	TSingleReturnValue<T>
 {
@@ -237,6 +251,13 @@ struct TReturnValue<T, typename TEnableIf<TIsTArray<typename TDecay<T>::Type>::V
 	TContainerReturnValue<T>
 {
 	using TContainerReturnValue<T>::TContainerReturnValue;
+};
+
+template <typename T>
+struct TReturnValue<T, typename TEnableIf<TIsEnum<typename TDecay<T>::Type>::Value>::Type> :
+	TSingleReturnValue<T>
+{
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>

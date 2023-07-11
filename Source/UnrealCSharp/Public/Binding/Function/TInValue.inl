@@ -173,6 +173,22 @@ struct TInValue<T, typename TEnableIf<TIsTScriptInterface<typename TDecay<T>::Ty
 };
 
 template <typename T>
+struct TInValue<T, typename TEnableIf<TIsUStruct<typename TDecay<T>::Type>::Value>::Type> :
+	TBaseInValue<T>
+{
+	using Super = TBaseInValue<T>;
+
+	using Super::TBaseInValue;
+
+	using Type = typename Super::Type;
+
+	MonoObject* Set()
+	{
+		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
+	}
+};
+
+template <typename T>
 struct TInValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FString>::Value>::Type> :
 	TSingleInValue<T>
 {
@@ -248,6 +264,13 @@ struct TInValue<T, typename TEnableIf<TIsTArray<typename TDecay<T>::Type>::Value
 	TContainerInValue<T>
 {
 	using TContainerInValue<T>::TContainerInValue;
+};
+
+template <typename T>
+struct TInValue<T, typename TEnableIf<TIsEnum<typename TDecay<T>::Type>::Value>::Type> :
+	TSingleInValue<T>
+{
+	using TSingleInValue<T>::TSingleInValue;
 };
 
 template <typename T>

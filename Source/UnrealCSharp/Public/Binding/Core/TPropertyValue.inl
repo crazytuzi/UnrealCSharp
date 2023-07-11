@@ -20,7 +20,7 @@ struct TPropertyValue
 };
 
 template <typename T>
-struct TPrimitivePropertyValue
+struct TSinglePropertyValue
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -62,61 +62,61 @@ struct TMultiPropertyValue
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
@@ -169,7 +169,7 @@ struct TPropertyValue<T,
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
 
@@ -185,7 +185,7 @@ struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 			FCSharpEnvironment::GetEnvironment().Bind(T::StaticStruct(), false);
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), nullptr,
-			                                                        InMember, SrcMonoObject, false);
+			                                                        InMember, SrcMonoObject, bNeedFree);
 		}
 
 		return SrcMonoObject;
@@ -268,7 +268,7 @@ struct TPropertyValue<T,
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
@@ -537,8 +537,16 @@ struct TPropertyValue<T,
 template <typename T>
 struct TPropertyValue<T,
                       typename TEnableIf<TIsEnum<T>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
+	static MonoObject* Get(T* InMember)
+	{
+		// @TODO
+		T Value = *InMember;
+
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
+			TPropertyClass<T, T>::Get(), &Value);
+	}
 };
 
 template <typename T>
