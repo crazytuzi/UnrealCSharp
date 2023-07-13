@@ -61,6 +61,32 @@ struct TMultiPropertyValue
 };
 
 template <typename T>
+struct TBindingPropertyValue
+{
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+			FCSharpEnvironment::GetEnvironment().AddBindingReference(
+				SrcMonoObject, InMember, bNeedFree);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static T Set(const MonoObject* InValue)
+	{
+		return *FCSharpEnvironment::GetEnvironment().GetBinding<T>(InValue);
+	}
+};
+
+template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> :
 	TSinglePropertyValue<T>
 {

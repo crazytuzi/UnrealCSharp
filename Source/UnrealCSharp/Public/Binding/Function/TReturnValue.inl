@@ -67,6 +67,20 @@ struct TMultiReturnValue :
 };
 
 template <typename T>
+struct TBindingReturnValue :
+	TBaseReturnValue<T>
+{
+	using Super = TBaseReturnValue<T>;
+
+	using Type = typename Super::Type;
+
+	explicit TBindingReturnValue(Type&& InValue):
+		Super(TPropertyValue<Type, Type>::Get(new Type(InValue), true))
+	{
+	}
+};
+
+template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
 	TSingleReturnValue<T>
 {

@@ -5,6 +5,14 @@
 #include "Binding/Function/TFunctionBuilder.inl"
 #include "Binding/Function/TConstructorBuilder.inl"
 #include "Binding/Function/TDestructorBuilder.inl"
+#include "Binding/Template/TClassName.inl"
+#include "Binding/TypeInfo/TName.inl"
+#include "Binding/TypeInfo/TNameSpace.inl"
+#include "Binding/Core/TPropertyClass.inl"
+#include "Binding/Core/TPropertyValue.inl"
+#include "Binding/Property/TPropertyBuilder.inl"
+#include "Binding/Function/TArgument.inl"
+#include "Binding/Function/TReturnValue.inl"
 
 #define WITH_PROPERTY_INFO WITH_EDITOR
 
@@ -42,6 +50,33 @@ struct TNameSpace<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> \
 	{ \
 		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
 	} \
+}; \
+template <typename T> \
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> : \
+	TBindingPropertyClass<T> \
+{ \
+}; \
+template <typename T> \
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> : \
+	TBindingPropertyValue<T> \
+{ \
+}; \
+template <typename InClass, typename Result, Result InClass::* Member> \
+struct TPropertyBuilder<Result InClass::*, Member, typename TEnableIf<TIsSame<Result, Class>::Value>::Type> : \
+	TPropertyInfoBuilder<InClass, Result, Member> \
+{ \
+}; \
+template <typename T> \
+struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Class>::Value>::Type> : \
+	TBindingArgument<T> \
+{ \
+	using TBindingArgument<T>::TBindingArgument; \
+}; \
+template <typename T> \
+struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Class>::Value>::Type> : \
+	TBindingReturnValue<T> \
+{ \
+	using TBindingReturnValue<T>::TBindingReturnValue; \
 };
 
 #define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set
