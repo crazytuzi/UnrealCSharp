@@ -139,7 +139,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 				FunctionParamName.Add(FString::Printf(TEXT(
 					"OutValue%d"
 				),
-				                                      FunctionOutParamIndex.Num()
+				                                      FunctionOutParamIndex.Num() - 1
 				));
 			}
 			else

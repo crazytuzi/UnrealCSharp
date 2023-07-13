@@ -6,7 +6,7 @@
 class UNREALCSHARP_API FSetHelper final : public FContainerHelper
 {
 public:
-	explicit FSetHelper(FProperty* InProperty, void* InData = nullptr);
+	explicit FSetHelper(FProperty* InProperty, void* InData = nullptr, bool InbNeedFree = false);
 
 	~FSetHelper();
 
