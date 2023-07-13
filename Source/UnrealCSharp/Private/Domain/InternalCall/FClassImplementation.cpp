@@ -5,7 +5,7 @@
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-BINDING_CLASS(UClass);
+BINDING_REFLECTION_CLASS(UClass);
 
 struct FRegisterUClass
 {

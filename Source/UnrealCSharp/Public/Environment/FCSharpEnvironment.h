@@ -10,6 +10,9 @@
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
 #include "Registry/FMixinRegistry.h"
+#include "Registry/FBindingRegistry.h"
+#include "Template/TIsUObject.inl"
+#include "Template/TIsUStruct.inl"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
 
 class UNREALCSHARP_API FCSharpEnvironment
@@ -179,6 +182,52 @@ public:
 	auto RemoveMultiReference(const void* InAddress) const;
 
 public:
+	MonoObject* GetBinding(const void* InObject) const;
+
+	template <typename T>
+	auto GetBinding(const MonoObject* InMonoObject) const;
+
+	bool AddBindingReference(MonoObject* InMonoObject, const void* InObject, bool bNeedFree = true) const;
+
+	bool RemoveBindingReference(const MonoObject* InMonoObject) const;
+
+public:
+	template <typename T, typename Enable = void>
+	class TGetObject
+	{
+	};
+
+	template <typename T>
+	class TGetObject<T, typename TEnableIf<TIsUObject<T>::Value, T>::Type>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
+		{
+			return InEnvironment.GetObject<T>(InMonoObject);
+		}
+	};
+
+	template <typename T>
+	class TGetObject<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
+		{
+			return static_cast<T*>(InEnvironment.GetStruct(InMonoObject));
+		}
+	};
+
+	template <typename T>
+	class TGetObject<T, typename TEnableIf<TNot<TOr<TIsUObject<T>, TIsUStruct<T>>>::Value, T>::Type>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
+		{
+			return InEnvironment.GetBinding<T>(InMonoObject);
+		}
+	};
+
+public:
 	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference) const;
 
 	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
@@ -216,6 +265,8 @@ private:
 	FMultiRegistry* MultiRegistry;
 
 	FMixinRegistry* MixinRegistry;
+
+	FBindingRegistry* BindingRegistry;
 };
 
 #include "FCSharpEnvironment.inl"

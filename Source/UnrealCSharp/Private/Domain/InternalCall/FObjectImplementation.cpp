@@ -6,7 +6,7 @@
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-BINDING_CLASS(UObject);
+BINDING_REFLECTION_CLASS(UObject);
 
 struct FRegisterObject
 {

@@ -6,7 +6,7 @@
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-BINDING_CLASS(UDataTableFunctionLibrary);
+BINDING_REFLECTION_CLASS(UDataTableFunctionLibrary);
 
 struct FRegisterDataTableFunctionLibrary
 {

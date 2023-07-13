@@ -139,3 +139,9 @@ auto FCSharpEnvironment::RemoveMultiReference(const void* InAddress) const
 		       ? FMultiRegistry::TMultiRegistry<T, T>::RemoveReference(MultiRegistry, InAddress)
 		       : false;
 }
+
+template <typename T>
+auto FCSharpEnvironment::GetBinding(const MonoObject* InMonoObject) const
+{
+	return BindingRegistry != nullptr ? static_cast<T*>(BindingRegistry->GetObject(InMonoObject)) : nullptr;
+}

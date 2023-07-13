@@ -4,7 +4,7 @@
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-BINDING_CLASS(UWorld);
+BINDING_REFLECTION_CLASS(UWorld);
 
 struct FRegisterWorld
 {

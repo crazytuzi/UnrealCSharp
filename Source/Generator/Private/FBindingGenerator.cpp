@@ -161,13 +161,29 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 		}
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
-			"%s %s%s%s %s(%s)"
+			"%s%s%s%s%s%s%s(%s)"
 		),
-		                                           *FunctionAccessSpecifiers,
+		                                           Function.IsDestructor() == true
+			                                           ? TEXT("")
+			                                           : *FunctionAccessSpecifiers,
+		                                           Function.IsDestructor() == true ? TEXT("") : TEXT(" "),
 		                                           *FunctionStatic,
 		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
-		                                           *FunctionReturnType,
-		                                           *Function.GetFunctionName(),
+		                                           (Function.IsConstructor() == true || Function.IsDestructor() == true)
+			                                           ? TEXT("")
+			                                           : *FunctionReturnType,
+		                                           (Function.IsConstructor() == true || Function.IsDestructor() == true)
+			                                           ? TEXT("")
+			                                           : TEXT(" "),
+		                                           Function.IsConstructor() == true
+			                                           ? *FullClassContent
+			                                           : (Function.IsDestructor() == true
+				                                              ? *FString::Printf(TEXT(
+					                                              "~%s"
+				                                              ),
+					                                              *FullClassContent
+				                                              )
+				                                              : *Function.GetFunctionName()),
 		                                           *FunctionDeclarationBody
 		);
 
@@ -195,7 +211,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 		if (Function.GetReturn() != nullptr)
 		{
 			FunctionReturnParamBody = FString::Printf(TEXT(
-				"\t\t\treturn (%s) __ReturnValue;"
+				"\t\t\treturn (%s) __ReturnValue;\n"
 			),
 			                                          *FunctionReturnType
 			);
@@ -231,7 +247,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 			"\t\t%s\n"
 			"\t\t{\n"
 			"%s"
-			"\n\t\t}\n"
+			"\t\t}\n"
 		),
 		                                   FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
 		                                   *FunctionDeclaration,

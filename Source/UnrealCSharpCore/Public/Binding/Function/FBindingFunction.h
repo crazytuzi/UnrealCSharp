@@ -17,6 +17,16 @@ struct FBindingFunction
 		return Name;
 	}
 
+	bool IsConstructor() const
+	{
+		return Info != nullptr ? Info->IsConstructor() : false;
+	}
+
+	bool IsDestructor() const
+	{
+		return Info != nullptr ? Info->IsDestructor() : false;
+	}
+
 	bool IsStatic() const
 	{
 		return Info != nullptr ? Info->IsStatic() : false;
