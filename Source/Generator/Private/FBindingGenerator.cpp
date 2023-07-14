@@ -175,15 +175,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 		                                           (Function.IsConstructor() == true || Function.IsDestructor() == true)
 			                                           ? TEXT("")
 			                                           : TEXT(" "),
-		                                           Function.IsConstructor() == true
-			                                           ? *FullClassContent
-			                                           : (Function.IsDestructor() == true
-				                                              ? *FString::Printf(TEXT(
-					                                              "~%s"
-				                                              ),
-					                                              *FullClassContent
-				                                              )
-				                                              : *Function.GetFunctionName()),
+		                                           *Function.GetFunctionName(),
 		                                           *FunctionDeclarationBody
 		);
 
@@ -191,7 +183,8 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 			"\t\t\t%s.%s(%s, out var __ReturnValue, out var __OutValue"
 		),
 		                                        *BINDING_CLASS_IMPLEMENTATION(ClassContent),
-		                                        *BINDING_COMBINE_FUNCTION(ClassContent, Function.GetFunctionName()),
+		                                        *BINDING_COMBINE_FUNCTION(
+			                                        ClassContent, Function.GetFunctionImplementationName()),
 		                                        Function.IsStatic() == true ? TEXT("null") : TEXT("this")
 		);
 
@@ -387,7 +380,8 @@ void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
 			"\t\tpublic static extern void %s(%s InObject, out Object ReturnValue, out ObjectList OutValue, params Object[] InValue);\n"
 		),
-		                                           *BINDING_COMBINE_FUNCTION(ClassContent, Function.GetFunctionName()),
+		                                           *BINDING_COMBINE_FUNCTION(
+			                                           ClassContent, Function.GetFunctionImplementationName()),
 		                                           *FullClassContent
 		);
 

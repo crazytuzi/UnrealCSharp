@@ -30,7 +30,7 @@ public:
 	void BindingProperty(const FString& InName, FTypeInfo* InTypeInfo, const void* InGetMethod,
 	                     const void* InSetMethod);
 
-	void BindingFunction(const FString& InName, FFunctionInfo* InTypeInfo);
+	void BindingFunction(const FString& InName, const FString& InImplementationName, FFunctionInfo* InTypeInfo);
 
 private:
 	static TMap<FString, FBindingClass> Classes;

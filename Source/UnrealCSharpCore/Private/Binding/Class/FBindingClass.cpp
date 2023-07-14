@@ -54,10 +54,12 @@ void FBindingClass::BindingProperty(const FString& InName, FTypeInfo* InTypeInfo
 	);
 }
 
-void FBindingClass::BindingFunction(const FString& InName, FFunctionInfo* InTypeInfo)
+void FBindingClass::BindingFunction(const FString& InName, const FString& InImplementationName,
+                                    FFunctionInfo* InTypeInfo)
 {
 	Functions.Emplace(
 		InTypeInfo,
-		InName
+		InName,
+		InImplementationName
 	);
 }

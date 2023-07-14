@@ -122,6 +122,20 @@ struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Clas
 #define BINDING_FUNCTION(Function) BINDING_FUNCTION_BUILDER_INVOKE(Function)
 #endif
 
+#define BINDING_OVERRIDE_BUILDER_INVOKE(SIGNATURE, Function) \
+	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
+	{ \
+		TFunctionBuilder<SIGNATURE, Function>::Invoke(BINDING_FUNCTION_PARAM); \
+	}).Value.Pointer
+
+#define BINDING_OVERRIDE_BUILDER_INFO(SIGNATURE, Function) TFunctionBuilder<SIGNATURE, Function>::Info()
+
+#if WITH_FUNCTION_INFO
+#define BINDING_OVERRIDE(SIGNATURE, Function) BINDING_OVERRIDE_BUILDER_INVOKE(SIGNATURE, Function), BINDING_OVERRIDE_BUILDER_INFO(SIGNATURE, Function)
+#else
+#define BINDING_OVERRIDE(SIGNATURE, Function) BINDING_OVERRIDE_BUILDER_INVOKE(SIGNATURE, Function)
+#endif
+
 #define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) \
 	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
 	{ \

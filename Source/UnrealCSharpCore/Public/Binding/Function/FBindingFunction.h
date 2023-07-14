@@ -1,20 +1,16 @@
 #pragma once
 
+#include "FBindingFunctionBase.inl"
 #include "FFunctionInfo.h"
 
-struct FBindingFunction
+struct FBindingFunction : FBindingFunctionBase
 {
 	FBindingFunction() = default;
 
-	FBindingFunction(FFunctionInfo* InInfo, const FString& InName):
-		Name(InName),
-		Info{InInfo}
+	FBindingFunction(FFunctionInfo* InInfo, const FString& InName, const FString& InImplementationName):
+		FBindingFunctionBase(InName, InImplementationName),
+		Info(InInfo)
 	{
-	}
-
-	FString GetFunctionName() const
-	{
-		return Name;
 	}
 
 	bool IsConstructor() const
@@ -45,7 +41,5 @@ struct FBindingFunction
 	}
 
 private:
-	FString Name;
-
 	FFunctionInfo* Info;
 };

@@ -2,6 +2,7 @@
 
 #include "Binding/TypeInfo/FTypeInfo.h"
 #include "Macro/BindingMacro.h"
+#include "Binding/Function/FBindingFunctionBase.inl"
 
 class UNREALCSHARP_API FBindingClassBuilder
 {
@@ -9,8 +10,8 @@ public:
 	explicit FBindingClassBuilder(const FString& InClass, const FString& InImplementationNameSpace);
 
 #if WITH_PROPERTY_INFO
-	explicit FBindingClassBuilder(const FString& InClass, FTypeInfo* InTypeInfo,
-	                              const FString& InImplementationNameSpace);
+	explicit FBindingClassBuilder(const FString& InClass, const FString& InImplementationNameSpace,
+	                              FTypeInfo* InTypeInfo);
 #endif
 
 	virtual ~FBindingClassBuilder() = default;
@@ -31,6 +32,20 @@ public:
 
 	void Register();
 
+protected:
+#if WITH_FUNCTION_INFO
+	FBindingClassBuilder& Function(const FString& InName, const FString& InImplementationName,
+	                               const void* InMethod, FFunctionInfo* InFunctionInfo = nullptr);
+#else
+	FBindingClassBuilder& Function(const FString& InName, const FString& InImplementationName,
+	                               const void* InMethod);
+#endif
+
+private:
+	FString GetFunctionImplementationName(const FString& InName) const;
+
+	int32 GetFunctionCount(const FString& InName) const;
+
 private:
 	FString Class;
 
@@ -38,5 +53,5 @@ private:
 
 	FString ImplementationNameSpace;
 
-	TMap<FString, const void*> Functions;
+	TMap<FBindingFunctionBase, const void*> Functions;
 };
