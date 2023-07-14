@@ -6,6 +6,7 @@
 #include "Binding/Function/TConstructorBuilder.inl"
 #include "Binding/Function/TDestructorBuilder.inl"
 #include "Binding/Template/TClassName.inl"
+#include "Binding/Template/TClassFullName.inl"
 #include "Binding/TypeInfo/TName.inl"
 #include "Binding/TypeInfo/TNameSpace.inl"
 #include "Binding/Core/TPropertyClass.inl"
@@ -27,6 +28,11 @@ template <> \
 struct TClassName<Class> \
 { \
 	static FString Get() { return BINDING_REMOVE_PREFIX_CLASS_STR(Class); } \
+}; \
+template <> \
+struct TClassFullName<Class> \
+{ \
+	static FString Get() { return BINDING_STR(Class); } \
 };
 
 #define BINDING_CLASS(Class) \
@@ -34,6 +40,11 @@ template <> \
 struct TClassName<Class> \
 { \
 	static FString Get() { return BINDING_REMOVE_PREFIX_CLASS_STR(Class); } \
+}; \
+template <> \
+struct TClassFullName<Class> \
+{ \
+static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
 struct TName<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> \
