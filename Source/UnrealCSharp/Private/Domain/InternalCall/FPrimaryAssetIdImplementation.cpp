@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FPrimaryAssetIdImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStructPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterPrimaryAssetId
 {
 	FRegisterPrimaryAssetId()
 	{
-		TScriptStructBuilder<FPrimaryAssetId>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FPrimaryAssetId>(NAMESPACE_LIBRARY)
 			.Function("ParseTypeAndNameName",
 			          static_cast<void*>(
 				          FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplementation))
@@ -37,9 +34,7 @@ static FRegisterPrimaryAssetId RegisterPrimaryAssetId;
 void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplementation(
 	MonoObject* TypeAndName, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
-		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
+	const auto FoundMonoClass = TPropertyClass<FPrimaryAssetId, FPrimaryAssetId>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -56,9 +51,7 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplement
 void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImplementation(MonoObject* TypeAndName,
 	MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
-		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
+	const auto FoundMonoClass = TPropertyClass<FPrimaryAssetId, FPrimaryAssetId>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -95,8 +88,7 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation(
 	{
 		const auto ResultString = PrimaryAssetId->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -110,9 +102,7 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation(
 
 void FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation(MonoObject* String, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
-		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
+	const auto FoundMonoClass = TPropertyClass<FPrimaryAssetId, FPrimaryAssetId>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 

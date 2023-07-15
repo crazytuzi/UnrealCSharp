@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FLogImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Log/UnrealCSharpLog.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -7,7 +7,7 @@ struct FRegisterLog
 {
 	FRegisterLog()
 	{
-		FBindingClassBuilder(TEXT("Log"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Log"), NAMESPACE_LIBRARY)
 			.Function("Log", static_cast<void*>(FLogImplementation::Log_LogImplementation))
 			.Register();
 	}

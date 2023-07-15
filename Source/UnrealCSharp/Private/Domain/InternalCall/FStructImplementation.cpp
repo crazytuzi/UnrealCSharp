@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FStructImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 #include "Async/Async.h"
@@ -8,7 +8,7 @@ struct FRegisterStruct
 {
 	FRegisterStruct()
 	{
-		FBindingClassBuilder(TEXT("Struct"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Struct"), NAMESPACE_LIBRARY)
 			.Function("StaticStruct", static_cast<void*>(FStructImplementation::Struct_StaticStructImplementation))
 			.Function("Register", static_cast<void*>(FStructImplementation::Struct_RegisterImplementation))
 			.Function("UnRegister", static_cast<void*>(FStructImplementation::Struct_UnRegisterImplementation))

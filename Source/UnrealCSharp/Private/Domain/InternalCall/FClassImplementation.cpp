@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FClassImplementation.h"
-#include "Binding/Class/TClassBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/Property/TPropertyBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/BindingMacro.h"
@@ -11,7 +11,7 @@ struct FRegisterUClass
 {
 	FRegisterUClass()
 	{
-		TClassBuilder<UClass>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<UClass>(NAMESPACE_LIBRARY)
 			.Property("ClassDefaultObject", BINDING_READONLY_PROPERTY(&UClass::ClassDefaultObject))
 			.Function("GetDefaultObject",
 			          static_cast<void*>(FClassImplementation::Class_GetDefaultObjectImplementation))

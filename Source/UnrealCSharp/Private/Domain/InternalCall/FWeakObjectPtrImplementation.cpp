@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FWeakObjectPtrImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 #include "Async/Async.h"
@@ -8,7 +8,7 @@ struct FRegisterWeakObjectPtr
 {
 	FRegisterWeakObjectPtr()
 	{
-		FBindingClassBuilder(TEXT("WeakObjectPtr"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("WeakObjectPtr"), NAMESPACE_LIBRARY)
 			.Function("Register",
 			          static_cast<void*>(FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation))
 			.Function("UnRegister",

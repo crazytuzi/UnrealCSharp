@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FLazyObjectPtrImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -7,7 +7,7 @@ struct FRegisterLazyObjectPtr
 {
 	FRegisterLazyObjectPtr()
 	{
-		FBindingClassBuilder(TEXT("LazyObjectPtr"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("LazyObjectPtr"), NAMESPACE_LIBRARY)
 			.Function("Register",
 			          static_cast<void*>(FLazyObjectPtrImplementation::LazyObjectPtr_RegisterImplementation))
 			.Function("UnRegister",

@@ -1,6 +1,6 @@
 ﻿#include "Domain/InternalCall/FDataTableFunctionLibrary.h"
-#include "Binding/Class/FBindingClassBuilder.h"
-#include "Binding/Class/TClassBuilder.inl"
+#include "Binding/Class/FClassBuilder.h"
+#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Macro/BindingMacro.h"
@@ -12,7 +12,7 @@ struct FRegisterDataTableFunctionLibrary
 {
 	FRegisterDataTableFunctionLibrary()
 	{
-		TClassBuilder<UDataTableFunctionLibrary>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<UDataTableFunctionLibrary>(NAMESPACE_LIBRARY)
 			.Function("GetDataTableRowFromName",
 			          static_cast<void*>(
 				          FDataTableFunctionLibraryImplementation::DataTableFunctionLibrary_GetDataTableRowFromNameImplementation))

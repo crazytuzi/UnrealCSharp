@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/FBindingClassBuilder.h"
+﻿#include "Binding/Class/FClassBuilder.h"
 #include "Binding/FBinding.h"
 #include "Binding/Class/FBindingClass.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -6,7 +6,7 @@
 #include "Macro/ClassMacro.h"
 #include "Kismet/KismetStringLibrary.h"
 
-FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, const FString& InImplementationNameSpace):
+FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace):
 	Class(InClass),
 	TypeInfo(nullptr),
 	ImplementationNameSpace(InImplementationNameSpace)
@@ -14,8 +14,8 @@ FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, const FString
 }
 
 #if WITH_PROPERTY_INFO
-FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, const FString& InImplementationNameSpace,
-                                           FTypeInfo* InTypeInfo):
+FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace,
+                             FTypeInfo* InTypeInfo):
 	Class(InClass),
 	TypeInfo(InTypeInfo),
 	ImplementationNameSpace(InImplementationNameSpace)
@@ -24,10 +24,10 @@ FBindingClassBuilder::FBindingClassBuilder(const FString& InClass, const FString
 #endif
 
 #if WITH_PROPERTY_INFO
-FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, const void* InGetMethod,
-                                                     const void* InSetMethod, FTypeInfo* InTypeInfo)
+FClassBuilder& FClassBuilder::Property(const FString& InName, const void* InGetMethod,
+                                       const void* InSetMethod, FTypeInfo* InTypeInfo)
 #else
-FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, const void* InGetMethod,
+FClassBuilder& FClassBuilder::Property(const FString& InName, const void* InGetMethod,
 													 const void* InSetMethod)
 #endif
 {
@@ -43,10 +43,10 @@ FBindingClassBuilder& FBindingClassBuilder::Property(const FString& InName, cons
 }
 
 #if WITH_FUNCTION_INFO
-FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, const void* InMethod,
-                                                     FFunctionInfo* InFunctionInfo)
+FClassBuilder& FClassBuilder::Function(const FString& InName, const void* InMethod,
+                                       FFunctionInfo* InFunctionInfo)
 #else
-FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, const void* InMethod)
+FClassBuilder& FClassBuilder::Function(const FString& InName, const void* InMethod)
 #endif
 {
 #if WITH_FUNCTION_INFO
@@ -56,7 +56,7 @@ FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, cons
 #endif
 }
 
-void FBindingClassBuilder::Register()
+void FClassBuilder::Register()
 {
 	for (const auto& Iterator : Functions)
 	{
@@ -65,10 +65,10 @@ void FBindingClassBuilder::Register()
 }
 
 #if WITH_FUNCTION_INFO
-FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, const FString& InImplementationName,
-                                                     const void* InMethod, FFunctionInfo* InFunctionInfo)
+FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
+                                       const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, const FString& InImplementationName,
+FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
 	const void* InMethod)
 #endif
 {
@@ -90,7 +90,7 @@ FBindingClassBuilder& FBindingClassBuilder::Function(const FString& InName, cons
 	return *this;
 }
 
-FString FBindingClassBuilder::GetFunctionImplementationName(const FString& InName) const
+FString FClassBuilder::GetFunctionImplementationName(const FString& InName) const
 {
 	const auto Count = GetFunctionCount(InName);
 
@@ -101,7 +101,7 @@ FString FBindingClassBuilder::GetFunctionImplementationName(const FString& InNam
 	);
 }
 
-int32 FBindingClassBuilder::GetFunctionCount(const FString& InName) const
+int32 FClassBuilder::GetFunctionCount(const FString& InName) const
 {
 	auto Count = 0;
 

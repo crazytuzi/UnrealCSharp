@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FUnrealImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -7,7 +7,7 @@ struct FRegisterUnreal
 {
 	FRegisterUnreal()
 	{
-		FBindingClassBuilder(TEXT("Unreal"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Unreal"), NAMESPACE_LIBRARY)
 			.Function("NewObject",
 			          static_cast<void*>(FUnrealImplementation::Unreal_NewObjectImplementation))
 			.Function("DuplicateObject",

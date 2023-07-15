@@ -1,8 +1,7 @@
 ﻿#include "Domain/InternalCall/FObjectImplementation.h"
-#include "Binding/Class/TClassBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Core/TPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -12,7 +11,7 @@ struct FRegisterObject
 {
 	FRegisterObject()
 	{
-		TClassBuilder<UObject>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<UObject>(NAMESPACE_LIBRARY)
 			.Function("StaticClass", static_cast<void*>(FObjectImplementation::Object_StaticClassImplementation))
 			.Function("GetClass", static_cast<void*>(FObjectImplementation::Object_GetClassImplementation))
 			.Function("GetName", static_cast<void*>(FObjectImplementation::Object_GetNameImplementation))
@@ -50,8 +49,7 @@ void FObjectImplementation::Object_GetNameImplementation(const MonoObject* InMon
 	{
 		const auto Name = FoundObject->GetName();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*Name)));

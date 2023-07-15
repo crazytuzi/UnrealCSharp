@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FFunctionImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -7,7 +7,7 @@ struct FRegisterFunction
 {
 	FRegisterFunction()
 	{
-		FBindingClassBuilder(TEXT("Function"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Function"), NAMESPACE_LIBRARY)
 			.Function("Reflection", static_cast<void*>(FFunctionImplementation::Function_ReflectionImplementation))
 			.Register();
 	}

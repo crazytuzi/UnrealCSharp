@@ -203,23 +203,26 @@ struct TScriptStruct<FTestUninitializedScriptStructMembersTest>
 template <>
 struct TScriptStruct<FMatrix>
 {
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FMatrix>::Get()); }
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TName<FMatrix, FMatrix>::Get()); }
 };
 
 template <>
 struct TScriptStruct<FIntPoint>
 {
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FIntPoint>::Get()); }
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TName<FIntPoint, FIntPoint>::Get()); }
 };
 
 template <>
 struct TScriptStruct<FTimespan>
 {
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FTimespan>::Get()); }
+	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TName<FTimespan, FTimespan>::Get()); }
 };
 
 template <>
 struct TScriptStruct<FAssetBundleEntry>
 {
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TScriptStructName<FAssetBundleEntry>::Get()); }
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*TName<FAssetBundleEntry, FAssetBundleEntry>::Get());
+	}
 };

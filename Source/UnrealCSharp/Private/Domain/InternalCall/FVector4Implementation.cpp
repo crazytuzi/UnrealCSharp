@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FVector4Implementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStructPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterVector4
 {
 	FRegisterVector4()
 	{
-		TScriptStructBuilder<FVector4>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FVector4>(NAMESPACE_LIBRARY)
 			.Function("GetComponent", static_cast<void*>(FVector4Implementation::Vector4_GetComponentImplementation))
 			.Function("SetComponent", static_cast<void*>(FVector4Implementation::Vector4_SetComponentImplementation))
 			.Function("Negated", static_cast<void*>(FVector4Implementation::Vector4_NegatedImplementation))
@@ -84,9 +81,7 @@ void FVector4Implementation::Vector4_NegatedImplementation(const MonoObject* InM
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -106,9 +101,7 @@ void FVector4Implementation::Vector4_AddImplementation(const MonoObject* A, cons
 
 	const auto Vector4B = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -129,9 +122,7 @@ void FVector4Implementation::Vector4_SubtractImplementation(const MonoObject* A,
 
 	const auto Vector4B = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -150,9 +141,7 @@ void FVector4Implementation::Vector4_MultiplyScaleImplementation(const MonoObjec
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -171,9 +160,7 @@ void FVector4Implementation::Vector4_DivideScaleImplementation(const MonoObject*
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -194,9 +181,7 @@ void FVector4Implementation::Vector4_DivideImplementation(const MonoObject* A, c
 
 	const auto Vector4B = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -217,9 +202,7 @@ void FVector4Implementation::Vector4_MultiplyImplementation(const MonoObject* A,
 
 	const auto Vector4B = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -296,9 +279,7 @@ void FVector4Implementation::Vector4_CrossProductImplementation(const MonoObject
 
 	const auto Vector4B = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -360,8 +341,7 @@ void FVector4Implementation::Vector4_ToStringImplementation(const MonoObject* In
 	{
 		const auto ResultString = Vector4->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -393,9 +373,7 @@ void FVector4Implementation::Vector4_GetSafeNormalImplementation(const MonoObjec
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -414,9 +392,7 @@ void FVector4Implementation::Vector4_GetUnsafeNormal3Implementation(const MonoOb
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -435,9 +411,7 @@ void FVector4Implementation::Vector4_ToOrientationRotatorImplementation(const Mo
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
-		CLASS_SCRIPT_STRUCT_NAME(FRotator));
+	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -456,9 +430,7 @@ void FVector4Implementation::Vector4_ToOrientationQuatImplementation(const MonoO
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FQuat)),
-		CLASS_SCRIPT_STRUCT_NAME(FQuat));
+	const auto FoundMonoClass = TPropertyClass<FQuat, FQuat>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -476,9 +448,7 @@ void FVector4Implementation::Vector4_RotationImplementation(const MonoObject* In
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FRotator)),
-		CLASS_SCRIPT_STRUCT_NAME(FRotator));
+	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -582,9 +552,7 @@ void FVector4Implementation::Vector4_Reflect3Implementation(const MonoObject* In
 
 	const auto Vector4Normal = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(Normal);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -603,9 +571,7 @@ void FVector4Implementation::Vector4_FindBestAxisVectors3Implementation(const Mo
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector4)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector4));
+	const auto FoundMonoClass = TPropertyClass<FVector4, FVector4>::Get();
 
 	const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 

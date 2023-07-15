@@ -1,15 +1,14 @@
 ﻿#include "Domain/InternalCall/FSoftClassPathImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStructPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterSoftClassPath
 {
 	FRegisterSoftClassPath()
 	{
-		TScriptStructBuilder<FSoftClassPath>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FSoftClassPath>(NAMESPACE_LIBRARY)
 			.Function("GetOrCreateIDForObject",
 			          static_cast<void*>(
 				          FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForObjectImplementation))
@@ -24,9 +23,7 @@ void FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForObjectImplement
 {
 	const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FSoftClassPath)),
-		CLASS_SCRIPT_STRUCT_NAME(FSoftClassPath));
+	const auto FoundMonoClass = TPropertyClass<FSoftClassPath, FSoftClassPath>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 

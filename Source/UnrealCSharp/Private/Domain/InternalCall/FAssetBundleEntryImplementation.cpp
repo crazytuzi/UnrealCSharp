@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FAssetBundleEntryImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -7,7 +7,7 @@ struct FRegisterAssetBundleEntry
 {
 	FRegisterAssetBundleEntry()
 	{
-		TScriptStructBuilder<FAssetBundleEntry>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FAssetBundleEntry>(NAMESPACE_LIBRARY)
 			.Function("IsValid",
 			          static_cast<void*>(FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation))
 			.Function("Equality",
