@@ -90,6 +90,58 @@ struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Clas
 	using TBindingReturnValue<T>::TBindingReturnValue; \
 };
 
+#define BINDING_SCRIPT_STRUCT(Class) \
+template <> \
+struct TClassName<Class> \
+{ \
+	static FString Get() { return BINDING_REMOVE_PREFIX_CLASS_STR(Class); } \
+}; \
+template <> \
+struct TClassFullName<Class> \
+{ \
+	static FString Get() { return BINDING_STR(Class); } \
+}; \
+template <typename T> \
+struct TName<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> \
+{ \
+	static FString Get() { return BINDING_STR(Class); } \
+}; \
+template <typename T> \
+struct TNameSpace<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(TBaseStructure<T>::Get())}; \
+	} \
+}; \
+template <typename T> \
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> : \
+	TScriptStructPropertyClass<T> \
+{ \
+}; \
+template <typename T> \
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> : \
+	TScriptStructPropertyValue<T> \
+{ \
+}; \
+template <typename InClass, typename Result, Result InClass::* Member> \
+struct TPropertyBuilder<Result InClass::*, Member, typename TEnableIf<TIsSame<Result, Class>::Value>::Type> : \
+	TPropertyInfoBuilder<InClass, Result, Member> \
+{ \
+}; \
+template <typename T> \
+struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Class>::Value>::Type> : \
+	TScriptStructArgument<T> \
+{ \
+	using TScriptStructArgument<T>::TScriptStructArgument; \
+}; \
+template <typename T> \
+struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Class>::Value>::Type> : \
+	TScriptStructReturnValue<T> \
+{ \
+	using TScriptStructReturnValue<T>::TScriptStructReturnValue; \
+};
+
 #define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set
 
 #define BINDING_PROPERTY_BUILDER_GET(Property) TPropertyBuilder<decltype(Property), Property>::Get

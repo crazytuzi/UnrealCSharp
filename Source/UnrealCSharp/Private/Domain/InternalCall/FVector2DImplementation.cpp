@@ -1,6 +1,6 @@
 ﻿#include "Domain/InternalCall/FVector2DImplementation.h"
 #include "Binding/Class/TReflectionClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStructPropertyClass.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 

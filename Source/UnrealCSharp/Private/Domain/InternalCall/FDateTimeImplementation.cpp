@@ -1,6 +1,6 @@
 ﻿#include "Domain/InternalCall/FDateTimeImplementation.h"
 #include "Binding/Class/TReflectionClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStructPropertyClass.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 

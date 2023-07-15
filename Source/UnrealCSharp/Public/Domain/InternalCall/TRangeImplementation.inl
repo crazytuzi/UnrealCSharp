@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Environment/FCSharpEnvironment.h"
-#include "Binding/ScriptStruct/TScriptStructPropertyClass.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 
 template <typename T, typename U, typename V>
 auto TRangeImplementation<T, U, V>::Range_EqualityImplementation(const MonoObject* A, const MonoObject* B)

@@ -94,6 +94,22 @@ struct TBindingArgument :
 };
 
 template <typename T>
+struct TScriptStructArgument :
+	TBaseArgument<T>
+{
+	using Super = TBaseArgument<T>;
+
+	using Super::TBaseArgument;
+
+	using Type = typename Super::Type;
+
+	MonoObject* Set()
+	{
+		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
+	}
+};
+
+template <typename T>
 struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
 	TSingleArgument<T>
 {

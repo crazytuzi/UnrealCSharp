@@ -1,6 +1,6 @@
 ﻿#include "Domain/InternalCall/FPolyglotTextDataImplementation.h"
 #include "Binding/Class/TReflectionClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStructPropertyClass.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Internationalization/PolyglotTextData.h"
 #include "Macro/NamespaceMacro.h"

@@ -1,228 +1,69 @@
 ﻿#pragma once
 
-#include "TScriptStructName.inl"
+#include "TBaseStructure.inl"
 
-static UScriptStruct* StaticGetBaseStructureInternal(const FName& Name)
-{
-	static auto CoreUObjectPkg = FindObjectChecked<UPackage>(nullptr, TEXT("/Script/CoreUObject"));
+BINDING_SCRIPT_STRUCT(FRotator);
 
-	const auto Result = static_cast<UScriptStruct*>(StaticFindObjectFast(
-		UScriptStruct::StaticClass(), CoreUObjectPkg, Name, false, false, RF_NoFlags, EInternalObjectFlags::None));
+BINDING_SCRIPT_STRUCT(FQuat);
 
-#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
-	if (Result == nullptr)
-	{
-		UE_LOG(LogClass, Fatal, TEXT("Failed to find native struct '%s.%s'"), *CoreUObjectPkg->GetName(),
-		       *Name.ToString());
-	}
-#endif
+BINDING_SCRIPT_STRUCT(FTransform);
 
-	return Result;
-}
+BINDING_SCRIPT_STRUCT(FLinearColor);
 
-template <class T>
-struct TScriptStruct
-{
-	static UScriptStruct* Get() { return T::StaticStruct(); }
-};
+BINDING_SCRIPT_STRUCT(FColor);
 
-template <>
-struct TScriptStruct<FRotator>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FRotator>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FPlane);
 
-template <>
-struct TScriptStruct<FQuat>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FQuat>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FVector);
 
-template <>
-struct TScriptStruct<FTransform>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FTransform>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FVector2D);
 
-template <>
-struct TScriptStruct<FLinearColor>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FLinearColor>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FVector4);
 
-template <>
-struct TScriptStruct<FColor>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FColor>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FRandomStream);
 
-template <>
-struct TScriptStruct<FPlane>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FPlane>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FGuid);
 
-template <>
-struct TScriptStruct<FVector>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FVector>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FBox2D);
 
-template <>
-struct TScriptStruct<FVector2D>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FVector2D>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FFallbackStruct);
 
-template <>
-struct TScriptStruct<FVector4>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FVector4>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FFloatRangeBound);
 
-template <>
-struct TScriptStruct<FRandomStream>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FRandomStream>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FFloatRange);
 
-template <>
-struct TScriptStruct<FGuid>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FGuid>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FInt32RangeBound);
 
-template <>
-struct TScriptStruct<FBox2D>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FBox2D>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FInt32Range);
 
-template <>
-struct TScriptStruct<FFallbackStruct>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FFallbackStruct>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FFloatInterval);
 
-template <>
-struct TScriptStruct<FFloatRangeBound>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FFloatRangeBound>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FInt32Interval);
 
-template <>
-struct TScriptStruct<FFloatRange>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FFloatRange>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FFrameNumber);
 
-template <>
-struct TScriptStruct<FInt32RangeBound>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FInt32RangeBound>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FFrameTime);
 
-template <>
-struct TScriptStruct<FInt32Range>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FInt32Range>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FSoftObjectPath);
 
-template <>
-struct TScriptStruct<FFloatInterval>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FFloatInterval>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FSoftClassPath);
 
-template <>
-struct TScriptStruct<FInt32Interval>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FInt32Interval>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FPrimaryAssetType);
 
-template <>
-struct TScriptStruct<FFrameNumber>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FFrameNumber>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FPrimaryAssetId);
 
-template <>
-struct TScriptStruct<FFrameTime>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FFrameTime>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FDateTime);
 
-template <>
-struct TScriptStruct<FSoftObjectPath>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FSoftObjectPath>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FPolyglotTextData);
 
-template <>
-struct TScriptStruct<FSoftClassPath>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FSoftClassPath>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FAssetBundleData);
 
-template <>
-struct TScriptStruct<FPrimaryAssetType>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FPrimaryAssetType>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FTestUninitializedScriptStructMembersTest);
 
-template <>
-struct TScriptStruct<FPrimaryAssetId>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FPrimaryAssetId>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FMatrix);
 
-template <>
-struct TScriptStruct<FDateTime>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FDateTime>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FIntPoint);
 
-template <>
-struct TScriptStruct<FPolyglotTextData>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FPolyglotTextData>::Get(); }
-};
+BINDING_SCRIPT_STRUCT(FTimespan);
 
-template <>
-struct TScriptStruct<FAssetBundleData>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FAssetBundleData>::Get(); }
-};
-
-template <>
-struct TScriptStruct<FTestUninitializedScriptStructMembersTest>
-{
-	static UScriptStruct* Get() { return TBaseStructure<FTestUninitializedScriptStructMembersTest>::Get(); }
-};
-
-template <>
-struct TScriptStruct<FMatrix>
-{
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TName<FMatrix, FMatrix>::Get()); }
-};
-
-template <>
-struct TScriptStruct<FIntPoint>
-{
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TName<FIntPoint, FIntPoint>::Get()); }
-};
-
-template <>
-struct TScriptStruct<FTimespan>
-{
-	static UScriptStruct* Get() { return StaticGetBaseStructureInternal(*TName<FTimespan, FTimespan>::Get()); }
-};
-
-template <>
-struct TScriptStruct<FAssetBundleEntry>
-{
-	static UScriptStruct* Get()
-	{
-		return StaticGetBaseStructureInternal(*TName<FAssetBundleEntry, FAssetBundleEntry>::Get());
-	}
-};
+BINDING_SCRIPT_STRUCT(FAssetBundleEntry);

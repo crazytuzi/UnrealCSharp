@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Environment/FCSharpEnvironment.h"
-#include "Binding/ScriptStruct/TScriptStructPropertyClass.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 
 template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_SizeImplementation(const MonoObject* InMonoObject)
