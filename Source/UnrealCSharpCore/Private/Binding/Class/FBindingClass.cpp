@@ -3,11 +3,12 @@
 TMap<FString, FBindingClass> FBindingClass::Classes;
 
 FBindingClass* FBindingClass::GetClass(const bool InIsReflection, const FString& InClass,
-                                       const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo)
+                                       const FString& InFullClass, const FString& InImplementationNameSpace,
+                                       FTypeInfo* InTypeInfo)
 {
 	if (!Classes.Contains(InClass))
 	{
-		Classes.Add(InClass, {InIsReflection, InImplementationNameSpace, InTypeInfo});
+		Classes.Add(InClass, {InIsReflection, InClass, InFullClass, InImplementationNameSpace, InTypeInfo});
 	}
 
 	return Classes.Find(InClass);
@@ -31,6 +32,16 @@ const FString& FBindingClass::GetImplementationNameSpace() const
 const FString& FBindingClass::GetBase() const
 {
 	return Base;
+}
+
+const FString& FBindingClass::GetClass() const
+{
+	return Class;
+}
+
+const FString& FBindingClass::GetFullClass() const
+{
+	return FullClass;
 }
 
 const FBindingTypeInfo& FBindingClass::GetTypeInfo() const
@@ -74,9 +85,10 @@ void FBindingClass::BindingFunction(const FString& InName, const FString& InImpl
 	);
 }
 
-void FBindingClass::Inheritance(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo)
+void FBindingClass::Inheritance(const FString& InClass, const FString& InFullClass,
+                                const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo)
 {
-	Base = InClass;
+	Base = InFullClass;
 
-	GetClass(IsReflection(), InClass, InImplementationNameSpace, InTypeInfo);
+	GetClass(IsReflection(), InClass, InFullClass, InImplementationNameSpace, InTypeInfo);
 }

@@ -12,7 +12,8 @@ class TBindingClassBuilder final : public FClassBuilder
 public:
 	explicit TBindingClassBuilder(const FString& InImplementationNameSpace):
 #if WITH_PROPERTY_INFO
-		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace, TTypeInfo<T>::Get())
+		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace,
+		              TClassFullName<T>::Get(), TTypeInfo<T>::Get())
 #else
 		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace)
 #endif
@@ -25,8 +26,8 @@ public:
 	template <typename Class>
 	TBindingClassBuilder& Inheritance(const FString& InImplementationNameSpace)
 	{
-		GetBindingClass()->Inheritance(TClassFullName<Class>::Get(), InImplementationNameSpace,
-		                               TTypeInfo<Class>::Get());
+		GetBindingClass()->Inheritance(TClassName<Class>::Get(), TClassFullName<Class>::Get(),
+		                               InImplementationNameSpace, TTypeInfo<Class>::Get());
 
 		return *this;
 	}

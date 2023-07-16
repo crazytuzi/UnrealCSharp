@@ -10,7 +10,8 @@ class TReflectionClassBuilder final : public FClassBuilder
 public:
 	explicit TReflectionClassBuilder(const FString& InImplementationNameSpace):
 #if WITH_PROPERTY_INFO
-		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace, TTypeInfo<T>::Get())
+		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace,
+		              TClassFullName<T>::Get(), TTypeInfo<T>::Get())
 #else
 		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace)
 #endif
