@@ -2,6 +2,7 @@
 
 #include "Binding/TypeInfo/FTypeInfo.h"
 #include "Macro/BindingMacro.h"
+#include "Binding/Class/FBindingClass.h"
 #include "Binding/Function/FBindingFunctionBase.inl"
 
 class UNREALCSHARP_API FClassBuilder
@@ -40,6 +41,10 @@ protected:
 	FClassBuilder& Function(const FString& InName, const FString& InImplementationName,
 	                               const void* InMethod);
 #endif
+
+	virtual bool IsReflection() const;
+
+	FBindingClass* GetBindingClass() const;
 
 private:
 	FString GetFunctionImplementationName(const FString& InName) const;

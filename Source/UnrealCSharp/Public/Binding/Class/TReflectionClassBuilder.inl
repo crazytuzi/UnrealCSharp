@@ -16,4 +16,9 @@ public:
 #endif
 	{
 	}
+
+	virtual bool IsReflection() const override
+	{
+		return true;
+	}
 };

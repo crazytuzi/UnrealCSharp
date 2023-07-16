@@ -1,6 +1,5 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Binding/FBinding.h"
-#include "Binding/Class/FBindingClass.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Macro/ClassMacro.h"
@@ -34,8 +33,7 @@ FClassBuilder& FClassBuilder::Property(const FString& InName, const void* InGetM
 #if WITH_PROPERTY_INFO
 	if (InTypeInfo != nullptr)
 	{
-		FBindingClass::GetClass(Class, COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace), TypeInfo)->
-			BindingProperty(InName, InTypeInfo, InGetMethod, InSetMethod);
+		GetBindingClass()->BindingProperty(InName, InTypeInfo, InGetMethod, InSetMethod);
 	}
 #endif
 
@@ -75,8 +73,7 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InI
 #if WITH_FUNCTION_INFO
 	if (InFunctionInfo != nullptr)
 	{
-		FBindingClass::GetClass(Class, COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace), TypeInfo)->
-			BindingFunction(InName, InImplementationName, InFunctionInfo);
+		GetBindingClass()->BindingFunction(InName, InImplementationName, InFunctionInfo);
 	}
 #endif
 
@@ -88,6 +85,19 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InI
 	                  }, InMethod);
 
 	return *this;
+}
+
+bool FClassBuilder::IsReflection() const
+{
+	return false;
+}
+
+FBindingClass* FClassBuilder::GetBindingClass() const
+{
+	return FBindingClass::GetClass(IsReflection(),
+	                               Class,
+	                               COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace),
+	                               TypeInfo);
 }
 
 FString FClassBuilder::GetFunctionImplementationName(const FString& InName) const

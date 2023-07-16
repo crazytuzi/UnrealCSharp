@@ -2,6 +2,7 @@
 
 #include "FClassBuilder.h"
 #include "Binding/Template/TClassName.inl"
+#include "Binding/Template/TClassFullName.inl"
 #include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Macro/FunctionMacro.h"
 
@@ -19,6 +20,15 @@ public:
 		Constructor(BINDING_CONSTRUCTOR(T));
 
 		Destructor(BINDING_DESTRUCTOR());
+	}
+
+	template <typename Class>
+	TBindingClassBuilder& Inheritance(const FString& InImplementationNameSpace)
+	{
+		GetBindingClass()->Inheritance(TClassFullName<Class>::Get(), InImplementationNameSpace,
+		                               TTypeInfo<Class>::Get());
+
+		return *this;
 	}
 
 #if WITH_FUNCTION_INFO

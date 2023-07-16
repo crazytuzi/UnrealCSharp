@@ -22,7 +22,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 {
 	FString UsingNameSpaceContent;
 
-	TSet<FString> UsingNameSpaces{InClass.GetImplementationNameSpace()};
+	TSet<FString> UsingNameSpaces{InClass.GetImplementationNameSpace(), TEXT("System")};
 
 	const auto& NameSpaceContent = InClass.GetTypeInfo().GetNameSpace();
 
@@ -33,6 +33,23 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 	FString PropertyContent;
 
 	FString FunctionContent;
+
+	if (!InClass.IsReflection())
+	{
+		FunctionContent = FString::Printf(TEXT(
+			"\t\tprotected %s(Type InValue)%s\n"
+			"\t\t{\n"
+			"\t\t}\n"
+		),
+		                                  *FullClassContent,
+		                                  InClass.GetBase().IsEmpty()
+			                                  ? TEXT("")
+			                                  : *FString::Printf(TEXT(
+				                                  " : base(typeof(%s))"
+			                                  ),
+			                                                     *FullClassContent
+			                                  ));
+	}
 
 	for (const auto& Property : InClass.GetProperties())
 	{
@@ -160,8 +177,18 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 			);
 		}
 
+		FString Base;
+
+		if (!InClass.IsReflection() && !InClass.GetBase().IsEmpty() && Function.IsConstructor())
+		{
+			Base = FString::Printf(TEXT(
+				" : base(typeof(%s))"
+			),
+			                       *FullClassContent);
+		}
+
 		auto FunctionDeclaration = FString::Printf(TEXT(
-			"%s%s%s%s%s%s%s(%s)"
+			"%s%s%s%s%s%s%s(%s)%s"
 		),
 		                                           Function.IsDestructor() == true
 			                                           ? TEXT("")
@@ -176,7 +203,8 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 			                                           ? TEXT("")
 			                                           : TEXT(" "),
 		                                           *Function.GetFunctionName(),
-		                                           *FunctionDeclarationBody
+		                                           *FunctionDeclarationBody,
+		                                           *Base
 		);
 
 		auto FunctionCallBody = FString::Printf(TEXT(
@@ -262,7 +290,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
-		"\tpublic partial class %s\n"
+		"\tpublic partial class %s%s\n"
 		"\t{\n"
 		"%s"
 		"%s"
@@ -273,8 +301,15 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent[0],
 	                               *FullClassContent,
+	                               InClass.GetBase().IsEmpty()
+		                               ? TEXT("")
+		                               : *FString::Printf(TEXT(
+			                               " : %s"
+		                               ),
+		                                                  *InClass.GetBase()
+		                               ),
 	                               *PropertyContent,
-	                               FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
+	                               PropertyContent.IsEmpty() ? TEXT("") : TEXT("\n"),
 	                               *FunctionContent
 	);
 

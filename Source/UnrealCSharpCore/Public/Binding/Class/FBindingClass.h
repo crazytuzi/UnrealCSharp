@@ -6,19 +6,24 @@
 class UNREALCSHARPCORE_API FBindingClass
 {
 public:
-	FBindingClass(const FString& InBindingNameSpace, FTypeInfo* InTypeInfo):
+	FBindingClass(const bool InIsReflection, const FString& InBindingNameSpace, FTypeInfo* InTypeInfo):
+		bIsReflection(InIsReflection),
 		ImplementationNameSpace(InBindingNameSpace),
 		TypeInfo{InTypeInfo}
 	{
 	}
 
-	static FBindingClass* GetClass(const FString& InClass, const FString& InImplementationNameSpace,
-	                               FTypeInfo* InTypeInfo);
+	static FBindingClass* GetClass(bool InIsReflection, const FString& InClass,
+	                               const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
 
 	static const TMap<FString, FBindingClass>& GetClasses();
 
 public:
+	bool IsReflection() const;
+
 	const FString& GetImplementationNameSpace() const;
+
+	const FString& GetBase() const;
 
 	const FBindingTypeInfo& GetTypeInfo() const;
 
@@ -32,10 +37,16 @@ public:
 
 	void BindingFunction(const FString& InName, const FString& InImplementationName, FFunctionInfo* InTypeInfo);
 
+	void Inheritance(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
+
 private:
 	static TMap<FString, FBindingClass> Classes;
 
+	bool bIsReflection;
+
 	FString ImplementationNameSpace;
+
+	FString Base;
 
 	FBindingTypeInfo TypeInfo;
 
