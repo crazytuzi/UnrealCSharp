@@ -71,7 +71,10 @@ struct TBindingPropertyValue
 		{
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+			auto InParams = static_cast<void*>(FoundMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
 			FCSharpEnvironment::GetEnvironment().AddBindingReference(
 				SrcMonoObject, InMember, bNeedFree);

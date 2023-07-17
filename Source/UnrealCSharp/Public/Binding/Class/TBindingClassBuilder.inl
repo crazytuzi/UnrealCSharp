@@ -18,7 +18,10 @@ public:
 		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace)
 #endif
 	{
-		Constructor(BINDING_CONSTRUCTOR(T));
+		if constexpr (std::is_default_constructible_v<T>)
+		{
+			Constructor(BINDING_CONSTRUCTOR(T));
+		}
 
 		Destructor(BINDING_DESTRUCTOR());
 	}
