@@ -1,16 +1,16 @@
 ﻿#include "Domain/InternalCall/FWorldImplementation.h"
-#include "Binding/Class/TClassBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-BINDING_CLASS(UWorld);
+BINDING_REFLECTION_CLASS(UWorld);
 
 struct FRegisterWorld
 {
 	FRegisterWorld()
 	{
-		TClassBuilder<UWorld>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<UWorld>(NAMESPACE_LIBRARY)
 			.Function("SpawnActor", static_cast<void*>(FWorldImplementation::World_SpawnActorImplementation))
 			.Register();
 	}

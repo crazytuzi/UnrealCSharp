@@ -1,16 +1,15 @@
 ﻿#include "Domain/InternalCall/FPolyglotTextDataImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Internationalization/PolyglotTextData.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterPolyglotTextData
 {
 	FRegisterPolyglotTextData()
 	{
-		TScriptStructBuilder<FPolyglotTextData>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FPolyglotTextData>(NAMESPACE_LIBRARY)
 			.Function("IsValid",
 			          static_cast<void*>(FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation))
 			.Function("SetNativeCulture",
@@ -72,8 +71,7 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation(
 
 	const auto Result = PolyglotTextData->IsValid(&Text);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT);
+	const auto FoundMonoClass = TPropertyClass<FText, FText>::Get();
 
 	auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 		TCHAR_TO_UTF8(*Text.ToString())));
@@ -110,8 +108,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeCultureImplement
 	{
 		const auto ResultString = PolyglotTextData->GetNativeCulture();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -133,8 +130,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_ResolveNativeCultureImple
 	{
 		const auto ResultString = PolyglotTextData->ResolveNativeCulture();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -176,8 +172,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation
 
 		PolyglotTextData->GetIdentity(StringOutNamespace, StringOutKey);
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString1 = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*StringOutNamespace)));
@@ -207,8 +202,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNamespaceImplementatio
 	{
 		const auto ResultString = PolyglotTextData->GetNamespace();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -230,8 +224,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetKeyImplementation(
 	{
 		const auto ResultString = PolyglotTextData->GetKey();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -267,8 +260,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeStringImplementa
 	{
 		const auto ResultString = PolyglotTextData->GetNativeString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -325,8 +317,7 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImpleme
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InCulture, nullptr))), String);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+	const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 	auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 		TCHAR_TO_UTF8(*String)));
@@ -386,8 +377,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetTextImplementation(
 	{
 		const auto ResultString = PolyglotTextData->GetText();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT);
+		const auto FoundMonoClass = TPropertyClass<FText, FText>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString.ToString())));

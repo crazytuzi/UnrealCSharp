@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FAssetBundleDataImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterAssetBundleData
 {
 	FRegisterAssetBundleData()
 	{
-		TScriptStructBuilder<FAssetBundleData>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FAssetBundleData>(NAMESPACE_LIBRARY)
 			.Function("Equality",
 			          static_cast<void*>(FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation))
 			.Function("Inequality",
@@ -63,9 +60,7 @@ void FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation(
 	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleData>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FAssetBundleEntry)),
-		CLASS_SCRIPT_STRUCT_NAME(FAssetBundleEntry));
+	const auto FoundMonoClass = TPropertyClass<FAssetBundleEntry, FAssetBundleEntry>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -121,8 +116,7 @@ void FAssetBundleDataImplementation::AssetBundleData_ToDebugStringImplementation
 	{
 		const auto ResultString = AssetBundleData->ToDebugString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));

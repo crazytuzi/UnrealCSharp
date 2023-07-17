@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FSetImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
 #include "Macro/NamespaceMacro.h"
@@ -10,7 +10,7 @@ struct FRegisterSet
 {
 	FRegisterSet()
 	{
-		FBindingClassBuilder(TEXT("Set"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Set"), NAMESPACE_LIBRARY)
 			.Function("Register", static_cast<void*>(FSetImplementation::Set_RegisterImplementation))
 			.Function("UnRegister", static_cast<void*>(FSetImplementation::Set_UnRegisterImplementation))
 			.Function("Empty", static_cast<void*>(FSetImplementation::Set_EmptyImplementation))

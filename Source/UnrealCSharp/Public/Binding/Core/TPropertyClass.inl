@@ -33,6 +33,24 @@ struct TMultiPropertyClass
 };
 
 template <typename T>
+struct TBindingPropertyClass
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+
+template <typename T>
+struct TScriptStructPropertyClass
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+
+template <typename T>
 struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type>
 {
 	static MonoClass* Get()

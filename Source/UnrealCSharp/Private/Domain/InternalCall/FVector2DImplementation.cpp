@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FVector2DImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterVector2D
 {
 	FRegisterVector2D()
 	{
-		TScriptStructBuilder<FVector2D>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FVector2D>(NAMESPACE_LIBRARY)
 			.Function("Add", static_cast<void*>(FVector2DImplementation::Vector2D_AddImplementation))
 			.Function("Subtract", static_cast<void*>(FVector2DImplementation::Vector2D_SubtractImplementation))
 			.Function("MultiplyScale",
@@ -75,9 +72,7 @@ void FVector2DImplementation::Vector2D_AddImplementation(const MonoObject* A, co
 
 	const auto Vector2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -98,9 +93,7 @@ void FVector2DImplementation::Vector2D_SubtractImplementation(const MonoObject* 
 
 	const auto Vector2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -119,9 +112,7 @@ void FVector2DImplementation::Vector2D_MultiplyScaleImplementation(const MonoObj
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -140,9 +131,7 @@ void FVector2DImplementation::Vector2D_DivideScaleImplementation(const MonoObjec
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -161,9 +150,7 @@ void FVector2DImplementation::Vector2D_AddAImplementation(const MonoObject* InMo
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -182,9 +169,7 @@ void FVector2DImplementation::Vector2D_SubtractAImplementation(const MonoObject*
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -205,9 +190,7 @@ void FVector2DImplementation::Vector2D_MultiplyImplementation(const MonoObject* 
 
 	const auto Vector2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -228,9 +211,7 @@ void FVector2DImplementation::Vector2D_DivideImplementation(const MonoObject* A,
 
 	const auto Vector2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -360,9 +341,7 @@ void FVector2DImplementation::Vector2D_NegatedImplementation(const MonoObject* I
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -446,9 +425,7 @@ void FVector2DImplementation::Vector2D_MaxImplementation(const MonoObject* A, co
 
 	const auto Vector2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -469,9 +446,7 @@ void FVector2DImplementation::Vector2D_MinImplementation(const MonoObject* A, co
 
 	const auto Vector2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -576,9 +551,7 @@ void FVector2DImplementation::Vector2D_GetRotatedImplementation(const MonoObject
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -597,9 +570,7 @@ void FVector2DImplementation::Vector2D_GetSafeNormalImplementation(const MonoObj
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -639,9 +610,7 @@ void FVector2DImplementation::Vector2D_IntPointImplementation(const MonoObject* 
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FIntPoint)),
-		CLASS_SCRIPT_STRUCT_NAME(FIntPoint));
+	const auto FoundMonoClass = TPropertyClass<FIntPoint, FIntPoint>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -660,9 +629,7 @@ void FVector2DImplementation::Vector2D_RoundToVectorImplementation(const MonoObj
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -681,9 +648,7 @@ void FVector2DImplementation::Vector2D_ClampAxesImplementation(const MonoObject*
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -702,9 +667,7 @@ void FVector2DImplementation::Vector2D_GetSignVectorImplementation(const MonoObj
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -722,9 +685,7 @@ void FVector2DImplementation::Vector2D_GetAbsImplementation(const MonoObject* In
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector2D)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector2D));
+	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -746,8 +707,7 @@ void FVector2DImplementation::Vector2D_ToStringImplementation(const MonoObject* 
 	{
 		const auto ResultString = Vector2D->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -791,9 +751,7 @@ void FVector2DImplementation::Vector2D_SphericalToUnitCartesianImplementation(
 {
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 

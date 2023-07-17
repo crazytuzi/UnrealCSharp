@@ -1,9 +1,10 @@
 #pragma once
 
+#include "EFunctionType.h"
 #include "FFunctionInfo.h"
 #include "Binding/TypeInfo/TTypeInfo.inl"
 
-template <bool bIsStatic, typename Result, typename... Args>
+template <EFunctionType FunctionType, typename Result, typename... Args>
 struct TFunctionInfo final : FFunctionInfo
 {
 	TFunctionInfo():
@@ -12,9 +13,19 @@ struct TFunctionInfo final : FFunctionInfo
 	{
 	}
 
+	virtual bool IsConstructor() const override
+	{
+		return FunctionType == EFunctionType::Constructor;
+	}
+
+	virtual bool IsDestructor() const override
+	{
+		return FunctionType == EFunctionType::Destructor;
+	}
+
 	virtual bool IsStatic() const override
 	{
-		return bIsStatic;
+		return FunctionType == EFunctionType::Static;
 	}
 
 	virtual FTypeInfo* GetReturn() const override

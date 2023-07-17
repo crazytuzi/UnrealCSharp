@@ -61,6 +61,69 @@ struct TMultiPropertyValue
 };
 
 template <typename T>
+struct TBindingPropertyValue
+{
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+			FCSharpEnvironment::GetEnvironment().AddBindingReference(
+				SrcMonoObject, InMember, bNeedFree);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static T Set(const MonoObject* InValue)
+	{
+		return *FCSharpEnvironment::GetEnvironment().GetBinding<T>(InValue);
+	}
+};
+
+template <typename T>
+struct TScriptStructPropertyValue
+{
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			auto InParams = static_cast<void*>(FoundMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<T>::Get(), false);
+
+			FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), nullptr,
+			                                                        InMember, SrcMonoObject, bNeedFree);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static T Set(const MonoObject* InValue)
+	{
+		const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+
+		T Value;
+
+		TBaseStructure<T>::Get()->CopyScriptStruct(&Value, SrcStruct);
+
+		return Value;
+	}
+};
+
+template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> :
 	TSinglePropertyValue<T>
 {

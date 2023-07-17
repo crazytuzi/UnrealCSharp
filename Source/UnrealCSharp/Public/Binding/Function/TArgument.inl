@@ -78,6 +78,38 @@ struct TMultiArgument :
 };
 
 template <typename T>
+struct TBindingArgument :
+	TBaseArgument<T>
+{
+	using Super = TBaseArgument<T>;
+
+	using Super::TBaseArgument;
+
+	using Type = typename Super::Type;
+
+	MonoObject* Set()
+	{
+		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
+	}
+};
+
+template <typename T>
+struct TScriptStructArgument :
+	TBaseArgument<T>
+{
+	using Super = TBaseArgument<T>;
+
+	using Super::TBaseArgument;
+
+	using Type = typename Super::Type;
+
+	MonoObject* Set()
+	{
+		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
+	}
+};
+
+template <typename T>
 struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
 	TSingleArgument<T>
 {
@@ -149,10 +181,10 @@ struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, float>:
 
 template <typename T>
 struct TArgument<T,
-                typename TEnableIf<TAnd<
-	                TIsDerivedFrom<typename TRemovePointer<typename TDecay<T>::Type>::Type, UObject>,
-	                TNot<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>>::Value>
-                ::Type> :
+                 typename TEnableIf<TAnd<
+	                 TIsDerivedFrom<typename TRemovePointer<typename TDecay<T>::Type>::Type, UObject>,
+	                 TNot<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>>::Value>
+                 ::Type> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
@@ -253,7 +285,7 @@ struct TArgument<T, typename TEnableIf<TIsTSubclassOf<typename TDecay<T>::Type>:
 
 template <typename T>
 struct TArgument<T, typename TEnableIf<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type,
-                                              UClass>::Value>::Type> :
+                                               UClass>::Value>::Type> :
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;

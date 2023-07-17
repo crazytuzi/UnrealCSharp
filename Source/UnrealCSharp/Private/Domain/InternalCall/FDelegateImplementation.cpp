@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FDelegateImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Macro/NamespaceMacro.h"
@@ -9,7 +9,7 @@ struct FRegisterDelegate
 {
 	FRegisterDelegate()
 	{
-		FBindingClassBuilder(TEXT("Delegate"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Delegate"), NAMESPACE_LIBRARY)
 			.Function("Register", static_cast<void*>(FDelegateImplementation::Delegate_RegisterImplementation))
 			.Function("UnRegister", static_cast<void*>(FDelegateImplementation::Delegate_UnRegisterImplementation))
 			.Function("Bind", static_cast<void*>(FDelegateImplementation::Delegate_BindImplementation))
