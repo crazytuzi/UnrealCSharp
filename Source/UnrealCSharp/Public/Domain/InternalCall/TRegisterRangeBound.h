@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Domain/InternalCall/TRangeBoundImplementation.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -11,7 +11,7 @@ struct TRegisterRangeBound
 
 	TRegisterRangeBound()
 	{
-		TScriptStructBuilder<T>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<T>(NAMESPACE_LIBRARY)
 			.Function("Equality",
 			          static_cast<void*>(FRangeBoundImplementation::RangeBound_EqualityImplementation))
 			.Function("Inequality",

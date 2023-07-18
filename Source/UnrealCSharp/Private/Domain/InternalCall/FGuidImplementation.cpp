@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FGuidImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/ClassMacro.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterGuid
 {
 	FRegisterGuid()
 	{
-		TScriptStructBuilder<FGuid>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FGuid>(NAMESPACE_LIBRARY)
 			.Function("Equality", static_cast<void*>(FGuidImplementation::Guid_EqualityImplementation))
 			.Function("Inequality", static_cast<void*>(FGuidImplementation::Guid_InequalityImplementation))
 			.Function("LessThan", static_cast<void*>(FGuidImplementation::Guid_LessThanImplementation))
@@ -117,8 +114,7 @@ void FGuidImplementation::Guid_LexToStringImplementation(const MonoObject* InMon
 	{
 		const auto ResultString = LexToString(*Guid);
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -160,8 +156,7 @@ void FGuidImplementation::Guid_ToStringImplementation(const MonoObject* InMonoOb
 	{
 		const auto ResultString = Guid->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -175,9 +170,7 @@ void FGuidImplementation::Guid_ToStringImplementation(const MonoObject* InMonoOb
 
 void FGuidImplementation::Guid_NewGuidImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FGuid)),
-		CLASS_SCRIPT_STRUCT_NAME(FGuid));
+	const auto FoundMonoClass = TPropertyClass<FGuid, FGuid>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -193,9 +186,7 @@ void FGuidImplementation::Guid_NewGuidImplementation(MonoObject** OutValue)
 
 bool FGuidImplementation::Guid_ParseImplementation(MonoObject* GuidString, MonoObject** OutGuid)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FGuid)),
-		CLASS_SCRIPT_STRUCT_NAME(FGuid));
+	const auto FoundMonoClass = TPropertyClass<FGuid, FGuid>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 

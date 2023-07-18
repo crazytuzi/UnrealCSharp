@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FTimespanImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterTimespan
 {
 	FRegisterTimespan()
 	{
-		TScriptStructBuilder<FTimespan>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FTimespan>(NAMESPACE_LIBRARY)
 			.Function("Add", static_cast<void*>(FTimespanImplementation::Timespan_AddImplementation))
 			.Function("Negated", static_cast<void*>(FTimespanImplementation::Timespan_NegatedImplementation))
 			.Function("Subtract", static_cast<void*>(FTimespanImplementation::Timespan_SubtractImplementation))
@@ -79,9 +76,7 @@ void FTimespanImplementation::Timespan_AddImplementation(const MonoObject* A, co
 
 	const auto TimespanB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -99,9 +94,7 @@ void FTimespanImplementation::Timespan_NegatedImplementation(const MonoObject* I
 {
 	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -122,9 +115,7 @@ void FTimespanImplementation::Timespan_SubtractImplementation(const MonoObject* 
 
 	const auto TimespanB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -143,9 +134,7 @@ void FTimespanImplementation::Timespan_MultiplyImplementation(const MonoObject* 
 {
 	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -164,9 +153,7 @@ void FTimespanImplementation::Timespan_DivideImplementation(const MonoObject* In
 {
 	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -187,9 +174,7 @@ void FTimespanImplementation::Timespan_RemainderImplementation(const MonoObject*
 
 	const auto TimespanB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -303,9 +288,7 @@ void FTimespanImplementation::Timespan_GetDurationImplementation(const MonoObjec
 {
 	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -507,8 +490,7 @@ void FTimespanImplementation::Timespan_ToStringImplementation(const MonoObject* 
 	{
 		const auto ResultString = Timespan->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -522,9 +504,7 @@ void FTimespanImplementation::Timespan_ToStringImplementation(const MonoObject* 
 
 void FTimespanImplementation::Timespan_FromDaysImplementation(const double Days, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -540,9 +520,7 @@ void FTimespanImplementation::Timespan_FromDaysImplementation(const double Days,
 
 void FTimespanImplementation::Timespan_FromHoursImplementation(const double Hours, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -558,9 +536,7 @@ void FTimespanImplementation::Timespan_FromHoursImplementation(const double Hour
 
 void FTimespanImplementation::Timespan_FromMicrosecondsImplementation(const double Microseconds, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -576,9 +552,7 @@ void FTimespanImplementation::Timespan_FromMicrosecondsImplementation(const doub
 
 void FTimespanImplementation::Timespan_FromMillisecondsImplementation(const double Milliseconds, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -594,9 +568,7 @@ void FTimespanImplementation::Timespan_FromMillisecondsImplementation(const doub
 
 void FTimespanImplementation::Timespan_FromMinutesImplementation(const double Minutes, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -612,9 +584,7 @@ void FTimespanImplementation::Timespan_FromMinutesImplementation(const double Mi
 
 void FTimespanImplementation::Timespan_FromSecondsImplementation(const double Seconds, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -630,9 +600,7 @@ void FTimespanImplementation::Timespan_FromSecondsImplementation(const double Se
 
 void FTimespanImplementation::Timespan_MaxValueImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -648,9 +616,7 @@ void FTimespanImplementation::Timespan_MaxValueImplementation(MonoObject** OutVa
 
 void FTimespanImplementation::Timespan_MinValueImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -666,9 +632,7 @@ void FTimespanImplementation::Timespan_MinValueImplementation(MonoObject** OutVa
 
 bool FTimespanImplementation::Timespan_ParseImplementation(MonoObject* TimespanString, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -703,9 +667,7 @@ double FTimespanImplementation::Timespan_RatioImplementation(const MonoObject* D
 
 void FTimespanImplementation::Timespan_ZeroImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 

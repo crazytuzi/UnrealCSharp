@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FMapImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FMapHelper.h"
@@ -10,7 +10,7 @@ struct FRegisterMap
 {
 	FRegisterMap()
 	{
-		FBindingClassBuilder(TEXT("Map"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Map"), NAMESPACE_LIBRARY)
 			.Function("Register", static_cast<void*>(FMapImplementation::Map_RegisterImplementation))
 			.Function("UnRegister", static_cast<void*>(FMapImplementation::Map_UnRegisterImplementation))
 			.Function("Empty", static_cast<void*>(FMapImplementation::Map_EmptyImplementation))

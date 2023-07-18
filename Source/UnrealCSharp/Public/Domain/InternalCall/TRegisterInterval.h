@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Domain/InternalCall/TIntervalImplementation.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -11,7 +11,7 @@ struct TRegisterInterval
 
 	TRegisterInterval()
 	{
-		TScriptStructBuilder<T>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<T>(NAMESPACE_LIBRARY)
 			.Function("Size",
 			          static_cast<void*>(FIntervalImplementation::Interval_SizeImplementation))
 			.Function("IsValid",

@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FSoftClassPtrImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 #include "Async/Async.h"
@@ -8,7 +8,7 @@ struct FRegisterSoftClassPtr
 {
 	FRegisterSoftClassPtr()
 	{
-		FBindingClassBuilder(TEXT("SoftClassPtr"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("SoftClassPtr"), NAMESPACE_LIBRARY)
 			.Function("Register",
 			          static_cast<void*>(FSoftClassPtrImplementation::SoftClassPtr_RegisterImplementation))
 			.Function("UnRegister",

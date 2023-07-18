@@ -8,18 +8,18 @@ struct TFunctionBuilder
 {
 };
 
-template <bool bIsStatic, typename Result, typename... Args>
+template <EFunctionType FunctionType, typename Result, typename... Args>
 struct TFunctionInfoBuilder
 {
 	static FFunctionInfo* Info()
 	{
-		return TFunctionInfo<bIsStatic, Result, Args...>::Get();
+		return TFunctionInfo<FunctionType, Result, Args...>::Get();
 	}
 };
 
 template <typename Result, typename... Args, Result (*Function)(Args...)>
 struct TFunctionBuilder<Result (*)(Args...), Function> :
-	TFunctionInfoBuilder<true, Result, Args...>
+	TFunctionInfoBuilder<EFunctionType::Static, Result, Args...>
 {
 	static void Invoke(BINDING_FUNCTION_SIGNATURE)
 	{
@@ -30,7 +30,7 @@ struct TFunctionBuilder<Result (*)(Args...), Function> :
 
 template <typename Class, typename Result, typename... Args, Result (Class::*Function)(Args...)>
 struct TFunctionBuilder<Result (Class::*)(Args...), Function> :
-	TFunctionInfoBuilder<false, Result, Args...>
+	TFunctionInfoBuilder<EFunctionType::Member, Result, Args...>
 {
 	static void Invoke(BINDING_FUNCTION_SIGNATURE)
 	{
@@ -41,7 +41,7 @@ struct TFunctionBuilder<Result (Class::*)(Args...), Function> :
 
 template <typename Class, typename Result, typename... Args, Result (Class::*Function)(Args...) const>
 struct TFunctionBuilder<Result (Class::*)(Args...) const, Function> :
-	TFunctionInfoBuilder<false, Result, Args...>
+	TFunctionInfoBuilder<EFunctionType::Member, Result, Args...>
 {
 	static void Invoke(BINDING_FUNCTION_SIGNATURE)
 	{

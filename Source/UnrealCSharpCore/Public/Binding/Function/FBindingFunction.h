@@ -1,20 +1,26 @@
 #pragma once
 
+#include "FBindingFunctionBase.inl"
 #include "FFunctionInfo.h"
 
-struct FBindingFunction
+struct FBindingFunction : FBindingFunctionBase
 {
 	FBindingFunction() = default;
 
-	FBindingFunction(FFunctionInfo* InInfo, const FString& InName):
-		Name(InName),
-		Info{InInfo}
+	FBindingFunction(FFunctionInfo* InInfo, const FString& InName, const FString& InImplementationName):
+		FBindingFunctionBase(InName, InImplementationName),
+		Info(InInfo)
 	{
 	}
 
-	FString GetFunctionName() const
+	bool IsConstructor() const
 	{
-		return Name;
+		return Info != nullptr ? Info->IsConstructor() : false;
+	}
+
+	bool IsDestructor() const
+	{
+		return Info != nullptr ? Info->IsDestructor() : false;
 	}
 
 	bool IsStatic() const
@@ -35,7 +41,5 @@ struct FBindingFunction
 	}
 
 private:
-	FString Name;
-
 	FFunctionInfo* Info;
 };

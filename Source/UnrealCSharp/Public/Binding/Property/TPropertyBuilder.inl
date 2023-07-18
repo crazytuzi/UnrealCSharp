@@ -23,7 +23,8 @@ struct TPropertyInfoBuilder
 {
 	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
 	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+			FCSharpEnvironment::GetEnvironment(), InMonoObject))
 		{
 			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member));
 		}
@@ -31,7 +32,8 @@ struct TPropertyInfoBuilder
 
 	static void Set(const MonoObject* InMonoObject, MonoObject* InValue)
 	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+			FCSharpEnvironment::GetEnvironment(), InMonoObject))
 		{
 			FoundObject->*Member = TPropertyValue<Result, Result>::Set(InValue);
 		}
@@ -49,7 +51,8 @@ struct TContainerPropertyBuilder :
 {
 	static void Get(MonoObject* InMonoObject, MonoObject** OutValue)
 	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+			FCSharpEnvironment::GetEnvironment(), InMonoObject))
 		{
 			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InMonoObject);
 		}
