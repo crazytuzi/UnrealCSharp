@@ -12,6 +12,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
 
 template <typename T, T, typename Enable = void>
 struct TPropertyBuilder
@@ -224,7 +225,7 @@ struct TPropertyBuilder<Result Class::*, Member,
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsEnum<Result>::Value>::Type> :
+                        typename TEnableIf<TAnd<TIsEnum<Result>, TNot<TIsNotUEnum<Result>>>::Value>::Type> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };

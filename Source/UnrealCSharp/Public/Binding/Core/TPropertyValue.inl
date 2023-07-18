@@ -13,6 +13,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
 
 template <typename T, typename Enable = void>
 struct TPropertyValue
@@ -124,6 +125,12 @@ struct TScriptStructPropertyValue
 
 		return Value;
 	}
+};
+
+template <typename T>
+struct TBindingEnumPropertyValue :
+	TSinglePropertyValue<T>
+{
 };
 
 template <typename T>
@@ -602,7 +609,7 @@ struct TPropertyValue<T,
 
 template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsEnum<T>::Value, T>::Type> :
+                      typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type> :
 	TSinglePropertyValue<T>
 {
 	static MonoObject* Get(T* InMember)

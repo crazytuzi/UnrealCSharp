@@ -110,6 +110,13 @@ struct TScriptStructArgument :
 };
 
 template <typename T>
+struct TBindingEnumArgument :
+	TSingleArgument<T>
+{
+	using TSingleArgument<T>::TSingleArgument;
+};
+
+template <typename T>
 struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
 	TSingleArgument<T>
 {
@@ -299,7 +306,9 @@ struct TArgument<T, typename TEnableIf<TIsTArray<typename TDecay<T>::Type>::Valu
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsEnum<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, typename TEnableIf<TAnd<TIsEnum<typename TDecay<T>::Type>,
+                                            TNot<TIsNotUEnum<typename TDecay<T>::Type>>>
+	                 ::Value>::Type> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;

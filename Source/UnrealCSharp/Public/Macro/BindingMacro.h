@@ -14,6 +14,7 @@
 #include "Binding/Property/TPropertyBuilder.inl"
 #include "Binding/Function/TArgument.inl"
 #include "Binding/Function/TReturnValue.inl"
+#include "Template/TIsNotUEnum.inl"
 
 #define WITH_PROPERTY_INFO WITH_EDITOR
 
@@ -140,6 +141,63 @@ struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Clas
 	TScriptStructReturnValue<T> \
 { \
 	using TScriptStructReturnValue<T>::TScriptStructReturnValue; \
+};
+
+#define BINDING_ENUM(Class) \
+template <> \
+struct TClassName<Class> \
+{ \
+	static FString Get() { return BINDING_REMOVE_PREFIX_CLASS_STR(Class); } \
+}; \
+template <> \
+struct TClassFullName<Class> \
+{ \
+	static FString Get() { return BINDING_STR(Class); } \
+}; \
+template <typename T> \
+struct TName<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> \
+{ \
+	static FString Get() { return BINDING_STR(Class); } \
+}; \
+template <typename T> \
+struct TNameSpace<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
+	} \
+}; \
+template <typename T> \
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> : \
+	TBindingEnumPropertyClass<T> \
+{ \
+}; \
+template <typename T> \
+struct TPropertyValue<T, typename TEnableIf<TIsSame<T, Class>::Value, T>::Type> : \
+	TBindingEnumPropertyValue<T> \
+{ \
+}; \
+template <typename InClass, typename Result, Result InClass::* Member> \
+struct TPropertyBuilder<Result InClass::*, Member, typename TEnableIf<TIsSame<Result, Class>::Value>::Type> : \
+	TPropertyInfoBuilder<InClass, Result, Member> \
+{ \
+}; \
+template <typename T> \
+struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Class>::Value>::Type> : \
+	TBindingEnumArgument<T> \
+{ \
+	using TBindingEnumArgument<T>::TBindingEnumArgument; \
+}; \
+template <typename T> \
+struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, Class>::Value>::Type> : \
+	TBindingEnumReturnValue<T> \
+{ \
+	using TBindingEnumReturnValue<T>::TBindingEnumReturnValue; \
+}; \
+template <> \
+struct TIsNotUEnum<Class> \
+{ \
+	enum { Value = true }; \
 };
 
 #define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set

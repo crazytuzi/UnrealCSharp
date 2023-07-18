@@ -12,6 +12,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
 
 template <typename T, typename Enable = void>
 struct TPropertyClass
@@ -43,6 +44,15 @@ struct TBindingPropertyClass
 
 template <typename T>
 struct TScriptStructPropertyClass
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+
+template <typename T>
+struct TBindingEnumPropertyClass
 {
 	static MonoClass* Get()
 	{
@@ -333,7 +343,7 @@ struct TPropertyClass<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type>
 };
 
 template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsEnum<T>::Value, T>::Type>
+struct TPropertyClass<T, typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type>
 {
 	static MonoClass* Get()
 	{

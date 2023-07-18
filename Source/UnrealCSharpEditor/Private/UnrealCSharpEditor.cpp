@@ -8,6 +8,7 @@
 #include "FStructGenerator.h"
 #include "FSolutionGenerator.h"
 #include "FBindingGenerator.h"
+#include "FBindingEnumGenerator.h"
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Misc/MessageDialog.h"
@@ -22,12 +23,12 @@ static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 void FUnrealCSharpEditorModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	
+
 	FUnrealCSharpEditorStyle::Initialize();
 	FUnrealCSharpEditorStyle::ReloadTextures();
 
 	FUnrealCSharpEditorCommands::Register();
-	
+
 	PluginCommands = MakeShareable(new FUICommandList);
 
 	PluginCommands->MapAction(
@@ -35,7 +36,8 @@ void FUnrealCSharpEditorModule::StartupModule()
 		FExecuteAction::CreateRaw(this, &FUnrealCSharpEditorModule::PluginButtonClicked),
 		FCanExecuteAction());
 
-	UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
+	UToolMenus::RegisterStartupCallback(
+		FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
 }
 
 void FUnrealCSharpEditorModule::ShutdownModule()
@@ -84,6 +86,8 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 
 	FBindingGenerator::Generator();
 
+	FBindingEnumGenerator::Generator();
+
 	CollectGarbage(RF_NoFlags, true);
 
 	FCSharpCompiler::Get().Compile();
@@ -107,7 +111,8 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 		{
 			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection("Settings");
 			{
-				FToolMenuEntry& Entry = Section.AddEntry(FToolMenuEntry::InitToolBarButton(FUnrealCSharpEditorCommands::Get().PluginAction));
+				FToolMenuEntry& Entry = Section.AddEntry(
+					FToolMenuEntry::InitToolBarButton(FUnrealCSharpEditorCommands::Get().PluginAction));
 				Entry.SetCommandList(PluginCommands);
 			}
 		}
@@ -115,5 +120,5 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FUnrealCSharpEditorModule, UnrealCSharpEditor)
