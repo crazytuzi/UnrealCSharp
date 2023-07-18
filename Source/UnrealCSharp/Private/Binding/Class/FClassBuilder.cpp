@@ -43,13 +43,13 @@ FClassBuilder& FClassBuilder::Property(const FString& InName, const void* InGetM
 
 #if WITH_FUNCTION_INFO
 FClassBuilder& FClassBuilder::Function(const FString& InName, const void* InMethod,
-                                       FFunctionInfo* InFunctionInfo)
+                                       FFunctionInfo* InFunctionInfo, const TArray<FString>& InParamNames)
 #else
-FClassBuilder& FClassBuilder::Function(const FString& InName, const void* InMethod)
+FClassBuilder& FClassBuilder::Function(const FString& InName, const void* InMethod, const TArray<FString>& InParamNames)
 #endif
 {
 #if WITH_FUNCTION_INFO
-	return Function(InName, GetFunctionImplementationName(InName), InMethod, InFunctionInfo);
+	return Function(InName, GetFunctionImplementationName(InName), InMethod, InFunctionInfo, InParamNames);
 #else
 	return Function(InName, GetFunctionImplementationName(InName), InMethod);
 #endif
@@ -65,16 +65,17 @@ void FClassBuilder::Register()
 
 #if WITH_FUNCTION_INFO
 FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
-                                       const void* InMethod, FFunctionInfo* InFunctionInfo)
+                                       const void* InMethod, FFunctionInfo* InFunctionInfo,
+                                       const TArray<FString>& InParamNames)
 #else
 FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
-	const void* InMethod)
+                                       const void* InMethod, const TArray<FString>& InParamNames)
 #endif
 {
 #if WITH_FUNCTION_INFO
 	if (InFunctionInfo != nullptr)
 	{
-		GetBindingClass()->BindingFunction(InName, InImplementationName, InFunctionInfo);
+		GetBindingClass()->BindingFunction(InName, InImplementationName, InFunctionInfo, InParamNames);
 	}
 #endif
 

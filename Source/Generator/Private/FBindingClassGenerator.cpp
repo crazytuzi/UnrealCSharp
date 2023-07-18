@@ -2,6 +2,7 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BindingMacro.h"
+#include "UEVersion.h"
 
 void FBindingClassGenerator::Generator()
 {
@@ -145,36 +146,65 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 		TArray<FString> FunctionParamName;
 
-		for (auto Index = 0; Index < Params.Num(); ++Index)
+#if UE_ARRAY_IS_EMPTY
+		if (!Function.GetParamNames().IsEmpty())
+#else
+		if (Function.GetParamNames().Num() > 0)
+#endif
 		{
-			if (Params[Index]->IsOut())
+			FunctionParamName = Function.GetParamNames();
+
+			for (auto Index = 0; Index < Params.Num(); ++Index)
 			{
-				FunctionOutParamIndex.Add(Index);
+				if (Params[Index]->IsOut())
+				{
+					FunctionOutParamIndex.Add(Index);
 
-				FunctionDeclarationBody += TEXT("ref ");
+					FunctionDeclarationBody += TEXT("ref ");
+				}
 
-				FunctionParamName.Add(FString::Printf(TEXT(
-					"OutValue%d"
+				FunctionDeclarationBody += FString::Printf(TEXT(
+					"%s %s%s"
 				),
-				                                      FunctionOutParamIndex.Num() - 1
-				));
+				                                           *Params[Index]->GetName(),
+				                                           *FunctionParamName[Index],
+				                                           Index == Params.Num() - 1 ? TEXT("") : TEXT(", ")
+				);
 			}
-			else
+		}
+		else
+		{
+			for (auto Index = 0; Index < Params.Num(); ++Index)
 			{
-				FunctionParamName.Add(FString::Printf(TEXT(
-					"InValue%d"
-				),
-				                                      Index - FunctionOutParamIndex.Num()
-				));
-			}
+				if (Params[Index]->IsOut())
+				{
+					FunctionOutParamIndex.Add(Index);
 
-			FunctionDeclarationBody += FString::Printf(TEXT(
-				"%s %s%s"
-			),
-			                                           *Params[Index]->GetName(),
-			                                           *FunctionParamName[Index],
-			                                           Index == Params.Num() - 1 ? TEXT("") : TEXT(", ")
-			);
+					FunctionDeclarationBody += TEXT("ref ");
+
+					FunctionParamName.Add(FString::Printf(TEXT(
+						"OutValue%d"
+					),
+					                                      FunctionOutParamIndex.Num() - 1
+					));
+				}
+				else
+				{
+					FunctionParamName.Add(FString::Printf(TEXT(
+						"InValue%d"
+					),
+					                                      Index - FunctionOutParamIndex.Num()
+					));
+				}
+
+				FunctionDeclarationBody += FString::Printf(TEXT(
+					"%s %s%s"
+				),
+				                                           *Params[Index]->GetName(),
+				                                           *FunctionParamName[Index],
+				                                           Index == Params.Num() - 1 ? TEXT("") : TEXT(", ")
+				);
+			}
 		}
 
 		FString Base;
