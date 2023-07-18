@@ -15,8 +15,11 @@ public:
 	template <typename Type>
 	TBindingEnumBuilder& Enumerator(const FString& InKey, const Type InValue)
 	{
-		FBindingEnum::GetEnum(TClassName<T>::Get(), TClassFullName<T>::Get(),
-		                      TTypeInfo<T>::Get())->BindingEnumerator(InKey, static_cast<int64>(InValue));
+		FBindingEnum::GetEnum(TClassName<T>::Get(),
+		                      TClassFullName<T>::Get(),
+		                      TName<std::underlying_type_t<Type>, std::underlying_type_t<Type>>::Get(),
+		                      TTypeInfo<T>::Get())->
+			BindingEnumerator(InKey, static_cast<std::underlying_type_t<Type>>(InValue));
 
 		return *this;
 	}

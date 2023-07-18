@@ -5,9 +5,11 @@
 class UNREALCSHARPCORE_API FBindingEnum
 {
 public:
-	FBindingEnum(const FString& InEnum, const FString& InFullEnum, FTypeInfo* InTypeInfo);
+	FBindingEnum(const FString& InEnum, const FString& InFullEnum,
+	             const FString& InUnderlyingType, FTypeInfo* InTypeInfo);
 
-	static FBindingEnum* GetEnum(const FString& InEnum, const FString& InFullEnum, FTypeInfo* InTypeInfo);
+	static FBindingEnum* GetEnum(const FString& InEnum, const FString& InFullEnum,
+	                             const FString& InUnderlyingType, FTypeInfo* InTypeInfo);
 
 public:
 	static const TMap<FString, FBindingEnum>& GetEnums();
@@ -16,6 +18,8 @@ public:
 	const FString& GetEnum() const;
 
 	const FString& GetFullEnum() const;
+
+	const FString& GetUnderlyingType() const;
 
 	const FBindingTypeInfo& GetTypeInfo() const;
 
@@ -30,6 +34,8 @@ private:
 	FString Enum;
 
 	FString FullEnum;
+
+	FString UnderlyingType;
 
 	FBindingTypeInfo TypeInfo;
 

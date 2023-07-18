@@ -54,7 +54,7 @@ void FBindingEnumGenerator::Generator(const FBindingEnum& InEnum)
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
-		"\tpublic enum %s\n"
+		"\tpublic enum %s : %s\n"
 		"\t{\n"
 		"%s"
 		"\t}\n"
@@ -63,6 +63,7 @@ void FBindingEnumGenerator::Generator(const FBindingEnum& InEnum)
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent[0],
 	                                     *FullClassContent,
+	                                     *InEnum.GetUnderlyingType(),
 	                                     *EnumeratorContent
 	);
 
