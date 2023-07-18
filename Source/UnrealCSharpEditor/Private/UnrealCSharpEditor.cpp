@@ -7,7 +7,7 @@
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
 #include "FSolutionGenerator.h"
-#include "FBindingGenerator.h"
+#include "FBindingClassGenerator.h"
 #include "FBindingEnumGenerator.h"
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
@@ -84,7 +84,7 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 
 	FSolutionGenerator::Generator();
 
-	FBindingGenerator::Generator();
+	FBindingClassGenerator::Generator();
 
 	FBindingEnumGenerator::Generator();
 

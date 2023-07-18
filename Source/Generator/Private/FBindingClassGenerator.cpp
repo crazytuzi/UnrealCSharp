@@ -1,9 +1,9 @@
-#include "FBindingGenerator.h"
+#include "FBindingClassGenerator.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BindingMacro.h"
 
-void FBindingGenerator::Generator()
+void FBindingClassGenerator::Generator()
 {
 	for (const auto& Class : FBindingClass::GetClasses())
 	{
@@ -11,14 +11,14 @@ void FBindingGenerator::Generator()
 	}
 }
 
-void FBindingGenerator::Generator(const FBindingClass& InClass)
+void FBindingClassGenerator::Generator(const FBindingClass& InClass)
 {
 	GeneratorPartial(InClass);
 
 	GeneratorImplementation(InClass);
 }
 
-void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
+void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 {
 	FString UsingNameSpaceContent;
 
@@ -322,7 +322,7 @@ void FBindingGenerator::GeneratorPartial(const FBindingClass& InClass)
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
 
-void FBindingGenerator::GeneratorImplementation(const FBindingClass& InClass)
+void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClass)
 {
 	FString UsingNameSpaceContent;
 
