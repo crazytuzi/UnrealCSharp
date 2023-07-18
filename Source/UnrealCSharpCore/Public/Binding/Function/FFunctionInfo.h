@@ -1,5 +1,7 @@
 #pragma once
 
+#define WITH_FUNCTION_INFO WITH_EDITOR
+
 #include "Binding/TypeInfo/FTypeInfo.h"
 
 struct FFunctionInfo

@@ -14,11 +14,8 @@
 #include "Binding/Property/TPropertyBuilder.inl"
 #include "Binding/Function/TArgument.inl"
 #include "Binding/Function/TReturnValue.inl"
+#include "Binding/Function/TOverrideBuilder.inl"
 #include "Template/TIsNotUEnum.inl"
-
-#define WITH_PROPERTY_INFO WITH_EDITOR
-
-#define WITH_FUNCTION_INFO WITH_EDITOR
 
 #define BINDING_STR(Str) #Str
 
@@ -244,6 +241,12 @@ struct TIsNotUEnum<Class> \
 #define BINDING_OVERRIDE(SIGNATURE, Function) BINDING_OVERRIDE_BUILDER_INVOKE(SIGNATURE, Function), BINDING_OVERRIDE_BUILDER_INFO(SIGNATURE, Function)
 #else
 #define BINDING_OVERRIDE(SIGNATURE, Function) BINDING_OVERRIDE_BUILDER_INVOKE(SIGNATURE, Function)
+#endif
+
+#if WITH_FUNCTION_INFO
+#define BINDING_OVERRIDES(...) TOverrideBuilder<void*, FFunctionInfo*>::Get(##__VA_ARGS__)
+#else
+#define BINDING_OVERRIDES(...) TOverrideBuilder<void*>::Get(##__VA_ARGS__)
 #endif
 
 #define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) \
