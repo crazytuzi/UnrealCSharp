@@ -9,6 +9,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
 
 template <typename T, typename Enable = void>
 struct TName
@@ -255,7 +256,7 @@ struct TName<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TName<T, typename TEnableIf<TIsEnum<T>::Value, T>::Type>
+struct TName<T, typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type>
 {
 	static FString Get()
 	{

@@ -42,7 +42,8 @@ public:
 	void BindingProperty(const FString& InName, FTypeInfo* InTypeInfo, const void* InGetMethod,
 	                     const void* InSetMethod);
 
-	void BindingFunction(const FString& InName, const FString& InImplementationName, FFunctionInfo* InTypeInfo);
+	void BindingFunction(const FString& InName, const FString& InImplementationName,
+	                     FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames);
 
 	void Inheritance(const FString& InClass, const FString& InFullClass,
 	                 const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);

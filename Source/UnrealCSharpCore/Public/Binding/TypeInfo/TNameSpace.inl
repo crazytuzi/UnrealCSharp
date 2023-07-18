@@ -11,6 +11,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
 
 template <typename T, typename Enable = void>
 struct TNameSpace
@@ -211,7 +212,7 @@ struct TNameSpace<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> final :
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsEnum<T>::Value, T>::Type>
+struct TNameSpace<T, typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type>
 {
 	static TArray<FString> Get()
 	{

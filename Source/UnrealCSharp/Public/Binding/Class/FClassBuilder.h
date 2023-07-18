@@ -18,17 +18,17 @@ public:
 	virtual ~FClassBuilder() = default;
 
 #if WITH_PROPERTY_INFO
-	FClassBuilder& Property(const FString& InName, const void* InGetMethod, const void* InSetMethod,
-	                        FTypeInfo* InTypeInfo = nullptr);
+	FClassBuilder& Property(const FString& InName, const void* InGetMethod,
+	                        const void* InSetMethod, FTypeInfo* InTypeInfo = nullptr);
 #else
 	FClassBuilder& Property(const FString& InName, const void* InGetMethod, const void* InSetMethod);
 #endif
 
 #if WITH_FUNCTION_INFO
 	FClassBuilder& Function(const FString& InName, const void* InMethod,
-	                        FFunctionInfo* InFunctionInfo = nullptr);
+	                        FFunctionInfo* InFunctionInfo = nullptr, const TArray<FString>& InParamNames = {});
 #else
-	FClassBuilder& Function(const FString& InName, const void* InMethod);
+	FClassBuilder& Function(const FString& InName, const void* InMethod, const TArray<FString>& InParamNames = {});
 #endif
 
 	void Register();
@@ -36,10 +36,11 @@ public:
 protected:
 #if WITH_FUNCTION_INFO
 	FClassBuilder& Function(const FString& InName, const FString& InImplementationName,
-	                        const void* InMethod, FFunctionInfo* InFunctionInfo = nullptr);
+	                        const void* InMethod, FFunctionInfo* InFunctionInfo = nullptr,
+	                        const TArray<FString>& InParamNames = {});
 #else
 	FClassBuilder& Function(const FString& InName, const FString& InImplementationName,
-	                               const void* InMethod);
+	                               const void* InMethod, const TArray<FString>& InParamNames = {});
 #endif
 
 	virtual bool IsReflection() const;

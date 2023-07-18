@@ -95,6 +95,13 @@ struct TScriptStructReturnValue :
 };
 
 template <typename T>
+struct TBindingEnumReturnValue :
+	TSingleReturnValue<T>
+{
+	using TSingleReturnValue<T>::TSingleReturnValue;
+};
+
+template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
 	TSingleReturnValue<T>
 {
@@ -282,7 +289,9 @@ struct TReturnValue<T, typename TEnableIf<TIsTArray<typename TDecay<T>::Type>::V
 };
 
 template <typename T>
-struct TReturnValue<T, typename TEnableIf<TIsEnum<typename TDecay<T>::Type>::Value>::Type> :
+struct TReturnValue<T, typename TEnableIf<TAnd<TIsEnum<typename TDecay<T>::Type>,
+                                               TNot<TIsNotUEnum<typename TDecay<T>::Type>>>
+	                    ::Value>::Type> :
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;

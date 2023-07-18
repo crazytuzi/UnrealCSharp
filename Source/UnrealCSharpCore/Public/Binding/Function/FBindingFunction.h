@@ -7,9 +7,11 @@ struct FBindingFunction : FBindingFunctionBase
 {
 	FBindingFunction() = default;
 
-	FBindingFunction(FFunctionInfo* InInfo, const FString& InName, const FString& InImplementationName):
+	FBindingFunction(FFunctionInfo* InInfo, const FString& InName,
+	                 const FString& InImplementationName, const TArray<FString>& InParamNames):
 		FBindingFunctionBase(InName, InImplementationName),
-		Info(InInfo)
+		Info(InInfo),
+		ParamNames(InParamNames)
 	{
 	}
 
@@ -40,6 +42,13 @@ struct FBindingFunction : FBindingFunctionBase
 		return Info != nullptr ? Info->GetParams() : Instance;
 	}
 
+	const TArray<FString>& GetParamNames() const
+	{
+		return ParamNames;
+	}
+
 private:
 	FFunctionInfo* Info;
+
+	TArray<FString> ParamNames;
 };
