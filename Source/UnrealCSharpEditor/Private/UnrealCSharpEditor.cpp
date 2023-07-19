@@ -66,7 +66,7 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
 	}
 
-	FScopedSlowTask SlowTask(10,
+	FScopedSlowTask SlowTask(11,
 		LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
 	SlowTask.MakeDialog();
 
