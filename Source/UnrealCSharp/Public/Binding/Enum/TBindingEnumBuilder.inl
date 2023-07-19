@@ -2,6 +2,8 @@
 
 #include "Binding/Enum/FBindingEnum.h"
 #include "Binding/TypeInfo/TTypeInfo.inl"
+#include "Binding/Template/TClassName.inl"
+#include "Binding/Template/TClassFullName.inl"
 
 template <typename T>
 class TBindingEnumBuilder

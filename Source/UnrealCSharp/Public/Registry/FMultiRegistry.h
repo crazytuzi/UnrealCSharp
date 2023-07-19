@@ -6,6 +6,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsTScriptInterface.inl"
+#include "Template/TIsTSubclassOf.inl"
 
 class FMultiRegistry
 {
