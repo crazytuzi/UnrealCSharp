@@ -32,6 +32,7 @@ struct TBaseStructure<FMatrix>
 };
 #endif
 
+#if UE_T_BASE_STRUCTURE_F_INT_POINT
 template <>
 struct TBaseStructure<FIntPoint>
 {
@@ -40,6 +41,7 @@ struct TBaseStructure<FIntPoint>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FIntPoint));
 	}
 };
+#endif
 
 template <>
 struct TBaseStructure<FTimespan>
