@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Binding/Core/TPropertyValue.inl"
+#include "UEVersion.h"
 
 template <typename T, typename Enable = void>
 struct TReturnValue
@@ -95,88 +96,147 @@ struct TScriptStructReturnValue :
 };
 
 template <typename T>
+struct TBindingEnumReturnValue :
+	TSingleReturnValue<T>
+{
+	using TSingleReturnValue<T>::TSingleReturnValue;
+};
+
+template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, uint8>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint16>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, uint16>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint32>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, uint32>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint64>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, uint64>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int8>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, int8>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int16>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, int16>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int32>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, int32>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int64>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, int64>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, bool>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, bool>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, float>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, float>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T,
                     typename TEnableIf<TAnd<
 	                    TIsDerivedFrom<typename TRemovePointer<typename TDecay<T>::Type>::Type, UObject>,
 	                    TNot<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>>::Value>
                     ::Type> :
+#else
+struct TReturnValue<T,
+                    typename TEnableIf<
+	                    TIsDerivedFrom<typename TRemovePointer<typename TDecay<T>::Type>::Type, UObject>::Value &&
+	                    !std::is_same_v<typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>
+                    ::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FName>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, FName>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
@@ -204,14 +264,22 @@ struct TReturnValue<T, typename TEnableIf<TIsUStruct<typename TDecay<T>::Type>::
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FString>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, FString>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FText>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, FText>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
@@ -239,7 +307,11 @@ struct TReturnValue<T, typename TEnableIf<TIsTSoftObjectPtr<typename TDecay<T>::
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, double>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, double>>::Type> :
+#endif
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
@@ -267,8 +339,13 @@ struct TReturnValue<T, typename TEnableIf<TIsTSubclassOf<typename TDecay<T>::Typ
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<
 	                    typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>::Value>::Type> :
+#else
+struct TReturnValue<T, typename TEnableIf<std::is_same_v<
+	                    typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>::Type> :
+#endif
 	TMultiReturnValue<T>
 {
 	using TMultiReturnValue<T>::TMultiReturnValue;
@@ -282,7 +359,9 @@ struct TReturnValue<T, typename TEnableIf<TIsTArray<typename TDecay<T>::Type>::V
 };
 
 template <typename T>
-struct TReturnValue<T, typename TEnableIf<TIsEnum<typename TDecay<T>::Type>::Value>::Type> :
+struct TReturnValue<T, typename TEnableIf<TAnd<TIsEnum<typename TDecay<T>::Type>,
+                                               TNot<TIsNotUEnum<typename TDecay<T>::Type>>>
+	                    ::Value>::Type> :
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;

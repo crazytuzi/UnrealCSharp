@@ -21,7 +21,7 @@ struct TConstructorHelper<TTuple<Args...>>
 
 		auto Value = new Class(Forward<Args>(Argument.template Get<Index>().Get())...);
 
-		TOut(OutValue, Argument).template Get<0, Args...>();
+		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument).template Get<0, Args...>();
 
 		FCSharpEnvironment::GetEnvironment().AddBindingReference(InMonoObject, Value);
 	}

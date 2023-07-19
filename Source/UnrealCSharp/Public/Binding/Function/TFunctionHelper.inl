@@ -4,6 +4,7 @@
 #include "TOut.inl"
 #include "TReturnValue.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "UEVersion.h"
 
 inline MonoObject* Get(MonoArray* InMonoArray, const SIZE_T InIndex)
 {
@@ -23,7 +24,11 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 	{
 		TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
 
+#if UE_T_IS_SAME
 		if constexpr (TIsSame<Result, void>::Value)
+#else
+		if constexpr (std::is_same_v<Result, void>)
+#endif
 		{
 			InFunction(Forward<Args>(Argument.template Get<Index>().Get())...);
 		}
@@ -34,7 +39,7 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 				.Get();
 		}
 
-		TOut(OutValue, Argument).template Get<0, Args...>();
+		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument).template Get<0, Args...>();
 	}
 
 	template <typename Class, typename Function, SIZE_T... Index>
@@ -45,7 +50,11 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 		{
 			TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
 
+#if UE_T_IS_SAME
 			if constexpr (TIsSame<Result, void>::Value)
+#else
+			if constexpr (std::is_same_v<Result, void>)
+#endif
 			{
 				(FoundObject->*InFunction)(Forward<Args>(Argument.template Get<Index>().Get())...);
 			}
@@ -56,7 +65,7 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 					.Get();
 			}
 
-			TOut(OutValue, Argument).template Get<0, Args...>();
+			TOut<TTuple<TArgument<Args>...>>(OutValue, Argument).template Get<0, Args...>();
 		}
 	}
 };

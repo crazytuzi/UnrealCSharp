@@ -12,7 +12,12 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
+#include "Template/TIsTSubclassOf.inl"
+#include "Template/TIsTSet.inl"
+#include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
+#include "UEVersion.h"
 
 template <typename T, typename Enable = void>
 struct TPropertyValue
@@ -71,7 +76,10 @@ struct TBindingPropertyValue
 		{
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+			auto InParams = static_cast<void*>(FoundMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
 			FCSharpEnvironment::GetEnvironment().AddBindingReference(
 				SrcMonoObject, InMember, bNeedFree);
@@ -124,71 +132,124 @@ struct TScriptStructPropertyValue
 };
 
 template <typename T>
+struct TBindingEnumPropertyValue :
+	TSinglePropertyValue<T>
+{
+};
+
+template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, uint8>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, uint16>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, uint32>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, uint64>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, int8>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, int16>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, int32>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, int64>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, bool>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, float>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T,
                       typename TEnableIf<TAnd<
 	                                         TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
 	                                         TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
                       ::Type>
+#else
+struct TPropertyValue<T,
+                      typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>::Value &&
+                                         !std::is_same_v<typename TRemovePointer<T>::Type, UClass>, T>
+                      ::Type>
+#endif
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -202,7 +263,11 @@ struct TPropertyValue<T,
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, FName>, T>::Type>
+#endif
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -267,7 +332,11 @@ struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type>
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, FString>, T>::Type>
+#endif
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -288,7 +357,11 @@ struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type>
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, FText>, T>::Type>
+#endif
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -330,7 +403,11 @@ struct TPropertyValue<T,
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type> :
+#else
+struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, double>, T>::Type> :
+#endif
 	TSinglePropertyValue<T>
 {
 };
@@ -507,8 +584,13 @@ struct TPropertyValue<T,
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyValue<T,
                       typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type>
+#else
+struct TPropertyValue<T,
+                      typename TEnableIf<std::is_same_v<typename TRemovePointer<T>::Type, UClass>, T>::Type>
+#endif
 {
 	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
 	{
@@ -599,7 +681,7 @@ struct TPropertyValue<T,
 
 template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsEnum<T>::Value, T>::Type> :
+                      typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type> :
 	TSinglePropertyValue<T>
 {
 	static MonoObject* Get(T* InMember)

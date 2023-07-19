@@ -11,7 +11,12 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
+#include "Template/TIsTSubclassOf.inl"
+#include "Template/TIsTSet.inl"
+#include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
+#include "UEVersion.h"
 
 template <typename T, typename Enable = void>
 struct TPropertyClass
@@ -51,100 +56,7 @@ struct TScriptStructPropertyClass
 };
 
 template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_Byte_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_UInt16_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_UInt32_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_UInt64_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_SByte_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_Int16_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_Int32_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_Int64_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_Boolean_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type>
-{
-	static MonoClass* Get()
-	{
-		return FMonoDomain::Get_Single_Class();
-	}
-};
-
-template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TAnd<
-	                                            TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
-	                                            TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
-                      ::Type>
+struct TBindingEnumPropertyClass
 {
 	static MonoClass* Get()
 	{
@@ -153,7 +65,159 @@ struct TPropertyClass<T, typename TEnableIf<TAnd<
 };
 
 template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, uint8>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_Byte_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, uint16>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_UInt16_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, uint32>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_UInt32_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, uint64>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_UInt64_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, int8>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_SByte_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, int16>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_Int16_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, int32>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_Int32_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, int64>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_Int64_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, bool>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_Boolean_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, float>, T>::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Get_Single_Class();
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
+struct TPropertyClass<T, typename TEnableIf<TAnd<
+	                                            TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
+	                                            TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
+                      ::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>::Value &&
+                                            !std::is_same_v<typename TRemovePointer<T>::Type, UClass>, T>
+                      ::Type>
+#endif
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+
+template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyClass<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, FName>, T>::Type>
+#endif
 {
 	static MonoClass* Get()
 	{
@@ -186,7 +250,11 @@ struct TPropertyClass<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyClass<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, FString>, T>::Type>
+#endif
 {
 	static MonoClass* Get()
 	{
@@ -195,7 +263,11 @@ struct TPropertyClass<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyClass<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, FText>, T>::Type>
+#endif
 {
 	static MonoClass* Get()
 	{
@@ -222,7 +294,11 @@ struct TPropertyClass<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Typ
 };
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyClass<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type>
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, double>, T>::Type>
+#endif
 {
 	static MonoClass* Get()
 	{
@@ -301,7 +377,11 @@ struct TPropertyClass<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> 
 
 
 template <typename T>
+#if UE_T_IS_SAME
 struct TPropertyClass<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type> :
+#else
+struct TPropertyClass<T, typename TEnableIf<std::is_same_v<typename TRemovePointer<T>::Type, UClass>, T>::Type> :
+#endif
 	TPropertyClass<TSubclassOf<UObject>, TSubclassOf<UObject>>
 {
 };
@@ -333,7 +413,7 @@ struct TPropertyClass<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type>
 };
 
 template <typename T>
-struct TPropertyClass<T, typename TEnableIf<TIsEnum<T>::Value, T>::Type>
+struct TPropertyClass<T, typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type>
 {
 	static MonoClass* Get()
 	{
