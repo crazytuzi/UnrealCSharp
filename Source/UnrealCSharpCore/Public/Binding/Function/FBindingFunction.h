@@ -1,20 +1,28 @@
 #pragma once
 
+#include "FBindingFunctionBase.inl"
 #include "FFunctionInfo.h"
 
-struct FBindingFunction
+struct FBindingFunction : FBindingFunctionBase
 {
 	FBindingFunction() = default;
 
-	FBindingFunction(FFunctionInfo* InInfo, const FString& InName):
-		Name(InName),
-		Info{InInfo}
+	FBindingFunction(FFunctionInfo* InInfo, const FString& InName,
+	                 const FString& InImplementationName, const TArray<FString>& InParamNames):
+		FBindingFunctionBase(InName, InImplementationName),
+		Info(InInfo),
+		ParamNames(InParamNames)
 	{
 	}
 
-	FString GetFunctionName() const
+	bool IsConstructor() const
 	{
-		return Name;
+		return Info != nullptr ? Info->IsConstructor() : false;
+	}
+
+	bool IsDestructor() const
+	{
+		return Info != nullptr ? Info->IsDestructor() : false;
 	}
 
 	bool IsStatic() const
@@ -34,8 +42,13 @@ struct FBindingFunction
 		return Info != nullptr ? Info->GetParams() : Instance;
 	}
 
-private:
-	FString Name;
+	const TArray<FString>& GetParamNames() const
+	{
+		return ParamNames;
+	}
 
+private:
 	FFunctionInfo* Info;
+
+	TArray<FString> ParamNames;
 };

@@ -68,6 +68,8 @@ void FCSharpEnvironment::Initialize()
 
 	MixinRegistry = new FMixinRegistry();
 
+	BindingRegistry = new FBindingRegistry();
+
 	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
 		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
 
@@ -103,6 +105,13 @@ void FCSharpEnvironment::Deinitialize()
 	if (OnAsyncLoadingFlushUpdateHandle.IsValid())
 	{
 		FCoreDelegates::OnAsyncLoadingFlushUpdate.Remove(OnAsyncLoadingFlushUpdateHandle);
+	}
+
+	if (BindingRegistry != nullptr)
+	{
+		delete BindingRegistry;
+
+		BindingRegistry = nullptr;
 	}
 
 	if (MixinRegistry != nullptr)
@@ -483,6 +492,21 @@ bool FCSharpEnvironment::RemoveDelegateReference(const void* InAddress) const
 bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InGarbageCollectionHandle) : false;
+}
+
+MonoObject* FCSharpEnvironment::GetBinding(const void* InObject) const
+{
+	return BindingRegistry != nullptr ? BindingRegistry->GetObject(InObject) : nullptr;
+}
+
+bool FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const void* InObject, const bool bNeedFree) const
+{
+	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InObject, InMonoObject, bNeedFree) : false;
+}
+
+bool FCSharpEnvironment::RemoveBindingReference(const MonoObject* InMonoObject) const
+{
+	return BindingRegistry != nullptr ? BindingRegistry->RemoveReference(InMonoObject) : false;
 }
 
 bool FCSharpEnvironment::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference) const

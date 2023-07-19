@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FRandomStreamImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterRandomStream
 {
 	FRegisterRandomStream()
 	{
-		TScriptStructBuilder<FRandomStream>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FRandomStream>(NAMESPACE_LIBRARY)
 			.Function("Initialize",
 			          static_cast<void*>(FRandomStreamImplementation::RandomStream_InitializeImplementation))
 			.Function("InitializeName",
@@ -141,9 +138,7 @@ void FRandomStreamImplementation::RandomStream_GetUnitVectorImplementation(
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -230,9 +225,7 @@ void FRandomStreamImplementation::RandomStream_VRandImplementation(const MonoObj
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -254,9 +247,7 @@ void FRandomStreamImplementation::RandomStream_VRandConeHalfAngleImplementation(
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Dir);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -279,9 +270,7 @@ void FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHal
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Dir);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -305,8 +294,7 @@ void FRandomStreamImplementation::RandomStream_ToStringImplementation(const Mono
 	{
 		const auto ResultString = RandomStream->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));

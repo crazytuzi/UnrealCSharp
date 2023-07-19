@@ -13,6 +13,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
 
 template <typename T, typename Enable = void>
 struct TPropertyValue
@@ -20,7 +21,7 @@ struct TPropertyValue
 };
 
 template <typename T>
-struct TPrimitivePropertyValue
+struct TSinglePropertyValue
 {
 	static MonoObject* Get(T* InMember)
 	{
@@ -61,62 +62,134 @@ struct TMultiPropertyValue
 };
 
 template <typename T>
+struct TBindingPropertyValue
+{
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			auto InParams = static_cast<void*>(FoundMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+			FCSharpEnvironment::GetEnvironment().AddBindingReference(
+				SrcMonoObject, InMember, bNeedFree);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static T Set(const MonoObject* InValue)
+	{
+		return *FCSharpEnvironment::GetEnvironment().GetBinding<T>(InValue);
+	}
+};
+
+template <typename T>
+struct TScriptStructPropertyValue
+{
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			auto InParams = static_cast<void*>(FoundMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<T>::Get(), false);
+
+			FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), nullptr,
+			                                                        InMember, SrcMonoObject, bNeedFree);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static T Set(const MonoObject* InValue)
+	{
+		const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+
+		T Value;
+
+		TBaseStructure<T>::Get()->CopyScriptStruct(&Value, SrcStruct);
+
+		return Value;
+	}
+};
+
+template <typename T>
+struct TBindingEnumPropertyValue :
+	TSinglePropertyValue<T>
+{
+};
+
+template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
@@ -169,7 +242,7 @@ struct TPropertyValue<T,
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
 
@@ -185,7 +258,7 @@ struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 			FCSharpEnvironment::GetEnvironment().Bind(T::StaticStruct(), false);
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), nullptr,
-			                                                        InMember, SrcMonoObject, false);
+			                                                        InMember, SrcMonoObject, bNeedFree);
 		}
 
 		return SrcMonoObject;
@@ -268,7 +341,7 @@ struct TPropertyValue<T,
 
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+	TSinglePropertyValue<T>
 {
 };
 
@@ -447,7 +520,7 @@ template <typename T>
 struct TPropertyValue<T,
                       typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InMember);
 
@@ -458,7 +531,7 @@ struct TPropertyValue<T,
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
-				SrcMonoObject, InMember, false);
+				SrcMonoObject, InMember, bNeedFree);
 		}
 
 		return SrcMonoObject;
@@ -536,9 +609,17 @@ struct TPropertyValue<T,
 
 template <typename T>
 struct TPropertyValue<T,
-                      typename TEnableIf<TIsEnum<T>::Value, T>::Type> :
-	TPrimitivePropertyValue<T>
+                      typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type> :
+	TSinglePropertyValue<T>
 {
+	static MonoObject* Get(T* InMember)
+	{
+		// @TODO
+		T Value = *InMember;
+
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
+			TPropertyClass<T, T>::Get(), &Value);
+	}
 };
 
 template <typename T>

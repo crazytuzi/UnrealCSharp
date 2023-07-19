@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FArrayImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FArrayHelper.h"
@@ -10,7 +10,7 @@ struct FRegisterArray
 {
 	FRegisterArray()
 	{
-		FBindingClassBuilder(TEXT("Array"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Array"), NAMESPACE_LIBRARY)
 			.Function("Register", static_cast<void*>(FArrayImplementation::Array_RegisterImplementation))
 			.Function("UnRegister", static_cast<void*>(FArrayImplementation::Array_UnRegisterImplementation))
 			.Function("GetTypeSize", static_cast<void*>(FArrayImplementation::Array_GetTypeSizeImplementation))

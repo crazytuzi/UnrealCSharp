@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FScriptInterfaceImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 #include "Async/Async.h"
@@ -8,7 +8,7 @@ struct FRegisterScriptInterface
 {
 	FRegisterScriptInterface()
 	{
-		FBindingClassBuilder(TEXT("ScriptInterface"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("ScriptInterface"), NAMESPACE_LIBRARY)
 			.Function("Register",
 			          static_cast<void*>(FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation))
 			.Function("UnRegister",

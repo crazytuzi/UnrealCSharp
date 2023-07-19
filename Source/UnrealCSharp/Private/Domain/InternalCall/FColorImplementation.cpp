@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FColorImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/ClassMacro.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterColor
 {
 	FRegisterColor()
 	{
-		TScriptStructBuilder<FColor>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FColor>(NAMESPACE_LIBRARY)
 			.Function("DWColor", static_cast<void*>(FColorImplementation::Color_DWColorImplementation))
 			.Function("Equality", static_cast<void*>(FColorImplementation::Color_EqualityImplementation))
 			.Function("Inequality", static_cast<void*>(FColorImplementation::Color_InequalityImplementation))
@@ -82,9 +79,7 @@ void FColorImplementation::Color_FromRGBEImplementation(const MonoObject* InMono
 {
 	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
-		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
+	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -105,9 +100,7 @@ void FColorImplementation::Color_FromHexImplementation(MonoObject* HexString, Mo
 		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 			GetDomain()->Object_To_String(HexString, nullptr)));
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
-		CLASS_SCRIPT_STRUCT_NAME(FColor));
+	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -123,9 +116,7 @@ void FColorImplementation::Color_FromHexImplementation(MonoObject* HexString, Mo
 
 void FColorImplementation::Color_MakeRandomColorImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
-		CLASS_SCRIPT_STRUCT_NAME(FColor));
+	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -141,9 +132,7 @@ void FColorImplementation::Color_MakeRandomColorImplementation(MonoObject** OutV
 
 void FColorImplementation::Color_MakeRedToGreenColorFromScalarImplementation(const float Scalar, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
-		CLASS_SCRIPT_STRUCT_NAME(FColor));
+	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -159,9 +148,7 @@ void FColorImplementation::Color_MakeRedToGreenColorFromScalarImplementation(con
 
 void FColorImplementation::Color_MakeFromColorTemperatureImplementation(const float Temp, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
-		CLASS_SCRIPT_STRUCT_NAME(FColor));
+	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -180,9 +167,7 @@ void FColorImplementation::Color_WithAlphaImplementation(const MonoObject* InMon
 {
 	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FColor)),
-		CLASS_SCRIPT_STRUCT_NAME(FColor));
+	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -201,9 +186,7 @@ void FColorImplementation::Color_ReinterpretAsLinearImplementation(const MonoObj
 {
 	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FLinearColor)),
-		CLASS_SCRIPT_STRUCT_NAME(FLinearColor));
+	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -226,8 +209,7 @@ void FColorImplementation::Color_ToHexImplementation(const MonoObject* InMonoObj
 	{
 		const auto ResultString = Color->ToHex();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -247,8 +229,7 @@ void FColorImplementation::Color_ToStringImplementation(const MonoObject* InMono
 	{
 		const auto ResultString = Color->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));

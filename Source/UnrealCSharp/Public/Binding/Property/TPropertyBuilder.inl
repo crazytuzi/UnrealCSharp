@@ -12,6 +12,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsNotUEnum.inl"
 
 template <typename T, T, typename Enable = void>
 struct TPropertyBuilder
@@ -23,7 +24,8 @@ struct TPropertyInfoBuilder
 {
 	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
 	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+			FCSharpEnvironment::GetEnvironment(), InMonoObject))
 		{
 			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member));
 		}
@@ -31,7 +33,8 @@ struct TPropertyInfoBuilder
 
 	static void Set(const MonoObject* InMonoObject, MonoObject* InValue)
 	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+			FCSharpEnvironment::GetEnvironment(), InMonoObject))
 		{
 			FoundObject->*Member = TPropertyValue<Result, Result>::Set(InValue);
 		}
@@ -49,7 +52,8 @@ struct TContainerPropertyBuilder :
 {
 	static void Get(MonoObject* InMonoObject, MonoObject** OutValue)
 	{
-		if (auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<Class>(InMonoObject))
+		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+			FCSharpEnvironment::GetEnvironment(), InMonoObject))
 		{
 			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InMonoObject);
 		}
@@ -221,7 +225,7 @@ struct TPropertyBuilder<Result Class::*, Member,
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsEnum<Result>::Value>::Type> :
+                        typename TEnableIf<TAnd<TIsEnum<Result>, TNot<TIsNotUEnum<Result>>>::Value>::Type> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };

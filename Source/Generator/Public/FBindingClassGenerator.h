@@ -2,7 +2,7 @@
 
 #include "Binding/Class/FBindingClass.h"
 
-class FBindingGenerator
+class FBindingClassGenerator
 {
 public:
 	static GENERATOR_API void Generator();

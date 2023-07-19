@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FMulticastDelegateImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
 #include "Macro/NamespaceMacro.h"
@@ -8,7 +8,7 @@ struct FRegisterMulticastDelegate
 {
 	FRegisterMulticastDelegate()
 	{
-		FBindingClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_LIBRARY)
 			.Function("IsBound",
 			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation))
 			.Function("Contains",

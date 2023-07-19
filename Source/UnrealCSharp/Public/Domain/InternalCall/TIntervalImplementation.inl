@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Environment/FCSharpEnvironment.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 
 template <typename T, typename U>
 auto TIntervalImplementation<T, U>::Interval_SizeImplementation(const MonoObject* InMonoObject)
@@ -86,9 +86,7 @@ auto TIntervalImplementation<T, U>::Interval_IntersectImplementation(const MonoO
 
 	const auto IntervalB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 

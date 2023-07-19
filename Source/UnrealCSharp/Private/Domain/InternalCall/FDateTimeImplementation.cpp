@@ -1,17 +1,14 @@
 ﻿#include "Domain/InternalCall/FDateTimeImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.inl"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterDateTime
 {
 	FRegisterDateTime()
 	{
-		TScriptStructBuilder<FDateTime>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FDateTime>(NAMESPACE_LIBRARY)
 			.Function("AddTimespan", static_cast<void*>(FDateTimeImplementation::DateTime_AddTimespanImplementation))
 			.Function("AddDateTime", static_cast<void*>(FDateTimeImplementation::DateTime_AddDateTimeImplementation))
 			.Function("SubtractDateTime",
@@ -80,9 +77,7 @@ void FDateTimeImplementation::DateTime_AddTimespanImplementation(const MonoObjec
 
 	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -115,10 +110,7 @@ void FDateTimeImplementation::DateTime_SubtractDateTimeImplementation(const Mono
 
 	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
-
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
@@ -138,9 +130,7 @@ void FDateTimeImplementation::DateTime_SubtractTimespanImplementation(const Mono
 
 	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -242,9 +232,7 @@ void FDateTimeImplementation::DateTime_GetDatePartImplementation(const MonoObjec
 {
 	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -405,10 +393,7 @@ void FDateTimeImplementation::DateTime_GetTimeOfDayImplementation(const MonoObje
 {
 	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FTimespan)),
-		CLASS_SCRIPT_STRUCT_NAME(FTimespan));
-
+	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
@@ -465,8 +450,7 @@ void FDateTimeImplementation::DateTime_ToHttpDateImplementation(const MonoObject
 	{
 		const auto ResultString = DateTime->ToHttpDate();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -486,8 +470,7 @@ void FDateTimeImplementation::DateTime_ToIso8601Implementation(const MonoObject*
 	{
 		const auto ResultString = DateTime->ToIso8601();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -507,8 +490,7 @@ void FDateTimeImplementation::DateTime_ToStringImplementation(const MonoObject* 
 	{
 		const auto ResultString = DateTime->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
@@ -544,9 +526,7 @@ int32 FDateTimeImplementation::DateTime_DaysInYearImplementation(const int32 Yea
 
 void FDateTimeImplementation::DateTime_FromJulianDayImplementation(const double JulianDay, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -562,9 +542,7 @@ void FDateTimeImplementation::DateTime_FromJulianDayImplementation(const double 
 
 void FDateTimeImplementation::DateTime_FromUnixTimestampImplementation(const int64 UnixTime, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -585,9 +563,7 @@ bool FDateTimeImplementation::DateTime_IsLeapYearImplementation(const int32 Year
 
 void FDateTimeImplementation::DateTime_MaxValueImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -603,9 +579,7 @@ void FDateTimeImplementation::DateTime_MaxValueImplementation(MonoObject** OutVa
 
 void FDateTimeImplementation::DateTime_MinValueImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -621,9 +595,7 @@ void FDateTimeImplementation::DateTime_MinValueImplementation(MonoObject** OutVa
 
 void FDateTimeImplementation::DateTime_NowImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -639,9 +611,7 @@ void FDateTimeImplementation::DateTime_NowImplementation(MonoObject** OutValue)
 
 bool FDateTimeImplementation::DateTime_ParseImplementation(MonoObject* DateTimeString, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -662,9 +632,7 @@ bool FDateTimeImplementation::DateTime_ParseImplementation(MonoObject* DateTimeS
 
 bool FDateTimeImplementation::DateTime_ParseHttpDateImplementation(MonoObject* HttpDate, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -685,9 +653,7 @@ bool FDateTimeImplementation::DateTime_ParseHttpDateImplementation(MonoObject* H
 
 void FDateTimeImplementation::DateTime_TodayImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
@@ -703,9 +669,7 @@ void FDateTimeImplementation::DateTime_TodayImplementation(MonoObject** OutValue
 
 void FDateTimeImplementation::DateTime_UtcNowImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FDateTime)),
-		CLASS_SCRIPT_STRUCT_NAME(FDateTime));
+	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
