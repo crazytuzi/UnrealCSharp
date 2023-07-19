@@ -41,6 +41,8 @@
 
 #define UE_FILTER_CLASS_PATHS UE_VERSION_START(5, 1, 0)
 
+#define UE_T_IS_SAME !UE_VERSION_START(5, 2, 0)
+
 #define STD_CPP_11 __cplusplus >= 201103L
 
 #define STD_CPP_14 __cplusplus >= 201402L
