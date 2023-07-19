@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Macro/BindingMacro.h"
+#include "UEVersion.h"
 
 static UScriptStruct* StaticGetBaseStructureInternal(const FName& Name)
 {
@@ -19,6 +20,17 @@ static UScriptStruct* StaticGetBaseStructureInternal(const FName& Name)
 
 	return Result;
 }
+
+#if UE_T_BASE_STRUCTURE_F_MATRIX
+template <>
+struct TBaseStructure<FMatrix>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FMatrix));
+	}
+};
+#endif
 
 template <>
 struct TBaseStructure<FIntPoint>

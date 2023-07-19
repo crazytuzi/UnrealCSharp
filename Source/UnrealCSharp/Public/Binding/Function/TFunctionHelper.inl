@@ -34,7 +34,7 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 				.Get();
 		}
 
-		TOut(OutValue, Argument).template Get<0, Args...>();
+		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument).template Get<0, Args...>();
 	}
 
 	template <typename Class, typename Function, SIZE_T... Index>
@@ -56,7 +56,7 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 					.Get();
 			}
 
-			TOut(OutValue, Argument).template Get<0, Args...>();
+			TOut<TTuple<TArgument<Args>...>>(OutValue, Argument).template Get<0, Args...>();
 		}
 	}
 };
