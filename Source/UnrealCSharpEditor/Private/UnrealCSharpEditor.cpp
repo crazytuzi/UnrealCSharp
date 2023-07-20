@@ -15,6 +15,7 @@
 #include "ToolMenus.h"
 #include "Internationalization/Culture.h"
 #include "FCodeAnalysis.h"
+#include "Misc/ScopedSlowTask.h"
 
 static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 
@@ -65,14 +66,23 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
 	}
 
+	FScopedSlowTask SlowTask(11,
+		LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
+	SlowTask.MakeDialog();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Generator"));
 	FCodeAnalysis::CodeAnalysis();
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "UClass Generator"));
 	FClassGenerator::Generator();
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "UScriptStruct Generator"));
 	FStructGenerator::Generator();
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "UEnum Generator"));
 	FEnumGenerator::Generator();
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Blueprint Generator"));
 	FBlueprintGenerator::Generator();
 
 	FEnumGenerator::EmptyEnumUnderlyingType();
@@ -82,15 +92,22 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 		FInternationalization::Get().SetCurrentCulture(CurrentCultureName);
 	}
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Solution Generator"));
 	FSolutionGenerator::Generator();
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "BindingClass Generator"));
 	FBindingClassGenerator::Generator();
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "BindingEnum Generator"));
 	FBindingEnumGenerator::Generator();
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Garbage Collect"));
 	CollectGarbage(RF_NoFlags, true);
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Compile Generator"));
 	FCSharpCompiler::Get().Compile();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Completion"));
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()
