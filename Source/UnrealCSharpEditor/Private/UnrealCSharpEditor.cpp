@@ -66,23 +66,28 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
 	}
 
-	FScopedSlowTask SlowTask(11,
-		LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
+	FScopedSlowTask SlowTask(11, LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
+
 	SlowTask.MakeDialog();
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Generator"));
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis"));
+
 	FCodeAnalysis::CodeAnalysis();
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "UClass Generator"));
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Class Generator"));
+
 	FClassGenerator::Generator();
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "UScriptStruct Generator"));
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Struct Generator"));
+
 	FStructGenerator::Generator();
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "UEnum Generator"));
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Enum Generator"));
+
 	FEnumGenerator::Generator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Blueprint Generator"));
+
 	FBlueprintGenerator::Generator();
 
 	FEnumGenerator::EmptyEnumUnderlyingType();
@@ -96,15 +101,19 @@ void FUnrealCSharpEditorModule::PluginButtonClicked()
 	FSolutionGenerator::Generator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "BindingClass Generator"));
+
 	FBindingClassGenerator::Generator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "BindingEnum Generator"));
+
 	FBindingEnumGenerator::Generator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Garbage Collect"));
+
 	CollectGarbage(RF_NoFlags, true);
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Compile Generator"));
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Compiler"));
+
 	FCSharpCompiler::Get().Compile();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Completion"));
