@@ -34,6 +34,14 @@ void FCSharpCompiler::Compile() const
 	}
 }
 
+void FCSharpCompiler::ImmediatelyCompile() const
+{
+	if (Runnable != nullptr)
+	{
+		Runnable->DoWork();
+	}
+}
+
 void FCSharpCompiler::Compile(const TArray<FFileChangeData>& FileChangeData) const
 {
 	if (Runnable != nullptr)
