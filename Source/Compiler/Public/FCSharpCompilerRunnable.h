@@ -23,9 +23,9 @@ public:
 
 	bool IsCompiling() const;
 
-private:
 	void DoWork();
 
+private:
 	static void Compile();
 
 	static void Pdb2Mdb();

@@ -26,11 +26,11 @@ void FMixinGenerator::Generator()
 		FMixinClassGenerator::Generator();
 
 		FMixinStructGenerator::Generator();
+
+		FMixinEnumGenerator::Generator();
+
+		FMonoDomain::Deinitialize();
 	}
-
-	FMixinEnumGenerator::Generator();
-
-	FMonoDomain::Deinitialize();
 }
 
 #if WITH_EDITOR
@@ -72,6 +72,9 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 		}
 	}
 
-	FMonoDomain::Deinitialize();
+	if (FMonoDomain::bLoadSucceed)
+	{
+		FMonoDomain::Deinitialize();
+	}
 }
 #endif

@@ -15,6 +15,8 @@ public:
 public:
 	void Compile() const;
 
+	void ImmediatelyCompile() const;
+
 	void Compile(const TArray<FFileChangeData>& FileChangeData) const;
 
 	bool IsCompiling() const;

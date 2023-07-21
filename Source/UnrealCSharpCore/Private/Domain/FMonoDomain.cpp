@@ -3,6 +3,7 @@
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/Macro.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -30,12 +31,18 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 {
 	RegisterMonoTrace();
 
+	if (!FPaths::FileExists(InParams.AssemblyUtil))
+	{
+		return;
+	}
+
 	if (Domain == nullptr)
 	{
 #if WITH_EDITOR
 		auto MonoDir = FString::Printf(TEXT(
-			"%s/Binaries/%s"),
-		                               *FPaths::ProjectDir(),
+			"%s/%s/Binaries/%s"),
+		                               *FPaths::ProjectPluginsDir(),
+		                               *PLUGIN_NAME,
 #if PLATFORM_WINDOWS
 		                               TEXT("Win64")
 #endif

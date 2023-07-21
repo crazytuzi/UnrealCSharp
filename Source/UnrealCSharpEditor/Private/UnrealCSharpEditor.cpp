@@ -15,6 +15,7 @@
 #include "ToolMenus.h"
 #include "Internationalization/Culture.h"
 #include "FCodeAnalysis.h"
+#include "Misc/ScopedSlowTask.h"
 
 static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 
@@ -54,43 +55,9 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 	FUnrealCSharpEditorCommands::Unregister();
 }
 
-void FUnrealCSharpEditorModule::PluginButtonClicked()
+void FUnrealCSharpEditorModule::PluginButtonClicked() const
 {
-	static FString DefaultCultureName = TEXT("en");
-
-	const auto CurrentCultureName = FInternationalization::Get().GetCurrentCulture().Get().GetName();
-
-	if (!CurrentCultureName.Equals(DefaultCultureName))
-	{
-		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
-	}
-
-	FCodeAnalysis::CodeAnalysis();
-
-	FClassGenerator::Generator();
-
-	FStructGenerator::Generator();
-
-	FEnumGenerator::Generator();
-
-	FBlueprintGenerator::Generator();
-
-	FEnumGenerator::EmptyEnumUnderlyingType();
-
-	if (!CurrentCultureName.Equals(DefaultCultureName))
-	{
-		FInternationalization::Get().SetCurrentCulture(CurrentCultureName);
-	}
-
-	FSolutionGenerator::Generator();
-
-	FBindingClassGenerator::Generator();
-
-	FBindingEnumGenerator::Generator();
-
-	CollectGarbage(RF_NoFlags, true);
-
-	FCSharpCompiler::Get().Compile();
+	Generator();
 }
 
 void FUnrealCSharpEditorModule::RegisterMenus()
@@ -117,6 +84,71 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 			}
 		}
 	}
+}
+
+void FUnrealCSharpEditorModule::Generator() const
+{
+	static FString DefaultCultureName = TEXT("en");
+
+	const auto CurrentCultureName = FInternationalization::Get().GetCurrentCulture().Get().GetName();
+
+	if (!CurrentCultureName.Equals(DefaultCultureName))
+	{
+		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
+	}
+
+	FScopedSlowTask SlowTask(11, LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
+
+	SlowTask.MakeDialog();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis"));
+
+	FCodeAnalysis::CodeAnalysis();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Class Generator"));
+
+	FClassGenerator::Generator();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Struct Generator"));
+
+	FStructGenerator::Generator();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Enum Generator"));
+
+	FEnumGenerator::Generator();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Blueprint Generator"));
+
+	FBlueprintGenerator::Generator();
+
+	FEnumGenerator::EmptyEnumUnderlyingType();
+
+	if (!CurrentCultureName.Equals(DefaultCultureName))
+	{
+		FInternationalization::Get().SetCurrentCulture(CurrentCultureName);
+	}
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Solution Generator"));
+
+	FSolutionGenerator::Generator();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "BindingClass Generator"));
+
+	FBindingClassGenerator::Generator();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "BindingEnum Generator"));
+
+	FBindingEnumGenerator::Generator();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Garbage Collect"));
+
+	CollectGarbage(RF_NoFlags, true);
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Compiler"));
+
+	FCSharpCompiler::Get().ImmediatelyCompile();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Completion"));
 }
 
 #undef LOCTEXT_NAMESPACE

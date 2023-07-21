@@ -114,12 +114,14 @@ void FCSharpCompilerRunnable::DoWork()
 
 	Pdb2Mdb();
 
-	AsyncTask(ENamedThreads::GameThread, [this]
+	const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
 	{
 		FMixinGenerator::Generator(FileChanges);
 
 		FileChanges.Empty();
-	});
+	}, TStatId(), nullptr, ENamedThreads::GameThread);
+
+	FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
 
 	bIsCompiling = false;
 }
