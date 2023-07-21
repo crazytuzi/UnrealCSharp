@@ -10,7 +10,7 @@ public:
 	static FString GetClassNameSpace();
 
 	static void SetPropertyFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
-	
+
 	static void SetFunctionFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 private:

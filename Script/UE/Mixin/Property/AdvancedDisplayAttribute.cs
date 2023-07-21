@@ -1,8 +1,9 @@
 using System;
- namespace Script.Mixin 
-{     
-[AttributeUsage(AttributeTargets.Property)]     
-public class AdvancedDisplayAttribute  : Attribute    
-{    
-} 
+
+namespace Script.Mixin
+{
+    [AttributeUsage(AttributeTargets.Property)]
+    public class AdvancedDisplayAttribute : Attribute
+    {
+    }
 }

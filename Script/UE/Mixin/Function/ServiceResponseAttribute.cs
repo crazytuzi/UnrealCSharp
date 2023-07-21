@@ -1,8 +1,9 @@
 using System;
-namespace Script.Mixin 
-{     
-[AttributeUsage(AttributeTargets.Method)]     
-public class ServiceResponseAttribute  : Attribute    
-{    
-} 
+
+namespace Script.Mixin
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ServiceResponseAttribute : Attribute
+    {
+    }
 }

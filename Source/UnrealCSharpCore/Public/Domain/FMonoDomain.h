@@ -27,9 +27,6 @@ public:
 	static void Deinitialize();
 
 public:
-
-	inline  static bool bIsFileExists;
-	
 	static MonoObject* Object_New(MonoClass* InMonoClass);
 
 	static MonoObject* Object_New(MonoClass* InMonoClass, const int32 InParamCount, void** InParams);

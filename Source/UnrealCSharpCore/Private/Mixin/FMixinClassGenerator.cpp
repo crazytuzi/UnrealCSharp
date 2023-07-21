@@ -11,7 +11,6 @@
 #include "Mixin/FMixinGeneratorCore.h"
 #include "Template/TGetArrayLength.h"
 #include "mono/metadata/object.h"
-#include "UObject/UnrealTypePrivate.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
 #endif
@@ -112,7 +111,7 @@ void FMixinClassGenerator::Generator(MonoClass* InMonoClass)
 
 	Class->SetSuperStruct(ParentClass);
 
-//	Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
+	Class->ClassAddReferencedObjects = ParentClass->ClassAddReferencedObjects;
 
 	// @TODO
 	GeneratorProperty(InMonoClass, Class);
@@ -163,14 +162,10 @@ void FMixinClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* InC
 				const auto PropertyType = FMonoDomain::Property_Get_Type(Property);
 
 				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
-				
+
 				const auto CppProperty = FTypeBridge::Factory(ReflectionType, InClass, PropertyName,
 				                                              EObjectFlags::RF_Public);
-				if(InClass->GetName()=="TestClass1")
-				{
-					
-				}
-				
+
 				FMixinGeneratorCore::SetPropertyFlags(CppProperty, Attrs);
 
 				InClass->AddCppProperty(CppProperty);
@@ -233,11 +228,6 @@ void FMixinClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InC
 
 				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
 
-				// @TODO
-				Function->FunctionFlags = FUNC_Public | FUNC_BlueprintCallable | FUNC_BlueprintEvent;
-				
-				FMixinGeneratorCore::SetFunctionFlags(Function,Attrs);
-				
 				Function->MinAlignment = 1;
 
 				if (const auto ReturnParamType = FMonoDomain::Signature_Get_Return_Type(Signature))
@@ -248,7 +238,7 @@ void FMixinClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InC
 					                                           RF_Public | RF_Transient);
 
 					Property->SetPropertyFlags(CPF_Parm | CPF_ReturnParm);
-					
+
 					Function->AddCppProperty(Property);
 				}
 
@@ -276,6 +266,8 @@ void FMixinClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InC
 				Function->Next = InClass->Children;
 
 				InClass->Children = Function;
+
+				FMixinGeneratorCore::SetFunctionFlags(Function, Attrs);
 
 				InClass->AddFunctionToFunctionMap(Function, MethodName);
 

@@ -1,8 +1,9 @@
 using System;
-namespace Script.Mixin 
-{     
-[AttributeUsage(AttributeTargets.Method)]     
-public class BlueprintPureAttribute  : Attribute    
-{    
-} 
+
+namespace Script.Mixin
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    public class BlueprintPureAttribute : Attribute
+    {
+    }
 }

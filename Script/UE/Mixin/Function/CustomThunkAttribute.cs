@@ -1,8 +1,9 @@
 using System;
-namespace Script.Mixin 
-{     
-[AttributeUsage(AttributeTargets.Method)]     
-public class CustomThunkAttribute  : Attribute    
-{    
-} 
+
+namespace Script.Mixin
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CustomThunkAttribute : Attribute
+    {
+    }
 }

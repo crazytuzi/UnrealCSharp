@@ -1,8 +1,9 @@
 using System;
- namespace Script.Mixin 
-{     
-[AttributeUsage(AttributeTargets.Property)]     
-public class NonPIEDuplicateTransientAttribute  : Attribute    
-{    
-} 
+
+namespace Script.Mixin
+{
+    [AttributeUsage(AttributeTargets.Property)]
+    public class NonPIEDuplicateTransientAttribute : Attribute
+    {
+    }
 }
