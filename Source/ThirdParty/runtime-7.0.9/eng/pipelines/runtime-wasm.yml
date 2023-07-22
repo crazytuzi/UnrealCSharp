@@ -1,0 +1,40 @@
+# This is a wrapper yml for `runtime-extra-platforms-wasm.yml`, which
+# has all the wasm jobs. This file is essentially so we can have point
+# the pipeline in azdo UI to this, and thus avoid any scheduled triggers
+
+trigger: none
+
+variables:
+  - template: /eng/pipelines/common/variables.yml
+
+jobs:
+
+#
+# Evaluate paths
+#
+- ${{ if eq(variables.dependOnEvaluatePaths, true) }}:
+  - template: /eng/pipelines/common/evaluate-default-paths.yml
+
+- template: /eng/pipelines/runtime-extra-platforms-wasm.yml
+  parameters:
+    isWasmOnlyBuild: ${{ variables.isWasmOnlyBuild }}
+    isRollingBuild: ${{ variables.isRollingBuild }}
+
+# Run AOT tests with SIMD enabled
+- template: /eng/pipelines/common/templates/wasm-library-tests.yml
+  parameters:
+    platforms:
+      - Browser_wasm
+    nameSuffix: _SIMD_AOT
+    isExtraPlatformsBuild: false
+    isWasmOnlyBuild: true
+    extraBuildArgs: /p:EnableAggressiveTrimming=true /p:BuildAOTTestsOnHelix=true /p:RunAOTCompilation=true
+    extraHelixArgs: /p:NeedsToBuildWasmAppsOnHelix=true /p:WasmEnableSIMD=true
+    runSmokeOnlyArg: ''
+    alwaysRun: true
+    # failures due to
+    #   https://github.com/dotnet/runtime/issues/75044
+    #   and https://github.com/dotnet/runtime/issues/75098
+    shouldContinueOnError: true
+    scenarios:
+      - WasmTestOnNodeJS

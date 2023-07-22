@@ -1,0 +1,19 @@
+parameters:
+  packageType: null
+  image: null
+  packageStepDescription: null
+  packagingArgs: ''
+  subsetArg: ''
+
+steps:
+- script: |
+    set -x
+    df -h
+    $(DockerRunMSBuild) ${{ parameters.image }} $(BuildScript) \
+      --ci \
+      ${{ parameters.subsetArg }} \
+      ${{ parameters.packagingArgs }} \
+      $(CommonMSBuildArgs) \
+      $(LiveOverridePathArgs) \
+      /bl:artifacts/log/$(_BuildConfig)/msbuild.${{ parameters.packageType }}.installers.binlog
+  displayName: Package ${{ parameters.packageStepDescription }} - ${{ parameters.packageType }}

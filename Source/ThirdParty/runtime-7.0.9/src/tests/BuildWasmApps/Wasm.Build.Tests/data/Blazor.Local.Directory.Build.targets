@@ -1,0 +1,5 @@
+<Project>
+  <Target Name="PrintRuntimePackPath" BeforeTargets="Publish">
+    <Message Text="** MicrosoftNetCoreAppRuntimePackDir : %(ResolvedRuntimePack.PackageDirectory)" Importance="High" />
+  </Target>
+</Project>

@@ -1,0 +1,10 @@
+﻿<Project>
+  <Import Project="..\Directory.Build.props" />
+  <PropertyGroup>
+    <!-- Since this assembly version is pinned, we don't want to validate that it matches
+    the expected assembly version on the targeting pack. -->
+    <SkipValidateAssemblyVersion>true</SkipValidateAssemblyVersion>
+    <StrongNameKeyId>Microsoft</StrongNameKeyId>
+    <SupportedOSPlatforms>windows</SupportedOSPlatforms>
+  </PropertyGroup>
+</Project>
