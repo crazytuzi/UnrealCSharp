@@ -8,182 +8,138 @@ struct FRegisterProperty
 	FRegisterProperty()
 	{
 		FClassBuilder(TEXT("Property"), NAMESPACE_LIBRARY)
-			.Function("GetObjectByteProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectBytePropertyImplementation))
-			.Function("SetObjectByteProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectBytePropertyImplementation))
+			.Function("GetObjectByteProperty", FPropertyImplementation::Property_GetObjectBytePropertyImplementation)
+			.Function("SetObjectByteProperty", FPropertyImplementation::Property_SetObjectBytePropertyImplementation)
 			.Function("GetObjectUInt16Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectUInt16PropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectUInt16PropertyImplementation)
 			.Function("SetObjectUInt16Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectUInt16PropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectUInt16PropertyImplementation)
 			.Function("GetObjectUInt32Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectUInt32PropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectUInt32PropertyImplementation)
 			.Function("SetObjectUInt32Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectUInt32PropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectUInt32PropertyImplementation)
 			.Function("GetObjectUInt64Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectUInt64PropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectUInt64PropertyImplementation)
 			.Function("SetObjectUInt64Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectUInt64PropertyImplementation))
-			.Function("GetObjectInt8Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectInt8PropertyImplementation))
-			.Function("SetObjectInt8Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectInt8PropertyImplementation))
-			.Function("GetObjectInt16Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectInt16PropertyImplementation))
-			.Function("SetObjectInt16Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectInt16PropertyImplementation))
-			.Function("GetObjectIntProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectIntPropertyImplementation))
-			.Function("SetObjectIntProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectIntPropertyImplementation))
-			.Function("GetObjectInt64Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectInt64PropertyImplementation))
-			.Function("SetObjectInt64Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectInt64PropertyImplementation))
-			.Function("GetObjectBoolProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectBoolPropertyImplementation))
-			.Function("SetObjectBoolProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectBoolPropertyImplementation))
-			.Function("GetObjectFloatProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectFloatPropertyImplementation))
-			.Function("SetObjectFloatProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectFloatPropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectUInt64PropertyImplementation)
+			.Function("GetObjectInt8Property", FPropertyImplementation::Property_GetObjectInt8PropertyImplementation)
+			.Function("SetObjectInt8Property", FPropertyImplementation::Property_SetObjectInt8PropertyImplementation)
+			.Function("GetObjectInt16Property", FPropertyImplementation::Property_GetObjectInt16PropertyImplementation)
+			.Function("SetObjectInt16Property", FPropertyImplementation::Property_SetObjectInt16PropertyImplementation)
+			.Function("GetObjectIntProperty", FPropertyImplementation::Property_GetObjectIntPropertyImplementation)
+			.Function("SetObjectIntProperty", FPropertyImplementation::Property_SetObjectIntPropertyImplementation)
+			.Function("GetObjectInt64Property", FPropertyImplementation::Property_GetObjectInt64PropertyImplementation)
+			.Function("SetObjectInt64Property", FPropertyImplementation::Property_SetObjectInt64PropertyImplementation)
+			.Function("GetObjectBoolProperty", FPropertyImplementation::Property_GetObjectBoolPropertyImplementation)
+			.Function("SetObjectBoolProperty", FPropertyImplementation::Property_SetObjectBoolPropertyImplementation)
+			.Function("GetObjectFloatProperty", FPropertyImplementation::Property_GetObjectFloatPropertyImplementation)
+			.Function("SetObjectFloatProperty", FPropertyImplementation::Property_SetObjectFloatPropertyImplementation)
 			.Function("GetObjectObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectObjectPropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectObjectPropertyImplementation)
 			.Function("SetObjectObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectObjectPropertyImplementation))
-			.Function("GetObjectClassProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectClassPropertyImplementation))
-			.Function("SetObjectClassProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectClassPropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectObjectPropertyImplementation)
+			.Function("GetObjectClassProperty", FPropertyImplementation::Property_GetObjectClassPropertyImplementation)
+			.Function("SetObjectClassProperty", FPropertyImplementation::Property_SetObjectClassPropertyImplementation)
 			.Function("GetObjectInterfaceProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectInterfacePropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectInterfacePropertyImplementation)
 			.Function("SetObjectInterfaceProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectInterfacePropertyImplementation))
-			.Function("GetObjectArrayProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectArrayPropertyImplementation))
-			.Function("SetObjectArrayProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectArrayPropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectInterfacePropertyImplementation)
+			.Function("GetObjectArrayProperty", FPropertyImplementation::Property_GetObjectArrayPropertyImplementation)
+			.Function("SetObjectArrayProperty", FPropertyImplementation::Property_SetObjectArrayPropertyImplementation)
 			.Function("GetObjectWeakObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectWeakObjectPropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectWeakObjectPropertyImplementation)
 			.Function("SetObjectWeakObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectWeakObjectPropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectWeakObjectPropertyImplementation)
 			.Function("GetObjectLazyObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectLazyObjectPropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectLazyObjectPropertyImplementation)
 			.Function("SetObjectLazyObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectLazyObjectPropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectLazyObjectPropertyImplementation)
 			.Function("GetObjectSoftClassProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectSoftClassPropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectSoftClassPropertyImplementation)
 			.Function("SetObjectSoftClassProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectSoftClassPropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectSoftClassPropertyImplementation)
 			.Function("GetObjectSoftObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectSoftObjectPropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectSoftObjectPropertyImplementation)
 			.Function("SetObjectSoftObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectSoftObjectPropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectSoftObjectPropertyImplementation)
 			.Function("GetObjectDoubleProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectDoublePropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectDoublePropertyImplementation)
 			.Function("SetObjectDoubleProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectDoublePropertyImplementation))
-			.Function("GetObjectMapProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectMapPropertyImplementation))
-			.Function("SetObjectMapProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectMapPropertyImplementation))
-			.Function("GetObjectSetProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectSetPropertyImplementation))
-			.Function("SetObjectSetProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectSetPropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectDoublePropertyImplementation)
+			.Function("GetObjectMapProperty", FPropertyImplementation::Property_GetObjectMapPropertyImplementation)
+			.Function("SetObjectMapProperty", FPropertyImplementation::Property_SetObjectMapPropertyImplementation)
+			.Function("GetObjectSetProperty", FPropertyImplementation::Property_GetObjectSetPropertyImplementation)
+			.Function("SetObjectSetProperty", FPropertyImplementation::Property_SetObjectSetPropertyImplementation)
 			.Function("GetObjectFieldPathProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetObjectFieldPathPropertyImplementation))
+			          FPropertyImplementation::Property_GetObjectFieldPathPropertyImplementation)
 			.Function("SetObjectFieldPathProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetObjectFieldPathPropertyImplementation))
-			.Function("GetStructByteProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructBytePropertyImplementation))
-			.Function("SetStructByteProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructBytePropertyImplementation))
+			          FPropertyImplementation::Property_SetObjectFieldPathPropertyImplementation)
+			.Function("GetStructByteProperty", FPropertyImplementation::Property_GetStructBytePropertyImplementation)
+			.Function("SetStructByteProperty", FPropertyImplementation::Property_SetStructBytePropertyImplementation)
 			.Function("GetStructUInt16Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructUInt16PropertyImplementation))
+			          FPropertyImplementation::Property_GetStructUInt16PropertyImplementation)
 			.Function("SetStructUInt16Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructUInt16PropertyImplementation))
+			          FPropertyImplementation::Property_SetStructUInt16PropertyImplementation)
 			.Function("GetStructUInt32Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructUInt32PropertyImplementation))
+			          FPropertyImplementation::Property_GetStructUInt32PropertyImplementation)
 			.Function("SetStructUInt32Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructUInt32PropertyImplementation))
+			          FPropertyImplementation::Property_SetStructUInt32PropertyImplementation)
 			.Function("GetStructUInt64Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructUInt64PropertyImplementation))
+			          FPropertyImplementation::Property_GetStructUInt64PropertyImplementation)
 			.Function("SetStructUInt64Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructUInt64PropertyImplementation))
-			.Function("GetStructInt8Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructInt8PropertyImplementation))
-			.Function("SetStructInt8Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructInt8PropertyImplementation))
-			.Function("GetStructInt16Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructInt16PropertyImplementation))
-			.Function("SetStructInt16Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructInt16PropertyImplementation))
-			.Function("GetStructIntProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructIntPropertyImplementation))
-			.Function("SetStructIntProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructIntPropertyImplementation))
-			.Function("GetStructInt64Property",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructInt64PropertyImplementation))
-			.Function("SetStructInt64Property",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructInt64PropertyImplementation))
-			.Function("GetStructBoolProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructBoolPropertyImplementation))
-			.Function("SetStructBoolProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructBoolPropertyImplementation))
-			.Function("GetStructFloatProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructFloatPropertyImplementation))
-			.Function("SetStructFloatProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructFloatPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructUInt64PropertyImplementation)
+			.Function("GetStructInt8Property", FPropertyImplementation::Property_GetStructInt8PropertyImplementation)
+			.Function("SetStructInt8Property", FPropertyImplementation::Property_SetStructInt8PropertyImplementation)
+			.Function("GetStructInt16Property", FPropertyImplementation::Property_GetStructInt16PropertyImplementation)
+			.Function("SetStructInt16Property", FPropertyImplementation::Property_SetStructInt16PropertyImplementation)
+			.Function("GetStructIntProperty", FPropertyImplementation::Property_GetStructIntPropertyImplementation)
+			.Function("SetStructIntProperty", FPropertyImplementation::Property_SetStructIntPropertyImplementation)
+			.Function("GetStructInt64Property", FPropertyImplementation::Property_GetStructInt64PropertyImplementation)
+			.Function("SetStructInt64Property", FPropertyImplementation::Property_SetStructInt64PropertyImplementation)
+			.Function("GetStructBoolProperty", FPropertyImplementation::Property_GetStructBoolPropertyImplementation)
+			.Function("SetStructBoolProperty", FPropertyImplementation::Property_SetStructBoolPropertyImplementation)
+			.Function("GetStructFloatProperty", FPropertyImplementation::Property_GetStructFloatPropertyImplementation)
+			.Function("SetStructFloatProperty", FPropertyImplementation::Property_SetStructFloatPropertyImplementation)
 			.Function("GetStructObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructObjectPropertyImplementation))
+			          FPropertyImplementation::Property_GetStructObjectPropertyImplementation)
 			.Function("SetStructObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructObjectPropertyImplementation))
-			.Function("GetStructClassProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructClassPropertyImplementation))
-			.Function("SetStructClassProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructClassPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructObjectPropertyImplementation)
+			.Function("GetStructClassProperty", FPropertyImplementation::Property_GetStructClassPropertyImplementation)
+			.Function("SetStructClassProperty", FPropertyImplementation::Property_SetStructClassPropertyImplementation)
 			.Function("GetStructInterfaceProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructInterfacePropertyImplementation))
+			          FPropertyImplementation::Property_GetStructInterfacePropertyImplementation)
 			.Function("SetStructInterfaceProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructInterfacePropertyImplementation))
-			.Function("GetStructArrayProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructArrayPropertyImplementation))
-			.Function("SetStructArrayProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructArrayPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructInterfacePropertyImplementation)
+			.Function("GetStructArrayProperty", FPropertyImplementation::Property_GetStructArrayPropertyImplementation)
+			.Function("SetStructArrayProperty", FPropertyImplementation::Property_SetStructArrayPropertyImplementation)
 			.Function("GetStructWeakObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructWeakObjectPropertyImplementation))
+			          FPropertyImplementation::Property_GetStructWeakObjectPropertyImplementation)
 			.Function("SetStructWeakObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructWeakObjectPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructWeakObjectPropertyImplementation)
 			.Function("GetStructLazyObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructLazyObjectPropertyImplementation))
+			          FPropertyImplementation::Property_GetStructLazyObjectPropertyImplementation)
 			.Function("SetStructLazyObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructLazyObjectPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructLazyObjectPropertyImplementation)
 			.Function("GetStructSoftClassProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructSoftClassPropertyImplementation))
+			          FPropertyImplementation::Property_GetStructSoftClassPropertyImplementation)
 			.Function("SetStructSoftClassProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructSoftClassPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructSoftClassPropertyImplementation)
 			.Function("GetStructSoftObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructSoftObjectPropertyImplementation))
+			          FPropertyImplementation::Property_GetStructSoftObjectPropertyImplementation)
 			.Function("SetStructSoftObjectProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructSoftObjectPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructSoftObjectPropertyImplementation)
 			.Function("GetStructDoubleProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructDoublePropertyImplementation))
+			          FPropertyImplementation::Property_GetStructDoublePropertyImplementation)
 			.Function("SetStructDoubleProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructDoublePropertyImplementation))
-			.Function("GetStructMapProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructMapPropertyImplementation))
-			.Function("SetStructMapProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructMapPropertyImplementation))
-			.Function("GetStructSetProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructSetPropertyImplementation))
-			.Function("SetStructSetProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructSetPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructDoublePropertyImplementation)
+			.Function("GetStructMapProperty", FPropertyImplementation::Property_GetStructMapPropertyImplementation)
+			.Function("SetStructMapProperty", FPropertyImplementation::Property_SetStructMapPropertyImplementation)
+			.Function("GetStructSetProperty", FPropertyImplementation::Property_GetStructSetPropertyImplementation)
+			.Function("SetStructSetProperty", FPropertyImplementation::Property_SetStructSetPropertyImplementation)
 			.Function("GetStructFieldPathProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_GetStructFieldPathPropertyImplementation))
+			          FPropertyImplementation::Property_GetStructFieldPathPropertyImplementation)
 			.Function("SetStructFieldPathProperty",
-			          static_cast<void*>(FPropertyImplementation::Property_SetStructFieldPathPropertyImplementation))
+			          FPropertyImplementation::Property_SetStructFieldPathPropertyImplementation)
 			.Register();
 	}
 };

@@ -8,12 +8,9 @@ struct FRegisterLazyObjectPtr
 	FRegisterLazyObjectPtr()
 	{
 		FClassBuilder(TEXT("LazyObjectPtr"), NAMESPACE_LIBRARY)
-			.Function("Register",
-			          static_cast<void*>(FLazyObjectPtrImplementation::LazyObjectPtr_RegisterImplementation))
-			.Function("UnRegister",
-			          static_cast<void*>(FLazyObjectPtrImplementation::LazyObjectPtr_UnRegisterImplementation))
-			.Function("Get",
-			          static_cast<void*>(FLazyObjectPtrImplementation::LazyObjectPtr_GetImplementation))
+			.Function("Register", FLazyObjectPtrImplementation::LazyObjectPtr_RegisterImplementation)
+			.Function("UnRegister", FLazyObjectPtrImplementation::LazyObjectPtr_UnRegisterImplementation)
+			.Function("Get", FLazyObjectPtrImplementation::LazyObjectPtr_GetImplementation)
 			.Register();
 	}
 };

@@ -72,7 +72,7 @@ void UMulticastDelegateHandler::Deinitialize()
 
 bool UMulticastDelegateHandler::IsBound() const
 {
-	return MulticastScriptDelegate != nullptr ? MulticastScriptDelegate->IsBound() : nullptr;
+	return MulticastScriptDelegate != nullptr ? MulticastScriptDelegate->IsBound() : false;
 }
 
 bool UMulticastDelegateHandler::Contains(MonoObject* InMulticastDelegate) const

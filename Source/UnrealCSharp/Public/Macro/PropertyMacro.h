@@ -14,7 +14,7 @@
 void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, Type& OutValue) \
 { \
 	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<##TemplateType##>(InMonoObject, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType>(InMonoObject, InStruct)) \
 	{ \
 		const auto PropertyName = FName(UTF8_TO_TCHAR( \
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InPropertyName))); \
@@ -30,7 +30,7 @@ void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyIm
 void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, Type InValue) \
 { \
 	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<##TemplateType##>(InMonoObject, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType>(InMonoObject, InStruct)) \
 	{ \
 		const auto PropertyName = FName(UTF8_TO_TCHAR( \
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InPropertyName))); \
@@ -46,7 +46,7 @@ void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyIm
 void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const MonoObject* InMonoObject, MonoString* InPropertyName, MonoObject** OutValue) \
 { \
 	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<##TemplateType##>(InMonoObject, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType>(InMonoObject, InStruct)) \
 	{ \
 		const auto PropertyName = FName(UTF8_TO_TCHAR( \
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InPropertyName))); \

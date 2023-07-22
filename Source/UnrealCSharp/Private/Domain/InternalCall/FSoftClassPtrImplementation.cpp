@@ -9,12 +9,9 @@ struct FRegisterSoftClassPtr
 	FRegisterSoftClassPtr()
 	{
 		FClassBuilder(TEXT("SoftClassPtr"), NAMESPACE_LIBRARY)
-			.Function("Register",
-			          static_cast<void*>(FSoftClassPtrImplementation::SoftClassPtr_RegisterImplementation))
-			.Function("UnRegister",
-			          static_cast<void*>(FSoftClassPtrImplementation::SoftClassPtr_UnRegisterImplementation))
-			.Function("Get",
-			          static_cast<void*>(FSoftClassPtrImplementation::SoftClassPtr_GetImplementation))
+			.Function("Register", FSoftClassPtrImplementation::SoftClassPtr_RegisterImplementation)
+			.Function("UnRegister", FSoftClassPtrImplementation::SoftClassPtr_UnRegisterImplementation)
+			.Function("Get", FSoftClassPtrImplementation::SoftClassPtr_GetImplementation)
 			.Register();
 	}
 };

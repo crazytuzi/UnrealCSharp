@@ -17,18 +17,36 @@ public:
 
 	virtual ~FClassBuilder() = default;
 
-#if WITH_PROPERTY_INFO
-	FClassBuilder& Property(const FString& InName, const void* InGetMethod,
-	                        const void* InSetMethod, FTypeInfo* InTypeInfo = nullptr);
-#else
-	FClassBuilder& Property(const FString& InName, const void* InGetMethod, const void* InSetMethod);
-#endif
+	template <typename T>
+	struct TFunctionPointer
+	{
+		explicit TFunctionPointer(T InFunction)
+		{
+			Value.Function = InFunction;
+		}
 
+		union
+		{
+			T Function;
+
+			void* Pointer;
+		} Value;
+	};
+
+	template <typename T>
 #if WITH_FUNCTION_INFO
-	FClassBuilder& Function(const FString& InName, const void* InMethod,
+	FClassBuilder& Function(const FString& InName, T InMethod,
 	                        FFunctionInfo* InFunctionInfo = nullptr, const TArray<FString>& InParamNames = {});
 #else
-	FClassBuilder& Function(const FString& InName, const void* InMethod, const TArray<FString>& InParamNames = {});
+	FClassBuilder& Function(const FString& InName, T InMethod, const TArray<FString>& InParamNames = {});
+#endif
+
+	template <typename T, typename U>
+#if WITH_PROPERTY_INFO
+	FClassBuilder& Property(const FString& InName, T InGetMethod,
+	                        U InSetMethod, FTypeInfo* InTypeInfo = nullptr);
+#else
+	FClassBuilder& Property(const FString& InName, T InGetMethod, U InSetMethod);
 #endif
 
 	void Register();
@@ -63,3 +81,48 @@ private:
 
 	TMap<FBindingFunctionBase, const void*> Functions;
 };
+
+template <typename T>
+#if WITH_FUNCTION_INFO
+FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod,
+                                       FFunctionInfo* InFunctionInfo, const TArray<FString>& InParamNames)
+#else
+FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod, const TArray<FString>& InParamNames)
+#endif
+{
+#if WITH_FUNCTION_INFO
+	return Function(InName,
+	                GetFunctionImplementationName(InName),
+	                TFunctionPointer(InMethod).Value.Pointer,
+	                InFunctionInfo,
+	                InParamNames);
+#else
+	return Function(InName,
+		GetFunctionImplementationName(InName),
+		TFunctionPointer(InMethod).Value.Pointer,
+		InParamNames);
+#endif
+}
+
+template <typename T, typename U>
+#if WITH_PROPERTY_INFO
+FClassBuilder& FClassBuilder::Property(const FString& InName, T InGetMethod,
+                                       U InSetMethod, FTypeInfo* InTypeInfo)
+#else
+FClassBuilder& FClassBuilder::Property(const FString& InName, T InGetMethod, U InSetMethod)
+#endif
+{
+#if WITH_PROPERTY_INFO
+	if (InTypeInfo != nullptr)
+	{
+		GetBindingClass()->BindingProperty(InName,
+		                                   InTypeInfo,
+		                                   TFunctionPointer(InGetMethod).Value.Pointer,
+		                                   TFunctionPointer(InSetMethod).Value.Pointer
+		);
+	}
+#endif
+
+	return Function(BINDING_PROPERTY_GET + InName, TFunctionPointer(InGetMethod).Value.Pointer).
+		Function(BINDING_PROPERTY_SET + InName, TFunctionPointer(InSetMethod).Value.Pointer);
+}

@@ -37,7 +37,43 @@ public class Mono : ModuleRules
 			RuntimeDependencies.Add("$(BinaryOutputDir)/mono-sgen.pdb",
 				Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-sgen.pdb"));
 
-			var Files = GetFiles(Path.Combine(LibraryPath, "net7.0"));
+			var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
+
+			foreach (var File in Files)
+			{
+				var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
+
+				var DestPath = File.Substring(ModuleLastDirectory.Length + 1,
+					File.Length - ModuleLastDirectory.Length - 1);
+
+				RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
+			}
+		}
+		else if (Target.Platform == UnrealTargetPlatform.Android)
+		{
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "libmonosgen-2.0.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-debugger-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-diagnostics_tracing-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-hot_reload-static.a"));
+
+			// PublicAdditionalLibraries.Add(
+			// 	Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-profiler-aot.lib"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "libmonosgen-2.0.a"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libmonosgen-2.0.so",
+				Path.Combine(LibraryPath, Target.Platform.ToString(), "libmonosgen-2.0.so"));
+
+			// RuntimeDependencies.Add("$(BinaryOutputDir)/mono-sgen.pdb",
+			// 	Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-sgen.pdb"));
+
+			var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
 
 			foreach (var File in Files)
 			{

@@ -12,11 +12,11 @@ struct FRegisterObject
 	FRegisterObject()
 	{
 		TReflectionClassBuilder<UObject>(NAMESPACE_LIBRARY)
-			.Function("StaticClass", static_cast<void*>(FObjectImplementation::Object_StaticClassImplementation))
-			.Function("GetClass", static_cast<void*>(FObjectImplementation::Object_GetClassImplementation))
-			.Function("GetName", static_cast<void*>(FObjectImplementation::Object_GetNameImplementation))
-			.Function("GetWorld", static_cast<void*>(FObjectImplementation::Object_GetWorldImplementation))
-			.Function("IsValid", static_cast<void*>(FObjectImplementation::Object_IsValidImplementation))
+			.Function("StaticClass", FObjectImplementation::Object_StaticClassImplementation)
+			.Function("GetClass", FObjectImplementation::Object_GetClassImplementation)
+			.Function("GetName", FObjectImplementation::Object_GetNameImplementation)
+			.Function("GetWorld", FObjectImplementation::Object_GetWorldImplementation)
+			.Function("IsValid", FObjectImplementation::Object_IsValidImplementation)
 			.Register();
 	}
 };

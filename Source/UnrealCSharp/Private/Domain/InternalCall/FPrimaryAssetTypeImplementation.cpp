@@ -9,16 +9,11 @@ struct FRegisterPrimaryAssetType
 	FRegisterPrimaryAssetType()
 	{
 		TReflectionClassBuilder<FPrimaryAssetType>(NAMESPACE_LIBRARY)
-			.Function("GetName",
-			          static_cast<void*>(FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation))
-			.Function("Equality",
-			          static_cast<void*>(FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation))
-			.Function("Inequality",
-			          static_cast<void*>(FPrimaryAssetTypeImplementation::PrimaryAssetType_InequalityImplementation))
-			.Function("IsValid",
-			          static_cast<void*>(FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation))
-			.Function("ToString",
-			          static_cast<void*>(FPrimaryAssetTypeImplementation::PrimaryAssetType_ToStringImplementation))
+			.Function("GetName", FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation)
+			.Function("Equality", FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation)
+			.Function("Inequality", FPrimaryAssetTypeImplementation::PrimaryAssetType_InequalityImplementation)
+			.Function("IsValid", FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation)
+			.Function("ToString", FPrimaryAssetTypeImplementation::PrimaryAssetType_ToStringImplementation)
 			.Register();
 	}
 };

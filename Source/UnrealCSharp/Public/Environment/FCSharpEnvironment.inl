@@ -1,18 +1,6 @@
 #pragma once
 
 template <typename T>
-auto FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const
-{
-	return FCSharpBind::Bind<T>(InMonoObject, InReflectionType);
-}
-
-template <typename T>
-auto FCSharpEnvironment::Bind(MonoObject* InMonoObject) const
-{
-	return FCSharpBind::Bind<T>(InMonoObject);
-}
-
-template <typename T>
 T* FCSharpEnvironment::TGetAddress<UObject, T>::operator()(const FCSharpEnvironment* InEnvironment,
                                                            const MonoObject* InMonoObject) const
 {
