@@ -120,7 +120,7 @@ public class DotNetRuntime : ModuleRules
 			complieCmd += "-c release";
 			Configuration = "Release";
 		}
-
+        // complieCmd += " > " + PluginDirectory + "\\BuildMono.log";
 		Console.WriteLine("build mono cmd: " + complieCmd);
         var startInfo = new ProcessStartInfo
 		{
@@ -128,14 +128,32 @@ public class DotNetRuntime : ModuleRules
 			WorkingDirectory = ModuleDirectory + "/src/runtime",
 			UseShellExecute = false,
 			Arguments = complieCmd,
+			RedirectStandardOutput = true,
+			RedirectStandardError= true,
+			StandardOutputEncoding = Encoding.UTF8
 		};
 		var process = new Process();
 		process.StartInfo = startInfo;
+		process.OutputDataReceived += (sender, e) =>
+		{
+			Console.WriteLine(e.Data);
+		};
+		bool Error = false;
+		process.ErrorDataReceived += (sender, e) =>
+		{
+			Error = true;
+			Console.WriteLine(e.Data);
+		};
 		process.Start();
+		process.BeginOutputReadLine();
+		process.BeginErrorReadLine();
 		process.WaitForExit();
 		process.Close();
-		
-		
+
+		if (Error == true)
+		{
+			Console.WriteLine("==================error==============");
+		}
 		
 		// 头文件
 		PublicIncludePaths.Add($"{ModuleDirectory}\\src\\runtime\\artifacts\\obj\\mono\\windows.x64.{Configuration}\\out\\include\\mono-2.0");
