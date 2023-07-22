@@ -1,13 +1,13 @@
 ﻿#include "Reflection/Delegate/FDelegateHelper.h"
 
-FDelegateHelper::FDelegateHelper(FScriptDelegate* InDelegate, UFunction* InSignatureFunction):
-	DelegateHandler(nullptr)
+FDelegateHelper::FDelegateHelper()
 {
-	DelegateHandler = NewObject<UDelegateHandler>(GWorld);
+	Initialize(nullptr, nullptr);
+}
 
-	DelegateHandler->AddToRoot();
-
-	DelegateHandler->Initialize(InDelegate, InSignatureFunction);
+FDelegateHelper::FDelegateHelper(FScriptDelegate* InDelegate, UFunction* InSignatureFunction)
+{
+	Initialize(InDelegate, InSignatureFunction);
 }
 
 FDelegateHelper::~FDelegateHelper()
@@ -15,8 +15,16 @@ FDelegateHelper::~FDelegateHelper()
 	Deinitialize();
 }
 
-void FDelegateHelper::Initialize()
+void FDelegateHelper::Initialize(FScriptDelegate* InDelegate, UFunction* InSignatureFunction)
 {
+	DelegateHandler = NewObject<UDelegateHandler>();
+
+	DelegateHandler->AddToRoot();
+
+	DelegateHandler->Initialize(InDelegate,
+	                            InSignatureFunction != nullptr
+		                            ? InSignatureFunction
+		                            : DelegateHandler->GetCallBack());
 }
 
 void FDelegateHelper::Deinitialize()

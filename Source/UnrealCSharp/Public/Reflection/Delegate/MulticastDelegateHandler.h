@@ -44,7 +44,15 @@ public:
 
 	void Broadcast(MonoObject** OutValue, MonoArray* InValue) const;
 
+	UObject* GetUObject() const;
+
+	FName GetFunctionName() const;
+
+	UFunction* GetCallBack() const;
+
 private:
+	bool bNeedFree;
+
 	FMulticastScriptDelegate* MulticastScriptDelegate;
 
 	FCSharpDelegateDescriptor* DelegateDescriptor;

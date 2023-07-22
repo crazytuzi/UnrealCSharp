@@ -390,6 +390,23 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	FProperty* DelegateReturnParam = nullptr;
 
+	const auto ConstructorContent = FString::Printf(TEXT(
+		"\t\tpublic %s() => MulticastDelegateUtils.MulticastDelegate_Register(this);\n"
+		"\n"
+		"\t\tprivate %s(Type InValue)\n"
+		"\t\t{\n"
+		"\t\t}\n"
+	),
+	                                                *FullClassContent,
+	                                                *FullClassContent
+	);
+
+	const auto DestructorContent = FString::Printf(TEXT(
+		"\n\t\t~%s() => MulticastDelegateUtils.MulticastDelegate_UnRegister(this);\n"
+	),
+	                                               *FullClassContent
+	);
+
 	for (TFieldIterator<FProperty> ParamIterator(SignatureFunction); ParamIterator && (ParamIterator->PropertyFlags &
 		     CPF_Parm); ++ParamIterator)
 	{
@@ -643,6 +660,9 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		"\t{\n"
 		"%s"
 		"%s"
+		"\n"
+		"%s"
+		"%s"
 		"%s"
 		"%s"
 		"%s"
@@ -659,6 +679,8 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *NameSpaceContent,
 	                               *FullClassContent,
 	                               *SuperClassContent,
+	                               *ConstructorContent,
+	                               *DestructorContent,
 	                               *ContainsFunctionContent,
 	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
 	                               *AddFunctionContent,
