@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnrealBuildTool;
 
 public class DotNetRuntime : ModuleRules
@@ -16,8 +17,8 @@ public class DotNetRuntime : ModuleRules
 		InitBuildFuncDictionary();
 		Type = ModuleType.External;
 		LibraryPath = Path.Combine(ModuleDirectory, "lib");
-		bool IsBuildFromSource = false;
-		if (BuildFuncDictionary.TryGetValue((Target.Platform, IsBuildFromSource), out var BuildFunction))
+		bool IsBuildFromSource = true;
+        if (BuildFuncDictionary.TryGetValue((Target.Platform, IsBuildFromSource), out var BuildFunction))
 		{
 			BuildFunction?.Invoke();
 		}
@@ -29,8 +30,9 @@ public class DotNetRuntime : ModuleRules
 		{
 			throw new NotSupportedException();
 		}
-			
-	}
+
+
+    }
 
 	private void InitBuildFuncDictionary()
 	{
@@ -79,9 +81,10 @@ public class DotNetRuntime : ModuleRules
 		foreach (var File in Files)
 		{
 			var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
-
-
-			RuntimeDependencies.Add("$(BinaryOutputDir)/net7.0", File);
+			var fileInfo = new FileInfo(File);
+			
+			
+			RuntimeDependencies.Add("$(BinaryOutputDir)/net7.0/" + fileInfo.Name, File);
 		}
 	}
 
@@ -106,41 +109,33 @@ public class DotNetRuntime : ModuleRules
 	private void BuildMonoForWin64()
 	{
 		var complieCmd = "./build.cmd mono -arch x64 ";
+		var Configuration = "Release";
 		if (IsDebug() == true)
 		{
 			complieCmd += "-c debug";
+			Configuration = "Debug";
 		}
 		else
+		{
 			complieCmd += "-c release";
+			Configuration = "Release";
+		}
 
 		Console.WriteLine("build mono cmd: " + complieCmd);
-		var startInfo = new ProcessStartInfo
+        var startInfo = new ProcessStartInfo
 		{
 			FileName = "powershell.exe",
 			WorkingDirectory = ModuleDirectory + "/src/runtime",
-			RedirectStandardInput = true,
 			UseShellExecute = false,
 			Arguments = complieCmd,
-			CreateNoWindow = false
 		};
 		var process = new Process();
 		process.StartInfo = startInfo;
-		process.OutputDataReceived += (sender, e) =>
-		{
-			Console.WriteLine(e.Data);
-		};
-		process.ErrorDataReceived += (sender, e) =>
-		{
-			Console.WriteLine(e.Data);
-		};
 		process.Start();
 		process.WaitForExit();
 		process.Close();
 		
 		
-		var Configuration = "Release";
-		if (IsDebug())
-			Configuration = "Debug";
 		
 		// 头文件
 		PublicIncludePaths.Add($"{ModuleDirectory}\\src\\runtime\\artifacts\\obj\\mono\\windows.x64.{Configuration}\\out\\include\\mono-2.0");
