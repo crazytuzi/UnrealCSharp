@@ -28,7 +28,7 @@ public class UnrealCSharp : ModuleRules
 				"Core",
 				"Engine",
 				// ... add other public dependencies that you statically link with here ...
-				"Mono",
+				"DotNetRuntime",
 				"CrossVersion",
 				"UnrealCSharpCore"
 			}
