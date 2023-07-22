@@ -1,11 +1,14 @@
 ﻿#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Misc/FileHelper.h"
+#include "Mixin/CSharpGeneratedClass.h"
+#include "Mixin/CSharpBlueprintGeneratedClass.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "Animation/AnimBlueprintGeneratedClass.h"
 
 void FClassGenerator::Generator()
 {
@@ -22,6 +25,16 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
+	if (Cast<UCSharpGeneratedClass>(InClass) || Cast<UCSharpBlueprintGeneratedClass>(InClass))
+	{
+		return;
+	}
+
+	if (Cast<UAnimBlueprintGeneratedClass>(InClass))
+	{
+		return;
+	}
+
 	auto ClassName = InClass->GetName();
 
 	if (ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
@@ -34,6 +47,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FString UsingNameSpaceContent;
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass);
+
+	if (!FGeneratorCore::IsSupportedModule(NameSpaceContent))
+	{
+		return;
+	}
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InClass);
 
@@ -63,15 +81,24 @@ void FClassGenerator::Generator(const UClass* InClass)
 	{
 		auto SuperClassNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass);
 
+		if (!FGeneratorCore::IsSupportedModule(SuperClassNameSpace))
+		{
+			return;
+		}
+
 		if (NameSpaceContent != SuperClassNameSpace)
 		{
 			UsingNameSpaces.Add(SuperClassNameSpace);
 		}
 
 		SuperClassContent = FString::Printf(TEXT(
-			" : %s"
+			" : %s, IStaticClass"
 		),
 		                                    *FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass));
+	}
+	else
+	{
+		SuperClassContent = ": IStaticClass";
 	}
 
 	for (auto Interface : InClass->Interfaces)
@@ -193,6 +220,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 		     FunctionIterator)
 		{
+			if (OverrideFunctions.Contains(FunctionIterator->GetName()))
+			{
+				continue;
+			}
+
 			Functions.Add(*FunctionIterator);
 		}
 	}
@@ -675,7 +707,17 @@ FString FClassGenerator::GetCppFunctionDefaultParam(const UFunction* InFunction,
 			}
 			else
 			{
-				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
+				const auto EnumName = ByteProperty->Enum->GetName();
+
+				// @TODO
+				if (EnumName == TEXT("ECollisionChannel"))
+				{
+					return FString::Printf(TEXT(" = %s.%s"), *EnumName,
+					                       *UCollisionProfile::Get()->ReturnChannelNameFromContainerIndex(
+						                       ByteProperty->Enum->GetIndexByName(*MetaData)).ToString());
+				}
+
+				return FString::Printf(TEXT(" = %s.%s"), *EnumName, *MetaData);
 			}
 		}
 		else

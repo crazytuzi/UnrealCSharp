@@ -26,6 +26,7 @@ public class Compiler : ModuleRules
 			new string[]
 			{
 				"Core",
+				"DirectoryWatcher"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -39,7 +40,8 @@ public class Compiler : ModuleRules
 				"Slate",
 				"SlateCore",
 				"Json",
-				"UnrealCSharpCore"
+				"UnrealCSharpCore",
+				"CrossVersion"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

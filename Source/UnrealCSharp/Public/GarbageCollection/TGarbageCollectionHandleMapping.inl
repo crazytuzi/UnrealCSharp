@@ -1,77 +1,84 @@
 ﻿#pragma once
 
-template <typename T>
-T& TGarbageCollectionHandleMapping<T>::operator[](const FGarbageCollectionHandle& InKey)
-{
-	return GarbageCollectionHandle2T[InKey];
-}
+#include "FGarbageCollectionHandle.h"
+#include "mono/metadata/object-forward.h"
 
 template <typename T>
-const T& TGarbageCollectionHandleMapping<T>::operator[](const FGarbageCollectionHandle& InKey) const
+class TGarbageCollectionHandleMapping
 {
-	return GarbageCollectionHandle2T[InKey];
-}
+public:
+	typedef FGarbageCollectionHandle Key;
 
-template <typename T>
-void TGarbageCollectionHandleMapping<T>::Empty()
-{
-	GarbageCollectionHandle2T.Empty();
-}
+	typedef T Value;
 
-template <typename T>
-T& TGarbageCollectionHandleMapping<T>::Emplace(FGarbageCollectionHandle&& InKey, T&& InValue)
-{
-	return GarbageCollectionHandle2T.Emplace(Forward<FGarbageCollectionHandle>(InKey), Forward<T>(InValue));
-}
-
-template <typename T>
-int32 TGarbageCollectionHandleMapping<T>::Remove(const FGarbageCollectionHandle& InKey)
-{
-	return GarbageCollectionHandle2T.Remove(InKey);
-}
-
-template <typename T>
-int32 TGarbageCollectionHandleMapping<T>::Remove(const MonoObject* InKey)
-{
-	for (const auto& Pair : GarbageCollectionHandle2T)
+public:
+	Value& operator[](const Key& InKey)
 	{
-		if (Pair.Key == InKey)
-		{
-			return GarbageCollectionHandle2T.Remove(Pair.Key);
-		}
+		return GarbageCollectionHandle2T[InKey];
 	}
 
-	return 0;
-}
-
-template <typename T>
-T* TGarbageCollectionHandleMapping<T>::Find(const MonoObject* InMonoObject)
-{
-	for (auto& Pair : GarbageCollectionHandle2T)
+	const Value& operator[](const Key& InKey) const
 	{
-		if (Pair.Key == InMonoObject)
-		{
-			return &Pair.Value;
-		}
+		return GarbageCollectionHandle2T[InKey];
 	}
 
-	return nullptr;
-}
+	void Empty()
+	{
+		GarbageCollectionHandle2T.Empty();
+	}
 
-template <typename T>
-T* TGarbageCollectionHandleMapping<T>::Find(const FGarbageCollectionHandle& InKey)
-{
-	return GarbageCollectionHandle2T.Find(InKey);
-}
+	Value& Emplace(Key&& InKey, T&& InValue)
+	{
+		return GarbageCollectionHandle2T.Emplace(Forward<Key>(InKey), Forward<T>(InValue));
+	}
 
-template <typename T>
-bool TGarbageCollectionHandleMapping<T>::Contains(const FGarbageCollectionHandle& InKey) const
-{
-	return GarbageCollectionHandle2T.Contains(InKey);
-}
+	int32 Remove(const Key& InKey)
+	{
+		return GarbageCollectionHandle2T.Remove(InKey);
+	}
 
-template <typename T>
-TMap<FGarbageCollectionHandle, T>& TGarbageCollectionHandleMapping<T>::Get()
-{
-	return GarbageCollectionHandle2T;
-}
+	int32 Remove(const MonoObject* InKey)
+	{
+		for (const auto& Pair : GarbageCollectionHandle2T)
+		{
+			if (Pair.Key == InKey)
+			{
+				return GarbageCollectionHandle2T.Remove(Pair.Key);
+			}
+		}
+
+		return 0;
+	}
+
+	Value* Find(const MonoObject* InMonoObject)
+	{
+		for (auto& Pair : GarbageCollectionHandle2T)
+		{
+			if (Pair.Key == InMonoObject)
+			{
+				return &Pair.Value;
+			}
+		}
+
+		return nullptr;
+	}
+
+	Value* Find(const Key& InKey)
+	{
+		return GarbageCollectionHandle2T.Find(InKey);
+	}
+
+	bool Contains(const Key& InKey) const
+	{
+		return GarbageCollectionHandle2T.Contains(InKey);
+	}
+
+public:
+	TMap<Key, Value>& Get()
+	{
+		return GarbageCollectionHandle2T;
+	}
+
+private:
+	TMap<Key, Value> GarbageCollectionHandle2T;
+};

@@ -40,15 +40,15 @@ void FUObjectListener::OnUnrealCSharpModuleInActive()
 
 void FUObjectListener::NotifyUObjectCreated(const UObjectBase* Object, const int32 Index)
 {
-	FCSharpEnvironment::GetEnvironment()->NotifyUObjectCreated(Object, Index);
+	FCSharpEnvironment::GetEnvironment().NotifyUObjectCreated(Object, Index);
 }
 
 void FUObjectListener::NotifyUObjectDeleted(const UObjectBase* Object, const int32 Index)
 {
-	FCSharpEnvironment::GetEnvironment()->NotifyUObjectDeleted(Object, Index);
+	FCSharpEnvironment::GetEnvironment().NotifyUObjectDeleted(Object, Index);
 }
 
 void FUObjectListener::OnUObjectArrayShutdown()
 {
-	FCSharpEnvironment::GetEnvironment()->OnUObjectArrayShutdown();
+	FCSharpEnvironment::GetEnvironment().OnUObjectArrayShutdown();
 }

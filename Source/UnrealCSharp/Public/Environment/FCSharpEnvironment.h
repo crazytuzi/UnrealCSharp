@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Domain/FMonoDomain.h"
+#include "Domain/FDomain.h"
 #include "Registry/FClassRegistry.h"
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FCSharpBind.h"
@@ -9,9 +9,13 @@
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
+#include "Registry/FMixinRegistry.h"
+#include "Registry/FBindingRegistry.h"
+#include "Template/TIsUObject.inl"
+#include "Template/TIsUStruct.inl"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
 
-class FCSharpEnvironment
+class UNREALCSHARP_API FCSharpEnvironment
 {
 public:
 	FCSharpEnvironment();
@@ -24,10 +28,10 @@ public:
 	void Deinitialize();
 
 public:
-	static FCSharpEnvironment* GetEnvironment();
+	static FCSharpEnvironment& GetEnvironment();
 
 public:
-	FMonoDomain* GetDomain() const;
+	FDomain* GetDomain() const;
 
 public:
 	void NotifyUObjectCreated(const class UObjectBase* Object, int32 Index);
@@ -35,6 +39,8 @@ public:
 	void NotifyUObjectDeleted(const class UObjectBase* Object, int32 Index);
 
 	void OnUObjectArrayShutdown();
+
+	void OnUnrealCSharpModuleActive();
 
 	void OnUnrealCSharpModuleInActive();
 
@@ -63,7 +69,7 @@ public:
 
 	FClassDescriptor* GetClassDescriptor(const FName& InClassName) const;
 
-	FClassDescriptor* NewClassDescriptor(const FMonoDomain* InMonoDomain, UStruct* InStruct) const;
+	FClassDescriptor* NewClassDescriptor(const FDomain* InDomain, UStruct* InStruct) const;
 
 	void DeleteClassDescriptor(const UStruct* InStruct) const;
 
@@ -113,7 +119,7 @@ public:
 
 	MonoObject* GetContainerObject(const void* InAddress) const;
 
-	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject) const;
+	bool AddContainerReference(void* InContainer, MonoObject* InMonoObject, void* InAddress = nullptr) const;
 
 	bool AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
 	                           MonoObject* InMonoObject) const;
@@ -167,10 +173,7 @@ public:
 	auto GetMultiObject(const void* InAddress) const;
 
 	template <typename T>
-	auto AddMultiReference(MonoObject* InMonoObject, const T& InValue) const;
-
-	template <typename T>
-	auto AddMultiReference(void* InAddress, MonoObject* InMonoObject, const T& InValue) const;
+	auto AddMultiReference(MonoObject* InMonoObject, void* InValue, bool bNeedFree = true) const;
 
 	template <typename T>
 	auto RemoveMultiReference(const MonoObject* InMonoObject) const;
@@ -179,16 +182,64 @@ public:
 	auto RemoveMultiReference(const void* InAddress) const;
 
 public:
+	MonoObject* GetBinding(const void* InObject) const;
+
+	template <typename T>
+	auto GetBinding(const MonoObject* InMonoObject) const;
+
+	bool AddBindingReference(MonoObject* InMonoObject, const void* InObject, bool bNeedFree = true) const;
+
+	bool RemoveBindingReference(const MonoObject* InMonoObject) const;
+
+public:
+	template <typename T, typename Enable = void>
+	class TGetObject
+	{
+	};
+
+	template <typename T>
+	class TGetObject<T, typename TEnableIf<TIsUObject<T>::Value, T>::Type>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
+		{
+			return InEnvironment.GetObject<T>(InMonoObject);
+		}
+	};
+
+	template <typename T>
+	class TGetObject<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
+		{
+			return static_cast<T*>(InEnvironment.GetStruct(InMonoObject));
+		}
+	};
+
+	template <typename T>
+	class TGetObject<T, typename TEnableIf<TNot<TOr<TIsUObject<T>, TIsUStruct<T>>>::Value, T>::Type>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
+		{
+			return InEnvironment.GetBinding<T>(InMonoObject);
+		}
+	};
+
+public:
 	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference) const;
 
 	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
 
 private:
-	static FCSharpEnvironment* Environment;
+	static FCSharpEnvironment Environment;
 
-	FMonoDomain* Domain;
+	FDomain* Domain;
 
 private:
+	FDelegateHandle OnUnrealCSharpModuleActiveDelegateHandle;
+
 	FDelegateHandle OnUnrealCSharpModuleInActiveDelegateHandle;
 
 	FDelegateHandle OnAsyncLoadingFlushUpdateHandle;
@@ -212,6 +263,10 @@ private:
 	FDelegateRegistry* DelegateRegistry;
 
 	FMultiRegistry* MultiRegistry;
+
+	FMixinRegistry* MixinRegistry;
+
+	FBindingRegistry* BindingRegistry;
 };
 
 #include "FCSharpEnvironment.inl"

@@ -1,4 +1,5 @@
-﻿using Script.Library;
+﻿using System;
+using Script.Library;
 using Script.Common;
 using Script.Engine;
 
@@ -30,6 +31,11 @@ namespace Script.CoreUObject
         public override string ToString()
         {
             return GetName().ToString();
+        }
+
+        public Boolean IsValid()
+        {
+            return ObjectImplementation.Object_IsValidImplementation(this);
         }
     }
 }

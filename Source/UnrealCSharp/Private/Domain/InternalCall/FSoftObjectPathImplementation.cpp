@@ -1,15 +1,14 @@
 ﻿#include "Domain/InternalCall/FSoftObjectPathImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterSoftObjectPath
 {
 	FRegisterSoftObjectPath()
 	{
-		TScriptStructBuilder<FSoftObjectPath>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FSoftObjectPath>(NAMESPACE_LIBRARY)
 			.Function("ToString",
 			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_ToStringImplementation))
 			.Function("GetAssetPathName",
@@ -69,20 +68,19 @@ static FRegisterSoftObjectPath RegisterSoftObjectPath;
 void FSoftObjectPathImplementation::SoftObjectPath_ToStringImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
 	{
 		const auto ResultString = SoftObjectPath->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -92,20 +90,19 @@ void FSoftObjectPathImplementation::SoftObjectPath_ToStringImplementation(
 void FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathNameImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
 	{
 		const auto ResultString = SoftObjectPath->GetAssetPathName();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME);
+		const auto FoundMonoClass = TPropertyClass<FName, FName>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString.ToString())));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -115,20 +112,19 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathNameImplementatio
 void FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathStringImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
 	{
 		const auto ResultString = SoftObjectPath->GetAssetPathString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -138,20 +134,19 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathStringImplementat
 void FSoftObjectPathImplementation::SoftObjectPath_GetSubPathStringImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
 	{
 		const auto ResultString = SoftObjectPath->GetSubPathString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -161,20 +156,19 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetSubPathStringImplementatio
 void FSoftObjectPathImplementation::SoftObjectPath_GetLongPackageNameImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
 	{
 		const auto ResultString = SoftObjectPath->GetLongPackageName();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -184,20 +178,19 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetLongPackageNameImplementat
 void FSoftObjectPathImplementation::SoftObjectPath_GetAssetNameImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
 	{
 		const auto ResultString = SoftObjectPath->GetAssetName();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -207,13 +200,13 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetAssetNameImplementation(
 void FSoftObjectPathImplementation::SoftObjectPath_SetPathNameImplementation(
 	const MonoObject* InMonoObject, MonoObject* Path)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr && Path != nullptr)
 	{
 		return SoftObjectPath->SetPath(FName(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(Path, nullptr)))));
 	}
 }
@@ -221,20 +214,20 @@ void FSoftObjectPathImplementation::SoftObjectPath_SetPathNameImplementation(
 void FSoftObjectPathImplementation::SoftObjectPath_SetPathStringImplementation(
 	const MonoObject* InMonoObject, MonoObject* Path)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr && Path != nullptr)
 	{
 		return SoftObjectPath->SetPath(FString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(Path, nullptr)))));
 	}
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_ResetImplementation(const MonoObject* InMonoObject)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
@@ -245,7 +238,7 @@ void FSoftObjectPathImplementation::SoftObjectPath_ResetImplementation(const Mon
 
 bool FSoftObjectPathImplementation::SoftObjectPath_IsValidImplementation(const MonoObject* InMonoObject)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
@@ -258,7 +251,7 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsValidImplementation(const M
 
 bool FSoftObjectPathImplementation::SoftObjectPath_IsNullImplementation(const MonoObject* InMonoObject)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
@@ -271,7 +264,7 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsNullImplementation(const Mo
 
 bool FSoftObjectPathImplementation::SoftObjectPath_IsAssetImplementation(const MonoObject* InMonoObject)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
@@ -284,7 +277,7 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsAssetImplementation(const M
 
 bool FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation(const MonoObject* InMonoObject)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
@@ -297,9 +290,9 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation(con
 
 bool FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto SoftObjectPathA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FSoftObjectPath>(A);
+	const auto SoftObjectPathA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(A);
 
-	const auto SoftObjectPathB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FSoftObjectPath>(B);
+	const auto SoftObjectPathB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(B);
 
 	if (SoftObjectPathA != nullptr && SoftObjectPathB)
 	{
@@ -311,9 +304,9 @@ bool FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation(const 
 
 bool FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto SoftObjectPathA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FSoftObjectPath>(A);
+	const auto SoftObjectPathA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(A);
 
-	const auto SoftObjectPathB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FSoftObjectPath>(B);
+	const auto SoftObjectPathB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(B);
 
 	if (SoftObjectPathA != nullptr && SoftObjectPathB)
 	{
@@ -325,7 +318,7 @@ bool FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation(cons
 
 bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEImplementation(const MonoObject* InMonoObject)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
@@ -339,7 +332,7 @@ bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEImplementation(con
 bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEInstanceImplementation(
 	const MonoObject* InMonoObject, const int32 PIEInstance)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
@@ -352,7 +345,7 @@ bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEInstanceImplementa
 
 bool FSoftObjectPathImplementation::SoftObjectPath_FixupCoreRedirectsImplementation(const MonoObject* InMonoObject)
 {
-	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(InMonoObject);
 
 	if (SoftObjectPath != nullptr)
@@ -376,17 +369,15 @@ int32 FSoftObjectPathImplementation::SoftObjectPath_InvalidateTagImplementation(
 void FSoftObjectPathImplementation::SoftObjectPath_GetOrCreateIDForObjectImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InMonoObject);
+	const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FSoftObjectPath)),
-		CLASS_SCRIPT_STRUCT_NAME(FSoftObjectPath));
+	const auto FoundMonoClass = TPropertyClass<FSoftObjectPath, FSoftObjectPath>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutSoftObjectPath = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutSoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FSoftObjectPath>(NewMonoObject);
 
 	if (FoundObject != nullptr && OutSoftObjectPath != nullptr)
@@ -398,7 +389,7 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetOrCreateIDForObjectImpleme
 void FSoftObjectPathImplementation::SoftObjectPath_AddPIEPackageNameImplementation(MonoObject* NewPIEPackageName)
 {
 	FSoftObjectPath::AddPIEPackageName(UTF8_TO_TCHAR(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 			GetDomain()->Object_To_String(NewPIEPackageName, nullptr))));
 }
 

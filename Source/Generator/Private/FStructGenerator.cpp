@@ -3,7 +3,8 @@
 #include "FGeneratorCore.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Mixin/CSharpScriptStruct.h"
 
 void FStructGenerator::Generator()
 {
@@ -20,6 +21,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		return;
 	}
 
+	if (Cast<UCSharpScriptStruct>(InScriptStruct))
+	{
+		return;
+	}
+
 	auto ClassName = InScriptStruct->GetName();
 
 	if (ClassName.StartsWith(TEXT("STRUCT_REINST_")))
@@ -32,6 +38,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	FString UsingNameSpaceContent;
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct);
+
+	if (!FGeneratorCore::IsSupportedModule(NameSpaceContent))
+	{
+		return;
+	}
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InScriptStruct);
 
@@ -52,6 +63,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	if (SuperStruct != nullptr)
 	{
 		auto SuperStructNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperStruct);
+
+		if (!FGeneratorCore::IsSupportedModule(SuperStructNameSpace))
+		{
+			return;
+		}
 
 		if (NameSpaceContent != SuperStructNameSpace)
 		{

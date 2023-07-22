@@ -1,15 +1,14 @@
 ﻿#include "Domain/InternalCall/FFrameNumberImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterFrameNumber
 {
 	FRegisterFrameNumber()
 	{
-		TScriptStructBuilder<FFrameNumber>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FFrameNumber>(NAMESPACE_LIBRARY)
 			.Function("Increment", static_cast<void*>(FFrameNumberImplementation::FrameNumber_IncrementImplementation))
 			.Function("Decrement", static_cast<void*>(FFrameNumberImplementation::FrameNumber_DecrementImplementation))
 			.Function("Equality", static_cast<void*>(FFrameNumberImplementation::FrameNumber_EqualityImplementation))
@@ -36,7 +35,7 @@ static FRegisterFrameNumber RegisterFrameNumber;
 
 void FFrameNumberImplementation::FrameNumber_IncrementImplementation(const MonoObject* InMonoObject)
 {
-	const auto FrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameNumber>(InMonoObject);
 
 	if (FrameNumber != nullptr)
@@ -47,7 +46,7 @@ void FFrameNumberImplementation::FrameNumber_IncrementImplementation(const MonoO
 
 void FFrameNumberImplementation::FrameNumber_DecrementImplementation(const MonoObject* InMonoObject)
 {
-	const auto FrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameNumber>(InMonoObject);
 
 	if (FrameNumber != nullptr)
@@ -58,9 +57,9 @@ void FFrameNumberImplementation::FrameNumber_DecrementImplementation(const MonoO
 
 bool FFrameNumberImplementation::FrameNumber_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr)
 	{
@@ -72,9 +71,9 @@ bool FFrameNumberImplementation::FrameNumber_EqualityImplementation(const MonoOb
 
 bool FFrameNumberImplementation::FrameNumber_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr)
 	{
@@ -86,9 +85,9 @@ bool FFrameNumberImplementation::FrameNumber_InequalityImplementation(const Mono
 
 bool FFrameNumberImplementation::FrameNumber_LessThanImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr)
 	{
@@ -100,9 +99,9 @@ bool FFrameNumberImplementation::FrameNumber_LessThanImplementation(const MonoOb
 
 bool FFrameNumberImplementation::FrameNumber_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr)
 	{
@@ -114,9 +113,9 @@ bool FFrameNumberImplementation::FrameNumber_GreaterThanImplementation(const Mon
 
 bool FFrameNumberImplementation::FrameNumber_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr)
 	{
@@ -128,9 +127,9 @@ bool FFrameNumberImplementation::FrameNumber_LessThanOrEqualImplementation(const
 
 bool FFrameNumberImplementation::FrameNumber_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr)
 	{
@@ -143,19 +142,17 @@ bool FFrameNumberImplementation::FrameNumber_GreaterThanOrEqualImplementation(co
 void FFrameNumberImplementation::FrameNumber_AddImplementation(const MonoObject* A, const MonoObject* B,
                                                                MonoObject** OutValue)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
-		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
+	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr && OutFrameNumber != nullptr)
@@ -167,19 +164,17 @@ void FFrameNumberImplementation::FrameNumber_AddImplementation(const MonoObject*
 void FFrameNumberImplementation::FrameNumber_SubtractImplementation(const MonoObject* A, const MonoObject* B,
                                                                     MonoObject** OutValue)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
-		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
+	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr && OutFrameNumber != nullptr)
@@ -191,19 +186,17 @@ void FFrameNumberImplementation::FrameNumber_SubtractImplementation(const MonoOb
 void FFrameNumberImplementation::FrameNumber_RemainderImplementation(const MonoObject* A, const MonoObject* B,
                                                                      MonoObject** OutValue)
 {
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(A);
+	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(B);
+	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
-		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
+	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameNumberA != nullptr && FrameNumberB != nullptr && OutFrameNumber != nullptr)
@@ -215,18 +208,16 @@ void FFrameNumberImplementation::FrameNumber_RemainderImplementation(const MonoO
 void FFrameNumberImplementation::FrameNumber_NegatedImplementation(const MonoObject* InMonoObject,
                                                                    MonoObject** OutValue)
 {
-	const auto FrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameNumber>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
-		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
+	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameNumber != nullptr && OutFrameNumber != nullptr)
@@ -238,18 +229,16 @@ void FFrameNumberImplementation::FrameNumber_NegatedImplementation(const MonoObj
 void FFrameNumberImplementation::FrameNumber_MultiplyImplementation(const MonoObject* InMonoObject, const float Scalar,
                                                                     MonoObject** OutValue)
 {
-	const auto FrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameNumber>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
-		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
+	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameNumber != nullptr && OutFrameNumber != nullptr)
@@ -261,18 +250,16 @@ void FFrameNumberImplementation::FrameNumber_MultiplyImplementation(const MonoOb
 void FFrameNumberImplementation::FrameNumber_DivideImplementation(const MonoObject* InMonoObject, const float Scalar,
                                                                   MonoObject** OutValue)
 {
-	const auto FrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FFrameNumber>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FFrameNumber)),
-		CLASS_SCRIPT_STRUCT_NAME(FFrameNumber));
+	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FFrameNumber>(
+	const auto OutFrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(
 		NewMonoObject);
 
 	if (FrameNumber != nullptr && OutFrameNumber != nullptr)

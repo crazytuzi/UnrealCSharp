@@ -5,11 +5,12 @@
 #include "FCSharpCompiler.h"
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "WidgetBlueprint.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Engine/UserDefinedStruct.h"
+#include "Mixin/FMixinGenerator.h"
 
 FEditorListener::FEditorListener()
 {
@@ -28,12 +29,17 @@ FEditorListener::FEditorListener()
 
 	auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(TEXT("DirectoryWatcher"));
 
-	DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
-		FUnrealCSharpFunctionLibrary::GetBasePath(),
-		IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
-		OnDirectoryChangedDelegateHandle,
-		IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
-	);
+	const auto& ChangedDirectories = FUnrealCSharpFunctionLibrary::GetChangedDirectories();
+
+	for (const auto& Directory : ChangedDirectories)
+	{
+		DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
+			Directory,
+			IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
+			OnDirectoryChangedDelegateHandle,
+			IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
+		);
+	}
 }
 
 FEditorListener::~FEditorListener()
@@ -43,8 +49,13 @@ FEditorListener::~FEditorListener()
 		auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
 			TEXT("DirectoryWatcher"));
 
-		DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
-			FUnrealCSharpFunctionLibrary::GetBasePath(), OnDirectoryChangedDelegateHandle);
+		const auto& ChangedDirectories = FUnrealCSharpFunctionLibrary::GetChangedDirectories();
+
+		for (const auto& Directory : ChangedDirectories)
+		{
+			DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
+				Directory, OnDirectoryChangedDelegateHandle);
+		}
 	}
 
 	if (OnMainFrameCreationFinishedDelegateHandle.IsValid())
@@ -67,7 +78,7 @@ FEditorListener::~FEditorListener()
 
 void FEditorListener::OnPostEngineInit()
 {
-	FCSharpCompiler::Get().Compile();
+	FMixinGenerator::Generator();
 }
 
 void FEditorListener::OnPreBeginPIE(const bool)
@@ -222,7 +233,7 @@ void FEditorListener::OnWindowActivatedEvent()
 {
 	if (FileChanges.Num() > 0)
 	{
-		FCSharpCompiler::Get().Compile();
+		FCSharpCompiler::Get().Compile(FileChanges);
 
 		FileChanges.Reset();
 	}

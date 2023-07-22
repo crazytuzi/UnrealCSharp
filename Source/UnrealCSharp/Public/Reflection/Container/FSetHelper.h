@@ -3,10 +3,10 @@
 #include "FContainerHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-class FSetHelper final : public FContainerHelper
+class UNREALCSHARP_API FSetHelper final : public FContainerHelper
 {
 public:
-	explicit FSetHelper(FProperty* InProperty, void* InData = nullptr);
+	explicit FSetHelper(FProperty* InProperty, void* InData = nullptr, bool InbNeedFree = false);
 
 	~FSetHelper();
 
@@ -19,6 +19,8 @@ public:
 	void Empty(int32 InExpectedNumElements) const;
 
 	int32 Num() const;
+
+	int32 GetMaxIndex() const;
 
 	void Add(void* InValue) const;
 

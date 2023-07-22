@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
+#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
 #include "Reflection/Container/FContainerHelper.h"
 #include "mono/metadata/object-forward.h"
 
@@ -38,7 +38,7 @@ public:
 
 	MonoObject* GetObject(const void* InAddress);
 
-	bool AddReference(void* InContainer, MonoObject* InMonoObject);
+	bool AddReference(void* InContainer, MonoObject* InMonoObject, void* InAddress = nullptr);
 
 	bool AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
 	                  MonoObject* InMonoObject);

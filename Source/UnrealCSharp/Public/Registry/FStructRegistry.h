@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
+#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
 #include "mono/metadata/object-forward.h"
 
 struct FStructAddressBase
@@ -25,7 +25,7 @@ class FStructRegistry
 private:
 	struct FStructAddress : FStructAddressBase
 	{
-		UScriptStruct* ScriptStruct;
+		TWeakObjectPtr<UScriptStruct> ScriptStruct;
 
 		bool bNeedFree;
 

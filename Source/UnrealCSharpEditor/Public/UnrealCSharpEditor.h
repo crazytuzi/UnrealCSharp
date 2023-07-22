@@ -12,18 +12,18 @@ class FMenuBuilder;
 class FUnrealCSharpEditorModule : public IModuleInterface
 {
 public:
-
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-	
-	/** This function will be bound to Command. */
-	void PluginButtonClicked();
-	
-private:
 
+	/** This function will be bound to Command. */
+	void PluginButtonClicked() const;
+
+private:
 	void RegisterMenus();
 
+private:
+	void Generator() const;
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;

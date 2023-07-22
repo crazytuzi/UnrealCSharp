@@ -1,14 +1,14 @@
 ﻿#include "Domain/InternalCall/FPrimaryAssetTypeImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterPrimaryAssetType
 {
 	FRegisterPrimaryAssetType()
 	{
-		TScriptStructBuilder<FPrimaryAssetType>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FPrimaryAssetType>(NAMESPACE_LIBRARY)
 			.Function("GetName",
 			          static_cast<void*>(FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation))
 			.Function("Equality",
@@ -28,20 +28,19 @@ static FRegisterPrimaryAssetType RegisterPrimaryAssetType;
 void FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(InMonoObject);
 
 	if (PrimaryAssetType != nullptr)
 	{
 		const auto ResultString = PrimaryAssetType->GetName();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME);
+		const auto FoundMonoClass = TPropertyClass<FName, FName>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString.ToString())));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -50,10 +49,10 @@ void FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation(
 
 bool FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto PrimaryAssetTypeA = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetTypeA = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(A);
 
-	const auto PrimaryAssetTypeB = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetTypeB = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(B);
 
 	if (PrimaryAssetTypeA != nullptr && PrimaryAssetTypeB != nullptr)
@@ -67,10 +66,10 @@ bool FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation(co
 bool FPrimaryAssetTypeImplementation::PrimaryAssetType_InequalityImplementation(
 	const MonoObject* A, const MonoObject* B)
 {
-	const auto PrimaryAssetTypeA = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetTypeA = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(A);
 
-	const auto PrimaryAssetTypeB = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetTypeB = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(B);
 
 	if (PrimaryAssetTypeA != nullptr && PrimaryAssetTypeB != nullptr)
@@ -83,7 +82,7 @@ bool FPrimaryAssetTypeImplementation::PrimaryAssetType_InequalityImplementation(
 
 bool FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation(const MonoObject* InMonoObject)
 {
-	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(InMonoObject);
 
 	if (PrimaryAssetType != nullptr)
@@ -97,20 +96,19 @@ bool FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation(con
 void FPrimaryAssetTypeImplementation::PrimaryAssetType_ToStringImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(InMonoObject);
 
 	if (PrimaryAssetType != nullptr)
 	{
 		const auto ResultString = PrimaryAssetType->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;

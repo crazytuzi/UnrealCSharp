@@ -19,6 +19,9 @@ namespace Script.Library
         public static extern Int32 Set_NumImplementation<T>(TSet<T> InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Int32 Set_GetMaxIndexImplementation<T>(TSet<T> InSet);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Set_AddImplementation<T>(TSet<T> InSet, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

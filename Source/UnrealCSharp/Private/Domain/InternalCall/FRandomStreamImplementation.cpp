@@ -1,15 +1,14 @@
 ﻿#include "Domain/InternalCall/FRandomStreamImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterRandomStream
 {
 	FRegisterRandomStream()
 	{
-		TScriptStructBuilder<FRandomStream>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FRandomStream>(NAMESPACE_LIBRARY)
 			.Function("Initialize",
 			          static_cast<void*>(FRandomStreamImplementation::RandomStream_InitializeImplementation))
 			.Function("InitializeName",
@@ -49,7 +48,7 @@ static FRegisterRandomStream RegisterRandomStream;
 void FRandomStreamImplementation::RandomStream_InitializeImplementation(const MonoObject* InMonoObject,
                                                                         const int32 InSeed)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -61,20 +60,20 @@ void FRandomStreamImplementation::RandomStream_InitializeImplementation(const Mo
 void FRandomStreamImplementation::RandomStream_InitializeNameImplementation(
 	const MonoObject* InMonoObject, MonoObject* InName)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
 	{
 		return RandomStream->Initialize(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InName, nullptr))));
 	}
 }
 
 void FRandomStreamImplementation::RandomStream_ResetImplementation(const MonoObject* InMonoObject)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -85,7 +84,7 @@ void FRandomStreamImplementation::RandomStream_ResetImplementation(const MonoObj
 
 int32 FRandomStreamImplementation::RandomStream_GetInitialSeedImplementation(const MonoObject* InMonoObject)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -98,7 +97,7 @@ int32 FRandomStreamImplementation::RandomStream_GetInitialSeedImplementation(con
 
 void FRandomStreamImplementation::RandomStream_GenerateNewSeedImplementation(const MonoObject* InMonoObject)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -109,7 +108,7 @@ void FRandomStreamImplementation::RandomStream_GenerateNewSeedImplementation(con
 
 float FRandomStreamImplementation::RandomStream_GetFractionImplementation(const MonoObject* InMonoObject)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -122,7 +121,7 @@ float FRandomStreamImplementation::RandomStream_GetFractionImplementation(const 
 
 uint32 FRandomStreamImplementation::RandomStream_GetUnsignedIntImplementation(const MonoObject* InMonoObject)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -136,18 +135,16 @@ uint32 FRandomStreamImplementation::RandomStream_GetUnsignedIntImplementation(co
 void FRandomStreamImplementation::RandomStream_GetUnitVectorImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (RandomStream != nullptr && OutVector != nullptr)
 	{
@@ -157,7 +154,7 @@ void FRandomStreamImplementation::RandomStream_GetUnitVectorImplementation(
 
 int32 FRandomStreamImplementation::RandomStream_GetCurrentSeedImplementation(const MonoObject* InMonoObject)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -170,7 +167,7 @@ int32 FRandomStreamImplementation::RandomStream_GetCurrentSeedImplementation(con
 
 float FRandomStreamImplementation::RandomStream_FRandImplementation(const MonoObject* InMonoObject)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -183,7 +180,7 @@ float FRandomStreamImplementation::RandomStream_FRandImplementation(const MonoOb
 
 int32 FRandomStreamImplementation::RandomStream_RandHelperImplementation(const MonoObject* InMonoObject, const int32 A)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -197,7 +194,7 @@ int32 FRandomStreamImplementation::RandomStream_RandHelperImplementation(const M
 int32 FRandomStreamImplementation::RandomStream_RandRangeImplementation(const MonoObject* InMonoObject, const int32 Min,
                                                                         const int32 Max)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -211,7 +208,7 @@ int32 FRandomStreamImplementation::RandomStream_RandRangeImplementation(const Mo
 float FRandomStreamImplementation::RandomStream_FRandRangeImplementation(
 	const MonoObject* InMonoObject, const float InMin, const float InMax)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
@@ -225,18 +222,16 @@ float FRandomStreamImplementation::RandomStream_FRandRangeImplementation(
 void FRandomStreamImplementation::RandomStream_VRandImplementation(const MonoObject* InMonoObject,
                                                                    MonoObject** OutValue)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (RandomStream != nullptr && OutVector != nullptr)
 	{
@@ -247,20 +242,18 @@ void FRandomStreamImplementation::RandomStream_VRandImplementation(const MonoObj
 void FRandomStreamImplementation::RandomStream_VRandConeHalfAngleImplementation(
 	const MonoObject* InMonoObject, const MonoObject* Dir, const float ConeHalfAngleRad, MonoObject** OutValue)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Dir);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Dir);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (RandomStream != nullptr && OutVector != nullptr)
 	{
@@ -272,20 +265,18 @@ void FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHal
 	const MonoObject* InMonoObject, const MonoObject* Dir, const float HorizontalConeHalfAngleRad,
 	const float VerticalConeHalfAngleRad, MonoObject** OutValue)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
-	const auto Vector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(Dir);
+	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Dir);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FVector)),
-		CLASS_SCRIPT_STRUCT_NAME(FVector));
+	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
 
 	if (RandomStream != nullptr && OutVector != nullptr)
 	{
@@ -296,20 +287,19 @@ void FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHal
 void FRandomStreamImplementation::RandomStream_ToStringImplementation(const MonoObject* InMonoObject,
                                                                       MonoObject** OutValue)
 {
-	const auto RandomStream = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FRandomStream>(InMonoObject);
 
 	if (RandomStream != nullptr)
 	{
 		const auto ResultString = RandomStream->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;

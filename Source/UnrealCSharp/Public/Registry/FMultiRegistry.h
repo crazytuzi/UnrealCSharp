@@ -1,32 +1,67 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.h"
-#include "mono/metadata/object-forward.h"
+#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
+#include "Template/TIsTWeakObjectPtr.inl"
+#include "Template/TIsTLazyObjectPtr.inl"
+#include "Template/TIsTSoftObjectPtr.inl"
+#include "Template/TIsTSoftClassPtr.inl"
+#include "Template/TIsTScriptInterface.inl"
+#include "Template/TIsTSubclassOf.inl"
 
 class FMultiRegistry
 {
 public:
-	template <typename T>
+	template <typename T, template<typename...> class IsType>
 	struct TMultiAddress
 	{
 		typedef T Type;
 
 		void* Address;
 
-		Type Value;
+		Type* Value;
+
+		bool bNeedFree;
+
+		template <typename U>
+		struct TIsType
+		{
+			enum { Value = IsType<U>::Value };
+		};
 	};
 
-	typedef TMultiAddress<TSubclassOf<UObject>> FSubclassOfAddress;
+	typedef TMultiAddress<TSubclassOf<UObject>, TIsTSubclassOf> FSubclassOfAddress;
 
-	typedef TMultiAddress<TWeakObjectPtr<UObject>> FWeakObjectPtrAddress;
+	typedef TMultiAddress<TWeakObjectPtr<UObject>, TIsTWeakObjectPtr> FWeakObjectPtrAddress;
 
-	typedef TMultiAddress<TLazyObjectPtr<UObject>> FLazyObjectPtrAddress;
+	typedef TMultiAddress<TLazyObjectPtr<UObject>, TIsTLazyObjectPtr> FLazyObjectPtrAddress;
 
-	typedef TMultiAddress<TSoftObjectPtr<UObject>> FSoftObjectPtrAddress;
+	typedef TMultiAddress<TSoftObjectPtr<UObject>, TIsTSoftObjectPtr> FSoftObjectPtrAddress;
 
-	typedef TMultiAddress<TScriptInterface<IInterface>> FScriptInterfaceAddress;
+	typedef TMultiAddress<TScriptInterface<IInterface>, TIsTScriptInterface> FScriptInterfaceAddress;
 
-	typedef TMultiAddress<TSoftClassPtr<UObject>> FSoftClassPtrAddress;
+	typedef TMultiAddress<TSoftClassPtr<UObject>, TIsTSoftClassPtr> FSoftClassPtrAddress;
+
+	template <typename T, typename U = T>
+	struct TMultiRegistry
+	{
+	};
+
+	template <typename R, R, typename U, typename S, S>
+	struct TMultiRegistryImplementation
+	{
+	};
+
+	template <typename T>
+	struct TMultiMapping
+	{
+		typedef T Key;
+
+		typedef TGarbageCollectionHandleMapping<T> GarbageCollectionHandle2Address;
+
+		typedef typename TGarbageCollectionHandleMapping<Key>::Key Value;
+
+		typedef TMap<void*, Value> Address2GarbageCollectionHandle;
+	};
 
 public:
 	FMultiRegistry();
@@ -38,50 +73,32 @@ public:
 
 	void Deinitialize();
 
-public:
-	template <typename T>
-	auto GetMulti(const MonoObject* InMonoObject);
-
-	template <typename T>
-	auto GetObject(const void* InAddress) const;
-
-public:
-	template <typename T>
-	auto AddReference(MonoObject* InMonoObject, const T& InValue);
-
-	template <typename T>
-	auto AddReference(void* InAddress, MonoObject* InMonoObject, const T& InValue);
-
-	template <typename T>
-	auto RemoveReference(const MonoObject* InMonoObject);
-
-	template <typename T>
-	auto RemoveReference(const void* InAddress);
-
 private:
-	TGarbageCollectionHandleMapping<FSubclassOfAddress> GarbageCollectionHandle2SubclassOfAddress;
+	TMultiMapping<FSubclassOfAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2SubclassOfAddress;
 
-	TMap<void*, FGarbageCollectionHandle> SubclassOfAddress2GarbageCollectionHandle;
+	TMultiMapping<FSubclassOfAddress>::Address2GarbageCollectionHandle SubclassOfAddress2GarbageCollectionHandle;
 
-	TGarbageCollectionHandleMapping<FWeakObjectPtrAddress> GarbageCollectionHandle2WeakObjectPtrAddress;
+	TMultiMapping<FWeakObjectPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2WeakObjectPtrAddress;
 
-	TMap<void*, FGarbageCollectionHandle> WeakObjectPtrAddress2GarbageCollectionHandle;
+	TMultiMapping<FWeakObjectPtrAddress>::Address2GarbageCollectionHandle WeakObjectPtrAddress2GarbageCollectionHandle;
 
-	TGarbageCollectionHandleMapping<FLazyObjectPtrAddress> GarbageCollectionHandle2LazyObjectPtrAddress;
+	TMultiMapping<FLazyObjectPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2LazyObjectPtrAddress;
 
-	TMap<void*, FGarbageCollectionHandle> LazyObjectPtrAddress2GarbageCollectionHandle;
+	TMultiMapping<FLazyObjectPtrAddress>::Address2GarbageCollectionHandle LazyObjectPtrAddress2GarbageCollectionHandle;
 
-	TGarbageCollectionHandleMapping<FSoftObjectPtrAddress> GarbageCollectionHandle2SoftObjectPtrAddress;
+	TMultiMapping<FSoftObjectPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2SoftObjectPtrAddress;
 
-	TMap<void*, FGarbageCollectionHandle> SoftObjectPtrAddress2GarbageCollectionHandle;
+	TMultiMapping<FSoftObjectPtrAddress>::Address2GarbageCollectionHandle SoftObjectPtrAddress2GarbageCollectionHandle;
 
-	TGarbageCollectionHandleMapping<FScriptInterfaceAddress> GarbageCollectionHandle2ScriptInterfaceAddress;
+	TMultiMapping<FScriptInterfaceAddress>::GarbageCollectionHandle2Address
+	GarbageCollectionHandle2ScriptInterfaceAddress;
 
-	TMap<void*, FGarbageCollectionHandle> ScriptInterfaceAddress2GarbageCollectionHandle;
+	TMultiMapping<FScriptInterfaceAddress>::Address2GarbageCollectionHandle
+	ScriptInterfaceAddress2GarbageCollectionHandle;
 
-	TGarbageCollectionHandleMapping<FSoftClassPtrAddress> GarbageCollectionHandle2SoftClassPtrAddress;
+	TMultiMapping<FSoftClassPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2SoftClassPtrAddress;
 
-	TMap<void*, FGarbageCollectionHandle> SoftClassPtrAddress2GarbageCollectionHandle;
+	TMultiMapping<FSoftClassPtrAddress>::Address2GarbageCollectionHandle SoftClassPtrAddress2GarbageCollectionHandle;
 };
 
 #include "FMultiRegistry.inl"

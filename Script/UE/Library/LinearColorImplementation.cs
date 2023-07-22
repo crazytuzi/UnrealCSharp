@@ -86,6 +86,17 @@ namespace Script.Library
         public static extern void LinearColor_LerpUsingHSVImplementation(FLinearColor From, FLinearColor To,
             Single Progress, out FLinearColor OutValue);
 
+#if UE_5_0_OR_LATER
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void LinearColor_QuantizeFloorImplementation(FLinearColor InLinearColor,
+            out FColor OutValue);
+#endif
+
+#if UE_5_0_OR_LATER
+        [Obsolete(
+            "Most callers of Quantize should have been calling QuantizeRound; to match old behavior use QuantizeFloor",
+            false)]
+#endif
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void LinearColor_QuantizeImplementation(FLinearColor InLinearColor, out FColor OutValue);
 
@@ -101,10 +112,11 @@ namespace Script.Library
         public static extern void LinearColor_DesaturateImplementation(FLinearColor InLinearColor, Single Desaturation,
             out FLinearColor OutValue);
 
-#if !UE_5_0_OR_LATER
+#if UE_5_0_OR_LATER
+        [Obsolete("", true)]
+#endif
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Single LinearColor_ComputeLuminanceImplementation(FLinearColor InLinearColor);
-#endif
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Single LinearColor_GetMaxImplementation(FLinearColor InLinearColor);

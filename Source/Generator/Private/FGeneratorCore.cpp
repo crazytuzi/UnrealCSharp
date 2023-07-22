@@ -2,7 +2,13 @@
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Misc/FileHelper.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
+#include "Mixin/CSharpGeneratedClass.h"
+#include "Mixin/CSharpBlueprintGeneratedClass.h"
+#include "Mixin/CSharpScriptStruct.h"
+#include "Mixin/CSharpEnum.h"
+#include "UEVersion.h"
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -13,7 +19,11 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 
 	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
 
-	if (InField->IsNative() == false)
+	if (InField->IsNative() == false ||
+		Cast<UCSharpGeneratedClass>(InField) ||
+		Cast<UCSharpBlueprintGeneratedClass>(InField) ||
+		Cast<UCSharpScriptStruct>(InField) ||
+		Cast<UCSharpEnum>(InField))
 	{
 		auto Index = 0;
 
@@ -178,7 +188,7 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		FDelegateGenerator::Generator(MapProperty->ValueProp);
 
 		return FString::Printf(TEXT(
-			"TMap<%s,%s>"
+			"TMap<%s, %s>"
 		),
 		                       *GetPropertyType(MapProperty->KeyProp),
 		                       *GetPropertyType(MapProperty->ValueProp)
@@ -597,4 +607,60 @@ bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& St
 
 	return FFileHelper::SaveStringToFile(String, *FileName, FFileHelper::EEncodingOptions::ForceUTF8, FileManager,
 	                                     FILEWRITE_None);
+}
+
+bool FGeneratorCore::IsSupportedModule(const FString& InModule)
+{
+	static TArray<FString> Modules;
+
+#if UE_ARRAY_IS_EMPTY
+	if (Modules.IsEmpty())
+#else
+	if (Modules.Num() == 0)
+#endif
+	{
+		const auto File = FPaths::ConvertRelativePathToFull(FPaths::Combine(
+			FPaths::ProjectPluginsDir(), PLUGIN_NAME, CONFIG, FString::Printf(TEXT(
+				"%s%s"
+			),
+			                                                                  *PLUGIN_NAME,
+			                                                                  *INI_SUFFIX
+			)));
+
+		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), Modules, File);
+
+		for (auto& Module : Modules)
+		{
+			Module = FString::Printf(TEXT(
+				"%s.%s"),
+			                         *SCRIPT,
+			                         *Module
+			);
+		}
+
+		Modules.Add(FString::Printf(TEXT(
+			"%s.%s"),
+		                            *SCRIPT,
+		                            FApp::GetProjectName()
+		));
+	}
+
+	static auto GameRoot = FString::Printf(TEXT(
+		"%s.Game"
+	),
+	                                       *SCRIPT
+	);
+
+	static auto Game = FString::Printf(TEXT(
+		"%s.Game."
+	),
+	                                   *SCRIPT
+	);
+
+	if (InModule == GameRoot || InModule.StartsWith(Game))
+	{
+		return true;
+	}
+
+	return Modules.Contains(InModule);
 }

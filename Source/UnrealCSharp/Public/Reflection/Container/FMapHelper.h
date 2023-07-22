@@ -3,10 +3,11 @@
 #include "FContainerHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-class FMapHelper final : public FContainerHelper
+class UNREALCSHARP_API FMapHelper final : public FContainerHelper
 {
 public:
-	explicit FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData = nullptr);
+	explicit FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData = nullptr,
+	                    bool InbNeedFree = false);
 
 	~FMapHelper();
 

@@ -2,11 +2,13 @@
 
 #include "UnrealCSharp.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
+#include "Mixin/FMixinGenerator.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpModule"
 
 void FUnrealCSharpModule::StartupModule()
 {
+	FMixinGenerator::Generator();
 }
 
 void FUnrealCSharpModule::ShutdownModule()

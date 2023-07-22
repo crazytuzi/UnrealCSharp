@@ -3,10 +3,10 @@
 #include "FContainerHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-class FArrayHelper final : public FContainerHelper
+class UNREALCSHARP_API FArrayHelper final : public FContainerHelper
 {
 public:
-	explicit FArrayHelper(FProperty* InProperty, void* InData = nullptr);
+	explicit FArrayHelper(FProperty* InProperty, void* InData = nullptr, bool InbNeedFree = false);
 
 	~FArrayHelper();
 

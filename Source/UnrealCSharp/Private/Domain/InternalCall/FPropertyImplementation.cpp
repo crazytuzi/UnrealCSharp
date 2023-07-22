@@ -1,5 +1,5 @@
 ﻿#include "Domain/InternalCall/FPropertyImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -7,7 +7,7 @@ struct FRegisterProperty
 {
 	FRegisterProperty()
 	{
-		FBindingClassBuilder(TEXT("Property"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Property"), NAMESPACE_LIBRARY)
 			.Function("GetObjectByteProperty",
 			          static_cast<void*>(FPropertyImplementation::Property_GetObjectBytePropertyImplementation))
 			.Function("SetObjectByteProperty",

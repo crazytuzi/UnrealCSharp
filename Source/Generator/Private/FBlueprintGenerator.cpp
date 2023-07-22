@@ -32,8 +32,10 @@ void FBlueprintGenerator::Generator()
 
 	for (const auto& AssetData : OutAssetData)
 	{
-		if (AssetData.AssetClass == UBlueprint::StaticClass()->GetFName() ||
-			AssetData.AssetClass == UWidgetBlueprint::StaticClass()->GetFName())
+		const auto& AssetName = AssetData.GetClass()->GetFName();
+
+		if (AssetName == UBlueprint::StaticClass()->GetFName() ||
+			AssetName == UWidgetBlueprint::StaticClass()->GetFName())
 		{
 			if (const auto Blueprint = LoadObject<
 				UBlueprint>(nullptr, *AssetData.ObjectPath.ToString()))
@@ -44,7 +46,7 @@ void FBlueprintGenerator::Generator()
 				}
 			}
 		}
-		else if (AssetData.AssetClass == UUserDefinedStruct::StaticClass()->GetFName())
+		else if (AssetName == UUserDefinedStruct::StaticClass()->GetFName())
 		{
 			if (const auto UserDefinedStruct = LoadObject<
 				UUserDefinedStruct>(nullptr, *AssetData.ObjectPath.ToString()))
@@ -52,7 +54,7 @@ void FBlueprintGenerator::Generator()
 				FStructGenerator::Generator(UserDefinedStruct);
 			}
 		}
-		else if (AssetData.AssetClass == UUserDefinedEnum::StaticClass()->GetFName())
+		else if (AssetName == UUserDefinedEnum::StaticClass()->GetFName())
 		{
 			if (const auto UserDefinedEnum = LoadObject<
 				UUserDefinedEnum>(nullptr, *AssetData.ObjectPath.ToString()))

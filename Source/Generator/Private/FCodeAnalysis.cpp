@@ -1,40 +1,35 @@
 ﻿#include "FCodeAnalysis.h"
-#include "FUnrealCSharpFunctionLibrary.h"
-#include "Macro.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 
 void FCodeAnalysis::CodeAnalysis()
 {
-	const auto Program = GetProgram();
-
-	auto& FileManager = IFileManager::Get();
-
-	if (!FileManager.FileExists(*Program))
-	{
-		Compile();
-	}
+	Compile();
 
 	Analysis();
 }
 
 void FCodeAnalysis::Compile()
 {
+	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
+
 	const auto CodeAnalysisPath = FPaths::ConvertRelativePathToFull(
 		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, CODE_ANALYSIS));
 
-	const auto CompileTool = FUnrealCSharpFunctionLibrary::GetCompileTool();
-
-	const auto CompileParam = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-		"%s\\%s.csproj /build \"Debug\""
+	const auto CompileParam = FString::Printf(TEXT(
+		"build %s/%s.csproj --nologo -c Debug"
 	),
-		*CodeAnalysisPath,
-		*CODE_ANALYSIS
-	));
+	                                          *CodeAnalysisPath,
+	                                          *CODE_ANALYSIS
+	);
 
 	void* ReadPipe = nullptr;
 
 	void* WritePipe = nullptr;
 
 	auto OutProcessID = 0u;
+
+	FString Result;
 
 	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
 
@@ -53,6 +48,8 @@ void FCodeAnalysis::Compile()
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
 	{
 		FPlatformProcess::Sleep(0.01f);
+
+		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
 	}
 
 	auto ReturnCode = 0;
@@ -68,17 +65,29 @@ void FCodeAnalysis::Compile()
 			// @TODO
 		}
 	}
+
+	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+	FPlatformProcess::CloseProc(ProcessHandle);
 }
 
 void FCodeAnalysis::Analysis()
 {
-	const auto Program = GetProgram();
+	const auto Program = FPaths::ConvertRelativePathToFull(
+		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, CODE_ANALYSIS,
+		                FString::Printf(TEXT(
+			                "%s.exe"
+		                ),
+		                                *CODE_ANALYSIS
+		                )));
 
 	const auto CompileParam = FString::Printf(TEXT(
 		"%s %s"
 	),
-	                                          *FUnrealCSharpFunctionLibrary::GetGamePath(),
-	                                          *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
+	                                          *FPaths::ConvertRelativePathToFull(
+		                                          FUnrealCSharpFunctionLibrary::GetGamePath()),
+	                                          *FPaths::ConvertRelativePathToFull(
+		                                          FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath())
 	);
 
 	void* ReadPipe = nullptr;
@@ -119,18 +128,4 @@ void FCodeAnalysis::Analysis()
 			// @TODO
 		}
 	}
-}
-
-FString FCodeAnalysis::GetProgram()
-{
-	return FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, CODE_ANALYSIS,
-		                TEXT("bin"),
-		                TEXT("Debug"),
-		                TEXT("net7.0"),
-		                FString::Printf(TEXT(
-			                "%s.exe"
-		                ),
-		                                *CODE_ANALYSIS
-		                )));
 }

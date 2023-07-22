@@ -1,6 +1,6 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
-#include "Macro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
@@ -8,27 +8,39 @@
 void SignalHandler(int32)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
-	       UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(
-		       FCSharpEnvironment::GetEnvironment()->GetDomain()->GetTraceback())));
+	       UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback())));
 
 	GLog->Flush();
 }
 
-FCSharpEnvironment* FCSharpEnvironment::Environment = nullptr;
+FCSharpEnvironment FCSharpEnvironment::Environment;
 
 FCSharpEnvironment::FCSharpEnvironment()
 {
-	Initialize();
+	OnUnrealCSharpModuleActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.AddRaw(
+		this, &FCSharpEnvironment::OnUnrealCSharpModuleActive);
+
+	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
+		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
 }
 
 FCSharpEnvironment::~FCSharpEnvironment()
 {
-	Deinitialize();
+	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
+	{
+		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+	}
+
+	if (OnUnrealCSharpModuleActiveDelegateHandle.IsValid())
+	{
+		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive.Remove(OnUnrealCSharpModuleActiveDelegateHandle);
+	}
 }
 
 void FCSharpEnvironment::Initialize()
 {
-	Domain = new FMonoDomain({
+	Domain = new FDomain({
 		"",
 		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
 		DLL_SUFFIX,
@@ -54,8 +66,9 @@ void FCSharpEnvironment::Initialize()
 
 	MultiRegistry = new FMultiRegistry();
 
-	OnUnrealCSharpModuleInActiveDelegateHandle = FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.AddRaw(
-		this, &FCSharpEnvironment::OnUnrealCSharpModuleInActive);
+	MixinRegistry = new FMixinRegistry();
+
+	BindingRegistry = new FBindingRegistry();
 
 	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
 		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
@@ -81,6 +94,8 @@ void FCSharpEnvironment::Initialize()
 	{
 		signal(SignalType, SignalHandler);
 	}
+
+	FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Broadcast();
 }
 
 void FCSharpEnvironment::Deinitialize()
@@ -92,9 +107,18 @@ void FCSharpEnvironment::Deinitialize()
 		FCoreDelegates::OnAsyncLoadingFlushUpdate.Remove(OnAsyncLoadingFlushUpdateHandle);
 	}
 
-	if (OnUnrealCSharpModuleInActiveDelegateHandle.IsValid())
+	if (BindingRegistry != nullptr)
 	{
-		FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleInActive.Remove(OnUnrealCSharpModuleInActiveDelegateHandle);
+		delete BindingRegistry;
+
+		BindingRegistry = nullptr;
+	}
+
+	if (MixinRegistry != nullptr)
+	{
+		delete MixinRegistry;
+
+		MixinRegistry = nullptr;
 	}
 
 	if (MultiRegistry != nullptr)
@@ -154,17 +178,12 @@ void FCSharpEnvironment::Deinitialize()
 	}
 }
 
-FCSharpEnvironment* FCSharpEnvironment::GetEnvironment()
+FCSharpEnvironment& FCSharpEnvironment::GetEnvironment()
 {
-	if (Environment == nullptr)
-	{
-		Environment = new FCSharpEnvironment();
-	}
-
 	return Environment;
 }
 
-FMonoDomain* FCSharpEnvironment::GetDomain() const
+FDomain* FCSharpEnvironment::GetDomain() const
 {
 	return Domain;
 }
@@ -196,7 +215,7 @@ void FCSharpEnvironment::NotifyUObjectDeleted(const UObjectBase* Object, int32 I
 		}
 		else
 		{
-			RemoveObjectReference(InObject);
+			(void)RemoveObjectReference(InObject);
 		}
 	}
 }
@@ -205,14 +224,14 @@ void FCSharpEnvironment::OnUObjectArrayShutdown()
 {
 }
 
+void FCSharpEnvironment::OnUnrealCSharpModuleActive()
+{
+	Initialize();
+}
+
 void FCSharpEnvironment::OnUnrealCSharpModuleInActive()
 {
-	if (Environment != nullptr)
-	{
-		delete Environment;
-
-		Environment = nullptr;
-	}
+	Deinitialize();
 }
 
 void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
@@ -308,9 +327,9 @@ FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const FName& InClassNam
 	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InClassName) : nullptr;
 }
 
-FClassDescriptor* FCSharpEnvironment::NewClassDescriptor(const FMonoDomain* InMonoDomain, UStruct* InStruct) const
+FClassDescriptor* FCSharpEnvironment::NewClassDescriptor(const FDomain* InDomain, UStruct* InStruct) const
 {
-	return ClassRegistry != nullptr ? ClassRegistry->NewClassDescriptor(InMonoDomain, InStruct) : nullptr;
+	return ClassRegistry != nullptr ? ClassRegistry->NewClassDescriptor(InDomain, InStruct) : nullptr;
 }
 
 void FCSharpEnvironment::DeleteClassDescriptor(const UStruct* InStruct) const
@@ -417,9 +436,9 @@ MonoObject* FCSharpEnvironment::GetContainerObject(const void* InAddress) const
 	return ContainerRegistry != nullptr ? ContainerRegistry->GetObject(InAddress) : nullptr;
 }
 
-bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* InMonoObject) const
+bool FCSharpEnvironment::AddContainerReference(void* InContainer, MonoObject* InMonoObject, void* InAddress) const
 {
-	return ContainerRegistry != nullptr ? ContainerRegistry->AddReference(InContainer, InMonoObject) : false;
+	return ContainerRegistry != nullptr ? ContainerRegistry->AddReference(InContainer, InMonoObject, InAddress) : false;
 }
 
 bool FCSharpEnvironment::AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress,
@@ -473,6 +492,21 @@ bool FCSharpEnvironment::RemoveDelegateReference(const void* InAddress) const
 bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InGarbageCollectionHandle) : false;
+}
+
+MonoObject* FCSharpEnvironment::GetBinding(const void* InObject) const
+{
+	return BindingRegistry != nullptr ? BindingRegistry->GetObject(InObject) : nullptr;
+}
+
+bool FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const void* InObject, const bool bNeedFree) const
+{
+	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InObject, InMonoObject, bNeedFree) : false;
+}
+
+bool FCSharpEnvironment::RemoveBindingReference(const MonoObject* InMonoObject) const
+{
+	return BindingRegistry != nullptr ? BindingRegistry->RemoveReference(InMonoObject) : false;
 }
 
 bool FCSharpEnvironment::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference) const

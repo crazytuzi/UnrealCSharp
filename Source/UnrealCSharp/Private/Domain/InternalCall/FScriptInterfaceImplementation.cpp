@@ -1,13 +1,14 @@
 ﻿#include "Domain/InternalCall/FScriptInterfaceImplementation.h"
-#include "Binding/Class/FBindingClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterScriptInterface
 {
 	FRegisterScriptInterface()
 	{
-		FBindingClassBuilder(TEXT("ScriptInterface"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("ScriptInterface"), NAMESPACE_LIBRARY)
 			.Function("Register",
 			          static_cast<void*>(FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation))
 			.Function("UnRegister",
@@ -23,32 +24,25 @@ static FRegisterScriptInterface RegisterScriptInterface;
 void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(
 	MonoObject* InMonoObject, const MonoObject* InObject, MonoString* InInterfaceName)
 {
-	const auto FoundObject = FCSharpEnvironment::GetEnvironment()->GetObject(InObject);
+	const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
-	const auto InterfaceName = UTF8_TO_TCHAR(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(InInterfaceName));
+	const auto ScriptInterface = new TScriptInterface<IInterface>(FoundObject);
 
-	const auto InterfaceClass = LoadClass<UInterface>(nullptr, InterfaceName);
-
-	TScriptInterface<IInterface> ScriptInterface;
-
-	ScriptInterface.SetObject(FoundObject);
-
-	ScriptInterface.SetInterface(static_cast<IInterface*>(FoundObject->GetInterfaceAddress(InterfaceClass)));
-
-	FCSharpEnvironment::GetEnvironment()->AddMultiReference<TScriptInterface<
-		IInterface>>(InMonoObject, ScriptInterface);
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(InMonoObject, ScriptInterface);
 }
 
 void FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation(const MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment()->RemoveMultiReference<TScriptInterface<IInterface>>(InMonoObject);
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(InMonoObject);
+	});
 }
 
 void FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation(const MonoObject* InMonoObject,
                                                                              MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment()->GetMulti<TScriptInterface<IInterface>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(InMonoObject);
 
-	*OutValue = FCSharpEnvironment::GetEnvironment()->Bind(Multi.GetObject());
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject());
 }

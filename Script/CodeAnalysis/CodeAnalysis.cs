@@ -13,6 +13,11 @@ namespace CodeAnalysis
 
             var OutputPathName = args[1];
 
+            if (!Directory.Exists(OutputPathName))
+            {
+                Directory.CreateDirectory(OutputPathName);
+            }
+
             foreach (var Item in Directory.GetFiles(OutputPathName))
             {
                 File.Delete(Item);
@@ -55,33 +60,21 @@ namespace CodeAnalysis
         {
             var Tree = CSharpSyntaxTree.ParseText(InContent);
 
-            var Root = (CompilationUnitSyntax) Tree.GetRoot();
+            var Root = (CompilationUnitSyntax)Tree.GetRoot();
 
-            foreach (NamespaceDeclarationSyntax NamespaceDeclaration in Root.Members)
+            foreach (var RootMember in Root.Members)
             {
-                foreach (ClassDeclarationSyntax ClassDeclaration in NamespaceDeclaration.Members)
+                if (RootMember is BaseNamespaceDeclarationSyntax NamespaceDeclaration)
                 {
-                    var Functions = new List<string>();
-
-                    var bIsOverride = false;
-
-                    foreach (var Attribute in ClassDeclaration.AttributeLists)
+                    foreach (var NameSpaceMember in NamespaceDeclaration.Members)
                     {
-                        if (Attribute.ToString().Equals("[IsOverride]"))
+                        if (NameSpaceMember is ClassDeclarationSyntax ClassDeclaration)
                         {
-                            bIsOverride = true;
+                            var Functions = new List<string>();
 
-                            break;
-                        }
-                    }
+                            var bIsOverride = false;
 
-                    if (bIsOverride)
-                    {
-                        foreach (MethodDeclarationSyntax MethodDeclaration in ClassDeclaration.Members)
-                        {
-                            bIsOverride = false;
-
-                            foreach (var Attribute in MethodDeclaration.AttributeLists)
+                            foreach (var Attribute in ClassDeclaration.AttributeLists)
                             {
                                 if (Attribute.ToString().Equals("[IsOverride]"))
                                 {
@@ -93,19 +86,41 @@ namespace CodeAnalysis
 
                             if (bIsOverride)
                             {
-                                Functions.Add(MethodDeclaration.Identifier.ToString());
+                                foreach (var MemberDeclaration in ClassDeclaration.Members)
+                                {
+                                    if (MemberDeclaration is MethodDeclarationSyntax MethodDeclaration)
+                                    {
+                                        bIsOverride = false;
+
+                                        foreach (var Attribute in MethodDeclaration.AttributeLists)
+                                        {
+                                            if (Attribute.ToString().Equals("[IsOverride]"))
+                                            {
+                                                bIsOverride = true;
+
+                                                break;
+                                            }
+                                        }
+
+                                        if (bIsOverride)
+                                        {
+                                            Functions.Add(MethodDeclaration.Identifier.ToString());
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (Functions.Count > 0)
+                            {
+                                var FileName = Path.Combine(InPathName,
+                                    String.Format("{0}.{1}.json", NamespaceDeclaration.Name,
+                                        ClassDeclaration.Identifier));
+
+                                var Value = String.Format("{{\"Override\":{0}}}", JsonSerializer.Serialize(Functions));
+
+                                File.WriteAllText(FileName, Value);
                             }
                         }
-                    }
-
-                    if (Functions.Count > 0)
-                    {
-                        var FileName = Path.Combine(InPathName,
-                            String.Format("{0}.{1}.json", NamespaceDeclaration.Name, ClassDeclaration.Identifier));
-
-                        var Value = String.Format("{{\"Override\":{0}}}", JsonSerializer.Serialize(Functions));
-
-                        File.WriteAllText(FileName, Value);
                     }
                 }
             }

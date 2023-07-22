@@ -1,14 +1,13 @@
 ﻿#include "Domain/InternalCall/FAssetBundleEntryImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterAssetBundleEntry
 {
 	FRegisterAssetBundleEntry()
 	{
-		TScriptStructBuilder<FAssetBundleEntry>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FAssetBundleEntry>(NAMESPACE_LIBRARY)
 			.Function("IsValid",
 			          static_cast<void*>(FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation))
 			.Function("Equality",
@@ -23,7 +22,7 @@ static FRegisterAssetBundleEntry RegisterAssetBundleEntry;
 
 bool FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation(const MonoObject* InMonoObject)
 {
-	const auto AssetBundleEntry = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleEntry = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleEntry>(InMonoObject);
 
 	if (AssetBundleEntry != nullptr)
@@ -36,10 +35,10 @@ bool FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation(con
 
 bool FAssetBundleEntryImplementation::AssetBundleEntry_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto AssetBundleEntryA = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleEntryA = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleEntry>(A);
 
-	const auto AssetBundleEntryB = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleEntryB = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleEntry>(B);
 
 	if (AssetBundleEntryA != nullptr && AssetBundleEntryB != nullptr)
@@ -53,10 +52,10 @@ bool FAssetBundleEntryImplementation::AssetBundleEntry_EqualityImplementation(co
 bool FAssetBundleEntryImplementation::AssetBundleEntry_InequalityImplementation(
 	const MonoObject* A, const MonoObject* B)
 {
-	const auto AssetBundleEntryA = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleEntryA = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleEntry>(A);
 
-	const auto AssetBundleEntryB = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto AssetBundleEntryB = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleEntry>(B);
 
 	if (AssetBundleEntryA != nullptr && AssetBundleEntryB != nullptr)

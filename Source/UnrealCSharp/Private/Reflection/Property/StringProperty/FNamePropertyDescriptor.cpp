@@ -8,10 +8,10 @@ void FNamePropertyDescriptor::Get(void* Src, void** Dest) const
 	{
 		const auto FoundMonoClass = FTypeBridge::GetMonoClass(NameProperty);
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*NameProperty->GetPropertyValue(Src).ToString())));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*Dest = NewMonoObject;
@@ -25,7 +25,7 @@ void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcObject = static_cast<MonoObject*>(Src);
 
 		const auto SrcValue = UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(SrcObject, nullptr)));
 
 		NameProperty->InitializeValue(Dest);
@@ -41,7 +41,7 @@ bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint
 		const auto StringA = NameProperty->GetPropertyValue(A).ToString();
 
 		const auto StringB = UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr)));
 
 		return StringA == StringB;

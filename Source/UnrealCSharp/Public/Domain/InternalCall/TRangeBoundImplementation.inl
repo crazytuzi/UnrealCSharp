@@ -1,15 +1,13 @@
 ﻿#pragma once
 
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(A);
+	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
-	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(B);
+	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
 
 	if (RangeBoundA != nullptr && RangeBoundB != nullptr)
 	{
@@ -22,9 +20,9 @@ auto TRangeBoundImplementation<T, U>::RangeBound_EqualityImplementation(const Mo
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(A);
+	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
-	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(B);
+	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
 
 	if (RangeBoundA != nullptr && RangeBoundB != nullptr)
 	{
@@ -37,7 +35,7 @@ auto TRangeBoundImplementation<T, U>::RangeBound_InequalityImplementation(const 
 template <typename T, typename U>
 U TRangeBoundImplementation<T, U>::RangeBound_GetValueImplementation(const MonoObject* InMonoObject)
 {
-	const auto RangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto RangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (RangeBound != nullptr)
 	{
@@ -51,7 +49,7 @@ template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_SetValueImplementation(const MonoObject* InMonoObject,
                                                                         const U NewValue)
 {
-	const auto RangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto RangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (RangeBound != nullptr)
 	{
@@ -62,7 +60,7 @@ auto TRangeBoundImplementation<T, U>::RangeBound_SetValueImplementation(const Mo
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_IsClosedImplementation(const MonoObject* InMonoObject)
 {
-	const auto RangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto RangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (RangeBound != nullptr)
 	{
@@ -75,7 +73,7 @@ auto TRangeBoundImplementation<T, U>::RangeBound_IsClosedImplementation(const Mo
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_IsExclusiveImplementation(const MonoObject* InMonoObject)
 {
-	const auto RangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto RangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (RangeBound != nullptr)
 	{
@@ -88,7 +86,7 @@ auto TRangeBoundImplementation<T, U>::RangeBound_IsExclusiveImplementation(const
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_IsInclusiveImplementation(const MonoObject* InMonoObject)
 {
-	const auto RangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto RangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (RangeBound != nullptr)
 	{
@@ -101,7 +99,7 @@ auto TRangeBoundImplementation<T, U>::RangeBound_IsInclusiveImplementation(const
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_IsOpenImplementation(const MonoObject* InMonoObject)
 {
-	const auto RangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto RangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
 	if (RangeBound != nullptr)
 	{
@@ -114,15 +112,13 @@ auto TRangeBoundImplementation<T, U>::RangeBound_IsOpenImplementation(const Mono
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_ExclusiveImplementation(const U Value, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (OutRangeBound != nullptr)
 	{
@@ -133,15 +129,13 @@ auto TRangeBoundImplementation<T, U>::RangeBound_ExclusiveImplementation(const U
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_InclusiveImplementation(const U Value, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (OutRangeBound != nullptr)
 	{
@@ -152,15 +146,13 @@ auto TRangeBoundImplementation<T, U>::RangeBound_InclusiveImplementation(const U
 template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_OpenImplementation(MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (OutRangeBound != nullptr)
 	{
@@ -172,17 +164,15 @@ template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_FlipInclusionImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto RangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto RangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (RangeBound != nullptr && OutRangeBound != nullptr)
 	{
@@ -194,19 +184,17 @@ template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_MaxLowerImplementation(const MonoObject* A, const MonoObject* B,
                                                                         MonoObject** OutValue)
 {
-	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(A);
+	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
-	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(B);
+	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (RangeBoundA != nullptr && RangeBoundB != nullptr && OutRangeBound != nullptr)
 	{
@@ -218,19 +206,17 @@ template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_MaxUpperImplementation(const MonoObject* A, const MonoObject* B,
                                                                         MonoObject** OutValue)
 {
-	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(A);
+	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
-	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(B);
+	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (RangeBoundA != nullptr && RangeBoundB != nullptr && OutRangeBound != nullptr)
 	{
@@ -242,19 +228,17 @@ template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_MinLowerImplementation(const MonoObject* A, const MonoObject* B,
                                                                         MonoObject** OutValue)
 {
-	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(A);
+	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
-	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(B);
+	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (RangeBoundA != nullptr && RangeBoundB != nullptr && OutRangeBound != nullptr)
 	{
@@ -266,19 +250,17 @@ template <typename T, typename U>
 auto TRangeBoundImplementation<T, U>::RangeBound_MinUpperImplementation(const MonoObject* A, const MonoObject* B,
                                                                         MonoObject** OutValue)
 {
-	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(A);
+	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
-	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(B);
+	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(T)),
-		CLASS_SCRIPT_STRUCT_NAME(T));
+	const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
 
 	if (RangeBoundA != nullptr && RangeBoundB != nullptr && OutRangeBound != nullptr)
 	{

@@ -55,6 +55,10 @@ public:
 	static void LinearColor_LerpUsingHSVImplementation(const MonoObject* From, const MonoObject* To, float Progress,
 	                                                   MonoObject** OutValue);
 
+#if UE_LINEAR_COLOR_QUANTIZE_FLOOR
+	static void LinearColor_QuantizeFloorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+#endif
+
 	static void LinearColor_QuantizeImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
 	static void LinearColor_QuantizeRoundImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);

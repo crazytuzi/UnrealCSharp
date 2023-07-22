@@ -27,7 +27,7 @@ public:
 private:
 	friend class FCSharpBind;
 
-	UStruct* Struct;
+	TWeakObjectPtr<UStruct> Struct;
 
 	MonoClass* BindMonoClass;
 

@@ -1,6 +1,6 @@
 ﻿#include "Reflection/Container/FMapHelper.h"
 
-FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData):
+FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData, const bool InbNeedFree):
 	KeyPropertyDescriptor(nullptr),
 	ValuePropertyDescriptor(nullptr),
 	ScriptMap(nullptr),
@@ -8,7 +8,7 @@ FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, voi
 {
 	if (InData != nullptr)
 	{
-		bNeedFree = false;
+		bNeedFree = InbNeedFree;
 
 		ScriptMap = static_cast<FScriptMap*>(InData);
 	}
@@ -198,7 +198,7 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 		}
 	}
 
-	uint8* Data = nullptr;
+	uint8* Data;
 
 	if (KeyIndex == INDEX_NONE)
 	{

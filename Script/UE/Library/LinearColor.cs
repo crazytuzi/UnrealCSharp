@@ -144,6 +144,20 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
+#if UE_5_0_OR_LATER
+        public FColor QuantizeFloor()
+        {
+            LinearColorImplementation.LinearColor_QuantizeFloorImplementation(this, out var OutValue);
+
+            return OutValue;
+        }
+#endif
+
+#if UE_5_0_OR_LATER
+        [Obsolete(
+            "Most callers of Quantize should have been calling QuantizeRound; to match old behavior use QuantizeFloor",
+            false)]
+#endif
         public FColor Quantize()
         {
             LinearColorImplementation.LinearColor_QuantizeImplementation(this, out var OutValue);
@@ -172,10 +186,11 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-#if !UE_5_0_OR_LATER
+#if UE_5_0_OR_LATER
+        [Obsolete("", true)]
+#endif
         public Single ComputeLuminance() =>
             LinearColorImplementation.LinearColor_ComputeLuminanceImplementation(this);
-#endif
 
         public Single GetMax() =>
             LinearColorImplementation.LinearColor_GetMaxImplementation(this);

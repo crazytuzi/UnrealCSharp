@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Script.Reflection.Container;
 
 namespace Script.Common
 {
-    public class TArray<T> : IEnumerable
+    public class TArray<T> : IEnumerable<T>
     {
         public TArray() => ArrayUtils.Array_Register(this);
 
@@ -14,7 +15,15 @@ namespace Script.Common
 
         ~TArray() => ArrayUtils.Array_UnRegister(this);
 
-        public IEnumerator GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (var Index = 0; Index < Num(); Index++)
+            {
+                yield return this[Index];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
         {
             for (var Index = 0; Index < Num(); Index++)
             {

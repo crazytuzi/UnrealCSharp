@@ -1,15 +1,14 @@
 ﻿#include "Domain/InternalCall/FPrimaryAssetIdImplementation.h"
-#include "Binding/Class/TScriptStructBuilder.h"
+#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/ClassMacro.h"
 #include "Macro/NamespaceMacro.h"
-#include "FUnrealCSharpFunctionLibrary.h"
 
 struct FRegisterPrimaryAssetId
 {
 	FRegisterPrimaryAssetId()
 	{
-		TScriptStructBuilder<FPrimaryAssetId>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FPrimaryAssetId>(NAMESPACE_LIBRARY)
 			.Function("ParseTypeAndNameName",
 			          static_cast<void*>(
 				          FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplementation))
@@ -35,44 +34,40 @@ static FRegisterPrimaryAssetId RegisterPrimaryAssetId;
 void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplementation(
 	MonoObject* TypeAndName, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
-		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
+	const auto FoundMonoClass = TPropertyClass<FPrimaryAssetId, FPrimaryAssetId>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
 
 	*OutPrimaryAssetId = FPrimaryAssetId::ParseTypeAndName(FName(UTF8_TO_TCHAR(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 			GetDomain()->Object_To_String(TypeAndName, nullptr)))));
 }
 
 void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImplementation(MonoObject* TypeAndName,
 	MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
-		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
+	const auto FoundMonoClass = TPropertyClass<FPrimaryAssetId, FPrimaryAssetId>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
 
 	*OutPrimaryAssetId = FPrimaryAssetId::ParseTypeAndName(FString(UTF8_TO_TCHAR(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 			GetDomain()->Object_To_String(TypeAndName, nullptr)))));
 }
 
 bool FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation(const MonoObject* InMonoObject)
 {
-	const auto PrimaryAssetId = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetId>(InMonoObject);
 
 	if (PrimaryAssetId != nullptr)
@@ -86,20 +81,19 @@ bool FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation(const M
 void FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
-	const auto PrimaryAssetId = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto PrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetId>(InMonoObject);
 
 	if (PrimaryAssetId != nullptr)
 	{
 		const auto ResultString = PrimaryAssetId->ToString();
 
-		const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment()->GetDomain()->String_New(
+		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -108,27 +102,25 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation(
 
 void FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation(MonoObject* String, MonoObject** OutValue)
 {
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment()->GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(CLASS_SCRIPT_STRUCT(FPrimaryAssetId)),
-		CLASS_SCRIPT_STRUCT_NAME(FPrimaryAssetId));
+	const auto FoundMonoClass = TPropertyClass<FPrimaryAssetId, FPrimaryAssetId>::Get();
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment()->GetDomain()->Object_New(FoundMonoClass);
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment()->GetAddress<
+	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
 
 	*OutPrimaryAssetId = FPrimaryAssetId::FromString(FString(UTF8_TO_TCHAR(
-		FCSharpEnvironment::GetEnvironment()->GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment()->
+		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 			GetDomain()->Object_To_String(String, nullptr)))));
 }
 
 bool FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto PrimaryAssetIdA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPrimaryAssetId>(A);
+	const auto PrimaryAssetIdA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(A);
 
-	const auto PrimaryAssetIdB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPrimaryAssetId>(B);
+	const auto PrimaryAssetIdB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(B);
 
 	if (PrimaryAssetIdA != nullptr && PrimaryAssetIdB != nullptr)
 	{
@@ -140,9 +132,9 @@ bool FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation(const 
 
 bool FPrimaryAssetIdImplementation::PrimaryAssetId_InequalityImplementation(const MonoObject* A, const MonoObject* B)
 {
-	const auto PrimaryAssetIdA = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPrimaryAssetId>(A);
+	const auto PrimaryAssetIdA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(A);
 
-	const auto PrimaryAssetIdB = FCSharpEnvironment::GetEnvironment()->GetAddress<UScriptStruct, FPrimaryAssetId>(B);
+	const auto PrimaryAssetIdB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(B);
 
 	if (PrimaryAssetIdA != nullptr && PrimaryAssetIdB != nullptr)
 	{

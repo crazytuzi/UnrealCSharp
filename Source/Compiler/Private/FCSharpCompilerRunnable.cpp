@@ -1,8 +1,8 @@
 ﻿#include "FCSharpCompilerRunnable.h"
-#include "FUnrealCSharpFunctionLibrary.h"
-#include "Macro.h"
-
-FString FCSharpCompilerRunnable::CompileTool;
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
+#include "UEVersion.h"
+#include "Mixin/FMixinGenerator.h"
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
@@ -12,9 +12,11 @@ FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 
 bool FCSharpCompilerRunnable::Init()
 {
-	CompileTool = FUnrealCSharpFunctionLibrary::GetCompileTool();
-
+#if UE_PLATFORM_PROCESS_GET_SYNCH_EVENT_FROM_POOL
+	Event = FPlatformProcess::GetSynchEventFromPool(true);
+#else
 	Event = FPlatformProcess::CreateSynchEvent(true);
+#endif
 
 	return FRunnable::Init();
 }
@@ -81,6 +83,24 @@ void FCSharpCompilerRunnable::EnqueueTask()
 	Event->Trigger();
 }
 
+void FCSharpCompilerRunnable::EnqueueTask(const TArray<FFileChangeData>& FileChangeData)
+{
+	{
+		FScopeLock ScopeLock(&CriticalSection);
+
+		if (!Tasks.IsEmpty())
+		{
+			Tasks.Empty();
+		}
+
+		FileChanges.Append(FileChangeData);
+
+		Tasks.Enqueue(true);
+	}
+
+	Event->Trigger();
+}
+
 bool FCSharpCompilerRunnable::IsCompiling() const
 {
 	return bIsCompiling == true || !Tasks.IsEmpty();
@@ -94,31 +114,42 @@ void FCSharpCompilerRunnable::DoWork()
 
 	Pdb2Mdb();
 
+	const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
+	{
+		FMixinGenerator::Generator(FileChanges);
+
+		FileChanges.Empty();
+	}, TStatId(), nullptr, ENamedThreads::GameThread);
+
+	FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
+
 	bIsCompiling = false;
 }
 
 void FCSharpCompilerRunnable::Compile()
 {
-	const auto OutFile = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-		"%sScript\\Script.log"
-	),
-	                                                                       *FPaths::ProjectDir()
-	));
+	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-	FPlatformFileManager::Get().Get().GetPlatformFile().DeleteFile(*OutFile);
-
-	const auto CompileParam = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-		"%sScript\\Game\\Game.csproj /build \"Debug\" /Out %s"
+	const auto OutDirectory = FString::Printf(TEXT(
+		"%sScript"
 	),
-		*FPaths::ProjectDir(),
-		*OutFile
-	));
+	                                          *FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir())
+	);
+
+	const auto CompileParam = FString::Printf(TEXT(
+		"publish %sScript/Game/Game.csproj --nologo -c Debug -o %s"
+	),
+	                                          *FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()),
+	                                          *OutDirectory
+	);
 
 	void* ReadPipe = nullptr;
 
 	void* WritePipe = nullptr;
 
 	auto OutProcessID = 0u;
+
+	FString Result;
 
 	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
 
@@ -137,6 +168,8 @@ void FCSharpCompilerRunnable::Compile()
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
 	{
 		FPlatformProcess::Sleep(0.01f);
+
+		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
 	}
 
 	auto ReturnCode = 0;
@@ -149,13 +182,13 @@ void FCSharpCompilerRunnable::Compile()
 		}
 		else
 		{
-			FString Result;
-
-			FFileHelper::LoadFileToString(Result, *OutFile);
-
 			// @TODO
 		}
 	}
+
+	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+	FPlatformProcess::CloseProc(ProcessHandle);
 }
 
 void FCSharpCompilerRunnable::Pdb2Mdb()

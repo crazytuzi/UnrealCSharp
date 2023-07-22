@@ -48,7 +48,7 @@ MonoObject* FContainerRegistry::GetObject(const void* InAddress)
 	return nullptr;
 }
 
-bool FContainerRegistry::AddReference(void* InContainer, MonoObject* InMonoObject)
+bool FContainerRegistry::AddReference(void* InContainer, MonoObject* InMonoObject, void* InAddress)
 {
 	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
@@ -57,7 +57,7 @@ bool FContainerRegistry::AddReference(void* InContainer, MonoObject* InMonoObjec
 
 	GarbageCollectionHandle2ContainerAddress.Emplace(MoveTemp(GarbageCollectionHandle),
 	                                                 FContainerAddress{
-		                                                 nullptr, static_cast<FContainerHelper*>(InContainer)
+		                                                 InAddress, static_cast<FContainerHelper*>(InContainer)
 	                                                 });
 
 	return true;
@@ -76,7 +76,7 @@ bool FContainerRegistry::AddReference(const FGarbageCollectionHandle& InOwner, v
 		                                                 InAddress, static_cast<FContainerHelper*>(InContainer)
 	                                                 });
 
-	return FCSharpEnvironment::GetEnvironment()->
+	return FCSharpEnvironment::GetEnvironment().
 		AddReference(InOwner, new FContainerReference(GarbageCollectionHandle));
 }
 

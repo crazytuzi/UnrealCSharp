@@ -34,5 +34,5 @@ public:
 	FName GetFunctionName() const;
 
 private:
-	UDelegateHandler* DelegateHandler;
+	TWeakObjectPtr<UDelegateHandler> DelegateHandler;
 };

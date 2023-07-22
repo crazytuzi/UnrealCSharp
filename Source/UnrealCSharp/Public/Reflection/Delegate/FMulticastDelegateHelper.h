@@ -33,5 +33,5 @@ public:
 	void Broadcast(MonoObject** OutValue, MonoArray* InValue) const;
 
 private:
-	UMulticastDelegateHandler* MulticastDelegateHandler;
+	TWeakObjectPtr<UMulticastDelegateHandler> MulticastDelegateHandler;
 };
