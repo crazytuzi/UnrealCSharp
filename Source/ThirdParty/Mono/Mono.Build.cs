@@ -84,6 +84,13 @@ public class Mono : ModuleRules
 
 				RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
 			}
+
+			string APLName = "Mono_APL.xml";
+
+			string RelativeAPLPath = Utils.MakePathRelativeTo(Path.Combine(ModuleDirectory, "lib", "Android"),
+				Target.RelativeEnginePath);
+
+			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(RelativeAPLPath, APLName));
 		}
 	}
 
