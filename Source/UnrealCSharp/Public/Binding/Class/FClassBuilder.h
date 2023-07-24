@@ -90,16 +90,18 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod,
 FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod, const TArray<FString>& InParamNames)
 #endif
 {
+	auto FunctionPointer = TFunctionPointer(InMethod);
+
 #if WITH_FUNCTION_INFO
 	return Function(InName,
 	                GetFunctionImplementationName(InName),
-	                TFunctionPointer(InMethod).Value.Pointer,
+	                FunctionPointer.Value.Pointer,
 	                InFunctionInfo,
 	                InParamNames);
 #else
 	return Function(InName,
 		GetFunctionImplementationName(InName),
-		TFunctionPointer(InMethod).Value.Pointer,
+		FunctionPointer.Value.Pointer,
 		InParamNames);
 #endif
 }
@@ -112,17 +114,21 @@ FClassBuilder& FClassBuilder::Property(const FString& InName, T InGetMethod,
 FClassBuilder& FClassBuilder::Property(const FString& InName, T InGetMethod, U InSetMethod)
 #endif
 {
+	auto GetFunctionPointer = TFunctionPointer(InGetMethod);
+
+	auto SetFunctionPointer = TFunctionPointer(InSetMethod);
+
 #if WITH_PROPERTY_INFO
 	if (InTypeInfo != nullptr)
 	{
 		GetBindingClass()->BindingProperty(InName,
 		                                   InTypeInfo,
-		                                   TFunctionPointer(InGetMethod).Value.Pointer,
-		                                   TFunctionPointer(InSetMethod).Value.Pointer
+		                                   GetFunctionPointer.Value.Pointer,
+		                                   SetFunctionPointer.Value.Pointer
 		);
 	}
 #endif
 
-	return Function(BINDING_PROPERTY_GET + InName, TFunctionPointer(InGetMethod).Value.Pointer).
-		Function(BINDING_PROPERTY_SET + InName, TFunctionPointer(InSetMethod).Value.Pointer);
+	return Function(BINDING_PROPERTY_GET + InName, GetFunctionPointer.Value.Pointer).
+		Function(BINDING_PROPERTY_SET + InName, SetFunctionPointer.Value.Pointer);
 }
