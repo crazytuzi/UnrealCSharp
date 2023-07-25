@@ -13,8 +13,7 @@ struct FRegisterUClass
 	{
 		TReflectionClassBuilder<UClass>(NAMESPACE_LIBRARY)
 			.Property("ClassDefaultObject", BINDING_READONLY_PROPERTY(&UClass::ClassDefaultObject))
-			.Function("GetDefaultObject",
-			          static_cast<void*>(FClassImplementation::Class_GetDefaultObjectImplementation))
+			.Function("GetDefaultObject", FClassImplementation::Class_GetDefaultObjectImplementation)
 			.Register();
 	}
 };

@@ -9,12 +9,9 @@ struct FRegisterScriptInterface
 	FRegisterScriptInterface()
 	{
 		FClassBuilder(TEXT("ScriptInterface"), NAMESPACE_LIBRARY)
-			.Function("Register",
-			          static_cast<void*>(FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation))
-			.Function("UnRegister",
-			          static_cast<void*>(FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation))
-			.Function("GetObject",
-			          static_cast<void*>(FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation))
+			.Function("Register", FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation)
+			.Function("UnRegister", FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation)
+			.Function("GetObject", FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation)
 			.Register();
 	}
 };

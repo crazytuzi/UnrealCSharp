@@ -78,8 +78,32 @@ public class Mono : ModuleRules
 		}
 	}
 
+ private void BuildForAndroid()
+ {
 
-	private void BuildForWin64WithSource()
+		var LibraryPath = Path.Combine(ModuleDirectory, "lib");
+    PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "libmonosgen-2.0.a"));
+
+    var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
+
+    foreach (var File in Files)
+    {
+      var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
+
+      var DestPath = File.Substring(ModuleLastDirectory.Length + 1,
+        File.Length - ModuleLastDirectory.Length - 1);
+
+      RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
+    }
+
+    string APLName = "Mono_APL.xml";
+
+    string RelativeAPLPath = Utils.MakePathRelativeTo(Path.Combine(ModuleDirectory, "lib", "Android"),
+      Target.RelativeEnginePath);
+
+    AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(RelativeAPLPath, APLName));
+ }
+  private void BuildForWin64WithSource()
 	{
 		var Configuration = "Release";
 		if (IsDebug() == true)
@@ -124,7 +148,7 @@ public class Mono : ModuleRules
 		
 		
 		var LibraryPath = Path.Combine(ModuleDirectory, "lib");
-		var Files = GetFiles(Path.Combine(LibraryPath, "net7.0"));
+		var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
 
 		foreach (var File in Files)
 		{

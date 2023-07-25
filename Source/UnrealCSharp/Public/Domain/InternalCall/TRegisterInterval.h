@@ -12,20 +12,13 @@ struct TRegisterInterval
 	TRegisterInterval()
 	{
 		TReflectionClassBuilder<T>(NAMESPACE_LIBRARY)
-			.Function("Size",
-			          static_cast<void*>(FIntervalImplementation::Interval_SizeImplementation))
-			.Function("IsValid",
-			          static_cast<void*>(FIntervalImplementation::Interval_IsValidImplementation))
-			.Function("Contains",
-			          static_cast<void*>(FIntervalImplementation::Interval_ContainsImplementation))
-			.Function("Expand",
-			          static_cast<void*>(FIntervalImplementation::Interval_ExpandImplementation))
-			.Function("Include",
-			          static_cast<void*>(FIntervalImplementation::Interval_IncludeImplementation))
-			.Function("Interpolate",
-			          static_cast<void*>(FIntervalImplementation::Interval_InterpolateImplementation))
-			.Function("Intersect",
-			          static_cast<void*>(FIntervalImplementation::Interval_IntersectImplementation))
+			.Function("Size", FIntervalImplementation::Interval_SizeImplementation)
+			.Function("IsValid", FIntervalImplementation::Interval_IsValidImplementation)
+			.Function("Contains", FIntervalImplementation::Interval_ContainsImplementation)
+			.Function("Expand", FIntervalImplementation::Interval_ExpandImplementation)
+			.Function("Include", FIntervalImplementation::Interval_IncludeImplementation)
+			.Function("Interpolate", FIntervalImplementation::Interval_InterpolateImplementation)
+			.Function("Intersect", FIntervalImplementation::Interval_IntersectImplementation)
 			.Register();
 	}
 };

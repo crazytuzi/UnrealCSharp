@@ -10,8 +10,7 @@ struct FRegisterSoftClassPath
 	{
 		TReflectionClassBuilder<FSoftClassPath>(NAMESPACE_LIBRARY)
 			.Function("GetOrCreateIDForObject",
-			          static_cast<void*>(
-				          FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForObjectImplementation))
+			          FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForObjectImplementation)
 			.Register();
 	}
 };

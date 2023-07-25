@@ -10,21 +10,14 @@ struct FRegisterPrimaryAssetId
 	{
 		TReflectionClassBuilder<FPrimaryAssetId>(NAMESPACE_LIBRARY)
 			.Function("ParseTypeAndNameName",
-			          static_cast<void*>(
-				          FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplementation))
+			          FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplementation)
 			.Function("ParseTypeAndNameString",
-			          static_cast<void*>(
-				          FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImplementation))
-			.Function("IsValid",
-			          static_cast<void*>(FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation))
-			.Function("ToString",
-			          static_cast<void*>(FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation))
-			.Function("FromString",
-			          static_cast<void*>(FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation))
-			.Function("Equality",
-			          static_cast<void*>(FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation))
-			.Function("Inequality",
-			          static_cast<void*>(FPrimaryAssetIdImplementation::PrimaryAssetId_InequalityImplementation))
+			          FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImplementation)
+			.Function("IsValid", FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation)
+			.Function("ToString", FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation)
+			.Function("FromString", FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation)
+			.Function("Equality", FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation)
+			.Function("Inequality", FPrimaryAssetIdImplementation::PrimaryAssetId_InequalityImplementation)
 			.Register();
 	}
 };

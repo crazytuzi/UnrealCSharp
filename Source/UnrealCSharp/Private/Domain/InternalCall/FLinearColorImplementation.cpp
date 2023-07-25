@@ -9,65 +9,45 @@ struct FRegisterLinearColor
 	FRegisterLinearColor()
 	{
 		TReflectionClassBuilder<FLinearColor>(NAMESPACE_LIBRARY)
-			.Function("ToRGBE", static_cast<void*>(FLinearColorImplementation::LinearColor_ToRGBEImplementation))
-			.Function("FromSRGBColor",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_FromSRGBColorImplementation))
-			.Function("FromPow22Color",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_FromPow22ColorImplementation))
-			.Function("Component", static_cast<void*>(FLinearColorImplementation::LinearColor_ComponentImplementation))
-			.Function("Add", static_cast<void*>(FLinearColorImplementation::LinearColor_AddImplementation))
-			.Function("Subtract", static_cast<void*>(FLinearColorImplementation::LinearColor_SubtractImplementation))
-			.Function("Multiply", static_cast<void*>(FLinearColorImplementation::LinearColor_MultiplyImplementation))
-			.Function("MultiplyScalar",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_MultiplyScalarImplementation))
-			.Function("Divide", static_cast<void*>(FLinearColorImplementation::LinearColor_DivideImplementation))
-			.Function("DivideScalar",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_DivideScalarImplementation))
-			.Function("GetClamped",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_GetClampedImplementation))
-			.Function("Equality", static_cast<void*>(FLinearColorImplementation::LinearColor_EqualityImplementation))
-			.Function("Inequality",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_InequalityImplementation))
-			.Function("Equals", static_cast<void*>(FLinearColorImplementation::LinearColor_EqualsImplementation))
-			.Function("CopyWithNewOpacity",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_CopyWithNewOpacityImplementation))
-			.Function("MakeFromHSV8",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation))
-			.Function("MakeRandomColor",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_MakeRandomColorImplementation))
+			.Function("ToRGBE", FLinearColorImplementation::LinearColor_ToRGBEImplementation)
+			.Function("FromSRGBColor", FLinearColorImplementation::LinearColor_FromSRGBColorImplementation)
+			.Function("FromPow22Color", FLinearColorImplementation::LinearColor_FromPow22ColorImplementation)
+			.Function("Component", FLinearColorImplementation::LinearColor_ComponentImplementation)
+			.Function("Add", FLinearColorImplementation::LinearColor_AddImplementation)
+			.Function("Subtract", FLinearColorImplementation::LinearColor_SubtractImplementation)
+			.Function("Multiply", FLinearColorImplementation::LinearColor_MultiplyImplementation)
+			.Function("MultiplyScalar", FLinearColorImplementation::LinearColor_MultiplyScalarImplementation)
+			.Function("Divide", FLinearColorImplementation::LinearColor_DivideImplementation)
+			.Function("DivideScalar", FLinearColorImplementation::LinearColor_DivideScalarImplementation)
+			.Function("GetClamped", FLinearColorImplementation::LinearColor_GetClampedImplementation)
+			.Function("Equality", FLinearColorImplementation::LinearColor_EqualityImplementation)
+			.Function("Inequality", FLinearColorImplementation::LinearColor_InequalityImplementation)
+			.Function("Equals", FLinearColorImplementation::LinearColor_EqualsImplementation)
+			.Function("CopyWithNewOpacity", FLinearColorImplementation::LinearColor_CopyWithNewOpacityImplementation)
+			.Function("MakeFromHSV8", FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation)
+			.Function("MakeRandomColor", FLinearColorImplementation::LinearColor_MakeRandomColorImplementation)
 			.Function("MakeFromColorTemperature",
-			          static_cast<void*>(
-				          FLinearColorImplementation::LinearColor_MakeFromColorTemperatureImplementation))
-			.Function("Dist", static_cast<void*>(FLinearColorImplementation::LinearColor_DistImplementation))
-			.Function("LinearRGBToHSV",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_LinearRGBToHSVImplementation))
-			.Function("HSVToLinearRGB",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation))
-			.Function("LerpUsingHSV",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation))
+			          FLinearColorImplementation::LinearColor_MakeFromColorTemperatureImplementation)
+			.Function("Dist", FLinearColorImplementation::LinearColor_DistImplementation)
+			.Function("LinearRGBToHSV", FLinearColorImplementation::LinearColor_LinearRGBToHSVImplementation)
+			.Function("HSVToLinearRGB", FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation)
+			.Function("LerpUsingHSV", FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation)
 #if UE_LINEAR_COLOR_QUANTIZE_FLOOR
-			.Function("QuantizeFloor",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeFloorImplementation))
+			.Function("QuantizeFloor", FLinearColorImplementation::LinearColor_QuantizeFloorImplementation)
 #endif
-			.Function("Quantize", static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeImplementation))
-			.Function("QuantizeRound",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_QuantizeRoundImplementation))
-			.Function("ToFColor", static_cast<void*>(FLinearColorImplementation::LinearColor_ToFColorImplementation))
-			.Function("Desaturate",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_DesaturateImplementation))
+			.Function("Quantize", FLinearColorImplementation::LinearColor_QuantizeImplementation)
+			.Function("QuantizeRound", FLinearColorImplementation::LinearColor_QuantizeRoundImplementation)
+			.Function("ToFColor", FLinearColorImplementation::LinearColor_ToFColorImplementation)
+			.Function("Desaturate", FLinearColorImplementation::LinearColor_DesaturateImplementation)
 #if UE_LINEAR_COLOR_COMPUTE_LUMINANCE
-			.Function("ComputeLuminance",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation))
+			.Function("ComputeLuminance", FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation)
 #endif
-			.Function("GetMax", static_cast<void*>(FLinearColorImplementation::LinearColor_GetMaxImplementation))
-			.Function("IsAlmostBlack",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_IsAlmostBlackImplementation))
-			.Function("GetMin", static_cast<void*>(FLinearColorImplementation::LinearColor_GetMinImplementation))
-			.Function("GetLuminance",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_GetLuminanceImplementation))
-			.Function("ToString", static_cast<void*>(FLinearColorImplementation::LinearColor_ToStringImplementation))
-			.Function("InitFromString",
-			          static_cast<void*>(FLinearColorImplementation::LinearColor_InitFromStringImplementation))
+			.Function("GetMax", FLinearColorImplementation::LinearColor_GetMaxImplementation)
+			.Function("IsAlmostBlack", FLinearColorImplementation::LinearColor_IsAlmostBlackImplementation)
+			.Function("GetMin", FLinearColorImplementation::LinearColor_GetMinImplementation)
+			.Function("GetLuminance", FLinearColorImplementation::LinearColor_GetLuminanceImplementation)
+			.Function("ToString", FLinearColorImplementation::LinearColor_ToStringImplementation)
+			.Function("InitFromString", FLinearColorImplementation::LinearColor_InitFromStringImplementation)
 			.Register();
 	}
 };
