@@ -55,6 +55,24 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const void* InMeth
 #endif
 }
 
+#if WITH_FUNCTION_INFO
+FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<TPair<void*, FFunctionInfo*>>& InMethod)
+#else
+FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<void*>& InMethod)
+#endif
+{
+	for (auto i = 0; i < InMethod.Num(); ++i)
+	{
+#if WITH_EDITOR
+		Function(InName, InMethod[i].Key, InMethod[i].Value);
+#else
+		Function(InName, InMethod[i]);
+#endif
+	}
+
+	return *this;
+}
+
 void FClassBuilder::Register()
 {
 	for (const auto& Iterator : Functions)

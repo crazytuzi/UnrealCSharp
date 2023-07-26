@@ -31,6 +31,12 @@ public:
 	FClassBuilder& Function(const FString& InName, const void* InMethod, const TArray<FString>& InParamNames = {});
 #endif
 
+#if WITH_FUNCTION_INFO
+	FClassBuilder& Function(const FString& InName, const TArray<TPair<void*, FFunctionInfo*>>& InMethod);
+#else
+	FClassBuilder& Function(const FString& InName, const TArray<void*>& InMethod);
+#endif
+
 	void Register();
 
 protected:
