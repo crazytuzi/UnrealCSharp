@@ -12,6 +12,7 @@
 #include "mono/metadata/mono-debug.h"
 #include "mono/metadata/class.h"
 #include "mono/metadata/reflection.h"
+#include "Misc/FileHelper.h"
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
@@ -31,6 +32,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 {
 	RegisterMonoTrace();
 
+	RegisterAssemblyPreloadHook();
+
 	if (!FPaths::FileExists(InParams.AssemblyUtil))
 	{
 		return;
@@ -38,22 +41,6 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 	if (Domain == nullptr)
 	{
-#if WITH_EDITOR
-		auto MonoDir = FString::Printf(TEXT(
-			"%s/%s/Binaries/%s"),
-		                               *FPaths::ProjectPluginsDir(),
-		                               *PLUGIN_NAME,
-#if PLATFORM_WINDOWS
-		                               TEXT("Win64")
-#endif
-		);
-
-		mono_set_dirs(TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT("Mono\\lib\\net7.0"))),
-		              TCHAR_TO_ANSI(*FPaths::Combine(MonoDir, TEXT(""))));
-#else
-		mono_set_dirs("Mono\\lib\\net7.0", "");
-#endif
-
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
 		Domain = mono_jit_init("UnrealCSharp");
@@ -61,15 +48,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 		mono_domain_set(Domain, false);
 	}
 
-	if (AssemblyUtilAssembly == nullptr)
-	{
-		AssemblyUtilAssembly = mono_domain_assembly_open(Domain, TCHAR_TO_ANSI(*InParams.AssemblyUtil));
-	}
-
-	if (AssemblyUtilImage == nullptr)
-	{
-		AssemblyUtilImage = mono_assembly_get_image(AssemblyUtilAssembly);
-	}
+	LoadAssembly(TCHAR_TO_ANSI(*FPaths::GetBaseFilename(InParams.AssemblyUtil)), InParams.AssemblyUtil,
+	             &AssemblyUtilImage, &AssemblyUtilAssembly);
 
 	InitializeAssembly(InParams.Assemblies);
 
@@ -536,6 +516,82 @@ MonoType* FMonoDomain::Property_Get_Type(MonoProperty* InMonoProperty)
 	return nullptr;
 }
 
+MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath,
+                                               void* InUserData)
+{
+	const auto AssemblyName = mono_assembly_name_get_name(InAssemblyName);
+
+	TArray<uint8> Data;
+
+#if WITH_EDITOR
+	auto Path = FString::Printf(TEXT(
+		"%s/%s/Source/ThirdParty/Mono/lib/%s/net7.0"),
+	                            *FPaths::ProjectPluginsDir(),
+	                            *PLUGIN_NAME,
+#if PLATFORM_WINDOWS
+	                            TEXT("Win64")
+#endif
+	);
+#else
+	auto Path = FString::Printf(TEXT(
+		"%s/Binaries/%s/Mono/lib/%s/net7.0"),
+	                            *FPaths::ProjectDir(),
+#if PLATFORM_WINDOWS
+								TEXT("Win64"),
+								TEXT("Win64"));
+#elif PLATFORM_ANDROID
+	                            TEXT("Android"),
+	                            TEXT("Android"));
+#endif
+#endif
+
+	const auto File = FPaths::Combine(Path, AssemblyName) + DLL_SUFFIX;
+
+	MonoAssembly* Assembly;
+
+	LoadAssembly(AssemblyName, File, nullptr, &Assembly);
+
+	return Assembly;
+}
+
+void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile,
+                               MonoImage** OutImage, MonoAssembly** OutAssembly)
+{
+	TArray<uint8> Data;
+
+	FFileHelper::LoadFileToArray(Data, *InFile);
+
+	auto ImageOpenStatus = MonoImageOpenStatus::MONO_IMAGE_OK;
+
+	const auto Image = mono_image_open_from_data_with_name((char*)Data.GetData(), Data.Num(),
+	                                                       true, &ImageOpenStatus,
+	                                                       false, InAssemblyName);
+
+	if (ImageOpenStatus != MonoImageOpenStatus::MONO_IMAGE_OK)
+	{
+		// @TODO
+		return;
+	}
+
+	const auto Assembly = mono_assembly_load_from_full(Image, InAssemblyName, &ImageOpenStatus, false);
+
+	if (ImageOpenStatus != MonoImageOpenStatus::MONO_IMAGE_OK)
+	{
+		// @TODO
+		return;
+	}
+
+	if (OutImage != nullptr)
+	{
+		*OutImage = Image;
+	}
+
+	if (OutAssembly != nullptr)
+	{
+		*OutAssembly = Assembly;
+	}
+}
+
 void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 {
 	InitializeAssemblyLoadContext();
@@ -578,38 +634,33 @@ void FMonoDomain::DeinitializeAssemblyLoadContext()
 
 void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 {
-	if (const auto AssemblyUtilMonoClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),
-	                                                            TCHAR_TO_ANSI(*CLASS_ASSEMBLY_UTIL)))
+	for (const auto& AssemblyPath : InAssemblies)
 	{
-		void* Params[1];
-
-		if (const auto LoadMonoMethod = Class_Get_Method_From_Name(AssemblyUtilMonoClass, FUNCTION_ASSEMBLY_UTIL_LOAD,
-		                                                           TGetArrayLength(Params)))
+		if (!FPaths::FileExists(AssemblyPath))
 		{
-			for (const auto& AssemblyPath : InAssemblies)
-			{
-				if (!FPaths::FileExists(AssemblyPath))
-				{
-					continue;;
-				}
+			continue;;
+		}
 
-				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
+		MonoImage* Image = nullptr;
 
-				if (const auto Result = Runtime_Invoke(LoadMonoMethod, nullptr, Params, nullptr))
-				{
-					auto GCHandle = GCHandle_New_V2(Result, true);
+		MonoAssembly* Assembly = nullptr;
 
-					AssemblyGCHandles.Add(GCHandle);
+		LoadAssembly(TCHAR_TO_UTF8(*FPaths::GetBaseFilename(AssemblyPath)), AssemblyPath, &Image, &Assembly);
 
-					const auto ReflectionAssembly = (MonoReflectionAssembly*)GCHandle_Get_Target_V2(GCHandle);
+		if (Image != nullptr)
+		{
+			Images.Add(Image);
+		}
 
-					auto Assembly = mono_reflection_assembly_get_assembly(ReflectionAssembly);
+		if (Assembly != nullptr)
+		{
+			Assemblies.Add(Assembly);
 
-					Assemblies.Add(Assembly);
+			const auto ReflectionAssembly = mono_assembly_get_object(Domain, Assembly);
 
-					Images.Add(mono_assembly_get_image(Assembly));
-				}
-			}
+			auto GCHandle = GCHandle_New_V2((MonoObject*)ReflectionAssembly, true);
+
+			AssemblyGCHandles.Add(GCHandle);
 		}
 	}
 
@@ -633,6 +684,11 @@ void FMonoDomain::UnloadAssembly()
 	Images.Reset();
 
 	Assemblies.Reset();
+}
+
+void FMonoDomain::RegisterAssemblyPreloadHook()
+{
+	mono_install_assembly_preload_hook(AssemblyPreloadHook, nullptr);
 }
 
 void FMonoDomain::RegisterMonoTrace()
