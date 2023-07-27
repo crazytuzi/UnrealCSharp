@@ -34,10 +34,12 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 	RegisterAssemblyPreloadHook();
 
+#if WITH_EDITOR
 	if (!FPaths::FileExists(InParams.AssemblyUtil))
 	{
 		return;
 	}
+#endif
 
 	if (Domain == nullptr)
 	{
@@ -48,8 +50,10 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 		mono_domain_set(Domain, false);
 	}
 
+#if WITH_EDITOR
 	LoadAssembly(TCHAR_TO_ANSI(*FPaths::GetBaseFilename(InParams.AssemblyUtil)), InParams.AssemblyUtil,
 	             &AssemblyUtilImage, &AssemblyUtilAssembly);
+#endif
 
 	InitializeAssembly(InParams.Assemblies);
 
@@ -594,7 +598,9 @@ void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile
 
 void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 {
+#if WITH_EDITOR
 	InitializeAssemblyLoadContext();
+#endif
 
 	LoadAssembly(InAssemblies);
 }
@@ -603,7 +609,9 @@ void FMonoDomain::DeinitializeAssembly()
 {
 	UnloadAssembly();
 
+#if WITH_EDITOR
 	DeinitializeAssemblyLoadContext();
+#endif
 }
 
 void FMonoDomain::InitializeAssemblyLoadContext()
@@ -634,6 +642,42 @@ void FMonoDomain::DeinitializeAssemblyLoadContext()
 
 void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 {
+#if WITH_EDITOR
+	if (const auto AssemblyUtilMonoClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),
+	                                                            TCHAR_TO_ANSI(*CLASS_ASSEMBLY_UTIL)))
+	{
+		void* Params[1];
+
+		if (const auto LoadMonoMethod = Class_Get_Method_From_Name(AssemblyUtilMonoClass, FUNCTION_ASSEMBLY_UTIL_LOAD,
+		                                                           TGetArrayLength(Params)))
+		{
+			for (const auto& AssemblyPath : InAssemblies)
+			{
+				if (!FPaths::FileExists(AssemblyPath))
+				{
+					continue;;
+				}
+
+				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
+
+				if (const auto Result = Runtime_Invoke(LoadMonoMethod, nullptr, Params, nullptr))
+				{
+					auto GCHandle = GCHandle_New_V2(Result, true);
+
+					AssemblyGCHandles.Add(GCHandle);
+
+					const auto ReflectionAssembly = (MonoReflectionAssembly*)GCHandle_Get_Target_V2(GCHandle);
+
+					auto Assembly = mono_reflection_assembly_get_assembly(ReflectionAssembly);
+
+					Assemblies.Add(Assembly);
+
+					Images.Add(mono_assembly_get_image(Assembly));
+				}
+			}
+		}
+	}
+#else
 	for (const auto& AssemblyPath : InAssemblies)
 	{
 		if (!FPaths::FileExists(AssemblyPath))
@@ -663,6 +707,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 			AssemblyGCHandles.Add(GCHandle);
 		}
 	}
+#endif
 
 	bLoadSucceed = Assemblies.Num() == InAssemblies.Num();
 }

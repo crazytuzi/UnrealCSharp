@@ -11,8 +11,8 @@ void FMixinGenerator::Generator()
 {
 	FMonoDomain::Initialize({
 		"",
-		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
-		DLL_SUFFIX,
+		FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
+		FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + DLL_SUFFIX,
 		{
 			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
 			DLL_SUFFIX,
@@ -38,8 +38,8 @@ void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 {
 	FMonoDomain::Initialize({
 		"",
-		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
-		DLL_SUFFIX,
+		FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
+		FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + DLL_SUFFIX,
 		{
 			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
 			DLL_SUFFIX,

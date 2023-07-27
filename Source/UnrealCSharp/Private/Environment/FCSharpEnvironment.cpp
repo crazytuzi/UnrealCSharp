@@ -43,8 +43,8 @@ void FCSharpEnvironment::Initialize()
 {
 	Domain = new FDomain({
 		"",
-		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
-		DLL_SUFFIX,
+		FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
+		FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + DLL_SUFFIX,
 		{
 			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
 			DLL_SUFFIX,
