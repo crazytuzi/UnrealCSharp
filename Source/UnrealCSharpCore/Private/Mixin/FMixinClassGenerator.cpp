@@ -299,9 +299,6 @@ void FMixinClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InC
 
 				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
 
-				// @TODO
-				Function->FunctionFlags = FUNC_Public | FUNC_BlueprintCallable | FUNC_BlueprintEvent;
-
 				Function->MinAlignment = 1;
 
 				if (const auto ReturnParamType = FMonoDomain::Signature_Get_Return_Type(Signature))
@@ -340,6 +337,8 @@ void FMixinClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InC
 				Function->Next = InClass->Children;
 
 				InClass->Children = Function;
+
+				FMixinGeneratorCore::SetFunctionFlags(Function, Attrs);
 
 				InClass->AddFunctionToFunctionMap(Function, MethodName);
 
