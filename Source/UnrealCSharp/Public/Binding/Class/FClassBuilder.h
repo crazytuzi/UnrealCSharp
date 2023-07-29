@@ -49,6 +49,12 @@ public:
 	FClassBuilder& Property(const FString& InName, T InGetMethod, U InSetMethod);
 #endif
 
+#if WITH_FUNCTION_INFO
+	FClassBuilder& Function(const FString& InName, const TArray<TPair<void*, FFunctionInfo*>>& InMethod);
+#else
+	FClassBuilder& Function(const FString& InName, const TArray<void*>& InMethod);
+#endif
+
 	void Register();
 
 protected:
