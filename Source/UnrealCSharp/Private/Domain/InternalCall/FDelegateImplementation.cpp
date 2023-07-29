@@ -1,4 +1,5 @@
 ﻿#include "Domain/InternalCall/FDelegateImplementation.h"
+#include "Registry/FCSharpBind.h"
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
@@ -10,13 +11,13 @@ struct FRegisterDelegate
 	FRegisterDelegate()
 	{
 		FClassBuilder(TEXT("Delegate"), NAMESPACE_LIBRARY)
-			.Function("Register", static_cast<void*>(FDelegateImplementation::Delegate_RegisterImplementation))
-			.Function("UnRegister", static_cast<void*>(FDelegateImplementation::Delegate_UnRegisterImplementation))
-			.Function("Bind", static_cast<void*>(FDelegateImplementation::Delegate_BindImplementation))
-			.Function("IsBound", static_cast<void*>(FDelegateImplementation::Delegate_IsBoundImplementation))
-			.Function("UnBind", static_cast<void*>(FDelegateImplementation::Delegate_UnBindImplementation))
-			.Function("Clear", static_cast<void*>(FDelegateImplementation::Delegate_ClearImplementation))
-			.Function("Execute", static_cast<void*>(FDelegateImplementation::Delegate_ExecuteImplementation))
+			.Function("Register", FDelegateImplementation::Delegate_RegisterImplementation)
+			.Function("UnRegister", FDelegateImplementation::Delegate_UnRegisterImplementation)
+			.Function("Bind", FDelegateImplementation::Delegate_BindImplementation)
+			.Function("IsBound", FDelegateImplementation::Delegate_IsBoundImplementation)
+			.Function("UnBind", FDelegateImplementation::Delegate_UnBindImplementation)
+			.Function("Clear", FDelegateImplementation::Delegate_ClearImplementation)
+			.Function("Execute", FDelegateImplementation::Delegate_ExecuteImplementation)
 			.Register();
 	}
 };
@@ -25,7 +26,7 @@ static FRegisterDelegate RegisterDelegate;
 
 void FDelegateImplementation::Delegate_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().Bind<FDelegateHelper>(InMonoObject);
+	FCSharpBind::Bind<FDelegateHelper>(InMonoObject);
 }
 
 void FDelegateImplementation::Delegate_UnRegisterImplementation(const MonoObject* InMonoObject)

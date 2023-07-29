@@ -9,71 +9,54 @@ struct FRegisterMatrix
 	FRegisterMatrix()
 	{
 		TReflectionClassBuilder<FMatrix>(NAMESPACE_LIBRARY)
-			.Property("M", static_cast<void*>(FMatrixImplementation::Matrix_GetMImplementation),
-			          static_cast<void*>(FMatrixImplementation::Matrix_SetMImplementation))
-			.Function("SetIdentity", static_cast<void*>(FMatrixImplementation::Matrix_SetIdentityImplementation))
-			.Function("Multiply", static_cast<void*>(FMatrixImplementation::Matrix_MultiplyImplementation))
-			.Function("Add", static_cast<void*>(FMatrixImplementation::Matrix_AddImplementation))
-			.Function("MultiplyScale", static_cast<void*>(FMatrixImplementation::Matrix_MultiplyScaleImplementation))
-			.Function("Equality", static_cast<void*>(FMatrixImplementation::Matrix_EqualityImplementation))
-			.Function("Equals", static_cast<void*>(FMatrixImplementation::Matrix_EqualsImplementation))
-			.Function("Inequality", static_cast<void*>(FMatrixImplementation::Matrix_InequalityImplementation))
-			.Function("TransformFVector4",
-			          static_cast<void*>(FMatrixImplementation::Matrix_TransformFVector4Implementation))
-			.Function("TransformPosition",
-			          static_cast<void*>(FMatrixImplementation::Matrix_TransformPositionImplementation))
-			.Function("InverseTransformPosition",
-			          static_cast<void*>(FMatrixImplementation::Matrix_InverseTransformPositionImplementation))
-			.Function("TransformVector",
-			          static_cast<void*>(FMatrixImplementation::Matrix_TransformVectorImplementation))
-			.Function("InverseTransformVector",
-			          static_cast<void*>(FMatrixImplementation::Matrix_InverseTransformVectorImplementation))
-			.Function("GetTransposed", static_cast<void*>(FMatrixImplementation::Matrix_GetTransposedImplementation))
-			.Function("Determinant", static_cast<void*>(FMatrixImplementation::Matrix_DeterminantImplementation))
-			.Function("RotDeterminant", static_cast<void*>(FMatrixImplementation::Matrix_RotDeterminantImplementation))
-			.Function("InverseFast", static_cast<void*>(FMatrixImplementation::Matrix_InverseFastImplementation))
-			.Function("Inverse", static_cast<void*>(FMatrixImplementation::Matrix_InverseImplementation))
-			.Function("TransposeAdjoint",
-			          static_cast<void*>(FMatrixImplementation::Matrix_TransposeAdjointImplementation))
-			.Function("RemoveScaling", static_cast<void*>(FMatrixImplementation::Matrix_RemoveScalingImplementation))
-			.Function("GetMatrixWithoutScale",
-			          static_cast<void*>(FMatrixImplementation::Matrix_GetMatrixWithoutScaleImplementation))
-			.Function("ExtractScaling", static_cast<void*>(FMatrixImplementation::Matrix_ExtractScalingImplementation))
-			.Function("GetScaleVector", static_cast<void*>(FMatrixImplementation::Matrix_GetScaleVectorImplementation))
-			.Function("RemoveTranslation",
-			          static_cast<void*>(FMatrixImplementation::Matrix_RemoveTranslationImplementation))
-			.Function("ConcatTranslation",
-			          static_cast<void*>(FMatrixImplementation::Matrix_ConcatTranslationImplementation))
-			.Function("ContainsNaN", static_cast<void*>(FMatrixImplementation::Matrix_ContainsNaNImplementation))
-			.Function("ScaleTranslation",
-			          static_cast<void*>(FMatrixImplementation::Matrix_ScaleTranslationImplementation))
-			.Function("GetMaximumAxisScale",
-			          static_cast<void*>(FMatrixImplementation::Matrix_GetMaximumAxisScaleImplementation))
-			.Function("ApplyScale", static_cast<void*>(FMatrixImplementation::Matrix_ApplyScaleImplementation))
-			.Function("GetOrigin", static_cast<void*>(FMatrixImplementation::Matrix_GetOriginImplementation))
-			.Function("GetScaledAxes", static_cast<void*>(FMatrixImplementation::Matrix_GetScaledAxesImplementation))
-			.Function("GetUnitAxes", static_cast<void*>(FMatrixImplementation::Matrix_GetUnitAxesImplementation))
-			.Function("SetAxis", static_cast<void*>(FMatrixImplementation::Matrix_SetAxisImplementation))
-			.Function("SetOrigin", static_cast<void*>(FMatrixImplementation::Matrix_SetOriginImplementation))
-			.Function("SetAxes", static_cast<void*>(FMatrixImplementation::Matrix_SetAxesImplementation))
-			.Function("GetColumn", static_cast<void*>(FMatrixImplementation::Matrix_GetColumnImplementation))
-			.Function("SetColumn", static_cast<void*>(FMatrixImplementation::Matrix_SetColumnImplementation))
-			.Function("Rotator", static_cast<void*>(FMatrixImplementation::Matrix_RotatorImplementation))
-			.Function("ToQuat", static_cast<void*>(FMatrixImplementation::Matrix_ToQuatImplementation))
-			.Function("GetFrustumNearPlane",
-			          static_cast<void*>(FMatrixImplementation::Matrix_GetFrustumNearPlaneImplementation))
-			.Function("GetFrustumFarPlane",
-			          static_cast<void*>(FMatrixImplementation::Matrix_GetFrustumFarPlaneImplementation))
-			.Function("GetFrustumLeftPlane",
-			          static_cast<void*>(FMatrixImplementation::Matrix_GetFrustumLeftPlaneImplementation))
-			.Function("GetFrustumRightPlane",
-			          static_cast<void*>(FMatrixImplementation::Matrix_GetFrustumRightPlaneImplementation))
-			.Function("GetFrustumTopPlane",
-			          static_cast<void*>(FMatrixImplementation::Matrix_GetFrustumTopPlaneImplementation))
-			.Function("GetFrustumBottomPlane",
-			          static_cast<void*>(FMatrixImplementation::Matrix_GetFrustumBottomPlaneImplementation))
-			.Function("ToString", static_cast<void*>(FMatrixImplementation::Matrix_ToStringImplementation))
-			.Function("ComputeHash", static_cast<void*>(FMatrixImplementation::Matrix_ComputeHashImplementation))
+			.Property("M", FMatrixImplementation::Matrix_GetMImplementation,
+			          FMatrixImplementation::Matrix_SetMImplementation)
+			.Function("SetIdentity", FMatrixImplementation::Matrix_SetIdentityImplementation)
+			.Function("Multiply", FMatrixImplementation::Matrix_MultiplyImplementation)
+			.Function("Add", FMatrixImplementation::Matrix_AddImplementation)
+			.Function("MultiplyScale", FMatrixImplementation::Matrix_MultiplyScaleImplementation)
+			.Function("Equality", FMatrixImplementation::Matrix_EqualityImplementation)
+			.Function("Equals", FMatrixImplementation::Matrix_EqualsImplementation)
+			.Function("Inequality", FMatrixImplementation::Matrix_InequalityImplementation)
+			.Function("TransformFVector4", FMatrixImplementation::Matrix_TransformFVector4Implementation)
+			.Function("TransformPosition", FMatrixImplementation::Matrix_TransformPositionImplementation)
+			.Function("InverseTransformPosition", FMatrixImplementation::Matrix_InverseTransformPositionImplementation)
+			.Function("TransformVector", FMatrixImplementation::Matrix_TransformVectorImplementation)
+			.Function("InverseTransformVector", FMatrixImplementation::Matrix_InverseTransformVectorImplementation)
+			.Function("GetTransposed", FMatrixImplementation::Matrix_GetTransposedImplementation)
+			.Function("Determinant", FMatrixImplementation::Matrix_DeterminantImplementation)
+			.Function("RotDeterminant", FMatrixImplementation::Matrix_RotDeterminantImplementation)
+			.Function("InverseFast", FMatrixImplementation::Matrix_InverseFastImplementation)
+			.Function("Inverse", FMatrixImplementation::Matrix_InverseImplementation)
+			.Function("TransposeAdjoint", FMatrixImplementation::Matrix_TransposeAdjointImplementation)
+			.Function("RemoveScaling", FMatrixImplementation::Matrix_RemoveScalingImplementation)
+			.Function("GetMatrixWithoutScale", FMatrixImplementation::Matrix_GetMatrixWithoutScaleImplementation)
+			.Function("ExtractScaling", FMatrixImplementation::Matrix_ExtractScalingImplementation)
+			.Function("GetScaleVector", FMatrixImplementation::Matrix_GetScaleVectorImplementation)
+			.Function("RemoveTranslation", FMatrixImplementation::Matrix_RemoveTranslationImplementation)
+			.Function("ConcatTranslation", FMatrixImplementation::Matrix_ConcatTranslationImplementation)
+			.Function("ContainsNaN", FMatrixImplementation::Matrix_ContainsNaNImplementation)
+			.Function("ScaleTranslation", FMatrixImplementation::Matrix_ScaleTranslationImplementation)
+			.Function("GetMaximumAxisScale", FMatrixImplementation::Matrix_GetMaximumAxisScaleImplementation)
+			.Function("ApplyScale", FMatrixImplementation::Matrix_ApplyScaleImplementation)
+			.Function("GetOrigin", FMatrixImplementation::Matrix_GetOriginImplementation)
+			.Function("GetScaledAxes", FMatrixImplementation::Matrix_GetScaledAxesImplementation)
+			.Function("GetUnitAxes", FMatrixImplementation::Matrix_GetUnitAxesImplementation)
+			.Function("SetAxis", FMatrixImplementation::Matrix_SetAxisImplementation)
+			.Function("SetOrigin", FMatrixImplementation::Matrix_SetOriginImplementation)
+			.Function("SetAxes", FMatrixImplementation::Matrix_SetAxesImplementation)
+			.Function("GetColumn", FMatrixImplementation::Matrix_GetColumnImplementation)
+			.Function("SetColumn", FMatrixImplementation::Matrix_SetColumnImplementation)
+			.Function("Rotator", FMatrixImplementation::Matrix_RotatorImplementation)
+			.Function("ToQuat", FMatrixImplementation::Matrix_ToQuatImplementation)
+			.Function("GetFrustumNearPlane", FMatrixImplementation::Matrix_GetFrustumNearPlaneImplementation)
+			.Function("GetFrustumFarPlane", FMatrixImplementation::Matrix_GetFrustumFarPlaneImplementation)
+			.Function("GetFrustumLeftPlane", FMatrixImplementation::Matrix_GetFrustumLeftPlaneImplementation)
+			.Function("GetFrustumRightPlane", FMatrixImplementation::Matrix_GetFrustumRightPlaneImplementation)
+			.Function("GetFrustumTopPlane", FMatrixImplementation::Matrix_GetFrustumTopPlaneImplementation)
+			.Function("GetFrustumBottomPlane", FMatrixImplementation::Matrix_GetFrustumBottomPlaneImplementation)
+			.Function("ToString", FMatrixImplementation::Matrix_ToStringImplementation)
+			.Function("ComputeHash", FMatrixImplementation::Matrix_ComputeHashImplementation)
 			.Register();
 	}
 };

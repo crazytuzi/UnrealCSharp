@@ -9,137 +9,95 @@ struct FRegisterTransform
 	FRegisterTransform()
 	{
 		TReflectionClassBuilder<FTransform>(NAMESPACE_LIBRARY)
-			.Function("DebugPrint", static_cast<void*>(FTransformImplementation::Transform_DebugPrintImplementation))
-			.Function("ToHumanReadableString",
-			          static_cast<void*>(FTransformImplementation::Transform_ToHumanReadableStringImplementation))
-			.Function("ToString", static_cast<void*>(FTransformImplementation::Transform_ToStringImplementation))
-			.Function("InitFromString",
-			          static_cast<void*>(FTransformImplementation::Transform_InitFromStringImplementation))
-			.Function("ToMatrixWithScale",
-			          static_cast<void*>(FTransformImplementation::Transform_ToMatrixWithScaleImplementation))
+			.Function("DebugPrint", FTransformImplementation::Transform_DebugPrintImplementation)
+			.Function("ToHumanReadableString", FTransformImplementation::Transform_ToHumanReadableStringImplementation)
+			.Function("ToString", FTransformImplementation::Transform_ToStringImplementation)
+			.Function("InitFromString", FTransformImplementation::Transform_InitFromStringImplementation)
+			.Function("ToMatrixWithScale", FTransformImplementation::Transform_ToMatrixWithScaleImplementation)
 			.Function("ToInverseMatrixWithScale",
-			          static_cast<void*>(FTransformImplementation::Transform_ToInverseMatrixWithScaleImplementation))
-			.Function("Inverse", static_cast<void*>(FTransformImplementation::Transform_InverseImplementation))
-			.Function("ToMatrixNoScale",
-			          static_cast<void*>(FTransformImplementation::Transform_ToMatrixNoScaleImplementation))
-			.Function("Blend", static_cast<void*>(FTransformImplementation::Transform_BlendImplementation))
-			.Function("BlendWith", static_cast<void*>(FTransformImplementation::Transform_BlendWithImplementation))
-			.Function("Add", static_cast<void*>(FTransformImplementation::Transform_AddImplementation))
-			.Function("Multiply", static_cast<void*>(FTransformImplementation::Transform_MultiplyImplementation))
-			.Function("MultiplyQuat",
-			          static_cast<void*>(FTransformImplementation::Transform_MultiplyQuatImplementation))
-			.Function("AnyHasNegativeScale",
-			          static_cast<void*>(FTransformImplementation::Transform_AnyHasNegativeScaleImplementation))
+			          FTransformImplementation::Transform_ToInverseMatrixWithScaleImplementation)
+			.Function("Inverse", FTransformImplementation::Transform_InverseImplementation)
+			.Function("ToMatrixNoScale", FTransformImplementation::Transform_ToMatrixNoScaleImplementation)
+			.Function("Blend", FTransformImplementation::Transform_BlendImplementation)
+			.Function("BlendWith", FTransformImplementation::Transform_BlendWithImplementation)
+			.Function("Add", FTransformImplementation::Transform_AddImplementation)
+			.Function("Multiply", FTransformImplementation::Transform_MultiplyImplementation)
+			.Function("MultiplyQuat", FTransformImplementation::Transform_MultiplyQuatImplementation)
+			.Function("AnyHasNegativeScale", FTransformImplementation::Transform_AnyHasNegativeScaleImplementation)
 			.Function("ScaleTranslationVector",
-			          static_cast<void*>(FTransformImplementation::Transform_ScaleTranslationVectorImplementation))
-			.Function("ScaleTranslationScale",
-			          static_cast<void*>(FTransformImplementation::Transform_ScaleTranslationScaleImplementation))
-			.Function("RemoveScaling",
-			          static_cast<void*>(FTransformImplementation::Transform_RemoveScalingImplementation))
-			.Function("GetMaximumAxisScale",
-			          static_cast<void*>(FTransformImplementation::Transform_GetMaximumAxisScaleImplementation))
-			.Function("GetMinimumAxisScale",
-			          static_cast<void*>(FTransformImplementation::Transform_GetMinimumAxisScaleImplementation))
-			.Function("GetRelativeTransform",
-			          static_cast<void*>(FTransformImplementation::Transform_GetRelativeTransformImplementation))
+			          FTransformImplementation::Transform_ScaleTranslationVectorImplementation)
+			.Function("ScaleTranslationScale", FTransformImplementation::Transform_ScaleTranslationScaleImplementation)
+			.Function("RemoveScaling", FTransformImplementation::Transform_RemoveScalingImplementation)
+			.Function("GetMaximumAxisScale", FTransformImplementation::Transform_GetMaximumAxisScaleImplementation)
+			.Function("GetMinimumAxisScale", FTransformImplementation::Transform_GetMinimumAxisScaleImplementation)
+			.Function("GetRelativeTransform", FTransformImplementation::Transform_GetRelativeTransformImplementation)
 			.Function("GetRelativeTransformReverse",
-			          static_cast<void*>(FTransformImplementation::Transform_GetRelativeTransformReverseImplementation))
+			          FTransformImplementation::Transform_GetRelativeTransformReverseImplementation)
 			.Function("SetToRelativeTransform",
-			          static_cast<void*>(FTransformImplementation::Transform_SetToRelativeTransformImplementation))
-			.Function("TransformFVector4",
-			          static_cast<void*>(FTransformImplementation::Transform_TransformFVector4Implementation))
+			          FTransformImplementation::Transform_SetToRelativeTransformImplementation)
+			.Function("TransformFVector4", FTransformImplementation::Transform_TransformFVector4Implementation)
 			.Function("TransformFVector4NoScale",
-			          static_cast<void*>(FTransformImplementation::Transform_TransformFVector4NoScaleImplementation))
-			.Function("TransformPosition",
-			          static_cast<void*>(FTransformImplementation::Transform_TransformPositionImplementation))
+			          FTransformImplementation::Transform_TransformFVector4NoScaleImplementation)
+			.Function("TransformPosition", FTransformImplementation::Transform_TransformPositionImplementation)
 			.Function("TransformPositionNoScale",
-			          static_cast<void*>(FTransformImplementation::Transform_TransformPositionNoScaleImplementation))
+			          FTransformImplementation::Transform_TransformPositionNoScaleImplementation)
 			.Function("InverseTransformPositionNoScale",
-			          static_cast<void*>(
-				          FTransformImplementation::Transform_InverseTransformPositionNoScaleImplementation))
-			.Function("TransformVector",
-			          static_cast<void*>(FTransformImplementation::Transform_TransformVectorImplementation))
+			          FTransformImplementation::Transform_InverseTransformPositionNoScaleImplementation)
+			.Function("TransformVector", FTransformImplementation::Transform_TransformVectorImplementation)
 			.Function("TransformVectorNoScale",
-			          static_cast<void*>(FTransformImplementation::Transform_TransformVectorNoScaleImplementation))
+			          FTransformImplementation::Transform_TransformVectorNoScaleImplementation)
 			.Function("InverseTransformVector",
-			          static_cast<void*>(FTransformImplementation::Transform_InverseTransformVectorImplementation))
+			          FTransformImplementation::Transform_InverseTransformVectorImplementation)
 			.Function("InverseTransformVectorNoScale",
-			          static_cast<void*>(
-				          FTransformImplementation::Transform_InverseTransformVectorNoScaleImplementation))
-			.Function("TransformRotation",
-			          static_cast<void*>(FTransformImplementation::Transform_TransformRotationImplementation))
+			          FTransformImplementation::Transform_InverseTransformVectorNoScaleImplementation)
+			.Function("TransformRotation", FTransformImplementation::Transform_TransformRotationImplementation)
 			.Function("InverseTransformRotation",
-			          static_cast<void*>(FTransformImplementation::Transform_InverseTransformRotationImplementation))
-			.Function("GetScaledScale",
-			          static_cast<void*>(FTransformImplementation::Transform_GetScaledScaleImplementation))
-			.Function("GetScaledVector",
-			          static_cast<void*>(FTransformImplementation::Transform_GetScaledVectorImplementation))
+			          FTransformImplementation::Transform_InverseTransformRotationImplementation)
+			.Function("GetScaledScale", FTransformImplementation::Transform_GetScaledScaleImplementation)
+			.Function("GetScaledVector", FTransformImplementation::Transform_GetScaledVectorImplementation)
 			.Function("GetSafeScaleReciprocal",
-			          static_cast<void*>(FTransformImplementation::Transform_GetSafeScaleReciprocalImplementation))
-			.Function("GetLocation", static_cast<void*>(FTransformImplementation::Transform_GetLocationImplementation))
-			.Function("Rotator", static_cast<void*>(FTransformImplementation::Transform_RotatorImplementation))
-			.Function("GetDeterminant",
-			          static_cast<void*>(FTransformImplementation::Transform_GetDeterminantImplementation))
-			.Function("SetLocation", static_cast<void*>(FTransformImplementation::Transform_SetLocationImplementation))
-			.Function("ContainsNaN", static_cast<void*>(FTransformImplementation::Transform_ContainsNaNImplementation))
-			.Function("IsValid", static_cast<void*>(FTransformImplementation::Transform_IsValidImplementation))
-			.Function("AreRotationsEqual",
-			          static_cast<void*>(FTransformImplementation::Transform_AreRotationsEqualImplementation))
-			.Function("AreTranslationsEqual",
-			          static_cast<void*>(FTransformImplementation::Transform_AreTranslationsEqualImplementation))
-			.Function("AreScale3DsEqual",
-			          static_cast<void*>(FTransformImplementation::Transform_AreScale3DsEqualImplementation))
-			.Function("RotationEquals",
-			          static_cast<void*>(FTransformImplementation::Transform_RotationEqualsImplementation))
-			.Function("TranslationEquals",
-			          static_cast<void*>(FTransformImplementation::Transform_TranslationEqualsImplementation))
-			.Function("Scale3DEquals",
-			          static_cast<void*>(FTransformImplementation::Transform_Scale3DEqualsImplementation))
-			.Function("Equals", static_cast<void*>(FTransformImplementation::Transform_EqualsImplementation))
-			.Function("Identical", static_cast<void*>(FTransformImplementation::Transform_IdenticalImplementation))
-			.Function("EqualsNoScale",
-			          static_cast<void*>(FTransformImplementation::Transform_EqualsNoScaleImplementation))
-			.Function("StaticMultiply",
-			          static_cast<void*>(FTransformImplementation::Transform_StaticMultiplyImplementation))
-			.Function("SetComponents",
-			          static_cast<void*>(FTransformImplementation::Transform_SetComponentsImplementation))
-			.Function("SetIdentity", static_cast<void*>(FTransformImplementation::Transform_SetIdentityImplementation))
-			.Function("MultiplyScale3D",
-			          static_cast<void*>(FTransformImplementation::Transform_MultiplyScale3DImplementation))
-			.Function("SetTranslation",
-			          static_cast<void*>(FTransformImplementation::Transform_SetTranslationImplementation))
-			.Function("CopyTranslation",
-			          static_cast<void*>(FTransformImplementation::Transform_CopyTranslationImplementation))
-			.Function("ConcatenateRotation",
-			          static_cast<void*>(FTransformImplementation::Transform_ConcatenateRotationImplementation))
-			.Function("AddToTranslation",
-			          static_cast<void*>(FTransformImplementation::Transform_AddToTranslationImplementation))
-			.Function("AddTranslations",
-			          static_cast<void*>(FTransformImplementation::Transform_AddTranslationsImplementation))
-			.Function("SubtractTranslations",
-			          static_cast<void*>(FTransformImplementation::Transform_SubtractTranslationsImplementation))
-			.Function("SetRotation", static_cast<void*>(FTransformImplementation::Transform_SetRotationImplementation))
-			.Function("CopyRotation",
-			          static_cast<void*>(FTransformImplementation::Transform_CopyRotationImplementation))
-			.Function("SetScale3D", static_cast<void*>(FTransformImplementation::Transform_SetScale3DImplementation))
-			.Function("CopyScale3D", static_cast<void*>(FTransformImplementation::Transform_CopyScale3DImplementation))
+			          FTransformImplementation::Transform_GetSafeScaleReciprocalImplementation)
+			.Function("GetLocation", FTransformImplementation::Transform_GetLocationImplementation)
+			.Function("Rotator", FTransformImplementation::Transform_RotatorImplementation)
+			.Function("GetDeterminant", FTransformImplementation::Transform_GetDeterminantImplementation)
+			.Function("SetLocation", FTransformImplementation::Transform_SetLocationImplementation)
+			.Function("ContainsNaN", FTransformImplementation::Transform_ContainsNaNImplementation)
+			.Function("IsValid", FTransformImplementation::Transform_IsValidImplementation)
+			.Function("AreRotationsEqual", FTransformImplementation::Transform_AreRotationsEqualImplementation)
+			.Function("AreTranslationsEqual", FTransformImplementation::Transform_AreTranslationsEqualImplementation)
+			.Function("AreScale3DsEqual", FTransformImplementation::Transform_AreScale3DsEqualImplementation)
+			.Function("RotationEquals", FTransformImplementation::Transform_RotationEqualsImplementation)
+			.Function("TranslationEquals", FTransformImplementation::Transform_TranslationEqualsImplementation)
+			.Function("Scale3DEquals", FTransformImplementation::Transform_Scale3DEqualsImplementation)
+			.Function("Equals", FTransformImplementation::Transform_EqualsImplementation)
+			.Function("Identical", FTransformImplementation::Transform_IdenticalImplementation)
+			.Function("EqualsNoScale", FTransformImplementation::Transform_EqualsNoScaleImplementation)
+			.Function("StaticMultiply", FTransformImplementation::Transform_StaticMultiplyImplementation)
+			.Function("SetComponents", FTransformImplementation::Transform_SetComponentsImplementation)
+			.Function("SetIdentity", FTransformImplementation::Transform_SetIdentityImplementation)
+			.Function("MultiplyScale3D", FTransformImplementation::Transform_MultiplyScale3DImplementation)
+			.Function("SetTranslation", FTransformImplementation::Transform_SetTranslationImplementation)
+			.Function("CopyTranslation", FTransformImplementation::Transform_CopyTranslationImplementation)
+			.Function("ConcatenateRotation", FTransformImplementation::Transform_ConcatenateRotationImplementation)
+			.Function("AddToTranslation", FTransformImplementation::Transform_AddToTranslationImplementation)
+			.Function("AddTranslations", FTransformImplementation::Transform_AddTranslationsImplementation)
+			.Function("SubtractTranslations", FTransformImplementation::Transform_SubtractTranslationsImplementation)
+			.Function("SetRotation", FTransformImplementation::Transform_SetRotationImplementation)
+			.Function("CopyRotation", FTransformImplementation::Transform_CopyRotationImplementation)
+			.Function("SetScale3D", FTransformImplementation::Transform_SetScale3DImplementation)
+			.Function("CopyScale3D", FTransformImplementation::Transform_CopyScale3DImplementation)
 			.Function("SetTranslationAndScale3D",
-			          static_cast<void*>(FTransformImplementation::Transform_SetTranslationAndScale3DImplementation))
-			.Function("Accumulate", static_cast<void*>(FTransformImplementation::Transform_AccumulateImplementation))
-			.Function("NormalizeRotation",
-			          static_cast<void*>(FTransformImplementation::Transform_NormalizeRotationImplementation))
-			.Function("IsRotationNormalized",
-			          static_cast<void*>(FTransformImplementation::Transform_IsRotationNormalizedImplementation))
-			.Function("GetRotation", static_cast<void*>(FTransformImplementation::Transform_GetRotationImplementation))
-			.Function("GetTranslation",
-			          static_cast<void*>(FTransformImplementation::Transform_GetTranslationImplementation))
-			.Function("GetScale3D", static_cast<void*>(FTransformImplementation::Transform_GetScale3DImplementation))
-			.Function("CopyRotationPart",
-			          static_cast<void*>(FTransformImplementation::Transform_CopyRotationPartImplementation))
+			          FTransformImplementation::Transform_SetTranslationAndScale3DImplementation)
+			.Function("Accumulate", FTransformImplementation::Transform_AccumulateImplementation)
+			.Function("NormalizeRotation", FTransformImplementation::Transform_NormalizeRotationImplementation)
+			.Function("IsRotationNormalized", FTransformImplementation::Transform_IsRotationNormalizedImplementation)
+			.Function("GetRotation", FTransformImplementation::Transform_GetRotationImplementation)
+			.Function("GetTranslation", FTransformImplementation::Transform_GetTranslationImplementation)
+			.Function("GetScale3D", FTransformImplementation::Transform_GetScale3DImplementation)
+			.Function("CopyRotationPart", FTransformImplementation::Transform_CopyRotationPartImplementation)
 			.Function("CopyTranslationAndScale3D",
-			          static_cast<void*>(FTransformImplementation::Transform_CopyTranslationAndScale3DImplementation))
-			.Function("SetFromMatrix",
-			          static_cast<void*>(FTransformImplementation::Transform_SetFromMatrixImplementation))
+			          FTransformImplementation::Transform_CopyTranslationAndScale3DImplementation)
+			.Function("SetFromMatrix", FTransformImplementation::Transform_SetFromMatrixImplementation)
 			.Register();
 	}
 };

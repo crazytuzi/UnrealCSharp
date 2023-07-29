@@ -42,7 +42,9 @@ struct TTypeInfo<void> final : FTypeInfo
 
 	virtual const TArray<FString>& GetNameSpace() const override
 	{
-		return {};
+		static TArray<FString> Instance;
+
+		return Instance;
 	}
 
 	virtual bool IsOut() const override

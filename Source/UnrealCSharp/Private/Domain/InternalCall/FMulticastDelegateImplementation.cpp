@@ -9,22 +9,14 @@ struct FRegisterMulticastDelegate
 	FRegisterMulticastDelegate()
 	{
 		FClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_LIBRARY)
-			.Function("IsBound",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation))
-			.Function("Contains",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation))
-			.Function("Add",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_AddImplementation))
-			.Function("AddUnique",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation))
-			.Function("Remove",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation))
-			.Function("RemoveAll",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation))
-			.Function("Clear",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation))
-			.Function("Broadcast",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation))
+			.Function("IsBound", FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation)
+			.Function("Contains", FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation)
+			.Function("Add", FMulticastDelegateImplementation::MulticastDelegate_AddImplementation)
+			.Function("AddUnique", FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation)
+			.Function("Remove", FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation)
+			.Function("RemoveAll", FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation)
+			.Function("Clear", FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation)
+			.Function("Broadcast", FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation)
 			.Register();
 	}
 };

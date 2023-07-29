@@ -9,36 +9,23 @@ struct FRegisterRandomStream
 	FRegisterRandomStream()
 	{
 		TReflectionClassBuilder<FRandomStream>(NAMESPACE_LIBRARY)
-			.Function("Initialize",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_InitializeImplementation))
-			.Function("InitializeName",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_InitializeNameImplementation))
-			.Function("Reset", static_cast<void*>(FRandomStreamImplementation::RandomStream_ResetImplementation))
-			.Function("GetInitialSeed",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_GetInitialSeedImplementation))
-			.Function("GenerateNewSeed",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_GenerateNewSeedImplementation))
-			.Function("GetFraction",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_GetFractionImplementation))
-			.Function("GetUnsignedInt",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_GetUnsignedIntImplementation))
-			.Function("GetUnitVector",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_GetUnitVectorImplementation))
-			.Function("GetCurrentSeed",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_GetCurrentSeedImplementation))
-			.Function("FRand", static_cast<void*>(FRandomStreamImplementation::RandomStream_FRandImplementation))
-			.Function("RandHelper",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_RandHelperImplementation))
-			.Function("RandRange",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_RandRangeImplementation))
-			.Function("FRandRange",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_FRandRangeImplementation))
-			.Function("VRand", static_cast<void*>(FRandomStreamImplementation::RandomStream_VRandImplementation))
-			.Function("VRandConeHalfAngle",
-			          static_cast<void*>(FRandomStreamImplementation::RandomStream_VRandConeHalfAngleImplementation))
+			.Function("Initialize", FRandomStreamImplementation::RandomStream_InitializeImplementation)
+			.Function("InitializeName", FRandomStreamImplementation::RandomStream_InitializeNameImplementation)
+			.Function("Reset", FRandomStreamImplementation::RandomStream_ResetImplementation)
+			.Function("GetInitialSeed", FRandomStreamImplementation::RandomStream_GetInitialSeedImplementation)
+			.Function("GenerateNewSeed", FRandomStreamImplementation::RandomStream_GenerateNewSeedImplementation)
+			.Function("GetFraction", FRandomStreamImplementation::RandomStream_GetFractionImplementation)
+			.Function("GetUnsignedInt", FRandomStreamImplementation::RandomStream_GetUnsignedIntImplementation)
+			.Function("GetUnitVector", FRandomStreamImplementation::RandomStream_GetUnitVectorImplementation)
+			.Function("GetCurrentSeed", FRandomStreamImplementation::RandomStream_GetCurrentSeedImplementation)
+			.Function("FRand", FRandomStreamImplementation::RandomStream_FRandImplementation)
+			.Function("RandHelper", FRandomStreamImplementation::RandomStream_RandHelperImplementation)
+			.Function("RandRange", FRandomStreamImplementation::RandomStream_RandRangeImplementation)
+			.Function("FRandRange", FRandomStreamImplementation::RandomStream_FRandRangeImplementation)
+			.Function("VRand", FRandomStreamImplementation::RandomStream_VRandImplementation)
+			.Function("VRandConeHalfAngle", FRandomStreamImplementation::RandomStream_VRandConeHalfAngleImplementation)
 			.Function("VRandConeHorizontalAndVerticalHalfAngle",
-			          static_cast<void*>(
-				          FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHalfAngleImplementation))
+			          FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHalfAngleImplementation)
 			.Register();
 	}
 };

@@ -9,29 +9,25 @@ struct FRegisterFrameTime
 	FRegisterFrameTime()
 	{
 		TReflectionClassBuilder<FFrameTime>(NAMESPACE_LIBRARY)
-			.Function("GetFrame", static_cast<void*>(FFrameTimeImplementation::FrameTime_GetFrameImplementation))
-			.Function("GetSubFrame", static_cast<void*>(FFrameTimeImplementation::FrameTime_GetSubFrameImplementation))
-			.Function("FloorToFrame",
-			          static_cast<void*>(FFrameTimeImplementation::FrameTime_FloorToFrameImplementation))
-			.Function("CeilToFrame", static_cast<void*>(FFrameTimeImplementation::FrameTime_CeilToFrameImplementation))
-			.Function("RoundToFrame",
-			          static_cast<void*>(FFrameTimeImplementation::FrameTime_RoundToFrameImplementation))
-			.Function("AsDecimal", static_cast<void*>(FFrameTimeImplementation::FrameTime_AsDecimalImplementation))
-			.Function("FromDecimal", static_cast<void*>(FFrameTimeImplementation::FrameTime_FromDecimalImplementation))
-			.Function("Equality", static_cast<void*>(FFrameTimeImplementation::FrameTime_EqualityImplementation))
-			.Function("Inequality", static_cast<void*>(FFrameTimeImplementation::FrameTime_InequalityImplementation))
-			.Function("GreaterThan", static_cast<void*>(FFrameTimeImplementation::FrameTime_GreaterThanImplementation))
-			.Function("GreaterThanOrEqual",
-			          static_cast<void*>(FFrameTimeImplementation::FrameTime_GreaterThanOrEqualImplementation))
-			.Function("LessThan", static_cast<void*>(FFrameTimeImplementation::FrameTime_LessThanImplementation))
-			.Function("LessThanOrEqual",
-			          static_cast<void*>(FFrameTimeImplementation::FrameTime_LessThanOrEqualImplementation))
-			.Function("Add", static_cast<void*>(FFrameTimeImplementation::FrameTime_AddImplementation))
-			.Function("Subtract", static_cast<void*>(FFrameTimeImplementation::FrameTime_SubtractImplementation))
-			.Function("Remainder", static_cast<void*>(FFrameTimeImplementation::FrameTime_RemainderImplementation))
-			.Function("Negated", static_cast<void*>(FFrameTimeImplementation::FrameTime_NegatedImplementation))
-			.Function("Multiply", static_cast<void*>(FFrameTimeImplementation::FrameTime_MultiplyImplementation))
-			.Function("Divide", static_cast<void*>(FFrameTimeImplementation::FrameTime_DivideImplementation))
+			.Function("GetFrame", FFrameTimeImplementation::FrameTime_GetFrameImplementation)
+			.Function("GetSubFrame", FFrameTimeImplementation::FrameTime_GetSubFrameImplementation)
+			.Function("FloorToFrame", FFrameTimeImplementation::FrameTime_FloorToFrameImplementation)
+			.Function("CeilToFrame", FFrameTimeImplementation::FrameTime_CeilToFrameImplementation)
+			.Function("RoundToFrame", FFrameTimeImplementation::FrameTime_RoundToFrameImplementation)
+			.Function("AsDecimal", FFrameTimeImplementation::FrameTime_AsDecimalImplementation)
+			.Function("FromDecimal", FFrameTimeImplementation::FrameTime_FromDecimalImplementation)
+			.Function("Equality", FFrameTimeImplementation::FrameTime_EqualityImplementation)
+			.Function("Inequality", FFrameTimeImplementation::FrameTime_InequalityImplementation)
+			.Function("GreaterThan", FFrameTimeImplementation::FrameTime_GreaterThanImplementation)
+			.Function("GreaterThanOrEqual", FFrameTimeImplementation::FrameTime_GreaterThanOrEqualImplementation)
+			.Function("LessThan", FFrameTimeImplementation::FrameTime_LessThanImplementation)
+			.Function("LessThanOrEqual", FFrameTimeImplementation::FrameTime_LessThanOrEqualImplementation)
+			.Function("Add", FFrameTimeImplementation::FrameTime_AddImplementation)
+			.Function("Subtract", FFrameTimeImplementation::FrameTime_SubtractImplementation)
+			.Function("Remainder", FFrameTimeImplementation::FrameTime_RemainderImplementation)
+			.Function("Negated", FFrameTimeImplementation::FrameTime_NegatedImplementation)
+			.Function("Multiply", FFrameTimeImplementation::FrameTime_MultiplyImplementation)
+			.Function("Divide", FFrameTimeImplementation::FrameTime_DivideImplementation)
 			.Register();
 	}
 };

@@ -3,7 +3,6 @@
 #include "Domain/FDomain.h"
 #include "Registry/FClassRegistry.h"
 #include "Registry/FContainerRegistry.h"
-#include "Registry/FCSharpBind.h"
 #include "Registry/FMultiRegistry.h"
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FReferenceRegistry.h"
@@ -53,16 +52,10 @@ public:
 
 	bool Bind(UStruct* InStruct, bool bNeedMonoClass) const;
 
-	template <typename T>
-	auto Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType) const;
-
 	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	          MonoReflectionType* InValueReflectionType) const;
 
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
-
-	template <typename T>
-	auto Bind(MonoObject* InMonoObject) const;
 
 public:
 	FClassDescriptor* GetClassDescriptor(const UStruct* InStruct) const;

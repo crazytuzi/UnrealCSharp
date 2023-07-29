@@ -173,6 +173,11 @@ public:
 	static MonoType* Property_Get_Type(MonoProperty* InMonoProperty);
 
 public:
+	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath, void* InUserData);
+
+	static void LoadAssembly(const char* InAssemblyName, const FString& InFile,
+	                         MonoImage** OutImage, MonoAssembly** OutAssembly);
+
 	static void InitializeAssembly(const TArray<FString>& InAssemblies);
 
 	static void DeinitializeAssembly();
@@ -186,6 +191,8 @@ public:
 	static void UnloadAssembly();
 
 private:
+	static void RegisterAssemblyPreloadHook();
+
 	static void RegisterMonoTrace();
 
 	static void RegisterLog();

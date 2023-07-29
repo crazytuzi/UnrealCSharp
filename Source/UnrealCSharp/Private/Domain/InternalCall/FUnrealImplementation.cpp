@@ -8,14 +8,10 @@ struct FRegisterUnreal
 	FRegisterUnreal()
 	{
 		FClassBuilder(TEXT("Unreal"), NAMESPACE_LIBRARY)
-			.Function("NewObject",
-			          static_cast<void*>(FUnrealImplementation::Unreal_NewObjectImplementation))
-			.Function("DuplicateObject",
-			          static_cast<void*>(FUnrealImplementation::Unreal_DuplicateObjectImplementation))
-			.Function("LoadObject",
-			          static_cast<void*>(FUnrealImplementation::Unreal_LoadObjectImplementation))
-			.Function("LoadClass",
-			          static_cast<void*>(FUnrealImplementation::Unreal_LoadClassImplementation))
+			.Function("NewObject", FUnrealImplementation::Unreal_NewObjectImplementation)
+			.Function("DuplicateObject", FUnrealImplementation::Unreal_DuplicateObjectImplementation)
+			.Function("LoadObject", FUnrealImplementation::Unreal_LoadObjectImplementation)
+			.Function("LoadClass", FUnrealImplementation::Unreal_LoadClassImplementation)
 			.Register();
 	}
 };

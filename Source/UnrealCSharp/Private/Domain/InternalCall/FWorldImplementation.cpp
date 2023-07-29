@@ -11,7 +11,7 @@ struct FRegisterWorld
 	FRegisterWorld()
 	{
 		TReflectionClassBuilder<UWorld>(NAMESPACE_LIBRARY)
-			.Function("SpawnActor", static_cast<void*>(FWorldImplementation::World_SpawnActorImplementation))
+			.Function("SpawnActor", FWorldImplementation::World_SpawnActorImplementation)
 			.Register();
 	}
 };

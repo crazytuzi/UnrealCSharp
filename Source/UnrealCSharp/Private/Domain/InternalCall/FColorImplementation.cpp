@@ -9,26 +9,24 @@ struct FRegisterColor
 	FRegisterColor()
 	{
 		TReflectionClassBuilder<FColor>(NAMESPACE_LIBRARY)
-			.Function("DWColor", static_cast<void*>(FColorImplementation::Color_DWColorImplementation))
-			.Function("Equality", static_cast<void*>(FColorImplementation::Color_EqualityImplementation))
-			.Function("Inequality", static_cast<void*>(FColorImplementation::Color_InequalityImplementation))
-			.Function("FromRGBE", static_cast<void*>(FColorImplementation::Color_FromRGBEImplementation))
-			.Function("FromHex", static_cast<void*>(FColorImplementation::Color_FromHexImplementation))
-			.Function("MakeRandomColor", static_cast<void*>(FColorImplementation::Color_MakeRandomColorImplementation))
+			.Function("DWColor", FColorImplementation::Color_DWColorImplementation)
+			.Function("Equality", FColorImplementation::Color_EqualityImplementation)
+			.Function("Inequality", FColorImplementation::Color_InequalityImplementation)
+			.Function("FromRGBE", FColorImplementation::Color_FromRGBEImplementation)
+			.Function("FromHex", FColorImplementation::Color_FromHexImplementation)
+			.Function("MakeRandomColor", FColorImplementation::Color_MakeRandomColorImplementation)
 			.Function("MakeRedToGreenColorFromScalar",
-			          static_cast<void*>(FColorImplementation::Color_MakeRedToGreenColorFromScalarImplementation))
-			.Function("MakeFromColorTemperature",
-			          static_cast<void*>(FColorImplementation::Color_MakeFromColorTemperatureImplementation))
-			.Function("WithAlpha", static_cast<void*>(FColorImplementation::Color_WithAlphaImplementation))
-			.Function("ReinterpretAsLinear",
-			          static_cast<void*>(FColorImplementation::Color_ReinterpretAsLinearImplementation))
-			.Function("ToHex", static_cast<void*>(FColorImplementation::Color_ToHexImplementation))
-			.Function("ToString", static_cast<void*>(FColorImplementation::Color_ToStringImplementation))
-			.Function("InitFromString", static_cast<void*>(FColorImplementation::Color_InitFromStringImplementation))
-			.Function("ToPackedARGB", static_cast<void*>(FColorImplementation::Color_ToPackedARGBImplementation))
-			.Function("ToPackedABGR", static_cast<void*>(FColorImplementation::Color_ToPackedABGRImplementation))
-			.Function("ToPackedRGBA", static_cast<void*>(FColorImplementation::Color_ToPackedRGBAImplementation))
-			.Function("ToPackedBGRA", static_cast<void*>(FColorImplementation::Color_ToPackedBGRAImplementation))
+			          FColorImplementation::Color_MakeRedToGreenColorFromScalarImplementation)
+			.Function("MakeFromColorTemperature", FColorImplementation::Color_MakeFromColorTemperatureImplementation)
+			.Function("WithAlpha", FColorImplementation::Color_WithAlphaImplementation)
+			.Function("ReinterpretAsLinear", FColorImplementation::Color_ReinterpretAsLinearImplementation)
+			.Function("ToHex", FColorImplementation::Color_ToHexImplementation)
+			.Function("ToString", FColorImplementation::Color_ToStringImplementation)
+			.Function("InitFromString", FColorImplementation::Color_InitFromStringImplementation)
+			.Function("ToPackedARGB", FColorImplementation::Color_ToPackedARGBImplementation)
+			.Function("ToPackedABGR", FColorImplementation::Color_ToPackedABGRImplementation)
+			.Function("ToPackedRGBA", FColorImplementation::Color_ToPackedRGBAImplementation)
+			.Function("ToPackedBGRA", FColorImplementation::Color_ToPackedBGRAImplementation)
 			.Register();
 	}
 };
