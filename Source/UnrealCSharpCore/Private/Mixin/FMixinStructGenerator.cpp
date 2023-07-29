@@ -1,12 +1,12 @@
 #include "Mixin/FMixinStructGenerator.h"
 #include "Bridge/FTypeBridge.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyAttributeMacro.h"
 #include "Domain/FMonoDomain.h"
-#include "Mixin/CSharpScriptStruct.h"
 #include "Mixin/FMixinGeneratorCore.h"
 #include "Template/TGetArrayLength.inl"
 #if WITH_EDITOR
@@ -50,6 +50,31 @@ void FMixinStructGenerator::Generator()
 	}
 }
 
+#if WITH_EDITOR
+void FMixinStructGenerator::CodeAnalysisGenerator()
+{
+	auto CSharpScriptStruct = FMixinGeneratorCore::GetMixin(
+		FString::Printf(TEXT(
+			"%s/%s.json"),
+		                *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+		                *UCSharpScriptStruct::StaticClass()->GetName()),
+		UCSharpScriptStruct::StaticClass()->GetName()
+	);
+
+	for (const auto& StructName : CSharpScriptStruct)
+	{
+		const auto Outer = FMixinGeneratorCore::GetOuter();
+
+		const auto ScriptStruct = LoadObject<UCSharpScriptStruct>(Outer, *StructName);
+
+		if (ScriptStruct == nullptr)
+		{
+			GeneratorCSharpScriptStruct(Outer, StructName);
+		}
+	}
+}
+#endif
+
 void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInstance)
 {
 	if (InMonoClass == nullptr)
@@ -59,7 +84,7 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
-	const auto Outer = UObject::StaticClass()->GetPackage();
+	const auto Outer = FMixinGeneratorCore::GetOuter();
 
 #if WITH_EDITOR
 	auto bExisted = false;
@@ -102,9 +127,7 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 	}
 	else
 	{
-		ScriptStruct = NewObject<UCSharpScriptStruct>(Outer, ClassName, RF_Public);
-
-		ScriptStruct->AddToRoot();
+		ScriptStruct = GeneratorCSharpScriptStruct(Outer, ClassName);
 	}
 
 	if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
@@ -131,18 +154,11 @@ void FMixinStructGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 	ScriptStruct->SetMetaData(FBlueprintMetadata::MD_AllowableBlueprintVariableType, TEXT("true"));
 #endif
 
+	BeginGenerator(ScriptStruct);
+
 	GeneratorProperty(InMonoClass, ScriptStruct);
 
-	ScriptStruct->Bind();
-
-	ScriptStruct->StaticLink(true);
-
-	if (ScriptStruct->GetPropertiesSize() == 0)
-	{
-		ScriptStruct->SetPropertiesSize(1);
-	}
-
-	ScriptStruct->StructFlags = STRUCT_Native;
+	EndGenerator(ScriptStruct);
 
 #if WITH_EDITOR
 	if (bReInstance == true && bExisted == true)
@@ -160,6 +176,37 @@ bool FMixinStructGenerator::IsMixinStruct(MonoClass* InMonoClass)
 	const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
 
 	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
+}
+
+void FMixinStructGenerator::BeginGenerator(UScriptStruct* InScriptStruct)
+{
+}
+
+void FMixinStructGenerator::EndGenerator(UScriptStruct* InScriptStruct)
+{
+	InScriptStruct->Bind();
+
+	InScriptStruct->StaticLink(true);
+
+	if (InScriptStruct->GetPropertiesSize() == 0)
+	{
+		InScriptStruct->SetPropertiesSize(1);
+	}
+
+	InScriptStruct->StructFlags = STRUCT_Native;
+}
+
+UCSharpScriptStruct* FMixinStructGenerator::GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName)
+{
+	const auto ScriptStruct = NewObject<UCSharpScriptStruct>(InOuter, *InName, RF_Public);
+
+	ScriptStruct->AddToRoot();
+
+	BeginGenerator(ScriptStruct);
+
+	EndGenerator(ScriptStruct);
+
+	return ScriptStruct;
 }
 
 #if WITH_EDITOR

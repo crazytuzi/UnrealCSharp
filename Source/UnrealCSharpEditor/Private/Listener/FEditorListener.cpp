@@ -2,9 +2,11 @@
 #include "Interfaces/IMainFrameModule.h"
 #include "DirectoryWatcherModule.h"
 #include "FClassGenerator.h"
+#include "FCodeAnalysis.h"
 #include "FCSharpCompiler.h"
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
+#include "UnrealCSharpEditor.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "WidgetBlueprint.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -78,7 +80,16 @@ FEditorListener::~FEditorListener()
 
 void FEditorListener::OnPostEngineInit()
 {
-	FMixinGenerator::Generator();
+	if (IsRunningCookCommandlet())
+	{
+		FUnrealCSharpEditorModule::Generator();
+	}
+	else
+	{
+		FCodeAnalysis::CodeAnalysis();
+
+		FMixinGenerator::CodeAnalysisGenerator();
+	}
 }
 
 void FEditorListener::OnPreBeginPIE(const bool)
