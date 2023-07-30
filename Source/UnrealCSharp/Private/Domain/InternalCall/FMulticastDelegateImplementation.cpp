@@ -3,12 +3,17 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
 #include "Macro/NamespaceMacro.h"
+#include "Async/Async.h"
+#include "Registry/FCSharpBind.h"
 
 struct FRegisterMulticastDelegate
 {
 	FRegisterMulticastDelegate()
 	{
 		FClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_LIBRARY)
+			.Function("Register", FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation)
+			.Function("UnRegister", FMulticastDelegateImplementation::MulticastDelegate_RegisterImplementation)
+			.Function("Contains", FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation)
 			.Function("IsBound", FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation)
 			.Function("Contains", FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation)
 			.Function("Add", FMulticastDelegateImplementation::MulticastDelegate_AddImplementation)
@@ -22,6 +27,19 @@ struct FRegisterMulticastDelegate
 };
 
 static FRegisterMulticastDelegate RegisterMulticastDelegate;
+
+void FMulticastDelegateImplementation::MulticastDelegate_RegisterImplementation(MonoObject* InMonoObject)
+{
+	FCSharpBind::Bind<FMulticastDelegateHelper>(InMonoObject);
+}
+
+void FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation(const MonoObject* InMonoObject)
+{
+	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InMonoObject);
+	});
+}
 
 bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(const MonoObject* InMonoObject)
 {

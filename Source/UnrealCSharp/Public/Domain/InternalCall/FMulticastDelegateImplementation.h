@@ -5,6 +5,10 @@
 class FMulticastDelegateImplementation
 {
 public:
+	static void MulticastDelegate_RegisterImplementation(MonoObject* InMonoObject);
+
+	static void MulticastDelegate_UnRegisterImplementation(const MonoObject* InMonoObject);
+
 	static bool MulticastDelegate_IsBoundImplementation(const MonoObject* InMonoObject);
 
 	static bool MulticastDelegate_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);

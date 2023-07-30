@@ -1,14 +1,14 @@
 ﻿#include "Reflection/Delegate/FMulticastDelegateHelper.h"
 
-FMulticastDelegateHelper::FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate,
-                                                   UFunction* InSignatureFunction):
-	MulticastDelegateHandler(nullptr)
+FMulticastDelegateHelper::FMulticastDelegateHelper()
 {
-	MulticastDelegateHandler = NewObject<UMulticastDelegateHandler>();
+	Initialize(nullptr, nullptr);
+}
 
-	MulticastDelegateHandler->AddToRoot();
-
-	MulticastDelegateHandler->Initialize(InMulticastDelegate, InSignatureFunction);
+FMulticastDelegateHelper::FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate,
+                                                   UFunction* InSignatureFunction)
+{
+	Initialize(InMulticastDelegate, InSignatureFunction);
 }
 
 FMulticastDelegateHelper::~FMulticastDelegateHelper()
@@ -16,8 +16,16 @@ FMulticastDelegateHelper::~FMulticastDelegateHelper()
 	Deinitialize();
 }
 
-void FMulticastDelegateHelper::Initialize()
+void FMulticastDelegateHelper::Initialize(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction)
 {
+	MulticastDelegateHandler = NewObject<UMulticastDelegateHandler>();
+
+	MulticastDelegateHandler->AddToRoot();
+
+	MulticastDelegateHandler->Initialize(InMulticastDelegate,
+	                                     InSignatureFunction != nullptr
+		                                     ? InSignatureFunction
+		                                     : MulticastDelegateHandler->GetCallBack());
 }
 
 void FMulticastDelegateHelper::Deinitialize()
@@ -25,7 +33,7 @@ void FMulticastDelegateHelper::Deinitialize()
 	if (MulticastDelegateHandler != nullptr)
 	{
 		MulticastDelegateHandler->Deinitialize();
-		
+
 		MulticastDelegateHandler->RemoveFromRoot();
 
 		MulticastDelegateHandler = nullptr;
@@ -88,4 +96,14 @@ void FMulticastDelegateHelper::Broadcast(MonoObject** OutValue, MonoArray* InVal
 	{
 		MulticastDelegateHandler->Broadcast(OutValue, InValue);
 	}
+}
+
+UObject* FMulticastDelegateHelper::GetUObject() const
+{
+	return MulticastDelegateHandler != nullptr ? MulticastDelegateHandler->GetUObject() : nullptr;
+}
+
+FName FMulticastDelegateHelper::GetFunctionName() const
+{
+	return MulticastDelegateHandler != nullptr ? MulticastDelegateHandler->GetFunctionName() : NAME_None;
 }
