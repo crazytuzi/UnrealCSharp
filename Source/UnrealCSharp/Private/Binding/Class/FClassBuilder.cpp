@@ -1,8 +1,5 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Binding/FBinding.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "Macro/FunctionMacro.h"
-#include "Macro/ClassMacro.h"
 #include "Kismet/KismetStringLibrary.h"
 
 FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace):
@@ -23,36 +20,22 @@ FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementa
 }
 #endif
 
-#if WITH_PROPERTY_INFO
-FClassBuilder& FClassBuilder::Property(const FString& InName, const void* InGetMethod,
-                                       const void* InSetMethod, FTypeInfo* InTypeInfo)
+#if WITH_FUNCTION_INFO
+FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<TPair<void*, FFunctionInfo*>>& InMethod)
 #else
-FClassBuilder& FClassBuilder::Property(const FString& InName, const void* InGetMethod,
-													 const void* InSetMethod)
+FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<void*>& InMethod)
 #endif
 {
-#if WITH_PROPERTY_INFO
-	if (InTypeInfo != nullptr)
+	for (auto i = 0; i < InMethod.Num(); ++i)
 	{
-		GetBindingClass()->BindingProperty(InName, InTypeInfo, InGetMethod, InSetMethod);
+#if WITH_EDITOR
+		Function(InName, InMethod[i].Key, InMethod[i].Value);
+#else
+		Function(InName, InMethod[i]);
+#endif
 	}
-#endif
 
-	return Function(BINDING_PROPERTY_GET + InName, InGetMethod).Function(BINDING_PROPERTY_SET + InName, InSetMethod);
-}
-
-#if WITH_FUNCTION_INFO
-FClassBuilder& FClassBuilder::Function(const FString& InName, const void* InMethod,
-                                       FFunctionInfo* InFunctionInfo, const TArray<FString>& InParamNames)
-#else
-FClassBuilder& FClassBuilder::Function(const FString& InName, const void* InMethod, const TArray<FString>& InParamNames)
-#endif
-{
-#if WITH_FUNCTION_INFO
-	return Function(InName, GetFunctionImplementationName(InName), InMethod, InFunctionInfo, InParamNames);
-#else
-	return Function(InName, GetFunctionImplementationName(InName), InMethod);
-#endif
+	return *this;
 }
 
 void FClassBuilder::Register()

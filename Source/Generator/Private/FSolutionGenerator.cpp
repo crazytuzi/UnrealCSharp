@@ -31,14 +31,13 @@ void FSolutionGenerator::Compile()
 {
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-	const auto CodeAnalysisPath = FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, ASSEMBLY_UTIL));
+	const auto AssemblyUtilPath = FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath();
 
 	const auto CompileParam = FString::Printf(TEXT(
 		"build %s/%s.csproj --nologo -c Debug"
 	),
-	                                          *CodeAnalysisPath,
-	                                          *ASSEMBLY_UTIL
+	                                          *AssemblyUtilPath,
+	                                          *FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
 	);
 
 	void* ReadPipe = nullptr;

@@ -9,24 +9,20 @@ struct FRegisterFrameNumber
 	FRegisterFrameNumber()
 	{
 		TReflectionClassBuilder<FFrameNumber>(NAMESPACE_LIBRARY)
-			.Function("Increment", static_cast<void*>(FFrameNumberImplementation::FrameNumber_IncrementImplementation))
-			.Function("Decrement", static_cast<void*>(FFrameNumberImplementation::FrameNumber_DecrementImplementation))
-			.Function("Equality", static_cast<void*>(FFrameNumberImplementation::FrameNumber_EqualityImplementation))
-			.Function("Inequality",
-			          static_cast<void*>(FFrameNumberImplementation::FrameNumber_InequalityImplementation))
-			.Function("LessThan", static_cast<void*>(FFrameNumberImplementation::FrameNumber_LessThanImplementation))
-			.Function("GreaterThan",
-			          static_cast<void*>(FFrameNumberImplementation::FrameNumber_GreaterThanImplementation))
-			.Function("LessThanOrEqual",
-			          static_cast<void*>(FFrameNumberImplementation::FrameNumber_LessThanOrEqualImplementation))
-			.Function("GreaterThanOrEqual",
-			          static_cast<void*>(FFrameNumberImplementation::FrameNumber_GreaterThanOrEqualImplementation))
-			.Function("Add", static_cast<void*>(FFrameNumberImplementation::FrameNumber_AddImplementation))
-			.Function("Subtract", static_cast<void*>(FFrameNumberImplementation::FrameNumber_SubtractImplementation))
-			.Function("Remainder", static_cast<void*>(FFrameNumberImplementation::FrameNumber_RemainderImplementation))
-			.Function("Negated", static_cast<void*>(FFrameNumberImplementation::FrameNumber_NegatedImplementation))
-			.Function("Multiply", static_cast<void*>(FFrameNumberImplementation::FrameNumber_MultiplyImplementation))
-			.Function("Divide", static_cast<void*>(FFrameNumberImplementation::FrameNumber_DivideImplementation))
+			.Function("Increment", FFrameNumberImplementation::FrameNumber_IncrementImplementation)
+			.Function("Decrement", FFrameNumberImplementation::FrameNumber_DecrementImplementation)
+			.Function("Equality", FFrameNumberImplementation::FrameNumber_EqualityImplementation)
+			.Function("Inequality", FFrameNumberImplementation::FrameNumber_InequalityImplementation)
+			.Function("LessThan", FFrameNumberImplementation::FrameNumber_LessThanImplementation)
+			.Function("GreaterThan", FFrameNumberImplementation::FrameNumber_GreaterThanImplementation)
+			.Function("LessThanOrEqual", FFrameNumberImplementation::FrameNumber_LessThanOrEqualImplementation)
+			.Function("GreaterThanOrEqual", FFrameNumberImplementation::FrameNumber_GreaterThanOrEqualImplementation)
+			.Function("Add", FFrameNumberImplementation::FrameNumber_AddImplementation)
+			.Function("Subtract", FFrameNumberImplementation::FrameNumber_SubtractImplementation)
+			.Function("Remainder", FFrameNumberImplementation::FrameNumber_RemainderImplementation)
+			.Function("Negated", FFrameNumberImplementation::FrameNumber_NegatedImplementation)
+			.Function("Multiply", FFrameNumberImplementation::FrameNumber_MultiplyImplementation)
+			.Function("Divide", FFrameNumberImplementation::FrameNumber_DivideImplementation)
 			.Register();
 	}
 };

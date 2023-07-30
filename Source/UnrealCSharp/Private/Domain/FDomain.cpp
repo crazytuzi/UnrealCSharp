@@ -382,22 +382,22 @@ void FDomain::GCHandle_Free(const uint32 InGCHandle) const
 	FMonoDomain::GCHandle_Free(InGCHandle);
 }
 
-MonoGCHandle FDomain::GCHandle_New_V2(MonoObject* InMonoObject, const mono_bool bPinned) const
+MonoGCHandle FDomain::GCHandle_New_V2(MonoObject* InMonoObject, const mono_bool bPinned)
 {
 	return FMonoDomain::GCHandle_New_V2(InMonoObject, bPinned);
 }
 
-MonoGCHandle FDomain::GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, const mono_bool bTrackResurrection) const
+MonoGCHandle FDomain::GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
 {
 	return FMonoDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
 }
 
-MonoObject* FDomain::GCHandle_Get_Target_V2(const MonoGCHandle InGCHandle) const
+MonoObject* FDomain::GCHandle_Get_Target_V2(const MonoGCHandle InGCHandle)
 {
 	return FMonoDomain::GCHandle_Get_Target_V2(InGCHandle);
 }
 
-void FDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle) const
+void FDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
 {
 	return FMonoDomain::GCHandle_Free_V2(InGCHandle);
 }
@@ -458,7 +458,7 @@ MonoString* FDomain::GetTraceback() const
 
 void FDomain::RegisterBinding() const
 {
-	for (const auto Binding : FBinding::Get().GetBinding())
+	for (const auto& Binding : FBinding::Get().GetBinding())
 	{
 		FMonoInternalCall::RegisterInternalCall(TCHAR_TO_ANSI(*Binding.Key), Binding.Value);
 	}

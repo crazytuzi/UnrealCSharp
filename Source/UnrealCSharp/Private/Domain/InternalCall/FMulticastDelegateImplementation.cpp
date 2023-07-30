@@ -4,32 +4,24 @@
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
 #include "Macro/NamespaceMacro.h"
 #include "Async/Async.h"
+#include "Registry/FCSharpBind.h"
 
 struct FRegisterMulticastDelegate
 {
 	FRegisterMulticastDelegate()
 	{
 		FClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_LIBRARY)
-			.Function("Register",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RegisterImplementation))
-			.Function("UnRegister",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation))
-			.Function("IsBound",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation))
-			.Function("Contains",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation))
-			.Function("Add",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_AddImplementation))
-			.Function("AddUnique",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation))
-			.Function("Remove",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation))
-			.Function("RemoveAll",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation))
-			.Function("Clear",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation))
-			.Function("Broadcast",
-			          static_cast<void*>(FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation))
+			.Function("Register", FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation)
+			.Function("UnRegister", FMulticastDelegateImplementation::MulticastDelegate_RegisterImplementation)
+			.Function("Contains", FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation)
+			.Function("IsBound", FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation)
+			.Function("Contains", FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation)
+			.Function("Add", FMulticastDelegateImplementation::MulticastDelegate_AddImplementation)
+			.Function("AddUnique", FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation)
+			.Function("Remove", FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation)
+			.Function("RemoveAll", FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation)
+			.Function("Clear", FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation)
+			.Function("Broadcast", FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation)
 			.Register();
 	}
 };
@@ -38,7 +30,7 @@ static FRegisterMulticastDelegate RegisterMulticastDelegate;
 
 void FMulticastDelegateImplementation::MulticastDelegate_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().Bind<FMulticastDelegateHelper>(InMonoObject);
+	FCSharpBind::Bind<FMulticastDelegateHelper>(InMonoObject);
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation(const MonoObject* InMonoObject)

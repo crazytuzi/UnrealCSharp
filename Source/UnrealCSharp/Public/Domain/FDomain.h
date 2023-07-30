@@ -153,13 +153,13 @@ public:
 
 	void GCHandle_Free(uint32 InGCHandle) const;
 
-	MonoGCHandle GCHandle_New_V2(MonoObject* InMonoObject, mono_bool bPinned) const;
+	static MonoGCHandle GCHandle_New_V2(MonoObject* InMonoObject, mono_bool bPinned);
 
-	MonoGCHandle GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, mono_bool bTrackResurrection) const;
+	static MonoGCHandle GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, mono_bool bTrackResurrection);
 
-	MonoObject* GCHandle_Get_Target_V2(MonoGCHandle InGCHandle) const;
+	static MonoObject* GCHandle_Get_Target_V2(MonoGCHandle InGCHandle);
 
-	void GCHandle_Free_V2(MonoGCHandle InGCHandle) const;
+	static void GCHandle_Free_V2(MonoGCHandle InGCHandle);
 
 	MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                              int32 InParamCount) const;

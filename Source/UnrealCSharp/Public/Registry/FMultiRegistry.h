@@ -18,7 +18,7 @@ public:
 
 		void* Address;
 
-		Type* Value;
+		Type* MultiValue;
 
 		bool bNeedFree;
 

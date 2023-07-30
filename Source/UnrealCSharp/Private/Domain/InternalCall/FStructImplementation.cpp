@@ -9,9 +9,9 @@ struct FRegisterStruct
 	FRegisterStruct()
 	{
 		FClassBuilder(TEXT("Struct"), NAMESPACE_LIBRARY)
-			.Function("StaticStruct", static_cast<void*>(FStructImplementation::Struct_StaticStructImplementation))
-			.Function("Register", static_cast<void*>(FStructImplementation::Struct_RegisterImplementation))
-			.Function("UnRegister", static_cast<void*>(FStructImplementation::Struct_UnRegisterImplementation))
+			.Function("StaticStruct", FStructImplementation::Struct_StaticStructImplementation)
+			.Function("Register", FStructImplementation::Struct_RegisterImplementation)
+			.Function("UnRegister", FStructImplementation::Struct_UnRegisterImplementation)
 			.Register();
 	}
 };

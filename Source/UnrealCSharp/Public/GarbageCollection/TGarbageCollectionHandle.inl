@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "mono/metadata/object-forward.h"
+#include "Domain/FDomain.h"
 
 template <typename T>
 class TGarbageCollectionHandle
@@ -23,7 +24,7 @@ public:
 
 	operator MonoObject*() const
 	{
-		return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_Get_Target_V2(Handle);
+		return FDomain::GCHandle_Get_Target_V2(Handle);
 	}
 
 	bool operator==(const TGarbageCollectionHandle& Other) const
@@ -44,18 +45,17 @@ public:
 public:
 	static TGarbageCollectionHandle NewRef(MonoObject* InMonoObject, const mono_bool bPinned)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_New_V2(InMonoObject, bPinned);
+		return FDomain::GCHandle_New_V2(InMonoObject, bPinned);
 	}
 
 	static TGarbageCollectionHandle NewWeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_New_WeakRef_V2(
-			InMonoObject, bTrackResurrection);
+		return FDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
 	}
 
 	static void Free(TGarbageCollectionHandle& InGarbageCollectionHandle, const bool bReset = true)
 	{
-		FCSharpEnvironment::GetEnvironment().GetDomain()->GCHandle_Free_V2(InGarbageCollectionHandle);
+		FDomain::GCHandle_Free_V2(InGarbageCollectionHandle);
 
 		if (bReset)
 		{

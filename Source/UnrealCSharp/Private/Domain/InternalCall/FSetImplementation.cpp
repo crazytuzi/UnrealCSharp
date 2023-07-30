@@ -1,4 +1,5 @@
 ﻿#include "Domain/InternalCall/FSetImplementation.h"
+#include "Registry/FCSharpBind.h"
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
@@ -11,16 +12,16 @@ struct FRegisterSet
 	FRegisterSet()
 	{
 		FClassBuilder(TEXT("Set"), NAMESPACE_LIBRARY)
-			.Function("Register", static_cast<void*>(FSetImplementation::Set_RegisterImplementation))
-			.Function("UnRegister", static_cast<void*>(FSetImplementation::Set_UnRegisterImplementation))
-			.Function("Empty", static_cast<void*>(FSetImplementation::Set_EmptyImplementation))
-			.Function("Num", static_cast<void*>(FSetImplementation::Set_NumImplementation))
-			.Function("GetMaxIndex", static_cast<void*>(FSetImplementation::Set_GetMaxIndexImplementation))
-			.Function("Add", static_cast<void*>(FSetImplementation::Set_AddImplementation))
-			.Function("Remove", static_cast<void*>(FSetImplementation::Set_RemoveImplementation))
-			.Function("Contains", static_cast<void*>(FSetImplementation::Set_ContainsImplementation))
-			.Function("IsValidIndex", static_cast<void*>(FSetImplementation::Set_IsValidIndexImplementation))
-			.Function("GetEnumerator", static_cast<void*>(FSetImplementation::Set_GetEnumeratorImplementation))
+			.Function("Register", FSetImplementation::Set_RegisterImplementation)
+			.Function("UnRegister", FSetImplementation::Set_UnRegisterImplementation)
+			.Function("Empty", FSetImplementation::Set_EmptyImplementation)
+			.Function("Num", FSetImplementation::Set_NumImplementation)
+			.Function("GetMaxIndex", FSetImplementation::Set_GetMaxIndexImplementation)
+			.Function("Add", FSetImplementation::Set_AddImplementation)
+			.Function("Remove", FSetImplementation::Set_RemoveImplementation)
+			.Function("Contains", FSetImplementation::Set_ContainsImplementation)
+			.Function("IsValidIndex", FSetImplementation::Set_IsValidIndexImplementation)
+			.Function("GetEnumerator", FSetImplementation::Set_GetEnumeratorImplementation)
 			.Register();
 	}
 };
@@ -29,8 +30,7 @@ static FRegisterSet RegisterSet;
 
 void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().Bind<FSetHelper>(InMonoObject,
-	                                                      FTypeBridge::GetGenericArgument(InMonoObject));
+	FCSharpBind::Bind<FSetHelper>(InMonoObject, FTypeBridge::GetGenericArgument(InMonoObject));
 }
 
 void FSetImplementation::Set_UnRegisterImplementation(const MonoObject* InMonoObject)

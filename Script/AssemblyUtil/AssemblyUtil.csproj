@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Script</RootNamespace>
-	  <OutputPath>..\..\..\..\Content\Script</OutputPath>
+	  <OutputPath>.</OutputPath>
 	  <DebugType>full</DebugType>
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>

@@ -20,7 +20,7 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 	{
 		const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(InMonoObject);
 
-		return FoundAddress != nullptr ? static_cast<typename AddressResult::Type*>(FoundAddress->Value) : nullptr;
+		return FoundAddress != nullptr ? static_cast<typename AddressResult::Type*>(FoundAddress->MultiValue) : nullptr;
 	}
 
 	static MonoObject* GetObject(Class* InRegistry, const void* InAddress)

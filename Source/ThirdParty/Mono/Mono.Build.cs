@@ -37,7 +37,7 @@ public class Mono : ModuleRules
 			RuntimeDependencies.Add("$(BinaryOutputDir)/mono-sgen.pdb",
 				Path.Combine(LibraryPath, Target.Platform.ToString(), "mono-sgen.pdb"));
 
-			var Files = GetFiles(Path.Combine(LibraryPath, "net7.0"));
+			var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
 
 			foreach (var File in Files)
 			{
@@ -48,6 +48,29 @@ public class Mono : ModuleRules
 
 				RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
 			}
+		}
+		else if (Target.Platform == UnrealTargetPlatform.Android)
+		{
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "libmonosgen-2.0.a"));
+
+			var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
+
+			foreach (var File in Files)
+			{
+				var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
+
+				var DestPath = File.Substring(ModuleLastDirectory.Length + 1,
+					File.Length - ModuleLastDirectory.Length - 1);
+
+				RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
+			}
+
+			string APLName = "Mono_APL.xml";
+
+			string RelativeAPLPath = Utils.MakePathRelativeTo(Path.Combine(ModuleDirectory, "lib", "Android"),
+				Target.RelativeEnginePath);
+
+			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(RelativeAPLPath, APLName));
 		}
 	}
 

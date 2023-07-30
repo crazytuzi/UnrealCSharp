@@ -9,12 +9,9 @@ struct FRegisterSubclassOf
 	FRegisterSubclassOf()
 	{
 		FClassBuilder(TEXT("SubclassOf"), NAMESPACE_LIBRARY)
-			.Function("Register",
-			          static_cast<void*>(FSubclassOfImplementation::SubclassOf_RegisterImplementation))
-			.Function("UnRegister",
-			          static_cast<void*>(FSubclassOfImplementation::SubclassOf_UnRegisterImplementation))
-			.Function("Get",
-			          static_cast<void*>(FSubclassOfImplementation::SubclassOf_GetImplementation))
+			.Function("Register", FSubclassOfImplementation::SubclassOf_RegisterImplementation)
+			.Function("UnRegister", FSubclassOfImplementation::SubclassOf_UnRegisterImplementation)
+			.Function("Get", FSubclassOfImplementation::SubclassOf_GetImplementation)
 			.Register();
 	}
 };

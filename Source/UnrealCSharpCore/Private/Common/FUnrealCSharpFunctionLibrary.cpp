@@ -11,7 +11,7 @@
 
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
-	return TEXT("dotnet");
+	return TEXT("C:/Program Files/dotnet/dotnet.exe");
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
@@ -346,12 +346,13 @@ FString FUnrealCSharpFunctionLibrary::GetBindingPath()
 
 FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
 {
-	return TEXT("AssemblyUtil");
+	return ASSEMBLY_UTIL;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath()
 {
-	return FPaths::Combine(GetBasePath(), GetAssemblyUtilProjectName());
+	return FPaths::ConvertRelativePathToFull(
+		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, GetAssemblyUtilProjectName()));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const UField* InField)

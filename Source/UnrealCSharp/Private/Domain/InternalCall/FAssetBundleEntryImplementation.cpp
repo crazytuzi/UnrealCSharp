@@ -8,12 +8,9 @@ struct FRegisterAssetBundleEntry
 	FRegisterAssetBundleEntry()
 	{
 		TReflectionClassBuilder<FAssetBundleEntry>(NAMESPACE_LIBRARY)
-			.Function("IsValid",
-			          static_cast<void*>(FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation))
-			.Function("Equality",
-			          static_cast<void*>(FAssetBundleEntryImplementation::AssetBundleEntry_EqualityImplementation))
-			.Function("Inequality",
-			          static_cast<void*>(FAssetBundleEntryImplementation::AssetBundleEntry_InequalityImplementation))
+			.Function("IsValid", FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation)
+			.Function("Equality", FAssetBundleEntryImplementation::AssetBundleEntry_EqualityImplementation)
+			.Function("Inequality", FAssetBundleEntryImplementation::AssetBundleEntry_InequalityImplementation)
 			.Register();
 	}
 };

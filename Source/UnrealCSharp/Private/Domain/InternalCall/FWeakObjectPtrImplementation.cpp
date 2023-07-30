@@ -9,12 +9,9 @@ struct FRegisterWeakObjectPtr
 	FRegisterWeakObjectPtr()
 	{
 		FClassBuilder(TEXT("WeakObjectPtr"), NAMESPACE_LIBRARY)
-			.Function("Register",
-			          static_cast<void*>(FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation))
-			.Function("UnRegister",
-			          static_cast<void*>(FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation))
-			.Function("Get",
-			          static_cast<void*>(FWeakObjectPtrImplementation::WeakObjectPtr_GetImplementation))
+			.Function("Register", FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation)
+			.Function("UnRegister", FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation)
+			.Function("Get", FWeakObjectPtrImplementation::WeakObjectPtr_GetImplementation)
 			.Register();
 	}
 };
