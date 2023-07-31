@@ -9,50 +9,39 @@ struct FRegisterRotator
 	FRegisterRotator()
 	{
 		TReflectionClassBuilder<FRotator>(NAMESPACE_LIBRARY)
-			.Function("Add", static_cast<void*>(FRotatorImplementation::Rotator_AddImplementation))
-			.Function("Subtract", static_cast<void*>(FRotatorImplementation::Rotator_SubtractImplementation))
-			.Function("Multiply", static_cast<void*>(FRotatorImplementation::Rotator_MultiplyImplementation))
-			.Function("Equality", static_cast<void*>(FRotatorImplementation::Rotator_EqualityImplementation))
-			.Function("Inequality", static_cast<void*>(FRotatorImplementation::Rotator_InequalityImplementation))
-			.Function("Equals", static_cast<void*>(FRotatorImplementation::Rotator_EqualsImplementation))
-			.Function("AddDelta", static_cast<void*>(FRotatorImplementation::Rotator_AddDeltaImplementation))
-			.Function("GetInverse", static_cast<void*>(FRotatorImplementation::Rotator_GetInverseImplementation))
-			.Function("GridSnap", static_cast<void*>(FRotatorImplementation::Rotator_GridSnapImplementation))
-			.Function("Vector", static_cast<void*>(FRotatorImplementation::Rotator_VectorImplementation))
-			.Function("Quaternion", static_cast<void*>(FRotatorImplementation::Rotator_QuaternionImplementation))
-			.Function("Euler", static_cast<void*>(FRotatorImplementation::Rotator_EulerImplementation))
-			.Function("RotateVector", static_cast<void*>(FRotatorImplementation::Rotator_RotateVectorImplementation))
-			.Function("UnrotateVector",
-			          static_cast<void*>(FRotatorImplementation::Rotator_UnrotateVectorImplementation))
-			.Function("Clamp", static_cast<void*>(FRotatorImplementation::Rotator_ClampImplementation))
-			.Function("GetNormalized", static_cast<void*>(FRotatorImplementation::Rotator_GetNormalizedImplementation))
-			.Function("GetDenormalized",
-			          static_cast<void*>(FRotatorImplementation::Rotator_GetDenormalizedImplementation))
-			.Function("Normalize", static_cast<void*>(FRotatorImplementation::Rotator_NormalizeImplementation))
-			.Function("GetWindingAndRemainder",
-			          static_cast<void*>(FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation))
-			.Function("GetManhattanDistance",
-			          static_cast<void*>(FRotatorImplementation::Rotator_GetManhattanDistanceImplementation))
-			.Function("GetEquivalentRotator",
-			          static_cast<void*>(FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation))
-			.Function("SetClosestTo", static_cast<void*>(FRotatorImplementation::Rotator_SetClosestToMeImplementation))
-			.Function("ToString", static_cast<void*>(FRotatorImplementation::Rotator_ToStringImplementation))
-			.Function("ToCompactString",
-			          static_cast<void*>(FRotatorImplementation::Rotator_ToCompactStringImplementation))
-			.Function("InitFromString",
-			          static_cast<void*>(FRotatorImplementation::Rotator_InitFromStringImplementation))
-			.Function("ContainsNaN", static_cast<void*>(FRotatorImplementation::Rotator_ContainsNaNImplementation))
-			.Function("ClampAxis", static_cast<void*>(FRotatorImplementation::Rotator_ClampAxisImplementation))
-			.Function("NormalizeAxis", static_cast<void*>(FRotatorImplementation::Rotator_NormalizeAxisImplementation))
-			.Function("CompressAxisToByte",
-			          static_cast<void*>(FRotatorImplementation::Rotator_CompressAxisToByteImplementation))
-			.Function("DecompressAxisFromByte",
-			          static_cast<void*>(FRotatorImplementation::Rotator_DecompressAxisFromByteImplementation))
-			.Function("CompressAxisToShort",
-			          static_cast<void*>(FRotatorImplementation::Rotator_CompressAxisToShortImplementation))
-			.Function("DecompressAxisFromShort",
-			          static_cast<void*>(FRotatorImplementation::Rotator_DecompressAxisFromShortImplementation))
-			.Function("MakeFromEuler", static_cast<void*>(FRotatorImplementation::Rotator_MakeFromEulerImplementation))
+			.Function("Add", FRotatorImplementation::Rotator_AddImplementation)
+			.Function("Subtract", FRotatorImplementation::Rotator_SubtractImplementation)
+			.Function("Multiply", FRotatorImplementation::Rotator_MultiplyImplementation)
+			.Function("Equality", FRotatorImplementation::Rotator_EqualityImplementation)
+			.Function("Inequality", FRotatorImplementation::Rotator_InequalityImplementation)
+			.Function("Equals", FRotatorImplementation::Rotator_EqualsImplementation)
+			.Function("AddDelta", FRotatorImplementation::Rotator_AddDeltaImplementation)
+			.Function("GetInverse", FRotatorImplementation::Rotator_GetInverseImplementation)
+			.Function("GridSnap", FRotatorImplementation::Rotator_GridSnapImplementation)
+			.Function("Vector", FRotatorImplementation::Rotator_VectorImplementation)
+			.Function("Quaternion", FRotatorImplementation::Rotator_QuaternionImplementation)
+			.Function("Euler", FRotatorImplementation::Rotator_EulerImplementation)
+			.Function("RotateVector", FRotatorImplementation::Rotator_RotateVectorImplementation)
+			.Function("UnrotateVector", FRotatorImplementation::Rotator_UnrotateVectorImplementation)
+			.Function("Clamp", FRotatorImplementation::Rotator_ClampImplementation)
+			.Function("GetNormalized", FRotatorImplementation::Rotator_GetNormalizedImplementation)
+			.Function("GetDenormalized", FRotatorImplementation::Rotator_GetDenormalizedImplementation)
+			.Function("Normalize", FRotatorImplementation::Rotator_NormalizeImplementation)
+			.Function("GetWindingAndRemainder", FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation)
+			.Function("GetManhattanDistance", FRotatorImplementation::Rotator_GetManhattanDistanceImplementation)
+			.Function("GetEquivalentRotator", FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation)
+			.Function("SetClosestTo", FRotatorImplementation::Rotator_SetClosestToMeImplementation)
+			.Function("ToString", FRotatorImplementation::Rotator_ToStringImplementation)
+			.Function("ToCompactString", FRotatorImplementation::Rotator_ToCompactStringImplementation)
+			.Function("InitFromString", FRotatorImplementation::Rotator_InitFromStringImplementation)
+			.Function("ContainsNaN", FRotatorImplementation::Rotator_ContainsNaNImplementation)
+			.Function("ClampAxis", FRotatorImplementation::Rotator_ClampAxisImplementation)
+			.Function("NormalizeAxis", FRotatorImplementation::Rotator_NormalizeAxisImplementation)
+			.Function("CompressAxisToByte", FRotatorImplementation::Rotator_CompressAxisToByteImplementation)
+			.Function("DecompressAxisFromByte", FRotatorImplementation::Rotator_DecompressAxisFromByteImplementation)
+			.Function("CompressAxisToShort", FRotatorImplementation::Rotator_CompressAxisToShortImplementation)
+			.Function("DecompressAxisFromShort", FRotatorImplementation::Rotator_DecompressAxisFromShortImplementation)
+			.Function("MakeFromEuler", FRotatorImplementation::Rotator_MakeFromEulerImplementation)
 			.Register();
 	}
 };

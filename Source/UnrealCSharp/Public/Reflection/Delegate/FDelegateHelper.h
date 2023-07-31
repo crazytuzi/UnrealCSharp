@@ -9,12 +9,14 @@ public:
 	typedef UDelegateHandler UHandlerType;
 
 public:
+	FDelegateHelper();
+
 	FDelegateHelper(FScriptDelegate* InDelegate, UFunction* InSignatureFunction);
 
 	virtual ~FDelegateHelper() override;
 
 public:
-	void Initialize();
+	void Initialize(FScriptDelegate* InDelegate, UFunction* InSignatureFunction);
 
 	void Deinitialize();
 

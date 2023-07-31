@@ -10,51 +10,34 @@ struct FRegisterPolyglotTextData
 	FRegisterPolyglotTextData()
 	{
 		TReflectionClassBuilder<FPolyglotTextData>(NAMESPACE_LIBRARY)
-			.Function("IsValid",
-			          static_cast<void*>(FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation))
+			.Function("IsValid", FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation)
 			.Function("SetNativeCulture",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_SetNativeCultureImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_SetNativeCultureImplementation)
 			.Function("GetNativeCulture",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_GetNativeCultureImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_GetNativeCultureImplementation)
 			.Function("ResolveNativeCulture",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_ResolveNativeCultureImplementation))
-			.Function("SetIdentity",
-			          static_cast<void*>(FPolyglotTextDataImplementation::PolyglotTextData_SetIdentityImplementation))
-			.Function("GetIdentity",
-			          static_cast<void*>(FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation))
-			.Function("GetNamespace",
-			          static_cast<void*>(FPolyglotTextDataImplementation::PolyglotTextData_GetNamespaceImplementation))
-			.Function("GetKey",
-			          static_cast<void*>(FPolyglotTextDataImplementation::PolyglotTextData_GetKeyImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_ResolveNativeCultureImplementation)
+			.Function("SetIdentity", FPolyglotTextDataImplementation::PolyglotTextData_SetIdentityImplementation)
+			.Function("GetIdentity", FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation)
+			.Function("GetNamespace", FPolyglotTextDataImplementation::PolyglotTextData_GetNamespaceImplementation)
+			.Function("GetKey", FPolyglotTextDataImplementation::PolyglotTextData_GetKeyImplementation)
 			.Function("SetNativeString",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_SetNativeStringImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_SetNativeStringImplementation)
 			.Function("GetNativeString",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_GetNativeStringImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_GetNativeStringImplementation)
 			.Function("AddLocalizedString",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_AddLocalizedStringImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_AddLocalizedStringImplementation)
 			.Function("RemoveLocalizedString",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_RemoveLocalizedStringImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_RemoveLocalizedStringImplementation)
 			.Function("GetLocalizedString",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImplementation)
 			.Function("ClearLocalizedStrings",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_ClearLocalizedStringsImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_ClearLocalizedStringsImplementation)
 			.Function("SetIsMinimalPatch",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_SetIsMinimalPatchImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_SetIsMinimalPatchImplementation)
 			.Function("GetIsMinimalPatch",
-			          static_cast<void*>(
-				          FPolyglotTextDataImplementation::PolyglotTextData_GetIsMinimalPatchImplementation))
-			.Function("GetText",
-			          static_cast<void*>(FPolyglotTextDataImplementation::PolyglotTextData_GetTextImplementation))
+			          FPolyglotTextDataImplementation::PolyglotTextData_GetIsMinimalPatchImplementation)
+			.Function("GetText", FPolyglotTextDataImplementation::PolyglotTextData_GetTextImplementation)
 			.Register();
 	}
 };

@@ -24,7 +24,9 @@ void UDelegateHandler::CSharpCallBack()
 
 void UDelegateHandler::Initialize(FScriptDelegate* InScriptDelegate, UFunction* InSignatureFunction)
 {
-	ScriptDelegate = InScriptDelegate;
+	bNeedFree = InScriptDelegate == nullptr;
+
+	ScriptDelegate = InScriptDelegate != nullptr ? InScriptDelegate : new FScriptDelegate();
 
 	DelegateDescriptor = new FCSharpDelegateDescriptor(InSignatureFunction);
 }
@@ -40,6 +42,11 @@ void UDelegateHandler::Deinitialize()
 	{
 		// @TODO
 		ScriptDelegate->Unbind();
+
+		if (bNeedFree)
+		{
+			delete ScriptDelegate;
+		}
 
 		ScriptDelegate = nullptr;
 	}

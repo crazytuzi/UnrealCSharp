@@ -8,7 +8,7 @@ struct FRegisterLog
 	FRegisterLog()
 	{
 		FClassBuilder(TEXT("Log"), NAMESPACE_LIBRARY)
-			.Function("Log", static_cast<void*>(FLogImplementation::Log_LogImplementation))
+			.Function("Log", FLogImplementation::Log_LogImplementation)
 			.Register();
 	}
 };

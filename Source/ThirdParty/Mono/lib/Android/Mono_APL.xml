@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Plugin additions-->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- init section is always evaluated once per architecture -->
+    <init>
+        <log text="Mono APL init"/>
+    </init>
+
+    <!-- optional files or directories to copy to Intermediate/Android/APK -->
+    <resourceCopies>
+        <log text="libmonosgen-2.0 APL copying files for $S(Architecture)/"/>
+        <copyFile src="$S(PluginDir)/libmonosgen-2.0.so"
+                  dst="$S(BuildDir)/libs/arm64-v8a/libmonosgen-2.0.so"/>
+    </resourceCopies>
+    <resourceCopies>
+        <log text="libSystem.Native APL copying files for $S(Architecture)/"/>
+        <copyFile src="$S(PluginDir)/libSystem.Native.so"
+                  dst="$S(BuildDir)/libs/arm64-v8a/libSystem.Native.so"/>
+    </resourceCopies>
+
+    <soLoadLibrary>
+        <log text="libmonosgen-2.0 APL adding loadLibrary references"/>
+        <loadLibrary name="libmonosgen-2.0" failmsg="libmonosgen-2.0 not loaded and required!"/>
+    </soLoadLibrary>
+    <soLoadLibrary>
+        <log text="libSystem.Native APL adding loadLibrary references"/>
+        <loadLibrary name="libSystem.Native" failmsg="libSystem.Native not loaded and required!"/>
+    </soLoadLibrary>
+</root>

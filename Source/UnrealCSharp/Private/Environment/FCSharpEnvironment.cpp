@@ -1,4 +1,5 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
+#include "Registry/FCSharpBind.h"
 #include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
@@ -42,8 +43,8 @@ void FCSharpEnvironment::Initialize()
 {
 	Domain = new FDomain({
 		"",
-		FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() +
-		DLL_SUFFIX,
+		FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
+		FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + DLL_SUFFIX,
 		{
 			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
 			DLL_SUFFIX,
@@ -84,8 +85,10 @@ void FCSharpEnvironment::Initialize()
 		SIGSEGV,
 		// Software termination signal from kill
 		SIGTERM,
+#if PLATFORM_WINDOWS
 		// Ctrl-Break sequence
 		SIGBREAK,
+#endif
 		// abnormal termination triggered by abort call
 		SIGABRT,
 	};
@@ -451,12 +454,12 @@ bool FCSharpEnvironment::AddContainerReference(const FGarbageCollectionHandle& I
 
 bool FCSharpEnvironment::RemoveContainerReference(const MonoObject* InMonoObject) const
 {
-	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InMonoObject) : nullptr;
+	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InMonoObject) : false;
 }
 
 bool FCSharpEnvironment::RemoveContainerReference(const void* InAddress) const
 {
-	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InAddress) : nullptr;
+	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InAddress) : false;
 }
 
 MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InAddress) const

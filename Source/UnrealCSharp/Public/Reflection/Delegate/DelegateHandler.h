@@ -45,6 +45,8 @@ public:
 	UFunction* GetCallBack() const;
 
 private:
+	bool bNeedFree;
+
 	FScriptDelegate* ScriptDelegate;
 
 	FCSharpDelegateDescriptor* DelegateDescriptor;

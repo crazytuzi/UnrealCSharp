@@ -8,6 +8,12 @@ namespace Script.Library
     public static class MulticastDelegateImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void MulticastDelegate_RegisterImplementation(FDelegateBase InMonoObject);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void MulticastDelegate_UnRegisterImplementation(FDelegateBase InMonoObject);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean MulticastDelegate_IsBoundImplementation(FDelegateBase InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -15,7 +21,8 @@ namespace Script.Library
             T InMulticastDelegate) where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void MulticastDelegate_AddImplementation<T>(FDelegateBase InMonoObject, T InMulticastDelegate)
+        public static extern void MulticastDelegate_AddImplementation<T>(FDelegateBase InMonoObject,
+            T InMulticastDelegate)
             where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -27,7 +34,8 @@ namespace Script.Library
             T InMulticastDelegate) where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void MulticastDelegate_RemoveAllImplementation(FDelegateBase InMonoObject, UObject InObject);
+        public static extern void MulticastDelegate_RemoveAllImplementation(FDelegateBase InMonoObject,
+            UObject InObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void MulticastDelegate_ClearImplementation(FDelegateBase InMonoObject);

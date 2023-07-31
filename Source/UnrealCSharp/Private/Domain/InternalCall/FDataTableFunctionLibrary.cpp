@@ -14,8 +14,7 @@ struct FRegisterDataTableFunctionLibrary
 	{
 		TReflectionClassBuilder<UDataTableFunctionLibrary>(NAMESPACE_LIBRARY)
 			.Function("GetDataTableRowFromName",
-			          static_cast<void*>(
-				          FDataTableFunctionLibraryImplementation::DataTableFunctionLibrary_GetDataTableRowFromNameImplementation))
+			          FDataTableFunctionLibraryImplementation::DataTableFunctionLibrary_GetDataTableRowFromNameImplementation)
 			.Register();
 	}
 };

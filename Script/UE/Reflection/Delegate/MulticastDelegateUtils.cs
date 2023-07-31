@@ -7,6 +7,12 @@ namespace Script.Reflection.Delegate
 {
     public static class MulticastDelegateUtils
     {
+        public static void MulticastDelegate_Register(FDelegateBase InMonoObject) =>
+            MulticastDelegateImplementation.MulticastDelegate_RegisterImplementation(InMonoObject);
+
+        public static void MulticastDelegate_UnRegister(FDelegateBase InMonoObject) =>
+            MulticastDelegateImplementation.MulticastDelegate_UnRegisterImplementation(InMonoObject);
+
         public static Boolean MulticastDelegate_IsBound(FDelegateBase InMonoObject) =>
             MulticastDelegateImplementation.MulticastDelegate_IsBoundImplementation(InMonoObject);
 
@@ -20,7 +26,8 @@ namespace Script.Reflection.Delegate
 
         public static void MulticastDelegate_AddUnique<T>(FDelegateBase InMonoObject, T InMulticastDelegate)
             where T : System.Delegate =>
-            MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(InMonoObject, InMulticastDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(InMonoObject,
+                InMulticastDelegate);
 
         public static void MulticastDelegate_Remove<T>(FDelegateBase InMonoObject, T InMulticastDelegate)
             where T : System.Delegate =>
@@ -34,6 +41,7 @@ namespace Script.Reflection.Delegate
 
         public static void
             MulticastDelegate_Broadcast(FDelegateBase InMonoObject, out ObjectList OutValue, params Object[] InValue) =>
-            MulticastDelegateImplementation.MulticastDelegate_BroadcastImplementation(InMonoObject, out OutValue, InValue);
+            MulticastDelegateImplementation.MulticastDelegate_BroadcastImplementation(InMonoObject, out OutValue,
+                InValue);
     }
 }

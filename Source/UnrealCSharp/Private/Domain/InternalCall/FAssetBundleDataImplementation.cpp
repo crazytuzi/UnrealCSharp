@@ -9,17 +9,12 @@ struct FRegisterAssetBundleData
 	FRegisterAssetBundleData()
 	{
 		TReflectionClassBuilder<FAssetBundleData>(NAMESPACE_LIBRARY)
-			.Function("Equality",
-			          static_cast<void*>(FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation))
-			.Function("Inequality",
-			          static_cast<void*>(FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation))
-			.Function("FindEntry",
-			          static_cast<void*>(FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation))
-			.Function("AddBundleAsset",
-			          static_cast<void*>(FAssetBundleDataImplementation::AssetBundleData_AddBundleAssetImplementation))
-			.Function("Reset", static_cast<void*>(FAssetBundleDataImplementation::AssetBundleData_ResetImplementation))
-			.Function("ToDebugString",
-			          static_cast<void*>(FAssetBundleDataImplementation::AssetBundleData_ToDebugStringImplementation))
+			.Function("Equality", FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation)
+			.Function("Inequality", FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation)
+			.Function("FindEntry", FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation)
+			.Function("AddBundleAsset", FAssetBundleDataImplementation::AssetBundleData_AddBundleAssetImplementation)
+			.Function("Reset", FAssetBundleDataImplementation::AssetBundleData_ResetImplementation)
+			.Function("ToDebugString", FAssetBundleDataImplementation::AssetBundleData_ToDebugStringImplementation)
 			.Register();
 	}
 };

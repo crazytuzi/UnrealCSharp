@@ -57,15 +57,8 @@ MonoObject* FSetPropertyDescriptor::Object_New(void* InAddress) const
 	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 		InAddress, SetProperty->GetOffset_ForInternal());
 
-	if (OwnerGarbageCollectionHandle.IsValid())
-	{
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, SetHelper,
-		                                                           Object);
-	}
-	else
-	{
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
-	}
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, SetHelper,
+	                                                           Object);
 
 	return Object;
 }

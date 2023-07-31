@@ -36,7 +36,11 @@ void UMulticastDelegateHandler::CSharpCallBack()
 void UMulticastDelegateHandler::Initialize(FMulticastScriptDelegate* InMulticastScriptDelegate,
                                            UFunction* InSignatureFunction)
 {
-	MulticastScriptDelegate = InMulticastScriptDelegate;
+	bNeedFree = InMulticastScriptDelegate == nullptr;
+
+	MulticastScriptDelegate = InMulticastScriptDelegate != nullptr
+		                          ? InMulticastScriptDelegate
+		                          : new FMulticastScriptDelegate();
 
 	DelegateDescriptor = new FCSharpDelegateDescriptor(InSignatureFunction);
 }
@@ -46,6 +50,11 @@ void UMulticastDelegateHandler::Deinitialize()
 	if (MulticastScriptDelegate != nullptr)
 	{
 		MulticastScriptDelegate->RemoveAll(this);
+
+		if (bNeedFree)
+		{
+			delete MulticastScriptDelegate;
+		}
 
 		MulticastScriptDelegate = nullptr;
 	}
@@ -72,7 +81,7 @@ void UMulticastDelegateHandler::Deinitialize()
 
 bool UMulticastDelegateHandler::IsBound() const
 {
-	return MulticastScriptDelegate != nullptr ? MulticastScriptDelegate->IsBound() : nullptr;
+	return MulticastScriptDelegate != nullptr ? MulticastScriptDelegate->IsBound() : false;
 }
 
 bool UMulticastDelegateHandler::Contains(MonoObject* InMulticastDelegate) const
@@ -271,4 +280,19 @@ void UMulticastDelegateHandler::Broadcast(MonoObject** OutValue, MonoArray* InVa
 			}
 		}
 	}
+}
+
+UObject* UMulticastDelegateHandler::GetUObject() const
+{
+	return const_cast<UObject*>(ScriptDelegate.GetUObject());
+}
+
+FName UMulticastDelegateHandler::GetFunctionName() const
+{
+	return ScriptDelegate.GetFunctionName();
+}
+
+UFunction* UMulticastDelegateHandler::GetCallBack() const
+{
+	return FindFunction(TEXT("CSharpCallBack"));
 }

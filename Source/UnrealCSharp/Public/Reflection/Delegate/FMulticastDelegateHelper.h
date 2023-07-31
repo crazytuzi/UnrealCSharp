@@ -6,12 +6,14 @@
 class FMulticastDelegateHelper final : public FDelegateBaseHelper
 {
 public:
+	FMulticastDelegateHelper();
+
 	FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction);
 
 	virtual ~FMulticastDelegateHelper() override;
 
 public:
-	void Initialize();
+	void Initialize(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction);
 
 	void Deinitialize();
 
@@ -31,6 +33,10 @@ public:
 	void Clear() const;
 
 	void Broadcast(MonoObject** OutValue, MonoArray* InValue) const;
+
+	UObject* GetUObject() const;
+
+	FName GetFunctionName() const;
 
 private:
 	TWeakObjectPtr<UMulticastDelegateHandler> MulticastDelegateHandler;

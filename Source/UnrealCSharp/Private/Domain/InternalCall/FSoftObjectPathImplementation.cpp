@@ -9,56 +9,36 @@ struct FRegisterSoftObjectPath
 	FRegisterSoftObjectPath()
 	{
 		TReflectionClassBuilder<FSoftObjectPath>(NAMESPACE_LIBRARY)
-			.Function("ToString",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_ToStringImplementation))
-			.Function("GetAssetPathName",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathNameImplementation))
+			.Function("ToString", FSoftObjectPathImplementation::SoftObjectPath_ToStringImplementation)
+			.Function("GetAssetPathName", FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathNameImplementation)
 			.Function("GetAssetPathString",
-			          static_cast<void*>(
-				          FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathStringImplementation))
-			.Function("GetSubPathString",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_GetSubPathStringImplementation))
+			          FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathStringImplementation)
+			.Function("GetSubPathString", FSoftObjectPathImplementation::SoftObjectPath_GetSubPathStringImplementation)
 			.Function("GetLongPackageName",
-			          static_cast<void*>(
-				          FSoftObjectPathImplementation::SoftObjectPath_GetLongPackageNameImplementation))
-			.Function("GetAssetName",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_GetAssetNameImplementation))
-			.Function("SetPathName",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_SetPathNameImplementation))
-			.Function("SetPathString",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_SetPathStringImplementation))
-			.Function("Reset", static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_ResetImplementation))
-			.Function("IsValid",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_IsValidImplementation))
-			.Function("IsNull", static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_IsNullImplementation))
-			.Function("IsAsset",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_IsAssetImplementation))
-			.Function("IsSubobject",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation))
-			.Function("Equality",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation))
-			.Function("Inequality",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation))
-			.Function("FixupForPIE",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEImplementation))
+			          FSoftObjectPathImplementation::SoftObjectPath_GetLongPackageNameImplementation)
+			.Function("GetAssetName", FSoftObjectPathImplementation::SoftObjectPath_GetAssetNameImplementation)
+			.Function("SetPathName", FSoftObjectPathImplementation::SoftObjectPath_SetPathNameImplementation)
+			.Function("SetPathString", FSoftObjectPathImplementation::SoftObjectPath_SetPathStringImplementation)
+			.Function("Reset", FSoftObjectPathImplementation::SoftObjectPath_ResetImplementation)
+			.Function("IsValid", FSoftObjectPathImplementation::SoftObjectPath_IsValidImplementation)
+			.Function("IsNull", FSoftObjectPathImplementation::SoftObjectPath_IsNullImplementation)
+			.Function("IsAsset", FSoftObjectPathImplementation::SoftObjectPath_IsAssetImplementation)
+			.Function("IsSubobject", FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation)
+			.Function("Equality", FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation)
+			.Function("Inequality", FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation)
+			.Function("FixupForPIE", FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEImplementation)
 			.Function("FixupForPIEInstance",
-			          static_cast<void*>(
-				          FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEInstanceImplementation))
+			          FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEInstanceImplementation)
 			.Function("FixupCoreRedirects",
-			          static_cast<void*>(
-				          FSoftObjectPathImplementation::SoftObjectPath_FixupCoreRedirectsImplementation))
-			.Function("GetCurrentTag",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_GetCurrentTagImplementation))
-			.Function("InvalidateTag",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_InvalidateTagImplementation))
+			          FSoftObjectPathImplementation::SoftObjectPath_FixupCoreRedirectsImplementation)
+			.Function("GetCurrentTag", FSoftObjectPathImplementation::SoftObjectPath_GetCurrentTagImplementation)
+			.Function("InvalidateTag", FSoftObjectPathImplementation::SoftObjectPath_InvalidateTagImplementation)
 			.Function("GetOrCreateIDForObject",
-			          static_cast<void*>(
-				          FSoftObjectPathImplementation::SoftObjectPath_GetOrCreateIDForObjectImplementation))
+			          FSoftObjectPathImplementation::SoftObjectPath_GetOrCreateIDForObjectImplementation)
 			.Function("AddPIEPackageName",
-			          static_cast<void*>(FSoftObjectPathImplementation::SoftObjectPath_AddPIEPackageNameImplementation))
+			          FSoftObjectPathImplementation::SoftObjectPath_AddPIEPackageNameImplementation)
 			.Function("ClearPIEPackageNames",
-			          static_cast<void*>(
-				          FSoftObjectPathImplementation::SoftObjectPath_ClearPIEPackageNamesImplementation))
+			          FSoftObjectPathImplementation::SoftObjectPath_ClearPIEPackageNamesImplementation)
 			.Register();
 	}
 };
