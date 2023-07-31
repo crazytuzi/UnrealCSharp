@@ -30,7 +30,10 @@ void FSoftObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		SoftObjectProperty->InitializeValue(Dest);
 
-		SoftObjectProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
+		if (SrcMulti != nullptr)
+		{
+			SoftObjectProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
+		}
 
 		Object_New(Dest);
 	}
