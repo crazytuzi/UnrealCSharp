@@ -2,6 +2,11 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.Library
 {
@@ -14,7 +19,7 @@ namespace Script.Library
         public static extern void Rotator_SubtractImplementation(FRotator A, FRotator B, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_MultiplyImplementation(FRotator A, Single Scale, out FRotator OutValue);
+        public static extern void Rotator_MultiplyImplementation(FRotator A, LwcType Scale, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Rotator_EqualityImplementation(FRotator A, FRotator B);
@@ -23,17 +28,17 @@ namespace Script.Library
         public static extern Boolean Rotator_InequalityImplementation(FRotator A, FRotator B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_IsNearlyZeroImplementation(FRotator InRotator, Single Tolerance);
+        public static extern Boolean Rotator_IsNearlyZeroImplementation(FRotator InRotator, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Rotator_IsZeroImplementation(FRotator InRotator);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_EqualsImplementation(FRotator A, FRotator B, Single Tolerance);
+        public static extern Boolean Rotator_EqualsImplementation(FRotator A, FRotator B, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_AddDeltaImplementation(FRotator A, Single DeltaPitch, Single DeltaYaw,
-            Single DeltaRoll, out FRotator OutValue);
+        public static extern void Rotator_AddDeltaImplementation(FRotator A, LwcType DeltaPitch, LwcType DeltaYaw,
+            LwcType DeltaRoll, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rotator_GetInverseImplementation(FRotator InRotator, out FRotator OutValue);
@@ -76,7 +81,7 @@ namespace Script.Library
             out FRotator Remainder);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Rotator_GetManhattanDistanceImplementation(FRotator InRotator, FRotator Rotator);
+        public static extern LwcType Rotator_GetManhattanDistanceImplementation(FRotator InRotator, FRotator Rotator);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rotator_GetEquivalentRotatorImplementation(FRotator InRotator, out FRotator OutValue);
@@ -97,22 +102,22 @@ namespace Script.Library
         public static extern Boolean Rotator_ContainsNaNImplementation(FRotator InRotator);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Rotator_ClampAxisImplementation(Single Angle);
+        public static extern LwcType Rotator_ClampAxisImplementation(LwcType Angle);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Rotator_NormalizeAxisImplementation(Single Angle);
+        public static extern LwcType Rotator_NormalizeAxisImplementation(LwcType Angle);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Byte Rotator_CompressAxisToByteImplementation(Single Angle);
+        public static extern Byte Rotator_CompressAxisToByteImplementation(LwcType Angle);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Rotator_DecompressAxisFromByteImplementation(Byte Angle);
+        public static extern LwcType Rotator_DecompressAxisFromByteImplementation(Byte Angle);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern UInt16 Rotator_CompressAxisToShortImplementation(Byte Angle);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Rotator_DecompressAxisFromShortImplementation(UInt16 Angle);
+        public static extern LwcType Rotator_DecompressAxisFromShortImplementation(UInt16 Angle);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rotator_MakeFromEulerImplementation(FVector Euler, out FRotator OutValue);

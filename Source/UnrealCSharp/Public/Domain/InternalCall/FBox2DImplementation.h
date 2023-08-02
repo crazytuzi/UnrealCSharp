@@ -1,9 +1,16 @@
 ﻿#pragma once
 
+#include "UEVersion.h"
 #include "mono/metadata/object-forward.h"
 
 class FBox2DImplementation
 {
+#if UE_LWC_TYPE
+	using LwcType = double;
+#else
+	using LwcType = float;
+#endif
+
 public:
 	static bool Box2D_EqualityImplementation(const MonoObject* A, const MonoObject* B);
 
@@ -18,12 +25,12 @@ public:
 	static void Box2D_SetReferenceImplementation(const MonoObject* InMonoObject, int32 Index,
 	                                             const MonoObject* InValue);
 
-	static float Box2D_ComputeSquaredDistanceToPointImplementation(const MonoObject* InMonoObject,
-	                                                               const MonoObject* Point);
+	static LwcType Box2D_ComputeSquaredDistanceToPointImplementation(const MonoObject* InMonoObject,
+	                                                                 const MonoObject* Point);
 
-	static void Box2D_ExpandByImplementation(const MonoObject* InMonoObject, float W, MonoObject** OutValue);
+	static void Box2D_ExpandByImplementation(const MonoObject* InMonoObject, LwcType W, MonoObject** OutValue);
 
-	static float Box2D_GetAreaImplementation(const MonoObject* InMonoObject);
+	static LwcType Box2D_GetAreaImplementation(const MonoObject* InMonoObject);
 
 	static void Box2D_GetCenterImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 

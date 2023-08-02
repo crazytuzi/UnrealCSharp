@@ -1,6 +1,11 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.CoreUObject
 {
@@ -38,17 +43,17 @@ namespace Script.CoreUObject
             set => Box2DImplementation.Box2D_SetReferenceImplementation(this, Index, value);
         }
 
-        public Single ComputeSquaredDistanceToPoint(FVector2D Point) =>
+        public LwcType ComputeSquaredDistanceToPoint(FVector2D Point) =>
             Box2DImplementation.Box2D_ComputeSquaredDistanceToPointImplementation(this, Point);
 
-        public FBox2D ExpandBy(Single W)
+        public FBox2D ExpandBy(LwcType W)
         {
             Box2DImplementation.Box2D_ExpandByImplementation(this, W, out var OutValue);
 
             return OutValue;
         }
 
-        public Single GetArea() =>
+        public LwcType GetArea() =>
             Box2DImplementation.Box2D_GetAreaImplementation(this);
 
         public FVector2D GetCenter()

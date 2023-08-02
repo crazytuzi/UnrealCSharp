@@ -247,7 +247,7 @@ void FTransformImplementation::Transform_ToMatrixNoScaleImplementation(const Mon
 }
 
 void FTransformImplementation::Transform_BlendImplementation(const MonoObject* InMonoObject, const MonoObject* Atom1,
-                                                             const MonoObject* Atom2, const float Alpha)
+                                                             const MonoObject* Atom2, const LwcType Alpha)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -262,7 +262,7 @@ void FTransformImplementation::Transform_BlendImplementation(const MonoObject* I
 }
 
 void FTransformImplementation::Transform_BlendWithImplementation(const MonoObject* InMonoObject,
-                                                                 const MonoObject* OtherAtom, const float Alpha)
+                                                                 const MonoObject* OtherAtom, const LwcType Alpha)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -371,7 +371,7 @@ void FTransformImplementation::Transform_ScaleTranslationVectorImplementation(
 }
 
 void FTransformImplementation::Transform_ScaleTranslationScaleImplementation(
-	const MonoObject* InMonoObject, const float Scale)
+	const MonoObject* InMonoObject, const LwcType Scale)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -382,7 +382,7 @@ void FTransformImplementation::Transform_ScaleTranslationScaleImplementation(
 }
 
 void FTransformImplementation::Transform_RemoveScalingImplementation(const MonoObject* InMonoObject,
-                                                                     const float Tolerance)
+                                                                     const LwcType Tolerance)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -392,7 +392,8 @@ void FTransformImplementation::Transform_RemoveScalingImplementation(const MonoO
 	}
 }
 
-float FTransformImplementation::Transform_GetMaximumAxisScaleImplementation(const MonoObject* InMonoObject)
+FTransformImplementation::LwcType FTransformImplementation::Transform_GetMaximumAxisScaleImplementation(
+	const MonoObject* InMonoObject)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -404,7 +405,8 @@ float FTransformImplementation::Transform_GetMaximumAxisScaleImplementation(cons
 	return 0.f;
 }
 
-float FTransformImplementation::Transform_GetMinimumAxisScaleImplementation(const MonoObject* InMonoObject)
+FTransformImplementation::LwcType FTransformImplementation::Transform_GetMinimumAxisScaleImplementation(
+	const MonoObject* InMonoObject)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -705,7 +707,8 @@ void FTransformImplementation::Transform_InverseTransformRotationImplementation(
 	}
 }
 
-void FTransformImplementation::Transform_GetScaledScaleImplementation(const MonoObject* InMonoObject, const float Scale,
+void FTransformImplementation::Transform_GetScaledScaleImplementation(const MonoObject* InMonoObject,
+                                                                      const LwcType Scale,
                                                                       MonoObject** OutValue)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
@@ -748,7 +751,7 @@ void FTransformImplementation::Transform_GetScaledVectorImplementation(const Mon
 }
 
 void FTransformImplementation::Transform_GetSafeScaleReciprocalImplementation(
-	const MonoObject* InScale, const float Tolerance, MonoObject** OutValue)
+	const MonoObject* InScale, const LwcType Tolerance, MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InScale);
 
@@ -803,7 +806,8 @@ void FTransformImplementation::Transform_RotatorImplementation(const MonoObject*
 	}
 }
 
-float FTransformImplementation::Transform_GetDeterminantImplementation(const MonoObject* InMonoObject)
+FTransformImplementation::LwcType FTransformImplementation::Transform_GetDeterminantImplementation(
+	const MonoObject* InMonoObject)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -853,7 +857,7 @@ bool FTransformImplementation::Transform_IsValidImplementation(const MonoObject*
 }
 
 bool FTransformImplementation::Transform_AreRotationsEqualImplementation(
-	const MonoObject* A, const MonoObject* B, const float Tolerance)
+	const MonoObject* A, const MonoObject* B, const LwcType Tolerance)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -868,7 +872,7 @@ bool FTransformImplementation::Transform_AreRotationsEqualImplementation(
 }
 
 bool FTransformImplementation::Transform_AreTranslationsEqualImplementation(
-	const MonoObject* A, const MonoObject* B, const float Tolerance)
+	const MonoObject* A, const MonoObject* B, const LwcType Tolerance)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -883,7 +887,7 @@ bool FTransformImplementation::Transform_AreTranslationsEqualImplementation(
 }
 
 bool FTransformImplementation::Transform_AreScale3DsEqualImplementation(const MonoObject* A, const MonoObject* B,
-                                                                        const float Tolerance)
+                                                                        const LwcType Tolerance)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -898,7 +902,7 @@ bool FTransformImplementation::Transform_AreScale3DsEqualImplementation(const Mo
 }
 
 bool FTransformImplementation::Transform_RotationEqualsImplementation(const MonoObject* InMonoObject,
-                                                                      const MonoObject* Other, const float Tolerance)
+                                                                      const MonoObject* Other, const LwcType Tolerance)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -913,7 +917,7 @@ bool FTransformImplementation::Transform_RotationEqualsImplementation(const Mono
 }
 
 bool FTransformImplementation::Transform_TranslationEqualsImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Other, const float Tolerance)
+	const MonoObject* InMonoObject, const MonoObject* Other, const LwcType Tolerance)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -928,7 +932,7 @@ bool FTransformImplementation::Transform_TranslationEqualsImplementation(
 }
 
 bool FTransformImplementation::Transform_Scale3DEqualsImplementation(const MonoObject* InMonoObject,
-                                                                     const MonoObject* Other, const float Tolerance)
+                                                                     const MonoObject* Other, const LwcType Tolerance)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -943,7 +947,7 @@ bool FTransformImplementation::Transform_Scale3DEqualsImplementation(const MonoO
 }
 
 bool FTransformImplementation::Transform_EqualsImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
-                                                              const float Tolerance)
+                                                              const LwcType Tolerance)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 
@@ -973,7 +977,7 @@ bool FTransformImplementation::Transform_IdenticalImplementation(const MonoObjec
 }
 
 bool FTransformImplementation::Transform_EqualsNoScaleImplementation(const MonoObject* InMonoObject,
-                                                                     const MonoObject* Other, const float Tolerance)
+                                                                     const MonoObject* Other, const LwcType Tolerance)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
 

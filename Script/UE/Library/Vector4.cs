@@ -1,12 +1,17 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.CoreUObject
 {
     public partial class FVector4
     {
-        public Single this[Int32 ComponentIndex]
+        public LwcType this[Int32 ComponentIndex]
         {
             get => Vector4Implementation.Vector4_GetComponentImplementation(this, ComponentIndex);
 
@@ -34,14 +39,14 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FVector4 operator *(FVector4 A, Single Scale)
+        public static FVector4 operator *(FVector4 A, LwcType Scale)
         {
             Vector4Implementation.Vector4_MultiplyScaleImplementation(A, Scale, out var OutValue);
 
             return OutValue;
         }
 
-        public static FVector4 operator /(FVector4 A, Single Scale)
+        public static FVector4 operator /(FVector4 A, LwcType Scale)
         {
             Vector4Implementation.Vector4_DivideScaleImplementation(A, Scale, out var OutValue);
 
@@ -62,10 +67,10 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Single Dot3(FVector4 V1, FVector4 V2) =>
+        public static LwcType Dot3(FVector4 V1, FVector4 V2) =>
             Vector4Implementation.Vector4_Dot3Implementation(V1, V2);
 
-        public static Single Dot4(FVector4 V1, FVector4 V2) =>
+        public static LwcType Dot4(FVector4 V1, FVector4 V2) =>
             Vector4Implementation.Vector4_Dot4Implementation(V1, V2);
 
         public static Boolean operator ==(FVector4 A, FVector4 B) =>
@@ -81,15 +86,15 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public Single Component(Int32 Index) =>
+        public LwcType Component(Int32 Index) =>
             Vector4Implementation.Vector4_ComponentImplementation(this, Index);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Equals(FVector4 V, Single Tolerance) =>
+        public Boolean Equals(FVector4 V, LwcType Tolerance) =>
             Vector4Implementation.Vector4_EqualsImplementation(this, V, Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean IsUnit3(Single LengthSquaredTolerance) =>
+        public Boolean IsUnit3(LwcType LengthSquaredTolerance) =>
             Vector4Implementation.Vector4_IsUnit3Implementation(this, LengthSquaredTolerance);
 
         public override string ToString()
@@ -103,7 +108,7 @@ namespace Script.CoreUObject
             Vector4Implementation.Vector4_InitFromStringImplementation(this, InSourceString);
 
         // @TODO SMALL_NUMBER
-        public FVector4 GetSafeNormal(Single Tolerance)
+        public FVector4 GetSafeNormal(LwcType Tolerance)
         {
             Vector4Implementation.Vector4_GetSafeNormalImplementation(this, Tolerance, out var OutValue);
 
@@ -138,26 +143,26 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public void Set(Single InX, Single InY, Single InZ, Single InW) =>
+        public void Set(LwcType InX, LwcType InY, LwcType InZ, LwcType InW) =>
             Vector4Implementation.Vector4_SetImplementation(this, InX, InY, InZ, InW);
 
-        public Single Size3() =>
+        public LwcType Size3() =>
             Vector4Implementation.Vector4_Size3Implementation(this);
 
-        public Single SizeSquared3() =>
+        public LwcType SizeSquared3() =>
             Vector4Implementation.Vector4_SizeSquared3Implementation(this);
 
-        public Single Size() =>
+        public LwcType Size() =>
             Vector4Implementation.Vector4_SizeImplementation(this);
 
-        public Single SizeSquared() =>
+        public LwcType SizeSquared() =>
             Vector4Implementation.Vector4_SizeSquaredImplementation(this);
 
         public Boolean ContainsNaN() =>
             Vector4Implementation.Vector4_ContainsNaNImplementation(this);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean IsNearlyZero3(Single Tolerance) =>
+        public Boolean IsNearlyZero3(LwcType Tolerance) =>
             Vector4Implementation.Vector4_IsNearlyZero3Implementation(this, Tolerance);
 
         public FVector4 Reflect3(FVector4 Normal)

@@ -1,6 +1,11 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.CoreUObject
 {
@@ -23,11 +28,11 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public Single PlaneDot(FVector P) =>
+        public LwcType PlaneDot(FVector P) =>
             PlaneImplementation.Plane_PlaneDotImplementation(this, P);
 
         // @TODO SMALL_NUMBER
-        public new Boolean Normalize(Single Tolerance) =>
+        public new Boolean Normalize(LwcType Tolerance) =>
             PlaneImplementation.Plane_NormalizeImplementation(this, Tolerance);
 
         public FPlane Flip()
@@ -44,7 +49,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FPlane TransformByUsingAdjointT(FMatrix M, Single DetM, FMatrix TA)
+        public FPlane TransformByUsingAdjointT(FMatrix M, LwcType DetM, FMatrix TA)
         {
             PlaneImplementation.Plane_TransformByUsingAdjointTImplementation(this, M, DetM, TA, out var OutValue);
 
@@ -58,10 +63,10 @@ namespace Script.CoreUObject
             PlaneImplementation.Plane_InequalityImplementation(A, B);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Equals(FPlane V, Single Tolerance) =>
+        public Boolean Equals(FPlane V, LwcType Tolerance) =>
             PlaneImplementation.Plane_EqualsImplementation(this, V, Tolerance);
 
-        public static Single operator |(FPlane A, FPlane B) =>
+        public static LwcType operator |(FPlane A, FPlane B) =>
             PlaneImplementation.Plane_DotProductImplementation(A, B);
 
         public static FPlane operator +(FPlane A, FPlane B)
@@ -78,14 +83,14 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FPlane operator /(FPlane A, Single Scale)
+        public static FPlane operator /(FPlane A, LwcType Scale)
         {
             PlaneImplementation.Plane_DivideImplementation(A, Scale, out var OutValue);
 
             return OutValue;
         }
 
-        public static FPlane operator *(FPlane A, Single Scale)
+        public static FPlane operator *(FPlane A, LwcType Scale)
         {
             PlaneImplementation.Plane_MultiplyImplementation(A, Scale, out var OutValue);
 

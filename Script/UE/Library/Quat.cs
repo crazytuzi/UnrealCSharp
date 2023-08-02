@@ -1,6 +1,11 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.CoreUObject
 {
@@ -21,11 +26,11 @@ namespace Script.CoreUObject
         }
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Equals(FQuat Q, Single Tolerance) =>
+        public Boolean Equals(FQuat Q, LwcType Tolerance) =>
             QuatImplementation.Quat_EqualsImplementation(this, Q, Tolerance);
 
         // @TODO SMALL_NUMBER
-        public Boolean IsIdentity(Single Tolerance) =>
+        public Boolean IsIdentity(LwcType Tolerance) =>
             QuatImplementation.Quat_IsIdentityImplementation(this, Tolerance);
 
         public static FQuat operator *(FQuat A, FQuat B)
@@ -49,14 +54,14 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FQuat operator *(FQuat A, Single Scale)
+        public static FQuat operator *(FQuat A, LwcType Scale)
         {
             QuatImplementation.Quat_MultiplyScaleImplementation(A, Scale, out var OutValue);
 
             return OutValue;
         }
 
-        public static FQuat operator /(FQuat A, Single Scale)
+        public static FQuat operator /(FQuat A, LwcType Scale)
         {
             QuatImplementation.Quat_DivideImplementation(A, Scale, out var OutValue);
 
@@ -72,7 +77,7 @@ namespace Script.CoreUObject
         public static Boolean operator !=(FQuat A, FQuat B) =>
             QuatImplementation.Quat_InequalityImplementation(A, B);
 
-        public static Single operator |(FQuat A, FQuat B) =>
+        public static LwcType operator |(FQuat A, FQuat B) =>
             QuatImplementation.Quat_DotProductImplementation(A, B);
 
         public static FQuat MakeFromEuler(FVector Euler)
@@ -90,11 +95,11 @@ namespace Script.CoreUObject
         }
 
         // @TODO SMALL_NUMBER
-        public void Normalize(Single Tolerance) =>
+        public void Normalize(LwcType Tolerance) =>
             QuatImplementation.Quat_NormalizeImplementation(this, Tolerance);
 
         // @TODO SMALL_NUMBER
-        public FQuat GetNormalized(Single Tolerance)
+        public FQuat GetNormalized(LwcType Tolerance)
         {
             QuatImplementation.Quat_GetNormalizedImplementation(this, Tolerance, out var OutValue);
 
@@ -104,22 +109,22 @@ namespace Script.CoreUObject
         public Boolean IsNormalized() =>
             QuatImplementation.Quat_IsNormalizedImplementation(this);
 
-        public Single Size() =>
+        public LwcType Size() =>
             QuatImplementation.Quat_SizeImplementation(this);
 
-        public Single SizeSquared() =>
+        public LwcType SizeSquared() =>
             QuatImplementation.Quat_SizeSquaredImplementation(this);
 
-        public Single GetAngle() =>
+        public LwcType GetAngle() =>
             QuatImplementation.Quat_GetAngleImplementation(this);
 
-        public void ToAxisAndAngle(out FVector Axis, out Single Angle) =>
+        public void ToAxisAndAngle(out FVector Axis, out LwcType Angle) =>
             QuatImplementation.Quat_ToAxisAndAngleImplementation(this, out Axis, out Angle);
 
         public void ToSwingTwist(FVector InTwistAxis, out FQuat OutSwing, out FQuat OutTwist) =>
             QuatImplementation.Quat_ToSwingTwistImplementation(this, InTwistAxis, out OutSwing, out OutTwist);
 
-        public Single GetTwistAngle(FVector TwistAxis) =>
+        public LwcType GetTwistAngle(FVector TwistAxis) =>
             QuatImplementation.Quat_GetTwistAngleImplementation(this, TwistAxis);
 
         public FVector RotateVector(FVector V)
@@ -223,7 +228,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public Single AngularDistance(FQuat Q) =>
+        public LwcType AngularDistance(FQuat Q) =>
             QuatImplementation.Quat_AngularDistanceImplementation(this, Q);
 
         public Boolean ContainsNaN() =>
@@ -260,69 +265,69 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Single Error(FQuat Q1, FQuat Q2) =>
+        public static LwcType Error(FQuat Q1, FQuat Q2) =>
             QuatImplementation.Quat_ErrorImplementation(Q1, Q2);
 
-        public static Single ErrorAutoNormalize(FQuat Q1, FQuat Q2) =>
+        public static LwcType ErrorAutoNormalize(FQuat Q1, FQuat Q2) =>
             QuatImplementation.Quat_ErrorAutoNormalizeImplementation(Q1, Q2);
 
-        public static FQuat FastLerp(FQuat A, FQuat B, Single Alpha)
+        public static FQuat FastLerp(FQuat A, FQuat B, LwcType Alpha)
         {
             QuatImplementation.Quat_FastLerpImplementation(A, B, Alpha, out var OutValue);
 
             return OutValue;
         }
 
-        public static FQuat FastBilerp(FQuat P00, FQuat P10, FQuat P01, FQuat P11, Single FracX, Single FracY)
+        public static FQuat FastBilerp(FQuat P00, FQuat P10, FQuat P01, FQuat P11, LwcType FracX, LwcType FracY)
         {
             QuatImplementation.Quat_FastBilerpImplementation(P00, P10, P01, P11, FracX, FracY, out var OutValue);
 
             return OutValue;
         }
 
-        public static FQuat Slerp_NotNormalized(FQuat Quat1, FQuat Quat2, Single Slerp)
+        public static FQuat Slerp_NotNormalized(FQuat Quat1, FQuat Quat2, LwcType Slerp)
         {
             QuatImplementation.Quat_Slerp_NotNormalizedImplementation(Quat1, Quat2, Slerp, out var OutValue);
 
             return OutValue;
         }
 
-        public static FQuat Slerp(FQuat Quat1, FQuat Quat2, Single Slerp)
+        public static FQuat Slerp(FQuat Quat1, FQuat Quat2, LwcType Slerp)
         {
             QuatImplementation.Quat_SlerpImplementation(Quat1, Quat2, Slerp, out var OutValue);
 
             return OutValue;
         }
 
-        public static FQuat SlerpFullPath_NotNormalized(FQuat quat1, FQuat quat2, Single Alpha)
+        public static FQuat SlerpFullPath_NotNormalized(FQuat quat1, FQuat quat2, LwcType Alpha)
         {
             QuatImplementation.Quat_SlerpFullPath_NotNormalizedImplementation(quat1, quat2, Alpha, out var OutValue);
 
             return OutValue;
         }
 
-        public static FQuat SlerpFullPath(FQuat quat1, FQuat quat2, Single Alpha)
+        public static FQuat SlerpFullPath(FQuat quat1, FQuat quat2, LwcType Alpha)
         {
             QuatImplementation.Quat_SlerpFullPathImplementation(quat1, quat2, Alpha, out var OutValue);
 
             return OutValue;
         }
 
-        public static FQuat Squad(FQuat quat1, FQuat tang1, FQuat quat2, FQuat tang2, Single Alpha)
+        public static FQuat Squad(FQuat quat1, FQuat tang1, FQuat quat2, FQuat tang2, LwcType Alpha)
         {
             QuatImplementation.Quat_SquadImplementation(quat1, tang1, quat2, tang2, Alpha, out var OutValue);
 
             return OutValue;
         }
 
-        public static FQuat SquadFullPath(FQuat quat1, FQuat tang1, FQuat quat2, FQuat tang2, Single Alpha)
+        public static FQuat SquadFullPath(FQuat quat1, FQuat tang1, FQuat quat2, FQuat tang2, LwcType Alpha)
         {
             QuatImplementation.Quat_SquadFullPathImplementation(quat1, tang1, quat2, tang2, Alpha, out var OutValue);
 
             return OutValue;
         }
 
-        public static void Quat_CalcTangentsImplementation(FQuat PrevP, FQuat P, FQuat NextP, Single Tension,
+        public static void Quat_CalcTangentsImplementation(FQuat PrevP, FQuat P, FQuat NextP, LwcType Tension,
             out FQuat OutTan) =>
             QuatImplementation.Quat_CalcTangentsImplementation(PrevP, P, NextP, Tension, out OutTan);
     }

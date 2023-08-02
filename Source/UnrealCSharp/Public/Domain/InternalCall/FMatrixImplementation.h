@@ -1,13 +1,21 @@
 ﻿#pragma once
 
+#include "UEVersion.h"
 #include "mono/metadata/object-forward.h"
 
 class FMatrixImplementation
 {
-public:
-	static float Matrix_GetMImplementation(const MonoObject* InMonoObject, uint32 InRow, uint32 InColumn);
+#if UE_LWC_TYPE
+	using LwcType = double;
+#else
+	using LwcType = float;
+#endif
 
-	static void Matrix_SetMImplementation(const MonoObject* InMonoObject, uint32 InRow, uint32 InColumn, float InValue);
+public:
+	static LwcType Matrix_GetMImplementation(const MonoObject* InMonoObject, uint32 InRow, uint32 InColumn);
+
+	static void Matrix_SetMImplementation(const MonoObject* InMonoObject, uint32 InRow, uint32 InColumn,
+	                                      LwcType InValue);
 
 	static void Matrix_SetIdentityImplementation(const MonoObject* InMonoObject);
 
@@ -15,11 +23,12 @@ public:
 
 	static void Matrix_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
 
-	static void Matrix_MultiplyScaleImplementation(const MonoObject* InMonoObject, float Other, MonoObject** OutValue);
+	static void Matrix_MultiplyScaleImplementation(const MonoObject* InMonoObject, LwcType Other,
+	                                               MonoObject** OutValue);
 
 	static bool Matrix_EqualityImplementation(const MonoObject* A, const MonoObject* B);
 
-	static bool Matrix_EqualsImplementation(const MonoObject* A, const MonoObject* B, float Tolerance);
+	static bool Matrix_EqualsImplementation(const MonoObject* A, const MonoObject* B, LwcType Tolerance);
 
 	static bool Matrix_InequalityImplementation(const MonoObject* A, const MonoObject* B);
 
@@ -40,9 +49,9 @@ public:
 
 	static void Matrix_GetTransposedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
-	static float Matrix_DeterminantImplementation(const MonoObject* InMonoObject);
+	static LwcType Matrix_DeterminantImplementation(const MonoObject* InMonoObject);
 
-	static float Matrix_RotDeterminantImplementation(const MonoObject* InMonoObject);
+	static LwcType Matrix_RotDeterminantImplementation(const MonoObject* InMonoObject);
 
 	static void Matrix_InverseFastImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
@@ -50,15 +59,15 @@ public:
 
 	static void Matrix_TransposeAdjointImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
-	static void Matrix_RemoveScalingImplementation(const MonoObject* InMonoObject, float Tolerance);
+	static void Matrix_RemoveScalingImplementation(const MonoObject* InMonoObject, LwcType Tolerance);
 
-	static void Matrix_GetMatrixWithoutScaleImplementation(const MonoObject* InMonoObject, float Tolerance,
+	static void Matrix_GetMatrixWithoutScaleImplementation(const MonoObject* InMonoObject, LwcType Tolerance,
 	                                                       MonoObject** OutValue);
 
-	static void Matrix_ExtractScalingImplementation(const MonoObject* InMonoObject, float Tolerance,
+	static void Matrix_ExtractScalingImplementation(const MonoObject* InMonoObject, LwcType Tolerance,
 	                                                MonoObject** OutValue);
 
-	static void Matrix_GetScaleVectorImplementation(const MonoObject* InMonoObject, float Tolerance,
+	static void Matrix_GetScaleVectorImplementation(const MonoObject* InMonoObject, LwcType Tolerance,
 	                                                MonoObject** OutValue);
 
 	static void Matrix_RemoveTranslationImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
@@ -70,9 +79,9 @@ public:
 
 	static void Matrix_ScaleTranslationImplementation(const MonoObject* InMonoObject, const MonoObject* Scale3D);
 
-	static float Matrix_GetMaximumAxisScaleImplementation(const MonoObject* InMonoObject);
+	static LwcType Matrix_GetMaximumAxisScaleImplementation(const MonoObject* InMonoObject);
 
-	static void Matrix_ApplyScaleImplementation(const MonoObject* InMonoObject, float Scale, MonoObject** OutValue);
+	static void Matrix_ApplyScaleImplementation(const MonoObject* InMonoObject, LwcType Scale, MonoObject** OutValue);
 
 	static void Matrix_GetOriginImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
