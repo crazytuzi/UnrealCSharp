@@ -30,7 +30,10 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		ClassProperty->InitializeValue(Dest);
 
-		ClassProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
+		if (SrcMulti != nullptr)
+		{
+			ClassProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
+		}
 
 		Object_New(Dest);
 	}

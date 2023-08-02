@@ -359,6 +359,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FunctionOutParamIndexMapping.AddDefaulted(FunctionParams.Num());
 
+		auto bGeneratorFunctionDefaultParam = false;
+
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 		{
 			if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->HasAnyPropertyFlags(
@@ -379,10 +381,18 @@ void FClassGenerator::Generator(const UClass* InClass)
 					FunctionOutParamIndex.Emplace(Index);
 				}
 			}
+
+			if (bGeneratorFunctionDefaultParam == false)
+			{
+				bGeneratorFunctionDefaultParam = HasFunctionDefaultParam(Function, FunctionParams[Index]);
+			}
 		}
 
-		auto bGeneratorFunctionDefaultParam = GeneratorFunctionDefaultParam(
-			FunctionOutParamIndex, FunctionRefParamIndex);
+		if (bGeneratorFunctionDefaultParam)
+		{
+			bGeneratorFunctionDefaultParam = GeneratorFunctionDefaultParam(
+				FunctionOutParamIndex, FunctionRefParamIndex);
+		}
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 		{
@@ -542,6 +552,16 @@ void FClassGenerator::Generator(const UClass* InClass)
 			);
 		}
 
+		FString FunctionDefaultParamBody;
+
+		if (bGeneratorFunctionDefaultParam)
+		{
+			for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
+			{
+				FunctionDefaultParamBody += GeneratorFunctionDefaultParam(Function, FunctionParams[Index], FunctionTab);
+			}
+		}
+
 		FString FunctionOutParamBody;
 
 		for (auto FunctionOutParam : FunctionOutParams)
@@ -554,11 +574,12 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		auto FunctionImplementationBody = FString::Printf(TEXT(
-			"%s%s\n"
+			"%s%s%s\n"
 			"%s"
 			"%s"
 			"%s"
 		),
+		                                                  *FunctionDefaultParamBody,
 		                                                  *FunctionTab,
 		                                                  *FunctionCallBody,
 		                                                  *FunctionOutParamBody,
@@ -663,6 +684,45 @@ bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& InFunct
 	(InFunctionOutParamIndex.Num() > InFunctionRefParamIndex.Num()
 		 ? InFunctionOutParamIndex[InFunctionOutParamIndex.Num() - 1] == InFunctionOutParamIndex.Num() - 1
 		 : InFunctionRefParamIndex[InFunctionRefParamIndex.Num() - 1] == InFunctionRefParamIndex.Num() - 1);
+}
+
+bool FClassGenerator::HasFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
+{
+	if (InFunction == nullptr || InProperty == nullptr)
+	{
+		return false;
+	}
+
+	if (!InFunction->HasAnyFunctionFlags(FUNC_BlueprintCallable))
+	{
+		return false;
+	}
+
+	if (Cast<UBlueprintGeneratedClass>(InFunction->GetOuter()))
+	{
+		return HasBlueprintFunctionDefaultParam(InFunction, InProperty);
+	}
+
+	return HasCppFunctionDefaultParam(InFunction, InProperty);
+}
+
+bool FClassGenerator::HasCppFunctionDefaultParam(const UFunction* InFunction, const FProperty* InProperty)
+{
+	const auto Key = FString::Printf(TEXT("CPP_Default_%s"), *InProperty->GetName());
+
+	return InFunction->HasMetaData(*Key);
+}
+
+bool FClassGenerator::HasBlueprintFunctionDefaultParam(const UFunction* InFunction, const FProperty* InProperty)
+{
+	if (InProperty->HasAnyPropertyFlags(CPF_OutParm) && !InProperty->HasAnyPropertyFlags(CPF_ConstParm))
+	{
+		return false;;
+	}
+
+	const auto Key = InProperty->GetName();
+
+	return InFunction->HasMetaData(*Key);
 }
 
 FString FClassGenerator::GetFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
@@ -925,6 +985,357 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	if (CastField<FSetProperty>(InProperty))
 	{
 		return FString::Printf(TEXT(" = null"));
+	}
+
+	return TEXT("");
+}
+
+FString FClassGenerator::GeneratorFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
+                                                       const FString& InFunctionTab)
+{
+	if (InFunction == nullptr || InProperty == nullptr)
+	{
+		return TEXT("");
+	}
+
+	if (!FGeneratorCore::IsSafeProperty(InProperty))
+	{
+		return TEXT("");
+	}
+
+	if (Cast<UBlueprintGeneratedClass>(InFunction->GetOuter()))
+	{
+		return GeneratorBlueprintFunctionDefaultParam(InFunction, InProperty, InFunctionTab);
+	}
+
+	return GeneratorCppFunctionDefaultParam(InFunction, InProperty, InFunctionTab);
+}
+
+FString FClassGenerator::GeneratorCppFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
+                                                          const FString& InFunctionTab)
+{
+	const auto Key = FString::Printf(TEXT("CPP_Default_%s"), *InProperty->GetName());
+
+	if (!InFunction->HasMetaData(*Key))
+	{
+		return TEXT("");
+	}
+
+	const auto MetaData = InFunction->GetMetaData(*Key);
+
+	return GeneratorFunctionDefaultParam(InProperty, MetaData, InFunctionTab);
+}
+
+FString FClassGenerator::GeneratorBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
+                                                                const FString& InFunctionTab)
+{
+	if (InProperty->HasAnyPropertyFlags(CPF_OutParm) && !InProperty->HasAnyPropertyFlags(CPF_ConstParm))
+	{
+		return TEXT("");
+	}
+
+	const auto Key = InProperty->GetName();
+
+	if (!InFunction->HasMetaData(*Key))
+	{
+		return TEXT("");
+	}
+
+	const auto MetaData = InFunction->GetMetaData(*Key);
+
+	return GeneratorFunctionDefaultParam(InProperty, MetaData, InFunctionTab);
+}
+
+FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, const FString& InMetaData,
+                                                       const FString& InFunctionTab)
+{
+	if (CastField<FNameProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(
+			"%s%s ??= new FName(\"%s\");\n\n"
+		),
+		                       *InFunctionTab,
+		                       *InProperty->GetName(),
+		                       *InMetaData
+		);
+	}
+
+	if (const auto StructProperty = CastField<FStructProperty>(InProperty))
+	{
+		if (StructProperty->Struct == TBaseStructure<FRotator>::Get())
+		{
+			FRotator Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				return FString::Printf(TEXT(
+					"%s%s ??= new FRotator\n"
+					"%s{\n"
+					"%s\tPitch = %ff,\n"
+					"%s\tYaw = %ff,\n"
+					"%s\tRoll = %ff\n"
+					"%s};\n\n"
+				),
+				                       *InFunctionTab,
+				                       *InProperty->GetName(),
+				                       *InFunctionTab,
+				                       *InFunctionTab,
+				                       Value.Pitch,
+				                       *InFunctionTab,
+				                       Value.Yaw,
+				                       *InFunctionTab,
+				                       Value.Roll,
+				                       *InFunctionTab
+				);
+			}
+		}
+
+		if (StructProperty->Struct == TBaseStructure<FQuat>::Get())
+		{
+			FQuat Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				return FString::Printf(TEXT(
+					"%s%s ??= new FQuat\n"
+					"%s{\n"
+					"%s\tX = %ff,\n"
+					"%s\tY = %ff,\n"
+					"%s\tZ = %ff\n"
+					"%s\tW = %ff\n"
+					"%s};\n\n"
+				),
+				                       *InFunctionTab,
+				                       *InProperty->GetName(),
+				                       *InFunctionTab,
+				                       *InFunctionTab,
+				                       Value.X,
+				                       *InFunctionTab,
+				                       Value.Y,
+				                       *InFunctionTab,
+				                       Value.Z,
+				                       *InFunctionTab,
+				                       Value.W,
+				                       *InFunctionTab
+				);
+			}
+		}
+
+		if (StructProperty->Struct == TBaseStructure<FLinearColor>::Get())
+		{
+			FLinearColor Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				return FString::Printf(TEXT(
+					"%s%s ??= new FLinearColor\n"
+					"%s{\n"
+					"%s\tR = %ff,\n"
+					"%s\tG = %ff,\n"
+					"%s\tB = %ff,\n"
+					"%s\tA = %ff\n"
+					"%s};\n\n"
+				),
+				                       *InFunctionTab,
+				                       *InProperty->GetName(),
+				                       *InFunctionTab,
+				                       *InFunctionTab,
+				                       Value.R,
+				                       *InFunctionTab,
+				                       Value.G,
+				                       *InFunctionTab,
+				                       Value.B,
+				                       *InFunctionTab,
+				                       Value.A,
+				                       *InFunctionTab
+				);
+			}
+		}
+
+		if (StructProperty->Struct == TBaseStructure<FColor>::Get())
+		{
+			FColor Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				return FString::Printf(TEXT(
+					"%s%s ??= new FColor\n"
+					"%s{\n"
+					"%s\tR = %hhu,\n"
+					"%s\tG = %hhu,\n"
+					"%s\tB = %hhu,\n"
+					"%s\tA = %hhu\n"
+					"%s};\n\n"
+				),
+				                       *InFunctionTab,
+				                       *InProperty->GetName(),
+				                       *InFunctionTab,
+				                       *InFunctionTab,
+				                       Value.R,
+				                       *InFunctionTab,
+				                       Value.G,
+				                       *InFunctionTab,
+				                       Value.B,
+				                       *InFunctionTab,
+				                       Value.A,
+				                       *InFunctionTab
+				);
+			}
+		}
+
+		if (StructProperty->Struct == TBaseStructure<FPlane>::Get())
+		{
+			FPlane Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				return FString::Printf(TEXT(
+					"%s%s ??= new FPlane\n"
+					"%s{\n"
+					"%s\tX = %ff,\n"
+					"%s\tY = %ff,\n"
+					"%s\tZ = %ff\n"
+					"%s\tW = %ff\n"
+					"%s};\n\n"
+				),
+				                       *InFunctionTab,
+				                       *InProperty->GetName(),
+				                       *InFunctionTab,
+				                       *InFunctionTab,
+				                       Value.X,
+				                       *InFunctionTab,
+				                       Value.Y,
+				                       *InFunctionTab,
+				                       Value.Z,
+				                       *InFunctionTab,
+				                       Value.W,
+				                       *InFunctionTab
+				);
+			}
+		}
+
+		if (StructProperty->Struct == TBaseStructure<FVector>::Get())
+		{
+			FVector Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				return FString::Printf(TEXT(
+					"%s%s ??= new FVector\n"
+					"%s{\n"
+					"%s\tX = %ff,\n"
+					"%s\tY = %ff,\n"
+					"%s\tZ = %ff\n"
+					"%s};\n\n"
+				),
+				                       *InFunctionTab,
+				                       *InProperty->GetName(),
+				                       *InFunctionTab,
+				                       *InFunctionTab,
+				                       Value.X,
+				                       *InFunctionTab,
+				                       Value.Y,
+				                       *InFunctionTab,
+				                       Value.Z,
+				                       *InFunctionTab
+				);
+			}
+		}
+
+		if (StructProperty->Struct == TBaseStructure<FVector2D>::Get())
+		{
+			FVector2D Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				return FString::Printf(TEXT(
+					"%s%s ??= new FVector2D\n"
+					"%s{\n"
+					"%s\tX = %ff,\n"
+					"%s\tY = %ff,\n"
+					"%s};\n\n"
+				),
+				                       *InFunctionTab,
+				                       *InProperty->GetName(),
+				                       *InFunctionTab,
+				                       *InFunctionTab,
+				                       Value.X,
+				                       *InFunctionTab,
+				                       Value.Y,
+				                       *InFunctionTab
+				);
+			}
+		}
+
+		if (StructProperty->Struct == TBaseStructure<FVector4>::Get())
+		{
+			FVector4 Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				return FString::Printf(TEXT(
+					"%s%s ??= new FVector4\n"
+					"%s{\n"
+					"%s\tX = %ff,\n"
+					"%s\tY = %ff,\n"
+					"%s\tZ = %ff\n"
+					"%s\tW = %ff\n"
+					"%s};\n\n"
+				),
+				                       *InFunctionTab,
+				                       *InProperty->GetName(),
+				                       *InFunctionTab,
+				                       *InFunctionTab,
+				                       Value.X,
+				                       *InFunctionTab,
+				                       Value.Y,
+				                       *InFunctionTab,
+				                       Value.Z,
+				                       *InFunctionTab,
+				                       Value.W,
+				                       *InFunctionTab
+				);
+			}
+		}
+
+		return FString::Printf(TEXT(
+			"%s%s ??= new F%s();\n\n"
+		),
+		                       *InFunctionTab,
+		                       *InProperty->GetName(),
+		                       *StructProperty->Struct->GetName()
+		);
+	}
+
+	if (CastField<FStrProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(
+			"%s%s ??= new FString(\"%s\");\n\n"
+		),
+		                       *InFunctionTab,
+		                       *InProperty->GetName(),
+		                       *InMetaData
+		);
+	}
+
+	if (CastField<FTextProperty>(InProperty))
+	{
+		auto Value = InMetaData;
+
+		static auto InvText = FString(TEXT("INVTEXT"));
+
+		if (Value.Contains(InvText))
+		{
+			Value = Value.Mid(InvText.Len() + 2, Value.Len() - InvText.Len() - 4);
+		}
+
+		return FString::Printf(TEXT(
+			"%s%s ??= new FText(\"%s\");\n\n"
+		),
+		                       *InFunctionTab,
+		                       *InProperty->GetName(),
+		                       *Value
+		);
 	}
 
 	return TEXT("");
