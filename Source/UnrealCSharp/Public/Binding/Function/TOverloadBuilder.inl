@@ -7,7 +7,7 @@ template <typename FunctionType, typename InfoType>
 #else
 template <typename FunctionType>
 #endif
-struct TOverrideBuilder
+struct TOverloadBuilder
 {
 #if WITH_FUNCTION_INFO
 	static void GetImplementation(TArray<TPair<FunctionType, InfoType>>& OutValue)

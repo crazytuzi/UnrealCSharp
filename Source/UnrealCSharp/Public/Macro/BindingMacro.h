@@ -14,7 +14,7 @@
 #include "Binding/Property/TPropertyBuilder.inl"
 #include "Binding/Function/TArgument.inl"
 #include "Binding/Function/TReturnValue.inl"
-#include "Binding/Function/TOverrideBuilder.inl"
+#include "Binding/Function/TOverloadBuilder.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "UEVersion.h"
 
@@ -230,24 +230,24 @@ struct TIsNotUEnum<Class> \
 #define BINDING_FUNCTION(Function) BINDING_FUNCTION_BUILDER_INVOKE(Function)
 #endif
 
-#define BINDING_OVERRIDE_BUILDER_INVOKE(SIGNATURE, Function) \
+#define BINDING_OVERLOAD_BUILDER_INVOKE(SIGNATURE, Function) \
 	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
 	{ \
 		TFunctionBuilder<SIGNATURE, Function>::Invoke(BINDING_FUNCTION_PARAM); \
 	}).Value.Pointer
 
-#define BINDING_OVERRIDE_BUILDER_INFO(SIGNATURE, Function) TFunctionBuilder<SIGNATURE, Function>::Info()
+#define BINDING_OVERLOAD_BUILDER_INFO(SIGNATURE, Function) TFunctionBuilder<SIGNATURE, Function>::Info()
 
 #if WITH_FUNCTION_INFO
-#define BINDING_OVERRIDE(SIGNATURE, Function) BINDING_OVERRIDE_BUILDER_INVOKE(SIGNATURE, Function), BINDING_OVERRIDE_BUILDER_INFO(SIGNATURE, Function)
+#define BINDING_OVERLOAD(SIGNATURE, Function) BINDING_OVERLOAD_BUILDER_INVOKE(SIGNATURE, Function), BINDING_OVERLOAD_BUILDER_INFO(SIGNATURE, Function)
 #else
-#define BINDING_OVERRIDE(SIGNATURE, Function) BINDING_OVERRIDE_BUILDER_INVOKE(SIGNATURE, Function)
+#define BINDING_OVERLOAD(SIGNATURE, Function) BINDING_OVERLOAD_BUILDER_INVOKE(SIGNATURE, Function)
 #endif
 
 #if WITH_FUNCTION_INFO
-#define BINDING_OVERRIDES(...) TOverrideBuilder<void*, FFunctionInfo*>::Get(##__VA_ARGS__)
+#define BINDING_OVERLOADS(...) TOverloadBuilder<void*, FFunctionInfo*>::Get(##__VA_ARGS__)
 #else
-#define BINDING_OVERRIDES(...) TOverrideBuilder<void*>::Get(##__VA_ARGS__)
+#define BINDING_OVERLOADS(...) TOverloadBuilder<void*>::Get(##__VA_ARGS__)
 #endif
 
 #define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) \
