@@ -664,3 +664,20 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 
 	return Modules.Contains(InModule);
 }
+
+TArray<FName> FGeneratorCore::GetAssetsPaths()
+{
+	TArray<FString> AssetsPaths;
+
+	const auto File = FPaths::ConvertRelativePathToFull(FPaths::Combine(
+		FPaths::ProjectPluginsDir(), PLUGIN_NAME, CONFIG, FString::Printf(TEXT(
+			"%s%s"
+		),
+		                                                                  *PLUGIN_NAME,
+		                                                                  *INI_SUFFIX
+		)));
+
+	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), AssetsPaths, File);
+
+	return TArray<FName>{AssetsPaths};
+}

@@ -30,4 +30,6 @@ public:
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 
 	static bool IsSupportedModule(const FString& InModule);
+
+	static TArray<FName> GetAssetsPaths();
 };
