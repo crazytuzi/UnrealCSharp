@@ -63,8 +63,9 @@ struct FRegisterMatrix
 
 static FRegisterMatrix RegisterMatrix;
 
-float FMatrixImplementation::Matrix_GetMImplementation(const MonoObject* InMonoObject, const uint32 InRow,
-                                                       const uint32 InColumn)
+FMatrixImplementation::LwcType FMatrixImplementation::Matrix_GetMImplementation(
+	const MonoObject* InMonoObject, const uint32 InRow,
+	const uint32 InColumn)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
 
@@ -77,7 +78,7 @@ float FMatrixImplementation::Matrix_GetMImplementation(const MonoObject* InMonoO
 }
 
 void FMatrixImplementation::Matrix_SetMImplementation(const MonoObject* InMonoObject, const uint32 InRow,
-                                                      const uint32 InColumn, const float InValue)
+                                                      const uint32 InColumn, const LwcType InValue)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
 
@@ -138,7 +139,7 @@ void FMatrixImplementation::Matrix_AddImplementation(const MonoObject* A, const 
 	}
 }
 
-void FMatrixImplementation::Matrix_MultiplyScaleImplementation(const MonoObject* InMonoObject, const float Other,
+void FMatrixImplementation::Matrix_MultiplyScaleImplementation(const MonoObject* InMonoObject, const LwcType Other,
                                                                MonoObject** OutValue)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
@@ -171,7 +172,8 @@ bool FMatrixImplementation::Matrix_EqualityImplementation(const MonoObject* A, c
 	return false;
 }
 
-bool FMatrixImplementation::Matrix_EqualsImplementation(const MonoObject* A, const MonoObject* B, const float Tolerance)
+bool FMatrixImplementation::Matrix_EqualsImplementation(const MonoObject* A, const MonoObject* B,
+                                                        const LwcType Tolerance)
 {
 	const auto MatrixA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(A);
 
@@ -322,7 +324,7 @@ void FMatrixImplementation::Matrix_GetTransposedImplementation(const MonoObject*
 	}
 }
 
-float FMatrixImplementation::Matrix_DeterminantImplementation(const MonoObject* InMonoObject)
+FMatrixImplementation::LwcType FMatrixImplementation::Matrix_DeterminantImplementation(const MonoObject* InMonoObject)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
 
@@ -334,7 +336,8 @@ float FMatrixImplementation::Matrix_DeterminantImplementation(const MonoObject* 
 	return 0.f;
 }
 
-float FMatrixImplementation::Matrix_RotDeterminantImplementation(const MonoObject* InMonoObject)
+FMatrixImplementation::LwcType FMatrixImplementation::Matrix_RotDeterminantImplementation(
+	const MonoObject* InMonoObject)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
 
@@ -400,7 +403,7 @@ void FMatrixImplementation::Matrix_TransposeAdjointImplementation(const MonoObje
 	}
 }
 
-void FMatrixImplementation::Matrix_RemoveScalingImplementation(const MonoObject* InMonoObject, const float Tolerance)
+void FMatrixImplementation::Matrix_RemoveScalingImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
 
@@ -411,7 +414,7 @@ void FMatrixImplementation::Matrix_RemoveScalingImplementation(const MonoObject*
 }
 
 void FMatrixImplementation::Matrix_GetMatrixWithoutScaleImplementation(const MonoObject* InMonoObject,
-                                                                       const float Tolerance, MonoObject** OutValue)
+                                                                       const LwcType Tolerance, MonoObject** OutValue)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
 
@@ -429,7 +432,7 @@ void FMatrixImplementation::Matrix_GetMatrixWithoutScaleImplementation(const Mon
 	}
 }
 
-void FMatrixImplementation::Matrix_ExtractScalingImplementation(const MonoObject* InMonoObject, const float Tolerance,
+void FMatrixImplementation::Matrix_ExtractScalingImplementation(const MonoObject* InMonoObject, const LwcType Tolerance,
                                                                 MonoObject** OutValue)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
@@ -448,7 +451,7 @@ void FMatrixImplementation::Matrix_ExtractScalingImplementation(const MonoObject
 	}
 }
 
-void FMatrixImplementation::Matrix_GetScaleVectorImplementation(const MonoObject* InMonoObject, const float Tolerance,
+void FMatrixImplementation::Matrix_GetScaleVectorImplementation(const MonoObject* InMonoObject, const LwcType Tolerance,
                                                                 MonoObject** OutValue)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
@@ -532,7 +535,8 @@ void FMatrixImplementation::Matrix_ScaleTranslationImplementation(const MonoObje
 	}
 }
 
-float FMatrixImplementation::Matrix_GetMaximumAxisScaleImplementation(const MonoObject* InMonoObject)
+FMatrixImplementation::LwcType FMatrixImplementation::Matrix_GetMaximumAxisScaleImplementation(
+	const MonoObject* InMonoObject)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
 
@@ -544,7 +548,7 @@ float FMatrixImplementation::Matrix_GetMaximumAxisScaleImplementation(const Mono
 	return 0.f;
 }
 
-void FMatrixImplementation::Matrix_ApplyScaleImplementation(const MonoObject* InMonoObject, const float Scale,
+void FMatrixImplementation::Matrix_ApplyScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                             MonoObject** OutValue)
 {
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);

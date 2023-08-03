@@ -1,6 +1,11 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.CoreUObject
 {
@@ -20,10 +25,10 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Single operator |(FVector A, FVector B) =>
+        public static LwcType operator |(FVector A, FVector B) =>
             VectorImplementation.Vector_DotProductImplementation(A, B);
 
-        public static Single DotProduct(FVector A, FVector B) =>
+        public static LwcType DotProduct(FVector A, FVector B) =>
             VectorImplementation.Vector_DotProductImplementation(A, B);
 
         public static FVector operator +(FVector A, FVector B)
@@ -33,7 +38,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FVector operator +(FVector A, Single Bias)
+        public static FVector operator +(FVector A, LwcType Bias)
         {
             VectorImplementation.Vector_AddBiasImplementation(A, Bias, out var OutValue);
 
@@ -47,7 +52,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FVector operator -(FVector A, Single Bias)
+        public static FVector operator -(FVector A, LwcType Bias)
         {
             VectorImplementation.Vector_SubtractBiasImplementation(A, Bias, out var OutValue);
 
@@ -61,7 +66,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FVector operator *(FVector A, Single Scale)
+        public static FVector operator *(FVector A, LwcType Scale)
         {
             VectorImplementation.Vector_MultiplyScaleImplementation(A, Scale, out var OutValue);
 
@@ -75,7 +80,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FVector operator /(FVector A, Single Scale)
+        public static FVector operator /(FVector A, LwcType Scale)
         {
             VectorImplementation.Vector_DivideScaleImplementation(A, Scale, out var OutValue);
 
@@ -89,11 +94,11 @@ namespace Script.CoreUObject
             VectorImplementation.Vector_InequalityImplementation(A, B);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Equals(FVector V, Single Tolerance) =>
+        public Boolean Equals(FVector V, LwcType Tolerance) =>
             VectorImplementation.Vector_EqualsImplementation(this, V, Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean AllComponentsEqual(Single Tolerance) =>
+        public Boolean AllComponentsEqual(LwcType Tolerance) =>
             VectorImplementation.Vector_AllComponentsEqualImplementation(this, Tolerance);
 
         public static FVector operator -(FVector A)
@@ -103,33 +108,33 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public Single this[Int32 Index]
+        public LwcType this[Int32 Index]
         {
             get => VectorImplementation.Vector_GetComponentImplementation(this, Index);
 
             set => VectorImplementation.Vector_SetComponentImplementation(this, Index, value);
         }
 
-        public Single Component(Int32 Index) =>
+        public LwcType Component(Int32 Index) =>
             VectorImplementation.Vector_ComponentImplementation(this, Index);
 
         // @TODO
         // GetComponentForAxis
         // SetComponentForAxis
 
-        public void Set(Single InX, Single InY, Single InZ) =>
+        public void Set(LwcType InX, LwcType InY, LwcType InZ) =>
             VectorImplementation.Vector_SetImplementation(this, InX, InY, InZ);
 
-        public Single GetMax() =>
+        public LwcType GetMax() =>
             VectorImplementation.Vector_GetMaxImplementation(this);
 
-        public Single GetAbsMax() =>
+        public LwcType GetAbsMax() =>
             VectorImplementation.Vector_GetAbsMaxImplementation(this);
 
-        public Single GetMin() =>
+        public LwcType GetMin() =>
             VectorImplementation.Vector_GetMinImplementation(this);
 
-        public Single GetAbsMin() =>
+        public LwcType GetAbsMin() =>
             VectorImplementation.Vector_GetAbsMinImplementation(this);
 
         public FVector ComponentMin(FVector Other)
@@ -153,34 +158,34 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public Single Size() =>
+        public LwcType Size() =>
             VectorImplementation.Vector_SizeImplementation(this);
 
-        public Single SizeSquared() =>
+        public LwcType SizeSquared() =>
             VectorImplementation.Vector_SizeSquaredImplementation(this);
 
-        public Single Size2D() =>
+        public LwcType Size2D() =>
             VectorImplementation.Vector_Size2DImplementation(this);
 
-        public Single SizeSquared2D() =>
+        public LwcType SizeSquared2D() =>
             VectorImplementation.Vector_SizeSquared2DImplementation(this);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean IsNearlyZero(Single Tolerance) =>
+        public Boolean IsNearlyZero(LwcType Tolerance) =>
             VectorImplementation.Vector_IsNearlyZeroImplementation(this, Tolerance);
 
         public Boolean IsZero() =>
             VectorImplementation.Vector_IsZeroImplementation(this);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean IsUnit(Single Tolerance) =>
+        public Boolean IsUnit(LwcType Tolerance) =>
             VectorImplementation.Vector_IsUnitImplementation(this, Tolerance);
 
         public Boolean IsNormalized() =>
             VectorImplementation.Vector_IsNormalizedImplementation(this);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Normalize(Single Tolerance) =>
+        public Boolean Normalize(LwcType Tolerance) =>
             VectorImplementation.Vector_NormalizeImplementation(this, Tolerance);
 
         public FVector GetUnsafeNormal()
@@ -191,7 +196,7 @@ namespace Script.CoreUObject
         }
 
         // @TODO KINDA_SMALL_NUMBER
-        public FVector GetSafeNormal(Single Tolerance)
+        public FVector GetSafeNormal(LwcType Tolerance)
         {
             VectorImplementation.Vector_GetSafeNormalImplementation(this, Tolerance, out var OutValue);
 
@@ -199,14 +204,14 @@ namespace Script.CoreUObject
         }
 
         // @TODO KINDA_SMALL_NUMBER
-        public FVector GetSafeNormal2D(Single Tolerance)
+        public FVector GetSafeNormal2D(LwcType Tolerance)
         {
             VectorImplementation.Vector_GetSafeNormal2DImplementation(this, Tolerance, out var OutValue);
 
             return OutValue;
         }
 
-        public void ToDirectionAndLength(out FVector OutDir, out Single OutLength) =>
+        public void ToDirectionAndLength(out FVector OutDir, out LwcType OutLength) =>
             VectorImplementation.Vector_ToDirectionAndLengthImplementation(this, out OutDir, out OutLength);
 
         public FVector GetSignVector()
@@ -230,14 +235,14 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FVector GridSnap(Single GridSz)
+        public FVector GridSnap(LwcType GridSz)
         {
             VectorImplementation.Vector_GridSnapImplementation(this, GridSz, out var OutValue);
 
             return OutValue;
         }
 
-        public FVector BoundToCube(Single Radius)
+        public FVector BoundToCube(LwcType Radius)
         {
             VectorImplementation.Vector_BoundToCubeImplementation(this, Radius, out var OutValue);
 
@@ -251,35 +256,35 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FVector GetClampedToSize(Single Min, Single Max)
+        public FVector GetClampedToSize(LwcType Min, LwcType Max)
         {
             VectorImplementation.Vector_GetClampedToSizeImplementation(this, Min, Max, out var OutValue);
 
             return OutValue;
         }
 
-        public FVector GetClampedToSize2D(Single Min, Single Max)
+        public FVector GetClampedToSize2D(LwcType Min, LwcType Max)
         {
             VectorImplementation.Vector_GetClampedToSize2DImplementation(this, Min, Max, out var OutValue);
 
             return OutValue;
         }
 
-        public FVector GetClampedToMaxSize(Single MaxSize)
+        public FVector GetClampedToMaxSize(LwcType MaxSize)
         {
             VectorImplementation.Vector_GetClampedToMaxSizeImplementation(this, MaxSize, out var OutValue);
 
             return OutValue;
         }
 
-        public FVector GetClampedToMaxSize2D(Single MaxSize)
+        public FVector GetClampedToMaxSize2D(LwcType MaxSize)
         {
             VectorImplementation.Vector_GetClampedToMaxSize2DImplementation(this, MaxSize, out var OutValue);
 
             return OutValue;
         }
 
-        public void AddBounded(FVector V, Single Radius = Int16.MaxValue) =>
+        public void AddBounded(FVector V, LwcType Radius = Int16.MaxValue) =>
             VectorImplementation.Vector_AddBoundedImplementation(this, V, Radius);
 
         public FVector Reciprocal()
@@ -290,7 +295,7 @@ namespace Script.CoreUObject
         }
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean IsUniform(Single Tolerance) =>
+        public Boolean IsUniform(LwcType Tolerance) =>
             VectorImplementation.Vector_IsUniformImplementation(this, Tolerance);
 
         public FVector MirrorByVector(FVector MirrorNormal)
@@ -307,14 +312,14 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FVector RotateAngleAxis(Single AngleDeg, FVector Axis)
+        public FVector RotateAngleAxis(LwcType AngleDeg, FVector Axis)
         {
             VectorImplementation.Vector_RotateAngleAxisImplementation(this, AngleDeg, Axis, out var OutValue);
 
             return OutValue;
         }
 
-        public Single CosineAngle2D(FVector B) =>
+        public LwcType CosineAngle2D(FVector B) =>
             VectorImplementation.Vector_CosineAngle2DImplementation(this, B);
 
         public FVector ProjectOnTo(FVector A)
@@ -399,7 +404,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public Single HeadingAngle() =>
+        public LwcType HeadingAngle() =>
             VectorImplementation.Vector_HeadingAngleImplementation(this);
 
         public static void CreateOrthonormalBasis(out FVector XAxis, out FVector YAxis, out FVector ZAxis) =>
@@ -408,10 +413,10 @@ namespace Script.CoreUObject
         public static Boolean PointsAreSame(FVector P, FVector Q) =>
             VectorImplementation.Vector_PointsAreSameImplementation(P, Q);
 
-        public static Boolean PointsAreNear(FVector Point1, FVector Point2, Single Dist) =>
+        public static Boolean PointsAreNear(FVector Point1, FVector Point2, LwcType Dist) =>
             VectorImplementation.Vector_PointsAreNearImplementation(Point1, Point2, Dist);
 
-        public static Single PointPlaneDist(FVector Point, FVector PlaneBase, FVector PlaneNormal) =>
+        public static LwcType PointPlaneDist(FVector Point, FVector PlaneBase, FVector PlaneNormal) =>
             VectorImplementation.Vector_PointPlaneDistImplementation(Point, PlaneBase, PlaneNormal);
 
         public static FVector PointPlaneProject(FVector Point, FPlane Plane)
@@ -443,48 +448,48 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Single Dist(FVector V1, FVector V2) =>
+        public static LwcType Dist(FVector V1, FVector V2) =>
             VectorImplementation.Vector_DistImplementation(V1, V2);
 
-        public static Single Distance(FVector V1, FVector V2) =>
+        public static LwcType Distance(FVector V1, FVector V2) =>
             VectorImplementation.Vector_DistanceImplementation(V1, V2);
 
-        public static Single DistXY(FVector V1, FVector V2) =>
+        public static LwcType DistXY(FVector V1, FVector V2) =>
             VectorImplementation.Vector_DistXYImplementation(V1, V2);
 
-        public static Single Dist2D(FVector V1, FVector V2) =>
+        public static LwcType Dist2D(FVector V1, FVector V2) =>
             VectorImplementation.Vector_Dist2DImplementation(V1, V2);
 
-        public static Single DistSquared(FVector V1, FVector V2) =>
+        public static LwcType DistSquared(FVector V1, FVector V2) =>
             VectorImplementation.Vector_DistSquaredImplementation(V1, V2);
 
-        public static Single DistSquaredXY(FVector V1, FVector V2) =>
+        public static LwcType DistSquaredXY(FVector V1, FVector V2) =>
             VectorImplementation.Vector_DistSquaredXYImplementation(V1, V2);
 
-        public static Single DistSquared2D(FVector V1, FVector V2) =>
+        public static LwcType DistSquared2D(FVector V1, FVector V2) =>
             VectorImplementation.Vector_DistSquared2DImplementation(V1, V2);
 
-        public static Single BoxPushOut(FVector Normal, FVector Size) =>
+        public static LwcType BoxPushOut(FVector Normal, FVector Size) =>
             VectorImplementation.Vector_BoxPushOutImplementation(Normal, Size);
 
         // @TODO THRESH_NORMALS_ARE_PARALLEL
-        public static Boolean Parallel(FVector Normal1, FVector Normal2, Single ParallelCosineThreshold) =>
+        public static Boolean Parallel(FVector Normal1, FVector Normal2, LwcType ParallelCosineThreshold) =>
             VectorImplementation.Vector_ParallelImplementation(Normal1, Normal2, ParallelCosineThreshold);
 
         // @TODO THRESH_NORMALS_ARE_PARALLEL
-        public static Boolean Coincident(FVector Normal1, FVector Normal2, Single ParallelCosineThreshold) =>
+        public static Boolean Coincident(FVector Normal1, FVector Normal2, LwcType ParallelCosineThreshold) =>
             VectorImplementation.Vector_CoincidentImplementation(Normal1, Normal2, ParallelCosineThreshold);
 
         // @TODO THRESH_NORMALS_ARE_PARALLEL
-        public static Boolean Orthogonal(FVector Normal1, FVector Normal2, Single ParallelCosineThreshold) =>
+        public static Boolean Orthogonal(FVector Normal1, FVector Normal2, LwcType ParallelCosineThreshold) =>
             VectorImplementation.Vector_OrthogonalImplementation(Normal1, Normal2, ParallelCosineThreshold);
 
         // @TODO THRESH_NORMALS_ARE_PARALLEL
         public static Boolean Coplanar(FVector Base1, FVector Normal1, FVector Base2, FVector Normal2,
-            Single ParallelCosineThreshold) =>
+            LwcType ParallelCosineThreshold) =>
             VectorImplementation.Vector_CoplanarImplementation(Base1, Normal1, Base2, Normal2, ParallelCosineThreshold);
 
-        public static Single Triple(FVector X, FVector Y, FVector Z) =>
+        public static LwcType Triple(FVector X, FVector Y, FVector Z) =>
             VectorImplementation.Vector_TripleImplementation(X, Y, Z);
 
         // @TODO

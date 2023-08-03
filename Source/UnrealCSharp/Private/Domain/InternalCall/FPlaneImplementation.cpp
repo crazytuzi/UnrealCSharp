@@ -61,7 +61,8 @@ void FPlaneImplementation::Plane_GetOriginImplementation(const MonoObject* InMon
 	}
 }
 
-float FPlaneImplementation::Plane_PlaneDotImplementation(const MonoObject* InMonoObject, const MonoObject* P)
+FPlaneImplementation::LwcType FPlaneImplementation::Plane_PlaneDotImplementation(
+	const MonoObject* InMonoObject, const MonoObject* P)
 {
 	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
@@ -75,7 +76,7 @@ float FPlaneImplementation::Plane_PlaneDotImplementation(const MonoObject* InMon
 	return 0.f;
 }
 
-bool FPlaneImplementation::Plane_NormalizeImplementation(const MonoObject* InMonoObject, const float Tolerance)
+bool FPlaneImplementation::Plane_NormalizeImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
 {
 	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
 
@@ -127,7 +128,7 @@ void FPlaneImplementation::Plane_TransformByImplementation(const MonoObject* InM
 }
 
 void FPlaneImplementation::Plane_TransformByUsingAdjointTImplementation(const MonoObject* InMonoObject,
-                                                                        const MonoObject* M, const float DetM,
+                                                                        const MonoObject* M, const LwcType DetM,
                                                                         const MonoObject* TA, MonoObject** OutValue)
 {
 	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
@@ -178,7 +179,7 @@ bool FPlaneImplementation::Plane_InequalityImplementation(const MonoObject* A, c
 	return false;
 }
 
-bool FPlaneImplementation::Plane_EqualsImplementation(const MonoObject* A, const MonoObject* B, const float Tolerance)
+bool FPlaneImplementation::Plane_EqualsImplementation(const MonoObject* A, const MonoObject* B, const LwcType Tolerance)
 {
 	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
 
@@ -192,7 +193,8 @@ bool FPlaneImplementation::Plane_EqualsImplementation(const MonoObject* A, const
 	return false;
 }
 
-float FPlaneImplementation::Plane_DotProductImplementation(const MonoObject* A, const MonoObject* B)
+FPlaneImplementation::LwcType FPlaneImplementation::Plane_DotProductImplementation(
+	const MonoObject* A, const MonoObject* B)
 {
 	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
 
@@ -246,7 +248,7 @@ void FPlaneImplementation::Plane_SubtractImplementation(const MonoObject* A, con
 	}
 }
 
-void FPlaneImplementation::Plane_DivideImplementation(const MonoObject* InMonoObject, const float Scale,
+void FPlaneImplementation::Plane_DivideImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                       MonoObject** OutValue)
 {
 	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);
@@ -265,7 +267,7 @@ void FPlaneImplementation::Plane_DivideImplementation(const MonoObject* InMonoOb
 	}
 }
 
-void FPlaneImplementation::Plane_MultiplyImplementation(const MonoObject* InMonoObject, const float Scale,
+void FPlaneImplementation::Plane_MultiplyImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                         MonoObject** OutValue)
 {
 	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(InMonoObject);

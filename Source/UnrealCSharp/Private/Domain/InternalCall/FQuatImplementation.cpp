@@ -112,7 +112,7 @@ void FQuatImplementation::Quat_SubtractImplementation(const MonoObject* A, const
 	}
 }
 
-bool FQuatImplementation::Quat_EqualsImplementation(const MonoObject* A, const MonoObject* B, const float Tolerance)
+bool FQuatImplementation::Quat_EqualsImplementation(const MonoObject* A, const MonoObject* B, const LwcType Tolerance)
 {
 	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
@@ -126,7 +126,7 @@ bool FQuatImplementation::Quat_EqualsImplementation(const MonoObject* A, const M
 	return false;
 }
 
-bool FQuatImplementation::Quat_IsIdentityImplementation(const MonoObject* InMonoObject, const float Tolerance)
+bool FQuatImplementation::Quat_IsIdentityImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
 {
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
@@ -200,7 +200,7 @@ void FQuatImplementation::Quat_MultiplyMatrixImplementation(const MonoObject* In
 	}
 }
 
-void FQuatImplementation::Quat_MultiplyScaleImplementation(const MonoObject* InMonoObject, const float Scale,
+void FQuatImplementation::Quat_MultiplyScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                            MonoObject** OutValue)
 {
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
@@ -219,7 +219,7 @@ void FQuatImplementation::Quat_MultiplyScaleImplementation(const MonoObject* InM
 	}
 }
 
-void FQuatImplementation::Quat_DivideImplementation(const MonoObject* InMonoObject, const float Scale,
+void FQuatImplementation::Quat_DivideImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                     MonoObject** OutValue)
 {
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
@@ -281,7 +281,8 @@ bool FQuatImplementation::Quat_InequalityImplementation(const MonoObject* A, con
 	return false;
 }
 
-float FQuatImplementation::Quat_DotProductImplementation(const MonoObject* A, const MonoObject* B)
+FQuatImplementation::LwcType FQuatImplementation::Quat_DotProductImplementation(
+	const MonoObject* A, const MonoObject* B)
 {
 	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
 
@@ -331,7 +332,7 @@ void FQuatImplementation::Quat_EulerImplementation(const MonoObject* InMonoObjec
 	}
 }
 
-void FQuatImplementation::Quat_NormalizeImplementation(const MonoObject* InMonoObject, const float Tolerance)
+void FQuatImplementation::Quat_NormalizeImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
 {
 	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
@@ -339,7 +340,7 @@ void FQuatImplementation::Quat_NormalizeImplementation(const MonoObject* InMonoO
 	}
 }
 
-void FQuatImplementation::Quat_GetNormalizedImplementation(const MonoObject* InMonoObject, const float Tolerance,
+void FQuatImplementation::Quat_GetNormalizedImplementation(const MonoObject* InMonoObject, const LwcType Tolerance,
                                                            MonoObject** OutValue)
 {
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
@@ -368,7 +369,7 @@ bool FQuatImplementation::Quat_IsNormalizedImplementation(const MonoObject* InMo
 	return false;
 }
 
-float FQuatImplementation::Quat_SizeImplementation(const MonoObject* InMonoObject)
+FQuatImplementation::LwcType FQuatImplementation::Quat_SizeImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
@@ -378,7 +379,7 @@ float FQuatImplementation::Quat_SizeImplementation(const MonoObject* InMonoObjec
 	return 0.f;
 }
 
-float FQuatImplementation::Quat_SizeSquaredImplementation(const MonoObject* InMonoObject)
+FQuatImplementation::LwcType FQuatImplementation::Quat_SizeSquaredImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
@@ -388,7 +389,7 @@ float FQuatImplementation::Quat_SizeSquaredImplementation(const MonoObject* InMo
 	return 0.f;
 }
 
-float FQuatImplementation::Quat_GetAngleImplementation(const MonoObject* InMonoObject)
+FQuatImplementation::LwcType FQuatImplementation::Quat_GetAngleImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject))
 	{
@@ -399,7 +400,7 @@ float FQuatImplementation::Quat_GetAngleImplementation(const MonoObject* InMonoO
 }
 
 void FQuatImplementation::Quat_ToAxisAndAngleImplementation(const MonoObject* InMonoObject, MonoObject** Axis,
-                                                            float& Angle)
+                                                            LwcType& Angle)
 {
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
@@ -444,7 +445,8 @@ void FQuatImplementation::Quat_ToSwingTwistImplementation(const MonoObject* InMo
 	}
 }
 
-float FQuatImplementation::Quat_GetTwistAngleImplementation(const MonoObject* InMonoObject, const MonoObject* TwistAxis)
+FQuatImplementation::LwcType FQuatImplementation::Quat_GetTwistAngleImplementation(
+	const MonoObject* InMonoObject, const MonoObject* TwistAxis)
 {
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
@@ -729,7 +731,8 @@ void FQuatImplementation::Quat_GetRotationAxisImplementation(const MonoObject* I
 	}
 }
 
-float FQuatImplementation::Quat_AngularDistanceImplementation(const MonoObject* InMonoObject, const MonoObject* Q)
+FQuatImplementation::LwcType FQuatImplementation::Quat_AngularDistanceImplementation(
+	const MonoObject* InMonoObject, const MonoObject* Q)
 {
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InMonoObject);
 
@@ -852,7 +855,7 @@ void FQuatImplementation::Quat_FindBetweenVectorsImplementation(const MonoObject
 	}
 }
 
-float FQuatImplementation::Quat_ErrorImplementation(const MonoObject* Q1, const MonoObject* Q2)
+FQuatImplementation::LwcType FQuatImplementation::Quat_ErrorImplementation(const MonoObject* Q1, const MonoObject* Q2)
 {
 	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q1);
 
@@ -866,7 +869,8 @@ float FQuatImplementation::Quat_ErrorImplementation(const MonoObject* Q1, const 
 	return 0.f;
 }
 
-float FQuatImplementation::Quat_ErrorAutoNormalizeImplementation(const MonoObject* Q1, const MonoObject* Q2)
+FQuatImplementation::LwcType FQuatImplementation::Quat_ErrorAutoNormalizeImplementation(
+	const MonoObject* Q1, const MonoObject* Q2)
 {
 	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q1);
 
@@ -880,7 +884,7 @@ float FQuatImplementation::Quat_ErrorAutoNormalizeImplementation(const MonoObjec
 	return 0.f;
 }
 
-void FQuatImplementation::Quat_FastLerpImplementation(const MonoObject* A, const MonoObject* B, const float Alpha,
+void FQuatImplementation::Quat_FastLerpImplementation(const MonoObject* A, const MonoObject* B, const LwcType Alpha,
                                                       MonoObject** OutValue)
 {
 	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
@@ -902,8 +906,9 @@ void FQuatImplementation::Quat_FastLerpImplementation(const MonoObject* A, const
 }
 
 void FQuatImplementation::Quat_FastBilerpImplementation(const MonoObject* P00, const MonoObject* P10,
-                                                        const MonoObject* P01, const MonoObject* P11, const float FracX,
-                                                        const float FracY, MonoObject** OutValue)
+                                                        const MonoObject* P01, const MonoObject* P11,
+                                                        const LwcType FracX,
+                                                        const LwcType FracY, MonoObject** OutValue)
 {
 	const auto QuatP00 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(P00);
 
@@ -928,7 +933,7 @@ void FQuatImplementation::Quat_FastBilerpImplementation(const MonoObject* P00, c
 }
 
 void FQuatImplementation::Quat_Slerp_NotNormalizedImplementation(const MonoObject* Quat1, const MonoObject* Quat2,
-                                                                 const float Slerp, MonoObject** OutValue)
+                                                                 const LwcType Slerp, MonoObject** OutValue)
 {
 	const auto QuatQ1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Quat1);
 
@@ -948,7 +953,8 @@ void FQuatImplementation::Quat_Slerp_NotNormalizedImplementation(const MonoObjec
 	}
 }
 
-void FQuatImplementation::Quat_SlerpImplementation(const MonoObject* Quat1, const MonoObject* Quat2, const float Slerp,
+void FQuatImplementation::Quat_SlerpImplementation(const MonoObject* Quat1, const MonoObject* Quat2,
+                                                   const LwcType Slerp,
                                                    MonoObject** OutValue)
 {
 	const auto QuatQ1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Quat1);
@@ -970,7 +976,7 @@ void FQuatImplementation::Quat_SlerpImplementation(const MonoObject* Quat1, cons
 }
 
 void FQuatImplementation::Quat_SlerpFullPath_NotNormalizedImplementation(
-	const MonoObject* quat1, const MonoObject* quat2, const float Alpha, MonoObject** OutValue)
+	const MonoObject* quat1, const MonoObject* quat2, const LwcType Alpha, MonoObject** OutValue)
 {
 	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat1);
 
@@ -991,7 +997,7 @@ void FQuatImplementation::Quat_SlerpFullPath_NotNormalizedImplementation(
 }
 
 void FQuatImplementation::Quat_SlerpFullPathImplementation(const MonoObject* quat1, const MonoObject* quat2,
-                                                           const float Alpha, MonoObject** OutValue)
+                                                           const LwcType Alpha, MonoObject** OutValue)
 {
 	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat1);
 
@@ -1012,7 +1018,8 @@ void FQuatImplementation::Quat_SlerpFullPathImplementation(const MonoObject* qua
 }
 
 void FQuatImplementation::Quat_SquadImplementation(const MonoObject* quat1, const MonoObject* tang1,
-                                                   const MonoObject* quat2, const MonoObject* tang2, const float Alpha,
+                                                   const MonoObject* quat2, const MonoObject* tang2,
+                                                   const LwcType Alpha,
                                                    MonoObject** OutValue)
 {
 	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat1);
@@ -1039,7 +1046,7 @@ void FQuatImplementation::Quat_SquadImplementation(const MonoObject* quat1, cons
 
 void FQuatImplementation::Quat_SquadFullPathImplementation(const MonoObject* quat1, const MonoObject* tang1,
                                                            const MonoObject* quat2, const MonoObject* tang2,
-                                                           const float Alpha, MonoObject** OutValue)
+                                                           const LwcType Alpha, MonoObject** OutValue)
 {
 	const auto Quat1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(quat1);
 
@@ -1064,7 +1071,7 @@ void FQuatImplementation::Quat_SquadFullPathImplementation(const MonoObject* qua
 }
 
 void FQuatImplementation::Quat_CalcTangentsImplementation(const MonoObject* PrevP, const MonoObject* P,
-                                                          const MonoObject* NextP, const float Tension,
+                                                          const MonoObject* NextP, const LwcType Tension,
                                                           MonoObject** OutValue)
 {
 	const auto QuatPrevP = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(PrevP);

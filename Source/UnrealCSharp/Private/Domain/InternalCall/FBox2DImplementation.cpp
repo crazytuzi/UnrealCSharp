@@ -137,7 +137,7 @@ void FBox2DImplementation::Box2D_SetReferenceImplementation(const MonoObject* In
 	}
 }
 
-float FBox2DImplementation::Box2D_ComputeSquaredDistanceToPointImplementation(
+FBox2DImplementation::LwcType FBox2DImplementation::Box2D_ComputeSquaredDistanceToPointImplementation(
 	const MonoObject* InMonoObject, const MonoObject* Point)
 {
 	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
@@ -152,7 +152,7 @@ float FBox2DImplementation::Box2D_ComputeSquaredDistanceToPointImplementation(
 	return 0.f;
 }
 
-void FBox2DImplementation::Box2D_ExpandByImplementation(const MonoObject* InMonoObject, const float W,
+void FBox2DImplementation::Box2D_ExpandByImplementation(const MonoObject* InMonoObject, const LwcType W,
                                                         MonoObject** OutValue)
 {
 	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
@@ -171,7 +171,7 @@ void FBox2DImplementation::Box2D_ExpandByImplementation(const MonoObject* InMono
 	}
 }
 
-float FBox2DImplementation::Box2D_GetAreaImplementation(const MonoObject* InMonoObject)
+FBox2DImplementation::LwcType FBox2DImplementation::Box2D_GetAreaImplementation(const MonoObject* InMonoObject)
 {
 	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
 

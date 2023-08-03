@@ -1,12 +1,17 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.CoreUObject
 {
     public partial class FMatrix
     {
-        public Single this[UInt32 InRow, UInt32 InColumn]
+        public LwcType this[UInt32 InRow, UInt32 InColumn]
         {
             get => MatrixImplementation.Matrix_GetMImplementation(this, InRow, InColumn);
 
@@ -32,7 +37,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FMatrix operator *(FMatrix A, Single Other)
+        public static FMatrix operator *(FMatrix A, LwcType Other)
         {
             MatrixImplementation.Matrix_MultiplyScaleImplementation(A, Other, out var OutValue);
 
@@ -43,7 +48,7 @@ namespace Script.CoreUObject
             MatrixImplementation.Matrix_EqualityImplementation(A, B);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Equals(FMatrix Other, Single Tolerance) =>
+        public Boolean Equals(FMatrix Other, LwcType Tolerance) =>
             MatrixImplementation.Matrix_EqualsImplementation(this, Other, Tolerance);
 
         public static Boolean operator !=(FMatrix A, FMatrix B) =>
@@ -91,10 +96,10 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public Single Determinant() =>
+        public LwcType Determinant() =>
             MatrixImplementation.Matrix_DeterminantImplementation(this);
 
-        public Single RotDeterminant() =>
+        public LwcType RotDeterminant() =>
             MatrixImplementation.Matrix_RotDeterminantImplementation(this);
 
         public FMatrix InverseFast()
@@ -119,11 +124,11 @@ namespace Script.CoreUObject
         }
 
         // @TODO SMALL_NUMBER
-        public void RemoveScaling(FMatrix Other, Single Tolerance) =>
+        public void RemoveScaling(FMatrix Other, LwcType Tolerance) =>
             MatrixImplementation.Matrix_RemoveScalingImplementation(this, Tolerance);
 
         // @TODO SMALL_NUMBER
-        public FMatrix GetMatrixWithoutScale(Single Tolerance)
+        public FMatrix GetMatrixWithoutScale(LwcType Tolerance)
         {
             MatrixImplementation.Matrix_GetMatrixWithoutScaleImplementation(this, Tolerance, out var OutValue);
 
@@ -131,7 +136,7 @@ namespace Script.CoreUObject
         }
 
         // @TODO SMALL_NUMBER
-        public FVector ExtractScaling(Single Tolerance)
+        public FVector ExtractScaling(LwcType Tolerance)
         {
             MatrixImplementation.Matrix_ExtractScalingImplementation(this, Tolerance, out var OutValue);
 
@@ -139,7 +144,7 @@ namespace Script.CoreUObject
         }
 
         // @TODO SMALL_NUMBER
-        public FVector GetScaleVector(Single Tolerance)
+        public FVector GetScaleVector(LwcType Tolerance)
         {
             MatrixImplementation.Matrix_GetScaleVectorImplementation(this, Tolerance, out var OutValue);
 
@@ -166,10 +171,10 @@ namespace Script.CoreUObject
         public void ScaleTranslation(FVector Scale3D) =>
             MatrixImplementation.Matrix_ScaleTranslationImplementation(this, Scale3D);
 
-        public Single GetMaximumAxisScale() =>
+        public LwcType GetMaximumAxisScale() =>
             MatrixImplementation.Matrix_GetMaximumAxisScaleImplementation(this);
 
-        public FMatrix ApplyScale(Single Scale)
+        public FMatrix ApplyScale(LwcType Scale)
         {
             MatrixImplementation.Matrix_ApplyScaleImplementation(this, Scale, out var OutValue);
 

@@ -2,6 +2,11 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.Library
 {
@@ -37,11 +42,11 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_BlendImplementation(FTransform InTransform, FTransform Atom1,
-            FTransform Atom2, Single Alpha);
+            FTransform Atom2, LwcType Alpha);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_BlendWithImplementation(FTransform InTransform, FTransform OtherAtom,
-            Single Alpha);
+            LwcType Alpha);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_AddImplementation(FTransform A, FTransform B, out FTransform OutValue);
@@ -62,16 +67,16 @@ namespace Script.Library
             FVector InScale3D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ScaleTranslationScaleImplementation(FTransform InTransform, Single Scale);
+        public static extern void Transform_ScaleTranslationScaleImplementation(FTransform InTransform, LwcType Scale);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_RemoveScalingImplementation(FTransform InTransform, Single Tolerance);
+        public static extern void Transform_RemoveScalingImplementation(FTransform InTransform, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Transform_GetMaximumAxisScaleImplementation(FTransform InTransform);
+        public static extern LwcType Transform_GetMaximumAxisScaleImplementation(FTransform InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Transform_GetMinimumAxisScaleImplementation(FTransform InTransform);
+        public static extern LwcType Transform_GetMinimumAxisScaleImplementation(FTransform InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_GetRelativeTransformImplementation(FTransform InTransform, FTransform Other,
@@ -134,7 +139,7 @@ namespace Script.Library
             out FQuat OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetScaledScaleImplementation(FTransform InTransform, Single Scale,
+        public static extern void Transform_GetScaledScaleImplementation(FTransform InTransform, LwcType Scale,
             out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -142,7 +147,7 @@ namespace Script.Library
             out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetSafeScaleReciprocalImplementation(FVector InScale, Single Tolerance,
+        public static extern void Transform_GetSafeScaleReciprocalImplementation(FVector InScale, LwcType Tolerance,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -152,7 +157,7 @@ namespace Script.Library
         public static extern void Transform_RotatorImplementation(FTransform InTransform, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Transform_GetDeterminantImplementation(FTransform InTransform);
+        public static extern LwcType Transform_GetDeterminantImplementation(FTransform InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_SetLocationImplementation(FTransform InTransform, FVector Origin);
@@ -165,31 +170,31 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_AreRotationsEqualImplementation(FTransform A, FTransform B,
-            Single Tolerance);
+            LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_AreTranslationsEqualImplementation(FTransform A, FTransform B,
-            Single Tolerance);
+            LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_AreScale3DsEqualImplementation(FTransform A, FTransform B,
-            Single Tolerance);
+            LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_RotationEqualsImplementation(FTransform InTransform, FTransform Other,
-            Single Tolerance);
+            LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_TranslationEqualsImplementation(FTransform InTransform, FTransform Other,
-            Single Tolerance);
+            LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_Scale3DEqualsImplementation(FTransform InTransform, FTransform Other,
-            Single Tolerance);
+            LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_EqualsImplementation(FTransform InTransform, FTransform Other,
-            Single Tolerance);
+            LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_IdenticalImplementation(FTransform InTransform, FTransform Other,
@@ -197,7 +202,7 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Transform_EqualsNoScaleImplementation(FTransform InTransform, FTransform Other,
-            Single Tolerance);
+            LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_StaticMultiplyImplementation(out FTransform OutTransform, FTransform A,

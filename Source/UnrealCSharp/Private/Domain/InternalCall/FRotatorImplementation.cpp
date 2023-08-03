@@ -89,7 +89,7 @@ void FRotatorImplementation::Rotator_SubtractImplementation(const MonoObject* A,
 	}
 }
 
-void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* InMonoObject, const float Scale,
+void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                             MonoObject** OutValue)
 {
 	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
@@ -136,7 +136,7 @@ bool FRotatorImplementation::Rotator_InequalityImplementation(const MonoObject* 
 	return false;
 }
 
-bool FRotatorImplementation::Rotator_IsNearlyZeroImplementation(const MonoObject* InMonoObject, const float Tolerance)
+bool FRotatorImplementation::Rotator_IsNearlyZeroImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
 {
 	if (const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject))
 	{
@@ -157,7 +157,7 @@ bool FRotatorImplementation::Rotator_IsZeroImplementation(const MonoObject* InMo
 }
 
 bool FRotatorImplementation::Rotator_EqualsImplementation(const MonoObject* A, const MonoObject* B,
-                                                          const float Tolerance)
+                                                          const LwcType Tolerance)
 {
 	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(A);
 
@@ -171,8 +171,8 @@ bool FRotatorImplementation::Rotator_EqualsImplementation(const MonoObject* A, c
 	return false;
 }
 
-void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* InMonoObject, const float DeltaPitch,
-                                                            const float DeltaYaw, const float DeltaRoll,
+void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* InMonoObject, const LwcType DeltaPitch,
+                                                            const LwcType DeltaYaw, const LwcType DeltaRoll,
                                                             MonoObject** OutValue)
 {
 	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
@@ -416,7 +416,7 @@ void FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation(
 	}
 }
 
-float FRotatorImplementation::Rotator_GetManhattanDistanceImplementation(
+FRotatorImplementation::LwcType FRotatorImplementation::Rotator_GetManhattanDistanceImplementation(
 	const MonoObject* InMonoObject, const MonoObject* Rotator)
 {
 	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
@@ -536,32 +536,33 @@ bool FRotatorImplementation::Rotator_ContainsNaNImplementation(const MonoObject*
 	return false;
 }
 
-float FRotatorImplementation::Rotator_ClampAxisImplementation(const float Angle)
+FRotatorImplementation::LwcType FRotatorImplementation::Rotator_ClampAxisImplementation(const LwcType Angle)
 {
 	return FRotator::ClampAxis(Angle);
 }
 
-float FRotatorImplementation::Rotator_NormalizeAxisImplementation(const float Angle)
+FRotatorImplementation::LwcType FRotatorImplementation::Rotator_NormalizeAxisImplementation(const LwcType Angle)
 {
 	return FRotator::NormalizeAxis(Angle);
 }
 
-uint8 FRotatorImplementation::Rotator_CompressAxisToByteImplementation(const float Angle)
+uint8 FRotatorImplementation::Rotator_CompressAxisToByteImplementation(const LwcType Angle)
 {
 	return FRotator::CompressAxisToByte(Angle);
 }
 
-float FRotatorImplementation::Rotator_DecompressAxisFromByteImplementation(const uint8 Angle)
+FRotatorImplementation::LwcType FRotatorImplementation::Rotator_DecompressAxisFromByteImplementation(const uint8 Angle)
 {
 	return FRotator::DecompressAxisFromByte(Angle);
 }
 
-uint16 FRotatorImplementation::Rotator_CompressAxisToShortImplementation(const float Angle)
+uint16 FRotatorImplementation::Rotator_CompressAxisToShortImplementation(const LwcType Angle)
 {
 	return FRotator::CompressAxisToShort(Angle);
 }
 
-float FRotatorImplementation::Rotator_DecompressAxisFromShortImplementation(const uint16 Angle)
+FRotatorImplementation::LwcType FRotatorImplementation::Rotator_DecompressAxisFromShortImplementation(
+	const uint16 Angle)
 {
 	return FRotator::DecompressAxisFromShort(Angle);
 }

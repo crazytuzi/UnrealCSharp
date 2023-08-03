@@ -1,6 +1,11 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.CoreUObject
 {
@@ -54,10 +59,10 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public void Blend(FTransform Atom1, FTransform Atom2, Single Alpha) =>
+        public void Blend(FTransform Atom1, FTransform Atom2, LwcType Alpha) =>
             TransformImplementation.Transform_BlendImplementation(this, Atom1, Atom2, Alpha);
 
-        public void BlendWith(FTransform OtherAtom, Single Alpha) =>
+        public void BlendWith(FTransform OtherAtom, LwcType Alpha) =>
             TransformImplementation.Transform_BlendWithImplementation(this, OtherAtom, Alpha);
 
         public static FTransform operator +(FTransform A, FTransform B)
@@ -87,17 +92,17 @@ namespace Script.CoreUObject
         public void ScaleTranslation(FVector InScale3D) =>
             TransformImplementation.Transform_ScaleTranslationVectorImplementation(this, InScale3D);
 
-        public void ScaleTranslation(Single Scale) =>
+        public void ScaleTranslation(LwcType Scale) =>
             TransformImplementation.Transform_ScaleTranslationScaleImplementation(this, Scale);
 
         // @TODO SMALL_NUMBER
-        public void RemoveScaling(Single Scale) =>
+        public void RemoveScaling(LwcType Scale) =>
             TransformImplementation.Transform_RemoveScalingImplementation(this, Scale);
 
-        public Single GetMaximumAxisScale() =>
+        public LwcType GetMaximumAxisScale() =>
             TransformImplementation.Transform_GetMaximumAxisScaleImplementation(this);
 
-        public Single GetMinimumAxisScale() =>
+        public LwcType GetMinimumAxisScale() =>
             TransformImplementation.Transform_GetMinimumAxisScaleImplementation(this);
 
         public FTransform GetRelativeTransform(FTransform Other)
@@ -201,7 +206,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public FTransform GetScaled(Single Scale)
+        public FTransform GetScaled(LwcType Scale)
         {
             TransformImplementation.Transform_GetScaledScaleImplementation(this, Scale, out var OutValue);
 
@@ -221,7 +226,7 @@ namespace Script.CoreUObject
         // Mirror
 
         // @TODO SMALL_NUMBER
-        public static FVector GetSafeScaleReciprocal(FVector InScale, Single Tolerance)
+        public static FVector GetSafeScaleReciprocal(FVector InScale, LwcType Tolerance)
         {
             TransformImplementation.Transform_GetSafeScaleReciprocalImplementation(InScale, Tolerance,
                 out var OutValue);
@@ -243,7 +248,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public Single GetDeterminant() =>
+        public LwcType GetDeterminant() =>
             TransformImplementation.Transform_GetDeterminantImplementation(this);
 
         public void SetLocation(FVector Origin) =>
@@ -256,38 +261,38 @@ namespace Script.CoreUObject
             TransformImplementation.Transform_IsValidImplementation(this);
 
         // @TODO KINDA_SMALL_NUMBER
-        public static Boolean AreRotationsEqual(FTransform A, FTransform B, Single Tolerance) =>
+        public static Boolean AreRotationsEqual(FTransform A, FTransform B, LwcType Tolerance) =>
             TransformImplementation.Transform_AreRotationsEqualImplementation(A, B, Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
-        public static Boolean AreTranslationsEqual(FTransform A, FTransform B, Single Tolerance) =>
+        public static Boolean AreTranslationsEqual(FTransform A, FTransform B, LwcType Tolerance) =>
             TransformImplementation.Transform_AreTranslationsEqualImplementation(A, B, Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
-        public static Boolean AreScale3DsEqual(FTransform A, FTransform B, Single Tolerance) =>
+        public static Boolean AreScale3DsEqual(FTransform A, FTransform B, LwcType Tolerance) =>
             TransformImplementation.Transform_AreScale3DsEqualImplementation(A, B, Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean RotationEquals(FTransform Other, Single Tolerance) =>
+        public Boolean RotationEquals(FTransform Other, LwcType Tolerance) =>
             TransformImplementation.Transform_RotationEqualsImplementation(this, Other, Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean TranslationEquals(FTransform Other, Single Tolerance) =>
+        public Boolean TranslationEquals(FTransform Other, LwcType Tolerance) =>
             TransformImplementation.Transform_TranslationEqualsImplementation(this, Other, Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Scale3DEquals(FTransform Other, Single Tolerance) =>
+        public Boolean Scale3DEquals(FTransform Other, LwcType Tolerance) =>
             TransformImplementation.Transform_Scale3DEqualsImplementation(this, Other, Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Equals(FTransform Other, Single Tolerance) =>
+        public Boolean Equals(FTransform Other, LwcType Tolerance) =>
             TransformImplementation.Transform_EqualsImplementation(this, Other, Tolerance);
 
         public Boolean Identical(FTransform Other, UInt32 PortFlags) =>
             TransformImplementation.Transform_IdenticalImplementation(this, Other, PortFlags);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean EqualsNoScale(FTransform Other, Single Tolerance) =>
+        public Boolean EqualsNoScale(FTransform Other, LwcType Tolerance) =>
             TransformImplementation.Transform_EqualsNoScaleImplementation(this, Other, Tolerance);
 
         public static void Multiply(out FTransform OutTransform, FTransform A, FTransform B) =>

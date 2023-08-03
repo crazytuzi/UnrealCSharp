@@ -1,6 +1,11 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.CoreUObject
 {
@@ -20,7 +25,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static FRotator operator *(FRotator A, Single Scale)
+        public static FRotator operator *(FRotator A, LwcType Scale)
         {
             RotatorImplementation.Rotator_MultiplyImplementation(A, Scale, out var OutValue);
 
@@ -34,17 +39,17 @@ namespace Script.CoreUObject
             RotatorImplementation.Rotator_InequalityImplementation(A, B);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean IsNearlyZero(Single Tolerance) =>
+        public Boolean IsNearlyZero(LwcType Tolerance) =>
             RotatorImplementation.Rotator_IsNearlyZeroImplementation(this, Tolerance);
 
         public Boolean IsZero() =>
             RotatorImplementation.Rotator_IsZeroImplementation(this);
 
         // @TODO KINDA_SMALL_NUMBER
-        public Boolean Equals(FRotator R, Single Tolerance) =>
+        public Boolean Equals(FRotator R, LwcType Tolerance) =>
             RotatorImplementation.Rotator_EqualsImplementation(this, R, Tolerance);
 
-        public FRotator Add(Single DeltaPitch, Single DeltaYaw, Single DeltaRoll)
+        public FRotator Add(LwcType DeltaPitch, LwcType DeltaYaw, LwcType DeltaRoll)
         {
             RotatorImplementation.Rotator_AddDeltaImplementation(this, DeltaPitch, DeltaYaw, DeltaRoll,
                 out var OutValue);
@@ -132,7 +137,7 @@ namespace Script.CoreUObject
         public void GetWindingAndRemainder(out FRotator Winding, out FRotator Remainder) =>
             RotatorImplementation.Rotator_GetWindingAndRemainderImplementation(this, out Winding, out Remainder);
 
-        public Single GetManhattanDistance(FRotator Rotator) =>
+        public LwcType GetManhattanDistance(FRotator Rotator) =>
             RotatorImplementation.Rotator_GetManhattanDistanceImplementation(this, Rotator);
 
         public FRotator GetEquivalentRotator()
@@ -169,22 +174,22 @@ namespace Script.CoreUObject
         public Boolean ContainsNaN() =>
             RotatorImplementation.Rotator_ContainsNaNImplementation(this);
 
-        public static Single ClampAxis(Single Angle) =>
+        public static LwcType ClampAxis(LwcType Angle) =>
             RotatorImplementation.Rotator_ClampAxisImplementation(Angle);
 
-        public static Single NormalizeAxis(Single Angle) =>
+        public static LwcType NormalizeAxis(LwcType Angle) =>
             RotatorImplementation.Rotator_NormalizeAxisImplementation(Angle);
 
-        public static Byte CompressAxisToByte(Single Angle) =>
+        public static Byte CompressAxisToByte(LwcType Angle) =>
             RotatorImplementation.Rotator_CompressAxisToByteImplementation(Angle);
 
-        public static Single DecompressAxisFromByte(Byte Angle) =>
+        public static LwcType DecompressAxisFromByte(Byte Angle) =>
             RotatorImplementation.Rotator_DecompressAxisFromByteImplementation(Angle);
 
         public static UInt16 CompressAxisToByte(Byte Angle) =>
             RotatorImplementation.Rotator_CompressAxisToShortImplementation(Angle);
 
-        public static Single DecompressAxisFromShort(UInt16 Angle) =>
+        public static LwcType DecompressAxisFromShort(UInt16 Angle) =>
             RotatorImplementation.Rotator_DecompressAxisFromShortImplementation(Angle);
 
         public static FRotator MakeFromEuler(FVector Euler)

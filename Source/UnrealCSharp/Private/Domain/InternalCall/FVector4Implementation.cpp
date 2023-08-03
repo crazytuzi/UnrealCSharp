@@ -48,8 +48,9 @@ struct FRegisterVector4
 
 static FRegisterVector4 RegisterVector4;
 
-float FVector4Implementation::Vector4_GetComponentImplementation(const MonoObject* InMonoObject,
-                                                                 const int32 ComponentIndex)
+FVector4Implementation::LwcType FVector4Implementation::Vector4_GetComponentImplementation(
+	const MonoObject* InMonoObject,
+	const int32 ComponentIndex)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -62,7 +63,7 @@ float FVector4Implementation::Vector4_GetComponentImplementation(const MonoObjec
 }
 
 void FVector4Implementation::Vector4_SetComponentImplementation(const MonoObject* InMonoObject,
-                                                                const int32 ComponentIndex, const float InValue)
+                                                                const int32 ComponentIndex, const LwcType InValue)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -131,7 +132,7 @@ void FVector4Implementation::Vector4_SubtractImplementation(const MonoObject* A,
 	}
 }
 
-void FVector4Implementation::Vector4_MultiplyScaleImplementation(const MonoObject* InMonoObject, const float Scale,
+void FVector4Implementation::Vector4_MultiplyScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                                  MonoObject** OutValue)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
@@ -150,7 +151,7 @@ void FVector4Implementation::Vector4_MultiplyScaleImplementation(const MonoObjec
 	}
 }
 
-void FVector4Implementation::Vector4_DivideScaleImplementation(const MonoObject* InMonoObject, const float Scale,
+void FVector4Implementation::Vector4_DivideScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                                MonoObject** OutValue)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
@@ -211,7 +212,8 @@ void FVector4Implementation::Vector4_MultiplyImplementation(const MonoObject* A,
 	}
 }
 
-float FVector4Implementation::Vector4_Dot3Implementation(const MonoObject* A, const MonoObject* B)
+FVector4Implementation::LwcType FVector4Implementation::Vector4_Dot3Implementation(
+	const MonoObject* A, const MonoObject* B)
 {
 	const auto Vector4A = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(A);
 
@@ -225,7 +227,8 @@ float FVector4Implementation::Vector4_Dot3Implementation(const MonoObject* A, co
 	return 0.f;
 }
 
-float FVector4Implementation::Vector4_Dot4Implementation(const MonoObject* A, const MonoObject* B)
+FVector4Implementation::LwcType FVector4Implementation::Vector4_Dot4Implementation(
+	const MonoObject* A, const MonoObject* B)
 {
 	const auto Vector4A = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(A);
 
@@ -288,7 +291,8 @@ void FVector4Implementation::Vector4_CrossProductImplementation(const MonoObject
 	}
 }
 
-float FVector4Implementation::Vector4_ComponentImplementation(const MonoObject* InMonoObject, const int32 Index)
+FVector4Implementation::LwcType FVector4Implementation::Vector4_ComponentImplementation(
+	const MonoObject* InMonoObject, const int32 Index)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -301,7 +305,7 @@ float FVector4Implementation::Vector4_ComponentImplementation(const MonoObject* 
 }
 
 bool FVector4Implementation::Vector4_EqualsImplementation(const MonoObject* A, const MonoObject* B,
-                                                          const float Tolerance)
+                                                          const LwcType Tolerance)
 {
 	const auto Vector4A = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(A);
 
@@ -316,7 +320,7 @@ bool FVector4Implementation::Vector4_EqualsImplementation(const MonoObject* A, c
 }
 
 bool FVector4Implementation::Vector4_IsUnit3Implementation(const MonoObject* InMonoObject,
-                                                           const float LengthSquaredTolerance)
+                                                           const LwcType LengthSquaredTolerance)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -363,7 +367,8 @@ bool FVector4Implementation::Vector4_InitFromStringImplementation(const MonoObje
 	return false;
 }
 
-void FVector4Implementation::Vector4_GetSafeNormalImplementation(const MonoObject* InMonoObject, const float Tolerance,
+void FVector4Implementation::Vector4_GetSafeNormalImplementation(const MonoObject* InMonoObject,
+                                                                 const LwcType Tolerance,
                                                                  MonoObject** OutValue)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
@@ -457,8 +462,9 @@ void FVector4Implementation::Vector4_RotationImplementation(const MonoObject* In
 	}
 }
 
-void FVector4Implementation::Vector4_SetImplementation(const MonoObject* InMonoObject, const float InX, const float InY,
-                                                       const float InZ, const float InW)
+void FVector4Implementation::Vector4_SetImplementation(const MonoObject* InMonoObject, const LwcType InX,
+                                                       const LwcType InY,
+                                                       const LwcType InZ, const LwcType InW)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -468,7 +474,7 @@ void FVector4Implementation::Vector4_SetImplementation(const MonoObject* InMonoO
 	}
 }
 
-float FVector4Implementation::Vector4_Size3Implementation(const MonoObject* InMonoObject)
+FVector4Implementation::LwcType FVector4Implementation::Vector4_Size3Implementation(const MonoObject* InMonoObject)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -480,7 +486,8 @@ float FVector4Implementation::Vector4_Size3Implementation(const MonoObject* InMo
 	return 0.f;
 }
 
-float FVector4Implementation::Vector4_SizeSquared3Implementation(const MonoObject* InMonoObject)
+FVector4Implementation::LwcType FVector4Implementation::Vector4_SizeSquared3Implementation(
+	const MonoObject* InMonoObject)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -492,7 +499,7 @@ float FVector4Implementation::Vector4_SizeSquared3Implementation(const MonoObjec
 	return 0.f;
 }
 
-float FVector4Implementation::Vector4_SizeImplementation(const MonoObject* InMonoObject)
+FVector4Implementation::LwcType FVector4Implementation::Vector4_SizeImplementation(const MonoObject* InMonoObject)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -504,7 +511,8 @@ float FVector4Implementation::Vector4_SizeImplementation(const MonoObject* InMon
 	return 0.f;
 }
 
-float FVector4Implementation::Vector4_SizeSquaredImplementation(const MonoObject* InMonoObject)
+FVector4Implementation::LwcType FVector4Implementation::Vector4_SizeSquaredImplementation(
+	const MonoObject* InMonoObject)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 
@@ -528,7 +536,8 @@ bool FVector4Implementation::Vector4_ContainsNaNImplementation(const MonoObject*
 	return false;
 }
 
-bool FVector4Implementation::Vector4_IsNearlyZero3Implementation(const MonoObject* InMonoObject, const float Tolerance)
+bool FVector4Implementation::Vector4_IsNearlyZero3Implementation(const MonoObject* InMonoObject,
+                                                                 const LwcType Tolerance)
 {
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(InMonoObject);
 

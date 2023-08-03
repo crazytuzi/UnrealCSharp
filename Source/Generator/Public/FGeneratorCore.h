@@ -29,5 +29,9 @@ public:
 
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 
+	static FString GetConfig();
+
 	static bool IsSupportedModule(const FString& InModule);
+
+	static TArray<FName> GetAssetsPaths();
 };

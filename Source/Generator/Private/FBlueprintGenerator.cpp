@@ -6,29 +6,15 @@
 #include "Engine/UserDefinedEnum.h"
 #include "Engine/UserDefinedStruct.h"
 #include "UMGEditor/Public/WidgetBlueprint.h"
-#include "UEVersion.h"
+#include "FGeneratorCore.h"
 
 void FBlueprintGenerator::Generator()
 {
 	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
-	FARFilter Filter;
-
-#if UE_FILTER_CLASS_PATHS
-	Filter.ClassPaths = {
-		UBlueprint::StaticClass()->GetClassPathName(), UWidgetBlueprint::StaticClass()->GetClassPathName(),
-		UUserDefinedStruct::StaticClass()->GetClassPathName(), UUserDefinedEnum::StaticClass()->GetClassPathName()
-	};
-#else
-	Filter.ClassNames = {
-		UBlueprint::StaticClass()->GetFName(), UWidgetBlueprint::StaticClass()->GetFName(),
-		UUserDefinedStruct::StaticClass()->GetFName(), UUserDefinedEnum::StaticClass()->GetFName()
-	};
-#endif
-
 	TArray<FAssetData> OutAssetData;
 
-	AssetRegistryModule.Get().GetAssets(Filter, OutAssetData);
+	AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetAssetsPaths(), OutAssetData, true);
 
 	for (const auto& AssetData : OutAssetData)
 	{

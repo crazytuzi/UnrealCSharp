@@ -2,17 +2,22 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.Library
 {
     public static class MatrixImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Matrix_GetMImplementation(FMatrix InMatrix, UInt32 InRow, UInt32 InColumn);
+        public static extern LwcType Matrix_GetMImplementation(FMatrix InMatrix, UInt32 InRow, UInt32 InColumn);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Matrix_SetMImplementation(FMatrix InMatrix, UInt32 InRow, UInt32 InColumn,
-            Single InValue);
+            LwcType InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Matrix_SetIdentityImplementation(FMatrix InMatrix);
@@ -24,14 +29,14 @@ namespace Script.Library
         public static extern void Matrix_AddImplementation(FMatrix A, FMatrix B, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_MultiplyScaleImplementation(FMatrix InMatrix, Single Other,
+        public static extern void Matrix_MultiplyScaleImplementation(FMatrix InMatrix, LwcType Other,
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Matrix_EqualityImplementation(FMatrix A, FMatrix B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_EqualsImplementation(FMatrix A, FMatrix B, Single Tolerance);
+        public static extern Boolean Matrix_EqualsImplementation(FMatrix A, FMatrix B, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Matrix_InequalityImplementation(FMatrix A, FMatrix B);
@@ -60,10 +65,10 @@ namespace Script.Library
         public static extern void Matrix_GetTransposedImplementation(FMatrix InMatrix, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Matrix_DeterminantImplementation(FMatrix InMatrix);
+        public static extern LwcType Matrix_DeterminantImplementation(FMatrix InMatrix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Matrix_RotDeterminantImplementation(FMatrix InMatrix);
+        public static extern LwcType Matrix_RotDeterminantImplementation(FMatrix InMatrix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Matrix_InverseFastImplementation(FMatrix InMatrix, out FMatrix OutValue);
@@ -75,18 +80,18 @@ namespace Script.Library
         public static extern void Matrix_TransposeAdjointImplementation(FMatrix InMatrix, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_RemoveScalingImplementation(FMatrix InMatrix, Single Tolerance);
+        public static extern void Matrix_RemoveScalingImplementation(FMatrix InMatrix, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetMatrixWithoutScaleImplementation(FMatrix InMatrix, Single Tolerance,
+        public static extern void Matrix_GetMatrixWithoutScaleImplementation(FMatrix InMatrix, LwcType Tolerance,
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_ExtractScalingImplementation(FMatrix InMatrix, Single Tolerance,
+        public static extern void Matrix_ExtractScalingImplementation(FMatrix InMatrix, LwcType Tolerance,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetScaleVectorImplementation(FMatrix InMatrix, Single Tolerance,
+        public static extern void Matrix_GetScaleVectorImplementation(FMatrix InMatrix, LwcType Tolerance,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -103,10 +108,11 @@ namespace Script.Library
         public static extern void Matrix_ScaleTranslationImplementation(FMatrix InMatrix, FVector Scale3D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Matrix_GetMaximumAxisScaleImplementation(FMatrix InMatrix);
+        public static extern LwcType Matrix_GetMaximumAxisScaleImplementation(FMatrix InMatrix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_ApplyScaleImplementation(FMatrix InMatrix, Single Scale, out FMatrix OutValue);
+        public static extern void
+            Matrix_ApplyScaleImplementation(FMatrix InMatrix, LwcType Scale, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Matrix_GetOriginImplementation(FMatrix InMatrix, out FVector OutValue);

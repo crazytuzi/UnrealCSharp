@@ -1,9 +1,16 @@
 ﻿#pragma once
 
+#include "UEVersion.h"
 #include "mono/metadata/object-forward.h"
 
 class FTransformImplementation
 {
+#if UE_LWC_TYPE
+	using LwcType = double;
+#else
+	using LwcType = float;
+#endif
+
 public:
 	static void Transform_DebugPrintImplementation(const MonoObject* InMonoObject);
 
@@ -22,10 +29,10 @@ public:
 	static void Transform_ToMatrixNoScaleImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
 	static void Transform_BlendImplementation(const MonoObject* InMonoObject, const MonoObject* Atom1,
-	                                          const MonoObject* Atom2, float Alpha);
+	                                          const MonoObject* Atom2, LwcType Alpha);
 
 	static void Transform_BlendWithImplementation(const MonoObject* InMonoObject, const MonoObject* OtherAtom,
-	                                              float Alpha);
+	                                              LwcType Alpha);
 
 	static void Transform_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
 
@@ -39,13 +46,13 @@ public:
 	static void Transform_ScaleTranslationVectorImplementation(const MonoObject* InMonoObject,
 	                                                           const MonoObject* InScale3D);
 
-	static void Transform_ScaleTranslationScaleImplementation(const MonoObject* InMonoObject, float Scale);
+	static void Transform_ScaleTranslationScaleImplementation(const MonoObject* InMonoObject, LwcType Scale);
 
-	static void Transform_RemoveScalingImplementation(const MonoObject* InMonoObject, float Tolerance);
+	static void Transform_RemoveScalingImplementation(const MonoObject* InMonoObject, LwcType Tolerance);
 
-	static float Transform_GetMaximumAxisScaleImplementation(const MonoObject* InMonoObject);
+	static LwcType Transform_GetMaximumAxisScaleImplementation(const MonoObject* InMonoObject);
 
-	static float Transform_GetMinimumAxisScaleImplementation(const MonoObject* InMonoObject);
+	static LwcType Transform_GetMinimumAxisScaleImplementation(const MonoObject* InMonoObject);
 
 	static void Transform_GetRelativeTransformImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
 	                                                         MonoObject** OutValue);
@@ -89,20 +96,20 @@ public:
 	static void Transform_InverseTransformRotationImplementation(const MonoObject* InMonoObject, const MonoObject* Q,
 	                                                             MonoObject** OutValue);
 
-	static void Transform_GetScaledScaleImplementation(const MonoObject* InMonoObject, float Scale,
+	static void Transform_GetScaledScaleImplementation(const MonoObject* InMonoObject, LwcType Scale,
 	                                                   MonoObject** OutValue);
 
 	static void Transform_GetScaledVectorImplementation(const MonoObject* InMonoObject, const MonoObject* Scale,
 	                                                    MonoObject** OutValue);
 
-	static void Transform_GetSafeScaleReciprocalImplementation(const MonoObject* InScale, float Tolerance,
+	static void Transform_GetSafeScaleReciprocalImplementation(const MonoObject* InScale, LwcType Tolerance,
 	                                                           MonoObject** OutValue);
 
 	static void Transform_GetLocationImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
 	static void Transform_RotatorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
 
-	static float Transform_GetDeterminantImplementation(const MonoObject* InMonoObject);
+	static LwcType Transform_GetDeterminantImplementation(const MonoObject* InMonoObject);
 
 	static void Transform_SetLocationImplementation(const MonoObject* InMonoObject, const MonoObject* Origin);
 
@@ -110,29 +117,30 @@ public:
 
 	static bool Transform_IsValidImplementation(const MonoObject* InMonoObject);
 
-	static bool Transform_AreRotationsEqualImplementation(const MonoObject* A, const MonoObject* B, float Tolerance);
+	static bool Transform_AreRotationsEqualImplementation(const MonoObject* A, const MonoObject* B, LwcType Tolerance);
 
-	static bool Transform_AreTranslationsEqualImplementation(const MonoObject* A, const MonoObject* B, float Tolerance);
+	static bool Transform_AreTranslationsEqualImplementation(const MonoObject* A, const MonoObject* B,
+	                                                         LwcType Tolerance);
 
-	static bool Transform_AreScale3DsEqualImplementation(const MonoObject* A, const MonoObject* B, float Tolerance);
+	static bool Transform_AreScale3DsEqualImplementation(const MonoObject* A, const MonoObject* B, LwcType Tolerance);
 
 	static bool Transform_RotationEqualsImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
-	                                                   float Tolerance);
+	                                                   LwcType Tolerance);
 
 	static bool Transform_TranslationEqualsImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
-	                                                      float Tolerance);
+	                                                      LwcType Tolerance);
 
 	static bool Transform_Scale3DEqualsImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
-	                                                  float Tolerance);
+	                                                  LwcType Tolerance);
 
 	static bool Transform_EqualsImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
-	                                           float Tolerance);
+	                                           LwcType Tolerance);
 
 	static bool Transform_IdenticalImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
 	                                              uint32 PortFlags);
 
 	static bool Transform_EqualsNoScaleImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
-	                                                  float Tolerance);
+	                                                  LwcType Tolerance);
 
 	static void Transform_StaticMultiplyImplementation(MonoObject** OutValue, const MonoObject* A, const MonoObject* B);
 

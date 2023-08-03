@@ -2,6 +2,11 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+#if UE_5_0_OR_LATER
+using LwcType = System.Double;
+#else
+using LwcType = System.Single;
+#endif
 
 namespace Script.Library
 {
@@ -26,13 +31,13 @@ namespace Script.Library
         public static extern void Box2D_SetReferenceImplementation(FBox2D InBox2D, Int32 Index, FVector2D InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Box2D_ComputeSquaredDistanceToPointImplementation(FBox2D InBox2D, FVector2D Point);
+        public static extern LwcType Box2D_ComputeSquaredDistanceToPointImplementation(FBox2D InBox2D, FVector2D Point);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Box2D_ExpandByImplementation(FBox2D InBox2D, Single W, out FBox2D OutValue);
+        public static extern void Box2D_ExpandByImplementation(FBox2D InBox2D, LwcType W, out FBox2D OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Box2D_GetAreaImplementation(FBox2D InBox2D);
+        public static extern LwcType Box2D_GetAreaImplementation(FBox2D InBox2D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Box2D_GetCenterImplementation(FBox2D InBox2D, out FVector2D OutValue);

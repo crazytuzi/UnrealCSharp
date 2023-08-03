@@ -129,7 +129,8 @@ void FVectorImplementation::Vector_CrossProductImplementation(const MonoObject* 
 	}
 }
 
-float FVectorImplementation::Vector_DotProductImplementation(const MonoObject* A, const MonoObject* B)
+FVectorImplementation::LwcType FVectorImplementation::Vector_DotProductImplementation(
+	const MonoObject* A, const MonoObject* B)
 {
 	const auto VectorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(A);
 
@@ -163,7 +164,7 @@ void FVectorImplementation::Vector_AddImplementation(const MonoObject* A, const 
 	}
 }
 
-void FVectorImplementation::Vector_AddBiasImplementation(const MonoObject* InMonoObject, const float Bias,
+void FVectorImplementation::Vector_AddBiasImplementation(const MonoObject* InMonoObject, const LwcType Bias,
                                                          MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -203,7 +204,7 @@ void FVectorImplementation::Vector_SubtractImplementation(const MonoObject* A, c
 	}
 }
 
-void FVectorImplementation::Vector_SubtractBiasImplementation(const MonoObject* InMonoObject, const float Bias,
+void FVectorImplementation::Vector_SubtractBiasImplementation(const MonoObject* InMonoObject, const LwcType Bias,
                                                               MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -243,7 +244,7 @@ void FVectorImplementation::Vector_MultiplyImplementation(const MonoObject* A, c
 	}
 }
 
-void FVectorImplementation::Vector_MultiplyScaleImplementation(const MonoObject* InMonoObject, const float Scale,
+void FVectorImplementation::Vector_MultiplyScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                                MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -282,7 +283,7 @@ void FVectorImplementation::Vector_DivideImplementation(const MonoObject* A, con
 	}
 }
 
-void FVectorImplementation::Vector_DivideScaleImplementation(const MonoObject* InMonoObject, const float Scale,
+void FVectorImplementation::Vector_DivideScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
                                                              MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -329,7 +330,8 @@ bool FVectorImplementation::Vector_InequalityImplementation(const MonoObject* A,
 	return false;
 }
 
-bool FVectorImplementation::Vector_EqualsImplementation(const MonoObject* A, const MonoObject* B, const float Tolerance)
+bool FVectorImplementation::Vector_EqualsImplementation(const MonoObject* A, const MonoObject* B,
+                                                        const LwcType Tolerance)
 {
 	const auto VectorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(A);
 
@@ -344,7 +346,7 @@ bool FVectorImplementation::Vector_EqualsImplementation(const MonoObject* A, con
 }
 
 bool FVectorImplementation::Vector_AllComponentsEqualImplementation(const MonoObject* InMonoObject,
-                                                                    const float Tolerance)
+                                                                    const LwcType Tolerance)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -372,7 +374,8 @@ void FVectorImplementation::Vector_NegatedImplementation(const MonoObject* InMon
 	}
 }
 
-float FVectorImplementation::Vector_GetComponentImplementation(const MonoObject* InMonoObject, const int32 InIndex)
+FVectorImplementation::LwcType FVectorImplementation::Vector_GetComponentImplementation(
+	const MonoObject* InMonoObject, const int32 InIndex)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -383,7 +386,7 @@ float FVectorImplementation::Vector_GetComponentImplementation(const MonoObject*
 }
 
 void FVectorImplementation::Vector_SetComponentImplementation(const MonoObject* InMonoObject, const int32 InIndex,
-                                                              const float InValue)
+                                                              const LwcType InValue)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -391,7 +394,8 @@ void FVectorImplementation::Vector_SetComponentImplementation(const MonoObject* 
 	}
 }
 
-float FVectorImplementation::Vector_ComponentImplementation(const MonoObject* InMonoObject, const int32 InIndex)
+FVectorImplementation::LwcType FVectorImplementation::Vector_ComponentImplementation(
+	const MonoObject* InMonoObject, const int32 InIndex)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -401,8 +405,9 @@ float FVectorImplementation::Vector_ComponentImplementation(const MonoObject* In
 	return 0.f;
 }
 
-void FVectorImplementation::Vector_SetImplementation(const MonoObject* InMonoObject, const float InX, const float InY,
-                                                     const float InZ)
+void FVectorImplementation::Vector_SetImplementation(const MonoObject* InMonoObject, const LwcType InX,
+                                                     const LwcType InY,
+                                                     const LwcType InZ)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -410,7 +415,7 @@ void FVectorImplementation::Vector_SetImplementation(const MonoObject* InMonoObj
 	}
 }
 
-float FVectorImplementation::Vector_GetMaxImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_GetMaxImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -420,7 +425,7 @@ float FVectorImplementation::Vector_GetMaxImplementation(const MonoObject* InMon
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_GetAbsMaxImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_GetAbsMaxImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -430,7 +435,7 @@ float FVectorImplementation::Vector_GetAbsMaxImplementation(const MonoObject* In
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_GetMinImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_GetMinImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -440,7 +445,7 @@ float FVectorImplementation::Vector_GetMinImplementation(const MonoObject* InMon
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_GetAbsMinImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_GetAbsMinImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -450,7 +455,7 @@ float FVectorImplementation::Vector_GetAbsMinImplementation(const MonoObject* In
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_SizeImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_SizeImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -460,7 +465,7 @@ float FVectorImplementation::Vector_SizeImplementation(const MonoObject* InMonoO
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_SizeSquaredImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_SizeSquaredImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -470,7 +475,7 @@ float FVectorImplementation::Vector_SizeSquaredImplementation(const MonoObject* 
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_Size2DImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_Size2DImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -480,7 +485,7 @@ float FVectorImplementation::Vector_Size2DImplementation(const MonoObject* InMon
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_SizeSquared2DImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_SizeSquared2DImplementation(const MonoObject* InMonoObject)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -490,7 +495,7 @@ float FVectorImplementation::Vector_SizeSquared2DImplementation(const MonoObject
 	return 0.f;
 }
 
-bool FVectorImplementation::Vector_IsNearlyZeroImplementation(const MonoObject* InMonoObject, const float Tolerance)
+bool FVectorImplementation::Vector_IsNearlyZeroImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -511,7 +516,7 @@ bool FVectorImplementation::Vector_IsZeroImplementation(const MonoObject* InMono
 }
 
 bool FVectorImplementation::Vector_IsUnitImplementation(const MonoObject* InMonoObject,
-                                                        const float LengthSquaredTolerance)
+                                                        const LwcType LengthSquaredTolerance)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -531,7 +536,7 @@ bool FVectorImplementation::Vector_IsNormalizedImplementation(const MonoObject* 
 	return false;
 }
 
-bool FVectorImplementation::Vector_NormalizeImplementation(const MonoObject* InMonoObject, const float Tolerance)
+bool FVectorImplementation::Vector_NormalizeImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
 {
 	if (const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject))
 	{
@@ -559,7 +564,7 @@ void FVectorImplementation::Vector_GetUnsafeNormalImplementation(const MonoObjec
 	}
 }
 
-void FVectorImplementation::Vector_GetSafeNormalImplementation(const MonoObject* InMonoObject, const float Tolerance,
+void FVectorImplementation::Vector_GetSafeNormalImplementation(const MonoObject* InMonoObject, const LwcType Tolerance,
                                                                MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -578,7 +583,8 @@ void FVectorImplementation::Vector_GetSafeNormalImplementation(const MonoObject*
 	}
 }
 
-void FVectorImplementation::Vector_GetSafeNormal2DImplementation(const MonoObject* InMonoObject, const float Tolerance,
+void FVectorImplementation::Vector_GetSafeNormal2DImplementation(const MonoObject* InMonoObject,
+                                                                 const LwcType Tolerance,
                                                                  MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -598,7 +604,7 @@ void FVectorImplementation::Vector_GetSafeNormal2DImplementation(const MonoObjec
 }
 
 void FVectorImplementation::Vector_ToDirectionAndLengthImplementation(const MonoObject* InMonoObject,
-                                                                      MonoObject** OutDir, float& OutLength)
+                                                                      MonoObject** OutDir, LwcType& OutLength)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -671,7 +677,7 @@ void FVectorImplementation::Vector_GetUnsafeNormal2DImplementation(const MonoObj
 	}
 }
 
-void FVectorImplementation::Vector_GridSnapImplementation(const MonoObject* InMonoObject, const float GridSz,
+void FVectorImplementation::Vector_GridSnapImplementation(const MonoObject* InMonoObject, const LwcType GridSz,
                                                           MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -690,7 +696,7 @@ void FVectorImplementation::Vector_GridSnapImplementation(const MonoObject* InMo
 	}
 }
 
-void FVectorImplementation::Vector_BoundToCubeImplementation(const MonoObject* InMonoObject, const float Radius,
+void FVectorImplementation::Vector_BoundToCubeImplementation(const MonoObject* InMonoObject, const LwcType Radius,
                                                              MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -732,8 +738,8 @@ void FVectorImplementation::Vector_BoundToBoxImplementation(const MonoObject* In
 	}
 }
 
-void FVectorImplementation::Vector_GetClampedToSizeImplementation(const MonoObject* InMonoObject, const float Min,
-                                                                  const float Max, MonoObject** OutValue)
+void FVectorImplementation::Vector_GetClampedToSizeImplementation(const MonoObject* InMonoObject, const LwcType Min,
+                                                                  const LwcType Max, MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -751,8 +757,8 @@ void FVectorImplementation::Vector_GetClampedToSizeImplementation(const MonoObje
 	}
 }
 
-void FVectorImplementation::Vector_GetClampedToSize2DImplementation(const MonoObject* InMonoObject, const float Min,
-                                                                    const float Max, MonoObject** OutValue)
+void FVectorImplementation::Vector_GetClampedToSize2DImplementation(const MonoObject* InMonoObject, const LwcType Min,
+                                                                    const LwcType Max, MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -771,7 +777,7 @@ void FVectorImplementation::Vector_GetClampedToSize2DImplementation(const MonoOb
 }
 
 void FVectorImplementation::Vector_GetClampedToMaxSizeImplementation(const MonoObject* InMonoObject,
-                                                                     const float MaxSize, MonoObject** OutValue)
+                                                                     const LwcType MaxSize, MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -790,7 +796,7 @@ void FVectorImplementation::Vector_GetClampedToMaxSizeImplementation(const MonoO
 }
 
 void FVectorImplementation::Vector_GetClampedToMaxSize2DImplementation(const MonoObject* InMonoObject,
-                                                                       const float MaxSize, MonoObject** OutValue)
+                                                                       const LwcType MaxSize, MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -809,7 +815,7 @@ void FVectorImplementation::Vector_GetClampedToMaxSize2DImplementation(const Mon
 }
 
 void FVectorImplementation::Vector_AddBoundedImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-                                                            const float Radius)
+                                                            const LwcType Radius)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -839,7 +845,7 @@ void FVectorImplementation::Vector_ReciprocalImplementation(const MonoObject* In
 	}
 }
 
-bool FVectorImplementation::Vector_IsUniformImplementation(const MonoObject* InMonoObject, const float Tolerance)
+bool FVectorImplementation::Vector_IsUniformImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -894,7 +900,7 @@ void FVectorImplementation::Vector_MirrorByPlaneImplementation(const MonoObject*
 	}
 }
 
-void FVectorImplementation::Vector_RotateAngleAxisImplementation(const MonoObject* InMonoObject, const float AngleDeg,
+void FVectorImplementation::Vector_RotateAngleAxisImplementation(const MonoObject* InMonoObject, const LwcType AngleDeg,
                                                                  const MonoObject* Axis, MonoObject** OutValue)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
@@ -915,7 +921,8 @@ void FVectorImplementation::Vector_RotateAngleAxisImplementation(const MonoObjec
 	}
 }
 
-float FVectorImplementation::Vector_CosineAngle2DImplementation(const MonoObject* InMonoObject, const MonoObject* B)
+FVectorImplementation::LwcType FVectorImplementation::Vector_CosineAngle2DImplementation(
+	const MonoObject* InMonoObject, const MonoObject* B)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -1190,7 +1197,7 @@ void FVectorImplementation::Vector_UnitCartesianToSphericalImplementation(
 	}
 }
 
-float FVectorImplementation::Vector_HeadingAngleImplementation(const MonoObject* InMonoObject)
+FVectorImplementation::LwcType FVectorImplementation::Vector_HeadingAngleImplementation(const MonoObject* InMonoObject)
 {
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InMonoObject);
 
@@ -1249,7 +1256,7 @@ bool FVectorImplementation::Vector_PointsAreSameImplementation(const MonoObject*
 }
 
 bool FVectorImplementation::Vector_PointsAreNearImplementation(const MonoObject* Point1, const MonoObject* Point2,
-                                                               const float Dist)
+                                                               const LwcType Dist)
 {
 	const auto VectorPoint1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Point1);
 
@@ -1263,8 +1270,9 @@ bool FVectorImplementation::Vector_PointsAreNearImplementation(const MonoObject*
 	return false;
 }
 
-float FVectorImplementation::Vector_PointPlaneDistImplementation(const MonoObject* Point, const MonoObject* PlaneBase,
-                                                                 const MonoObject* PlaneNormal)
+FVectorImplementation::LwcType FVectorImplementation::Vector_PointPlaneDistImplementation(
+	const MonoObject* Point, const MonoObject* PlaneBase,
+	const MonoObject* PlaneNormal)
 {
 	const auto VectorPoint = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Point);
 
@@ -1374,7 +1382,8 @@ void FVectorImplementation::Vector_VectorPlaneProjectImplementation(const MonoOb
 	}
 }
 
-float FVectorImplementation::Vector_DistImplementation(const MonoObject* V1, const MonoObject* V2)
+FVectorImplementation::LwcType FVectorImplementation::Vector_DistImplementation(
+	const MonoObject* V1, const MonoObject* V2)
 {
 	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V1);
 
@@ -1388,7 +1397,8 @@ float FVectorImplementation::Vector_DistImplementation(const MonoObject* V1, con
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_DistanceImplementation(const MonoObject* V1, const MonoObject* V2)
+FVectorImplementation::LwcType FVectorImplementation::Vector_DistanceImplementation(
+	const MonoObject* V1, const MonoObject* V2)
 {
 	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V1);
 
@@ -1402,7 +1412,8 @@ float FVectorImplementation::Vector_DistanceImplementation(const MonoObject* V1,
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_DistXYImplementation(const MonoObject* V1, const MonoObject* V2)
+FVectorImplementation::LwcType FVectorImplementation::Vector_DistXYImplementation(
+	const MonoObject* V1, const MonoObject* V2)
 {
 	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V1);
 
@@ -1416,7 +1427,8 @@ float FVectorImplementation::Vector_DistXYImplementation(const MonoObject* V1, c
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_Dist2DImplementation(const MonoObject* V1, const MonoObject* V2)
+FVectorImplementation::LwcType FVectorImplementation::Vector_Dist2DImplementation(
+	const MonoObject* V1, const MonoObject* V2)
 {
 	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V1);
 
@@ -1430,7 +1442,8 @@ float FVectorImplementation::Vector_Dist2DImplementation(const MonoObject* V1, c
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_DistSquaredImplementation(const MonoObject* V1, const MonoObject* V2)
+FVectorImplementation::LwcType FVectorImplementation::Vector_DistSquaredImplementation(
+	const MonoObject* V1, const MonoObject* V2)
 {
 	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V1);
 
@@ -1444,7 +1457,8 @@ float FVectorImplementation::Vector_DistSquaredImplementation(const MonoObject* 
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_DistSquaredXYImplementation(const MonoObject* V1, const MonoObject* V2)
+FVectorImplementation::LwcType FVectorImplementation::Vector_DistSquaredXYImplementation(
+	const MonoObject* V1, const MonoObject* V2)
 {
 	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V1);
 
@@ -1458,7 +1472,8 @@ float FVectorImplementation::Vector_DistSquaredXYImplementation(const MonoObject
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_DistSquared2DImplementation(const MonoObject* V1, const MonoObject* V2)
+FVectorImplementation::LwcType FVectorImplementation::Vector_DistSquared2DImplementation(
+	const MonoObject* V1, const MonoObject* V2)
 {
 	const auto VectorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V1);
 
@@ -1472,7 +1487,8 @@ float FVectorImplementation::Vector_DistSquared2DImplementation(const MonoObject
 	return 0.f;
 }
 
-float FVectorImplementation::Vector_BoxPushOutImplementation(const MonoObject* Normal, const MonoObject* Size)
+FVectorImplementation::LwcType FVectorImplementation::Vector_BoxPushOutImplementation(
+	const MonoObject* Normal, const MonoObject* Size)
 {
 	const auto VectorNormal = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Normal);
 
@@ -1487,7 +1503,7 @@ float FVectorImplementation::Vector_BoxPushOutImplementation(const MonoObject* N
 }
 
 bool FVectorImplementation::Vector_ParallelImplementation(const MonoObject* Normal1, const MonoObject* Normal2,
-                                                          const float ParallelCosineThreshold)
+                                                          const LwcType ParallelCosineThreshold)
 {
 	const auto VectorNormal1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Normal1);
 
@@ -1502,7 +1518,7 @@ bool FVectorImplementation::Vector_ParallelImplementation(const MonoObject* Norm
 }
 
 bool FVectorImplementation::Vector_CoincidentImplementation(const MonoObject* Normal1, const MonoObject* Normal2,
-                                                            const float ParallelCosineThreshold)
+                                                            const LwcType ParallelCosineThreshold)
 {
 	const auto VectorNormal1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Normal1);
 
@@ -1517,7 +1533,7 @@ bool FVectorImplementation::Vector_CoincidentImplementation(const MonoObject* No
 }
 
 bool FVectorImplementation::Vector_OrthogonalImplementation(const MonoObject* Normal1, const MonoObject* Normal2,
-                                                            const float ParallelCosineThreshold)
+                                                            const LwcType ParallelCosineThreshold)
 {
 	const auto VectorNormal1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Normal1);
 
@@ -1533,7 +1549,7 @@ bool FVectorImplementation::Vector_OrthogonalImplementation(const MonoObject* No
 
 bool FVectorImplementation::Vector_CoplanarImplementation(const MonoObject* Base1, const MonoObject* Normal1,
                                                           const MonoObject* Base2, const MonoObject* Normal2,
-                                                          const float ParallelCosineThreshold)
+                                                          const LwcType ParallelCosineThreshold)
 {
 	const auto VectorBase1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Base1);
 
@@ -1551,7 +1567,8 @@ bool FVectorImplementation::Vector_CoplanarImplementation(const MonoObject* Base
 	return false;
 }
 
-float FVectorImplementation::Vector_TripleImplementation(const MonoObject* X, const MonoObject* Y, const MonoObject* Z)
+FVectorImplementation::LwcType FVectorImplementation::Vector_TripleImplementation(
+	const MonoObject* X, const MonoObject* Y, const MonoObject* Z)
 {
 	const auto VectorX = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(X);
 
