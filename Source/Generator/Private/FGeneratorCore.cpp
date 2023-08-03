@@ -609,6 +609,17 @@ bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& St
 	                                     FILEWRITE_None);
 }
 
+FString FGeneratorCore::GetConfig()
+{
+	return FPaths::ConvertRelativePathToFull(FPaths::Combine(
+		FPaths::ProjectPluginsDir(), PLUGIN_NAME, CONFIG, FString::Printf(TEXT(
+			"%s%s"
+		),
+		                                                                  *PLUGIN_NAME,
+		                                                                  *INI_SUFFIX
+		)));
+}
+
 bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 {
 	static TArray<FString> Modules;
@@ -619,15 +630,7 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 	if (Modules.Num() == 0)
 #endif
 	{
-		const auto File = FPaths::ConvertRelativePathToFull(FPaths::Combine(
-			FPaths::ProjectPluginsDir(), PLUGIN_NAME, CONFIG, FString::Printf(TEXT(
-				"%s%s"
-			),
-			                                                                  *PLUGIN_NAME,
-			                                                                  *INI_SUFFIX
-			)));
-
-		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), Modules, File);
+		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), Modules, GetConfig());
 
 		for (auto& Module : Modules)
 		{
@@ -669,15 +672,7 @@ TArray<FName> FGeneratorCore::GetAssetsPaths()
 {
 	TArray<FString> AssetsPaths;
 
-	const auto File = FPaths::ConvertRelativePathToFull(FPaths::Combine(
-		FPaths::ProjectPluginsDir(), PLUGIN_NAME, CONFIG, FString::Printf(TEXT(
-			"%s%s"
-		),
-		                                                                  *PLUGIN_NAME,
-		                                                                  *INI_SUFFIX
-		)));
-
-	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), AssetsPaths, File);
+	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), AssetsPaths, GetConfig());
 
 	return TArray<FName>{AssetsPaths};
 }
