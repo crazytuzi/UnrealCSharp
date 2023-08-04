@@ -25,7 +25,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
-	if (Cast<UCSharpGeneratedClass>(InClass) || Cast<UCSharpBlueprintGeneratedClass>(InClass))
+	if (Cast<UCSharpGeneratedClass>(InClass) ||
+		Cast<UCSharpBlueprintGeneratedClass>(InClass) ||
+		UCSharpGeneratedClass::StaticClass() == InClass ||
+		UCSharpBlueprintGeneratedClass::StaticClass() == InClass)
 	{
 		return;
 	}
