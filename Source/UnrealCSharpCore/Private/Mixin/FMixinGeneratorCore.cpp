@@ -6,6 +6,9 @@
 #include "Domain/FMonoDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Log/UnrealCSharpLog.h"
+#include "Misc/FileHelper.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 
 UPackage* FMixinGeneratorCore::GetOuter()
 {
@@ -494,6 +497,37 @@ void FMixinGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAttr
 		}
 	}
 }
+
+#if WITH_EDITOR
+TArray<FString> FMixinGeneratorCore::GetMixin(const FString& InFile, const FString& InField)
+{
+	auto& FileManager = IFileManager::Get();
+
+	if (!FileManager.FileExists(*InFile))
+	{
+		return {};
+	}
+
+	FString JsonStr;
+
+	if (FFileHelper::LoadFileToString(JsonStr, *InFile))
+	{
+		TSharedPtr<FJsonObject> JsonObj;
+
+		TArray<FString> Mixin;
+
+		const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
+
+		FJsonSerializer::Deserialize(JsonReader, JsonObj);
+
+		JsonObj->TryGetStringArrayField(InField, Mixin);
+
+		return Mixin;
+	}
+
+	return {};
+}
+#endif
 
 bool FMixinGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName)
 {

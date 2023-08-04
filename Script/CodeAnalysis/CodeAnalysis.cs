@@ -13,22 +13,24 @@ namespace CodeAnalysis
 
             var OutputPathName = args[1];
 
-            if (!Directory.Exists(OutputPathName))
-            {
-                Directory.CreateDirectory(OutputPathName);
-            }
+            var Analysis = new CodeAnalysis(InputPathName, OutputPathName);
 
-            foreach (var Item in Directory.GetFiles(OutputPathName))
-            {
-                File.Delete(Item);
-            }
+            Analysis.Analysis();
+        }
 
-            var Files = GetFiles(InputPathName);
+        private CodeAnalysis(string InInputPathName, string InOutputPathName)
+        {
+            InputPathName = InInputPathName;
 
-            foreach (var Item in Files)
+            OutputPathName = InOutputPathName;
+
+            Mixin = new Dictionary<string, List<string>>
             {
-                Analysis(File.ReadAllText(Item, Encoding.UTF8), OutputPathName);
-            }
+                ["CSharpGeneratedClass"] = new List<string>(),
+                ["CSharpBlueprintGeneratedClass"] = new List<string>(),
+                ["CSharpScriptStruct"] = new List<string>(),
+                ["CSharpEnum"] = new List<string>()
+            };
         }
 
         private static List<string> GetFiles(string InPathName)
@@ -56,13 +58,37 @@ namespace CodeAnalysis
             return Files;
         }
 
-        private static void Analysis(string InContent, string InPathName)
+        private void Analysis()
         {
-            var Tree = CSharpSyntaxTree.ParseText(InContent);
+            if (!Directory.Exists(OutputPathName))
+            {
+                Directory.CreateDirectory(OutputPathName);
+            }
 
-            var Root = (CompilationUnitSyntax)Tree.GetRoot();
+            foreach (var Item in Directory.GetFiles(OutputPathName))
+            {
+                File.Delete(Item);
+            }
 
-            foreach (var RootMember in Root.Members)
+            var Files = GetFiles(InputPathName);
+
+            foreach (var Item in Files)
+            {
+                var Tree = CSharpSyntaxTree.ParseText(File.ReadAllText(Item, Encoding.UTF8));
+
+                var Root = (CompilationUnitSyntax) Tree.GetRoot();
+
+                AnalysisIsOverride(Root);
+
+                AnalysisMixin(Root);
+            }
+
+            WriteAll();
+        }
+
+        private void AnalysisIsOverride(CompilationUnitSyntax InRoot)
+        {
+            foreach (var RootMember in InRoot.Members)
             {
                 if (RootMember is BaseNamespaceDeclarationSyntax NamespaceDeclaration)
                 {
@@ -112,7 +138,7 @@ namespace CodeAnalysis
 
                             if (Functions.Count > 0)
                             {
-                                var FileName = Path.Combine(InPathName,
+                                var FileName = Path.Combine(OutputPathName,
                                     String.Format("{0}.{1}.json", NamespaceDeclaration.Name,
                                         ClassDeclaration.Identifier));
 
@@ -125,5 +151,74 @@ namespace CodeAnalysis
                 }
             }
         }
+
+        private void AnalysisMixin(CompilationUnitSyntax InRoot)
+        {
+            foreach (var RootMember in InRoot.Members)
+            {
+                if (RootMember is BaseNamespaceDeclarationSyntax NamespaceDeclaration)
+                {
+                    foreach (var NameSpaceMember in NamespaceDeclaration.Members)
+                    {
+                        if (NameSpaceMember is ClassDeclarationSyntax ClassDeclaration)
+                        {
+                            foreach (var Attribute in ClassDeclaration.AttributeLists)
+                            {
+                                if (Attribute.ToString().Equals("[UClass]"))
+                                {
+                                    Mixin["CSharpGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
+
+                                    return;
+                                }
+
+                                if (Attribute.ToString().Equals("[UBlueprint]"))
+                                {
+                                    Mixin["CSharpBlueprintGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
+
+                                    return;
+                                }
+
+                                if (Attribute.ToString().Equals("[UStruct]"))
+                                {
+                                    Mixin["CSharpScriptStruct"].Add(ClassDeclaration.Identifier.ToString());
+
+                                    return;
+                                }
+                            }
+                        }
+                        else if (NameSpaceMember is EnumDeclarationSyntax EnumDeclaration)
+                        {
+                            foreach (var Attribute in EnumDeclaration.AttributeLists)
+                            {
+                                if (Attribute.ToString().Equals("[UEnum]"))
+                                {
+                                    Mixin["CSharpEnum"].Add(EnumDeclaration.Identifier.ToString());
+
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void WriteAll()
+        {
+            foreach (var Pair in Mixin)
+            {
+                var FileName = Path.Combine(OutputPathName, Pair.Key + ".json");
+
+                var Value = String.Format("{{\"{0}\":{1}}}", Pair.Key, JsonSerializer.Serialize(Pair.Value));
+
+                File.WriteAllText(FileName, Value);
+            }
+        }
+
+        private string InputPathName;
+
+        private string OutputPathName;
+
+        private Dictionary<string, List<string>> Mixin;
     }
 }

@@ -4,12 +4,13 @@
 #include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Domain/FMonoDomain.h"
-#include "Mixin/CSharpEnum.h"
 #include "Template/TGetArrayLength.inl"
 #if WITH_EDITOR
 #include "Kismet2/BlueprintEditorUtils.h"
 #endif
 #include "UEVersion.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Mixin/FMixinGeneratorCore.h"
 
 void FMixinEnumGenerator::Generator()
 {
@@ -48,6 +49,31 @@ void FMixinEnumGenerator::Generator()
 	}
 }
 
+#if WITH_EDITOR
+void FMixinEnumGenerator::CodeAnalysisGenerator()
+{
+	auto CSharpEnum = FMixinGeneratorCore::GetMixin(
+		FString::Printf(TEXT(
+			"%s/%s.json"),
+		                *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+		                *UCSharpEnum::StaticClass()->GetName()),
+		UCSharpEnum::StaticClass()->GetName()
+	);
+
+	for (const auto& EnumName : CSharpEnum)
+	{
+		const auto Outer = FMixinGeneratorCore::GetOuter();
+
+		const auto Enum = LoadObject<UCSharpEnum>(Outer, *EnumName);
+
+		if (Enum == nullptr)
+		{
+			GeneratorCSharpEnum(Outer, EnumName);
+		}
+	}
+}
+#endif
+
 void FMixinEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInstance)
 {
 	if (InMonoClass == nullptr)
@@ -57,7 +83,7 @@ void FMixinEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInstan
 
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
-	const auto Outer = UObject::StaticClass()->GetPackage();
+	const auto Outer = FMixinGeneratorCore::GetOuter();
 
 #if WITH_EDITOR
 	auto bExisted = false;
@@ -110,9 +136,7 @@ void FMixinEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInstan
 	}
 	else
 	{
-		Enum = NewObject<UCSharpEnum>(Outer, ClassName, RF_Public);
-
-		Enum->AddToRoot();
+		Enum = GeneratorCSharpEnum(Outer, ClassName);
 	}
 
 	// @TODO
@@ -138,6 +162,15 @@ bool FMixinEnumGenerator::IsMixinEnum(MonoClass* InMonoClass)
 	const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
 
 	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
+}
+
+UCSharpEnum* FMixinEnumGenerator::GeneratorCSharpEnum(UPackage* InOuter, const FString& InName)
+{
+	const auto Enum = NewObject<UCSharpEnum>(InOuter, *InName, RF_Public);
+
+	Enum->AddToRoot();
+
+	return Enum;
 }
 
 #if WITH_EDITOR

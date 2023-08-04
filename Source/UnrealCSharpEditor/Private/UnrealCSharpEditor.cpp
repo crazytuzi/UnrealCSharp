@@ -16,6 +16,7 @@
 #include "Internationalization/Culture.h"
 #include "FCodeAnalysis.h"
 #include "Misc/ScopedSlowTask.h"
+#include "Mixin/FMixinGenerator.h"
 
 static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 
@@ -86,7 +87,7 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 	}
 }
 
-void FUnrealCSharpEditorModule::Generator() const
+void FUnrealCSharpEditorModule::Generator()
 {
 	static FString DefaultCultureName = TEXT("en");
 
@@ -97,13 +98,17 @@ void FUnrealCSharpEditorModule::Generator() const
 		FInternationalization::Get().SetCurrentCulture(DefaultCultureName);
 	}
 
-	FScopedSlowTask SlowTask(11, LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
+	FScopedSlowTask SlowTask(12, LOCTEXT("GeneratingCodeAction", "Generating Code Action"));
 
 	SlowTask.MakeDialog();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis"));
 
 	FCodeAnalysis::CodeAnalysis();
+
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis Generator"));
+
+	FMixinGenerator::CodeAnalysisGenerator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Class Generator"));
 
