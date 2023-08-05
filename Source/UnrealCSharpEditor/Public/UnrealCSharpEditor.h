@@ -22,8 +22,8 @@ public:
 private:
 	void RegisterMenus();
 
-private:
-	void Generator() const;
+public:
+	static void Generator();
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;

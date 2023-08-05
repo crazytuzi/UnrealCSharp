@@ -71,10 +71,19 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 
 	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
 
-	if (InStruct->IsNative() ||
-		Cast<UCSharpGeneratedClass>(InStruct) ||
+	const auto bIsMixinClass = Cast<UCSharpGeneratedClass>(InStruct) ||
 		Cast<UCSharpBlueprintGeneratedClass>(InStruct) ||
-		Cast<UCSharpScriptStruct>(InStruct))
+		Cast<UCSharpScriptStruct>(InStruct) ||
+		UCSharpGeneratedClass::StaticClass() == InStruct ||
+		UCSharpBlueprintGeneratedClass::StaticClass() == InStruct ||
+		UCSharpScriptStruct::StaticClass() == InStruct;
+
+	if (bIsMixinClass)
+	{
+		ModuleName = TEXT("/Script/CoreUObject");
+	}
+
+	if (InStruct->IsNative() || bIsMixinClass)
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}

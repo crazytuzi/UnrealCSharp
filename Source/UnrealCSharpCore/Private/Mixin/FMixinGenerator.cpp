@@ -34,6 +34,17 @@ void FMixinGenerator::Generator()
 }
 
 #if WITH_EDITOR
+void FMixinGenerator::CodeAnalysisGenerator()
+{
+	FMixinClassGenerator::CodeAnalysisGenerator();
+
+	FMixinStructGenerator::CodeAnalysisGenerator();
+
+	FMixinEnumGenerator::CodeAnalysisGenerator();
+}
+#endif
+
+#if WITH_EDITOR
 void FMixinGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 {
 	FMonoDomain::Initialize({
