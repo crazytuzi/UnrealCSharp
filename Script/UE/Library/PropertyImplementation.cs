@@ -49,6 +49,16 @@ namespace Script.Library
             out UInt64 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_SetObjectSBytePropertyImplementation(Object InMonoObject,
+            string InPropertyName,
+            SByte InValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_GetObjectSBytePropertyImplementation(Object InMonoObject,
+            string InPropertyName,
+            out SByte OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_SetObjectInt16PropertyImplementation(Object InMonoObject,
             string InPropertyName,
             Int16 InValue);

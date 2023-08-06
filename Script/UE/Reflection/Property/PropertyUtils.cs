@@ -39,6 +39,14 @@ namespace Script.Reflection.Property
             PropertyImplementation.Property_SetObjectUInt64PropertyImplementation(InMonoObject, InPropertyName,
                 InValue);
 
+        public static void GetObjectProperty(Object InMonoObject, string InPropertyName, out SByte OutValue) =>
+            PropertyImplementation.Property_GetObjectSBytePropertyImplementation(InMonoObject, InPropertyName,
+                out OutValue);
+
+        public static void SetObjectProperty(Object InMonoObject, string InPropertyName, SByte InValue) =>
+            PropertyImplementation.Property_SetObjectSBytePropertyImplementation(InMonoObject, InPropertyName,
+                InValue);
+
         public static void GetObjectProperty(Object InMonoObject, string InPropertyName, out Int16 OutValue) =>
             PropertyImplementation.Property_GetObjectInt16PropertyImplementation(InMonoObject, InPropertyName,
                 out OutValue);

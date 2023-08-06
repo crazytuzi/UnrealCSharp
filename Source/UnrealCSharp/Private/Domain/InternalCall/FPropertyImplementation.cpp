@@ -22,8 +22,8 @@ struct FRegisterProperty
 			          FPropertyImplementation::Property_GetObjectUInt64PropertyImplementation)
 			.Function("SetObjectUInt64Property",
 			          FPropertyImplementation::Property_SetObjectUInt64PropertyImplementation)
-			.Function("GetObjectInt8Property", FPropertyImplementation::Property_GetObjectInt8PropertyImplementation)
-			.Function("SetObjectInt8Property", FPropertyImplementation::Property_SetObjectInt8PropertyImplementation)
+			.Function("GetObjectSByteProperty", FPropertyImplementation::Property_GetObjectSBytePropertyImplementation)
+			.Function("SetObjectSByteProperty", FPropertyImplementation::Property_SetObjectSBytePropertyImplementation)
 			.Function("GetObjectInt16Property", FPropertyImplementation::Property_GetObjectInt16PropertyImplementation)
 			.Function("SetObjectInt16Property", FPropertyImplementation::Property_SetObjectInt16PropertyImplementation)
 			.Function("GetObjectIntProperty", FPropertyImplementation::Property_GetObjectIntPropertyImplementation)
@@ -88,8 +88,8 @@ struct FRegisterProperty
 			          FPropertyImplementation::Property_GetStructUInt64PropertyImplementation)
 			.Function("SetStructUInt64Property",
 			          FPropertyImplementation::Property_SetStructUInt64PropertyImplementation)
-			.Function("GetStructInt8Property", FPropertyImplementation::Property_GetStructInt8PropertyImplementation)
-			.Function("SetStructInt8Property", FPropertyImplementation::Property_SetStructInt8PropertyImplementation)
+			.Function("GetStructSByteProperty", FPropertyImplementation::Property_GetStructSBytePropertyImplementation)
+			.Function("SetStructSByteProperty", FPropertyImplementation::Property_SetStructSBytePropertyImplementation)
 			.Function("GetStructInt16Property", FPropertyImplementation::Property_GetStructInt16PropertyImplementation)
 			.Function("SetStructInt16Property", FPropertyImplementation::Property_SetStructInt16PropertyImplementation)
 			.Function("GetStructIntProperty", FPropertyImplementation::Property_GetStructIntPropertyImplementation)
@@ -154,7 +154,7 @@ OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(UInt32, uint32)
 
 OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(UInt64, uint64)
 
-OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int8, int8)
+OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(SByte, int8)
 
 OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int16, int16)
 
@@ -198,7 +198,7 @@ STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(UInt32, uint32)
 
 STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(UInt64, uint64)
 
-STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int8, int8)
+STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(SByte, int8)
 
 STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int16, int16)
 
