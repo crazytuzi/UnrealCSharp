@@ -7,14 +7,7 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (InterfaceProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(Src);
-
-		if (SrcMonoObject == nullptr)
-		{
-			SrcMonoObject = Object_New(Src);
-		}
-
-		*Dest = SrcMonoObject;
+		*Dest = Object_New(Src);
 	}
 }
 
@@ -26,8 +19,6 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 			SrcMonoObject);
-
-		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(Dest);
 
 		InterfaceProperty->InitializeValue(Dest);
 
@@ -64,12 +55,17 @@ bool FInterfacePropertyDescriptor::Identical(const void* A, const void* B, const
 
 MonoObject* FInterfacePropertyDescriptor::Object_New(void* InAddress) const
 {
-	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(InterfaceProperty);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(InAddress);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+	if (Object == nullptr)
+	{
+		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(InterfaceProperty);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
-		Object, InAddress, false);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
+			Object, InAddress, false);
+	}
 
 	return Object;
 }

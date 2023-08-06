@@ -7,14 +7,7 @@ void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (SoftClassProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftClassPtr<UObject>>(Src);
-
-		if (SrcMonoObject == nullptr)
-		{
-			SrcMonoObject = Object_New(Src);
-		}
-
-		*Dest = SrcMonoObject;
+		*Dest = Object_New(Src);
 	}
 }
 
@@ -25,8 +18,6 @@ void FSoftClassPropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(SrcMonoObject);
-
-		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(Dest);
 
 		SoftClassProperty->InitializeValue(Dest);
 
@@ -57,11 +48,16 @@ bool FSoftClassPropertyDescriptor::Identical(const void* A, const void* B, const
 
 MonoObject* FSoftClassPropertyDescriptor::Object_New(void* InAddress) const
 {
-	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(SoftClassProperty);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftClassPtr<UObject>>(InAddress);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+	if (Object == nullptr)
+	{
+		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(SoftClassProperty);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(Object, InAddress, false);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(Object, InAddress, false);
+	}
 
 	return Object;
 }

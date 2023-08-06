@@ -97,8 +97,6 @@ public:
 
 	void* GetStruct(const MonoObject* InMonoObject) const;
 
-	bool RemoveStructReference(const void* InOwner, const void* InStruct) const;
-
 	bool RemoveStructReference(const MonoObject* InMonoObject) const;
 
 	FGarbageCollectionHandle GetGarbageCollectionHandle(void* InAddress, int32 InOffset) const;
@@ -119,8 +117,6 @@ public:
 
 	bool RemoveContainerReference(const MonoObject* InMonoObject) const;
 
-	bool RemoveContainerReference(const void* InAddress) const;
-
 public:
 	template <typename T>
 	auto GetDelegate(const MonoObject* InMonoObject) const;
@@ -133,10 +129,6 @@ public:
 	                          MonoObject* InMonoObject) const;
 
 	bool RemoveDelegateReference(const MonoObject* InMonoObject) const;
-
-	bool RemoveDelegateReference(const void* InAddress) const;
-
-	bool RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 private:
 	template <typename T, typename U>
@@ -170,9 +162,6 @@ public:
 
 	template <typename T>
 	auto RemoveMultiReference(const MonoObject* InMonoObject) const;
-
-	template <typename T>
-	auto RemoveMultiReference(const void* InAddress) const;
 
 public:
 	MonoObject* GetBinding(const void* InObject) const;

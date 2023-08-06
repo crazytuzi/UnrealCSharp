@@ -42,10 +42,6 @@ public:
 
 	bool RemoveReference(const MonoObject* InMonoObject);
 
-	bool RemoveReference(const void* InAddress);
-
-	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
-
 private:
 	TGarbageCollectionHandleMapping<FDelegateAddress> GarbageCollectionHandle2DelegateAddress;
 

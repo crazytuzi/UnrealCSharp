@@ -7,14 +7,7 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (StructProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(GetOwner(Src), Src);
-
-		if (SrcMonoObject == nullptr)
-		{
-			SrcMonoObject = Object_New(Src);
-		}
-
-		*Dest = SrcMonoObject;
+		*Dest = Object_New(Src);
 	}
 }
 
@@ -23,8 +16,6 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 	if (StructProperty != nullptr)
 	{
 		const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(static_cast<MonoObject*>(Src));
-
-		FCSharpEnvironment::GetEnvironment().RemoveStructReference(GetOwner(Dest), Dest);
 
 		StructProperty->InitializeValue(Dest);
 
@@ -61,17 +52,22 @@ void* FStructPropertyDescriptor::GetOwner(void* InAddress) const
 
 MonoObject* FStructPropertyDescriptor::Object_New(void* InAddress) const
 {
-	const auto FoundMonoClass = FTypeBridge::GetMonoClass(StructProperty);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetObject(GetOwner(InAddress), InAddress);
 
-	auto InParams = static_cast<void*>(FoundMonoClass);
+	if (Object == nullptr)
+	{
+		const auto FoundMonoClass = FTypeBridge::GetMonoClass(StructProperty);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-		FoundMonoClass, TGetArrayLength(InParams), &InParams);
+		auto InParams = static_cast<void*>(FoundMonoClass);
 
-	FCSharpEnvironment::GetEnvironment().Bind(StructProperty->Struct, false);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+			FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, GetOwner(InAddress), InAddress,
-	                                                         Object, false);
+		FCSharpEnvironment::GetEnvironment().Bind(StructProperty->Struct, false);
+
+		FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, GetOwner(InAddress), InAddress,
+		                                                        Object, false);
+	}
 
 	return Object;
 }
