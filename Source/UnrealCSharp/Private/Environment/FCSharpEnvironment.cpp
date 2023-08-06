@@ -9,8 +9,8 @@
 void SignalHandler(int32)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
-	       UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
-		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback())));
+	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
 }

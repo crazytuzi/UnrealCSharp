@@ -24,9 +24,9 @@ void FStrPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcValue = UTF8_TO_TCHAR(
+		const auto SrcValue = FString(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(SrcObject, nullptr)));
+				GetDomain()->Object_To_String(SrcObject, nullptr))));
 
 		StrProperty->InitializeValue(Dest);
 
