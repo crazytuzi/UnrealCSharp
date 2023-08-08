@@ -24,9 +24,9 @@ void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcValue = UTF8_TO_TCHAR(
+		const auto SrcValue = FName(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(SrcObject, nullptr)));
+				GetDomain()->Object_To_String(SrcObject, nullptr))));
 
 		NameProperty->InitializeValue(Dest);
 
@@ -38,13 +38,13 @@ bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint
 {
 	if (NameProperty != nullptr)
 	{
-		const auto StringA = NameProperty->GetPropertyValue(A).ToString();
+		const auto NameA = NameProperty->GetPropertyValue(A);
 
-		const auto StringB = UTF8_TO_TCHAR(
+		const auto NameB = FName(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr)));
+				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr))));
 
-		return StringA == StringB;
+		return NameA == NameB;
 	}
 
 	return false;

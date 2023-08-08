@@ -100,27 +100,3 @@ bool FContainerRegistry::RemoveReference(const MonoObject* InMonoObject)
 
 	return false;
 }
-
-bool FContainerRegistry::RemoveReference(const void* InAddress)
-{
-	for (auto& Pair : ContainerAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InAddress)
-		{
-			ContainerAddress2GarbageCollectionHandle.Remove(Pair.Key);
-
-			if (Pair.Key.ContainerHelper != nullptr)
-			{
-				delete Pair.Key.ContainerHelper;
-
-				Pair.Key.ContainerHelper = nullptr;
-			}
-
-			GarbageCollectionHandle2ContainerAddress.Remove(Pair.Value);
-
-			return true;
-		}
-	}
-
-	return false;
-}

@@ -9,8 +9,8 @@
 void SignalHandler(int32)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
-	       UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
-		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback())));
+	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
 }
@@ -405,11 +405,6 @@ void* FCSharpEnvironment::GetStruct(const MonoObject* InMonoObject) const
 	return StructRegistry != nullptr ? StructRegistry->GetStruct(InMonoObject) : nullptr;
 }
 
-bool FCSharpEnvironment::RemoveStructReference(const void* InOwner, const void* InStruct) const
-{
-	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InOwner, InStruct) : false;
-}
-
 bool FCSharpEnvironment::RemoveStructReference(const MonoObject* InMonoObject) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InMonoObject) : false;
@@ -457,11 +452,6 @@ bool FCSharpEnvironment::RemoveContainerReference(const MonoObject* InMonoObject
 	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InMonoObject) : false;
 }
 
-bool FCSharpEnvironment::RemoveContainerReference(const void* InAddress) const
-{
-	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InAddress) : false;
-}
-
 MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InAddress) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->GetObject(InAddress) : nullptr;
@@ -485,16 +475,6 @@ bool FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& In
 bool FCSharpEnvironment::RemoveDelegateReference(const MonoObject* InMonoObject) const
 {
 	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InMonoObject) : false;
-}
-
-bool FCSharpEnvironment::RemoveDelegateReference(const void* InAddress) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InAddress) : false;
-}
-
-bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InGarbageCollectionHandle) : false;
 }
 
 MonoObject* FCSharpEnvironment::GetBinding(const void* InObject) const

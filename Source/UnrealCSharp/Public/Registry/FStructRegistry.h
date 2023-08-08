@@ -62,8 +62,6 @@ public:
 	bool AddReference(UScriptStruct* InScriptStruct, const void* InOwner, const void* InStruct,
 	                  MonoObject* InMonoObject, bool bNeedFree = true);
 
-	bool RemoveReference(const void* InOwner, const void* InStruct);
-
 	bool RemoveReference(const MonoObject* InMonoObject);
 
 private:

@@ -65,34 +65,6 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 
 		return false;
 	}
-
-	static bool RemoveReference(Class* InRegistry, const void* InAddress)
-	{
-		if (const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandleMember).
-			Find(InAddress))
-		{
-			if (const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(
-				FoundGarbageCollectionHandle))
-			{
-				FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
-
-				(InRegistry->*Address2GarbageCollectionHandleMember).Remove(FoundAddress->Address);
-
-				if (FoundAddress->bNeedFree)
-				{
-					FMemory::Free(FoundAddress->Address);
-
-					FoundAddress->Address = nullptr;
-				}
-
-				(InRegistry->*GarbageCollectionHandle2AddressMember).Remove(FoundGarbageCollectionHandle);
-
-				return true;
-			}
-		}
-
-		return false;
-	}
 };
 
 template <typename T>

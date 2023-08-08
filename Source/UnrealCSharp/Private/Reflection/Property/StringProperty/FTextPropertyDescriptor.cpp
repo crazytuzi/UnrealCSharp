@@ -24,9 +24,9 @@ void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcValue = UTF8_TO_TCHAR(
+		const auto SrcValue = FString(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(SrcObject, nullptr)));
+				GetDomain()->Object_To_String(SrcObject, nullptr))));
 
 		TextProperty->InitializeValue(Dest);
 
@@ -40,9 +40,9 @@ bool FTextPropertyDescriptor::Identical(const void* A, const void* B, uint32 Por
 	{
 		const auto StringA = TextProperty->GetPropertyValue(A).ToString();
 
-		const auto StringB = UTF8_TO_TCHAR(
+		const auto StringB = FString(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr)));
+				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr))));
 
 		return StringA == StringB;
 	}

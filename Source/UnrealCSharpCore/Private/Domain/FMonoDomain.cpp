@@ -546,6 +546,9 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 #elif PLATFORM_ANDROID
 	                            TEXT("Android"),
 	                            TEXT("Android"));
+#elif PLATFORM_LINUX
+	                            TEXT("Linux"),
+	                            TEXT("Linux"));
 #endif
 #endif
 

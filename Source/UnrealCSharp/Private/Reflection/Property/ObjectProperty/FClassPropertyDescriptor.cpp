@@ -7,14 +7,7 @@ void FClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (ClassProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(Src);
-
-		if (SrcMonoObject == nullptr)
-		{
-			SrcMonoObject = Object_New(Src);
-		}
-
-		*Dest = SrcMonoObject;
+		*Dest = Object_New(Src);
 	}
 }
 
@@ -25,8 +18,6 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(SrcMonoObject);
-
-		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(Dest);
 
 		ClassProperty->InitializeValue(Dest);
 
@@ -60,11 +51,16 @@ bool FClassPropertyDescriptor::Identical(const void* A, const void* B, const uin
 
 MonoObject* FClassPropertyDescriptor::Object_New(void* InAddress) const
 {
-	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(ClassProperty);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InAddress);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+	if (Object == nullptr)
+	{
+		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(ClassProperty);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(Object, InAddress, false);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(Object, InAddress, false);
+	}
 
 	return Object;
 }

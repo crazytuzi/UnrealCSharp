@@ -72,6 +72,43 @@ public class Mono : ModuleRules
 
 			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(RelativeAPLPath, APLName));
 		}
+		else if (Target.Platform == UnrealTargetPlatform.Linux)
+		{
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "libmonosgen-2.0.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-debugger-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-diagnostics_tracing-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-hot_reload-static.a"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libcoreclr.so",
+				Path.Combine(LibraryPath, Target.Platform.ToString(), "libcoreclr.so"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libcoreclr.so.dbg",
+				Path.Combine(LibraryPath, Target.Platform.ToString(), "libcoreclr.so.dbg"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.Native.so",
+				Path.Combine(LibraryPath, Target.Platform.ToString(), "libSystem.Native.so"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.Native.so.dbg",
+				Path.Combine(LibraryPath, Target.Platform.ToString(), "libSystem.Native.so.dbg"));
+
+			var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
+
+			foreach (var File in Files)
+			{
+				var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
+
+				var DestPath = File.Substring(ModuleLastDirectory.Length + 1,
+					File.Length - ModuleLastDirectory.Length - 1);
+
+				RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
+			}
+		}
 	}
 
 	private static IEnumerable<string> GetFiles(string InDirectory, string InPattern = "*.*")

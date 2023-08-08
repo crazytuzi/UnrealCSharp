@@ -8,14 +8,7 @@ void FSetPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (SetProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(Src);
-
-		if (SrcMonoObject == nullptr)
-		{
-			SrcMonoObject = Object_New(Src);
-		}
-
-		*Dest = SrcMonoObject;
+		*Dest = Object_New(Src);
 	}
 }
 
@@ -27,8 +20,6 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(SrcMonoObject);
 
-		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
-
 		SetProperty->InitializeValue(Dest);
 
 		SetProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
@@ -39,26 +30,40 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 
 MonoObject* FSetPropertyDescriptor::Object_New(void* InAddress) const
 {
-	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(SetProperty);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject(InAddress);
 
-	const auto FoundMonoClass = FTypeBridge::GetMonoClass(SetProperty->ElementProp);
+	if (Object == nullptr)
+	{
+		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(SetProperty);
 
-	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(FoundMonoClass);
+		const auto FoundMonoClass = FTypeBridge::GetMonoClass(SetProperty->ElementProp);
 
-	const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(FoundMonoType);
+		const auto FoundMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(FoundMonoClass);
 
-	auto InParams = static_cast<void*>(FoundReflectionType);
+		const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
+			FoundMonoType);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-		GenericClassMonoClass, TGetArrayLength(InParams), &InParams);
+		auto InParams = static_cast<void*>(FoundReflectionType);
 
-	const auto SetHelper = new FSetHelper(SetProperty->ElementProp, InAddress);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+			GenericClassMonoClass, TGetArrayLength(InParams), &InParams);
 
-	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-		InAddress, SetProperty->GetOffset_ForInternal());
+		const auto SetHelper = new FSetHelper(SetProperty->ElementProp, InAddress);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, SetHelper,
-	                                                           Object);
+		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
+			InAddress, SetProperty->GetOffset_ForInternal());
+
+		if (OwnerGarbageCollectionHandle.IsValid())
+		{
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress,
+			                                                           SetHelper,
+			                                                           Object);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
+		}
+	}
 
 	return Object;
 }

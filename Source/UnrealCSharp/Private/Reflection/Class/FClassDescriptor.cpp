@@ -81,9 +81,9 @@ FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FName& InFunc
 
 FPropertyDescriptor* FClassDescriptor::GetPropertyDescriptor(const FName& InPropertyName) const
 {
-	if (const auto FoundFunctionDescriptor = PropertyDescriptorMap.Find(InPropertyName))
+	if (const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyName))
 	{
-		return *FoundFunctionDescriptor;
+		return *FoundPropertyDescriptor;
 	}
 
 	if (Struct != nullptr)

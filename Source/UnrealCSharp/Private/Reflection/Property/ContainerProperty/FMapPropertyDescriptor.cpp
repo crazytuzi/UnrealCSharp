@@ -8,14 +8,7 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (MapProperty != nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(Src);
-
-		if (SrcMonoObject == nullptr)
-		{
-			SrcMonoObject = Object_New(Src);
-		}
-
-		*Dest = SrcMonoObject;
+		*Dest = Object_New(Src);
 	}
 }
 
@@ -27,8 +20,6 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(SrcMonoObject);
 
-		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(Dest);
-
 		MapProperty->InitializeValue(Dest);
 
 		MapProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptMap());
@@ -39,34 +30,49 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 
 MonoObject* FMapPropertyDescriptor::Object_New(void* InAddress) const
 {
-	const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(MapProperty);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject(InAddress);
 
-	const auto FoundKeyMonoClass = FTypeBridge::GetMonoClass(MapProperty->KeyProp);
+	if (Object == nullptr)
+	{
+		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(MapProperty);
 
-	const auto FoundKeyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(FoundKeyMonoClass);
+		const auto FoundKeyMonoClass = FTypeBridge::GetMonoClass(MapProperty->KeyProp);
 
-	const auto FoundKeyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
-		FoundKeyMonoType);
+		const auto FoundKeyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+			FoundKeyMonoClass);
 
-	const auto FoundValueMonoClass = FTypeBridge::GetMonoClass(MapProperty->ValueProp);
+		const auto FoundKeyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
+			FoundKeyMonoType);
 
-	const auto FoundValueMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
-		FoundValueMonoClass);
+		const auto FoundValueMonoClass = FTypeBridge::GetMonoClass(MapProperty->ValueProp);
 
-	const auto FoundValueReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
-		FoundValueMonoType);
+		const auto FoundValueMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+			FoundValueMonoClass);
 
-	void* InParams[2] = {FoundKeyReflectionType, FoundValueReflectionType};
+		const auto FoundValueReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
+			FoundValueMonoType);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-		GenericClassMonoClass, TGetArrayLength(InParams), InParams);
+		void* InParams[2] = {FoundKeyReflectionType, FoundValueReflectionType};
 
-	const auto MapHelper = new FMapHelper(MapProperty->KeyProp, MapProperty->ValueProp, InAddress);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+			GenericClassMonoClass, TGetArrayLength(InParams), InParams);
 
-	const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-		InAddress, MapProperty->GetOffset_ForInternal());
+		const auto MapHelper = new FMapHelper(MapProperty->KeyProp, MapProperty->ValueProp, InAddress);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, MapHelper,
-	                                                           Object);
+		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
+			InAddress, MapProperty->GetOffset_ForInternal());
+
+		if (OwnerGarbageCollectionHandle.IsValid())
+		{
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress,
+			                                                           MapHelper,
+			                                                           Object);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Object);
+		}
+	}
+
 	return Object;
 }

@@ -45,8 +45,6 @@ public:
 
 	bool RemoveReference(const MonoObject* InMonoObject);
 
-	bool RemoveReference(const void* InAddress);
-
 private:
 	TGarbageCollectionHandleMapping<FContainerAddress> GarbageCollectionHandle2ContainerAddress;
 

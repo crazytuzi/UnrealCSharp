@@ -93,20 +93,6 @@ bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* In
 	return true;
 }
 
-bool FStructRegistry::RemoveReference(const void* InOwner, const void* InStruct)
-{
-	if (const auto FoundGarbageCollectionHandle = StructAddress2GarbageCollectionHandle.Find({
-		const_cast<void*>(InOwner), const_cast<void*>(InStruct)
-	}))
-	{
-		FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
-
-		return true;
-	}
-
-	return false;
-}
-
 bool FStructRegistry::RemoveReference(const MonoObject* InMonoObject)
 {
 	if (const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InMonoObject))
