@@ -18,8 +18,9 @@ struct FRegisterUnreal
 
 static FRegisterUnreal RegisterUnreal;
 
-void FUnrealImplementation::Unreal_NewObjectImplementation(const MonoObject* Outer, const MonoObject* Class,
-                                                           MonoObject* Name, MonoObject** OutValue)
+void FUnrealImplementation::Unreal_NewObjectImplementation(const FGarbageCollectionHandle Outer,
+                                                           const FGarbageCollectionHandle Class, MonoObject* Name,
+                                                           MonoObject** OutValue)
 {
 	const auto ObjectOuter = FCSharpEnvironment::GetEnvironment().GetObject(Outer);
 
@@ -34,8 +35,8 @@ void FUnrealImplementation::Unreal_NewObjectImplementation(const MonoObject* Out
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Object);
 }
 
-void FUnrealImplementation::Unreal_DuplicateObjectImplementation(const MonoObject* SourceObject,
-                                                                 const MonoObject* Outer, MonoObject* Name,
+void FUnrealImplementation::Unreal_DuplicateObjectImplementation(const FGarbageCollectionHandle SourceObject,
+                                                                 const FGarbageCollectionHandle Outer, MonoObject* Name,
                                                                  MonoObject** OutValue)
 {
 	const auto ObjectSourceObject = FCSharpEnvironment::GetEnvironment().GetObject(SourceObject);
@@ -51,7 +52,7 @@ void FUnrealImplementation::Unreal_DuplicateObjectImplementation(const MonoObjec
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Object);
 }
 
-void FUnrealImplementation::Unreal_LoadObjectImplementation(const MonoObject* Outer, MonoString* Name,
+void FUnrealImplementation::Unreal_LoadObjectImplementation(const FGarbageCollectionHandle Outer, MonoString* Name,
                                                             MonoObject** OutValue)
 {
 	const auto ObjectOuter = FCSharpEnvironment::GetEnvironment().GetObject(Outer);
@@ -63,7 +64,7 @@ void FUnrealImplementation::Unreal_LoadObjectImplementation(const MonoObject* Ou
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Object);
 }
 
-void FUnrealImplementation::Unreal_LoadClassImplementation(const MonoObject* Outer, MonoString* Name,
+void FUnrealImplementation::Unreal_LoadClassImplementation(const FGarbageCollectionHandle Outer, MonoString* Name,
                                                            MonoObject** OutValue)
 {
 	const auto ObjectOuter = FCSharpEnvironment::GetEnvironment().GetObject(Outer);

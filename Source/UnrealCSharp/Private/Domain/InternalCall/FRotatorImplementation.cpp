@@ -48,7 +48,8 @@ struct FRegisterRotator
 
 static FRegisterRotator RegisterRotator;
 
-void FRotatorImplementation::Rotator_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_AddImplementation(const FGarbageCollectionHandle A,
+                                                       const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(A);
 
@@ -68,8 +69,8 @@ void FRotatorImplementation::Rotator_AddImplementation(const MonoObject* A, cons
 	}
 }
 
-void FRotatorImplementation::Rotator_SubtractImplementation(const MonoObject* A, const MonoObject* B,
-                                                            MonoObject** OutValue)
+void FRotatorImplementation::Rotator_SubtractImplementation(const FGarbageCollectionHandle A,
+                                                            const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(A);
 
@@ -89,10 +90,11 @@ void FRotatorImplementation::Rotator_SubtractImplementation(const MonoObject* A,
 	}
 }
 
-void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* InMonoObject, const LwcType Scale,
-                                                            MonoObject** OutValue)
+void FRotatorImplementation::Rotator_MultiplyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const LwcType Scale, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -108,7 +110,8 @@ void FRotatorImplementation::Rotator_MultiplyImplementation(const MonoObject* In
 	}
 }
 
-bool FRotatorImplementation::Rotator_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FRotatorImplementation::Rotator_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                            const FGarbageCollectionHandle B)
 {
 	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(A);
 
@@ -122,7 +125,8 @@ bool FRotatorImplementation::Rotator_EqualityImplementation(const MonoObject* A,
 	return false;
 }
 
-bool FRotatorImplementation::Rotator_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FRotatorImplementation::Rotator_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B)
 {
 	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(A);
 
@@ -136,9 +140,11 @@ bool FRotatorImplementation::Rotator_InequalityImplementation(const MonoObject* 
 	return false;
 }
 
-bool FRotatorImplementation::Rotator_IsNearlyZeroImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
+bool FRotatorImplementation::Rotator_IsNearlyZeroImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Tolerance)
 {
-	if (const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject))
+	if (const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle))
 	{
 		return Rotator->IsNearlyZero(Tolerance);
 	}
@@ -146,9 +152,10 @@ bool FRotatorImplementation::Rotator_IsNearlyZeroImplementation(const MonoObject
 	return false;
 }
 
-bool FRotatorImplementation::Rotator_IsZeroImplementation(const MonoObject* InMonoObject)
+bool FRotatorImplementation::Rotator_IsZeroImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject))
+	if (const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle))
 	{
 		return Rotator->IsZero();
 	}
@@ -156,8 +163,8 @@ bool FRotatorImplementation::Rotator_IsZeroImplementation(const MonoObject* InMo
 	return false;
 }
 
-bool FRotatorImplementation::Rotator_EqualsImplementation(const MonoObject* A, const MonoObject* B,
-                                                          const LwcType Tolerance)
+bool FRotatorImplementation::Rotator_EqualsImplementation(const FGarbageCollectionHandle A,
+                                                          const FGarbageCollectionHandle B, const LwcType Tolerance)
 {
 	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(A);
 
@@ -171,11 +178,12 @@ bool FRotatorImplementation::Rotator_EqualsImplementation(const MonoObject* A, c
 	return false;
 }
 
-void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* InMonoObject, const LwcType DeltaPitch,
-                                                            const LwcType DeltaYaw, const LwcType DeltaRoll,
-                                                            MonoObject** OutValue)
+void FRotatorImplementation::Rotator_AddDeltaImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const LwcType DeltaPitch, const LwcType DeltaYaw,
+                                                            const LwcType DeltaRoll, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -191,9 +199,11 @@ void FRotatorImplementation::Rotator_AddDeltaImplementation(const MonoObject* In
 	}
 }
 
-void FRotatorImplementation::Rotator_GetInverseImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_GetInverseImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -209,10 +219,11 @@ void FRotatorImplementation::Rotator_GetInverseImplementation(const MonoObject* 
 	}
 }
 
-void FRotatorImplementation::Rotator_GridSnapImplementation(const MonoObject* InMonoObject, const MonoObject* RotGrid,
-                                                            MonoObject** OutValue)
+void FRotatorImplementation::Rotator_GridSnapImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const MonoObject* RotGrid, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto RotatorRotGrid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(RotGrid);
 
@@ -230,9 +241,11 @@ void FRotatorImplementation::Rotator_GridSnapImplementation(const MonoObject* In
 	}
 }
 
-void FRotatorImplementation::Rotator_VectorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_VectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                          MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -248,9 +261,11 @@ void FRotatorImplementation::Rotator_VectorImplementation(const MonoObject* InMo
 	}
 }
 
-void FRotatorImplementation::Rotator_QuaternionImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_QuaternionImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FQuat, FQuat>::Get();
 
@@ -266,9 +281,11 @@ void FRotatorImplementation::Rotator_QuaternionImplementation(const MonoObject* 
 	}
 }
 
-void FRotatorImplementation::Rotator_EulerImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_EulerImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -284,10 +301,11 @@ void FRotatorImplementation::Rotator_EulerImplementation(const MonoObject* InMon
 	}
 }
 
-void FRotatorImplementation::Rotator_RotateVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-                                                                MonoObject** OutValue)
+void FRotatorImplementation::Rotator_RotateVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -305,10 +323,11 @@ void FRotatorImplementation::Rotator_RotateVectorImplementation(const MonoObject
 	}
 }
 
-void FRotatorImplementation::Rotator_UnrotateVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-                                                                  MonoObject** OutValue)
+void FRotatorImplementation::Rotator_UnrotateVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -326,9 +345,11 @@ void FRotatorImplementation::Rotator_UnrotateVectorImplementation(const MonoObje
 	}
 }
 
-void FRotatorImplementation::Rotator_ClampImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_ClampImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -344,9 +365,11 @@ void FRotatorImplementation::Rotator_ClampImplementation(const MonoObject* InMon
 	}
 }
 
-void FRotatorImplementation::Rotator_GetNormalizedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_GetNormalizedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -362,10 +385,11 @@ void FRotatorImplementation::Rotator_GetNormalizedImplementation(const MonoObjec
 	}
 }
 
-void FRotatorImplementation::Rotator_GetDenormalizedImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FRotatorImplementation::Rotator_GetDenormalizedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -381,18 +405,20 @@ void FRotatorImplementation::Rotator_GetDenormalizedImplementation(const MonoObj
 	}
 }
 
-void FRotatorImplementation::Rotator_NormalizeImplementation(const MonoObject* InMonoObject)
+void FRotatorImplementation::Rotator_NormalizeImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject))
+	if (const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle))
 	{
 		Rotator->Normalize();
 	}
 }
 
 void FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation(
-	const MonoObject* InMonoObject, MonoObject** Winding, MonoObject** Remainder)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** Winding, MonoObject** Remainder)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -417,9 +443,10 @@ void FRotatorImplementation::Rotator_GetWindingAndRemainderImplementation(
 }
 
 FRotatorImplementation::LwcType FRotatorImplementation::Rotator_GetManhattanDistanceImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Rotator)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Rotator)
 {
-	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto RotatorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(Rotator);
 
@@ -431,10 +458,11 @@ FRotatorImplementation::LwcType FRotatorImplementation::Rotator_GetManhattanDist
 	return 0.f;
 }
 
-void FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation(const MonoObject* InMonoObject,
-                                                                        MonoObject** OutValue)
+void FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -450,9 +478,11 @@ void FRotatorImplementation::Rotator_GetEquivalentRotatorImplementation(const Mo
 	}
 }
 
-void FRotatorImplementation::Rotator_SetClosestToMeImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_SetClosestToMeImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -468,9 +498,11 @@ void FRotatorImplementation::Rotator_SetClosestToMeImplementation(const MonoObje
 	}
 }
 
-void FRotatorImplementation::Rotator_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FRotatorImplementation::Rotator_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	if (Rotator != nullptr)
 	{
@@ -488,10 +520,11 @@ void FRotatorImplementation::Rotator_ToStringImplementation(const MonoObject* In
 	}
 }
 
-void FRotatorImplementation::Rotator_ToCompactStringImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FRotatorImplementation::Rotator_ToCompactStringImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	if (Rotator != nullptr)
 	{
@@ -509,10 +542,11 @@ void FRotatorImplementation::Rotator_ToCompactStringImplementation(const MonoObj
 	}
 }
 
-bool FRotatorImplementation::Rotator_InitFromStringImplementation(const MonoObject* InMonoObject,
-                                                                  MonoObject* InSourceString)
+bool FRotatorImplementation::Rotator_InitFromStringImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InSourceString)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	if (Rotator != nullptr && InSourceString != nullptr)
 	{
@@ -524,9 +558,10 @@ bool FRotatorImplementation::Rotator_InitFromStringImplementation(const MonoObje
 	return false;
 }
 
-bool FRotatorImplementation::Rotator_ContainsNaNImplementation(const MonoObject* InMonoObject)
+bool FRotatorImplementation::Rotator_ContainsNaNImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(InMonoObject);
+	const auto Rotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(
+		InGarbageCollectionHandle);
 
 	if (Rotator != nullptr)
 	{

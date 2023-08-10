@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 #if UE_5_0_OR_LATER
 using LwcType = System.Double;
 #else
@@ -13,52 +13,52 @@ namespace Script.Library
     public static class PlaneImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_IsValidImplementation(FPlane InPlane);
+        public static extern Boolean Plane_IsValidImplementation(IntPtr InPlane);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_GetOriginImplementation(FPlane InPlane, out FVector OutValue);
+        public static extern void Plane_GetOriginImplementation(IntPtr InPlane, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_GetNormalImplementation(FPlane InPlane, out FVector OutValue);
+        public static extern void Plane_GetNormalImplementation(IntPtr InPlane, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Plane_PlaneDotImplementation(FPlane InPlane, FVector P);
+        public static extern LwcType Plane_PlaneDotImplementation(IntPtr InPlane, FVector P);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_NormalizeImplementation(FPlane InPlane, LwcType Tolerance);
+        public static extern Boolean Plane_NormalizeImplementation(IntPtr InPlane, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_FlipImplementation(FPlane InPlane, out FPlane OutValue);
+        public static extern void Plane_FlipImplementation(IntPtr InPlane, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_TransformByImplementation(FPlane InPlane, FMatrix M, out FPlane OutValue);
+        public static extern void Plane_TransformByImplementation(IntPtr InPlane, FMatrix M, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_TransformByUsingAdjointTImplementation(FPlane InPlane, FMatrix M, LwcType DetM,
+        public static extern void Plane_TransformByUsingAdjointTImplementation(IntPtr InPlane, FMatrix M, LwcType DetM,
             FMatrix TA, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_EqualityImplementation(FPlane A, FPlane B);
+        public static extern Boolean Plane_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_InequalityImplementation(FPlane A, FPlane B);
+        public static extern Boolean Plane_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_EqualsImplementation(FPlane InPlane, FPlane V, LwcType Tolerance);
+        public static extern Boolean Plane_EqualsImplementation(IntPtr InPlane, FPlane V, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Plane_DotProductImplementation(FPlane A, FPlane B);
+        public static extern LwcType Plane_DotProductImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_AddImplementation(FPlane A, FPlane B, out FPlane OutValue);
+        public static extern void Plane_AddImplementation(IntPtr A, IntPtr B, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_SubtractImplementation(FPlane A, FPlane B, out FPlane OutValue);
+        public static extern void Plane_SubtractImplementation(IntPtr A, IntPtr B, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_DivideImplementation(FPlane InPlane, LwcType Scale, out FPlane OutValue);
+        public static extern void Plane_DivideImplementation(IntPtr InPlane, LwcType Scale, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Plane_MultiplyImplementation(FPlane InPlane, LwcType Scale, out FPlane OutValue);
+        public static extern void Plane_MultiplyImplementation(IntPtr InPlane, LwcType Scale, out FPlane OutValue);
     }
 }

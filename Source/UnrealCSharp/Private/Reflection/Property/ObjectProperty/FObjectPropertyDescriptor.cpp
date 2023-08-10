@@ -16,7 +16,9 @@ void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (ObjectProperty != nullptr)
 	{
-		const auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(static_cast<MonoObject*>(Src));
+		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+
+		const auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(SrcMonoObject);
 
 		ObjectProperty->InitializeValue(Dest);
 

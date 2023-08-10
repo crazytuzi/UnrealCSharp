@@ -39,25 +39,26 @@ void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject)
 	                                          FTypeBridge::GetGenericArgument(InMonoObject, 1));
 }
 
-void FMapImplementation::Map_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FMapImplementation::Map_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InGarbageCollectionHandle);
 	});
 }
 
-void FMapImplementation::Map_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)
+void FMapImplementation::Map_EmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                 const int32 InExpectedNumElements)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		return MapHelper->Empty(InExpectedNumElements);
 	}
 }
 
-int32 FMapImplementation::Map_NumImplementation(const MonoObject* InMonoObject)
+int32 FMapImplementation::Map_NumImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		return MapHelper->Num();
 	}
@@ -65,9 +66,10 @@ int32 FMapImplementation::Map_NumImplementation(const MonoObject* InMonoObject)
 	return 0;
 }
 
-void FMapImplementation::Map_AddImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject* InValue)
+void FMapImplementation::Map_AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                               MonoObject* InKey, MonoObject* InValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		auto Key = static_cast<void*>(InKey);
 
@@ -87,9 +89,10 @@ void FMapImplementation::Map_AddImplementation(const MonoObject* InMonoObject, M
 	}
 }
 
-int32 FMapImplementation::Map_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InKey)
+int32 FMapImplementation::Map_RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                   MonoObject* InKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
@@ -104,10 +107,10 @@ int32 FMapImplementation::Map_RemoveImplementation(const MonoObject* InMonoObjec
 	return 0;
 }
 
-void FMapImplementation::Map_FindKeyImplementation(const MonoObject* InMonoObject, MonoObject* InValue,
-                                                   MonoObject** OutKey)
+void FMapImplementation::Map_FindKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                   MonoObject* InValue, MonoObject** OutKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		auto Value = static_cast<void*>(InValue);
 
@@ -130,10 +133,10 @@ void FMapImplementation::Map_FindKeyImplementation(const MonoObject* InMonoObjec
 	}
 }
 
-void FMapImplementation::Map_FindImplementation(const MonoObject* InMonoObject, MonoObject* InKey,
-                                                MonoObject** OutValue)
+void FMapImplementation::Map_FindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                MonoObject* InKey, MonoObject** OutValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		auto Key = static_cast<void*>(InKey);
 
@@ -156,9 +159,10 @@ void FMapImplementation::Map_FindImplementation(const MonoObject* InMonoObject, 
 	}
 }
 
-bool FMapImplementation::Map_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InKey)
+bool FMapImplementation::Map_ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                    MonoObject* InKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
 		{
@@ -173,9 +177,10 @@ bool FMapImplementation::Map_ContainsImplementation(const MonoObject* InMonoObje
 	return false;
 }
 
-void FMapImplementation::Map_GetImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject** OutValue)
+void FMapImplementation::Map_GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                               MonoObject* InKey, MonoObject** OutValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		auto Key = static_cast<void*>(InKey);
 
@@ -198,9 +203,10 @@ void FMapImplementation::Map_GetImplementation(const MonoObject* InMonoObject, M
 	}
 }
 
-void FMapImplementation::Map_SetImplementation(const MonoObject* InMonoObject, MonoObject* InKey, MonoObject* InValue)
+void FMapImplementation::Map_SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                               MonoObject* InKey, MonoObject* InValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		auto Key = static_cast<void*>(InKey);
 
@@ -220,9 +226,9 @@ void FMapImplementation::Map_SetImplementation(const MonoObject* InMonoObject, M
 	}
 }
 
-int32 FMapImplementation::Map_GetMaxIndexImplementation(const MonoObject* InMonoObject)
+int32 FMapImplementation::Map_GetMaxIndexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		return MapHelper->GetMaxIndex();
 	}
@@ -230,9 +236,10 @@ int32 FMapImplementation::Map_GetMaxIndexImplementation(const MonoObject* InMono
 	return 0;
 }
 
-bool FMapImplementation::Map_IsValidIndexImplementation(const MonoObject* InMonoObject, const int32 InIndex)
+bool FMapImplementation::Map_IsValidIndexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                        const int32 InIndex)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		return MapHelper->IsValidIndex(InIndex);
 	}
@@ -240,10 +247,10 @@ bool FMapImplementation::Map_IsValidIndexImplementation(const MonoObject* InMono
 	return false;
 }
 
-void FMapImplementation::Map_GetEnumeratorKeyImplementation(const MonoObject* InMonoObject, const int32 InIndex,
-                                                            MonoObject** OutKey)
+void FMapImplementation::Map_GetEnumeratorKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const int32 InIndex, MonoObject** OutKey)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		const auto Key = MapHelper->GetEnumeratorKey(InIndex);
 
@@ -259,10 +266,10 @@ void FMapImplementation::Map_GetEnumeratorKeyImplementation(const MonoObject* In
 	}
 }
 
-void FMapImplementation::Map_GetEnumeratorValueImplementation(const MonoObject* InMonoObject, const int32 InIndex,
-                                                              MonoObject** OutValue)
+void FMapImplementation::Map_GetEnumeratorValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              const int32 InIndex, MonoObject** OutValue)
 {
-	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InMonoObject))
+	if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InGarbageCollectionHandle))
 	{
 		const auto Value = MapHelper->GetEnumeratorValue(InIndex);
 

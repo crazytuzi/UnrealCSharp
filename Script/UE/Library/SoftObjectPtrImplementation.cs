@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -11,11 +12,10 @@ namespace Script.Library
             where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SoftObjectPtr_UnRegisterImplementation<T>(TSoftObjectPtr<T> InSoftObjectPtr)
-            where T : UObject;
+        public static extern void SoftObjectPtr_UnRegisterImplementation(IntPtr InSoftObjectPtr);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SoftObjectPtr_GetImplementation<T>(TSoftObjectPtr<T> InSoftObjectPtr, out T OutValue)
+        public static extern void SoftObjectPtr_GetImplementation<T>(IntPtr InSoftObjectPtr, out T OutValue)
             where T : UObject;
     }
 }

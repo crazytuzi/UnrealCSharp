@@ -16,11 +16,17 @@ public:
 	void Deinitialize();
 
 public:
+	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+
 	void* GetAddress(const MonoObject* InMonoObject);
+
+	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct);
 
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
 
 	MonoObject* GetObject(const UObject* InObject);
+
+	UObject* GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 	UObject* GetObject(const MonoObject* InMonoObject);
 
@@ -31,10 +37,12 @@ public:
 
 	bool RemoveReference(const UObject* InObject);
 
-	bool RemoveReference(const MonoObject* InMonoObject);
+	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
 	TGarbageCollectionHandleMapping<TWeakObjectPtr<const UObject>> GarbageCollectionHandle2Object;
 
 	TMap<TWeakObjectPtr<const UObject>, FGarbageCollectionHandle> Object2GarbageCollectionHandleMap;
+
+	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
 };

@@ -13,45 +13,45 @@ namespace Script.CoreUObject
     {
         public static FRotator operator +(FRotator A, FRotator B)
         {
-            RotatorImplementation.Rotator_AddImplementation(A, B, out var OutValue);
+            RotatorImplementation.Rotator_AddImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FRotator operator -(FRotator A, FRotator B)
         {
-            RotatorImplementation.Rotator_SubtractImplementation(A, B, out var OutValue);
+            RotatorImplementation.Rotator_SubtractImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FRotator operator *(FRotator A, LwcType Scale)
         {
-            RotatorImplementation.Rotator_MultiplyImplementation(A, Scale, out var OutValue);
+            RotatorImplementation.Rotator_MultiplyImplementation(A.GetHandle(), Scale, out var OutValue);
 
             return OutValue;
         }
 
         public static Boolean operator ==(FRotator A, FRotator B) =>
-            RotatorImplementation.Rotator_EqualityImplementation(A, B);
+            RotatorImplementation.Rotator_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FRotator A, FRotator B) =>
-            RotatorImplementation.Rotator_InequalityImplementation(A, B);
+            RotatorImplementation.Rotator_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         // @TODO KINDA_SMALL_NUMBER
         public Boolean IsNearlyZero(LwcType Tolerance) =>
-            RotatorImplementation.Rotator_IsNearlyZeroImplementation(this, Tolerance);
+            RotatorImplementation.Rotator_IsNearlyZeroImplementation(GetHandle(), Tolerance);
 
         public Boolean IsZero() =>
-            RotatorImplementation.Rotator_IsZeroImplementation(this);
+            RotatorImplementation.Rotator_IsZeroImplementation(GetHandle());
 
         // @TODO KINDA_SMALL_NUMBER
         public Boolean Equals(FRotator R, LwcType Tolerance) =>
-            RotatorImplementation.Rotator_EqualsImplementation(this, R, Tolerance);
+            RotatorImplementation.Rotator_EqualsImplementation(GetHandle(), R.GetHandle(), Tolerance);
 
         public FRotator Add(LwcType DeltaPitch, LwcType DeltaYaw, LwcType DeltaRoll)
         {
-            RotatorImplementation.Rotator_AddDeltaImplementation(this, DeltaPitch, DeltaYaw, DeltaRoll,
+            RotatorImplementation.Rotator_AddDeltaImplementation(GetHandle(), DeltaPitch, DeltaYaw, DeltaRoll,
                 out var OutValue);
 
             return OutValue;
@@ -59,70 +59,70 @@ namespace Script.CoreUObject
 
         public FRotator GetInverse()
         {
-            RotatorImplementation.Rotator_GetInverseImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_GetInverseImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FRotator GridSnap(FRotator RotGrid)
         {
-            RotatorImplementation.Rotator_GridSnapImplementation(this, RotGrid, out var OutValue);
+            RotatorImplementation.Rotator_GridSnapImplementation(GetHandle(), RotGrid, out var OutValue);
 
             return OutValue;
         }
 
         public FVector Vector()
         {
-            RotatorImplementation.Rotator_VectorImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_VectorImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FQuat Quaternion()
         {
-            RotatorImplementation.Rotator_QuaternionImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_QuaternionImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FVector Euler()
         {
-            RotatorImplementation.Rotator_EulerImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_EulerImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FVector RotateVector(FVector V)
         {
-            RotatorImplementation.Rotator_RotateVectorImplementation(this, V, out var OutValue);
+            RotatorImplementation.Rotator_RotateVectorImplementation(GetHandle(), V, out var OutValue);
 
             return OutValue;
         }
 
         public FVector UnrotateVector(FVector V)
         {
-            RotatorImplementation.Rotator_UnrotateVectorImplementation(this, V, out var OutValue);
+            RotatorImplementation.Rotator_UnrotateVectorImplementation(GetHandle(), V, out var OutValue);
 
             return OutValue;
         }
 
         public FRotator Clamp()
         {
-            RotatorImplementation.Rotator_ClampImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_ClampImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FRotator GetNormalized()
         {
-            RotatorImplementation.Rotator_GetNormalizedImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_GetNormalizedImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FRotator GetDenormalized()
         {
-            RotatorImplementation.Rotator_GetDenormalizedImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_GetDenormalizedImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
@@ -132,47 +132,47 @@ namespace Script.CoreUObject
         // SetComponentForAxis
 
         public void Normalize() =>
-            RotatorImplementation.Rotator_NormalizeImplementation(this);
+            RotatorImplementation.Rotator_NormalizeImplementation(GetHandle());
 
         public void GetWindingAndRemainder(out FRotator Winding, out FRotator Remainder) =>
-            RotatorImplementation.Rotator_GetWindingAndRemainderImplementation(this, out Winding, out Remainder);
+            RotatorImplementation.Rotator_GetWindingAndRemainderImplementation(GetHandle(), out Winding, out Remainder);
 
         public LwcType GetManhattanDistance(FRotator Rotator) =>
-            RotatorImplementation.Rotator_GetManhattanDistanceImplementation(this, Rotator);
+            RotatorImplementation.Rotator_GetManhattanDistanceImplementation(GetHandle(), Rotator);
 
         public FRotator GetEquivalentRotator()
         {
-            RotatorImplementation.Rotator_GetEquivalentRotatorImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_GetEquivalentRotatorImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FRotator SetClosestToMe()
         {
-            RotatorImplementation.Rotator_SetClosestToMeImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_SetClosestToMeImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public override string ToString()
         {
-            RotatorImplementation.Rotator_ToStringImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_ToStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue.ToString();
         }
 
         public FString ToCompactString()
         {
-            RotatorImplementation.Rotator_ToCompactStringImplementation(this, out var OutValue);
+            RotatorImplementation.Rotator_ToCompactStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public Boolean InitFromString(FString InSourceString) =>
-            RotatorImplementation.Rotator_InitFromStringImplementation(this, InSourceString);
+            RotatorImplementation.Rotator_InitFromStringImplementation(GetHandle(), InSourceString);
 
         public Boolean ContainsNaN() =>
-            RotatorImplementation.Rotator_ContainsNaNImplementation(this);
+            RotatorImplementation.Rotator_ContainsNaNImplementation(GetHandle());
 
         public static LwcType ClampAxis(LwcType Angle) =>
             RotatorImplementation.Rotator_ClampAxisImplementation(Angle);

@@ -36,7 +36,8 @@ struct FRegisterBox2D
 
 static FRegisterBox2D RegisterBox2D;
 
-bool FBox2DImplementation::Box2D_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FBox2DImplementation::Box2D_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                        const FGarbageCollectionHandle B)
 {
 	const auto Box2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(A);
 
@@ -50,7 +51,8 @@ bool FBox2DImplementation::Box2D_EqualityImplementation(const MonoObject* A, con
 	return false;
 }
 
-bool FBox2DImplementation::Box2D_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FBox2DImplementation::Box2D_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                          const FGarbageCollectionHandle B)
 {
 	const auto Box2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(A);
 
@@ -64,8 +66,8 @@ bool FBox2DImplementation::Box2D_InequalityImplementation(const MonoObject* A, c
 	return false;
 }
 
-void FBox2DImplementation::Box2D_AddVector2DImplementation(const MonoObject* A, const MonoObject* B,
-                                                           MonoObject** OutValue)
+void FBox2DImplementation::Box2D_AddVector2DImplementation(const FGarbageCollectionHandle A,
+                                                           const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(A);
 
@@ -85,7 +87,8 @@ void FBox2DImplementation::Box2D_AddVector2DImplementation(const MonoObject* A, 
 	}
 }
 
-void FBox2DImplementation::Box2D_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
+void FBox2DImplementation::Box2D_AddImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+                                                   MonoObject** OutValue)
 {
 	const auto Box2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(A);
 
@@ -105,10 +108,11 @@ void FBox2DImplementation::Box2D_AddImplementation(const MonoObject* A, const Mo
 	}
 }
 
-void FBox2DImplementation::Box2D_GetReferenceImplementation(const MonoObject* InMonoObject, const int32 Index,
-                                                            MonoObject** OutValue)
+void FBox2DImplementation::Box2D_GetReferenceImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const int32 Index, MonoObject** OutValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -124,10 +128,11 @@ void FBox2DImplementation::Box2D_GetReferenceImplementation(const MonoObject* In
 	}
 }
 
-void FBox2DImplementation::Box2D_SetReferenceImplementation(const MonoObject* InMonoObject, const int32 Index,
-                                                            const MonoObject* InValue)
+void FBox2DImplementation::Box2D_SetReferenceImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const int32 Index, const MonoObject* InValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InValue);
 
@@ -138,9 +143,10 @@ void FBox2DImplementation::Box2D_SetReferenceImplementation(const MonoObject* In
 }
 
 FBox2DImplementation::LwcType FBox2DImplementation::Box2D_ComputeSquaredDistanceToPointImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Point)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Point)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(Point);
 
@@ -152,10 +158,11 @@ FBox2DImplementation::LwcType FBox2DImplementation::Box2D_ComputeSquaredDistance
 	return 0.f;
 }
 
-void FBox2DImplementation::Box2D_ExpandByImplementation(const MonoObject* InMonoObject, const LwcType W,
-                                                        MonoObject** OutValue)
+void FBox2DImplementation::Box2D_ExpandByImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                        const LwcType W, MonoObject** OutValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FBox2D, FBox2D>::Get();
 
@@ -171,9 +178,11 @@ void FBox2DImplementation::Box2D_ExpandByImplementation(const MonoObject* InMono
 	}
 }
 
-FBox2DImplementation::LwcType FBox2DImplementation::Box2D_GetAreaImplementation(const MonoObject* InMonoObject)
+FBox2DImplementation::LwcType FBox2DImplementation::Box2D_GetAreaImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	if (Box2D != nullptr)
 	{
@@ -183,9 +192,11 @@ FBox2DImplementation::LwcType FBox2DImplementation::Box2D_GetAreaImplementation(
 	return 0.f;
 }
 
-void FBox2DImplementation::Box2D_GetCenterImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FBox2DImplementation::Box2D_GetCenterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         MonoObject** OutValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -201,10 +212,11 @@ void FBox2DImplementation::Box2D_GetCenterImplementation(const MonoObject* InMon
 	}
 }
 
-void FBox2DImplementation::Box2D_GetCenterAndExtentsImplementation(const MonoObject* InMonoObject, MonoObject** center,
-                                                                   MonoObject** Extents)
+void FBox2DImplementation::Box2D_GetCenterAndExtentsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** center, MonoObject** Extents)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -228,10 +240,11 @@ void FBox2DImplementation::Box2D_GetCenterAndExtentsImplementation(const MonoObj
 	}
 }
 
-void FBox2DImplementation::Box2D_GetClosestPointToImplementation(const MonoObject* InMonoObject,
-                                                                 const MonoObject* Point, MonoObject** OutValue)
+void FBox2DImplementation::Box2D_GetClosestPointToImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Point, MonoObject** OutValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(Point);
 
@@ -249,9 +262,11 @@ void FBox2DImplementation::Box2D_GetClosestPointToImplementation(const MonoObjec
 	}
 }
 
-void FBox2DImplementation::Box2D_GetExtentImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FBox2DImplementation::Box2D_GetExtentImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         MonoObject** OutValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -267,9 +282,11 @@ void FBox2DImplementation::Box2D_GetExtentImplementation(const MonoObject* InMon
 	}
 }
 
-void FBox2DImplementation::Box2D_GetSizeImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FBox2DImplementation::Box2D_GetSizeImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                       MonoObject** OutValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -285,9 +302,10 @@ void FBox2DImplementation::Box2D_GetSizeImplementation(const MonoObject* InMonoO
 	}
 }
 
-void FBox2DImplementation::Box2D_InitImplementation(const MonoObject* InMonoObject)
+void FBox2DImplementation::Box2D_InitImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	if (Box2D != nullptr)
 	{
@@ -295,9 +313,11 @@ void FBox2DImplementation::Box2D_InitImplementation(const MonoObject* InMonoObje
 	}
 }
 
-bool FBox2DImplementation::Box2D_IntersectImplementation(const MonoObject* InMonoObject, const MonoObject* other)
+bool FBox2DImplementation::Box2D_IntersectImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         const MonoObject* other)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto Box2DOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(other);
 
@@ -309,10 +329,11 @@ bool FBox2DImplementation::Box2D_IntersectImplementation(const MonoObject* InMon
 	return false;
 }
 
-bool FBox2DImplementation::Box2D_IsInsideVector2DImplementation(const MonoObject* InMonoObject,
-                                                                const MonoObject* TestPoint)
+bool FBox2DImplementation::Box2D_IsInsideVector2DImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* TestPoint)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(TestPoint);
 
@@ -324,9 +345,11 @@ bool FBox2DImplementation::Box2D_IsInsideVector2DImplementation(const MonoObject
 	return false;
 }
 
-bool FBox2DImplementation::Box2D_IsInsideBox2DImplementation(const MonoObject* InMonoObject, const MonoObject* Other)
+bool FBox2DImplementation::Box2D_IsInsideBox2DImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                             const MonoObject* Other)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto Box2DOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(Other);
 
@@ -338,10 +361,11 @@ bool FBox2DImplementation::Box2D_IsInsideBox2DImplementation(const MonoObject* I
 	return false;
 }
 
-void FBox2DImplementation::Box2D_ShiftByImplementation(const MonoObject* InMonoObject, const MonoObject* Offset,
-                                                       MonoObject** OutValue)
+void FBox2DImplementation::Box2D_ShiftByImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                       const MonoObject* Offset, MonoObject** OutValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(Offset);
 
@@ -359,9 +383,11 @@ void FBox2DImplementation::Box2D_ShiftByImplementation(const MonoObject* InMonoO
 	}
 }
 
-void FBox2DImplementation::Box2D_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FBox2DImplementation::Box2D_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                        MonoObject** OutValue)
 {
-	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(InMonoObject);
+	const auto Box2D = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FBox2D>(InGarbageCollectionHandle);
 
 	if (Box2D != nullptr)
 	{

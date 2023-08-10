@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 #if UE_5_0_OR_LATER
 using LwcType = System.Double;
 #else
@@ -13,49 +14,49 @@ namespace Script.Library
     public static class TransformImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_DebugPrintImplementation(FTransform InTransform);
+        public static extern void Transform_DebugPrintImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ToHumanReadableStringImplementation(FTransform InTransform,
+        public static extern void Transform_ToHumanReadableStringImplementation(IntPtr InTransform,
             out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ToStringImplementation(FTransform InTransform, out FString OutValue);
+        public static extern void Transform_ToStringImplementation(IntPtr InTransform, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_InitFromStringImplementation(FTransform InTransform,
+        public static extern Boolean Transform_InitFromStringImplementation(IntPtr InTransform,
             FString InSourceString);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ToMatrixWithScaleImplementation(FTransform InTransform,
+        public static extern void Transform_ToMatrixWithScaleImplementation(IntPtr InTransform,
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ToInverseMatrixWithScaleImplementation(FTransform InTransform,
+        public static extern void Transform_ToInverseMatrixWithScaleImplementation(IntPtr InTransform,
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_InverseImplementation(FTransform InTransform, out FTransform OutValue);
+        public static extern void Transform_InverseImplementation(IntPtr InTransform, out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ToMatrixNoScaleImplementation(FTransform InTransform, out FMatrix OutValue);
+        public static extern void Transform_ToMatrixNoScaleImplementation(IntPtr InTransform, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_BlendImplementation(FTransform InTransform, FTransform Atom1,
+        public static extern void Transform_BlendImplementation(IntPtr InTransform, FTransform Atom1,
             FTransform Atom2, LwcType Alpha);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_BlendWithImplementation(FTransform InTransform, FTransform OtherAtom,
+        public static extern void Transform_BlendWithImplementation(IntPtr InTransform, FTransform OtherAtom,
             LwcType Alpha);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_AddImplementation(FTransform A, FTransform B, out FTransform OutValue);
+        public static extern void Transform_AddImplementation(IntPtr A, IntPtr B, out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_MultiplyImplementation(FTransform A, FTransform B, out FTransform OutValue);
+        public static extern void Transform_MultiplyImplementation(IntPtr A, IntPtr B, out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_MultiplyQuatImplementation(FTransform InTransform, FQuat Other,
+        public static extern void Transform_MultiplyQuatImplementation(IntPtr InTransform, FQuat Other,
             out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -63,87 +64,87 @@ namespace Script.Library
             FVector InOtherScale3D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ScaleTranslationVectorImplementation(FTransform InTransform,
+        public static extern void Transform_ScaleTranslationVectorImplementation(IntPtr InTransform,
             FVector InScale3D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ScaleTranslationScaleImplementation(FTransform InTransform, LwcType Scale);
+        public static extern void Transform_ScaleTranslationScaleImplementation(IntPtr InTransform, LwcType Scale);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_RemoveScalingImplementation(FTransform InTransform, LwcType Tolerance);
+        public static extern void Transform_RemoveScalingImplementation(IntPtr InTransform, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Transform_GetMaximumAxisScaleImplementation(FTransform InTransform);
+        public static extern LwcType Transform_GetMaximumAxisScaleImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Transform_GetMinimumAxisScaleImplementation(FTransform InTransform);
+        public static extern LwcType Transform_GetMinimumAxisScaleImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetRelativeTransformImplementation(FTransform InTransform, FTransform Other,
+        public static extern void Transform_GetRelativeTransformImplementation(IntPtr InTransform, FTransform Other,
             out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetRelativeTransformReverseImplementation(FTransform InTransform,
+        public static extern void Transform_GetRelativeTransformReverseImplementation(IntPtr InTransform,
             FTransform Other, out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetToRelativeTransformImplementation(FTransform InTransform,
+        public static extern void Transform_SetToRelativeTransformImplementation(IntPtr InTransform,
             FTransform ParentTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_TransformFVector4Implementation(FTransform InTransform, FVector4 V,
+        public static extern void Transform_TransformFVector4Implementation(IntPtr InTransform, FVector4 V,
             out FVector4 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_TransformFVector4NoScaleImplementation(FTransform InTransform, FVector4 V,
+        public static extern void Transform_TransformFVector4NoScaleImplementation(IntPtr InTransform, FVector4 V,
             out FVector4 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_TransformPositionImplementation(FTransform InTransform, FVector V,
+        public static extern void Transform_TransformPositionImplementation(IntPtr InTransform, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_TransformPositionNoScaleImplementation(FTransform InTransform, FVector V,
+        public static extern void Transform_TransformPositionNoScaleImplementation(IntPtr InTransform, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_InverseTransformPositionImplementation(FTransform InTransform, FVector V,
+        public static extern void Transform_InverseTransformPositionImplementation(IntPtr InTransform, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_InverseTransformPositionNoScaleImplementation(FTransform InTransform,
+        public static extern void Transform_InverseTransformPositionNoScaleImplementation(IntPtr InTransform,
             FVector V, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_TransformVectorImplementation(FTransform InTransform, FVector V,
+        public static extern void Transform_TransformVectorImplementation(IntPtr InTransform, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_TransformVectorNoScaleImplementation(FTransform InTransform, FVector V,
+        public static extern void Transform_TransformVectorNoScaleImplementation(IntPtr InTransform, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_InverseTransformVectorImplementation(FTransform InTransform, FVector V,
+        public static extern void Transform_InverseTransformVectorImplementation(IntPtr InTransform, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_InverseTransformVectorNoScaleImplementation(FTransform InTransform,
+        public static extern void Transform_InverseTransformVectorNoScaleImplementation(IntPtr InTransform,
             FVector V, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_TransformRotationImplementation(FTransform InTransform, FQuat Q,
+        public static extern void Transform_TransformRotationImplementation(IntPtr InTransform, FQuat Q,
             out FQuat OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_InverseTransformRotationImplementation(FTransform InTransform, FQuat Q,
+        public static extern void Transform_InverseTransformRotationImplementation(IntPtr InTransform, FQuat Q,
             out FQuat OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetScaledScaleImplementation(FTransform InTransform, LwcType Scale,
+        public static extern void Transform_GetScaledScaleImplementation(IntPtr InTransform, LwcType Scale,
             out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetScaledVectorImplementation(FTransform InTransform, FVector Scale,
+        public static extern void Transform_GetScaledVectorImplementation(IntPtr InTransform, FVector Scale,
             out FTransform OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -151,139 +152,139 @@ namespace Script.Library
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetLocationImplementation(FTransform InTransform, out FVector OutValue);
+        public static extern void Transform_GetLocationImplementation(IntPtr InTransform, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_RotatorImplementation(FTransform InTransform, out FRotator OutValue);
+        public static extern void Transform_RotatorImplementation(IntPtr InTransform, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Transform_GetDeterminantImplementation(FTransform InTransform);
+        public static extern LwcType Transform_GetDeterminantImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetLocationImplementation(FTransform InTransform, FVector Origin);
+        public static extern void Transform_SetLocationImplementation(IntPtr InTransform, FVector Origin);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_ContainsNaNImplementation(FTransform InTransform);
+        public static extern Boolean Transform_ContainsNaNImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_IsValidImplementation(FTransform InTransform);
+        public static extern Boolean Transform_IsValidImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_AreRotationsEqualImplementation(FTransform A, FTransform B,
+        public static extern Boolean Transform_AreRotationsEqualImplementation(IntPtr A, IntPtr B,
             LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_AreTranslationsEqualImplementation(FTransform A, FTransform B,
+        public static extern Boolean Transform_AreTranslationsEqualImplementation(IntPtr A, IntPtr B,
             LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_AreScale3DsEqualImplementation(FTransform A, FTransform B,
+        public static extern Boolean Transform_AreScale3DsEqualImplementation(IntPtr A, IntPtr B,
             LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_RotationEqualsImplementation(FTransform InTransform, FTransform Other,
+        public static extern Boolean Transform_RotationEqualsImplementation(IntPtr InTransform, FTransform Other,
             LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_TranslationEqualsImplementation(FTransform InTransform, FTransform Other,
+        public static extern Boolean Transform_TranslationEqualsImplementation(IntPtr InTransform, FTransform Other,
             LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_Scale3DEqualsImplementation(FTransform InTransform, FTransform Other,
+        public static extern Boolean Transform_Scale3DEqualsImplementation(IntPtr InTransform, FTransform Other,
             LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_EqualsImplementation(FTransform InTransform, FTransform Other,
+        public static extern Boolean Transform_EqualsImplementation(IntPtr InTransform, FTransform Other,
             LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_IdenticalImplementation(FTransform InTransform, FTransform Other,
+        public static extern Boolean Transform_IdenticalImplementation(IntPtr InTransform, FTransform Other,
             UInt32 PortFlags);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_EqualsNoScaleImplementation(FTransform InTransform, FTransform Other,
+        public static extern Boolean Transform_EqualsNoScaleImplementation(IntPtr InTransform, FTransform Other,
             LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_StaticMultiplyImplementation(out FTransform OutTransform, FTransform A,
-            FTransform B);
+        public static extern void Transform_StaticMultiplyImplementation(out FTransform OutTransform, IntPtr A,
+            IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetComponentsImplementation(FTransform InTransform, FQuat InRotation,
+        public static extern void Transform_SetComponentsImplementation(IntPtr InTransform, FQuat InRotation,
             FVector InTranslation, FVector InScale3D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetIdentityImplementation(FTransform InTransform);
+        public static extern void Transform_SetIdentityImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_MultiplyScale3DImplementation(FTransform InTransform,
+        public static extern void Transform_MultiplyScale3DImplementation(IntPtr InTransform,
             FVector Scale3DMultiplier);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void
-            Transform_SetTranslationImplementation(FTransform InTransform, FVector NewTranslation);
+            Transform_SetTranslationImplementation(IntPtr InTransform, FVector NewTranslation);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_CopyTranslationImplementation(FTransform InTransform, FTransform Other);
+        public static extern void Transform_CopyTranslationImplementation(IntPtr InTransform, FTransform Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_ConcatenateRotationImplementation(FTransform InTransform,
+        public static extern void Transform_ConcatenateRotationImplementation(IntPtr InTransform,
             FQuat DeltaRotation);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_AddToTranslationImplementation(FTransform InTransform,
+        public static extern void Transform_AddToTranslationImplementation(IntPtr InTransform,
             FVector DeltaTranslation);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_AddTranslationsImplementation(FTransform A, FTransform B,
+        public static extern void Transform_AddTranslationsImplementation(IntPtr A, IntPtr B,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SubtractTranslationsImplementation(FTransform A, FTransform B,
+        public static extern void Transform_SubtractTranslationsImplementation(IntPtr A, IntPtr B,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetRotationImplementation(FTransform InTransform, FQuat NewRotation);
+        public static extern void Transform_SetRotationImplementation(IntPtr InTransform, FQuat NewRotation);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_CopyRotationImplementation(FTransform InTransform, FTransform Other);
+        public static extern void Transform_CopyRotationImplementation(IntPtr InTransform, FTransform Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetScale3DImplementation(FTransform InTransform, FVector NewScale3D);
+        public static extern void Transform_SetScale3DImplementation(IntPtr InTransform, FVector NewScale3D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_CopyScale3DImplementation(FTransform InTransform, FTransform Other);
+        public static extern void Transform_CopyScale3DImplementation(IntPtr InTransform, FTransform Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetTranslationAndScale3DImplementation(FTransform InTransform,
+        public static extern void Transform_SetTranslationAndScale3DImplementation(IntPtr InTransform,
             FVector NewTranslation, FVector NewScale3D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_AccumulateImplementation(FTransform InTransform, FTransform SourceAtom);
+        public static extern void Transform_AccumulateImplementation(IntPtr InTransform, FTransform SourceAtom);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_NormalizeRotationImplementation(FTransform InTransform);
+        public static extern void Transform_NormalizeRotationImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Transform_IsRotationNormalizedImplementation(FTransform InTransform);
+        public static extern Boolean Transform_IsRotationNormalizedImplementation(IntPtr InTransform);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetRotationImplementation(FTransform InTransform, out FQuat OutValue);
+        public static extern void Transform_GetRotationImplementation(IntPtr InTransform, out FQuat OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetTranslationImplementation(FTransform InTransform, out FVector OutValue);
+        public static extern void Transform_GetTranslationImplementation(IntPtr InTransform, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_GetScale3DImplementation(FTransform InTransform, out FVector OutValue);
+        public static extern void Transform_GetScale3DImplementation(IntPtr InTransform, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_CopyRotationPartImplementation(FTransform InTransform, FTransform SrcBA);
+        public static extern void Transform_CopyRotationPartImplementation(IntPtr InTransform, FTransform SrcBA);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_CopyTranslationAndScale3DImplementation(FTransform InTransform,
+        public static extern void Transform_CopyTranslationAndScale3DImplementation(IntPtr InTransform,
             FTransform SrcBA);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Transform_SetFromMatrixImplementation(FTransform InTransform, FMatrix InMatrix);
+        public static extern void Transform_SetFromMatrixImplementation(IntPtr InTransform, FMatrix InMatrix);
     }
 }

@@ -48,11 +48,17 @@ public:
 	void Deinitialize();
 
 public:
+	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+
 	void* GetAddress(const MonoObject* InMonoObject);
+
+	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct);
 
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
 
 	MonoObject* GetObject(const void* InOwner, const void* InStruct);
+
+	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 	void* GetStruct(const MonoObject* InMonoObject);
 
@@ -62,12 +68,14 @@ public:
 	bool AddReference(UScriptStruct* InScriptStruct, const void* InOwner, const void* InStruct,
 	                  MonoObject* InMonoObject, bool bNeedFree = true);
 
-	bool RemoveReference(const MonoObject* InMonoObject);
+	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
 	TGarbageCollectionHandleMapping<FStructAddress> GarbageCollectionHandle2StructAddress;
 
 	TMap<FStructAddressBase, FGarbageCollectionHandle> StructAddress2GarbageCollectionHandle;
+
+	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
 };
 
 #include "FStructRegistry.inl"

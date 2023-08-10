@@ -6,45 +6,57 @@ template <typename T, typename U, typename V>
 class TRangeImplementation
 {
 public:
-	static auto Range_EqualityImplementation(const MonoObject* A, const MonoObject* B);
+	static auto Range_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static auto Range_InequalityImplementation(const MonoObject* A, const MonoObject* B);
+	static auto Range_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static auto Range_AdjoinsImplementation(const MonoObject* InMonoObject, const MonoObject* Other);
+	static auto Range_AdjoinsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                        const MonoObject* Other);
 
-	static auto Range_ConjoinsImplementation(const MonoObject* InMonoObject, const MonoObject* X, const MonoObject* Y);
+	static auto Range_ConjoinsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         const MonoObject* X, const MonoObject* Y);
 
-	static auto Range_ContainsElementImplementation(const MonoObject* InMonoObject, const V Element);
+	static auto Range_ContainsElementImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                const V Element);
 
-	static auto Range_ContainsImplementation(const MonoObject* InMonoObject, const MonoObject* Other);
+	static auto Range_ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         const MonoObject* Other);
 
-	static auto Range_ContiguousImplementation(const MonoObject* InMonoObject, const MonoObject* Other);
+	static auto Range_ContiguousImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                           const MonoObject* Other);
 
-	static auto Range_GetLowerBoundImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static auto Range_GetLowerBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                              MonoObject** OutValue);
 
-	static auto Range_SetLowerBoundImplementation(const MonoObject* InMonoObject, const MonoObject* NewLowerBound);
+	static auto Range_SetLowerBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                              const MonoObject* NewLowerBound);
 
-	static auto Range_SetLowerBoundValueImplementation(const MonoObject* InMonoObject, const V NewLowerBoundValue);
+	static auto Range_SetLowerBoundValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                   const V NewLowerBoundValue);
 
-	static auto Range_GetLowerBoundValueImplementation(const MonoObject* InMonoObject);
+	static auto Range_GetLowerBoundValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static auto Range_GetUpperBoundImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static auto Range_GetUpperBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                              MonoObject** OutValue);
 
-	static auto Range_SetUpperBoundImplementation(const MonoObject* InMonoObject, const MonoObject* NewUpperBound);
+	static auto Range_SetUpperBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                              const MonoObject* NewUpperBound);
 
-	static auto Range_SetUpperBoundValueImplementation(const MonoObject* InMonoObject, const V NewUpperBoundValue);
+	static auto Range_SetUpperBoundValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                   const V NewUpperBoundValue);
 
-	static auto Range_GetUpperBoundValueImplementation(const MonoObject* InMonoObject);
+	static auto Range_GetUpperBoundValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static auto Range_HasLowerBoundImplementation(const MonoObject* InMonoObject);
+	static auto Range_HasLowerBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static auto Range_HasUpperBoundImplementation(const MonoObject* InMonoObject);
+	static auto Range_HasUpperBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static auto Range_IsDegenerateImplementation(const MonoObject* InMonoObject);
+	static auto Range_IsDegenerateImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static auto Range_IsEmptyImplementation(const MonoObject* InMonoObject);
+	static auto Range_IsEmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static auto Range_OverlapsImplementation(const MonoObject* InMonoObject, const MonoObject* Other);
+	static auto Range_OverlapsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         const MonoObject* Other);
 
 	static auto Range_HullImplementation(const MonoObject* X, const MonoObject* Y, MonoObject** OutValue);
 

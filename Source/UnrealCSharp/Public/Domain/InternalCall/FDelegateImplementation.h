@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "mono/metadata/object.h"
 
 class FDelegateImplementation
@@ -7,16 +8,17 @@ class FDelegateImplementation
 public:
 	static void Delegate_RegisterImplementation(MonoObject* InMonoObject);
 
-	static void Delegate_UnRegisterImplementation(const MonoObject* InMonoObject);
+	static void Delegate_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Delegate_BindImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
+	static void Delegate_BindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                        MonoObject* InDelegate);
 
-	static bool Delegate_IsBoundImplementation(const MonoObject* InMonoObject);
+	static bool Delegate_IsBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Delegate_UnBindImplementation(const MonoObject* InMonoObject);
+	static void Delegate_UnBindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Delegate_ClearImplementation(const MonoObject* InMonoObject);
+	static void Delegate_ClearImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Delegate_ExecuteImplementation(const MonoObject* InMonoObject, MonoObject** ReturnValue,
-	                                           MonoObject** OutValue, MonoArray* InValue);
+	static void Delegate_ExecuteImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                           MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue);
 };

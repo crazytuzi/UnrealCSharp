@@ -31,6 +31,8 @@ void FBindingRegistry::Deinitialize()
 	GarbageCollectionHandle2BindingAddress.Empty();
 
 	BindingAddress2GarbageCollectionHandle.Empty();
+
+	MonoObject2GarbageCollectionHandleMap.Empty();
 }
 
 MonoObject* FBindingRegistry::GetObject(const void* InObject)
@@ -42,40 +44,45 @@ MonoObject* FBindingRegistry::GetObject(const void* InObject)
 	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
 }
 
-void* FBindingRegistry::GetObject(const MonoObject* InMonoObject)
+void* FBindingRegistry::GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	const auto FoundStructAddress = GarbageCollectionHandle2BindingAddress.Find(InMonoObject);
+	const auto FoundStructAddress = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle);
 
 	return FoundStructAddress != nullptr ? FoundStructAddress->Address : nullptr;
 }
 
 bool FBindingRegistry::AddReference(const void* InObject, MonoObject* InMonoObject, bool bNeedFree)
 {
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-	BindingAddress2GarbageCollectionHandle.Emplace(FBindingAddress{const_cast<void*>(InObject), bNeedFree},
-	                                               GarbageCollectionHandle);
+	BindingAddress2GarbageCollectionHandle.Add(FBindingAddress{const_cast<void*>(InObject), bNeedFree},
+	                                           GarbageCollectionHandle);
 
-	GarbageCollectionHandle2BindingAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                               {const_cast<void*>(InObject), bNeedFree});
+	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
+	                                           {const_cast<void*>(InObject), bNeedFree});
+
+	MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
 
 	return true;
 }
 
 bool FBindingRegistry::RemoveReference(const MonoObject* InMonoObject)
 {
-	if (const auto FoundObject = GarbageCollectionHandle2BindingAddress.Find(InMonoObject))
+	if (const auto FoundGarbageCollectionHandle = MonoObject2GarbageCollectionHandleMap.Find(InMonoObject))
 	{
-		if (const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find(*FoundObject))
+		FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle, false);
+
+		if (const auto FoundObject = GarbageCollectionHandle2BindingAddress.Find(
+			MonoObject2GarbageCollectionHandleMap[InMonoObject]))
 		{
-			FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle, false);
+			MonoObject2GarbageCollectionHandleMap.Remove(InMonoObject);
+
+			GarbageCollectionHandle2BindingAddress.Remove(*FoundGarbageCollectionHandle);
+
+			BindingAddress2GarbageCollectionHandle.Remove(*FoundObject);
+
+			return true;
 		}
-
-		GarbageCollectionHandle2BindingAddress.Remove(InMonoObject);
-
-		BindingAddress2GarbageCollectionHandle.Remove(*FoundObject);
-
-		return true;
 	}
 
 	return false;

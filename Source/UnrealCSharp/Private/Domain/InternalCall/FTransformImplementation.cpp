@@ -104,9 +104,11 @@ struct FRegisterTransform
 
 static FRegisterTransform RegisterTransform;
 
-void FTransformImplementation::Transform_DebugPrintImplementation(const MonoObject* InMonoObject)
+void FTransformImplementation::Transform_DebugPrintImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -114,10 +116,11 @@ void FTransformImplementation::Transform_DebugPrintImplementation(const MonoObje
 	}
 }
 
-void FTransformImplementation::Transform_ToHumanReadableStringImplementation(const MonoObject* InMonoObject,
-                                                                             MonoObject** OutValue)
+void FTransformImplementation::Transform_ToHumanReadableStringImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -135,9 +138,11 @@ void FTransformImplementation::Transform_ToHumanReadableStringImplementation(con
 	}
 }
 
-void FTransformImplementation::Transform_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FTransformImplementation::Transform_ToStringImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -155,10 +160,11 @@ void FTransformImplementation::Transform_ToStringImplementation(const MonoObject
 	}
 }
 
-bool FTransformImplementation::Transform_InitFromStringImplementation(const MonoObject* InMonoObject,
-                                                                      MonoObject* InSourceString)
+bool FTransformImplementation::Transform_InitFromStringImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InSourceString)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr && InSourceString != nullptr)
 	{
@@ -171,9 +177,10 @@ bool FTransformImplementation::Transform_InitFromStringImplementation(const Mono
 }
 
 void FTransformImplementation::Transform_ToMatrixWithScaleImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -190,9 +197,10 @@ void FTransformImplementation::Transform_ToMatrixWithScaleImplementation(
 }
 
 void FTransformImplementation::Transform_ToInverseMatrixWithScaleImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -208,9 +216,11 @@ void FTransformImplementation::Transform_ToInverseMatrixWithScaleImplementation(
 	}
 }
 
-void FTransformImplementation::Transform_InverseImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FTransformImplementation::Transform_InverseImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FTransform, FTransform>::Get();
 
@@ -227,10 +237,11 @@ void FTransformImplementation::Transform_InverseImplementation(const MonoObject*
 	}
 }
 
-void FTransformImplementation::Transform_ToMatrixNoScaleImplementation(const MonoObject* InMonoObject,
-                                                                       MonoObject** OutValue)
+void FTransformImplementation::Transform_ToMatrixNoScaleImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -246,10 +257,12 @@ void FTransformImplementation::Transform_ToMatrixNoScaleImplementation(const Mon
 	}
 }
 
-void FTransformImplementation::Transform_BlendImplementation(const MonoObject* InMonoObject, const MonoObject* Atom1,
-                                                             const MonoObject* Atom2, const LwcType Alpha)
+void FTransformImplementation::Transform_BlendImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                             const FGarbageCollectionHandle Atom1,
+                                                             const FGarbageCollectionHandle Atom2, const LwcType Alpha)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformAtom1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Atom1);
 
@@ -261,10 +274,11 @@ void FTransformImplementation::Transform_BlendImplementation(const MonoObject* I
 	}
 }
 
-void FTransformImplementation::Transform_BlendWithImplementation(const MonoObject* InMonoObject,
-                                                                 const MonoObject* OtherAtom, const LwcType Alpha)
+void FTransformImplementation::Transform_BlendWithImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* OtherAtom, const LwcType Alpha)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOtherAtom = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FTransform>(OtherAtom);
@@ -275,8 +289,8 @@ void FTransformImplementation::Transform_BlendWithImplementation(const MonoObjec
 	}
 }
 
-void FTransformImplementation::Transform_AddImplementation(const MonoObject* A, const MonoObject* B,
-                                                           MonoObject** OutValue)
+void FTransformImplementation::Transform_AddImplementation(const FGarbageCollectionHandle A,
+                                                           const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -297,8 +311,8 @@ void FTransformImplementation::Transform_AddImplementation(const MonoObject* A, 
 	}
 }
 
-void FTransformImplementation::Transform_MultiplyImplementation(const MonoObject* A, const MonoObject* B,
-                                                                MonoObject** OutValue)
+void FTransformImplementation::Transform_MultiplyImplementation(const FGarbageCollectionHandle A,
+                                                                const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -319,8 +333,8 @@ void FTransformImplementation::Transform_MultiplyImplementation(const MonoObject
 	}
 }
 
-void FTransformImplementation::Transform_MultiplyQuatImplementation(const MonoObject* A, const MonoObject* B,
-                                                                    MonoObject** OutValue)
+void FTransformImplementation::Transform_MultiplyQuatImplementation(const FGarbageCollectionHandle A,
+                                                                    const MonoObject* B, MonoObject** OutValue)
 {
 	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -358,9 +372,10 @@ bool FTransformImplementation::Transform_AnyHasNegativeScaleImplementation(
 }
 
 void FTransformImplementation::Transform_ScaleTranslationVectorImplementation(
-	const MonoObject* InMonoObject, const MonoObject* InScale3D)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* InScale3D)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(InScale3D);
 
@@ -371,9 +386,10 @@ void FTransformImplementation::Transform_ScaleTranslationVectorImplementation(
 }
 
 void FTransformImplementation::Transform_ScaleTranslationScaleImplementation(
-	const MonoObject* InMonoObject, const LwcType Scale)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Scale)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -381,10 +397,11 @@ void FTransformImplementation::Transform_ScaleTranslationScaleImplementation(
 	}
 }
 
-void FTransformImplementation::Transform_RemoveScalingImplementation(const MonoObject* InMonoObject,
-                                                                     const LwcType Tolerance)
+void FTransformImplementation::Transform_RemoveScalingImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Tolerance)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -393,9 +410,10 @@ void FTransformImplementation::Transform_RemoveScalingImplementation(const MonoO
 }
 
 FTransformImplementation::LwcType FTransformImplementation::Transform_GetMaximumAxisScaleImplementation(
-	const MonoObject* InMonoObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -406,9 +424,10 @@ FTransformImplementation::LwcType FTransformImplementation::Transform_GetMaximum
 }
 
 FTransformImplementation::LwcType FTransformImplementation::Transform_GetMinimumAxisScaleImplementation(
-	const MonoObject* InMonoObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -419,9 +438,10 @@ FTransformImplementation::LwcType FTransformImplementation::Transform_GetMinimum
 }
 
 void FTransformImplementation::Transform_GetRelativeTransformImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Other, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -441,9 +461,10 @@ void FTransformImplementation::Transform_GetRelativeTransformImplementation(
 }
 
 void FTransformImplementation::Transform_GetRelativeTransformReverseImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Other, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -463,9 +484,10 @@ void FTransformImplementation::Transform_GetRelativeTransformReverseImplementati
 }
 
 void FTransformImplementation::Transform_SetToRelativeTransformImplementation(
-	const MonoObject* InMonoObject, const MonoObject* ParentTransform)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* ParentTransform)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformParentTransform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
 		ParentTransform);
@@ -477,9 +499,10 @@ void FTransformImplementation::Transform_SetToRelativeTransformImplementation(
 }
 
 void FTransformImplementation::Transform_TransformFVector4Implementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(V);
 
@@ -498,9 +521,10 @@ void FTransformImplementation::Transform_TransformFVector4Implementation(
 }
 
 void FTransformImplementation::Transform_TransformFVector4NoScaleImplementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(V);
 
@@ -519,9 +543,10 @@ void FTransformImplementation::Transform_TransformFVector4NoScaleImplementation(
 }
 
 void FTransformImplementation::Transform_TransformPositionImplementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -540,9 +565,10 @@ void FTransformImplementation::Transform_TransformPositionImplementation(
 }
 
 void FTransformImplementation::Transform_TransformPositionNoScaleImplementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -561,9 +587,10 @@ void FTransformImplementation::Transform_TransformPositionNoScaleImplementation(
 }
 
 void FTransformImplementation::Transform_InverseTransformPositionNoScaleImplementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -581,10 +608,11 @@ void FTransformImplementation::Transform_InverseTransformPositionNoScaleImplemen
 	}
 }
 
-void FTransformImplementation::Transform_TransformVectorImplementation(const MonoObject* InMonoObject,
-                                                                       const MonoObject* V, MonoObject** OutValue)
+void FTransformImplementation::Transform_TransformVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -603,9 +631,10 @@ void FTransformImplementation::Transform_TransformVectorImplementation(const Mon
 }
 
 void FTransformImplementation::Transform_TransformVectorNoScaleImplementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -624,9 +653,10 @@ void FTransformImplementation::Transform_TransformVectorNoScaleImplementation(
 }
 
 void FTransformImplementation::Transform_InverseTransformVectorImplementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -645,9 +675,10 @@ void FTransformImplementation::Transform_InverseTransformVectorImplementation(
 }
 
 void FTransformImplementation::Transform_InverseTransformVectorNoScaleImplementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -666,9 +697,10 @@ void FTransformImplementation::Transform_InverseTransformVectorNoScaleImplementa
 }
 
 void FTransformImplementation::Transform_TransformRotationImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Q, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Q, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q);
 
@@ -687,9 +719,10 @@ void FTransformImplementation::Transform_TransformRotationImplementation(
 }
 
 void FTransformImplementation::Transform_InverseTransformRotationImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Q, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Q, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(Q);
 
@@ -707,11 +740,11 @@ void FTransformImplementation::Transform_InverseTransformRotationImplementation(
 	}
 }
 
-void FTransformImplementation::Transform_GetScaledScaleImplementation(const MonoObject* InMonoObject,
-                                                                      const LwcType Scale,
-                                                                      MonoObject** OutValue)
+void FTransformImplementation::Transform_GetScaledScaleImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Scale, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FTransform, FTransform>::Get();
 
@@ -728,10 +761,11 @@ void FTransformImplementation::Transform_GetScaledScaleImplementation(const Mono
 	}
 }
 
-void FTransformImplementation::Transform_GetScaledVectorImplementation(const MonoObject* InMonoObject,
-                                                                       const MonoObject* Scale, MonoObject** OutValue)
+void FTransformImplementation::Transform_GetScaledVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Scale, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto VectorScale = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Scale);
 
@@ -769,10 +803,11 @@ void FTransformImplementation::Transform_GetSafeScaleReciprocalImplementation(
 	}
 }
 
-void FTransformImplementation::Transform_GetLocationImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FTransformImplementation::Transform_GetLocationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -788,9 +823,11 @@ void FTransformImplementation::Transform_GetLocationImplementation(const MonoObj
 	}
 }
 
-void FTransformImplementation::Transform_RotatorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FTransformImplementation::Transform_RotatorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -807,9 +844,10 @@ void FTransformImplementation::Transform_RotatorImplementation(const MonoObject*
 }
 
 FTransformImplementation::LwcType FTransformImplementation::Transform_GetDeterminantImplementation(
-	const MonoObject* InMonoObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -819,10 +857,11 @@ FTransformImplementation::LwcType FTransformImplementation::Transform_GetDetermi
 	return 0.f;
 }
 
-void FTransformImplementation::Transform_SetLocationImplementation(const MonoObject* InMonoObject,
-                                                                   const MonoObject* Origin)
+void FTransformImplementation::Transform_SetLocationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Origin)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Origin);
 
@@ -832,9 +871,11 @@ void FTransformImplementation::Transform_SetLocationImplementation(const MonoObj
 	}
 }
 
-bool FTransformImplementation::Transform_ContainsNaNImplementation(const MonoObject* InMonoObject)
+bool FTransformImplementation::Transform_ContainsNaNImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -844,9 +885,10 @@ bool FTransformImplementation::Transform_ContainsNaNImplementation(const MonoObj
 	return false;
 }
 
-bool FTransformImplementation::Transform_IsValidImplementation(const MonoObject* InMonoObject)
+bool FTransformImplementation::Transform_IsValidImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -857,7 +899,7 @@ bool FTransformImplementation::Transform_IsValidImplementation(const MonoObject*
 }
 
 bool FTransformImplementation::Transform_AreRotationsEqualImplementation(
-	const MonoObject* A, const MonoObject* B, const LwcType Tolerance)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B, const LwcType Tolerance)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -872,7 +914,7 @@ bool FTransformImplementation::Transform_AreRotationsEqualImplementation(
 }
 
 bool FTransformImplementation::Transform_AreTranslationsEqualImplementation(
-	const MonoObject* A, const MonoObject* B, const LwcType Tolerance)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B, const LwcType Tolerance)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -886,7 +928,8 @@ bool FTransformImplementation::Transform_AreTranslationsEqualImplementation(
 	return false;
 }
 
-bool FTransformImplementation::Transform_AreScale3DsEqualImplementation(const MonoObject* A, const MonoObject* B,
+bool FTransformImplementation::Transform_AreScale3DsEqualImplementation(const FGarbageCollectionHandle A,
+                                                                        const FGarbageCollectionHandle B,
                                                                         const LwcType Tolerance)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
@@ -901,10 +944,11 @@ bool FTransformImplementation::Transform_AreScale3DsEqualImplementation(const Mo
 	return false;
 }
 
-bool FTransformImplementation::Transform_RotationEqualsImplementation(const MonoObject* InMonoObject,
-                                                                      const MonoObject* Other, const LwcType Tolerance)
+bool FTransformImplementation::Transform_RotationEqualsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other, const LwcType Tolerance)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -917,9 +961,10 @@ bool FTransformImplementation::Transform_RotationEqualsImplementation(const Mono
 }
 
 bool FTransformImplementation::Transform_TranslationEqualsImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Other, const LwcType Tolerance)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other, const LwcType Tolerance)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -931,10 +976,11 @@ bool FTransformImplementation::Transform_TranslationEqualsImplementation(
 	return false;
 }
 
-bool FTransformImplementation::Transform_Scale3DEqualsImplementation(const MonoObject* InMonoObject,
-                                                                     const MonoObject* Other, const LwcType Tolerance)
+bool FTransformImplementation::Transform_Scale3DEqualsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other, const LwcType Tolerance)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -946,10 +992,11 @@ bool FTransformImplementation::Transform_Scale3DEqualsImplementation(const MonoO
 	return false;
 }
 
-bool FTransformImplementation::Transform_EqualsImplementation(const MonoObject* InMonoObject, const MonoObject* Other,
-                                                              const LwcType Tolerance)
+bool FTransformImplementation::Transform_EqualsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              const MonoObject* Other, const LwcType Tolerance)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -961,10 +1008,11 @@ bool FTransformImplementation::Transform_EqualsImplementation(const MonoObject* 
 	return false;
 }
 
-bool FTransformImplementation::Transform_IdenticalImplementation(const MonoObject* InMonoObject,
-                                                                 const MonoObject* Other, const uint32 PortFlags)
+bool FTransformImplementation::Transform_IdenticalImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other, const uint32 PortFlags)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -976,10 +1024,11 @@ bool FTransformImplementation::Transform_IdenticalImplementation(const MonoObjec
 	return false;
 }
 
-bool FTransformImplementation::Transform_EqualsNoScaleImplementation(const MonoObject* InMonoObject,
-                                                                     const MonoObject* Other, const LwcType Tolerance)
+bool FTransformImplementation::Transform_EqualsNoScaleImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other, const LwcType Tolerance)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -991,8 +1040,9 @@ bool FTransformImplementation::Transform_EqualsNoScaleImplementation(const MonoO
 	return false;
 }
 
-void FTransformImplementation::Transform_StaticMultiplyImplementation(MonoObject** OutValue, const MonoObject* A,
-                                                                      const MonoObject* B)
+void FTransformImplementation::Transform_StaticMultiplyImplementation(MonoObject** OutValue,
+                                                                      const FGarbageCollectionHandle A,
+                                                                      const FGarbageCollectionHandle B)
 {
 	const auto FoundMonoClass = TPropertyClass<FTransform, FTransform>::Get();
 
@@ -1013,12 +1063,12 @@ void FTransformImplementation::Transform_StaticMultiplyImplementation(MonoObject
 	}
 }
 
-void FTransformImplementation::Transform_SetComponentsImplementation(const MonoObject* InMonoObject,
-                                                                     const MonoObject* InRotation,
-                                                                     const MonoObject* InTranslation,
-                                                                     const MonoObject* InScale3D)
+void FTransformImplementation::Transform_SetComponentsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* InRotation,
+	const MonoObject* InTranslation, const MonoObject* InScale3D)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto QuatInRotation = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(InRotation);
 
@@ -1034,9 +1084,11 @@ void FTransformImplementation::Transform_SetComponentsImplementation(const MonoO
 	}
 }
 
-void FTransformImplementation::Transform_SetIdentityImplementation(const MonoObject* InMonoObject)
+void FTransformImplementation::Transform_SetIdentityImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -1044,10 +1096,11 @@ void FTransformImplementation::Transform_SetIdentityImplementation(const MonoObj
 	}
 }
 
-void FTransformImplementation::Transform_MultiplyScale3DImplementation(const MonoObject* InMonoObject,
-                                                                       const MonoObject* Scale3DMultiplier)
+void FTransformImplementation::Transform_MultiplyScale3DImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Scale3DMultiplier)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Scale3DMultiplier);
 
@@ -1057,10 +1110,11 @@ void FTransformImplementation::Transform_MultiplyScale3DImplementation(const Mon
 	}
 }
 
-void FTransformImplementation::Transform_SetTranslationImplementation(const MonoObject* InMonoObject,
-                                                                      const MonoObject* NewTranslation)
+void FTransformImplementation::Transform_SetTranslationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* NewTranslation)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewTranslation);
 
@@ -1070,10 +1124,11 @@ void FTransformImplementation::Transform_SetTranslationImplementation(const Mono
 	}
 }
 
-void FTransformImplementation::Transform_CopyTranslationImplementation(const MonoObject* InMonoObject,
-                                                                       const MonoObject* Other)
+void FTransformImplementation::Transform_CopyTranslationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -1084,9 +1139,10 @@ void FTransformImplementation::Transform_CopyTranslationImplementation(const Mon
 }
 
 void FTransformImplementation::Transform_ConcatenateRotationImplementation(
-	const MonoObject* InMonoObject, const MonoObject* DeltaRotation)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* DeltaRotation)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(DeltaRotation);
 
@@ -1096,10 +1152,11 @@ void FTransformImplementation::Transform_ConcatenateRotationImplementation(
 	}
 }
 
-void FTransformImplementation::Transform_AddToTranslationImplementation(const MonoObject* InMonoObject,
-                                                                        const MonoObject* DeltaTranslation)
+void FTransformImplementation::Transform_AddToTranslationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* DeltaTranslation)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(DeltaTranslation);
 
@@ -1109,7 +1166,8 @@ void FTransformImplementation::Transform_AddToTranslationImplementation(const Mo
 	}
 }
 
-void FTransformImplementation::Transform_AddTranslationsImplementation(const MonoObject* A, const MonoObject* B,
+void FTransformImplementation::Transform_AddTranslationsImplementation(const FGarbageCollectionHandle A,
+                                                                       const FGarbageCollectionHandle B,
                                                                        MonoObject** OutValue)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
@@ -1131,7 +1189,7 @@ void FTransformImplementation::Transform_AddTranslationsImplementation(const Mon
 }
 
 void FTransformImplementation::Transform_SubtractTranslationsImplementation(
-	const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
@@ -1151,10 +1209,11 @@ void FTransformImplementation::Transform_SubtractTranslationsImplementation(
 	}
 }
 
-void FTransformImplementation::Transform_SetRotationImplementation(const MonoObject* InMonoObject,
-                                                                   const MonoObject* NewRotation)
+void FTransformImplementation::Transform_SetRotationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* NewRotation)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Quat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewRotation);
 
@@ -1164,10 +1223,11 @@ void FTransformImplementation::Transform_SetRotationImplementation(const MonoObj
 	}
 }
 
-void FTransformImplementation::Transform_CopyRotationImplementation(const MonoObject* InMonoObject,
-                                                                    const MonoObject* Other)
+void FTransformImplementation::Transform_CopyRotationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -1177,10 +1237,11 @@ void FTransformImplementation::Transform_CopyRotationImplementation(const MonoOb
 	}
 }
 
-void FTransformImplementation::Transform_SetScale3DImplementation(const MonoObject* InMonoObject,
-                                                                  const MonoObject* NewScale3D)
+void FTransformImplementation::Transform_SetScale3DImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* NewScale3D)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewScale3D);
 
@@ -1190,10 +1251,11 @@ void FTransformImplementation::Transform_SetScale3DImplementation(const MonoObje
 	}
 }
 
-void FTransformImplementation::Transform_CopyScale3DImplementation(const MonoObject* InMonoObject,
-                                                                   const MonoObject* Other)
+void FTransformImplementation::Transform_CopyScale3DImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(Other);
 
@@ -1204,9 +1266,11 @@ void FTransformImplementation::Transform_CopyScale3DImplementation(const MonoObj
 }
 
 void FTransformImplementation::Transform_SetTranslationAndScale3DImplementation(
-	const MonoObject* InMonoObject, const MonoObject* NewTranslation, const MonoObject* NewScale3D)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* NewTranslation,
+	const MonoObject* NewScale3D)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto VectorNewTranslation = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(
 		NewTranslation);
@@ -1219,10 +1283,11 @@ void FTransformImplementation::Transform_SetTranslationAndScale3DImplementation(
 	}
 }
 
-void FTransformImplementation::Transform_AccumulateImplementation(const MonoObject* InMonoObject,
-                                                                  const MonoObject* SourceAtom)
+void FTransformImplementation::Transform_AccumulateImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* SourceAtom)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformSourceAtom = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FTransform>(SourceAtom);
@@ -1233,9 +1298,11 @@ void FTransformImplementation::Transform_AccumulateImplementation(const MonoObje
 	}
 }
 
-void FTransformImplementation::Transform_NormalizeRotationImplementation(const MonoObject* InMonoObject)
+void FTransformImplementation::Transform_NormalizeRotationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -1243,9 +1310,11 @@ void FTransformImplementation::Transform_NormalizeRotationImplementation(const M
 	}
 }
 
-bool FTransformImplementation::Transform_IsRotationNormalizedImplementation(const MonoObject* InMonoObject)
+bool FTransformImplementation::Transform_IsRotationNormalizedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	if (Transform != nullptr)
 	{
@@ -1255,10 +1324,11 @@ bool FTransformImplementation::Transform_IsRotationNormalizedImplementation(cons
 	return false;
 }
 
-void FTransformImplementation::Transform_GetRotationImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FTransformImplementation::Transform_GetRotationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FQuat, FQuat>::Get();
 
@@ -1274,10 +1344,11 @@ void FTransformImplementation::Transform_GetRotationImplementation(const MonoObj
 	}
 }
 
-void FTransformImplementation::Transform_GetTranslationImplementation(const MonoObject* InMonoObject,
-                                                                      MonoObject** OutValue)
+void FTransformImplementation::Transform_GetTranslationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -1293,9 +1364,11 @@ void FTransformImplementation::Transform_GetTranslationImplementation(const Mono
 	}
 }
 
-void FTransformImplementation::Transform_GetScale3DImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FTransformImplementation::Transform_GetScale3DImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -1311,10 +1384,11 @@ void FTransformImplementation::Transform_GetScale3DImplementation(const MonoObje
 	}
 }
 
-void FTransformImplementation::Transform_CopyRotationPartImplementation(const MonoObject* InMonoObject,
-                                                                        const MonoObject* SrcBA)
+void FTransformImplementation::Transform_CopyRotationPartImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* SrcBA)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformSrcBA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(SrcBA);
 
@@ -1325,9 +1399,10 @@ void FTransformImplementation::Transform_CopyRotationPartImplementation(const Mo
 }
 
 void FTransformImplementation::Transform_CopyTranslationAndScale3DImplementation(
-	const MonoObject* InMonoObject, const MonoObject* SrcBA)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* SrcBA)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto TransformSrcBA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(SrcBA);
 
@@ -1337,10 +1412,11 @@ void FTransformImplementation::Transform_CopyTranslationAndScale3DImplementation
 	}
 }
 
-void FTransformImplementation::Transform_SetFromMatrixImplementation(const MonoObject* InMonoObject,
-                                                                     const MonoObject* InMatrix)
+void FTransformImplementation::Transform_SetFromMatrixImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* InMatrix)
 {
-	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(InMonoObject);
+	const auto Transform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+		InGarbageCollectionHandle);
 
 	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMatrix);
 

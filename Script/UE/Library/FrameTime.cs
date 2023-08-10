@@ -1,6 +1,5 @@
 ﻿using System;
 using Script.Library;
-using Script.Common;
 
 namespace Script.CoreUObject
 {
@@ -8,37 +7,37 @@ namespace Script.CoreUObject
     {
         public FFrameNumber GetFrame()
         {
-            FrameTimeImplementation.FrameTime_GetFrameImplementation(this, out var OutValue);
+            FrameTimeImplementation.FrameTime_GetFrameImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public Single GetSubFrame() =>
-            FrameTimeImplementation.FrameTime_GetSubFrameImplementation(this);
+            FrameTimeImplementation.FrameTime_GetSubFrameImplementation(GetHandle());
 
         public FFrameNumber FloorToFrame()
         {
-            FrameTimeImplementation.FrameTime_FloorToFrameImplementation(this, out var OutValue);
+            FrameTimeImplementation.FrameTime_FloorToFrameImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FFrameNumber CeilToFrame()
         {
-            FrameTimeImplementation.FrameTime_CeilToFrameImplementation(this, out var OutValue);
+            FrameTimeImplementation.FrameTime_CeilToFrameImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FFrameNumber RoundToFrame()
         {
-            FrameTimeImplementation.FrameTime_RoundToFrameImplementation(this, out var OutValue);
+            FrameTimeImplementation.FrameTime_RoundToFrameImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public Double AsDecimal() =>
-            FrameTimeImplementation.FrameTime_AsDecimalImplementation(this);
+            FrameTimeImplementation.FrameTime_AsDecimalImplementation(GetHandle());
 
         public static FFrameTime FromDecimal(Double InDecimalFrame)
         {
@@ -48,61 +47,61 @@ namespace Script.CoreUObject
         }
 
         public static Boolean operator ==(FFrameTime A, FFrameTime B) =>
-            FrameTimeImplementation.FrameTime_EqualityImplementation(A, B);
+            FrameTimeImplementation.FrameTime_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FFrameTime A, FFrameTime B) =>
-            FrameTimeImplementation.FrameTime_InequalityImplementation(A, B);
+            FrameTimeImplementation.FrameTime_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >(FFrameTime A, FFrameTime B) =>
-            FrameTimeImplementation.FrameTime_GreaterThanImplementation(A, B);
+            FrameTimeImplementation.FrameTime_GreaterThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >=(FFrameTime A, FFrameTime B) =>
-            FrameTimeImplementation.FrameTime_GreaterThanOrEqualImplementation(A, B);
+            FrameTimeImplementation.FrameTime_GreaterThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <(FFrameTime A, FFrameTime B) =>
-            FrameTimeImplementation.FrameTime_LessThanImplementation(A, B);
+            FrameTimeImplementation.FrameTime_LessThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <=(FFrameTime A, FFrameTime B) =>
-            FrameTimeImplementation.FrameTime_LessThanOrEqualImplementation(A, B);
+            FrameTimeImplementation.FrameTime_LessThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         public static FFrameTime operator +(FFrameTime A, FFrameTime B)
         {
-            FrameTimeImplementation.FrameTime_AddImplementation(A, B, out var OutValue);
+            FrameTimeImplementation.FrameTime_AddImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameTime operator -(FFrameTime A, FFrameTime B)
         {
-            FrameTimeImplementation.FrameTime_SubtractImplementation(A, B, out var OutValue);
+            FrameTimeImplementation.FrameTime_SubtractImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameTime operator %(FFrameTime A, FFrameTime B)
         {
-            FrameTimeImplementation.FrameTime_RemainderImplementation(A, B, out var OutValue);
+            FrameTimeImplementation.FrameTime_RemainderImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameTime operator -(FFrameTime A)
         {
-            FrameTimeImplementation.FrameTime_NegatedImplementation(A, out var OutValue);
+            FrameTimeImplementation.FrameTime_NegatedImplementation(A.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameTime operator *(FFrameTime A, FFrameTime B)
         {
-            FrameTimeImplementation.FrameTime_MultiplyImplementation(A, B, out var OutValue);
+            FrameTimeImplementation.FrameTime_MultiplyImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameTime operator /(FFrameTime A, FFrameTime B)
         {
-            FrameTimeImplementation.FrameTime_DivideImplementation(A, B, out var OutValue);
+            FrameTimeImplementation.FrameTime_DivideImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }

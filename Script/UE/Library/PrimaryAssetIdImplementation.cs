@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -16,19 +17,19 @@ namespace Script.Library
             out FPrimaryAssetId OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PrimaryAssetId_IsValidImplementation(FPrimaryAssetId InPrimaryAssetId);
+        public static extern Boolean PrimaryAssetId_IsValidImplementation(IntPtr InPrimaryAssetId);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PrimaryAssetId_ToStringImplementation(FPrimaryAssetId InPrimaryAssetId,
+        public static extern void PrimaryAssetId_ToStringImplementation(IntPtr InPrimaryAssetId,
             out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void PrimaryAssetId_FromStringImplementation(FString String, out FPrimaryAssetId OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PrimaryAssetId_EqualityImplementation(FPrimaryAssetId A, FPrimaryAssetId B);
+        public static extern Boolean PrimaryAssetId_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PrimaryAssetId_InequalityImplementation(FPrimaryAssetId A, FPrimaryAssetId B);
+        public static extern Boolean PrimaryAssetId_InequalityImplementation(IntPtr A, IntPtr B);
     }
 }

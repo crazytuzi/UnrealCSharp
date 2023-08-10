@@ -60,7 +60,7 @@ MonoObject* FArrayPropertyDescriptor::Object_New(void* InAddress) const
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Object);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, ArrayHelper, Object);
 		}
 	}
 

@@ -111,4 +111,6 @@ void FMultiRegistry::Deinitialize()
 	GarbageCollectionHandle2SoftClassPtrAddress.Empty();
 
 	SoftClassPtrAddress2GarbageCollectionHandle.Empty();
+
+	MonoObject2GarbageCollectionHandleMap.Empty();
 }

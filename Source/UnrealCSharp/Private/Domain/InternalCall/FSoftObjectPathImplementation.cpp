@@ -46,10 +46,10 @@ struct FRegisterSoftObjectPath
 static FRegisterSoftObjectPath RegisterSoftObjectPath;
 
 void FSoftObjectPathImplementation::SoftObjectPath_ToStringImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -68,10 +68,10 @@ void FSoftObjectPathImplementation::SoftObjectPath_ToStringImplementation(
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathNameImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -90,10 +90,10 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathNameImplementatio
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathStringImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -112,10 +112,10 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetAssetPathStringImplementat
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_GetSubPathStringImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -134,10 +134,10 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetSubPathStringImplementatio
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_GetLongPackageNameImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -156,10 +156,10 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetLongPackageNameImplementat
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_GetAssetNameImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -178,10 +178,10 @@ void FSoftObjectPathImplementation::SoftObjectPath_GetAssetNameImplementation(
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_SetPathNameImplementation(
-	const MonoObject* InMonoObject, MonoObject* Path)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* Path)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr && Path != nullptr)
 	{
@@ -192,10 +192,10 @@ void FSoftObjectPathImplementation::SoftObjectPath_SetPathNameImplementation(
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_SetPathStringImplementation(
-	const MonoObject* InMonoObject, MonoObject* Path)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* Path)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr && Path != nullptr)
 	{
@@ -205,10 +205,11 @@ void FSoftObjectPathImplementation::SoftObjectPath_SetPathStringImplementation(
 	}
 }
 
-void FSoftObjectPathImplementation::SoftObjectPath_ResetImplementation(const MonoObject* InMonoObject)
+void FSoftObjectPathImplementation::SoftObjectPath_ResetImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -216,10 +217,11 @@ void FSoftObjectPathImplementation::SoftObjectPath_ResetImplementation(const Mon
 	}
 }
 
-bool FSoftObjectPathImplementation::SoftObjectPath_IsValidImplementation(const MonoObject* InMonoObject)
+bool FSoftObjectPathImplementation::SoftObjectPath_IsValidImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -229,10 +231,11 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsValidImplementation(const M
 	return false;
 }
 
-bool FSoftObjectPathImplementation::SoftObjectPath_IsNullImplementation(const MonoObject* InMonoObject)
+bool FSoftObjectPathImplementation::SoftObjectPath_IsNullImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -242,10 +245,11 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsNullImplementation(const Mo
 	return false;
 }
 
-bool FSoftObjectPathImplementation::SoftObjectPath_IsAssetImplementation(const MonoObject* InMonoObject)
+bool FSoftObjectPathImplementation::SoftObjectPath_IsAssetImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -255,10 +259,11 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsAssetImplementation(const M
 	return false;
 }
 
-bool FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation(const MonoObject* InMonoObject)
+bool FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -268,7 +273,8 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation(con
 	return false;
 }
 
-bool FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto SoftObjectPathA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(A);
 
@@ -282,7 +288,8 @@ bool FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation(const 
 	return false;
 }
 
-bool FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto SoftObjectPathA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(A);
 
@@ -296,10 +303,11 @@ bool FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation(cons
 	return false;
 }
 
-bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEImplementation(const MonoObject* InMonoObject)
+bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -310,10 +318,10 @@ bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEImplementation(con
 }
 
 bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEInstanceImplementation(
-	const MonoObject* InMonoObject, const int32 PIEInstance)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 PIEInstance)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -323,10 +331,11 @@ bool FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEInstanceImplementa
 	return false;
 }
 
-bool FSoftObjectPathImplementation::SoftObjectPath_FixupCoreRedirectsImplementation(const MonoObject* InMonoObject)
+bool FSoftObjectPathImplementation::SoftObjectPath_FixupCoreRedirectsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (SoftObjectPath != nullptr)
 	{
@@ -347,9 +356,9 @@ int32 FSoftObjectPathImplementation::SoftObjectPath_InvalidateTagImplementation(
 }
 
 void FSoftObjectPathImplementation::SoftObjectPath_GetOrCreateIDForObjectImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject);
+	const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FSoftObjectPath, FSoftObjectPath>::Get();
 

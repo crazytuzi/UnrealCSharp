@@ -27,17 +27,20 @@ void FSubclassOfImplementation::SubclassOf_RegisterImplementation(MonoObject* In
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(InMonoObject, SubclassOf);
 }
 
-void FSubclassOfImplementation::SubclassOf_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FSubclassOfImplementation::SubclassOf_UnRegisterImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<UObject>>(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<
+			UObject>>(InGarbageCollectionHandle);
 	});
 }
 
-void FSubclassOfImplementation::SubclassOf_GetImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FSubclassOfImplementation::SubclassOf_GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                             MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InGarbageCollectionHandle);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 }

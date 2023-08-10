@@ -34,7 +34,7 @@ public:
 public:
 	MonoObject* GetObject(const void* InObject);
 
-	void* GetObject(const MonoObject* InMonoObject);
+	void* GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 public:
 	bool AddReference(const void* InObject, MonoObject* InMonoObject, bool bNeedFree = true);
@@ -45,6 +45,8 @@ private:
 	TGarbageCollectionHandleMapping<FBindingAddress> GarbageCollectionHandle2BindingAddress;
 
 	TMap<FBindingAddress, FGarbageCollectionHandle> BindingAddress2GarbageCollectionHandle;
+
+	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
 };
 
 #include "FBindingRegistry.inl"

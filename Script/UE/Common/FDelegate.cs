@@ -6,14 +6,14 @@ namespace Script.Common
 {
     public class FDelegate<T> : FDelegateBase where T : Delegate
     {
-        public void Bind(UObject _, T InDelegate) => DelegateUtils.Delegate_Bind(this, InDelegate);
+        public void Bind(UObject _, T InDelegate) => DelegateUtils.Delegate_Bind(GetHandle(), InDelegate);
 
-        public void Bind(T InDelegate) => DelegateUtils.Delegate_Bind(this, InDelegate);
+        public void Bind(T InDelegate) => DelegateUtils.Delegate_Bind(GetHandle(), InDelegate);
 
-        public Boolean IsBound() => DelegateUtils.Delegate_IsBound(this);
+        public Boolean IsBound() => DelegateUtils.Delegate_IsBound(GetHandle());
 
-        public void Unbind() => DelegateUtils.Delegate_UnBind(this);
+        public void Unbind() => DelegateUtils.Delegate_UnBind(GetHandle());
 
-        public void Clear() => DelegateUtils.Delegate_Clear(this);
+        public void Clear() => DelegateUtils.Delegate_Clear(GetHandle());
     }
 }

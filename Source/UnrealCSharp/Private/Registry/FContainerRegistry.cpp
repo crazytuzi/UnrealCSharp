@@ -33,32 +33,40 @@ void FContainerRegistry::Deinitialize()
 	GarbageCollectionHandle2ContainerAddress.Empty();
 
 	ContainerAddress2GarbageCollectionHandle.Empty();
+
+	Address2GarbageCollectionHandle.Empty();
+
+	MonoObject2GarbageCollectionHandleMap.Empty();
 }
 
 MonoObject* FContainerRegistry::GetObject(const void* InAddress)
 {
-	for (const auto& Pair : ContainerAddress2GarbageCollectionHandle)
+	if (const auto GarbageCollectionHandle = Address2GarbageCollectionHandle.Find(InAddress))
 	{
-		if (Pair.Key == InAddress)
-		{
-			return Pair.Value;
-		}
+		return *GarbageCollectionHandle;
 	}
 
 	return nullptr;
 }
 
-bool FContainerRegistry::AddReference(void* InContainer, MonoObject* InMonoObject, void* InAddress)
+bool FContainerRegistry::AddReference(void* InAddress, void* InContainer, MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-	ContainerAddress2GarbageCollectionHandle.Emplace(
-		FContainerAddress{nullptr, static_cast<FContainerHelper*>(InContainer)}, GarbageCollectionHandle);
+	ContainerAddress2GarbageCollectionHandle.Add(
+		FContainerAddress{InAddress, static_cast<FContainerHelper*>(InContainer)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2ContainerAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                 FContainerAddress{
-		                                                 InAddress, static_cast<FContainerHelper*>(InContainer)
-	                                                 });
+	if (InAddress != nullptr)
+	{
+		Address2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
+	}
+
+	GarbageCollectionHandle2ContainerAddress.Add(GarbageCollectionHandle,
+	                                             FContainerAddress{
+		                                             InAddress, static_cast<FContainerHelper*>(InContainer)
+	                                             });
+
+	MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
 
 	return true;
 }
@@ -66,25 +74,34 @@ bool FContainerRegistry::AddReference(void* InContainer, MonoObject* InMonoObjec
 bool FContainerRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
                                       MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, false);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
 
-	ContainerAddress2GarbageCollectionHandle.Emplace(
+	ContainerAddress2GarbageCollectionHandle.Add(
 		FContainerAddress{InAddress, static_cast<FContainerHelper*>(InContainer)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2ContainerAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                 FContainerAddress{
-		                                                 InAddress, static_cast<FContainerHelper*>(InContainer)
-	                                                 });
+	Address2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2ContainerAddress.Add(GarbageCollectionHandle,
+	                                             FContainerAddress{
+		                                             InAddress, static_cast<FContainerHelper*>(InContainer)
+	                                             });
+
+	MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
 
 	return FCSharpEnvironment::GetEnvironment().
 		AddReference(InOwner, new FContainerReference(GarbageCollectionHandle));
 }
 
-bool FContainerRegistry::RemoveReference(const MonoObject* InMonoObject)
+bool FContainerRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	if (const auto& FoundContainerAddress = GarbageCollectionHandle2ContainerAddress.Find(InMonoObject))
+	if (const auto FoundContainerAddress = GarbageCollectionHandle2ContainerAddress.Find(InGarbageCollectionHandle))
 	{
 		ContainerAddress2GarbageCollectionHandle.Remove(*FoundContainerAddress);
+
+		if (FoundContainerAddress->Address != nullptr)
+		{
+			Address2GarbageCollectionHandle.Remove(FoundContainerAddress->Address);
+		}
 
 		if (FoundContainerAddress->ContainerHelper != nullptr)
 		{
@@ -93,7 +110,9 @@ bool FContainerRegistry::RemoveReference(const MonoObject* InMonoObject)
 			FoundContainerAddress->ContainerHelper = nullptr;
 		}
 
-		GarbageCollectionHandle2ContainerAddress.Remove(InMonoObject);
+		MonoObject2GarbageCollectionHandleMap.Remove(InGarbageCollectionHandle);
+
+		GarbageCollectionHandle2ContainerAddress.Remove(InGarbageCollectionHandle);
 
 		return true;
 	}

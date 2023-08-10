@@ -17,10 +17,11 @@ struct FRegisterAssetBundleEntry
 
 static FRegisterAssetBundleEntry RegisterAssetBundleEntry;
 
-bool FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation(const MonoObject* InMonoObject)
+bool FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto AssetBundleEntry = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FAssetBundleEntry>(InMonoObject);
+		UScriptStruct, FAssetBundleEntry>(InGarbageCollectionHandle);
 
 	if (AssetBundleEntry != nullptr)
 	{
@@ -30,7 +31,8 @@ bool FAssetBundleEntryImplementation::AssetBundleEntry_IsValidImplementation(con
 	return false;
 }
 
-bool FAssetBundleEntryImplementation::AssetBundleEntry_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FAssetBundleEntryImplementation::AssetBundleEntry_EqualityImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto AssetBundleEntryA = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleEntry>(A);
@@ -47,7 +49,7 @@ bool FAssetBundleEntryImplementation::AssetBundleEntry_EqualityImplementation(co
 }
 
 bool FAssetBundleEntryImplementation::AssetBundleEntry_InequalityImplementation(
-	const MonoObject* A, const MonoObject* B)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto AssetBundleEntryA = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FAssetBundleEntry>(A);

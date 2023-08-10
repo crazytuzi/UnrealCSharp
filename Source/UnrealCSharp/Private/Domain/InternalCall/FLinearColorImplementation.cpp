@@ -54,10 +54,11 @@ struct FRegisterLinearColor
 
 static FRegisterLinearColor RegisterLinearColor;
 
-void FLinearColorImplementation::LinearColor_ToRGBEImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_ToRGBEImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
@@ -112,10 +113,11 @@ void FLinearColorImplementation::LinearColor_FromPow22ColorImplementation(
 	}
 }
 
-float FLinearColorImplementation::LinearColor_ComponentImplementation(const MonoObject* InMonoObject, const int32 Index)
+float FLinearColorImplementation::LinearColor_ComponentImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 Index)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	if (LinearColor != nullptr)
 	{
@@ -125,8 +127,8 @@ float FLinearColorImplementation::LinearColor_ComponentImplementation(const Mono
 	return 0.f;
 }
 
-void FLinearColorImplementation::LinearColor_AddImplementation(const MonoObject* A, const MonoObject* B,
-                                                               MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_AddImplementation(const FGarbageCollectionHandle A,
+                                                               const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
@@ -147,7 +149,8 @@ void FLinearColorImplementation::LinearColor_AddImplementation(const MonoObject*
 	}
 }
 
-void FLinearColorImplementation::LinearColor_SubtractImplementation(const MonoObject* A, const MonoObject* B,
+void FLinearColorImplementation::LinearColor_SubtractImplementation(const FGarbageCollectionHandle A,
+                                                                    const FGarbageCollectionHandle B,
                                                                     MonoObject** OutValue)
 {
 	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
@@ -169,7 +172,8 @@ void FLinearColorImplementation::LinearColor_SubtractImplementation(const MonoOb
 	}
 }
 
-void FLinearColorImplementation::LinearColor_MultiplyImplementation(const MonoObject* A, const MonoObject* B,
+void FLinearColorImplementation::LinearColor_MultiplyImplementation(const FGarbageCollectionHandle A,
+                                                                    const FGarbageCollectionHandle B,
                                                                     MonoObject** OutValue)
 {
 	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
@@ -192,10 +196,10 @@ void FLinearColorImplementation::LinearColor_MultiplyImplementation(const MonoOb
 }
 
 void FLinearColorImplementation::LinearColor_MultiplyScalarImplementation(
-	const MonoObject* InMonoObject, const float Scalar, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float Scalar, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -212,7 +216,8 @@ void FLinearColorImplementation::LinearColor_MultiplyScalarImplementation(
 	}
 }
 
-void FLinearColorImplementation::LinearColor_DivideImplementation(const MonoObject* A, const MonoObject* B,
+void FLinearColorImplementation::LinearColor_DivideImplementation(const FGarbageCollectionHandle A,
+                                                                  const FGarbageCollectionHandle B,
                                                                   MonoObject** OutValue)
 {
 	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
@@ -234,11 +239,11 @@ void FLinearColorImplementation::LinearColor_DivideImplementation(const MonoObje
 	}
 }
 
-void FLinearColorImplementation::LinearColor_DivideScalarImplementation(const MonoObject* InMonoObject,
-                                                                        const float Scalar, MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_DivideScalarImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float Scalar, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -255,11 +260,12 @@ void FLinearColorImplementation::LinearColor_DivideScalarImplementation(const Mo
 	}
 }
 
-void FLinearColorImplementation::LinearColor_GetClampedImplementation(const MonoObject* InMonoObject, const float InMin,
-                                                                      const float InMax, MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_GetClampedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float InMin, const float InMax,
+	MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -276,7 +282,8 @@ void FLinearColorImplementation::LinearColor_GetClampedImplementation(const Mono
 	}
 }
 
-bool FLinearColorImplementation::LinearColor_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FLinearColorImplementation::LinearColor_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                                    const FGarbageCollectionHandle B)
 {
 	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
@@ -290,7 +297,8 @@ bool FLinearColorImplementation::LinearColor_EqualityImplementation(const MonoOb
 	return false;
 }
 
-bool FLinearColorImplementation::LinearColor_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FLinearColorImplementation::LinearColor_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                                      const FGarbageCollectionHandle B)
 {
 	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
 
@@ -304,7 +312,8 @@ bool FLinearColorImplementation::LinearColor_InequalityImplementation(const Mono
 	return false;
 }
 
-bool FLinearColorImplementation::LinearColor_EqualsImplementation(const MonoObject* A, const MonoObject* B,
+bool FLinearColorImplementation::LinearColor_EqualsImplementation(const FGarbageCollectionHandle A,
+                                                                  const FGarbageCollectionHandle B,
                                                                   const float Tolerance)
 {
 	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
@@ -320,10 +329,10 @@ bool FLinearColorImplementation::LinearColor_EqualsImplementation(const MonoObje
 }
 
 void FLinearColorImplementation::LinearColor_CopyWithNewOpacityImplementation(
-	const MonoObject* InMonoObject, const float NewOpacicty, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float NewOpacicty, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -393,7 +402,8 @@ void FLinearColorImplementation::LinearColor_MakeFromColorTemperatureImplementat
 	}
 }
 
-float FLinearColorImplementation::LinearColor_DistImplementation(const MonoObject* V1, const MonoObject* V2)
+float FLinearColorImplementation::LinearColor_DistImplementation(const FGarbageCollectionHandle V1,
+                                                                 const FGarbageCollectionHandle V2)
 {
 	const auto LinearColorV1 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(V1);
 
@@ -408,10 +418,10 @@ float FLinearColorImplementation::LinearColor_DistImplementation(const MonoObjec
 }
 
 void FLinearColorImplementation::LinearColor_LinearRGBToHSVImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -429,10 +439,10 @@ void FLinearColorImplementation::LinearColor_LinearRGBToHSVImplementation(
 }
 
 void FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -472,11 +482,11 @@ void FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation(const Mo
 }
 
 #if UE_LINEAR_COLOR_QUANTIZE_FLOOR
-void FLinearColorImplementation::LinearColor_QuantizeFloorImplementation(const MonoObject* InMonoObject,
-                                                                         MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_QuantizeFloorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
@@ -493,11 +503,11 @@ void FLinearColorImplementation::LinearColor_QuantizeFloorImplementation(const M
 }
 #endif
 
-void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoObject* InMonoObject,
-                                                                    MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_QuantizeImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
@@ -514,10 +524,10 @@ void FLinearColorImplementation::LinearColor_QuantizeImplementation(const MonoOb
 }
 
 void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
@@ -533,11 +543,11 @@ void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
 	}
 }
 
-void FLinearColorImplementation::LinearColor_ToFColorImplementation(const MonoObject* InMonoObject, const bool bSRGB,
-                                                                    MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_ToFColorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const bool bSRGB, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
@@ -553,11 +563,11 @@ void FLinearColorImplementation::LinearColor_ToFColorImplementation(const MonoOb
 	}
 }
 
-void FLinearColorImplementation::LinearColor_DesaturateImplementation(const MonoObject* InMonoObject,
-                                                                      const float Desaturation, MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_DesaturateImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float Desaturation, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -575,10 +585,11 @@ void FLinearColorImplementation::LinearColor_DesaturateImplementation(const Mono
 }
 
 #if UE_LINEAR_COLOR_COMPUTE_LUMINANCE
-float FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation(const MonoObject* InMonoObject)
+float FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	if (LinearColor != nullptr)
 	{
@@ -589,10 +600,11 @@ float FLinearColorImplementation::LinearColor_ComputeLuminanceImplementation(con
 }
 #endif
 
-float FLinearColorImplementation::LinearColor_GetMaxImplementation(const MonoObject* InMonoObject)
+float FLinearColorImplementation::LinearColor_GetMaxImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	if (LinearColor != nullptr)
 	{
@@ -602,10 +614,11 @@ float FLinearColorImplementation::LinearColor_GetMaxImplementation(const MonoObj
 	return 0.f;
 }
 
-bool FLinearColorImplementation::LinearColor_IsAlmostBlackImplementation(const MonoObject* InMonoObject)
+bool FLinearColorImplementation::LinearColor_IsAlmostBlackImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	if (LinearColor != nullptr)
 	{
@@ -615,10 +628,11 @@ bool FLinearColorImplementation::LinearColor_IsAlmostBlackImplementation(const M
 	return false;
 }
 
-float FLinearColorImplementation::LinearColor_GetMinImplementation(const MonoObject* InMonoObject)
+float FLinearColorImplementation::LinearColor_GetMinImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	if (LinearColor != nullptr)
 	{
@@ -628,10 +642,11 @@ float FLinearColorImplementation::LinearColor_GetMinImplementation(const MonoObj
 	return 0.f;
 }
 
-float FLinearColorImplementation::LinearColor_GetLuminanceImplementation(const MonoObject* InMonoObject)
+float FLinearColorImplementation::LinearColor_GetLuminanceImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	if (LinearColor != nullptr)
 	{
@@ -641,11 +656,11 @@ float FLinearColorImplementation::LinearColor_GetLuminanceImplementation(const M
 	return 0.f;
 }
 
-void FLinearColorImplementation::LinearColor_ToStringImplementation(const MonoObject* InMonoObject,
-                                                                    MonoObject** OutValue)
+void FLinearColorImplementation::LinearColor_ToStringImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	if (LinearColor != nullptr)
 	{
@@ -664,10 +679,10 @@ void FLinearColorImplementation::LinearColor_ToStringImplementation(const MonoOb
 }
 
 bool FLinearColorImplementation::LinearColor_InitFromStringImplementation(
-	const MonoObject* InMonoObject, MonoObject* InSourceString)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InSourceString)
 {
 	const auto LinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FLinearColor>(InMonoObject);
+		UScriptStruct, FLinearColor>(InGarbageCollectionHandle);
 
 	if (LinearColor != nullptr && InSourceString != nullptr)
 	{
