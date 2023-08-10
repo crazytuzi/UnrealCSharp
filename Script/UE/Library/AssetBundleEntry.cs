@@ -1,18 +1,17 @@
 ﻿using System;
 using Script.Library;
-using Script.Common;
 
 namespace Script.CoreUObject
 {
     public partial class FAssetBundleEntry
     {
         public Boolean IsValid() =>
-            AssetBundleEntryImplementation.AssetBundleEntry_IsValidImplementation(this);
+            AssetBundleEntryImplementation.AssetBundleEntry_IsValidImplementation(GetHandle());
 
         public static Boolean operator ==(FAssetBundleEntry A, FAssetBundleEntry B) =>
-            AssetBundleEntryImplementation.AssetBundleEntry_EqualityImplementation(A, B);
+            AssetBundleEntryImplementation.AssetBundleEntry_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FAssetBundleEntry A, FAssetBundleEntry B) =>
-            AssetBundleEntryImplementation.AssetBundleEntry_InequalityImplementation(A, B);
+            AssetBundleEntryImplementation.AssetBundleEntry_InequalityImplementation(A.GetHandle(), B.GetHandle());
     }
 }

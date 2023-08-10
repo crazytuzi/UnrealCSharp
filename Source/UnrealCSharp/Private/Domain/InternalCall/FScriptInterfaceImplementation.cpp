@@ -28,18 +28,21 @@ void FScriptInterfaceImplementation::ScriptInterface_RegisterImplementation(
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(InMonoObject, ScriptInterface);
 }
 
-void FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FScriptInterfaceImplementation::ScriptInterface_UnRegisterImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TScriptInterface<IInterface>>(
+			InGarbageCollectionHandle);
 	});
 }
 
-void FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation(const MonoObject* InMonoObject,
-                                                                             MonoObject** OutValue)
+void FScriptInterfaceImplementation::ScriptInterface_GetObjectImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
+		InGarbageCollectionHandle);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject());
 }

@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -11,11 +12,10 @@ namespace Script.Library
             where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void LazyObjectPtr_UnRegisterImplementation<T>(TLazyObjectPtr<T> InLazyObjectPtr)
-            where T : UObject;
+        public static extern void LazyObjectPtr_UnRegisterImplementation(IntPtr InLazyObjectPtr);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void LazyObjectPtr_GetImplementation<T>(TLazyObjectPtr<T> InLazyObjectPtr, out T OutValue)
+        public static extern void LazyObjectPtr_GetImplementation<T>(IntPtr InLazyObjectPtr, out T OutValue)
             where T : UObject;
     }
 }

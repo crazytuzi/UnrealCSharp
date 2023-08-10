@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -11,10 +12,9 @@ namespace Script.Library
             where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SubclassOf_UnRegisterImplementation<T>(TSubclassOf<T> InSubclassOf) where T : UObject;
+        public static extern void SubclassOf_UnRegisterImplementation(IntPtr InSubclassOf);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SubclassOf_GetImplementation<T>(TSubclassOf<T> InSubclassOf, out UClass OutValue)
-            where T : UObject;
+        public static extern void SubclassOf_GetImplementation(IntPtr InSubclassOf, out UClass OutValue);
     }
 }

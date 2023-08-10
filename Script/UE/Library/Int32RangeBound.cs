@@ -1,34 +1,33 @@
 ﻿using System;
 using Script.Library;
-using Script.Common;
 
 namespace Script.CoreUObject
 {
     public partial class FInt32RangeBound
     {
         public static Boolean operator ==(FInt32RangeBound A, FInt32RangeBound B) =>
-            Int32RangeBoundImplementation.Int32RangeBound_EqualityImplementation(A, B);
+            Int32RangeBoundImplementation.Int32RangeBound_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FInt32RangeBound A, FInt32RangeBound B) =>
-            Int32RangeBoundImplementation.Int32RangeBound_InequalityImplementation(A, B);
+            Int32RangeBoundImplementation.Int32RangeBound_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public Int32 GetValue() =>
-            Int32RangeBoundImplementation.Int32RangeBound_GetValueImplementation(this);
+            Int32RangeBoundImplementation.Int32RangeBound_GetValueImplementation(GetHandle());
 
         public void SetValue(Int32 NewValue) =>
-            Int32RangeBoundImplementation.Int32RangeBound_SetValueImplementation(this, NewValue);
+            Int32RangeBoundImplementation.Int32RangeBound_SetValueImplementation(GetHandle(), NewValue);
 
         public Boolean IsClosed() =>
-            Int32RangeBoundImplementation.Int32RangeBound_IsClosedImplementation(this);
+            Int32RangeBoundImplementation.Int32RangeBound_IsClosedImplementation(GetHandle());
 
         public Boolean IsExclusive() =>
-            Int32RangeBoundImplementation.Int32RangeBound_IsExclusiveImplementation(this);
+            Int32RangeBoundImplementation.Int32RangeBound_IsExclusiveImplementation(GetHandle());
 
         public Boolean IsInclusive() =>
-            Int32RangeBoundImplementation.Int32RangeBound_IsInclusiveImplementation(this);
+            Int32RangeBoundImplementation.Int32RangeBound_IsInclusiveImplementation(GetHandle());
 
         public Boolean IsOpen() =>
-            Int32RangeBoundImplementation.Int32RangeBound_IsOpenImplementation(this);
+            Int32RangeBoundImplementation.Int32RangeBound_IsOpenImplementation(GetHandle());
 
         public static FInt32RangeBound Exclusive(Int32 Value)
         {
@@ -53,35 +52,40 @@ namespace Script.CoreUObject
 
         public static FInt32RangeBound FlipInclusion(FInt32RangeBound Bound)
         {
-            Int32RangeBoundImplementation.Int32RangeBound_FlipInclusionImplementation(Bound, out var OutValue);
+            Int32RangeBoundImplementation.Int32RangeBound_FlipInclusionImplementation(Bound.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }
 
         public static FInt32RangeBound MaxLower(FInt32RangeBound A, FInt32RangeBound B)
         {
-            Int32RangeBoundImplementation.Int32RangeBound_MaxLowerImplementation(A, B, out var OutValue);
+            Int32RangeBoundImplementation.Int32RangeBound_MaxLowerImplementation(A.GetHandle(), B.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }
 
         public static FInt32RangeBound MaxUpper(FInt32RangeBound A, FInt32RangeBound B)
         {
-            Int32RangeBoundImplementation.Int32RangeBound_MaxUpperImplementation(A, B, out var OutValue);
+            Int32RangeBoundImplementation.Int32RangeBound_MaxUpperImplementation(A.GetHandle(), B.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }
 
         public static FInt32RangeBound MinLower(FInt32RangeBound A, FInt32RangeBound B)
         {
-            Int32RangeBoundImplementation.Int32RangeBound_MinLowerImplementation(A, B, out var OutValue);
+            Int32RangeBoundImplementation.Int32RangeBound_MinLowerImplementation(A.GetHandle(), B.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }
 
         public static FInt32RangeBound MinUpper(FInt32RangeBound A, FInt32RangeBound B)
         {
-            Int32RangeBoundImplementation.Int32RangeBound_MinUpperImplementation(A, B, out var OutValue);
+            Int32RangeBoundImplementation.Int32RangeBound_MinUpperImplementation(A.GetHandle(), B.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }

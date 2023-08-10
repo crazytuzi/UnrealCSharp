@@ -27,7 +27,8 @@ struct FRegisterGuid
 
 static FRegisterGuid RegisterGuid;
 
-bool FGuidImplementation::Guid_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FGuidImplementation::Guid_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                      const FGarbageCollectionHandle B)
 {
 	const auto GuidA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(A);
 
@@ -41,7 +42,8 @@ bool FGuidImplementation::Guid_EqualityImplementation(const MonoObject* A, const
 	return false;
 }
 
-bool FGuidImplementation::Guid_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FGuidImplementation::Guid_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                        const FGarbageCollectionHandle B)
 {
 	const auto GuidA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(A);
 
@@ -55,7 +57,8 @@ bool FGuidImplementation::Guid_InequalityImplementation(const MonoObject* A, con
 	return false;
 }
 
-bool FGuidImplementation::Guid_LessThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FGuidImplementation::Guid_LessThanImplementation(const FGarbageCollectionHandle A,
+                                                      const FGarbageCollectionHandle B)
 {
 	const auto GuidA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(A);
 
@@ -69,7 +72,8 @@ bool FGuidImplementation::Guid_LessThanImplementation(const MonoObject* A, const
 	return false;
 }
 
-bool FGuidImplementation::Guid_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FGuidImplementation::Guid_GreaterThanImplementation(const FGarbageCollectionHandle A,
+                                                         const FGarbageCollectionHandle B)
 {
 	const auto GuidA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(A);
 
@@ -83,9 +87,10 @@ bool FGuidImplementation::Guid_GreaterThanImplementation(const MonoObject* A, co
 	return false;
 }
 
-uint32 FGuidImplementation::Guid_GetComponentImplementation(const MonoObject* InMonoObject, const int32 Index)
+uint32 FGuidImplementation::Guid_GetComponentImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const int32 Index)
 {
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InMonoObject);
+	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
 
 	if (Guid != nullptr)
 	{
@@ -95,10 +100,10 @@ uint32 FGuidImplementation::Guid_GetComponentImplementation(const MonoObject* In
 	return 0u;
 }
 
-void FGuidImplementation::Guid_SetComponentImplementation(const MonoObject* InMonoObject, const int32 Index,
-                                                          const uint32 InValue)
+void FGuidImplementation::Guid_SetComponentImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                          const int32 Index, const uint32 InValue)
 {
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InMonoObject);
+	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
 
 	if (Guid != nullptr)
 	{
@@ -106,9 +111,9 @@ void FGuidImplementation::Guid_SetComponentImplementation(const MonoObject* InMo
 	}
 }
 
-void FGuidImplementation::Guid_LexToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FGuidImplementation::Guid_LexToStringImplementation(const MonoObject* Value, MonoObject** OutValue)
 {
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InMonoObject);
+	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(Value);
 
 	if (Guid != nullptr)
 	{
@@ -126,9 +131,9 @@ void FGuidImplementation::Guid_LexToStringImplementation(const MonoObject* InMon
 	}
 }
 
-void FGuidImplementation::Guid_InvalidateImplementation(const MonoObject* InMonoObject)
+void FGuidImplementation::Guid_InvalidateImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InMonoObject);
+	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
 
 	if (Guid != nullptr)
 	{
@@ -136,9 +141,9 @@ void FGuidImplementation::Guid_InvalidateImplementation(const MonoObject* InMono
 	}
 }
 
-bool FGuidImplementation::Guid_IsValidImplementation(const MonoObject* InMonoObject)
+bool FGuidImplementation::Guid_IsValidImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InMonoObject);
+	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
 
 	if (Guid != nullptr)
 	{
@@ -148,9 +153,10 @@ bool FGuidImplementation::Guid_IsValidImplementation(const MonoObject* InMonoObj
 	return false;
 }
 
-void FGuidImplementation::Guid_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FGuidImplementation::Guid_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                      MonoObject** OutValue)
 {
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InMonoObject);
+	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
 
 	if (Guid != nullptr)
 	{

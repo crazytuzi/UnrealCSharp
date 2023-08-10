@@ -1,28 +1,28 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Script.Common;
-using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class PrimaryAssetTypeImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PrimaryAssetType_GetNameImplementation(FPrimaryAssetType InPrimaryAssetType,
+        public static extern void PrimaryAssetType_GetNameImplementation(IntPtr InPrimaryAssetType,
             out FName OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PrimaryAssetType_EqualityImplementation(FPrimaryAssetType A, FPrimaryAssetType B);
+        public static extern Boolean PrimaryAssetType_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean
-            PrimaryAssetType_InequalityImplementation(FPrimaryAssetType A, FPrimaryAssetType B);
+            PrimaryAssetType_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PrimaryAssetType_IsValidImplementation(FPrimaryAssetType InPrimaryAssetType);
+        public static extern Boolean PrimaryAssetType_IsValidImplementation(IntPtr InPrimaryAssetType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PrimaryAssetType_ToStringImplementation(FPrimaryAssetType InPrimaryAssetType,
+        public static extern void PrimaryAssetType_ToStringImplementation(IntPtr InPrimaryAssetType,
             out FString OutValue);
     }
 }

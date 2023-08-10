@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 #if UE_5_0_OR_LATER
 using LwcType = System.Double;
 #else
@@ -13,93 +14,93 @@ namespace Script.Library
     public static class RotatorImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_AddImplementation(FRotator A, FRotator B, out FRotator OutValue);
+        public static extern void Rotator_AddImplementation(IntPtr A, IntPtr B, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_SubtractImplementation(FRotator A, FRotator B, out FRotator OutValue);
+        public static extern void Rotator_SubtractImplementation(IntPtr A, IntPtr B, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_MultiplyImplementation(FRotator A, LwcType Scale, out FRotator OutValue);
+        public static extern void Rotator_MultiplyImplementation(IntPtr A, LwcType Scale, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_EqualityImplementation(FRotator A, FRotator B);
+        public static extern Boolean Rotator_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_InequalityImplementation(FRotator A, FRotator B);
+        public static extern Boolean Rotator_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_IsNearlyZeroImplementation(FRotator InRotator, LwcType Tolerance);
+        public static extern Boolean Rotator_IsNearlyZeroImplementation(IntPtr InRotator, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_IsZeroImplementation(FRotator InRotator);
+        public static extern Boolean Rotator_IsZeroImplementation(IntPtr InRotator);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_EqualsImplementation(FRotator A, FRotator B, LwcType Tolerance);
+        public static extern Boolean Rotator_EqualsImplementation(IntPtr A, IntPtr B, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_AddDeltaImplementation(FRotator A, LwcType DeltaPitch, LwcType DeltaYaw,
+        public static extern void Rotator_AddDeltaImplementation(IntPtr A, LwcType DeltaPitch, LwcType DeltaYaw,
             LwcType DeltaRoll, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_GetInverseImplementation(FRotator InRotator, out FRotator OutValue);
+        public static extern void Rotator_GetInverseImplementation(IntPtr InRotator, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_GridSnapImplementation(FRotator InRotator, FRotator RotGrid,
+        public static extern void Rotator_GridSnapImplementation(IntPtr InRotator, FRotator RotGrid,
             out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_VectorImplementation(FRotator InRotator, out FVector OutValue);
+        public static extern void Rotator_VectorImplementation(IntPtr InRotator, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_QuaternionImplementation(FRotator InRotator, out FQuat OutValue);
+        public static extern void Rotator_QuaternionImplementation(IntPtr InRotator, out FQuat OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_EulerImplementation(FRotator InRotator, out FVector OutValue);
+        public static extern void Rotator_EulerImplementation(IntPtr InRotator, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_RotateVectorImplementation(FRotator InRotator, FVector V,
+        public static extern void Rotator_RotateVectorImplementation(IntPtr InRotator, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_UnrotateVectorImplementation(FRotator InRotator, FVector V,
+        public static extern void Rotator_UnrotateVectorImplementation(IntPtr InRotator, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_ClampImplementation(FRotator InRotator, out FRotator OutValue);
+        public static extern void Rotator_ClampImplementation(IntPtr InRotator, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_GetNormalizedImplementation(FRotator InRotator, out FRotator OutValue);
+        public static extern void Rotator_GetNormalizedImplementation(IntPtr InRotator, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_GetDenormalizedImplementation(FRotator InRotator, out FRotator OutValue);
+        public static extern void Rotator_GetDenormalizedImplementation(IntPtr InRotator, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_NormalizeImplementation(FRotator InRotator);
+        public static extern void Rotator_NormalizeImplementation(IntPtr InRotator);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_GetWindingAndRemainderImplementation(FRotator InRotator, out FRotator Winding,
+        public static extern void Rotator_GetWindingAndRemainderImplementation(IntPtr InRotator, out FRotator Winding,
             out FRotator Remainder);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Rotator_GetManhattanDistanceImplementation(FRotator InRotator, FRotator Rotator);
+        public static extern LwcType Rotator_GetManhattanDistanceImplementation(IntPtr InRotator, FRotator Rotator);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_GetEquivalentRotatorImplementation(FRotator InRotator, out FRotator OutValue);
+        public static extern void Rotator_GetEquivalentRotatorImplementation(IntPtr InRotator, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_SetClosestToMeImplementation(FRotator InRotator, out FRotator MakeClosest);
+        public static extern void Rotator_SetClosestToMeImplementation(IntPtr InRotator, out FRotator MakeClosest);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_ToStringImplementation(FRotator InRotator, out FString OutValue);
+        public static extern void Rotator_ToStringImplementation(IntPtr InRotator, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Rotator_ToCompactStringImplementation(FRotator InRotator, out FString OutValue);
+        public static extern void Rotator_ToCompactStringImplementation(IntPtr InRotator, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_InitFromStringImplementation(FRotator InRotator, FString InSourceString);
+        public static extern Boolean Rotator_InitFromStringImplementation(IntPtr InRotator, FString InSourceString);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_ContainsNaNImplementation(FRotator InRotator);
+        public static extern Boolean Rotator_ContainsNaNImplementation(IntPtr InRotator);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern LwcType Rotator_ClampAxisImplementation(LwcType Angle);

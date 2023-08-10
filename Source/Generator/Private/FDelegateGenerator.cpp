@@ -69,7 +69,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => DelegateUtils.Delegate_UnRegister(this);\n"
+		"\n\t\t~%s() => DelegateUtils.Delegate_UnRegister(GetHandle());\n"
 	),
 	                                               *FullClassContent
 	);
@@ -138,7 +138,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	);
 
 	auto ExecuteFunctionCallBody = FString::Printf(TEXT(
-		"DelegateUtils.Delegate_Execute<%s>(this, out var __ReturnValue, out var __OutValue"
+		"DelegateUtils.Delegate_Execute<%s>(GetHandle(), out var __ReturnValue, out var __OutValue"
 	),
 	                                               DelegateReturnParam != nullptr
 		                                               ? *FGeneratorCore::GetReturnParamType(DelegateReturnParam)
@@ -225,9 +225,9 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		SuperClassContent = TEXT("FRefDelegate");
 
 		BindFunctionContent = TEXT(
-			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => DelegateUtils.Delegate_Bind(this, InDelegate);\n"
+			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => DelegateUtils.Delegate_Bind(GetHandle(), InDelegate);\n"
 			"\n"
-			"\t\tpublic void Bind(Delegate InDelegate) => DelegateUtils.Delegate_Bind(this, InDelegate);\n"
+			"\t\tpublic void Bind(Delegate InDelegate) => DelegateUtils.Delegate_Bind(GetHandle(), InDelegate);\n"
 		);
 
 		DelegateDeclarationContent = FString::Printf(TEXT(
@@ -402,7 +402,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => MulticastDelegateUtils.MulticastDelegate_UnRegister(this);\n"
+		"\n\t\t~%s() => MulticastDelegateUtils.MulticastDelegate_UnRegister(GetHandle());\n"
 	),
 	                                               *FullClassContent
 	);
@@ -471,7 +471,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	);
 
 	auto BroadcastFunctionCallBody = FString(TEXT(
-		"MulticastDelegateUtils.MulticastDelegate_Broadcast(this, out var __OutValue"));
+		"MulticastDelegateUtils.MulticastDelegate_Broadcast(GetHandle(), out var __OutValue"));
 
 	for (auto Index = 0; Index < DelegateParams.Num(); ++Index)
 	{
@@ -552,27 +552,27 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		SuperClassContent = TEXT("FRefMulticastDelegate");
 
 		ContainsFunctionContent = TEXT(
-			"\t\tpublic Boolean Contains(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Contains(this, InDelegate);\n"
+			"\t\tpublic Boolean Contains(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Contains(GetHandle(), InDelegate);\n"
 			"\n"
-			"\t\tpublic Boolean Contains(Delegate InDelegate)=> MulticastDelegateUtils.MulticastDelegate_Contains(this, InDelegate);\n"
+			"\t\tpublic Boolean Contains(Delegate InDelegate)=> MulticastDelegateUtils.MulticastDelegate_Contains(GetHandle(), InDelegate);\n"
 		);
 
 		AddFunctionContent = TEXT(
-			"\t\tpublic void Add(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(this, InDelegate);\n"
+			"\t\tpublic void Add(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(GetHandle(), InDelegate);\n"
 			"\n"
-			"\t\tpublic void Add(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(this, InDelegate);\n"
+			"\t\tpublic void Add(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(GetHandle(), InDelegate);\n"
 		);
 
 		AddUniqueFunctionContent = TEXT(
-			"\t\tpublic void AddUnique(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(this, InDelegate);\n"
+			"\t\tpublic void AddUnique(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(GetHandle(), InDelegate);\n"
 			"\n"
-			"\t\tpublic void AddUnique(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(this, InDelegate);\n"
+			"\t\tpublic void AddUnique(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(GetHandle(), InDelegate);\n"
 		);
 
 		RemoveFunctionContent = TEXT(
-			"\t\tpublic void Remove(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(this, InDelegate);\n"
+			"\t\tpublic void Remove(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(GetHandle(), InDelegate);\n"
 			"\n"
-			"\t\tpublic void Remove(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(this, InDelegate);\n"
+			"\t\tpublic void Remove(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(GetHandle(), InDelegate);\n"
 		);
 
 		DelegateDeclarationContent = FString::Printf(TEXT(

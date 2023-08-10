@@ -33,18 +33,20 @@ void FMulticastDelegateImplementation::MulticastDelegate_RegisterImplementation(
 	FCSharpBind::Bind<FMulticastDelegateHelper>(InMonoObject);
 }
 
-void FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InGarbageCollectionHandle);
 	});
 }
 
-bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(const MonoObject* InMonoObject)
+bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-		FMulticastDelegateHelper>(InMonoObject))
+		FMulticastDelegateHelper>(InGarbageCollectionHandle))
 	{
 		return MulticastDelegateHelper->IsBound();
 	}
@@ -53,10 +55,10 @@ bool FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation(c
 }
 
 bool FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation(
-	const MonoObject* InMonoObject, MonoObject* InDelegate)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InDelegate)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-		FMulticastDelegateHelper>(InMonoObject))
+		FMulticastDelegateHelper>(InGarbageCollectionHandle))
 	{
 		return MulticastDelegateHelper->Contains(InDelegate);
 	}
@@ -65,59 +67,60 @@ bool FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation(
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_AddImplementation(
-	const MonoObject* InMonoObject, MonoObject* InDelegate)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InDelegate)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-		FMulticastDelegateHelper>(InMonoObject))
+		FMulticastDelegateHelper>(InGarbageCollectionHandle))
 	{
 		return MulticastDelegateHelper->Add(InDelegate);
 	}
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_AddUniqueImplementation(
-	const MonoObject* InMonoObject, MonoObject* InDelegate)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InDelegate)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-		FMulticastDelegateHelper>(InMonoObject))
+		FMulticastDelegateHelper>(InGarbageCollectionHandle))
 	{
 		return MulticastDelegateHelper->AddUnique(InDelegate);
 	}
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_RemoveImplementation(
-	const MonoObject* InMonoObject, MonoObject* InDelegate)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InDelegate)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-		FMulticastDelegateHelper>(InMonoObject))
+		FMulticastDelegateHelper>(InGarbageCollectionHandle))
 	{
 		return MulticastDelegateHelper->Remove(InDelegate);
 	}
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_RemoveAllImplementation(
-	const MonoObject* InMonoObject, MonoObject* InObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InObject)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-		FMulticastDelegateHelper>(InMonoObject))
+		FMulticastDelegateHelper>(InGarbageCollectionHandle))
 	{
 		return MulticastDelegateHelper->RemoveAll(InObject);
 	}
 }
 
-void FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation(const MonoObject* InMonoObject)
+void FMulticastDelegateImplementation::MulticastDelegate_ClearImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-		FMulticastDelegateHelper>(InMonoObject))
+		FMulticastDelegateHelper>(InGarbageCollectionHandle))
 	{
 		return MulticastDelegateHelper->Clear();
 	}
 }
 
 void FMulticastDelegateImplementation::MulticastDelegate_BroadcastImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue, MonoArray* InValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue, MonoArray* InValue)
 {
 	if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-		FMulticastDelegateHelper>(InMonoObject))
+		FMulticastDelegateHelper>(InGarbageCollectionHandle))
 	{
 		return MulticastDelegateHelper->Broadcast(OutValue, InValue);
 	}

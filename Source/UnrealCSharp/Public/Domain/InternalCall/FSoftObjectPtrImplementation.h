@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "mono/metadata/object.h"
 
 class FSoftObjectPtrImplementation
@@ -7,7 +8,8 @@ class FSoftObjectPtrImplementation
 public:
 	static void SoftObjectPtr_RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject);
 
-	static void SoftObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject);
+	static void SoftObjectPtr_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void SoftObjectPtr_GetImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void SoftObjectPtr_GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                            MonoObject** OutValue);
 };

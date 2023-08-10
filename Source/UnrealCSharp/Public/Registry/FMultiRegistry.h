@@ -99,6 +99,8 @@ private:
 	TMultiMapping<FSoftClassPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2SoftClassPtrAddress;
 
 	TMultiMapping<FSoftClassPtrAddress>::Address2GarbageCollectionHandle SoftClassPtrAddress2GarbageCollectionHandle;
+
+	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
 };
 
 #include "FMultiRegistry.inl"

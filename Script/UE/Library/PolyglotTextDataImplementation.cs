@@ -1,78 +1,78 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Script.Common;
-using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class PolyglotTextDataImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PolyglotTextData_IsValidImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern Boolean PolyglotTextData_IsValidImplementation(IntPtr InPolyglotTextData,
             out FText OutFailureReason);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_SetNativeCultureImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_SetNativeCultureImplementation(IntPtr InPolyglotTextData,
             FString InNativeCulture);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_GetNativeCultureImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_GetNativeCultureImplementation(IntPtr InPolyglotTextData,
             out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void PolyglotTextData_ResolveNativeCultureImplementation(
-            FPolyglotTextData InPolyglotTextData, out FString OutValue);
+            IntPtr InPolyglotTextData, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_SetIdentityImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_SetIdentityImplementation(IntPtr InPolyglotTextData,
             FString InNamespace, FString InKey);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_GetIdentityImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_GetIdentityImplementation(IntPtr InPolyglotTextData,
             out FString OutNamespace, out FString OutKey);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_GetNamespaceImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_GetNamespaceImplementation(IntPtr InPolyglotTextData,
             out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_GetKeyImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_GetKeyImplementation(IntPtr InPolyglotTextData,
             out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_SetNativeStringImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_SetNativeStringImplementation(IntPtr InPolyglotTextData,
             FString InNativeString);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_GetNativeStringImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_GetNativeStringImplementation(IntPtr InPolyglotTextData,
             out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void PolyglotTextData_AddLocalizedStringImplementation(
-            FPolyglotTextData InPolyglotTextData, FString InCulture, FString InLocalizedString);
+            IntPtr InPolyglotTextData, FString InCulture, FString InLocalizedString);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void PolyglotTextData_RemoveLocalizedStringImplementation(
-            FPolyglotTextData InPolyglotTextData, FString InCulture);
+            IntPtr InPolyglotTextData, FString InCulture);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean PolyglotTextData_GetLocalizedStringImplementation(
-            FPolyglotTextData InPolyglotTextData, FString InCulture, out FString OutLocalizedString);
+            IntPtr InPolyglotTextData, FString InCulture, out FString OutLocalizedString);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void PolyglotTextData_ClearLocalizedStringsImplementation(
-            FPolyglotTextData InPolyglotTextData);
+            IntPtr InPolyglotTextData);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_SetIsMinimalPatchImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_SetIsMinimalPatchImplementation(IntPtr InPolyglotTextData,
             Boolean InIsMinimalPatch);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean PolyglotTextData_GetIsMinimalPatchImplementation(
-            FPolyglotTextData InPolyglotTextData);
+            IntPtr InPolyglotTextData);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PolyglotTextData_GetTextImplementation(FPolyglotTextData InPolyglotTextData,
+        public static extern void PolyglotTextData_GetTextImplementation(IntPtr InPolyglotTextData,
             out FText OutValue);
     }
 }

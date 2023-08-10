@@ -8,76 +8,76 @@ namespace Script.CoreUObject
     {
         public override string ToString()
         {
-            SoftObjectPathImplementation.SoftObjectPath_ToStringImplementation(this, out var OutValue);
+            SoftObjectPathImplementation.SoftObjectPath_ToStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue.ToString();
         }
 
         public FName GetAssetPathName()
         {
-            SoftObjectPathImplementation.SoftObjectPath_GetAssetPathNameImplementation(this, out var OutValue);
+            SoftObjectPathImplementation.SoftObjectPath_GetAssetPathNameImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FString GetAssetPathString()
         {
-            SoftObjectPathImplementation.SoftObjectPath_GetAssetPathStringImplementation(this, out var OutValue);
+            SoftObjectPathImplementation.SoftObjectPath_GetAssetPathStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FString GetSubPathString()
         {
-            SoftObjectPathImplementation.SoftObjectPath_GetSubPathStringImplementation(this, out var OutValue);
+            SoftObjectPathImplementation.SoftObjectPath_GetSubPathStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FString GetLongPackageName()
         {
-            SoftObjectPathImplementation.SoftObjectPath_GetLongPackageNameImplementation(this, out var OutValue);
+            SoftObjectPathImplementation.SoftObjectPath_GetLongPackageNameImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FString GetAssetName()
         {
-            SoftObjectPathImplementation.SoftObjectPath_GetAssetNameImplementation(this, out var OutValue);
+            SoftObjectPathImplementation.SoftObjectPath_GetAssetNameImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public void SetPath(FName Path) =>
-            SoftObjectPathImplementation.SoftObjectPath_SetPathNameImplementation(this, Path);
+            SoftObjectPathImplementation.SoftObjectPath_SetPathNameImplementation(GetHandle(), Path);
 
         public void SetPath(FString Path) =>
-            SoftObjectPathImplementation.SoftObjectPath_SetPathStringImplementation(this, Path);
+            SoftObjectPathImplementation.SoftObjectPath_SetPathStringImplementation(GetHandle(), Path);
 
         // @TODO
         // TryLoad
         // ResolveObject
 
         public void Reset() =>
-            SoftObjectPathImplementation.SoftObjectPath_ResetImplementation(this);
+            SoftObjectPathImplementation.SoftObjectPath_ResetImplementation(GetHandle());
 
         public Boolean IsValid() =>
-            SoftObjectPathImplementation.SoftObjectPath_IsValidImplementation(this);
+            SoftObjectPathImplementation.SoftObjectPath_IsValidImplementation(GetHandle());
 
         public Boolean IsNull() =>
-            SoftObjectPathImplementation.SoftObjectPath_IsNullImplementation(this);
+            SoftObjectPathImplementation.SoftObjectPath_IsNullImplementation(GetHandle());
 
         public Boolean IsAsset() =>
-            SoftObjectPathImplementation.SoftObjectPath_IsAssetImplementation(this);
+            SoftObjectPathImplementation.SoftObjectPath_IsAssetImplementation(GetHandle());
 
         public Boolean IsSubobject() =>
-            SoftObjectPathImplementation.SoftObjectPath_IsSubobjectImplementation(this);
+            SoftObjectPathImplementation.SoftObjectPath_IsSubobjectImplementation(GetHandle());
 
         public static Boolean operator ==(FSoftObjectPath A, FSoftObjectPath B) =>
-            SoftObjectPathImplementation.SoftObjectPath_EqualityImplementation(A, B);
+            SoftObjectPathImplementation.SoftObjectPath_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FSoftObjectPath A, FSoftObjectPath B) =>
-            SoftObjectPathImplementation.SoftObjectPath_InequalityImplementation(A, B);
+            SoftObjectPathImplementation.SoftObjectPath_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         // @TODO
         // ExportTextItem
@@ -86,13 +86,13 @@ namespace Script.CoreUObject
         // PreSavePath
 
         public Boolean FixupForPIE() =>
-            SoftObjectPathImplementation.SoftObjectPath_FixupForPIEImplementation(this);
+            SoftObjectPathImplementation.SoftObjectPath_FixupForPIEImplementation(GetHandle());
 
         public Boolean FixupForPIE(Int32 PIEInstance) =>
-            SoftObjectPathImplementation.SoftObjectPath_FixupForPIEInstanceImplementation(this, PIEInstance);
+            SoftObjectPathImplementation.SoftObjectPath_FixupForPIEInstanceImplementation(GetHandle(), PIEInstance);
 
         public Boolean FixupCoreRedirects() =>
-            SoftObjectPathImplementation.SoftObjectPath_FixupCoreRedirectsImplementation(this);
+            SoftObjectPathImplementation.SoftObjectPath_FixupCoreRedirectsImplementation(GetHandle());
 
         public static Int32 GetCurrentTag() =>
             SoftObjectPathImplementation.SoftObjectPath_GetCurrentTagImplementation();

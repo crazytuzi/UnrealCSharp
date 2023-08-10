@@ -2,102 +2,103 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class TimespanImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Timespan_AddImplementation(FTimespan A, FTimespan B, out FTimespan OutValue);
+        public static extern void Timespan_AddImplementation(IntPtr A, IntPtr B, out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Timespan_NegatedImplementation(FTimespan InTimespan, out FTimespan OutValue);
+        public static extern void Timespan_NegatedImplementation(IntPtr InTimespan, out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Timespan_SubtractImplementation(FTimespan A, FTimespan B, out FTimespan OutValue);
+        public static extern void Timespan_SubtractImplementation(IntPtr A, IntPtr B, out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Timespan_MultiplyImplementation(FTimespan InTimespan, Double Scalar,
+        public static extern void Timespan_MultiplyImplementation(IntPtr InTimespan, Double Scalar,
             out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Timespan_DivideImplementation(FTimespan InTimespan, Double Scalar,
+        public static extern void Timespan_DivideImplementation(IntPtr InTimespan, Double Scalar,
             out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Timespan_RemainderImplementation(FTimespan A, FTimespan B, out FTimespan OutValue);
+        public static extern void Timespan_RemainderImplementation(IntPtr A, IntPtr B, out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Timespan_EqualityImplementation(FTimespan A, FTimespan B);
+        public static extern Boolean Timespan_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Timespan_InequalityImplementation(FTimespan A, FTimespan B);
+        public static extern Boolean Timespan_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Timespan_GreaterThanImplementation(FTimespan A, FTimespan B);
+        public static extern Boolean Timespan_GreaterThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Timespan_GreaterThanOrEqualImplementation(FTimespan A, FTimespan B);
+        public static extern Boolean Timespan_GreaterThanOrEqualImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Timespan_LessThanImplementation(FTimespan A, FTimespan B);
+        public static extern Boolean Timespan_LessThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Timespan_LessThanOrEqualImplementation(FTimespan A, FTimespan B);
+        public static extern Boolean Timespan_LessThanOrEqualImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Timespan_GetDaysImplementation(FTimespan InTimespan);
+        public static extern Int32 Timespan_GetDaysImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Timespan_GetDurationImplementation(FTimespan InTimespan, out FTimespan OutValue);
+        public static extern void Timespan_GetDurationImplementation(IntPtr InTimespan, out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Timespan_GetFractionMicroImplementation(FTimespan InTimespan);
+        public static extern Int32 Timespan_GetFractionMicroImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Timespan_GetFractionMilliImplementation(FTimespan InTimespan);
+        public static extern Int32 Timespan_GetFractionMilliImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Timespan_GetFractionNanoImplementation(FTimespan InTimespan);
+        public static extern Int32 Timespan_GetFractionNanoImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Timespan_GetFractionTicksImplementation(FTimespan InTimespan);
+        public static extern Int32 Timespan_GetFractionTicksImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Timespan_GetHoursImplementation(FTimespan InTimespan);
+        public static extern Int32 Timespan_GetHoursImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Timespan_GetMinutesImplementation(FTimespan InTimespan);
+        public static extern Int32 Timespan_GetMinutesImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Timespan_GetSecondsImplementation(FTimespan InTimespan);
+        public static extern Int32 Timespan_GetSecondsImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int64 Timespan_GetTicksImplementation(FTimespan InTimespan);
+        public static extern Int64 Timespan_GetTicksImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double Timespan_GetTotalDaysImplementation(FTimespan InTimespan);
+        public static extern Double Timespan_GetTotalDaysImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double Timespan_GetTotalHoursImplementation(FTimespan InTimespan);
+        public static extern Double Timespan_GetTotalHoursImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double Timespan_GetTotalMicrosecondsImplementation(FTimespan InTimespan);
+        public static extern Double Timespan_GetTotalMicrosecondsImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double Timespan_GetTotalMillisecondsImplementation(FTimespan InTimespan);
+        public static extern Double Timespan_GetTotalMillisecondsImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double Timespan_GetTotalMinutesImplementation(FTimespan InTimespan);
+        public static extern Double Timespan_GetTotalMinutesImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double Timespan_GetTotalSecondsImplementation(FTimespan InTimespan);
+        public static extern Double Timespan_GetTotalSecondsImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Timespan_IsZeroImplementation(FTimespan InTimespan);
+        public static extern Boolean Timespan_IsZeroImplementation(IntPtr InTimespan);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Timespan_ToStringImplementation(FTimespan InTimespan, out FString OutValue);
+        public static extern void Timespan_ToStringImplementation(IntPtr InTimespan, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Timespan_FromDaysImplementation(Double Days, out FTimespan OutValue);

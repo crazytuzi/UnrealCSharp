@@ -45,10 +45,10 @@ struct FRegisterPolyglotTextData
 static FRegisterPolyglotTextData RegisterPolyglotTextData;
 
 bool FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutFailureReason)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutFailureReason)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	FText Text;
 
@@ -68,10 +68,10 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation(
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeCultureImplementation(
-	const MonoObject* InMonoObject, MonoObject* InNativeCulture)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InNativeCulture)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -82,10 +82,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeCultureImplement
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeCultureImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -104,10 +104,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeCultureImplement
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_ResolveNativeCultureImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -126,10 +126,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_ResolveNativeCultureImple
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_SetIdentityImplementation(
-	const MonoObject* InMonoObject, MonoObject* InNamespace, MonoObject* InKey)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InNamespace, MonoObject* InKey)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -144,10 +144,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetIdentityImplementation
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutNamespace, MonoObject** OutKey)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutNamespace, MonoObject** OutKey)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -176,10 +176,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_GetNamespaceImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -198,10 +198,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNamespaceImplementatio
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_GetKeyImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -220,10 +220,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetKeyImplementation(
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeStringImplementation(
-	const MonoObject* InMonoObject, MonoObject* InNativeString)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InNativeString)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -234,10 +234,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetNativeStringImplementa
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeStringImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -256,10 +256,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeStringImplementa
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_AddLocalizedStringImplementation(
-	const MonoObject* InMonoObject, MonoObject* InCulture, MonoObject* InLocalizedString)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InCulture, MonoObject* InLocalizedString)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -274,10 +274,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_AddLocalizedStringImpleme
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_RemoveLocalizedStringImplementation(
-	const MonoObject* InMonoObject, MonoObject* InCulture)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InCulture)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -288,10 +288,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_RemoveLocalizedStringImpl
 }
 
 bool FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImplementation(
-	const MonoObject* InMonoObject, MonoObject* InCulture, MonoObject** OutLocalizedString)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InCulture, MonoObject** OutLocalizedString)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	FString String;
 
@@ -314,10 +314,10 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImpleme
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_ClearLocalizedStringsImplementation(
-	const MonoObject* InMonoObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -326,10 +326,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_ClearLocalizedStringsImpl
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_SetIsMinimalPatchImplementation(
-	const MonoObject* InMonoObject, const bool InIsMinimalPatch)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const bool InIsMinimalPatch)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -337,10 +337,11 @@ void FPolyglotTextDataImplementation::PolyglotTextData_SetIsMinimalPatchImplemen
 	}
 }
 
-bool FPolyglotTextDataImplementation::PolyglotTextData_GetIsMinimalPatchImplementation(const MonoObject* InMonoObject)
+bool FPolyglotTextDataImplementation::PolyglotTextData_GetIsMinimalPatchImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{
@@ -351,10 +352,10 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_GetIsMinimalPatchImplemen
 }
 
 void FPolyglotTextDataImplementation::PolyglotTextData_GetTextImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PolyglotTextData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPolyglotTextData>(InMonoObject);
+		UScriptStruct, FPolyglotTextData>(InGarbageCollectionHandle);
 
 	if (PolyglotTextData != nullptr)
 	{

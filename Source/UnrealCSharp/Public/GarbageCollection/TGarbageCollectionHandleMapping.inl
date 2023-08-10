@@ -27,40 +27,14 @@ public:
 		GarbageCollectionHandle2T.Empty();
 	}
 
-	Value& Emplace(Key&& InKey, T&& InValue)
+	void Add(const Key& InKey, const T& InValue)
 	{
-		return GarbageCollectionHandle2T.Emplace(Forward<Key>(InKey), Forward<T>(InValue));
+		GarbageCollectionHandle2T.Add(InKey, InValue);
 	}
 
 	int32 Remove(const Key& InKey)
 	{
 		return GarbageCollectionHandle2T.Remove(InKey);
-	}
-
-	int32 Remove(const MonoObject* InKey)
-	{
-		for (const auto& Pair : GarbageCollectionHandle2T)
-		{
-			if (Pair.Key == InKey)
-			{
-				return GarbageCollectionHandle2T.Remove(Pair.Key);
-			}
-		}
-
-		return 0;
-	}
-
-	Value* Find(const MonoObject* InMonoObject)
-	{
-		for (auto& Pair : GarbageCollectionHandle2T)
-		{
-			if (Pair.Key == InMonoObject)
-			{
-				return &Pair.Value;
-			}
-		}
-
-		return nullptr;
 	}
 
 	Value* Find(const Key& InKey)

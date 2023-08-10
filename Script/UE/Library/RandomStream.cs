@@ -7,58 +7,58 @@ namespace Script.CoreUObject
     public partial class FRandomStream
     {
         public void Initialize(Int32 InSeed) =>
-            RandomStreamImplementation.RandomStream_InitializeImplementation(this, InSeed);
+            RandomStreamImplementation.RandomStream_InitializeImplementation(GetHandle(), InSeed);
 
         public void Initialize(FName InName) =>
-            RandomStreamImplementation.RandomStream_InitializeNameImplementation(this, InName);
+            RandomStreamImplementation.RandomStream_InitializeNameImplementation(GetHandle(), InName);
 
         public void Reset() =>
-            RandomStreamImplementation.RandomStream_ResetImplementation(this);
+            RandomStreamImplementation.RandomStream_ResetImplementation(GetHandle());
 
         public Int32 GetInitialSeed() =>
-            RandomStreamImplementation.RandomStream_GetInitialSeedImplementation(this);
+            RandomStreamImplementation.RandomStream_GetInitialSeedImplementation(GetHandle());
 
         public void GenerateNewSeed() =>
-            RandomStreamImplementation.RandomStream_GenerateNewSeedImplementation(this);
+            RandomStreamImplementation.RandomStream_GenerateNewSeedImplementation(GetHandle());
 
         public Single GetFraction() =>
-            RandomStreamImplementation.RandomStream_GetFractionImplementation(this);
+            RandomStreamImplementation.RandomStream_GetFractionImplementation(GetHandle());
 
         public UInt32 GetUnsignedInt() =>
-            RandomStreamImplementation.RandomStream_GetUnsignedIntImplementation(this);
+            RandomStreamImplementation.RandomStream_GetUnsignedIntImplementation(GetHandle());
 
         public FVector GetUnitVector()
         {
-            RandomStreamImplementation.RandomStream_GetUnitVectorImplementation(this, out var OutValue);
+            RandomStreamImplementation.RandomStream_GetUnitVectorImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public Int32 GetCurrentSeed() =>
-            RandomStreamImplementation.RandomStream_GetCurrentSeedImplementation(this);
+            RandomStreamImplementation.RandomStream_GetCurrentSeedImplementation(GetHandle());
 
         public Single FRand() =>
-            RandomStreamImplementation.RandomStream_FRandImplementation(this);
+            RandomStreamImplementation.RandomStream_FRandImplementation(GetHandle());
 
         public Int32 RandHelper(Int32 A) =>
-            RandomStreamImplementation.RandomStream_RandHelperImplementation(this, A);
+            RandomStreamImplementation.RandomStream_RandHelperImplementation(GetHandle(), A);
 
         public Int32 RandRange(Int32 Min, Int32 Max) =>
-            RandomStreamImplementation.RandomStream_RandRangeImplementation(this, Min, Max);
+            RandomStreamImplementation.RandomStream_RandRangeImplementation(GetHandle(), Min, Max);
 
         public Single FRandRange(Single InMin, Single InMax) =>
-            RandomStreamImplementation.RandomStream_FRandRangeImplementation(this, InMin, InMax);
+            RandomStreamImplementation.RandomStream_FRandRangeImplementation(GetHandle(), InMin, InMax);
 
         public FVector VRand()
         {
-            RandomStreamImplementation.RandomStream_VRandImplementation(this, out var OutValue);
+            RandomStreamImplementation.RandomStream_VRandImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FVector VRandCone(FVector Dir, Single ConeHalfAngleRad)
         {
-            RandomStreamImplementation.RandomStream_VRandConeHalfAngleImplementation(this, Dir, ConeHalfAngleRad,
+            RandomStreamImplementation.RandomStream_VRandConeHalfAngleImplementation(GetHandle(), Dir, ConeHalfAngleRad,
                 out var OutValue);
 
             return OutValue;
@@ -66,7 +66,8 @@ namespace Script.CoreUObject
 
         public FVector VRandCone(FVector Dir, Single HorizontalConeHalfAngleRad, Single VerticalConeHalfAngleRad)
         {
-            RandomStreamImplementation.RandomStream_VRandConeHorizontalAndVerticalHalfAngleImplementation(this, Dir,
+            RandomStreamImplementation.RandomStream_VRandConeHorizontalAndVerticalHalfAngleImplementation(GetHandle(),
+                Dir,
                 HorizontalConeHalfAngleRad, VerticalConeHalfAngleRad, out var OutValue);
 
             return OutValue;
@@ -77,7 +78,7 @@ namespace Script.CoreUObject
 
         public override string ToString()
         {
-            RandomStreamImplementation.RandomStream_ToStringImplementation(this, out var OutValue);
+            RandomStreamImplementation.RandomStream_ToStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue.ToString();
         }

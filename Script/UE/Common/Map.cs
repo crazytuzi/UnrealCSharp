@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Script.CoreUObject;
 using Script.Reflection.Container;
 
 namespace Script.Common
 {
-    public class TMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+    public class TMap<TKey, TValue> : IGCHandle, IEnumerable<KeyValuePair<TKey, TValue>>
     {
         public TMap() => MapUtils.Map_Register(this);
 
@@ -13,7 +14,7 @@ namespace Script.Common
         {
         }
 
-        ~TMap() => MapUtils.Map_UnRegister(this);
+        ~TMap() => MapUtils.Map_UnRegister(GCHandle);
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
@@ -31,33 +32,46 @@ namespace Script.Common
             return GetEnumerator();
         }
 
-        public void Empty(Int32 InExpectedNumElements = 0) => MapUtils.Map_Empty(this, InExpectedNumElements);
+        public void Empty(Int32 InExpectedNumElements = 0) => MapUtils.Map_Empty(GCHandle, InExpectedNumElements);
 
-        public Int32 Num() => MapUtils.Map_Num(this);
+        public Int32 Num() => MapUtils.Map_Num(GCHandle);
 
-        public void Add(TKey InKey, TValue InValue) => MapUtils.Map_Add(this, InKey, InValue);
+        public void Add(TKey InKey, TValue InValue) => MapUtils.Map_Add(GCHandle, InKey, InValue);
 
-        public Int32 Remove(TKey InKey) => MapUtils.Map_Remove(this, InKey);
+        public Int32 Remove(TKey InKey) => MapUtils.Map_Remove<TKey, TValue>(GCHandle, InKey);
 
-        public TKey FindKey(TValue InValue) => MapUtils.Map_FindKey(this, InValue);
+        public TKey FindKey(TValue InValue) => MapUtils.Map_FindKey<TKey, TValue>(GCHandle, InValue);
 
-        public TValue Find(TKey InKey) => MapUtils.Map_Find(this, InKey);
+        public TValue Find(TKey InKey) => MapUtils.Map_Find<TKey, TValue>(GCHandle, InKey);
 
-        public Boolean Contains(TKey InKey) => MapUtils.Map_Contains(this, InKey);
+        public Boolean Contains(TKey InKey) => MapUtils.Map_Contains<TKey, TValue>(GCHandle, InKey);
 
         public TValue this[TKey InKey]
         {
-            get => MapUtils.Map_Get(this, InKey);
+            get => MapUtils.Map_Get<TKey, TValue>(GCHandle, InKey);
 
-            set => MapUtils.Map_Set(this, InKey, value);
+            set => MapUtils.Map_Set(GCHandle, InKey, value);
         }
 
-        private Int32 GetMaxIndex() => MapUtils.Map_GetMaxIndex(this);
+        private Int32 GetMaxIndex() => MapUtils.Map_GetMaxIndex(GCHandle);
 
-        private Boolean IsValidIndex(Int32 InIndex) => MapUtils.Map_IsValidIndex(this, InIndex);
+        private Boolean IsValidIndex(Int32 InIndex) => MapUtils.Map_IsValidIndex(GCHandle, InIndex);
 
-        private TKey GetEnumeratorKey(Int32 InIndex) => MapUtils.Map_GetEnumeratorKey(this, InIndex);
+        private TKey GetEnumeratorKey(Int32 InIndex) => MapUtils.Map_GetEnumeratorKey<TKey, TValue>(GCHandle, InIndex);
 
-        private TValue GetEnumeratorValue(Int32 InIndex) => MapUtils.Map_GetEnumeratorValue(this, InIndex);
+        private TValue GetEnumeratorValue(Int32 InIndex) =>
+            MapUtils.Map_GetEnumeratorValue<TKey, TValue>(GCHandle, InIndex);
+
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new System.IntPtr(InGCHandle);
+        }
+
+        public System.IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private System.IntPtr GCHandle;
     }
 }

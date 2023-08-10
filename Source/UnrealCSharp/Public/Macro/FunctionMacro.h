@@ -21,3 +21,5 @@
 #define FUNCTION_SYNCHRONIZATION_CONTEXT_TICK FString(TEXT("Tick"))
 
 #define FUNCTION_DESTRUCTOR FString(TEXT("Destructor"))
+
+#define FUNCTION_SET_HANDLE FString(TEXT("SetHandle"))

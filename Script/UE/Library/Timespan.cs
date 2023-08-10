@@ -8,128 +8,128 @@ namespace Script.CoreUObject
     {
         public static FTimespan operator +(FTimespan A, FTimespan B)
         {
-            TimespanImplementation.Timespan_AddImplementation(A, B, out var OutValue);
+            TimespanImplementation.Timespan_AddImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FTimespan operator -(FTimespan A)
         {
-            TimespanImplementation.Timespan_NegatedImplementation(A, out var OutValue);
+            TimespanImplementation.Timespan_NegatedImplementation(A.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FTimespan operator -(FTimespan A, FTimespan B)
         {
-            TimespanImplementation.Timespan_SubtractImplementation(A, B, out var OutValue);
+            TimespanImplementation.Timespan_SubtractImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FTimespan operator *(FTimespan A, Double Scalar)
         {
-            TimespanImplementation.Timespan_MultiplyImplementation(A, Scalar, out var OutValue);
+            TimespanImplementation.Timespan_MultiplyImplementation(A.GetHandle(), Scalar, out var OutValue);
 
             return OutValue;
         }
 
         public static FTimespan operator /(FTimespan A, Double Scalar)
         {
-            TimespanImplementation.Timespan_DivideImplementation(A, Scalar, out var OutValue);
+            TimespanImplementation.Timespan_DivideImplementation(A.GetHandle(), Scalar, out var OutValue);
 
             return OutValue;
         }
 
         public static FTimespan operator %(FTimespan A, FTimespan B)
         {
-            TimespanImplementation.Timespan_RemainderImplementation(A, B, out var OutValue);
+            TimespanImplementation.Timespan_RemainderImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static Boolean operator ==(FTimespan A, FTimespan B) =>
-            TimespanImplementation.Timespan_EqualityImplementation(A, B);
+            TimespanImplementation.Timespan_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FTimespan A, FTimespan B) =>
-            TimespanImplementation.Timespan_InequalityImplementation(A, B);
+            TimespanImplementation.Timespan_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >(FTimespan A, FTimespan B) =>
-            TimespanImplementation.Timespan_GreaterThanImplementation(A, B);
+            TimespanImplementation.Timespan_GreaterThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >=(FTimespan A, FTimespan B) =>
-            TimespanImplementation.Timespan_GreaterThanOrEqualImplementation(A, B);
+            TimespanImplementation.Timespan_GreaterThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <(FTimespan A, FTimespan B) =>
-            TimespanImplementation.Timespan_LessThanImplementation(A, B);
+            TimespanImplementation.Timespan_LessThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <=(FTimespan A, FTimespan B) =>
-            TimespanImplementation.Timespan_LessThanOrEqualImplementation(A, B);
+            TimespanImplementation.Timespan_LessThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         // @TODO
         // ExportTextItem
 
         public Int32 GetDays() =>
-            TimespanImplementation.Timespan_GetDaysImplementation(this);
+            TimespanImplementation.Timespan_GetDaysImplementation(GetHandle());
 
         public FTimespan GetDuration()
         {
-            TimespanImplementation.Timespan_GetDurationImplementation(this, out var OutValue);
+            TimespanImplementation.Timespan_GetDurationImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public Int32 GetFractionMicro() =>
-            TimespanImplementation.Timespan_GetFractionMicroImplementation(this);
+            TimespanImplementation.Timespan_GetFractionMicroImplementation(GetHandle());
 
         public Int32 GetFractionMilli() =>
-            TimespanImplementation.Timespan_GetFractionMilliImplementation(this);
+            TimespanImplementation.Timespan_GetFractionMilliImplementation(GetHandle());
 
         public Int32 GetFractionNano() =>
-            TimespanImplementation.Timespan_GetFractionNanoImplementation(this);
+            TimespanImplementation.Timespan_GetFractionNanoImplementation(GetHandle());
 
         public Int32 GetFractionTicks() =>
-            TimespanImplementation.Timespan_GetFractionTicksImplementation(this);
+            TimespanImplementation.Timespan_GetFractionTicksImplementation(GetHandle());
 
         public Int32 GetHours() =>
-            TimespanImplementation.Timespan_GetHoursImplementation(this);
+            TimespanImplementation.Timespan_GetHoursImplementation(GetHandle());
 
         public Int32 GetMinutes() =>
-            TimespanImplementation.Timespan_GetMinutesImplementation(this);
+            TimespanImplementation.Timespan_GetMinutesImplementation(GetHandle());
 
         public Int32 GetSeconds() =>
-            TimespanImplementation.Timespan_GetSecondsImplementation(this);
+            TimespanImplementation.Timespan_GetSecondsImplementation(GetHandle());
 
         public Int64 GetTicks() =>
-            TimespanImplementation.Timespan_GetTicksImplementation(this);
+            TimespanImplementation.Timespan_GetTicksImplementation(GetHandle());
 
         public Double GetTotalDays() =>
-            TimespanImplementation.Timespan_GetTotalDaysImplementation(this);
+            TimespanImplementation.Timespan_GetTotalDaysImplementation(GetHandle());
 
         public Double GetTotalHours() =>
-            TimespanImplementation.Timespan_GetTotalHoursImplementation(this);
+            TimespanImplementation.Timespan_GetTotalHoursImplementation(GetHandle());
 
         public Double GetTotalMicroseconds() =>
-            TimespanImplementation.Timespan_GetTotalMicrosecondsImplementation(this);
+            TimespanImplementation.Timespan_GetTotalMicrosecondsImplementation(GetHandle());
 
         public Double GetTotalMilliseconds() =>
-            TimespanImplementation.Timespan_GetTotalMillisecondsImplementation(this);
+            TimespanImplementation.Timespan_GetTotalMillisecondsImplementation(GetHandle());
 
         public Double GetTotalMinutes() =>
-            TimespanImplementation.Timespan_GetTotalMinutesImplementation(this);
+            TimespanImplementation.Timespan_GetTotalMinutesImplementation(GetHandle());
 
         public Double GetTotalSeconds() =>
-            TimespanImplementation.Timespan_GetTotalSecondsImplementation(this);
+            TimespanImplementation.Timespan_GetTotalSecondsImplementation(GetHandle());
 
         // @TODO
         // ImportTextItem
 
         public Boolean IsZero() =>
-            TimespanImplementation.Timespan_IsZeroImplementation(this);
+            TimespanImplementation.Timespan_IsZeroImplementation(GetHandle());
 
         public override string ToString()
         {
-            TimespanImplementation.Timespan_ToStringImplementation(this, out var OutValue);
+            TimespanImplementation.Timespan_ToStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue.ToString();
         }

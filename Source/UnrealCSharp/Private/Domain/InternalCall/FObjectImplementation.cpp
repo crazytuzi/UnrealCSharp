@@ -33,9 +33,10 @@ void FObjectImplementation::Object_StaticClassImplementation(MonoString* InClass
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(InClass);
 }
 
-void FObjectImplementation::Object_GetClassImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FObjectImplementation::Object_GetClassImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                          MonoObject** OutValue)
 {
-	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject))
+	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 	{
 		const auto Class = FoundObject->GetClass();
 
@@ -43,9 +44,10 @@ void FObjectImplementation::Object_GetClassImplementation(const MonoObject* InMo
 	}
 }
 
-void FObjectImplementation::Object_GetNameImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FObjectImplementation::Object_GetNameImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         MonoObject** OutValue)
 {
-	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject))
+	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 	{
 		const auto Name = FoundObject->GetName();
 
@@ -61,9 +63,10 @@ void FObjectImplementation::Object_GetNameImplementation(const MonoObject* InMon
 	}
 }
 
-void FObjectImplementation::Object_GetWorldImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FObjectImplementation::Object_GetWorldImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                          MonoObject** OutValue)
 {
-	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject))
+	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 	{
 		const auto World = FoundObject->GetWorld();
 
@@ -71,9 +74,9 @@ void FObjectImplementation::Object_GetWorldImplementation(const MonoObject* InMo
 	}
 }
 
-bool FObjectImplementation::Object_IsValidImplementation(const MonoObject* InMonoObject)
+bool FObjectImplementation::Object_IsValidImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject))
+	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 	{
 		return IsValid(FoundObject);
 	}

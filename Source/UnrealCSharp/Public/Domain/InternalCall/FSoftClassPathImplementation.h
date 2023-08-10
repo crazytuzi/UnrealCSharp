@@ -5,6 +5,6 @@
 class FSoftClassPathImplementation
 {
 public:
-	static void SoftClassPath_GetOrCreateIDForObjectImplementation(const MonoObject* InMonoObject,
-	                                                               MonoObject** OutValue);
+	static void SoftClassPath_GetOrCreateIDForClassImplementation(const MonoObject* InMonoObject,
+	                                                              MonoObject** OutValue);
 };

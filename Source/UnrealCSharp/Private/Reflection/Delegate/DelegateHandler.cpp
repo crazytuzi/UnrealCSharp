@@ -69,7 +69,7 @@ void UDelegateHandler::Bind(MonoObject* InDelegate)
 		}
 	}
 
-	DelegateGarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InDelegate, false);
+	DelegateGarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InDelegate, true);
 }
 
 bool UDelegateHandler::IsBound() const

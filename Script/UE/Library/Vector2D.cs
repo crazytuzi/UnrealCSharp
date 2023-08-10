@@ -13,152 +13,152 @@ namespace Script.CoreUObject
     {
         public static FVector2D operator +(FVector2D A, FVector2D B)
         {
-            Vector2DImplementation.Vector2D_AddImplementation(A, B, out var OutValue);
+            Vector2DImplementation.Vector2D_AddImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FVector2D operator -(FVector2D A, FVector2D B)
         {
-            Vector2DImplementation.Vector2D_SubtractImplementation(A, B, out var OutValue);
+            Vector2DImplementation.Vector2D_SubtractImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FVector2D operator *(FVector2D A, LwcType Scale)
         {
-            Vector2DImplementation.Vector2D_MultiplyScaleImplementation(A, Scale, out var OutValue);
+            Vector2DImplementation.Vector2D_MultiplyScaleImplementation(A.GetHandle(), Scale, out var OutValue);
 
             return OutValue;
         }
 
         public static FVector2D operator /(FVector2D A, LwcType Scale)
         {
-            Vector2DImplementation.Vector2D_DivideScaleImplementation(A, Scale, out var OutValue);
+            Vector2DImplementation.Vector2D_DivideScaleImplementation(A.GetHandle(), Scale, out var OutValue);
 
             return OutValue;
         }
 
         public static FVector2D operator +(FVector2D A, LwcType Scale)
         {
-            Vector2DImplementation.Vector2D_AddAImplementation(A, Scale, out var OutValue);
+            Vector2DImplementation.Vector2D_AddAImplementation(A.GetHandle(), Scale, out var OutValue);
 
             return OutValue;
         }
 
         public static FVector2D operator -(FVector2D A, LwcType Scale)
         {
-            Vector2DImplementation.Vector2D_SubtractAImplementation(A, Scale, out var OutValue);
+            Vector2DImplementation.Vector2D_SubtractAImplementation(A.GetHandle(), Scale, out var OutValue);
 
             return OutValue;
         }
 
         public static FVector2D operator *(FVector2D A, FVector2D B)
         {
-            Vector2DImplementation.Vector2D_MultiplyImplementation(A, B, out var OutValue);
+            Vector2DImplementation.Vector2D_MultiplyImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FVector2D operator /(FVector2D A, FVector2D B)
         {
-            Vector2DImplementation.Vector2D_DivideImplementation(A, B, out var OutValue);
+            Vector2DImplementation.Vector2D_DivideImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static LwcType operator |(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_DotProductImplementation(A, B);
+            Vector2DImplementation.Vector2D_DotProductImplementation(A.GetHandle(), B.GetHandle());
 
         public static LwcType operator ^(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_CrossProductImplementation(A, B);
+            Vector2DImplementation.Vector2D_CrossProductImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator ==(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_EqualityImplementation(A, B);
+            Vector2DImplementation.Vector2D_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_InequalityImplementation(A, B);
+            Vector2DImplementation.Vector2D_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_LessThanImplementation(A, B);
+            Vector2DImplementation.Vector2D_LessThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_GreaterThanImplementation(A, B);
+            Vector2DImplementation.Vector2D_GreaterThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <=(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_LessThanOrEqualImplementation(A, B);
+            Vector2DImplementation.Vector2D_LessThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >=(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_GreaterThanOrEqualImplementation(A, B);
+            Vector2DImplementation.Vector2D_GreaterThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         public static FVector2D operator -(FVector2D A)
         {
-            Vector2DImplementation.Vector2D_NegatedImplementation(A, out var OutValue);
+            Vector2DImplementation.Vector2D_NegatedImplementation(A.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public LwcType this[Int32 Index]
         {
-            get => Vector2DImplementation.Vector2D_GetComponentImplementation(this, Index);
+            get => Vector2DImplementation.Vector2D_GetComponentImplementation(GetHandle(), Index);
 
-            set => Vector2DImplementation.Vector2D_SetComponentImplementation(this, Index, value);
+            set => Vector2DImplementation.Vector2D_SetComponentImplementation(GetHandle(), Index, value);
         }
 
         public LwcType Component(Int32 Index) =>
-            Vector2DImplementation.Vector2D_ComponentImplementation(this, Index);
+            Vector2DImplementation.Vector2D_ComponentImplementation(GetHandle(), Index);
 
         public static LwcType DotProduct(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_DotProductImplementation(A, B);
+            Vector2DImplementation.Vector2D_DotProductImplementation(A.GetHandle(), B.GetHandle());
 
         public static LwcType DistSquared(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_DistSquaredImplementation(A, B);
+            Vector2DImplementation.Vector2D_DistSquaredImplementation(A.GetHandle(), B.GetHandle());
 
         public static LwcType Distance(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_DistanceImplementation(A, B);
+            Vector2DImplementation.Vector2D_DistanceImplementation(A.GetHandle(), B.GetHandle());
 
         public static LwcType CrossProduct(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_CrossProductImplementation(A, B);
+            Vector2DImplementation.Vector2D_CrossProductImplementation(A.GetHandle(), B.GetHandle());
 
         public static FVector2D Max(FVector2D A, FVector2D B)
         {
-            Vector2DImplementation.Vector2D_MaxImplementation(A, B, out var OutValue);
+            Vector2DImplementation.Vector2D_MaxImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FVector2D Min(FVector2D A, FVector2D B)
         {
-            Vector2DImplementation.Vector2D_MinImplementation(A, B, out var OutValue);
+            Vector2DImplementation.Vector2D_MinImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         // @TODO KINDA_SMALL_NUMBER
         public Boolean Equals(FVector2D V, LwcType Tolerance) =>
-            Vector2DImplementation.Vector2D_EqualsImplementation(this, V, Tolerance);
+            Vector2DImplementation.Vector2D_EqualsImplementation(GetHandle(), V.GetHandle(), Tolerance);
 
         public void Set(LwcType InX, LwcType InY) =>
-            Vector2DImplementation.Vector2D_SetImplementation(this, InX, InY);
+            Vector2DImplementation.Vector2D_SetImplementation(GetHandle(), InX, InY);
 
         public LwcType GetMax() =>
-            Vector2DImplementation.Vector2D_GetMaxImplementation(this);
+            Vector2DImplementation.Vector2D_GetMaxImplementation(GetHandle());
 
         public LwcType GetAbsMax() =>
-            Vector2DImplementation.Vector2D_GetAbsMaxImplementation(this);
+            Vector2DImplementation.Vector2D_GetAbsMaxImplementation(GetHandle());
 
         public LwcType GetMin() =>
-            Vector2DImplementation.Vector2D_GetMinImplementation(this);
+            Vector2DImplementation.Vector2D_GetMinImplementation(GetHandle());
 
         public LwcType Size() =>
-            Vector2DImplementation.Vector2D_SizeImplementation(this);
+            Vector2DImplementation.Vector2D_SizeImplementation(GetHandle());
 
         public LwcType SizeSquared() =>
-            Vector2DImplementation.Vector2D_SizeSquaredImplementation(this);
+            Vector2DImplementation.Vector2D_SizeSquaredImplementation(GetHandle());
 
         public FVector2D GetRotated(LwcType AngleDeg)
         {
-            Vector2DImplementation.Vector2D_GetRotatedImplementation(this, AngleDeg, out var OutValue);
+            Vector2DImplementation.Vector2D_GetRotatedImplementation(GetHandle(), AngleDeg, out var OutValue);
 
             return OutValue;
         }
@@ -166,76 +166,77 @@ namespace Script.CoreUObject
         // @TODO SMALL_NUMBER
         public FVector2D GetSafeNormal(LwcType Tolerance)
         {
-            Vector2DImplementation.Vector2D_GetSafeNormalImplementation(this, Tolerance, out var OutValue);
+            Vector2DImplementation.Vector2D_GetSafeNormalImplementation(GetHandle(), Tolerance, out var OutValue);
 
             return OutValue;
         }
 
         // @TODO SMALL_NUMBER
         public void Normalize(LwcType Tolerance) =>
-            Vector2DImplementation.Vector2D_NormalizeImplementation(this, Tolerance);
+            Vector2DImplementation.Vector2D_NormalizeImplementation(GetHandle(), Tolerance);
 
         // @TODO KINDA_SMALL_NUMBER
         public Boolean IsNearlyZero(LwcType Tolerance) =>
-            Vector2DImplementation.Vector2D_IsNearlyZeroImplementation(this, Tolerance);
+            Vector2DImplementation.Vector2D_IsNearlyZeroImplementation(GetHandle(), Tolerance);
 
         public void ToDirectionAndLength(out FVector2D OutDir, out LwcType OutLength) =>
-            Vector2DImplementation.Vector2D_ToDirectionAndLengthImplementation(this, out OutDir, out OutLength);
+            Vector2DImplementation.Vector2D_ToDirectionAndLengthImplementation(GetHandle(), out OutDir, out OutLength);
 
         public Boolean IsZero() =>
-            Vector2DImplementation.Vector2D_IsZeroImplementation(this);
+            Vector2DImplementation.Vector2D_IsZeroImplementation(GetHandle());
 
         public FIntPoint IntPoint()
         {
-            Vector2DImplementation.Vector2D_IntPointImplementation(this, out var OutValue);
+            Vector2DImplementation.Vector2D_IntPointImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FVector2D RoundToVector()
         {
-            Vector2DImplementation.Vector2D_RoundToVectorImplementation(this, out var OutValue);
+            Vector2DImplementation.Vector2D_RoundToVectorImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FVector2D ClampAxes(LwcType MinAxisVal, LwcType MaxAxisVal)
         {
-            Vector2DImplementation.Vector2D_ClampAxesImplementation(this, MinAxisVal, MaxAxisVal, out var OutValue);
+            Vector2DImplementation.Vector2D_ClampAxesImplementation(GetHandle(), MinAxisVal, MaxAxisVal,
+                out var OutValue);
 
             return OutValue;
         }
 
         public FVector2D GetSignVector()
         {
-            Vector2DImplementation.Vector2D_GetSignVectorImplementation(this, out var OutValue);
+            Vector2DImplementation.Vector2D_GetSignVectorImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FVector2D GetAbs()
         {
-            Vector2DImplementation.Vector2D_GetAbsImplementation(this, out var OutValue);
+            Vector2DImplementation.Vector2D_GetAbsImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public override string ToString()
         {
-            Vector2DImplementation.Vector2D_ToStringImplementation(this, out var OutValue);
+            Vector2DImplementation.Vector2D_ToStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue.ToString();
         }
 
         public Boolean InitFromString(FString InSourceString) =>
-            Vector2DImplementation.Vector2D_InitFromStringImplementation(this, InSourceString);
+            Vector2DImplementation.Vector2D_InitFromStringImplementation(GetHandle(), InSourceString);
 
         public Boolean ContainsNaN() =>
-            Vector2DImplementation.Vector2D_ContainsNaNImplementation(this);
+            Vector2DImplementation.Vector2D_ContainsNaNImplementation(GetHandle());
 
         public FVector SphericalToUnitCartesian()
         {
-            Vector2DImplementation.Vector2D_SphericalToUnitCartesianImplementation(this, out var OutValue);
+            Vector2DImplementation.Vector2D_SphericalToUnitCartesianImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }

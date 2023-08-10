@@ -3,13 +3,13 @@ using Script.Library;
 
 namespace Script.Common
 {
-    public class TSoftClassPtr<T> where T : UObject
+    public class TSoftClassPtr<T> : IGCHandle where T : UObject
     {
         public TSoftClassPtr()
         {
         }
 
-        ~TSoftClassPtr() => SoftClassPtrImplementation.SoftClassPtr_UnRegisterImplementation(this);
+        ~TSoftClassPtr() => SoftClassPtrImplementation.SoftClassPtr_UnRegisterImplementation(GetHandle());
 
         public TSoftClassPtr(UClass InClass) =>
             SoftClassPtrImplementation.SoftClassPtr_RegisterImplementation(this, InClass);
@@ -18,9 +18,21 @@ namespace Script.Common
 
         public UClass Get()
         {
-            SoftClassPtrImplementation.SoftClassPtr_GetImplementation(this, out var OutValue);
+            SoftClassPtrImplementation.SoftClassPtr_GetImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
+
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new System.IntPtr(InGCHandle);
+        }
+
+        public System.IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private System.IntPtr GCHandle;
     }
 }

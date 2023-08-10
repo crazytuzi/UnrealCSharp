@@ -4,9 +4,10 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 
 template <typename T, typename U>
-auto TIntervalImplementation<T, U>::Interval_SizeImplementation(const MonoObject* InMonoObject)
+auto TIntervalImplementation<T, U>::Interval_SizeImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Interval != nullptr)
 	{
@@ -17,9 +18,10 @@ auto TIntervalImplementation<T, U>::Interval_SizeImplementation(const MonoObject
 }
 
 template <typename T, typename U>
-auto TIntervalImplementation<T, U>::Interval_IsValidImplementation(const MonoObject* InMonoObject)
+auto TIntervalImplementation<T, U>::Interval_IsValidImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Interval != nullptr)
 	{
@@ -30,9 +32,10 @@ auto TIntervalImplementation<T, U>::Interval_IsValidImplementation(const MonoObj
 }
 
 template <typename T, typename U>
-auto TIntervalImplementation<T, U>::Interval_ContainsImplementation(const MonoObject* InMonoObject, const U Element)
+auto TIntervalImplementation<T, U>::Interval_ContainsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const U Element)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Interval != nullptr)
 	{
@@ -43,9 +46,10 @@ auto TIntervalImplementation<T, U>::Interval_ContainsImplementation(const MonoOb
 }
 
 template <typename T, typename U>
-auto TIntervalImplementation<T, U>::Interval_ExpandImplementation(const MonoObject* InMonoObject, const U ExpandAmount)
+auto TIntervalImplementation<T, U>::Interval_ExpandImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const U ExpandAmount)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Interval != nullptr)
 	{
@@ -54,9 +58,10 @@ auto TIntervalImplementation<T, U>::Interval_ExpandImplementation(const MonoObje
 }
 
 template <typename T, typename U>
-auto TIntervalImplementation<T, U>::Interval_IncludeImplementation(const MonoObject* InMonoObject, const U X)
+auto TIntervalImplementation<T, U>::Interval_IncludeImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const U X)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Interval != nullptr)
 	{
@@ -65,10 +70,10 @@ auto TIntervalImplementation<T, U>::Interval_IncludeImplementation(const MonoObj
 }
 
 template <typename T, typename U>
-auto TIntervalImplementation<T, U>::Interval_InterpolateImplementation(const MonoObject* InMonoObject,
-                                                                       const float Alpha)
+auto TIntervalImplementation<T, U>::Interval_InterpolateImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float Alpha)
 {
-	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Interval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Interval != nullptr)
 	{
@@ -79,7 +84,8 @@ auto TIntervalImplementation<T, U>::Interval_InterpolateImplementation(const Mon
 }
 
 template <typename T, typename U>
-auto TIntervalImplementation<T, U>::Interval_IntersectImplementation(const MonoObject* A, const MonoObject* B,
+auto TIntervalImplementation<T, U>::Interval_IntersectImplementation(const FGarbageCollectionHandle A,
+                                                                     const FGarbageCollectionHandle B,
                                                                      MonoObject** OutValue)
 {
 	const auto IntervalA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);

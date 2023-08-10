@@ -58,8 +58,8 @@ struct FRegisterVector2D
 
 static FRegisterVector2D RegisterVector2D;
 
-void FVector2DImplementation::Vector2D_AddImplementation(const MonoObject* A, const MonoObject* B,
-                                                         MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_AddImplementation(const FGarbageCollectionHandle A,
+                                                         const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -79,8 +79,8 @@ void FVector2DImplementation::Vector2D_AddImplementation(const MonoObject* A, co
 	}
 }
 
-void FVector2DImplementation::Vector2D_SubtractImplementation(const MonoObject* A, const MonoObject* B,
-                                                              MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_SubtractImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -100,10 +100,11 @@ void FVector2DImplementation::Vector2D_SubtractImplementation(const MonoObject* 
 	}
 }
 
-void FVector2DImplementation::Vector2D_MultiplyScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
-                                                                   MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_MultiplyScaleImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Scale, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -119,10 +120,11 @@ void FVector2DImplementation::Vector2D_MultiplyScaleImplementation(const MonoObj
 	}
 }
 
-void FVector2DImplementation::Vector2D_DivideScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
-                                                                 MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_DivideScaleImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Scale, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -138,10 +140,11 @@ void FVector2DImplementation::Vector2D_DivideScaleImplementation(const MonoObjec
 	}
 }
 
-void FVector2DImplementation::Vector2D_AddAImplementation(const MonoObject* InMonoObject, const LwcType A,
-                                                          MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_AddAImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                          const LwcType A, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -157,10 +160,11 @@ void FVector2DImplementation::Vector2D_AddAImplementation(const MonoObject* InMo
 	}
 }
 
-void FVector2DImplementation::Vector2D_SubtractAImplementation(const MonoObject* InMonoObject, const LwcType A,
-                                                               MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_SubtractAImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               const LwcType A, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -176,8 +180,8 @@ void FVector2DImplementation::Vector2D_SubtractAImplementation(const MonoObject*
 	}
 }
 
-void FVector2DImplementation::Vector2D_MultiplyImplementation(const MonoObject* A, const MonoObject* B,
-                                                              MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_MultiplyImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -197,8 +201,8 @@ void FVector2DImplementation::Vector2D_MultiplyImplementation(const MonoObject* 
 	}
 }
 
-void FVector2DImplementation::Vector2D_DivideImplementation(const MonoObject* A, const MonoObject* B,
-                                                            MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_DivideImplementation(const FGarbageCollectionHandle A,
+                                                            const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -219,7 +223,7 @@ void FVector2DImplementation::Vector2D_DivideImplementation(const MonoObject* A,
 }
 
 FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_DotProductImplementation(
-	const MonoObject* A, const MonoObject* B)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -234,7 +238,7 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_DotProductImp
 }
 
 FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_CrossProductImplementation(
-	const MonoObject* A, const MonoObject* B)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -248,7 +252,8 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_CrossProductI
 	return 0.f;
 }
 
-bool FVector2DImplementation::Vector2D_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FVector2DImplementation::Vector2D_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -262,7 +267,8 @@ bool FVector2DImplementation::Vector2D_EqualityImplementation(const MonoObject* 
 	return false;
 }
 
-bool FVector2DImplementation::Vector2D_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FVector2DImplementation::Vector2D_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                                const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -276,7 +282,8 @@ bool FVector2DImplementation::Vector2D_InequalityImplementation(const MonoObject
 	return false;
 }
 
-bool FVector2DImplementation::Vector2D_LessThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FVector2DImplementation::Vector2D_LessThanImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -290,7 +297,8 @@ bool FVector2DImplementation::Vector2D_LessThanImplementation(const MonoObject* 
 	return false;
 }
 
-bool FVector2DImplementation::Vector2D_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FVector2DImplementation::Vector2D_GreaterThanImplementation(const FGarbageCollectionHandle A,
+                                                                 const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -304,7 +312,8 @@ bool FVector2DImplementation::Vector2D_GreaterThanImplementation(const MonoObjec
 	return false;
 }
 
-bool FVector2DImplementation::Vector2D_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FVector2DImplementation::Vector2D_LessThanOrEqualImplementation(const FGarbageCollectionHandle A,
+                                                                     const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -318,7 +327,8 @@ bool FVector2DImplementation::Vector2D_LessThanOrEqualImplementation(const MonoO
 	return false;
 }
 
-bool FVector2DImplementation::Vector2D_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FVector2DImplementation::Vector2D_GreaterThanOrEqualImplementation(const FGarbageCollectionHandle A,
+                                                                        const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -332,9 +342,11 @@ bool FVector2DImplementation::Vector2D_GreaterThanOrEqualImplementation(const Mo
 	return false;
 }
 
-void FVector2DImplementation::Vector2D_NegatedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_NegatedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                             MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -351,9 +363,10 @@ void FVector2DImplementation::Vector2D_NegatedImplementation(const MonoObject* I
 }
 
 FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetComponentImplementation(
-	const MonoObject* InMonoObject, const int32 Index)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 Index)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -363,10 +376,11 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetComponentI
 	return 0.f;
 }
 
-void FVector2DImplementation::Vector2D_SetComponentImplementation(const MonoObject* InMonoObject, const int32 Index,
-                                                                  const LwcType InValue)
+void FVector2DImplementation::Vector2D_SetComponentImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 Index, const LwcType InValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -375,9 +389,10 @@ void FVector2DImplementation::Vector2D_SetComponentImplementation(const MonoObje
 }
 
 FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_ComponentImplementation(
-	const MonoObject* InMonoObject, const int32 Index)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 Index)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -388,7 +403,7 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_ComponentImpl
 }
 
 FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_DistSquaredImplementation(
-	const MonoObject* A, const MonoObject* B)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -403,7 +418,7 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_DistSquaredIm
 }
 
 FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_DistanceImplementation(
-	const MonoObject* A, const MonoObject* B)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -417,8 +432,8 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_DistanceImple
 	return 0.f;
 }
 
-void FVector2DImplementation::Vector2D_MaxImplementation(const MonoObject* A, const MonoObject* B,
-                                                         MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_MaxImplementation(const FGarbageCollectionHandle A,
+                                                         const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -438,8 +453,8 @@ void FVector2DImplementation::Vector2D_MaxImplementation(const MonoObject* A, co
 	}
 }
 
-void FVector2DImplementation::Vector2D_MinImplementation(const MonoObject* A, const MonoObject* B,
-                                                         MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_MinImplementation(const FGarbageCollectionHandle A,
+                                                         const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -459,8 +474,8 @@ void FVector2DImplementation::Vector2D_MinImplementation(const MonoObject* A, co
 	}
 }
 
-bool FVector2DImplementation::Vector2D_EqualsImplementation(const MonoObject* A, const MonoObject* B,
-                                                            const LwcType Tolerance)
+bool FVector2DImplementation::Vector2D_EqualsImplementation(const FGarbageCollectionHandle A,
+                                                            const FGarbageCollectionHandle B, const LwcType Tolerance)
 {
 	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
 
@@ -474,10 +489,11 @@ bool FVector2DImplementation::Vector2D_EqualsImplementation(const MonoObject* A,
 	return false;
 }
 
-void FVector2DImplementation::Vector2D_SetImplementation(const MonoObject* InMonoObject, const LwcType InX,
-                                                         const LwcType InY)
+void FVector2DImplementation::Vector2D_SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         const LwcType InX, const LwcType InY)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -485,9 +501,11 @@ void FVector2DImplementation::Vector2D_SetImplementation(const MonoObject* InMon
 	}
 }
 
-FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetMaxImplementation(const MonoObject* InMonoObject)
+FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetMaxImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -498,9 +516,10 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetMaxImpleme
 }
 
 FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetAbsMaxImplementation(
-	const MonoObject* InMonoObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -510,9 +529,11 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetAbsMaxImpl
 	return 0.f;
 }
 
-FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetMinImplementation(const MonoObject* InMonoObject)
+FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetMinImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -522,9 +543,11 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_GetMinImpleme
 	return 0.f;
 }
 
-FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_SizeImplementation(const MonoObject* InMonoObject)
+FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_SizeImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -535,9 +558,10 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_SizeImplement
 }
 
 FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_SizeSquaredImplementation(
-	const MonoObject* InMonoObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -547,10 +571,11 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_SizeSquaredIm
 	return 0.f;
 }
 
-void FVector2DImplementation::Vector2D_GetRotatedImplementation(const MonoObject* InMonoObject, const LwcType AngleDeg,
-                                                                MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_GetRotatedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType AngleDeg, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -566,10 +591,11 @@ void FVector2DImplementation::Vector2D_GetRotatedImplementation(const MonoObject
 	}
 }
 
-void FVector2DImplementation::Vector2D_GetSafeNormalImplementation(const MonoObject* InMonoObject,
-                                                                   const LwcType Tolerance, MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_GetSafeNormalImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Tolerance, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -585,9 +611,11 @@ void FVector2DImplementation::Vector2D_GetSafeNormalImplementation(const MonoObj
 	}
 }
 
-void FVector2DImplementation::Vector2D_NormalizeImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
+void FVector2DImplementation::Vector2D_NormalizeImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               const LwcType Tolerance)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -595,10 +623,11 @@ void FVector2DImplementation::Vector2D_NormalizeImplementation(const MonoObject*
 	}
 }
 
-bool FVector2DImplementation::Vector2D_IsNearlyZeroImplementation(const MonoObject* InMonoObject,
-                                                                  const LwcType Tolerance)
+bool FVector2DImplementation::Vector2D_IsNearlyZeroImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Tolerance)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -608,9 +637,11 @@ bool FVector2DImplementation::Vector2D_IsNearlyZeroImplementation(const MonoObje
 	return false;
 }
 
-void FVector2DImplementation::Vector2D_IntPointImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_IntPointImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FIntPoint, FIntPoint>::Get();
 
@@ -626,10 +657,11 @@ void FVector2DImplementation::Vector2D_IntPointImplementation(const MonoObject* 
 	}
 }
 
-void FVector2DImplementation::Vector2D_RoundToVectorImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_RoundToVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -645,10 +677,12 @@ void FVector2DImplementation::Vector2D_RoundToVectorImplementation(const MonoObj
 	}
 }
 
-void FVector2DImplementation::Vector2D_ClampAxesImplementation(const MonoObject* InMonoObject, const LwcType MinAxisVal,
-                                                               const LwcType MaxAxisVal, MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_ClampAxesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               const LwcType MinAxisVal, const LwcType MaxAxisVal,
+                                                               MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -664,10 +698,11 @@ void FVector2DImplementation::Vector2D_ClampAxesImplementation(const MonoObject*
 	}
 }
 
-void FVector2DImplementation::Vector2D_GetSignVectorImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_GetSignVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -683,9 +718,11 @@ void FVector2DImplementation::Vector2D_GetSignVectorImplementation(const MonoObj
 	}
 }
 
-void FVector2DImplementation::Vector2D_GetAbsImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_GetAbsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector2D, FVector2D>::Get();
 
@@ -701,9 +738,11 @@ void FVector2DImplementation::Vector2D_GetAbsImplementation(const MonoObject* In
 	}
 }
 
-void FVector2DImplementation::Vector2D_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FVector2DImplementation::Vector2D_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -721,10 +760,11 @@ void FVector2DImplementation::Vector2D_ToStringImplementation(const MonoObject* 
 	}
 }
 
-bool FVector2DImplementation::Vector2D_InitFromStringImplementation(const MonoObject* InMonoObject,
-                                                                    MonoObject* InSourceString)
+bool FVector2DImplementation::Vector2D_InitFromStringImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InSourceString)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr && InSourceString != nullptr)
 	{
@@ -736,9 +776,11 @@ bool FVector2DImplementation::Vector2D_InitFromStringImplementation(const MonoOb
 	return false;
 }
 
-bool FVector2DImplementation::Vector2D_ContainsNaNImplementation(const MonoObject* InMonoObject)
+bool FVector2DImplementation::Vector2D_ContainsNaNImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	if (Vector2D != nullptr)
 	{
@@ -749,9 +791,10 @@ bool FVector2DImplementation::Vector2D_ContainsNaNImplementation(const MonoObjec
 }
 
 void FVector2DImplementation::Vector2D_SphericalToUnitCartesianImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(InMonoObject);
+	const auto Vector2D = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 

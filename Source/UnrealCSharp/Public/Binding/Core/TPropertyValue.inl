@@ -473,7 +473,7 @@ struct TPropertyValue<T,
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, SrcMonoObject, InMember);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(InMember, MapHelper, SrcMonoObject);
 			}
 		}
 
@@ -549,7 +549,7 @@ struct TPropertyValue<T,
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, SrcMonoObject, InMember);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(InMember, SetHelper, SrcMonoObject);
 			}
 		}
 
@@ -661,7 +661,7 @@ struct TPropertyValue<T,
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, SrcMonoObject, InMember);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(InMember, ArrayHelper, SrcMonoObject);
 			}
 		}
 

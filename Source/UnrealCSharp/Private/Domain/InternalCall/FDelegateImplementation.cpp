@@ -29,25 +29,29 @@ void FDelegateImplementation::Delegate_RegisterImplementation(MonoObject* InMono
 	FCSharpBind::Bind<FDelegateHelper>(InMonoObject);
 }
 
-void FDelegateImplementation::Delegate_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FDelegateImplementation::Delegate_UnRegisterImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InGarbageCollectionHandle);
 	});
 }
 
-void FDelegateImplementation::Delegate_BindImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate)
+void FDelegateImplementation::Delegate_BindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                          MonoObject* InDelegate)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InMonoObject))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+		InGarbageCollectionHandle))
 	{
 		DelegateHelper->Bind(InDelegate);
 	}
 }
 
-bool FDelegateImplementation::Delegate_IsBoundImplementation(const MonoObject* InMonoObject)
+bool FDelegateImplementation::Delegate_IsBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InMonoObject))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+		InGarbageCollectionHandle))
 	{
 		return DelegateHelper->IsBound();
 	}
@@ -55,26 +59,30 @@ bool FDelegateImplementation::Delegate_IsBoundImplementation(const MonoObject* I
 	return false;
 }
 
-void FDelegateImplementation::Delegate_UnBindImplementation(const MonoObject* InMonoObject)
+void FDelegateImplementation::Delegate_UnBindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InMonoObject))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+		InGarbageCollectionHandle))
 	{
 		DelegateHelper->UnBind();
 	}
 }
 
-void FDelegateImplementation::Delegate_ClearImplementation(const MonoObject* InMonoObject)
+void FDelegateImplementation::Delegate_ClearImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InMonoObject))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+		InGarbageCollectionHandle))
 	{
 		DelegateHelper->Clear();
 	}
 }
 
-void FDelegateImplementation::Delegate_ExecuteImplementation(const MonoObject* InMonoObject, MonoObject** ReturnValue,
-                                                             MonoObject** OutValue, MonoArray* InValue)
+void FDelegateImplementation::Delegate_ExecuteImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                             MonoObject** ReturnValue, MonoObject** OutValue,
+                                                             MonoArray* InValue)
 {
-	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InMonoObject))
+	if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+		InGarbageCollectionHandle))
 	{
 		DelegateHelper->Execute(ReturnValue, OutValue, InValue);
 	}

@@ -260,7 +260,7 @@ bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 
 	const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(nullptr, MapHelper, InMonoObject);
 
 	return true;
 }

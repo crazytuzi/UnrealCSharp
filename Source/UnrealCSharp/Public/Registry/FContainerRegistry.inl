@@ -18,23 +18,15 @@ static uint32 GetTypeHash(const FContainerAddress& InContainerAddress)
 }
 
 template <typename T>
-auto FContainerRegistry::GetContainer(const MonoObject* InMonoObject)
+auto FContainerRegistry::GetContainer(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	const auto FoundContainerAddress = GarbageCollectionHandle2ContainerAddress.Find(InMonoObject);
+	const auto FoundContainerAddress = GarbageCollectionHandle2ContainerAddress.Find(InGarbageCollectionHandle);
 
 	return FoundContainerAddress != nullptr ? static_cast<T*>(FoundContainerAddress->ContainerHelper) : nullptr;
 }
 
 template <typename T>
-auto FContainerRegistry::GetContainer(const void* InAddress)
+auto FContainerRegistry::GetContainer(const MonoObject* InMonoObject)
 {
-	for (const auto& Pair : ContainerAddress2GarbageCollectionHandle)
-	{
-		if (Pair.Key == InAddress)
-		{
-			return static_cast<T*>(Pair.Key.ContainerHelper);
-		}
-	}
-
-	return static_cast<T*>(nullptr);
+	return GetContainer<T>(MonoObject2GarbageCollectionHandleMap[InMonoObject]);
 }

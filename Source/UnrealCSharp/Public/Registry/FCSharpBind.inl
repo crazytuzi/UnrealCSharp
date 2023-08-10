@@ -24,7 +24,7 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 
 	const auto ContainerHelper = new T(Property);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(nullptr, ContainerHelper, InMonoObject);
 
 	return true;
 }

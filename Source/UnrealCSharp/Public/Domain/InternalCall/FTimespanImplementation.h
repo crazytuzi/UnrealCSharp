@@ -1,69 +1,80 @@
 ﻿#pragma once
 
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "mono/metadata/object-forward.h"
 
 class FTimespanImplementation
 {
 public:
-	static void Timespan_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
+	static void Timespan_AddImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+	                                       MonoObject** OutValue);
 
-	static void Timespan_NegatedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Timespan_NegatedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                           MonoObject** OutValue);
 
-	static void Timespan_SubtractImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
+	static void Timespan_SubtractImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+	                                            MonoObject** OutValue);
 
-	static void Timespan_MultiplyImplementation(const MonoObject* InMonoObject, double Scalar, MonoObject** OutValue);
+	static void Timespan_MultiplyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, double Scalar,
+	                                            MonoObject** OutValue);
 
-	static void Timespan_DivideImplementation(const MonoObject* InMonoObject, double Scalar, MonoObject** OutValue);
+	static void Timespan_DivideImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, double Scalar,
+	                                          MonoObject** OutValue);
 
-	static void Timespan_RemainderImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
+	static void Timespan_RemainderImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+	                                             MonoObject** OutValue);
 
-	static bool Timespan_EqualityImplementation(const MonoObject* A, const MonoObject* B);
+	static bool Timespan_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static bool Timespan_InequalityImplementation(const MonoObject* A, const MonoObject* B);
+	static bool Timespan_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static bool Timespan_GreaterThanImplementation(const MonoObject* A, const MonoObject* B);
+	static bool Timespan_GreaterThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static bool Timespan_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B);
+	static bool Timespan_GreaterThanOrEqualImplementation(const FGarbageCollectionHandle A,
+	                                                      const FGarbageCollectionHandle B);
 
-	static bool Timespan_LessThanImplementation(const MonoObject* A, const MonoObject* B);
+	static bool Timespan_LessThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static bool Timespan_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B);
+	static bool Timespan_LessThanOrEqualImplementation(const FGarbageCollectionHandle A,
+	                                                   const FGarbageCollectionHandle B);
 
-	static int32 Timespan_GetDaysImplementation(const MonoObject* InMonoObject);
+	static int32 Timespan_GetDaysImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Timespan_GetDurationImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Timespan_GetDurationImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                               MonoObject** OutValue);
 
-	static int32 Timespan_GetFractionMicroImplementation(const MonoObject* InMonoObject);
+	static int32 Timespan_GetFractionMicroImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static int32 Timespan_GetFractionMilliImplementation(const MonoObject* InMonoObject);
+	static int32 Timespan_GetFractionMilliImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static int32 Timespan_GetFractionNanoImplementation(const MonoObject* InMonoObject);
+	static int32 Timespan_GetFractionNanoImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static int32 Timespan_GetFractionTicksImplementation(const MonoObject* InMonoObject);
+	static int32 Timespan_GetFractionTicksImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static int32 Timespan_GetHoursImplementation(const MonoObject* InMonoObject);
+	static int32 Timespan_GetHoursImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static int32 Timespan_GetMinutesImplementation(const MonoObject* InMonoObject);
+	static int32 Timespan_GetMinutesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static int32 Timespan_GetSecondsImplementation(const MonoObject* InMonoObject);
+	static int32 Timespan_GetSecondsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static int64 Timespan_GetTicksImplementation(const MonoObject* InMonoObject);
+	static int64 Timespan_GetTicksImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static double Timespan_GetTotalDaysImplementation(const MonoObject* InMonoObject);
+	static double Timespan_GetTotalDaysImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static double Timespan_GetTotalHoursImplementation(const MonoObject* InMonoObject);
+	static double Timespan_GetTotalHoursImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static double Timespan_GetTotalMicrosecondsImplementation(const MonoObject* InMonoObject);
+	static double Timespan_GetTotalMicrosecondsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static double Timespan_GetTotalMillisecondsImplementation(const MonoObject* InMonoObject);
+	static double Timespan_GetTotalMillisecondsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static double Timespan_GetTotalMinutesImplementation(const MonoObject* InMonoObject);
+	static double Timespan_GetTotalMinutesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static double Timespan_GetTotalSecondsImplementation(const MonoObject* InMonoObject);
+	static double Timespan_GetTotalSecondsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static bool Timespan_IsZeroImplementation(const MonoObject* InMonoObject);
+	static bool Timespan_IsZeroImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Timespan_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Timespan_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                            MonoObject** OutValue);
 
 	static void Timespan_FromDaysImplementation(double Days, MonoObject** OutValue);
 

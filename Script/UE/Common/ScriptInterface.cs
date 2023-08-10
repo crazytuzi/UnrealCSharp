@@ -3,13 +3,13 @@ using Script.Library;
 
 namespace Script.Common
 {
-    public class TScriptInterface<T> where T : IInterface
+    public class TScriptInterface<T> : IGCHandle where T : IInterface
     {
         public TScriptInterface()
         {
         }
 
-        ~TScriptInterface() => ScriptInterfaceImplementation.ScriptInterface_UnRegisterImplementation(this);
+        ~TScriptInterface() => ScriptInterfaceImplementation.ScriptInterface_UnRegisterImplementation(GetHandle());
 
         public TScriptInterface(T InObject) =>
             ScriptInterfaceImplementation.ScriptInterface_RegisterImplementation(this, InObject,
@@ -19,9 +19,21 @@ namespace Script.Common
 
         public U GetObject<U>() where U : UObject
         {
-            ScriptInterfaceImplementation.ScriptInterface_GetObjectImplementation<T, U>(this, out var OutValue);
+            ScriptInterfaceImplementation.ScriptInterface_GetObjectImplementation<U>(GetHandle(), out var OutValue);
 
             return OutValue;
         }
+
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new System.IntPtr(InGCHandle);
+        }
+
+        public System.IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private System.IntPtr GCHandle;
     }
 }

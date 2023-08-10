@@ -21,7 +21,8 @@ struct FRegisterAssetBundleData
 
 static FRegisterAssetBundleData RegisterAssetBundleData;
 
-bool FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto AssetBundleDataA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(A);
 
@@ -35,7 +36,8 @@ bool FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation(cons
 	return false;
 }
 
-bool FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto AssetBundleDataA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(A);
 
@@ -50,10 +52,10 @@ bool FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation(co
 }
 
 void FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation(
-	const MonoObject* InMonoObject, MonoObject* SearchName, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* SearchName, MonoObject** OutValue)
 {
 	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FAssetBundleData>(InMonoObject);
+		UScriptStruct, FAssetBundleData>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FAssetBundleEntry, FAssetBundleEntry>::Get();
 
@@ -73,13 +75,13 @@ void FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation(
 }
 
 void FAssetBundleDataImplementation::AssetBundleData_AddBundleAssetImplementation(
-	const MonoObject* InMonoObject, MonoObject* BundleName, const MonoObject* AssetPath)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* BundleName, const MonoObject* AssetPath)
 {
 	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FAssetBundleData>(InMonoObject);
+		UScriptStruct, FAssetBundleData>(InGarbageCollectionHandle);
 
 	const auto SoftObjectPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftObjectPath>(InMonoObject);
+		UScriptStruct, FSoftObjectPath>(InGarbageCollectionHandle);
 
 	if (AssetBundleData != nullptr && SoftObjectPath != nullptr)
 	{
@@ -90,10 +92,11 @@ void FAssetBundleDataImplementation::AssetBundleData_AddBundleAssetImplementatio
 	}
 }
 
-void FAssetBundleDataImplementation::AssetBundleData_ResetImplementation(const MonoObject* InMonoObject)
+void FAssetBundleDataImplementation::AssetBundleData_ResetImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FAssetBundleData>(InMonoObject);
+		UScriptStruct, FAssetBundleData>(InGarbageCollectionHandle);
 
 	if (AssetBundleData != nullptr)
 	{
@@ -102,10 +105,10 @@ void FAssetBundleDataImplementation::AssetBundleData_ResetImplementation(const M
 }
 
 void FAssetBundleDataImplementation::AssetBundleData_ToDebugStringImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto AssetBundleData = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FAssetBundleData>(InMonoObject);
+		UScriptStruct, FAssetBundleData>(InGarbageCollectionHandle);
 
 	if (AssetBundleData != nullptr)
 	{

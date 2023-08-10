@@ -32,11 +32,11 @@ struct FRegisterRandomStream
 
 static FRegisterRandomStream RegisterRandomStream;
 
-void FRandomStreamImplementation::RandomStream_InitializeImplementation(const MonoObject* InMonoObject,
-                                                                        const int32 InSeed)
+void FRandomStreamImplementation::RandomStream_InitializeImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 InSeed)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -45,10 +45,10 @@ void FRandomStreamImplementation::RandomStream_InitializeImplementation(const Mo
 }
 
 void FRandomStreamImplementation::RandomStream_InitializeNameImplementation(
-	const MonoObject* InMonoObject, MonoObject* InName)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InName)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -58,10 +58,11 @@ void FRandomStreamImplementation::RandomStream_InitializeNameImplementation(
 	}
 }
 
-void FRandomStreamImplementation::RandomStream_ResetImplementation(const MonoObject* InMonoObject)
+void FRandomStreamImplementation::RandomStream_ResetImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -69,10 +70,11 @@ void FRandomStreamImplementation::RandomStream_ResetImplementation(const MonoObj
 	}
 }
 
-int32 FRandomStreamImplementation::RandomStream_GetInitialSeedImplementation(const MonoObject* InMonoObject)
+int32 FRandomStreamImplementation::RandomStream_GetInitialSeedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -82,10 +84,11 @@ int32 FRandomStreamImplementation::RandomStream_GetInitialSeedImplementation(con
 	return 0;
 }
 
-void FRandomStreamImplementation::RandomStream_GenerateNewSeedImplementation(const MonoObject* InMonoObject)
+void FRandomStreamImplementation::RandomStream_GenerateNewSeedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -93,10 +96,11 @@ void FRandomStreamImplementation::RandomStream_GenerateNewSeedImplementation(con
 	}
 }
 
-float FRandomStreamImplementation::RandomStream_GetFractionImplementation(const MonoObject* InMonoObject)
+float FRandomStreamImplementation::RandomStream_GetFractionImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -106,10 +110,11 @@ float FRandomStreamImplementation::RandomStream_GetFractionImplementation(const 
 	return 0.f;
 }
 
-uint32 FRandomStreamImplementation::RandomStream_GetUnsignedIntImplementation(const MonoObject* InMonoObject)
+uint32 FRandomStreamImplementation::RandomStream_GetUnsignedIntImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -120,10 +125,10 @@ uint32 FRandomStreamImplementation::RandomStream_GetUnsignedIntImplementation(co
 }
 
 void FRandomStreamImplementation::RandomStream_GetUnitVectorImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -139,10 +144,11 @@ void FRandomStreamImplementation::RandomStream_GetUnitVectorImplementation(
 	}
 }
 
-int32 FRandomStreamImplementation::RandomStream_GetCurrentSeedImplementation(const MonoObject* InMonoObject)
+int32 FRandomStreamImplementation::RandomStream_GetCurrentSeedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -152,10 +158,11 @@ int32 FRandomStreamImplementation::RandomStream_GetCurrentSeedImplementation(con
 	return 0;
 }
 
-float FRandomStreamImplementation::RandomStream_FRandImplementation(const MonoObject* InMonoObject)
+float FRandomStreamImplementation::RandomStream_FRandImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -165,10 +172,11 @@ float FRandomStreamImplementation::RandomStream_FRandImplementation(const MonoOb
 	return 0.f;
 }
 
-int32 FRandomStreamImplementation::RandomStream_RandHelperImplementation(const MonoObject* InMonoObject, const int32 A)
+int32 FRandomStreamImplementation::RandomStream_RandHelperImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 A)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -178,11 +186,11 @@ int32 FRandomStreamImplementation::RandomStream_RandHelperImplementation(const M
 	return 0;
 }
 
-int32 FRandomStreamImplementation::RandomStream_RandRangeImplementation(const MonoObject* InMonoObject, const int32 Min,
-                                                                        const int32 Max)
+int32 FRandomStreamImplementation::RandomStream_RandRangeImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 Min, const int32 Max)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -193,10 +201,10 @@ int32 FRandomStreamImplementation::RandomStream_RandRangeImplementation(const Mo
 }
 
 float FRandomStreamImplementation::RandomStream_FRandRangeImplementation(
-	const MonoObject* InMonoObject, const float InMin, const float InMax)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float InMin, const float InMax)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{
@@ -206,11 +214,11 @@ float FRandomStreamImplementation::RandomStream_FRandRangeImplementation(
 	return 0.f;
 }
 
-void FRandomStreamImplementation::RandomStream_VRandImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FRandomStreamImplementation::RandomStream_VRandImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -227,10 +235,11 @@ void FRandomStreamImplementation::RandomStream_VRandImplementation(const MonoObj
 }
 
 void FRandomStreamImplementation::RandomStream_VRandConeHalfAngleImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Dir, const float ConeHalfAngleRad, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Dir, const float ConeHalfAngleRad,
+	MonoObject** OutValue)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Dir);
 
@@ -249,11 +258,11 @@ void FRandomStreamImplementation::RandomStream_VRandConeHalfAngleImplementation(
 }
 
 void FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHalfAngleImplementation(
-	const MonoObject* InMonoObject, const MonoObject* Dir, const float HorizontalConeHalfAngleRad,
-	const float VerticalConeHalfAngleRad, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Dir,
+	const float HorizontalConeHalfAngleRad, const float VerticalConeHalfAngleRad, MonoObject** OutValue)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Dir);
 
@@ -271,11 +280,11 @@ void FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHal
 	}
 }
 
-void FRandomStreamImplementation::RandomStream_ToStringImplementation(const MonoObject* InMonoObject,
-                                                                      MonoObject** OutValue)
+void FRandomStreamImplementation::RandomStream_ToStringImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto RandomStream = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FRandomStream>(InMonoObject);
+		UScriptStruct, FRandomStream>(InGarbageCollectionHandle);
 
 	if (RandomStream != nullptr)
 	{

@@ -7,17 +7,17 @@ namespace Script.CoreUObject
     public partial class FColor
     {
         public UInt32 DWColor() =>
-            ColorImplementation.Color_DWColorImplementation(this);
+            ColorImplementation.Color_DWColorImplementation(GetHandle());
 
         public static Boolean operator ==(FColor A, FColor B) =>
-            ColorImplementation.Color_EqualityImplementation(A, B);
+            ColorImplementation.Color_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FColor A, FColor B) =>
-            ColorImplementation.Color_InequalityImplementation(A, B);
+            ColorImplementation.Color_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public FLinearColor FromRGBE()
         {
-            ColorImplementation.Color_FromRGBEImplementation(this, out var OutValue);
+            ColorImplementation.Color_FromRGBEImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
@@ -52,45 +52,45 @@ namespace Script.CoreUObject
 
         public FColor WithAlpha(SByte Alpha)
         {
-            ColorImplementation.Color_WithAlphaImplementation(this, Alpha, out var OutValue);
+            ColorImplementation.Color_WithAlphaImplementation(GetHandle(), Alpha, out var OutValue);
 
             return OutValue;
         }
 
         public FLinearColor ReinterpretAsLinear()
         {
-            ColorImplementation.Color_ReinterpretAsLinearImplementation(this, out var OutValue);
+            ColorImplementation.Color_ReinterpretAsLinearImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FString ToHex()
         {
-            ColorImplementation.Color_ToHexImplementation(this, out var OutValue);
+            ColorImplementation.Color_ToHexImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public override string ToString()
         {
-            ColorImplementation.Color_ToStringImplementation(this, out var OutValue);
+            ColorImplementation.Color_ToStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue.ToString();
         }
 
         public Boolean InitFromString(FString InSourceString) =>
-            ColorImplementation.Color_InitFromStringImplementation(this, InSourceString);
+            ColorImplementation.Color_InitFromStringImplementation(GetHandle(), InSourceString);
 
         public UInt32 ToPackedARGB() =>
-            ColorImplementation.Color_ToPackedARGBImplementation(this);
+            ColorImplementation.Color_ToPackedARGBImplementation(GetHandle());
 
         public UInt32 ToPackedABGR() =>
-            ColorImplementation.Color_ToPackedABGRImplementation(this);
+            ColorImplementation.Color_ToPackedABGRImplementation(GetHandle());
 
         public UInt32 ToPackedRGBA() =>
-            ColorImplementation.Color_ToPackedRGBAImplementation(this);
+            ColorImplementation.Color_ToPackedRGBAImplementation(GetHandle());
 
         public UInt32 ToPackedBGRA() =>
-            ColorImplementation.Color_ToPackedBGRAImplementation(this);
+            ColorImplementation.Color_ToPackedBGRAImplementation(GetHandle());
     }
 }

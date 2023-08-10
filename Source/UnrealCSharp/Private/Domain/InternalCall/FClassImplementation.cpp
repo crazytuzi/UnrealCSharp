@@ -20,10 +20,10 @@ struct FRegisterUClass
 
 static FRegisterUClass RegisterUClass;
 
-void FClassImplementation::Class_GetDefaultObjectImplementation(const MonoObject* InMonoObject,
-                                                                const bool bCreateIfNeeded, MonoObject** OutValue)
+void FClassImplementation::Class_GetDefaultObjectImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const bool bCreateIfNeeded, MonoObject** OutValue)
 {
-	if (const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InMonoObject))
+	if (const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InGarbageCollectionHandle))
 	{
 		const auto Object = FoundClass->GetDefaultObject(bCreateIfNeeded);
 

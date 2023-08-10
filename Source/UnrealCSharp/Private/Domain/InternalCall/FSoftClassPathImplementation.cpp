@@ -9,15 +9,15 @@ struct FRegisterSoftClassPath
 	FRegisterSoftClassPath()
 	{
 		TReflectionClassBuilder<FSoftClassPath>(NAMESPACE_LIBRARY)
-			.Function("GetOrCreateIDForObject",
-			          FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForObjectImplementation)
+			.Function("GetOrCreateIDForClass",
+			          FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForClassImplementation)
 			.Register();
 	}
 };
 
 static FRegisterSoftClassPath RegisterSoftClassPath;
 
-void FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForObjectImplementation(
+void FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForClassImplementation(
 	const MonoObject* InMonoObject, MonoObject** OutValue)
 {
 	const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InMonoObject);

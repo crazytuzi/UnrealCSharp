@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Common;
-using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class AssetBundleEntryImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean AssetBundleEntry_IsValidImplementation(FAssetBundleEntry InAssetBundleEntry);
+        public static extern Boolean AssetBundleEntry_IsValidImplementation(IntPtr InAssetBundleEntry);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean AssetBundleEntry_EqualityImplementation(FAssetBundleEntry A, FAssetBundleEntry B);
+        public static extern Boolean AssetBundleEntry_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean
-            AssetBundleEntry_InequalityImplementation(FAssetBundleEntry A, FAssetBundleEntry B);
+            AssetBundleEntry_InequalityImplementation(IntPtr A, IntPtr B);
     }
 }

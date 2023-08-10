@@ -29,7 +29,7 @@ public:
 
 	bool operator==(const TGarbageCollectionHandle& Other) const
 	{
-		return static_cast<MonoObject*>(*this) == static_cast<MonoObject*>(Other);
+		return Handle == Other.Handle;
 	}
 
 	bool operator!=(const TGarbageCollectionHandle& Other) const

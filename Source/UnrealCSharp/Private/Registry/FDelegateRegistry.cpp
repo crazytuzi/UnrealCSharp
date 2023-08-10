@@ -33,16 +33,17 @@ void FDelegateRegistry::Deinitialize()
 	GarbageCollectionHandle2DelegateAddress.Empty();
 
 	DelegateAddress2GarbageCollectionHandle.Empty();
+
+	Address2GarbageCollectionHandle.Empty();
+
+	MonoObject2GarbageCollectionHandleMap.Empty();
 }
 
 MonoObject* FDelegateRegistry::GetObject(const void* InAddress)
 {
-	for (const auto& Pair : DelegateAddress2GarbageCollectionHandle)
+	if (const auto GarbageCollectionHandle = Address2GarbageCollectionHandle.Find(InAddress))
 	{
-		if (Pair.Key == InAddress)
-		{
-			return Pair.Value;
-		}
+		return *GarbageCollectionHandle;
 	}
 
 	return nullptr;
@@ -50,15 +51,19 @@ MonoObject* FDelegateRegistry::GetObject(const void* InAddress)
 
 bool FDelegateRegistry::AddReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, false);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-	DelegateAddress2GarbageCollectionHandle.Emplace(
+	DelegateAddress2GarbageCollectionHandle.Add(
 		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2DelegateAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                FDelegateAddress{
-		                                                InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
-	                                                });
+	Address2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2DelegateAddress.Add(GarbageCollectionHandle,
+	                                            FDelegateAddress{
+		                                            InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
+	                                            });
+
+	MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
 
 	return true;
 }
@@ -66,23 +71,29 @@ bool FDelegateRegistry::AddReference(void* InAddress, void* InDelegate, MonoObje
 bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
                                      MonoObject* InMonoObject)
 {
-	auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, false);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
 
-	DelegateAddress2GarbageCollectionHandle.Emplace(
+	DelegateAddress2GarbageCollectionHandle.Add(
 		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
 
-	GarbageCollectionHandle2DelegateAddress.Emplace(MoveTemp(GarbageCollectionHandle),
-	                                                FDelegateAddress{
-		                                                InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
-	                                                });
+	Address2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2DelegateAddress.Add(GarbageCollectionHandle,
+	                                            FDelegateAddress{
+		                                            InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
+	                                            });
+
+	MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
 
 	return FCSharpEnvironment::GetEnvironment().AddReference(InOwner, new FDelegateReference(GarbageCollectionHandle));
 }
 
-bool FDelegateRegistry::RemoveReference(const MonoObject* InMonoObject)
+bool FDelegateRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	if (const auto& FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InMonoObject))
+	if (const auto& FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InGarbageCollectionHandle))
 	{
+		Address2GarbageCollectionHandle.Remove(FoundDelegateAddress->Address);
+
 		if (FoundDelegateAddress->DelegateBaseHelper != nullptr)
 		{
 			delete FoundDelegateAddress->DelegateBaseHelper;
@@ -92,7 +103,7 @@ bool FDelegateRegistry::RemoveReference(const MonoObject* InMonoObject)
 
 		DelegateAddress2GarbageCollectionHandle.Remove(*FoundDelegateAddress);
 
-		GarbageCollectionHandle2DelegateAddress.Remove(InMonoObject);
+		GarbageCollectionHandle2DelegateAddress.Remove(InGarbageCollectionHandle);
 
 		return true;
 	}

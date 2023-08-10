@@ -13,6 +13,6 @@ namespace Script.Library
         public static extern void Struct_RegisterImplementation(Object InMonoObject, string InStructName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Struct_UnRegisterImplementation(Object InMonoObject);
+        public static extern void Struct_UnRegisterImplementation(IntPtr InMonoObject);
     }
 }

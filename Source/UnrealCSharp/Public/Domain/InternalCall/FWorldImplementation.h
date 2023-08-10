@@ -1,10 +1,12 @@
 ﻿#pragma once
 
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "mono/metadata/object.h"
 
 class FWorldImplementation
 {
 public:
-	static void World_SpawnActorImplementation(const MonoObject* InMonoObject, const MonoObject* Class,
-	                                           const MonoObject* Transform, MonoObject** OutValue);
+	static void World_SpawnActorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                           const FGarbageCollectionHandle Class, const MonoObject* Transform,
+	                                           MonoObject** OutValue);
 };

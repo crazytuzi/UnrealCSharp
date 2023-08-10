@@ -61,7 +61,7 @@ MonoObject* FSetPropertyDescriptor::Object_New(void* InAddress) const
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, SetHelper, Object);
 		}
 	}
 

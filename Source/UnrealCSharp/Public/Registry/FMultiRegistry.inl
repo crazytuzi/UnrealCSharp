@@ -16,11 +16,17 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 		Address2GarbageCollectionHandleMember
 	>
 {
-	static typename AddressResult::Type* GetMulti(Class* InRegistry, const MonoObject* InMonoObject)
+	static typename AddressResult::Type* GetMulti(Class* InRegistry,
+	                                              const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
-		const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(InMonoObject);
+		const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(InGarbageCollectionHandle);
 
 		return FoundAddress != nullptr ? static_cast<typename AddressResult::Type*>(FoundAddress->MultiValue) : nullptr;
+	}
+
+	static typename AddressResult::Type* GetMulti(Class* InRegistry, const MonoObject* InMonoObject)
+	{
+		return GetMulti(InRegistry, InRegistry->MonoObject2GarbageCollectionHandleMap[InMonoObject]);
 	}
 
 	static MonoObject* GetObject(Class* InRegistry, const void* InAddress)
@@ -34,20 +40,23 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 
 	static bool AddReference(Class* InRegistry, MonoObject* InMonoObject, void* InValue, bool bNeedFree = true)
 	{
-		auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-		(InRegistry->*Address2GarbageCollectionHandleMember).Emplace(InValue, GarbageCollectionHandle);
+		(InRegistry->*Address2GarbageCollectionHandleMember).Add(InValue, GarbageCollectionHandle);
 
-		(InRegistry->*GarbageCollectionHandle2AddressMember).Emplace(
-			MoveTemp(GarbageCollectionHandle),
+		(InRegistry->*GarbageCollectionHandle2AddressMember).Add(
+			GarbageCollectionHandle,
 			AddressResult{nullptr, static_cast<typename AddressResult::Type*>(InValue), bNeedFree});
+
+		InRegistry->MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
 
 		return true;
 	}
 
-	static bool RemoveReference(Class* InRegistry, const MonoObject* InMonoObject)
+	static bool RemoveReference(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
-		if (const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(InMonoObject))
+		if (const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2AddressMember).Find(
+			InGarbageCollectionHandle))
 		{
 			(InRegistry->*Address2GarbageCollectionHandleMember).Remove(FoundAddress->Address);
 
@@ -58,7 +67,9 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 				FoundAddress->Address = nullptr;
 			}
 
-			(InRegistry->*GarbageCollectionHandle2AddressMember).Remove(InMonoObject);
+			InRegistry->MonoObject2GarbageCollectionHandleMap.Remove(InGarbageCollectionHandle);
+
+			(InRegistry->*GarbageCollectionHandle2AddressMember).Remove(InGarbageCollectionHandle);
 
 			return true;
 		}

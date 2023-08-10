@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "UEVersion.h"
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "mono/metadata/object-forward.h"
 
 class FMatrixImplementation
@@ -12,114 +13,140 @@ class FMatrixImplementation
 #endif
 
 public:
-	static LwcType Matrix_GetMImplementation(const MonoObject* InMonoObject, uint32 InRow, uint32 InColumn);
+	static LwcType Matrix_GetMImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, uint32 InRow,
+	                                         uint32 InColumn);
 
-	static void Matrix_SetMImplementation(const MonoObject* InMonoObject, uint32 InRow, uint32 InColumn,
-	                                      LwcType InValue);
+	static void Matrix_SetMImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, uint32 InRow,
+	                                      uint32 InColumn, LwcType InValue);
 
-	static void Matrix_SetIdentityImplementation(const MonoObject* InMonoObject);
+	static void Matrix_SetIdentityImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Matrix_MultiplyImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
+	static void Matrix_MultiplyImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+	                                          MonoObject** OutValue);
 
-	static void Matrix_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
+	static void Matrix_AddImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+	                                     MonoObject** OutValue);
 
-	static void Matrix_MultiplyScaleImplementation(const MonoObject* InMonoObject, LwcType Other,
+	static void Matrix_MultiplyScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                               LwcType Other, MonoObject** OutValue);
+
+	static bool Matrix_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
+
+	static bool Matrix_EqualsImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+	                                        LwcType Tolerance);
+
+	static bool Matrix_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
+
+	static void Matrix_TransformFVector4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                   const MonoObject* V, MonoObject** OutValue);
+
+	static void Matrix_TransformPositionImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                   const MonoObject* V, MonoObject** OutValue);
+
+	static void Matrix_InverseTransformPositionImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                          const MonoObject* V, MonoObject** OutValue);
+
+	static void Matrix_TransformVectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                 const MonoObject* V, MonoObject** OutValue);
+
+	static void Matrix_InverseTransformVectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                        const MonoObject* V, MonoObject** OutValue);
+
+	static void Matrix_GetTransposedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                               MonoObject** OutValue);
 
-	static bool Matrix_EqualityImplementation(const MonoObject* A, const MonoObject* B);
+	static LwcType Matrix_DeterminantImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static bool Matrix_EqualsImplementation(const MonoObject* A, const MonoObject* B, LwcType Tolerance);
+	static LwcType Matrix_RotDeterminantImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static bool Matrix_InequalityImplementation(const MonoObject* A, const MonoObject* B);
+	static void Matrix_InverseFastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                             MonoObject** OutValue);
 
-	static void Matrix_TransformFVector4Implementation(const MonoObject* InMonoObject, const MonoObject* V,
+	static void Matrix_InverseImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         MonoObject** OutValue);
+
+	static void Matrix_TransposeAdjointImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                  MonoObject** OutValue);
+
+	static void Matrix_RemoveScalingImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                               LwcType Tolerance);
+
+	static void Matrix_GetMatrixWithoutScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                       LwcType Tolerance, MonoObject** OutValue);
+
+	static void Matrix_ExtractScalingImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                LwcType Tolerance, MonoObject** OutValue);
+
+	static void Matrix_GetScaleVectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                LwcType Tolerance, MonoObject** OutValue);
+
+	static void Matrix_RemoveTranslationImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                                   MonoObject** OutValue);
 
-	static void Matrix_TransformPositionImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-	                                                   MonoObject** OutValue);
+	static void Matrix_ConcatTranslationImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                   const MonoObject* Translation, MonoObject** OutValue);
 
-	static void Matrix_InverseTransformPositionImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-	                                                          MonoObject** OutValue);
+	static bool Matrix_ContainsNaNImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Matrix_TransformVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-	                                                 MonoObject** OutValue);
+	static void Matrix_ScaleTranslationImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                  const MonoObject* Scale3D);
 
-	static void Matrix_InverseTransformVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-	                                                        MonoObject** OutValue);
+	static LwcType Matrix_GetMaximumAxisScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Matrix_GetTransposedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Matrix_ApplyScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, LwcType Scale,
+	                                            MonoObject** OutValue);
 
-	static LwcType Matrix_DeterminantImplementation(const MonoObject* InMonoObject);
+	static void Matrix_GetOriginImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                           MonoObject** OutValue);
 
-	static LwcType Matrix_RotDeterminantImplementation(const MonoObject* InMonoObject);
+	static void Matrix_GetScaledAxesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                               MonoObject** X, MonoObject** Y, MonoObject** Z);
 
-	static void Matrix_InverseFastImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Matrix_GetUnitAxesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                             MonoObject** X, MonoObject** Y, MonoObject** Z);
 
-	static void Matrix_InverseImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Matrix_SetAxisImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, int32 i,
+	                                         const MonoObject* Axis);
 
-	static void Matrix_TransposeAdjointImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Matrix_SetOriginImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                           const MonoObject* NewOrigin);
 
-	static void Matrix_RemoveScalingImplementation(const MonoObject* InMonoObject, LwcType Tolerance);
-
-	static void Matrix_GetMatrixWithoutScaleImplementation(const MonoObject* InMonoObject, LwcType Tolerance,
-	                                                       MonoObject** OutValue);
-
-	static void Matrix_ExtractScalingImplementation(const MonoObject* InMonoObject, LwcType Tolerance,
-	                                                MonoObject** OutValue);
-
-	static void Matrix_GetScaleVectorImplementation(const MonoObject* InMonoObject, LwcType Tolerance,
-	                                                MonoObject** OutValue);
-
-	static void Matrix_RemoveTranslationImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
-
-	static void Matrix_ConcatTranslationImplementation(const MonoObject* InMonoObject, const MonoObject* Translation,
-	                                                   MonoObject** OutValue);
-
-	static bool Matrix_ContainsNaNImplementation(const MonoObject* InMonoObject);
-
-	static void Matrix_ScaleTranslationImplementation(const MonoObject* InMonoObject, const MonoObject* Scale3D);
-
-	static LwcType Matrix_GetMaximumAxisScaleImplementation(const MonoObject* InMonoObject);
-
-	static void Matrix_ApplyScaleImplementation(const MonoObject* InMonoObject, LwcType Scale, MonoObject** OutValue);
-
-	static void Matrix_GetOriginImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
-
-	static void Matrix_GetScaledAxesImplementation(const MonoObject* InMonoObject, MonoObject** X, MonoObject** Y,
-	                                               MonoObject** Z);
-
-	static void Matrix_GetUnitAxesImplementation(const MonoObject* InMonoObject, MonoObject** X, MonoObject** Y,
-	                                             MonoObject** Z);
-
-	static void Matrix_SetAxisImplementation(const MonoObject* InMonoObject, int32 i, const MonoObject* Axis);
-
-	static void Matrix_SetOriginImplementation(const MonoObject* InMonoObject, const MonoObject* NewOrigin);
-
-	static void Matrix_SetAxesImplementation(const MonoObject* InMonoObject, const MonoObject* Axis0,
-	                                         const MonoObject* Axis1, const MonoObject* Axis2,
+	static void Matrix_SetAxesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         const MonoObject* Axis0, const MonoObject* Axis1, const MonoObject* Axis2,
 	                                         const MonoObject* Origin);
 
-	static void Matrix_GetColumnImplementation(const MonoObject* InMonoObject, int32 i, MonoObject** OutValue);
+	static void Matrix_GetColumnImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, int32 i,
+	                                           MonoObject** OutValue);
 
-	static void Matrix_SetColumnImplementation(const MonoObject* InMonoObject, int32 i, const MonoObject* Value);
+	static void Matrix_SetColumnImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, int32 i,
+	                                           const MonoObject* Value);
 
-	static void Matrix_RotatorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Matrix_RotatorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         MonoObject** OutValue);
 
-	static void Matrix_ToQuatImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Matrix_ToQuatImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                        MonoObject** OutValue);
 
-	static bool Matrix_GetFrustumNearPlaneImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static bool Matrix_GetFrustumNearPlaneImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                     MonoObject** OutValue);
 
-	static bool Matrix_GetFrustumFarPlaneImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static bool Matrix_GetFrustumFarPlaneImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                    MonoObject** OutValue);
 
-	static bool Matrix_GetFrustumLeftPlaneImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static bool Matrix_GetFrustumLeftPlaneImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                     MonoObject** OutValue);
 
-	static bool Matrix_GetFrustumRightPlaneImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static bool Matrix_GetFrustumRightPlaneImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                      MonoObject** OutValue);
 
-	static bool Matrix_GetFrustumTopPlaneImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static bool Matrix_GetFrustumTopPlaneImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                    MonoObject** OutValue);
 
-	static bool Matrix_GetFrustumBottomPlaneImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static bool Matrix_GetFrustumBottomPlaneImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                       MonoObject** OutValue);
 
-	static void Matrix_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Matrix_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                          MonoObject** OutValue);
 
-	static uint32 Matrix_ComputeHashImplementation(const MonoObject* InMonoObject);
+	static uint32 Matrix_ComputeHashImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 };

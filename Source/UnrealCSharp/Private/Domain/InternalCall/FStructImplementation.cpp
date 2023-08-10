@@ -36,10 +36,10 @@ void FStructImplementation::Struct_RegisterImplementation(MonoObject* InMonoObje
 	FCSharpEnvironment::GetEnvironment().Bind(InMonoObject, StructName);
 }
 
-void FStructImplementation::Struct_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FStructImplementation::Struct_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveStructReference(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveStructReference(InGarbageCollectionHandle);
 	});
 }

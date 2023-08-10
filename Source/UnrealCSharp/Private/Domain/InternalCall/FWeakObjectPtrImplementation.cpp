@@ -28,18 +28,21 @@ void FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation(MonoObje
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(InMonoObject, WeakObjectPtr);
 }
 
-void FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(
+			InGarbageCollectionHandle);
 	});
 }
 
-void FWeakObjectPtrImplementation::WeakObjectPtr_GetImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FWeakObjectPtrImplementation::WeakObjectPtr_GetImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<
+		UObject>>(InGarbageCollectionHandle);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 }
