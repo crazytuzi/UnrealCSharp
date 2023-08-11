@@ -26,16 +26,20 @@ void FClassRegistry::Deinitialize()
 	}
 
 	ClassDescriptorMap.Empty();
+
+	PropertyDescriptorMap.Empty();
+
+	FunctionDescriptorMap.Empty();
 }
 
-FClassDescriptor* FClassRegistry::GetClassDescriptor(const UStruct* InStruct)
+FClassDescriptor* FClassRegistry::GetClassDescriptor(const UStruct* InStruct) const
 {
 	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct);
 
 	return FoundClassDescriptor != nullptr ? *FoundClassDescriptor : nullptr;
 }
 
-FClassDescriptor* FClassRegistry::GetClassDescriptor(const FName& InClassName)
+FClassDescriptor* FClassRegistry::GetClassDescriptor(const FName& InClassName) const
 {
 	const auto InClass = LoadObject<UStruct>(nullptr, *InClassName.ToString());
 
@@ -75,4 +79,50 @@ void FClassRegistry::DeleteClassDescriptor(const UStruct* InStruct)
 
 		ClassDescriptorMap.Remove(InStruct);
 	}
+}
+
+FPropertyDescriptor* FClassRegistry::GetPropertyDescriptor(const FDomain* InDomain, const UStruct* InStruct,
+                                                           MonoString* InPropertyName)
+{
+	if (const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyName))
+	{
+		return *FoundPropertyDescriptor;
+	}
+
+	if (const auto FoundClassDescriptor = GetClassDescriptor(InStruct))
+	{
+		const auto PropertyName = FName(UTF8_TO_TCHAR(InDomain->String_To_UTF8(InPropertyName)));
+
+		if (const auto FoundPropertyDescriptor = FoundClassDescriptor->GetPropertyDescriptor(PropertyName))
+		{
+			PropertyDescriptorMap.Add(InPropertyName, FoundPropertyDescriptor);
+
+			return FoundPropertyDescriptor;
+		}
+	}
+
+	return nullptr;
+}
+
+FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const FDomain* InDomain, const UStruct* InStruct,
+                                                           MonoString* InFunctionName)
+{
+	if (const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionName))
+	{
+		return *FoundFunctionDescriptor;
+	}
+
+	if (const auto FoundClassDescriptor = GetClassDescriptor(InStruct))
+	{
+		const auto FunctionName = FName(UTF8_TO_TCHAR(InDomain->String_To_UTF8(InFunctionName)));
+
+		if (const auto FoundFunctionDescriptor = FoundClassDescriptor->GetFunctionDescriptor(FunctionName))
+		{
+			FunctionDescriptorMap.Add(InFunctionName, FoundFunctionDescriptor);
+
+			return FoundFunctionDescriptor;
+		}
+	}
+
+	return nullptr;
 }

@@ -351,6 +351,12 @@ FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const UStruct* In
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetFunctionDescriptor(InFunctionName) : nullptr;
 }
 
+FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const UStruct* InStruct,
+                                                               MonoString* InFunctionName) const
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetFunctionDescriptor(Domain, InStruct, InFunctionName) : nullptr;
+}
+
 FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const FName& InClassName,
                                                                const FName& InFunctionName) const
 {
@@ -365,6 +371,12 @@ FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const UStruct* In
 	const auto FoundClassDescriptor = GetClassDescriptor(InStruct);
 
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetPropertyDescriptor(InPropertyName) : nullptr;
+}
+
+FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const UStruct* InStruct,
+                                                               MonoString* InPropertyName) const
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetPropertyDescriptor(Domain, InStruct, InPropertyName) : nullptr;
 }
 
 bool FCSharpEnvironment::AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const
