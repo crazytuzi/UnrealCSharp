@@ -23,11 +23,11 @@ namespace Script.CoreUObject
         }
 
         public Boolean IsValid() =>
-            PrimaryAssetIdImplementation.PrimaryAssetId_IsValidImplementation(this);
+            PrimaryAssetIdImplementation.PrimaryAssetId_IsValidImplementation(GetHandle());
 
         public override string ToString()
         {
-            PrimaryAssetIdImplementation.PrimaryAssetId_ToStringImplementation(this, out var OutValue);
+            PrimaryAssetIdImplementation.PrimaryAssetId_ToStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue.ToString();
         }
@@ -40,9 +40,9 @@ namespace Script.CoreUObject
         }
 
         public static Boolean operator ==(FPrimaryAssetId A, FPrimaryAssetId B) =>
-            PrimaryAssetIdImplementation.PrimaryAssetId_EqualityImplementation(A, B);
+            PrimaryAssetIdImplementation.PrimaryAssetId_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FPrimaryAssetId A, FPrimaryAssetId B) =>
-            PrimaryAssetIdImplementation.PrimaryAssetId_InequalityImplementation(A, B);
+            PrimaryAssetIdImplementation.PrimaryAssetId_InequalityImplementation(A.GetHandle(), B.GetHandle());
     }
 }

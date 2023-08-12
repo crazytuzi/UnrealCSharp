@@ -31,24 +31,28 @@ public:
 
 public:
 	template <typename T>
-	auto GetContainer(const MonoObject* InMonoObject);
+	auto GetContainer(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 	template <typename T>
-	auto GetContainer(const void* InAddress);
+	auto GetContainer(const MonoObject* InMonoObject);
 
 	MonoObject* GetObject(const void* InAddress);
 
-	bool AddReference(void* InContainer, MonoObject* InMonoObject, void* InAddress = nullptr);
+	bool AddReference(void* InAddress, void* InContainer, MonoObject* InMonoObject);
 
 	bool AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
 	                  MonoObject* InMonoObject);
 
-	bool RemoveReference(const MonoObject* InMonoObject);
+	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
 	TGarbageCollectionHandleMapping<FContainerAddress> GarbageCollectionHandle2ContainerAddress;
 
 	TMap<FContainerAddress, FGarbageCollectionHandle> ContainerAddress2GarbageCollectionHandle;
+
+	TMap<void*, FGarbageCollectionHandle> Address2GarbageCollectionHandle;
+
+	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
 };
 
 #include "FContainerRegistry.inl"

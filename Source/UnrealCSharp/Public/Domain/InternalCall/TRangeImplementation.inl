@@ -4,7 +4,8 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+auto TRangeImplementation<T, U, V>::Range_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                                 const FGarbageCollectionHandle B)
 {
 	const auto RangeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
@@ -19,7 +20,8 @@ auto TRangeImplementation<T, U, V>::Range_EqualityImplementation(const MonoObjec
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+auto TRangeImplementation<T, U, V>::Range_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                                   const FGarbageCollectionHandle B)
 {
 	const auto RangeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
 
@@ -34,9 +36,10 @@ auto TRangeImplementation<T, U, V>::Range_InequalityImplementation(const MonoObj
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_AdjoinsImplementation(const MonoObject* InMonoObject, const MonoObject* Other)
+auto TRangeImplementation<T, U, V>::Range_AdjoinsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto RangeOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(Other);
 
@@ -49,10 +52,11 @@ auto TRangeImplementation<T, U, V>::Range_AdjoinsImplementation(const MonoObject
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_ConjoinsImplementation(const MonoObject* InMonoObject, const MonoObject* X,
-                                                                 const MonoObject* Y)
+auto TRangeImplementation<T, U, V>::Range_ConjoinsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* X,
+	const MonoObject* Y)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto RangeX = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(X);
 
@@ -67,9 +71,10 @@ auto TRangeImplementation<T, U, V>::Range_ConjoinsImplementation(const MonoObjec
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_ContainsElementImplementation(const MonoObject* InMonoObject, const V Element)
+auto TRangeImplementation<T, U, V>::Range_ContainsElementImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const V Element)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -80,10 +85,10 @@ auto TRangeImplementation<T, U, V>::Range_ContainsElementImplementation(const Mo
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_ContainsImplementation(const MonoObject* InMonoObject,
-                                                                 const MonoObject* Other)
+auto TRangeImplementation<T, U, V>::Range_ContainsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto RangeOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(Other);
 
@@ -96,10 +101,10 @@ auto TRangeImplementation<T, U, V>::Range_ContainsImplementation(const MonoObjec
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_ContiguousImplementation(const MonoObject* InMonoObject,
-                                                                   const MonoObject* Other)
+auto TRangeImplementation<T, U, V>::Range_ContiguousImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto RangeOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(Other);
 
@@ -112,10 +117,10 @@ auto TRangeImplementation<T, U, V>::Range_ContiguousImplementation(const MonoObj
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_GetLowerBoundImplementation(const MonoObject* InMonoObject,
-                                                                      MonoObject** OutValue)
+auto TRangeImplementation<T, U, V>::Range_GetLowerBoundImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<U, U>::Get();
 
@@ -132,10 +137,10 @@ auto TRangeImplementation<T, U, V>::Range_GetLowerBoundImplementation(const Mono
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_SetLowerBoundImplementation(const MonoObject* InMonoObject,
-                                                                      const MonoObject* NewLowerBound)
+auto TRangeImplementation<T, U, V>::Range_SetLowerBoundImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* NewLowerBound)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto RangeBoundNewLowerBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, U>(
 		NewLowerBound);
@@ -148,9 +153,9 @@ auto TRangeImplementation<T, U, V>::Range_SetLowerBoundImplementation(const Mono
 
 template <typename T, typename U, typename V>
 auto TRangeImplementation<T, U, V>::Range_SetLowerBoundValueImplementation(
-	const MonoObject* InMonoObject, const V NewLowerBoundValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const V NewLowerBoundValue)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -159,9 +164,10 @@ auto TRangeImplementation<T, U, V>::Range_SetLowerBoundValueImplementation(
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_GetLowerBoundValueImplementation(const MonoObject* InMonoObject)
+auto TRangeImplementation<T, U, V>::Range_GetLowerBoundValueImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -172,10 +178,10 @@ auto TRangeImplementation<T, U, V>::Range_GetLowerBoundValueImplementation(const
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_GetUpperBoundImplementation(const MonoObject* InMonoObject,
-                                                                      MonoObject** OutValue)
+auto TRangeImplementation<T, U, V>::Range_GetUpperBoundImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<U, U>::Get();
 
@@ -192,10 +198,10 @@ auto TRangeImplementation<T, U, V>::Range_GetUpperBoundImplementation(const Mono
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_SetUpperBoundImplementation(const MonoObject* InMonoObject,
-                                                                      const MonoObject* NewUpperBound)
+auto TRangeImplementation<T, U, V>::Range_SetUpperBoundImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* NewUpperBound)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto RangeBoundNewUpperBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, U>(
 		NewUpperBound);
@@ -208,9 +214,9 @@ auto TRangeImplementation<T, U, V>::Range_SetUpperBoundImplementation(const Mono
 
 template <typename T, typename U, typename V>
 auto TRangeImplementation<T, U, V>::Range_SetUpperBoundValueImplementation(
-	const MonoObject* InMonoObject, const V NewUpperBoundValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const V NewUpperBoundValue)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -219,9 +225,10 @@ auto TRangeImplementation<T, U, V>::Range_SetUpperBoundValueImplementation(
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_GetUpperBoundValueImplementation(const MonoObject* InMonoObject)
+auto TRangeImplementation<T, U, V>::Range_GetUpperBoundValueImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -232,9 +239,10 @@ auto TRangeImplementation<T, U, V>::Range_GetUpperBoundValueImplementation(const
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_HasLowerBoundImplementation(const MonoObject* InMonoObject)
+auto TRangeImplementation<T, U, V>::Range_HasLowerBoundImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -245,9 +253,10 @@ auto TRangeImplementation<T, U, V>::Range_HasLowerBoundImplementation(const Mono
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_HasUpperBoundImplementation(const MonoObject* InMonoObject)
+auto TRangeImplementation<T, U, V>::Range_HasUpperBoundImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -258,9 +267,10 @@ auto TRangeImplementation<T, U, V>::Range_HasUpperBoundImplementation(const Mono
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_IsDegenerateImplementation(const MonoObject* InMonoObject)
+auto TRangeImplementation<T, U, V>::Range_IsDegenerateImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -271,9 +281,10 @@ auto TRangeImplementation<T, U, V>::Range_IsDegenerateImplementation(const MonoO
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_IsEmptyImplementation(const MonoObject* InMonoObject)
+auto TRangeImplementation<T, U, V>::Range_IsEmptyImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	if (Range != nullptr)
 	{
@@ -284,10 +295,10 @@ auto TRangeImplementation<T, U, V>::Range_IsEmptyImplementation(const MonoObject
 }
 
 template <typename T, typename U, typename V>
-auto TRangeImplementation<T, U, V>::Range_OverlapsImplementation(const MonoObject* InMonoObject,
-                                                                 const MonoObject* Other)
+auto TRangeImplementation<T, U, V>::Range_OverlapsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Other)
 {
-	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InMonoObject);
+	const auto Range = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(InGarbageCollectionHandle);
 
 	const auto RangeOther = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(Other);
 

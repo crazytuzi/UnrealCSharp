@@ -1,78 +1,77 @@
 ﻿using System;
 using Script.Library;
-using Script.Common;
 
 namespace Script.CoreUObject
 {
     public partial class FInt32Range
     {
         public static Boolean operator ==(FInt32Range A, FInt32Range B) =>
-            Int32RangeImplementation.Int32Range_EqualityImplementation(A, B);
+            Int32RangeImplementation.Int32Range_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FInt32Range A, FInt32Range B) =>
-            Int32RangeImplementation.Int32Range_InequalityImplementation(A, B);
+            Int32RangeImplementation.Int32Range_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public Boolean Adjoins(FInt32Range Other) =>
-            Int32RangeImplementation.Int32Range_AdjoinsImplementation(this, Other);
+            Int32RangeImplementation.Int32Range_AdjoinsImplementation(GetHandle(), Other);
 
         public Boolean Conjoins(FInt32Range X, FInt32Range Y) =>
-            Int32RangeImplementation.Int32Range_ConjoinsImplementation(this, X, Y);
+            Int32RangeImplementation.Int32Range_ConjoinsImplementation(GetHandle(), X, Y);
 
         public Boolean Contains(Int32 Element) =>
-            Int32RangeImplementation.Int32Range_ContainsElementImplementation(this, Element);
+            Int32RangeImplementation.Int32Range_ContainsElementImplementation(GetHandle(), Element);
 
         public Boolean Contains(FInt32Range Other) =>
-            Int32RangeImplementation.Int32Range_ContainsImplementation(this, Other);
+            Int32RangeImplementation.Int32Range_ContainsImplementation(GetHandle(), Other);
 
         public Boolean Contiguous(FInt32Range Other) =>
-            Int32RangeImplementation.Int32Range_ContiguousImplementation(this, Other);
+            Int32RangeImplementation.Int32Range_ContiguousImplementation(GetHandle(), Other);
 
         public FInt32RangeBound GetLowerBound()
         {
-            Int32RangeImplementation.Int32Range_GetLowerBoundImplementation(this, out var OutValue);
+            Int32RangeImplementation.Int32Range_GetLowerBoundImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public void SetLowerBound(FInt32RangeBound NewLowerBound) =>
-            Int32RangeImplementation.Int32Range_SetLowerBoundImplementation(this, NewLowerBound);
+            Int32RangeImplementation.Int32Range_SetLowerBoundImplementation(GetHandle(), NewLowerBound);
 
         public void SetLowerBoundValue(Int32 NewLowerBoundValue) =>
-            Int32RangeImplementation.Int32Range_SetLowerBoundValueImplementation(this, NewLowerBoundValue);
+            Int32RangeImplementation.Int32Range_SetLowerBoundValueImplementation(GetHandle(), NewLowerBoundValue);
 
         public Int32 GetLowerBoundValue() =>
-            Int32RangeImplementation.Int32Range_GetLowerBoundValueImplementation(this);
+            Int32RangeImplementation.Int32Range_GetLowerBoundValueImplementation(GetHandle());
 
         public FInt32RangeBound GetUpperBound()
         {
-            Int32RangeImplementation.Int32Range_GetUpperBoundImplementation(this, out var OutValue);
+            Int32RangeImplementation.Int32Range_GetUpperBoundImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public void SetUpperBound(FInt32RangeBound NewUpperBound) =>
-            Int32RangeImplementation.Int32Range_SetUpperBoundImplementation(this, NewUpperBound);
+            Int32RangeImplementation.Int32Range_SetUpperBoundImplementation(GetHandle(), NewUpperBound);
 
         public void SetUpperBoundValue(Int32 NewLowerBoundValue) =>
-            Int32RangeImplementation.Int32Range_SetUpperBoundValueImplementation(this, NewLowerBoundValue);
+            Int32RangeImplementation.Int32Range_SetUpperBoundValueImplementation(GetHandle(), NewLowerBoundValue);
 
         public Int32 GetUpperBoundValue() =>
-            Int32RangeImplementation.Int32Range_GetUpperBoundValueImplementation(this);
+            Int32RangeImplementation.Int32Range_GetUpperBoundValueImplementation(GetHandle());
 
         public Boolean HasLowerBound() =>
-            Int32RangeImplementation.Int32Range_HasLowerBoundImplementation(this);
+            Int32RangeImplementation.Int32Range_HasLowerBoundImplementation(GetHandle());
 
         public Boolean HasUpperBound() =>
-            Int32RangeImplementation.Int32Range_HasUpperBoundImplementation(this);
+            Int32RangeImplementation.Int32Range_HasUpperBoundImplementation(GetHandle());
 
         public Boolean IsDegenerate() =>
-            Int32RangeImplementation.Int32Range_IsDegenerateImplementation(this);
+            Int32RangeImplementation.Int32Range_IsDegenerateImplementation(GetHandle());
 
         public Boolean IsEmpty() =>
-            Int32RangeImplementation.Int32Range_IsEmptyImplementation(this);
+            Int32RangeImplementation.Int32Range_IsEmptyImplementation(GetHandle());
 
         public Boolean Overlaps(FInt32Range Other) =>
-            Int32RangeImplementation.Int32Range_OverlapsImplementation(this, Other);
+            Int32RangeImplementation.Int32Range_OverlapsImplementation(GetHandle(), Other);
 
         // @TODO
         // Size

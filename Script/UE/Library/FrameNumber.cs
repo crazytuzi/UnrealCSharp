@@ -1,6 +1,5 @@
 ﻿using System;
 using Script.Library;
-using Script.Common;
 
 namespace Script.CoreUObject
 {
@@ -8,74 +7,76 @@ namespace Script.CoreUObject
     {
         public static FFrameNumber operator ++(FFrameNumber A)
         {
-            FrameNumberImplementation.FrameNumber_IncrementImplementation(A);
+            FrameNumberImplementation.FrameNumber_IncrementImplementation(A.GetHandle());
 
             return A;
         }
 
         public static FFrameNumber operator --(FFrameNumber A)
         {
-            FrameNumberImplementation.FrameNumber_DecrementImplementation(A);
+            FrameNumberImplementation.FrameNumber_DecrementImplementation(A.GetHandle());
 
             return A;
         }
 
         public static Boolean operator ==(FFrameNumber A, FFrameNumber B) =>
-            FrameNumberImplementation.FrameNumber_EqualityImplementation(A, B);
+            FrameNumberImplementation.FrameNumber_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FFrameNumber A, FFrameNumber B) =>
-            FrameNumberImplementation.FrameNumber_InequalityImplementation(A, B);
+            FrameNumberImplementation.FrameNumber_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <(FFrameNumber A, FFrameNumber B) =>
-            FrameNumberImplementation.FrameNumber_LessThanImplementation(A, B);
+            FrameNumberImplementation.FrameNumber_LessThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >(FFrameNumber A, FFrameNumber B) =>
-            FrameNumberImplementation.FrameNumber_GreaterThanImplementation(A, B);
+            FrameNumberImplementation.FrameNumber_GreaterThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <=(FFrameNumber A, FFrameNumber B) =>
-            FrameNumberImplementation.FrameNumber_LessThanOrEqualImplementation(A, B);
+            FrameNumberImplementation.FrameNumber_LessThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >=(FFrameNumber A, FFrameNumber B) =>
-            FrameNumberImplementation.FrameNumber_GreaterThanOrEqualImplementation(A, B);
+            FrameNumberImplementation.FrameNumber_GreaterThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         public static FFrameNumber operator +(FFrameNumber A, FFrameNumber B)
         {
-            FrameNumberImplementation.FrameNumber_AddImplementation(A, B, out var OutValue);
+            FrameNumberImplementation.FrameNumber_AddImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameNumber operator -(FFrameNumber A, FFrameNumber B)
         {
-            FrameNumberImplementation.FrameNumber_SubtractImplementation(A, B, out var OutValue);
+            FrameNumberImplementation.FrameNumber_SubtractImplementation(A.GetHandle(), B.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameNumber operator %(FFrameNumber A, FFrameNumber B)
         {
-            FrameNumberImplementation.FrameNumber_RemainderImplementation(A, B, out var OutValue);
+            FrameNumberImplementation.FrameNumber_RemainderImplementation(A.GetHandle(), B.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameNumber operator -(FFrameNumber A)
         {
-            FrameNumberImplementation.FrameNumber_NegatedImplementation(A, out var OutValue);
+            FrameNumberImplementation.FrameNumber_NegatedImplementation(A.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameNumber operator *(FFrameNumber A, Single Scalar)
         {
-            FrameNumberImplementation.FrameNumber_MultiplyImplementation(A, Scalar, out var OutValue);
+            FrameNumberImplementation.FrameNumber_MultiplyImplementation(A.GetHandle(), Scalar, out var OutValue);
 
             return OutValue;
         }
 
         public static FFrameNumber operator /(FFrameNumber A, Single Scalar)
         {
-            FrameNumberImplementation.FrameNumber_DivideImplementation(A, Scalar, out var OutValue);
+            FrameNumberImplementation.FrameNumber_DivideImplementation(A.GetHandle(), Scalar, out var OutValue);
 
             return OutValue;
         }

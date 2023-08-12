@@ -11,11 +11,10 @@ namespace Script.Library
             T InObject, string InInterfaceName) where T : IInterface;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void ScriptInterface_UnRegisterImplementation<T>(TScriptInterface<T> InScriptInterface)
-            where T : IInterface;
+        public static extern void ScriptInterface_UnRegisterImplementation(System.IntPtr InScriptInterface);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void ScriptInterface_GetObjectImplementation<T, U>(TScriptInterface<T> InScriptInterface,
-            out U OutValue) where T : IInterface where U : UObject;
+        public static extern void ScriptInterface_GetObjectImplementation<U>(System.IntPtr InScriptInterface,
+            out U OutValue) where U : UObject;
     }
 }

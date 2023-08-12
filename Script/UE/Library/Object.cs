@@ -2,28 +2,29 @@
 using Script.Library;
 using Script.Common;
 using Script.Engine;
+using IntPtr = System.IntPtr;
 
 namespace Script.CoreUObject
 {
-    public partial class UObject
+    public partial class UObject : IGCHandle
     {
         public UClass GetClass()
         {
-            ObjectImplementation.Object_GetClassImplementation(this, out var OutValue);
+            ObjectImplementation.Object_GetClassImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FString GetName()
         {
-            ObjectImplementation.Object_GetNameImplementation(this, out var OutValue);
+            ObjectImplementation.Object_GetNameImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public UWorld GetWorld()
         {
-            ObjectImplementation.Object_GetWorldImplementation(this, out var OutValue);
+            ObjectImplementation.Object_GetWorldImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
@@ -35,7 +36,19 @@ namespace Script.CoreUObject
 
         public Boolean IsValid()
         {
-            return ObjectImplementation.Object_IsValidImplementation(this);
+            return ObjectImplementation.Object_IsValidImplementation(GetHandle());
         }
+
+        public unsafe void SetHandle(void* InHandle)
+        {
+            GCHandle = new IntPtr(InHandle);
+        }
+
+        public IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private IntPtr GCHandle;
     }
 }

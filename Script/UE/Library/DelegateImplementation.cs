@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Script.Common;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -10,23 +11,23 @@ namespace Script.Library
         public static extern void Delegate_RegisterImplementation(FDelegateBase InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_UnRegisterImplementation(FDelegateBase InMonoObject);
+        public static extern void Delegate_UnRegisterImplementation(IntPtr InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_BindImplementation<T>(FDelegateBase InMonoObject, T InDelegate)
+        public static extern void Delegate_BindImplementation<T>(IntPtr InMonoObject, T InDelegate)
             where T : System.Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Delegate_IsBoundImplementation(FDelegateBase InMonoObject);
+        public static extern Boolean Delegate_IsBoundImplementation(IntPtr InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_UnBindImplementation(FDelegateBase InMonoObject);
+        public static extern void Delegate_UnBindImplementation(IntPtr InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_ClearImplementation(FDelegateBase InMonoObject);
+        public static extern void Delegate_ClearImplementation(IntPtr InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_ExecuteImplementation<T>(FDelegateBase InMonoObject, out T ReturnValue,
+        public static extern void Delegate_ExecuteImplementation<T>(IntPtr InMonoObject, out T ReturnValue,
             out ObjectList OutValue, params Object[] InValue);
     }
 }

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "mono/metadata/object.h"
 
 class FMulticastDelegateImplementation
@@ -7,22 +8,27 @@ class FMulticastDelegateImplementation
 public:
 	static void MulticastDelegate_RegisterImplementation(MonoObject* InMonoObject);
 
-	static void MulticastDelegate_UnRegisterImplementation(const MonoObject* InMonoObject);
+	static void MulticastDelegate_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static bool MulticastDelegate_IsBoundImplementation(const MonoObject* InMonoObject);
+	static bool MulticastDelegate_IsBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static bool MulticastDelegate_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
+	static bool MulticastDelegate_ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                     MonoObject* InDelegate);
 
-	static void MulticastDelegate_AddImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
+	static void MulticastDelegate_AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                MonoObject* InDelegate);
 
-	static void MulticastDelegate_AddUniqueImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
+	static void MulticastDelegate_AddUniqueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                      MonoObject* InDelegate);
 
-	static void MulticastDelegate_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InDelegate);
+	static void MulticastDelegate_RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                   MonoObject* InDelegate);
 
-	static void MulticastDelegate_RemoveAllImplementation(const MonoObject* InMonoObject, MonoObject* InObject);
+	static void MulticastDelegate_RemoveAllImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                      MonoObject* InObject);
 
-	static void MulticastDelegate_ClearImplementation(const MonoObject* InMonoObject);
+	static void MulticastDelegate_ClearImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void MulticastDelegate_BroadcastImplementation(const MonoObject* InMonoObject, MonoObject** OutValue,
-	                                                      MonoArray* InValue);
+	static void MulticastDelegate_BroadcastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                      MonoObject** OutValue, MonoArray* InValue);
 };

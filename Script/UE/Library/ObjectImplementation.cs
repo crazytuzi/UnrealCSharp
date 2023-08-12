@@ -2,6 +2,7 @@
 using Script.Common;
 using Script.CoreUObject;
 using Script.Engine;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -11,15 +12,15 @@ namespace Script.Library
         public static extern void Object_StaticClassImplementation(string InClassName, out UClass OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Object_GetClassImplementation(UObject InObject, out UClass OutValue);
+        public static extern void Object_GetClassImplementation(IntPtr InObject, out UClass OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Object_GetNameImplementation(UObject InObject, out FString OutValue);
+        public static extern void Object_GetNameImplementation(IntPtr InObject, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Object_GetWorldImplementation(UObject InObject, out UWorld OutValue);
+        public static extern void Object_GetWorldImplementation(IntPtr InObject, out UWorld OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Object_IsValidImplementation(UObject InObject);
+        public static extern bool Object_IsValidImplementation(IntPtr InObject);
     }
 }

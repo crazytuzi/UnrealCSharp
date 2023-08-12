@@ -8,14 +8,16 @@ namespace Script.Engine
         // @TODO
         public T SpawnActor<T>(UClass Class, FTransform Transform) where T : UObject
         {
-            WorldImplementation.World_SpawnActorImplementation<T>(this, Class, Transform, out var OutValue);
+            WorldImplementation.World_SpawnActorImplementation<T>(GetHandle(), Class.GetHandle(), Transform,
+                out var OutValue);
 
             return OutValue;
         }
 
         public T SpawnActor<T>(FTransform Transform) where T : UObject, IStaticClass
         {
-            WorldImplementation.World_SpawnActorImplementation<T>(this, T.StaticClass(), Transform, out var OutValue);
+            WorldImplementation.World_SpawnActorImplementation<T>(GetHandle(), T.StaticClass().GetHandle(), Transform,
+                out var OutValue);
 
             return OutValue;
         }

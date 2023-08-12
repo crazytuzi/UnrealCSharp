@@ -7,20 +7,22 @@ namespace Script.CoreUObject
     public partial class FAssetBundleData
     {
         public static Boolean operator ==(FAssetBundleData A, FAssetBundleData B) =>
-            AssetBundleDataImplementation.AssetBundleData_EqualityImplementation(A, B);
+            AssetBundleDataImplementation.AssetBundleData_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FAssetBundleData A, FAssetBundleData B) =>
-            AssetBundleDataImplementation.AssetBundleData_InequalityImplementation(A, B);
+            AssetBundleDataImplementation.AssetBundleData_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public FAssetBundleEntry FindEntry(FName SearchName)
         {
-            AssetBundleDataImplementation.AssetBundleData_FindEntryImplementation(this, SearchName, out var OutValue);
+            AssetBundleDataImplementation.AssetBundleData_FindEntryImplementation(GetHandle(), SearchName,
+                out var OutValue);
 
             return OutValue;
         }
 
         public void AddBundleAsset(FName BundleName, FSoftObjectPath AssetPath) =>
-            AssetBundleDataImplementation.AssetBundleData_AddBundleAssetImplementation(this, BundleName, AssetPath);
+            AssetBundleDataImplementation.AssetBundleData_AddBundleAssetImplementation(GetHandle(), BundleName,
+                AssetPath);
 
         // @TODO
         // AddBundleAsset
@@ -28,7 +30,7 @@ namespace Script.CoreUObject
         // SetBundleAssets
 
         public void Reset() =>
-            AssetBundleDataImplementation.AssetBundleData_ResetImplementation(this);
+            AssetBundleDataImplementation.AssetBundleData_ResetImplementation(GetHandle());
 
         // @TODO
         // ExportTextItem
@@ -36,7 +38,7 @@ namespace Script.CoreUObject
 
         public FString ToDebugString()
         {
-            AssetBundleDataImplementation.AssetBundleData_ToDebugStringImplementation(this, out var OutValue);
+            AssetBundleDataImplementation.AssetBundleData_ToDebugStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }

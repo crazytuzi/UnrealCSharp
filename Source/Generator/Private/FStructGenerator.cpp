@@ -56,6 +56,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	FString PropertyContent;
 
+	FString GCHandleContent;
+
 	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
 
 	auto SuperStruct = InScriptStruct->GetSuperStruct();
@@ -107,10 +109,27 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		);
 
 		DestructorContent = FString::Printf(TEXT(
-			"\n\t\t~%s() => StructUtils.Struct_UnRegister(this);\n"
+			"\n\t\t~%s() => StructUtils.Struct_UnRegister(GetHandle());\n"
 		),
 		                                    *FullClassContent
 		);
+
+		GCHandleContent = TEXT(
+			"\t\tpublic unsafe void SetHandle(void* InHandle)\n"
+			"\t\t{\n"
+			"\t\t\tGCHandle = new IntPtr(InHandle);\n"
+			"\t\t}\n"
+			"\n"
+			"\t\tpublic IntPtr GetHandle()\n"
+			"\t\t{\n"
+			"\t\t\treturn GCHandle;\n"
+			"\t\t}\n"
+			"\n"
+			"\t\tprivate IntPtr GCHandle;\n");
+
+		UsingNameSpaces.Append({
+			TEXT("IntPtr = System.IntPtr"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass())
+		});
 	}
 
 	auto StaticStructContent = FString::Printf(TEXT(
@@ -167,12 +186,12 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\t\t{\n"
 			"\t\t\tget\n"
 			"\t\t\t{\n"
-			"\t\t\t\tPropertyUtils.GetStructProperty(this, \"%s\", out %s value);\n"
+			"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), \"%s\", out %s value);\n"
 			"\n"
 			"\t\t\t\treturn %s;\n"
 			"\t\t\t}\n"
 			"\n"
-			"\t\t\tset => PropertyUtils.SetStructProperty(this, \"%s\", %s);\n"
+			"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), \"%s\", %s);\n"
 			"\t\t}\n"
 		),
 		                                   *PropertyAccessSpecifiers,
@@ -215,6 +234,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"%s"
 		"%s"
 		"%s"
+		"\n"
+		"%s"
 		"\t}\n"
 		"}"
 	),
@@ -222,12 +243,13 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *NameSpaceContent,
 	                               *PathNameAttributeContent,
 	                               *FullClassContent,
-	                               *SuperStructContent,
+	                               SuperStruct != nullptr ? *SuperStructContent : TEXT(" : IGCHandle"),
 	                               *StaticStructContent,
 	                               *ConstructorContent,
 	                               *DestructorContent,
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
-	                               *PropertyContent
+	                               *PropertyContent,
+	                               *GCHandleContent
 	);
 
 	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InScriptStruct);

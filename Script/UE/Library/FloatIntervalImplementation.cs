@@ -1,35 +1,35 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class FloatIntervalImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single FloatInterval_SizeImplementation(FFloatInterval InFloatInterval);
+        public static extern Single FloatInterval_SizeImplementation(IntPtr InFloatInterval);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatInterval_IsValidImplementation(FFloatInterval InFloatInterval);
+        public static extern Boolean FloatInterval_IsValidImplementation(IntPtr InFloatInterval);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatInterval_ContainsImplementation(FFloatInterval InFloatInterval,
+        public static extern Boolean FloatInterval_ContainsImplementation(IntPtr InFloatInterval,
             Single Element);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatInterval_ExpandImplementation(FFloatInterval InFloatInterval,
+        public static extern void FloatInterval_ExpandImplementation(IntPtr InFloatInterval,
             Single ExpandAmount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatInterval_IncludeImplementation(FFloatInterval InFloatInterval, Single X);
+        public static extern void FloatInterval_IncludeImplementation(IntPtr InFloatInterval, Single X);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single FloatInterval_InterpolateImplementation(FFloatInterval InFloatInterval,
+        public static extern Single FloatInterval_InterpolateImplementation(IntPtr InFloatInterval,
             Single Alpha);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatInterval_IntersectImplementation(FFloatInterval A, FFloatInterval B,
+        public static extern void FloatInterval_IntersectImplementation(IntPtr A, IntPtr B,
             out FFloatInterval OutValue);
     }
 }

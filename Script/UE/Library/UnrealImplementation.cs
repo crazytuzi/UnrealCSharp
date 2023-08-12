@@ -7,18 +7,20 @@ namespace Script.Library
     public static class UnrealImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Unreal_NewObjectImplementation<T>(UObject Outer, UClass Class, FName Name,
+        public static extern void Unreal_NewObjectImplementation<T>(System.IntPtr Outer, System.IntPtr Class,
+            FName Name,
             out T OutValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Unreal_DuplicateObjectImplementation<T>(UObject SourceObject, UObject Outer,
+        public static extern void Unreal_DuplicateObjectImplementation<T>(System.IntPtr SourceObject,
+            System.IntPtr Outer,
             FName Name, out T OutValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Unreal_LoadObjectImplementation<T>(UObject Outer, string Name, out T OutValue)
+        public static extern void Unreal_LoadObjectImplementation<T>(System.IntPtr Outer, string Name, out T OutValue)
             where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Unreal_LoadClassImplementation(UObject Outer, string Name, out UClass OutValue);
+        public static extern void Unreal_LoadClassImplementation(System.IntPtr Outer, string Name, out UClass OutValue);
     }
 }

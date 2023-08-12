@@ -33,25 +33,26 @@ void FSetImplementation::Set_RegisterImplementation(MonoObject* InMonoObject)
 	FCSharpBind::Bind<FSetHelper>(InMonoObject, FTypeBridge::GetGenericArgument(InMonoObject));
 }
 
-void FSetImplementation::Set_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FSetImplementation::Set_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InGarbageCollectionHandle);
 	});
 }
 
-void FSetImplementation::Set_EmptyImplementation(const MonoObject* InMonoObject, const int32 InExpectedNumElements)
+void FSetImplementation::Set_EmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                 const int32 InExpectedNumElements)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InGarbageCollectionHandle))
 	{
 		SetHelper->Empty(InExpectedNumElements);
 	}
 }
 
-int32 FSetImplementation::Set_NumImplementation(const MonoObject* InMonoObject)
+int32 FSetImplementation::Set_NumImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InGarbageCollectionHandle))
 	{
 		return SetHelper->Num();
 	}
@@ -59,9 +60,9 @@ int32 FSetImplementation::Set_NumImplementation(const MonoObject* InMonoObject)
 	return 0;
 }
 
-int32 FSetImplementation::Set_GetMaxIndexImplementation(const MonoObject* InMonoObject)
+int32 FSetImplementation::Set_GetMaxIndexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InGarbageCollectionHandle))
 	{
 		return SetHelper->GetMaxIndex();
 	}
@@ -69,9 +70,10 @@ int32 FSetImplementation::Set_GetMaxIndexImplementation(const MonoObject* InMono
 	return 0;
 }
 
-void FSetImplementation::Set_AddImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
+void FSetImplementation::Set_AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                               MonoObject* InValue)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InGarbageCollectionHandle))
 	{
 		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
 		{
@@ -84,9 +86,10 @@ void FSetImplementation::Set_AddImplementation(const MonoObject* InMonoObject, M
 	}
 }
 
-int32 FSetImplementation::Set_RemoveImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
+int32 FSetImplementation::Set_RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                   MonoObject* InValue)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InGarbageCollectionHandle))
 	{
 		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
 		{
@@ -101,9 +104,10 @@ int32 FSetImplementation::Set_RemoveImplementation(const MonoObject* InMonoObjec
 	return 0;
 }
 
-bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObject, MonoObject* InValue)
+bool FSetImplementation::Set_ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                    MonoObject* InValue)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InGarbageCollectionHandle))
 	{
 		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
 		{
@@ -118,9 +122,10 @@ bool FSetImplementation::Set_ContainsImplementation(const MonoObject* InMonoObje
 	return false;
 }
 
-bool FSetImplementation::Set_IsValidIndexImplementation(const MonoObject* InMonoObject, const int32 InIndex)
+bool FSetImplementation::Set_IsValidIndexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                        const int32 InIndex)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InGarbageCollectionHandle))
 	{
 		return SetHelper->IsValidIndex(InIndex);
 	}
@@ -128,10 +133,11 @@ bool FSetImplementation::Set_IsValidIndexImplementation(const MonoObject* InMono
 	return false;
 }
 
-void FSetImplementation::Set_GetEnumeratorImplementation(const MonoObject* InMonoObject, const int32 InIndex,
+void FSetImplementation::Set_GetEnumeratorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         const int32 InIndex,
                                                          MonoObject** OutValue)
 {
-	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InMonoObject))
+	if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InGarbageCollectionHandle))
 	{
 		const auto Value = SetHelper->GetEnumerator(InIndex);
 

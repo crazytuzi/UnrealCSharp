@@ -2,106 +2,107 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class DateTimeImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_AddTimespanImplementation(FDateTime A, FTimespan B, out FDateTime OutValue);
+        public static extern void DateTime_AddTimespanImplementation(IntPtr A, IntPtr B, out FDateTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_AddDateTimeImplementation(FDateTime A, FDateTime B);
+        public static extern void DateTime_AddDateTimeImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_SubtractDateTimeImplementation(FDateTime A, FDateTime B,
+        public static extern void DateTime_SubtractDateTimeImplementation(IntPtr A, IntPtr B,
             out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_SubtractTimespanImplementation(FDateTime A, FTimespan B,
+        public static extern void DateTime_SubtractTimespanImplementation(IntPtr A, IntPtr B,
             out FDateTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_EqualityImplementation(FDateTime A, FDateTime B);
+        public static extern Boolean DateTime_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_InequalityImplementation(FDateTime A, FDateTime B);
+        public static extern Boolean DateTime_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_GreaterThanImplementation(FDateTime A, FDateTime B);
+        public static extern Boolean DateTime_GreaterThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_GreaterThanOrEqualImplementation(FDateTime A, FDateTime B);
+        public static extern Boolean DateTime_GreaterThanOrEqualImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_LessThanImplementation(FDateTime A, FDateTime B);
+        public static extern Boolean DateTime_LessThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_LessThanOrEqualImplementation(FDateTime A, FDateTime B);
+        public static extern Boolean DateTime_LessThanOrEqualImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_GetDatePartImplementation(FDateTime InDateTime, out FDateTime OutValue);
+        public static extern void DateTime_GetDatePartImplementation(IntPtr InDateTime, out FDateTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_GetDateComponentsImplementation(FDateTime InDateTime, out Int32 OutYear,
+        public static extern void DateTime_GetDateComponentsImplementation(IntPtr InDateTime, out Int32 OutYear,
             out Int32 OutMonth, out Int32 OutDay);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetDayImplementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetDayImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetDayOfYearImplementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetDayOfYearImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetHourImplementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetHourImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetHour12Implementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetHour12Implementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double DateTime_GetJulianDayImplementation(FDateTime InDateTime);
+        public static extern Double DateTime_GetJulianDayImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double DateTime_GetModifiedJulianDayImplementation(FDateTime InDateTime);
+        public static extern Double DateTime_GetModifiedJulianDayImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetMillisecondImplementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetMillisecondImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetMinuteImplementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetMinuteImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetMonthImplementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetMonthImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetSecondImplementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetSecondImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int64 DateTime_GetTicksImplementation(FDateTime InDateTime);
+        public static extern Int64 DateTime_GetTicksImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_GetTimeOfDayImplementation(FDateTime InDateTime, out FTimespan OutValue);
+        public static extern void DateTime_GetTimeOfDayImplementation(IntPtr InDateTime, out FTimespan OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 DateTime_GetYearImplementation(FDateTime InDateTime);
+        public static extern Int32 DateTime_GetYearImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_IsAfternoonImplementation(FDateTime InDateTime);
+        public static extern Boolean DateTime_IsAfternoonImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_IsMorningImplementation(FDateTime InDateTime);
+        public static extern Boolean DateTime_IsMorningImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_ToHttpDateImplementation(FDateTime InDateTime, out FString OutValue);
+        public static extern void DateTime_ToHttpDateImplementation(IntPtr InDateTime, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_ToIso8601Implementation(FDateTime InDateTime, out FString OutValue);
+        public static extern void DateTime_ToIso8601Implementation(IntPtr InDateTime, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void DateTime_ToStringImplementation(FDateTime InDateTime, out FString OutValue);
+        public static extern void DateTime_ToStringImplementation(IntPtr InDateTime, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int64 DateTime_ToUnixTimestampImplementation(FDateTime InDateTime);
+        public static extern Int64 DateTime_ToUnixTimestampImplementation(IntPtr InDateTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 DateTime_DaysInMonthImplementation(Int32 Year, Int32 Month);

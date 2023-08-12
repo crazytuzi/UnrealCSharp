@@ -231,7 +231,7 @@ MonoReflectionMethod* FDomain::Method_Get_Object(MonoMethod* InMethod, MonoClass
 	return FMonoDomain::Method_Get_Object(InMethod, InMonoClass);
 }
 
-MonoObject* FDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams) const
+MonoObject* FDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams)
 {
 	return FMonoDomain::Runtime_Invoke(InFunction, InMonoObject, InParams);
 }
@@ -257,7 +257,7 @@ void FDomain::Unhandled_Exception(MonoObject* InException) const
 	FMonoDomain::Unhandled_Exception(InException);
 }
 
-MonoClass* FDomain::Object_Get_Class(MonoObject* InMonoObject) const
+MonoClass* FDomain::Object_Get_Class(MonoObject* InMonoObject)
 {
 	return FMonoDomain::Object_Get_Class(InMonoObject);
 }
@@ -384,12 +384,43 @@ void FDomain::GCHandle_Free(const uint32 InGCHandle) const
 
 MonoGCHandle FDomain::GCHandle_New_V2(MonoObject* InMonoObject, const mono_bool bPinned)
 {
-	return FMonoDomain::GCHandle_New_V2(InMonoObject, bPinned);
+	return GCHandle_New_V2(InMonoObject, Object_Get_Class(InMonoObject), bPinned);
+}
+
+MonoGCHandle FDomain::GCHandle_New_V2(MonoObject* InMonoObject, MonoClass* InMonoClass, const mono_bool bPinned)
+{
+	const auto GarbageCollectionHandle = FMonoDomain::GCHandle_New_V2(InMonoObject, bPinned);
+
+	auto InParams = static_cast<void*>(GarbageCollectionHandle);
+
+	if (const auto SetGCHandleMonoMethod = Parent_Class_Get_Method_From_Name(
+		InMonoClass, FUNCTION_SET_HANDLE, TGetArrayLength(InParams)))
+	{
+		Runtime_Invoke(SetGCHandleMonoMethod, InMonoObject, &InParams);
+	}
+
+	return GarbageCollectionHandle;
 }
 
 MonoGCHandle FDomain::GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
 {
-	return FMonoDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
+	return GCHandle_New_WeakRef_V2(InMonoObject, Object_Get_Class(InMonoObject), bTrackResurrection);
+}
+
+MonoGCHandle FDomain::GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, MonoClass* InMonoClass,
+                                              mono_bool bTrackResurrection)
+{
+	const auto GarbageCollectionHandle = FMonoDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
+
+	auto InParams = static_cast<void*>(GarbageCollectionHandle);
+
+	if (const auto SetGCHandleMonoMethod = Parent_Class_Get_Method_From_Name(
+		InMonoClass, FUNCTION_SET_HANDLE, TGetArrayLength(InParams)))
+	{
+		Runtime_Invoke(SetGCHandleMonoMethod, InMonoObject, &InParams);
+	}
+
+	return GarbageCollectionHandle;
 }
 
 MonoObject* FDomain::GCHandle_Get_Target_V2(const MonoGCHandle InGCHandle)
@@ -403,7 +434,7 @@ void FDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
 }
 
 MonoMethod* FDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
-                                                       const int32 InParamCount) const
+                                                       const int32 InParamCount)
 {
 	return FMonoDomain::Parent_Class_Get_Method_From_Name(InMonoClass, InFunctionName, InParamCount);
 }

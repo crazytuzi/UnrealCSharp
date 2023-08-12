@@ -21,10 +21,10 @@ struct FRegisterPrimaryAssetType
 static FRegisterPrimaryAssetType RegisterPrimaryAssetType;
 
 void FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetType>(InMonoObject);
+		UScriptStruct, FPrimaryAssetType>(InGarbageCollectionHandle);
 
 	if (PrimaryAssetType != nullptr)
 	{
@@ -42,7 +42,8 @@ void FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation(
 	}
 }
 
-bool FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto PrimaryAssetTypeA = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(A);
@@ -59,7 +60,7 @@ bool FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation(co
 }
 
 bool FPrimaryAssetTypeImplementation::PrimaryAssetType_InequalityImplementation(
-	const MonoObject* A, const MonoObject* B)
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto PrimaryAssetTypeA = FCSharpEnvironment::GetEnvironment().GetAddress<
 		UScriptStruct, FPrimaryAssetType>(A);
@@ -75,10 +76,11 @@ bool FPrimaryAssetTypeImplementation::PrimaryAssetType_InequalityImplementation(
 	return false;
 }
 
-bool FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation(const MonoObject* InMonoObject)
+bool FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetType>(InMonoObject);
+		UScriptStruct, FPrimaryAssetType>(InGarbageCollectionHandle);
 
 	if (PrimaryAssetType != nullptr)
 	{
@@ -89,10 +91,10 @@ bool FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation(con
 }
 
 void FPrimaryAssetTypeImplementation::PrimaryAssetType_ToStringImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PrimaryAssetType = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetType>(InMonoObject);
+		UScriptStruct, FPrimaryAssetType>(InGarbageCollectionHandle);
 
 	if (PrimaryAssetType != nullptr)
 	{

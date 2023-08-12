@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "Macro/PropertyMacro.h"
 #include "mono/metadata/object.h"
 

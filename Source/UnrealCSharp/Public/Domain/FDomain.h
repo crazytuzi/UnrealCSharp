@@ -93,7 +93,7 @@ public:
 
 	MonoReflectionMethod* Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass) const;
 
-	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams) const;
+	static MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams);
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;
 
@@ -103,7 +103,7 @@ public:
 
 	void Unhandled_Exception(MonoObject* InException) const;
 
-	MonoClass* Object_Get_Class(MonoObject* InMonoObject) const;
+	static MonoClass* Object_Get_Class(MonoObject* InMonoObject);
 
 	MonoObject* Value_Box(MonoClass* InMonoClass, void* InValue) const;
 
@@ -155,14 +155,19 @@ public:
 
 	static MonoGCHandle GCHandle_New_V2(MonoObject* InMonoObject, mono_bool bPinned);
 
+	static MonoGCHandle GCHandle_New_V2(MonoObject* InMonoObject, MonoClass* InMonoClass, const mono_bool bPinned);
+
 	static MonoGCHandle GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, mono_bool bTrackResurrection);
+
+	static MonoGCHandle GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, MonoClass* InMonoClass,
+	                                            mono_bool bTrackResurrection);
 
 	static MonoObject* GCHandle_Get_Target_V2(MonoGCHandle InGCHandle);
 
 	static void GCHandle_Free_V2(MonoGCHandle InGCHandle);
 
-	MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
-	                                              int32 InParamCount) const;
+	static MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
+	                                                     int32 InParamCount);
 
 	MonoType* Property_Get_Type(MonoProperty* InMonoProperty) const;
 

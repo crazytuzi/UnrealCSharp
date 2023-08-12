@@ -29,10 +29,11 @@ struct FRegisterFrameNumber
 
 static FRegisterFrameNumber RegisterFrameNumber;
 
-void FFrameNumberImplementation::FrameNumber_IncrementImplementation(const MonoObject* InMonoObject)
+void FFrameNumberImplementation::FrameNumber_IncrementImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FFrameNumber>(InMonoObject);
+		UScriptStruct, FFrameNumber>(InGarbageCollectionHandle);
 
 	if (FrameNumber != nullptr)
 	{
@@ -40,10 +41,11 @@ void FFrameNumberImplementation::FrameNumber_IncrementImplementation(const MonoO
 	}
 }
 
-void FFrameNumberImplementation::FrameNumber_DecrementImplementation(const MonoObject* InMonoObject)
+void FFrameNumberImplementation::FrameNumber_DecrementImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FFrameNumber>(InMonoObject);
+		UScriptStruct, FFrameNumber>(InGarbageCollectionHandle);
 
 	if (FrameNumber != nullptr)
 	{
@@ -51,7 +53,8 @@ void FFrameNumberImplementation::FrameNumber_DecrementImplementation(const MonoO
 	}
 }
 
-bool FFrameNumberImplementation::FrameNumber_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameNumberImplementation::FrameNumber_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                                    const FGarbageCollectionHandle B)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
@@ -65,7 +68,8 @@ bool FFrameNumberImplementation::FrameNumber_EqualityImplementation(const MonoOb
 	return false;
 }
 
-bool FFrameNumberImplementation::FrameNumber_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameNumberImplementation::FrameNumber_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                                      const FGarbageCollectionHandle B)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
@@ -79,7 +83,8 @@ bool FFrameNumberImplementation::FrameNumber_InequalityImplementation(const Mono
 	return false;
 }
 
-bool FFrameNumberImplementation::FrameNumber_LessThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameNumberImplementation::FrameNumber_LessThanImplementation(const FGarbageCollectionHandle A,
+                                                                    const FGarbageCollectionHandle B)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
@@ -93,7 +98,8 @@ bool FFrameNumberImplementation::FrameNumber_LessThanImplementation(const MonoOb
 	return false;
 }
 
-bool FFrameNumberImplementation::FrameNumber_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameNumberImplementation::FrameNumber_GreaterThanImplementation(const FGarbageCollectionHandle A,
+                                                                       const FGarbageCollectionHandle B)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
@@ -107,7 +113,8 @@ bool FFrameNumberImplementation::FrameNumber_GreaterThanImplementation(const Mon
 	return false;
 }
 
-bool FFrameNumberImplementation::FrameNumber_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameNumberImplementation::FrameNumber_LessThanOrEqualImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
@@ -121,7 +128,8 @@ bool FFrameNumberImplementation::FrameNumber_LessThanOrEqualImplementation(const
 	return false;
 }
 
-bool FFrameNumberImplementation::FrameNumber_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameNumberImplementation::FrameNumber_GreaterThanOrEqualImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
@@ -135,8 +143,8 @@ bool FFrameNumberImplementation::FrameNumber_GreaterThanOrEqualImplementation(co
 	return false;
 }
 
-void FFrameNumberImplementation::FrameNumber_AddImplementation(const MonoObject* A, const MonoObject* B,
-                                                               MonoObject** OutValue)
+void FFrameNumberImplementation::FrameNumber_AddImplementation(const FGarbageCollectionHandle A,
+                                                               const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
 
@@ -157,7 +165,8 @@ void FFrameNumberImplementation::FrameNumber_AddImplementation(const MonoObject*
 	}
 }
 
-void FFrameNumberImplementation::FrameNumber_SubtractImplementation(const MonoObject* A, const MonoObject* B,
+void FFrameNumberImplementation::FrameNumber_SubtractImplementation(const FGarbageCollectionHandle A,
+                                                                    const FGarbageCollectionHandle B,
                                                                     MonoObject** OutValue)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
@@ -179,7 +188,8 @@ void FFrameNumberImplementation::FrameNumber_SubtractImplementation(const MonoOb
 	}
 }
 
-void FFrameNumberImplementation::FrameNumber_RemainderImplementation(const MonoObject* A, const MonoObject* B,
+void FFrameNumberImplementation::FrameNumber_RemainderImplementation(const FGarbageCollectionHandle A,
+                                                                     const FGarbageCollectionHandle B,
                                                                      MonoObject** OutValue)
 {
 	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
@@ -201,11 +211,11 @@ void FFrameNumberImplementation::FrameNumber_RemainderImplementation(const MonoO
 	}
 }
 
-void FFrameNumberImplementation::FrameNumber_NegatedImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FFrameNumberImplementation::FrameNumber_NegatedImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FFrameNumber>(InMonoObject);
+		UScriptStruct, FFrameNumber>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
@@ -222,11 +232,11 @@ void FFrameNumberImplementation::FrameNumber_NegatedImplementation(const MonoObj
 	}
 }
 
-void FFrameNumberImplementation::FrameNumber_MultiplyImplementation(const MonoObject* InMonoObject, const float Scalar,
-                                                                    MonoObject** OutValue)
+void FFrameNumberImplementation::FrameNumber_MultiplyImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float Scalar, MonoObject** OutValue)
 {
 	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FFrameNumber>(InMonoObject);
+		UScriptStruct, FFrameNumber>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
@@ -243,11 +253,11 @@ void FFrameNumberImplementation::FrameNumber_MultiplyImplementation(const MonoOb
 	}
 }
 
-void FFrameNumberImplementation::FrameNumber_DivideImplementation(const MonoObject* InMonoObject, const float Scalar,
-                                                                  MonoObject** OutValue)
+void FFrameNumberImplementation::FrameNumber_DivideImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float Scalar, MonoObject** OutValue)
 {
 	const auto FrameNumber = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FFrameNumber>(InMonoObject);
+		UScriptStruct, FFrameNumber>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 

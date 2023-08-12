@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "mono/metadata/object.h"
 
 class FObjectImplementation
@@ -7,11 +8,14 @@ class FObjectImplementation
 public:
 	static void Object_StaticClassImplementation(MonoString* InClassName, MonoObject** OutValue);
 
-	static void Object_GetClassImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Object_GetClassImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                          MonoObject** OutValue);
 
-	static void Object_GetNameImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Object_GetNameImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         MonoObject** OutValue);
 
-	static void Object_GetWorldImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Object_GetWorldImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                          MonoObject** OutValue);
 
-	static bool Object_IsValidImplementation(const MonoObject* InMonoObject);
+	static bool Object_IsValidImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 };

@@ -27,15 +27,17 @@ void FLazyObjectPtrImplementation::LazyObjectPtr_RegisterImplementation(MonoObje
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(InMonoObject, LazyObjectPtr);
 }
 
-void FLazyObjectPtrImplementation::LazyObjectPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FLazyObjectPtrImplementation::LazyObjectPtr_UnRegisterImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(InMonoObject);
+	(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(InGarbageCollectionHandle);
 }
 
-void FLazyObjectPtrImplementation::LazyObjectPtr_GetImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FLazyObjectPtrImplementation::LazyObjectPtr_GetImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<
+		UObject>>(InGarbageCollectionHandle);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 }

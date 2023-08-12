@@ -1,71 +1,71 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class FrameTimeImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FrameTime_GetFrameImplementation(FFrameTime InFrameTime, out FFrameNumber OutValue);
+        public static extern void FrameTime_GetFrameImplementation(IntPtr InFrameTime, out FFrameNumber OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single FrameTime_GetSubFrameImplementation(FFrameTime InFrameTime);
+        public static extern Single FrameTime_GetSubFrameImplementation(IntPtr InFrameTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FrameTime_FloorToFrameImplementation(FFrameTime InFrameTime,
+        public static extern void FrameTime_FloorToFrameImplementation(IntPtr InFrameTime,
             out FFrameNumber OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void
-            FrameTime_CeilToFrameImplementation(FFrameTime InFrameTime, out FFrameNumber OutValue);
+            FrameTime_CeilToFrameImplementation(IntPtr InFrameTime, out FFrameNumber OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FrameTime_RoundToFrameImplementation(FFrameTime InFrameTime,
+        public static extern void FrameTime_RoundToFrameImplementation(IntPtr InFrameTime,
             out FFrameNumber OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double FrameTime_AsDecimalImplementation(FFrameTime InFrameTime);
+        public static extern Double FrameTime_AsDecimalImplementation(IntPtr InFrameTime);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FrameTime_FromDecimalImplementation(Double InDecimalFrame, out FFrameTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameTime_EqualityImplementation(FFrameTime A, FFrameTime B);
+        public static extern Boolean FrameTime_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameTime_InequalityImplementation(FFrameTime A, FFrameTime B);
+        public static extern Boolean FrameTime_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameTime_GreaterThanImplementation(FFrameTime A, FFrameTime B);
+        public static extern Boolean FrameTime_GreaterThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameTime_GreaterThanOrEqualImplementation(FFrameTime A, FFrameTime B);
+        public static extern Boolean FrameTime_GreaterThanOrEqualImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameTime_LessThanImplementation(FFrameTime A, FFrameTime B);
+        public static extern Boolean FrameTime_LessThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameTime_LessThanOrEqualImplementation(FFrameTime A, FFrameTime B);
+        public static extern Boolean FrameTime_LessThanOrEqualImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FrameTime_AddImplementation(FFrameTime A, FFrameTime B, out FFrameTime OutValue);
+        public static extern void FrameTime_AddImplementation(IntPtr A, IntPtr B, out FFrameTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FrameTime_SubtractImplementation(FFrameTime A, FFrameTime B, out FFrameTime OutValue);
+        public static extern void FrameTime_SubtractImplementation(IntPtr A, IntPtr B, out FFrameTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void
-            FrameTime_RemainderImplementation(FFrameTime A, FFrameTime B, out FFrameTime OutValue);
+            FrameTime_RemainderImplementation(IntPtr A, IntPtr B, out FFrameTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FrameTime_NegatedImplementation(FFrameTime InFrameTime, out FFrameTime OutValue);
+        public static extern void FrameTime_NegatedImplementation(IntPtr InFrameTime, out FFrameTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FrameTime_MultiplyImplementation(FFrameTime A, FFrameTime B, out FFrameTime OutValue);
+        public static extern void FrameTime_MultiplyImplementation(IntPtr A, IntPtr B, out FFrameTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FrameTime_DivideImplementation(FFrameTime A, FFrameTime B, out FFrameTime OutValue);
+        public static extern void FrameTime_DivideImplementation(IntPtr A, IntPtr B, out FFrameTime OutValue);
     }
 }

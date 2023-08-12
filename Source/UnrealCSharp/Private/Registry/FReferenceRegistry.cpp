@@ -23,7 +23,7 @@ bool FReferenceRegistry::AddReference(const FGarbageCollectionHandle& InOwner, F
 {
 	if (!ReferenceRelationship.Contains(InOwner))
 	{
-		ReferenceRelationship.Emplace(CopyTemp(InOwner), {});
+		ReferenceRelationship.Add(InOwner, {});
 	}
 
 	ReferenceRelationship[InOwner].Emplace(InReference);

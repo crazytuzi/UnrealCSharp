@@ -56,8 +56,8 @@ struct FRegisterTimespan
 
 static FRegisterTimespan RegisterTimespan;
 
-void FTimespanImplementation::Timespan_AddImplementation(const MonoObject* A, const MonoObject* B,
-                                                         MonoObject** OutValue)
+void FTimespanImplementation::Timespan_AddImplementation(const FGarbageCollectionHandle A,
+                                                         const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -77,9 +77,11 @@ void FTimespanImplementation::Timespan_AddImplementation(const MonoObject* A, co
 	}
 }
 
-void FTimespanImplementation::Timespan_NegatedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FTimespanImplementation::Timespan_NegatedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                             MonoObject** OutValue)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
@@ -95,8 +97,8 @@ void FTimespanImplementation::Timespan_NegatedImplementation(const MonoObject* I
 	}
 }
 
-void FTimespanImplementation::Timespan_SubtractImplementation(const MonoObject* A, const MonoObject* B,
-                                                              MonoObject** OutValue)
+void FTimespanImplementation::Timespan_SubtractImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -116,10 +118,11 @@ void FTimespanImplementation::Timespan_SubtractImplementation(const MonoObject* 
 	}
 }
 
-void FTimespanImplementation::Timespan_MultiplyImplementation(const MonoObject* InMonoObject, const double Scalar,
-                                                              MonoObject** OutValue)
+void FTimespanImplementation::Timespan_MultiplyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              const double Scalar, MonoObject** OutValue)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
@@ -135,10 +138,11 @@ void FTimespanImplementation::Timespan_MultiplyImplementation(const MonoObject* 
 	}
 }
 
-void FTimespanImplementation::Timespan_DivideImplementation(const MonoObject* InMonoObject, const double Scalar,
-                                                            MonoObject** OutValue)
+void FTimespanImplementation::Timespan_DivideImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const double Scalar, MonoObject** OutValue)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
@@ -154,8 +158,8 @@ void FTimespanImplementation::Timespan_DivideImplementation(const MonoObject* In
 	}
 }
 
-void FTimespanImplementation::Timespan_RemainderImplementation(const MonoObject* A, const MonoObject* B,
-                                                               MonoObject** OutValue)
+void FTimespanImplementation::Timespan_RemainderImplementation(const FGarbageCollectionHandle A,
+                                                               const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -175,7 +179,8 @@ void FTimespanImplementation::Timespan_RemainderImplementation(const MonoObject*
 	}
 }
 
-bool FTimespanImplementation::Timespan_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FTimespanImplementation::Timespan_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -189,7 +194,8 @@ bool FTimespanImplementation::Timespan_EqualityImplementation(const MonoObject* 
 	return false;
 }
 
-bool FTimespanImplementation::Timespan_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FTimespanImplementation::Timespan_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                                const FGarbageCollectionHandle B)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -203,7 +209,8 @@ bool FTimespanImplementation::Timespan_InequalityImplementation(const MonoObject
 	return false;
 }
 
-bool FTimespanImplementation::Timespan_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FTimespanImplementation::Timespan_GreaterThanImplementation(const FGarbageCollectionHandle A,
+                                                                 const FGarbageCollectionHandle B)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -217,7 +224,8 @@ bool FTimespanImplementation::Timespan_GreaterThanImplementation(const MonoObjec
 	return false;
 }
 
-bool FTimespanImplementation::Timespan_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FTimespanImplementation::Timespan_GreaterThanOrEqualImplementation(const FGarbageCollectionHandle A,
+                                                                        const FGarbageCollectionHandle B)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -231,7 +239,8 @@ bool FTimespanImplementation::Timespan_GreaterThanOrEqualImplementation(const Mo
 	return false;
 }
 
-bool FTimespanImplementation::Timespan_LessThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FTimespanImplementation::Timespan_LessThanImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -245,7 +254,8 @@ bool FTimespanImplementation::Timespan_LessThanImplementation(const MonoObject* 
 	return false;
 }
 
-bool FTimespanImplementation::Timespan_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FTimespanImplementation::Timespan_LessThanOrEqualImplementation(const FGarbageCollectionHandle A,
+                                                                     const FGarbageCollectionHandle B)
 {
 	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
 
@@ -259,9 +269,10 @@ bool FTimespanImplementation::Timespan_LessThanOrEqualImplementation(const MonoO
 	return false;
 }
 
-int32 FTimespanImplementation::Timespan_GetDaysImplementation(const MonoObject* InMonoObject)
+int32 FTimespanImplementation::Timespan_GetDaysImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -271,9 +282,11 @@ int32 FTimespanImplementation::Timespan_GetDaysImplementation(const MonoObject* 
 	return 0;
 }
 
-void FTimespanImplementation::Timespan_GetDurationImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FTimespanImplementation::Timespan_GetDurationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 
@@ -289,9 +302,11 @@ void FTimespanImplementation::Timespan_GetDurationImplementation(const MonoObjec
 	}
 }
 
-int32 FTimespanImplementation::Timespan_GetFractionMicroImplementation(const MonoObject* InMonoObject)
+int32 FTimespanImplementation::Timespan_GetFractionMicroImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -301,9 +316,11 @@ int32 FTimespanImplementation::Timespan_GetFractionMicroImplementation(const Mon
 	return 0;
 }
 
-int32 FTimespanImplementation::Timespan_GetFractionMilliImplementation(const MonoObject* InMonoObject)
+int32 FTimespanImplementation::Timespan_GetFractionMilliImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -313,9 +330,11 @@ int32 FTimespanImplementation::Timespan_GetFractionMilliImplementation(const Mon
 	return 0;
 }
 
-int32 FTimespanImplementation::Timespan_GetFractionNanoImplementation(const MonoObject* InMonoObject)
+int32 FTimespanImplementation::Timespan_GetFractionNanoImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -325,9 +344,11 @@ int32 FTimespanImplementation::Timespan_GetFractionNanoImplementation(const Mono
 	return 0;
 }
 
-int32 FTimespanImplementation::Timespan_GetFractionTicksImplementation(const MonoObject* InMonoObject)
+int32 FTimespanImplementation::Timespan_GetFractionTicksImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -337,9 +358,10 @@ int32 FTimespanImplementation::Timespan_GetFractionTicksImplementation(const Mon
 	return 0;
 }
 
-int32 FTimespanImplementation::Timespan_GetHoursImplementation(const MonoObject* InMonoObject)
+int32 FTimespanImplementation::Timespan_GetHoursImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -349,9 +371,11 @@ int32 FTimespanImplementation::Timespan_GetHoursImplementation(const MonoObject*
 	return 0;
 }
 
-int32 FTimespanImplementation::Timespan_GetMinutesImplementation(const MonoObject* InMonoObject)
+int32 FTimespanImplementation::Timespan_GetMinutesImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -361,9 +385,11 @@ int32 FTimespanImplementation::Timespan_GetMinutesImplementation(const MonoObjec
 	return 0;
 }
 
-int32 FTimespanImplementation::Timespan_GetSecondsImplementation(const MonoObject* InMonoObject)
+int32 FTimespanImplementation::Timespan_GetSecondsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -373,9 +399,10 @@ int32 FTimespanImplementation::Timespan_GetSecondsImplementation(const MonoObjec
 	return 0;
 }
 
-int64 FTimespanImplementation::Timespan_GetTicksImplementation(const MonoObject* InMonoObject)
+int64 FTimespanImplementation::Timespan_GetTicksImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -385,9 +412,11 @@ int64 FTimespanImplementation::Timespan_GetTicksImplementation(const MonoObject*
 	return 0;
 }
 
-double FTimespanImplementation::Timespan_GetTotalDaysImplementation(const MonoObject* InMonoObject)
+double FTimespanImplementation::Timespan_GetTotalDaysImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -397,9 +426,11 @@ double FTimespanImplementation::Timespan_GetTotalDaysImplementation(const MonoOb
 	return 0.0;
 }
 
-double FTimespanImplementation::Timespan_GetTotalHoursImplementation(const MonoObject* InMonoObject)
+double FTimespanImplementation::Timespan_GetTotalHoursImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -409,9 +440,11 @@ double FTimespanImplementation::Timespan_GetTotalHoursImplementation(const MonoO
 	return 0.0;
 }
 
-double FTimespanImplementation::Timespan_GetTotalMicrosecondsImplementation(const MonoObject* InMonoObject)
+double FTimespanImplementation::Timespan_GetTotalMicrosecondsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -421,9 +454,11 @@ double FTimespanImplementation::Timespan_GetTotalMicrosecondsImplementation(cons
 	return 0.0;
 }
 
-double FTimespanImplementation::Timespan_GetTotalMillisecondsImplementation(const MonoObject* InMonoObject)
+double FTimespanImplementation::Timespan_GetTotalMillisecondsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -433,9 +468,11 @@ double FTimespanImplementation::Timespan_GetTotalMillisecondsImplementation(cons
 	return 0.0;
 }
 
-double FTimespanImplementation::Timespan_GetTotalMinutesImplementation(const MonoObject* InMonoObject)
+double FTimespanImplementation::Timespan_GetTotalMinutesImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -445,9 +482,11 @@ double FTimespanImplementation::Timespan_GetTotalMinutesImplementation(const Mon
 	return 0.0;
 }
 
-double FTimespanImplementation::Timespan_GetTotalSecondsImplementation(const MonoObject* InMonoObject)
+double FTimespanImplementation::Timespan_GetTotalSecondsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -457,9 +496,10 @@ double FTimespanImplementation::Timespan_GetTotalSecondsImplementation(const Mon
 	return 0.0;
 }
 
-bool FTimespanImplementation::Timespan_IsZeroImplementation(const MonoObject* InMonoObject)
+bool FTimespanImplementation::Timespan_IsZeroImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{
@@ -469,9 +509,11 @@ bool FTimespanImplementation::Timespan_IsZeroImplementation(const MonoObject* In
 	return false;
 }
 
-void FTimespanImplementation::Timespan_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FTimespanImplementation::Timespan_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              MonoObject** OutValue)
 {
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(InMonoObject);
+	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(
+		InGarbageCollectionHandle);
 
 	if (Timespan != nullptr)
 	{

@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 #if UE_5_0_OR_LATER
 using LwcType = System.Double;
 #else
@@ -13,162 +14,162 @@ namespace Script.Library
     public static class MatrixImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Matrix_GetMImplementation(FMatrix InMatrix, UInt32 InRow, UInt32 InColumn);
+        public static extern LwcType Matrix_GetMImplementation(IntPtr InMatrix, UInt32 InRow, UInt32 InColumn);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_SetMImplementation(FMatrix InMatrix, UInt32 InRow, UInt32 InColumn,
+        public static extern void Matrix_SetMImplementation(IntPtr InMatrix, UInt32 InRow, UInt32 InColumn,
             LwcType InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_SetIdentityImplementation(FMatrix InMatrix);
+        public static extern void Matrix_SetIdentityImplementation(IntPtr InMatrix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_MultiplyImplementation(FMatrix A, FMatrix B, out FMatrix OutValue);
+        public static extern void Matrix_MultiplyImplementation(IntPtr A, IntPtr B, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_AddImplementation(FMatrix A, FMatrix B, out FMatrix OutValue);
+        public static extern void Matrix_AddImplementation(IntPtr A, IntPtr B, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_MultiplyScaleImplementation(FMatrix InMatrix, LwcType Other,
+        public static extern void Matrix_MultiplyScaleImplementation(IntPtr InMatrix, LwcType Other,
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_EqualityImplementation(FMatrix A, FMatrix B);
+        public static extern Boolean Matrix_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_EqualsImplementation(FMatrix A, FMatrix B, LwcType Tolerance);
+        public static extern Boolean Matrix_EqualsImplementation(IntPtr A, IntPtr B, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_InequalityImplementation(FMatrix A, FMatrix B);
+        public static extern Boolean Matrix_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_TransformFVector4Implementation(FMatrix InMatrix, FVector4 V,
+        public static extern void Matrix_TransformFVector4Implementation(IntPtr InMatrix, FVector4 V,
             out FVector4 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_TransformPositionImplementation(FMatrix InMatrix, FVector V,
+        public static extern void Matrix_TransformPositionImplementation(IntPtr InMatrix, FVector V,
             out FVector4 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_InverseTransformPositionImplementation(FMatrix InMatrix, FVector V,
+        public static extern void Matrix_InverseTransformPositionImplementation(IntPtr InMatrix, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_TransformVectorImplementation(FMatrix InMatrix, FVector V,
+        public static extern void Matrix_TransformVectorImplementation(IntPtr InMatrix, FVector V,
             out FVector4 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_InverseTransformVectorImplementation(FMatrix InMatrix, FVector V,
+        public static extern void Matrix_InverseTransformVectorImplementation(IntPtr InMatrix, FVector V,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetTransposedImplementation(FMatrix InMatrix, out FMatrix OutValue);
+        public static extern void Matrix_GetTransposedImplementation(IntPtr InMatrix, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Matrix_DeterminantImplementation(FMatrix InMatrix);
+        public static extern LwcType Matrix_DeterminantImplementation(IntPtr InMatrix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Matrix_RotDeterminantImplementation(FMatrix InMatrix);
+        public static extern LwcType Matrix_RotDeterminantImplementation(IntPtr InMatrix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_InverseFastImplementation(FMatrix InMatrix, out FMatrix OutValue);
+        public static extern void Matrix_InverseFastImplementation(IntPtr InMatrix, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_InverseImplementation(FMatrix InMatrix, out FMatrix OutValue);
+        public static extern void Matrix_InverseImplementation(IntPtr InMatrix, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_TransposeAdjointImplementation(FMatrix InMatrix, out FMatrix OutValue);
+        public static extern void Matrix_TransposeAdjointImplementation(IntPtr InMatrix, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_RemoveScalingImplementation(FMatrix InMatrix, LwcType Tolerance);
+        public static extern void Matrix_RemoveScalingImplementation(IntPtr InMatrix, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetMatrixWithoutScaleImplementation(FMatrix InMatrix, LwcType Tolerance,
+        public static extern void Matrix_GetMatrixWithoutScaleImplementation(IntPtr InMatrix, LwcType Tolerance,
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_ExtractScalingImplementation(FMatrix InMatrix, LwcType Tolerance,
+        public static extern void Matrix_ExtractScalingImplementation(IntPtr InMatrix, LwcType Tolerance,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetScaleVectorImplementation(FMatrix InMatrix, LwcType Tolerance,
+        public static extern void Matrix_GetScaleVectorImplementation(IntPtr InMatrix, LwcType Tolerance,
             out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_RemoveTranslationImplementation(FMatrix InMatrix, out FMatrix OutValue);
+        public static extern void Matrix_RemoveTranslationImplementation(IntPtr InMatrix, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_ConcatTranslationImplementation(FMatrix InMatrix, FVector Translation,
+        public static extern void Matrix_ConcatTranslationImplementation(IntPtr InMatrix, FVector Translation,
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_ContainsNaNImplementation(FMatrix InMatrix);
+        public static extern Boolean Matrix_ContainsNaNImplementation(IntPtr InMatrix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_ScaleTranslationImplementation(FMatrix InMatrix, FVector Scale3D);
+        public static extern void Matrix_ScaleTranslationImplementation(IntPtr InMatrix, FVector Scale3D);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern LwcType Matrix_GetMaximumAxisScaleImplementation(FMatrix InMatrix);
+        public static extern LwcType Matrix_GetMaximumAxisScaleImplementation(IntPtr InMatrix);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void
-            Matrix_ApplyScaleImplementation(FMatrix InMatrix, LwcType Scale, out FMatrix OutValue);
+            Matrix_ApplyScaleImplementation(IntPtr InMatrix, LwcType Scale, out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetOriginImplementation(FMatrix InMatrix, out FVector OutValue);
+        public static extern void Matrix_GetOriginImplementation(IntPtr InMatrix, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetScaledAxesImplementation(FMatrix InMatrix, out FVector X, out FVector Y,
+        public static extern void Matrix_GetScaledAxesImplementation(IntPtr InMatrix, out FVector X, out FVector Y,
             out FVector Z);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetUnitAxesImplementation(FMatrix InMatrix, out FVector X, out FVector Y,
+        public static extern void Matrix_GetUnitAxesImplementation(IntPtr InMatrix, out FVector X, out FVector Y,
             out FVector Z);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_SetAxisImplementation(FMatrix InMatrix, Int32 i, FVector Axis);
+        public static extern void Matrix_SetAxisImplementation(IntPtr InMatrix, Int32 i, FVector Axis);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_SetOriginImplementation(FMatrix InMatrix, FVector NewOrigin);
+        public static extern void Matrix_SetOriginImplementation(IntPtr InMatrix, FVector NewOrigin);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_SetAxesImplementation(FMatrix InMatrix, FVector Axis0, FVector Axis1,
+        public static extern void Matrix_SetAxesImplementation(IntPtr InMatrix, FVector Axis0, FVector Axis1,
             FVector Axis2, FVector Origin);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_GetColumnImplementation(FMatrix InMatrix, Int32 i, out FVector OutValue);
+        public static extern void Matrix_GetColumnImplementation(IntPtr InMatrix, Int32 i, out FVector OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_SetColumnImplementation(FMatrix InMatrix, Int32 i, FVector Value);
+        public static extern void Matrix_SetColumnImplementation(IntPtr InMatrix, Int32 i, FVector Value);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_RotatorImplementation(FMatrix InMatrix, out FRotator OutValue);
+        public static extern void Matrix_RotatorImplementation(IntPtr InMatrix, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_ToQuatImplementation(FMatrix InMatrix, out FQuat OutValue);
+        public static extern void Matrix_ToQuatImplementation(IntPtr InMatrix, out FQuat OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_GetFrustumNearPlaneImplementation(FMatrix InMatrix, out FPlane OutValue);
+        public static extern Boolean Matrix_GetFrustumNearPlaneImplementation(IntPtr InMatrix, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_GetFrustumFarPlaneImplementation(FMatrix InMatrix, out FPlane OutValue);
+        public static extern Boolean Matrix_GetFrustumFarPlaneImplementation(IntPtr InMatrix, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_GetFrustumLeftPlaneImplementation(FMatrix InMatrix, out FPlane OutValue);
+        public static extern Boolean Matrix_GetFrustumLeftPlaneImplementation(IntPtr InMatrix, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_GetFrustumRightPlaneImplementation(FMatrix InMatrix, out FPlane OutValue);
+        public static extern Boolean Matrix_GetFrustumRightPlaneImplementation(IntPtr InMatrix, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_GetFrustumTopPlaneImplementation(FMatrix InMatrix, out FPlane OutValue);
+        public static extern Boolean Matrix_GetFrustumTopPlaneImplementation(IntPtr InMatrix, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_GetFrustumBottomPlaneImplementation(FMatrix InMatrix, out FPlane OutValue);
+        public static extern Boolean Matrix_GetFrustumBottomPlaneImplementation(IntPtr InMatrix, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Matrix_ToStringImplementation(FMatrix InMatrix, out FString OutValue);
+        public static extern void Matrix_ToStringImplementation(IntPtr InMatrix, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UInt32 Matrix_ComputeHashImplementation(FMatrix InMatrix);
+        public static extern UInt32 Matrix_ComputeHashImplementation(IntPtr InMatrix);
     }
 }

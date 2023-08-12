@@ -28,18 +28,20 @@ void FSoftClassPtrImplementation::SoftClassPtr_RegisterImplementation(MonoObject
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(InMonoObject, SoftClassPtr);
 }
 
-void FSoftClassPtrImplementation::SoftClassPtr_UnRegisterImplementation(const MonoObject* InMonoObject)
+void FSoftClassPtrImplementation::SoftClassPtr_UnRegisterImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	AsyncTask(ENamedThreads::GameThread, [InMonoObject]
+	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(
+			InGarbageCollectionHandle);
 	});
 }
 
-void FSoftClassPtrImplementation::SoftClassPtr_GetImplementation(const MonoObject* InMonoObject,
-                                                                 MonoObject** OutValue)
+void FSoftClassPtrImplementation::SoftClassPtr_GetImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InMonoObject);
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InGarbageCollectionHandle);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 }

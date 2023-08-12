@@ -34,9 +34,11 @@ struct FRegisterFrameTime
 
 static FRegisterFrameTime RegisterFrameTime;
 
-void FFrameTimeImplementation::FrameTime_GetFrameImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_GetFrameImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
@@ -53,9 +55,11 @@ void FFrameTimeImplementation::FrameTime_GetFrameImplementation(const MonoObject
 	}
 }
 
-float FFrameTimeImplementation::FrameTime_GetSubFrameImplementation(const MonoObject* InMonoObject)
+float FFrameTimeImplementation::FrameTime_GetSubFrameImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	if (FrameTime != nullptr)
 	{
@@ -65,10 +69,11 @@ float FFrameTimeImplementation::FrameTime_GetSubFrameImplementation(const MonoOb
 	return 0.f;
 }
 
-void FFrameTimeImplementation::FrameTime_FloorToFrameImplementation(const MonoObject* InMonoObject,
-                                                                    MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_FloorToFrameImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
@@ -85,10 +90,11 @@ void FFrameTimeImplementation::FrameTime_FloorToFrameImplementation(const MonoOb
 	}
 }
 
-void FFrameTimeImplementation::FrameTime_CeilToFrameImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_CeilToFrameImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
@@ -105,10 +111,11 @@ void FFrameTimeImplementation::FrameTime_CeilToFrameImplementation(const MonoObj
 	}
 }
 
-void FFrameTimeImplementation::FrameTime_RoundToFrameImplementation(const MonoObject* InMonoObject,
-                                                                    MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_RoundToFrameImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameNumber, FFrameNumber>::Get();
 
@@ -125,9 +132,11 @@ void FFrameTimeImplementation::FrameTime_RoundToFrameImplementation(const MonoOb
 	}
 }
 
-double FFrameTimeImplementation::FrameTime_AsDecimalImplementation(const MonoObject* InMonoObject)
+double FFrameTimeImplementation::FrameTime_AsDecimalImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	if (FrameTime != nullptr)
 	{
@@ -154,7 +163,8 @@ void FFrameTimeImplementation::FrameTime_FromDecimalImplementation(const double 
 	}
 }
 
-bool FFrameTimeImplementation::FrameTime_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameTimeImplementation::FrameTime_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                                const FGarbageCollectionHandle B)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
@@ -168,7 +178,8 @@ bool FFrameTimeImplementation::FrameTime_EqualityImplementation(const MonoObject
 	return false;
 }
 
-bool FFrameTimeImplementation::FrameTime_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameTimeImplementation::FrameTime_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                                  const FGarbageCollectionHandle B)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
@@ -182,7 +193,8 @@ bool FFrameTimeImplementation::FrameTime_InequalityImplementation(const MonoObje
 	return false;
 }
 
-bool FFrameTimeImplementation::FrameTime_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameTimeImplementation::FrameTime_GreaterThanImplementation(const FGarbageCollectionHandle A,
+                                                                   const FGarbageCollectionHandle B)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
@@ -196,7 +208,8 @@ bool FFrameTimeImplementation::FrameTime_GreaterThanImplementation(const MonoObj
 	return false;
 }
 
-bool FFrameTimeImplementation::FrameTime_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameTimeImplementation::FrameTime_GreaterThanOrEqualImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
@@ -210,7 +223,8 @@ bool FFrameTimeImplementation::FrameTime_GreaterThanOrEqualImplementation(const 
 	return false;
 }
 
-bool FFrameTimeImplementation::FrameTime_LessThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameTimeImplementation::FrameTime_LessThanImplementation(const FGarbageCollectionHandle A,
+                                                                const FGarbageCollectionHandle B)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
@@ -224,7 +238,8 @@ bool FFrameTimeImplementation::FrameTime_LessThanImplementation(const MonoObject
 	return false;
 }
 
-bool FFrameTimeImplementation::FrameTime_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FFrameTimeImplementation::FrameTime_LessThanOrEqualImplementation(const FGarbageCollectionHandle A,
+                                                                       const FGarbageCollectionHandle B)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
@@ -238,8 +253,8 @@ bool FFrameTimeImplementation::FrameTime_LessThanOrEqualImplementation(const Mon
 	return false;
 }
 
-void FFrameTimeImplementation::FrameTime_AddImplementation(const MonoObject* A, const MonoObject* B,
-                                                           MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_AddImplementation(const FGarbageCollectionHandle A,
+                                                           const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
@@ -260,8 +275,8 @@ void FFrameTimeImplementation::FrameTime_AddImplementation(const MonoObject* A, 
 	}
 }
 
-void FFrameTimeImplementation::FrameTime_SubtractImplementation(const MonoObject* A, const MonoObject* B,
-                                                                MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_SubtractImplementation(const FGarbageCollectionHandle A,
+                                                                const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
 
@@ -282,7 +297,8 @@ void FFrameTimeImplementation::FrameTime_SubtractImplementation(const MonoObject
 	}
 }
 
-void FFrameTimeImplementation::FrameTime_RemainderImplementation(const MonoObject* A, const MonoObject* B,
+void FFrameTimeImplementation::FrameTime_RemainderImplementation(const FGarbageCollectionHandle A,
+                                                                 const FGarbageCollectionHandle B,
                                                                  MonoObject** OutValue)
 {
 	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
@@ -304,9 +320,11 @@ void FFrameTimeImplementation::FrameTime_RemainderImplementation(const MonoObjec
 	}
 }
 
-void FFrameTimeImplementation::FrameTime_NegatedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_NegatedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameTime, FFrameTime>::Get();
 
@@ -323,10 +341,11 @@ void FFrameTimeImplementation::FrameTime_NegatedImplementation(const MonoObject*
 	}
 }
 
-void FFrameTimeImplementation::FrameTime_MultiplyImplementation(const MonoObject* InMonoObject, const float Scalar,
-                                                                MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_MultiplyImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const float Scalar, MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameTime, FFrameTime>::Get();
 
@@ -343,10 +362,11 @@ void FFrameTimeImplementation::FrameTime_MultiplyImplementation(const MonoObject
 	}
 }
 
-void FFrameTimeImplementation::FrameTime_DivideImplementation(const MonoObject* InMonoObject, const float Scalar,
-                                                              MonoObject** OutValue)
+void FFrameTimeImplementation::FrameTime_DivideImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              const float Scalar, MonoObject** OutValue)
 {
-	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(InMonoObject);
+	const auto FrameTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FFrameTime, FFrameTime>::Get();
 

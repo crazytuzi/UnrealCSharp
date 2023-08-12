@@ -1,84 +1,84 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class FloatRangeImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_EqualityImplementation(FFloatRange A, FFloatRange B);
+        public static extern Boolean FloatRange_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_InequalityImplementation(FFloatRange A, FFloatRange B);
+        public static extern Boolean FloatRange_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_AdjoinsImplementation(FFloatRange InFloatRange, FFloatRange Other);
+        public static extern Boolean FloatRange_AdjoinsImplementation(IntPtr InFloatRange, FFloatRange Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_ConjoinsImplementation(FFloatRange InFloatRange, FFloatRange X,
+        public static extern Boolean FloatRange_ConjoinsImplementation(IntPtr InFloatRange, FFloatRange X,
             FFloatRange Y);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_ContainsElementImplementation(FFloatRange InFloatRange, Single Element);
+        public static extern Boolean FloatRange_ContainsElementImplementation(IntPtr InFloatRange, Single Element);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_ContainsImplementation(FFloatRange InFloatRange, FFloatRange Other);
+        public static extern Boolean FloatRange_ContainsImplementation(IntPtr InFloatRange, FFloatRange Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_ContiguousImplementation(FFloatRange InFloatRange, FFloatRange Other);
+        public static extern Boolean FloatRange_ContiguousImplementation(IntPtr InFloatRange, FFloatRange Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRange_GetLowerBoundImplementation(FFloatRange InFloatRange,
+        public static extern void FloatRange_GetLowerBoundImplementation(IntPtr InFloatRange,
             out FFloatRangeBound OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRange_SetLowerBoundImplementation(FFloatRange InFloatRange,
+        public static extern void FloatRange_SetLowerBoundImplementation(IntPtr InFloatRange,
             FFloatRangeBound NewLowerBound);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRange_SetLowerBoundValueImplementation(FFloatRange InFloatRange,
+        public static extern void FloatRange_SetLowerBoundValueImplementation(IntPtr InFloatRange,
             Single NewLowerBoundValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single FloatRange_GetLowerBoundValueImplementation(FFloatRange InFloatRange);
+        public static extern Single FloatRange_GetLowerBoundValueImplementation(IntPtr InFloatRange);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRange_GetUpperBoundImplementation(FFloatRange InFloatRange,
+        public static extern void FloatRange_GetUpperBoundImplementation(IntPtr InFloatRange,
             out FFloatRangeBound OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRange_SetUpperBoundImplementation(FFloatRange InFloatRange,
+        public static extern void FloatRange_SetUpperBoundImplementation(IntPtr InFloatRange,
             FFloatRangeBound NewUpperBound);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRange_SetUpperBoundValueImplementation(FFloatRange InFloatRange,
+        public static extern void FloatRange_SetUpperBoundValueImplementation(IntPtr InFloatRange,
             Single NewUpperBoundValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single FloatRange_GetUpperBoundValueImplementation(FFloatRange InFloatRange);
+        public static extern Single FloatRange_GetUpperBoundValueImplementation(IntPtr InFloatRange);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_HasLowerBoundImplementation(FFloatRange InFloatRange);
+        public static extern Boolean FloatRange_HasLowerBoundImplementation(IntPtr InFloatRange);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_HasUpperBoundImplementation(FFloatRange InFloatRange);
+        public static extern Boolean FloatRange_HasUpperBoundImplementation(IntPtr InFloatRange);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_IsDegenerateImplementation(FFloatRange InFloatRange);
+        public static extern Boolean FloatRange_IsDegenerateImplementation(IntPtr InFloatRange);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_IsEmptyImplementation(FFloatRange InFloatRange);
+        public static extern Boolean FloatRange_IsEmptyImplementation(IntPtr InFloatRange);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_OverlapsImplementation(FFloatRange InFloatRange, FFloatRange Other);
+        public static extern Boolean FloatRange_OverlapsImplementation(IntPtr InFloatRange, FFloatRange Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRange_HullImplementation(FFloatRange X, FFloatRange Y, out FFloatRange OutValue);
+        public static extern void FloatRange_HullImplementation(IntPtr X, IntPtr Y, out FFloatRange OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRange_IntersectionImplementation(FFloatRange X, FFloatRange Y,
+        public static extern void FloatRange_IntersectionImplementation(IntPtr X, IntPtr Y,
             out FFloatRange OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

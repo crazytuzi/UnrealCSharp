@@ -41,8 +41,8 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplement
 			GetDomain()->Object_To_String(TypeAndName, nullptr)))));
 }
 
-void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImplementation(MonoObject* TypeAndName,
-	MonoObject** OutValue)
+void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImplementation(
+	MonoObject* TypeAndName, MonoObject** OutValue)
 {
 	const auto FoundMonoClass = TPropertyClass<FPrimaryAssetId, FPrimaryAssetId>::Get();
 
@@ -58,10 +58,11 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImpleme
 			GetDomain()->Object_To_String(TypeAndName, nullptr)))));
 }
 
-bool FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation(const MonoObject* InMonoObject)
+bool FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
 	const auto PrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetId>(InMonoObject);
+		UScriptStruct, FPrimaryAssetId>(InGarbageCollectionHandle);
 
 	if (PrimaryAssetId != nullptr)
 	{
@@ -72,10 +73,10 @@ bool FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation(const M
 }
 
 void FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
 	const auto PrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetId>(InMonoObject);
+		UScriptStruct, FPrimaryAssetId>(InGarbageCollectionHandle);
 
 	if (PrimaryAssetId != nullptr)
 	{
@@ -109,7 +110,8 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation(Mono
 			GetDomain()->Object_To_String(String, nullptr)))));
 }
 
-bool FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto PrimaryAssetIdA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(A);
 
@@ -123,7 +125,8 @@ bool FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation(const 
 	return false;
 }
 
-bool FPrimaryAssetIdImplementation::PrimaryAssetId_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FPrimaryAssetIdImplementation::PrimaryAssetId_InequalityImplementation(
+	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
 {
 	const auto PrimaryAssetIdA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(A);
 

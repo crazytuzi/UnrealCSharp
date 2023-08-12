@@ -22,11 +22,11 @@ struct FRegisterDataTableFunctionLibrary
 static FRegisterDataTableFunctionLibrary RegisterDataTableFunctionLibrary;
 
 bool FDataTableFunctionLibraryImplementation::DataTableFunctionLibrary_GetDataTableRowFromNameImplementation(
-	const MonoObject* Table, MonoString* RowName, MonoObject** OutRow)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* RowName, MonoObject** OutRow)
 {
 	const auto InRowName = UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(RowName));
 
-	if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<UDataTable>(Table))
+	if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<UDataTable>(InGarbageCollectionHandle))
 	{
 #if UE_OBJECT_PTR
 		FCSharpEnvironment::GetEnvironment().Bind(DataTable->RowStruct.Get(), false);

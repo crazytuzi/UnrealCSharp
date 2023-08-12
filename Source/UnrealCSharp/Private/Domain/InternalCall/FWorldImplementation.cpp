@@ -18,10 +18,11 @@ struct FRegisterWorld
 
 static FRegisterWorld RegisterWorld;
 
-void FWorldImplementation::World_SpawnActorImplementation(const MonoObject* InMonoObject, const MonoObject* Class,
+void FWorldImplementation::World_SpawnActorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                          const FGarbageCollectionHandle Class,
                                                           const MonoObject* Transform, MonoObject** OutValue)
 {
-	if (const auto FoundWorld = FCSharpEnvironment::GetEnvironment().GetObject<UWorld>(InMonoObject))
+	if (const auto FoundWorld = FCSharpEnvironment::GetEnvironment().GetObject<UWorld>(InGarbageCollectionHandle))
 	{
 		const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(Class);
 

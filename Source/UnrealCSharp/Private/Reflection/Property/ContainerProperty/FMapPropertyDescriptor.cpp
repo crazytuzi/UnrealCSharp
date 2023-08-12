@@ -70,7 +70,7 @@ MonoObject* FMapPropertyDescriptor::Object_New(void* InAddress) const
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Object);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, MapHelper, Object);
 		}
 	}
 

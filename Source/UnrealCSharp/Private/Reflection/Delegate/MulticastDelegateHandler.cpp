@@ -132,7 +132,7 @@ void UMulticastDelegateHandler::Add(MonoObject* InMulticastDelegate)
 		}
 	}
 
-	DelegateGarbageCollectionHandles.Emplace(FGarbageCollectionHandle::NewRef(InMulticastDelegate, false));
+	DelegateGarbageCollectionHandles.Emplace(FGarbageCollectionHandle::NewRef(InMulticastDelegate, true));
 }
 
 void UMulticastDelegateHandler::AddUnique(MonoObject* InMulticastDelegate)
@@ -151,7 +151,7 @@ void UMulticastDelegateHandler::AddUnique(MonoObject* InMulticastDelegate)
 
 	if (!Contains(InMulticastDelegate))
 	{
-		DelegateGarbageCollectionHandles.Emplace(FGarbageCollectionHandle::NewRef(InMulticastDelegate, false));
+		DelegateGarbageCollectionHandles.Emplace(FGarbageCollectionHandle::NewRef(InMulticastDelegate, true));
 	}
 }
 

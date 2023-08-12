@@ -64,10 +64,10 @@ struct FRegisterMatrix
 static FRegisterMatrix RegisterMatrix;
 
 FMatrixImplementation::LwcType FMatrixImplementation::Matrix_GetMImplementation(
-	const MonoObject* InMonoObject, const uint32 InRow,
-	const uint32 InColumn)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InRow, const uint32 InColumn)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -77,10 +77,11 @@ FMatrixImplementation::LwcType FMatrixImplementation::Matrix_GetMImplementation(
 	return 0.f;
 }
 
-void FMatrixImplementation::Matrix_SetMImplementation(const MonoObject* InMonoObject, const uint32 InRow,
-                                                      const uint32 InColumn, const LwcType InValue)
+void FMatrixImplementation::Matrix_SetMImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                      const uint32 InRow, const uint32 InColumn, const LwcType InValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -88,9 +89,10 @@ void FMatrixImplementation::Matrix_SetMImplementation(const MonoObject* InMonoOb
 	}
 }
 
-void FMatrixImplementation::Matrix_SetIdentityImplementation(const MonoObject* InMonoObject)
+void FMatrixImplementation::Matrix_SetIdentityImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -98,8 +100,8 @@ void FMatrixImplementation::Matrix_SetIdentityImplementation(const MonoObject* I
 	}
 }
 
-void FMatrixImplementation::Matrix_MultiplyImplementation(const MonoObject* A, const MonoObject* B,
-                                                          MonoObject** OutValue)
+void FMatrixImplementation::Matrix_MultiplyImplementation(const FGarbageCollectionHandle A,
+                                                          const FGarbageCollectionHandle B, MonoObject** OutValue)
 {
 	const auto MatrixA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(A);
 
@@ -119,7 +121,8 @@ void FMatrixImplementation::Matrix_MultiplyImplementation(const MonoObject* A, c
 	}
 }
 
-void FMatrixImplementation::Matrix_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_AddImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+                                                     MonoObject** OutValue)
 {
 	const auto MatrixA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(A);
 
@@ -139,10 +142,11 @@ void FMatrixImplementation::Matrix_AddImplementation(const MonoObject* A, const 
 	}
 }
 
-void FMatrixImplementation::Matrix_MultiplyScaleImplementation(const MonoObject* InMonoObject, const LwcType Other,
-                                                               MonoObject** OutValue)
+void FMatrixImplementation::Matrix_MultiplyScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               const LwcType Other, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -158,7 +162,8 @@ void FMatrixImplementation::Matrix_MultiplyScaleImplementation(const MonoObject*
 	}
 }
 
-bool FMatrixImplementation::Matrix_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FMatrixImplementation::Matrix_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                          const FGarbageCollectionHandle B)
 {
 	const auto MatrixA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(A);
 
@@ -172,8 +177,8 @@ bool FMatrixImplementation::Matrix_EqualityImplementation(const MonoObject* A, c
 	return false;
 }
 
-bool FMatrixImplementation::Matrix_EqualsImplementation(const MonoObject* A, const MonoObject* B,
-                                                        const LwcType Tolerance)
+bool FMatrixImplementation::Matrix_EqualsImplementation(const FGarbageCollectionHandle A,
+                                                        const FGarbageCollectionHandle B, const LwcType Tolerance)
 {
 	const auto MatrixA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(A);
 
@@ -187,7 +192,8 @@ bool FMatrixImplementation::Matrix_EqualsImplementation(const MonoObject* A, con
 	return false;
 }
 
-bool FMatrixImplementation::Matrix_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FMatrixImplementation::Matrix_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                            const FGarbageCollectionHandle B)
 {
 	const auto MatrixA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(A);
 
@@ -201,10 +207,11 @@ bool FMatrixImplementation::Matrix_InequalityImplementation(const MonoObject* A,
 	return false;
 }
 
-void FMatrixImplementation::Matrix_TransformFVector4Implementation(const MonoObject* InMonoObject, const MonoObject* V,
-                                                                   MonoObject** OutValue)
+void FMatrixImplementation::Matrix_TransformFVector4Implementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(V);
 
@@ -222,10 +229,11 @@ void FMatrixImplementation::Matrix_TransformFVector4Implementation(const MonoObj
 	}
 }
 
-void FMatrixImplementation::Matrix_TransformPositionImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-                                                                   MonoObject** OutValue)
+void FMatrixImplementation::Matrix_TransformPositionImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -244,9 +252,10 @@ void FMatrixImplementation::Matrix_TransformPositionImplementation(const MonoObj
 }
 
 void FMatrixImplementation::Matrix_InverseTransformPositionImplementation(
-	const MonoObject* InMonoObject, const MonoObject* V, MonoObject** OutValue)
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -264,10 +273,11 @@ void FMatrixImplementation::Matrix_InverseTransformPositionImplementation(
 	}
 }
 
-void FMatrixImplementation::Matrix_TransformVectorImplementation(const MonoObject* InMonoObject, const MonoObject* V,
-                                                                 MonoObject** OutValue)
+void FMatrixImplementation::Matrix_TransformVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -285,10 +295,11 @@ void FMatrixImplementation::Matrix_TransformVectorImplementation(const MonoObjec
 	}
 }
 
-void FMatrixImplementation::Matrix_InverseTransformVectorImplementation(const MonoObject* InMonoObject,
-                                                                        const MonoObject* V, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_InverseTransformVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* V, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(V);
 
@@ -306,9 +317,11 @@ void FMatrixImplementation::Matrix_InverseTransformVectorImplementation(const Mo
 	}
 }
 
-void FMatrixImplementation::Matrix_GetTransposedImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_GetTransposedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -324,9 +337,11 @@ void FMatrixImplementation::Matrix_GetTransposedImplementation(const MonoObject*
 	}
 }
 
-FMatrixImplementation::LwcType FMatrixImplementation::Matrix_DeterminantImplementation(const MonoObject* InMonoObject)
+FMatrixImplementation::LwcType FMatrixImplementation::Matrix_DeterminantImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -337,9 +352,10 @@ FMatrixImplementation::LwcType FMatrixImplementation::Matrix_DeterminantImplemen
 }
 
 FMatrixImplementation::LwcType FMatrixImplementation::Matrix_RotDeterminantImplementation(
-	const MonoObject* InMonoObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -349,9 +365,11 @@ FMatrixImplementation::LwcType FMatrixImplementation::Matrix_RotDeterminantImple
 	return 0.f;
 }
 
-void FMatrixImplementation::Matrix_InverseFastImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_InverseFastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                             MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -367,9 +385,11 @@ void FMatrixImplementation::Matrix_InverseFastImplementation(const MonoObject* I
 	}
 }
 
-void FMatrixImplementation::Matrix_InverseImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_InverseImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -385,9 +405,11 @@ void FMatrixImplementation::Matrix_InverseImplementation(const MonoObject* InMon
 	}
 }
 
-void FMatrixImplementation::Matrix_TransposeAdjointImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_TransposeAdjointImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -403,9 +425,11 @@ void FMatrixImplementation::Matrix_TransposeAdjointImplementation(const MonoObje
 	}
 }
 
-void FMatrixImplementation::Matrix_RemoveScalingImplementation(const MonoObject* InMonoObject, const LwcType Tolerance)
+void FMatrixImplementation::Matrix_RemoveScalingImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               const LwcType Tolerance)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -413,10 +437,11 @@ void FMatrixImplementation::Matrix_RemoveScalingImplementation(const MonoObject*
 	}
 }
 
-void FMatrixImplementation::Matrix_GetMatrixWithoutScaleImplementation(const MonoObject* InMonoObject,
-                                                                       const LwcType Tolerance, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_GetMatrixWithoutScaleImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Tolerance, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -432,10 +457,11 @@ void FMatrixImplementation::Matrix_GetMatrixWithoutScaleImplementation(const Mon
 	}
 }
 
-void FMatrixImplementation::Matrix_ExtractScalingImplementation(const MonoObject* InMonoObject, const LwcType Tolerance,
-                                                                MonoObject** OutValue)
+void FMatrixImplementation::Matrix_ExtractScalingImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Tolerance, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -451,10 +477,11 @@ void FMatrixImplementation::Matrix_ExtractScalingImplementation(const MonoObject
 	}
 }
 
-void FMatrixImplementation::Matrix_GetScaleVectorImplementation(const MonoObject* InMonoObject, const LwcType Tolerance,
-                                                                MonoObject** OutValue)
+void FMatrixImplementation::Matrix_GetScaleVectorImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const LwcType Tolerance, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -470,10 +497,11 @@ void FMatrixImplementation::Matrix_GetScaleVectorImplementation(const MonoObject
 	}
 }
 
-void FMatrixImplementation::Matrix_RemoveTranslationImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FMatrixImplementation::Matrix_RemoveTranslationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -489,10 +517,11 @@ void FMatrixImplementation::Matrix_RemoveTranslationImplementation(const MonoObj
 	}
 }
 
-void FMatrixImplementation::Matrix_ConcatTranslationImplementation(const MonoObject* InMonoObject,
-                                                                   const MonoObject* Translation, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_ConcatTranslationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Translation, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Translation);
 
@@ -510,9 +539,10 @@ void FMatrixImplementation::Matrix_ConcatTranslationImplementation(const MonoObj
 	}
 }
 
-bool FMatrixImplementation::Matrix_ContainsNaNImplementation(const MonoObject* InMonoObject)
+bool FMatrixImplementation::Matrix_ContainsNaNImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -522,10 +552,11 @@ bool FMatrixImplementation::Matrix_ContainsNaNImplementation(const MonoObject* I
 	return false;
 }
 
-void FMatrixImplementation::Matrix_ScaleTranslationImplementation(const MonoObject* InMonoObject,
-                                                                  const MonoObject* Scale3D)
+void FMatrixImplementation::Matrix_ScaleTranslationImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Scale3D)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Scale3D);
 
@@ -536,9 +567,10 @@ void FMatrixImplementation::Matrix_ScaleTranslationImplementation(const MonoObje
 }
 
 FMatrixImplementation::LwcType FMatrixImplementation::Matrix_GetMaximumAxisScaleImplementation(
-	const MonoObject* InMonoObject)
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -548,10 +580,11 @@ FMatrixImplementation::LwcType FMatrixImplementation::Matrix_GetMaximumAxisScale
 	return 0.f;
 }
 
-void FMatrixImplementation::Matrix_ApplyScaleImplementation(const MonoObject* InMonoObject, const LwcType Scale,
-                                                            MonoObject** OutValue)
+void FMatrixImplementation::Matrix_ApplyScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                            const LwcType Scale, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FMatrix, FMatrix>::Get();
 
@@ -567,9 +600,11 @@ void FMatrixImplementation::Matrix_ApplyScaleImplementation(const MonoObject* In
 	}
 }
 
-void FMatrixImplementation::Matrix_GetOriginImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_GetOriginImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                           MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -585,10 +620,11 @@ void FMatrixImplementation::Matrix_GetOriginImplementation(const MonoObject* InM
 	}
 }
 
-void FMatrixImplementation::Matrix_GetScaledAxesImplementation(const MonoObject* InMonoObject, MonoObject** X,
-                                                               MonoObject** Y, MonoObject** Z)
+void FMatrixImplementation::Matrix_GetScaledAxesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               MonoObject** X, MonoObject** Y, MonoObject** Z)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -616,10 +652,11 @@ void FMatrixImplementation::Matrix_GetScaledAxesImplementation(const MonoObject*
 	}
 }
 
-void FMatrixImplementation::Matrix_GetUnitAxesImplementation(const MonoObject* InMonoObject, MonoObject** X,
-                                                             MonoObject** Y, MonoObject** Z)
+void FMatrixImplementation::Matrix_GetUnitAxesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                             MonoObject** X, MonoObject** Y, MonoObject** Z)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -647,10 +684,11 @@ void FMatrixImplementation::Matrix_GetUnitAxesImplementation(const MonoObject* I
 	}
 }
 
-void FMatrixImplementation::Matrix_SetAxisImplementation(const MonoObject* InMonoObject, const int32 i,
-                                                         const MonoObject* Axis)
+void FMatrixImplementation::Matrix_SetAxisImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         const int32 i, const MonoObject* Axis)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Axis);
 
@@ -660,9 +698,11 @@ void FMatrixImplementation::Matrix_SetAxisImplementation(const MonoObject* InMon
 	}
 }
 
-void FMatrixImplementation::Matrix_SetOriginImplementation(const MonoObject* InMonoObject, const MonoObject* NewOrigin)
+void FMatrixImplementation::Matrix_SetOriginImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                           const MonoObject* NewOrigin)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewOrigin);
 
@@ -672,11 +712,12 @@ void FMatrixImplementation::Matrix_SetOriginImplementation(const MonoObject* InM
 	}
 }
 
-void FMatrixImplementation::Matrix_SetAxesImplementation(const MonoObject* InMonoObject, const MonoObject* Axis0,
-                                                         const MonoObject* Axis1, const MonoObject* Axis2,
-                                                         const MonoObject* Origin)
+void FMatrixImplementation::Matrix_SetAxesImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         const MonoObject* Axis0, const MonoObject* Axis1,
+                                                         const MonoObject* Axis2, const MonoObject* Origin)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto VectorAxis0 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Axis0);
 
@@ -693,10 +734,11 @@ void FMatrixImplementation::Matrix_SetAxesImplementation(const MonoObject* InMon
 	}
 }
 
-void FMatrixImplementation::Matrix_GetColumnImplementation(const MonoObject* InMonoObject, const int32 i,
-                                                           MonoObject** OutValue)
+void FMatrixImplementation::Matrix_GetColumnImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                           const int32 i, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
 
@@ -712,10 +754,11 @@ void FMatrixImplementation::Matrix_GetColumnImplementation(const MonoObject* InM
 	}
 }
 
-void FMatrixImplementation::Matrix_SetColumnImplementation(const MonoObject* InMonoObject, const int32 i,
-                                                           const MonoObject* Value)
+void FMatrixImplementation::Matrix_SetColumnImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                           const int32 i, const MonoObject* Value)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(Value);
 
@@ -725,9 +768,11 @@ void FMatrixImplementation::Matrix_SetColumnImplementation(const MonoObject* InM
 	}
 }
 
-void FMatrixImplementation::Matrix_RotatorImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_RotatorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FRotator, FRotator>::Get();
 
@@ -743,9 +788,11 @@ void FMatrixImplementation::Matrix_RotatorImplementation(const MonoObject* InMon
 	}
 }
 
-void FMatrixImplementation::Matrix_ToQuatImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_ToQuatImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                        MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FQuat, FQuat>::Get();
 
@@ -761,10 +808,11 @@ void FMatrixImplementation::Matrix_ToQuatImplementation(const MonoObject* InMono
 	}
 }
 
-bool FMatrixImplementation::Matrix_GetFrustumNearPlaneImplementation(const MonoObject* InMonoObject,
-                                                                     MonoObject** OutValue)
+bool FMatrixImplementation::Matrix_GetFrustumNearPlaneImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
 
@@ -782,10 +830,11 @@ bool FMatrixImplementation::Matrix_GetFrustumNearPlaneImplementation(const MonoO
 	return false;
 }
 
-bool FMatrixImplementation::Matrix_GetFrustumFarPlaneImplementation(const MonoObject* InMonoObject,
-                                                                    MonoObject** OutValue)
+bool FMatrixImplementation::Matrix_GetFrustumFarPlaneImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
 
@@ -803,10 +852,11 @@ bool FMatrixImplementation::Matrix_GetFrustumFarPlaneImplementation(const MonoOb
 	return false;
 }
 
-bool FMatrixImplementation::Matrix_GetFrustumLeftPlaneImplementation(const MonoObject* InMonoObject,
-                                                                     MonoObject** OutValue)
+bool FMatrixImplementation::Matrix_GetFrustumLeftPlaneImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
 
@@ -824,10 +874,11 @@ bool FMatrixImplementation::Matrix_GetFrustumLeftPlaneImplementation(const MonoO
 	return false;
 }
 
-bool FMatrixImplementation::Matrix_GetFrustumRightPlaneImplementation(const MonoObject* InMonoObject,
-                                                                      MonoObject** OutValue)
+bool FMatrixImplementation::Matrix_GetFrustumRightPlaneImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
 
@@ -845,10 +896,11 @@ bool FMatrixImplementation::Matrix_GetFrustumRightPlaneImplementation(const Mono
 	return false;
 }
 
-bool FMatrixImplementation::Matrix_GetFrustumTopPlaneImplementation(const MonoObject* InMonoObject,
-                                                                    MonoObject** OutValue)
+bool FMatrixImplementation::Matrix_GetFrustumTopPlaneImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
 
@@ -866,10 +918,11 @@ bool FMatrixImplementation::Matrix_GetFrustumTopPlaneImplementation(const MonoOb
 	return false;
 }
 
-bool FMatrixImplementation::Matrix_GetFrustumBottomPlaneImplementation(const MonoObject* InMonoObject,
-                                                                       MonoObject** OutValue)
+bool FMatrixImplementation::Matrix_GetFrustumBottomPlaneImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
 
@@ -887,9 +940,11 @@ bool FMatrixImplementation::Matrix_GetFrustumBottomPlaneImplementation(const Mon
 	return false;
 }
 
-void FMatrixImplementation::Matrix_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FMatrixImplementation::Matrix_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                          MonoObject** OutValue)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{
@@ -907,9 +962,10 @@ void FMatrixImplementation::Matrix_ToStringImplementation(const MonoObject* InMo
 	}
 }
 
-uint32 FMatrixImplementation::Matrix_ComputeHashImplementation(const MonoObject* InMonoObject)
+uint32 FMatrixImplementation::Matrix_ComputeHashImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(InMonoObject);
+	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(
+		InGarbageCollectionHandle);
 
 	if (Matrix != nullptr)
 	{

@@ -1,36 +1,36 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Common;
 using Script.CoreUObject;
+using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
     public static class FloatRangeBoundImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRangeBound_EqualityImplementation(FFloatRangeBound A, FFloatRangeBound B);
+        public static extern Boolean FloatRangeBound_EqualityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRangeBound_InequalityImplementation(FFloatRangeBound A, FFloatRangeBound B);
+        public static extern Boolean FloatRangeBound_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single FloatRangeBound_GetValueImplementation(FFloatRangeBound InFloatRangeBound);
+        public static extern Single FloatRangeBound_GetValueImplementation(IntPtr InFloatRangeBound);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRangeBound_SetValueImplementation(FFloatRangeBound InFloatRangeBound,
+        public static extern void FloatRangeBound_SetValueImplementation(IntPtr InFloatRangeBound,
             Single NewValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRangeBound_IsClosedImplementation(FFloatRangeBound InFloatRangeBound);
+        public static extern Boolean FloatRangeBound_IsClosedImplementation(IntPtr InFloatRangeBound);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRangeBound_IsExclusiveImplementation(FFloatRangeBound InFloatRangeBound);
+        public static extern Boolean FloatRangeBound_IsExclusiveImplementation(IntPtr InFloatRangeBound);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRangeBound_IsInclusiveImplementation(FFloatRangeBound InFloatRangeBound);
+        public static extern Boolean FloatRangeBound_IsInclusiveImplementation(IntPtr InFloatRangeBound);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRangeBound_IsOpenImplementation(FFloatRangeBound InFloatRangeBound);
+        public static extern Boolean FloatRangeBound_IsOpenImplementation(IntPtr InFloatRangeBound);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FloatRangeBound_ExclusiveImplementation(Single Value, out FFloatRangeBound OutValue);
@@ -46,19 +46,19 @@ namespace Script.Library
             out FFloatRangeBound OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRangeBound_MaxLowerImplementation(FFloatRangeBound A, FFloatRangeBound B,
+        public static extern void FloatRangeBound_MaxLowerImplementation(IntPtr A, IntPtr B,
             out FFloatRangeBound OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRangeBound_MaxUpperImplementation(FFloatRangeBound A, FFloatRangeBound B,
+        public static extern void FloatRangeBound_MaxUpperImplementation(IntPtr A, IntPtr B,
             out FFloatRangeBound OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRangeBound_MinLowerImplementation(FFloatRangeBound A, FFloatRangeBound B,
+        public static extern void FloatRangeBound_MinLowerImplementation(IntPtr A, IntPtr B,
             out FFloatRangeBound OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FloatRangeBound_MinUpperImplementation(FFloatRangeBound A, FFloatRangeBound B,
+        public static extern void FloatRangeBound_MinUpperImplementation(IntPtr A, IntPtr B,
             out FFloatRangeBound OutValue);
     }
 }

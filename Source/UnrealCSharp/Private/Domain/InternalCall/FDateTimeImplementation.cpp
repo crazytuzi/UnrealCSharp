@@ -59,7 +59,8 @@ struct FRegisterDateTime
 
 static FRegisterDateTime RegisterDateTime;
 
-void FDateTimeImplementation::DateTime_AddTimespanImplementation(const MonoObject* A, const MonoObject* B,
+void FDateTimeImplementation::DateTime_AddTimespanImplementation(const FGarbageCollectionHandle A,
+                                                                 const FGarbageCollectionHandle B,
                                                                  MonoObject** OutValue)
 {
 	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
@@ -80,7 +81,8 @@ void FDateTimeImplementation::DateTime_AddTimespanImplementation(const MonoObjec
 	}
 }
 
-void FDateTimeImplementation::DateTime_AddDateTimeImplementation(const MonoObject* A, const MonoObject* B)
+void FDateTimeImplementation::DateTime_AddDateTimeImplementation(const FGarbageCollectionHandle A,
+                                                                 const FGarbageCollectionHandle B)
 {
 	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
@@ -92,7 +94,8 @@ void FDateTimeImplementation::DateTime_AddDateTimeImplementation(const MonoObjec
 	}
 }
 
-void FDateTimeImplementation::DateTime_SubtractDateTimeImplementation(const MonoObject* A, const MonoObject* B,
+void FDateTimeImplementation::DateTime_SubtractDateTimeImplementation(const FGarbageCollectionHandle A,
+                                                                      const FGarbageCollectionHandle B,
                                                                       MonoObject** OutValue)
 {
 	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
@@ -112,7 +115,8 @@ void FDateTimeImplementation::DateTime_SubtractDateTimeImplementation(const Mono
 	}
 }
 
-void FDateTimeImplementation::DateTime_SubtractTimespanImplementation(const MonoObject* A, const MonoObject* B,
+void FDateTimeImplementation::DateTime_SubtractTimespanImplementation(const FGarbageCollectionHandle A,
+                                                                      const FGarbageCollectionHandle B,
                                                                       MonoObject** OutValue)
 {
 	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
@@ -133,7 +137,8 @@ void FDateTimeImplementation::DateTime_SubtractTimespanImplementation(const Mono
 	}
 }
 
-bool FDateTimeImplementation::DateTime_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FDateTimeImplementation::DateTime_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B)
 {
 	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
@@ -147,7 +152,8 @@ bool FDateTimeImplementation::DateTime_EqualityImplementation(const MonoObject* 
 	return false;
 }
 
-bool FDateTimeImplementation::DateTime_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FDateTimeImplementation::DateTime_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                                const FGarbageCollectionHandle B)
 {
 	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
@@ -161,7 +167,8 @@ bool FDateTimeImplementation::DateTime_InequalityImplementation(const MonoObject
 	return false;
 }
 
-bool FDateTimeImplementation::DateTime_GreaterThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FDateTimeImplementation::DateTime_GreaterThanImplementation(const FGarbageCollectionHandle A,
+                                                                 const FGarbageCollectionHandle B)
 {
 	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
@@ -175,7 +182,8 @@ bool FDateTimeImplementation::DateTime_GreaterThanImplementation(const MonoObjec
 	return false;
 }
 
-bool FDateTimeImplementation::DateTime_GreaterThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FDateTimeImplementation::DateTime_GreaterThanOrEqualImplementation(const FGarbageCollectionHandle A,
+                                                                        const FGarbageCollectionHandle B)
 {
 	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
@@ -189,7 +197,8 @@ bool FDateTimeImplementation::DateTime_GreaterThanOrEqualImplementation(const Mo
 	return false;
 }
 
-bool FDateTimeImplementation::DateTime_LessThanImplementation(const MonoObject* A, const MonoObject* B)
+bool FDateTimeImplementation::DateTime_LessThanImplementation(const FGarbageCollectionHandle A,
+                                                              const FGarbageCollectionHandle B)
 {
 	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
@@ -203,7 +212,8 @@ bool FDateTimeImplementation::DateTime_LessThanImplementation(const MonoObject* 
 	return false;
 }
 
-bool FDateTimeImplementation::DateTime_LessThanOrEqualImplementation(const MonoObject* A, const MonoObject* B)
+bool FDateTimeImplementation::DateTime_LessThanOrEqualImplementation(const FGarbageCollectionHandle A,
+                                                                     const FGarbageCollectionHandle B)
 {
 	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
 
@@ -217,9 +227,11 @@ bool FDateTimeImplementation::DateTime_LessThanOrEqualImplementation(const MonoO
 	return false;
 }
 
-void FDateTimeImplementation::DateTime_GetDatePartImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FDateTimeImplementation::DateTime_GetDatePartImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
 
@@ -235,10 +247,11 @@ void FDateTimeImplementation::DateTime_GetDatePartImplementation(const MonoObjec
 	}
 }
 
-void FDateTimeImplementation::DateTime_GetDateComponentsImplementation(const MonoObject* InMonoObject, int32& OutYear,
-                                                                       int32& OutMonth, int32& OutDay)
+void FDateTimeImplementation::DateTime_GetDateComponentsImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, int32& OutYear, int32& OutMonth, int32& OutDay)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -246,9 +259,10 @@ void FDateTimeImplementation::DateTime_GetDateComponentsImplementation(const Mon
 	}
 }
 
-int32 FDateTimeImplementation::DateTime_GetDayImplementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetDayImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -258,9 +272,11 @@ int32 FDateTimeImplementation::DateTime_GetDayImplementation(const MonoObject* I
 	return 0;
 }
 
-int32 FDateTimeImplementation::DateTime_GetDayOfYearImplementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetDayOfYearImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -270,9 +286,10 @@ int32 FDateTimeImplementation::DateTime_GetDayOfYearImplementation(const MonoObj
 	return 0;
 }
 
-int32 FDateTimeImplementation::DateTime_GetHourImplementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetHourImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -282,9 +299,11 @@ int32 FDateTimeImplementation::DateTime_GetHourImplementation(const MonoObject* 
 	return 0;
 }
 
-int32 FDateTimeImplementation::DateTime_GetHour12Implementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetHour12Implementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -294,9 +313,11 @@ int32 FDateTimeImplementation::DateTime_GetHour12Implementation(const MonoObject
 	return 0;
 }
 
-double FDateTimeImplementation::DateTime_GetJulianDayImplementation(const MonoObject* InMonoObject)
+double FDateTimeImplementation::DateTime_GetJulianDayImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -306,9 +327,11 @@ double FDateTimeImplementation::DateTime_GetJulianDayImplementation(const MonoOb
 	return 0.0;
 }
 
-double FDateTimeImplementation::DateTime_GetModifiedJulianDayImplementation(const MonoObject* InMonoObject)
+double FDateTimeImplementation::DateTime_GetModifiedJulianDayImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -318,9 +341,11 @@ double FDateTimeImplementation::DateTime_GetModifiedJulianDayImplementation(cons
 	return 0.0;
 }
 
-int32 FDateTimeImplementation::DateTime_GetMillisecondImplementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetMillisecondImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -330,9 +355,11 @@ int32 FDateTimeImplementation::DateTime_GetMillisecondImplementation(const MonoO
 	return 0;
 }
 
-int32 FDateTimeImplementation::DateTime_GetMinuteImplementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetMinuteImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -342,9 +369,10 @@ int32 FDateTimeImplementation::DateTime_GetMinuteImplementation(const MonoObject
 	return 0;
 }
 
-int32 FDateTimeImplementation::DateTime_GetMonthImplementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetMonthImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -354,9 +382,11 @@ int32 FDateTimeImplementation::DateTime_GetMonthImplementation(const MonoObject*
 	return 0;
 }
 
-int32 FDateTimeImplementation::DateTime_GetSecondImplementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetSecondImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -366,9 +396,10 @@ int32 FDateTimeImplementation::DateTime_GetSecondImplementation(const MonoObject
 	return 0;
 }
 
-int64 FDateTimeImplementation::DateTime_GetTicksImplementation(const MonoObject* InMonoObject)
+int64 FDateTimeImplementation::DateTime_GetTicksImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -378,9 +409,11 @@ int64 FDateTimeImplementation::DateTime_GetTicksImplementation(const MonoObject*
 	return 0;
 }
 
-void FDateTimeImplementation::DateTime_GetTimeOfDayImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FDateTimeImplementation::DateTime_GetTimeOfDayImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
 	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
@@ -395,9 +428,10 @@ void FDateTimeImplementation::DateTime_GetTimeOfDayImplementation(const MonoObje
 	}
 }
 
-int32 FDateTimeImplementation::DateTime_GetYearImplementation(const MonoObject* InMonoObject)
+int32 FDateTimeImplementation::DateTime_GetYearImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -407,9 +441,11 @@ int32 FDateTimeImplementation::DateTime_GetYearImplementation(const MonoObject* 
 	return 0;
 }
 
-bool FDateTimeImplementation::DateTime_IsAfternoonImplementation(const MonoObject* InMonoObject)
+bool FDateTimeImplementation::DateTime_IsAfternoonImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -419,9 +455,10 @@ bool FDateTimeImplementation::DateTime_IsAfternoonImplementation(const MonoObjec
 	return false;
 }
 
-bool FDateTimeImplementation::DateTime_IsMorningImplementation(const MonoObject* InMonoObject)
+bool FDateTimeImplementation::DateTime_IsMorningImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -431,9 +468,11 @@ bool FDateTimeImplementation::DateTime_IsMorningImplementation(const MonoObject*
 	return false;
 }
 
-void FDateTimeImplementation::DateTime_ToHttpDateImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FDateTimeImplementation::DateTime_ToHttpDateImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -451,9 +490,11 @@ void FDateTimeImplementation::DateTime_ToHttpDateImplementation(const MonoObject
 	}
 }
 
-void FDateTimeImplementation::DateTime_ToIso8601Implementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FDateTimeImplementation::DateTime_ToIso8601Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                               MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -471,9 +512,11 @@ void FDateTimeImplementation::DateTime_ToIso8601Implementation(const MonoObject*
 	}
 }
 
-void FDateTimeImplementation::DateTime_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FDateTimeImplementation::DateTime_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                              MonoObject** OutValue)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{
@@ -491,9 +534,11 @@ void FDateTimeImplementation::DateTime_ToStringImplementation(const MonoObject* 
 	}
 }
 
-int64 FDateTimeImplementation::DateTime_ToUnixTimestampImplementation(const MonoObject* InMonoObject)
+int64 FDateTimeImplementation::DateTime_ToUnixTimestampImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(InMonoObject);
+	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
+		InGarbageCollectionHandle);
 
 	if (DateTime != nullptr)
 	{

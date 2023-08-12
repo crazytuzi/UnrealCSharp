@@ -2,10 +2,11 @@
 using Script.Reflection.Container;
 using System.Collections;
 using System.Collections.Generic;
+using Script.CoreUObject;
 
 namespace Script.Common
 {
-    public class TSet<T> : IEnumerable<T>
+    public class TSet<T> : IGCHandle, IEnumerable<T>
     {
         public TSet() => SetUtils.Set_Register(this);
 
@@ -13,7 +14,7 @@ namespace Script.Common
         {
         }
 
-        ~TSet() => SetUtils.Set_UnRegister(this);
+        ~TSet() => SetUtils.Set_UnRegister(GetHandle());
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -37,20 +38,32 @@ namespace Script.Common
             }
         }
 
-        public void Empty(Int32 InExpectedNumElements = 0) => SetUtils.Set_Empty(this, InExpectedNumElements);
+        public void Empty(Int32 InExpectedNumElements = 0) => SetUtils.Set_Empty(GetHandle(), InExpectedNumElements);
 
-        public Int32 Num() => SetUtils.Set_Num(this);
+        public Int32 Num() => SetUtils.Set_Num(GetHandle());
 
-        public Int32 GetMaxIndex() => SetUtils.Set_GetMaxIndex(this);
+        public Int32 GetMaxIndex() => SetUtils.Set_GetMaxIndex(GetHandle());
 
-        public void Add(T InValue) => SetUtils.Set_Add(this, InValue);
+        public void Add(T InValue) => SetUtils.Set_Add(GetHandle(), InValue);
 
-        public Int32 Remove(T InValue) => SetUtils.Set_Remove(this, InValue);
+        public Int32 Remove(T InValue) => SetUtils.Set_Remove(GetHandle(), InValue);
 
-        public Boolean Contains(T InValue) => SetUtils.Set_Contains(this, InValue);
+        public Boolean Contains(T InValue) => SetUtils.Set_Contains(GetHandle(), InValue);
 
-        private Boolean IsValidIndex(Int32 InIndex) => SetUtils.Set_IsValidIndex(this, InIndex);
+        private Boolean IsValidIndex(Int32 InIndex) => SetUtils.Set_IsValidIndex(GetHandle(), InIndex);
 
-        private T this[Int32 InIndex] => SetUtils.Set_GetEnumerator(this, InIndex);
+        private T this[Int32 InIndex] => SetUtils.Set_GetEnumerator<T>(GetHandle(), InIndex);
+
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new System.IntPtr(InGCHandle);
+        }
+
+        public System.IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private System.IntPtr GCHandle;
     }
 }

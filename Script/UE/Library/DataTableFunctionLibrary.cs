@@ -9,7 +9,8 @@ namespace Script.Engine
         public static Boolean GetDataTableRowFromName<T>(UDataTable Table, FName RowName, out T OutRow)
         {
             return DataTableFunctionLibraryImplementation
-                .DataTableFunctionLibrary_GetDataTableRowFromNameImplementation(Table, RowName.ToString(), out OutRow);
+                .DataTableFunctionLibrary_GetDataTableRowFromNameImplementation(Table.GetHandle(), RowName.ToString(),
+                    out OutRow);
         }
     }
 }

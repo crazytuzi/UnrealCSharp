@@ -8,139 +8,141 @@ namespace Script.CoreUObject
     {
         public static FDateTime operator +(FDateTime A, FTimespan B)
         {
-            DateTimeImplementation.DateTime_AddTimespanImplementation(A, B, out var OutValue);
+            DateTimeImplementation.DateTime_AddTimespanImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public static FDateTime operator +(FDateTime A, FDateTime B)
         {
-            DateTimeImplementation.DateTime_AddDateTimeImplementation(A, B);
+            DateTimeImplementation.DateTime_AddDateTimeImplementation(A.GetHandle(), B.GetHandle());
 
             return A;
         }
 
         public static FTimespan operator -(FDateTime A, FDateTime B)
         {
-            DateTimeImplementation.DateTime_SubtractDateTimeImplementation(A, B, out var OutValue);
+            DateTimeImplementation.DateTime_SubtractDateTimeImplementation(A.GetHandle(), B.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }
 
         public static FDateTime operator -(FDateTime A, FTimespan B)
         {
-            DateTimeImplementation.DateTime_SubtractTimespanImplementation(A, B, out var OutValue);
+            DateTimeImplementation.DateTime_SubtractTimespanImplementation(A.GetHandle(), B.GetHandle(),
+                out var OutValue);
 
             return OutValue;
         }
 
         public static Boolean operator ==(FDateTime A, FDateTime B) =>
-            DateTimeImplementation.DateTime_EqualityImplementation(A, B);
+            DateTimeImplementation.DateTime_EqualityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator !=(FDateTime A, FDateTime B) =>
-            DateTimeImplementation.DateTime_InequalityImplementation(A, B);
+            DateTimeImplementation.DateTime_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >(FDateTime A, FDateTime B) =>
-            DateTimeImplementation.DateTime_GreaterThanImplementation(A, B);
+            DateTimeImplementation.DateTime_GreaterThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator >=(FDateTime A, FDateTime B) =>
-            DateTimeImplementation.DateTime_GreaterThanOrEqualImplementation(A, B);
+            DateTimeImplementation.DateTime_GreaterThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <(FDateTime A, FDateTime B) =>
-            DateTimeImplementation.DateTime_LessThanImplementation(A, B);
+            DateTimeImplementation.DateTime_LessThanImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <=(FDateTime A, FDateTime B) =>
-            DateTimeImplementation.DateTime_LessThanOrEqualImplementation(A, B);
+            DateTimeImplementation.DateTime_LessThanOrEqualImplementation(A.GetHandle(), B.GetHandle());
 
         // @TODO
         // ExportTextItem
 
         public FDateTime GetDate()
         {
-            DateTimeImplementation.DateTime_GetDatePartImplementation(this, out var OutValue);
+            DateTimeImplementation.DateTime_GetDatePartImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public void GetDate(out Int32 OutYear, out Int32 OutMonth, out Int32 OutDay) =>
-            DateTimeImplementation.DateTime_GetDateComponentsImplementation(this, out OutYear, out OutMonth,
+            DateTimeImplementation.DateTime_GetDateComponentsImplementation(GetHandle(), out OutYear, out OutMonth,
                 out OutDay);
 
         public Int32 GetDay() =>
-            DateTimeImplementation.DateTime_GetDayImplementation(this);
+            DateTimeImplementation.DateTime_GetDayImplementation(GetHandle());
 
         // @TODO
         // GetDayOfWeek
 
         public Int32 GetDayOfYear() =>
-            DateTimeImplementation.DateTime_GetDayOfYearImplementation(this);
+            DateTimeImplementation.DateTime_GetDayOfYearImplementation(GetHandle());
 
         public Int32 GetHour() =>
-            DateTimeImplementation.DateTime_GetHourImplementation(this);
+            DateTimeImplementation.DateTime_GetHourImplementation(GetHandle());
 
         public Int32 GetHour12() =>
-            DateTimeImplementation.DateTime_GetHour12Implementation(this);
+            DateTimeImplementation.DateTime_GetHour12Implementation(GetHandle());
 
         public Double GetJulianDay() =>
-            DateTimeImplementation.DateTime_GetJulianDayImplementation(this);
+            DateTimeImplementation.DateTime_GetJulianDayImplementation(GetHandle());
 
         public Double GetModifiedJulianDay() =>
-            DateTimeImplementation.DateTime_GetModifiedJulianDayImplementation(this);
+            DateTimeImplementation.DateTime_GetModifiedJulianDayImplementation(GetHandle());
 
         public Int32 GetMillisecond() =>
-            DateTimeImplementation.DateTime_GetMillisecondImplementation(this);
+            DateTimeImplementation.DateTime_GetMillisecondImplementation(GetHandle());
 
         public Int32 GetMinute() =>
-            DateTimeImplementation.DateTime_GetMinuteImplementation(this);
+            DateTimeImplementation.DateTime_GetMinuteImplementation(GetHandle());
 
         public Int32 GetMonth() =>
-            DateTimeImplementation.DateTime_GetMonthImplementation(this);
+            DateTimeImplementation.DateTime_GetMonthImplementation(GetHandle());
 
         // @TODO
         // GetMonthOfYear
 
         public Int32 GetSecond() =>
-            DateTimeImplementation.DateTime_GetSecondImplementation(this);
+            DateTimeImplementation.DateTime_GetSecondImplementation(GetHandle());
 
         public Int64 GetTicks() =>
-            DateTimeImplementation.DateTime_GetTicksImplementation(this);
+            DateTimeImplementation.DateTime_GetTicksImplementation(GetHandle());
 
         public FTimespan GetTimeOfDay()
         {
-            DateTimeImplementation.DateTime_GetTimeOfDayImplementation(this, out var OutValue);
+            DateTimeImplementation.DateTime_GetTimeOfDayImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public Int32 GetYear() =>
-            DateTimeImplementation.DateTime_GetYearImplementation(this);
+            DateTimeImplementation.DateTime_GetYearImplementation(GetHandle());
 
         // @TODO
         // ImportTextItem
 
         public Boolean IsAfternoon() =>
-            DateTimeImplementation.DateTime_IsAfternoonImplementation(this);
+            DateTimeImplementation.DateTime_IsAfternoonImplementation(GetHandle());
 
         public Boolean IsMorning() =>
-            DateTimeImplementation.DateTime_IsMorningImplementation(this);
+            DateTimeImplementation.DateTime_IsMorningImplementation(GetHandle());
 
         public FString ToHttpDate()
         {
-            DateTimeImplementation.DateTime_ToHttpDateImplementation(this, out var OutValue);
+            DateTimeImplementation.DateTime_ToHttpDateImplementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public FString ToIso8601()
         {
-            DateTimeImplementation.DateTime_ToIso8601Implementation(this, out var OutValue);
+            DateTimeImplementation.DateTime_ToIso8601Implementation(GetHandle(), out var OutValue);
 
             return OutValue;
         }
 
         public override string ToString()
         {
-            DateTimeImplementation.DateTime_ToStringImplementation(this, out var OutValue);
+            DateTimeImplementation.DateTime_ToStringImplementation(GetHandle(), out var OutValue);
 
             return OutValue.ToString();
         }
@@ -149,7 +151,7 @@ namespace Script.CoreUObject
         // ToString
 
         public Int64 ToUnixTimestamp() =>
-            DateTimeImplementation.DateTime_ToUnixTimestampImplementation(this);
+            DateTimeImplementation.DateTime_ToUnixTimestampImplementation(GetHandle());
 
         public static Int32 DaysInMonth(Int32 Year, Int32 Month) =>
             DateTimeImplementation.DateTime_DaysInMonthImplementation(Year, Month);

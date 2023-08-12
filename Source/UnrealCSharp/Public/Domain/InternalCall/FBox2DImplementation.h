@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "UEVersion.h"
+#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "mono/metadata/object-forward.h"
 
 class FBox2DImplementation
@@ -12,48 +13,59 @@ class FBox2DImplementation
 #endif
 
 public:
-	static bool Box2D_EqualityImplementation(const MonoObject* A, const MonoObject* B);
+	static bool Box2D_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static bool Box2D_InequalityImplementation(const MonoObject* A, const MonoObject* B);
+	static bool Box2D_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static void Box2D_AddVector2DImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
+	static void Box2D_AddVector2DImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+	                                            MonoObject** OutValue);
 
-	static void Box2D_AddImplementation(const MonoObject* A, const MonoObject* B, MonoObject** OutValue);
+	static void Box2D_AddImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
+	                                    MonoObject** OutValue);
 
-	static void Box2D_GetReferenceImplementation(const MonoObject* InMonoObject, int32 Index, MonoObject** OutValue);
+	static void Box2D_GetReferenceImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, int32 Index,
+	                                             MonoObject** OutValue);
 
-	static void Box2D_SetReferenceImplementation(const MonoObject* InMonoObject, int32 Index,
+	static void Box2D_SetReferenceImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, int32 Index,
 	                                             const MonoObject* InValue);
 
-	static LwcType Box2D_ComputeSquaredDistanceToPointImplementation(const MonoObject* InMonoObject,
-	                                                                 const MonoObject* Point);
+	static LwcType Box2D_ComputeSquaredDistanceToPointImplementation(
+		const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* Point);
 
-	static void Box2D_ExpandByImplementation(const MonoObject* InMonoObject, LwcType W, MonoObject** OutValue);
+	static void Box2D_ExpandByImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, LwcType W,
+	                                         MonoObject** OutValue);
 
-	static LwcType Box2D_GetAreaImplementation(const MonoObject* InMonoObject);
+	static LwcType Box2D_GetAreaImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static void Box2D_GetCenterImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Box2D_GetCenterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                          MonoObject** OutValue);
 
-	static void Box2D_GetCenterAndExtentsImplementation(const MonoObject* InMonoObject, MonoObject** center,
-	                                                    MonoObject** Extents);
+	static void Box2D_GetCenterAndExtentsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                    MonoObject** center, MonoObject** Extents);
 
-	static void Box2D_GetClosestPointToImplementation(const MonoObject* InMonoObject, const MonoObject* Point,
-	                                                  MonoObject** OutValue);
+	static void Box2D_GetClosestPointToImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                  const MonoObject* Point, MonoObject** OutValue);
 
-	static void Box2D_GetExtentImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Box2D_GetExtentImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                          MonoObject** OutValue);
 
-	static void Box2D_GetSizeImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
-
-	static void Box2D_InitImplementation(const MonoObject* InMonoObject);
-
-	static bool Box2D_IntersectImplementation(const MonoObject* InMonoObject, const MonoObject* other);
-
-	static bool Box2D_IsInsideVector2DImplementation(const MonoObject* InMonoObject, const MonoObject* TestPoint);
-
-	static bool Box2D_IsInsideBox2DImplementation(const MonoObject* InMonoObject, const MonoObject* Other);
-
-	static void Box2D_ShiftByImplementation(const MonoObject* InMonoObject, const MonoObject* Offset,
+	static void Box2D_GetSizeImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                        MonoObject** OutValue);
 
-	static void Box2D_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue);
+	static void Box2D_InitImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
+
+	static bool Box2D_IntersectImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                          const MonoObject* other);
+
+	static bool Box2D_IsInsideVector2DImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                 const MonoObject* TestPoint);
+
+	static bool Box2D_IsInsideBox2DImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                              const MonoObject* Other);
+
+	static void Box2D_ShiftByImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                        const MonoObject* Offset, MonoObject** OutValue);
+
+	static void Box2D_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         MonoObject** OutValue);
 };

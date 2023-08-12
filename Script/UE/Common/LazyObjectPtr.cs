@@ -3,13 +3,13 @@ using Script.Library;
 
 namespace Script.Common
 {
-    public class TLazyObjectPtr<T> where T : UObject
+    public class TLazyObjectPtr<T> : IGCHandle where T : UObject
     {
         public TLazyObjectPtr()
         {
         }
 
-        ~TLazyObjectPtr() => LazyObjectPtrImplementation.LazyObjectPtr_UnRegisterImplementation(this);
+        ~TLazyObjectPtr() => LazyObjectPtrImplementation.LazyObjectPtr_UnRegisterImplementation(GetHandle());
 
         public TLazyObjectPtr(T InObject) =>
             LazyObjectPtrImplementation.LazyObjectPtr_RegisterImplementation(this, InObject);
@@ -18,9 +18,21 @@ namespace Script.Common
 
         public T Get()
         {
-            LazyObjectPtrImplementation.LazyObjectPtr_GetImplementation(this, out var OutValue);
+            LazyObjectPtrImplementation.LazyObjectPtr_GetImplementation<T>(GetHandle(), out var OutValue);
 
             return OutValue;
         }
+
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new System.IntPtr(InGCHandle);
+        }
+
+        public System.IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private System.IntPtr GCHandle;
     }
 }

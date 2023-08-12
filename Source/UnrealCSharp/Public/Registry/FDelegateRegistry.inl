@@ -16,9 +16,9 @@ static uint32 GetTypeHash(const FDelegateAddress& InDelegateAddress)
 }
 
 template <typename T>
-auto FDelegateRegistry::GetDelegate(const MonoObject* InMonoObject)
+auto FDelegateRegistry::GetDelegate(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	const auto FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InMonoObject);
+	const auto FoundDelegateAddress = GarbageCollectionHandle2DelegateAddress.Find(InGarbageCollectionHandle);
 
 	return FoundDelegateAddress != nullptr ? static_cast<T*>(FoundDelegateAddress->DelegateBaseHelper) : nullptr;
 }

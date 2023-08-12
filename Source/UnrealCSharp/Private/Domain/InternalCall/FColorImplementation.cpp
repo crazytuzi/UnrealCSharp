@@ -33,9 +33,10 @@ struct FRegisterColor
 
 static FRegisterColor RegisterColor;
 
-uint32 FColorImplementation::Color_DWColorImplementation(const MonoObject* InMonoObject)
+uint32 FColorImplementation::Color_DWColorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	if (Color != nullptr)
 	{
@@ -45,7 +46,8 @@ uint32 FColorImplementation::Color_DWColorImplementation(const MonoObject* InMon
 	return 0u;
 }
 
-bool FColorImplementation::Color_EqualityImplementation(const MonoObject* A, const MonoObject* B)
+bool FColorImplementation::Color_EqualityImplementation(const FGarbageCollectionHandle A,
+                                                        const FGarbageCollectionHandle B)
 {
 	const auto ColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(A);
 
@@ -59,7 +61,8 @@ bool FColorImplementation::Color_EqualityImplementation(const MonoObject* A, con
 	return false;
 }
 
-bool FColorImplementation::Color_InequalityImplementation(const MonoObject* A, const MonoObject* B)
+bool FColorImplementation::Color_InequalityImplementation(const FGarbageCollectionHandle A,
+                                                          const FGarbageCollectionHandle B)
 {
 	const auto ColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(A);
 
@@ -73,9 +76,11 @@ bool FColorImplementation::Color_InequalityImplementation(const MonoObject* A, c
 	return false;
 }
 
-void FColorImplementation::Color_FromRGBEImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FColorImplementation::Color_FromRGBEImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                        MonoObject** OutValue)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -160,10 +165,11 @@ void FColorImplementation::Color_MakeFromColorTemperatureImplementation(const fl
 	}
 }
 
-void FColorImplementation::Color_WithAlphaImplementation(const MonoObject* InMonoObject, const uint8 Alpha,
-                                                         MonoObject** OutValue)
+void FColorImplementation::Color_WithAlphaImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                         const uint8 Alpha, MonoObject** OutValue)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
 
@@ -179,10 +185,11 @@ void FColorImplementation::Color_WithAlphaImplementation(const MonoObject* InMon
 	}
 }
 
-void FColorImplementation::Color_ReinterpretAsLinearImplementation(const MonoObject* InMonoObject,
-                                                                   MonoObject** OutValue)
+void FColorImplementation::Color_ReinterpretAsLinearImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
 
@@ -199,9 +206,11 @@ void FColorImplementation::Color_ReinterpretAsLinearImplementation(const MonoObj
 	}
 }
 
-void FColorImplementation::Color_ToHexImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FColorImplementation::Color_ToHexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                     MonoObject** OutValue)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	if (Color != nullptr)
 	{
@@ -219,9 +228,11 @@ void FColorImplementation::Color_ToHexImplementation(const MonoObject* InMonoObj
 	}
 }
 
-void FColorImplementation::Color_ToStringImplementation(const MonoObject* InMonoObject, MonoObject** OutValue)
+void FColorImplementation::Color_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                        MonoObject** OutValue)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	if (Color != nullptr)
 	{
@@ -239,10 +250,11 @@ void FColorImplementation::Color_ToStringImplementation(const MonoObject* InMono
 	}
 }
 
-bool FColorImplementation::Color_InitFromStringImplementation(const MonoObject* InMonoObject,
+bool FColorImplementation::Color_InitFromStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
                                                               MonoObject* InSourceString)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	if (Color != nullptr && InSourceString != nullptr)
 	{
@@ -254,9 +266,10 @@ bool FColorImplementation::Color_InitFromStringImplementation(const MonoObject* 
 	return false;
 }
 
-uint32 FColorImplementation::Color_ToPackedARGBImplementation(const MonoObject* InMonoObject)
+uint32 FColorImplementation::Color_ToPackedARGBImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	if (Color != nullptr)
 	{
@@ -266,9 +279,10 @@ uint32 FColorImplementation::Color_ToPackedARGBImplementation(const MonoObject* 
 	return 0u;
 }
 
-uint32 FColorImplementation::Color_ToPackedABGRImplementation(const MonoObject* InMonoObject)
+uint32 FColorImplementation::Color_ToPackedABGRImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	if (Color != nullptr)
 	{
@@ -278,9 +292,10 @@ uint32 FColorImplementation::Color_ToPackedABGRImplementation(const MonoObject* 
 	return 0u;
 }
 
-uint32 FColorImplementation::Color_ToPackedRGBAImplementation(const MonoObject* InMonoObject)
+uint32 FColorImplementation::Color_ToPackedRGBAImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	if (Color != nullptr)
 	{
@@ -290,9 +305,10 @@ uint32 FColorImplementation::Color_ToPackedRGBAImplementation(const MonoObject* 
 	return 0u;
 }
 
-uint32 FColorImplementation::Color_ToPackedBGRAImplementation(const MonoObject* InMonoObject)
+uint32 FColorImplementation::Color_ToPackedBGRAImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 {
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(InMonoObject);
+	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
+		UScriptStruct, FColor>(InGarbageCollectionHandle);
 
 	if (Color != nullptr)
 	{

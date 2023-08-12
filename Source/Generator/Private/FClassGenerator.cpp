@@ -144,12 +144,12 @@ void FClassGenerator::Generator(const UClass* InClass)
 			"\t\t{\n"
 			"\t\t\tget\n"
 			"\t\t\t{\n"
-			"\t\t\t\tPropertyUtils.GetObjectProperty(this, \"%s\", out %s value);\n"
+			"\t\t\t\tPropertyUtils.GetObjectProperty(GetHandle(), \"%s\", out %s value);\n"
 			"\n"
 			"\t\t\t\treturn %s;\n"
 			"\t\t\t}\n"
 			"\n"
-			"\t\t\tset => PropertyUtils.SetObjectProperty(this, \"%s\", %s);\n"
+			"\t\t\tset => PropertyUtils.SetObjectProperty(GetHandle(), \"%s\", %s);\n"
 			"\t\t}\n"
 		),
 		                                   *PropertyAccessSpecifiers,
@@ -459,7 +459,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 				"FunctionUtils.Function_Reflection<%s>(%s, \"%s\", out var __ReturnValue, out var __OutValue"
 			),
 			FunctionReturnParam != nullptr ? *FGeneratorCore::GetReturnParamType(FunctionReturnParam) : TEXT("Object"),
-			bIsStatic == true ? TEXT("StaticClass().GetDefaultObject()") : TEXT("this"),
+			bIsStatic == true ? TEXT("StaticClass().GetDefaultObject().GetHandle()") : TEXT("GetHandle()"),
 			*FunctionName);
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
