@@ -74,6 +74,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	FString IInterfaceContent;
 
+	FString PropertyNameContent;
+
+	FString FunctionNameContent;
+
 	auto bIsInterface = InClass->IsChildOf(UInterface::StaticClass());
 
 	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
@@ -116,6 +120,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto bHasProperty = false;
 
+	TArray<TPair<FString, FString>> PropertyNames;
+
 	for (TFieldIterator<FProperty> PropertyIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
 	                                                EFieldIteratorFlags::ExcludeDeprecated); PropertyIterator; ++
 	     PropertyIterator)
@@ -137,6 +143,15 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		auto PropertyName = PropertyIterator->GetName();
 
+		PropertyNames.Add({
+			FString::Printf(TEXT(
+				"__%s"
+			),
+			                *PropertyName
+			),
+			PropertyName
+		});
+
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
 		PropertyContent += FString::Printf(TEXT(
@@ -144,21 +159,21 @@ void FClassGenerator::Generator(const UClass* InClass)
 			"\t\t{\n"
 			"\t\t\tget\n"
 			"\t\t\t{\n"
-			"\t\t\t\tPropertyUtils.GetObjectProperty(GetHandle(), \"%s\", out %s value);\n"
+			"\t\t\t\tPropertyUtils.GetObjectProperty(GetHandle(), %s, out %s value);\n"
 			"\n"
 			"\t\t\t\treturn %s;\n"
 			"\t\t\t}\n"
 			"\n"
-			"\t\t\tset => PropertyUtils.SetObjectProperty(GetHandle(), \"%s\", %s);\n"
+			"\t\t\tset => PropertyUtils.SetObjectProperty(GetHandle(), %s, %s);\n"
 			"\t\t}\n"
 		),
 		                                   *PropertyAccessSpecifiers,
 		                                   *PropertyType,
 		                                   *FGeneratorCore::GetName(PropertyName),
-		                                   *PropertyName,
+		                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 		                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 		                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-		                                   *PropertyName,
+		                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 		);
 	}
@@ -166,6 +181,17 @@ void FClassGenerator::Generator(const UClass* InClass)
 	if (bHasProperty == true)
 	{
 		UsingNameSpaces.Add(TEXT("Script.Reflection.Property"));
+	}
+
+	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
+	{
+		PropertyNameContent += FString::Printf(TEXT(
+			"%s\t\tprivate static string %s = \"%s\";\n"
+		),
+		                                       Index == 0 ? TEXT("") : TEXT("\n"),
+		                                       *PropertyNames[Index].Key,
+		                                       *PropertyNames[Index].Value
+		);
 	}
 
 	auto bHasFunction = false;
@@ -189,6 +215,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()));
 
 	TArray<UFunction*> Functions;
+
+	TArray<TPair<FString, FString>> FunctionNames;
 
 	for (TFieldIterator<UFunction> FunctionIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
 	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
@@ -442,6 +470,15 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
+		FunctionNames.Add({
+			FString::Printf(TEXT(
+				"__%s"
+			),
+			                *FunctionName
+			),
+			FunctionName
+		});
+
 		FunctionDeclarations.Emplace(FunctionDeclaration);
 
 		if (bIsInterface == true)
@@ -456,11 +493,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		auto FunctionCallBody = FString::Printf(
 			TEXT(
-				"FunctionUtils.Function_Reflection<%s>(%s, \"%s\", out var __ReturnValue, out var __OutValue"
+				"FunctionUtils.Function_Reflection<%s>(%s, %s, out var __ReturnValue, out var __OutValue"
 			),
 			FunctionReturnParam != nullptr ? *FGeneratorCore::GetReturnParamType(FunctionReturnParam) : TEXT("Object"),
 			bIsStatic == true ? TEXT("StaticClass().GetDefaultObject().GetHandle()") : TEXT("GetHandle()"),
-			*FunctionName);
+			*FunctionNames[FunctionNames.Num() - 1].Key);
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 		{
@@ -603,6 +640,17 @@ void FClassGenerator::Generator(const UClass* InClass)
 		FunctionContent += FString::Format(*FunctionStringFormat, StringFormatArgs);
 	}
 
+	for (auto Index = 0; Index < FunctionNames.Num(); ++Index)
+	{
+		FunctionNameContent += FString::Printf(TEXT(
+			"%s\t\tprivate static string %s = \"%s\";\n"
+		),
+		                                       Index == 0 ? TEXT("") : TEXT("\n"),
+		                                       *FunctionNames[Index].Key,
+		                                       *FunctionNames[Index].Value
+		);
+	}
+
 	if (bIsInterface == true)
 	{
 		IInterfaceContent = FString::Printf(TEXT(
@@ -653,6 +701,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 		"%s"
 		"%s"
 		"%s"
+		"%s"
+		"%s"
+		"%s"
+		"%s"
 		"\t}\n"
 		"%s"
 		"%s"
@@ -667,7 +719,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                               *PropertyContent,
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
 	                               *FunctionContent,
-	                               bIsInterface ? TEXT("\n") : TEXT(""),
+	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
+	                               *PropertyNameContent,
+	                               bHasFunction == true ? TEXT("\n") : TEXT(""),
+	                               *FunctionNameContent,
+	                               bIsInterface == true ? TEXT("\n") : TEXT(""),
 	                               *IInterfaceContent
 	);
 

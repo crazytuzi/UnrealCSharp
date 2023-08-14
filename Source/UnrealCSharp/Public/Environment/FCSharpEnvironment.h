@@ -68,9 +68,13 @@ public:
 
 	FFunctionDescriptor* GetFunctionDescriptor(const UStruct* InStruct, const FName& InFunctionName) const;
 
+	FFunctionDescriptor* GetFunctionDescriptor(const UStruct* InStruct, MonoString* InFunctionName) const;
+
 	FFunctionDescriptor* GetFunctionDescriptor(const FName& InClassName, const FName& InFunctionName) const;
 
 	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, const FName& InPropertyName) const;
+
+	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, MonoString* InPropertyName) const;
 
 public:
 	template <typename T>
