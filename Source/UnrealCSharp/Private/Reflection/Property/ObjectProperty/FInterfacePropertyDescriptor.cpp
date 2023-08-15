@@ -33,8 +33,6 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 
 		Interface->SetInterface(Object ? Object->GetInterfaceAddress(InterfaceProperty->InterfaceClass) : nullptr);
 #endif
-
-		Object_New(Dest);
 	}
 }
 

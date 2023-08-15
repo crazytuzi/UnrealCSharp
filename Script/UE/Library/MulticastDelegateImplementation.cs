@@ -43,6 +43,6 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void MulticastDelegate_BroadcastImplementation(IntPtr InMonoObject,
-            out ObjectList OutValue, params Object[] InValue);
+            out Object[] OutValue, params Object[] InValue);
     }
 }

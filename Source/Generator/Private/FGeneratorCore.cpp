@@ -424,50 +424,8 @@ FString FGeneratorCore::GetOutParamString(FProperty* Property, const uint32 Inde
 {
 	if (Property == nullptr) return TEXT("");
 
-	if (const auto ByteProperty = CastField<FByteProperty>(Property))
-	{
-		if (ByteProperty->Enum != nullptr)
-		{
-			return FString::Printf(TEXT(
-				"(%s) (*(Byte*)((IntPtr) __OutValue.Value[%d]).ToPointer())"
-			),
-			                       *GetPropertyType(Property), Index);
-		}
-		else
-		{
-			return FString::Printf(TEXT(
-				"*(%s*) ((IntPtr) __OutValue.Value[%d]).ToPointer()"
-			),
-			                       *GetPropertyType(Property),
-			                       Index);
-		}
-	}
-
-	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-	{
-		return FString::Printf(TEXT(
-			"(%s) (*(%s*)((IntPtr) __OutValue.Value[%d]).ToPointer())"
-		),
-		                       *GetPropertyType(Property),
-		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()),
-		                       Index);
-	}
-
-	if (CastField<FUInt16Property>(Property) || CastField<FUInt32Property>(Property) ||
-		CastField<FUInt64Property>(Property) || CastField<FInt8Property>(Property) ||
-		CastField<FInt16Property>(Property) || CastField<FIntProperty>(Property) ||
-		CastField<FInt64Property>(Property) || CastField<FBoolProperty>(Property) ||
-		CastField<FFloatProperty>(Property) || CastField<FDoubleProperty>(Property))
-	{
-		return FString::Printf(TEXT(
-			"*(%s*) ((IntPtr) __OutValue.Value[%d]).ToPointer()"
-		),
-		                       *GetPropertyType(Property),
-		                       Index);
-	}
-
 	return FString::Printf(TEXT(
-		"(%s) __OutValue.Value[%d]"
+		"(%s) __OutValue[%d]"
 	),
 	                       *GetPropertyType(Property),
 	                       Index);
@@ -515,26 +473,10 @@ FString FGeneratorCore::GetReturnParamType(FProperty* Property)
 
 FString FGeneratorCore::GetReturnParamName(FProperty* Property)
 {
-	if (const auto ByteProperty = CastField<FByteProperty>(Property))
-	{
-		if (ByteProperty->Enum != nullptr)
-		{
-			return FString::Printf(TEXT(
-				"(%s) __ReturnValue"
-			),
-			                       *FUnrealCSharpFunctionLibrary::GetFullClass(ByteProperty->Enum));
-		}
-	}
-
-	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-	{
-		return FString::Printf(TEXT(
-			"(%s) __ReturnValue"
-		),
-		                       *FUnrealCSharpFunctionLibrary::GetFullClass(EnumProperty->GetEnum()));
-	}
-
-	return TEXT("__ReturnValue");
+	return FString::Printf(TEXT(
+		"(%s) __ReturnValue"
+	),
+	                       *GetPropertyType(Property));
 }
 
 FString FGeneratorCore::GetName(FString InName)

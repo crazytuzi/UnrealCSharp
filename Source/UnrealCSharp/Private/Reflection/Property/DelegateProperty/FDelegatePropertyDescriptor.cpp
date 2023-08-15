@@ -26,8 +26,6 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto DestScriptDelegate = DelegateProperty->GetPropertyValuePtr(Dest);
 
 		DestScriptDelegate->BindUFunction(SrcDelegateHelper->GetUObject(), SrcDelegateHelper->GetFunctionName());
-
-		Object_New(Dest);
 	}
 }
 

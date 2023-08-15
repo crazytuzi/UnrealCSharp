@@ -36,7 +36,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 		return EPropertyTypeExtent::UInt64;
 	}
 
-	if (InMonoClass == FMonoDomain::Get_Byte_Class())
+	if (InMonoClass == FMonoDomain::Get_SByte_Class())
 	{
 		return EPropertyTypeExtent::Int8;
 	}
@@ -206,7 +206,7 @@ MonoClass* FTypeBridge::GetMonoClass(FProperty* InProperty)
 
 	if (CastField<FInt8Property>(InProperty))
 	{
-		return FMonoDomain::Get_Byte_Class();
+		return FMonoDomain::Get_SByte_Class();
 	}
 
 	if (CastField<FInt16Property>(InProperty))

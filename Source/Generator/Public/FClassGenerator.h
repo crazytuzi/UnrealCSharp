@@ -25,17 +25,13 @@ private:
 
 	static FString GetBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty);
 
-	static FString GeneratorFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
-	                                             const FString& InFunctionTab);
+	static FString GeneratorFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty);
 
-	static FString GeneratorCppFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
-	                                                const FString& InFunctionTab);
+	static FString GeneratorCppFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty);
 
-	static FString GeneratorBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
-	                                                      const FString& InFunctionTab);
+	static FString GeneratorBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty);
 
-	static FString GeneratorFunctionDefaultParam(FProperty* InProperty, const FString& InMetaData,
-	                                             const FString& InFunctionTab);
+	static FString GeneratorFunctionDefaultParam(FProperty* InProperty, const FString& InMetaData);
 
 	static TArray<FString> GetOverrideFunctions(const FString& InNameSpace, const FString& InClass);
 };

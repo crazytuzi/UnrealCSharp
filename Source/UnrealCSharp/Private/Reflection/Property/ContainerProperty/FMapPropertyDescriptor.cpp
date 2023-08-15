@@ -23,8 +23,6 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 		MapProperty->InitializeValue(Dest);
 
 		MapProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptMap());
-
-		Object_New(Dest);
 	}
 }
 

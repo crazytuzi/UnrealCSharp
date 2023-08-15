@@ -25,8 +25,6 @@ void FSoftObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 		{
 			SoftObjectProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
 		}
-
-		Object_New(Dest);
 	}
 }
 

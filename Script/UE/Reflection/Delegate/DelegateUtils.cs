@@ -25,7 +25,7 @@ namespace Script.Reflection.Delegate
         public static void Delegate_Clear(IntPtr InMonoObject) =>
             DelegateImplementation.Delegate_ClearImplementation(InMonoObject);
 
-        public static void Delegate_Execute<T>(IntPtr InMonoObject, out T ReturnValue, out ObjectList OutValue,
+        public static void Delegate_Execute<T>(IntPtr InMonoObject, out T ReturnValue, out Object[] OutValue,
             params Object[] InValue) =>
             DelegateImplementation.Delegate_ExecuteImplementation(InMonoObject, out ReturnValue, out OutValue, InValue);
     }
