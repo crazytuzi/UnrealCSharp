@@ -251,9 +251,9 @@ struct TIsNotUEnum<Class> \
 #endif
 
 #define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) \
-	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
+	FFunctionPointer([](BINDING_CONSTRUCTOR_SIGNATURE) \
 	{ \
-		TConstructorBuilder<T, ##__VA_ARGS__>::Invoke(BINDING_FUNCTION_PARAM); \
+		TConstructorBuilder<T, ##__VA_ARGS__>::Invoke(BINDING_CONSTRUCTOR_PARAM); \
 	}).Value.Pointer
 
 #define BINDING_CONSTRUCTOR_BUILDER_INFO(T, ...) TConstructorBuilder<T, ##__VA_ARGS__>::Info()

@@ -127,9 +127,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\n"
 			"\t\tprivate IntPtr GCHandle;\n");
 
-		UsingNameSpaces.Append({
-			TEXT("IntPtr = System.IntPtr"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass())
-		});
+		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 	}
 
 	auto StaticStructContent = FString::Printf(TEXT(

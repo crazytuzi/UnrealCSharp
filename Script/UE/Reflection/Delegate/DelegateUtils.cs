@@ -1,7 +1,6 @@
 ﻿using System;
 using Script.Common;
 using Script.Library;
-using IntPtr = System.IntPtr;
 
 namespace Script.Reflection.Delegate
 {

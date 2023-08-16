@@ -1,4 +1,5 @@
-﻿using Script.CoreUObject;
+﻿using System;
+using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Common
@@ -25,14 +26,14 @@ namespace Script.Common
 
         public unsafe void SetHandle(void* InGCHandle)
         {
-            GCHandle = new System.IntPtr(InGCHandle);
+            GCHandle = new IntPtr(InGCHandle);
         }
 
-        public System.IntPtr GetHandle()
+        public IntPtr GetHandle()
         {
             return GCHandle;
         }
 
-        private System.IntPtr GCHandle;
+        private IntPtr GCHandle;
     }
 }

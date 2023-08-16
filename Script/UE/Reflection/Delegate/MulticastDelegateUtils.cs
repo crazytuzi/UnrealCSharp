@@ -2,7 +2,6 @@
 using Script.Common;
 using Script.CoreUObject;
 using Script.Library;
-using IntPtr = System.IntPtr;
 
 namespace Script.Reflection.Delegate
 {

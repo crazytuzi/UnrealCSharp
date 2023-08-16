@@ -26,19 +26,19 @@ struct TPropertyBuilder
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyInfoBuilder
 {
-	static void Get(const MonoObject* InMonoObject, MonoObject** OutValue)
+	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InMonoObject))
+			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
 			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member));
 		}
 	}
 
-	static void Set(const MonoObject* InMonoObject, MonoObject* InValue)
+	static void Set(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InValue)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InMonoObject))
+			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
 			FoundObject->*Member = TPropertyValue<Result, Result>::Set(InValue);
 		}

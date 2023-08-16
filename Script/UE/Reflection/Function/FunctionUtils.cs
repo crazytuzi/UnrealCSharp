@@ -1,6 +1,5 @@
 ﻿using System;
 using Script.Library;
-using IntPtr = System.IntPtr;
 
 namespace Script.Reflection.Function
 {
