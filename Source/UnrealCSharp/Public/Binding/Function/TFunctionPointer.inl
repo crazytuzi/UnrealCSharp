@@ -1,7 +1,5 @@
 #pragma once
 
-#include "GarbageCollection/FGarbageCollectionHandle.h"
-
 #ifndef BINDING_CONSTRUCTOR_SIGNATURE
 #define BINDING_CONSTRUCTOR_SIGNATURE MonoObject* InMonoObject, MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue
 #endif
@@ -18,23 +16,17 @@
 #define BINDING_FUNCTION_PARAM InGarbageCollectionHandle, ReturnValue, OutValue, InValue
 #endif
 
-struct FFunctionPointer
+template <typename T>
+struct TFunctionPointer
 {
-	explicit FFunctionPointer(void (*InConstructor)(BINDING_CONSTRUCTOR_SIGNATURE))
-	{
-		Value.Constructor = InConstructor;
-	}
-
-	explicit FFunctionPointer(void (*InFunction)(BINDING_FUNCTION_SIGNATURE))
+	explicit TFunctionPointer(const T& InFunction)
 	{
 		Value.Function = InFunction;
 	}
 
 	union
 	{
-		void (*Constructor)(BINDING_CONSTRUCTOR_SIGNATURE);
-
-		void (*Function)(BINDING_FUNCTION_SIGNATURE);
+		T Function;
 
 		void* Pointer;
 	} Value;
