@@ -22,8 +22,6 @@ void FWeakObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 		WeakObjectProperty->InitializeValue(Dest);
 
 		WeakObjectProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
-
-		Object_New(Dest);
 	}
 }
 

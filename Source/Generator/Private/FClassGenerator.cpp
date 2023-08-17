@@ -493,9 +493,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		auto FunctionCallBody = FString::Printf(
 			TEXT(
-				"FunctionUtils.Function_Reflection<%s>(%s, %s, out var __ReturnValue, out var __OutValue"
+				"FunctionUtils.Function_Reflection(%s, %s, out var __ReturnValue, out var __OutValue"
 			),
-			FunctionReturnParam != nullptr ? *FGeneratorCore::GetReturnParamType(FunctionReturnParam) : TEXT("Object"),
 			bIsStatic == true ? TEXT("StaticClass().GetDefaultObject().GetHandle()") : TEXT("GetHandle()"),
 			*FunctionNames[FunctionNames.Num() - 1].Key);
 
@@ -509,17 +508,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FunctionCallBody += TEXT(");");
 
-		auto bIsSafeFunction = true;
-
 		TArray<FString> FunctionOutParams;
 
 		for (auto Index = 0; Index < FunctionOutParamIndex.Num(); ++Index)
 		{
-			if (bIsSafeFunction == true)
-			{
-				bIsSafeFunction = FGeneratorCore::IsSafeProperty(FunctionParams[FunctionOutParamIndex[Index]]);
-			}
-
 			FunctionOutParams.Emplace(FString::Printf(TEXT(
 				"%s = %s;"
 			),
@@ -532,11 +524,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		for (auto Index = 0; Index < FunctionRefParamIndex.Num(); ++Index)
 		{
-			if (bIsSafeFunction == true)
-			{
-				bIsSafeFunction = FGeneratorCore::IsSafeProperty(FunctionParams[FunctionRefParamIndex[Index]]);
-			}
-
 			FunctionOutParams.Emplace(FString::Printf(TEXT(
 				"%s = %s;"
 			),
@@ -558,47 +545,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                          *FGeneratorCore::GetReturnParamName(FunctionReturnParam));
 		}
 
-		FString FunctionTab;
-
-		FString FunctionStringFormat;
-
-		if (bIsSafeFunction == true)
-		{
-			FunctionTab = TEXT("\t\t\t");
-
-			FunctionStringFormat = TEXT(
-				"{0}"
-				"\t\t{1}\n"
-				"\t\t{\n"
-				"{2}"
-				"\t\t}\n"
-			);
-		}
-		else
-		{
-			FunctionTab = TEXT("\t\t\t\t");
-
-			UsingNameSpaces.Add(TEXT("IntPtr = Script.Common.IntPtr"));
-
-			FunctionStringFormat = TEXT(
-				"{0}"
-				"\t\t{1}\n"
-				"\t\t{\n"
-				"\t\t\tunsafe\n"
-				"\t\t\t{\n"
-				"{2}"
-				"\t\t\t}\n"
-				"\t\t}\n"
-			);
-		}
-
 		FString FunctionDefaultParamBody;
 
 		if (bGeneratorFunctionDefaultParam)
 		{
 			for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 			{
-				FunctionDefaultParamBody += GeneratorFunctionDefaultParam(Function, FunctionParams[Index], FunctionTab);
+				FunctionDefaultParamBody += GeneratorFunctionDefaultParam(Function, FunctionParams[Index]);
 			}
 		}
 
@@ -607,20 +560,18 @@ void FClassGenerator::Generator(const UClass* InClass)
 		for (auto FunctionOutParam : FunctionOutParams)
 		{
 			FunctionOutParamBody += FString::Printf(TEXT(
-				"\n%s%s\n"
+				"\n\t\t\t%s\n"
 			),
-			                                        *FunctionTab,
 			                                        *FunctionOutParam);
 		}
 
 		auto FunctionImplementationBody = FString::Printf(TEXT(
-			"%s%s%s\n"
+			"%s\t\t\t%s\n"
 			"%s"
 			"%s"
 			"%s"
 		),
 		                                                  *FunctionDefaultParamBody,
-		                                                  *FunctionTab,
 		                                                  *FunctionCallBody,
 		                                                  *FunctionOutParamBody,
 		                                                  FunctionReturnParamBody.IsEmpty() ? TEXT("") : TEXT("\n"),
@@ -628,16 +579,21 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                                  ? TEXT("")
 			                                                  : *FString::Printf(
 				                                                  TEXT(
-					                                                  "%s%s\n"
+					                                                  "\t\t\t%s\n"
 				                                                  ),
-				                                                  *FunctionTab,
 				                                                  *FunctionReturnParamBody));
 
-		FStringFormatOrderedArguments StringFormatArgs{
-			FunctionComment, FunctionDeclaration, FunctionImplementationBody
-		};
-
-		FunctionContent += FString::Format(*FunctionStringFormat, StringFormatArgs);
+		FunctionContent += FString::Printf(TEXT(
+			"%s"
+			"\t\t%s\n"
+			"\t\t{\n"
+			"%s"
+			"\t\t}\n"
+		),
+		                                   *FunctionComment,
+		                                   *FunctionDeclaration,
+		                                   *FunctionImplementationBody
+		);
 	}
 
 	for (auto Index = 0; Index < FunctionNames.Num(); ++Index)
@@ -1049,8 +1005,7 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	return TEXT("");
 }
 
-FString FClassGenerator::GeneratorFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
-                                                       const FString& InFunctionTab)
+FString FClassGenerator::GeneratorFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
 {
 	if (InFunction == nullptr || InProperty == nullptr)
 	{
@@ -1064,14 +1019,13 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(const UFunction* InFuncti
 
 	if (Cast<UBlueprintGeneratedClass>(InFunction->GetOuter()))
 	{
-		return GeneratorBlueprintFunctionDefaultParam(InFunction, InProperty, InFunctionTab);
+		return GeneratorBlueprintFunctionDefaultParam(InFunction, InProperty);
 	}
 
-	return GeneratorCppFunctionDefaultParam(InFunction, InProperty, InFunctionTab);
+	return GeneratorCppFunctionDefaultParam(InFunction, InProperty);
 }
 
-FString FClassGenerator::GeneratorCppFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
-                                                          const FString& InFunctionTab)
+FString FClassGenerator::GeneratorCppFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
 {
 	const auto Key = FString::Printf(TEXT("CPP_Default_%s"), *InProperty->GetName());
 
@@ -1082,11 +1036,10 @@ FString FClassGenerator::GeneratorCppFunctionDefaultParam(const UFunction* InFun
 
 	const auto MetaData = InFunction->GetMetaData(*Key);
 
-	return GeneratorFunctionDefaultParam(InProperty, MetaData, InFunctionTab);
+	return GeneratorFunctionDefaultParam(InProperty, MetaData);
 }
 
-FString FClassGenerator::GeneratorBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty,
-                                                                const FString& InFunctionTab)
+FString FClassGenerator::GeneratorBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty)
 {
 	if (InProperty->HasAnyPropertyFlags(CPF_OutParm) && !InProperty->HasAnyPropertyFlags(CPF_ConstParm))
 	{
@@ -1102,18 +1055,16 @@ FString FClassGenerator::GeneratorBlueprintFunctionDefaultParam(const UFunction*
 
 	const auto MetaData = InFunction->GetMetaData(*Key);
 
-	return GeneratorFunctionDefaultParam(InProperty, MetaData, InFunctionTab);
+	return GeneratorFunctionDefaultParam(InProperty, MetaData);
 }
 
-FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, const FString& InMetaData,
-                                                       const FString& InFunctionTab)
+FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, const FString& InMetaData)
 {
 	if (CastField<FNameProperty>(InProperty))
 	{
 		return FString::Printf(TEXT(
-			"%s%s ??= new FName(\"%s\");\n\n"
+			"\t\t\t%s ??= new FName(\"%s\");\n\n"
 		),
-		                       *InFunctionTab,
 		                       *InProperty->GetName(),
 		                       *InMetaData
 		);
@@ -1128,23 +1079,17 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"%s%s ??= new FRotator\n"
-					"%s{\n"
-					"%s\tPitch = %ff,\n"
-					"%s\tYaw = %ff,\n"
-					"%s\tRoll = %ff\n"
-					"%s};\n\n"
+					"\t\t\t%s ??= new FRotator\n"
+					"\t\t\t{\n"
+					"\t\t\t\tPitch = %ff,\n"
+					"\t\t\t\tYaw = %ff,\n"
+					"\t\t\t\tRoll = %ff\n"
+					"\t\t\t};\n\n"
 				),
-				                       *InFunctionTab,
 				                       *InProperty->GetName(),
-				                       *InFunctionTab,
-				                       *InFunctionTab,
 				                       Value.Pitch,
-				                       *InFunctionTab,
 				                       Value.Yaw,
-				                       *InFunctionTab,
-				                       Value.Roll,
-				                       *InFunctionTab
+				                       Value.Roll
 				);
 			}
 		}
@@ -1156,26 +1101,19 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"%s%s ??= new FQuat\n"
-					"%s{\n"
-					"%s\tX = %ff,\n"
-					"%s\tY = %ff,\n"
-					"%s\tZ = %ff\n"
-					"%s\tW = %ff\n"
-					"%s};\n\n"
+					"\t\t\t%s ??= new FQuat\n"
+					"\t\t\t{\n"
+					"\t\t\t\tX = %ff,\n"
+					"\t\t\t\tY = %ff,\n"
+					"\t\t\t\tZ = %ff\n"
+					"\t\t\t\tW = %ff\n"
+					"\t\t\t};\n\n"
 				),
-				                       *InFunctionTab,
 				                       *InProperty->GetName(),
-				                       *InFunctionTab,
-				                       *InFunctionTab,
 				                       Value.X,
-				                       *InFunctionTab,
 				                       Value.Y,
-				                       *InFunctionTab,
 				                       Value.Z,
-				                       *InFunctionTab,
-				                       Value.W,
-				                       *InFunctionTab
+				                       Value.W
 				);
 			}
 		}
@@ -1187,26 +1125,19 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"%s%s ??= new FLinearColor\n"
-					"%s{\n"
-					"%s\tR = %ff,\n"
-					"%s\tG = %ff,\n"
-					"%s\tB = %ff,\n"
-					"%s\tA = %ff\n"
-					"%s};\n\n"
+					"\t\t\t%s ??= new FLinearColor\n"
+					"\t\t\t{\n"
+					"\t\t\t\tR = %ff,\n"
+					"\t\t\t\tG = %ff,\n"
+					"\t\t\t\tB = %ff,\n"
+					"\t\t\t\tA = %ff\n"
+					"\t\t\t};\n\n"
 				),
-				                       *InFunctionTab,
 				                       *InProperty->GetName(),
-				                       *InFunctionTab,
-				                       *InFunctionTab,
 				                       Value.R,
-				                       *InFunctionTab,
 				                       Value.G,
-				                       *InFunctionTab,
 				                       Value.B,
-				                       *InFunctionTab,
-				                       Value.A,
-				                       *InFunctionTab
+				                       Value.A
 				);
 			}
 		}
@@ -1218,26 +1149,19 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"%s%s ??= new FColor\n"
-					"%s{\n"
-					"%s\tR = %hhu,\n"
-					"%s\tG = %hhu,\n"
-					"%s\tB = %hhu,\n"
-					"%s\tA = %hhu\n"
-					"%s};\n\n"
+					"\t\t\t%s ??= new FColor\n"
+					"\t\t\t{\n"
+					"\t\t\t\tR = %hhu,\n"
+					"\t\t\t\tG = %hhu,\n"
+					"\t\t\t\tB = %hhu,\n"
+					"\t\t\t\tA = %hhu\n"
+					"\t\t\t};\n\n"
 				),
-				                       *InFunctionTab,
 				                       *InProperty->GetName(),
-				                       *InFunctionTab,
-				                       *InFunctionTab,
 				                       Value.R,
-				                       *InFunctionTab,
 				                       Value.G,
-				                       *InFunctionTab,
 				                       Value.B,
-				                       *InFunctionTab,
-				                       Value.A,
-				                       *InFunctionTab
+				                       Value.A
 				);
 			}
 		}
@@ -1249,26 +1173,19 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"%s%s ??= new FPlane\n"
-					"%s{\n"
-					"%s\tX = %ff,\n"
-					"%s\tY = %ff,\n"
-					"%s\tZ = %ff\n"
-					"%s\tW = %ff\n"
-					"%s};\n\n"
+					"\t\t\t%s ??= new FPlane\n"
+					"\t\t\t{\n"
+					"\t\t\t\tX = %ff,\n"
+					"\t\t\t\tY = %ff,\n"
+					"\t\t\t\tZ = %ff\n"
+					"\t\t\t\tW = %ff\n"
+					"\t\t\t};\n\n"
 				),
-				                       *InFunctionTab,
 				                       *InProperty->GetName(),
-				                       *InFunctionTab,
-				                       *InFunctionTab,
 				                       Value.X,
-				                       *InFunctionTab,
 				                       Value.Y,
-				                       *InFunctionTab,
 				                       Value.Z,
-				                       *InFunctionTab,
-				                       Value.W,
-				                       *InFunctionTab
+				                       Value.W
 				);
 			}
 		}
@@ -1280,23 +1197,17 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"%s%s ??= new FVector\n"
-					"%s{\n"
-					"%s\tX = %ff,\n"
-					"%s\tY = %ff,\n"
-					"%s\tZ = %ff\n"
-					"%s};\n\n"
+					"\t\t\t%s ??= new FVector\n"
+					"\t\t\t{\n"
+					"\t\t\t\tX = %ff,\n"
+					"\t\t\t\tY = %ff,\n"
+					"\t\t\t\tZ = %ff\n"
+					"\t\t\t};\n\n"
 				),
-				                       *InFunctionTab,
 				                       *InProperty->GetName(),
-				                       *InFunctionTab,
-				                       *InFunctionTab,
 				                       Value.X,
-				                       *InFunctionTab,
 				                       Value.Y,
-				                       *InFunctionTab,
-				                       Value.Z,
-				                       *InFunctionTab
+				                       Value.Z
 				);
 			}
 		}
@@ -1308,20 +1219,15 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"%s%s ??= new FVector2D\n"
-					"%s{\n"
-					"%s\tX = %ff,\n"
-					"%s\tY = %ff,\n"
-					"%s};\n\n"
+					"\t\t\t%s ??= new FVector2D\n"
+					"\t\t\t{\n"
+					"\t\t\t\tX = %ff,\n"
+					"\t\t\t\tY = %ff,\n"
+					"\t\t\t};\n\n"
 				),
-				                       *InFunctionTab,
 				                       *InProperty->GetName(),
-				                       *InFunctionTab,
-				                       *InFunctionTab,
 				                       Value.X,
-				                       *InFunctionTab,
-				                       Value.Y,
-				                       *InFunctionTab
+				                       Value.Y
 				);
 			}
 		}
@@ -1333,34 +1239,26 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"%s%s ??= new FVector4\n"
-					"%s{\n"
-					"%s\tX = %ff,\n"
-					"%s\tY = %ff,\n"
-					"%s\tZ = %ff\n"
-					"%s\tW = %ff\n"
-					"%s};\n\n"
+					"\t\t\t%s ??= new FVector4\n"
+					"\t\t\t{\n"
+					"\t\t\t\tX = %ff,\n"
+					"\t\t\t\tY = %ff,\n"
+					"\t\t\t\tZ = %ff\n"
+					"\t\t\t\tW = %ff\n"
+					"\t\t\t};\n\n"
 				),
-				                       *InFunctionTab,
 				                       *InProperty->GetName(),
-				                       *InFunctionTab,
-				                       *InFunctionTab,
 				                       Value.X,
-				                       *InFunctionTab,
 				                       Value.Y,
-				                       *InFunctionTab,
 				                       Value.Z,
-				                       *InFunctionTab,
-				                       Value.W,
-				                       *InFunctionTab
+				                       Value.W
 				);
 			}
 		}
 
 		return FString::Printf(TEXT(
-			"%s%s ??= new F%s();\n\n"
+			"\t\t\t%s ??= new F%s();\n\n"
 		),
-		                       *InFunctionTab,
 		                       *InProperty->GetName(),
 		                       *StructProperty->Struct->GetName()
 		);
@@ -1369,9 +1267,8 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 	if (CastField<FStrProperty>(InProperty))
 	{
 		return FString::Printf(TEXT(
-			"%s%s ??= new FString(\"%s\");\n\n"
+			"\t\t\t%s ??= new FString(\"%s\");\n\n"
 		),
-		                       *InFunctionTab,
 		                       *InProperty->GetName(),
 		                       *InMetaData
 		);
@@ -1389,9 +1286,8 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		}
 
 		return FString::Printf(TEXT(
-			"%s%s ??= new FText(\"%s\");\n\n"
+			"\t\t\t%s ??= new FText(\"%s\");\n\n"
 		),
-		                       *InFunctionTab,
 		                       *InProperty->GetName(),
 		                       *Value
 		);

@@ -20,8 +20,6 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 		StructProperty->InitializeValue(Dest);
 
 		StructProperty->CopySingleValue(Dest, SrcStruct);
-
-		Object_New(Dest);
 	}
 }
 

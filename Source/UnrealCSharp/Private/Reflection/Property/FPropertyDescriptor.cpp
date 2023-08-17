@@ -176,7 +176,6 @@ FPropertyDescriptor::FPropertyDescriptor(FProperty* InProperty):
 
 void FPropertyDescriptor::Get(void* Src, void** Dest) const
 {
-	*Dest = Src;
 }
 
 void FPropertyDescriptor::Get(void* Src, void* Dest) const

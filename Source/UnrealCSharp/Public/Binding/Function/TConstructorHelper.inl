@@ -15,13 +15,15 @@ template <typename... Args>
 struct TConstructorHelper<TTuple<Args...>>
 {
 	template <typename Class, SIZE_T... Index>
-	static void Call(TIntegerSequence<SIZE_T, Index...>, BINDING_FUNCTION_SIGNATURE)
+	static void Call(TIntegerSequence<SIZE_T, Index...>, BINDING_CONSTRUCTOR_SIGNATURE)
 	{
 		TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
 
 		auto Value = new Class(Forward<Args>(Argument.template Get<Index>().Get())...);
 
-		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument).template Get<0, Args...>();
+		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument)
+			.template Initialize<0, Args...>()
+			.template Get<0, Args...>();
 
 		FCSharpEnvironment::GetEnvironment().AddBindingReference(InMonoObject, Value);
 	}

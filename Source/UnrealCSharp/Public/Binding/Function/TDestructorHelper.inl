@@ -18,6 +18,6 @@ struct TDestructorHelper<TTuple<Args...>>
 	{
 		TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
 
-		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InMonoObject);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InGarbageCollectionHandle);
 	}
 };

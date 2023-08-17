@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
 using Script.Reflection.Property;
-using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {

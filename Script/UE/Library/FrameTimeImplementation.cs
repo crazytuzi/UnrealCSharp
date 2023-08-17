@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Script.CoreUObject;
-using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {

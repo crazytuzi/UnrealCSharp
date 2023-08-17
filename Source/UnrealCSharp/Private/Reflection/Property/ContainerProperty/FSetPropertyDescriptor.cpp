@@ -23,8 +23,6 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 		SetProperty->InitializeValue(Dest);
 
 		SetProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
-
-		Object_New(Dest);
 	}
 }
 

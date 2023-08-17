@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
-using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -43,6 +42,6 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void MulticastDelegate_BroadcastImplementation(IntPtr InMonoObject,
-            out ObjectList OutValue, params Object[] InValue);
+            out Object[] OutValue, params Object[] InValue);
     }
 }

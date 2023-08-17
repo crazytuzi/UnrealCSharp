@@ -22,8 +22,6 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 		LazyObjectProperty->InitializeValue(Dest);
 
 		LazyObjectProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
-
-		Object_New(Dest);
 	}
 }
 

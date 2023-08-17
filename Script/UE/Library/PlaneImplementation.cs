@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Script.CoreUObject;
-using IntPtr = System.IntPtr;
 #if UE_5_0_OR_LATER
 using LwcType = System.Double;
 #else

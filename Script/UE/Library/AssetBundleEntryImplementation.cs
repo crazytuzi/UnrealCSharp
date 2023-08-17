@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {

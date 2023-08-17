@@ -1,6 +1,8 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Binding/FBinding.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Macro/ClassMacro.h"
+#include "Macro/FunctionMacro.h"
 
 FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace):
 	Class(InClass),

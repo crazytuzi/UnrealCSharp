@@ -1,9 +1,7 @@
 ﻿#include "Reflection/Function/FFunctionDescriptor.h"
+#include "Bridge/FTypeBridge.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/MonoMacro.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "Macro/ClassMacro.h"
-#include "Macro/FunctionMacro.h"
 
 FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction):
 	Function(InFunction),
@@ -124,7 +122,7 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 		{
 			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Parent_Class_Get_Method_From_Name(FoundMonoClass, TCHAR_TO_UTF8(*Stack.Node->GetName()),
-				                           PropertyDescriptors.Num()))
+				                                  PropertyDescriptors.Num()))
 			{
 				const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
 					FoundMonoMethod, FoundMonoObject, CSharpParams.GetData());
@@ -232,45 +230,29 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 
 		if (ReturnPropertyDescriptor != nullptr)
 		{
-			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), ReturnValue);
+			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
+			                              (void**)(ReturnValue));
 		}
 
 		if (OutPropertyIndexes.Num() > 0)
 		{
-			const auto FoundObjectListClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_OBJECT_LIST);
+			const auto MonoObjectArray = FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(),
+			                                                    OutPropertyIndexes.Num());
 
-			const auto FoundIntPtrClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_INT_PTR);
-
-			const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Method_From_Name(
-				FoundObjectListClass, FUNCTION_OBJECT_LIST_ADD, 1);
-
-			const auto NewObjectList = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundObjectListClass);
-
-			for (const auto Index : OutPropertyIndexes)
+			for (auto Index = 0; Index < OutPropertyIndexes.Num(); ++Index)
 			{
-				if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
+				if (const auto OutPropertyDescriptor = PropertyDescriptors[OutPropertyIndexes[Index]])
 				{
-					auto Value = static_cast<void**>(FMemory_Alloca(sizeof(void*)));
+					MonoObject* Value = nullptr;
 
-					OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), Value);
+					OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
+					                           (void**)&Value);
 
-					if (OutPropertyDescriptor->IsPrimitiveProperty())
-					{
-						auto NewIntPtr = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->
-							Object_New(FoundIntPtrClass, 1, Value));
-
-						Value = &NewIntPtr;
-					}
-
-					FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
-						FoundAddMethod, NewObjectList, Value);
+					ARRAY_SET(MonoObjectArray, MonoObject*, Index, Value);
 				}
 			}
 
-			*OutValue = NewObjectList;
+			*OutValue = (MonoObject*)MonoObjectArray;
 		}
 	}
 	else if (bIsRemote)

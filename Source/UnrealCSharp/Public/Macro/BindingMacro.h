@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMacro/BindingMacro.h"
-#include "Binding/Function/FFunctionPointer.h"
+#include "Binding/Function/TFunctionPointer.inl"
 #include "Binding/Function/TFunctionBuilder.inl"
 #include "Binding/Function/TConstructorBuilder.inl"
 #include "Binding/Function/TDestructorBuilder.inl"
@@ -16,7 +16,6 @@
 #include "Binding/Function/TReturnValue.inl"
 #include "Binding/Function/TOverloadBuilder.inl"
 #include "Template/TIsNotUEnum.inl"
-#include "UEVersion.h"
 
 #define BINDING_STR(Str) #Str
 
@@ -216,11 +215,7 @@ struct TIsNotUEnum<Class> \
 #define BINDING_READONLY_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), nullptr
 #endif
 
-#define BINDING_FUNCTION_BUILDER_INVOKE(Function) \
-	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
-	{ \
-		TFunctionBuilder<decltype(Function), Function>::Invoke(BINDING_FUNCTION_PARAM); \
-	}).Value.Pointer
+#define BINDING_FUNCTION_BUILDER_INVOKE(Function) TFunctionPointer(&TFunctionBuilder<decltype(Function), Function>::Invoke).Value.Pointer
 
 #define BINDING_FUNCTION_BUILDER_INFO(Function) TFunctionBuilder<decltype(Function), Function>::Info()
 
@@ -230,18 +225,14 @@ struct TIsNotUEnum<Class> \
 #define BINDING_FUNCTION(Function) BINDING_FUNCTION_BUILDER_INVOKE(Function)
 #endif
 
-#define BINDING_OVERLOAD_BUILDER_INVOKE(SIGNATURE, Function) \
-	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
-	{ \
-		TFunctionBuilder<SIGNATURE, Function>::Invoke(BINDING_FUNCTION_PARAM); \
-	}).Value.Pointer
+#define BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function) TFunctionPointer(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
 
-#define BINDING_OVERLOAD_BUILDER_INFO(SIGNATURE, Function) TFunctionBuilder<SIGNATURE, Function>::Info()
+#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function) TFunctionBuilder<Signature, Function>::Info()
 
 #if WITH_FUNCTION_INFO
-#define BINDING_OVERLOAD(SIGNATURE, Function) BINDING_OVERLOAD_BUILDER_INVOKE(SIGNATURE, Function), BINDING_OVERLOAD_BUILDER_INFO(SIGNATURE, Function)
+#define BINDING_OVERLOAD(Signature, Function) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function), BINDING_OVERLOAD_BUILDER_INFO(Signature, Function)
 #else
-#define BINDING_OVERLOAD(SIGNATURE, Function) BINDING_OVERLOAD_BUILDER_INVOKE(SIGNATURE, Function)
+#define BINDING_OVERLOAD(Signature, Function) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function)
 #endif
 
 #if WITH_FUNCTION_INFO
@@ -250,11 +241,7 @@ struct TIsNotUEnum<Class> \
 #define BINDING_OVERLOADS(...) TOverloadBuilder<void*>::Get(##__VA_ARGS__)
 #endif
 
-#define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) \
-	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
-	{ \
-		TConstructorBuilder<T, ##__VA_ARGS__>::Invoke(BINDING_FUNCTION_PARAM); \
-	}).Value.Pointer
+#define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) TFunctionPointer(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke).Value.Pointer
 
 #define BINDING_CONSTRUCTOR_BUILDER_INFO(T, ...) TConstructorBuilder<T, ##__VA_ARGS__>::Info()
 
@@ -264,11 +251,7 @@ struct TIsNotUEnum<Class> \
 #define BINDING_CONSTRUCTOR(T, ...) BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ##__VA_ARGS__)
 #endif
 
-#define BINDING_DESTRUCTOR_BUILDER_INVOKE(...) \
-	FFunctionPointer([](BINDING_FUNCTION_SIGNATURE) \
-	{ \
-		TDestructorBuilder<##__VA_ARGS__>::Invoke(BINDING_FUNCTION_PARAM); \
-	}).Value.Pointer
+#define BINDING_DESTRUCTOR_BUILDER_INVOKE(...) TFunctionPointer(&TDestructorBuilder<##__VA_ARGS__>::Invoke).Value.Pointer
 
 #define BINDING_DESTRUCTOR_BUILDER_INFO(...) TDestructorBuilder<##__VA_ARGS__>::Info()
 

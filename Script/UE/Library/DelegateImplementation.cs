@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Script.Common;
-using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -28,6 +27,6 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Delegate_ExecuteImplementation<T>(IntPtr InMonoObject, out T ReturnValue,
-            out ObjectList OutValue, params Object[] InValue);
+            out Object[] OutValue, params Object[] InValue);
     }
 }

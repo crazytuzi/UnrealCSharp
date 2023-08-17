@@ -1,17 +1,37 @@
 #pragma once
 
-#include "CoreMacro/NamespaceMacro.h"
-#include "Macro/ClassMacro.h"
-#include "Macro/FunctionMacro.h"
-#include "Environment/FCSharpEnvironment.h"
-
 template <typename Type>
 struct TOut
 {
 	explicit TOut(MonoObject** InOutValue, Type& InArgument):
 		OutValue(InOutValue),
-		Argument(InArgument)
+		Argument(InArgument),
+		Count(0)
 	{
+	}
+
+	template <SIZE_T Index>
+	TOut& Initialize()
+	{
+		if (Count > 0)
+		{
+			*OutValue = (MonoObject*)FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(), Count);
+
+			Count = 0;
+		}
+
+		return *this;
+	}
+
+	template <SIZE_T Index, typename T, typename... Args>
+	TOut& Initialize()
+	{
+		if (Argument.template Get<Index>().IsOut())
+		{
+			++Count;
+		}
+
+		return Initialize<Index + 1, Args...>();;
 	}
 
 	template <SIZE_T Index>
@@ -24,20 +44,9 @@ struct TOut
 	{
 		if (Argument.template Get<Index>().IsOut())
 		{
-			const auto FoundObjectListClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_OBJECT_LIST);
+			auto Value = Argument.template Get<Index>().Set();
 
-			if (*OutValue == nullptr)
-			{
-				*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundObjectListClass);
-			}
-
-			const auto FoundAddMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Method_From_Name(
-				FoundObjectListClass, FUNCTION_OBJECT_LIST_ADD, 1);
-
-			auto Value = static_cast<void*>(Argument.template Get<Index>().Set());
-
-			FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(FoundAddMethod, *OutValue, &Value);
+			ARRAY_SET((MonoArray*)*OutValue, MonoObject*, Count++, Value);
 		}
 
 		Get<Index + 1, Args...>();
@@ -47,4 +56,6 @@ private:
 	MonoObject** OutValue;
 
 	Type& Argument;
+
+	int32 Count;
 };
