@@ -23,7 +23,7 @@ public:
 			Constructor(BINDING_CONSTRUCTOR(T));
 		}
 
-		Destructor(BINDING_DESTRUCTOR());
+		Destructor(BINDING_DESTRUCTOR(T));
 	}
 
 	template <typename Class>

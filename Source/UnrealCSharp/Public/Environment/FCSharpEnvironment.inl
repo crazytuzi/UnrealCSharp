@@ -181,3 +181,11 @@ auto FCSharpEnvironment::GetBinding(const FGarbageCollectionHandle& InGarbageCol
 		       ? static_cast<T*>(BindingRegistry->GetObject(InGarbageCollectionHandle))
 		       : nullptr;
 }
+
+template <typename T>
+auto FCSharpEnvironment::RemoveBindingReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+{
+	return BindingRegistry != nullptr
+		       ? BindingRegistry->RemoveReference<T>(InGarbageCollectionHandle)
+		       : false;
+}

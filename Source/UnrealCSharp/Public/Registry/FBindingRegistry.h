@@ -39,7 +39,8 @@ public:
 public:
 	bool AddReference(const void* InObject, MonoObject* InMonoObject, bool bNeedFree = true);
 
-	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	template <typename T>
+	auto RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
 	TGarbageCollectionHandleMapping<FBindingAddress> GarbageCollectionHandle2BindingAddress;

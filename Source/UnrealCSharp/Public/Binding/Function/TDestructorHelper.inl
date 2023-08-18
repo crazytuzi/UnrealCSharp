@@ -13,11 +13,9 @@ struct TDestructorHelper
 template <typename... Args>
 struct TDestructorHelper<TTuple<Args...>>
 {
-	template <SIZE_T... Index>
+	template <typename Class, SIZE_T... Index>
 	static void Call(TIntegerSequence<SIZE_T, Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
-
-		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InGarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference<Class>(InGarbageCollectionHandle);
 	}
 };

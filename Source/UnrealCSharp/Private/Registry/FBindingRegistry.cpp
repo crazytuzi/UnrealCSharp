@@ -61,24 +61,3 @@ bool FBindingRegistry::AddReference(const void* InObject, MonoObject* InMonoObje
 
 	return true;
 }
-
-bool FBindingRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
-{
-	if (const auto FoundBindingAddress = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle))
-	{
-		BindingAddress2GarbageCollectionHandle.Remove(*FoundBindingAddress);
-
-		if (FoundBindingAddress->bNeedFree)
-		{
-			FMemory::Free(FoundBindingAddress->Address);
-
-			FoundBindingAddress->Address = nullptr;
-		}
-
-		GarbageCollectionHandle2BindingAddress.Remove(InGarbageCollectionHandle);
-
-		return true;
-	}
-
-	return false;
-}
