@@ -44,7 +44,7 @@ bool FTextPropertyDescriptor::Identical(const void* A, const void* B, uint32 Por
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr))));
 
-		return StringA == StringB;
+		return StringA.Equals(StringB);
 	}
 
 	return false;
