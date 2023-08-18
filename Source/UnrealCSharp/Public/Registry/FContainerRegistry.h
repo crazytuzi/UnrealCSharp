@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
+#include "GarbageCollection/TMonoObjectMapping.inl"
 #include "Reflection/Container/FContainerHelper.h"
 #include "mono/metadata/object-forward.h"
 
@@ -52,7 +53,7 @@ private:
 
 	TMap<void*, FGarbageCollectionHandle> Address2GarbageCollectionHandle;
 
-	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
+	TMonoObjectMapping<FContainerAddress> MonoObject2ContainerAddress;
 };
 
 #include "FContainerRegistry.inl"

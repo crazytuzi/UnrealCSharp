@@ -26,7 +26,7 @@ void FObjectRegistry::Deinitialize()
 
 	Object2GarbageCollectionHandleMap.Empty();
 
-	MonoObject2GarbageCollectionHandleMap.Empty();
+	MonoObject2Object.Empty();
 }
 
 void* FObjectRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle)
@@ -38,7 +38,9 @@ void* FObjectRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageColle
 
 void* FObjectRegistry::GetAddress(const MonoObject* InMonoObject)
 {
-	return GetAddress(MonoObject2GarbageCollectionHandleMap[InMonoObject]);
+	const auto FoundObject = MonoObject2Object.Find(InMonoObject);
+
+	return FoundObject != nullptr ? const_cast<UObject*>(FoundObject->Get()) : nullptr;
 }
 
 void* FObjectRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct)
@@ -55,7 +57,14 @@ void* FObjectRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageColle
 
 void* FObjectRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct)
 {
-	return GetAddress(MonoObject2GarbageCollectionHandleMap[InMonoObject], InStruct);
+	if (const auto FoundObject = MonoObject2Object.Find(InMonoObject))
+	{
+		InStruct = (*FoundObject)->GetClass();
+
+		return const_cast<UObject*>(FoundObject->Get());
+	}
+
+	return nullptr;
 }
 
 MonoObject* FObjectRegistry::GetObject(const UObject* InObject)
@@ -72,7 +81,7 @@ UObject* FObjectRegistry::GetObject(const FGarbageCollectionHandle& InGarbageCol
 
 UObject* FObjectRegistry::GetObject(const MonoObject* InMonoObject)
 {
-	return static_cast<UObject*>(GetAddress(MonoObject2GarbageCollectionHandleMap[InMonoObject]));
+	return static_cast<UObject*>(GetAddress(InMonoObject));
 }
 
 FGarbageCollectionHandle FObjectRegistry::GetGarbageCollectionHandle(const UObject* InObject)
@@ -90,7 +99,7 @@ bool FObjectRegistry::AddReference(UObject* InObject, MonoObject* InMonoObject)
 
 	GarbageCollectionHandle2Object.Add(GarbageCollectionHandle, &*InObject);
 
-	MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
+	MonoObject2Object.Add(InMonoObject, &*InObject);
 
 	return true;
 }
@@ -101,7 +110,7 @@ bool FObjectRegistry::RemoveReference(const UObject* InObject)
 	{
 		Object2GarbageCollectionHandleMap.Remove(InObject);
 
-		MonoObject2GarbageCollectionHandleMap.Remove(*FoundGarbageCollectionHandle);
+		MonoObject2Object.Remove(*FoundGarbageCollectionHandle);
 
 		GarbageCollectionHandle2Object.Remove(*FoundGarbageCollectionHandle);
 
@@ -126,7 +135,7 @@ bool FObjectRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageC
 			(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
 		}
 
-		MonoObject2GarbageCollectionHandleMap.Remove(InGarbageCollectionHandle);
+		MonoObject2Object.Remove(InGarbageCollectionHandle);
 
 		GarbageCollectionHandle2Object.Remove(InGarbageCollectionHandle);
 

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
+#include "GarbageCollection/TMonoObjectMapping.inl"
 #include "mono/metadata/object-forward.h"
 
 struct FStructAddressBase
@@ -75,7 +76,7 @@ private:
 
 	TMap<FStructAddressBase, FGarbageCollectionHandle> StructAddress2GarbageCollectionHandle;
 
-	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
+	TMonoObjectMapping<FStructAddress> MonoObject2StructAddress;
 };
 
 #include "FStructRegistry.inl"

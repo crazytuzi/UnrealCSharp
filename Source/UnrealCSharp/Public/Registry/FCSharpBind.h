@@ -2,7 +2,6 @@
 
 #include "Domain/FDomain.h"
 #include "Reflection/Class/FClassDescriptor.h"
-#include "Reflection/Container/FContainerHelper.h"
 #include "Reflection/Function/FFunctionDescriptor.h"
 
 class FCSharpBind

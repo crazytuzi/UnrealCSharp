@@ -45,8 +45,6 @@ private:
 	TGarbageCollectionHandleMapping<FBindingAddress> GarbageCollectionHandle2BindingAddress;
 
 	TMap<FBindingAddress, FGarbageCollectionHandle> BindingAddress2GarbageCollectionHandle;
-
-	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
 };
 
 #include "FBindingRegistry.inl"

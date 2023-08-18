@@ -28,5 +28,7 @@ auto FContainerRegistry::GetContainer(const FGarbageCollectionHandle& InGarbageC
 template <typename T>
 auto FContainerRegistry::GetContainer(const MonoObject* InMonoObject)
 {
-	return GetContainer<T>(MonoObject2GarbageCollectionHandleMap[InMonoObject]);
+	const auto FoundContainerAddress = MonoObject2ContainerAddress.Find(InMonoObject);
+
+	return FoundContainerAddress != nullptr ? static_cast<T*>(FoundContainerAddress->ContainerHelper) : nullptr;
 }

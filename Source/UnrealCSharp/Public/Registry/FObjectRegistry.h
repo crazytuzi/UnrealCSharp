@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
+#include "GarbageCollection/TMonoObjectMapping.inl"
 #include "mono/metadata/object-forward.h"
 
 class UNREALCSHARP_API FObjectRegistry
@@ -44,5 +45,5 @@ private:
 
 	TMap<TWeakObjectPtr<const UObject>, FGarbageCollectionHandle> Object2GarbageCollectionHandleMap;
 
-	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
+	TMonoObjectMapping<TWeakObjectPtr<const UObject>> MonoObject2Object;
 };
