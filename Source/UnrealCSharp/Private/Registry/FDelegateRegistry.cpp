@@ -35,8 +35,6 @@ void FDelegateRegistry::Deinitialize()
 	DelegateAddress2GarbageCollectionHandle.Empty();
 
 	Address2GarbageCollectionHandle.Empty();
-
-	MonoObject2GarbageCollectionHandleMap.Empty();
 }
 
 MonoObject* FDelegateRegistry::GetObject(const void* InAddress)
@@ -63,8 +61,6 @@ bool FDelegateRegistry::AddReference(void* InAddress, void* InDelegate, MonoObje
 		                                            InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
 	                                            });
 
-	MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
-
 	return true;
 }
 
@@ -82,8 +78,6 @@ bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, vo
 	                                            FDelegateAddress{
 		                                            InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)
 	                                            });
-
-	MonoObject2GarbageCollectionHandleMap.Add(InMonoObject, GarbageCollectionHandle);
 
 	return FCSharpEnvironment::GetEnvironment().AddReference(InOwner, new FDelegateReference(GarbageCollectionHandle));
 }

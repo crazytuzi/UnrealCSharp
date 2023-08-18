@@ -56,6 +56,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	FString PropertyContent;
 
+	FString PropertyNameContent;
+
 	FString GCHandleContent;
 
 	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
@@ -148,6 +150,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto bHasProperty = false;
 
+	TArray<TPair<FString, FString>> PropertyNames;
+
 	for (TFieldIterator<FProperty> PropertyIterator(InScriptStruct, EFieldIteratorFlags::ExcludeSuper,
 	                                                EFieldIteratorFlags::ExcludeDeprecated); PropertyIterator; ++
 	     PropertyIterator)
@@ -169,6 +173,15 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 		auto PropertyName = PropertyIterator->GetName();
 
+		PropertyNames.Add({
+			FString::Printf(TEXT(
+				"__%s"
+			),
+			                *PropertyName
+			),
+			PropertyName
+		});
+
 		auto VariableFriendlyPropertyName = PropertyName;
 
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
@@ -186,21 +199,21 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 				"\t\t{\n"
 				"\t\t\tget\n"
 				"\t\t\t{\n"
-				"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), \"%s\", out %s value);\n"
+				"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), %s, out %s value);\n"
 				"\n"
 				"\t\t\t\treturn %s;\n"
 				"\t\t\t}\n"
 				"\n"
-				"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), \"%s\", %s);\n"
+				"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
 			                                   *FGeneratorCore::GetName(VariableFriendlyPropertyName),
-			                                   *PropertyName,
+			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-			                                   *PropertyName,
+			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
 		}
@@ -236,6 +249,17 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		UsingNameSpaces.Add(TEXT("Script.Reflection.Property"));
 	}
 
+	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
+	{
+		PropertyNameContent += FString::Printf(TEXT(
+			"%s\t\tprivate static string %s = \"%s\";\n"
+		),
+		                                       Index == 0 ? TEXT("") : TEXT("\n"),
+		                                       *PropertyNames[Index].Key,
+		                                       *PropertyNames[Index].Value
+		);
+	}
+
 	UsingNameSpaces.Remove(UsingNameSpaceContent);
 
 	UsingNameSpaces.Remove(TEXT(""));
@@ -260,6 +284,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"%s"
 		"%s"
 		"%s"
+		"%s"
+		"%s"
 		"\n"
 		"%s"
 		"\t}\n"
@@ -275,6 +301,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *DestructorContent,
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
 	                               *PropertyContent,
+	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
+	                               *PropertyNameContent,
 	                               *GCHandleContent
 	);
 

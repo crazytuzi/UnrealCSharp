@@ -48,8 +48,6 @@ private:
 	TMap<FDelegateAddress, FGarbageCollectionHandle> DelegateAddress2GarbageCollectionHandle;
 
 	TMap<void*, FGarbageCollectionHandle> Address2GarbageCollectionHandle;
-
-	TMap<MonoObject*, FGarbageCollectionHandle> MonoObject2GarbageCollectionHandleMap;
 };
 
 #include "FDelegateRegistry.inl"

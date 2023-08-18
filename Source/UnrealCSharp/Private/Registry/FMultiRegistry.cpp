@@ -32,6 +32,8 @@ void FMultiRegistry::Deinitialize()
 
 	SubclassOfAddress2GarbageCollectionHandle.Empty();
 
+	MonoObject2SubclassOfAddress.Empty();
+
 	for (auto& Pair : GarbageCollectionHandle2WeakObjectPtrAddress.Get())
 	{
 		FGarbageCollectionHandle::Free(Pair.Key);
@@ -47,6 +49,8 @@ void FMultiRegistry::Deinitialize()
 	GarbageCollectionHandle2WeakObjectPtrAddress.Empty();
 
 	WeakObjectPtrAddress2GarbageCollectionHandle.Empty();
+
+	MonoObject2WeakObjectPtrAddress.Empty();
 
 	for (auto& Pair : GarbageCollectionHandle2LazyObjectPtrAddress.Get())
 	{
@@ -64,6 +68,8 @@ void FMultiRegistry::Deinitialize()
 
 	LazyObjectPtrAddress2GarbageCollectionHandle.Empty();
 
+	MonoObject2LazyObjectPtrAddress.Empty();
+
 	for (auto& Pair : GarbageCollectionHandle2SoftObjectPtrAddress.Get())
 	{
 		FGarbageCollectionHandle::Free(Pair.Key);
@@ -79,6 +85,8 @@ void FMultiRegistry::Deinitialize()
 	GarbageCollectionHandle2SoftObjectPtrAddress.Empty();
 
 	SoftObjectPtrAddress2GarbageCollectionHandle.Empty();
+
+	MonoObject2SoftObjectPtrAddress.Empty();
 
 	for (auto& Pair : GarbageCollectionHandle2ScriptInterfaceAddress.Get())
 	{
@@ -96,6 +104,8 @@ void FMultiRegistry::Deinitialize()
 
 	ScriptInterfaceAddress2GarbageCollectionHandle.Empty();
 
+	MonoObject2ScriptInterfaceAddress.Empty();
+
 	for (auto& Pair : GarbageCollectionHandle2SoftClassPtrAddress.Get())
 	{
 		FGarbageCollectionHandle::Free(Pair.Key);
@@ -112,5 +122,5 @@ void FMultiRegistry::Deinitialize()
 
 	SoftClassPtrAddress2GarbageCollectionHandle.Empty();
 
-	MonoObject2GarbageCollectionHandleMap.Empty();
+	MonoObject2SoftClassPtrAddress.Empty();
 }
