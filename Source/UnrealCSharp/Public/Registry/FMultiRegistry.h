@@ -59,7 +59,7 @@ public:
 
 		typedef TGarbageCollectionHandleMapping<T> GarbageCollectionHandle2Address;
 
-		typedef typename TGarbageCollectionHandleMapping<Key>::Key Value;
+		typedef typename TGarbageCollectionHandleMapping<Key>::KeyType Value;
 
 		typedef TMap<void*, Value> Address2GarbageCollectionHandle;
 
