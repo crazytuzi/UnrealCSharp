@@ -154,28 +154,56 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
-		PropertyContent += FString::Printf(TEXT(
-			"\t\t%s %s %s\n"
-			"\t\t{\n"
-			"\t\t\tget\n"
-			"\t\t\t{\n"
-			"\t\t\t\tPropertyUtils.GetObjectProperty(GetHandle(), %s, out %s value);\n"
-			"\n"
-			"\t\t\t\treturn %s;\n"
-			"\t\t\t}\n"
-			"\n"
-			"\t\t\tset => PropertyUtils.SetObjectProperty(GetHandle(), %s, %s);\n"
-			"\t\t}\n"
-		),
-		                                   *PropertyAccessSpecifiers,
-		                                   *PropertyType,
-		                                   *FGeneratorCore::GetName(PropertyName),
-		                                   *PropertyNames[PropertyNames.Num() - 1].Key,
-		                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
-		                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-		                                   *PropertyNames[PropertyNames.Num() - 1].Key,
-		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
-		);
+		if (!FGeneratorCore::IsSafeProperty(*PropertyIterator))
+		{
+			PropertyContent += FString::Printf(TEXT(
+				"\t\t%s %s %s\n"
+				"\t\t{\n"
+				"\t\t\tget\n"
+				"\t\t\t{\n"
+				"\t\t\t\tPropertyUtils.GetObjectProperty(GetHandle(), %s, out %s value);\n"
+				"\n"
+				"\t\t\t\treturn %s;\n"
+				"\t\t\t}\n"
+				"\n"
+				"\t\t\tset => PropertyUtils.SetObjectProperty(GetHandle(), %s, %s);\n"
+				"\t\t}\n"
+			),
+			                                   *PropertyAccessSpecifiers,
+			                                   *PropertyType,
+			                                   *FGeneratorCore::GetName(PropertyName),
+			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
+			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
+			);
+		}
+		else
+		{
+			PropertyContent += FString::Printf(TEXT(
+				"\t\t%s %s %s\n"
+				"\t\t{\n"
+				"\t\t\tget\n"
+				"\t\t\t{\n"
+				"\t\t\t\tPropertyUtils.GetObjectProperty(GetHandle(), %s, out Object value);\n"
+				"\n"
+				"\t\t\t\treturn %s as %s;\n"
+				"\t\t\t}\n"
+				"\n"
+				"\t\t\tset => PropertyUtils.SetObjectProperty(GetHandle(), %s, %s);\n"
+				"\t\t}\n"
+			),
+			                                   *PropertyAccessSpecifiers,
+			                                   *PropertyType,
+			                                   *FGeneratorCore::GetName(PropertyName),
+			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
+			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
+			);
+		}
 	}
 
 	if (bHasProperty == true)

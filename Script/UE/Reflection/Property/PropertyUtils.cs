@@ -1,6 +1,4 @@
 ﻿using System;
-using Script.Common;
-using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Reflection.Property
@@ -83,127 +81,25 @@ namespace Script.Reflection.Property
             PropertyImplementation.Property_GetObjectFloatPropertyImplementation(InMonoObject, InPropertyName,
                 out OutValue);
 
-        public static void SetObjectProperty(IntPtr InMonoObject, string InPropertyName, Single OutValue) =>
+        public static void SetObjectProperty(IntPtr InMonoObject, string InPropertyName, Single InValue) =>
             PropertyImplementation.Property_SetObjectFloatPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
+                InValue);
 
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, out T OutValue) =>
-            PropertyImplementation.Property_GetObjectObjectPropertyImplementation(InMonoObject, InPropertyName,
+        public static void GetObjectProperty(IntPtr InMonoObject, string InPropertyName, out Object OutValue) =>
+            PropertyImplementation.Property_GetObjectCompoundPropertyImplementation(InMonoObject, InPropertyName,
                 out OutValue);
 
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, T OutValue) =>
-            PropertyImplementation.Property_SetObjectObjectPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, out TSubclassOf<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetObjectClassPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, TSubclassOf<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetObjectClassPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TScriptInterface<T> OutValue)
-            where T : IInterface =>
-            PropertyImplementation.Property_GetObjectInterfacePropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            TScriptInterface<T> OutValue)
-            where T : IInterface =>
-            PropertyImplementation.Property_SetObjectInterfacePropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, out TArray<T> OutValue) =>
-            PropertyImplementation.Property_GetObjectArrayPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, TArray<T> OutValue) =>
-            PropertyImplementation.Property_SetObjectArrayPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TWeakObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetObjectWeakObjectPropertyImplementation(InMonoObject,
-                InPropertyName, out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, TWeakObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetObjectWeakObjectPropertyImplementation(InMonoObject,
-                InPropertyName, OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TLazyObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetObjectLazyObjectPropertyImplementation(InMonoObject,
-                InPropertyName, out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, TLazyObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetObjectLazyObjectPropertyImplementation(InMonoObject,
-                InPropertyName, OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TSoftClassPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetObjectSoftClassPropertyImplementation(InMonoObject,
-                InPropertyName, out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, TSoftClassPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetObjectSoftClassPropertyImplementation(InMonoObject,
-                InPropertyName, OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TSoftObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetObjectSoftObjectPropertyImplementation(InMonoObject,
-                InPropertyName, out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, TSoftObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetObjectSoftObjectPropertyImplementation(InMonoObject,
-                InPropertyName, OutValue);
+        public static void SetObjectProperty(IntPtr InMonoObject, string InPropertyName, Object InValue) =>
+            PropertyImplementation.Property_SetObjectCompoundPropertyImplementation(InMonoObject, InPropertyName,
+                InValue);
 
         public static void GetObjectProperty(IntPtr InMonoObject, string InPropertyName, out Double OutValue) =>
             PropertyImplementation.Property_GetObjectDoublePropertyImplementation(InMonoObject, InPropertyName,
                 out OutValue);
 
-        public static void SetObjectProperty(IntPtr InMonoObject, string InPropertyName, Double OutValue) =>
+        public static void SetObjectProperty(IntPtr InMonoObject, string InPropertyName, Double InValue) =>
             PropertyImplementation.Property_SetObjectDoublePropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetObjectProperty<TKey, TValue>(IntPtr InMonoObject, string InPropertyName,
-            out TMap<TKey, TValue> OutValue) =>
-            PropertyImplementation.Property_GetObjectMapPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetObjectProperty<TKey, TValue>(IntPtr InMonoObject, string InPropertyName,
-            TMap<TKey, TValue> OutValue) =>
-            PropertyImplementation.Property_SetObjectMapPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, out TSet<T> OutValue) =>
-            PropertyImplementation.Property_GetObjectSetPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, TSet<T> OutValue) =>
-            PropertyImplementation.Property_SetObjectSetPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, out TFieldPath<T> OutValue)
-            where T : FField =>
-            PropertyImplementation.Property_GetObjectFieldPathPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetObjectProperty<T>(IntPtr InMonoObject, string InPropertyName, TFieldPath<T> OutValue)
-            where T : FField =>
-            PropertyImplementation.Property_SetObjectFieldPathPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
+                InValue);
 
         public static void GetStructProperty(IntPtr InMonoObject, string InPropertyName, out Byte OutValue) =>
             PropertyImplementation.Property_GetStructBytePropertyImplementation(InMonoObject, InPropertyName,
@@ -235,6 +131,14 @@ namespace Script.Reflection.Property
 
         public static void SetStructProperty(IntPtr InMonoObject, string InPropertyName, UInt64 InValue) =>
             PropertyImplementation.Property_SetStructUInt64PropertyImplementation(InMonoObject, InPropertyName,
+                InValue);
+
+        public static void GetStructProperty(IntPtr InMonoObject, string InPropertyName, out SByte OutValue) =>
+            PropertyImplementation.Property_GetStructSBytePropertyImplementation(InMonoObject, InPropertyName,
+                out OutValue);
+
+        public static void SetStructProperty(IntPtr InMonoObject, string InPropertyName, SByte InValue) =>
+            PropertyImplementation.Property_SetStructSBytePropertyImplementation(InMonoObject, InPropertyName,
                 InValue);
 
         public static void GetStructProperty(IntPtr InMonoObject, string InPropertyName, out Int16 OutValue) =>
@@ -273,126 +177,24 @@ namespace Script.Reflection.Property
             PropertyImplementation.Property_GetStructFloatPropertyImplementation(InMonoObject, InPropertyName,
                 out OutValue);
 
-        public static void SetStructProperty(IntPtr InMonoObject, string InPropertyName, Single OutValue) =>
+        public static void SetStructProperty(IntPtr InMonoObject, string InPropertyName, Single InValue) =>
             PropertyImplementation.Property_SetStructFloatPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
+                InValue);
 
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, out T OutValue) =>
-            PropertyImplementation.Property_GetStructObjectPropertyImplementation(InMonoObject, InPropertyName,
+        public static void GetStructProperty(IntPtr InMonoObject, string InPropertyName, out Object OutValue) =>
+            PropertyImplementation.Property_GetStructCompoundPropertyImplementation(InMonoObject, InPropertyName,
                 out OutValue);
 
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, T OutValue) =>
-            PropertyImplementation.Property_SetStructObjectPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, out TSubclassOf<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetStructClassPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, TSubclassOf<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetStructClassPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TScriptInterface<T> OutValue)
-            where T : IInterface =>
-            PropertyImplementation.Property_GetStructInterfacePropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            TScriptInterface<T> OutValue)
-            where T : IInterface =>
-            PropertyImplementation.Property_SetStructInterfacePropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, out TArray<T> OutValue) =>
-            PropertyImplementation.Property_GetStructArrayPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, TArray<T> OutValue) =>
-            PropertyImplementation.Property_SetStructArrayPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TWeakObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetStructWeakObjectPropertyImplementation(InMonoObject,
-                InPropertyName, out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, TWeakObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetStructWeakObjectPropertyImplementation(InMonoObject,
-                InPropertyName, OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TLazyObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetStructLazyObjectPropertyImplementation(InMonoObject,
-                InPropertyName, out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, TLazyObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetStructLazyObjectPropertyImplementation(InMonoObject,
-                InPropertyName, OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TSoftClassPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetStructSoftClassPropertyImplementation(InMonoObject,
-                InPropertyName, out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, TSoftClassPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetStructSoftClassPropertyImplementation(InMonoObject,
-                InPropertyName, OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName,
-            out TSoftObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_GetStructSoftObjectPropertyImplementation(InMonoObject,
-                InPropertyName, out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, TSoftObjectPtr<T> OutValue)
-            where T : UObject =>
-            PropertyImplementation.Property_SetStructSoftObjectPropertyImplementation(InMonoObject,
-                InPropertyName, OutValue);
+        public static void SetStructProperty(IntPtr InMonoObject, string InPropertyName, Object InValue) =>
+            PropertyImplementation.Property_SetStructCompoundPropertyImplementation(InMonoObject, InPropertyName,
+                InValue);
 
         public static void GetStructProperty(IntPtr InMonoObject, string InPropertyName, out Double OutValue) =>
             PropertyImplementation.Property_GetStructDoublePropertyImplementation(InMonoObject, InPropertyName,
                 out OutValue);
 
-        public static void SetStructProperty(IntPtr InMonoObject, string InPropertyName, Double OutValue) =>
+        public static void SetStructProperty(IntPtr InMonoObject, string InPropertyName, Double InValue) =>
             PropertyImplementation.Property_SetStructDoublePropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetStructProperty<TKey, TValue>(IntPtr InMonoObject, string InPropertyName,
-            out TMap<TKey, TValue> OutValue) =>
-            PropertyImplementation.Property_GetStructMapPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetStructProperty<TKey, TValue>(IntPtr InMonoObject, string InPropertyName,
-            TMap<TKey, TValue> OutValue) =>
-            PropertyImplementation.Property_SetStructMapPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, out TSet<T> OutValue) =>
-            PropertyImplementation.Property_GetStructSetPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, TSet<T> OutValue) =>
-            PropertyImplementation.Property_SetStructSetPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
-
-        public static void GetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, out TFieldPath<T> OutValue)
-            where T : FField =>
-            PropertyImplementation.Property_GetStructFieldPathPropertyImplementation(InMonoObject, InPropertyName,
-                out OutValue);
-
-        public static void SetStructProperty<T>(IntPtr InMonoObject, string InPropertyName, TFieldPath<T> OutValue)
-            where T : FField =>
-            PropertyImplementation.Property_SetStructFieldPathPropertyImplementation(InMonoObject, InPropertyName,
-                OutValue);
+                InValue);
     }
 }
