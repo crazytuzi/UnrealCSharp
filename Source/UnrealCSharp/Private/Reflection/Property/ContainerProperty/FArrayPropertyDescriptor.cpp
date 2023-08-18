@@ -23,8 +23,6 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 		ArrayProperty->InitializeValue(Dest);
 
 		ArrayProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptArray());
-
-		Object_New(Dest);
 	}
 }
 

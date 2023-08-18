@@ -91,14 +91,14 @@ namespace Script.Common
 
         public unsafe void SetHandle(void* InGCHandle)
         {
-            GCHandle = new System.IntPtr(InGCHandle);
+            GCHandle = new IntPtr(InGCHandle);
         }
 
-        public System.IntPtr GetHandle()
+        public IntPtr GetHandle()
         {
             return GCHandle;
         }
 
-        private System.IntPtr GCHandle;
+        private IntPtr GCHandle;
     }
 }

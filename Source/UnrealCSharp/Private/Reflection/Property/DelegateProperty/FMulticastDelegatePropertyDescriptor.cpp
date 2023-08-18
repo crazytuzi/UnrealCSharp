@@ -32,8 +32,6 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 		                             SrcMulticastDelegateHelper->GetFunctionName());
 
 		MulticastScriptDelegate->Add(ScriptDelegate);
-
-		Object_New(Dest);
 	}
 }
 

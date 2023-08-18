@@ -2,7 +2,6 @@
 using Script.Common;
 using Script.CoreUObject;
 using Script.Library;
-using IntPtr = System.IntPtr;
 
 namespace Script.Reflection.Delegate
 {
@@ -41,7 +40,7 @@ namespace Script.Reflection.Delegate
             MulticastDelegateImplementation.MulticastDelegate_ClearImplementation(InMonoObject);
 
         public static void
-            MulticastDelegate_Broadcast(IntPtr InMonoObject, out ObjectList OutValue, params Object[] InValue) =>
+            MulticastDelegate_Broadcast(IntPtr InMonoObject, out Object[] OutValue, params Object[] InValue) =>
             MulticastDelegateImplementation.MulticastDelegate_BroadcastImplementation(InMonoObject, out OutValue,
                 InValue);
     }

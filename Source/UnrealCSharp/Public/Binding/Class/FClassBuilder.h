@@ -18,22 +18,6 @@ public:
 	virtual ~FClassBuilder() = default;
 
 	template <typename T>
-	struct TFunctionPointer
-	{
-		explicit TFunctionPointer(T InFunction)
-		{
-			Value.Function = InFunction;
-		}
-
-		union
-		{
-			T Function;
-
-			void* Pointer;
-		} Value;
-	};
-
-	template <typename T>
 #if WITH_FUNCTION_INFO
 	FClassBuilder& Function(const FString& InName, T InMethod,
 	                        FFunctionInfo* InFunctionInfo = nullptr, const TArray<FString>& InParamNames = {});

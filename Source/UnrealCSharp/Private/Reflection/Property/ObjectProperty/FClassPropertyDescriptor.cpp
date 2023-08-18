@@ -25,8 +25,6 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 		{
 			ClassProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
 		}
-
-		Object_New(Dest);
 	}
 }
 

@@ -39,7 +39,7 @@ public:
 public:
 	bool AddReference(const void* InObject, MonoObject* InMonoObject, bool bNeedFree = true);
 
-	bool RemoveReference(const MonoObject* InMonoObject);
+	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
 	TGarbageCollectionHandleMapping<FBindingAddress> GarbageCollectionHandle2BindingAddress;

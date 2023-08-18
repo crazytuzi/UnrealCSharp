@@ -44,10 +44,8 @@ void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyIm
 	UStruct* InStruct = nullptr; \
 	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType>(InGarbageCollectionHandle, InStruct)) \
 	{ \
-		const auto PropertyName = FName(UTF8_TO_TCHAR( \
-			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InPropertyName))); \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor( \
-			InStruct, PropertyName)) \
+			InStruct, InPropertyName)) \
 		{ \
 			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), OutValue); \
 		} \

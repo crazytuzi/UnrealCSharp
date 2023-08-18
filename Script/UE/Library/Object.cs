@@ -2,7 +2,6 @@
 using Script.Library;
 using Script.Common;
 using Script.Engine;
-using IntPtr = System.IntPtr;
 
 namespace Script.CoreUObject
 {

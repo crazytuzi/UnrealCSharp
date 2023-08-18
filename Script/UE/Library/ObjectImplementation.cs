@@ -1,8 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
 using Script.Engine;
-using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {

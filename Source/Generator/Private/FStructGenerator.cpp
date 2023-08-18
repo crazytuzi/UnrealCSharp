@@ -127,9 +127,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\n"
 			"\t\tprivate IntPtr GCHandle;\n");
 
-		UsingNameSpaces.Append({
-			TEXT("IntPtr = System.IntPtr"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass())
-		});
+		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 	}
 
 	auto StaticStructContent = FString::Printf(TEXT(
@@ -181,28 +179,56 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 				UserDefinedStruct, *PropertyIterator);
 		}
 
-		PropertyContent += FString::Printf(TEXT(
-			"\t\t%s %s %s\n"
-			"\t\t{\n"
-			"\t\t\tget\n"
-			"\t\t\t{\n"
-			"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), \"%s\", out %s value);\n"
-			"\n"
-			"\t\t\t\treturn %s;\n"
-			"\t\t\t}\n"
-			"\n"
-			"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), \"%s\", %s);\n"
-			"\t\t}\n"
-		),
-		                                   *PropertyAccessSpecifiers,
-		                                   *PropertyType,
-		                                   *FGeneratorCore::GetName(VariableFriendlyPropertyName),
-		                                   *PropertyName,
-		                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
-		                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-		                                   *PropertyName,
-		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
-		);
+		if (!FGeneratorCore::IsSafeProperty(*PropertyIterator))
+		{
+			PropertyContent += FString::Printf(TEXT(
+				"\t\t%s %s %s\n"
+				"\t\t{\n"
+				"\t\t\tget\n"
+				"\t\t\t{\n"
+				"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), \"%s\", out %s value);\n"
+				"\n"
+				"\t\t\t\treturn %s;\n"
+				"\t\t\t}\n"
+				"\n"
+				"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), \"%s\", %s);\n"
+				"\t\t}\n"
+			),
+			                                   *PropertyAccessSpecifiers,
+			                                   *PropertyType,
+			                                   *FGeneratorCore::GetName(VariableFriendlyPropertyName),
+			                                   *PropertyName,
+			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
+			                                   *PropertyName,
+			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
+			);
+		}
+		else
+		{
+			PropertyContent += FString::Printf(TEXT(
+				"\t\t%s %s %s\n"
+				"\t\t{\n"
+				"\t\t\tget\n"
+				"\t\t\t{\n"
+				"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), \"%s\", out Object value);\n"
+				"\n"
+				"\t\t\t\treturn %s as %s;\n"
+				"\t\t\t}\n"
+				"\n"
+				"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), \"%s\", %s);\n"
+				"\t\t}\n"
+			),
+			                                   *PropertyAccessSpecifiers,
+			                                   *PropertyType,
+			                                   *FGeneratorCore::GetName(VariableFriendlyPropertyName),
+			                                   *PropertyName,
+			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
+			                                   *PropertyName,
+			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
+			);
+		}
 	}
 
 	if (bHasProperty == true)

@@ -39,14 +39,16 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 				.Get();
 		}
 
-		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument).template Get<0, Args...>();
+		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument)
+			.template Initialize<0, Args...>()
+			.template Get<0, Args...>();
 	}
 
 	template <typename Class, typename Function, SIZE_T... Index>
 	static void Call(Function InFunction, TIntegerSequence<SIZE_T, Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InMonoObject))
+			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
 			TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
 
@@ -65,7 +67,9 @@ struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
 					.Get();
 			}
 
-			TOut<TTuple<TArgument<Args>...>>(OutValue, Argument).template Get<0, Args...>();
+			TOut<TTuple<TArgument<Args>...>>(OutValue, Argument)
+				.template Initialize<0, Args...>()
+				.template Get<0, Args...>();
 		}
 	}
 };

@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.Common;
-using Script.CoreUObject;
-using Script.Reflection.Property;
-using IntPtr = System.IntPtr;
 
 namespace Script.Library
 {
@@ -110,84 +106,14 @@ namespace Script.Library
             Single InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectObjectPropertyImplementation<T>(IntPtr InMonoObject,
+        public static extern void Property_GetObjectCompoundPropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
-            out T OutValue);
+            out Object OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectObjectPropertyImplementation<T>(IntPtr InMonoObject,
+        public static extern void Property_SetObjectCompoundPropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
-            T InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectClassPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TSubclassOf<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectClassPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TSubclassOf<T> InValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectInterfacePropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TScriptInterface<T> OutValue) where T : IInterface;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectInterfacePropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TScriptInterface<T> InValue) where T : IInterface;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectArrayPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TArray<T> OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectArrayPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TArray<T> InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectWeakObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TWeakObjectPtr<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectWeakObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TWeakObjectPtr<T> InValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectLazyObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TLazyObjectPtr<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectLazyObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TLazyObjectPtr<T> InValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectSoftClassPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TSoftClassPtr<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectSoftClassPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TSoftClassPtr<T> InValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectSoftObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TSoftObjectPtr<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectSoftObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TSoftObjectPtr<T> InValue) where T : UObject;
+            Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetObjectDoublePropertyImplementation(IntPtr InMonoObject,
@@ -198,36 +124,6 @@ namespace Script.Library
         public static extern void Property_SetObjectDoublePropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
             Double InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectMapPropertyImplementation<TKey, TValue>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TMap<TKey, TValue> OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectMapPropertyImplementation<TKey, TValue>(IntPtr InMonoObject,
-            string InPropertyName,
-            TMap<TKey, TValue> InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectSetPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TSet<T> OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectSetPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TSet<T> InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetObjectFieldPathPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TFieldPath<T> OutValue) where T : FField;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectFieldPathPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TFieldPath<T> InValue) where T : FField;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetStructBytePropertyImplementation(IntPtr InMonoObject,
@@ -250,19 +146,14 @@ namespace Script.Library
             UInt16 InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructUInt32PropertyImplementation(IntPtr InMonoObject,
-            string InPropertyName,
-            UInt32 InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetStructUInt32PropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
             out UInt32 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructUInt64PropertyImplementation(IntPtr InMonoObject,
+        public static extern void Property_SetStructUInt32PropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
-            UInt64 InValue);
+            UInt32 InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetStructUInt64PropertyImplementation(IntPtr InMonoObject,
@@ -270,14 +161,29 @@ namespace Script.Library
             out UInt64 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructInt16PropertyImplementation(IntPtr InMonoObject,
+        public static extern void Property_SetStructUInt64PropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
-            Int16 InValue);
+            UInt64 InValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_GetStructSBytePropertyImplementation(IntPtr InMonoObject,
+            string InPropertyName,
+            out SByte OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_SetStructSBytePropertyImplementation(IntPtr InMonoObject,
+            string InPropertyName,
+            SByte InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetStructInt16PropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
             out Int16 OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Property_SetStructInt16PropertyImplementation(IntPtr InMonoObject,
+            string InPropertyName,
+            Int16 InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetStructIntPropertyImplementation(IntPtr InMonoObject,
@@ -320,84 +226,14 @@ namespace Script.Library
             Single InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructObjectPropertyImplementation<T>(IntPtr InMonoObject,
+        public static extern void Property_GetStructCompoundPropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
-            out T OutValue);
+            out Object OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructObjectPropertyImplementation<T>(IntPtr InMonoObject,
+        public static extern void Property_SetStructCompoundPropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
-            T InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructClassPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TSubclassOf<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructClassPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TSubclassOf<T> InValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructInterfacePropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TScriptInterface<T> OutValue) where T : IInterface;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructInterfacePropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TScriptInterface<T> InValue) where T : IInterface;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructArrayPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TArray<T> OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructArrayPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TArray<T> InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructWeakObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TWeakObjectPtr<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructWeakObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TWeakObjectPtr<T> InValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructLazyObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TLazyObjectPtr<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructLazyObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TLazyObjectPtr<T> InValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructSoftClassPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TSoftClassPtr<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructSoftClassPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TSoftClassPtr<T> InValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructSoftObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TSoftObjectPtr<T> OutValue) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructSoftObjectPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TSoftObjectPtr<T> InValue) where T : UObject;
+            Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Property_GetStructDoublePropertyImplementation(IntPtr InMonoObject,
@@ -408,35 +244,5 @@ namespace Script.Library
         public static extern void Property_SetStructDoublePropertyImplementation(IntPtr InMonoObject,
             string InPropertyName,
             Double InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructMapPropertyImplementation<TKey, TValue>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TMap<TKey, TValue> OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructMapPropertyImplementation<TKey, TValue>(IntPtr InMonoObject,
-            string InPropertyName,
-            TMap<TKey, TValue> InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructSetPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TSet<T> OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructSetPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TSet<T> InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_GetStructFieldPathPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            out TFieldPath<T> OutValue) where T : FField;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructFieldPathPropertyImplementation<T>(IntPtr InMonoObject,
-            string InPropertyName,
-            TFieldPath<T> InValue) where T : FField;
     }
 }

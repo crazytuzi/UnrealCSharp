@@ -11,9 +11,9 @@ struct TConstructorBuilder
 		return TFunctionInfo<EFunctionType::Constructor, void, Args...>::Get();
 	}
 
-	static void Invoke(BINDING_FUNCTION_SIGNATURE)
+	static void Invoke(BINDING_CONSTRUCTOR_SIGNATURE)
 	{
 		TConstructorHelper<TTuple<Args...>>::template Call<Class>(
-			TMakeIntegerSequence<SIZE_T, sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
+			TMakeIntegerSequence<SIZE_T, sizeof...(Args)>(), BINDING_CONSTRUCTOR_PARAM);
 	}
 };
