@@ -551,7 +551,7 @@ bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& St
 	                                     FILEWRITE_None);
 }
 
-FString FGeneratorCore::GetConfig()
+FString FGeneratorCore::GetPluginConfig()
 {
 	return FPaths::ConvertRelativePathToFull(FPaths::Combine(
 		FPaths::ProjectPluginsDir(), PLUGIN_NAME, CONFIG, FString::Printf(TEXT(
@@ -559,6 +559,17 @@ FString FGeneratorCore::GetConfig()
 		),
 		                                                                  *PLUGIN_NAME,
 		                                                                  *INI_SUFFIX
+		)));
+}
+
+FString FGeneratorCore::GetProjectConfig()
+{
+	return FPaths::ConvertRelativePathToFull(FPaths::Combine(
+		FPaths::ProjectConfigDir(), FString::Printf(TEXT(
+			"%s%s"
+		),
+		                                            *PLUGIN_NAME,
+		                                            *INI_SUFFIX
 		)));
 }
 
@@ -572,15 +583,28 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 	if (Modules.Num() == 0)
 #endif
 	{
-		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), Modules, GetConfig());
+		TArray<FString> OutArray;
 
-		for (auto& Module : Modules)
+		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), OutArray, GetPluginConfig());
+
+		for (const auto& Module : OutArray)
 		{
-			Module = FString::Printf(TEXT(
+			Modules.Add(FString::Printf(TEXT(
 				"%s.%s"),
-			                         *SCRIPT,
-			                         *Module
-			);
+			                            *SCRIPT,
+			                            *Module
+			));
+		}
+
+		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), OutArray, GetProjectConfig());
+
+		for (const auto& Module : OutArray)
+		{
+			Modules.Add(FString::Printf(TEXT(
+				"%s.%s"),
+			                            *SCRIPT,
+			                            *Module
+			));
 		}
 
 		Modules.Add(FString::Printf(TEXT(
@@ -612,9 +636,17 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 
 TArray<FName> FGeneratorCore::GetAssetsPaths()
 {
-	TArray<FString> AssetsPaths;
+	TArray<FName> AssetsPaths;
 
-	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), AssetsPaths, GetConfig());
+	TArray<FString> OutArray;
 
-	return TArray<FName>{AssetsPaths};
+	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), OutArray, GetPluginConfig());
+
+	AssetsPaths.Append(OutArray);
+
+	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), OutArray, GetProjectConfig());
+
+	AssetsPaths.Append(OutArray);
+
+	return AssetsPaths;
 }

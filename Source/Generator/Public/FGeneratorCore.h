@@ -29,7 +29,9 @@ public:
 
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 
-	static FString GetConfig();
+	static FString GetPluginConfig();
+
+	static FString GetProjectConfig();
 
 	static bool IsSupportedModule(const FString& InModule);
 
