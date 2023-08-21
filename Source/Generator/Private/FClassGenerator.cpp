@@ -982,6 +982,13 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 		return FString::Printf(TEXT(" = null"));
 	}
 
+	if (CastField<FInterfaceProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+
 	if (CastField<FStructProperty>(InProperty))
 	{
 		// @TODO
@@ -992,6 +999,11 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	if (CastField<FArrayProperty>(InProperty))
 	{
 		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (const auto EnumProperty = CastField<FEnumProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = %s.%s"), *EnumProperty->GetEnum()->GetName(), *MetaData);
 	}
 
 	if (CastField<FStrProperty>(InProperty))
