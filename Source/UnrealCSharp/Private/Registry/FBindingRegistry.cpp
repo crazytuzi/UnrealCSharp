@@ -22,9 +22,9 @@ void FBindingRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Address);
+			delete Pair.Value.AddressWrapper;
 
-			Pair.Value.Address = nullptr;
+			Pair.Value.AddressWrapper = nullptr;
 		}
 	}
 
@@ -46,18 +46,26 @@ void* FBindingRegistry::GetObject(const FGarbageCollectionHandle& InGarbageColle
 {
 	const auto FoundStructAddress = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle);
 
-	return FoundStructAddress != nullptr ? FoundStructAddress->Address : nullptr;
+	return FoundStructAddress != nullptr ? FoundStructAddress->AddressWrapper->GetValue() : nullptr;
 }
 
-bool FBindingRegistry::AddReference(const void* InObject, MonoObject* InMonoObject, bool bNeedFree)
+bool FBindingRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+	if (const auto FoundBindingAddress = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle))
+	{
+		BindingAddress2GarbageCollectionHandle.Remove(FoundBindingAddress->AddressWrapper->GetValue());
 
-	BindingAddress2GarbageCollectionHandle.Add(FBindingAddress{const_cast<void*>(InObject), bNeedFree},
-	                                           GarbageCollectionHandle);
+		if (FoundBindingAddress->bNeedFree)
+		{
+			delete FoundBindingAddress->AddressWrapper;
 
-	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
-	                                           {const_cast<void*>(InObject), bNeedFree});
+			FoundBindingAddress->AddressWrapper = nullptr;
+		}
 
-	return true;
+		GarbageCollectionHandle2BindingAddress.Remove(InGarbageCollectionHandle);
+
+		return true;
+	}
+
+	return false;
 }

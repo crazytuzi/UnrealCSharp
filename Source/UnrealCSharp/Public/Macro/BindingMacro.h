@@ -251,12 +251,12 @@ struct TIsNotUEnum<Class> \
 #define BINDING_CONSTRUCTOR(T, ...) BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ##__VA_ARGS__)
 #endif
 
-#define BINDING_DESTRUCTOR_BUILDER_INVOKE(T, ...) TFunctionPointer(&TDestructorBuilder<T, ##__VA_ARGS__>::Invoke).Value.Pointer
+#define BINDING_DESTRUCTOR_BUILDER_INVOKE(...) TFunctionPointer(&TDestructorBuilder<##__VA_ARGS__>::Invoke).Value.Pointer
 
-#define BINDING_DESTRUCTOR_BUILDER_INFO(T, ...) TDestructorBuilder<T, ##__VA_ARGS__>::Info()
+#define BINDING_DESTRUCTOR_BUILDER_INFO(...) TDestructorBuilder<##__VA_ARGS__>::Info()
 
 #if WITH_FUNCTION_INFO
-#define BINDING_DESTRUCTOR(T, ...) BINDING_DESTRUCTOR_BUILDER_INVOKE(T, ##__VA_ARGS__), BINDING_DESTRUCTOR_BUILDER_INFO(T, ##__VA_ARGS__)
+#define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__), BINDING_DESTRUCTOR_BUILDER_INFO(##__VA_ARGS__)
 #else
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__)
 #endif

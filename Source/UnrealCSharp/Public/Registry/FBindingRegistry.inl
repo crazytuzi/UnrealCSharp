@@ -2,32 +2,23 @@
 
 bool operator==(const FBindingAddress& A, const FBindingAddress& B)
 {
-	return A.Address == B.Address;
+	return A.AddressWrapper == B.AddressWrapper;
 }
 
 uint32 GetTypeHash(const FBindingAddress& InBindingAddress)
 {
-	return GetTypeHash(InBindingAddress.Address);
+	return GetTypeHash(InBindingAddress.AddressWrapper);
 }
 
 template <typename T>
-auto FBindingRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
+auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject, const bool bNeedFree)
 {
-	if (const auto FoundBindingAddress = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle))
-	{
-		BindingAddress2GarbageCollectionHandle.Remove(*FoundBindingAddress);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-		if (FoundBindingAddress->bNeedFree)
-		{
-			delete static_cast<T*>(FoundBindingAddress->Address);
+	BindingAddress2GarbageCollectionHandle.Add(static_cast<void*>(const_cast<T*>(InObject)), GarbageCollectionHandle);
 
-			FoundBindingAddress->Address = nullptr;
-		}
+	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
+	                                           FBindingAddress{new TBindingAddressWrapper(InObject), bNeedFree});
 
-		GarbageCollectionHandle2BindingAddress.Remove(InGarbageCollectionHandle);
-
-		return true;
-	}
-
-	return false;
+	return true;
 }

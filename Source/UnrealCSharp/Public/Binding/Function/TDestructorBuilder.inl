@@ -3,7 +3,7 @@
 #include "TDestructorHelper.inl"
 #include "Binding/Function/TFunctionInfo.inl"
 
-template <typename Class, typename... Args>
+template <typename... Args>
 struct TDestructorBuilder
 {
 	static FFunctionInfo* Info()
@@ -13,7 +13,7 @@ struct TDestructorBuilder
 
 	static void Invoke(BINDING_FUNCTION_SIGNATURE)
 	{
-		TDestructorHelper<TTuple<Args...>>::template Call<Class>(
+		TDestructorHelper<TTuple<Args...>>::template Call(
 			TMakeIntegerSequence<SIZE_T, sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
 	}
 };
