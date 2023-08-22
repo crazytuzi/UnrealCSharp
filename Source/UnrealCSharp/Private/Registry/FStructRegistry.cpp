@@ -29,6 +29,8 @@ void FStructRegistry::Deinitialize()
 				{
 					Pair.Value.ScriptStruct->DestroyStruct(Pair.Value.Address);
 				}
+
+				FMemory::Free(Pair.Value.Address);
 			}
 
 			Pair.Value.Address = nullptr;
@@ -144,6 +146,8 @@ bool FStructRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageC
 				{
 					FoundStructAddress->ScriptStruct->DestroyStruct(FoundStructAddress->Address);
 				}
+
+				FMemory::Free(FoundStructAddress->Address);
 			}
 
 			FoundStructAddress->Address = nullptr;
