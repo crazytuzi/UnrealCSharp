@@ -57,9 +57,12 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
 {
 	return FNameEncode::Encode(FString::Printf(TEXT(
-		"I%s"
-	),
-	                                           *GetFullClass(InStruct).RightChop(1)));
+			"I%s"
+		),
+	                                           InStruct->IsInBlueprint()
+		                                           ? *GetFullClass(InStruct)
+		                                           : *GetFullClass(InStruct).RightChop(1))
+	);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
