@@ -1300,9 +1300,10 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		}
 
 		return FString::Printf(TEXT(
-			"\t\t\t%s ??= new F%s();\n\n"
+			"\t\t\t%s ??= new %s%s();\n\n"
 		),
 		                       *InProperty->GetName(),
+		                       StructProperty->Struct->IsNative() ? TEXT("F") : TEXT(""),
 		                       *StructProperty->Struct->GetName()
 		);
 	}
