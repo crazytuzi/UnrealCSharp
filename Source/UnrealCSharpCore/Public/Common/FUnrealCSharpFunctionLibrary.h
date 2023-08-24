@@ -64,6 +64,8 @@ public:
 
 	static TArray<FString> GetChangedDirectories();
 
+	static FString Encode(const FString& InName, bool bEncodeWideString = false);
+
 private:
 	static TArray<FString>& GetGameModuleList();
 };

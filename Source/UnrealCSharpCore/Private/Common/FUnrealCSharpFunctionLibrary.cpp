@@ -47,21 +47,21 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 		return TEXT("");
 	}
 
-	return FNameEncode::Encode(FString::Printf(TEXT(
+	return Encode(FString::Printf(TEXT(
 		"%s%s"
 	),
-	                                           InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""),
-	                                           *InStruct->GetName()));
+	                              InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""),
+	                              *InStruct->GetName()));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
 {
-	return FNameEncode::Encode(FString::Printf(TEXT(
+	return Encode(FString::Printf(TEXT(
 			"I%s"
 		),
-	                                           InStruct->IsInBlueprint()
-		                                           ? *GetFullClass(InStruct)
-		                                           : *GetFullClass(InStruct).RightChop(1))
+	                              InStruct->IsInBlueprint()
+		                              ? *GetFullClass(InStruct)
+		                              : *GetFullClass(InStruct).RightChop(1))
 	);
 }
 
@@ -437,6 +437,11 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 		});
 
 	return Directories;
+}
+
+FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool bEncodeWideString)
+{
+	return FNameEncode::Encode(InName, bEncodeWideString);
 }
 
 TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()

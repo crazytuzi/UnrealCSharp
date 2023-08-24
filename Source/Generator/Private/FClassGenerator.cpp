@@ -147,7 +147,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FString::Printf(TEXT(
 				"__%s"
 			),
-			                *PropertyName
+			                *FUnrealCSharpFunctionLibrary::Encode(PropertyName)
 			),
 			PropertyName
 		});
@@ -502,7 +502,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FString::Printf(TEXT(
 				"__%s"
 			),
-			                *FunctionName
+			                *FUnrealCSharpFunctionLibrary::Encode(FunctionName)
 			),
 			FunctionName
 		});

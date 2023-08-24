@@ -177,7 +177,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			FString::Printf(TEXT(
 				"__%s"
 			),
-			                *PropertyName
+			                *FUnrealCSharpFunctionLibrary::Encode(PropertyName)
 			),
 			PropertyName
 		});
