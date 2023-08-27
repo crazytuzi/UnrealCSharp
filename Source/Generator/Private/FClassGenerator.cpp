@@ -147,7 +147,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FString::Printf(TEXT(
 				"__%s"
 			),
-			                *PropertyName
+			                *FUnrealCSharpFunctionLibrary::Encode(PropertyName)
 			),
 			PropertyName
 		});
@@ -214,7 +214,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
 	{
 		PropertyNameContent += FString::Printf(TEXT(
-			"%s\t\tprivate static string %s = \"%s\";\n"
+			"%s\t\tprivate static string %s = new string(\"%s\");\n"
 		),
 		                                       Index == 0 ? TEXT("") : TEXT("\n"),
 		                                       *PropertyNames[Index].Key,
@@ -502,7 +502,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FString::Printf(TEXT(
 				"__%s"
 			),
-			                *FunctionName
+			                *FUnrealCSharpFunctionLibrary::Encode(FunctionName)
 			),
 			FunctionName
 		});
@@ -627,7 +627,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	for (auto Index = 0; Index < FunctionNames.Num(); ++Index)
 	{
 		FunctionNameContent += FString::Printf(TEXT(
-			"%s\t\tprivate static string %s = \"%s\";\n"
+			"%s\t\tprivate static string %s = new string(\"%s\");\n"
 		),
 		                                       Index == 0 ? TEXT("") : TEXT("\n"),
 		                                       *FunctionNames[Index].Key,
@@ -1300,9 +1300,10 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		}
 
 		return FString::Printf(TEXT(
-			"\t\t\t%s ??= new F%s();\n\n"
+			"\t\t\t%s ??= new %s%s();\n\n"
 		),
 		                       *InProperty->GetName(),
+		                       StructProperty->Struct->IsNative() ? TEXT("F") : TEXT(""),
 		                       *StructProperty->Struct->GetName()
 		);
 	}
