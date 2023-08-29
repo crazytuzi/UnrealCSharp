@@ -190,7 +190,8 @@ public:
 	template <typename T>
 	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	bool AddBindingReference(MonoObject* InMonoObject, const void* InObject, bool bNeedFree = true) const;
+	template <typename T>
+	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject, bool bNeedFree = true) const;
 
 	bool RemoveBindingReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 

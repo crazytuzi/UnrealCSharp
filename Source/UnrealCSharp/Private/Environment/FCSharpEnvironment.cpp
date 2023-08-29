@@ -499,11 +499,6 @@ MonoObject* FCSharpEnvironment::GetBinding(const void* InObject) const
 	return BindingRegistry != nullptr ? BindingRegistry->GetObject(InObject) : nullptr;
 }
 
-bool FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const void* InObject, const bool bNeedFree) const
-{
-	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InObject, InMonoObject, bNeedFree) : false;
-}
-
 bool FCSharpEnvironment::RemoveBindingReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return BindingRegistry != nullptr ? BindingRegistry->RemoveReference(InGarbageCollectionHandle) : false;

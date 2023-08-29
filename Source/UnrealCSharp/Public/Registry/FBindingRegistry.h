@@ -2,14 +2,47 @@
 
 #include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
 
+struct FBindingAddressWrapper
+{
+	virtual ~FBindingAddressWrapper()
+	{
+	}
+
+	virtual void* GetValue()
+	{
+		return nullptr;
+	}
+};
+
+template <typename T>
+struct TBindingAddressWrapper : FBindingAddressWrapper
+{
+	explicit TBindingAddressWrapper(T* InValue): Value(InValue)
+	{
+	}
+
+	virtual ~TBindingAddressWrapper() override
+	{
+		delete Value;
+	}
+
+	virtual void* GetValue() override
+	{
+		return (void*)Value;
+	}
+
+private:
+	T* Value;
+};
+
 struct FBindingAddress
 {
-	void* Address;
+	FBindingAddressWrapper* AddressWrapper;
 
 	bool bNeedFree;
 
-	FBindingAddress(void* InAddress, const bool InNeedFree = true):
-		Address(InAddress),
+	FBindingAddress(FBindingAddressWrapper* InAddressWrapper, const bool InNeedFree = true):
+		AddressWrapper(InAddressWrapper),
 		bNeedFree(InNeedFree)
 	{
 	}
@@ -37,14 +70,15 @@ public:
 	void* GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 public:
-	bool AddReference(const void* InObject, MonoObject* InMonoObject, bool bNeedFree = true);
+	template <typename T>
+	auto AddReference(const T* InObject, MonoObject* InMonoObject, bool bNeedFree = true);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
 	TGarbageCollectionHandleMapping<FBindingAddress> GarbageCollectionHandle2BindingAddress;
 
-	TMap<FBindingAddress, FGarbageCollectionHandle> BindingAddress2GarbageCollectionHandle;
+	TMap<void*, FGarbageCollectionHandle> BindingAddress2GarbageCollectionHandle;
 };
 
 #include "FBindingRegistry.inl"

@@ -23,7 +23,15 @@ void FStructRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Address);
+			if (Pair.Value.ScriptStruct.IsValid())
+			{
+				if (!(Pair.Value.ScriptStruct->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
+				{
+					Pair.Value.ScriptStruct->DestroyStruct(Pair.Value.Address);
+				}
+
+				FMemory::Free(Pair.Value.Address);
+			}
 
 			Pair.Value.Address = nullptr;
 		}
@@ -132,7 +140,15 @@ bool FStructRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageC
 
 		if (FoundStructAddress->bNeedFree)
 		{
-			FMemory::Free(FoundStructAddress->Address);
+			if (FoundStructAddress->ScriptStruct.IsValid())
+			{
+				if (!(FoundStructAddress->ScriptStruct->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
+				{
+					FoundStructAddress->ScriptStruct->DestroyStruct(FoundStructAddress->Address);
+				}
+
+				FMemory::Free(FoundStructAddress->Address);
+			}
 
 			FoundStructAddress->Address = nullptr;
 		}
