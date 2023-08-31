@@ -181,3 +181,9 @@ auto FCSharpEnvironment::GetBinding(const FGarbageCollectionHandle& InGarbageCol
 		       ? static_cast<T*>(BindingRegistry->GetObject(InGarbageCollectionHandle))
 		       : nullptr;
 }
+
+template <typename T>
+auto FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const T* InObject, const bool bNeedFree) const
+{
+	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InObject, InMonoObject, bNeedFree) : false;
+}
