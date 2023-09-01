@@ -6,7 +6,7 @@
 class FInterfacePropertyDescriptor final : public FObjectPropertyDescriptor
 {
 public:
-	using FObjectPropertyDescriptor::FObjectPropertyDescriptor;
+	explicit FInterfacePropertyDescriptor(FProperty* InProperty);
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;
@@ -18,4 +18,6 @@ public:
 
 private:
 	MonoObject* Object_New(void* InAddress) const;
+
+	MonoClass* Class;
 };

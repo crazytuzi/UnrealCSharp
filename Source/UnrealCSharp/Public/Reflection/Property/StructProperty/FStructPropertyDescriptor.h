@@ -6,7 +6,7 @@
 class FStructPropertyDescriptor final : public FPropertyDescriptor
 {
 public:
-	using FPropertyDescriptor::FPropertyDescriptor;
+	explicit FStructPropertyDescriptor(FProperty* InProperty);;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;
@@ -20,4 +20,6 @@ private:
 	void* GetOwner(void* InAddress) const;
 
 	MonoObject* Object_New(void* InAddress) const;
+
+	MonoClass* Class;
 };
