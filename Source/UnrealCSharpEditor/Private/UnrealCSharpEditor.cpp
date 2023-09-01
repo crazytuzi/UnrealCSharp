@@ -17,6 +17,7 @@
 #include "FCodeAnalysis.h"
 #include "Misc/ScopedSlowTask.h"
 #include "Mixin/FMixinGenerator.h"
+#include "Setting/UnrealCSharpSetting.h"
 
 static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
 
@@ -40,6 +41,8 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	UToolMenus::RegisterStartupCallback(
 		FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
+
+	FUnrealCSharpSettingsHelper::RegisterSettings();
 }
 
 void FUnrealCSharpEditorModule::ShutdownModule()
@@ -54,6 +57,8 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 	FUnrealCSharpEditorStyle::Shutdown();
 
 	FUnrealCSharpEditorCommands::Unregister();
+
+	FUnrealCSharpSettingsHelper::UnregisterSettings();
 }
 
 void FUnrealCSharpEditorModule::PluginButtonClicked() const

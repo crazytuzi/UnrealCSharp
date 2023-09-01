@@ -9,9 +9,11 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
+FString FUnrealCSharpFunctionLibrary::DotNetPath = TEXT("C:/Program Files/dotnet/dotnet.exe");
+
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
-	return TEXT("C:/Program Files/dotnet/dotnet.exe");
+	return DotNetPath;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)

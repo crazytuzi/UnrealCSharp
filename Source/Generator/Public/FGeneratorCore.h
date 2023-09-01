@@ -1,6 +1,9 @@
 ﻿#pragma once
 
-class FGeneratorCore
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetAdditionAssetsPaths, TArray<FName>&)
+
+class GENERATOR_API FGeneratorCore
 {
 public:
 	static FString GetPathNameAttribute(const UField* InField);
@@ -36,4 +39,6 @@ public:
 	static bool IsSupportedModule(const FString& InModule);
 
 	static TArray<FName> GetAssetsPaths();
+
+	static FOnGetAdditionAssetsPaths OnGetAdditionAssetsPaths;
 };

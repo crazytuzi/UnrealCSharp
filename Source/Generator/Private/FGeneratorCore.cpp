@@ -10,6 +10,8 @@
 #include "Mixin/CSharpEnum.h"
 #include "UEVersion.h"
 
+FOnGetAdditionAssetsPaths FGeneratorCore::OnGetAdditionAssetsPaths;
+
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
 	if (InField == nullptr)
@@ -647,6 +649,10 @@ TArray<FName> FGeneratorCore::GetAssetsPaths()
 	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), OutArray, GetProjectConfig());
 
 	AssetsPaths.Append(OutArray);
+
+	TArray<FName> AdditionAssetsPaths;
+	OnGetAdditionAssetsPaths.Broadcast(AdditionAssetsPaths);
+	AssetsPaths.Append(AdditionAssetsPaths);
 
 	return AssetsPaths;
 }
