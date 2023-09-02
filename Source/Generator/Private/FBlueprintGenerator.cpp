@@ -18,34 +18,37 @@ void FBlueprintGenerator::Generator()
 
 	for (const auto& AssetData : OutAssetData)
 	{
-		const auto& AssetName = AssetData.GetClass()->GetFName();
-
-		if (AssetName == UBlueprint::StaticClass()->GetFName() ||
-			AssetName == UWidgetBlueprint::StaticClass()->GetFName())
+		if (const auto AssetDataClass = AssetData.GetClass())
 		{
-			if (const auto Blueprint = LoadObject<
-				UBlueprint>(nullptr, *AssetData.ObjectPath.ToString()))
+			const auto& AssetName = AssetDataClass->GetFName();
+
+			if (AssetName == UBlueprint::StaticClass()->GetFName() ||
+				AssetName == UWidgetBlueprint::StaticClass()->GetFName())
 			{
-				if (const auto Class = Cast<UClass>(Blueprint->GeneratedClass))
+				if (const auto Blueprint = LoadObject<
+					UBlueprint>(nullptr, *AssetData.ObjectPath.ToString()))
 				{
-					FClassGenerator::Generator(Class);
+					if (const auto Class = Cast<UClass>(Blueprint->GeneratedClass))
+					{
+						FClassGenerator::Generator(Class);
+					}
 				}
 			}
-		}
-		else if (AssetName == UUserDefinedStruct::StaticClass()->GetFName())
-		{
-			if (const auto UserDefinedStruct = LoadObject<
-				UUserDefinedStruct>(nullptr, *AssetData.ObjectPath.ToString()))
+			else if (AssetName == UUserDefinedStruct::StaticClass()->GetFName())
 			{
-				FStructGenerator::Generator(UserDefinedStruct);
+				if (const auto UserDefinedStruct = LoadObject<
+					UUserDefinedStruct>(nullptr, *AssetData.ObjectPath.ToString()))
+				{
+					FStructGenerator::Generator(UserDefinedStruct);
+				}
 			}
-		}
-		else if (AssetName == UUserDefinedEnum::StaticClass()->GetFName())
-		{
-			if (const auto UserDefinedEnum = LoadObject<
-				UUserDefinedEnum>(nullptr, *AssetData.ObjectPath.ToString()))
+			else if (AssetName == UUserDefinedEnum::StaticClass()->GetFName())
 			{
-				FEnumGenerator::Generator(UserDefinedEnum);
+				if (const auto UserDefinedEnum = LoadObject<
+					UUserDefinedEnum>(nullptr, *AssetData.ObjectPath.ToString()))
+				{
+					FEnumGenerator::Generator(UserDefinedEnum);
+				}
 			}
 		}
 	}
