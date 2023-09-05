@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-class FBinding
+class UNREALCSHARPCORE_API FBinding
 {
 public:
 	static FBinding& Get();

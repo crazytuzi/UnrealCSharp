@@ -177,7 +177,4 @@ public:
 	void DeinitializeSynchronizationContext();
 
 	MonoString* GetTraceback() const;
-
-private:
-	void RegisterBinding() const;
 };
