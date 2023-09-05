@@ -3,6 +3,13 @@
 #include "Bridge/FTypeBridge.h"
 #include "UEVersion.h"
 
+FWeakObjectPropertyDescriptor::FWeakObjectPropertyDescriptor(FProperty* InProperty):
+	FObjectPropertyDescriptor(InProperty),
+	Class(nullptr)
+{
+	Class = FTypeBridge::GetMonoClass(WeakObjectProperty);
+}
+
 void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (WeakObjectProperty != nullptr)
@@ -50,9 +57,7 @@ MonoObject* FWeakObjectPropertyDescriptor::Object_New(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(WeakObjectProperty);
-
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(Object, InAddress, false);
 	}

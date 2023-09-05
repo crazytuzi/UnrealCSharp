@@ -2,17 +2,22 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
 
+FTextPropertyDescriptor::FTextPropertyDescriptor(FProperty* InProperty):
+	FPropertyDescriptor(InProperty),
+	Class(nullptr)
+{
+	Class = FTypeBridge::GetMonoClass(TextProperty);
+}
+
 void FTextPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (TextProperty != nullptr)
 	{
-		const auto FoundMonoClass = FTypeBridge::GetMonoClass(TextProperty);
-
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*TextProperty->GetPropertyValue(Src).ToString())));
 
 		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-			FoundMonoClass, 1, &NewMonoString);
+			Class, 1, &NewMonoString);
 
 		*Dest = NewMonoObject;
 	}

@@ -1108,7 +1108,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s ??= new FName(\"%s\");\n\n"
 		),
-		                       *InProperty->GetName(),
+		                       *FGeneratorCore::GetName(InProperty->GetName()),
 		                       *InMetaData
 		);
 	}

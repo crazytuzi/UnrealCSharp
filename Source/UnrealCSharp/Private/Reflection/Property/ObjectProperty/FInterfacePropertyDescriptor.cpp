@@ -3,6 +3,13 @@
 #include "Bridge/FTypeBridge.h"
 #include "UEVersion.h"
 
+FInterfacePropertyDescriptor::FInterfacePropertyDescriptor(FProperty* InProperty):
+	FObjectPropertyDescriptor(InProperty),
+	Class(nullptr)
+{
+	Class = FTypeBridge::GetMonoClass(InterfaceProperty);
+}
+
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (InterfaceProperty != nullptr)
@@ -57,9 +64,7 @@ MonoObject* FInterfacePropertyDescriptor::Object_New(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(InterfaceProperty);
-
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
 			Object, InAddress, false);
