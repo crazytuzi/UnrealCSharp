@@ -3,6 +3,13 @@
 #include "Bridge/FTypeBridge.h"
 #include "UEVersion.h"
 
+FLazyObjectPropertyDescriptor::FLazyObjectPropertyDescriptor(FProperty* InProperty):
+	FObjectPropertyDescriptor(InProperty),
+	Class(nullptr)
+{
+	Class = FTypeBridge::GetMonoClass(LazyObjectProperty);
+}
+
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (LazyObjectProperty != nullptr)
@@ -50,9 +57,7 @@ MonoObject* FLazyObjectPropertyDescriptor::Object_New(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(LazyObjectProperty);
-
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(Object, InAddress, false);
 	}
