@@ -18,4 +18,7 @@ public:
 	                                          MonoObject** OutValue);
 
 	static bool Object_IsValidImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
+
+	static bool Object_IsAImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                     const FGarbageCollectionHandle SomeBase);
 };

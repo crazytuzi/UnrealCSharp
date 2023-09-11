@@ -38,6 +38,11 @@ namespace Script.CoreUObject
             return ObjectImplementation.Object_IsValidImplementation(GetHandle());
         }
 
+        public Boolean IsA<T>() where T : UObject, IStaticClass
+        {
+            return ObjectImplementation.Object_IsAImplementation(GetHandle(), T.StaticClass().GetHandle());
+        }
+
         public unsafe void SetHandle(void* InHandle)
         {
             GCHandle = new IntPtr(InHandle);

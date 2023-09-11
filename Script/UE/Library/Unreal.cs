@@ -54,5 +54,15 @@ namespace Script.Library
 
             return OutValue;
         }
+
+        public static T Cast<T>(UObject Outer) where T : UObject, IStaticClass
+        {
+            if (Outer.IsA<T>())
+            {
+                return Outer as T;
+            }
+
+            return null;
+        }
     }
 }
