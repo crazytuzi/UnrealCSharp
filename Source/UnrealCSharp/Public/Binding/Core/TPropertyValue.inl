@@ -466,7 +466,7 @@ struct TPropertyValue<T,
 			if (InMonoObject != nullptr)
 			{
 				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject), 0);
+					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject));
 
 				FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
 				                                                           MapHelper, SrcMonoObject);
@@ -542,7 +542,7 @@ struct TPropertyValue<T,
 			if (InMonoObject != nullptr)
 			{
 				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject), 0);
+					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject));
 
 				FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
 				                                                           SetHelper, SrcMonoObject);
@@ -654,7 +654,7 @@ struct TPropertyValue<T,
 			if (InMonoObject != nullptr)
 			{
 				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject), 0);
+					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject));
 
 				FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
 				                                                           ArrayHelper, SrcMonoObject);

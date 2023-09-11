@@ -111,7 +111,9 @@ public:
 
 	bool RemoveStructReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	FGarbageCollectionHandle GetGarbageCollectionHandle(void* InAddress, int32 InOffset) const;
+	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject) const;
+
+	FGarbageCollectionHandle GetGarbageCollectionHandle(void* InAddress, const FProperty* InProperty) const;
 
 public:
 	template <typename T>
