@@ -76,11 +76,11 @@ EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Proper
 
 		GET_PROPERTY_TYPE(FTextProperty, EPropertyTypeExtent::Text)
 
+		GET_PROPERTY_TYPE(FMulticastInlineDelegateProperty, EPropertyTypeExtent::MulticastInlineDelegate)
+
+		GET_PROPERTY_TYPE(FMulticastSparseDelegateProperty, EPropertyTypeExtent::MulticastSparseDelegate)
+
 		GET_PROPERTY_TYPE(FMulticastDelegateProperty, EPropertyTypeExtent::MulticastDelegate)
-
-		GET_PROPERTY_TYPE(FMulticastInlineDelegateProperty, EPropertyTypeExtent::MulticastDelegate)
-
-		GET_PROPERTY_TYPE(FMulticastSparseDelegateProperty, EPropertyTypeExtent::MulticastDelegate)
 
 		GET_PROPERTY_TYPE(FWeakObjectProperty, EPropertyTypeExtent::WeakObjectReference)
 
@@ -144,11 +144,11 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FTextProperty)
 
-	NEW_PROPERTY_DESCRIPTOR(FMulticastDelegateProperty)
-
 	NEW_PROPERTY_DESCRIPTOR(FMulticastInlineDelegateProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FMulticastSparseDelegateProperty)
+
+	NEW_PROPERTY_DESCRIPTOR(FMulticastDelegateProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FWeakObjectProperty)
 

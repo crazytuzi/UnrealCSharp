@@ -13,6 +13,7 @@
 #include "mono/metadata/class.h"
 #include "mono/metadata/reflection.h"
 #include "Misc/FileHelper.h"
+#include "Binding/FBinding.h"
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
@@ -58,6 +59,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 	InitializeAssembly(InParams.Assemblies);
 
 	RegisterLog();
+
+	RegisterBinding();
 }
 
 void FMonoDomain::Deinitialize()
@@ -760,5 +763,13 @@ void FMonoDomain::RegisterLog()
 				Runtime_Invoke(FoundMethod, nullptr, nullptr, nullptr);
 			}
 		}
+	}
+}
+
+void FMonoDomain::RegisterBinding()
+{
+	for (const auto& Binding : FBinding::Get().GetBinding())
+	{
+		mono_add_internal_call(TCHAR_TO_ANSI(*Binding.Key), Binding.Value);
 	}
 }

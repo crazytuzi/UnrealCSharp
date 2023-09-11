@@ -4,6 +4,19 @@
 #include "Bridge/FTypeBridge.h"
 #include "Template/TGetArrayLength.inl"
 
+FMulticastDelegatePropertyDescriptor::FMulticastDelegatePropertyDescriptor(FProperty* InProperty):
+	FPropertyDescriptor(InProperty),
+	Class(nullptr),
+	Type(nullptr)
+{
+	Class = FTypeBridge::GetMonoClass(MulticastDelegateProperty);
+
+	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(Class);
+
+	Type = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
+		FoundMonoType);
+}
+
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (MulticastDelegateProperty != nullptr)
@@ -23,8 +36,7 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 
 		MulticastDelegateProperty->InitializeValue(Dest);
 
-		const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(MulticastDelegateProperty->
-			GetMulticastDelegate(Dest));
+		const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest));
 
 		FScriptDelegate ScriptDelegate;
 
@@ -35,26 +47,25 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
+const FMulticastScriptDelegate* FMulticastDelegatePropertyDescriptor::GetMulticastDelegate(void* InAddress) const
+{
+	return MulticastDelegateProperty->GetMulticastDelegate(InAddress);
+}
+
 MonoObject* FMulticastDelegatePropertyDescriptor::Object_New(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject(InAddress);
 
 	if (Object == nullptr)
 	{
-		const auto FoundMonoClass = FTypeBridge::GetMonoClass(MulticastDelegateProperty);
-
 		const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
-			static_cast<FMulticastScriptDelegate*>(InAddress), MulticastDelegateProperty->SignatureFunction);
+			const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
+			MulticastDelegateProperty->SignatureFunction);
 
-		const auto FoundMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(FoundMonoClass);
-
-		const auto FoundReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
-			FoundMonoType);
-
-		auto InParams = static_cast<void*>(FoundReflectionType);
+		auto InParams = static_cast<void*>(Type);
 
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-			FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			Class, TGetArrayLength(InParams), &InParams);
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, DelegateProperty->GetOffset_ForInternal());

@@ -197,6 +197,8 @@ private:
 
 	static void RegisterLog();
 
+	static void RegisterBinding();
+
 public:
 	static MonoDomain* Domain;
 

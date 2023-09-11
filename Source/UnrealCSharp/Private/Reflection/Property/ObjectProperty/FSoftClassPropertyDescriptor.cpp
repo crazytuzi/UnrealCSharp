@@ -3,6 +3,13 @@
 #include "Bridge/FTypeBridge.h"
 #include "UEVersion.h"
 
+FSoftClassPropertyDescriptor::FSoftClassPropertyDescriptor(FProperty* InProperty):
+	FObjectPropertyDescriptor(InProperty),
+	Class(nullptr)
+{
+	Class = FTypeBridge::GetMonoClass(SoftClassProperty);
+}
+
 void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (SoftClassProperty != nullptr)
@@ -50,9 +57,7 @@ MonoObject* FSoftClassPropertyDescriptor::Object_New(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		const auto GenericClassMonoClass = FTypeBridge::GetMonoClass(SoftClassProperty);
-
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(GenericClassMonoClass);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(Object, InAddress, false);
 	}

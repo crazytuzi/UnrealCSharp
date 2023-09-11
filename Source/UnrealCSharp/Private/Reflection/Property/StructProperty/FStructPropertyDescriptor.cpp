@@ -3,6 +3,13 @@
 #include "Bridge/FTypeBridge.h"
 #include "Template/TGetArrayLength.inl"
 
+FStructPropertyDescriptor::FStructPropertyDescriptor(FProperty* InProperty):
+	FPropertyDescriptor(InProperty),
+	Class(nullptr)
+{
+	Class = FTypeBridge::GetMonoClass(StructProperty);
+}
+
 void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (StructProperty != nullptr)
@@ -54,12 +61,10 @@ MonoObject* FStructPropertyDescriptor::Object_New(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		const auto FoundMonoClass = FTypeBridge::GetMonoClass(StructProperty);
-
-		auto InParams = static_cast<void*>(FoundMonoClass);
+		auto InParams = static_cast<void*>(Class);
 
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-			FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			Class, TGetArrayLength(InParams), &InParams);
 
 		FCSharpEnvironment::GetEnvironment().Bind(StructProperty->Struct, false);
 

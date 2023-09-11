@@ -36,4 +36,6 @@ UNREALCSHARPCORE_API enum class EPropertyTypeExtent
 	Array,
 	Enum,
 	SoftClassReference,
+	MulticastInlineDelegate,
+	MulticastSparseDelegate
 };

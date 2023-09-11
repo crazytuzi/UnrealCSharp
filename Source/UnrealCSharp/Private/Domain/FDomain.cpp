@@ -1,6 +1,4 @@
 #include "Domain/FDomain.h"
-#include "Binding/FBinding.h"
-#include "Domain/InternalCall/FMonoInternalCall.h"
 #include "Log/FMonoLog.h"
 #include "Template/TGetArrayLength.inl"
 #include "CoreMacro/ClassMacro.h"
@@ -22,8 +20,6 @@ void FDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 	FMonoDomain::Initialize(InParams);
 
 	InitializeSynchronizationContext();
-
-	RegisterBinding();
 }
 
 void FDomain::Deinitialize()
@@ -485,12 +481,4 @@ MonoString* FDomain::GetTraceback() const
 	}
 
 	return nullptr;
-}
-
-void FDomain::RegisterBinding() const
-{
-	for (const auto& Binding : FBinding::Get().GetBinding())
-	{
-		FMonoInternalCall::RegisterInternalCall(TCHAR_TO_ANSI(*Binding.Key), Binding.Value);
-	}
 }
