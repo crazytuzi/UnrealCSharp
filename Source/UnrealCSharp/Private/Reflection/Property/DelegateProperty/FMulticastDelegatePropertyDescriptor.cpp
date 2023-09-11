@@ -36,8 +36,7 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 
 		MulticastDelegateProperty->InitializeValue(Dest);
 
-		const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(MulticastDelegateProperty->
-			GetMulticastDelegate(Dest));
+		const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest));
 
 		FScriptDelegate ScriptDelegate;
 
@@ -48,6 +47,11 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
+const FMulticastScriptDelegate* FMulticastDelegatePropertyDescriptor::GetMulticastDelegate(void* InAddress) const
+{
+	return MulticastDelegateProperty->GetMulticastDelegate(InAddress);
+}
+
 MonoObject* FMulticastDelegatePropertyDescriptor::Object_New(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject(InAddress);
@@ -55,7 +59,8 @@ MonoObject* FMulticastDelegatePropertyDescriptor::Object_New(void* InAddress) co
 	if (Object == nullptr)
 	{
 		const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
-			static_cast<FMulticastScriptDelegate*>(InAddress), MulticastDelegateProperty->SignatureFunction);
+			const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
+			MulticastDelegateProperty->SignatureFunction);
 
 		auto InParams = static_cast<void*>(Type);
 

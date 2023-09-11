@@ -13,6 +13,9 @@ public:
 
 	virtual void Set(void* Src, void* Dest) const override;
 
+protected:
+	virtual const FMulticastScriptDelegate* GetMulticastDelegate(void* InAddress) const;
+
 private:
 	MonoObject* Object_New(void* InAddress) const;
 

@@ -82,8 +82,6 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 
 	TArray<void*> CSharpParams;
 
-	TArray<uint32> MallocMemoryIndexes;
-
 	CSharpParams.Reserve(PropertyDescriptors.Num());
 
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
@@ -98,20 +96,18 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 			}
 			else
 			{
-				CSharpParams.Add(nullptr);
+				CSharpParams.Add(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams));
 
 				PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
-				                                &CSharpParams[Index]);
+				                                CSharpParams[Index]);
 			}
 		}
 		else
 		{
-			CSharpParams.Add(FMemory::Malloc(PropertyDescriptors[Index]->GetSize()));
+			CSharpParams.AddZeroed();
 
 			PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
 			                                &CSharpParams[Index]);
-
-			MallocMemoryIndexes.Add(Index);
 		}
 	}
 
@@ -166,15 +162,6 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 			}
 		}
 	}
-
-	for (const auto& Index : MallocMemoryIndexes)
-	{
-		FMemory::Free(CSharpParams[Index]);
-
-		CSharpParams[Index] = nullptr;
-	}
-
-	MallocMemoryIndexes.Empty();
 
 	CSharpParams.Empty();
 
