@@ -17,6 +17,7 @@ struct FRegisterObject
 			.Function("GetName", FObjectImplementation::Object_GetNameImplementation)
 			.Function("GetWorld", FObjectImplementation::Object_GetWorldImplementation)
 			.Function("IsValid", FObjectImplementation::Object_IsValidImplementation)
+			.Function("IsA", FObjectImplementation::Object_IsAImplementation)
 			.Register();
 	}
 };
@@ -79,6 +80,20 @@ bool FObjectImplementation::Object_IsValidImplementation(const FGarbageCollectio
 	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 	{
 		return IsValid(FoundObject);
+	}
+
+	return false;
+}
+
+bool FObjectImplementation::Object_IsAImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+                                                     const FGarbageCollectionHandle SomeBase)
+{
+	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+	{
+		if (const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(SomeBase))
+		{
+			return FoundObject->IsA(FoundClass);
+		}
 	}
 
 	return false;

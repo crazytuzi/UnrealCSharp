@@ -54,7 +54,7 @@ MonoObject* FArrayPropertyDescriptor::Object_New(void* InAddress) const
 		const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, InAddress);
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-			InAddress, ArrayProperty->GetOffset_ForInternal());
+			InAddress, ArrayProperty);
 
 		if (OwnerGarbageCollectionHandle.IsValid())
 		{

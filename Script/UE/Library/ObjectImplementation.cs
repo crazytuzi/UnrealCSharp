@@ -22,5 +22,8 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool Object_IsValidImplementation(IntPtr InObject);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Object_IsAImplementation(IntPtr InObject, IntPtr SomeBase);
     }
 }

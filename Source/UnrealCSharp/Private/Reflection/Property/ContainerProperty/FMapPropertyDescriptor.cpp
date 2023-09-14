@@ -63,7 +63,7 @@ MonoObject* FMapPropertyDescriptor::Object_New(void* InAddress) const
 		const auto MapHelper = new FMapHelper(MapProperty->KeyProp, MapProperty->ValueProp, InAddress);
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-			InAddress, MapProperty->GetOffset_ForInternal());
+			InAddress, MapProperty);
 
 		if (OwnerGarbageCollectionHandle.IsValid())
 		{

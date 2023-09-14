@@ -56,7 +56,7 @@ MonoObject* FDelegatePropertyDescriptor::Object_New(void* InAddress) const
 			Class, TGetArrayLength(InParams), &InParams);
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-			InAddress, DelegateProperty->GetOffset_ForInternal());
+			InAddress, DelegateProperty);
 
 		if (OwnerGarbageCollectionHandle.IsValid())
 		{
