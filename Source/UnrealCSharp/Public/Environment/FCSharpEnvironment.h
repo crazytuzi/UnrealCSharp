@@ -100,10 +100,10 @@ public:
 
 	bool RemoveObjectReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	bool AddStructReference(UScriptStruct* InScriptStruct, const void* InOwner, const void* InStruct,
-	                        MonoObject* InMonoObject, bool bNeedFree = true) const;
+	bool AddStructReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject,
+	                        bool bNeedFree = true) const;
 
-	MonoObject* GetObject(const void* InOwner, const void* InStruct) const;
+	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct) const;
 
 	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 

@@ -99,7 +99,7 @@ struct TScriptStructPropertyValue
 {
 	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(TBaseStructure<T>::Get(), InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -299,7 +299,7 @@ struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 {
 	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(nullptr, InMember);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(T::StaticStruct(), InMember);
 
 		if (SrcMonoObject == nullptr)
 		{

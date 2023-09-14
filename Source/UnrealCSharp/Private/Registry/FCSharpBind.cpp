@@ -285,7 +285,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, MonoObject* InMonoObject
 
 	InScriptStruct->InitializeStruct(Structure);
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference(InScriptStruct, nullptr, Structure, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddStructReference(InScriptStruct, Structure, InMonoObject);
 
 	return true;
 }

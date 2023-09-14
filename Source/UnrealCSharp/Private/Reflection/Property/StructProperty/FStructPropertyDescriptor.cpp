@@ -45,19 +45,9 @@ bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const ui
 	return false;
 }
 
-void* FStructPropertyDescriptor::GetOwner(void* InAddress) const
+MonoObject* FStructPropertyDescriptor::Object_New(const void* InAddress) const
 {
-	if (StructProperty != nullptr)
-	{
-		return static_cast<uint8*>(InAddress) - StructProperty->GetOffset_ForInternal();
-	}
-
-	return nullptr;
-}
-
-MonoObject* FStructPropertyDescriptor::Object_New(void* InAddress) const
-{
-	auto Object = FCSharpEnvironment::GetEnvironment().GetObject(GetOwner(InAddress), InAddress);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetObject(StructProperty->Struct, InAddress);
 
 	if (Object == nullptr)
 	{
@@ -68,8 +58,7 @@ MonoObject* FStructPropertyDescriptor::Object_New(void* InAddress) const
 
 		FCSharpEnvironment::GetEnvironment().Bind(StructProperty->Struct, false);
 
-		FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, GetOwner(InAddress), InAddress,
-		                                                        Object, false);
+		FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, InAddress, Object, false);
 	}
 
 	return Object;
