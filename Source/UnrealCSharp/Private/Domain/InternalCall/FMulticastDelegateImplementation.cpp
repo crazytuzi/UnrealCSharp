@@ -11,8 +11,8 @@ struct FRegisterMulticastDelegate
 	FRegisterMulticastDelegate()
 	{
 		FClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_LIBRARY)
-			.Function("Register", FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation)
-			.Function("UnRegister", FMulticastDelegateImplementation::MulticastDelegate_RegisterImplementation)
+			.Function("Register", FMulticastDelegateImplementation::MulticastDelegate_RegisterImplementation)
+			.Function("UnRegister", FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementation)
 			.Function("Contains", FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation)
 			.Function("IsBound", FMulticastDelegateImplementation::MulticastDelegate_IsBoundImplementation)
 			.Function("Contains", FMulticastDelegateImplementation::MulticastDelegate_ContainsImplementation)
