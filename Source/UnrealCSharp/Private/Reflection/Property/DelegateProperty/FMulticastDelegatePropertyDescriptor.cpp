@@ -21,7 +21,15 @@ void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (MulticastDelegateProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
+	}
+}
+
+void FMulticastDelegatePropertyDescriptor::Get(void* Src, void* Dest) const
+{
+	if (MulticastDelegateProperty != nullptr)
+	{
+		*static_cast<void**>(Dest) = NewRef(Src);
 	}
 }
 
@@ -52,7 +60,7 @@ const FMulticastScriptDelegate* FMulticastDelegatePropertyDescriptor::GetMultica
 	return MulticastDelegateProperty->GetMulticastDelegate(InAddress);
 }
 
-MonoObject* FMulticastDelegatePropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FMulticastDelegatePropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject(InAddress);
 
@@ -70,16 +78,25 @@ MonoObject* FMulticastDelegatePropertyDescriptor::Object_New(void* InAddress) co
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, DelegateProperty);
 
-		if (OwnerGarbageCollectionHandle.IsValid())
-		{
-			FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerGarbageCollectionHandle, InAddress,
-			                                                          MulticastDelegateHelper, Object);
-		}
-		else
-		{
-			FCSharpEnvironment::GetEnvironment().AddDelegateReference(InAddress, MulticastDelegateHelper, Object);
-		}
+		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerGarbageCollectionHandle, InAddress,
+		                                                          MulticastDelegateHelper, Object);
 	}
+
+	return Object;
+}
+
+MonoObject* FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
+{
+	const auto MulticastDelegateHelper = new FMulticastDelegateHelper(
+		const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
+		MulticastDelegateProperty->SignatureFunction);
+
+	auto InParams = static_cast<void*>(Type);
+
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		Class, TGetArrayLength(InParams), &InParams);
+
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(InAddress, MulticastDelegateHelper, Object);
 
 	return Object;
 }

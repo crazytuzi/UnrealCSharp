@@ -218,7 +218,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 		if (ReturnPropertyDescriptor != nullptr)
 		{
 			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
-			                              (void**)(ReturnValue));
+			                              reinterpret_cast<void**>(ReturnValue));
 		}
 
 		if (OutPropertyIndexes.Num() > 0)
@@ -233,7 +233,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 					MonoObject* Value = nullptr;
 
 					OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
-					                           (void**)&Value);
+					                           reinterpret_cast<void**>(&Value));
 
 					ARRAY_SET(MonoObjectArray, MonoObject*, Index, Value);
 				}

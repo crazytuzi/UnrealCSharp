@@ -8,14 +8,21 @@ FStructPropertyDescriptor::FStructPropertyDescriptor(FProperty* InProperty):
 	Class(nullptr)
 {
 	Class = FTypeBridge::GetMonoClass(StructProperty);
+
+	FCSharpEnvironment::GetEnvironment().Bind(StructProperty->Struct, false);
 }
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (StructProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
 	}
+}
+
+void FStructPropertyDescriptor::Get(void* Src, void* Dest) const
+{
+	*static_cast<void**>(Dest) = NewRef(Src);
 }
 
 void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
@@ -45,7 +52,7 @@ bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const ui
 	return false;
 }
 
-MonoObject* FStructPropertyDescriptor::Object_New(const void* InAddress) const
+MonoObject* FStructPropertyDescriptor::NewRef(const void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetObject(StructProperty->Struct, InAddress);
 
@@ -56,10 +63,20 @@ MonoObject* FStructPropertyDescriptor::Object_New(const void* InAddress) const
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			Class, TGetArrayLength(InParams), &InParams);
 
-		FCSharpEnvironment::GetEnvironment().Bind(StructProperty->Struct, false);
-
 		FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, InAddress, Object, false);
 	}
+
+	return Object;
+}
+
+MonoObject* FStructPropertyDescriptor::NewWeakRef(const void* InAddress) const
+{
+	auto InParams = static_cast<void*>(Class);
+
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		Class, TGetArrayLength(InParams), &InParams);
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, InAddress, Object, false);
 
 	return Object;
 }

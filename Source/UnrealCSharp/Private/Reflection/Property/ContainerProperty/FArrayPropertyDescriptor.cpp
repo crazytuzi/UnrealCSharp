@@ -22,7 +22,15 @@ void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (ArrayProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
+	}
+}
+
+void FArrayPropertyDescriptor::Get(void* Src, void* Dest) const
+{
+	if (ArrayProperty != nullptr)
+	{
+		*static_cast<void**>(Dest) = NewRef(Src);
 	}
 }
 
@@ -40,7 +48,7 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
-MonoObject* FArrayPropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FArrayPropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject(InAddress);
 
@@ -56,16 +64,23 @@ MonoObject* FArrayPropertyDescriptor::Object_New(void* InAddress) const
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, ArrayProperty);
 
-		if (OwnerGarbageCollectionHandle.IsValid())
-		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress,
-			                                                           ArrayHelper, Object);
-		}
-		else
-		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, ArrayHelper, Object);
-		}
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, ArrayHelper,
+		                                                           Object);
 	}
+
+	return Object;
+}
+
+MonoObject* FArrayPropertyDescriptor::NewWeakRef(void* InAddress) const
+{
+	auto InParams = static_cast<void*>(Type);
+
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		Class, TGetArrayLength(InParams), &InParams);
+
+	const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, InAddress);
+
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, ArrayHelper, Object);
 
 	return Object;
 }
