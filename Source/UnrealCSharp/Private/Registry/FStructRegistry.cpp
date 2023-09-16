@@ -82,10 +82,10 @@ void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InSt
 	return nullptr;
 }
 
-MonoObject* FStructRegistry::GetObject(const void* InOwner, const void* InStruct)
+MonoObject* FStructRegistry::GetObject(UScriptStruct* InScriptStruct, const void* InStruct)
 {
 	const auto FoundGarbageCollectionHandle = StructAddress2GarbageCollectionHandle.Find({
-		const_cast<void*>(InOwner), const_cast<void*>(InStruct)
+		InScriptStruct, const_cast<void*>(InStruct)
 	});
 
 	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
@@ -101,32 +101,35 @@ void* FStructRegistry::GetStruct(const MonoObject* InMonoObject)
 	return GetAddress(InMonoObject);
 }
 
-FGarbageCollectionHandle FStructRegistry::GetGarbageCollectionHandle(const void* InOwner, const void* InStruct)
+FGarbageCollectionHandle FStructRegistry::GetGarbageCollectionHandle(UScriptStruct* InScriptStruct,
+                                                                     const void* InStruct)
 {
 	const auto FoundGarbageCollectionHandle = StructAddress2GarbageCollectionHandle.Find({
-		const_cast<void*>(InOwner), const_cast<void*>(InStruct)
+		InScriptStruct, const_cast<void*>(InStruct)
 	});
 
 	return FoundGarbageCollectionHandle != nullptr ? *FoundGarbageCollectionHandle : FGarbageCollectionHandle();
 }
 
-bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InOwner, const void* InStruct,
+bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct,
                                    MonoObject* InMonoObject,
                                    const bool bNeedFree)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
 	StructAddress2GarbageCollectionHandle.Add(
-		FStructAddressBase{const_cast<void*>(InOwner), const_cast<void*>(InStruct)}, GarbageCollectionHandle);
+		FStructAddressBase{InScriptStruct, const_cast<void*>(InStruct)}, GarbageCollectionHandle);
 
 	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
-		                                          const_cast<void*>(InOwner), const_cast<void*>(InStruct),
-		                                          InScriptStruct, bNeedFree
+		                                          InScriptStruct,
+		                                          const_cast<void*>(InStruct),
+		                                          bNeedFree
 	                                          });
 
 	MonoObject2StructAddress.Add(InMonoObject, {
-		                             const_cast<void*>(InOwner), const_cast<void*>(InStruct),
-		                             InScriptStruct, bNeedFree
+		                             InScriptStruct,
+		                             const_cast<void*>(InStruct),
+		                             bNeedFree
 	                             });
 
 	return true;
@@ -136,7 +139,9 @@ bool FStructRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageC
 {
 	if (const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InGarbageCollectionHandle))
 	{
-		StructAddress2GarbageCollectionHandle.Remove({FoundStructAddress->Owner, FoundStructAddress->Address});
+		StructAddress2GarbageCollectionHandle.Remove({
+			FoundStructAddress->ScriptStruct.Get(), FoundStructAddress->Address
+		});
 
 		if (FoundStructAddress->bNeedFree)
 		{

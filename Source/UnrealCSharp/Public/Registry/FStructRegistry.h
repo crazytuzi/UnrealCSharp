@@ -6,12 +6,12 @@
 
 struct FStructAddressBase
 {
-	void* Owner;
+	TWeakObjectPtr<UScriptStruct> ScriptStruct;
 
 	void* Address;
 
-	FStructAddressBase(void* InOwner, void* InAddress):
-		Owner(InOwner),
+	FStructAddressBase(UScriptStruct* InScriptStruct, void* InAddress):
+		ScriptStruct(InScriptStruct),
 		Address(InAddress)
 	{
 	}
@@ -26,13 +26,10 @@ class FStructRegistry
 private:
 	struct FStructAddress : FStructAddressBase
 	{
-		TWeakObjectPtr<UScriptStruct> ScriptStruct;
-
 		bool bNeedFree;
 
-		FStructAddress(void* InOwner, void* InAddress, UScriptStruct* InScriptStruct, const bool InbNeedFree):
-			FStructAddressBase(InOwner, InAddress),
-			ScriptStruct(InScriptStruct),
+		FStructAddress(UScriptStruct* InScriptStruct, void* InAddress, const bool InbNeedFree):
+			FStructAddressBase(InScriptStruct, InAddress),
 			bNeedFree(InbNeedFree)
 		{
 		}
@@ -57,17 +54,17 @@ public:
 
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
 
-	MonoObject* GetObject(const void* InOwner, const void* InStruct);
+	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct);
 
 	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 	void* GetStruct(const MonoObject* InMonoObject);
 
-	FGarbageCollectionHandle GetGarbageCollectionHandle(const void* InOwner, const void* InStruct);
+	FGarbageCollectionHandle GetGarbageCollectionHandle(UScriptStruct* InScriptStruct, const void* InStruct);
 
 public:
-	bool AddReference(UScriptStruct* InScriptStruct, const void* InOwner, const void* InStruct,
-	                  MonoObject* InMonoObject, bool bNeedFree = true);
+	bool AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject,
+	                  bool bNeedFree = true);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
