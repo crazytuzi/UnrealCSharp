@@ -407,6 +407,14 @@ bool FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, const
 		       : false;
 }
 
+bool FCSharpEnvironment::AddStructReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct,
+                                            const void* InStruct, MonoObject* InMonoObject) const
+{
+	return StructRegistry != nullptr
+		       ? StructRegistry->AddReference(InOwner, InScriptStruct, InStruct, InMonoObject)
+		       : false;
+}
+
 MonoObject* FCSharpEnvironment::GetObject(UScriptStruct* InScriptStruct, const void* InStruct) const
 {
 	return StructRegistry != nullptr ? StructRegistry->GetObject(InScriptStruct, InStruct) : nullptr;

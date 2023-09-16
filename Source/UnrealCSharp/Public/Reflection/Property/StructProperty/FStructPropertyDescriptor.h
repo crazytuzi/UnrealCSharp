@@ -19,7 +19,7 @@ public:
 	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const override;
 
 private:
-	MonoObject* NewRef(const void* InAddress) const;
+	MonoObject* NewRef(void* InAddress) const;
 
 	MonoObject* NewWeakRef(const void* InAddress) const;
 

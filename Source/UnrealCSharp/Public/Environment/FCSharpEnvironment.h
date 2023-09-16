@@ -103,6 +103,9 @@ public:
 	bool AddStructReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject,
 	                        bool bNeedFree = true) const;
 
+	bool AddStructReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct,
+	                        const void* InStruct, MonoObject* InMonoObject) const;
+
 	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct) const;
 
 	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;

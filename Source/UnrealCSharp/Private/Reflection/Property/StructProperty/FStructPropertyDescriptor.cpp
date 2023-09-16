@@ -52,7 +52,7 @@ bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const ui
 	return false;
 }
 
-MonoObject* FStructPropertyDescriptor::NewRef(const void* InAddress) const
+MonoObject* FStructPropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetObject(StructProperty->Struct, InAddress);
 
@@ -63,7 +63,11 @@ MonoObject* FStructPropertyDescriptor::NewRef(const void* InAddress) const
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 			Class, TGetArrayLength(InParams), &InParams);
 
-		FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, InAddress, Object, false);
+		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
+			InAddress, StructProperty);
+
+		FCSharpEnvironment::GetEnvironment().AddStructReference(OwnerGarbageCollectionHandle, StructProperty->Struct,
+		                                                        InAddress, Object);
 	}
 
 	return Object;
