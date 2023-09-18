@@ -1,5 +1,6 @@
 ﻿#include "Registry/FStructRegistry.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reference/FStructReference.h"
 
 FStructRegistry::FStructRegistry()
 {
@@ -111,9 +112,8 @@ FGarbageCollectionHandle FStructRegistry::GetGarbageCollectionHandle(UScriptStru
 	return FoundGarbageCollectionHandle != nullptr ? *FoundGarbageCollectionHandle : FGarbageCollectionHandle();
 }
 
-bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct,
-                                   MonoObject* InMonoObject,
-                                   const bool bNeedFree)
+bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject,
+                                   bool bNeedFree)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
@@ -135,10 +135,36 @@ bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* In
 	return true;
 }
 
+bool FStructRegistry::AddReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct,
+                                   const void* InStruct, MonoObject* InMonoObject)
+{
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
+
+	StructAddress2GarbageCollectionHandle.Add(
+		FStructAddressBase{InScriptStruct, const_cast<void*>(InStruct)}, GarbageCollectionHandle);
+
+	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
+		                                          InScriptStruct,
+		                                          const_cast<void*>(InStruct),
+		                                          false
+	                                          });
+
+	MonoObject2StructAddress.Add(InMonoObject, {
+		                             InScriptStruct,
+		                             const_cast<void*>(InStruct),
+		                             false
+	                             });
+
+	return FCSharpEnvironment::GetEnvironment().
+		AddReference(InOwner, new FStructReference(GarbageCollectionHandle));
+}
+
 bool FStructRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
 	if (const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InGarbageCollectionHandle))
 	{
+		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(InGarbageCollectionHandle);
+
 		StructAddress2GarbageCollectionHandle.Remove({
 			FoundStructAddress->ScriptStruct.Get(), FoundStructAddress->Address
 		});

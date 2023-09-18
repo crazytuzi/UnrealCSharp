@@ -121,15 +121,7 @@ void FArrayImplementation::Array_GetImplementation(const FGarbageCollectionHandl
 	{
 		const auto Value = ArrayHelper->Get(InIndex);
 
-		if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-		{
-			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(ArrayHelper->GetInnerPropertyDescriptor()->GetProperty()), Value);
-		}
-		else
-		{
-			ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
-		}
+		ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
 	}
 }
 

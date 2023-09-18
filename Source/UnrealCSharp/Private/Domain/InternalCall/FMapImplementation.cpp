@@ -121,15 +121,7 @@ void FMapImplementation::Map_FindKeyImplementation(const FGarbageCollectionHandl
 
 		const auto Key = MapHelper->FindKey(Value);
 
-		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
-		{
-			*OutKey = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(MapHelper->GetKeyPropertyDescriptor()->GetProperty()), Key);
-		}
-		else
-		{
-			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(OutKey));
-		}
+		MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(OutKey));
 	}
 }
 
@@ -147,15 +139,7 @@ void FMapImplementation::Map_FindImplementation(const FGarbageCollectionHandle I
 
 		const auto Value = MapHelper->Find(Key);
 
-		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
-		{
-			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
-		}
-		else
-		{
-			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
-		}
+		MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
 	}
 }
 
@@ -191,15 +175,7 @@ void FMapImplementation::Map_GetImplementation(const FGarbageCollectionHandle In
 
 		const auto Value = MapHelper->Get(Key);
 
-		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
-		{
-			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
-		}
-		else
-		{
-			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
-		}
+		MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
 	}
 }
 
@@ -254,15 +230,7 @@ void FMapImplementation::Map_GetEnumeratorKeyImplementation(const FGarbageCollec
 	{
 		const auto Key = MapHelper->GetEnumeratorKey(InIndex);
 
-		if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
-		{
-			*OutKey = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(MapHelper->GetKeyPropertyDescriptor()->GetProperty()), Key);
-		}
-		else
-		{
-			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(OutKey));
-		}
+		MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(OutKey));
 	}
 }
 
@@ -273,14 +241,6 @@ void FMapImplementation::Map_GetEnumeratorValueImplementation(const FGarbageColl
 	{
 		const auto Value = MapHelper->GetEnumeratorValue(InIndex);
 
-		if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
-		{
-			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(MapHelper->GetValuePropertyDescriptor()->GetProperty()), Value);
-		}
-		else
-		{
-			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
-		}
+		MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
 	}
 }

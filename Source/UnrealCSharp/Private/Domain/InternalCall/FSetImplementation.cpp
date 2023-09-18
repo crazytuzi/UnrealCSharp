@@ -141,14 +141,6 @@ void FSetImplementation::Set_GetEnumeratorImplementation(const FGarbageCollectio
 	{
 		const auto Value = SetHelper->GetEnumerator(InIndex);
 
-		if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
-		{
-			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-				FTypeBridge::GetMonoClass(SetHelper->GetElementPropertyDescriptor()->GetProperty()), Value);
-		}
-		else
-		{
-			SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
-		}
+		SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
 	}
 }

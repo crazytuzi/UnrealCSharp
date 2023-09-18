@@ -115,7 +115,7 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 	if (ReturnPropertyDescriptor != nullptr)
 	{
 		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
-		                              (void**)(ReturnValue));
+		                              reinterpret_cast<void**>(ReturnValue));
 	}
 
 	if (OutPropertyIndexes.Num() > 0)
@@ -129,7 +129,8 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 			{
 				MonoObject* Value = nullptr;
 
-				OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), (void**)&Value);
+				OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
+				                           reinterpret_cast<void**>(&Value));
 
 				ARRAY_SET(MonoObjectArray, MonoObject*, Index, Value);
 			}
@@ -186,7 +187,8 @@ bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptD
 			{
 				MonoObject* Value = nullptr;
 
-				OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), (void**)&Value);
+				OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
+				                           reinterpret_cast<void**>(&Value));
 
 				ARRAY_SET(MonoObjectArray, MonoObject*, Index, Value);
 			}

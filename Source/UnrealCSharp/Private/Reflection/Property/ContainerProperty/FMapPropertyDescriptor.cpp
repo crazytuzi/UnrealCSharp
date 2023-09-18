@@ -31,7 +31,15 @@ void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (MapProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
+	}
+}
+
+void FMapPropertyDescriptor::Get(void* Src, void* Dest) const
+{
+	if (MapProperty != nullptr)
+	{
+		*static_cast<void**>(Dest) = NewRef(Src);
 	}
 }
 
@@ -49,7 +57,7 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
-MonoObject* FMapPropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FMapPropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject(InAddress);
 
@@ -65,17 +73,23 @@ MonoObject* FMapPropertyDescriptor::Object_New(void* InAddress) const
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, MapProperty);
 
-		if (OwnerGarbageCollectionHandle.IsValid())
-		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress,
-			                                                           MapHelper,
-			                                                           Object);
-		}
-		else
-		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, MapHelper, Object);
-		}
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, MapHelper,
+		                                                           Object);
 	}
+
+	return Object;
+}
+
+MonoObject* FMapPropertyDescriptor::NewWeakRef(void* InAddress) const
+{
+	void* InParams[2] = {KeyType, ValueType};
+
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		Class, TGetArrayLength(InParams), InParams);
+
+	const auto MapHelper = new FMapHelper(MapProperty->KeyProp, MapProperty->ValueProp, InAddress);
+
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, MapHelper, Object);
 
 	return Object;
 }

@@ -22,7 +22,15 @@ void FSetPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (SetProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
+	}
+}
+
+void FSetPropertyDescriptor::Get(void* Src, void* Dest) const
+{
+	if (SetProperty != nullptr)
+	{
+		*static_cast<void**>(Dest) = NewRef(Src);
 	}
 }
 
@@ -40,7 +48,7 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
-MonoObject* FSetPropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject(InAddress);
 
@@ -56,17 +64,23 @@ MonoObject* FSetPropertyDescriptor::Object_New(void* InAddress) const
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, SetProperty);
 
-		if (OwnerGarbageCollectionHandle.IsValid())
-		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress,
-			                                                           SetHelper,
-			                                                           Object);
-		}
-		else
-		{
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, SetHelper, Object);
-		}
+		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, SetHelper,
+		                                                           Object);
 	}
+
+	return Object;
+}
+
+MonoObject* FSetPropertyDescriptor::NewWeakRef(void* InAddress) const
+{
+	auto InParams = static_cast<void*>(Type);
+
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		Class, TGetArrayLength(InParams), &InParams);
+
+	const auto SetHelper = new FSetHelper(SetProperty->ElementProp, InAddress);
+
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, SetHelper, Object);
 
 	return Object;
 }

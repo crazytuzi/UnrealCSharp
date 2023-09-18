@@ -20,7 +20,15 @@ void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (DelegateProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
+	}
+}
+
+void FDelegatePropertyDescriptor::Get(void* Src, void* Dest) const
+{
+	if (DelegateProperty != nullptr)
+	{
+		*static_cast<void**>(Dest) = NewRef(Src);
 	}
 }
 
@@ -41,7 +49,7 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
-MonoObject* FDelegatePropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject(InAddress);
 
@@ -58,16 +66,24 @@ MonoObject* FDelegatePropertyDescriptor::Object_New(void* InAddress) const
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, DelegateProperty);
 
-		if (OwnerGarbageCollectionHandle.IsValid())
-		{
-			FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerGarbageCollectionHandle, InAddress,
-			                                                          DelegateHelper, Object);
-		}
-		else
-		{
-			FCSharpEnvironment::GetEnvironment().AddDelegateReference(InAddress, DelegateHelper, Object);
-		}
+		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerGarbageCollectionHandle, InAddress,
+		                                                          DelegateHelper, Object);
 	}
+
+	return Object;
+}
+
+MonoObject* FDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
+{
+	const auto DelegateHelper = new FDelegateHelper(DelegateProperty->GetPropertyValuePtr(InAddress),
+	                                                DelegateProperty->SignatureFunction);
+
+	auto InParams = static_cast<void*>(Type);
+
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		Class, TGetArrayLength(InParams), &InParams);
+
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(InAddress, DelegateHelper, Object);
 
 	return Object;
 }
