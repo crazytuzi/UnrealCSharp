@@ -7,11 +7,36 @@
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Template/TGetArrayLength.inl"
 
 #if !WITH_EDITOR
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 #endif
+
+FCSharpBind::FCSharpBind()
+{
+	Initialize();
+}
+
+FCSharpBind::~FCSharpBind()
+{
+	Deinitialize();
+}
+
+void FCSharpBind::Initialize()
+{
+	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.AddRaw(
+		this, &FCSharpBind::OnCSharpEnvironmentInitialize);
+}
+
+void FCSharpBind::Deinitialize()
+{
+	if (OnCSharpEnvironmentInitializeDelegateHandle.IsValid())
+	{
+		FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Remove(OnCSharpEnvironmentInitializeDelegateHandle);
+	}
+}
 
 MonoObject* FCSharpBind::Bind(FDomain* InDomain, UObject* InObject)
 {
@@ -481,4 +506,16 @@ bool FCSharpBind::IsOverrideMethod(const FDomain* InDomain, MonoReflectionMethod
 	}
 
 	return false;
+}
+
+void FCSharpBind::OnCSharpEnvironmentInitialize()
+{
+	for (const auto Class : TObjectRange<UClass>())
+	{
+		// @TODO
+		if (Class->IsChildOf(UBlueprintFunctionLibrary::StaticClass()))
+		{
+			FCSharpEnvironment::GetEnvironment().Bind(Class);
+		}
+	}
 }

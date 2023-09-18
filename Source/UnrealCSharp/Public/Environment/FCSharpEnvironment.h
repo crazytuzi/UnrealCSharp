@@ -272,6 +272,8 @@ private:
 	TArray<FWeakObjectPtr> AsyncLoadingObjectArray;
 
 private:
+	FCSharpBind* CSharpBind;
+
 	FClassRegistry* ClassRegistry;
 
 	FReferenceRegistry* ReferenceRegistry;

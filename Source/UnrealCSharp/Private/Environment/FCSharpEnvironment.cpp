@@ -53,6 +53,8 @@ void FCSharpEnvironment::Initialize()
 		}
 	});
 
+	CSharpBind = new FCSharpBind();
+
 	ClassRegistry = new FClassRegistry();
 
 	ReferenceRegistry = new FReferenceRegistry();
@@ -171,6 +173,13 @@ void FCSharpEnvironment::Deinitialize()
 		delete ClassRegistry;
 
 		ClassRegistry = nullptr;
+	}
+
+	if (CSharpBind != nullptr)
+	{
+		delete CSharpBind;
+
+		CSharpBind = nullptr;
 	}
 
 	if (Domain != nullptr)
