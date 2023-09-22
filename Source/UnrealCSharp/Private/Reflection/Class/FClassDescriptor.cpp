@@ -72,6 +72,19 @@ FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FName& InFunc
 				return NewFunctionDescriptor;
 			}
 
+			for (const auto& Interface : InClass->Interfaces)
+			{
+				if (const auto FoundFunction = Interface.Class->FindFunctionByName(
+					InFunctionName, EIncludeSuperFlag::IncludeSuper))
+				{
+					const auto NewFunctionDescriptor = new FFunctionDescriptor(FoundFunction);
+
+					FunctionDescriptorMap.Add(InFunctionName, NewFunctionDescriptor);
+
+					return NewFunctionDescriptor;
+				}
+			}
+
 			InClass = InClass->GetSuperClass();
 		}
 	}

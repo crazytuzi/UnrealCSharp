@@ -53,6 +53,8 @@ void FCSharpEnvironment::Initialize()
 		}
 	});
 
+	CSharpBind = new FCSharpBind();
+
 	ClassRegistry = new FClassRegistry();
 
 	ReferenceRegistry = new FReferenceRegistry();
@@ -173,6 +175,13 @@ void FCSharpEnvironment::Deinitialize()
 		ClassRegistry = nullptr;
 	}
 
+	if (CSharpBind != nullptr)
+	{
+		delete CSharpBind;
+
+		CSharpBind = nullptr;
+	}
+
 	if (Domain != nullptr)
 	{
 		delete Domain;
@@ -195,6 +204,11 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 {
 	if (const auto InObject = static_cast<UObject*>(const_cast<UObjectBase*>(Object)))
 	{
+		if (InObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject | EObjectFlags::RF_ArchetypeObject))
+		{
+			return;
+		}
+
 		if (IsInGameThread())
 		{
 			Bind(InObject, true);

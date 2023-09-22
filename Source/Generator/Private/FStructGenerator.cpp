@@ -224,21 +224,21 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 				"\t\t{\n"
 				"\t\t\tget\n"
 				"\t\t\t{\n"
-				"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), \"%s\", out Object value);\n"
+				"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), %s, out Object value);\n"
 				"\n"
 				"\t\t\t\treturn %s as %s;\n"
 				"\t\t\t}\n"
 				"\n"
-				"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), \"%s\", %s);\n"
+				"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
 			                                   *FGeneratorCore::GetName(VariableFriendlyPropertyName),
-			                                   *PropertyName,
+			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
 			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
-			                                   *PropertyName,
+			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
 		}

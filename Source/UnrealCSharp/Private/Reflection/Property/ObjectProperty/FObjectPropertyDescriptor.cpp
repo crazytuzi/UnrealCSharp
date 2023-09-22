@@ -8,7 +8,7 @@ void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 	{
 		const auto SrcObject = ObjectProperty->GetObjectPropertyValue(Src);
 
-		*Dest = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);;
+		*Dest = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
 	}
 }
 

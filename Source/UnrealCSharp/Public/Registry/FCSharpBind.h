@@ -7,6 +7,16 @@
 class FCSharpBind
 {
 public:
+	FCSharpBind();
+
+	~FCSharpBind();
+
+public:
+	void Initialize();
+
+	void Deinitialize();
+
+public:
 	static MonoObject* Bind(FDomain* InDomain, UObject* InObject);
 
 	static bool Bind(FDomain* InDomain, UObject* InObject, bool bNeedMonoClass);
@@ -64,10 +74,16 @@ private:
 
 	static bool IsOverrideMethod(const FDomain* InDomain, MonoReflectionMethod* InMonoReflectionMethod);
 
+private:
+	void OnCSharpEnvironmentInitialize();
+
 #if !WITH_EDITOR
 private:
 	static TSet<TWeakObjectPtr<UStruct>> NotOverrideTypes;
 #endif
+
+private:
+	FDelegateHandle OnCSharpEnvironmentInitializeDelegateHandle;
 };
 
 #include "FCSharpBind.inl"
