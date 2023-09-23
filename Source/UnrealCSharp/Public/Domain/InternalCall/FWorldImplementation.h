@@ -7,6 +7,8 @@ class FWorldImplementation
 {
 public:
 	static void World_SpawnActorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                           const FGarbageCollectionHandle Class, const MonoObject* Transform,
-	                                           MonoObject** OutValue);
+	                                           const FGarbageCollectionHandle InClass, const MonoObject* InTransform,
+	                                           const FGarbageCollectionHandle InOwner,
+	                                           const FGarbageCollectionHandle InInstigator,
+	                                           uint8 InCollisionHandlingOverride, MonoObject** OutValue);
 };
