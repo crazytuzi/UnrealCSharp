@@ -81,8 +81,7 @@ struct TBindingPropertyValue
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 				FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
-			FCSharpEnvironment::GetEnvironment().AddBindingReference(
-				SrcMonoObject, InMember, bNeedFree);
+			FCSharpEnvironment::GetEnvironment().AddBindingReference(SrcMonoObject, InMember, bNeedFree);
 		}
 
 		return SrcMonoObject;
@@ -112,8 +111,8 @@ struct TScriptStructPropertyValue
 
 			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<T>::Get(), false);
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), nullptr,
-			                                                        InMember, SrcMonoObject, bNeedFree);
+			FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), InMember, SrcMonoObject,
+			                                                        bNeedFree);
 		}
 
 		return SrcMonoObject;
@@ -312,8 +311,8 @@ struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 
 			FCSharpEnvironment::GetEnvironment().Bind(T::StaticStruct(), false);
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), nullptr,
-			                                                        InMember, SrcMonoObject, bNeedFree);
+			FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), InMember, SrcMonoObject,
+			                                                        bNeedFree);
 		}
 
 		return SrcMonoObject;
