@@ -7,6 +7,7 @@
 #include "Engine/UserDefinedStruct.h"
 #include "UMGEditor/Public/WidgetBlueprint.h"
 #include "FGeneratorCore.h"
+#include "UEVersion.h"
 
 void FBlueprintGenerator::Generator()
 {
@@ -14,7 +15,13 @@ void FBlueprintGenerator::Generator()
 
 	TArray<FAssetData> OutAssetData;
 
+#if UE_GET_ASSETS_BY_PATHS
+	for (const auto& AssetsPath : FGeneratorCore::GetAssetsPaths())
+	{
+		AssetRegistryModule.Get().GetAssetsByPath(AssetsPath, OutAssetData, true);
+#else
 	AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetAssetsPaths(), OutAssetData, true);
+#endif
 
 	for (const auto& AssetData : OutAssetData)
 	{
@@ -52,4 +59,8 @@ void FBlueprintGenerator::Generator()
 			}
 		}
 	}
+
+#if UE_GET_ASSETS_BY_PATHS
+	}
+#endif
 }
