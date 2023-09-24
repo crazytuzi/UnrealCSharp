@@ -13,6 +13,7 @@
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
 #endif
+#include "UEVersion.h"
 
 void FMixinClassGenerator::Generator()
 {

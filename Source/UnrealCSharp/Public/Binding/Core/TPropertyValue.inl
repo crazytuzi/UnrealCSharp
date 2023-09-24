@@ -261,6 +261,22 @@ struct TPropertyValue<T,
 	}
 };
 
+#if UE_OBJECT_PTR
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsTObjectPtr<T>::Value, T>::Type>
+{
+	static MonoObject* Get(T* InMember)
+	{
+		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
+	}
+
+	static T Set(const MonoObject* InValue)
+	{
+		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType*>(InValue);
+	}
+};
+#endif
+
 template <typename T>
 #if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
