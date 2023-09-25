@@ -101,7 +101,7 @@ void FSetHelper::Add(void* InValue) const
 
 		ElementPropertyDescriptor->Set(InValue, Data);
 
-		ScriptSet->Rehash(ScriptSetLayout, [=](const void* Src)
+		ScriptSet->Rehash(ScriptSetLayout, [=, this](const void* Src)
 		{
 			return ElementPropertyDescriptor->GetValueTypeHash(Src);
 		});

@@ -208,7 +208,7 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 
 		KeyPropertyDescriptor->Set(InKey, Data);
 
-		ScriptMap->Rehash(ScriptMapLayout, [=](const void* Src)
+		ScriptMap->Rehash(ScriptMapLayout, [=, this](const void* Src)
 		{
 			return KeyPropertyDescriptor->GetValueTypeHash(Src);
 		});
