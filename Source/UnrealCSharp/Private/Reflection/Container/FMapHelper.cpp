@@ -1,4 +1,5 @@
 ﻿#include "Reflection/Container/FMapHelper.h"
+#include "UEVersion.h"
 
 FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData, const bool InbNeedFree):
 	KeyPropertyDescriptor(nullptr),
@@ -208,7 +209,11 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 
 		KeyPropertyDescriptor->Set(InKey, Data);
 
+#if STD_CPP_20
 		ScriptMap->Rehash(ScriptMapLayout, [=, this](const void* Src)
+#else
+		ScriptMap->Rehash(ScriptMapLayout, [=](const void* Src)
+#endif
 		{
 			return KeyPropertyDescriptor->GetValueTypeHash(Src);
 		});

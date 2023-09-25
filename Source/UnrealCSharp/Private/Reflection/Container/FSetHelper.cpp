@@ -1,5 +1,6 @@
 ﻿#include "Reflection/Container/FSetHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
+#include "UEVersion.h"
 
 FSetHelper::FSetHelper(FProperty* InProperty, void* InData, const bool InbNeedFree):
 	ElementPropertyDescriptor(nullptr),
@@ -101,7 +102,11 @@ void FSetHelper::Add(void* InValue) const
 
 		ElementPropertyDescriptor->Set(InValue, Data);
 
+#if STD_CPP_20
 		ScriptSet->Rehash(ScriptSetLayout, [=, this](const void* Src)
+#else
+		ScriptSet->Rehash(ScriptSetLayout, [=](const void* Src)
+#endif
 		{
 			return ElementPropertyDescriptor->GetValueTypeHash(Src);
 		});
