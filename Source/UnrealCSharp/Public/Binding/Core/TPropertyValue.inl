@@ -81,8 +81,7 @@ struct TBindingPropertyValue
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 				FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
-			FCSharpEnvironment::GetEnvironment().AddBindingReference(
-				SrcMonoObject, InMember, bNeedFree);
+			FCSharpEnvironment::GetEnvironment().AddBindingReference(SrcMonoObject, InMember, bNeedFree);
 		}
 
 		return SrcMonoObject;
@@ -112,8 +111,8 @@ struct TScriptStructPropertyValue
 
 			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<T>::Get(), false);
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), nullptr,
-			                                                        InMember, SrcMonoObject, bNeedFree);
+			FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), InMember, SrcMonoObject,
+			                                                        bNeedFree);
 		}
 
 		return SrcMonoObject;
@@ -262,6 +261,22 @@ struct TPropertyValue<T,
 	}
 };
 
+#if UE_OBJECT_PTR
+template <typename T>
+struct TPropertyValue<T, typename TEnableIf<TIsTObjectPtr<T>::Value, T>::Type>
+{
+	static MonoObject* Get(T* InMember)
+	{
+		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
+	}
+
+	static T Set(const MonoObject* InValue)
+	{
+		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType*>(InValue);
+	}
+};
+#endif
+
 template <typename T>
 #if UE_T_IS_SAME
 struct TPropertyValue<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
@@ -312,8 +327,8 @@ struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 
 			FCSharpEnvironment::GetEnvironment().Bind(T::StaticStruct(), false);
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), nullptr,
-			                                                        InMember, SrcMonoObject, bNeedFree);
+			FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), InMember, SrcMonoObject,
+			                                                        bNeedFree);
 		}
 
 		return SrcMonoObject;

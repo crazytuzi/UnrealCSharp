@@ -13,6 +13,18 @@
 #include "Engine/UserDefinedEnum.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Mixin/FMixinGenerator.h"
+#include "UEVersion.h"
+
+#if UE_IS_RUNNING_COOK_COMMANDLET
+static bool IsRunningCookCommandlet()
+{
+	const FString Commandline = FCommandLine::Get();
+
+	const auto bIsCookCommandlet = IsRunningCommandlet() && Commandline.Contains(TEXT("run=cook"));
+
+	return bIsCookCommandlet;
+}
+#endif
 
 FEditorListener::FEditorListener()
 {

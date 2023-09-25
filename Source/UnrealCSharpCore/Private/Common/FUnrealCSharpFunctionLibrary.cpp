@@ -8,6 +8,7 @@
 #include "Mixin/CSharpEnum.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "UEVersion.h"
 
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {

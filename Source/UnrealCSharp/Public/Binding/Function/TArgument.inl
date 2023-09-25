@@ -247,6 +247,15 @@ struct TArgument<T,
 	using TSingleArgument<T>::TSingleArgument;
 };
 
+#if UE_OBJECT_PTR
+template <typename T>
+struct TArgument<T, typename TEnableIf<TIsTObjectPtr<typename TDecay<T>::Type>::Value>::Type> :
+	TSingleArgument<T>
+{
+	using TSingleArgument<T>::TSingleArgument;
+};
+#endif
+
 template <typename T>
 #if UE_T_IS_SAME
 struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FName>::Value>::Type> :

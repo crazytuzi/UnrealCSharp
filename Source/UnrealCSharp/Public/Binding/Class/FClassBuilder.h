@@ -80,7 +80,7 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod,
 FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod, const TArray<FString>& InParamNames)
 #endif
 {
-	auto FunctionPointer = TFunctionPointer(InMethod);
+	auto FunctionPointer = TFunctionPointer<decltype(InMethod)>(InMethod);
 
 #if WITH_FUNCTION_INFO
 	return Function(InName,
@@ -104,9 +104,9 @@ FClassBuilder& FClassBuilder::Property(const FString& InName, T InGetMethod,
 FClassBuilder& FClassBuilder::Property(const FString& InName, T InGetMethod, U InSetMethod)
 #endif
 {
-	auto GetFunctionPointer = TFunctionPointer(InGetMethod);
+	auto GetFunctionPointer = TFunctionPointer<decltype(InGetMethod)>(InGetMethod);
 
-	auto SetFunctionPointer = TFunctionPointer(InSetMethod);
+	auto SetFunctionPointer = TFunctionPointer<decltype(InSetMethod)>(InSetMethod);
 
 #if WITH_PROPERTY_INFO
 	if (InTypeInfo != nullptr)

@@ -47,7 +47,8 @@ public class UnrealCSharpEditor : ModuleRules
 				"Compiler",
 				"MainFrame", 
 				"UnrealCSharpCore", 
-				"UMGEditor"
+				"UMGEditor",
+				"CrossVersion"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

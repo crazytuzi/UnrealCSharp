@@ -182,6 +182,14 @@ struct TPropertyBuilder<Result Class::*, Member,
 {
 };
 
+#if UE_OBJECT_PTR
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsTObjectPtr<Result>::Value>::Type> :
+	TPropertyInfoBuilder<Class, Result, Member>
+{
+};
+#endif
+
 template <typename Class, typename Result, Result Class::* Member>
 #if UE_T_IS_SAME
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, FName>::Value>::Type> :

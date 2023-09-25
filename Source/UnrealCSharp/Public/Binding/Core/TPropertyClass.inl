@@ -212,6 +212,17 @@ struct TPropertyClass<T, typename TEnableIf<TIsDerivedFrom<typename TRemovePoint
 	}
 };
 
+#if UE_OBJECT_PTR
+template <typename T>
+struct TPropertyClass<T, typename TEnableIf<TIsTObjectPtr<T>::Value, T>::Type>
+{
+	static MonoClass* Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+#endif
+
 template <typename T>
 #if UE_T_IS_SAME
 struct TPropertyClass<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>

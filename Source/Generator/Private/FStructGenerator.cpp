@@ -173,7 +173,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 		auto PropertyName = PropertyIterator->GetName();
 
-		PropertyNames.Add({
+		PropertyNames.Add(TPair<FString, FString>{
 			FString::Printf(TEXT(
 				"__%s"
 			),

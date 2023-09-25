@@ -143,7 +143,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		auto PropertyName = PropertyIterator->GetName();
 
-		PropertyNames.Add({
+		PropertyNames.Add(TPair<FString, FString>{
 			FString::Printf(TEXT(
 				"__%s"
 			),
@@ -498,7 +498,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		FunctionNames.Add({
+		FunctionNames.Add(TPair<FString, FString>{
 			FString::Printf(TEXT(
 				"__%s"
 			),

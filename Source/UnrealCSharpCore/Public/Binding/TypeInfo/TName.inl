@@ -182,6 +182,17 @@ struct TName<T, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<T>::Ty
 	}
 };
 
+#if UE_OBJECT_PTR
+template <typename T>
+struct TName<T, typename TEnableIf<TIsTObjectPtr<T>::Value, T>::Type>
+{
+	static FString Get()
+	{
+		return FUnrealCSharpFunctionLibrary::GetFullClass(T::ElementType::StaticClass());
+	}
+};
+#endif
+
 template <typename T>
 #if UE_T_IS_SAME
 struct TName<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type>
