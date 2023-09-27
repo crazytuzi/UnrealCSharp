@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
-#include "GarbageCollection/TMonoObjectMapping.inl"
 #include "TAddress.inl"
 #include "TValueMapping.inl"
 #include "mono/metadata/object-forward.h"

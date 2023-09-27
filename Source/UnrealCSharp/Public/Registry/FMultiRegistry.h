@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
-#include "GarbageCollection/TMonoObjectMapping.inl"
 #include "Template/TIsTWeakObjectPtr.inl"
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
