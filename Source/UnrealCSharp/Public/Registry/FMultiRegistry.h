@@ -8,26 +8,22 @@
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsTScriptInterface.inl"
 #include "Template/TIsTSubclassOf.inl"
+#include "TAddress.inl"
+#include "TValueMapping.inl"
 
 class FMultiRegistry
 {
 public:
 	template <typename T, template<typename...> class IsType>
-	struct TMultiAddress
+	struct TMultiAddress : TAddress<T, IsType>
 	{
-		typedef T Type;
-
-		void* Address;
-
-		Type* MultiValue;
+		TMultiAddress(void* InAddress, T* InValue, const bool InNeedFree):
+			TAddress<T, IsType>(InAddress, InValue),
+			bNeedFree(InNeedFree)
+		{
+		}
 
 		bool bNeedFree;
-
-		template <typename U>
-		struct TIsType
-		{
-			enum { Value = IsType<U>::Value };
-		};
 	};
 
 	typedef TMultiAddress<TSubclassOf<UObject>, TIsTSubclassOf> FSubclassOfAddress;
@@ -47,23 +43,9 @@ public:
 	{
 	};
 
-	template <typename R, R, typename U, typename P, P, typename Q, Q>
+	template <typename R, R, typename U, typename V, typename P, P, typename Q, Q>
 	struct TMultiRegistryImplementation
 	{
-	};
-
-	template <typename T>
-	struct TMultiMapping
-	{
-		typedef T Key;
-
-		typedef TGarbageCollectionHandleMapping<T> GarbageCollectionHandle2Address;
-
-		typedef typename TGarbageCollectionHandleMapping<Key>::KeyType Value;
-
-		typedef TMap<void*, Value> Address2GarbageCollectionHandle;
-
-		typedef TMonoObjectMapping<T> MonoObject2Address;
 	};
 
 public:
@@ -77,43 +59,51 @@ public:
 	void Deinitialize();
 
 private:
-	TMultiMapping<FSubclassOfAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2SubclassOfAddress;
+	TValueMapping<void*, FSubclassOfAddress>::GarbageCollectionHandle2Value GarbageCollectionHandle2SubclassOfAddress;
 
-	TMultiMapping<FSubclassOfAddress>::Address2GarbageCollectionHandle SubclassOfAddress2GarbageCollectionHandle;
+	TValueMapping<void*, FSubclassOfAddress>::Value2GarbageCollectionHandle SubclassOfAddress2GarbageCollectionHandle;
 
-	TMultiMapping<FSubclassOfAddress>::MonoObject2Address MonoObject2SubclassOfAddress;
+	TValueMapping<void*, FSubclassOfAddress>::MonoObject2Value MonoObject2SubclassOfAddress;
 
-	TMultiMapping<FWeakObjectPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2WeakObjectPtrAddress;
+	TValueMapping<void*, FWeakObjectPtrAddress>::GarbageCollectionHandle2Value
+	GarbageCollectionHandle2WeakObjectPtrAddress;
 
-	TMultiMapping<FWeakObjectPtrAddress>::Address2GarbageCollectionHandle WeakObjectPtrAddress2GarbageCollectionHandle;
+	TValueMapping<void*, FWeakObjectPtrAddress>::Value2GarbageCollectionHandle
+	WeakObjectPtrAddress2GarbageCollectionHandle;
 
-	TMultiMapping<FWeakObjectPtrAddress>::MonoObject2Address MonoObject2WeakObjectPtrAddress;
+	TValueMapping<void*, FWeakObjectPtrAddress>::MonoObject2Value MonoObject2WeakObjectPtrAddress;
 
-	TMultiMapping<FLazyObjectPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2LazyObjectPtrAddress;
+	TValueMapping<void*, FLazyObjectPtrAddress>::GarbageCollectionHandle2Value
+	GarbageCollectionHandle2LazyObjectPtrAddress;
 
-	TMultiMapping<FLazyObjectPtrAddress>::Address2GarbageCollectionHandle LazyObjectPtrAddress2GarbageCollectionHandle;
+	TValueMapping<void*, FLazyObjectPtrAddress>::Value2GarbageCollectionHandle
+	LazyObjectPtrAddress2GarbageCollectionHandle;
 
-	TMultiMapping<FLazyObjectPtrAddress>::MonoObject2Address MonoObject2LazyObjectPtrAddress;
+	TValueMapping<void*, FLazyObjectPtrAddress>::MonoObject2Value MonoObject2LazyObjectPtrAddress;
 
-	TMultiMapping<FSoftObjectPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2SoftObjectPtrAddress;
+	TValueMapping<void*, FSoftObjectPtrAddress>::GarbageCollectionHandle2Value
+	GarbageCollectionHandle2SoftObjectPtrAddress;
 
-	TMultiMapping<FSoftObjectPtrAddress>::Address2GarbageCollectionHandle SoftObjectPtrAddress2GarbageCollectionHandle;
+	TValueMapping<void*, FSoftObjectPtrAddress>::Value2GarbageCollectionHandle
+	SoftObjectPtrAddress2GarbageCollectionHandle;
 
-	TMultiMapping<FSoftObjectPtrAddress>::MonoObject2Address MonoObject2SoftObjectPtrAddress;
+	TValueMapping<void*, FSoftObjectPtrAddress>::MonoObject2Value MonoObject2SoftObjectPtrAddress;
 
-	TMultiMapping<FScriptInterfaceAddress>::GarbageCollectionHandle2Address
+	TValueMapping<void*, FScriptInterfaceAddress>::GarbageCollectionHandle2Value
 	GarbageCollectionHandle2ScriptInterfaceAddress;
 
-	TMultiMapping<FScriptInterfaceAddress>::Address2GarbageCollectionHandle
+	TValueMapping<void*, FScriptInterfaceAddress>::Value2GarbageCollectionHandle
 	ScriptInterfaceAddress2GarbageCollectionHandle;
 
-	TMultiMapping<FScriptInterfaceAddress>::MonoObject2Address MonoObject2ScriptInterfaceAddress;
+	TValueMapping<void*, FScriptInterfaceAddress>::MonoObject2Value MonoObject2ScriptInterfaceAddress;
 
-	TMultiMapping<FSoftClassPtrAddress>::GarbageCollectionHandle2Address GarbageCollectionHandle2SoftClassPtrAddress;
+	TValueMapping<void*, FSoftClassPtrAddress>::GarbageCollectionHandle2Value
+	GarbageCollectionHandle2SoftClassPtrAddress;
 
-	TMultiMapping<FSoftClassPtrAddress>::Address2GarbageCollectionHandle SoftClassPtrAddress2GarbageCollectionHandle;
+	TValueMapping<void*, FSoftClassPtrAddress>::Value2GarbageCollectionHandle
+	SoftClassPtrAddress2GarbageCollectionHandle;
 
-	TMultiMapping<FSoftClassPtrAddress>::MonoObject2Address MonoObject2SoftClassPtrAddress;
+	TValueMapping<void*, FSoftClassPtrAddress>::MonoObject2Value MonoObject2SoftClassPtrAddress;
 };
 
 #include "FMultiRegistry.inl"
