@@ -15,10 +15,10 @@ class FMultiRegistry
 {
 public:
 	template <typename T, template<typename...> class IsType>
-	struct TMultiAddress : TAddress<T, IsType>
+	struct TMultiAddress : TTypeAddress<T, IsType>
 	{
-		TMultiAddress(void* InAddress, T* InValue, const bool InNeedFree):
-			TAddress<T, IsType>(InAddress, InValue),
+		TMultiAddress(void* InAddress, T InValue, const bool InNeedFree):
+			TTypeAddress<T, IsType>(InAddress, InValue),
 			bNeedFree(InNeedFree)
 		{
 		}
@@ -26,17 +26,17 @@ public:
 		bool bNeedFree;
 	};
 
-	typedef TMultiAddress<TSubclassOf<UObject>, TIsTSubclassOf> FSubclassOfAddress;
+	typedef TMultiAddress<TSubclassOf<UObject>*, TIsTSubclassOf> FSubclassOfAddress;
 
-	typedef TMultiAddress<TWeakObjectPtr<UObject>, TIsTWeakObjectPtr> FWeakObjectPtrAddress;
+	typedef TMultiAddress<TWeakObjectPtr<UObject>*, TIsTWeakObjectPtr> FWeakObjectPtrAddress;
 
-	typedef TMultiAddress<TLazyObjectPtr<UObject>, TIsTLazyObjectPtr> FLazyObjectPtrAddress;
+	typedef TMultiAddress<TLazyObjectPtr<UObject>*, TIsTLazyObjectPtr> FLazyObjectPtrAddress;
 
-	typedef TMultiAddress<TSoftObjectPtr<UObject>, TIsTSoftObjectPtr> FSoftObjectPtrAddress;
+	typedef TMultiAddress<TSoftObjectPtr<UObject>*, TIsTSoftObjectPtr> FSoftObjectPtrAddress;
 
-	typedef TMultiAddress<TScriptInterface<IInterface>, TIsTScriptInterface> FScriptInterfaceAddress;
+	typedef TMultiAddress<TScriptInterface<IInterface>*, TIsTScriptInterface> FScriptInterfaceAddress;
 
-	typedef TMultiAddress<TSoftClassPtr<UObject>, TIsTSoftClassPtr> FSoftClassPtrAddress;
+	typedef TMultiAddress<TSoftClassPtr<UObject>*, TIsTSoftClassPtr> FSoftClassPtrAddress;
 
 	template <typename T, typename U = T>
 	struct TMultiRegistry

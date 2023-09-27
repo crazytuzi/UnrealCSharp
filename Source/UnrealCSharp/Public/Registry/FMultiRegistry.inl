@@ -22,19 +22,19 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 		MonoObject2ValueMember
 	>
 {
-	static typename ValueType::Type* GetMulti(Class* InRegistry,
-	                                          const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static typename ValueType::Type GetMulti(Class* InRegistry,
+	                                         const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		const auto FoundAddress = (InRegistry->*GarbageCollectionHandle2ValueMember).Find(InGarbageCollectionHandle);
 
-		return FoundAddress != nullptr ? static_cast<typename ValueType::Type*>(FoundAddress->Value) : nullptr;
+		return FoundAddress != nullptr ? static_cast<typename ValueType::Type>(FoundAddress->Value) : nullptr;
 	}
 
-	static typename ValueType::Type* GetMulti(Class* InRegistry, const MonoObject* InMonoObject)
+	static typename ValueType::Type GetMulti(Class* InRegistry, const MonoObject* InMonoObject)
 	{
 		const auto FoundAddress = (InRegistry->*MonoObject2ValueMember).Find(InMonoObject);
 
-		return FoundAddress != nullptr ? static_cast<typename ValueType::Type*>(FoundAddress->Value) : nullptr;
+		return FoundAddress != nullptr ? static_cast<typename ValueType::Type>(FoundAddress->Value) : nullptr;
 	}
 
 	static MonoObject* GetObject(Class* InRegistry, const void* InAddress)
@@ -54,11 +54,11 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 
 		(InRegistry->*GarbageCollectionHandle2ValueMember).Add(
 			GarbageCollectionHandle,
-			ValueType(nullptr, static_cast<typename ValueType::Type*>(InValue), bNeedFree));
+			ValueType(nullptr, static_cast<typename ValueType::Type>(InValue), bNeedFree));
 
 		(InRegistry->*MonoObject2ValueMember).Add(
 			InMonoObject,
-			ValueType(nullptr, static_cast<typename ValueType::Type*>(InValue), bNeedFree));
+			ValueType(nullptr, static_cast<typename ValueType::Type>(InValue), bNeedFree));
 
 		return true;
 	}

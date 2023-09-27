@@ -1,17 +1,11 @@
 #pragma once
 
-template <typename T, template<typename...> class IsType>
+template <typename T>
 struct TAddress
 {
 	typedef T Type;
 
-	template <typename U>
-	struct TIsType
-	{
-		enum { value = IsType<U>::Value };
-	};
-
-	TAddress(void* InAddress, Type* InValue):
+	TAddress(void* InAddress, Type InValue):
 		Address(InAddress),
 		Value(InValue)
 	{
@@ -19,5 +13,17 @@ struct TAddress
 
 	void* Address;
 
-	Type* Value;
+	Type Value;
+};
+
+template <typename T, template<typename...> class IsType>
+struct TTypeAddress : TAddress<T>
+{
+	template <typename U>
+	struct TIsType
+	{
+		enum { value = IsType<U>::Value };
+	};
+
+	using TAddress<T>::TAddress;
 };
