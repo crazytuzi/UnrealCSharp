@@ -2,17 +2,14 @@
 
 #include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
 #include "GarbageCollection/TMonoObjectMapping.inl"
+#include "TAddress.inl"
+#include "TValueMapping.inl"
 #include "mono/metadata/object-forward.h"
 
-struct FStructAddressBase
+struct FStructAddressBase : TAddress<TWeakObjectPtr<UScriptStruct>>
 {
-	TWeakObjectPtr<UScriptStruct> ScriptStruct;
-
-	void* Address;
-
-	FStructAddressBase(UScriptStruct* InScriptStruct, void* InAddress):
-		ScriptStruct(InScriptStruct),
-		Address(InAddress)
+	FStructAddressBase(void* InAddress, UScriptStruct* InScriptStruct):
+		TAddress(InAddress, InScriptStruct)
 	{
 	}
 };
@@ -28,8 +25,8 @@ private:
 	{
 		bool bNeedFree;
 
-		FStructAddress(UScriptStruct* InScriptStruct, void* InAddress, const bool InbNeedFree):
-			FStructAddressBase(InScriptStruct, InAddress),
+		FStructAddress(void* InAddress, UScriptStruct* InScriptStruct, const bool InbNeedFree):
+			FStructAddressBase(InAddress, InScriptStruct),
 			bNeedFree(InbNeedFree)
 		{
 		}
@@ -72,11 +69,13 @@ public:
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
-	TGarbageCollectionHandleMapping<FStructAddress> GarbageCollectionHandle2StructAddress;
+	TValueMapping<FStructAddressBase, FStructAddress>::GarbageCollectionHandle2Value
+	GarbageCollectionHandle2StructAddress;
 
-	TMap<FStructAddressBase, FGarbageCollectionHandle> StructAddress2GarbageCollectionHandle;
+	TValueMapping<FStructAddressBase, FStructAddress>::Value2GarbageCollectionHandle
+	StructAddress2GarbageCollectionHandle;
 
-	TMonoObjectMapping<FStructAddress> MonoObject2StructAddress;
+	TValueMapping<FStructAddressBase, FStructAddress>::MonoObject2Value MonoObject2StructAddress;
 };
 
 #include "FStructRegistry.inl"

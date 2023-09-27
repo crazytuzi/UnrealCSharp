@@ -24,11 +24,11 @@ void FStructRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			if (Pair.Value.ScriptStruct.IsValid())
+			if (Pair.Value.Value.IsValid())
 			{
-				if (!(Pair.Value.ScriptStruct->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
+				if (!(Pair.Value.Value->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
 				{
-					Pair.Value.ScriptStruct->DestroyStruct(Pair.Value.Address);
+					Pair.Value.Value->DestroyStruct(Pair.Value.Address);
 				}
 
 				FMemory::Free(Pair.Value.Address);
@@ -63,7 +63,7 @@ void* FStructRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageColle
 {
 	if (const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InGarbageCollectionHandle))
 	{
-		InStruct = FoundStructAddress->ScriptStruct.Get();
+		InStruct = FoundStructAddress->Value.Get();
 
 		return FoundStructAddress->Address;
 	}
@@ -75,7 +75,7 @@ void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InSt
 {
 	if (const auto FoundStructAddress = MonoObject2StructAddress.Find(InMonoObject))
 	{
-		InStruct = FoundStructAddress->ScriptStruct.Get();
+		InStruct = FoundStructAddress->Value.Get();
 
 		return FoundStructAddress->Address;
 	}
@@ -86,7 +86,7 @@ void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InSt
 MonoObject* FStructRegistry::GetObject(UScriptStruct* InScriptStruct, const void* InStruct)
 {
 	const auto FoundGarbageCollectionHandle = StructAddress2GarbageCollectionHandle.Find({
-		InScriptStruct, const_cast<void*>(InStruct)
+		const_cast<void*>(InStruct), InScriptStruct
 	});
 
 	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
@@ -106,7 +106,7 @@ FGarbageCollectionHandle FStructRegistry::GetGarbageCollectionHandle(UScriptStru
                                                                      const void* InStruct)
 {
 	const auto FoundGarbageCollectionHandle = StructAddress2GarbageCollectionHandle.Find({
-		InScriptStruct, const_cast<void*>(InStruct)
+		const_cast<void*>(InStruct), InScriptStruct
 	});
 
 	return FoundGarbageCollectionHandle != nullptr ? *FoundGarbageCollectionHandle : FGarbageCollectionHandle();
@@ -118,17 +118,17 @@ bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* In
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
 	StructAddress2GarbageCollectionHandle.Add(
-		FStructAddressBase{InScriptStruct, const_cast<void*>(InStruct)}, GarbageCollectionHandle);
+		FStructAddressBase{const_cast<void*>(InStruct), InScriptStruct}, GarbageCollectionHandle);
 
 	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
-		                                          InScriptStruct,
 		                                          const_cast<void*>(InStruct),
+		                                          InScriptStruct,
 		                                          bNeedFree
 	                                          });
 
 	MonoObject2StructAddress.Add(InMonoObject, {
-		                             InScriptStruct,
 		                             const_cast<void*>(InStruct),
+		                             InScriptStruct,
 		                             bNeedFree
 	                             });
 
@@ -141,17 +141,17 @@ bool FStructRegistry::AddReference(const FGarbageCollectionHandle& InOwner, UScr
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
 
 	StructAddress2GarbageCollectionHandle.Add(
-		FStructAddressBase{InScriptStruct, const_cast<void*>(InStruct)}, GarbageCollectionHandle);
+		FStructAddressBase{const_cast<void*>(InStruct), InScriptStruct}, GarbageCollectionHandle);
 
 	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
-		                                          InScriptStruct,
 		                                          const_cast<void*>(InStruct),
+		                                          InScriptStruct,
 		                                          false
 	                                          });
 
 	MonoObject2StructAddress.Add(InMonoObject, {
-		                             InScriptStruct,
 		                             const_cast<void*>(InStruct),
+		                             InScriptStruct,
 		                             false
 	                             });
 
@@ -166,16 +166,16 @@ bool FStructRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageC
 		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(InGarbageCollectionHandle);
 
 		StructAddress2GarbageCollectionHandle.Remove({
-			FoundStructAddress->ScriptStruct.Get(), FoundStructAddress->Address
+			FoundStructAddress->Address, FoundStructAddress->Value.Get()
 		});
 
 		if (FoundStructAddress->bNeedFree)
 		{
-			if (FoundStructAddress->ScriptStruct.IsValid())
+			if (FoundStructAddress->Value.IsValid())
 			{
-				if (!(FoundStructAddress->ScriptStruct->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
+				if (!(FoundStructAddress->Value->StructFlags & (STRUCT_IsPlainOldData | STRUCT_NoDestructor)))
 				{
-					FoundStructAddress->ScriptStruct->DestroyStruct(FoundStructAddress->Address);
+					FoundStructAddress->Value->DestroyStruct(FoundStructAddress->Address);
 				}
 
 				FMemory::Free(FoundStructAddress->Address);
