@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
-#include "GarbageCollection/TMonoObjectMapping.inl"
+#include "TValueMapping.inl"
 
 struct FBindingAddressWrapper
 {
@@ -81,11 +80,11 @@ public:
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
-	TGarbageCollectionHandleMapping<FBindingAddress> GarbageCollectionHandle2BindingAddress;
+	TValueMapping<void*, FBindingAddress>::GarbageCollectionHandle2Value GarbageCollectionHandle2BindingAddress;
 
-	TMap<void*, FGarbageCollectionHandle> BindingAddress2GarbageCollectionHandle;
+	TValueMapping<void*, FBindingAddress>::Value2GarbageCollectionHandle BindingAddress2GarbageCollectionHandle;
 
-	TMonoObjectMapping<FBindingAddress> MonoObject2BindingAddress;
+	TValueMapping<void*, FBindingAddress>::MonoObject2Value MonoObject2BindingAddress;
 };
 
 #include "FBindingRegistry.inl"

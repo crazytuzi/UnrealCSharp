@@ -23,9 +23,9 @@ private:
 	{
 		bool bNeedFree;
 
-		FStructAddress(void* InAddress, UScriptStruct* InScriptStruct, const bool InbNeedFree):
+		FStructAddress(void* InAddress, UScriptStruct* InScriptStruct, const bool InNeedFree):
 			FStructAddressBase(InAddress, InScriptStruct),
-			bNeedFree(InbNeedFree)
+			bNeedFree(InNeedFree)
 		{
 		}
 	};

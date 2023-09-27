@@ -37,9 +37,7 @@ void FBindingRegistry::Deinitialize()
 
 MonoObject* FBindingRegistry::GetObject(const void* InObject)
 {
-	const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find({
-		const_cast<void*>(InObject)
-	});
+	const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find(InObject);
 
 	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
 }
