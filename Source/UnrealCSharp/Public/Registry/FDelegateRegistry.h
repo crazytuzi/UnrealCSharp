@@ -1,24 +1,18 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
 #include "Reflection/Delegate/FDelegateBaseHelper.h"
+#include "TAddress.inl"
+#include "TValueMapping.inl"
 #include "mono/metadata/object-forward.h"
-
-struct FDelegateAddress
-{
-	void* Address;
-
-	FDelegateBaseHelper* DelegateBaseHelper;
-};
-
-static bool operator==(const FDelegateAddress& A, const FDelegateAddress& B);
-
-static bool operator==(const FDelegateAddress& A, const void* B);
-
-static uint32 GetTypeHash(const FDelegateAddress& InDelegateAddress);
 
 class FDelegateRegistry
 {
+private:
+	struct FDelegateAddress : TAddress<FDelegateBaseHelper*>
+	{
+		using TAddress::TAddress;
+	};
+
 public:
 	FDelegateRegistry();
 
@@ -43,11 +37,9 @@ public:
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
-	TGarbageCollectionHandleMapping<FDelegateAddress> GarbageCollectionHandle2DelegateAddress;
+	TValueMapping<void*, FDelegateAddress>::GarbageCollectionHandle2Value GarbageCollectionHandle2DelegateAddress;
 
-	TMap<FDelegateAddress, FGarbageCollectionHandle> DelegateAddress2GarbageCollectionHandle;
-
-	TMap<void*, FGarbageCollectionHandle> Address2GarbageCollectionHandle;
+	TValueMapping<void*, FDelegateAddress>::Value2GarbageCollectionHandle Address2GarbageCollectionHandle;
 };
 
 #include "FDelegateRegistry.inl"

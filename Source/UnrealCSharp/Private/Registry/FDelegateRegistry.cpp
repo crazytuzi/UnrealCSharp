@@ -20,19 +20,17 @@ void FDelegateRegistry::Deinitialize()
 {
 	for (auto& Pair : GarbageCollectionHandle2DelegateAddress.Get())
 	{
-		if (Pair.Value.DelegateBaseHelper != nullptr)
+		if (Pair.Value.Value != nullptr)
 		{
-			delete Pair.Value.DelegateBaseHelper;
+			delete Pair.Value.Value;
 
-			Pair.Value.DelegateBaseHelper = nullptr;
+			Pair.Value.Value = nullptr;
 		}
 
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
 	GarbageCollectionHandle2DelegateAddress.Empty();
-
-	DelegateAddress2GarbageCollectionHandle.Empty();
 
 	Address2GarbageCollectionHandle.Empty();
 }
@@ -51,9 +49,6 @@ bool FDelegateRegistry::AddReference(void* InAddress, void* InDelegate, MonoObje
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-	DelegateAddress2GarbageCollectionHandle.Add(
-		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
-
 	Address2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
 
 	GarbageCollectionHandle2DelegateAddress.Add(GarbageCollectionHandle,
@@ -68,9 +63,6 @@ bool FDelegateRegistry::AddReference(const FGarbageCollectionHandle& InOwner, vo
                                      MonoObject* InMonoObject)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
-
-	DelegateAddress2GarbageCollectionHandle.Add(
-		FDelegateAddress{InAddress, static_cast<FDelegateBaseHelper*>(InDelegate)}, GarbageCollectionHandle);
 
 	Address2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
 
@@ -88,14 +80,12 @@ bool FDelegateRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbag
 	{
 		Address2GarbageCollectionHandle.Remove(FoundDelegateAddress->Address);
 
-		if (FoundDelegateAddress->DelegateBaseHelper != nullptr)
+		if (FoundDelegateAddress->Value != nullptr)
 		{
-			delete FoundDelegateAddress->DelegateBaseHelper;
+			delete FoundDelegateAddress->Value;
 
-			FoundDelegateAddress->DelegateBaseHelper = nullptr;
+			FoundDelegateAddress->Value = nullptr;
 		}
-
-		DelegateAddress2GarbageCollectionHandle.Remove(*FoundDelegateAddress);
 
 		GarbageCollectionHandle2DelegateAddress.Remove(InGarbageCollectionHandle);
 
