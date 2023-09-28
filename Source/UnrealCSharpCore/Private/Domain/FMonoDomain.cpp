@@ -44,6 +44,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 	if (Domain == nullptr)
 	{
+		mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
+
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
 		Domain = mono_jit_init("UnrealCSharp");
