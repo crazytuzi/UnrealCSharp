@@ -6,9 +6,13 @@
 template <typename Key, typename Value = Key>
 struct TValueMapping
 {
-	typedef TGarbageCollectionHandleMapping<Value> GarbageCollectionHandle2Value;
+	typedef Key KeyType;
 
-	typedef TMap<Key, typename TGarbageCollectionHandleMapping<Value>::KeyType> Value2GarbageCollectionHandle;
+	typedef Value ValueType;
 
-	typedef TMonoObjectMapping<Value> MonoObject2Value;
+	typedef TGarbageCollectionHandleMapping<ValueType> GarbageCollectionHandle2Value;
+
+	typedef TMap<KeyType, typename GarbageCollectionHandle2Value::KeyType> Value2GarbageCollectionHandle;
+
+	typedef TMonoObjectMapping<ValueType> MonoObject2Value;
 };

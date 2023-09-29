@@ -53,7 +53,7 @@ void FArrayImplementation::Array_UnRegisterImplementation(const FGarbageCollecti
 {
 	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InGarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FArrayHelper>(InGarbageCollectionHandle);
 	});
 }
 

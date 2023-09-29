@@ -2,7 +2,6 @@
 
 #include "Domain/FDomain.h"
 #include "Registry/FClassRegistry.h"
-#include "Registry/FContainerRegistry.h"
 #include "Registry/FMultiRegistry.h"
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FReferenceRegistry.h"
@@ -125,14 +124,18 @@ public:
 	template <typename T>
 	auto GetContainer(const MonoObject* InMonoObject) const;
 
-	MonoObject* GetContainerObject(const void* InAddress) const;
+	template <typename T>
+	auto GetContainerObject(const void* InAddress) const;
 
-	bool AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const;
+	template <typename T>
+	auto AddContainerReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
 
-	bool AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
+	template <typename T>
+	auto AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
 	                           MonoObject* InMonoObject) const;
 
-	bool RemoveContainerReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+	template <typename T>
+	auto RemoveContainerReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 public:
 	template <typename T>
@@ -275,7 +278,7 @@ private:
 	TArray<FWeakObjectPtr> AsyncLoadingObjectArray;
 
 private:
-	FCSharpBind* CSharpBind;
+	class FCSharpBind* CSharpBind;
 
 	FClassRegistry* ClassRegistry;
 
@@ -285,7 +288,7 @@ private:
 
 	FStructRegistry* StructRegistry;
 
-	FContainerRegistry* ContainerRegistry;
+	class FContainerRegistry* ContainerRegistry;
 
 	FDelegateRegistry* DelegateRegistry;
 

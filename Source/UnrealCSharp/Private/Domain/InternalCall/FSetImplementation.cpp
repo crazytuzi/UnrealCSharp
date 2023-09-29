@@ -37,7 +37,7 @@ void FSetImplementation::Set_UnRegisterImplementation(const FGarbageCollectionHa
 {
 	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference(InGarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FSetHelper>(InGarbageCollectionHandle);
 	});
 }
 

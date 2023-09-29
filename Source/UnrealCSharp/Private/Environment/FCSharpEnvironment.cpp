@@ -1,4 +1,5 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
+#include "Registry/FContainerRegistry.h"
 #include "Registry/FCSharpBind.h"
 #include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -471,29 +472,6 @@ FGarbageCollectionHandle FCSharpEnvironment::GetGarbageCollectionHandle(
 			       ? StructRegistry->GetGarbageCollectionHandle(InProperty->GetOwner<UScriptStruct>(), Owner)
 			       : FGarbageCollectionHandle();
 	}
-}
-
-MonoObject* FCSharpEnvironment::GetContainerObject(const void* InAddress) const
-{
-	return ContainerRegistry != nullptr ? ContainerRegistry->GetObject(InAddress) : nullptr;
-}
-
-bool FCSharpEnvironment::AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const
-{
-	return ContainerRegistry != nullptr ? ContainerRegistry->AddReference(InAddress, InContainer, InMonoObject) : false;
-}
-
-bool FCSharpEnvironment::AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress,
-                                               void* InContainer, MonoObject* InMonoObject) const
-{
-	return ContainerRegistry != nullptr
-		       ? ContainerRegistry->AddReference(InOwner, InAddress, InContainer, InMonoObject)
-		       : false;
-}
-
-bool FCSharpEnvironment::RemoveContainerReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
-{
-	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InGarbageCollectionHandle) : false;
 }
 
 MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InAddress) const
