@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
+#include "GarbageCollection/TMonoObjectMapping.inl"
 
 struct FBindingAddressWrapper
 {
@@ -65,9 +66,13 @@ public:
 	void Deinitialize();
 
 public:
-	MonoObject* GetObject(const void* InObject);
+	template <typename T>
+	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
-	void* GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	template <typename T>
+	auto GetBinding(const MonoObject* InMonoObject);
+
+	MonoObject* GetObject(const void* InObject);
 
 public:
 	template <typename T>
@@ -79,6 +84,8 @@ private:
 	TGarbageCollectionHandleMapping<FBindingAddress> GarbageCollectionHandle2BindingAddress;
 
 	TMap<void*, FGarbageCollectionHandle> BindingAddress2GarbageCollectionHandle;
+
+	TMonoObjectMapping<FBindingAddress> MonoObject2BindingAddress;
 };
 
 #include "FBindingRegistry.inl"

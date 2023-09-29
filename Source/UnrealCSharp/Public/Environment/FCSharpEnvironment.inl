@@ -178,7 +178,15 @@ template <typename T>
 auto FCSharpEnvironment::GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return BindingRegistry != nullptr
-		       ? static_cast<T*>(BindingRegistry->GetObject(InGarbageCollectionHandle))
+		       ? BindingRegistry->GetBinding<T>(InGarbageCollectionHandle)
+		       : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::GetBinding(const MonoObject* InMonoObject) const
+{
+	return BindingRegistry != nullptr
+		       ? BindingRegistry->GetBinding<T>(InMonoObject)
 		       : nullptr;
 }
 

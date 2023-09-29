@@ -152,6 +152,17 @@ struct TNameSpace<T, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<T
 	}
 };
 
+#if UE_OBJECT_PTR
+template <typename T>
+struct TNameSpace<T, typename TEnableIf<TIsTObjectPtr<T>::Value, T>::Type>
+{
+	static TArray<FString> Get()
+	{
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(T::ElementType::StaticClass())};
+	}
+};
+#endif
+
 template <typename T>
 #if UE_T_IS_SAME
 struct TNameSpace<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type> final :

@@ -19,17 +19,35 @@ struct FRegisterWorld
 static FRegisterWorld RegisterWorld;
 
 void FWorldImplementation::World_SpawnActorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                          const FGarbageCollectionHandle Class,
-                                                          const MonoObject* Transform, MonoObject** OutValue)
+                                                          const FGarbageCollectionHandle InClass,
+                                                          const MonoObject* InTransform,
+                                                          const FGarbageCollectionHandle InOwner,
+                                                          const FGarbageCollectionHandle InInstigator,
+                                                          uint8 InCollisionHandlingOverride, MonoObject** OutValue)
 {
 	if (const auto FoundWorld = FCSharpEnvironment::GetEnvironment().GetObject<UWorld>(InGarbageCollectionHandle))
 	{
-		const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(Class);
+		const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
 
-		const auto FoundTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-			UScriptStruct, FTransform>(Transform);
+		const auto FoundTransform = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(
+			InTransform);
 
-		const auto Actor = FoundWorld->SpawnActor(FoundClass, FoundTransform);
+		const auto FoundOwner = FCSharpEnvironment::GetEnvironment().GetObject<AActor>(InOwner);
+
+		const auto FoundInstigator = FCSharpEnvironment::GetEnvironment().GetObject<APawn>(InInstigator);
+
+		const auto SpawnActorCollisionHandlingMethod = static_cast<ESpawnActorCollisionHandlingMethod>(
+			InCollisionHandlingOverride);
+
+		FActorSpawnParameters ActorSpawnParameters;
+
+		ActorSpawnParameters.Owner = FoundOwner;
+
+		ActorSpawnParameters.Instigator = FoundInstigator;
+
+		ActorSpawnParameters.SpawnCollisionHandlingOverride = SpawnActorCollisionHandlingMethod;
+
+		const auto Actor = FoundWorld->SpawnActor<AActor>(FoundClass, *FoundTransform, ActorSpawnParameters);
 
 		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Actor);
 	}

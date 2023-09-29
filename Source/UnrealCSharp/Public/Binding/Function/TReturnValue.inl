@@ -231,6 +231,15 @@ struct TReturnValue<T,
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
+#if UE_OBJECT_PTR
+template <typename T>
+struct TReturnValue<T, typename TEnableIf<TIsTObjectPtr<typename TDecay<T>::Type>::Value>::Type> :
+	TSingleReturnValue<T>
+{
+	using TSingleReturnValue<T>::TSingleReturnValue;
+};
+#endif
+
 template <typename T>
 #if UE_T_IS_SAME
 struct TReturnValue<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FName>::Value>::Type> :
