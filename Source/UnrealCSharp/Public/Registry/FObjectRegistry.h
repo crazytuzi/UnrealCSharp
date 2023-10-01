@@ -6,6 +6,14 @@
 class UNREALCSHARP_API FObjectRegistry
 {
 public:
+	template <typename Key>
+	struct TObjectMapping : TValueMapping<Key>
+	{
+	};
+
+	typedef TObjectMapping<TWeakObjectPtr<const UObject>> FObjectMapping;
+
+public:
 	FObjectRegistry();
 
 	~FObjectRegistry();
@@ -40,9 +48,9 @@ public:
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
-	TValueMapping<TWeakObjectPtr<const UObject>>::GarbageCollectionHandle2Value GarbageCollectionHandle2Object;
+	FObjectMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2Object;
 
-	TValueMapping<TWeakObjectPtr<const UObject>>::Value2GarbageCollectionHandle Object2GarbageCollectionHandleMap;
+	FObjectMapping::FKey2GarbageCollectionHandle Object2GarbageCollectionHandleMap;
 
-	TValueMapping<TWeakObjectPtr<const UObject>>::MonoObject2Value MonoObject2Object;
+	FObjectMapping::FMonoObject2Value MonoObject2Object;
 };

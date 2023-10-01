@@ -2,7 +2,6 @@
 
 #include "Domain/FDomain.h"
 #include "Reflection/Class/FClassDescriptor.h"
-#include "Reflection/Function/FFunctionDescriptor.h"
 
 class FCSharpBind
 {
@@ -26,7 +25,8 @@ public:
 	template <typename T>
 	static auto Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
 
-	static bool Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+	template <typename T>
+	static auto Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	                 MonoReflectionType* InValueReflectionType);
 
 	static bool Bind(FDomain* InDomain, MonoObject* InMonoObject, const FName& InStructName);
@@ -47,7 +47,8 @@ private:
 	template <typename T>
 	static auto BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
 
-	static bool BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+	template <typename T>
+	static auto BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	                               MonoReflectionType* InValueReflectionType);
 
 	static bool BindImplementation(FDomain* InDomain, MonoObject* InMonoObject, const FName& InStructName);

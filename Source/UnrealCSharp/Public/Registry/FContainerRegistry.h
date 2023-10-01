@@ -1,15 +1,15 @@
 ﻿#pragma once
 
-#include "TAddress.inl"
+#include "TValue.inl"
 #include "TValueMapping.inl"
 #include "Reflection/Container/FArrayHelper.h"
 #include "Reflection/Container/FMapHelper.h"
 #include "Reflection/Container/FSetHelper.h"
 
 template <typename T>
-struct TContainerAddress : TAddress<T>
+struct TContainerAddress : TAddressValue<T>
 {
-	using TAddress<T>::TAddress;
+	using TAddressValue<T>::TAddressValue;
 };
 
 typedef TContainerAddress<FArrayHelper*> FArrayHelperAddress;
@@ -33,18 +33,20 @@ static uint32 GetTypeHash(const FSetHelperAddress& InSetHelperAddress);
 class FContainerRegistry
 {
 public:
-	template <typename Key>
+	template <typename Key, typename Address>
 	struct TContainerValueMapping : TValueMapping<Key>
 	{
-		typedef TMap<void*, typename TValueMapping<Key>::GarbageCollectionHandle2Value::KeyType>
-		Address2GarbageCollectionHandle;
+		typedef Address FAddressType;
+
+		typedef TMap<FAddressType, typename TValueMapping<Key>::FGarbageCollectionHandle2Value::KeyType>
+		FAddress2GarbageCollectionHandle;
 	};
 
-	typedef TContainerValueMapping<FArrayHelperAddress> FArrayHelperValueMapping;
+	typedef TContainerValueMapping<FArrayHelperAddress, void*> FArrayHelperValueMapping;
 
-	typedef TContainerValueMapping<FMapHelperAddress> FMapHelperValueMapping;
+	typedef TContainerValueMapping<FMapHelperAddress, void*> FMapHelperValueMapping;
 
-	typedef TContainerValueMapping<FSetHelperAddress> FSetHelperValueMapping;
+	typedef TContainerValueMapping<FSetHelperAddress, void*> FSetHelperValueMapping;
 
 	template <typename T>
 	struct TContainerRegistry
@@ -67,29 +69,29 @@ public:
 	void Deinitialize();
 
 private:
-	FArrayHelperValueMapping::GarbageCollectionHandle2Value GarbageCollectionHandle2ArrayHelperAddress;
+	FArrayHelperValueMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2ArrayHelperAddress;
 
-	FArrayHelperValueMapping::Value2GarbageCollectionHandle ArrayHelperAddress2GarbageCollectionHandle;
+	FArrayHelperValueMapping::FKey2GarbageCollectionHandle ArrayHelperAddress2GarbageCollectionHandle;
 
-	FArrayHelperValueMapping::MonoObject2Value MonoObject2ArrayHelperAddress;
+	FArrayHelperValueMapping::FMonoObject2Value MonoObject2ArrayHelperAddress;
 
-	FArrayHelperValueMapping::Address2GarbageCollectionHandle ArrayAddress2GarbageCollectionHandle;
+	FArrayHelperValueMapping::FAddress2GarbageCollectionHandle ArrayAddress2GarbageCollectionHandle;
 
-	FMapHelperValueMapping::GarbageCollectionHandle2Value GarbageCollectionHandle2MapHelperAddress;
+	FMapHelperValueMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2MapHelperAddress;
 
-	FMapHelperValueMapping::Value2GarbageCollectionHandle MapHelperAddress2GarbageCollectionHandle;
+	FMapHelperValueMapping::FKey2GarbageCollectionHandle MapHelperAddress2GarbageCollectionHandle;
 
-	FMapHelperValueMapping::MonoObject2Value MonoObject2MapHelperAddress;
+	FMapHelperValueMapping::FMonoObject2Value MonoObject2MapHelperAddress;
 
-	FMapHelperValueMapping::Address2GarbageCollectionHandle MapAddress2GarbageCollectionHandle;
+	FMapHelperValueMapping::FAddress2GarbageCollectionHandle MapAddress2GarbageCollectionHandle;
 
-	FSetHelperValueMapping::GarbageCollectionHandle2Value GarbageCollectionHandle2SetHelperAddress;
+	FSetHelperValueMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2SetHelperAddress;
 
-	FSetHelperValueMapping::Value2GarbageCollectionHandle SetHelperAddress2GarbageCollectionHandle;
+	FSetHelperValueMapping::FKey2GarbageCollectionHandle SetHelperAddress2GarbageCollectionHandle;
 
-	FSetHelperValueMapping::MonoObject2Value MonoObject2SetHelperAddress;
+	FSetHelperValueMapping::FMonoObject2Value MonoObject2SetHelperAddress;
 
-	FSetHelperValueMapping::Address2GarbageCollectionHandle SetAddress2GarbageCollectionHandle;
+	FSetHelperValueMapping::FAddress2GarbageCollectionHandle SetAddress2GarbageCollectionHandle;
 };
 
 #include "FContainerRegistry.inl"

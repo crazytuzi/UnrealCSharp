@@ -124,7 +124,7 @@ public:
 	auto GetContainer(const MonoObject* InMonoObject) const;
 
 	template <typename T>
-	auto GetContainerObject(const void* InAddress) const;
+	auto GetContainerObject(void* InAddress) const;
 
 	template <typename T>
 	auto AddContainerReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
@@ -141,7 +141,7 @@ public:
 	auto GetDelegate(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	template <typename T>
-	auto GetDelegateObject(const void* InAddress) const;
+	auto GetDelegateObject(void* InAddress) const;
 
 	template <typename T>
 	auto AddDelegateReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
@@ -187,7 +187,7 @@ public:
 	auto GetMulti(const MonoObject* InMonoObject) const;
 
 	template <typename T>
-	auto GetMultiObject(const void* InAddress) const;
+	auto GetMultiObject(void* InAddress) const;
 
 	template <typename T>
 	auto AddMultiReference(MonoObject* InMonoObject, void* InValue, bool bNeedFree = true) const;
@@ -196,7 +196,7 @@ public:
 	auto RemoveMultiReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 public:
-	MonoObject* GetBinding(const void* InObject) const;
+	MonoObject* GetBinding(void* InObject) const;
 
 	template <typename T>
 	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;

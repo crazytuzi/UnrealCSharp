@@ -22,9 +22,9 @@ void FMultiRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Address);
+			FMemory::Free(Pair.Value.Value);
 
-			Pair.Value.Address = nullptr;
+			Pair.Value.Value = nullptr;
 		}
 	}
 
@@ -40,9 +40,9 @@ void FMultiRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Address);
+			FMemory::Free(Pair.Value.Value);
 
-			Pair.Value.Address = nullptr;
+			Pair.Value.Value = nullptr;
 		}
 	}
 
@@ -58,9 +58,9 @@ void FMultiRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Address);
+			FMemory::Free(Pair.Value.Value);
 
-			Pair.Value.Address = nullptr;
+			Pair.Value.Value = nullptr;
 		}
 	}
 
@@ -76,9 +76,9 @@ void FMultiRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Address);
+			FMemory::Free(Pair.Value.Value);
 
-			Pair.Value.Address = nullptr;
+			Pair.Value.Value = nullptr;
 		}
 	}
 
@@ -94,9 +94,9 @@ void FMultiRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Address);
+			FMemory::Free(Pair.Value.Value);
 
-			Pair.Value.Address = nullptr;
+			Pair.Value.Value = nullptr;
 		}
 	}
 
@@ -112,9 +112,9 @@ void FMultiRegistry::Deinitialize()
 
 		if (Pair.Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Address);
+			FMemory::Free(Pair.Value.Value);
 
-			Pair.Value.Address = nullptr;
+			Pair.Value.Value = nullptr;
 		}
 	}
 

@@ -136,7 +136,7 @@ auto FCSharpEnvironment::GetContainer(const MonoObject* InMonoObject) const
 }
 
 template <typename T>
-auto FCSharpEnvironment::GetContainerObject(const void* InAddress) const
+auto FCSharpEnvironment::GetContainerObject(void* InAddress) const
 {
 	return ContainerRegistry != nullptr
 		       ? FContainerRegistry::TContainerRegistry<T>::GetObject(ContainerRegistry, InAddress)
@@ -180,7 +180,7 @@ auto FCSharpEnvironment::GetDelegate(const FGarbageCollectionHandle& InGarbageCo
 }
 
 template <typename T>
-auto FCSharpEnvironment::GetDelegateObject(const void* InAddress) const
+auto FCSharpEnvironment::GetDelegateObject(void* InAddress) const
 {
 	return DelegateRegistry != nullptr
 		       ? FDelegateRegistry::TDelegateRegistry<T>::GetObject(DelegateRegistry, InAddress)
@@ -231,7 +231,7 @@ auto FCSharpEnvironment::GetMulti(const MonoObject* InMonoObject) const
 }
 
 template <typename T>
-auto FCSharpEnvironment::GetMultiObject(const void* InAddress) const
+auto FCSharpEnvironment::GetMultiObject(void* InAddress) const
 {
 	return MultiRegistry != nullptr
 		       ? FMultiRegistry::TMultiRegistry<T, T>::GetObject(MultiRegistry, InAddress)

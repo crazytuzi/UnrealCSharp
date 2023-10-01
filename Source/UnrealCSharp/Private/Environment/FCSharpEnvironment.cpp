@@ -325,12 +325,6 @@ bool FCSharpEnvironment::Bind(UStruct* InStruct, const bool bNeedMonoClass) cons
 	return FCSharpBind::Bind(Domain, InStruct, bNeedMonoClass);
 }
 
-bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
-                              MonoReflectionType* InValueReflectionType) const
-{
-	return FCSharpBind::Bind(InMonoObject, InKeyReflectionType, InValueReflectionType);
-}
-
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
 {
 	return FCSharpBind::Bind(Domain, InMonoObject, InStructName);
@@ -475,7 +469,7 @@ FGarbageCollectionHandle FCSharpEnvironment::GetGarbageCollectionHandle(
 	}
 }
 
-MonoObject* FCSharpEnvironment::GetBinding(const void* InObject) const
+MonoObject* FCSharpEnvironment::GetBinding(void* InObject) const
 {
 	return BindingRegistry != nullptr ? BindingRegistry->GetObject(InObject) : nullptr;
 }

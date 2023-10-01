@@ -10,9 +10,9 @@ struct TValueMapping
 
 	typedef Value ValueType;
 
-	typedef TGarbageCollectionHandleMapping<ValueType> GarbageCollectionHandle2Value;
+	typedef TGarbageCollectionHandleMapping<ValueType> FGarbageCollectionHandle2Value;
 
-	typedef TMap<KeyType, typename GarbageCollectionHandle2Value::KeyType> Value2GarbageCollectionHandle;
+	typedef TMap<KeyType, typename FGarbageCollectionHandle2Value::KeyType> FKey2GarbageCollectionHandle;
 
-	typedef TMonoObjectMapping<ValueType> MonoObject2Value;
+	typedef TMonoObjectMapping<ValueType> FMonoObject2Value;
 };

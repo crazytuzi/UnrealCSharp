@@ -30,7 +30,7 @@ void FDelegateRegistry::Deinitialize()
 
 	GarbageCollectionHandle2DelegateHelperAddress.Empty();
 
-	DelegateHelperAddress2GarbageCollectionHandle.Empty();
+	DelegateAddress2GarbageCollectionHandle.Empty();
 
 	for (auto& Pair : GarbageCollectionHandle2MulticastDelegateHelperAddress.Get())
 	{
@@ -46,5 +46,5 @@ void FDelegateRegistry::Deinitialize()
 
 	GarbageCollectionHandle2MulticastDelegateHelperAddress.Empty();
 
-	MulticastDelegateHelperAddress2GarbageCollectionHandle.Empty();
+	MulticastDelegateAddress2GarbageCollectionHandle.Empty();
 }

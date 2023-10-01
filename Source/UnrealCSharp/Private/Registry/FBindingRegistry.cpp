@@ -35,7 +35,7 @@ void FBindingRegistry::Deinitialize()
 	MonoObject2BindingAddress.Empty();
 }
 
-MonoObject* FBindingRegistry::GetObject(const void* InObject)
+MonoObject* FBindingRegistry::GetObject(const FBindingValueMapping::KeyType InObject)
 {
 	const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find(InObject);
 
@@ -44,15 +44,15 @@ MonoObject* FBindingRegistry::GetObject(const void* InObject)
 
 bool FBindingRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	if (const auto FoundBindingAddress = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle))
+	if (const auto FoundValue = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle))
 	{
-		BindingAddress2GarbageCollectionHandle.Remove(FoundBindingAddress->AddressWrapper->GetValue());
+		BindingAddress2GarbageCollectionHandle.Remove(FoundValue->AddressWrapper->GetValue());
 
-		if (FoundBindingAddress->bNeedFree)
+		if (FoundValue->bNeedFree)
 		{
-			delete FoundBindingAddress->AddressWrapper;
+			delete FoundValue->AddressWrapper;
 
-			FoundBindingAddress->AddressWrapper = nullptr;
+			FoundValue->AddressWrapper = nullptr;
 		}
 
 		MonoObject2BindingAddress.Remove(InGarbageCollectionHandle);

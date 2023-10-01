@@ -2,8 +2,6 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
-#include "Reflection/Container/FArrayHelper.h"
-#include "Reflection/Container/FMapHelper.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/FCSharpInvoker.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -70,12 +68,6 @@ bool FCSharpBind::Bind(FDomain* InDomain, UStruct* InStruct, const bool bNeedMon
 	}
 
 	return BindImplementation(InDomain, InStruct);
-}
-
-bool FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
-                       MonoReflectionType* InValueReflectionType)
-{
-	return BindImplementation(InMonoObject, InKeyReflectionType, InValueReflectionType);
 }
 
 bool FCSharpBind::Bind(FDomain* InDomain, MonoObject* InMonoObject, const FName& InStructName)
@@ -267,25 +259,6 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		UpdateCallCSharpFunction(NewFunction);
 	}
-
-	return true;
-}
-
-bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
-                                     MonoReflectionType* InValueReflectionType)
-{
-	const auto KeyProperty = FTypeBridge::Factory(InKeyReflectionType, nullptr, "", EObjectFlags::RF_Transient);
-
-	KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
-
-	const auto ValueProperty =
-		FTypeBridge::Factory(InValueReflectionType, nullptr, "", EObjectFlags::RF_Transient);
-
-	ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
-
-	const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty);
-
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(nullptr, MapHelper, InMonoObject);
 
 	return true;
 }

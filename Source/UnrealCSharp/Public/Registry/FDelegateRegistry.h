@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "TAddress.inl"
+#include "TValue.inl"
 #include "TValueMapping.inl"
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
@@ -9,18 +9,23 @@ class FDelegateRegistry
 {
 public:
 	template <typename T>
-	struct TDelegateAddress : TAddress<T>
+	struct TDelegateAddress : TAddressValue<T>
 	{
-		using TAddress<T>::TAddress;
+		using TAddressValue<T>::TAddressValue;
 	};
 
 	typedef TDelegateAddress<FDelegateHelper*> FDelegateHelperAddress;
 
 	typedef TDelegateAddress<FMulticastDelegateHelper*> FMulticastDelegateHelperAddress;
 
-	typedef TValueMapping<void*, FDelegateHelperAddress> FDelegateHelperMapping;
+	template <typename Key, typename Value>
+	struct TDelegateValueMapping : TValueMapping<Key, Value>
+	{
+	};
 
-	typedef TValueMapping<void*, FMulticastDelegateHelperAddress> FMulticastDelegateHelperMapping;
+	typedef TDelegateValueMapping<void*, FDelegateHelperAddress> FDelegateHelperMapping;
+
+	typedef TDelegateValueMapping<void*, FMulticastDelegateHelperAddress> FMulticastDelegateHelperMapping;
 
 	template <typename T>
 	struct TDelegateRegistry
@@ -43,15 +48,14 @@ public:
 	void Deinitialize();
 
 private:
-	FDelegateHelperMapping::GarbageCollectionHandle2Value GarbageCollectionHandle2DelegateHelperAddress;
+	FDelegateHelperMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2DelegateHelperAddress;
 
-	FDelegateHelperMapping::Value2GarbageCollectionHandle DelegateHelperAddress2GarbageCollectionHandle;
+	FDelegateHelperMapping::FKey2GarbageCollectionHandle DelegateAddress2GarbageCollectionHandle;
 
-	FMulticastDelegateHelperMapping::GarbageCollectionHandle2Value
+	FMulticastDelegateHelperMapping::FGarbageCollectionHandle2Value
 	GarbageCollectionHandle2MulticastDelegateHelperAddress;
 
-	FMulticastDelegateHelperMapping::Value2GarbageCollectionHandle
-	MulticastDelegateHelperAddress2GarbageCollectionHandle;
+	FMulticastDelegateHelperMapping::FKey2GarbageCollectionHandle MulticastDelegateAddress2GarbageCollectionHandle;
 };
 
 #include "FDelegateRegistry.inl"

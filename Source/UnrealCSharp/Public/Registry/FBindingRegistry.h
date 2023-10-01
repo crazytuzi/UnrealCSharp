@@ -15,9 +15,10 @@ struct FBindingAddressWrapper
 };
 
 template <typename T>
-struct TBindingAddressWrapper : FBindingAddressWrapper
+struct TBindingAddressWrapper final : FBindingAddressWrapper
 {
-	explicit TBindingAddressWrapper(T* InValue): Value(InValue)
+	explicit TBindingAddressWrapper(T* InValue):
+		Value(InValue)
 	{
 	}
 
@@ -28,7 +29,7 @@ struct TBindingAddressWrapper : FBindingAddressWrapper
 
 	virtual void* GetValue() override
 	{
-		return (void*)Value;
+		return static_cast<void*>(Value);
 	}
 
 private:
@@ -37,11 +38,13 @@ private:
 
 struct FBindingAddress
 {
-	FBindingAddressWrapper* AddressWrapper;
+	typedef FBindingAddressWrapper FWrapperType;
+
+	FWrapperType* AddressWrapper;
 
 	bool bNeedFree;
 
-	FBindingAddress(FBindingAddressWrapper* InAddressWrapper, const bool InNeedFree = true):
+	explicit FBindingAddress(FWrapperType* InAddressWrapper, const bool InNeedFree = true):
 		AddressWrapper(InAddressWrapper),
 		bNeedFree(InNeedFree)
 	{
@@ -54,6 +57,14 @@ static uint32 GetTypeHash(const FBindingAddress& InBindingAddress);
 
 class UNREALCSHARP_API FBindingRegistry
 {
+public:
+	template <typename Key, typename Value>
+	struct TBindingValueMapping : TValueMapping<Key, Value>
+	{
+	};
+
+	typedef TBindingValueMapping<void*, FBindingAddress> FBindingValueMapping;
+
 public:
 	FBindingRegistry();
 
@@ -71,7 +82,7 @@ public:
 	template <typename T>
 	auto GetBinding(const MonoObject* InMonoObject);
 
-	MonoObject* GetObject(const void* InObject);
+	MonoObject* GetObject(const FBindingValueMapping::KeyType InObject);
 
 public:
 	template <typename T>
@@ -80,11 +91,11 @@ public:
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
-	TValueMapping<void*, FBindingAddress>::GarbageCollectionHandle2Value GarbageCollectionHandle2BindingAddress;
+	FBindingValueMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2BindingAddress;
 
-	TValueMapping<void*, FBindingAddress>::Value2GarbageCollectionHandle BindingAddress2GarbageCollectionHandle;
+	FBindingValueMapping::FKey2GarbageCollectionHandle BindingAddress2GarbageCollectionHandle;
 
-	TValueMapping<void*, FBindingAddress>::MonoObject2Value MonoObject2BindingAddress;
+	FBindingValueMapping::FMonoObject2Value MonoObject2BindingAddress;
 };
 
 #include "FBindingRegistry.inl"

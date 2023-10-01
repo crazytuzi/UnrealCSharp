@@ -1,4 +1,5 @@
 ﻿#include "Domain/InternalCall/FMapImplementation.h"
+#include "Registry/FCSharpBind.h"
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
@@ -34,9 +35,9 @@ static FRegisterMap RegisterMap;
 
 void FMapImplementation::Map_RegisterImplementation(MonoObject* InMonoObject)
 {
-	FCSharpEnvironment::GetEnvironment().Bind(InMonoObject,
-	                                          FTypeBridge::GetGenericArgument(InMonoObject),
-	                                          FTypeBridge::GetGenericArgument(InMonoObject, 1));
+	FCSharpBind::Bind<FMapHelper>(InMonoObject,
+	                              FTypeBridge::GetGenericArgument(InMonoObject),
+	                              FTypeBridge::GetGenericArgument(InMonoObject, 1));
 }
 
 void FMapImplementation::Map_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
