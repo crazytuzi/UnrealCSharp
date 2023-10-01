@@ -76,8 +76,6 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** ReturnValue,
                                                 MonoObject** OutValue, MonoArray* InValue)
 {
-	void* Params = Function->ParmsSize > 0 ? FMemory::Malloc(Function->ParmsSize, 16) : nullptr;
-
 	auto ParamIndex = 0;
 
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
@@ -145,8 +143,6 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptDelegate* InMulticastScriptDelegate,
                                                          MonoObject** OutValue, MonoArray* InValue)
 {
-	void* Params = Function->ParmsSize > 0 ? FMemory::Malloc(Function->ParmsSize, 16) : nullptr;
-
 	auto ParamIndex = 0;
 
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
