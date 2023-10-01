@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Registry/FContainerRegistry.h"
+#include "Registry/FDelegateRegistry.h"
 
 template <typename T>
 T* FCSharpEnvironment::TGetAddress<UObject, T>::operator()(const FCSharpEnvironment* InEnvironment,
@@ -173,7 +174,44 @@ auto FCSharpEnvironment::RemoveContainerReference(const FGarbageCollectionHandle
 template <typename T>
 auto FCSharpEnvironment::GetDelegate(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
-	return DelegateRegistry != nullptr ? DelegateRegistry->GetDelegate<T>(InGarbageCollectionHandle) : nullptr;
+	return DelegateRegistry != nullptr
+		       ? FDelegateRegistry::TDelegateRegistry<T>::GetDelegate(DelegateRegistry, InGarbageCollectionHandle)
+		       : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::GetDelegateObject(const void* InAddress) const
+{
+	return DelegateRegistry != nullptr
+		       ? FDelegateRegistry::TDelegateRegistry<T>::GetObject(DelegateRegistry, InAddress)
+		       : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::AddDelegateReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const
+{
+	return DelegateRegistry != nullptr
+		       ? FDelegateRegistry::TDelegateRegistry<T>::AddReference(DelegateRegistry, InAddress, InValue,
+		                                                               InMonoObject)
+		       : false;
+}
+
+template <typename T>
+auto FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
+                                              MonoObject* InMonoObject) const
+{
+	return DelegateRegistry != nullptr
+		       ? FDelegateRegistry::TDelegateRegistry<T>::AddReference(DelegateRegistry, InOwner, InAddress, InValue,
+		                                                               InMonoObject)
+		       : false;
+}
+
+template <typename T>
+auto FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+{
+	return DelegateRegistry != nullptr
+		       ? FDelegateRegistry::TDelegateRegistry<T>::RemoveReference(DelegateRegistry, InGarbageCollectionHandle)
+		       : false;
 }
 
 template <typename T>

@@ -1,5 +1,6 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
 #include "Registry/FContainerRegistry.h"
+#include "Registry/FDelegateRegistry.h"
 #include "Registry/FCSharpBind.h"
 #include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -472,31 +473,6 @@ FGarbageCollectionHandle FCSharpEnvironment::GetGarbageCollectionHandle(
 			       ? StructRegistry->GetGarbageCollectionHandle(InProperty->GetOwner<UScriptStruct>(), Owner)
 			       : FGarbageCollectionHandle();
 	}
-}
-
-MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InAddress) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->GetObject(InAddress) : nullptr;
-}
-
-bool FCSharpEnvironment::AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const
-{
-	return DelegateRegistry != nullptr
-		       ? DelegateRegistry->AddReference(InAddress, InDelegate, InMonoObject)
-		       : false;
-}
-
-bool FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress,
-                                              void* InDelegate, MonoObject* InMonoObject) const
-{
-	return DelegateRegistry != nullptr
-		       ? DelegateRegistry->AddReference(InOwner, InAddress, InDelegate, InMonoObject)
-		       : false;
-}
-
-bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InGarbageCollectionHandle) : false;
 }
 
 MonoObject* FCSharpEnvironment::GetBinding(const void* InObject) const

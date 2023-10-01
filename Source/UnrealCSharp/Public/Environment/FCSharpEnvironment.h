@@ -3,7 +3,6 @@
 #include "Domain/FDomain.h"
 #include "Registry/FClassRegistry.h"
 #include "Registry/FMultiRegistry.h"
-#include "Registry/FDelegateRegistry.h"
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
@@ -141,14 +140,18 @@ public:
 	template <typename T>
 	auto GetDelegate(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	MonoObject* GetDelegateObject(const void* InAddress) const;
+	template <typename T>
+	auto GetDelegateObject(const void* InAddress) const;
 
-	bool AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const;
+	template <typename T>
+	auto AddDelegateReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
 
-	bool AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
+	template <typename T>
+	auto AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
 	                          MonoObject* InMonoObject) const;
 
-	bool RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+	template <typename T>
+	auto RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 private:
 	template <typename T, typename U>
@@ -290,7 +293,7 @@ private:
 
 	class FContainerRegistry* ContainerRegistry;
 
-	FDelegateRegistry* DelegateRegistry;
+	class FDelegateRegistry* DelegateRegistry;
 
 	FMultiRegistry* MultiRegistry;
 
