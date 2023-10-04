@@ -6,7 +6,8 @@
 FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction):
 	Function(InFunction),
 	OriginalFunction(nullptr),
-	ReturnPropertyDescriptor(nullptr)
+	ReturnPropertyDescriptor(nullptr),
+	Params(nullptr)
 {
 	FFunctionDescriptor::Initialize();
 }
@@ -51,6 +52,8 @@ void FFunctionDescriptor::Initialize()
 			}
 		}
 	}
+
+	Params = Function->ParmsSize > 0 ? FMemory::Malloc(Function->ParmsSize, 16) : nullptr;
 }
 
 void FFunctionDescriptor::Deinitialize()
@@ -72,6 +75,13 @@ void FFunctionDescriptor::Deinitialize()
 	}
 
 	OutPropertyIndexes.Empty();
+
+	if (Params != nullptr)
+	{
+		FMemory::Free(Params);
+
+		Params = nullptr;
+	}
 }
 
 bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
@@ -176,8 +186,6 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 	const bool bIsRemote = FunctionCallspace & FunctionCallspace::Remote;
 
 	const bool bIsLocal = FunctionCallspace & FunctionCallspace::Local;
-
-	void* Params = Function->ParmsSize > 0 ? FMemory::Malloc(Function->ParmsSize, 16) : nullptr;
 
 	auto ParamIndex = 0;
 
