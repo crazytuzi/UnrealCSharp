@@ -10,9 +10,15 @@
 #include "Serialization/JsonSerializer.h"
 #include "UEVersion.h"
 
+#if PLATFORM_WINDOWS
+FString FUnrealCSharpFunctionLibrary::DotNetPath = TEXT("C:/Program Files/dotnet/dotnet.exe");
+#else
+FString FUnrealCSharpFunctionLibrary::DotNetPath = TEXT("/usr/local/share/dotnet/dotnet");
+#endif
+
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
-	return TEXT("C:/Program Files/dotnet/dotnet.exe");
+	return DotNetPath;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)

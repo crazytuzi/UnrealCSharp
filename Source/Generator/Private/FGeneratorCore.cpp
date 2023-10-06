@@ -9,6 +9,7 @@
 #include "Mixin/CSharpScriptStruct.h"
 #include "Mixin/CSharpEnum.h"
 #include "UEVersion.h"
+#include "Setting/UnrealCSharpEditorSetting.h"
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -587,6 +588,12 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 
 		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), OutArray, GetPluginConfig());
 
+		const auto CommandletSettings = GetMutableDefault<UUnrealCSharpEditorSetting>();
+		if ( CommandletSettings )
+		{
+			OutArray.Append(CommandletSettings->GeneratorModules);
+		}
+
 		for (const auto& Module : OutArray)
 		{
 			Modules.Add(FString::Printf(TEXT(
@@ -612,6 +619,9 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 		                            *SCRIPT,
 		                            FApp::GetProjectName()
 		));
+
+		
+		
 	}
 
 	static auto GameRoot = FString::Printf(TEXT(
