@@ -20,4 +20,5 @@ public:
 
 public:
 	TSharedPtr< FUICommandInfo > PluginAction;
+	TSharedPtr< FUICommandInfo > OpenEditorSettings;
 };
