@@ -59,7 +59,7 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 
 MonoObject* FMapPropertyDescriptor::NewRef(void* InAddress) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject(InAddress);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InAddress);
 
 	if (Object == nullptr)
 	{

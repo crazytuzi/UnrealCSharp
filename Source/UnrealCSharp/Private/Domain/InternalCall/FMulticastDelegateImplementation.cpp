@@ -38,7 +38,8 @@ void FMulticastDelegateImplementation::MulticastDelegate_UnRegisterImplementatio
 {
 	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InGarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference<FMulticastDelegateHelper>(
+			InGarbageCollectionHandle);
 	});
 }
 

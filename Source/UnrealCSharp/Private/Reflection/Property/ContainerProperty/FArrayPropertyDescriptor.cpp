@@ -50,7 +50,7 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 
 MonoObject* FArrayPropertyDescriptor::NewRef(void* InAddress) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject(InAddress);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject<FArrayHelper>(InAddress);
 
 	if (Object == nullptr)
 	{

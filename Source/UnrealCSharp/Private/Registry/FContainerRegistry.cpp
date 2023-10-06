@@ -1,6 +1,4 @@
 ﻿#include "Registry/FContainerRegistry.h"
-#include "Reference/FContainerReference.h"
-#include "Environment/FCSharpEnvironment.h"
 
 FContainerRegistry::FContainerRegistry()
 {
@@ -18,110 +16,63 @@ void FContainerRegistry::Initialize()
 
 void FContainerRegistry::Deinitialize()
 {
-	for (auto& Pair : GarbageCollectionHandle2ContainerAddress.Get())
+	for (auto& Pair : GarbageCollectionHandle2ArrayHelperAddress.Get())
 	{
-		if (Pair.Value.ContainerHelper != nullptr)
+		if (Pair.Value.Value != nullptr)
 		{
-			delete Pair.Value.ContainerHelper;
+			delete Pair.Value.Value;
 
-			Pair.Value.ContainerHelper = nullptr;
+			Pair.Value.Value = nullptr;
 		}
 
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
-	GarbageCollectionHandle2ContainerAddress.Empty();
+	GarbageCollectionHandle2ArrayHelperAddress.Empty();
 
-	ContainerAddress2GarbageCollectionHandle.Empty();
+	ArrayHelperAddress2GarbageCollectionHandle.Empty();
 
-	Address2GarbageCollectionHandle.Empty();
+	MonoObject2ArrayHelperAddress.Empty();
 
-	MonoObject2ContainerAddress.Empty();
-}
+	ArrayAddress2GarbageCollectionHandle.Empty();
 
-MonoObject* FContainerRegistry::GetObject(const void* InAddress)
-{
-	if (const auto GarbageCollectionHandle = Address2GarbageCollectionHandle.Find(InAddress))
+	for (auto& Pair : GarbageCollectionHandle2MapHelperAddress.Get())
 	{
-		return *GarbageCollectionHandle;
-	}
-
-	return nullptr;
-}
-
-bool FContainerRegistry::AddReference(void* InAddress, void* InContainer, MonoObject* InMonoObject)
-{
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	ContainerAddress2GarbageCollectionHandle.Add(
-		FContainerAddress{InAddress, static_cast<FContainerHelper*>(InContainer)}, GarbageCollectionHandle);
-
-	if (InAddress != nullptr)
-	{
-		Address2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
-	}
-
-	GarbageCollectionHandle2ContainerAddress.Add(GarbageCollectionHandle,
-	                                             FContainerAddress{
-		                                             InAddress, static_cast<FContainerHelper*>(InContainer)
-	                                             });
-
-	MonoObject2ContainerAddress.Add(InMonoObject,
-	                                FContainerAddress{
-		                                InAddress, static_cast<FContainerHelper*>(InContainer)
-	                                });
-
-	return true;
-}
-
-bool FContainerRegistry::AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
-                                      MonoObject* InMonoObject)
-{
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
-
-	ContainerAddress2GarbageCollectionHandle.Add(
-		FContainerAddress{InAddress, static_cast<FContainerHelper*>(InContainer)}, GarbageCollectionHandle);
-
-	Address2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
-
-	GarbageCollectionHandle2ContainerAddress.Add(GarbageCollectionHandle,
-	                                             FContainerAddress{
-		                                             InAddress, static_cast<FContainerHelper*>(InContainer)
-	                                             });
-
-	MonoObject2ContainerAddress.Add(InMonoObject,
-	                                FContainerAddress{
-		                                InAddress, static_cast<FContainerHelper*>(InContainer)
-	                                });
-
-	return FCSharpEnvironment::GetEnvironment().
-		AddReference(InOwner, new FContainerReference(GarbageCollectionHandle));
-}
-
-bool FContainerRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
-{
-	if (const auto FoundContainerAddress = GarbageCollectionHandle2ContainerAddress.Find(InGarbageCollectionHandle))
-	{
-		ContainerAddress2GarbageCollectionHandle.Remove(*FoundContainerAddress);
-
-		if (FoundContainerAddress->Address != nullptr)
+		if (Pair.Value.Value != nullptr)
 		{
-			Address2GarbageCollectionHandle.Remove(FoundContainerAddress->Address);
+			delete Pair.Value.Value;
+
+			Pair.Value.Value = nullptr;
 		}
 
-		if (FoundContainerAddress->ContainerHelper != nullptr)
-		{
-			delete FoundContainerAddress->ContainerHelper;
-
-			FoundContainerAddress->ContainerHelper = nullptr;
-		}
-
-		MonoObject2ContainerAddress.Remove(InGarbageCollectionHandle);
-
-		GarbageCollectionHandle2ContainerAddress.Remove(InGarbageCollectionHandle);
-
-		return true;
+		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
-	return false;
+	GarbageCollectionHandle2MapHelperAddress.Empty();
+
+	MapHelperAddress2GarbageCollectionHandle.Empty();
+
+	MonoObject2MapHelperAddress.Empty();
+
+	MapAddress2GarbageCollectionHandle.Empty();
+
+	for (auto& Pair : GarbageCollectionHandle2SetHelperAddress.Get())
+	{
+		if (Pair.Value.Value != nullptr)
+		{
+			delete Pair.Value.Value;
+
+			Pair.Value.Value = nullptr;
+		}
+
+		FGarbageCollectionHandle::Free(Pair.Key);
+	}
+
+	GarbageCollectionHandle2SetHelperAddress.Empty();
+
+	SetHelperAddress2GarbageCollectionHandle.Empty();
+
+	MonoObject2SetHelperAddress.Empty();
+
+	SetAddress2GarbageCollectionHandle.Empty();
 }
