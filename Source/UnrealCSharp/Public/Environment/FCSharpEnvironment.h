@@ -2,9 +2,7 @@
 
 #include "Domain/FDomain.h"
 #include "Registry/FClassRegistry.h"
-#include "Registry/FContainerRegistry.h"
 #include "Registry/FMultiRegistry.h"
-#include "Registry/FDelegateRegistry.h"
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
@@ -125,27 +123,35 @@ public:
 	template <typename T>
 	auto GetContainer(const MonoObject* InMonoObject) const;
 
-	MonoObject* GetContainerObject(const void* InAddress) const;
+	template <typename T>
+	auto GetContainerObject(void* InAddress) const;
 
-	bool AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const;
+	template <typename T>
+	auto AddContainerReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
 
-	bool AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InContainer,
+	template <typename T>
+	auto AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
 	                           MonoObject* InMonoObject) const;
 
-	bool RemoveContainerReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+	template <typename T>
+	auto RemoveContainerReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 public:
 	template <typename T>
 	auto GetDelegate(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	MonoObject* GetDelegateObject(const void* InAddress) const;
+	template <typename T>
+	auto GetDelegateObject(void* InAddress) const;
 
-	bool AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const;
+	template <typename T>
+	auto AddDelegateReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
 
-	bool AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
+	template <typename T>
+	auto AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
 	                          MonoObject* InMonoObject) const;
 
-	bool RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+	template <typename T>
+	auto RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 private:
 	template <typename T, typename U>
@@ -181,7 +187,7 @@ public:
 	auto GetMulti(const MonoObject* InMonoObject) const;
 
 	template <typename T>
-	auto GetMultiObject(const void* InAddress) const;
+	auto GetMultiObject(void* InAddress) const;
 
 	template <typename T>
 	auto AddMultiReference(MonoObject* InMonoObject, void* InValue, bool bNeedFree = true) const;
@@ -190,7 +196,7 @@ public:
 	auto RemoveMultiReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 public:
-	MonoObject* GetBinding(const void* InObject) const;
+	MonoObject* GetBinding(void* InObject) const;
 
 	template <typename T>
 	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -275,7 +281,7 @@ private:
 	TArray<FWeakObjectPtr> AsyncLoadingObjectArray;
 
 private:
-	FCSharpBind* CSharpBind;
+	class FCSharpBind* CSharpBind;
 
 	FClassRegistry* ClassRegistry;
 
@@ -285,9 +291,9 @@ private:
 
 	FStructRegistry* StructRegistry;
 
-	FContainerRegistry* ContainerRegistry;
+	class FContainerRegistry* ContainerRegistry;
 
-	FDelegateRegistry* DelegateRegistry;
+	class FDelegateRegistry* DelegateRegistry;
 
 	FMultiRegistry* MultiRegistry;
 

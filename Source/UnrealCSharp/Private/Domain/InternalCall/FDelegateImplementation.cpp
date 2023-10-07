@@ -34,7 +34,7 @@ void FDelegateImplementation::Delegate_UnRegisterImplementation(
 {
 	AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference(InGarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference<FDelegateHelper>(InGarbageCollectionHandle);
 	});
 }
 

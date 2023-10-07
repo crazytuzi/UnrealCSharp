@@ -1,11 +1,18 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
-#include "GarbageCollection/TMonoObjectMapping.inl"
+#include "TValueMapping.inl"
 #include "mono/metadata/object-forward.h"
 
 class UNREALCSHARP_API FObjectRegistry
 {
+public:
+	template <typename Key>
+	struct TObjectMapping : TValueMapping<Key>
+	{
+	};
+
+	typedef TObjectMapping<TWeakObjectPtr<const UObject>> FObjectMapping;
+
 public:
 	FObjectRegistry();
 
@@ -41,9 +48,9 @@ public:
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 private:
-	TGarbageCollectionHandleMapping<TWeakObjectPtr<const UObject>> GarbageCollectionHandle2Object;
+	FObjectMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2Object;
 
-	TMap<TWeakObjectPtr<const UObject>, FGarbageCollectionHandle> Object2GarbageCollectionHandleMap;
+	FObjectMapping::FKey2GarbageCollectionHandle Object2GarbageCollectionHandleMap;
 
-	TMonoObjectMapping<TWeakObjectPtr<const UObject>> MonoObject2Object;
+	FObjectMapping::FMonoObject2Value MonoObject2Object;
 };

@@ -62,7 +62,7 @@ const FMulticastScriptDelegate* FMulticastDelegatePropertyDescriptor::GetMultica
 
 MonoObject* FMulticastDelegatePropertyDescriptor::NewRef(void* InAddress) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject(InAddress);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject<FMulticastDelegateHelper>(InAddress);
 
 	if (Object == nullptr)
 	{
