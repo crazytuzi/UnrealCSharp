@@ -2,11 +2,6 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
-#if UE_5_0_OR_LATER
-using LwcType = System.Double;
-#else
-using LwcType = System.Single;
-#endif
 
 namespace Script.Library
 {
