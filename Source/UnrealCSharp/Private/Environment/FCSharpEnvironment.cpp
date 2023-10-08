@@ -1,4 +1,6 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
+#include "Registry/FContainerRegistry.h"
+#include "Registry/FDelegateRegistry.h"
 #include "Registry/FCSharpBind.h"
 #include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -323,12 +325,6 @@ bool FCSharpEnvironment::Bind(UStruct* InStruct, const bool bNeedMonoClass) cons
 	return FCSharpBind::Bind(Domain, InStruct, bNeedMonoClass);
 }
 
-bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
-                              MonoReflectionType* InValueReflectionType) const
-{
-	return FCSharpBind::Bind(InMonoObject, InKeyReflectionType, InValueReflectionType);
-}
-
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
 {
 	return FCSharpBind::Bind(Domain, InMonoObject, InStructName);
@@ -473,55 +469,7 @@ FGarbageCollectionHandle FCSharpEnvironment::GetGarbageCollectionHandle(
 	}
 }
 
-MonoObject* FCSharpEnvironment::GetContainerObject(const void* InAddress) const
-{
-	return ContainerRegistry != nullptr ? ContainerRegistry->GetObject(InAddress) : nullptr;
-}
-
-bool FCSharpEnvironment::AddContainerReference(void* InAddress, void* InContainer, MonoObject* InMonoObject) const
-{
-	return ContainerRegistry != nullptr ? ContainerRegistry->AddReference(InAddress, InContainer, InMonoObject) : false;
-}
-
-bool FCSharpEnvironment::AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress,
-                                               void* InContainer, MonoObject* InMonoObject) const
-{
-	return ContainerRegistry != nullptr
-		       ? ContainerRegistry->AddReference(InOwner, InAddress, InContainer, InMonoObject)
-		       : false;
-}
-
-bool FCSharpEnvironment::RemoveContainerReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
-{
-	return ContainerRegistry != nullptr ? ContainerRegistry->RemoveReference(InGarbageCollectionHandle) : false;
-}
-
-MonoObject* FCSharpEnvironment::GetDelegateObject(const void* InAddress) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->GetObject(InAddress) : nullptr;
-}
-
-bool FCSharpEnvironment::AddDelegateReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject) const
-{
-	return DelegateRegistry != nullptr
-		       ? DelegateRegistry->AddReference(InAddress, InDelegate, InMonoObject)
-		       : false;
-}
-
-bool FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress,
-                                              void* InDelegate, MonoObject* InMonoObject) const
-{
-	return DelegateRegistry != nullptr
-		       ? DelegateRegistry->AddReference(InOwner, InAddress, InDelegate, InMonoObject)
-		       : false;
-}
-
-bool FCSharpEnvironment::RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
-{
-	return DelegateRegistry != nullptr ? DelegateRegistry->RemoveReference(InGarbageCollectionHandle) : false;
-}
-
-MonoObject* FCSharpEnvironment::GetBinding(const void* InObject) const
+MonoObject* FCSharpEnvironment::GetBinding(void* InObject) const
 {
 	return BindingRegistry != nullptr ? BindingRegistry->GetObject(InObject) : nullptr;
 }

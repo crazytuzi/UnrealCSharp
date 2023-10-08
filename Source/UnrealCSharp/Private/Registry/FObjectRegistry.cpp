@@ -126,9 +126,9 @@ bool FObjectRegistry::RemoveReference(const UObject* InObject)
 
 bool FObjectRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
-	if (const auto FoundObject = GarbageCollectionHandle2Object.Find(InGarbageCollectionHandle))
+	if (const auto FoundValue = GarbageCollectionHandle2Object.Find(InGarbageCollectionHandle))
 	{
-		if (const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(*FoundObject))
+		if (const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(*FoundValue))
 		{
 			FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle, false);
 
@@ -139,7 +139,7 @@ bool FObjectRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageC
 
 		GarbageCollectionHandle2Object.Remove(InGarbageCollectionHandle);
 
-		Object2GarbageCollectionHandleMap.Remove(*FoundObject);
+		Object2GarbageCollectionHandleMap.Remove(*FoundValue);
 
 		return true;
 	}

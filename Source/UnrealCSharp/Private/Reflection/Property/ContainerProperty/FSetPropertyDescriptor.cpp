@@ -50,7 +50,7 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 
 MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject(InAddress);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InAddress);
 
 	if (Object == nullptr)
 	{

@@ -10,6 +10,13 @@ auto FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectio
 }
 
 template <typename T>
+auto FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+                       MonoReflectionType* InValueReflectionType)
+{
+	return BindImplementation<T>(InMonoObject, InKeyReflectionType, InValueReflectionType);
+}
+
+template <typename T>
 auto FCSharpBind::Bind(MonoObject* InMonoObject)
 {
 	return BindImplementation<T>(InMonoObject);
@@ -23,6 +30,26 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 	Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
 	const auto ContainerHelper = new T(Property);
+
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(nullptr, ContainerHelper, InMonoObject);
+
+	return true;
+}
+
+template <typename T>
+auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+                                     MonoReflectionType* InValueReflectionType)
+{
+	const auto KeyProperty = FTypeBridge::Factory(InKeyReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+
+	KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+	const auto ValueProperty =
+		FTypeBridge::Factory(InValueReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+
+	ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+	const auto ContainerHelper = new T(KeyProperty, ValueProperty);
 
 	FCSharpEnvironment::GetEnvironment().AddContainerReference(nullptr, ContainerHelper, InMonoObject);
 

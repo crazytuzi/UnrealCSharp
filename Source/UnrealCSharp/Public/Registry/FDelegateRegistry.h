@@ -1,24 +1,42 @@
 ﻿#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
-#include "Reflection/Delegate/FDelegateBaseHelper.h"
-#include "mono/metadata/object-forward.h"
-
-struct FDelegateAddress
-{
-	void* Address;
-
-	FDelegateBaseHelper* DelegateBaseHelper;
-};
-
-static bool operator==(const FDelegateAddress& A, const FDelegateAddress& B);
-
-static bool operator==(const FDelegateAddress& A, const void* B);
-
-static uint32 GetTypeHash(const FDelegateAddress& InDelegateAddress);
+#include "TValue.inl"
+#include "TValueMapping.inl"
+#include "Reflection/Delegate/FDelegateHelper.h"
+#include "Reflection/Delegate/FMulticastDelegateHelper.h"
 
 class FDelegateRegistry
 {
+public:
+	template <typename T>
+	struct TDelegateAddress : TAddressValue<T>
+	{
+		using TAddressValue<T>::TAddressValue;
+	};
+
+	typedef TDelegateAddress<FDelegateHelper*> FDelegateHelperAddress;
+
+	typedef TDelegateAddress<FMulticastDelegateHelper*> FMulticastDelegateHelperAddress;
+
+	template <typename Key, typename Value>
+	struct TDelegateValueMapping : TValueMapping<Key, Value>
+	{
+	};
+
+	typedef TDelegateValueMapping<void*, FDelegateHelperAddress> FDelegateHelperMapping;
+
+	typedef TDelegateValueMapping<void*, FMulticastDelegateHelperAddress> FMulticastDelegateHelperMapping;
+
+	template <typename T>
+	struct TDelegateRegistry
+	{
+	};
+
+	template <typename T, typename P, P, typename Q, Q>
+	struct TDelegateRegistryImplementation
+	{
+	};
+
 public:
 	FDelegateRegistry();
 
@@ -29,25 +47,15 @@ public:
 
 	void Deinitialize();
 
-public:
-	template <typename T>
-	auto GetDelegate(const FGarbageCollectionHandle& InGarbageCollectionHandle);
-
-	MonoObject* GetObject(const void* InAddress);
-
-	bool AddReference(void* InAddress, void* InDelegate, MonoObject* InMonoObject);
-
-	bool AddReference(const FGarbageCollectionHandle& InOwner, void* InAddress, void* InDelegate,
-	                  MonoObject* InMonoObject);
-
-	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
-
 private:
-	TGarbageCollectionHandleMapping<FDelegateAddress> GarbageCollectionHandle2DelegateAddress;
+	FDelegateHelperMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2DelegateHelperAddress;
 
-	TMap<FDelegateAddress, FGarbageCollectionHandle> DelegateAddress2GarbageCollectionHandle;
+	FDelegateHelperMapping::FKey2GarbageCollectionHandle DelegateAddress2GarbageCollectionHandle;
 
-	TMap<void*, FGarbageCollectionHandle> Address2GarbageCollectionHandle;
+	FMulticastDelegateHelperMapping::FGarbageCollectionHandle2Value
+	GarbageCollectionHandle2MulticastDelegateHelperAddress;
+
+	FMulticastDelegateHelperMapping::FKey2GarbageCollectionHandle MulticastDelegateAddress2GarbageCollectionHandle;
 };
 
 #include "FDelegateRegistry.inl"

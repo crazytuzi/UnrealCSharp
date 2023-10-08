@@ -51,7 +51,7 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 
 MonoObject* FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject(InAddress);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject<FDelegateHelper>(InAddress);
 
 	if (Object == nullptr)
 	{
