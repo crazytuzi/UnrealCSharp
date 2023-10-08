@@ -11,8 +11,6 @@ struct FRegisterFrameNumber
 		TReflectionClassBuilder<FFrameNumber>(NAMESPACE_LIBRARY)
 			.Function("Increment", FFrameNumberImplementation::FrameNumber_IncrementImplementation)
 			.Function("Decrement", FFrameNumberImplementation::FrameNumber_DecrementImplementation)
-			.Function("Equality", FFrameNumberImplementation::FrameNumber_EqualityImplementation)
-			.Function("Inequality", FFrameNumberImplementation::FrameNumber_InequalityImplementation)
 			.Function("LessThan", FFrameNumberImplementation::FrameNumber_LessThanImplementation)
 			.Function("GreaterThan", FFrameNumberImplementation::FrameNumber_GreaterThanImplementation)
 			.Function("LessThanOrEqual", FFrameNumberImplementation::FrameNumber_LessThanOrEqualImplementation)
@@ -51,36 +49,6 @@ void FFrameNumberImplementation::FrameNumber_DecrementImplementation(
 	{
 		FrameNumber->operator--();
 	}
-}
-
-bool FFrameNumberImplementation::FrameNumber_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                                    const FGarbageCollectionHandle B)
-{
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
-
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
-
-	if (FrameNumberA != nullptr && FrameNumberB != nullptr)
-	{
-		return operator==(*FrameNumberA, *FrameNumberB);
-	}
-
-	return false;
-}
-
-bool FFrameNumberImplementation::FrameNumber_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                                      const FGarbageCollectionHandle B)
-{
-	const auto FrameNumberA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(A);
-
-	const auto FrameNumberB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameNumber>(B);
-
-	if (FrameNumberA != nullptr && FrameNumberB != nullptr)
-	{
-		return operator!=(*FrameNumberA, *FrameNumberB);
-	}
-
-	return false;
 }
 
 bool FFrameNumberImplementation::FrameNumber_LessThanImplementation(const FGarbageCollectionHandle A,

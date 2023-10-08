@@ -20,8 +20,6 @@ struct FRegisterLinearColor
 			.Function("Divide", FLinearColorImplementation::LinearColor_DivideImplementation)
 			.Function("DivideScalar", FLinearColorImplementation::LinearColor_DivideScalarImplementation)
 			.Function("GetClamped", FLinearColorImplementation::LinearColor_GetClampedImplementation)
-			.Function("Equality", FLinearColorImplementation::LinearColor_EqualityImplementation)
-			.Function("Inequality", FLinearColorImplementation::LinearColor_InequalityImplementation)
 			.Function("Equals", FLinearColorImplementation::LinearColor_EqualsImplementation)
 			.Function("CopyWithNewOpacity", FLinearColorImplementation::LinearColor_CopyWithNewOpacityImplementation)
 			.Function("MakeFromHSV8", FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation)
@@ -280,36 +278,6 @@ void FLinearColorImplementation::LinearColor_GetClampedImplementation(
 	{
 		*OutLinearColor = LinearColor->GetClamped(InMin, InMax);
 	}
-}
-
-bool FLinearColorImplementation::LinearColor_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                                    const FGarbageCollectionHandle B)
-{
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
-
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
-
-	if (LinearColorA != nullptr && LinearColorB != nullptr)
-	{
-		return LinearColorA->operator==(*LinearColorB);
-	}
-
-	return false;
-}
-
-bool FLinearColorImplementation::LinearColor_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                                      const FGarbageCollectionHandle B)
-{
-	const auto LinearColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(A);
-
-	const auto LinearColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(B);
-
-	if (LinearColorA != nullptr && LinearColorB != nullptr)
-	{
-		return LinearColorA->operator!=(*LinearColorB);
-	}
-
-	return false;
 }
 
 bool FLinearColorImplementation::LinearColor_EqualsImplementation(const FGarbageCollectionHandle A,

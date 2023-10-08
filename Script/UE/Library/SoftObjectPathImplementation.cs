@@ -55,12 +55,6 @@ namespace Script.Library
         public static extern Boolean SoftObjectPath_IsSubobjectImplementation(IntPtr InSoftObjectPath);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean SoftObjectPath_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean SoftObjectPath_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean SoftObjectPath_FixupForPIEImplementation(IntPtr InSoftObjectPath);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

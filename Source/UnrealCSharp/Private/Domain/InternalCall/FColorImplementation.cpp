@@ -10,8 +10,6 @@ struct FRegisterColor
 	{
 		TReflectionClassBuilder<FColor>(NAMESPACE_LIBRARY)
 			.Function("DWColor", FColorImplementation::Color_DWColorImplementation)
-			.Function("Equality", FColorImplementation::Color_EqualityImplementation)
-			.Function("Inequality", FColorImplementation::Color_InequalityImplementation)
 			.Function("FromRGBE", FColorImplementation::Color_FromRGBEImplementation)
 			.Function("FromHex", FColorImplementation::Color_FromHexImplementation)
 			.Function("MakeRandomColor", FColorImplementation::Color_MakeRandomColorImplementation)
@@ -44,36 +42,6 @@ uint32 FColorImplementation::Color_DWColorImplementation(const FGarbageCollectio
 	}
 
 	return 0u;
-}
-
-bool FColorImplementation::Color_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                        const FGarbageCollectionHandle B)
-{
-	const auto ColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(A);
-
-	const auto ColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(B);
-
-	if (ColorA != nullptr && ColorB != nullptr)
-	{
-		return ColorA->operator==(*ColorB);
-	}
-
-	return false;
-}
-
-bool FColorImplementation::Color_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                          const FGarbageCollectionHandle B)
-{
-	const auto ColorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(A);
-
-	const auto ColorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(B);
-
-	if (ColorA != nullptr && ColorB != nullptr)
-	{
-		return ColorA->operator!=(*ColorB);
-	}
-
-	return false;
 }
 
 void FColorImplementation::Color_FromRGBEImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,

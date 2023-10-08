@@ -7,11 +7,5 @@ namespace Script.CoreUObject
     {
         public Boolean IsValid() =>
             AssetBundleEntryImplementation.AssetBundleEntry_IsValidImplementation(GetHandle());
-
-        public static Boolean operator ==(FAssetBundleEntry A, FAssetBundleEntry B) =>
-            AssetBundleEntryImplementation.AssetBundleEntry_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FAssetBundleEntry A, FAssetBundleEntry B) =>
-            AssetBundleEntryImplementation.AssetBundleEntry_InequalityImplementation(A.GetHandle(), B.GetHandle());
     }
 }

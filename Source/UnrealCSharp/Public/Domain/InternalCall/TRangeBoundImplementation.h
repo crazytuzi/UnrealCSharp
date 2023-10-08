@@ -6,10 +6,6 @@ template <typename T, typename U>
 class TRangeBoundImplementation
 {
 public:
-	static auto RangeBound_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static auto RangeBound_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static U RangeBound_GetValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
 	static auto RangeBound_SetValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,

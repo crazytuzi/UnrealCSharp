@@ -9,8 +9,6 @@ struct FRegisterAssetBundleData
 	FRegisterAssetBundleData()
 	{
 		TReflectionClassBuilder<FAssetBundleData>(NAMESPACE_LIBRARY)
-			.Function("Equality", FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation)
-			.Function("Inequality", FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation)
 			.Function("FindEntry", FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation)
 			.Function("AddBundleAsset", FAssetBundleDataImplementation::AssetBundleData_AddBundleAssetImplementation)
 			.Function("Reset", FAssetBundleDataImplementation::AssetBundleData_ResetImplementation)
@@ -20,36 +18,6 @@ struct FRegisterAssetBundleData
 };
 
 static FRegisterAssetBundleData RegisterAssetBundleData;
-
-bool FAssetBundleDataImplementation::AssetBundleData_EqualityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto AssetBundleDataA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(A);
-
-	const auto AssetBundleDataB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(B);
-
-	if (AssetBundleDataA != nullptr && AssetBundleDataB != nullptr)
-	{
-		return AssetBundleDataA->operator==(*AssetBundleDataB);
-	}
-
-	return false;
-}
-
-bool FAssetBundleDataImplementation::AssetBundleData_InequalityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto AssetBundleDataA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(A);
-
-	const auto AssetBundleDataB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FAssetBundleData>(B);
-
-	if (AssetBundleDataA != nullptr && AssetBundleDataB != nullptr)
-	{
-		return AssetBundleDataA->operator!=(*AssetBundleDataB);
-	}
-
-	return false;
-}
 
 void FAssetBundleDataImplementation::AssetBundleData_FindEntryImplementation(
 	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* SearchName, MonoObject** OutValue)

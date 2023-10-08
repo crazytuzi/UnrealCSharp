@@ -2,11 +2,6 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
-#if UE_5_0_OR_LATER
-using LwcType = System.Double;
-#else
-using LwcType = System.Single;
-#endif
 
 namespace Script.Library
 {
@@ -44,12 +39,6 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern LwcType Vector2D_CrossProductImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Vector2D_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Vector2D_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Vector2D_LessThanImplementation(IntPtr A, IntPtr B);

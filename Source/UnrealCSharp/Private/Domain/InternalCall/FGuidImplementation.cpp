@@ -9,8 +9,6 @@ struct FRegisterGuid
 	FRegisterGuid()
 	{
 		TReflectionClassBuilder<FGuid>(NAMESPACE_LIBRARY)
-			.Function("Equality", FGuidImplementation::Guid_EqualityImplementation)
-			.Function("Inequality", FGuidImplementation::Guid_InequalityImplementation)
 			.Function("LessThan", FGuidImplementation::Guid_LessThanImplementation)
 			.Function("GreaterThan", FGuidImplementation::Guid_GreaterThanImplementation)
 			.Function("GetComponent", FGuidImplementation::Guid_GetComponentImplementation)
@@ -26,36 +24,6 @@ struct FRegisterGuid
 };
 
 static FRegisterGuid RegisterGuid;
-
-bool FGuidImplementation::Guid_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                      const FGarbageCollectionHandle B)
-{
-	const auto GuidA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(A);
-
-	const auto GuidB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(B);
-
-	if (GuidA != nullptr && GuidB != nullptr)
-	{
-		return operator==(*GuidA, *GuidB);
-	}
-
-	return false;
-}
-
-bool FGuidImplementation::Guid_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                        const FGarbageCollectionHandle B)
-{
-	const auto GuidA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(A);
-
-	const auto GuidB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(B);
-
-	if (GuidA != nullptr && GuidB != nullptr)
-	{
-		return operator!=(*GuidA, *GuidB);
-	}
-
-	return false;
-}
 
 bool FGuidImplementation::Guid_LessThanImplementation(const FGarbageCollectionHandle A,
                                                       const FGarbageCollectionHandle B)

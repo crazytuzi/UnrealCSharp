@@ -13,6 +13,9 @@ namespace Script.Library
         public static extern void Struct_RegisterImplementation(Object InMonoObject, string InStructName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean Struct_IdenticalImplementation(IntPtr InScriptStruct, IntPtr InA, IntPtr InB);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Struct_UnRegisterImplementation(IntPtr InMonoObject);
     }
 }

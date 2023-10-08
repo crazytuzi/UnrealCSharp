@@ -24,8 +24,6 @@ struct FRegisterSoftObjectPath
 			.Function("IsNull", FSoftObjectPathImplementation::SoftObjectPath_IsNullImplementation)
 			.Function("IsAsset", FSoftObjectPathImplementation::SoftObjectPath_IsAssetImplementation)
 			.Function("IsSubobject", FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation)
-			.Function("Equality", FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation)
-			.Function("Inequality", FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation)
 			.Function("FixupForPIE", FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEImplementation)
 			.Function("FixupForPIEInstance",
 			          FSoftObjectPathImplementation::SoftObjectPath_FixupForPIEInstanceImplementation)
@@ -268,36 +266,6 @@ bool FSoftObjectPathImplementation::SoftObjectPath_IsSubobjectImplementation(
 	if (SoftObjectPath != nullptr)
 	{
 		return SoftObjectPath->IsSubobject();
-	}
-
-	return false;
-}
-
-bool FSoftObjectPathImplementation::SoftObjectPath_EqualityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto SoftObjectPathA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(A);
-
-	const auto SoftObjectPathB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(B);
-
-	if (SoftObjectPathA != nullptr && SoftObjectPathB)
-	{
-		return SoftObjectPathA->operator==(*SoftObjectPathB);
-	}
-
-	return false;
-}
-
-bool FSoftObjectPathImplementation::SoftObjectPath_InequalityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto SoftObjectPathA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(A);
-
-	const auto SoftObjectPathB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FSoftObjectPath>(B);
-
-	if (SoftObjectPathA != nullptr && SoftObjectPathB)
-	{
-		return SoftObjectPathA->operator!=(*SoftObjectPathB);
 	}
 
 	return false;

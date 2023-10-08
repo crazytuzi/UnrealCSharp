@@ -12,8 +12,6 @@ struct FRegisterRotator
 			.Function("Add", FRotatorImplementation::Rotator_AddImplementation)
 			.Function("Subtract", FRotatorImplementation::Rotator_SubtractImplementation)
 			.Function("Multiply", FRotatorImplementation::Rotator_MultiplyImplementation)
-			.Function("Equality", FRotatorImplementation::Rotator_EqualityImplementation)
-			.Function("Inequality", FRotatorImplementation::Rotator_InequalityImplementation)
 			.Function("Equals", FRotatorImplementation::Rotator_EqualsImplementation)
 			.Function("AddDelta", FRotatorImplementation::Rotator_AddDeltaImplementation)
 			.Function("GetInverse", FRotatorImplementation::Rotator_GetInverseImplementation)
@@ -108,36 +106,6 @@ void FRotatorImplementation::Rotator_MultiplyImplementation(const FGarbageCollec
 	{
 		*OutRotator = Rotator->operator*(Scale);
 	}
-}
-
-bool FRotatorImplementation::Rotator_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                            const FGarbageCollectionHandle B)
-{
-	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(A);
-
-	const auto RotatorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(B);
-
-	if (RotatorA != nullptr && RotatorB != nullptr)
-	{
-		return RotatorA->operator==(*RotatorB);
-	}
-
-	return false;
-}
-
-bool FRotatorImplementation::Rotator_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                              const FGarbageCollectionHandle B)
-{
-	const auto RotatorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(A);
-
-	const auto RotatorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(B);
-
-	if (RotatorA != nullptr && RotatorB != nullptr)
-	{
-		return RotatorA->operator!=(*RotatorB);
-	}
-
-	return false;
 }
 
 bool FRotatorImplementation::Rotator_IsNearlyZeroImplementation(

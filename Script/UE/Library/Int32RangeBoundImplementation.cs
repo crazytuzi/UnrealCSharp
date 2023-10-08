@@ -7,12 +7,6 @@ namespace Script.Library
     public static class Int32RangeBoundImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Int32RangeBound_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Int32RangeBound_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Int32RangeBound_GetValueImplementation(IntPtr InInt32RangeBound);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

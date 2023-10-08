@@ -30,12 +30,8 @@ public:
 	static void Matrix_MultiplyScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                               LwcType Other, MonoObject** OutValue);
 
-	static bool Matrix_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool Matrix_EqualsImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
 	                                        LwcType Tolerance);
-
-	static bool Matrix_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
 	static void Matrix_TransformFVector4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                                   const MonoObject* V, MonoObject** OutValue);

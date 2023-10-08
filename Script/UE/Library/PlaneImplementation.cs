@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Script.CoreUObject;
-#if UE_5_0_OR_LATER
-using LwcType = System.Double;
-#else
-using LwcType = System.Single;
-#endif
 
 namespace Script.Library
 {
@@ -35,12 +30,6 @@ namespace Script.Library
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Plane_TransformByUsingAdjointTImplementation(IntPtr InPlane, FMatrix M, LwcType DetM,
             FMatrix TA, out FPlane OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Plane_EqualsImplementation(IntPtr InPlane, FPlane V, LwcType Tolerance);

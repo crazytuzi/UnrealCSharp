@@ -11,6 +11,7 @@ struct FRegisterStruct
 		FClassBuilder(TEXT("Struct"), NAMESPACE_LIBRARY)
 			.Function("StaticStruct", FStructImplementation::Struct_StaticStructImplementation)
 			.Function("Register", FStructImplementation::Struct_RegisterImplementation)
+			.Function("Identical", FStructImplementation::Struct_IdenticalImplementation)
 			.Function("UnRegister", FStructImplementation::Struct_UnRegisterImplementation)
 			.Register();
 	}
@@ -34,6 +35,24 @@ void FStructImplementation::Struct_RegisterImplementation(MonoObject* InMonoObje
 		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
 
 	FCSharpEnvironment::GetEnvironment().Bind(InMonoObject, StructName);
+}
+
+bool FStructImplementation::Struct_IdenticalImplementation(const FGarbageCollectionHandle InScriptStruct,
+                                                           const FGarbageCollectionHandle InA,
+                                                           const FGarbageCollectionHandle InB)
+{
+	if (const auto FoundScriptStruct = FCSharpEnvironment::GetEnvironment().GetObject<UScriptStruct>(InScriptStruct))
+	{
+		if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetStruct(InA))
+		{
+			if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetStruct(InB))
+			{
+				return FoundScriptStruct->CompareScriptStruct(FoundA, FoundB, PPF_None);
+			}
+		}
+	}
+
+	return false;
 }
 
 void FStructImplementation::Struct_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)

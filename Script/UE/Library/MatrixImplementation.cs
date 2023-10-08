@@ -2,11 +2,6 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
-#if UE_5_0_OR_LATER
-using LwcType = System.Double;
-#else
-using LwcType = System.Single;
-#endif
 
 namespace Script.Library
 {
@@ -33,13 +28,7 @@ namespace Script.Library
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Matrix_EqualsImplementation(IntPtr A, IntPtr B, LwcType Tolerance);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Matrix_TransformFVector4Implementation(IntPtr InMatrix, FVector4 V,

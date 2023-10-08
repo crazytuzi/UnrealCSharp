@@ -3,38 +3,6 @@
 #include "Environment/FCSharpEnvironment.h"
 
 template <typename T, typename U>
-auto TRangeBoundImplementation<T, U>::RangeBound_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                                        const FGarbageCollectionHandle B)
-{
-	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
-
-	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
-
-	if (RangeBoundA != nullptr && RangeBoundB != nullptr)
-	{
-		return RangeBoundA->operator==(*RangeBoundB);
-	}
-
-	return false;
-}
-
-template <typename T, typename U>
-auto TRangeBoundImplementation<T, U>::RangeBound_InequalityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto RangeBoundA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(A);
-
-	const auto RangeBoundB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(B);
-
-	if (RangeBoundA != nullptr && RangeBoundB != nullptr)
-	{
-		return RangeBoundA->operator!=(*RangeBoundB);
-	}
-
-	return false;
-}
-
-template <typename T, typename U>
 U TRangeBoundImplementation<T, U>::RangeBound_GetValueImplementation(
 	const FGarbageCollectionHandle InGarbageCollectionHandle)
 {

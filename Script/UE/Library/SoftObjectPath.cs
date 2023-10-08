@@ -73,12 +73,6 @@ namespace Script.CoreUObject
         public Boolean IsSubobject() =>
             SoftObjectPathImplementation.SoftObjectPath_IsSubobjectImplementation(GetHandle());
 
-        public static Boolean operator ==(FSoftObjectPath A, FSoftObjectPath B) =>
-            SoftObjectPathImplementation.SoftObjectPath_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FSoftObjectPath A, FSoftObjectPath B) =>
-            SoftObjectPathImplementation.SoftObjectPath_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         // @TODO
         // ExportTextItem
         // ImportTextItem

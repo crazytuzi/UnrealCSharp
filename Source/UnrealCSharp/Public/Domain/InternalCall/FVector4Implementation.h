@@ -44,10 +44,6 @@ public:
 
 	static LwcType Vector4_Dot4Implementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
-	static bool Vector4_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Vector4_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static void Vector4_CrossProductImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
 	                                               MonoObject** OutValue);
 

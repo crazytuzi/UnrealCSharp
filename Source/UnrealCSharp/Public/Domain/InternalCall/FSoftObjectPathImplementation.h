@@ -40,12 +40,6 @@ public:
 
 	static bool SoftObjectPath_IsSubobjectImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static bool SoftObjectPath_EqualityImplementation(const FGarbageCollectionHandle A,
-	                                                  const FGarbageCollectionHandle B);
-
-	static bool SoftObjectPath_InequalityImplementation(const FGarbageCollectionHandle A,
-	                                                    const FGarbageCollectionHandle B);
-
 	static bool SoftObjectPath_FixupForPIEImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
 	static bool SoftObjectPath_FixupForPIEInstanceImplementation(

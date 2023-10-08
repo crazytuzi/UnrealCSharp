@@ -11,13 +11,6 @@ namespace Script.Library
             out FName OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PrimaryAssetType_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean
-            PrimaryAssetType_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean PrimaryAssetType_IsValidImplementation(IntPtr InPrimaryAssetType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

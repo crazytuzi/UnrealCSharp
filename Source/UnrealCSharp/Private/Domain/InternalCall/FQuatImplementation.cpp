@@ -18,8 +18,6 @@ struct FRegisterQuat
 			.Function("MultiplyMatrix", FQuatImplementation::Quat_MultiplyMatrixImplementation)
 			.Function("MultiplyScale", FQuatImplementation::Quat_MultiplyScaleImplementation)
 			.Function("Divide", FQuatImplementation::Quat_DivideImplementation)
-			.Function("Equality", FQuatImplementation::Quat_EqualityImplementation)
-			.Function("Inequality", FQuatImplementation::Quat_InequalityImplementation)
 			.Function("DotProduct", FQuatImplementation::Quat_DotProductImplementation)
 			.Function("MakeFromEuler", FQuatImplementation::Quat_MakeFromEulerImplementation)
 			.Function("Euler", FQuatImplementation::Quat_EulerImplementation)
@@ -253,36 +251,6 @@ bool FQuatImplementation::Quat_IdenticalImplementation(const FGarbageCollectionH
 	if (Quat != nullptr && QuatQ != nullptr)
 	{
 		return Quat->Identical(QuatQ, PortFlags);
-	}
-
-	return false;
-}
-
-bool FQuatImplementation::Quat_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                      const FGarbageCollectionHandle B)
-{
-	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
-
-	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
-
-	if (QuatA != nullptr && QuatB != nullptr)
-	{
-		return QuatA->operator==(*QuatB);
-	}
-
-	return false;
-}
-
-bool FQuatImplementation::Quat_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                        const FGarbageCollectionHandle B)
-{
-	const auto QuatA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(A);
-
-	const auto QuatB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(B);
-
-	if (QuatA != nullptr && QuatB != nullptr)
-	{
-		return QuatA->operator!=(*QuatB);
 	}
 
 	return false;

@@ -12,8 +12,6 @@ struct TRegisterRangeBound
 	TRegisterRangeBound()
 	{
 		TReflectionClassBuilder<T>(NAMESPACE_LIBRARY)
-			.Function("Equality", FRangeBoundImplementation::RangeBound_EqualityImplementation)
-			.Function("Inequality", FRangeBoundImplementation::RangeBound_InequalityImplementation)
 			.Function("GetValue", FRangeBoundImplementation::RangeBound_GetValueImplementation)
 			.Function("SetValue", FRangeBoundImplementation::RangeBound_SetValueImplementation)
 			.Function("IsClosed", FRangeBoundImplementation::RangeBound_IsClosedImplementation)

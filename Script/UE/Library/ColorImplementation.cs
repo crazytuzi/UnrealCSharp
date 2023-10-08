@@ -11,12 +11,6 @@ namespace Script.Library
         public static extern UInt32 Color_DWColorImplementation(IntPtr InColor);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Color_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Color_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Color_FromRGBEImplementation(IntPtr InColor, out FLinearColor OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

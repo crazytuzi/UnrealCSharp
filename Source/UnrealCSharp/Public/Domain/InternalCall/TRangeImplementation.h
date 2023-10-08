@@ -6,10 +6,6 @@ template <typename T, typename U, typename V>
 class TRangeImplementation
 {
 public:
-	static auto Range_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static auto Range_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static auto Range_AdjoinsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                        const MonoObject* Other);
 

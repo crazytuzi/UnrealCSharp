@@ -9,12 +9,6 @@ namespace Script.CoreUObject
         public UInt32 DWColor() =>
             ColorImplementation.Color_DWColorImplementation(GetHandle());
 
-        public static Boolean operator ==(FColor A, FColor B) =>
-            ColorImplementation.Color_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FColor A, FColor B) =>
-            ColorImplementation.Color_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public FLinearColor FromRGBE()
         {
             ColorImplementation.Color_FromRGBEImplementation(GetHandle(), out var OutValue);

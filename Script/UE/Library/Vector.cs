@@ -1,11 +1,6 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
-#if UE_5_0_OR_LATER
-using LwcType = System.Double;
-#else
-using LwcType = System.Single;
-#endif
 
 namespace Script.CoreUObject
 {
@@ -86,12 +81,6 @@ namespace Script.CoreUObject
 
             return OutValue;
         }
-
-        public static Boolean operator ==(FVector A, FVector B) =>
-            VectorImplementation.Vector_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FVector A, FVector B) =>
-            VectorImplementation.Vector_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         // @TODO KINDA_SMALL_NUMBER
         public Boolean Equals(FVector V, LwcType Tolerance) =>

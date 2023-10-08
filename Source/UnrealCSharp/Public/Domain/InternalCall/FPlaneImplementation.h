@@ -34,10 +34,6 @@ public:
 	                                                         const MonoObject* M, LwcType DetM, const MonoObject* TA,
 	                                                         MonoObject** OutValue);
 
-	static bool Plane_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Plane_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool Plane_EqualsImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
 	                                       LwcType Tolerance);
 

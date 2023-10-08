@@ -36,12 +36,6 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Boolean operator ==(FDateTime A, FDateTime B) =>
-            DateTimeImplementation.DateTime_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FDateTime A, FDateTime B) =>
-            DateTimeImplementation.DateTime_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public static Boolean operator >(FDateTime A, FDateTime B) =>
             DateTimeImplementation.DateTime_GreaterThanImplementation(A.GetHandle(), B.GetHandle());
 
