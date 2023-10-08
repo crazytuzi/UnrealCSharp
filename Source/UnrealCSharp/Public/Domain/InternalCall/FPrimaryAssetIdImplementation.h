@@ -16,10 +16,4 @@ public:
 	                                                  MonoObject** OutValue);
 
 	static void PrimaryAssetId_FromStringImplementation(MonoObject* String, MonoObject** OutValue);
-
-	static bool PrimaryAssetId_EqualityImplementation(const FGarbageCollectionHandle A,
-	                                                  const FGarbageCollectionHandle B);
-
-	static bool PrimaryAssetId_InequalityImplementation(const FGarbageCollectionHandle A,
-	                                                    const FGarbageCollectionHandle B);
 };

@@ -56,12 +56,6 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Boolean operator ==(FPlane A, FPlane B) =>
-            PlaneImplementation.Plane_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FPlane A, FPlane B) =>
-            PlaneImplementation.Plane_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         // @TODO KINDA_SMALL_NUMBER
         public Boolean Equals(FPlane V, LwcType Tolerance) =>
             PlaneImplementation.Plane_EqualsImplementation(GetHandle(), V, Tolerance);

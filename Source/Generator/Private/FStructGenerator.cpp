@@ -54,6 +54,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	FString DestructorContent;
 
+	FString IdenticalContent;
+
 	FString PropertyContent;
 
 	FString PropertyNameContent;
@@ -142,6 +144,16 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	),
 	                                           SuperStruct != nullptr ? TEXT(" new") : TEXT(""),
 	                                           *PathNameAttributeContent
+	);
+
+	IdenticalContent = FString::Printf(TEXT(
+		"\t\tpublic static Boolean operator ==(%s A, %s B) => StructUtils.Struct_Identical(StaticStruct().GetHandle(), A.GetHandle(), B.GetHandle());\n\n"
+		"\t\tpublic static Boolean operator !=(%s A, %s B) => !StructUtils.Struct_Identical(StaticStruct().GetHandle(), A.GetHandle(), B.GetHandle());\n"
+	),
+	                                   *FullClassContent,
+	                                   *FullClassContent,
+	                                   *FullClassContent,
+	                                   *FullClassContent
 	);
 
 	UsingNameSpaces.Add(TEXT("Script.Reflection.Struct"));
@@ -282,6 +294,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"%s\n"
 		"%s"
 		"%s"
+		"\n"
+		"%s"
 		"%s"
 		"%s"
 		"%s"
@@ -299,6 +313,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *StaticStructContent,
 	                               *ConstructorContent,
 	                               *DestructorContent,
+	                               *IdenticalContent,
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
 	                               *PropertyContent,
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),

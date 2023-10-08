@@ -16,8 +16,6 @@ struct FRegisterPrimaryAssetId
 			.Function("IsValid", FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation)
 			.Function("ToString", FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation)
 			.Function("FromString", FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation)
-			.Function("Equality", FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation)
-			.Function("Inequality", FPrimaryAssetIdImplementation::PrimaryAssetId_InequalityImplementation)
 			.Register();
 	}
 };
@@ -108,34 +106,4 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation(Mono
 	*OutPrimaryAssetId = FPrimaryAssetId::FromString(FString(UTF8_TO_TCHAR(
 		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 			GetDomain()->Object_To_String(String, nullptr)))));
-}
-
-bool FPrimaryAssetIdImplementation::PrimaryAssetId_EqualityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto PrimaryAssetIdA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(A);
-
-	const auto PrimaryAssetIdB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(B);
-
-	if (PrimaryAssetIdA != nullptr && PrimaryAssetIdB != nullptr)
-	{
-		return PrimaryAssetIdA->operator==(*PrimaryAssetIdB);
-	}
-
-	return false;
-}
-
-bool FPrimaryAssetIdImplementation::PrimaryAssetId_InequalityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto PrimaryAssetIdA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(A);
-
-	const auto PrimaryAssetIdB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPrimaryAssetId>(B);
-
-	if (PrimaryAssetIdA != nullptr && PrimaryAssetIdB != nullptr)
-	{
-		return PrimaryAssetIdA->operator!=(*PrimaryAssetIdB);
-	}
-
-	return false;
 }

@@ -15,8 +15,6 @@ struct FRegisterTimespan
 			.Function("Multiply", FTimespanImplementation::Timespan_MultiplyImplementation)
 			.Function("Divide", FTimespanImplementation::Timespan_DivideImplementation)
 			.Function("Remainder", FTimespanImplementation::Timespan_RemainderImplementation)
-			.Function("Equality", FTimespanImplementation::Timespan_EqualityImplementation)
-			.Function("Inequality", FTimespanImplementation::Timespan_InequalityImplementation)
 			.Function("GreaterThan", FTimespanImplementation::Timespan_GreaterThanImplementation)
 			.Function("GreaterThanOrEqual", FTimespanImplementation::Timespan_GreaterThanOrEqualImplementation)
 			.Function("LessThan", FTimespanImplementation::Timespan_LessThanImplementation)
@@ -177,36 +175,6 @@ void FTimespanImplementation::Timespan_RemainderImplementation(const FGarbageCol
 	{
 		*OutTimespan = TimespanA->operator%(*TimespanB);
 	}
-}
-
-bool FTimespanImplementation::Timespan_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                              const FGarbageCollectionHandle B)
-{
-	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
-
-	const auto TimespanB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
-
-	if (TimespanA != nullptr && TimespanB != nullptr)
-	{
-		return TimespanA->operator==(*TimespanB);
-	}
-
-	return false;
-}
-
-bool FTimespanImplementation::Timespan_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                                const FGarbageCollectionHandle B)
-{
-	const auto TimespanA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(A);
-
-	const auto TimespanB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
-
-	if (TimespanA != nullptr && TimespanB != nullptr)
-	{
-		return TimespanA->operator!=(*TimespanB);
-	}
-
-	return false;
 }
 
 bool FTimespanImplementation::Timespan_GreaterThanImplementation(const FGarbageCollectionHandle A,

@@ -24,11 +24,5 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void PrimaryAssetId_FromStringImplementation(FString String, out FPrimaryAssetId OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PrimaryAssetId_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean PrimaryAssetId_InequalityImplementation(IntPtr A, IntPtr B);
     }
 }

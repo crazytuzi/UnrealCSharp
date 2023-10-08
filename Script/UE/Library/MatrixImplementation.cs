@@ -33,13 +33,7 @@ namespace Script.Library
             out FMatrix OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Matrix_EqualsImplementation(IntPtr A, IntPtr B, LwcType Tolerance);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Matrix_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Matrix_TransformFVector4Implementation(IntPtr InMatrix, FVector4 V,

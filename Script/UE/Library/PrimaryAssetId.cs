@@ -38,11 +38,5 @@ namespace Script.CoreUObject
 
             return OutValue;
         }
-
-        public static Boolean operator ==(FPrimaryAssetId A, FPrimaryAssetId B) =>
-            PrimaryAssetIdImplementation.PrimaryAssetId_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FPrimaryAssetId A, FPrimaryAssetId B) =>
-            PrimaryAssetIdImplementation.PrimaryAssetId_InequalityImplementation(A.GetHandle(), B.GetHandle());
     }
 }

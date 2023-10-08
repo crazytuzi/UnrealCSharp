@@ -73,12 +73,6 @@ namespace Script.CoreUObject
         public static LwcType Dot4(FVector4 V1, FVector4 V2) =>
             Vector4Implementation.Vector4_Dot4Implementation(V1.GetHandle(), V2.GetHandle());
 
-        public static Boolean operator ==(FVector4 A, FVector4 B) =>
-            Vector4Implementation.Vector4_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FVector4 A, FVector4 B) =>
-            Vector4Implementation.Vector4_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public static FVector4 operator ^(FVector4 A, FVector4 B)
         {
             Vector4Implementation.Vector4_CrossProductImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);

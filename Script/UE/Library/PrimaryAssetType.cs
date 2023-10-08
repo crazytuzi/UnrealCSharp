@@ -13,12 +13,6 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Boolean operator ==(FPrimaryAssetType A, FPrimaryAssetType B) =>
-            PrimaryAssetTypeImplementation.PrimaryAssetType_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FPrimaryAssetType A, FPrimaryAssetType B) =>
-            PrimaryAssetTypeImplementation.PrimaryAssetType_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public Boolean IsValid() =>
             PrimaryAssetTypeImplementation.PrimaryAssetType_IsValidImplementation(GetHandle());
 

@@ -48,12 +48,6 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Boolean operator ==(FTimespan A, FTimespan B) =>
-            TimespanImplementation.Timespan_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FTimespan A, FTimespan B) =>
-            TimespanImplementation.Timespan_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public static Boolean operator >(FTimespan A, FTimespan B) =>
             TimespanImplementation.Timespan_GreaterThanImplementation(A.GetHandle(), B.GetHandle());
 

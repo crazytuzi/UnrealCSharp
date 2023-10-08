@@ -22,10 +22,6 @@ public:
 	static void Rotator_MultiplyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, LwcType Scale,
 	                                           MonoObject** OutValue);
 
-	static bool Rotator_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Rotator_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool Rotator_IsNearlyZeroImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                               LwcType Tolerance);
 

@@ -12,8 +12,6 @@ struct TRegisterRange
 	TRegisterRange()
 	{
 		TReflectionClassBuilder<T>(NAMESPACE_LIBRARY)
-			.Function("Equality", FRangeImplementation::Range_EqualityImplementation)
-			.Function("Inequality", FRangeImplementation::Range_InequalityImplementation)
 			.Function("Adjoins", FRangeImplementation::Range_AdjoinsImplementation)
 			.Function("Conjoins", FRangeImplementation::Range_ConjoinsImplementation)
 			.Function("ContainsElement", FRangeImplementation::Range_ContainsElementImplementation)

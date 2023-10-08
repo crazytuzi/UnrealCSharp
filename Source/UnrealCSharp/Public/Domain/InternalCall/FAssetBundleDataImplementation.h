@@ -6,12 +6,6 @@
 class FAssetBundleDataImplementation
 {
 public:
-	static bool AssetBundleData_EqualityImplementation(const FGarbageCollectionHandle A,
-	                                                   const FGarbageCollectionHandle B);
-
-	static bool AssetBundleData_InequalityImplementation(const FGarbageCollectionHandle A,
-	                                                     const FGarbageCollectionHandle B);
-
 	static void AssetBundleData_FindEntryImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                                    MonoObject* SearchName, MonoObject** OutValue);
 

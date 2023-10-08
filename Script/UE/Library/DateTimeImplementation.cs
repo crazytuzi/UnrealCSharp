@@ -22,12 +22,6 @@ namespace Script.Library
             out FDateTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean DateTime_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean DateTime_GreaterThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

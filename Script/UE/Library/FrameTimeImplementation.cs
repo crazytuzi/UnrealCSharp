@@ -31,12 +31,6 @@ namespace Script.Library
         public static extern void FrameTime_FromDecimalImplementation(Double InDecimalFrame, out FFrameTime OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameTime_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameTime_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean FrameTime_GreaterThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

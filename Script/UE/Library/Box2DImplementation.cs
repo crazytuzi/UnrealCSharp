@@ -13,12 +13,6 @@ namespace Script.Library
     public static class Box2DImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Box2D_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Box2D_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Box2D_AddVector2DImplementation(IntPtr A, IntPtr B, out FBox2D OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

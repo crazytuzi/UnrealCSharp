@@ -8,12 +8,6 @@ namespace Script.Library
     public static class AssetBundleDataImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean AssetBundleData_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean AssetBundleData_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AssetBundleData_FindEntryImplementation(IntPtr InAssetBundleData,
             FName SearchName, out FAssetBundleEntry OutValue);
 

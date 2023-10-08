@@ -20,8 +20,6 @@ struct FRegisterVector4
 			.Function("Multiply", FVector4Implementation::Vector4_MultiplyImplementation)
 			.Function("Dot3", FVector4Implementation::Vector4_Dot3Implementation)
 			.Function("Dot4", FVector4Implementation::Vector4_Dot4Implementation)
-			.Function("Equality", FVector4Implementation::Vector4_EqualityImplementation)
-			.Function("Inequality", FVector4Implementation::Vector4_InequalityImplementation)
 			.Function("CrossProduct", FVector4Implementation::Vector4_CrossProductImplementation)
 			.Function("Component", FVector4Implementation::Vector4_ComponentImplementation)
 			.Function("Equals", FVector4Implementation::Vector4_EqualsImplementation)
@@ -246,36 +244,6 @@ FVector4Implementation::LwcType FVector4Implementation::Vector4_Dot4Implementati
 	}
 
 	return 0.f;
-}
-
-bool FVector4Implementation::Vector4_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                            const FGarbageCollectionHandle B)
-{
-	const auto Vector4A = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(A);
-
-	const auto Vector4B = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(B);
-
-	if (Vector4A != nullptr && Vector4B != nullptr)
-	{
-		return Vector4A->operator==(*Vector4B);
-	}
-
-	return false;
-}
-
-bool FVector4Implementation::Vector4_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                              const FGarbageCollectionHandle B)
-{
-	const auto Vector4A = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(A);
-
-	const auto Vector4B = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(B);
-
-	if (Vector4A != nullptr && Vector4B != nullptr)
-	{
-		return Vector4A->operator!=(*Vector4B);
-	}
-
-	return false;
 }
 
 void FVector4Implementation::Vector4_CrossProductImplementation(const FGarbageCollectionHandle A,

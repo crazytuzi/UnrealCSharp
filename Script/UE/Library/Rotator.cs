@@ -32,12 +32,6 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Boolean operator ==(FRotator A, FRotator B) =>
-            RotatorImplementation.Rotator_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FRotator A, FRotator B) =>
-            RotatorImplementation.Rotator_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         // @TODO KINDA_SMALL_NUMBER
         public Boolean IsNearlyZero(LwcType Tolerance) =>
             RotatorImplementation.Rotator_IsNearlyZeroImplementation(GetHandle(), Tolerance);

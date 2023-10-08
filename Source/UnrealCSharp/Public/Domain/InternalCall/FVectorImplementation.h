@@ -42,10 +42,6 @@ public:
 	static void Vector_DivideScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                             LwcType Scale, MonoObject** OutValue);
 
-	static bool Vector_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Vector_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool Vector_EqualsImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
 	                                        LwcType Tolerance);
 

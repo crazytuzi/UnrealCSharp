@@ -16,8 +16,6 @@ struct FRegisterPlane
 			.Function("Flip", FPlaneImplementation::Plane_FlipImplementation)
 			.Function("TransformBy", FPlaneImplementation::Plane_TransformByImplementation)
 			.Function("TransformByUsingAdjointT", FPlaneImplementation::Plane_TransformByUsingAdjointTImplementation)
-			.Function("Equality", FPlaneImplementation::Plane_EqualityImplementation)
-			.Function("Inequality", FPlaneImplementation::Plane_InequalityImplementation)
 			.Function("Equals", FPlaneImplementation::Plane_EqualsImplementation)
 			.Function("DotProduct", FPlaneImplementation::Plane_DotProductImplementation)
 			.Function("DotProduct", FPlaneImplementation::Plane_DotProductImplementation)
@@ -159,36 +157,6 @@ void FPlaneImplementation::Plane_TransformByUsingAdjointTImplementation(
 	{
 		*OutPlane = Plane->TransformByUsingAdjointT(*MatrixM, DetM, *MatrixTA);
 	}
-}
-
-bool FPlaneImplementation::Plane_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                        const FGarbageCollectionHandle B)
-{
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
-
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
-
-	if (PlaneA != nullptr && PlaneB != nullptr)
-	{
-		return PlaneA->operator==(*PlaneB);
-	}
-
-	return false;
-}
-
-bool FPlaneImplementation::Plane_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                          const FGarbageCollectionHandle B)
-{
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
-
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
-
-	if (PlaneA != nullptr && PlaneB != nullptr)
-	{
-		return PlaneA->operator!=(*PlaneB);
-	}
-
-	return false;
 }
 
 bool FPlaneImplementation::Plane_EqualsImplementation(const FGarbageCollectionHandle A,

@@ -43,12 +43,6 @@ namespace Script.Library
         public static extern Boolean Quat_IdenticalImplementation(IntPtr InQuat, FQuat Q, UInt32 PortFlags);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Quat_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Quat_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern LwcType Quat_DotProductImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

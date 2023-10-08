@@ -19,12 +19,6 @@ namespace Script.CoreUObject
             return A;
         }
 
-        public static Boolean operator ==(FFrameNumber A, FFrameNumber B) =>
-            FrameNumberImplementation.FrameNumber_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FFrameNumber A, FFrameNumber B) =>
-            FrameNumberImplementation.FrameNumber_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public static Boolean operator <(FFrameNumber A, FFrameNumber B) =>
             FrameNumberImplementation.FrameNumber_LessThanImplementation(A.GetHandle(), B.GetHandle());
 

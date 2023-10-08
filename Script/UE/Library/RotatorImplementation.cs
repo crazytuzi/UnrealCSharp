@@ -22,12 +22,6 @@ namespace Script.Library
         public static extern void Rotator_MultiplyImplementation(IntPtr A, LwcType Scale, out FRotator OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Rotator_IsNearlyZeroImplementation(IntPtr InRotator, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

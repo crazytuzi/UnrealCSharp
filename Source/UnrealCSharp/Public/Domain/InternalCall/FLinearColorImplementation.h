@@ -38,11 +38,6 @@ public:
 	static void LinearColor_GetClampedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                                 float InMin, float InMax, MonoObject** OutValue);
 
-	static bool LinearColor_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool LinearColor_InequalityImplementation(const FGarbageCollectionHandle A,
-	                                                 const FGarbageCollectionHandle B);
-
 	static bool LinearColor_EqualsImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
 	                                             float Tolerance);
 

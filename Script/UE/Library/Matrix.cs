@@ -43,15 +43,9 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Boolean operator ==(FMatrix A, FMatrix B) =>
-            MatrixImplementation.Matrix_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
         // @TODO KINDA_SMALL_NUMBER
         public Boolean Equals(FMatrix Other, LwcType Tolerance) =>
             MatrixImplementation.Matrix_EqualsImplementation(GetHandle(), Other.GetHandle(), Tolerance);
-
-        public static Boolean operator !=(FMatrix A, FMatrix B) =>
-            MatrixImplementation.Matrix_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public FVector4 TransformFVector4(FVector4 V)
         {

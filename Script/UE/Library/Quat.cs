@@ -71,12 +71,6 @@ namespace Script.CoreUObject
         public Boolean Identical(FQuat Q, UInt32 PortFlags) =>
             QuatImplementation.Quat_IdenticalImplementation(GetHandle(), Q, PortFlags);
 
-        public static Boolean operator ==(FQuat A, FQuat B) =>
-            QuatImplementation.Quat_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FQuat A, FQuat B) =>
-            QuatImplementation.Quat_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public static LwcType operator |(FQuat A, FQuat B) =>
             QuatImplementation.Quat_DotProductImplementation(A.GetHandle(), B.GetHandle());
 

@@ -49,12 +49,6 @@ namespace Script.Library
         public static extern LwcType Vector4_Dot4Implementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Vector4_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Vector4_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Vector4_CrossProductImplementation(IntPtr A, IntPtr B, out FVector4 OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

@@ -15,9 +15,7 @@ struct FRegisterMatrix
 			.Function("Multiply", FMatrixImplementation::Matrix_MultiplyImplementation)
 			.Function("Add", FMatrixImplementation::Matrix_AddImplementation)
 			.Function("MultiplyScale", FMatrixImplementation::Matrix_MultiplyScaleImplementation)
-			.Function("Equality", FMatrixImplementation::Matrix_EqualityImplementation)
 			.Function("Equals", FMatrixImplementation::Matrix_EqualsImplementation)
-			.Function("Inequality", FMatrixImplementation::Matrix_InequalityImplementation)
 			.Function("TransformFVector4", FMatrixImplementation::Matrix_TransformFVector4Implementation)
 			.Function("TransformPosition", FMatrixImplementation::Matrix_TransformPositionImplementation)
 			.Function("InverseTransformPosition", FMatrixImplementation::Matrix_InverseTransformPositionImplementation)
@@ -162,21 +160,6 @@ void FMatrixImplementation::Matrix_MultiplyScaleImplementation(const FGarbageCol
 	}
 }
 
-bool FMatrixImplementation::Matrix_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                          const FGarbageCollectionHandle B)
-{
-	const auto MatrixA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(A);
-
-	const auto MatrixB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(B);
-
-	if (MatrixA != nullptr && MatrixB != nullptr)
-	{
-		return MatrixA->operator==(*MatrixB);
-	}
-
-	return false;
-}
-
 bool FMatrixImplementation::Matrix_EqualsImplementation(const FGarbageCollectionHandle A,
                                                         const FGarbageCollectionHandle B, const LwcType Tolerance)
 {
@@ -187,21 +170,6 @@ bool FMatrixImplementation::Matrix_EqualsImplementation(const FGarbageCollection
 	if (MatrixA != nullptr && MatrixB != nullptr)
 	{
 		return MatrixA->Equals(*MatrixB, Tolerance);
-	}
-
-	return false;
-}
-
-bool FMatrixImplementation::Matrix_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                            const FGarbageCollectionHandle B)
-{
-	const auto MatrixA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(A);
-
-	const auto MatrixB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(B);
-
-	if (MatrixA != nullptr && MatrixB != nullptr)
-	{
-		return MatrixA->operator!=(*MatrixB);
 	}
 
 	return false;

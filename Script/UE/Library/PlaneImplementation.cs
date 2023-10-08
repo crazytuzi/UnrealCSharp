@@ -37,12 +37,6 @@ namespace Script.Library
             FMatrix TA, out FPlane OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Plane_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Plane_EqualsImplementation(IntPtr InPlane, FPlane V, LwcType Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

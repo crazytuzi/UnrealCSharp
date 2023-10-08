@@ -10,12 +10,6 @@ namespace Script.CoreUObject
 {
     public partial class FBox2D
     {
-        public static Boolean operator ==(FBox2D A, FBox2D B) =>
-            Box2DImplementation.Box2D_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FBox2D A, FBox2D B) =>
-            Box2DImplementation.Box2D_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public static FBox2D operator +(FBox2D A, FVector2D B)
         {
             Box2DImplementation.Box2D_AddVector2DImplementation(A.GetHandle(), B.GetHandle(), out var OutValue);
