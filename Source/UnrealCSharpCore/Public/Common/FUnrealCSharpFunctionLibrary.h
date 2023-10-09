@@ -66,6 +66,8 @@ public:
 
 	static FString Encode(const FString& InName, bool bEncodeWideString = false);
 
+	static FString DotNetPath;
+
 private:
 	static TArray<FString>& GetGameModuleList();
 };

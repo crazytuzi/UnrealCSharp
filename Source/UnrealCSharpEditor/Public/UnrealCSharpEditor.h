@@ -26,7 +26,7 @@ public:
 	static void Generator();
 
 private:
-	TSharedPtr<class FUICommandList> PluginCommands;
+	TSharedPtr<class FUnrealCharpToolBar> UnrealCharpToolBar;
 
 	FEditorListener EditorListener;
 };
