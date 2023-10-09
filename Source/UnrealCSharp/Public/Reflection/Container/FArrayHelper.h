@@ -16,6 +16,8 @@ public:
 	void Deinitialize();
 
 public:
+	static bool Identical(const FArrayHelper* InA, const FArrayHelper* InB);
+
 	int32 GetTypeSize() const;
 
 	int32 GetSlack() const;

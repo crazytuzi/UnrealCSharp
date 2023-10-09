@@ -16,6 +16,12 @@ namespace Script.Common
 
         ~TSet() => SetUtils.Set_UnRegister(GetHandle());
 
+        [Obsolete("It is not supported like UE.", true)]
+        public static Boolean operator ==(TSet<T> A, TSet<T> B) => false;
+
+        [Obsolete("It is not supported like UE.", true)]
+        public static Boolean operator !=(TSet<T> A, TSet<T> B) => false;
+
         public IEnumerator<T> GetEnumerator()
         {
             for (var Index = 0; Index < Num(); Index++)

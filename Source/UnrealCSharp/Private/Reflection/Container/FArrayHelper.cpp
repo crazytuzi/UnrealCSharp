@@ -54,6 +54,44 @@ void FArrayHelper::Deinitialize()
 	}
 }
 
+bool FArrayHelper::Identical(const FArrayHelper* InA, const FArrayHelper* InB)
+{
+	if (InA == nullptr || InB == nullptr)
+	{
+		return false;
+	}
+
+	if (InA->GetTypeSize() != InB->GetTypeSize())
+	{
+		return false;
+	}
+
+	if (InA->Num() != InB->Num())
+	{
+		return false;
+	}
+
+	auto ScriptArrayHelperA = InA->CreateHelperFormInnerProperty();
+
+	auto ScriptArrayHelperB = InB->CreateHelperFormInnerProperty();
+
+	const auto InnerPropertyDescriptor = InA->GetInnerPropertyDescriptor();
+
+	for (auto Index = 0; Index < InA->Num(); ++Index)
+	{
+		const auto ItemA = ScriptArrayHelperA.GetRawPtr(Index);
+
+		const auto ItemB = ScriptArrayHelperB.GetRawPtr(Index);
+
+		if (!InnerPropertyDescriptor->Identical(ItemA, ItemB))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 int32 FArrayHelper::GetTypeSize() const
 {
 	return InnerPropertyDescriptor->GetSize();

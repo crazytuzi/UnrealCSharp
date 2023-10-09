@@ -16,6 +16,12 @@ namespace Script.Common
 
         ~TArray() => ArrayUtils.Array_UnRegister(GetHandle());
 
+        public static Boolean operator ==(TArray<T> A, TArray<T> B) =>
+            ArrayUtils.Array_Identical(A.GetHandle(), B.GetHandle());
+
+        public static Boolean operator !=(TArray<T> A, TArray<T> B) =>
+            !ArrayUtils.Array_Identical(A.GetHandle(), B.GetHandle());
+
         public IEnumerator<T> GetEnumerator()
         {
             for (var Index = 0; Index < Num(); Index++)

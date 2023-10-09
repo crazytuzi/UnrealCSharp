@@ -13,6 +13,7 @@ struct FRegisterArray
 	{
 		FClassBuilder(TEXT("Array"), NAMESPACE_LIBRARY)
 			.Function("Register", FArrayImplementation::Array_RegisterImplementation)
+			.Function("Identical", FArrayImplementation::Array_IdenticalImplementation)
 			.Function("UnRegister", FArrayImplementation::Array_UnRegisterImplementation)
 			.Function("GetTypeSize", FArrayImplementation::Array_GetTypeSizeImplementation)
 			.Function("GetSlack", FArrayImplementation::Array_GetSlackImplementation)
@@ -47,6 +48,20 @@ static FRegisterArray RegisterArray;
 void FArrayImplementation::Array_RegisterImplementation(MonoObject* InMonoObject)
 {
 	FCSharpBind::Bind<FArrayHelper>(InMonoObject, FTypeBridge::GetGenericArgument(InMonoObject));
+}
+
+bool FArrayImplementation::Array_IdenticalImplementation(const FGarbageCollectionHandle InA,
+                                                         const FGarbageCollectionHandle InB)
+{
+	if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InA))
+	{
+		if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InB))
+		{
+			return FArrayHelper::Identical(FoundA, FoundB);
+		}
+	}
+
+	return false;
 }
 
 void FArrayImplementation::Array_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)

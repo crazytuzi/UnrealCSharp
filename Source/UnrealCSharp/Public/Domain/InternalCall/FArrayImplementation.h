@@ -8,6 +8,9 @@ class FArrayImplementation
 public:
 	static void Array_RegisterImplementation(MonoObject* InMonoObject);
 
+	static bool Array_IdenticalImplementation(const FGarbageCollectionHandle InA,
+	                                          const FGarbageCollectionHandle InB);
+
 	static void Array_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
 	static int32 Array_GetTypeSizeImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);

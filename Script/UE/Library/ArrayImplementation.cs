@@ -10,6 +10,9 @@ namespace Script.Library
         public static extern void Array_RegisterImplementation<T>(TArray<T> InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean Array_IdenticalImplementation(IntPtr InA, IntPtr InB);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Array_UnRegisterImplementation(IntPtr InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
