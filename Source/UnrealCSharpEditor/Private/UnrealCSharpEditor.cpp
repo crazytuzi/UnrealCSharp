@@ -19,8 +19,6 @@
 #include "Mixin/FMixinGenerator.h"
 #include "ToolBar/UnrealCSharpToolBar.h"
 
-static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
-
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 
 void FUnrealCSharpEditorModule::StartupModule()
@@ -28,12 +26,13 @@ void FUnrealCSharpEditorModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 
 	FUnrealCSharpEditorStyle::Initialize();
+
 	FUnrealCSharpEditorStyle::ReloadTextures();
 
 	FUnrealCSharpEditorCommands::Register();
 
-	UnrealCharpToolBar = MakeShareable(new FUnrealCharpToolBar);
-	
+	UnrealCSharpToolBar = MakeShared<FUnrealCSharpToolBar>();
+
 	UToolMenus::RegisterStartupCallback(
 		FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
 }
@@ -61,9 +60,10 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 {
 	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
 	FToolMenuOwnerScoped OwnerScoped(this);
-	if ( UnrealCharpToolBar != nullptr )
+
+	if (UnrealCSharpToolBar.IsValid())
 	{
-		UnrealCharpToolBar->Initialize();
+		UnrealCSharpToolBar->Initialize();
 	}
 }
 

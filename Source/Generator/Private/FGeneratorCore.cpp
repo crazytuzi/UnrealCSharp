@@ -588,10 +588,9 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 
 		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), OutArray, GetPluginConfig());
 
-		const auto CommandletSettings = GetMutableDefault<UUnrealCSharpEditorSetting>();
-		if ( CommandletSettings )
+		if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
 		{
-			OutArray.Append(CommandletSettings->GeneratorModules);
+			OutArray.Append(UnrealCSharpEditorSetting->GetGeneratorModules());
 		}
 
 		for (const auto& Module : OutArray)
@@ -619,9 +618,6 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 		                            *SCRIPT,
 		                            FApp::GetProjectName()
 		));
-
-		
-		
 	}
 
 	static auto GameRoot = FString::Printf(TEXT(

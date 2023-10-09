@@ -2,23 +2,19 @@
 
 #include "CoreMinimal.h"
 
-
-class FUnrealCharpToolBar
+class FUnrealCSharpToolBar final
 {
 public:
-	FUnrealCharpToolBar();
-	virtual ~FUnrealCharpToolBar() = default;
+	FUnrealCSharpToolBar();
 
+public:
 	void Initialize();
-
-	
-
-	
 
 private:
 	void BuildAction();
-	
+
 	TSharedRef<SWidget> GenerateToolBarMenu();
 
+private:
 	TSharedRef<FUICommandList> PluginCommands;
 };

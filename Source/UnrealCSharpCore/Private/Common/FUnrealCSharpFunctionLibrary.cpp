@@ -9,16 +9,25 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "UEVersion.h"
-
-#if PLATFORM_WINDOWS
-FString FUnrealCSharpFunctionLibrary::DotNetPath = TEXT("C:/Program Files/dotnet/dotnet.exe");
-#else
-FString FUnrealCSharpFunctionLibrary::DotNetPath = TEXT("/usr/local/share/dotnet/dotnet");
-#endif
+#include "Setting/UnrealCSharpEditorSetting.h"
 
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
-	return DotNetPath;
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	{
+		const auto& DotNetPath = UnrealCSharpEditorSetting->GetDotNetPath();
+
+		if (!DotNetPath.IsEmpty())
+		{
+			return DotNetPath;
+		}
+	}
+
+#if PLATFORM_WINDOWS
+	return TEXT("C:/Program Files/dotnet/dotnet.exe");
+#else
+	return TEXT("/usr/local/share/dotnet/dotnet");
+#endif
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)

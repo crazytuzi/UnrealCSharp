@@ -6,12 +6,15 @@
 #include "Framework/Commands/Commands.h"
 #include "UnrealCSharpEditorStyle.h"
 
-class FUnrealCSharpEditorCommands : public TCommands<FUnrealCSharpEditorCommands>
+class FUnrealCSharpEditorCommands final : public TCommands<FUnrealCSharpEditorCommands>
 {
 public:
-
 	FUnrealCSharpEditorCommands()
-		: TCommands<FUnrealCSharpEditorCommands>(TEXT("UnrealCSharpEditor"), NSLOCTEXT("Contexts", "UnrealCSharpEditor", "UnrealCSharpEditor Plugin"), NAME_None, FUnrealCSharpEditorStyle::GetStyleSetName())
+		: TCommands<FUnrealCSharpEditorCommands>(
+			TEXT("UnrealCSharpEditor"),
+			NSLOCTEXT("Contexts", "UnrealCSharpEditor", "UnrealCSharpEditor Plugin"),
+			NAME_None,
+			FUnrealCSharpEditorStyle::GetStyleSetName())
 	{
 	}
 
@@ -19,6 +22,7 @@ public:
 	virtual void RegisterCommands() override;
 
 public:
-	TSharedPtr< FUICommandInfo > PluginAction;
-	TSharedPtr< FUICommandInfo > OpenEditorSettings;
+	TSharedPtr<FUICommandInfo> PluginAction;
+
+	TSharedPtr<FUICommandInfo> OpenEditorSettings;
 };
