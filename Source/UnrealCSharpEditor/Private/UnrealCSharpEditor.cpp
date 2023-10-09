@@ -17,8 +17,7 @@
 #include "FCodeAnalysis.h"
 #include "Misc/ScopedSlowTask.h"
 #include "Mixin/FMixinGenerator.h"
-
-static const FName UnrealCSharpEditorTabName("UnrealCSharpEditor");
+#include "ToolBar/UnrealCSharpToolBar.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 
@@ -27,16 +26,12 @@ void FUnrealCSharpEditorModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 
 	FUnrealCSharpEditorStyle::Initialize();
+
 	FUnrealCSharpEditorStyle::ReloadTextures();
 
 	FUnrealCSharpEditorCommands::Register();
 
-	PluginCommands = MakeShareable(new FUICommandList);
-
-	PluginCommands->MapAction(
-		FUnrealCSharpEditorCommands::Get().PluginAction,
-		FExecuteAction::CreateRaw(this, &FUnrealCSharpEditorModule::PluginButtonClicked),
-		FCanExecuteAction());
+	UnrealCSharpToolBar = MakeShared<FUnrealCSharpToolBar>();
 
 	UToolMenus::RegisterStartupCallback(
 		FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
@@ -66,24 +61,9 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
 	FToolMenuOwnerScoped OwnerScoped(this);
 
+	if (UnrealCSharpToolBar.IsValid())
 	{
-		UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Window");
-		{
-			FToolMenuSection& Section = Menu->FindOrAddSection("WindowLayout");
-			Section.AddMenuEntryWithCommandList(FUnrealCSharpEditorCommands::Get().PluginAction, PluginCommands);
-		}
-	}
-
-	{
-		UToolMenu* ToolbarMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar");
-		{
-			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection("Settings");
-			{
-				FToolMenuEntry& Entry = Section.AddEntry(
-					FToolMenuEntry::InitToolBarButton(FUnrealCSharpEditorCommands::Get().PluginAction));
-				Entry.SetCommandList(PluginCommands);
-			}
-		}
+		UnrealCSharpToolBar->Initialize();
 	}
 }
 

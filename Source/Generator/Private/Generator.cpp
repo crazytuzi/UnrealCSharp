@@ -16,5 +16,5 @@ void FGeneratorModule::ShutdownModule()
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FGeneratorModule, Generator)
