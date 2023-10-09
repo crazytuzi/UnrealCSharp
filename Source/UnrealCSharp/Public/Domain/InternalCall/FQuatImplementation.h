@@ -43,10 +43,6 @@ public:
 	static bool Quat_IdenticalImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                         const MonoObject* Q, uint32 PortFlags);
 
-	static bool Quat_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Quat_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static LwcType Quat_DotProductImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
 	static void Quat_MakeFromEulerImplementation(const MonoObject* Euler, MonoObject** OutValue);

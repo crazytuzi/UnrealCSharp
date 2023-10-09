@@ -43,10 +43,6 @@ public:
 	static LwcType Vector2D_CrossProductImplementation(const FGarbageCollectionHandle A,
 	                                                   const FGarbageCollectionHandle B);
 
-	static bool Vector2D_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Vector2D_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool Vector2D_LessThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
 	static bool Vector2D_GreaterThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);

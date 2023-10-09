@@ -19,8 +19,6 @@ struct FRegisterVector
 			.Function("MultiplyScale", FVectorImplementation::Vector_MultiplyScaleImplementation)
 			.Function("Divide", FVectorImplementation::Vector_DivideImplementation)
 			.Function("DivideScale", FVectorImplementation::Vector_DivideScaleImplementation)
-			.Function("Equality", FVectorImplementation::Vector_EqualityImplementation)
-			.Function("Inequality", FVectorImplementation::Vector_InequalityImplementation)
 			.Function("Equals", FVectorImplementation::Vector_EqualsImplementation)
 			.Function("AllComponentsEqual", FVectorImplementation::Vector_AllComponentsEqualImplementation)
 			.Function("Negated", FVectorImplementation::Vector_NegatedImplementation)
@@ -309,36 +307,6 @@ void FVectorImplementation::Vector_DivideScaleImplementation(const FGarbageColle
 	{
 		*OutVector = Vector->operator/(Scale);
 	}
-}
-
-bool FVectorImplementation::Vector_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                          const FGarbageCollectionHandle B)
-{
-	const auto VectorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(A);
-
-	const auto VectorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(B);
-
-	if (VectorA != nullptr && VectorB != nullptr)
-	{
-		return VectorA->operator==(*VectorB);
-	}
-
-	return false;
-}
-
-bool FVectorImplementation::Vector_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                            const FGarbageCollectionHandle B)
-{
-	const auto VectorA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(A);
-
-	const auto VectorB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(B);
-
-	if (VectorA != nullptr && VectorB != nullptr)
-	{
-		return VectorA->operator!=(*VectorB);
-	}
-
-	return false;
 }
 
 bool FVectorImplementation::Vector_EqualsImplementation(const FGarbageCollectionHandle A,

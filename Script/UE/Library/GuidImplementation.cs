@@ -8,12 +8,6 @@ namespace Script.Library
     public static class GuidImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Guid_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Guid_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Guid_LessThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

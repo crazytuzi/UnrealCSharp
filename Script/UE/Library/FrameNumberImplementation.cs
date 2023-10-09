@@ -13,12 +13,6 @@ namespace Script.Library
         public static extern void FrameNumber_DecrementImplementation(IntPtr InFrameNumber);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameNumber_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FrameNumber_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean FrameNumber_LessThanImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

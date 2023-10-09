@@ -8,10 +8,6 @@ class FColorImplementation
 public:
 	static uint32 Color_DWColorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static bool Color_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Color_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static void Color_FromRGBEImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                         MonoObject** OutValue);
 

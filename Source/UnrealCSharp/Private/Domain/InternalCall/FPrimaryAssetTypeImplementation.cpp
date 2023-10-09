@@ -10,8 +10,6 @@ struct FRegisterPrimaryAssetType
 	{
 		TReflectionClassBuilder<FPrimaryAssetType>(NAMESPACE_LIBRARY)
 			.Function("GetName", FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation)
-			.Function("Equality", FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation)
-			.Function("Inequality", FPrimaryAssetTypeImplementation::PrimaryAssetType_InequalityImplementation)
 			.Function("IsValid", FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation)
 			.Function("ToString", FPrimaryAssetTypeImplementation::PrimaryAssetType_ToStringImplementation)
 			.Register();
@@ -40,40 +38,6 @@ void FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation(
 
 		*OutValue = NewMonoObject;
 	}
-}
-
-bool FPrimaryAssetTypeImplementation::PrimaryAssetType_EqualityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto PrimaryAssetTypeA = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetType>(A);
-
-	const auto PrimaryAssetTypeB = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetType>(B);
-
-	if (PrimaryAssetTypeA != nullptr && PrimaryAssetTypeB != nullptr)
-	{
-		return PrimaryAssetTypeA->operator==(*PrimaryAssetTypeB);
-	}
-
-	return false;
-}
-
-bool FPrimaryAssetTypeImplementation::PrimaryAssetType_InequalityImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto PrimaryAssetTypeA = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetType>(A);
-
-	const auto PrimaryAssetTypeB = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetType>(B);
-
-	if (PrimaryAssetTypeA != nullptr && PrimaryAssetTypeB != nullptr)
-	{
-		return PrimaryAssetTypeA->operator!=(*PrimaryAssetTypeB);
-	}
-
-	return false;
 }
 
 bool FPrimaryAssetTypeImplementation::PrimaryAssetType_IsValidImplementation(

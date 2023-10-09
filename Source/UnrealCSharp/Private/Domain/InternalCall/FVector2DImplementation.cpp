@@ -19,8 +19,6 @@ struct FRegisterVector2D
 			.Function("Divide", FVector2DImplementation::Vector2D_DivideImplementation)
 			.Function("DotProduct", FVector2DImplementation::Vector2D_DotProductImplementation)
 			.Function("CrossProduct", FVector2DImplementation::Vector2D_CrossProductImplementation)
-			.Function("Equality", FVector2DImplementation::Vector2D_EqualityImplementation)
-			.Function("Inequality", FVector2DImplementation::Vector2D_InequalityImplementation)
 			.Function("LessThan", FVector2DImplementation::Vector2D_LessThanImplementation)
 			.Function("GreaterThan", FVector2DImplementation::Vector2D_GreaterThanImplementation)
 			.Function("LessThanOrEqual", FVector2DImplementation::Vector2D_LessThanOrEqualImplementation)
@@ -250,36 +248,6 @@ FVector2DImplementation::LwcType FVector2DImplementation::Vector2D_CrossProductI
 	}
 
 	return 0.f;
-}
-
-bool FVector2DImplementation::Vector2D_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                              const FGarbageCollectionHandle B)
-{
-	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
-
-	const auto Vector2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(B);
-
-	if (Vector2DA != nullptr && Vector2DB != nullptr)
-	{
-		return Vector2DA->operator==(*Vector2DB);
-	}
-
-	return false;
-}
-
-bool FVector2DImplementation::Vector2D_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                                const FGarbageCollectionHandle B)
-{
-	const auto Vector2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(A);
-
-	const auto Vector2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector2D>(B);
-
-	if (Vector2DA != nullptr && Vector2DB != nullptr)
-	{
-		return Vector2DA->operator!=(*Vector2DB);
-	}
-
-	return false;
 }
 
 bool FVector2DImplementation::Vector2D_LessThanImplementation(const FGarbageCollectionHandle A,

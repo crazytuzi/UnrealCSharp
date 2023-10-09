@@ -7,12 +7,6 @@ namespace Script.Library
     public static class Int32RangeImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Int32Range_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Int32Range_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Int32Range_AdjoinsImplementation(IntPtr InInt32Range, FInt32Range Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

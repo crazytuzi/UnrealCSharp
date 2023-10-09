@@ -6,10 +6,6 @@
 class FGuidImplementation
 {
 public:
-	static bool Guid_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Guid_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool Guid_LessThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
 	static bool Guid_GreaterThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);

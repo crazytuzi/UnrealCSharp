@@ -16,8 +16,6 @@ struct FRegisterFrameTime
 			.Function("RoundToFrame", FFrameTimeImplementation::FrameTime_RoundToFrameImplementation)
 			.Function("AsDecimal", FFrameTimeImplementation::FrameTime_AsDecimalImplementation)
 			.Function("FromDecimal", FFrameTimeImplementation::FrameTime_FromDecimalImplementation)
-			.Function("Equality", FFrameTimeImplementation::FrameTime_EqualityImplementation)
-			.Function("Inequality", FFrameTimeImplementation::FrameTime_InequalityImplementation)
 			.Function("GreaterThan", FFrameTimeImplementation::FrameTime_GreaterThanImplementation)
 			.Function("GreaterThanOrEqual", FFrameTimeImplementation::FrameTime_GreaterThanOrEqualImplementation)
 			.Function("LessThan", FFrameTimeImplementation::FrameTime_LessThanImplementation)
@@ -161,36 +159,6 @@ void FFrameTimeImplementation::FrameTime_FromDecimalImplementation(const double 
 	{
 		*OutFrameTime = FFrameTime::FromDecimal(InDecimalFrame);
 	}
-}
-
-bool FFrameTimeImplementation::FrameTime_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                                const FGarbageCollectionHandle B)
-{
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
-
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
-
-	if (FrameTimeA != nullptr && FrameTimeB != nullptr)
-	{
-		return operator==(*FrameTimeA, *FrameTimeB);
-	}
-
-	return false;
-}
-
-bool FFrameTimeImplementation::FrameTime_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                                  const FGarbageCollectionHandle B)
-{
-	const auto FrameTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(A);
-
-	const auto FrameTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FFrameTime>(B);
-
-	if (FrameTimeA != nullptr && FrameTimeB != nullptr)
-	{
-		return operator!=(*FrameTimeA, *FrameTimeB);
-	}
-
-	return false;
 }
 
 bool FFrameTimeImplementation::FrameTime_GreaterThanImplementation(const FGarbageCollectionHandle A,

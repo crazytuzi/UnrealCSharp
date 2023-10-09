@@ -7,12 +7,6 @@ namespace Script.Library
     public static class FloatRangeImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean FloatRange_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean FloatRange_AdjoinsImplementation(IntPtr InFloatRange, FFloatRange Other);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

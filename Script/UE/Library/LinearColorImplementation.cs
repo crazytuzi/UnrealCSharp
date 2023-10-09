@@ -48,12 +48,6 @@ namespace Script.Library
             Single InMax, out FLinearColor OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean LinearColor_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean LinearColor_InequalityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean LinearColor_EqualsImplementation(IntPtr A, IntPtr B, Single Tolerance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

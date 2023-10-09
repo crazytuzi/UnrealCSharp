@@ -13,8 +13,6 @@ struct FRegisterDateTime
 			.Function("AddDateTime", FDateTimeImplementation::DateTime_AddDateTimeImplementation)
 			.Function("SubtractDateTime", FDateTimeImplementation::DateTime_SubtractDateTimeImplementation)
 			.Function("SubtractTimespan", FDateTimeImplementation::DateTime_SubtractTimespanImplementation)
-			.Function("Equality", FDateTimeImplementation::DateTime_EqualityImplementation)
-			.Function("Inequality", FDateTimeImplementation::DateTime_InequalityImplementation)
 			.Function("GreaterThan", FDateTimeImplementation::DateTime_GreaterThanImplementation)
 			.Function("GreaterThanOrEqual", FDateTimeImplementation::DateTime_GreaterThanOrEqualImplementation)
 			.Function("LessThan", FDateTimeImplementation::DateTime_LessThanImplementation)
@@ -135,36 +133,6 @@ void FDateTimeImplementation::DateTime_SubtractTimespanImplementation(const FGar
 	{
 		*OutDateTime = DateTime->operator-(*Timespan);
 	}
-}
-
-bool FDateTimeImplementation::DateTime_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                              const FGarbageCollectionHandle B)
-{
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
-
-	if (DateTimeA != nullptr && DateTimeB != nullptr)
-	{
-		return DateTimeA->operator==(*DateTimeB);
-	}
-
-	return false;
-}
-
-bool FDateTimeImplementation::DateTime_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                                const FGarbageCollectionHandle B)
-{
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
-
-	if (DateTimeA != nullptr && DateTimeB != nullptr)
-	{
-		return DateTimeA->operator!=(*DateTimeB);
-	}
-
-	return false;
 }
 
 bool FDateTimeImplementation::DateTime_GreaterThanImplementation(const FGarbageCollectionHandle A,

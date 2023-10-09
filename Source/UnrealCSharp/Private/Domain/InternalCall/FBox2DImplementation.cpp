@@ -9,8 +9,6 @@ struct FRegisterBox2D
 	FRegisterBox2D()
 	{
 		TReflectionClassBuilder<FBox2D>(NAMESPACE_LIBRARY)
-			.Function("Equality", FBox2DImplementation::Box2D_EqualityImplementation)
-			.Function("Inequality", FBox2DImplementation::Box2D_InequalityImplementation)
 			.Function("AddVector2D", FBox2DImplementation::Box2D_AddVector2DImplementation)
 			.Function("Add", FBox2DImplementation::Box2D_AddImplementation)
 			.Function("GetReference", FBox2DImplementation::Box2D_GetReferenceImplementation)
@@ -35,36 +33,6 @@ struct FRegisterBox2D
 };
 
 static FRegisterBox2D RegisterBox2D;
-
-bool FBox2DImplementation::Box2D_EqualityImplementation(const FGarbageCollectionHandle A,
-                                                        const FGarbageCollectionHandle B)
-{
-	const auto Box2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(A);
-
-	const auto Box2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(B);
-
-	if (Box2DA != nullptr && Box2DB != nullptr)
-	{
-		return Box2DA->operator==(*Box2DB);
-	}
-
-	return false;
-}
-
-bool FBox2DImplementation::Box2D_InequalityImplementation(const FGarbageCollectionHandle A,
-                                                          const FGarbageCollectionHandle B)
-{
-	const auto Box2DA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(A);
-
-	const auto Box2DB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FBox2D>(B);
-
-	if (Box2DA != nullptr && Box2DB != nullptr)
-	{
-		return Box2DA->operator==(*Box2DB);
-	}
-
-	return false;
-}
 
 void FBox2DImplementation::Box2D_AddVector2DImplementation(const FGarbageCollectionHandle A,
                                                            const FGarbageCollectionHandle B, MonoObject** OutValue)

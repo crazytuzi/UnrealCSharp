@@ -1,11 +1,6 @@
 ﻿using System;
 using Script.Library;
 using Script.Common;
-#if UE_5_0_OR_LATER
-using LwcType = System.Double;
-#else
-using LwcType = System.Single;
-#endif
 
 namespace Script.CoreUObject
 {
@@ -72,12 +67,6 @@ namespace Script.CoreUObject
 
         public static LwcType operator ^(FVector2D A, FVector2D B) =>
             Vector2DImplementation.Vector2D_CrossProductImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator ==(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FVector2D A, FVector2D B) =>
-            Vector2DImplementation.Vector2D_InequalityImplementation(A.GetHandle(), B.GetHandle());
 
         public static Boolean operator <(FVector2D A, FVector2D B) =>
             Vector2DImplementation.Vector2D_LessThanImplementation(A.GetHandle(), B.GetHandle());

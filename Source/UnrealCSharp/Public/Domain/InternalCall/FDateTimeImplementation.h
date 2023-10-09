@@ -17,10 +17,6 @@ public:
 	static void DateTime_SubtractTimespanImplementation(const FGarbageCollectionHandle A,
 	                                                    const FGarbageCollectionHandle B, MonoObject** OutValue);
 
-	static bool DateTime_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool DateTime_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool DateTime_GreaterThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
 	static bool DateTime_GreaterThanOrEqualImplementation(const FGarbageCollectionHandle A,

@@ -13,10 +13,6 @@ class FBox2DImplementation
 #endif
 
 public:
-	static bool Box2D_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Box2D_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static void Box2D_AddVector2DImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
 	                                            MonoObject** OutValue);
 

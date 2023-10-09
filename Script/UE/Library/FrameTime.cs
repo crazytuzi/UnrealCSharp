@@ -46,12 +46,6 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public static Boolean operator ==(FFrameTime A, FFrameTime B) =>
-            FrameTimeImplementation.FrameTime_EqualityImplementation(A.GetHandle(), B.GetHandle());
-
-        public static Boolean operator !=(FFrameTime A, FFrameTime B) =>
-            FrameTimeImplementation.FrameTime_InequalityImplementation(A.GetHandle(), B.GetHandle());
-
         public static Boolean operator >(FFrameTime A, FFrameTime B) =>
             FrameTimeImplementation.FrameTime_GreaterThanImplementation(A.GetHandle(), B.GetHandle());
 

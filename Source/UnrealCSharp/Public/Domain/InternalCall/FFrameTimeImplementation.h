@@ -24,10 +24,6 @@ public:
 
 	static void FrameTime_FromDecimalImplementation(double InDecimalFrame, MonoObject** OutValue);
 
-	static bool FrameTime_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool FrameTime_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool FrameTime_GreaterThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
 	static bool FrameTime_GreaterThanOrEqualImplementation(const FGarbageCollectionHandle A,

@@ -2,11 +2,6 @@
 using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
-#if UE_5_0_OR_LATER
-using LwcType = System.Double;
-#else
-using LwcType = System.Single;
-#endif
 
 namespace Script.Library
 {
@@ -20,12 +15,6 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Rotator_MultiplyImplementation(IntPtr A, LwcType Scale, out FRotator OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_EqualityImplementation(IntPtr A, IntPtr B);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Rotator_InequalityImplementation(IntPtr A, IntPtr B);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Rotator_IsNearlyZeroImplementation(IntPtr InRotator, LwcType Tolerance);

@@ -10,11 +10,6 @@ public:
 
 	static void FrameNumber_DecrementImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
-	static bool FrameNumber_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool FrameNumber_InequalityImplementation(const FGarbageCollectionHandle A,
-	                                                 const FGarbageCollectionHandle B);
-
 	static bool FrameNumber_LessThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
 	static bool FrameNumber_GreaterThanImplementation(const FGarbageCollectionHandle A,

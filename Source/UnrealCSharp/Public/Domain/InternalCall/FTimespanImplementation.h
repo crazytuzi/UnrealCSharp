@@ -24,10 +24,6 @@ public:
 	static void Timespan_RemainderImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
 	                                             MonoObject** OutValue);
 
-	static bool Timespan_EqualityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
-	static bool Timespan_InequalityImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
-
 	static bool Timespan_GreaterThanImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B);
 
 	static bool Timespan_GreaterThanOrEqualImplementation(const FGarbageCollectionHandle A,
