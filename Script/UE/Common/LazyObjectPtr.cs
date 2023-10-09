@@ -17,6 +17,12 @@ namespace Script.Common
 
         public static implicit operator TLazyObjectPtr<T>(T InObject) => new TLazyObjectPtr<T>(InObject);
 
+        public static Boolean operator ==(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B) =>
+            LazyObjectPtrImplementation.LazyObjectPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
+        public static Boolean operator !=(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B) =>
+            !LazyObjectPtrImplementation.LazyObjectPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
         public T Get()
         {
             LazyObjectPtrImplementation.LazyObjectPtr_GetImplementation<T>(GetHandle(), out var OutValue);

@@ -12,6 +12,9 @@ namespace Script.Library
             T InObject, string InInterfaceName) where T : IInterface;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean ScriptInterface_IdenticalImplementation(IntPtr InA, IntPtr InB);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void ScriptInterface_UnRegisterImplementation(IntPtr InScriptInterface);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

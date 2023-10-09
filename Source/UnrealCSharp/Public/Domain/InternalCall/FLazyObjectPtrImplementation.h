@@ -8,6 +8,9 @@ class FLazyObjectPtrImplementation
 public:
 	static void LazyObjectPtr_RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject);
 
+	static bool LazyObjectPtr_IdenticalImplementation(const FGarbageCollectionHandle InA,
+	                                                  const FGarbageCollectionHandle InB);
+
 	static void LazyObjectPtr_UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle);
 
 	static void LazyObjectPtr_GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,

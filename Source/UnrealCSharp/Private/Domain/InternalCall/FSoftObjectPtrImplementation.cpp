@@ -10,6 +10,7 @@ struct FRegisterSoftObjectPtr
 	{
 		FClassBuilder(TEXT("SoftObjectPtr"), NAMESPACE_LIBRARY)
 			.Function("Register", FSoftObjectPtrImplementation::SoftObjectPtr_RegisterImplementation)
+			.Function("Identical", FSoftObjectPtrImplementation::SoftObjectPtr_IdenticalImplementation)
 			.Function("UnRegister", FSoftObjectPtrImplementation::SoftObjectPtr_UnRegisterImplementation)
 			.Function("Get", FSoftObjectPtrImplementation::SoftObjectPtr_GetImplementation)
 			.Register();
@@ -26,6 +27,20 @@ void FSoftObjectPtrImplementation::SoftObjectPtr_RegisterImplementation(MonoObje
 	const auto SoftObjectPtr = new TSoftObjectPtr<UObject>(FoundObject);
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>>(InMonoObject, SoftObjectPtr);
+}
+
+bool FSoftObjectPtrImplementation::SoftObjectPtr_IdenticalImplementation(const FGarbageCollectionHandle InA,
+                                                                         const FGarbageCollectionHandle InB)
+{
+	if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<UObject>>(InA))
+	{
+		if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<UObject>>(InB))
+		{
+			return *FoundA == *FoundB;
+		}
+	}
+
+	return false;
 }
 
 void FSoftObjectPtrImplementation::SoftObjectPtr_UnRegisterImplementation(

@@ -12,6 +12,9 @@ namespace Script.Library
             where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean SubclassOf_IdenticalImplementation(IntPtr InA, IntPtr InB);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SubclassOf_UnRegisterImplementation(IntPtr InSubclassOf);
 
         [MethodImpl(MethodImplOptions.InternalCall)]

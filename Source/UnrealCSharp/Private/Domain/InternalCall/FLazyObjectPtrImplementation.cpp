@@ -9,6 +9,7 @@ struct FRegisterLazyObjectPtr
 	{
 		FClassBuilder(TEXT("LazyObjectPtr"), NAMESPACE_LIBRARY)
 			.Function("Register", FLazyObjectPtrImplementation::LazyObjectPtr_RegisterImplementation)
+			.Function("Identical", FLazyObjectPtrImplementation::LazyObjectPtr_IdenticalImplementation)
 			.Function("UnRegister", FLazyObjectPtrImplementation::LazyObjectPtr_UnRegisterImplementation)
 			.Function("Get", FLazyObjectPtrImplementation::LazyObjectPtr_GetImplementation)
 			.Register();
@@ -25,6 +26,20 @@ void FLazyObjectPtrImplementation::LazyObjectPtr_RegisterImplementation(MonoObje
 	const auto LazyObjectPtr = new TLazyObjectPtr<UObject>(FoundObject);
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(InMonoObject, LazyObjectPtr);
+}
+
+bool FLazyObjectPtrImplementation::LazyObjectPtr_IdenticalImplementation(const FGarbageCollectionHandle InA,
+                                                                         const FGarbageCollectionHandle InB)
+{
+	if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(InA))
+	{
+		if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(InB))
+		{
+			return *FoundA == *FoundB;
+		}
+	}
+
+	return false;
 }
 
 void FLazyObjectPtrImplementation::LazyObjectPtr_UnRegisterImplementation(

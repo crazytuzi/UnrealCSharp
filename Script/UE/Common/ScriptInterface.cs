@@ -18,6 +18,12 @@ namespace Script.Common
 
         public static implicit operator TScriptInterface<T>(T InObject) => new TScriptInterface<T>(InObject);
 
+        public static Boolean operator ==(TScriptInterface<T> A, TScriptInterface<T> B) =>
+            ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
+        public static Boolean operator !=(TScriptInterface<T> A, TScriptInterface<T> B) =>
+            !ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
         public U GetObject<U>() where U : UObject
         {
             ScriptInterfaceImplementation.ScriptInterface_GetObjectImplementation<U>(GetHandle(), out var OutValue);

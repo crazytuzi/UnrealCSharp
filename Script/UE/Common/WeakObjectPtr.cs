@@ -17,6 +17,12 @@ namespace Script.Common
 
         public static implicit operator TWeakObjectPtr<T>(T InObject) => new TWeakObjectPtr<T>(InObject);
 
+        public static Boolean operator ==(TWeakObjectPtr<T> A, TWeakObjectPtr<T> B) =>
+            WeakObjectPtrImplementation.WeakObjectPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
+        public static Boolean operator !=(TWeakObjectPtr<T> A, TWeakObjectPtr<T> B) =>
+            !WeakObjectPtrImplementation.WeakObjectPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
         public T Get()
         {
             WeakObjectPtrImplementation.WeakObjectPtr_GetImplementation<T>(GetHandle(), out var OutValue);

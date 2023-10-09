@@ -13,6 +13,9 @@ namespace Script.Library
             where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean SoftClassPtr_IdenticalImplementation(IntPtr InA, IntPtr InB);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SoftClassPtr_UnRegisterImplementation(IntPtr InSoftClassPtr);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
