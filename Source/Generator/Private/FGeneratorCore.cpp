@@ -59,9 +59,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
 	{
-		return ByteProperty->Enum != nullptr
-			       ? FUnrealCSharpFunctionLibrary::GetFullClass(ByteProperty->Enum)
-			       : TEXT("Byte");
+		if (ByteProperty->Enum != nullptr)
+		{
+			FEnumGenerator::AddEnumUnderlyingType(ByteProperty->Enum, ByteProperty);
+
+			return FUnrealCSharpFunctionLibrary::GetFullClass(ByteProperty->Enum);
+		}
+
+		return TEXT("Byte");
 	}
 
 	if (CastField<FUInt16Property>(Property)) return TEXT("UInt16");
