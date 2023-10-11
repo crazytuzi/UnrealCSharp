@@ -16,6 +16,7 @@
 #include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
+#include "Template/TIsTEnumAsByte.inl"
 #include "UEVersion.h"
 
 template <typename T, T, typename Enable = void>
@@ -307,6 +308,13 @@ struct TPropertyBuilder<Result Class::*, Member,
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TAnd<TIsEnum<Result>, TNot<TIsNotUEnum<Result>>>::Value>::Type> :
+	TPropertyInfoBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member,
+                        typename TEnableIf<TIsTEnumAsByte<Result>::Value>::Type> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };

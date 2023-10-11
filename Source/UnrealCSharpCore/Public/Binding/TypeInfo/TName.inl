@@ -13,6 +13,7 @@
 #include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
+#include "Template/TIsTEnumAsByte.inl"
 #include "UEVersion.h"
 
 template <typename T, typename Enable = void>
@@ -343,6 +344,12 @@ struct TName<T, typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value
 	{
 		return FUnrealCSharpFunctionLibrary::GetFullClass(StaticEnum<T>());
 	}
+};
+
+template <typename T>
+struct TName<T, typename TEnableIf<TIsTEnumAsByte<T>::Value, T>::Type> :
+	TName<typename T::EnumType, typename T::EnumType>
+{
 };
 
 template <typename T>

@@ -377,6 +377,13 @@ struct TReturnValue<T, typename TEnableIf<TAnd<TIsEnum<typename TDecay<T>::Type>
 };
 
 template <typename T>
+struct TReturnValue<T, typename TEnableIf<TIsTEnumAsByte<typename TDecay<T>::Type>::Value>::Type> :
+	TReturnValue<typename T::EnumType, typename T::EnumType>
+{
+	using TReturnValue<typename T::EnumType, typename T::EnumType>::TReturnValue;
+};
+
+template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsTSoftClassPtr<typename TDecay<T>::Type>::Value>::Type> :
 	TMultiReturnValue<T>
 {
