@@ -16,6 +16,12 @@ namespace Script.Common
 
         public static implicit operator TSubclassOf<T>(UClass InClass) => new TSubclassOf<T>(InClass);
 
+        public static Boolean operator ==(TSubclassOf<T> A, TSubclassOf<T> B) =>
+            SubclassOfImplementation.SubclassOf_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
+        public static Boolean operator !=(TSubclassOf<T> A, TSubclassOf<T> B) =>
+            !SubclassOfImplementation.SubclassOf_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
         public UClass Get()
         {
             SubclassOfImplementation.SubclassOf_GetImplementation(GetHandle(), out var OutValue);

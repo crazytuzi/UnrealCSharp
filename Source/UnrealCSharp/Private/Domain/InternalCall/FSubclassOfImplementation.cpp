@@ -10,6 +10,7 @@ struct FRegisterSubclassOf
 	{
 		FClassBuilder(TEXT("SubclassOf"), NAMESPACE_LIBRARY)
 			.Function("Register", FSubclassOfImplementation::SubclassOf_RegisterImplementation)
+			.Function("Identical", FSubclassOfImplementation::SubclassOf_IdenticalImplementation)
 			.Function("UnRegister", FSubclassOfImplementation::SubclassOf_UnRegisterImplementation)
 			.Function("Get", FSubclassOfImplementation::SubclassOf_GetImplementation)
 			.Register();
@@ -25,6 +26,20 @@ void FSubclassOfImplementation::SubclassOf_RegisterImplementation(MonoObject* In
 	const auto SubclassOf = new TSubclassOf<UObject>(FoundClass);
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(InMonoObject, SubclassOf);
+}
+
+bool FSubclassOfImplementation::SubclassOf_IdenticalImplementation(const FGarbageCollectionHandle InA,
+                                                                   const FGarbageCollectionHandle InB)
+{
+	if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InA))
+	{
+		if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InB))
+		{
+			return *FoundA == *FoundB;
+		}
+	}
+
+	return false;
 }
 
 void FSubclassOfImplementation::SubclassOf_UnRegisterImplementation(

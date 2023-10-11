@@ -10,6 +10,7 @@ struct FRegisterWeakObjectPtr
 	{
 		FClassBuilder(TEXT("WeakObjectPtr"), NAMESPACE_LIBRARY)
 			.Function("Register", FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation)
+			.Function("Identical", FWeakObjectPtrImplementation::WeakObjectPtr_IdenticalImplementation)
 			.Function("UnRegister", FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation)
 			.Function("Get", FWeakObjectPtrImplementation::WeakObjectPtr_GetImplementation)
 			.Register();
@@ -26,6 +27,20 @@ void FWeakObjectPtrImplementation::WeakObjectPtr_RegisterImplementation(MonoObje
 	const auto WeakObjectPtr = new TWeakObjectPtr<UObject>(FoundObject);
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(InMonoObject, WeakObjectPtr);
+}
+
+bool FWeakObjectPtrImplementation::WeakObjectPtr_IdenticalImplementation(const FGarbageCollectionHandle InA,
+                                                                         const FGarbageCollectionHandle InB)
+{
+	if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(InA))
+	{
+		if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(InB))
+		{
+			return *FoundA == *FoundB;
+		}
+	}
+
+	return false;
 }
 
 void FWeakObjectPtrImplementation::WeakObjectPtr_UnRegisterImplementation(

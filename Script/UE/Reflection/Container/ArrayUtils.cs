@@ -9,6 +9,9 @@ namespace Script.Reflection.Container
         public static void Array_Register<T>(TArray<T> InArray) =>
             ArrayImplementation.Array_RegisterImplementation(InArray);
 
+        public static Boolean Array_Identical(IntPtr InA, IntPtr InB) =>
+            ArrayImplementation.Array_IdenticalImplementation(InA, InB);
+
         public static void Array_UnRegister(IntPtr InArray) =>
             ArrayImplementation.Array_UnRegisterImplementation(InArray);
 

@@ -17,6 +17,12 @@ namespace Script.Common
 
         public static implicit operator TSoftClassPtr<T>(UClass InClass) => new TSoftClassPtr<T>(InClass);
 
+        public static Boolean operator ==(TSoftClassPtr<T> A, TSoftClassPtr<T> B) =>
+            SoftClassPtrImplementation.SoftClassPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
+        public static Boolean operator !=(TSoftClassPtr<T> A, TSoftClassPtr<T> B) =>
+            !SoftClassPtrImplementation.SoftClassPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+
         public UClass Get()
         {
             SoftClassPtrImplementation.SoftClassPtr_GetImplementation(GetHandle(), out var OutValue);

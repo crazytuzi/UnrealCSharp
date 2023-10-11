@@ -16,6 +16,12 @@ namespace Script.Common
 
         ~TMap() => MapUtils.Map_UnRegister(GCHandle);
 
+        [Obsolete("It is not supported like UE.", true)]
+        public static Boolean operator ==(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
+
+        [Obsolete("It is not supported like UE.", true)]
+        public static Boolean operator !=(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
+
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             for (var Index = 0; Index < GetMaxIndex(); Index++)
