@@ -17,6 +17,7 @@
 #include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
+#include "Template/TIsTEnumAsByte.inl"
 #include "UEVersion.h"
 
 template <typename T, typename Enable = void>
@@ -698,6 +699,21 @@ template <typename T>
 struct TPropertyValue<T,
                       typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type> :
 	TSinglePropertyValue<T>
+{
+	static MonoObject* Get(T* InMember)
+	{
+		// @TODO
+		T Value = *InMember;
+
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
+			TPropertyClass<T, T>::Get(), &Value);
+	}
+};
+
+template <typename T>
+struct TPropertyValue<T,
+                      typename TEnableIf<TIsTEnumAsByte<T>::Value, T>::Type> :
+	TPropertyValue<typename T::EnumType, typename T::EnumType>
 {
 	static MonoObject* Get(T* InMember)
 	{
