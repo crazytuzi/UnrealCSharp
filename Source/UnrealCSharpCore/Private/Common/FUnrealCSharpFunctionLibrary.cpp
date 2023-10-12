@@ -11,6 +11,7 @@
 #include "UEVersion.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
@@ -29,6 +30,7 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 	return TEXT("/usr/local/share/dotnet/dotnet");
 #endif
 }
+#endif
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
