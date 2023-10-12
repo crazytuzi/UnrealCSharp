@@ -260,3 +260,13 @@ struct TIsNotUEnum<Class> \
 #else
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__)
 #endif
+
+#define BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function) TFunctionPointer(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
+
+#define BINDING_OPERATOR_BUILDER_INFO(Signature, Function) TFunctionBuilder<Signature, Function>::Info()
+
+#if WITH_FUNCTION_INFO
+#define BINDING_OPERATOR(Signature, Function) BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function), BINDING_OPERATOR_BUILDER_INFO(Signature, Function)
+#else
+#define BINDING_OPERATOR(Signature, Function) BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function)
+#endif
