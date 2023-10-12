@@ -434,7 +434,7 @@ struct TPropertyValue<T,
 {
 	static MonoObject* Get(T* InMember, const MonoObject* InMonoObject = nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -506,13 +506,10 @@ struct TPropertyValue<T,
 		{
 			if (SrcContainer->IsValidIndex(Index))
 			{
-				Value
-					[
-						*static_cast<typename TTemplateTypeTraits<T>::template Type<0>*>
-						(SrcContainer->GetEnumeratorKey(Index))
-					]
-					= *static_cast<typename TTemplateTypeTraits<T>::template Type<1>*>
-					(SrcContainer->GetEnumeratorValue(Index));
+				Value.Add(*static_cast<typename TTemplateTypeTraits<T>::template Type<0>*>
+				          (SrcContainer->GetEnumeratorKey(Index)),
+				          *static_cast<typename TTemplateTypeTraits<T>::template Type<1>*>
+				          (SrcContainer->GetEnumeratorValue(Index)));
 			}
 		}
 
@@ -526,7 +523,7 @@ struct TPropertyValue<T,
 {
 	static MonoObject* Get(T* InMember, const MonoObject* InMonoObject = nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -638,7 +635,7 @@ struct TPropertyValue<T,
 {
 	static MonoObject* Get(T* InMember, const MonoObject* InMonoObject = nullptr)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject(InMember);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FArrayHelper>(InMember);
 
 		if (SrcMonoObject == nullptr)
 		{

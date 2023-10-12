@@ -2,7 +2,7 @@
 
 #include "GarbageCollection/FGarbageCollectionHandle.h"
 
-class FReference
+class UNREALCSHARP_API FReference
 {
 public:
 	explicit FReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);

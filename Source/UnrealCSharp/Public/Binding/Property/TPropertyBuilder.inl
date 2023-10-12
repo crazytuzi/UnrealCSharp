@@ -55,12 +55,12 @@ template <typename Class, typename Result, Result Class::* Member>
 struct TContainerPropertyBuilder :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
-	static void Get(MonoObject* InMonoObject, MonoObject** OutValue)
+	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InMonoObject))
+			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InMonoObject);
+			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InGarbageCollectionHandle);
 		}
 	}
 };
