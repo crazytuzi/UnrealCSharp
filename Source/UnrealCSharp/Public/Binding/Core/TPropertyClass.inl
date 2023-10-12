@@ -16,6 +16,7 @@
 #include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
+#include "Template/TIsTEnumAsByte.inl"
 #include "UEVersion.h"
 
 template <typename T, typename Enable = void>
@@ -430,6 +431,12 @@ struct TPropertyClass<T, typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
+};
+
+template <typename T>
+struct TPropertyClass<T, typename TEnableIf<TIsTEnumAsByte<T>::Value, T>::Type> :
+	TPropertyClass<typename T::EnumType, typename T::EnumType>
+{
 };
 
 template <typename T>

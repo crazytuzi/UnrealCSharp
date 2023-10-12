@@ -29,7 +29,7 @@ struct TBindingAddressWrapper final : FBindingAddressWrapper
 
 	virtual void* GetValue() override
 	{
-		return static_cast<void*>(Value);
+		return (void*)Value;
 	}
 
 private:

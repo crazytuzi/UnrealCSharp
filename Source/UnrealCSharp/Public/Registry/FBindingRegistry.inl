@@ -33,7 +33,7 @@ auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject,
 
 	BindingAddress2GarbageCollectionHandle.Add(static_cast<void*>(const_cast<T*>(InObject)), GarbageCollectionHandle);
 
-	auto BindingAddressWrapper = new FBindingValueMapping::ValueType::FWrapperType(InObject);
+	auto BindingAddressWrapper = new TBindingAddressWrapper(InObject);
 
 	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
 	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, bNeedFree));
