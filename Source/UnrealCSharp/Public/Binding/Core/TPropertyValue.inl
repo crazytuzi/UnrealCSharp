@@ -62,7 +62,7 @@ struct TMultiPropertyValue
 
 	static T Set(const MonoObject* InValue)
 	{
-		return *FCSharpEnvironment::GetEnvironment().GetMulti<T>(InValue);
+		return *(T*)FCSharpEnvironment::GetEnvironment().GetMulti<T>(InValue);
 	}
 };
 
