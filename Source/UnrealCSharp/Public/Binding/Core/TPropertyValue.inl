@@ -630,20 +630,16 @@ struct TPropertyValue<T,
                       typename TEnableIf<std::is_same_v<typename TRemovePointer<T>::Type, UClass>, T>::Type>
 #endif
 {
-	static MonoObject* Get(T* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	static MonoObject* Get(T* InMember)
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InMember);
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-		if (SrcMonoObject == nullptr)
-		{
-			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+		auto SubclassOf = new TSubclassOf<UObject>(*InMember);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
-				SrcMonoObject, InMember, !InGarbageCollectionHandle.IsValid());
-		}
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
+			SrcMonoObject, SubclassOf, true);
 
 		return SrcMonoObject;
 	}
