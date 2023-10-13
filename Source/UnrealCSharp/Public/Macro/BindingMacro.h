@@ -72,7 +72,7 @@ struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> 
 }; \
 template <typename InClass, typename Result, Result InClass::* Member> \
 struct TPropertyBuilder<Result InClass::*, Member, typename TEnableIf<std::is_same_v<Result, Class>>::Type> : \
-	TPropertyInfoBuilder<InClass, Result, Member> \
+	TReferencePropertyBuilder<InClass, Result, Member> \
 { \
 }; \
 template <typename T> \
@@ -124,7 +124,7 @@ struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> 
 }; \
 template <typename InClass, typename Result, Result InClass::* Member> \
 struct TPropertyBuilder<Result InClass::*, Member, typename TEnableIf<std::is_same_v<Result, Class>>::Type> : \
-	TPropertyInfoBuilder<InClass, Result, Member> \
+	TReferencePropertyBuilder<InClass, Result, Member> \
 { \
 }; \
 template <typename T> \
@@ -241,7 +241,7 @@ struct TIsNotUEnum<Class> \
 #define BINDING_OVERLOADS(...) TOverloadBuilder<void*>::Get(##__VA_ARGS__)
 #endif
 
-#define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) TFunctionPointer(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke).Value.Pointer
+#define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) TFunctionPointer<decltype(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke)>(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke).Value.Pointer
 
 #define BINDING_CONSTRUCTOR_BUILDER_INFO(T, ...) TConstructorBuilder<T, ##__VA_ARGS__>::Info()
 
@@ -251,7 +251,7 @@ struct TIsNotUEnum<Class> \
 #define BINDING_CONSTRUCTOR(T, ...) BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ##__VA_ARGS__)
 #endif
 
-#define BINDING_DESTRUCTOR_BUILDER_INVOKE(...) TFunctionPointer(&TDestructorBuilder<##__VA_ARGS__>::Invoke).Value.Pointer
+#define BINDING_DESTRUCTOR_BUILDER_INVOKE(...) TFunctionPointer<decltype(&TDestructorBuilder<##__VA_ARGS__>::Invoke)>(&TDestructorBuilder<##__VA_ARGS__>::Invoke).Value.Pointer
 
 #define BINDING_DESTRUCTOR_BUILDER_INFO(...) TDestructorBuilder<##__VA_ARGS__>::Info()
 
@@ -261,7 +261,7 @@ struct TIsNotUEnum<Class> \
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__)
 #endif
 
-#define BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function) TFunctionPointer(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
+#define BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function) TFunctionPointer<decltype(&TFunctionBuilder<Signature, Function>::Invoke)>(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
 
 #define BINDING_OPERATOR_BUILDER_INFO(Signature, Function) TFunctionBuilder<Signature, Function>::Info()
 

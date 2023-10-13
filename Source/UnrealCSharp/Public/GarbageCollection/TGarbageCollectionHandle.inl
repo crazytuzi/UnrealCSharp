@@ -42,6 +42,13 @@ public:
 		return Handle != T();
 	}
 
+	static const TGarbageCollectionHandle& Zero()
+	{
+		static TGarbageCollectionHandle GarbageCollectionHandle;
+
+		return GarbageCollectionHandle;
+	}
+
 public:
 	static TGarbageCollectionHandle NewRef(MonoObject* InMonoObject, const mono_bool bPinned)
 	{

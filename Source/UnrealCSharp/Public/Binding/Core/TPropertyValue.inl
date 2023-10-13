@@ -43,7 +43,8 @@ struct TSinglePropertyValue
 template <typename T>
 struct TMultiPropertyValue
 {
-	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	static MonoObject* Get(T* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<T>(InMember);
 
@@ -54,7 +55,7 @@ struct TMultiPropertyValue
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<T>(
-				SrcMonoObject, InMember, bNeedFree);
+				SrcMonoObject, InMember, !InGarbageCollectionHandle.IsValid());
 		}
 
 		return SrcMonoObject;
@@ -69,7 +70,8 @@ struct TMultiPropertyValue
 template <typename T>
 struct TBindingPropertyValue
 {
-	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	static MonoObject* Get(T* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
 
@@ -82,7 +84,15 @@ struct TBindingPropertyValue
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 				FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
-			FCSharpEnvironment::GetEnvironment().AddBindingReference(SrcMonoObject, InMember, bNeedFree);
+			if (InGarbageCollectionHandle.IsValid())
+			{
+				FCSharpEnvironment::GetEnvironment().AddBindingReference(
+					InGarbageCollectionHandle, SrcMonoObject, InMember);
+			}
+			else
+			{
+				FCSharpEnvironment::GetEnvironment().AddBindingReference(SrcMonoObject, InMember);
+			}
 		}
 
 		return SrcMonoObject;
@@ -97,7 +107,8 @@ struct TBindingPropertyValue
 template <typename T>
 struct TScriptStructPropertyValue
 {
-	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	static MonoObject* Get(T* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(TBaseStructure<T>::Get(), InMember);
 
@@ -112,8 +123,17 @@ struct TScriptStructPropertyValue
 
 			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<T>::Get(), false);
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), InMember, SrcMonoObject,
-			                                                        bNeedFree);
+			if (InGarbageCollectionHandle.IsValid())
+			{
+				FCSharpEnvironment::GetEnvironment().AddStructReference(InGarbageCollectionHandle,
+				                                                        TBaseStructure<T>::Get(), InMember,
+				                                                        SrcMonoObject);
+			}
+			else
+			{
+				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), InMember,
+				                                                        SrcMonoObject);
+			}
 		}
 
 		return SrcMonoObject;
@@ -313,7 +333,8 @@ struct TPropertyValue<T,
 template <typename T>
 struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 {
-	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	static MonoObject* Get(T* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(T::StaticStruct(), InMember);
 
@@ -328,8 +349,15 @@ struct TPropertyValue<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 
 			FCSharpEnvironment::GetEnvironment().Bind(T::StaticStruct(), false);
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), InMember, SrcMonoObject,
-			                                                        bNeedFree);
+			if (InGarbageCollectionHandle.IsValid())
+			{
+				FCSharpEnvironment::GetEnvironment().AddStructReference(InGarbageCollectionHandle, T::StaticStruct(),
+				                                                        InMember, SrcMonoObject);
+			}
+			else
+			{
+				FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), InMember, SrcMonoObject);
+			}
 		}
 
 		return SrcMonoObject;
@@ -432,7 +460,8 @@ template <typename T>
 struct TPropertyValue<T,
                       typename TEnableIf<TIsTMap<T>::Value, T>::Type>
 {
-	static MonoObject* Get(T* InMember, const MonoObject* InMonoObject = nullptr)
+	static MonoObject* Get(T* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InMember);
 
@@ -477,15 +506,13 @@ struct TPropertyValue<T,
 
 			ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty, InMember, InMonoObject == nullptr);
+			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty, InMember,
+			                                      !InGarbageCollectionHandle.IsValid());
 
-			if (InMonoObject != nullptr)
+			if (InGarbageCollectionHandle.IsValid())
 			{
-				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject));
-
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
-				                                                           MapHelper, SrcMonoObject);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(
+					InGarbageCollectionHandle, InMember, MapHelper, SrcMonoObject);
 			}
 			else
 			{
@@ -521,7 +548,8 @@ template <typename T>
 struct TPropertyValue<T,
                       typename TEnableIf<TIsTSet<T>::Value, T>::Type>
 {
-	static MonoObject* Get(T* InMember, const MonoObject* InMonoObject = nullptr)
+	static MonoObject* Get(T* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InMember);
 
@@ -550,15 +578,12 @@ struct TPropertyValue<T,
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			const auto SetHelper = new FSetHelper(Property, InMember, InMonoObject == nullptr);
+			const auto SetHelper = new FSetHelper(Property, InMember, !InGarbageCollectionHandle.IsValid());
 
-			if (InMonoObject != nullptr)
+			if (InGarbageCollectionHandle.IsValid())
 			{
-				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject));
-
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
-				                                                           SetHelper, SrcMonoObject);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(
+					InGarbageCollectionHandle, InMember, SetHelper, SrcMonoObject);
 			}
 			else
 			{
@@ -605,7 +630,8 @@ struct TPropertyValue<T,
                       typename TEnableIf<std::is_same_v<typename TRemovePointer<T>::Type, UClass>, T>::Type>
 #endif
 {
-	static MonoObject* Get(T* InMember, const bool bNeedFree = false)
+	static MonoObject* Get(T* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InMember);
 
@@ -616,7 +642,7 @@ struct TPropertyValue<T,
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
-				SrcMonoObject, InMember, bNeedFree);
+				SrcMonoObject, InMember, !InGarbageCollectionHandle.IsValid());
 		}
 
 		return SrcMonoObject;
@@ -633,7 +659,8 @@ template <typename T>
 struct TPropertyValue<T,
                       typename TEnableIf<TIsTArray<T>::Value, T>::Type>
 {
-	static MonoObject* Get(T* InMember, const MonoObject* InMonoObject = nullptr)
+	static MonoObject* Get(T* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FArrayHelper>(InMember);
 
@@ -662,15 +689,12 @@ struct TPropertyValue<T,
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			const auto ArrayHelper = new FArrayHelper(Property, InMember, InMonoObject == nullptr);
+			const auto ArrayHelper = new FArrayHelper(Property, InMember, !InGarbageCollectionHandle.IsValid());
 
-			if (InMonoObject != nullptr)
+			if (InGarbageCollectionHandle.IsValid())
 			{
-				const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().
-					GetGarbageCollectionHandle(FCSharpEnvironment::GetEnvironment().GetObject(InMonoObject));
-
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InMember,
-				                                                           ArrayHelper, SrcMonoObject);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(
+					InGarbageCollectionHandle, InMember, ArrayHelper, SrcMonoObject);
 			}
 			else
 			{

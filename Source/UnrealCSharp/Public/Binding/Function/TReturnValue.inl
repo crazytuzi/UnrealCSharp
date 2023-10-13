@@ -40,59 +40,45 @@ struct TSingleReturnValue :
 };
 
 template <typename T>
-struct TContainerReturnValue :
+struct TReferenceReturnValue :
 	TBaseReturnValue<T>
 {
 	using Super = TBaseReturnValue<T>;
 
 	using Type = typename Super::Type;
 
-	explicit TContainerReturnValue(Type&& InValue):
+	explicit TReferenceReturnValue(Type&& InValue):
 		Super(TPropertyValue<Type, Type>::Get(new Type(InValue)))
 	{
 	}
 };
 
 template <typename T>
-struct TMultiReturnValue :
-	TBaseReturnValue<T>
+struct TContainerReturnValue :
+	TReferenceReturnValue<T>
 {
-	using Super = TBaseReturnValue<T>;
+	using TReferenceReturnValue<T>::TReferenceReturnValue;
+};
 
-	using Type = typename Super::Type;
-
-	explicit TMultiReturnValue(Type&& InValue):
-		Super(TPropertyValue<Type, Type>::Get(new Type(InValue), true))
-	{
-	}
+template <typename T>
+struct TMultiReturnValue :
+	TReferenceReturnValue<T>
+{
+	using TReferenceReturnValue<T>::TReferenceReturnValue;
 };
 
 template <typename T>
 struct TBindingReturnValue :
-	TBaseReturnValue<T>
+	TReferenceReturnValue<T>
 {
-	using Super = TBaseReturnValue<T>;
-
-	using Type = typename Super::Type;
-
-	explicit TBindingReturnValue(Type&& InValue):
-		Super(TPropertyValue<Type, Type>::Get(new Type(InValue), true))
-	{
-	}
+	using TReferenceReturnValue<T>::TReferenceReturnValue;
 };
 
 template <typename T>
 struct TScriptStructReturnValue :
-	TBaseReturnValue<T>
+	TReferenceReturnValue<T>
 {
-	using Super = TBaseReturnValue<T>;
-
-	using Type = typename Super::Type;
-
-	explicit TScriptStructReturnValue(Type&& InValue):
-		Super(TPropertyValue<Type, Type>::Get(new Type(InValue), true))
-	{
-	}
+	using TReferenceReturnValue<T>::TReferenceReturnValue;
 };
 
 template <typename T>
@@ -260,16 +246,9 @@ struct TReturnValue<T, typename TEnableIf<TIsTScriptInterface<typename TDecay<T>
 
 template <typename T>
 struct TReturnValue<T, typename TEnableIf<TIsUStruct<typename TDecay<T>::Type>::Value>::Type> :
-	TBaseReturnValue<T>
+	TReferenceReturnValue<T>
 {
-	using Super = TBaseReturnValue<T>;
-
-	using Type = typename Super::Type;
-
-	explicit TReturnValue(Type&& InValue):
-		Super(TPropertyValue<Type, Type>::Get(new Type(InValue), true))
-	{
-	}
+	using TReferenceReturnValue<T>::TReferenceReturnValue;
 };
 
 template <typename T>

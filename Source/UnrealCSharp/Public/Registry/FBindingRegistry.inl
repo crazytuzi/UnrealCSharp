@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Environment/FCSharpEnvironment.h"
+#include "Reference/FBindingReference.h"
+
 bool operator==(const FBindingAddress& A, const FBindingAddress& B)
 {
 	return A.AddressWrapper == B.AddressWrapper;
@@ -27,7 +30,7 @@ auto FBindingRegistry::GetBinding(const MonoObject* InMonoObject)
 }
 
 template <typename T>
-auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject, const bool bNeedFree)
+auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
@@ -36,9 +39,28 @@ auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject,
 	auto BindingAddressWrapper = new TBindingAddressWrapper(InObject);
 
 	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
-	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, bNeedFree));
+	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, true));
 
-	MonoObject2BindingAddress.Add(InMonoObject, FBindingValueMapping::ValueType(BindingAddressWrapper, bNeedFree));
+	MonoObject2BindingAddress.Add(InMonoObject, FBindingValueMapping::ValueType(BindingAddressWrapper, true));
 
 	return true;
+}
+
+template <typename T>
+auto FBindingRegistry::AddReference(const FGarbageCollectionHandle& InOwner, const T* InObject,
+                                    MonoObject* InMonoObject)
+{
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
+
+	BindingAddress2GarbageCollectionHandle.Add(static_cast<void*>(const_cast<T*>(InObject)), GarbageCollectionHandle);
+
+	auto BindingAddressWrapper = new TBindingAddressWrapper(InObject);
+
+	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
+	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, false));
+
+	MonoObject2BindingAddress.Add(InMonoObject, FBindingValueMapping::ValueType(BindingAddressWrapper, false));
+
+	return FCSharpEnvironment::GetEnvironment().
+		AddReference(InOwner, new FBindingReference(GarbageCollectionHandle));
 }

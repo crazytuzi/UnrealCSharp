@@ -1,6 +1,7 @@
 ﻿#include "Environment/FCSharpEnvironment.h"
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FDelegateRegistry.h"
+#include "Registry/FBindingRegistry.h"
 #include "Registry/FCSharpBind.h"
 #include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"

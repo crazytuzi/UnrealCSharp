@@ -47,7 +47,7 @@ struct TSingleArgument :
 };
 
 template <typename T>
-struct TContainerArgument :
+struct TReferenceArgument :
 	TBaseArgument<T>
 {
 	using Super = TBaseArgument<T>;
@@ -63,51 +63,31 @@ struct TContainerArgument :
 };
 
 template <typename T>
-struct TMultiArgument :
-	TBaseArgument<T>
+struct TContainerArgument :
+	TReferenceArgument<T>
 {
-	using Super = TBaseArgument<T>;
+	using TReferenceArgument<T>::TReferenceArgument;
+};
 
-	using Super::TBaseArgument;
-
-	using Type = typename Super::Type;
-
-	MonoObject* Set()
-	{
-		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
-	}
+template <typename T>
+struct TMultiArgument :
+	TReferenceArgument<T>
+{
+	using TReferenceArgument<T>::TReferenceArgument;
 };
 
 template <typename T>
 struct TBindingArgument :
-	TBaseArgument<T>
+	TReferenceArgument<T>
 {
-	using Super = TBaseArgument<T>;
-
-	using Super::TBaseArgument;
-
-	using Type = typename Super::Type;
-
-	MonoObject* Set()
-	{
-		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
-	}
+	using TReferenceArgument<T>::TReferenceArgument;
 };
 
 template <typename T>
 struct TScriptStructArgument :
-	TBaseArgument<T>
+	TReferenceArgument<T>
 {
-	using Super = TBaseArgument<T>;
-
-	using Super::TBaseArgument;
-
-	using Type = typename Super::Type;
-
-	MonoObject* Set()
-	{
-		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
-	}
+	using TReferenceArgument<T>::TReferenceArgument;
 };
 
 template <typename T>
@@ -276,18 +256,9 @@ struct TArgument<T, typename TEnableIf<TIsTScriptInterface<typename TDecay<T>::T
 
 template <typename T>
 struct TArgument<T, typename TEnableIf<TIsUStruct<typename TDecay<T>::Type>::Value>::Type> :
-	TBaseArgument<T>
+	TReferenceArgument<T>
 {
-	using Super = TBaseArgument<T>;
-
-	using Super::TBaseArgument;
-
-	using Type = typename Super::Type;
-
-	MonoObject* Set()
-	{
-		return TPropertyValue<Type, Type>::Get(new Type(Super::Value), true);
-	}
+	using TReferenceArgument<T>::TReferenceArgument;
 };
 
 template <typename T>

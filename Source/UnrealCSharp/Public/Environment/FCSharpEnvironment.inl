@@ -2,6 +2,7 @@
 
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FDelegateRegistry.h"
+#include "Registry/FBindingRegistry.h"
 
 template <typename T>
 T* FCSharpEnvironment::TGetAddress<UObject, T>::operator()(const FCSharpEnvironment* InEnvironment,
@@ -271,7 +272,14 @@ auto FCSharpEnvironment::GetBinding(const MonoObject* InMonoObject) const
 }
 
 template <typename T>
-auto FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const T* InObject, const bool bNeedFree) const
+auto FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const T* InObject) const
 {
-	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InObject, InMonoObject, bNeedFree) : false;
+	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InObject, InMonoObject) : false;
+}
+
+template <typename T>
+auto FCSharpEnvironment::AddBindingReference(const FGarbageCollectionHandle& InOwner, MonoObject* InMonoObject,
+                                             const T* InObject) const
+{
+	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InOwner, InObject, InMonoObject) : false;
 }
