@@ -246,7 +246,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		                                        *BINDING_COMBINE_FUNCTION(
 			                                        ClassContent, Function.GetFunctionImplementationName()),
 		                                        Function.IsStatic() == true
-			                                        ? TEXT("null")
+			                                        ? TEXT("IntPtr.Zero")
 			                                        : (Function.IsConstructor() ? TEXT("this") : TEXT("GetHandle()"))
 		);
 

@@ -21,7 +21,7 @@ struct TTypeInfo final : FTypeInfo
 
 	virtual bool IsOut() const override
 	{
-		return TAnd<TNot<TIsConst<T>>, TIsReferenceType<T>>::Value;
+		return TAnd<TIsReferenceType<T>, TNot<TIsConst<typename TRemoveReference<T>::Type>>>::Value;
 	}
 
 	static FTypeInfo* Get()

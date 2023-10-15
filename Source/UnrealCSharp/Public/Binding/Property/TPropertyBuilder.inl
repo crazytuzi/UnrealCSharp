@@ -52,17 +52,29 @@ struct TPropertyInfoBuilder
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TContainerPropertyBuilder :
+struct TReferencePropertyBuilder :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
-	static void Get(MonoObject* InMonoObject, MonoObject** OutValue)
+	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InMonoObject))
+			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InMonoObject);
+			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InGarbageCollectionHandle);
 		}
 	}
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TContainerPropertyBuilder :
+	TReferencePropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TMultiPropertyBuilder :
+	TReferencePropertyBuilder<Class, Result, Member>
+{
 };
 
 template <typename Class, typename Result, Result Class::* Member>
@@ -204,13 +216,13 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTScriptInterface<Result>::Value>::Type> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsUStruct<Result>::Value>::Type> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TReferencePropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -237,21 +249,21 @@ struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTWeakObjectPtr<Result>::Value>::Type> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTLazyObjectPtr<Result>::Value>::Type> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSoftObjectPtr<Result>::Value>::Type> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -282,7 +294,7 @@ struct TPropertyBuilder<Result Class::*, Member,
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSubclassOf<Result>::Value>::Type> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -322,6 +334,6 @@ struct TPropertyBuilder<Result Class::*, Member,
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         typename TEnableIf<TIsTSoftClassPtr<Result>::Value>::Type> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TMultiPropertyBuilder<Class, Result, Member>
 {
 };

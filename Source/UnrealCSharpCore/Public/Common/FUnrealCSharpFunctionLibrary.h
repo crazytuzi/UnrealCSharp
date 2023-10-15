@@ -5,7 +5,9 @@
 class UNREALCSHARPCORE_API FUnrealCSharpFunctionLibrary
 {
 public:
+#if WITH_EDITOR
 	static FString GetDotNet();
+#endif
 
 public:
 	static FString GetModuleName(const UField* InField);

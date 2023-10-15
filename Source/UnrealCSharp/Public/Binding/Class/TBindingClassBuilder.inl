@@ -35,6 +35,20 @@ public:
 		return *this;
 	}
 
+	TBindingClassBuilder& EqualTo()
+	{
+		EqualTo(BINDING_OPERATOR(bool(*)(const T&, const T&), &operator==));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& NotEqualTo()
+	{
+		NotEqualTo(BINDING_OPERATOR(bool(*)(const T&, const T&), &operator!=));
+
+		return *this;
+	}
+
 #if WITH_FUNCTION_INFO
 	TBindingClassBuilder& Constructor(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
@@ -72,6 +86,46 @@ public:
 								 *TClassFullName<T>::Get()
 				 ),
 				 FUNCTION_DESTRUCTOR,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& EqualTo(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& EqualTo(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator =="),
+		         FUNCTION_EQUAL_TO,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator =="),
+				 FUNCTION_EQUAL_TO,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& NotEqualTo(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& NotEqualTo(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator !="),
+		         FUNCTION_NOT_EQUAL_TO,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator !="),
+				 FUNCTION_NOT_EQUAL_TO,
 				 InMethod);
 #endif
 
