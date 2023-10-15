@@ -384,10 +384,18 @@ FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const UStruct* In
 	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetPropertyDescriptor(InPropertyName) : nullptr;
 }
 
-FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const UStruct* InStruct,
-                                                               MonoString* InPropertyName) const
+FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const uint32 InPropertyHash) const
 {
-	return ClassRegistry != nullptr ? ClassRegistry->GetPropertyDescriptor(Domain, InStruct, InPropertyName) : nullptr;
+	return ClassRegistry != nullptr ? ClassRegistry->GetPropertyDescriptor(InPropertyHash) : nullptr;
+}
+
+void FCSharpEnvironment::AddPropertyDescriptor(const uint32 InPropertyHash,
+                                               FPropertyDescriptor* InPropertyDescriptor) const
+{
+	if (ClassRegistry != nullptr)
+	{
+		ClassRegistry->AddPropertyDescriptor(InPropertyHash, InPropertyDescriptor);
+	}
 }
 
 bool FCSharpEnvironment::AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const

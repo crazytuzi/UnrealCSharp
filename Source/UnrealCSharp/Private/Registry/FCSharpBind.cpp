@@ -150,8 +150,24 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 		{
 			if (!NewClassDescriptor->PropertyDescriptorMap.Contains(Property->GetFName()))
 			{
-				NewClassDescriptor->PropertyDescriptorMap.Add(Property->GetFName(),
-				                                              FPropertyDescriptor::Factory(Property));
+				auto PropertyDescriptor = FPropertyDescriptor::Factory(Property);
+
+				NewClassDescriptor->PropertyDescriptorMap.Add(Property->GetFName(), PropertyDescriptor);
+
+				if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
+					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
+							"__%s"
+						),
+						*Property->GetFName().ToString()
+					))))
+				{
+					auto PropertyHash = GetTypeHash(PropertyDescriptor);
+
+					InDomain->Field_Static_Set_Value(InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
+					                                 FoundClassField, &PropertyHash);
+
+					FCSharpEnvironment::GetEnvironment().AddPropertyDescriptor(PropertyHash, PropertyDescriptor);
+				}
 			}
 		}
 	}

@@ -81,27 +81,11 @@ void FClassRegistry::DeleteClassDescriptor(const UStruct* InStruct)
 	}
 }
 
-FPropertyDescriptor* FClassRegistry::GetPropertyDescriptor(const FDomain* InDomain, const UStruct* InStruct,
-                                                           MonoString* InPropertyName)
+FPropertyDescriptor* FClassRegistry::GetPropertyDescriptor(const uint32 InPropertyHash)
 {
-	if (const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyName))
-	{
-		return *FoundPropertyDescriptor;
-	}
+	const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyHash);
 
-	if (const auto FoundClassDescriptor = GetClassDescriptor(InStruct))
-	{
-		const auto PropertyName = FName(UTF8_TO_TCHAR(InDomain->String_To_UTF8(InPropertyName)));
-
-		if (const auto FoundPropertyDescriptor = FoundClassDescriptor->GetPropertyDescriptor(PropertyName))
-		{
-			PropertyDescriptorMap.Add(InPropertyName, FoundPropertyDescriptor);
-
-			return FoundPropertyDescriptor;
-		}
-	}
-
-	return nullptr;
+	return FoundPropertyDescriptor != nullptr ? *FoundPropertyDescriptor : nullptr;
 }
 
 FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const FDomain* InDomain, const UStruct* InStruct,
@@ -125,4 +109,9 @@ FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const FDomain* InDoma
 	}
 
 	return nullptr;
+}
+
+void FClassRegistry::AddPropertyDescriptor(const uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor)
+{
+	PropertyDescriptorMap.Add(InPropertyHash, InPropertyDescriptor);
 }

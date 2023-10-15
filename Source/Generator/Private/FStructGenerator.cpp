@@ -264,11 +264,10 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
 	{
 		PropertyNameContent += FString::Printf(TEXT(
-			"%s\t\tprivate static string %s = new string(\"%s\");\n"
+			"%s\t\tprivate static UInt32 %s;\n"
 		),
 		                                       Index == 0 ? TEXT("") : TEXT("\n"),
-		                                       *PropertyNames[Index].Key,
-		                                       *PropertyNames[Index].Value
+		                                       *PropertyNames[Index].Key
 		);
 	}
 

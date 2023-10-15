@@ -71,7 +71,9 @@ public:
 
 	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, const FName& InPropertyName) const;
 
-	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, MonoString* InPropertyName) const;
+	FPropertyDescriptor* GetPropertyDescriptor(uint32 InPropertyHash) const;
+
+	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor) const;
 
 public:
 	template <typename T>

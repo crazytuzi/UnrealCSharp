@@ -23,16 +23,17 @@ public:
 
 	void DeleteClassDescriptor(const UStruct* InStruct);
 
-	FPropertyDescriptor* GetPropertyDescriptor(const FDomain* InDomain, const UStruct* InStruct,
-	                                           MonoString* InPropertyName);
+	FPropertyDescriptor* GetPropertyDescriptor(uint32 InPropertyHash);
 
 	FFunctionDescriptor* GetFunctionDescriptor(const FDomain* InDomain, const UStruct* InStruct,
 	                                           MonoString* InFunctionName);
 
+	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor);
+
 private:
 	TMap<TWeakObjectPtr<const UStruct>, FClassDescriptor*> ClassDescriptorMap;
 
-	TMap<MonoString*, FPropertyDescriptor*> PropertyDescriptorMap;
+	TMap<uint32, FPropertyDescriptor*> PropertyDescriptorMap;
 
 	TMap<MonoString*, FFunctionDescriptor*> FunctionDescriptorMap;
 };
