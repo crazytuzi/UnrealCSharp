@@ -1,10 +1,13 @@
 ﻿#include "Setting/UnrealCSharpEditorSetting.h"
+#if WITH_EDITOR
 #include "ISettingsModule.h"
+#endif
 #include "UEVersion.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorSettings"
 
+#if WITH_EDITOR
 void UUnrealCSharpEditorSetting::RegisterSettings()
 {
 	if (const auto SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
@@ -207,5 +210,6 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleArray()
 
 	return ModuleArray;
 }
+#endif
 
 #undef LOCTEXT_NAMESPACE

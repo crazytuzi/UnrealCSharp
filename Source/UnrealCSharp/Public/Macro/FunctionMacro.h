@@ -20,4 +20,8 @@
 
 #define FUNCTION_DESTRUCTOR FString(TEXT("Destructor"))
 
+#define FUNCTION_EQUAL_TO FString(TEXT("EqualTo"))
+
+#define FUNCTION_NOT_EQUAL_TO FString(TEXT("NotEqualTo"))
+
 #define FUNCTION_SET_HANDLE FString(TEXT("SetHandle"))

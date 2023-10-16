@@ -7,7 +7,6 @@
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
 #include "Registry/FMixinRegistry.h"
-#include "Registry/FBindingRegistry.h"
 #include "Template/TIsUObject.inl"
 #include "Template/TIsUStruct.inl"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
@@ -205,7 +204,11 @@ public:
 	auto GetBinding(const MonoObject* InMonoObject) const;
 
 	template <typename T>
-	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject, bool bNeedFree = true) const;
+	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject) const;
+
+	template <typename T>
+	auto AddBindingReference(const FGarbageCollectionHandle& InOwner, MonoObject* InMonoObject,
+	                         const T* InObject) const;
 
 	bool RemoveBindingReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
@@ -299,7 +302,7 @@ private:
 
 	FMixinRegistry* MixinRegistry;
 
-	FBindingRegistry* BindingRegistry;
+	class FBindingRegistry* BindingRegistry;
 };
 
 #include "FCSharpEnvironment.inl"
