@@ -27,7 +27,23 @@ void FClassRegistry::Deinitialize()
 
 	ClassDescriptorMap.Empty();
 
+	for (auto& PropertyDescriptorPair : PropertyDescriptorMap)
+	{
+		delete PropertyDescriptorPair.Value;
+
+		PropertyDescriptorPair.Value = nullptr;
+	}
+
 	PropertyDescriptorMap.Empty();
+
+	FunctionHashMap.Empty();
+
+	for (auto& FunctionDescriptorPair : FunctionDescriptorMap)
+	{
+		delete FunctionDescriptorPair.Value;
+
+		FunctionDescriptorPair.Value = nullptr;
+	}
 
 	FunctionDescriptorMap.Empty();
 }
@@ -46,7 +62,7 @@ FClassDescriptor* FClassRegistry::GetClassDescriptor(const FName& InClassName) c
 	return InClass != nullptr ? GetClassDescriptor(InClass) : nullptr;
 }
 
-FClassDescriptor* FClassRegistry::NewClassDescriptor(const FDomain* InDomain, UStruct* InStruct)
+FClassDescriptor* FClassRegistry::AddClassDescriptor(const FDomain* InDomain, UStruct* InStruct)
 {
 	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct);
 
@@ -71,7 +87,7 @@ FClassDescriptor* FClassRegistry::NewClassDescriptor(const FDomain* InDomain, US
 	return ClassDescriptor;
 }
 
-void FClassRegistry::DeleteClassDescriptor(const UStruct* InStruct)
+void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 {
 	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
@@ -81,28 +97,19 @@ void FClassRegistry::DeleteClassDescriptor(const UStruct* InStruct)
 	}
 }
 
-FPropertyDescriptor* FClassRegistry::GetPropertyDescriptor(const uint32 InPropertyHash)
+FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const uint32 InFunctionHash)
 {
-	const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyHash);
-
-	return FoundPropertyDescriptor != nullptr ? *FoundPropertyDescriptor : nullptr;
-}
-
-FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const FDomain* InDomain, const UStruct* InStruct,
-                                                           MonoString* InFunctionName)
-{
-	if (const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionName))
+	if (const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionHash))
 	{
 		return *FoundFunctionDescriptor;
 	}
 
-	if (const auto FoundClassDescriptor = GetClassDescriptor(InStruct))
+	if (const auto FoundFunctionHash = FunctionHashMap.Find(InFunctionHash))
 	{
-		const auto FunctionName = FName(UTF8_TO_TCHAR(InDomain->String_To_UTF8(InFunctionName)));
-
-		if (const auto FoundFunctionDescriptor = FoundClassDescriptor->GetFunctionDescriptor(FunctionName))
+		if (const auto FoundFunctionDescriptor = FoundFunctionHash->Key->
+		                                                            GetFunctionDescriptor(FoundFunctionHash->Value))
 		{
-			FunctionDescriptorMap.Add(InFunctionName, FoundFunctionDescriptor);
+			FunctionDescriptorMap.Add(InFunctionHash, FoundFunctionDescriptor);
 
 			return FoundFunctionDescriptor;
 		}
@@ -111,7 +118,47 @@ FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const FDomain* InDoma
 	return nullptr;
 }
 
+FPropertyDescriptor* FClassRegistry::GetPropertyDescriptor(const uint32 InPropertyHash)
+{
+	const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyHash);
+
+	return FoundPropertyDescriptor != nullptr ? *FoundPropertyDescriptor : nullptr;
+}
+
+void FClassRegistry::AddFunctionDescriptor(const uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor)
+{
+	FunctionDescriptorMap.Add(InFunctionHash, InFunctionDescriptor);
+}
+
+void FClassRegistry::AddFunctionHash(const uint32 InFunctionHash, FClassDescriptor* InClassDescriptor,
+                                     const FName& InFunctionName)
+{
+	FunctionHashMap.Add(InFunctionHash, TPair<FClassDescriptor*, FName>(InClassDescriptor, InFunctionName));
+}
+
+void FClassRegistry::RemoveFunctionDescriptor(const uint32 InFunctionHash)
+{
+	if (const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionHash))
+	{
+		delete *FoundFunctionDescriptor;
+
+		FunctionDescriptorMap.Remove(InFunctionHash);
+
+		FunctionHashMap.Remove(InFunctionHash);
+	}
+}
+
 void FClassRegistry::AddPropertyDescriptor(const uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor)
 {
 	PropertyDescriptorMap.Add(InPropertyHash, InPropertyDescriptor);
+}
+
+void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)
+{
+	if (const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyHash))
+	{
+		delete *FoundPropertyDescriptor;
+
+		PropertyDescriptorMap.Remove(InPropertyHash);
+	}
 }

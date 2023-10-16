@@ -16,13 +16,12 @@ struct FRegisterFunction
 static FRegisterFunction RegisterFunction;
 
 void FFunctionImplementation::Function_ReflectionImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InFunctionName, MonoObject** ReturnValue,
+	const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InFunctionHash, MonoObject** ReturnValue,
 	MonoObject** OutValue, MonoArray* InValue)
 {
 	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 	{
-		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor(
-			FoundObject->GetClass(), InFunctionName))
+		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor(InFunctionHash))
 		{
 			FunctionDescriptor->CallUnreal(FoundObject, ReturnValue, OutValue, InValue);
 		}

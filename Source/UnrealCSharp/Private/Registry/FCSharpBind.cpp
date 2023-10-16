@@ -136,7 +136,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 		SuperStruct = SuperStruct->GetSuperStruct();
 	}
 
-	const auto NewClassDescriptor = FCSharpEnvironment::GetEnvironment().NewClassDescriptor(InDomain, InStruct);
+	const auto NewClassDescriptor = FCSharpEnvironment::GetEnvironment().AddClassDescriptor(InDomain, InStruct);
 
 	if (NewClassDescriptor == nullptr)
 	{
@@ -148,11 +148,13 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 	{
 		if (const auto Property = *It)
 		{
-			if (!NewClassDescriptor->PropertyDescriptorMap.Contains(Property->GetFName()))
+			if (!NewClassDescriptor->HasPropertyDescriptor(Property->GetFName()))
 			{
-				auto PropertyDescriptor = FPropertyDescriptor::Factory(Property);
+				const auto PropertyDescriptor = FPropertyDescriptor::Factory(Property);
 
-				NewClassDescriptor->PropertyDescriptorMap.Add(Property->GetFName(), PropertyDescriptor);
+				auto PropertyHash = GetTypeHash(PropertyDescriptor);
+
+				NewClassDescriptor->PropertyHashSet.Add(PropertyHash);
 
 				if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
@@ -161,8 +163,6 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 						*Property->GetFName().ToString()
 					))))
 				{
-					auto PropertyHash = GetTypeHash(PropertyDescriptor);
-
 					InDomain->Field_Static_Set_Value(InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
 					                                 FoundClassField, &PropertyHash);
 
@@ -179,6 +179,31 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))
 		{
 			TMap<FName, UFunction*> Functions;
+
+			for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::ExcludeSuper,
+			                                  EFieldIteratorFlags::ExcludeDeprecated,
+			                                  EFieldIteratorFlags::IncludeInterfaces); It; ++It)
+			{
+				if (const auto Function = *It)
+				{
+					if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
+						NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
+								"__%s"
+							),
+							*Function->GetName()
+						))))
+					{
+						auto FunctionHash = GetTypeHash(Function);
+
+						InDomain->Field_Static_Set_Value(
+							InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
+							FoundClassField, &FunctionHash);
+
+						FCSharpEnvironment::GetEnvironment().AddFunctionHash(
+							FunctionHash, NewClassDescriptor, Function->GetFName());
+					}
+				}
+			}
 
 			for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::IncludeSuper,
 			                                  EFieldIteratorFlags::ExcludeDeprecated,
@@ -224,7 +249,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 		return false;
 	}
 
-	if (InClassDescriptor->FunctionDescriptorMap.Contains(InFunction->GetFName()))
+	if (InClassDescriptor->HasFunctionDescriptor(GetTypeHash(InFunction)))
 	{
 		return false;
 	}
@@ -242,7 +267,11 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 	{
 		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(OriginalFunction);
 
-		InClassDescriptor->FunctionDescriptorMap.Add(InFunction->GetFName(), NewFunctionDescriptor);
+		const auto FunctionHash = GetTypeHash(NewFunctionDescriptor);
+
+		InClassDescriptor->FunctionHashSet.Add(FunctionHash);
+
+		FCSharpEnvironment::GetEnvironment().AddFunctionDescriptor(FunctionHash, NewFunctionDescriptor);
 
 		const FName NewFunctionName(*FString::Printf(TEXT("%s%s"), *FunctionName.ToString(), TEXT("_Original")));
 
@@ -269,7 +298,11 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(NewFunction);
 
-		InClassDescriptor->FunctionDescriptorMap.Add(InFunction->GetFName(), NewFunctionDescriptor);
+		const auto FunctionHash = GetTypeHash(NewFunctionDescriptor);
+
+		InClassDescriptor->FunctionHashSet.Add(FunctionHash);
+
+		FCSharpEnvironment::GetEnvironment().AddFunctionDescriptor(FunctionHash, NewFunctionDescriptor);
 
 		NewFunctionDescriptor->OriginalFunction = OriginalFunction;
 

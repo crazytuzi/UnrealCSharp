@@ -84,6 +84,11 @@ void FFunctionDescriptor::Deinitialize()
 	}
 }
 
+FName FFunctionDescriptor::GetFName() const
+{
+	return Function.IsValid() ? Function->GetFName() : NAME_None;
+}
+
 bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 {
 	const auto InParams = Stack.Locals;
