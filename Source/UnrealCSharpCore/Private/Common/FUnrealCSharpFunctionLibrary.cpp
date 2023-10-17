@@ -462,6 +462,37 @@ FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool b
 	return FNameEncode::Encode(InName, bEncodeWideString);
 }
 
+TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
+{
+	static TArray<FString> GameModuleList;
+
+#if UE_ARRAY_IS_EMPTY
+	if ( GameModuleList.IsEmpty() )
+#else
+	if (GameModuleList.Num() == 0)
+#endif
+	{
+		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(),
+		                                       TEXT("UnrealCSharp_Engine_GameModules.json"));
+
+		FString JsonStr;
+
+		if ( FFileHelper::LoadFileToString(JsonStr, *FilePath) )
+		{
+			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
+
+			TSharedPtr<FJsonObject> JsonObj;
+
+			FJsonSerializer::Deserialize(JsonReader, JsonObj);
+
+			JsonObj->TryGetStringArrayField(TEXT("GameModules"), GameModuleList);
+			JsonObj->TryGetStringArrayField(TEXT("GameCoreModules"), GameModuleList);
+		}
+	}
+
+	return GameModuleList;
+}
+
 TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
 {
 	static TArray<FString> GameModuleList;
