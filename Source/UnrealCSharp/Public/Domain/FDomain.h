@@ -28,6 +28,8 @@ public:
 
 	void Runtime_Object_Init(MonoObject* InMonoObject) const;
 
+	MonoVTable* Class_VTable(MonoClass* InMonoClass);
+
 	MonoClass* Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName) const;
 
 	MonoMethod* Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
@@ -41,6 +43,8 @@ public:
 	MonoClass* Class_Get_Parent(MonoClass* InMonoClass) const;
 
 	MonoType* Class_Get_Type(MonoClass* InMonoClass) const;
+
+	MonoClassField* Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName);
 
 	MonoClassField* Class_Get_Fields(MonoClass* InMonoClass, void** InIterator) const;
 
@@ -57,6 +61,8 @@ public:
 	MonoCustomAttrInfo* Custom_Attrs_From_Method(MonoMethod* InMonoMethod) const;
 
 	mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass) const;
+
+	void Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue);
 
 	const char* Field_Get_Name(MonoClassField* InMonoClassField) const;
 

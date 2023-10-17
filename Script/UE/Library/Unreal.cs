@@ -1,5 +1,6 @@
 ﻿using Script.Common;
 using Script.CoreUObject;
+using Script.Engine;
 
 namespace Script.Library
 {
@@ -53,6 +54,16 @@ namespace Script.Library
             UnrealImplementation.Unreal_LoadClassImplementation(Outer.GetHandle(), Name, out var OutValue);
 
             return OutValue;
+        }
+
+        public static UWorld GWorld
+        {
+            get
+            {
+                UnrealImplementation.Unreal_GWorldImplementation(out var value);
+
+                return value;
+            }
         }
 
         public static T Cast<T>(UObject Outer) where T : UObject, IStaticClass

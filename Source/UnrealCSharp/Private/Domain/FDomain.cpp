@@ -69,6 +69,11 @@ void FDomain::Runtime_Object_Init(MonoObject* InMonoObject) const
 	FMonoDomain::Runtime_Object_Init(InMonoObject);
 }
 
+MonoVTable* FDomain::Class_VTable(MonoClass* InMonoClass)
+{
+	return FMonoDomain::Class_VTable(InMonoClass);
+}
+
 MonoClass* FDomain::Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName) const
 {
 	return FMonoDomain::Class_From_Name(InNameSpace, InMonoClassName);
@@ -99,6 +104,11 @@ MonoClass* FDomain::Class_Get_Parent(MonoClass* InMonoClass) const
 MonoType* FDomain::Class_Get_Type(MonoClass* InMonoClass) const
 {
 	return FMonoDomain::Class_Get_Type(InMonoClass);
+}
+
+MonoClassField* FDomain::Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName)
+{
+	return FMonoDomain::Class_Get_Field_From_Name(InMonoClass, InName);
 }
 
 MonoClassField* FDomain::Class_Get_Fields(MonoClass* InMonoClass, void** InIterator) const
@@ -139,6 +149,11 @@ MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Method(MonoMethod* InMonoMethod) 
 mono_bool FDomain::Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass) const
 {
 	return FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, InMonoClass);
+}
+
+void FDomain::Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue)
+{
+	FMonoDomain::Field_Static_Set_Value(InMonoVTable, InMonoClassField, InValue);
 }
 
 const char* FDomain::Field_Get_Name(MonoClassField* InMonoClassField) const

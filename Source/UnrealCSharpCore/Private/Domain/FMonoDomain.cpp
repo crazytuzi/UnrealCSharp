@@ -116,6 +116,11 @@ void FMonoDomain::Runtime_Object_Init(MonoObject* InMonoObject)
 	}
 }
 
+MonoVTable* FMonoDomain::Class_VTable(MonoClass* InMonoClass)
+{
+	return Domain != nullptr && InMonoClass != nullptr ? mono_class_vtable(Domain, InMonoClass) : nullptr;
+}
+
 MonoClass* FMonoDomain::Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName)
 {
 	for (const auto& Image : Images)
@@ -157,6 +162,11 @@ const char* FMonoDomain::Class_Get_Name(MonoClass* InMonoClass)
 MonoClass* FMonoDomain::Class_Get_Parent(MonoClass* InMonoClass)
 {
 	return InMonoClass != nullptr ? mono_class_get_parent(InMonoClass) : nullptr;
+}
+
+MonoClassField* FMonoDomain::Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName)
+{
+	return InMonoClass != nullptr ? mono_class_get_field_from_name(InMonoClass, InName) : nullptr;
 }
 
 MonoType* FMonoDomain::Class_Get_Type(MonoClass* InMonoClass)
@@ -201,6 +211,11 @@ MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Property(MonoClass* InMonoCla
 MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Method(MonoMethod* InMonoMethod)
 {
 	return InMonoMethod != nullptr ? mono_custom_attrs_from_method(InMonoMethod) : nullptr;
+}
+
+void FMonoDomain::Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue)
+{
+	mono_field_static_set_value(InMonoVTable, InMonoClassField, InValue);
 }
 
 mono_bool FMonoDomain::Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)

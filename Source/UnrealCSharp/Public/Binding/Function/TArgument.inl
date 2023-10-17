@@ -367,9 +367,9 @@ struct TArgument<T, typename TEnableIf<TAnd<TIsEnum<typename TDecay<T>::Type>,
 
 template <typename T>
 struct TArgument<T, typename TEnableIf<TIsTEnumAsByte<typename TDecay<T>::Type>::Value>::Type> :
-	TArgument<typename T::EnumType, typename T::EnumType>
+	TSingleArgument<T>
 {
-	using TArgument<typename T::EnumType, typename T::EnumType>::TArgument;
+	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>

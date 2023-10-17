@@ -16,6 +16,9 @@ public:
 	virtual void Deinitialize();
 
 public:
+	FName GetFName() const;
+
+public:
 	virtual bool CallCSharp(FFrame& Stack, RESULT_DECL);
 
 	virtual bool CallUnreal(UObject* InObject, MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue);
