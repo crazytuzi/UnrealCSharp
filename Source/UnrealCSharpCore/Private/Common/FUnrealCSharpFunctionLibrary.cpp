@@ -406,9 +406,9 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 
 	InScriptPath.ParseIntoArray(Splits, TEXT("/"));
 
-	const auto& GameModuleList = GetGameModuleList();
+	const auto& ProjectModuleList = GetProjectModuleList();
 
-	if (GameModuleList.Contains(Splits[0]) || (Splits[0] == TEXT("Script") && GameModuleList.Contains(Splits[1])))
+	if (ProjectModuleList.Contains(Splits[0]) || (Splits[0] == TEXT("Script") && ProjectModuleList.Contains(Splits[1])))
 	{
 		return GetGameProxyPath();
 	}
@@ -462,38 +462,7 @@ FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool b
 	return FNameEncode::Encode(InName, bEncodeWideString);
 }
 
-TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
-{
-	static TArray<FString> GameModuleList;
-
-#if UE_ARRAY_IS_EMPTY
-	if ( GameModuleList.IsEmpty() )
-#else
-	if (GameModuleList.Num() == 0)
-#endif
-	{
-		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(),
-		                                       TEXT("UnrealCSharp_Engine_GameModules.json"));
-
-		FString JsonStr;
-
-		if ( FFileHelper::LoadFileToString(JsonStr, *FilePath) )
-		{
-			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
-
-			TSharedPtr<FJsonObject> JsonObj;
-
-			FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-			JsonObj->TryGetStringArrayField(TEXT("GameModules"), GameModuleList);
-			JsonObj->TryGetStringArrayField(TEXT("GameCoreModules"), GameModuleList);
-		}
-	}
-
-	return GameModuleList;
-}
-
-TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
+const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 {
 	static TArray<FString> GameModuleList;
 
@@ -503,7 +472,7 @@ TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
 	if (GameModuleList.Num() == 0)
 #endif
 	{
-		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_GameModules.json"));
+		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 
 		FString JsonStr;
 
@@ -515,9 +484,42 @@ TArray<FString>& FUnrealCSharpFunctionLibrary::GetGameModuleList()
 
 			FJsonSerializer::Deserialize(JsonReader, JsonObj);
 
-			JsonObj->TryGetStringArrayField(TEXT("GameModules"), GameModuleList);
+			JsonObj->TryGetStringArrayField(TEXT("EngineModules"), GameModuleList);
+
+			JsonObj->TryGetStringArrayField(TEXT("EnginePlugins"), GameModuleList);
+		}
+	}
+
+	return GameModuleList;
+}
+
+const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
+{
+	static TArray<FString> GameModuleList;
+
+#if UE_ARRAY_IS_EMPTY
+	if (GameModuleList.IsEmpty())
+#else
+	if (GameModuleList.Num() == 0)
+#endif
+	{
+		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
+
+		FString JsonStr;
+
+		if (FFileHelper::LoadFileToString(JsonStr, *FilePath))
+		{
+			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
+
+			TSharedPtr<FJsonObject> JsonObj;
+
+			FJsonSerializer::Deserialize(JsonReader, JsonObj);
 
 			GameModuleList.Add(TEXT("Game"));
+
+			JsonObj->TryGetStringArrayField(TEXT("ProjectModules"), GameModuleList);
+
+			JsonObj->TryGetStringArrayField(TEXT("ProjectPlugins"), GameModuleList);
 		}
 	}
 

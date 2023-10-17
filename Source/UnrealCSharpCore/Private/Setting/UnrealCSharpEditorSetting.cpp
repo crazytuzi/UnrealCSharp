@@ -192,21 +192,21 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleArray()
 {
 	TArray<FString> ModuleArray;
 
-	TArray<FModuleStatus> OutModuleStatuses;
+	const auto& ProjectModules = FUnrealCSharpFunctionLibrary::GetProjectModuleList();
 
-	FModuleManager::Get().QueryModules(OutModuleStatuses);
+	const auto& EngineModules = FUnrealCSharpFunctionLibrary::GetEngineModuleList();
 
-	for (const auto& ModuleStatus : OutModuleStatuses)
+	for (const auto& ProjectModule : ProjectModules)
 	{
-		ModuleArray.AddUnique(ModuleStatus.Name);
+		ModuleArray.AddUnique(ProjectModule);
 	}
 
-	auto EngineModuleArray = FUnrealCSharpFunctionLibrary::GetEngineModuleList();
-
-	for ( const auto& ModuleStatus : EngineModuleArray )
+	for (const auto& EngineModule : EngineModules)
 	{
-		ModuleArray.AddUnique(ModuleStatus);
+		ModuleArray.AddUnique(EngineModule);
 	}
+
+	ModuleArray.Remove(TEXT("Game"));
 
 	return ModuleArray;
 }
