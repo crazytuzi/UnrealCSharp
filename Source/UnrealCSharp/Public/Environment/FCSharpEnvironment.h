@@ -49,9 +49,6 @@ public:
 
 	bool Bind(UStruct* InStruct, bool bNeedMonoClass) const;
 
-	bool Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
-	          MonoReflectionType* InValueReflectionType) const;
-
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
 
 public:
@@ -59,19 +56,25 @@ public:
 
 	FClassDescriptor* GetClassDescriptor(const FName& InClassName) const;
 
-	FClassDescriptor* NewClassDescriptor(const FDomain* InDomain, UStruct* InStruct) const;
+	FClassDescriptor* AddClassDescriptor(const FDomain* InDomain, UStruct* InStruct) const;
 
-	void DeleteClassDescriptor(const UStruct* InStruct) const;
+	void RemoveClassDescriptor(const UStruct* InStruct) const;
 
 	FFunctionDescriptor* GetFunctionDescriptor(const UStruct* InStruct, const FName& InFunctionName) const;
 
-	FFunctionDescriptor* GetFunctionDescriptor(const UStruct* InStruct, MonoString* InFunctionName) const;
+	FFunctionDescriptor* GetFunctionDescriptor(uint32 InFunctionHash) const;
 
-	FFunctionDescriptor* GetFunctionDescriptor(const FName& InClassName, const FName& InFunctionName) const;
+	void AddFunctionDescriptor(uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor) const;
 
-	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, const FName& InPropertyName) const;
+	void AddFunctionHash(uint32 InFunctionHash, FClassDescriptor* InClassDescriptor, const FName& InFunctionName) const;
 
-	FPropertyDescriptor* GetPropertyDescriptor(const UStruct* InStruct, MonoString* InPropertyName) const;
+	void RemoveFunctionDescriptor(uint32 InFunctionHash) const;
+
+	FPropertyDescriptor* GetPropertyDescriptor(uint32 InPropertyHash) const;
+
+	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor) const;
+
+	void RemovePropertyDescriptor(uint32 InPropertyHash) const;
 
 public:
 	template <typename T>

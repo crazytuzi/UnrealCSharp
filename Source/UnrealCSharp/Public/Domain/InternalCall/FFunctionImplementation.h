@@ -7,6 +7,6 @@ class FFunctionImplementation
 {
 public:
 	static void Function_ReflectionImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                              MonoString* InFunctionName, MonoObject** ReturnValue,
+	                                              const uint32 InFunctionHash, MonoObject** ReturnValue,
 	                                              MonoObject** OutValue, MonoArray* InValue);
 };

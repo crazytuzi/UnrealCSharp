@@ -12,6 +12,7 @@ struct FRegisterUnreal
 			.Function("DuplicateObject", FUnrealImplementation::Unreal_DuplicateObjectImplementation)
 			.Function("LoadObject", FUnrealImplementation::Unreal_LoadObjectImplementation)
 			.Function("LoadClass", FUnrealImplementation::Unreal_LoadClassImplementation)
+			.Function("GWorld", FUnrealImplementation::Unreal_GWorldImplementation)
 			.Register();
 	}
 };
@@ -74,4 +75,9 @@ void FUnrealImplementation::Unreal_LoadClassImplementation(const FGarbageCollect
 	const auto Class = LoadClass<UObject>(ObjectOuter, ObjectName);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Class);
+}
+
+void FUnrealImplementation::Unreal_GWorldImplementation(MonoObject** OutValue)
+{
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(GWorld);
 }

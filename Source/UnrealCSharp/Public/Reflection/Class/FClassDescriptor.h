@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPropertyDescriptor.h"
 #include "Reflection/Function/FFunctionDescriptor.h"
 #include "mono/metadata/object-forward.h"
 
@@ -22,7 +21,9 @@ public:
 public:
 	FFunctionDescriptor* GetFunctionDescriptor(const FName& InFunctionName);
 
-	FPropertyDescriptor* GetPropertyDescriptor(const FName& InPropertyName) const;
+	bool HasFunctionDescriptor(uint32 InFunctionHash) const;
+
+	bool HasPropertyDescriptor(const FName& InPropertyName);
 
 private:
 	friend class FCSharpBind;
@@ -31,7 +32,7 @@ private:
 
 	MonoClass* BindMonoClass;
 
-	TMap<FName, FFunctionDescriptor*> FunctionDescriptorMap;
+	TSet<uint32> PropertyHashSet;
 
-	TMap<FName, FPropertyDescriptor*> PropertyDescriptorMap;
+	TSet<uint32> FunctionHashSet;
 };

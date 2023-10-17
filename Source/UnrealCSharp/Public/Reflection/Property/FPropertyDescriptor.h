@@ -38,6 +38,8 @@ public:
 
 	virtual void DestroyValue(void* Dest) const;
 
+	FORCEINLINE FName GetFName() const;
+
 	FORCEINLINE void InitializeValue_InContainer(void* Dest) const;
 
 	FORCEINLINE int32 GetSize() const;

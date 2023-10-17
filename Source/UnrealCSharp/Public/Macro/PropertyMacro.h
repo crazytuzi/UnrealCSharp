@@ -6,18 +6,16 @@
 
 #define NEW_PROPERTY_DESCRIPTOR(FPropertyType) NEW_PROPERTY_DESCRIPTOR_IMPLEMENTATION(FPropertyType, FPropertyType##Descriptor)
 
-#define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InPropertyName, Type& OutValue);
+#define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, Type& OutValue);
 
-#define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InPropertyName, Type InValue);
+#define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType, Type) static void Property_Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, Type InValue);
 
 #define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType, Type) \
-void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InPropertyName, Type& OutValue) \
+void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, Type& OutValue) \
 { \
-	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType>(InGarbageCollectionHandle, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType, void*>(InGarbageCollectionHandle)) \
 	{ \
-		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor( \
-			InStruct, InPropertyName)) \
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor(InPropertyHash)) \
 		{ \
 			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), &OutValue); \
 		} \
@@ -25,13 +23,11 @@ void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyIm
 }
 
 #define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType, Type) \
-void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InPropertyName, Type InValue) \
+void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, Type InValue) \
 { \
-	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType>(InGarbageCollectionHandle, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType, void*>(InGarbageCollectionHandle)) \
 	{ \
-		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor( \
-			InStruct, InPropertyName)) \
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor(InPropertyHash)) \
 		{ \
 			PropertyDescriptor->Set(&InValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress)); \
 		} \
@@ -39,13 +35,11 @@ void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyIm
 }
 
 #define GET_COMPOUND_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType) \
-void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InPropertyName, MonoObject** OutValue) \
+void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, MonoObject** OutValue) \
 { \
-	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType>(InGarbageCollectionHandle, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType, void*>(InGarbageCollectionHandle)) \
 	{ \
-		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor( \
-			InStruct, InPropertyName)) \
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor(InPropertyHash)) \
 		{ \
 			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), OutValue); \
 		} \
@@ -53,22 +47,20 @@ void FPropertyImplementation::Property_Get##StructType##PropertyType##PropertyIm
 }
 
 #define SET_COMPOUND_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType) \
-void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InPropertyName, MonoObject* InValue) \
+void FPropertyImplementation::Property_Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, MonoObject* InValue) \
 { \
-	UStruct* InStruct = nullptr; \
-	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType>(InGarbageCollectionHandle, InStruct)) \
+	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType, void*>(InGarbageCollectionHandle)) \
 	{ \
-		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor( \
-			InStruct, InPropertyName)) \
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor(InPropertyHash)) \
 		{ \
 			PropertyDescriptor->Set(InValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress)); \
 		} \
 	} \
 }
 
-#define GET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType) static void Property_Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InPropertyName, MonoObject** OutValue);
+#define GET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType) static void Property_Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, MonoObject** OutValue);
 
-#define SET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType) static void Property_Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString* InPropertyName, MonoObject* InValue);
+#define SET_COMPOUND_PROPERTY_IMPLEMENTATION_DEFINE(StructType, PropertyType) static void Property_Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, MonoObject* InValue);
 
 #define OBJECT_GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(PropertyType, Type) GET_PRIMITIVE_PROPERTY_IMPLEMENTATION_DEFINE(Object, PropertyType, Type)
 
