@@ -3,6 +3,7 @@
 #include "ISettingsModule.h"
 #endif
 #include "UEVersion.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorSettings"
 
@@ -191,14 +192,21 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleArray()
 {
 	TArray<FString> ModuleArray;
 
-	TArray<FModuleStatus> OutModuleStatuses;
+	const auto& ProjectModules = FUnrealCSharpFunctionLibrary::GetProjectModuleList();
 
-	FModuleManager::Get().QueryModules(OutModuleStatuses);
+	const auto& EngineModules = FUnrealCSharpFunctionLibrary::GetEngineModuleList();
 
-	for (const auto& ModuleStatus : OutModuleStatuses)
+	for (const auto& ProjectModule : ProjectModules)
 	{
-		ModuleArray.AddUnique(ModuleStatus.Name);
+		ModuleArray.AddUnique(ProjectModule);
 	}
+
+	for (const auto& EngineModule : EngineModules)
+	{
+		ModuleArray.AddUnique(EngineModule);
+	}
+
+	ModuleArray.Remove(TEXT("Game"));
 
 	return ModuleArray;
 }

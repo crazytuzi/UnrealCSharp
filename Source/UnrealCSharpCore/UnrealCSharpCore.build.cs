@@ -18,21 +18,23 @@ public class UnrealCSharpCore : ModuleRules
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		bEnableUndefinedIdentifierWarnings = false;
-		
+
 		PublicIncludePaths.AddRange(
-			new string[] {
+			new string[]
+			{
 				// ... add public include paths required here ...
 			}
-			);
-				
-		
+		);
+
+
 		PrivateIncludePaths.AddRange(
-			new string[] {
+			new string[]
+			{
 				// ... add other private include paths required here ...
 			}
-			);
-			
-		
+		);
+
+
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -40,7 +42,7 @@ public class UnrealCSharpCore : ModuleRules
 				"Mono"
 				// ... add other public dependencies that you statically link with here ...
 			}
-			);
+		);
 
 		if (Target.bBuildEditor)
 		{
@@ -51,7 +53,7 @@ public class UnrealCSharpCore : ModuleRules
 					// ... add other public dependencies that you statically link with here ...
 				}
 			);
-			
+
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
@@ -61,7 +63,7 @@ public class UnrealCSharpCore : ModuleRules
 				}
 			);
 		}
-		
+
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -73,50 +75,108 @@ public class UnrealCSharpCore : ModuleRules
 				"CrossVersion"
 				// ... add private dependencies that you statically link with here ...	
 			}
-			);
-		
-		
+		);
+
+
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
 				// ... add any modules that your module loads dynamically here ...
 			}
-			);
+		);
 
+		GeneratorModules();
+	}
+
+	private void GeneratorModules()
+	{
 #if UE_5_0_OR_LATER
 		var ProjectPath = Path.GetDirectoryName(Target.ProjectFile?.FullName);
 #else
 		var ProjectPath = Path.GetDirectoryName(Target.ProjectFile.FullName);
-
-		if (ProjectPath == null) return;
 #endif
+
+		if (ProjectPath == null)
+		{
+			return;
+		}
+
 		var Intermediate = Path.Combine(ProjectPath, "Intermediate");
 
-		var JsonFullFilename = Path.Combine(Intermediate, "UnrealCSharp_GameModules.json");
+		var JsonFullFilename = Path.Combine(Intermediate, "UnrealCSharp_Modules.json");
 
 		if (!Directory.Exists(Intermediate))
 		{
 			Directory.CreateDirectory(Intermediate);
 		}
 
-		var GameModules = new List<string>();
+		var ProjectPlugins = new List<string>();
 
-		var ProjectPlugins =
+		var ProjectPluginInfos =
 			Plugins.ReadProjectPlugins(
 				new DirectoryReference(Path.GetFullPath(Path.Combine(PluginDirectory, "../../"))));
 
-		foreach (var ProjectPlugin in ProjectPlugins)
+		foreach (var ProjectPluginInfo in ProjectPluginInfos)
 		{
-			GameModules.Add(ProjectPlugin.Name);
+			ProjectPlugins.Add(ProjectPluginInfo.Name);
+		}
+
+		var EngineModules = new List<string>();
+
+		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Developer/"))),
+			EngineModules);
+
+		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Editor/"))), EngineModules);
+
+		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Programs/"))),
+			EngineModules);
+
+		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Runtime/"))), EngineModules);
+
+		var EnginePlugins = new List<string>();
+
+		var EnginePluginInfos =
+			Plugins.ReadEnginePlugins(
+				new DirectoryReference(Path.GetFullPath(EngineDirectory)));
+
+		foreach (var EnginePluginInfo in EnginePluginInfos)
+		{
+			EnginePlugins.Add(EnginePluginInfo.Name);
 		}
 
 		using (var Writer = new JsonWriter(JsonFullFilename))
 		{
 			Writer.WriteObjectStart();
 
-			Writer.WriteStringArrayField("GameModules", GameModules.Union(Target.ExtraModuleNames));
+			Writer.WriteStringArrayField("ProjectModules", Target.ExtraModuleNames);
+
+			Writer.WriteStringArrayField("ProjectPlugins", ProjectPlugins);
+
+			Writer.WriteStringArrayField("EngineModules", EngineModules);
+
+			Writer.WriteStringArrayField("EnginePlugins", EnginePlugins);
 
 			Writer.WriteObjectEnd();
+		}
+	}
+
+	private void GetModules(string InPathName, List<string> Modules)
+	{
+		var Suffix = "*.Build.cs";
+
+		var DirectoryInfo = new DirectoryInfo(InPathName);
+
+		foreach (var Item in DirectoryInfo.GetFiles(Suffix))
+		{
+			Modules.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length - 1));
+		}
+
+		foreach (var Directories in DirectoryInfo.GetDirectories())
+		{
+			foreach (var Item in Directories.GetFiles(Suffix, SearchOption.AllDirectories))
+			{
+				Modules.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length - 1));
+			}
 		}
 	}
 }

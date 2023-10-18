@@ -68,6 +68,7 @@ public:
 
 	static FString Encode(const FString& InName, bool bEncodeWideString = false);
 
-private:
-	static TArray<FString>& GetGameModuleList();
+	static const TArray<FString>& GetEngineModuleList();
+
+	static const TArray<FString>& GetProjectModuleList();
 };
