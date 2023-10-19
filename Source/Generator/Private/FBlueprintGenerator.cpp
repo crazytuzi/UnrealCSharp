@@ -15,6 +15,8 @@ void FBlueprintGenerator::Generator()
 
 	TArray<FAssetData> OutAssetData;
 
+	TArray<UUserDefinedEnum*> UserDefinedEnums;
+
 #if UE_GET_ASSETS_BY_PATHS
 	for (const auto& AssetsPath : FGeneratorCore::GetAssetsPaths())
 	{
@@ -54,7 +56,7 @@ void FBlueprintGenerator::Generator()
 				if (const auto UserDefinedEnum = LoadObject<
 					UUserDefinedEnum>(nullptr, *AssetData.ObjectPath.ToString()))
 				{
-					FEnumGenerator::Generator(UserDefinedEnum);
+					UserDefinedEnums.Emplace(UserDefinedEnum);
 				}
 			}
 		}
@@ -63,4 +65,9 @@ void FBlueprintGenerator::Generator()
 #if UE_GET_ASSETS_BY_PATHS
 	}
 #endif
+
+	for (const auto& UserDefinedEnum : UserDefinedEnums)
+	{
+		FEnumGenerator::Generator(UserDefinedEnum);
+	}
 }
