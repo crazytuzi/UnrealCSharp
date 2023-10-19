@@ -34,10 +34,17 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 		}
 	}
 
+	auto Name = InField->GetName();
+
+	if (Name.EndsWith("_C"))
+	{
+		Name = Name.LeftChop(2);
+	}
+
 	const auto PathName = FString::Printf(TEXT(
 		"%s%s"
 	),
-	                                      *InField->GetName().Replace(TEXT("_C"),TEXT("")),
+	                                      *Name,
 	                                      InField->IsNative()
 		                                      ? TEXT("")
 		                                      : *FString::Printf(TEXT(

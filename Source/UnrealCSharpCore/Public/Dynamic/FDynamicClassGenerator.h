@@ -20,12 +20,15 @@ public:
 private:
 	static void BeginGenerator(UClass* InClass, UClass* InParentClass);
 
+	static void BeginGenerator(UCSharpBlueprintGeneratedClass* InClass, UClass* InParentClass);
+
 	static void EndGenerator(UClass* InClass);
 
-	static UCSharpGeneratedClass* GeneratorCSharpGeneratedClass(UPackage* InOuter, const FString& InName);
+	static UCSharpGeneratedClass* GeneratorCSharpGeneratedClass(
+		UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
 	static UCSharpBlueprintGeneratedClass* GeneratorCSharpBlueprintGeneratedClass(
-		UPackage* InOuter, const FString& InName);
+		UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
 #if WITH_EDITOR
 	static void ReInstance(UClass* InClass);

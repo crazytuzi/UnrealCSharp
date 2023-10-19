@@ -14,6 +14,7 @@
 #include "BlueprintActionDatabase.h"
 #endif
 #include "UEVersion.h"
+#include "Dynamic/CSharpBlueprint.h"
 
 void FDynamicClassGenerator::Generator()
 {
@@ -71,7 +72,7 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 
 		if (Class == nullptr)
 		{
-			GeneratorCSharpGeneratedClass(Outer, ClassName);
+			GeneratorCSharpGeneratedClass(Outer, ClassName, AActor::StaticClass());
 		}
 	}
 
@@ -91,7 +92,7 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 
 		if (Class == nullptr)
 		{
-			GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName);
+			GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName, AActor::StaticClass());
 		}
 	}
 }
@@ -124,32 +125,34 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 	{
 		Class->PurgeClass(false);
 
-		if (!Cast<UBlueprintGeneratedClass>(ParentClass))
+		if (const auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(ParentClass))
 		{
-			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
+			Class->ClassFlags |= ParentClass->ClassFlags;
+
+			BeginGenerator(BlueprintGeneratedClass, ParentClass);
 		}
 		else
 		{
-			Class->ClassFlags |= ParentClass->ClassFlags;
+			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
+
+			BeginGenerator(Class, ParentClass);
 		}
 	}
 	else
 	{
 		if (Cast<UBlueprintGeneratedClass>(ParentClass))
 		{
-			Class = GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName);
+			Class = GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName, ParentClass);
 
 			Class->ClassFlags |= ParentClass->ClassFlags;
 		}
 		else
 		{
-			Class = GeneratorCSharpGeneratedClass(Outer, ClassName);
+			Class = GeneratorCSharpGeneratedClass(Outer, ClassName, ParentClass);
 
 			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 		}
 	}
-
-	BeginGenerator(Class, ParentClass);
 
 	GeneratorProperty(InMonoClass, Class);
 
@@ -190,6 +193,17 @@ void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentCla
 #if UE_CLASS_ADD_REFERENCED_OBJECTS
 	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
+
+	InClass->ClassCastFlags |= InParentClass->ClassCastFlags;
+}
+
+void FDynamicClassGenerator::BeginGenerator(UCSharpBlueprintGeneratedClass* InClass, UClass* InParentClass)
+{
+	BeginGenerator(static_cast<UClass*>(InClass), InParentClass);
+
+#if WITH_EDITOR
+	Cast<UCSharpBlueprint>(InClass->ClassGeneratedBy)->ParentClass = InParentClass;
+#endif
 }
 
 void FDynamicClassGenerator::EndGenerator(UClass* InClass)
@@ -201,13 +215,14 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 	InClass->AssembleReferenceTokenStream();
 }
 
-UCSharpGeneratedClass* FDynamicClassGenerator::GeneratorCSharpGeneratedClass(UPackage* InOuter, const FString& InName)
+UCSharpGeneratedClass* FDynamicClassGenerator::GeneratorCSharpGeneratedClass(
+	UPackage* InOuter, const FString& InName, UClass* InParentClass)
 {
 	const auto Class = NewObject<UCSharpGeneratedClass>(InOuter, *InName, RF_Public);
 
 	Class->AddToRoot();
 
-	BeginGenerator(Class, AActor::StaticClass());
+	BeginGenerator(Class, InParentClass);
 
 	EndGenerator(Class);
 
@@ -215,13 +230,13 @@ UCSharpGeneratedClass* FDynamicClassGenerator::GeneratorCSharpGeneratedClass(UPa
 }
 
 UCSharpBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorCSharpBlueprintGeneratedClass(
-	UPackage* InOuter, const FString& InName)
+	UPackage* InOuter, const FString& InName, UClass* InParentClass)
 {
 	auto Class = NewObject<UCSharpBlueprintGeneratedClass>(InOuter, *InName, RF_Public);
 
 	Class->UpdateCustomPropertyListForPostConstruction();
 
-	const auto Blueprint = NewObject<UBlueprint>(Class);
+	const auto Blueprint = NewObject<UCSharpBlueprint>(Class);
 
 	Blueprint->AddToRoot();
 
@@ -233,7 +248,7 @@ UCSharpBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorCSharpBlueprint
 	Class->ClassGeneratedBy = Blueprint;
 #endif
 
-	BeginGenerator(Class, AActor::StaticClass());
+	BeginGenerator(Class, InParentClass);
 
 	EndGenerator(Class);
 
@@ -296,7 +311,7 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 				InClass->AddCppProperty(CppProperty);
 
 #if WITH_EDITOR
-				if (const auto ClassGeneratedBy = Cast<UBlueprint>(InClass->ClassGeneratedBy))
+				if (const auto ClassGeneratedBy = Cast<UCSharpBlueprint>(InClass->ClassGeneratedBy))
 				{
 					auto bExisted = false;
 
