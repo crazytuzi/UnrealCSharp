@@ -24,6 +24,8 @@ void FFunctionDescriptor::Initialize()
 		return;
 	}
 
+	const auto IsNativeClass = Function->GetOwnerClass()->IsNative();
+
 	PropertyDescriptors.Reserve(Function->ReturnValueOffset != MAX_uint16
 		                            ? (Function->NumParms > 0
 			                               ? Function->NumParms - 1
@@ -45,9 +47,13 @@ void FFunctionDescriptor::Initialize()
 
 			const auto Index = PropertyDescriptors.Add(PropertyDescriptor);
 
-			if (Property->HasAnyPropertyFlags(CPF_OutParm | CPF_ReferenceParm) && !Property->HasAnyPropertyFlags(
-				CPF_ConstParm))
+			if (Property->HasAnyPropertyFlags(CPF_OutParm) && !Property->HasAnyPropertyFlags(CPF_ConstParm))
 			{
+				if (IsNativeClass || Property->HasAnyPropertyFlags(CPF_ReferenceParm))
+				{
+					ReferencePropertyIndexes.Emplace(Index);
+				}
+
 				OutPropertyIndexes.Emplace(Index);
 			}
 		}
@@ -200,7 +206,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 
 		PropertyDescriptor->InitializeValue_InContainer(Params);
 
-		if (!OutPropertyIndexes.Contains(Index))
+		if (ReferencePropertyIndexes.Contains(Index) || !OutPropertyIndexes.Contains(Index))
 		{
 			if (PropertyDescriptor->IsPrimitiveProperty())
 			{
