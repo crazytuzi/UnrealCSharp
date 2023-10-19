@@ -16,7 +16,7 @@
 #include "Internationalization/Culture.h"
 #include "FCodeAnalysis.h"
 #include "Misc/ScopedSlowTask.h"
-#include "Mixin/FMixinGenerator.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "ToolBar/UnrealCSharpToolBar.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
@@ -88,7 +88,7 @@ void FUnrealCSharpEditorModule::Generator()
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis Generator"));
 
-	FMixinGenerator::CodeAnalysisGenerator();
+	FDynamicGenerator::CodeAnalysisGenerator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Class Generator"));
 

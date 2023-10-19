@@ -12,7 +12,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Engine/UserDefinedStruct.h"
-#include "Mixin/FMixinGenerator.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "UEVersion.h"
 
 #if UE_IS_RUNNING_COOK_COMMANDLET
@@ -100,7 +100,7 @@ void FEditorListener::OnPostEngineInit()
 	{
 		FCodeAnalysis::CodeAnalysis();
 
-		FMixinGenerator::CodeAnalysisGenerator();
+		FDynamicGenerator::CodeAnalysisGenerator();
 	}
 }
 

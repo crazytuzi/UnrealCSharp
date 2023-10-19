@@ -2,7 +2,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "UEVersion.h"
-#include "Mixin/FMixinGenerator.h"
+#include "Dynamic/FDynamicGenerator.h"
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
@@ -116,7 +116,7 @@ void FCSharpCompilerRunnable::DoWork()
 
 	const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
 	{
-		FMixinGenerator::Generator(FileChanges);
+		FDynamicGenerator::Generator(FileChanges);
 
 		FileChanges.Empty();
 	}, TStatId(), nullptr, ENamedThreads::GameThread);

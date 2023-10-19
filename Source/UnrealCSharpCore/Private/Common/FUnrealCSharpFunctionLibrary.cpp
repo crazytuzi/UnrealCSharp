@@ -2,10 +2,10 @@
 #include "CoreMacro/Macro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
-#include "Mixin/CSharpGeneratedClass.h"
-#include "Mixin/CSharpBlueprintGeneratedClass.h"
-#include "Mixin/CSharpScriptStruct.h"
-#include "Mixin/CSharpEnum.h"
+#include "Dynamic/CSharpGeneratedClass.h"
+#include "Dynamic/CSharpBlueprintGeneratedClass.h"
+#include "Dynamic/CSharpScriptStruct.h"
+#include "Dynamic/CSharpEnum.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "UEVersion.h"
@@ -92,19 +92,19 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 
 	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
 
-	const auto bIsMixinClass = Cast<UCSharpGeneratedClass>(InStruct) ||
+	const auto bIsDynamicClass = Cast<UCSharpGeneratedClass>(InStruct) ||
 		Cast<UCSharpBlueprintGeneratedClass>(InStruct) ||
 		Cast<UCSharpScriptStruct>(InStruct) ||
 		UCSharpGeneratedClass::StaticClass() == InStruct ||
 		UCSharpBlueprintGeneratedClass::StaticClass() == InStruct ||
 		UCSharpScriptStruct::StaticClass() == InStruct;
 
-	if (bIsMixinClass)
+	if (bIsDynamicClass)
 	{
 		ModuleName = TEXT("/Script/CoreUObject");
 	}
 
-	if (InStruct->IsNative() || bIsMixinClass)
+	if (InStruct->IsNative() || bIsDynamicClass)
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}

@@ -72,7 +72,7 @@ void FCSharpEnvironment::Initialize()
 
 	MultiRegistry = new FMultiRegistry();
 
-	MixinRegistry = new FMixinRegistry();
+	DynamicRegistry = new FDynamicRegistry();
 
 	BindingRegistry = new FBindingRegistry();
 
@@ -122,11 +122,11 @@ void FCSharpEnvironment::Deinitialize()
 		BindingRegistry = nullptr;
 	}
 
-	if (MixinRegistry != nullptr)
+	if (DynamicRegistry != nullptr)
 	{
-		delete MixinRegistry;
+		delete DynamicRegistry;
 
-		MixinRegistry = nullptr;
+		DynamicRegistry = nullptr;
 	}
 
 	if (MultiRegistry != nullptr)
