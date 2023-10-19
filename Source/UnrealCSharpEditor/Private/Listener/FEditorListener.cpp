@@ -6,25 +6,12 @@
 #include "FCSharpCompiler.h"
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
-#include "UnrealCSharpEditor.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "WidgetBlueprint.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Dynamic/FDynamicGenerator.h"
-#include "UEVersion.h"
-
-#if UE_IS_RUNNING_COOK_COMMANDLET
-static bool IsRunningCookCommandlet()
-{
-	const FString Commandline = FCommandLine::Get();
-
-	const auto bIsCookCommandlet = IsRunningCommandlet() && Commandline.Contains(TEXT("run=cook"));
-
-	return bIsCookCommandlet;
-}
-#endif
 
 FEditorListener::FEditorListener()
 {
@@ -92,16 +79,9 @@ FEditorListener::~FEditorListener()
 
 void FEditorListener::OnPostEngineInit()
 {
-	if (IsRunningCookCommandlet())
-	{
-		FUnrealCSharpEditorModule::Generator();
-	}
-	else
-	{
-		FCodeAnalysis::CodeAnalysis();
+	FCodeAnalysis::CodeAnalysis();
 
-		FDynamicGenerator::CodeAnalysisGenerator();
-	}
+	FDynamicGenerator::CodeAnalysisGenerator();
 }
 
 void FEditorListener::OnPreBeginPIE(const bool)
