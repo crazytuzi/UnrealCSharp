@@ -340,6 +340,28 @@ MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObje
 	return InFunction != nullptr ? mono_runtime_invoke(InFunction, InMonoObject, InParams, InExc) : nullptr;
 }
 
+MonoObject* FMonoDomain::Runtime_Invoke_Array(MonoMethod* InFunction, void* InMonoObject, MonoArray* InParams)
+{
+	MonoObject* Exception = nullptr;
+
+	const auto ReturnValue = Runtime_Invoke_Array(InFunction, InMonoObject, InParams, &Exception);
+
+	if (Exception != nullptr)
+	{
+		Unhandled_Exception(Exception);
+
+		return nullptr;
+	}
+
+	return ReturnValue;
+}
+
+MonoObject* FMonoDomain::Runtime_Invoke_Array(MonoMethod* InFunction, void* InMonoObject, MonoArray* InParams,
+                                              MonoObject** InExc)
+{
+	return InFunction != nullptr ? mono_runtime_invoke_array(InFunction, InMonoObject, InParams, InExc) : nullptr;
+}
+
 MonoObject* FMonoDomain::Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams)
 {
 	MonoObject* Exception = nullptr;
