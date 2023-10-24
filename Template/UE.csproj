@@ -5,7 +5,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>Script</RootNamespace>
     <OutputPath>..\..\Content\Script</OutputPath>
-    <DebugType>full</DebugType>
+    <DebugType>Embedded</DebugType>
     <DefineConstants>$(DefineConstants);</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
