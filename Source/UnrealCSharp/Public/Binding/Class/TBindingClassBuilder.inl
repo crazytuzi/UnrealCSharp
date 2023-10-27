@@ -35,6 +35,27 @@ public:
 		return *this;
 	}
 
+	TBindingClassBuilder& Plus()
+	{
+		Plus(BINDING_OPERATOR(T(*)(const T&, const T&), &operator+));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& Multiplies()
+	{
+		Multiplies(BINDING_OPERATOR(T(*)(const T&, const T&), &operator*));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& Divides()
+	{
+		Divides(BINDING_OPERATOR(T(*)(const T&, const T&), &operator/));
+
+		return *this;
+	}
+
 	TBindingClassBuilder& EqualTo()
 	{
 		EqualTo(BINDING_OPERATOR(bool(*)(const T&, const T&), &operator==));
@@ -86,6 +107,66 @@ public:
 								 *TClassFullName<T>::Get()
 				 ),
 				 FUNCTION_DESTRUCTOR,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& Plus(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& Plus(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator +"),
+		         FUNCTION_PLUS,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator +"),
+				 FUNCTION_PLUS,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& Multiplies(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& Multiplies(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator *"),
+		         FUNCTION_MULTIPLIES,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator *"),
+				 FUNCTION_MULTIPLIES,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& Divides(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& Divides(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator /"),
+		         FUNCTION_DIVIDES,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator /"),
+				 FUNCTION_DIVIDES,
 				 InMethod);
 #endif
 
