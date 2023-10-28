@@ -42,6 +42,13 @@ public:
 		return *this;
 	}
 
+	TBindingClassBuilder& Minus()
+	{
+		Minus(BINDING_OPERATOR(T(*)(const T&, const T&), (&operator-)));
+
+		return *this;
+	}
+
 	TBindingClassBuilder& Multiplies()
 	{
 		Multiplies(BINDING_OPERATOR(T(*)(const T&, const T&), &operator*));
@@ -155,6 +162,26 @@ public:
 #else
 		Function(TEXT("operator +"),
 				 FUNCTION_PLUS,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& Minus(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& Minus(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator -"),
+		         FUNCTION_MINUS,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator -"),
+				 FUNCTION_MINUS,
 				 InMethod);
 #endif
 

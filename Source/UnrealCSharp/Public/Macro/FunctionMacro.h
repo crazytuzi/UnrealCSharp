@@ -22,6 +22,8 @@
 
 #define FUNCTION_PLUS FString(TEXT("Plus"))
 
+#define FUNCTION_MINUS FString(TEXT("Minus"))
+
 #define FUNCTION_MULTIPLIES FString(TEXT("Multiplies"))
 
 #define FUNCTION_DIVIDES FString(TEXT("Divides"))
