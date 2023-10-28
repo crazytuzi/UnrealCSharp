@@ -28,6 +28,8 @@
 
 #define FUNCTION_DIVIDES FString(TEXT("Divides"))
 
+#define FUNCTION_MODULUS FString(TEXT("Modulus"))
+
 #define FUNCTION_EQUAL_TO FString(TEXT("EqualTo"))
 
 #define FUNCTION_NOT_EQUAL_TO FString(TEXT("NotEqualTo"))
