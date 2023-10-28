@@ -70,6 +70,34 @@ public:
 		return *this;
 	}
 
+	TBindingClassBuilder& Less()
+	{
+		Less(BINDING_OPERATOR(bool(*)(const T&, const T&), &operator<));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& LessEqual()
+	{
+		LessEqual(BINDING_OPERATOR(bool(*)(const T&, const T&), &operator<=));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& Greater()
+	{
+		Greater(BINDING_OPERATOR(bool(*)(const T&, const T&), (&operator>)));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& GreaterEqual()
+	{
+		GreaterEqual(BINDING_OPERATOR(bool(*)(const T&, const T&), &operator>=));
+
+		return *this;
+	}
+
 #if WITH_FUNCTION_INFO
 	TBindingClassBuilder& Constructor(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
@@ -207,6 +235,86 @@ public:
 #else
 		Function(TEXT("operator !="),
 				 FUNCTION_NOT_EQUAL_TO,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& Less(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& Less(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator <"),
+		         FUNCTION_LESS,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator <"),
+				 FUNCTION_LESS,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& LessEqual(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& LessEqual(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator <="),
+		         FUNCTION_LESS_EQUAL,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator <="),
+				 FUNCTION_LESS_EQUAL,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& Greater(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& Greater(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator >"),
+		         FUNCTION_GREATER,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator >"),
+				 FUNCTION_GREATER,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& GreaterEqual(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& GreaterEqual(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator >="),
+		         FUNCTION_GREATER_EQUAL,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator >="),
+				 FUNCTION_GREATER_EQUAL,
 				 InMethod);
 #endif
 

@@ -30,4 +30,12 @@
 
 #define FUNCTION_NOT_EQUAL_TO FString(TEXT("NotEqualTo"))
 
+#define FUNCTION_LESS FString(TEXT("Less"))
+
+#define FUNCTION_LESS_EQUAL FString(TEXT("LessEqual"))
+
+#define FUNCTION_GREATER FString(TEXT("Greater"))
+
+#define FUNCTION_GREATER_EQUAL FString(TEXT("GreaterEqual"))
+
 #define FUNCTION_SET_HANDLE FString(TEXT("SetHandle"))
