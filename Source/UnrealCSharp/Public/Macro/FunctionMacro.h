@@ -20,6 +20,8 @@
 
 #define FUNCTION_DESTRUCTOR FString(TEXT("Destructor"))
 
+#define FUNCTION_LOGICAL_NOT FString(TEXT("LogicalNot"))
+
 #define FUNCTION_PLUS FString(TEXT("Plus"))
 
 #define FUNCTION_MINUS FString(TEXT("Minus"))

@@ -35,6 +35,13 @@ public:
 		return *this;
 	}
 
+	TBindingClassBuilder& LogicalNot()
+	{
+		LogicalNot(BINDING_OPERATOR(bool(*)(const T&), &operator!));
+
+		return *this;
+	}
+
 	TBindingClassBuilder& Plus()
 	{
 		Plus(BINDING_OPERATOR(T(*)(const T&, const T&), &operator+));
@@ -100,7 +107,7 @@ public:
 
 	TBindingClassBuilder& RightShift()
 	{
-		RightShift(BINDING_OPERATOR(T(*)(const T&, const T&), &operator>>));
+		RightShift(BINDING_OPERATOR(T(*)(const T&, const T&), (&operator>>)));
 
 		return *this;
 	}
@@ -184,6 +191,26 @@ public:
 								 *TClassFullName<T>::Get()
 				 ),
 				 FUNCTION_DESTRUCTOR,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& LogicalNot(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& LogicalNot(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator !"),
+		         FUNCTION_LOGICAL_NOT,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator !"),
+				 FUNCTION_LOGICAL_NOT,
 				 InMethod);
 #endif
 
