@@ -1,4 +1,4 @@
-﻿#include "Setting/UnrealCSharpEditorSetting.h"
+#include "Setting/UnrealCSharpEditorSetting.h"
 #if WITH_EDITOR
 #include "ISettingsModule.h"
 #endif
@@ -40,6 +40,7 @@ const FString& UUnrealCSharpEditorSetting::GetDotNetPath() const
 
 TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 {
+#if PLATFORM_WINDOWS
 	// https://learn.microsoft.com/en-us/dotnet/core/install/how-to-detect-installed-versions?pivots=os-windows
 	const FString DotNet = TEXT("dotnet");
 
@@ -146,11 +147,7 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 						             ? PathString.Left(PathString.Len() - 3)
 						             : PathString;
 
-#if PLATFORM_WINDOWS
 					PathString = PathString + TEXT("dotnet.exe");
-#else
-					PathStr = PathStr + TEXT("dotnet");
-#endif
 
 					// 路径唯一,添加到数组
 					ResultArray.AddUnique(PathString);
@@ -181,6 +178,9 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 
 	// 运行失败,返回默认路径
 	return ResultArray;
+#elif PLATFORM_MAC
+	return {TEXT("/usr/local/share/dotnet/dotnet")};
+#endif
 }
 
 const TArray<FString>& UUnrealCSharpEditorSetting::GetGeneratorModules()

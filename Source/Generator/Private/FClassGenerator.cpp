@@ -1106,7 +1106,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 	if (CastField<FNameProperty>(InProperty))
 	{
 		return FString::Printf(TEXT(
-			"\t\t\t%s ??= new FName(\"%s\");\n\n"
+			"\t\t\t%s \?\?= new FName(\"%s\");\n\n"
 		),
 		                       *FGeneratorCore::GetName(InProperty->GetName()),
 		                       *InMetaData
@@ -1122,7 +1122,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s ??= new FRotator\n"
+					"\t\t\t%s \?\?= new FRotator\n"
 					"\t\t\t{\n"
 					"\t\t\t\tPitch = %ff,\n"
 					"\t\t\t\tYaw = %ff,\n"
@@ -1144,7 +1144,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s ??= new FQuat\n"
+					"\t\t\t%s \?\?= new FQuat\n"
 					"\t\t\t{\n"
 					"\t\t\t\tX = %ff,\n"
 					"\t\t\t\tY = %ff,\n"
@@ -1168,7 +1168,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s ??= new FLinearColor\n"
+					"\t\t\t%s \?\?= new FLinearColor\n"
 					"\t\t\t{\n"
 					"\t\t\t\tR = %ff,\n"
 					"\t\t\t\tG = %ff,\n"
@@ -1192,7 +1192,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s ??= new FColor\n"
+					"\t\t\t%s \?\?= new FColor\n"
 					"\t\t\t{\n"
 					"\t\t\t\tR = %hhu,\n"
 					"\t\t\t\tG = %hhu,\n"
@@ -1216,7 +1216,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s ??= new FPlane\n"
+					"\t\t\t%s \?\?= new FPlane\n"
 					"\t\t\t{\n"
 					"\t\t\t\tX = %ff,\n"
 					"\t\t\t\tY = %ff,\n"
@@ -1240,7 +1240,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s ??= new FVector\n"
+					"\t\t\t%s \?\?= new FVector\n"
 					"\t\t\t{\n"
 					"\t\t\t\tX = %ff,\n"
 					"\t\t\t\tY = %ff,\n"
@@ -1262,7 +1262,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s ??= new FVector2D\n"
+					"\t\t\t%s \?\?= new FVector2D\n"
 					"\t\t\t{\n"
 					"\t\t\t\tX = %ff,\n"
 					"\t\t\t\tY = %ff,\n"
@@ -1282,7 +1282,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s ??= new FVector4\n"
+					"\t\t\t%s \?\?= new FVector4\n"
 					"\t\t\t{\n"
 					"\t\t\t\tX = %ff,\n"
 					"\t\t\t\tY = %ff,\n"
@@ -1300,7 +1300,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		}
 
 		return FString::Printf(TEXT(
-			"\t\t\t%s ??= new %s%s();\n\n"
+			"\t\t\t%s \?\?= new %s%s();\n\n"
 		),
 		                       *InProperty->GetName(),
 		                       StructProperty->Struct->IsNative() ? TEXT("F") : TEXT(""),
@@ -1311,7 +1311,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 	if (CastField<FStrProperty>(InProperty))
 	{
 		return FString::Printf(TEXT(
-			"\t\t\t%s ??= new FString(\"%s\");\n\n"
+			"\t\t\t%s \?\?= new FString(\"%s\");\n\n"
 		),
 		                       *InProperty->GetName(),
 		                       *InMetaData
@@ -1330,7 +1330,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		}
 
 		return FString::Printf(TEXT(
-			"\t\t\t%s ??= new FText(\"%s\");\n\n"
+			"\t\t\t%s \?\?= new FText(\"%s\");\n\n"
 		),
 		                       *InProperty->GetName(),
 		                       *Value

@@ -576,6 +576,8 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 	                            *PLUGIN_NAME,
 #if PLATFORM_WINDOWS
 	                            TEXT("Win64")
+#elif PLATFORM_MAC_X86
+	                            TEXT("macOS_x86_64")
 #endif
 	);
 #else

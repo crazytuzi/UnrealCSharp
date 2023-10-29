@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -98,6 +99,60 @@ public class Mono : ModuleRules
 				Path.Combine(LibraryPath, Target.Platform.ToString(), "libSystem.Native.so.dbg"));
 
 			var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
+
+			foreach (var File in Files)
+			{
+				var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
+
+				var DestPath = File.Substring(ModuleLastDirectory.Length + 1,
+					File.Length - ModuleLastDirectory.Length - 1);
+
+				RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
+			}
+		}
+		else if (Target.Platform == UnrealTargetPlatform.Mac)
+		{
+            var Platform = String.Format("macOS_{0}", base.Target.Architecture);
+            
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Platform, "libmonosgen-2.0.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Platform,
+				"libmono-component-debugger-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Platform,
+				"libmono-component-diagnostics_tracing-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Platform,
+				"libmono-component-hot_reload-static.a"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libcoreclr.dylib",
+				Path.Combine(LibraryPath, Platform, "libcoreclr.dylib"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libcoreclr.dylib.dwarf",
+				Path.Combine(LibraryPath, Platform, "libcoreclr.dylib.dwarf"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.Native.dylib",
+				Path.Combine(LibraryPath, Platform, "libSystem.Native.dylib"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.IO.Compression.Native.dylib",
+				Path.Combine(LibraryPath, Platform, "libSystem.IO.Compression.Native.dylib"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.Security.Cryptography.Native.Apple.dylib",
+				Path.Combine(LibraryPath, Platform, "libSystem.Security.Cryptography.Native.Apple.dylib"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.Security.Cryptography.Native.OpenSsl.dylib",
+				Path.Combine(LibraryPath, Platform, "libSystem.Security.Cryptography.Native.OpenSsl.dylib"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.Net.Security.Native.dylib",
+				Path.Combine(LibraryPath, Platform, "libSystem.Net.Security.Native.dylib"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.Globalization.Native.dylib",
+				Path.Combine(LibraryPath, Platform, "libSystem.Globalization.Native.dylib"));
+
+			RuntimeDependencies.Add("$(BinaryOutputDir)/libSystem.IO.Ports.Native.dylib",
+				Path.Combine(LibraryPath, Platform, "libSystem.IO.Ports.Native.dylib"));
+
+			var Files = GetFiles(Path.Combine(LibraryPath, Platform, "net7.0"));
 
 			foreach (var File in Files)
 			{
