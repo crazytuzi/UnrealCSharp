@@ -36,6 +36,10 @@
 
 #define FUNCTION_BIT_XOR FString(TEXT("BitXor"))
 
+#define FUNCTION_LEFT_SHIFT FString(TEXT("LeftShift"))
+
+#define FUNCTION_RIGHT_SHIFT FString(TEXT("RightShift"))
+
 #define FUNCTION_EQUAL_TO FString(TEXT("EqualTo"))
 
 #define FUNCTION_NOT_EQUAL_TO FString(TEXT("NotEqualTo"))

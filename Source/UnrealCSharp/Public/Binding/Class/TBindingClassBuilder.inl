@@ -91,6 +91,20 @@ public:
 		return *this;
 	}
 
+	TBindingClassBuilder& LeftShift()
+	{
+		LeftShift(BINDING_OPERATOR(T(*)(const T&, const T&), &operator<<));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& RightShift()
+	{
+		RightShift(BINDING_OPERATOR(T(*)(const T&, const T&), &operator>>));
+
+		return *this;
+	}
+
 	TBindingClassBuilder& EqualTo()
 	{
 		EqualTo(BINDING_OPERATOR(bool(*)(const T&, const T&), &operator==));
@@ -330,6 +344,46 @@ public:
 #else
 		Function(TEXT("operator ^"),
 				 FUNCTION_BIT_XOR,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& LeftShift(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& LeftShift(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator <<"),
+		         FUNCTION_LEFT_SHIFT,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator <<"),
+				 FUNCTION_LEFT_SHIFT,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& RightShift(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& RightShift(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator >>"),
+		         FUNCTION_RIGHT_SHIFT,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator >>"),
+				 FUNCTION_RIGHT_SHIFT,
 				 InMethod);
 #endif
 
