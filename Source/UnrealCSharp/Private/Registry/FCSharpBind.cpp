@@ -408,6 +408,10 @@ UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass*
 		return nullptr;
 	}
 
+	const auto OriginalFunctionFlags = InOriginalFunction->FunctionFlags;
+
+	InOriginalFunction->FunctionFlags &= (~EFunctionFlags::FUNC_Native);
+
 	FObjectDuplicationParameters ObjectDuplicationParameters(InOriginalFunction, InClass);
 
 	ObjectDuplicationParameters.DestName = InFunctionName;
@@ -416,10 +420,14 @@ UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass*
 
 	const auto NewFunction = Cast<UFunction>(StaticDuplicateObjectEx(ObjectDuplicationParameters));
 
+	InOriginalFunction->FunctionFlags = OriginalFunctionFlags;
+
 	if (NewFunction == nullptr)
 	{
 		return nullptr;
 	}
+
+	NewFunction->FunctionFlags = OriginalFunctionFlags;
 
 	NewFunction->SetNativeFunc(InOriginalFunction->GetNativeFunc());
 

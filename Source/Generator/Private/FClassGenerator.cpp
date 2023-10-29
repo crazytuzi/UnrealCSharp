@@ -80,6 +80,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto bIsInterface = InClass->IsChildOf(UInterface::StaticClass());
 
+	auto bIsNativeClass = InClass->IsNative();
+
 	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
 
 	auto SuperClass = InClass->GetSuperClass();
@@ -424,7 +426,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->HasAnyPropertyFlags(
 				CPF_ConstParm))
 			{
-				if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_ReferenceParm))
+				if (bIsNativeClass || FunctionParams[Index]->HasAnyPropertyFlags(CPF_ReferenceParm))
 				{
 					FunctionOutParamIndexMapping[FunctionParams.Num() - 1 - FunctionRefParamIndex.Num()] =
 						FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();

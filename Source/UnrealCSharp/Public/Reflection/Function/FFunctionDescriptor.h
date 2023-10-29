@@ -39,6 +39,8 @@ protected:
 
 	FPropertyDescriptor* ReturnPropertyDescriptor;
 
+	TArray<uint32> ReferencePropertyIndexes;
+
 	TArray<uint32> OutPropertyIndexes;
 
 	void* Params;

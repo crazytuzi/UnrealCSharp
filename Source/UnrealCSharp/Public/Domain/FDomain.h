@@ -103,6 +103,11 @@ public:
 
 	MonoObject* Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams, MonoObject** InExc) const;
 
+	static MonoObject* Runtime_Invoke_Array(MonoMethod* InFunction, void* InMonoObject, MonoArray* InParams);
+
+	static MonoObject* Runtime_Invoke_Array(MonoMethod* InFunction, void* InMonoObject, MonoArray* InParams,
+	                                        MonoObject** InExc);
+
 	MonoObject* Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams) const;
 
 	MonoObject* Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams, MonoObject** InExc) const;

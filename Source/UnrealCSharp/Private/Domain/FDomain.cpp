@@ -253,6 +253,17 @@ MonoObject* FDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, 
 	return FMonoDomain::Runtime_Invoke(InFunction, InMonoObject, InParams, InExc);
 }
 
+MonoObject* FDomain::Runtime_Invoke_Array(MonoMethod* InFunction, void* InMonoObject, MonoArray* InParams)
+{
+	return FMonoDomain::Runtime_Invoke_Array(InFunction, InMonoObject, InParams);
+}
+
+MonoObject* FDomain::Runtime_Invoke_Array(MonoMethod* InFunction, void* InMonoObject, MonoArray* InParams,
+                                          MonoObject** InExc)
+{
+	return FMonoDomain::Runtime_Invoke_Array(InFunction, InMonoObject, InParams, InExc);
+}
+
 MonoObject* FDomain::Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams) const
 {
 	return FMonoDomain::Runtime_Delegate_Invoke(InDelegate, InParams);
