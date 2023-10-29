@@ -20,8 +20,44 @@
 
 #define FUNCTION_DESTRUCTOR FString(TEXT("Destructor"))
 
+#define FUNCTION_LOGICAL_NOT FString(TEXT("LogicalNot"))
+
+#define FUNCTION_UNARY_PLUS FString(TEXT("UnaryPlus"))
+
+#define FUNCTION_UNARY_MINUS FString(TEXT("UnaryMinus"))
+
+#define FUNCTION_COMPLEMENT FString(TEXT("Complement"))
+
+#define FUNCTION_PLUS FString(TEXT("Plus"))
+
+#define FUNCTION_MINUS FString(TEXT("Minus"))
+
+#define FUNCTION_MULTIPLIES FString(TEXT("Multiplies"))
+
+#define FUNCTION_DIVIDES FString(TEXT("Divides"))
+
+#define FUNCTION_MODULUS FString(TEXT("Modulus"))
+
+#define FUNCTION_BIT_AND FString(TEXT("BitAnd"))
+
+#define FUNCTION_BIT_OR FString(TEXT("BitOr"))
+
+#define FUNCTION_BIT_XOR FString(TEXT("BitXor"))
+
+#define FUNCTION_LEFT_SHIFT FString(TEXT("LeftShift"))
+
+#define FUNCTION_RIGHT_SHIFT FString(TEXT("RightShift"))
+
 #define FUNCTION_EQUAL_TO FString(TEXT("EqualTo"))
 
 #define FUNCTION_NOT_EQUAL_TO FString(TEXT("NotEqualTo"))
+
+#define FUNCTION_LESS FString(TEXT("Less"))
+
+#define FUNCTION_LESS_EQUAL FString(TEXT("LessEqual"))
+
+#define FUNCTION_GREATER FString(TEXT("Greater"))
+
+#define FUNCTION_GREATER_EQUAL FString(TEXT("GreaterEqual"))
 
 #define FUNCTION_SET_HANDLE FString(TEXT("SetHandle"))
