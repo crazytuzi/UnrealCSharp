@@ -70,6 +70,27 @@ public:
 		return *this;
 	}
 
+	TBindingClassBuilder& BitAnd()
+	{
+		BitAnd(BINDING_OPERATOR(T(*)(const T&, const T&), &operator&));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& BitOr()
+	{
+		BitOr(BINDING_OPERATOR(T(*)(const T&, const T&), &operator|));
+
+		return *this;
+	}
+
+	TBindingClassBuilder& BitXor()
+	{
+		BitXor(BINDING_OPERATOR(T(*)(const T&, const T&), &operator^));
+
+		return *this;
+	}
+
 	TBindingClassBuilder& EqualTo()
 	{
 		EqualTo(BINDING_OPERATOR(bool(*)(const T&, const T&), &operator==));
@@ -249,6 +270,66 @@ public:
 #else
 		Function(TEXT("operator %"),
 				 FUNCTION_MODULUS,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& BitAnd(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& BitAnd(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator &"),
+		         FUNCTION_BIT_AND,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator &"),
+				 FUNCTION_BIT_AND,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& BitOr(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& BitOr(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator |"),
+		         FUNCTION_BIT_OR,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator |"),
+				 FUNCTION_BIT_OR,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TBindingClassBuilder& BitXor(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TBindingClassBuilder& BitXor(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator ^"),
+		         FUNCTION_BIT_XOR,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator ^"),
+				 FUNCTION_BIT_XOR,
 				 InMethod);
 #endif
 

@@ -30,6 +30,12 @@
 
 #define FUNCTION_MODULUS FString(TEXT("Modulus"))
 
+#define FUNCTION_BIT_AND FString(TEXT("BitAnd"))
+
+#define FUNCTION_BIT_OR FString(TEXT("BitOr"))
+
+#define FUNCTION_BIT_XOR FString(TEXT("BitXor"))
+
 #define FUNCTION_EQUAL_TO FString(TEXT("EqualTo"))
 
 #define FUNCTION_NOT_EQUAL_TO FString(TEXT("NotEqualTo"))
