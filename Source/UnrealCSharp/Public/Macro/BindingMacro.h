@@ -270,3 +270,27 @@ struct TIsNotUEnum<Class> \
 #else
 #define BINDING_OPERATOR(Signature, Function) BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function)
 #endif
+
+#define OPERATOR_BUILDER(Name, Signature) \
+TOperatorClassBuilder& Name() \
+{ \
+	return Name(BINDING_OPERATOR(Signature, &Name##Implementation));\
+}
+
+#define UNARY_OPERATOR(Name, Signature, Operator) \
+public: \
+OPERATOR_BUILDER(Name, Signature) \
+private: \
+static auto Name##Implementation(const T& In) \
+{ \
+	return Operator In; \
+}
+
+#define BINARY_OPERATOR(Name, Signature, Operator) \
+public: \
+OPERATOR_BUILDER(Name, Signature) \
+private: \
+static auto Name##Implementation(const T& InA, const T& InB) \
+{ \
+	return InA Operator InB; \
+}
