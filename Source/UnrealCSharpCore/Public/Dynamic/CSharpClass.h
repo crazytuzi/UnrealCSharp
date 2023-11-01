@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Class.h"
-#include "CSharpGeneratedClass.generated.h"
+#include "CSharpClass.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UNREALCSHARPCORE_API UCSharpGeneratedClass : public UClass
+class UNREALCSHARPCORE_API UCSharpClass : public UClass
 {
 	GENERATED_BODY()
 	

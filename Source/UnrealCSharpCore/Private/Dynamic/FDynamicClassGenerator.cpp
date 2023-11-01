@@ -60,8 +60,8 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 		FString::Printf(TEXT(
 			"%s/%s.json"),
 		                *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-		                *UCSharpGeneratedClass::StaticClass()->GetName()),
-		UCSharpGeneratedClass::StaticClass()->GetName()
+		                *UCSharpClass::StaticClass()->GetName()),
+		UCSharpClass::StaticClass()->GetName()
 	);
 
 	for (const auto& ClassName : CSharpGeneratedClass)
@@ -72,7 +72,7 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 
 		if (Class == nullptr)
 		{
-			GeneratorCSharpGeneratedClass(Outer, ClassName, AActor::StaticClass());
+			GeneratorCSharpClass(Outer, ClassName, AActor::StaticClass());
 		}
 	}
 
@@ -148,7 +148,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 		}
 		else
 		{
-			Class = GeneratorCSharpGeneratedClass(Outer, ClassName, ParentClass);
+			Class = GeneratorCSharpClass(Outer, ClassName, ParentClass);
 
 			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 		}
@@ -215,10 +215,10 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 	InClass->AssembleReferenceTokenStream();
 }
 
-UCSharpGeneratedClass* FDynamicClassGenerator::GeneratorCSharpGeneratedClass(
+UCSharpClass* FDynamicClassGenerator::GeneratorCSharpClass(
 	UPackage* InOuter, const FString& InName, UClass* InParentClass)
 {
-	const auto Class = NewObject<UCSharpGeneratedClass>(InOuter, *InName, RF_Public);
+	const auto Class = NewObject<UCSharpClass>(InOuter, *InName, RF_Public);
 
 	Class->AddToRoot();
 

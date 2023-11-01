@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Dynamic/CSharpGeneratedClass.h"
+#include "Dynamic/CSharpClass.h"
 #include "Dynamic/CSharpBlueprintGeneratedClass.h"
 #include "mono/metadata/object.h"
 
@@ -24,7 +24,7 @@ private:
 
 	static void EndGenerator(UClass* InClass);
 
-	static UCSharpGeneratedClass* GeneratorCSharpGeneratedClass(
+	static UCSharpClass* GeneratorCSharpClass(
 		UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
 	static UCSharpBlueprintGeneratedClass* GeneratorCSharpBlueprintGeneratedClass(

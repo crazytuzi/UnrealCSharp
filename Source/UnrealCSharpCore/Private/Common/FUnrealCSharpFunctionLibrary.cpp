@@ -2,7 +2,7 @@
 #include "CoreMacro/Macro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
-#include "Dynamic/CSharpGeneratedClass.h"
+#include "Dynamic/CSharpClass.h"
 #include "Dynamic/CSharpBlueprintGeneratedClass.h"
 #include "Dynamic/CSharpScriptStruct.h"
 #include "Dynamic/CSharpEnum.h"
@@ -92,10 +92,10 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 
 	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
 
-	const auto bIsDynamicClass = Cast<UCSharpGeneratedClass>(InStruct) ||
+	const auto bIsDynamicClass = Cast<UCSharpClass>(InStruct) ||
 		Cast<UCSharpBlueprintGeneratedClass>(InStruct) ||
 		Cast<UCSharpScriptStruct>(InStruct) ||
-		UCSharpGeneratedClass::StaticClass() == InStruct ||
+		UCSharpClass::StaticClass() == InStruct ||
 		UCSharpBlueprintGeneratedClass::StaticClass() == InStruct ||
 		UCSharpScriptStruct::StaticClass() == InStruct;
 

@@ -4,7 +4,7 @@
 #include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
-#include "Dynamic/CSharpGeneratedClass.h"
+#include "Dynamic/CSharpClass.h"
 #include "Dynamic/CSharpBlueprintGeneratedClass.h"
 #include "Dynamic/CSharpScriptStruct.h"
 #include "Dynamic/CSharpEnum.h"
@@ -21,7 +21,7 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
 
 	if (InField->IsNative() == false ||
-		Cast<UCSharpGeneratedClass>(InField) ||
+		Cast<UCSharpClass>(InField) ||
 		Cast<UCSharpBlueprintGeneratedClass>(InField) ||
 		Cast<UCSharpScriptStruct>(InField) ||
 		Cast<UCSharpEnum>(InField))
