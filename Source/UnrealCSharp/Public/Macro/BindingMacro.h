@@ -15,6 +15,7 @@
 #include "Binding/Function/TArgument.inl"
 #include "Binding/Function/TReturnValue.inl"
 #include "Binding/Function/TOverloadBuilder.inl"
+#include "Template/TIsScriptStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 
 #define BINDING_STR(Str) #Str
@@ -138,6 +139,11 @@ struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Typ
 	TScriptStructReturnValue<T> \
 { \
 	using TScriptStructReturnValue<T>::TScriptStructReturnValue; \
+}; \
+template <> \
+struct TIsScriptStruct<Class> \
+{ \
+	enum { Value = true }; \
 };
 
 #define BINDING_ENUM(Class) \
