@@ -10,7 +10,7 @@ struct TOut
 	{
 	}
 
-	template <SIZE_T Index>
+	template <size_t Index>
 	TOut& Initialize()
 	{
 		if (Count > 0)
@@ -23,10 +23,10 @@ struct TOut
 		return *this;
 	}
 
-	template <SIZE_T Index, typename T, typename... Args>
+	template <size_t Index, typename T, typename... Args>
 	TOut& Initialize()
 	{
-		if (Argument.template Get<Index>().IsOut())
+		if (std::get<Index>(Argument).IsOut())
 		{
 			++Count;
 		}
@@ -34,17 +34,17 @@ struct TOut
 		return Initialize<Index + 1, Args...>();;
 	}
 
-	template <SIZE_T Index>
+	template <size_t Index>
 	static void Get()
 	{
 	}
 
-	template <SIZE_T Index, typename T, typename... Args>
+	template <size_t Index, typename T, typename... Args>
 	void Get()
 	{
-		if (Argument.template Get<Index>().IsOut())
+		if (std::get<Index>(Argument).IsOut())
 		{
-			auto Value = Argument.template Get<Index>().Set();
+			auto Value = std::get<Index>(Argument).Set();
 
 			ARRAY_SET((MonoArray*)*OutValue, MonoObject*, Count++, Value);
 		}

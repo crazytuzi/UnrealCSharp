@@ -9,6 +9,7 @@
 #include "Registry/FMixinRegistry.h"
 #include "Template/TIsUObject.inl"
 #include "Template/TIsUStruct.inl"
+#include "Template/TIsScriptStruct.inl"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
 
 class UNREALCSHARP_API FCSharpEnvironment
@@ -222,7 +223,7 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, typename TEnableIf<TIsUObject<T>::Value, T>::Type>
+	class TGetObject<T, std::enable_if_t<TIsUObject<T>::Value, T>>
 	{
 	public:
 		T* operator()(const FCSharpEnvironment& InEnvironment,
@@ -238,7 +239,7 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
+	class TGetObject<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
 	{
 	public:
 		T* operator()(const FCSharpEnvironment& InEnvironment,
@@ -254,7 +255,21 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, typename TEnableIf<TNot<TOr<TIsUObject<T>, TIsUStruct<T>>>::Value, T>::Type>
+	class TGetObject<T, std::enable_if_t<TIsScriptStruct<T>::Value, T>>
+	{
+	public:
+		T* operator()(const FCSharpEnvironment& InEnvironment,
+		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+		{
+			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
+		}
+	};
+
+	template <typename T>
+	class TGetObject<T, std::enable_if_t<!(TIsUObject<T>::Value ||
+		                                     TIsUStruct<T>::Value ||
+		                                     TIsScriptStruct<T>::Value),
+	                                     T>>
 	{
 	public:
 		T* operator()(const FCSharpEnvironment& InEnvironment,

@@ -13,7 +13,7 @@ struct TConstructorBuilder
 
 	static void Invoke(BINDING_CONSTRUCTOR_SIGNATURE)
 	{
-		TConstructorHelper<TTuple<Args...>>::template Call<Class>(
-			TMakeIntegerSequence<SIZE_T, sizeof...(Args)>(), BINDING_CONSTRUCTOR_PARAM);
+		TConstructorHelper<std::tuple<Args...>>::template Call<Class>(
+			std::make_index_sequence<sizeof...(Args)>(), BINDING_CONSTRUCTOR_PARAM);
 	}
 };

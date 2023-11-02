@@ -4,9 +4,8 @@
 #include "TOut.inl"
 #include "TReturnValue.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "UEVersion.h"
 
-inline MonoObject* Get(MonoArray* InMonoArray, const SIZE_T InIndex)
+inline MonoObject* Get(MonoArray* InMonoArray, const size_t InIndex)
 {
 	return ARRAY_GET(InMonoArray, MonoObject*, InIndex);
 }
@@ -17,57 +16,49 @@ struct TFunctionHelper
 };
 
 template <typename Result, typename... Args>
-struct TFunctionHelper<TPair<Result, TTuple<Args...>>>
+struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 {
-	template <typename Function, SIZE_T... Index>
-	static void Call(Function InFunction, TIntegerSequence<SIZE_T, Index...>, BINDING_FUNCTION_SIGNATURE)
+	template <typename Function, size_t... Index>
+	static void Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
+		std::tuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
 
-#if UE_T_IS_SAME
-		if constexpr (TIsSame<Result, void>::Value)
-#else
 		if constexpr (std::is_same_v<Result, void>)
-#endif
 		{
-			InFunction(Forward<Args>(Argument.template Get<Index>().Get())...);
+			InFunction(std::forward<Args>(std::get<Index>(Argument).Get())...);
 		}
 		else
 		{
-			*ReturnValue = TReturnValue<Result>(Forward<Result>(
-					InFunction(Forward<Args>(Argument.template Get<Index>().Get())...)))
+			*ReturnValue = TReturnValue<Result>(std::forward<Result>(
+					InFunction(std::forward<Args>(std::get<Index>(Argument).Get())...)))
 				.Get();
 		}
 
-		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument)
+		TOut<std::tuple<TArgument<Args>...>>(OutValue, Argument)
 			.template Initialize<0, Args...>()
 			.template Get<0, Args...>();
 	}
 
-	template <typename Class, typename Function, SIZE_T... Index>
-	static void Call(Function InFunction, TIntegerSequence<SIZE_T, Index...>, BINDING_FUNCTION_SIGNATURE)
+	template <typename Class, typename Function, size_t... Index>
+	static void Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
+			std::tuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
 
-#if UE_T_IS_SAME
-			if constexpr (TIsSame<Result, void>::Value)
-#else
 			if constexpr (std::is_same_v<Result, void>)
-#endif
 			{
-				(FoundObject->*InFunction)(Forward<Args>(Argument.template Get<Index>().Get())...);
+				(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...);
 			}
 			else
 			{
-				*ReturnValue = TReturnValue<Result>(Forward<Result>(
-						(FoundObject->*InFunction)(Forward<Args>(Argument.template Get<Index>().Get())...)))
+				*ReturnValue = TReturnValue<Result>(std::forward<Result>(
+						(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...)))
 					.Get();
 			}
 
-			TOut<TTuple<TArgument<Args>...>>(OutValue, Argument)
+			TOut<std::tuple<TArgument<Args>...>>(OutValue, Argument)
 				.template Initialize<0, Args...>()
 				.template Get<0, Args...>();
 		}

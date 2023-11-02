@@ -91,8 +91,8 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 };
 
 template <typename T>
-struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
-	                                      FMultiRegistry::FSubclassOfAddress::TIsType<T>::value, T>::Type> :
+struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
+	                                      FMultiRegistry::FSubclassOfAddress::TIsType<T>::value, T>> :
 	TMultiRegistryImplementation<
 		FSubclassOfMapping,
 		decltype(&FMultiRegistry::GarbageCollectionHandle2SubclassOfAddress),
@@ -106,8 +106,8 @@ struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
 };
 
 template <typename T>
-struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
-	                                      FMultiRegistry::FWeakObjectPtrAddress::TIsType<T>::value, T>::Type> :
+struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
+	                                      FMultiRegistry::FWeakObjectPtrAddress::TIsType<T>::value, T>> :
 	TMultiRegistryImplementation<
 		FWeakObjectPtrMapping,
 		decltype(&FMultiRegistry::GarbageCollectionHandle2WeakObjectPtrAddress),
@@ -121,8 +121,8 @@ struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
 };
 
 template <typename T>
-struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
-	                                      FMultiRegistry::FLazyObjectPtrAddress::TIsType<T>::value, T>::Type> :
+struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
+	                                      FMultiRegistry::FLazyObjectPtrAddress::TIsType<T>::value, T>> :
 	TMultiRegistryImplementation<
 		FLazyObjectPtrMapping,
 		decltype(&FMultiRegistry::GarbageCollectionHandle2LazyObjectPtrAddress),
@@ -136,8 +136,8 @@ struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
 };
 
 template <typename T>
-struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
-	                                      FMultiRegistry::FSoftObjectPtrAddress::TIsType<T>::value, T>::Type> :
+struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
+	                                      FMultiRegistry::FSoftObjectPtrAddress::TIsType<T>::value, T>> :
 	TMultiRegistryImplementation<
 		FSoftObjectPtrMapping,
 		decltype(&FMultiRegistry::GarbageCollectionHandle2SoftObjectPtrAddress),
@@ -151,8 +151,8 @@ struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
 };
 
 template <typename T>
-struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
-	                                      FMultiRegistry::FScriptInterfaceAddress::TIsType<T>::value, T>::Type> :
+struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
+	                                      FMultiRegistry::FScriptInterfaceAddress::TIsType<T>::value, T>> :
 	TMultiRegistryImplementation<
 		FScriptInterfaceMapping,
 		decltype(&FMultiRegistry::GarbageCollectionHandle2ScriptInterfaceAddress),
@@ -166,8 +166,8 @@ struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
 };
 
 template <typename T>
-struct FMultiRegistry::TMultiRegistry<T, typename TEnableIf<
-	                                      FMultiRegistry::FSoftClassPtrAddress::TIsType<T>::value, T>::Type> :
+struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
+	                                      FMultiRegistry::FSoftClassPtrAddress::TIsType<T>::value, T>> :
 	TMultiRegistryImplementation<
 		FSoftClassPtrMapping,
 		decltype(&FMultiRegistry::GarbageCollectionHandle2SoftClassPtrAddress),

@@ -4,7 +4,7 @@
 #include "TOut.inl"
 #include "Environment/FCSharpEnvironment.h"
 
-extern MonoObject* Get(MonoArray* InMonoArray, const SIZE_T InIndex);
+extern MonoObject* Get(MonoArray* InMonoArray, const size_t InIndex);
 
 template <typename>
 struct TConstructorHelper
@@ -12,16 +12,16 @@ struct TConstructorHelper
 };
 
 template <typename... Args>
-struct TConstructorHelper<TTuple<Args...>>
+struct TConstructorHelper<std::tuple<Args...>>
 {
-	template <typename Class, SIZE_T... Index>
-	static void Call(TIntegerSequence<SIZE_T, Index...>, BINDING_CONSTRUCTOR_SIGNATURE)
+	template <typename Class, size_t... Index>
+	static void Call(std::index_sequence<Index...>, BINDING_CONSTRUCTOR_SIGNATURE)
 	{
-		TTuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
+		std::tuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
 
-		auto Value = new Class(Forward<Args>(Argument.template Get<Index>().Get())...);
+		auto Value = new Class(std::forward<Args>(Argument.template Get<Index>().Get())...);
 
-		TOut<TTuple<TArgument<Args>...>>(OutValue, Argument)
+		TOut<std::tuple<TArgument<Args>...>>(OutValue, Argument)
 			.template Initialize<0, Args...>()
 			.template Get<0, Args...>();
 

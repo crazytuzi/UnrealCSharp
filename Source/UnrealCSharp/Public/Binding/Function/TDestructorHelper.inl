@@ -3,7 +3,7 @@
 #include "TArgument.inl"
 #include "Environment/FCSharpEnvironment.h"
 
-extern MonoObject* Get(MonoArray* InMonoArray, const SIZE_T InIndex);
+extern MonoObject* Get(MonoArray* InMonoArray, const size_t InIndex);
 
 template <typename>
 struct TDestructorHelper
@@ -11,10 +11,10 @@ struct TDestructorHelper
 };
 
 template <typename... Args>
-struct TDestructorHelper<TTuple<Args...>>
+struct TDestructorHelper<std::tuple<Args...>>
 {
-	template <SIZE_T... Index>
-	static void Call(TIntegerSequence<SIZE_T, Index...>, BINDING_FUNCTION_SIGNATURE)
+	template <size_t... Index>
+	static void Call(std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
 		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InGarbageCollectionHandle);
 	}

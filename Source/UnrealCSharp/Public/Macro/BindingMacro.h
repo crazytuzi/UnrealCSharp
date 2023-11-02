@@ -15,6 +15,7 @@
 #include "Binding/Function/TArgument.inl"
 #include "Binding/Function/TReturnValue.inl"
 #include "Binding/Function/TOverloadBuilder.inl"
+#include "Template/TIsScriptStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 
 #define BINDING_STR(Str) #Str
@@ -45,7 +46,7 @@ struct TClassFullName<Class> \
 static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
-struct TName<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
+struct TName<T, std::enable_if_t<std::is_same_v<T, Class>, T>> \
 { \
 	static FString Get() \
 	{ \
@@ -53,7 +54,7 @@ struct TName<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
 	} \
 }; \
 template <typename T> \
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, Class>, T>> \
 { \
 	static TArray<FString> Get() \
 	{ \
@@ -61,28 +62,28 @@ struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
 	} \
 }; \
 template <typename T> \
-struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> : \
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, Class>, T>> : \
 	TBindingPropertyClass<T> \
 { \
 }; \
 template <typename T> \
-struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> : \
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, Class>, T>> : \
 	TBindingPropertyValue<T> \
 { \
 }; \
 template <typename InClass, typename Result, Result InClass::* Member> \
-struct TPropertyBuilder<Result InClass::*, Member, typename TEnableIf<std::is_same_v<Result, Class>>::Type> : \
+struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same_v<Result, Class>>> : \
 	TReferencePropertyBuilder<InClass, Result, Member> \
 { \
 }; \
 template <typename T> \
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, Class>>::Type> : \
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>>> : \
 	TBindingArgument<T> \
 { \
 	using TBindingArgument<T>::TBindingArgument; \
 }; \
 template <typename T> \
-struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, Class>>::Type> : \
+struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>>> : \
 	TBindingReturnValue<T> \
 { \
 	using TBindingReturnValue<T>::TBindingReturnValue; \
@@ -100,12 +101,12 @@ struct TClassFullName<Class> \
 	static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
-struct TName<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
+struct TName<T, std::enable_if_t<std::is_same_v<T, Class>, T>> \
 { \
 	static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, Class>, T>> \
 { \
 	static TArray<FString> Get() \
 	{ \
@@ -113,31 +114,36 @@ struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
 	} \
 }; \
 template <typename T> \
-struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> : \
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, Class>, T>> : \
 	TScriptStructPropertyClass<T> \
 { \
 }; \
 template <typename T> \
-struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> : \
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, Class>, T>> : \
 	TScriptStructPropertyValue<T> \
 { \
 }; \
 template <typename InClass, typename Result, Result InClass::* Member> \
-struct TPropertyBuilder<Result InClass::*, Member, typename TEnableIf<std::is_same_v<Result, Class>>::Type> : \
+struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same_v<Result, Class>>> : \
 	TReferencePropertyBuilder<InClass, Result, Member> \
 { \
 }; \
 template <typename T> \
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, Class>>::Type> : \
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>>> : \
 	TScriptStructArgument<T> \
 { \
 	using TScriptStructArgument<T>::TScriptStructArgument; \
 }; \
 template <typename T> \
-struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, Class>>::Type> : \
+struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>>> : \
 	TScriptStructReturnValue<T> \
 { \
 	using TScriptStructReturnValue<T>::TScriptStructReturnValue; \
+}; \
+template <> \
+struct TIsScriptStruct<Class> \
+{ \
+	enum { Value = true }; \
 };
 
 #define BINDING_ENUM(Class) \
@@ -152,12 +158,12 @@ struct TClassFullName<Class> \
 	static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
-struct TName<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
+struct TName<T, std::enable_if_t<std::is_same_v<T, Class>, T>> \
 { \
 	static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, Class>, T>> \
 { \
 	static TArray<FString> Get() \
 	{ \
@@ -165,28 +171,28 @@ struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> \
 	} \
 }; \
 template <typename T> \
-struct TPropertyClass<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> : \
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, Class>, T>> : \
 	TBindingEnumPropertyClass<T> \
 { \
 }; \
 template <typename T> \
-struct TPropertyValue<T, typename TEnableIf<std::is_same_v<T, Class>, T>::Type> : \
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, Class>, T>> : \
 	TBindingEnumPropertyValue<T> \
 { \
 }; \
 template <typename InClass, typename Result, Result InClass::* Member> \
-struct TPropertyBuilder<Result InClass::*, Member, typename TEnableIf<std::is_same_v<Result, Class>>::Type> : \
+struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same_v<Result, Class>>> : \
 	TPropertyInfoBuilder<InClass, Result, Member> \
 { \
 }; \
 template <typename T> \
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, Class>>::Type> : \
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>>> : \
 	TBindingEnumArgument<T> \
 { \
 	using TBindingEnumArgument<T>::TBindingEnumArgument; \
 }; \
 template <typename T> \
-struct TReturnValue<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, Class>>::Type> : \
+struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>>> : \
 	TBindingEnumReturnValue<T> \
 { \
 	using TBindingEnumReturnValue<T>::TBindingEnumReturnValue; \

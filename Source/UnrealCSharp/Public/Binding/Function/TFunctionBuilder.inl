@@ -23,8 +23,8 @@ struct TFunctionBuilder<Result (*)(Args...), Function> :
 {
 	static void Invoke(BINDING_FUNCTION_SIGNATURE)
 	{
-		TFunctionHelper<TPair<Result, TTuple<Args...>>>::Call(
-			Function, TMakeIntegerSequence<SIZE_T, sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
+		TFunctionHelper<TPair<Result, std::tuple<Args...>>>::Call(
+			Function, std::make_index_sequence<sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
 	}
 };
 
@@ -34,8 +34,8 @@ struct TFunctionBuilder<Result (Class::*)(Args...), Function> :
 {
 	static void Invoke(BINDING_FUNCTION_SIGNATURE)
 	{
-		TFunctionHelper<TPair<Result, TTuple<Args...>>>::template Call<Class>(
-			Function, TMakeIntegerSequence<SIZE_T, sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
+		TFunctionHelper<TPair<Result, std::tuple<Args...>>>::template Call<Class>(
+			Function, std::make_index_sequence<sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
 	}
 };
 
@@ -45,7 +45,7 @@ struct TFunctionBuilder<Result (Class::*)(Args...) const, Function> :
 {
 	static void Invoke(BINDING_FUNCTION_SIGNATURE)
 	{
-		TFunctionHelper<TPair<Result, TTuple<Args...>>>::template Call<Class>(
-			Function, TMakeIntegerSequence<SIZE_T, sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
+		TFunctionHelper<TPair<Result, std::tuple<Args...>>>::template Call<Class>(
+			Function, std::make_index_sequence<sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
 	}
 };
