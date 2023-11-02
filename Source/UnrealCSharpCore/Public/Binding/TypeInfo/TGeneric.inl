@@ -25,7 +25,7 @@ struct FGenericNameSpace
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTScriptInterface<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -40,7 +40,7 @@ struct TGeneric<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTWeakObjectPtr<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -55,7 +55,7 @@ struct TGeneric<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTLazyObjectPtr<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -70,7 +70,7 @@ struct TGeneric<T, typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTSoftObjectPtr<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -85,7 +85,7 @@ struct TGeneric<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTMap<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTMap<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -100,7 +100,7 @@ struct TGeneric<T, typename TEnableIf<TIsTMap<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTSet<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTSet<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -115,7 +115,7 @@ struct TGeneric<T, typename TEnableIf<TIsTSet<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTSubclassOf<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -130,7 +130,7 @@ struct TGeneric<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTArray<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -145,7 +145,7 @@ struct TGeneric<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> :
 };
 
 template <typename T>
-struct TGeneric<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> :
+struct TGeneric<T, std::enable_if_t<TIsTSoftClassPtr<T>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()

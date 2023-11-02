@@ -13,7 +13,7 @@ struct TDestructorBuilder
 
 	static void Invoke(BINDING_FUNCTION_SIGNATURE)
 	{
-		TDestructorHelper<TTuple<Args...>>::template Call(
-			TMakeIntegerSequence<SIZE_T, sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
+		TDestructorHelper<std::tuple<Args...>>::template Call(
+			std::make_index_sequence<sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
 	}
 };

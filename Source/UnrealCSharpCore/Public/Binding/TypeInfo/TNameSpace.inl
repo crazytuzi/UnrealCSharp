@@ -16,7 +16,6 @@
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
-#include "UEVersion.h"
 
 template <typename T, typename Enable = void>
 struct TNameSpace
@@ -36,126 +35,78 @@ struct TGenericNameSpace
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, uint8>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, uint8>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, uint8>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, uint16>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, uint16>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, uint16>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, uint32>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, uint32>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, uint32>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, uint64>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, uint64>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, uint64>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, int8>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, int8>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, int8>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, int16>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, int16>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, int16>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, int32>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, int32>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, int32>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, int64>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, int64>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, int64>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, bool>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, bool>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, bool>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, float>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, float>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, float>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TAnd<
-	                                        TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>,
-	                                        TNot<TIsSame<typename TRemovePointer<T>::Type, UClass>>>::Value, T>
-                  ::Type>
-#else
-struct TNameSpace<T, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<T>::Type, UObject>::Value &&
-                                        !std::is_same_v<typename TRemovePointer<T>::Type, UClass>, T>
-                  ::Type>
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<T>> &&
+                                      !std::is_same_v<std::remove_pointer_t<T>, UClass>, T>>
 {
 	static TArray<FString> Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(TRemovePointer<T>::Type::StaticClass())};
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::remove_pointer_t<T>::StaticClass())};
 	}
 };
 
 #if UE_OBJECT_PTR
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTObjectPtr<T>::Value, T>::Type>
+struct TNameSpace<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
@@ -165,17 +116,13 @@ struct TNameSpace<T, typename TEnableIf<TIsTObjectPtr<T>::Value, T>::Type>
 #endif
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, FName>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, FName>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, FName>, T>> final :
 	FCommonNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsIInterface<T>::Value, T>::Type>
+struct TNameSpace<T, std::enable_if_t<TIsIInterface<T>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
@@ -184,13 +131,13 @@ struct TNameSpace<T, typename TEnableIf<TIsIInterface<T>::Value, T>::Type>
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTScriptInterface<T>::Value, T>::Type> final :
+struct TNameSpace<T, std::enable_if_t<TIsTScriptInterface<T>::Value, T>> final :
 	TGenericNameSpace<T>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
+struct TNameSpace<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
@@ -199,55 +146,43 @@ struct TNameSpace<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, FString>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, FString>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, FString>, T>> final :
 	FCommonNameSpace
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, FText>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, FText>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, FText>, T>> final :
 	FCommonNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTWeakObjectPtr<T>::Value, T>::Type> final :
+struct TNameSpace<T, std::enable_if_t<TIsTWeakObjectPtr<T>::Value, T>> final :
 	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTLazyObjectPtr<T>::Value, T>::Type> final :
+struct TNameSpace<T, std::enable_if_t<TIsTLazyObjectPtr<T>::Value, T>> final :
 	TGenericNameSpace<T>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTSoftObjectPtr<T>::Value, T>::Type> final :
+struct TNameSpace<T, std::enable_if_t<TIsTSoftObjectPtr<T>::Value, T>> final :
 	TGenericNameSpace<T>
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<T, double>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<T, double>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, double>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTMap<T>::Value, T>::Type>
+struct TNameSpace<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
@@ -266,35 +201,31 @@ struct TNameSpace<T, typename TEnableIf<TIsTMap<T>::Value, T>::Type>
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTSet<T>::Value, T>::Type> final :
+struct TNameSpace<T, std::enable_if_t<TIsTSet<T>::Value, T>> final :
 	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTSubclassOf<T>::Value, T>::Type> :
+struct TNameSpace<T, std::enable_if_t<TIsTSubclassOf<T>::Value, T>> :
 	TGenericNameSpace<T>
 {
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TNameSpace<T, typename TEnableIf<TIsSame<typename TRemovePointer<T>::Type, UClass>::Value, T>::Type> final :
-#else
-struct TNameSpace<T, typename TEnableIf<std::is_same_v<typename TRemovePointer<T>::Type, UClass>, T>::Type> final :
-#endif
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<T>, UClass>, T>> final :
 	TNameSpace<TSubclassOf<UObject>, TSubclassOf<UObject>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTArray<T>::Value, T>::Type> final :
+struct TNameSpace<T, std::enable_if_t<TIsTArray<T>::Value, T>> final :
 	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::Value, T>::Type>
+struct TNameSpace<T, std::enable_if_t<TIsEnum<T>::Value && !TIsNotUEnum<T>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
@@ -303,13 +234,13 @@ struct TNameSpace<T, typename TEnableIf<TAnd<TIsEnum<T>, TNot<TIsNotUEnum<T>>>::
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTEnumAsByte<T>::Value, T>::Type> :
+struct TNameSpace<T, std::enable_if_t<TIsTEnumAsByte<T>::Value, T>> :
 	TNameSpace<typename T::EnumType, typename T::EnumType>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, typename TEnableIf<TIsTSoftClassPtr<T>::Value, T>::Type> final :
+struct TNameSpace<T, std::enable_if_t<TIsTSoftClassPtr<T>::Value, T>> final :
 	TGenericNameSpace<T>
 {
 };

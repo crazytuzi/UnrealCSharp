@@ -60,7 +60,7 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 
 		return FCSharpEnvironment::GetEnvironment().AddReference(
 			InOwner,
-			new TDelegateReference<typename TRemovePointer<typename FDelegateValueMapping::ValueType::Type>::Type>(
+			new TDelegateReference<std::remove_pointer_t<typename FDelegateValueMapping::ValueType::Type>>(
 				GarbageCollectionHandle));
 	}
 
@@ -87,8 +87,8 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 };
 
 template <>
-struct FDelegateRegistry::TDelegateRegistry<TRemovePointer<
-		FDelegateRegistry::FDelegateHelperMapping::ValueType::Type>::Type> :
+struct FDelegateRegistry::TDelegateRegistry<std::remove_pointer_t<
+		FDelegateRegistry::FDelegateHelperMapping::ValueType::Type>> :
 	TDelegateRegistryImplementation<
 		FDelegateHelperMapping,
 		decltype(&FDelegateRegistry::GarbageCollectionHandle2DelegateHelperAddress),
@@ -100,8 +100,8 @@ struct FDelegateRegistry::TDelegateRegistry<TRemovePointer<
 };
 
 template <>
-struct FDelegateRegistry::TDelegateRegistry<TRemovePointer<
-		FDelegateRegistry::FMulticastDelegateHelperMapping::ValueType::Type>::Type> :
+struct FDelegateRegistry::TDelegateRegistry<std::remove_pointer_t<
+		FDelegateRegistry::FMulticastDelegateHelperMapping::ValueType::Type>> :
 	TDelegateRegistryImplementation<
 		FMulticastDelegateHelperMapping,
 		decltype(&FDelegateRegistry::GarbageCollectionHandle2MulticastDelegateHelperAddress),

@@ -126,7 +126,7 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 
 		return FCSharpEnvironment::GetEnvironment().AddReference(
 			InOwner,
-			new TContainerReference<typename TRemovePointer<typename FContainerValueMapping::ValueType::Type>::Type>(
+			new TContainerReference<std::remove_pointer_t<typename FContainerValueMapping::ValueType::Type>>(
 				GarbageCollectionHandle));
 	}
 
@@ -160,8 +160,8 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 };
 
 template <>
-struct FContainerRegistry::TContainerRegistry<TRemovePointer<
-		FContainerRegistry::FArrayHelperValueMapping::ValueType::Type>::Type> :
+struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
+		FContainerRegistry::FArrayHelperValueMapping::ValueType::Type>> :
 	TContainerRegistryImplementation<
 		FArrayHelperValueMapping,
 		decltype(&FContainerRegistry::GarbageCollectionHandle2ArrayHelperAddress),
@@ -177,8 +177,8 @@ struct FContainerRegistry::TContainerRegistry<TRemovePointer<
 };
 
 template <>
-struct FContainerRegistry::TContainerRegistry<TRemovePointer<
-		FContainerRegistry::FMapHelperValueMapping::ValueType::Type>::Type> :
+struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
+		FContainerRegistry::FMapHelperValueMapping::ValueType::Type>> :
 	TContainerRegistryImplementation<
 		FMapHelperValueMapping,
 		decltype(&FContainerRegistry::GarbageCollectionHandle2MapHelperAddress),
@@ -194,8 +194,8 @@ struct FContainerRegistry::TContainerRegistry<TRemovePointer<
 };
 
 template <>
-struct FContainerRegistry::TContainerRegistry<TRemovePointer<
-		FContainerRegistry::FSetHelperValueMapping::ValueType::Type>::Type> :
+struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
+		FContainerRegistry::FSetHelperValueMapping::ValueType::Type>> :
 	TContainerRegistryImplementation<
 		FSetHelperValueMapping,
 		decltype(&FContainerRegistry::GarbageCollectionHandle2SetHelperAddress),

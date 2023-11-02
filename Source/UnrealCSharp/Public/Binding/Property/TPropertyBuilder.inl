@@ -17,7 +17,6 @@
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
-#include "UEVersion.h"
 
 template <typename T, T, typename Enable = void>
 struct TPropertyBuilder
@@ -78,262 +77,182 @@ struct TMultiPropertyBuilder :
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint8>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, uint8>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, uint8>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint16>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, uint16>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, uint16>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint32>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, uint32>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, uint32>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, uint64>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, uint64>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, uint64>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int8>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, int8>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, int8>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int16>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, int16>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, int16>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int32>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, int32>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, int32>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, int64>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, int64>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, int64>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, bool>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, bool>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, bool>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, float>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, float>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, float>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
 struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TAnd<
-	                        TIsDerivedFrom<typename TRemovePointer<Result>::Type, UObject>,
-	                        TNot<TIsSame<typename TRemovePointer<Result>::Type, UClass>>>::Value>
-                        ::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<
-	                        TIsDerivedFrom<typename TRemovePointer<Result>::Type, UObject>::Value &&
-	                        !std::is_same_v<typename TRemovePointer<Result>::Type, UClass>>
-                        ::Type> :
-#endif
+                        std::enable_if_t<
+	                        std::is_base_of_v<UObject, std::remove_pointer_t<Result>> &&
+	                        !std::is_same_v<std::remove_pointer_t<Result>, UClass>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 #if UE_OBJECT_PTR
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsTObjectPtr<Result>::Value>::Type> :
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTObjectPtr<Result>::Value>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 #endif
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, FName>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, FName>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FName>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTScriptInterface<Result>::Value>::Type> :
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTScriptInterface<Result>::Value>> :
 	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsUStruct<Result>::Value>::Type> :
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsUStruct<Result>::Value>> :
 	TReferencePropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, FString>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, FString>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FString>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, FText>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, FText>>::Type> :
-#endif
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FText>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTWeakObjectPtr<Result>::Value>::Type> :
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTWeakObjectPtr<Result>::Value>> :
+	TMultiPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTLazyObjectPtr<Result>::Value>> :
+	TMultiPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSoftObjectPtr<Result>::Value>> :
+	TMultiPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, double>>> :
+	TPropertyInfoBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTMap<Result>::Value>> :
+	TContainerPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSet<Result>::Value>> :
+	TContainerPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSubclassOf<Result>::Value>> :
 	TMultiPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTLazyObjectPtr<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTSoftObjectPtr<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<TIsSame<Result, double>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member, typename TEnableIf<std::is_same_v<Result, double>>::Type> :
-#endif
+                        std::enable_if_t<std::is_same_v<std::remove_pointer_t<Result>, UClass>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTMap<Result>::Value>::Type> :
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTArray<Result>::Value>> :
 	TContainerPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTSet<Result>::Value>::Type> :
-	TContainerPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTSubclassOf<Result>::Value>::Type> :
-	TMultiPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, Result Class::* Member>
-#if UE_T_IS_SAME
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsSame<typename TRemovePointer<Result>::Type, UClass>::Value>::Type> :
-#else
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<std::is_same_v<typename TRemovePointer<Result>::Type, UClass>>::Type> :
-#endif
+                        std::enable_if_t<TIsEnum<Result>::Value && !TIsNotUEnum<Result>::Value>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTArray<Result>::Value>::Type> :
-	TContainerPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TAnd<TIsEnum<Result>, TNot<TIsNotUEnum<Result>>>::Value>::Type> :
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTEnumAsByte<Result>::Value>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTEnumAsByte<Result>::Value>::Type> :
-	TPropertyInfoBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        typename TEnableIf<TIsTSoftClassPtr<Result>::Value>::Type> :
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSoftClassPtr<Result>::Value>> :
 	TMultiPropertyBuilder<Class, Result, Member>
 {
 };

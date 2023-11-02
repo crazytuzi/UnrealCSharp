@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Binding/Core/TPropertyValue.inl"
-#include "UEVersion.h"
 
 template <typename T, typename Enable = void>
 struct TArgument
@@ -11,7 +10,7 @@ struct TArgument
 template <typename T>
 struct TBaseArgument
 {
-	using Type = typename TDecay<T>::Type;
+	using Type = std::decay_t<T>;
 
 	TBaseArgument() = default;
 
@@ -32,7 +31,7 @@ struct TBaseArgument
 
 	constexpr bool IsOut() const
 	{
-		return TAnd<TNot<TIsConst<T>>, TIsReferenceType<T>>::Value;
+		return !std::is_const_v<T> && std::is_reference_v<T>;
 	}
 
 protected:
@@ -98,138 +97,88 @@ struct TBindingEnumArgument :
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint8>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, uint8>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint16>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, uint16>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint32>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, uint32>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, uint64>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, uint64>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int8>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, int8>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int16>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, int16>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int32>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, int32>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, int64>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, int64>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, bool>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, bool>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, float>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, float>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
 struct TArgument<T,
-                 typename TEnableIf<TAnd<
-	                 TIsDerivedFrom<typename TRemovePointer<typename TDecay<T>::Type>::Type, UObject>,
-	                 TNot<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>>::Value>
-                 ::Type> :
+                 std::enable_if_t<
+	                 std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
+	                 !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>>> :
 	TSingleArgument<T>
-#else
-struct TArgument<T,
-                 typename TEnableIf<
-	                 TIsDerivedFrom<typename TRemovePointer<typename TDecay<T>::Type>::Type, UObject>::Value &&
-	                 !std::is_same_v<typename TRemovePointer<typename TDecay<T>::Type>::Type, UClass>>
-                 ::Type> :
-	TSingleArgument<T>
-#endif
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 #if UE_OBJECT_PTR
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTObjectPtr<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
@@ -237,143 +186,120 @@ struct TArgument<T, typename TEnableIf<TIsTObjectPtr<typename TDecay<T>::Type>::
 #endif
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FName>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, FName>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTScriptInterface<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value>> :
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsUStruct<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value>> :
 	TReferenceArgument<T>
 {
 	using TReferenceArgument<T>::TReferenceArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FString>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, FString>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, FText>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, FText>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTWeakObjectPtr<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value>> :
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTLazyObjectPtr<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<T>>::Value>> :
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTSoftObjectPtr<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value>> :
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TDecay<T>::Type, double>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TDecay<T>::Type, double>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTMap<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value>> :
 	TContainerArgument<T>
 {
 	using TContainerArgument<T>::TContainerArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTSet<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value>> :
 	TContainerArgument<T>
 {
 	using TContainerArgument<T>::TContainerArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTSubclassOf<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value>> :
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;
 };
 
 template <typename T>
-#if UE_T_IS_SAME
-struct TArgument<T, typename TEnableIf<TIsSame<typename TRemovePointer<typename TDecay<T>::Type>::Type,
-                                               UClass>::Value>::Type> :
-#else
-struct TArgument<T, typename TEnableIf<std::is_same_v<typename TRemovePointer<typename TDecay<T>::Type>::Type,
-                                                      UClass>>::Type> :
-#endif
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>>> :
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTArray<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value>> :
 	TContainerArgument<T>
 {
 	using TContainerArgument<T>::TContainerArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TAnd<TIsEnum<typename TDecay<T>::Type>,
-                                            TNot<TIsNotUEnum<typename TDecay<T>::Type>>>
-	                 ::Value>::Type> :
+struct TArgument<T,
+                 std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTEnumAsByte<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
 
 template <typename T>
-struct TArgument<T, typename TEnableIf<TIsTSoftClassPtr<typename TDecay<T>::Type>::Value>::Type> :
+struct TArgument<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value>> :
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;

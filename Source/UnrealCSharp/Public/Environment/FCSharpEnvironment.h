@@ -223,7 +223,7 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, typename TEnableIf<TIsUObject<T>::Value, T>::Type>
+	class TGetObject<T, std::enable_if_t<TIsUObject<T>::Value, T>>
 	{
 	public:
 		T* operator()(const FCSharpEnvironment& InEnvironment,
@@ -239,7 +239,7 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, typename TEnableIf<TIsUStruct<T>::Value, T>::Type>
+	class TGetObject<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
 	{
 	public:
 		T* operator()(const FCSharpEnvironment& InEnvironment,
@@ -255,7 +255,7 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, typename TEnableIf<TIsScriptStruct<T>::Value, T>::Type>
+	class TGetObject<T, std::enable_if_t<TIsScriptStruct<T>::Value, T>>
 	{
 	public:
 		T* operator()(const FCSharpEnvironment& InEnvironment,
@@ -266,7 +266,10 @@ public:
 	};
 
 	template <typename T>
-	class TGetObject<T, typename TEnableIf<TNot<TOr<TIsUObject<T>, TIsUStruct<T>, TIsScriptStruct<T>>>::Value, T>::Type>
+	class TGetObject<T, std::enable_if_t<!(TIsUObject<T>::Value ||
+		                                     TIsUStruct<T>::Value ||
+		                                     TIsScriptStruct<T>::Value),
+	                                     T>>
 	{
 	public:
 		T* operator()(const FCSharpEnvironment& InEnvironment,
