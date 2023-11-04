@@ -283,11 +283,20 @@ TOperatorClassBuilder& Name() \
 	return Name(BINDING_OPERATOR(Signature, &Name##Implementation));\
 }
 
-#define UNARY_OPERATOR(Name, Signature, Operator) \
+#define PREFIX_UNARY_CONST_OPERATOR(Name, Signature, Operator) \
 public: \
 OPERATOR_BUILDER(Name, Signature) \
 private: \
 static auto Name##Implementation(const T& In) \
+{ \
+	return Operator In; \
+}
+
+#define PREFIX_UNARY_OPERATOR(Name, Signature, Operator) \
+public: \
+OPERATOR_BUILDER(Name, Signature) \
+private: \
+static T& Name##Implementation(T& In) \
 { \
 	return Operator In; \
 }

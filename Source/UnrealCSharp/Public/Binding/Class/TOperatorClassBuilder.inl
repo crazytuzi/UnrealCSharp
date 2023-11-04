@@ -21,13 +21,17 @@ public:
 	}
 
 public:
-	UNARY_OPERATOR(LogicalNot, bool(*)(const T&), !);
+	PREFIX_UNARY_CONST_OPERATOR(LogicalNot, bool(*)(const T&), !);
 
-	UNARY_OPERATOR(UnaryPlus, T(*)(const T&), +);
+	PREFIX_UNARY_CONST_OPERATOR(UnaryPlus, T(*)(const T&), +);
 
-	UNARY_OPERATOR(UnaryMinus, T(*)(const T&), -);
+	PREFIX_UNARY_CONST_OPERATOR(UnaryMinus, T(*)(const T&), -);
 
-	UNARY_OPERATOR(Complement, T(*)(const T&), ~);
+	PREFIX_UNARY_CONST_OPERATOR(Complement, T(*)(const T&), ~);
+
+	PREFIX_UNARY_OPERATOR(PreIncrement, T&(*)(T&), ++);
+
+	PREFIX_UNARY_OPERATOR(PreDecrement, T&(*)(T&), --);
 
 	BINARY_OPERATOR(Plus, T(*)(const T&, const T&), +);
 
@@ -137,6 +141,46 @@ private:
 		Function(TEXT("operator ~"),
 				 FUNCTION_COMPLEMENT,
 				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TOperatorClassBuilder& PreIncrement(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TOperatorClassBuilder& PreIncrement(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator ++"),
+		         FUNCTION_PRE_INCREMENT,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(TEXT("operator ++"),
+				 FUNCTION_PRE_INCREMENT,
+				 InMethod);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TOperatorClassBuilder& PreDecrement(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+    TOperatorClassBuilder& PreDecrement(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TEXT("operator --"),
+		         FUNCTION_PRE_DECREMENT,
+		         InMethod,
+		         InFunctionInfo);
+#else
+    	Function(TEXT("operator --"),
+    			 FUNCTION_PRE_DECREMENT,
+    			 InMethod);
 #endif
 
 		return *this;
