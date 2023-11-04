@@ -17,11 +17,11 @@ struct TConstructorHelper<std::tuple<Args...>>
 	template <typename Class, size_t... Index>
 	static void Call(std::index_sequence<Index...>, BINDING_CONSTRUCTOR_SIGNATURE)
 	{
-		std::tuple<TArgument<Args>...> Argument(Get(InValue, Index)...);
+		std::tuple<TArgument<Args, Args>...> Argument(Get(InValue, Index)...);
 
 		auto Value = new Class(std::forward<Args>(Argument.template Get<Index>().Get())...);
 
-		TOut<std::tuple<TArgument<Args>...>>(OutValue, Argument)
+		TOut<std::tuple<TArgument<Args, Args>...>>(OutValue, Argument)
 			.template Initialize<0, Args...>()
 			.template Get<0, Args...>();
 

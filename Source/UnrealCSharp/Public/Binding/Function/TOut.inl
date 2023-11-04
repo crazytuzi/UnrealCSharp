@@ -26,7 +26,7 @@ struct TOut
 	template <size_t Index, typename T, typename... Args>
 	TOut& Initialize()
 	{
-		if (std::get<Index>(Argument).IsOut())
+		if (std::get<Index>(Argument).IsRef())
 		{
 			++Count;
 		}
@@ -42,7 +42,7 @@ struct TOut
 	template <size_t Index, typename T, typename... Args>
 	void Get()
 	{
-		if (std::get<Index>(Argument).IsOut())
+		if (std::get<Index>(Argument).IsRef())
 		{
 			auto Value = std::get<Index>(Argument).Set();
 

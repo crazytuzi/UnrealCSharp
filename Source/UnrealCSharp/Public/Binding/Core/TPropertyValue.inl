@@ -27,7 +27,7 @@ struct TPropertyValue
 template <typename T>
 struct TSinglePropertyValue
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 			TPropertyClass<T, T>::Get(), InMember);
@@ -35,17 +35,17 @@ struct TSinglePropertyValue
 
 	static T Set(MonoObject* InValue)
 	{
-		return *(T*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
+		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
 	}
 };
 
 template <typename T>
 struct TMultiPropertyValue
 {
-	static MonoObject* Get(T* InMember,
+	static MonoObject* Get(std::decay_t<T>* InMember,
 	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<T>(InMember);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<std::decay_t<T>>(InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -53,8 +53,8 @@ struct TMultiPropertyValue
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<T>(
-				SrcMonoObject, InMember, !InGarbageCollectionHandle.IsValid());
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>>(
+				SrcMonoObject, InMember, !InGarbageCollectionHandle.IsValid() && !TTypeInfo<T>::IsReference());
 		}
 
 		return SrcMonoObject;
@@ -62,14 +62,14 @@ struct TMultiPropertyValue
 
 	static T Set(const MonoObject* InValue)
 	{
-		return *(T*)FCSharpEnvironment::GetEnvironment().GetMulti<T>(InValue);
+		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetMulti<std::decay_t<T>>(InValue);
 	}
 };
 
 template <typename T>
 struct TBindingPropertyValue
 {
-	static MonoObject* Get(T* InMember,
+	static MonoObject* Get(std::decay_t<T>* InMember,
 	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
@@ -90,7 +90,8 @@ struct TBindingPropertyValue
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddBindingReference(SrcMonoObject, InMember);
+				FCSharpEnvironment::GetEnvironment().AddBindingReference(
+					SrcMonoObject, InMember, !TTypeInfo<T>::IsReference());
 			}
 		}
 
@@ -99,7 +100,7 @@ struct TBindingPropertyValue
 
 	static T Set(const MonoObject* InValue)
 	{
-		return *FCSharpEnvironment::GetEnvironment().GetBinding<T>(InValue);
+		return *FCSharpEnvironment::GetEnvironment().GetBinding<std::decay_t<T>>(InValue);
 	}
 };
 
@@ -157,78 +158,78 @@ struct TBindingEnumPropertyValue :
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, uint8>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, uint16>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, uint32>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, uint64>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, int8>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, int16>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, int32>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, int64>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, bool>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, float>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T,
-                      std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<T>> &&
-                                       !std::is_same_v<std::remove_pointer_t<T>, UClass>, T>>
+                      std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
+                                       !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
 		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
 	}
 
-	static T Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const MonoObject* InValue)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetObject<std::remove_pointer_t<T>>(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetObject<std::remove_pointer_t<std::decay_t<T>>>(InValue);
 	}
 };
 
@@ -249,9 +250,9 @@ struct TPropertyValue<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
 #endif
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, FName>, T>>
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
@@ -261,27 +262,27 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, FName>, T>>
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass, 1, &NewMonoString);
 	}
 
-	static T Set(MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
-		return T(UTF8_TO_TCHAR(
+		return std::decay_t<T>(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InValue, nullptr))));
 	}
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTScriptInterface<T>::Value, T>> :
+struct TPropertyValue<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
+struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(T* InMember,
+	static MonoObject* Get(std::decay_t<T>* InMember,
 	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(T::StaticStruct(), InMember);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(std::decay_t<T>::StaticStruct(), InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -292,16 +293,17 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 				FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
-			FCSharpEnvironment::GetEnvironment().Bind(T::StaticStruct(), false);
+			FCSharpEnvironment::GetEnvironment().Bind(std::decay_t<T>::StaticStruct(), false);
 
 			if (InGarbageCollectionHandle.IsValid())
 			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(InGarbageCollectionHandle, T::StaticStruct(),
-				                                                        InMember, SrcMonoObject);
+				FCSharpEnvironment::GetEnvironment().AddStructReference(
+					InGarbageCollectionHandle, std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject);
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(T::StaticStruct(), InMember, SrcMonoObject);
+				FCSharpEnvironment::GetEnvironment().AddStructReference(
+					std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject, !TTypeInfo<T>::IsReference());
 			}
 		}
 
@@ -310,20 +312,14 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
 
 	static T Set(const MonoObject* InValue)
 	{
-		const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
-
-		T Value;
-
-		T::StaticStruct()->CopyScriptStruct(&Value, SrcStruct);
-
-		return Value;
+		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
 	}
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, FString>, T>>
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, T>>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
@@ -333,18 +329,18 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, FString>, T>>
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass, 1, &NewMonoString);
 	}
 
-	static T Set(MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
-		return T(UTF8_TO_TCHAR(
+		return std::decay_t<T>(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InValue, nullptr))));
 	}
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, FText>, T>>
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
@@ -354,42 +350,42 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, FText>, T>>
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass, 1, &NewMonoString);
 	}
 
-	static T Set(MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
-		return T::FromString(UTF8_TO_TCHAR(
+		return std::decay_t<T>::FromString(UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
 				GetDomain()->Object_To_String(InValue, nullptr))));
 	}
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTWeakObjectPtr<T>::Value, T>> :
+struct TPropertyValue<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTLazyObjectPtr<T>::Value, T>> :
+struct TPropertyValue<T, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTSoftObjectPtr<T>::Value, T>> :
+struct TPropertyValue<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<T, double>, T>> :
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>> :
 	TSinglePropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTMap<T>::Value, T>>
+struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(T* InMember,
+	static MonoObject* Get(std::decay_t<T>* InMember,
 	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InMember);
@@ -399,8 +395,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 			const auto FoundKeyPropertyMonoClass = TPropertyClass<
-					typename TTemplateTypeTraits<T>::template Type<0>,
-					typename TTemplateTypeTraits<T>::template Type<0>>
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 				::Get();
 
 			const auto FoundKeyPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -410,8 +406,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 				Type_Get_Object(FoundKeyPropertyMonoType);
 
 			const auto FoundValuePropertyMonoClass = TPropertyClass<
-					typename TTemplateTypeTraits<T>::template Type<1>,
-					typename TTemplateTypeTraits<T>::template Type<1>>
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>
 				::Get();
 
 			const auto FoundValuePropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->
@@ -452,9 +448,9 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const MonoObject* InValue)
 	{
-		T Value;
+		std::decay_t<T> Value;
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InValue);
 
@@ -462,9 +458,9 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 		{
 			if (SrcContainer->IsValidIndex(Index))
 			{
-				Value.Add(*static_cast<typename TTemplateTypeTraits<T>::template Type<0>*>
+				Value.Add(*static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>*>
 				          (SrcContainer->GetEnumeratorKey(Index)),
-				          *static_cast<typename TTemplateTypeTraits<T>::template Type<1>*>
+				          *static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>*>
 				          (SrcContainer->GetEnumeratorValue(Index)));
 			}
 		}
@@ -474,9 +470,9 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTSet<T>::Value, T>>
+struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(T* InMember,
+	static MonoObject* Get(std::decay_t<T>* InMember,
 	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InMember);
@@ -486,8 +482,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<T>::Value, T>>
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 			const auto FoundPropertyMonoClass = TPropertyClass<
-					typename TTemplateTypeTraits<T>::template Type<0>,
-					typename TTemplateTypeTraits<T>::template Type<0>>
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 				::Get();
 
 			const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -522,9 +518,9 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<T>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const MonoObject* InValue)
 	{
-		T Value;
+		std::decay_t<T> Value;
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InValue);
 
@@ -533,7 +529,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<T>::Value, T>>
 			if (SrcContainer->IsValidIndex(Index))
 			{
 				Value.Add(
-					*static_cast<typename TTemplateTypeTraits<T>::template Type<0>*>(SrcContainer->
+					*static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>*>(SrcContainer->
 						GetEnumerator(Index)));
 			}
 		}
@@ -543,15 +539,15 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<T>::Value, T>>
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTSubclassOf<T>::Value, T>> :
+struct TPropertyValue<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyValue<T>
 {
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<T>, UClass>, T>>
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
@@ -565,7 +561,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<T
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const MonoObject* InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InValue)->Get();
 	}
@@ -573,9 +569,9 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<T
 
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTArray<T>::Value, T>>
+struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(T* InMember,
+	static MonoObject* Get(std::decay_t<T>* InMember,
 	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FArrayHelper>(InMember);
@@ -585,8 +581,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<T>::Value, T>>
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 			const auto FoundPropertyMonoClass = TPropertyClass<
-					typename TTemplateTypeTraits<T>::template Type<0>,
-					typename TTemplateTypeTraits<T>::template Type<0>>
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 				::Get();
 
 			const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -621,47 +617,41 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<T>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const MonoObject* InValue)
 	{
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InValue);
 
-		return T(
-			static_cast<typename TTemplateTypeTraits<T>::template Type<0>*>
+		return std::decay_t<T>(
+			static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>*>
 			(SrcContainer->GetScriptArray()->GetData()),
 			SrcContainer->Num());
 	}
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsEnum<T>::Value && !TIsNotUEnum<T>::Value, T>> :
+struct TPropertyValue<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>> :
 	TSinglePropertyValue<T>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
-		// @TODO
-		T Value = *InMember;
-
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-			TPropertyClass<T, T>::Get(), &Value);
+			TPropertyClass<T, T>::Get(), InMember);
 	}
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTEnumAsByte<T>::Value, T>> :
-	TPropertyValue<typename T::EnumType, typename T::EnumType>
+struct TPropertyValue<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value, T>> :
+	TSinglePropertyValue<T>
 {
-	static MonoObject* Get(T* InMember)
+	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
-		// @TODO
-		T Value = *InMember;
-
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
-			TPropertyClass<T, T>::Get(), &Value);
+			TPropertyClass<T, T>::Get(), InMember);
 	}
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsTSoftClassPtr<T>::Value, T>> :
+struct TPropertyValue<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyValue<T>
 {
 };

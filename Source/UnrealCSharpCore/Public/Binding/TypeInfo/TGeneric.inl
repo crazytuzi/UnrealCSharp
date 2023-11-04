@@ -25,7 +25,7 @@ struct FGenericNameSpace
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTScriptInterface<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -40,7 +40,7 @@ struct TGeneric<T, std::enable_if_t<TIsTScriptInterface<T>::Value, T>> :
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTWeakObjectPtr<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -55,7 +55,7 @@ struct TGeneric<T, std::enable_if_t<TIsTWeakObjectPtr<T>::Value, T>> :
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTLazyObjectPtr<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -70,7 +70,7 @@ struct TGeneric<T, std::enable_if_t<TIsTLazyObjectPtr<T>::Value, T>> :
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTSoftObjectPtr<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -85,7 +85,7 @@ struct TGeneric<T, std::enable_if_t<TIsTSoftObjectPtr<T>::Value, T>> :
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTMap<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -100,7 +100,7 @@ struct TGeneric<T, std::enable_if_t<TIsTMap<T>::Value, T>> :
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTSet<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -115,7 +115,7 @@ struct TGeneric<T, std::enable_if_t<TIsTSet<T>::Value, T>> :
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTSubclassOf<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -130,7 +130,7 @@ struct TGeneric<T, std::enable_if_t<TIsTSubclassOf<T>::Value, T>> :
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTArray<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()
@@ -145,7 +145,7 @@ struct TGeneric<T, std::enable_if_t<TIsTArray<T>::Value, T>> :
 };
 
 template <typename T>
-struct TGeneric<T, std::enable_if_t<TIsTSoftClassPtr<T>::Value, T>> :
+struct TGeneric<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value, T>> :
 	FGenericNameSpace
 {
 	static FString GetTemplateName()

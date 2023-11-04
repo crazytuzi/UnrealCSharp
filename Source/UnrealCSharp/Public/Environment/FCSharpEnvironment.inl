@@ -272,7 +272,7 @@ auto FCSharpEnvironment::GetBinding(const MonoObject* InMonoObject) const
 }
 
 template <typename T>
-auto FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const T* InObject) const
+auto FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const T* InObject, bool bNeedFree) const
 {
 	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InObject, InMonoObject) : false;
 }

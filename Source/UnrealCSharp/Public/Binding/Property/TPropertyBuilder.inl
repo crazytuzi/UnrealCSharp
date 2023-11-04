@@ -51,7 +51,7 @@ struct TPropertyInfoBuilder
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TReferencePropertyBuilder :
+struct TParentPropertyBuilder :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
@@ -66,13 +66,31 @@ struct TReferencePropertyBuilder :
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TContainerPropertyBuilder :
-	TReferencePropertyBuilder<Class, Result, Member>
+	TParentPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TMultiPropertyBuilder :
-	TReferencePropertyBuilder<Class, Result, Member>
+	TParentPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TBindingPropertyBuilder :
+	TParentPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TScriptStructPropertyBuilder :
+	TParentPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, Result Class::* Member>
+struct TBindingEnumPropertyBuilder :
+	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
@@ -167,7 +185,7 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTScriptInte
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsUStruct<Result>::Value>> :
-	TReferencePropertyBuilder<Class, Result, Member>
+	TParentPropertyBuilder<Class, Result, Member>
 {
 };
 

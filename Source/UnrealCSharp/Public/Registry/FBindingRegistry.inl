@@ -30,7 +30,7 @@ auto FBindingRegistry::GetBinding(const MonoObject* InMonoObject)
 }
 
 template <typename T>
-auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject)
+auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject, bool bNeedFree)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
@@ -39,9 +39,9 @@ auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject)
 	auto BindingAddressWrapper = new TBindingAddressWrapper(InObject);
 
 	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
-	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, true));
+	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, bNeedFree));
 
-	MonoObject2BindingAddress.Add(InMonoObject, FBindingValueMapping::ValueType(BindingAddressWrapper, true));
+	MonoObject2BindingAddress.Add(InMonoObject, FBindingValueMapping::ValueType(BindingAddressWrapper, bNeedFree));
 
 	return true;
 }
