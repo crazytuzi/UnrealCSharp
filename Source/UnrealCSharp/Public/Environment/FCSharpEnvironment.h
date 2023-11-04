@@ -6,7 +6,7 @@
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
-#include "Registry/FMixinRegistry.h"
+#include "Registry/FDynamicRegistry.h"
 #include "Template/TIsUObject.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsScriptStruct.inl"
@@ -318,7 +318,7 @@ private:
 
 	FMultiRegistry* MultiRegistry;
 
-	FMixinRegistry* MixinRegistry;
+	FDynamicRegistry* DynamicRegistry;
 
 	class FBindingRegistry* BindingRegistry;
 };

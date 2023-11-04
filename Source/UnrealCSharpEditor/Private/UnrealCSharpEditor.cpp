@@ -16,8 +16,20 @@
 #include "Internationalization/Culture.h"
 #include "FCodeAnalysis.h"
 #include "Misc/ScopedSlowTask.h"
-#include "Mixin/FMixinGenerator.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "ToolBar/UnrealCSharpToolBar.h"
+#include "UEVersion.h"
+
+#if UE_IS_RUNNING_COOK_COMMANDLET
+static bool IsRunningCookCommandlet()
+{
+	const FString Commandline = FCommandLine::Get();
+
+	const auto bIsCookCommandlet = IsRunningCommandlet() && Commandline.Contains(TEXT("run=cook"));
+
+	return bIsCookCommandlet;
+}
+#endif
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 
@@ -35,6 +47,11 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	UToolMenus::RegisterStartupCallback(
 		FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
+
+	if (IsRunningCookCommandlet())
+	{
+		Generator();
+	}
 }
 
 void FUnrealCSharpEditorModule::ShutdownModule()
@@ -88,7 +105,7 @@ void FUnrealCSharpEditorModule::Generator()
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis Generator"));
 
-	FMixinGenerator::CodeAnalysisGenerator();
+	FDynamicGenerator::CodeAnalysisGenerator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Class Generator"));
 

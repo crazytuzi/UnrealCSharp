@@ -6,4 +6,4 @@
 
 #define NAMESPACE_COMMON FString(TEXT("Common"))
 
-#define NAMESPACE_MIXIN FString(TEXT("Mixin"))
+#define NAMESPACE_DYNAMIC FString(TEXT("Dynamic"))

@@ -4,7 +4,7 @@
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Mixin/CSharpScriptStruct.h"
+#include "Dynamic/CSharpScriptStruct.h"
 
 void FStructGenerator::Generator()
 {
