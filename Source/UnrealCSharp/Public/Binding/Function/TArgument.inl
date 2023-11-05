@@ -91,9 +91,7 @@ struct TParentArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_referen
 	                                           std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
 	TBaseArgument<std::decay_t<T>>
 {
-	using Super = TBaseArgument<std::decay_t<T>>;
-
-	using Super::TBaseArgument;
+	using TBaseArgument<std::decay_t<T>>::TBaseArgument;
 
 	constexpr bool IsRef() const
 	{
