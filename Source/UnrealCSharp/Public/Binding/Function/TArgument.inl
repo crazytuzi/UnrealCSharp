@@ -7,6 +7,11 @@ struct TArgument
 {
 };
 
+template <typename T, typename Enable = void>
+struct TParentArgument
+{
+};
+
 template <typename T>
 struct TBaseArgument
 {
@@ -58,7 +63,8 @@ struct TStringArgument :
 };
 
 template <typename T>
-struct TParentArgument :
+struct TParentArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>> || std::is_same_v<
+	                                           std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
 	TBaseArgument<T>
 {
 	using Super = TBaseArgument<T>;
@@ -81,10 +87,26 @@ struct TParentArgument :
 };
 
 template <typename T>
-struct TContainerArgument :
-	TParentArgument<std::decay_t<T>>
+struct TParentArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>> && !std::is_same_v<
+	                                           std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
+	TBaseArgument<std::decay_t<T>>
 {
-	using TParentArgument<std::decay_t<T>>::TParentArgument;
+	using Super = TBaseArgument<std::decay_t<T>>;
+
+	using Super::TBaseArgument;
+
+	constexpr bool IsRef() const
+	{
+		return TTypeInfo<T>::Get()->IsRef();
+	}
+};
+
+
+template <typename T>
+struct TContainerArgument :
+	TParentArgument<std::decay_t<T>, std::decay_t<T>>
+{
+	using TParentArgument<std::decay_t<T>, std::decay_t<T>>::TParentArgument;
 
 	constexpr bool IsRef() const
 	{
@@ -94,23 +116,23 @@ struct TContainerArgument :
 
 template <typename T>
 struct TMultiArgument :
-	TParentArgument<T>
+	TParentArgument<T, T>
 {
-	using TParentArgument<T>::TParentArgument;
+	using TParentArgument<T, T>::TParentArgument;
 };
 
 template <typename T>
 struct TBindingArgument :
-	TParentArgument<T>
+	TParentArgument<T, T>
 {
-	using TParentArgument<T>::TParentArgument;
+	using TParentArgument<T, T>::TParentArgument;
 };
 
 template <typename T>
 struct TScriptStructArgument :
-	TParentArgument<T>
+	TParentArgument<T, T>
 {
-	using TParentArgument<T>::TParentArgument;
+	using TParentArgument<T, T>::TParentArgument;
 };
 
 template <typename T>
@@ -230,9 +252,9 @@ struct TArgument<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>> :
-	TParentArgument<T>
+	TParentArgument<T, T>
 {
-	using TParentArgument<T>::TParentArgument;
+	using TParentArgument<T, T>::TParentArgument;
 };
 
 template <typename T>

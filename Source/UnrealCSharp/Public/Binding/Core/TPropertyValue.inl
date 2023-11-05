@@ -24,6 +24,16 @@ struct TPropertyValue
 {
 };
 
+template <typename T, typename Enable = void>
+struct TBindingPropertyValue
+{
+};
+
+template <typename T, typename Enable = void>
+struct TScriptStructPropertyValue
+{
+};
+
 template <typename T>
 struct TSinglePropertyValue
 {
@@ -67,7 +77,7 @@ struct TMultiPropertyValue
 };
 
 template <typename T>
-struct TBindingPropertyValue
+struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
 	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
@@ -105,12 +115,12 @@ struct TBindingPropertyValue
 };
 
 template <typename T>
-struct TScriptStructPropertyValue
+struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
-	static MonoObject* Get(T* InMember,
+	static MonoObject* Get(std::decay_t<T>* InMember,
 	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
 	{
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(TBaseStructure<T>::Get(), InMember);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(*InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -121,17 +131,59 @@ struct TScriptStructPropertyValue
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
 				FoundMonoClass, TGetArrayLength(InParams), &InParams);
 
-			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<T>::Get(), false);
+			if (InGarbageCollectionHandle.IsValid())
+			{
+				FCSharpEnvironment::GetEnvironment().AddBindingReference(
+					InGarbageCollectionHandle, SrcMonoObject, *InMember);
+			}
+			else
+			{
+				FCSharpEnvironment::GetEnvironment().AddBindingReference(
+					SrcMonoObject, *InMember, false);
+			}
+		}
+
+		return SrcMonoObject;
+	}
+
+	static std::decay_t<T> Set(const MonoObject* InValue)
+	{
+		return FCSharpEnvironment::GetEnvironment().GetBinding<
+			std::remove_pointer_t<std::remove_reference_t<T>>>(InValue);
+	}
+};
+
+template <typename T>
+struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>>
+{
+	static MonoObject* Get(std::decay_t<T>* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
+			TBaseStructure<std::decay_t<T>>::Get(), InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			auto InParams = static_cast<void*>(FoundMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<std::decay_t<T>>::Get(), false);
 
 			if (InGarbageCollectionHandle.IsValid())
 			{
 				FCSharpEnvironment::GetEnvironment().AddStructReference(InGarbageCollectionHandle,
-				                                                        TBaseStructure<T>::Get(), InMember,
+				                                                        TBaseStructure<std::decay_t<T>>::Get(),
+				                                                        InMember,
 				                                                        SrcMonoObject);
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), InMember,
+				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<std::decay_t<T>>::Get(),
+				                                                        InMember,
 				                                                        SrcMonoObject);
 			}
 		}
@@ -141,13 +193,52 @@ struct TScriptStructPropertyValue
 
 	static T Set(const MonoObject* InValue)
 	{
-		const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+	}
+};
 
-		T Value;
+template <typename T>
+struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>>
+{
+	static MonoObject* Get(std::decay_t<T>* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
+			TBaseStructure<std::remove_pointer_t<T>>::Get(), *InMember);
 
-		TBaseStructure<T>::Get()->CopyScriptStruct(&Value, SrcStruct);
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-		return Value;
+			auto InParams = static_cast<void*>(FoundMonoClass);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+
+			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<std::remove_pointer_t<T>>::Get(), false);
+
+			if (InGarbageCollectionHandle.IsValid())
+			{
+				FCSharpEnvironment::GetEnvironment().AddStructReference(InGarbageCollectionHandle,
+				                                                        TBaseStructure<std::remove_pointer_t<T>>::Get(),
+				                                                        *InMember,
+				                                                        SrcMonoObject);
+			}
+			else
+			{
+				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<std::remove_pointer_t<T>>::Get(),
+				                                                        *InMember,
+				                                                        SrcMonoObject,
+				                                                        false);
+			}
+		}
+
+		return SrcMonoObject;
+	}
+
+	static std::decay_t<T> Set(const MonoObject* InValue)
+	{
+		return (std::decay_t<T>)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
 	}
 };
 

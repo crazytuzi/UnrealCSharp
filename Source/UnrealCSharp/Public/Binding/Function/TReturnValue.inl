@@ -50,7 +50,7 @@ struct TParentReturnValue :
 
 	explicit TParentReturnValue(Type&& InValue)
 	{
-		if constexpr (TTypeInfo<T>::IsReference())
+		if constexpr (TTypeInfo<T>::IsReference() || std::is_pointer_v<T>)
 		{
 			Super::Object = TPropertyValue<Type, Type>::Get(&InValue);
 		}

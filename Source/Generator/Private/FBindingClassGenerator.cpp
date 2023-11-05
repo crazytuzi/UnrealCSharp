@@ -140,6 +140,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		if (Function.GetReturn() != nullptr)
 		{
 			FunctionReturnType = Function.GetReturn()->GetName();
+
+			UsingNameSpaces.Append(Function.GetReturn()->GetNameSpace());
 		}
 
 		FString FunctionDeclarationBody;
