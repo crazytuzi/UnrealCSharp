@@ -10,5 +10,5 @@ struct FTypeInfo
 
 	virtual const TArray<FString>& GetNameSpace() const = 0;
 
-	virtual bool IsOut() const = 0;
+	virtual bool IsRef() const = 0;
 };

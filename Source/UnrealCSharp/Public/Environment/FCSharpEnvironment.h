@@ -6,7 +6,7 @@
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
-#include "Registry/FMixinRegistry.h"
+#include "Registry/FDynamicRegistry.h"
 #include "Template/TIsUObject.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsScriptStruct.inl"
@@ -208,7 +208,7 @@ public:
 	auto GetBinding(const MonoObject* InMonoObject) const;
 
 	template <typename T>
-	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject) const;
+	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject, bool bNeedFree = true) const;
 
 	template <typename T>
 	auto AddBindingReference(const FGarbageCollectionHandle& InOwner, MonoObject* InMonoObject,
@@ -318,7 +318,7 @@ private:
 
 	FMultiRegistry* MultiRegistry;
 
-	FMixinRegistry* MixinRegistry;
+	FDynamicRegistry* DynamicRegistry;
 
 	class FBindingRegistry* BindingRegistry;
 };

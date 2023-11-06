@@ -22,7 +22,7 @@ struct TNameSpace
 {
 };
 
-template <typename T, typename Type = typename TTemplateTypeTraits<T>::Type>
+template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::Type>
 struct TGenericNameSpace
 {
 	static TArray<FString> Get()
@@ -35,165 +35,165 @@ struct TGenericNameSpace
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, uint8>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, uint16>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, uint32>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, uint64>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, int8>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, int16>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, int32>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, int64>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, bool>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, float>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<T>> &&
-                                      !std::is_same_v<std::remove_pointer_t<T>, UClass>, T>>
+struct TNameSpace<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
+                                      !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
 	static TArray<FString> Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::remove_pointer_t<T>::StaticClass())};
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::remove_pointer_t<std::decay_t<T>>::StaticClass())};
 	}
 };
 
 #if UE_OBJECT_PTR
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
+struct TNameSpace<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(T::ElementType::StaticClass())};
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::ElementType::StaticClass())};
 	}
 };
 #endif
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, FName>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>> final :
 	FCommonNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsIInterface<T>::Value, T>>
+struct TNameSpace<T, std::enable_if_t<TIsIInterface<std::decay_t<T>>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(T::UClassType::StaticClass())};
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::UClassType::StaticClass())};
 	}
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTScriptInterface<T>::Value, T>> final :
+struct TNameSpace<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value, T>> final :
 	TGenericNameSpace<T>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
+struct TNameSpace<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(T::StaticStruct())};
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::StaticStruct())};
 	}
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, FString>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, T>> final :
 	FCommonNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, FText>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>> final :
 	FCommonNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTWeakObjectPtr<T>::Value, T>> final :
-	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
+struct TNameSpace<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value, T>> final :
+	TGenericNameSpace<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTLazyObjectPtr<T>::Value, T>> final :
+struct TNameSpace<T, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<T>>::Value, T>> final :
 	TGenericNameSpace<T>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTSoftObjectPtr<T>::Value, T>> final :
+struct TNameSpace<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value, T>> final :
 	TGenericNameSpace<T>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<T, double>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>> final :
 	FPrimitiveNameSpace
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTMap<T>::Value, T>>
+struct TNameSpace<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
 		return TArrayBuilder<FString>()
 		       .Append(TNameSpace<
-				       typename TTemplateTypeTraits<T>::template Type<0>,
-				       typename TTemplateTypeTraits<T>::template Type<0>>
+				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 			       ::Get())
 		       .Append(TNameSpace<
-				       typename TTemplateTypeTraits<T>::template Type<1>,
-				       typename TTemplateTypeTraits<T>::template Type<1>>
+				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
+				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>
 			       ::Get())
 		       .Add(TGeneric<T, T>::GetNameSpace())
 		       .Build();
@@ -201,46 +201,46 @@ struct TNameSpace<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTSet<T>::Value, T>> final :
-	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
+struct TNameSpace<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>> final :
+	TGenericNameSpace<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTSubclassOf<T>::Value, T>> :
+struct TNameSpace<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>> :
 	TGenericNameSpace<T>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<T>, UClass>, T>> final :
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>> final :
 	TNameSpace<TSubclassOf<UObject>, TSubclassOf<UObject>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTArray<T>::Value, T>> final :
-	TGenericNameSpace<T, typename TTemplateTypeTraits<T>::template Type<0>>
+struct TNameSpace<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>> final :
+	TGenericNameSpace<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsEnum<T>::Value && !TIsNotUEnum<T>::Value, T>>
+struct TNameSpace<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>>
 {
 	static TArray<FString> Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(StaticEnum<T>())};
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(StaticEnum<std::decay_t<T>>())};
 	}
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTEnumAsByte<T>::Value, T>> :
-	TNameSpace<typename T::EnumType, typename T::EnumType>
+struct TNameSpace<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value, T>> :
+	TNameSpace<typename std::decay_t<T>::EnumType, typename std::decay_t<T>::EnumType>
 {
 };
 
 template <typename T>
-struct TNameSpace<T, std::enable_if_t<TIsTSoftClassPtr<T>::Value, T>> final :
+struct TNameSpace<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value, T>> final :
 	TGenericNameSpace<T>
 {
 };

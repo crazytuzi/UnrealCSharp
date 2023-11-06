@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "TOperatorClassBuilder.inl"
+#include "TClassBuilder.inl"
 
 template <typename T>
-class TReflectionClassBuilder final : public TOperatorClassBuilder<T>
+class TReflectionClassBuilder final : public TClassBuilder<T>
 {
 public:
 	explicit TReflectionClassBuilder(const FString& InImplementationNameSpace):
-		TOperatorClassBuilder<T>(InImplementationNameSpace)
+		TClassBuilder<T>(InImplementationNameSpace)
 	{
 	}
 

@@ -10,7 +10,9 @@ struct TReturnValue
 template <typename T>
 struct TBaseReturnValue
 {
-	using Type = std::decay_t<T>;
+	using Type = T;
+
+	TBaseReturnValue() = default;
 
 	explicit TBaseReturnValue(MonoObject* InObject):
 		Object(InObject)
@@ -39,45 +41,52 @@ struct TSingleReturnValue :
 };
 
 template <typename T>
-struct TReferenceReturnValue :
+struct TParentReturnValue :
 	TBaseReturnValue<T>
 {
 	using Super = TBaseReturnValue<T>;
 
 	using Type = typename Super::Type;
 
-	explicit TReferenceReturnValue(Type&& InValue):
-		Super(TPropertyValue<Type, Type>::Get(new Type(InValue)))
+	explicit TParentReturnValue(Type&& InValue)
 	{
+		if constexpr (TTypeInfo<T>::IsReference() || std::is_pointer_v<T>)
+		{
+			Super::Object = TPropertyValue<Type, Type>::Get(&InValue);
+		}
+		else
+		{
+			Super::Object = TPropertyValue<Type, Type>::Get(new Type(InValue));
+		}
 	}
 };
 
 template <typename T>
 struct TContainerReturnValue :
-	TReferenceReturnValue<T>
+	TParentReturnValue<T>
 {
-	using TReferenceReturnValue<T>::TReferenceReturnValue;
+	using TParentReturnValue<T>::TParentReturnValue;
 };
 
 template <typename T>
 struct TMultiReturnValue :
-	TReferenceReturnValue<T>
+	TParentReturnValue<T>
 {
-	using TReferenceReturnValue<T>::TReferenceReturnValue;
+	using TParentReturnValue<T>::TParentReturnValue;
 };
 
 template <typename T>
 struct TBindingReturnValue :
-	TReferenceReturnValue<T>
+	TParentReturnValue<T>
 {
-	using TReferenceReturnValue<T>::TReferenceReturnValue;
+	using TParentReturnValue<T>::TParentReturnValue;
 };
 
 template <typename T>
 struct TScriptStructReturnValue :
-	TReferenceReturnValue<T>
+	TParentReturnValue<T>
 {
-	using TReferenceReturnValue<T>::TReferenceReturnValue;
+	using TParentReturnValue<T>::TParentReturnValue;
 };
 
 template <typename T>
@@ -192,9 +201,9 @@ struct TReturnValue<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Va
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value>> :
-	TReferenceReturnValue<T>
+	TParentReturnValue<T>
 {
-	using TReferenceReturnValue<T>::TReferenceReturnValue;
+	using TParentReturnValue<T>::TParentReturnValue;
 };
 
 template <typename T>

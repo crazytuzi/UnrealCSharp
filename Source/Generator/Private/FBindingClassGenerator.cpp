@@ -140,6 +140,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		if (Function.GetReturn() != nullptr)
 		{
 			FunctionReturnType = Function.GetReturn()->GetName();
+
+			UsingNameSpaces.Append(Function.GetReturn()->GetNameSpace());
 		}
 
 		FString FunctionDeclarationBody;
@@ -158,7 +160,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 			for (auto Index = 0; Index < Params.Num(); ++Index)
 			{
-				if (Params[Index]->IsOut())
+				if (Params[Index]->IsRef())
 				{
 					FunctionOutParamIndex.Add(Index);
 
@@ -178,7 +180,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		{
 			for (auto Index = 0; Index < Params.Num(); ++Index)
 			{
-				if (Params[Index]->IsOut())
+				if (Params[Index]->IsRef())
 				{
 					FunctionOutParamIndex.Add(Index);
 

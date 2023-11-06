@@ -23,7 +23,7 @@ struct TPropertyClass
 {
 };
 
-template <typename T, typename Type = typename TTemplateTypeTraits<T>::Type>
+template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::Type>
 struct TMultiPropertyClass
 {
 	static MonoClass* Get()
@@ -65,7 +65,7 @@ struct TBindingEnumPropertyClass
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, uint8>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -74,7 +74,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, uint8>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, uint16>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -83,7 +83,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, uint16>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, uint32>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -92,7 +92,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, uint32>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, uint64>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -101,7 +101,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, uint64>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, int8>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -110,7 +110,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, int8>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, int16>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -119,7 +119,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, int16>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, int32>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -128,7 +128,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, int32>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, int64>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -137,7 +137,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, int64>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, bool>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -146,7 +146,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, bool>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, float>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -155,8 +155,8 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, float>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<T>> &&
-                                          !std::is_same_v<std::remove_pointer_t<T>, UClass>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
+                                          !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -166,7 +166,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove
 
 #if UE_OBJECT_PTR
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
+struct TPropertyClass<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 {
 	static MonoClass* Get()
 	{
@@ -176,7 +176,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
 #endif
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, FName>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -185,7 +185,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, FName>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsIInterface<T>::Value, T>>
+struct TPropertyClass<T, std::enable_if_t<TIsIInterface<std::decay_t<T>>::Value, T>>
 {
 	static MonoClass* Get()
 	{
@@ -194,13 +194,13 @@ struct TPropertyClass<T, std::enable_if_t<TIsIInterface<T>::Value, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTScriptInterface<T>::Value, T>> :
+struct TPropertyClass<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyClass<T>
 {
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
+struct TPropertyClass<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 {
 	static MonoClass* Get()
 	{
@@ -209,7 +209,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, FString>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -218,7 +218,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, FString>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, FText>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -227,25 +227,25 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, FText>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTWeakObjectPtr<T>::Value, T>> :
-	TMultiPropertyClass<T, typename TTemplateTypeTraits<T>::template Type<0>>
+struct TPropertyClass<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value, T>> :
+	TMultiPropertyClass<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 {
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTLazyObjectPtr<T>::Value, T>> :
+struct TPropertyClass<T, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyClass<T>
 {
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTSoftObjectPtr<T>::Value, T>> :
+struct TPropertyClass<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyClass<T>
 {
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, double>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>>
 {
 	static MonoClass* Get()
 	{
@@ -254,7 +254,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<T, double>, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTMap<T>::Value, T>>
+struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
 	static MonoClass* Get()
 	{
@@ -262,8 +262,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
 		const auto FoundKeyMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<T>::template Type<0>,
-				typename TTemplateTypeTraits<T>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 			::Get();
 
 		const auto FoundKeyMonoType = FMonoDomain::Class_Get_Type(FoundKeyMonoClass);
@@ -271,8 +271,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 		const auto FoundKeyReflectionType = FMonoDomain::Type_Get_Object(FoundKeyMonoType);
 
 		const auto FoundValueMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<T>::template Type<1>,
-				typename TTemplateTypeTraits<T>::template Type<1>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>
 			::Get();
 
 		const auto FoundValueMonoType = FMonoDomain::Class_Get_Type(FoundValueMonoClass);
@@ -291,7 +291,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<T>::Value, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTSet<T>::Value, T>>
+struct TPropertyClass<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 {
 	static MonoClass* Get()
 	{
@@ -299,8 +299,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSet<T>::Value, T>>
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
 		const auto FoundMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<T>::template Type<0>,
-				typename TTemplateTypeTraits<T>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 			::Get();
 
 		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);
@@ -317,20 +317,20 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSet<T>::Value, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTSubclassOf<T>::Value, T>> :
+struct TPropertyClass<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyClass<T>
 {
 };
 
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<T>, UClass>, T>> :
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>> :
 	TPropertyClass<TSubclassOf<UObject>, TSubclassOf<UObject>>
 {
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTArray<T>::Value, T>>
+struct TPropertyClass<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
 	static MonoClass* Get()
 	{
@@ -338,8 +338,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTArray<T>::Value, T>>
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
 		const auto FoundMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<T>::template Type<0>,
-				typename TTemplateTypeTraits<T>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
 			::Get();
 
 		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);
@@ -356,7 +356,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTArray<T>::Value, T>>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsEnum<T>::Value && !TIsNotUEnum<T>::Value, T>>
+struct TPropertyClass<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>>
 {
 	static MonoClass* Get()
 	{
@@ -365,13 +365,13 @@ struct TPropertyClass<T, std::enable_if_t<TIsEnum<T>::Value && !TIsNotUEnum<T>::
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTEnumAsByte<T>::Value, T>> :
-	TPropertyClass<typename T::EnumType, typename T::EnumType>
+struct TPropertyClass<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value, T>> :
+	TPropertyClass<typename std::decay_t<T>::EnumType, typename std::decay_t<T>::EnumType>
 {
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsTSoftClassPtr<T>::Value, T>> :
+struct TPropertyClass<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyClass<T>
 {
 };

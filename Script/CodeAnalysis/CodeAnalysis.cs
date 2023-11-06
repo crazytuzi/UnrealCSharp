@@ -24,7 +24,7 @@ namespace CodeAnalysis
 
             OutputPathName = InOutputPathName;
 
-            Mixin = new Dictionary<string, List<string>>
+            Dynamic = new Dictionary<string, List<string>>
             {
                 ["CSharpGeneratedClass"] = new List<string>(),
                 ["CSharpBlueprintGeneratedClass"] = new List<string>(),
@@ -76,11 +76,11 @@ namespace CodeAnalysis
             {
                 var Tree = CSharpSyntaxTree.ParseText(File.ReadAllText(Item, Encoding.UTF8));
 
-                var Root = (CompilationUnitSyntax) Tree.GetRoot();
+                var Root = (CompilationUnitSyntax)Tree.GetRoot();
 
                 AnalysisIsOverride(Root);
 
-                AnalysisMixin(Root);
+                AnalysisDynamic(Root);
             }
 
             WriteAll();
@@ -152,7 +152,7 @@ namespace CodeAnalysis
             }
         }
 
-        private void AnalysisMixin(CompilationUnitSyntax InRoot)
+        private void AnalysisDynamic(CompilationUnitSyntax InRoot)
         {
             foreach (var RootMember in InRoot.Members)
             {
@@ -166,21 +166,21 @@ namespace CodeAnalysis
                             {
                                 if (Attribute.ToString().Equals("[UClass]"))
                                 {
-                                    Mixin["CSharpGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
+                                    Dynamic["CSharpGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
 
                                     return;
                                 }
 
                                 if (Attribute.ToString().Equals("[UBlueprint]"))
                                 {
-                                    Mixin["CSharpBlueprintGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
+                                    Dynamic["CSharpBlueprintGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
 
                                     return;
                                 }
 
                                 if (Attribute.ToString().Equals("[UStruct]"))
                                 {
-                                    Mixin["CSharpScriptStruct"].Add(ClassDeclaration.Identifier.ToString());
+                                    Dynamic["CSharpScriptStruct"].Add(ClassDeclaration.Identifier.ToString());
 
                                     return;
                                 }
@@ -192,7 +192,7 @@ namespace CodeAnalysis
                             {
                                 if (Attribute.ToString().Equals("[UEnum]"))
                                 {
-                                    Mixin["CSharpEnum"].Add(EnumDeclaration.Identifier.ToString());
+                                    Dynamic["CSharpEnum"].Add(EnumDeclaration.Identifier.ToString());
 
                                     return;
                                 }
@@ -205,7 +205,7 @@ namespace CodeAnalysis
 
         private void WriteAll()
         {
-            foreach (var Pair in Mixin)
+            foreach (var Pair in Dynamic)
             {
                 var FileName = Path.Combine(OutputPathName, Pair.Key + ".json");
 
@@ -219,6 +219,6 @@ namespace CodeAnalysis
 
         private string OutputPathName;
 
-        private Dictionary<string, List<string>> Mixin;
+        private Dictionary<string, List<string>> Dynamic;
     }
 }

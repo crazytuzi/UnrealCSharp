@@ -22,9 +22,9 @@ struct FBindingTypeInfo
 		return Info != nullptr ? Info->GetNameSpace() : Instance;
 	}
 
-	bool IsOut() const
+	bool IsRef() const
 	{
-		return Info != nullptr ? Info->IsOut() : false;
+		return Info != nullptr ? Info->IsRef() : false;
 	}
 
 private:

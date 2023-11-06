@@ -4,10 +4,10 @@
 #include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
-#include "Mixin/CSharpGeneratedClass.h"
-#include "Mixin/CSharpBlueprintGeneratedClass.h"
-#include "Mixin/CSharpScriptStruct.h"
-#include "Mixin/CSharpEnum.h"
+#include "Dynamic/CSharpClass.h"
+#include "Dynamic/CSharpBlueprintGeneratedClass.h"
+#include "Dynamic/CSharpScriptStruct.h"
+#include "Dynamic/CSharpEnum.h"
 #include "UEVersion.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 
@@ -21,7 +21,7 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
 
 	if (InField->IsNative() == false ||
-		Cast<UCSharpGeneratedClass>(InField) ||
+		Cast<UCSharpClass>(InField) ||
 		Cast<UCSharpBlueprintGeneratedClass>(InField) ||
 		Cast<UCSharpScriptStruct>(InField) ||
 		Cast<UCSharpEnum>(InField))
@@ -34,10 +34,17 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 		}
 	}
 
+	auto Name = InField->GetName();
+
+	if (Name.EndsWith("_C"))
+	{
+		Name = Name.LeftChop(2);
+	}
+
 	const auto PathName = FString::Printf(TEXT(
 		"%s%s"
 	),
-	                                      *InField->GetName().Replace(TEXT("_C"),TEXT("")),
+	                                      *Name,
 	                                      InField->IsNative()
 		                                      ? TEXT("")
 		                                      : *FString::Printf(TEXT(

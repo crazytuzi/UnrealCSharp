@@ -28,6 +28,10 @@
 
 #define FUNCTION_COMPLEMENT FString(TEXT("Complement"))
 
+#define FUNCTION_PRE_INCREMENT FString(TEXT("PreIncrement"))
+
+#define FUNCTION_PRE_DECREMENT FString(TEXT("PreDecrement"))
+
 #define FUNCTION_PLUS FString(TEXT("Plus"))
 
 #define FUNCTION_MINUS FString(TEXT("Minus"))

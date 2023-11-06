@@ -7,21 +7,54 @@
 template <typename T>
 struct TTypeInfo final : FTypeInfo
 {
+	constexpr static bool IsReference()
+	{
+		return std::is_reference_v<T>;
+	}
+
 	virtual FString GetName() const override
 	{
-		return TName<std::decay_t<T>, std::decay_t<T>>::Get();
+		return TName<T, T>::Get();
 	}
 
 	virtual const TArray<FString>& GetNameSpace() const override
 	{
-		static auto Instance = TNameSpace<std::decay_t<T>, std::decay_t<T>>::Get();
+		static auto Instance = TNameSpace<T, T>::Get();
 
 		return Instance;
 	}
 
-	virtual bool IsOut() const override
+	virtual bool IsRef() const override
 	{
-		return std::is_reference_v<T> && !std::is_const_v<std::remove_reference_t<T>>;
+		if constexpr (std::is_same_v<std::decay_t<T>, bool> ||
+			std::is_same_v<std::decay_t<T>, int8> ||
+			std::is_same_v<std::decay_t<T>, int16> ||
+			std::is_same_v<std::decay_t<T>, int32> ||
+			std::is_same_v<std::decay_t<T>, int64> ||
+			std::is_same_v<std::decay_t<T>, uint8> ||
+			std::is_same_v<std::decay_t<T>, uint16> ||
+			std::is_same_v<std::decay_t<T>, uint32> ||
+			std::is_same_v<std::decay_t<T>, uint64> ||
+			std::is_same_v<std::decay_t<T>, float> ||
+			std::is_same_v<std::decay_t<T>, double> ||
+			TIsEnum<std::decay_t<T>>::Value ||
+			TIsEnumClass<std::decay_t<T>>::Value ||
+			TIsTEnumAsByte<std::decay_t<T>>::Value ||
+			std::is_same_v<std::decay_t<T>, FName> ||
+			std::is_same_v<std::decay_t<T>, FText> ||
+			std::is_same_v<std::decay_t<T>, FString> ||
+			std::is_pointer_v<std::decay_t<T>> ||
+			TIsTArray<std::decay_t<T>>::Value ||
+			TIsTSet<std::decay_t<T>>::Value ||
+			TIsTMap<std::decay_t<T>>::Value
+		)
+		{
+			return std::is_reference_v<T> && !std::is_const_v<std::remove_reference_t<T>>;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	static FTypeInfo* Get()
@@ -47,7 +80,7 @@ struct TTypeInfo<void> final : FTypeInfo
 		return Instance;
 	}
 
-	virtual bool IsOut() const override
+	virtual bool IsRef() const override
 	{
 		return false;
 	}

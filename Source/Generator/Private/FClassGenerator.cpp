@@ -4,8 +4,8 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Misc/FileHelper.h"
-#include "Mixin/CSharpGeneratedClass.h"
-#include "Mixin/CSharpBlueprintGeneratedClass.h"
+#include "Dynamic/CSharpClass.h"
+#include "Dynamic/CSharpBlueprintGeneratedClass.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
@@ -25,9 +25,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
-	if (Cast<UCSharpGeneratedClass>(InClass) ||
+	if (Cast<UCSharpClass>(InClass) ||
 		Cast<UCSharpBlueprintGeneratedClass>(InClass) ||
-		UCSharpGeneratedClass::StaticClass() == InClass ||
+		UCSharpClass::StaticClass() == InClass ||
 		UCSharpBlueprintGeneratedClass::StaticClass() == InClass)
 	{
 		return;
