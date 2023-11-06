@@ -7,10 +7,10 @@
 #include "Macro/FunctionMacro.h"
 
 template <typename T>
-class TOperatorClassBuilder : public FClassBuilder
+class TClassBuilder : public FClassBuilder
 {
 public:
-	explicit TOperatorClassBuilder(const FString& InImplementationNameSpace):
+	explicit TClassBuilder(const FString& InImplementationNameSpace):
 #if WITH_PROPERTY_INFO
 		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace,
 		              TClassFullName<T>::Get(), TTypeInfo<T>::Get())
@@ -18,6 +18,52 @@ public:
 		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace)
 #endif
 	{
+	}
+
+public:
+#if WITH_FUNCTION_INFO
+	TClassBuilder& Constructor(const void* InMethod, FFunctionInfo* InFunctionInfo,
+	                           const TArray<FString>& InParamNames = {})
+#else
+	TClassBuilder& Constructor(const void* InMethod,
+	                           const TArray<FString>& InParamNames = {})
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(TClassFullName<T>::Get(), InMethod, InFunctionInfo, InParamNames);
+#else
+		Function(TClassFullName<T>::Get(), InMethod, InParamNames);
+#endif
+
+		return *this;
+	}
+
+#if WITH_FUNCTION_INFO
+	TClassBuilder& Destructor(const void* InMethod, FFunctionInfo* InFunctionInfo)
+#else
+	TClassBuilder& Destructor(const void* InMethod)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		Function(FString::Printf(TEXT(
+			         "~%s"
+		         ),
+		                         *TClassFullName<T>::Get()
+		         ),
+		         FUNCTION_DESTRUCTOR,
+		         InMethod,
+		         InFunctionInfo);
+#else
+		Function(FString::Printf(TEXT(
+					 "~%s"
+				 ),
+								 *TClassFullName<T>::Get()
+				 ),
+				 FUNCTION_DESTRUCTOR,
+				 InMethod);
+#endif
+
+		return *this;
 	}
 
 public:
@@ -67,9 +113,9 @@ public:
 
 private:
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& LogicalNot(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& LogicalNot(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& LogicalNot(const void* InMethod)
+	TClassBuilder& LogicalNot(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -87,9 +133,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& UnaryPlus(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& UnaryPlus(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& UnaryPlus(const void* InMethod)
+	TClassBuilder& UnaryPlus(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -107,9 +153,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& UnaryMinus(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& UnaryMinus(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& UnaryMinus(const void* InMethod)
+	TClassBuilder& UnaryMinus(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -127,9 +173,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& Complement(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& Complement(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& Complement(const void* InMethod)
+	TClassBuilder& Complement(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -147,9 +193,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& PreIncrement(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& PreIncrement(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& PreIncrement(const void* InMethod)
+	TClassBuilder& PreIncrement(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -167,9 +213,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& PreDecrement(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& PreDecrement(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-    TOperatorClassBuilder& PreDecrement(const void* InMethod)
+    TClassBuilder& PreDecrement(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -187,9 +233,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& Plus(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& Plus(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& Plus(const void* InMethod)
+	TClassBuilder& Plus(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -207,9 +253,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& Minus(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& Minus(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& Minus(const void* InMethod)
+	TClassBuilder& Minus(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -227,9 +273,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& Multiplies(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& Multiplies(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& Multiplies(const void* InMethod)
+	TClassBuilder& Multiplies(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -247,9 +293,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& Divides(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& Divides(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& Divides(const void* InMethod)
+	TClassBuilder& Divides(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -267,9 +313,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& Modulus(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& Modulus(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& Modulus(const void* InMethod)
+	TClassBuilder& Modulus(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -287,9 +333,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& BitAnd(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& BitAnd(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& BitAnd(const void* InMethod)
+	TClassBuilder& BitAnd(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -307,9 +353,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& BitOr(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& BitOr(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& BitOr(const void* InMethod)
+	TClassBuilder& BitOr(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -327,9 +373,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& BitXor(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& BitXor(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& BitXor(const void* InMethod)
+	TClassBuilder& BitXor(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -347,9 +393,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& LeftShift(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& LeftShift(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& LeftShift(const void* InMethod)
+	TClassBuilder& LeftShift(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -367,9 +413,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& RightShift(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& RightShift(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& RightShift(const void* InMethod)
+	TClassBuilder& RightShift(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -387,9 +433,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& EqualTo(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& EqualTo(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& EqualTo(const void* InMethod)
+	TClassBuilder& EqualTo(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -407,9 +453,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& NotEqualTo(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& NotEqualTo(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& NotEqualTo(const void* InMethod)
+	TClassBuilder& NotEqualTo(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -427,9 +473,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& Less(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& Less(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& Less(const void* InMethod)
+	TClassBuilder& Less(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -447,9 +493,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& LessEqual(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& LessEqual(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& LessEqual(const void* InMethod)
+	TClassBuilder& LessEqual(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -467,9 +513,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& Greater(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& Greater(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& Greater(const void* InMethod)
+	TClassBuilder& Greater(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
@@ -487,9 +533,9 @@ private:
 	}
 
 #if WITH_FUNCTION_INFO
-	TOperatorClassBuilder& GreaterEqual(const void* InMethod, FFunctionInfo* InFunctionInfo)
+	TClassBuilder& GreaterEqual(const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TOperatorClassBuilder& GreaterEqual(const void* InMethod)
+	TClassBuilder& GreaterEqual(const void* InMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO

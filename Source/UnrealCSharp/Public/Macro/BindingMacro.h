@@ -278,7 +278,7 @@ struct TIsNotUEnum<Class> \
 #endif
 
 #define OPERATOR_BUILDER(Name, Signature) \
-TOperatorClassBuilder& Name() \
+TClassBuilder& Name() \
 { \
 	return Name(BINDING_OPERATOR(Signature, &Name##Implementation));\
 }
