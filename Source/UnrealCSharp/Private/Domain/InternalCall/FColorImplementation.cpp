@@ -1,287 +1,67 @@
-﻿#include "Domain/InternalCall/FColorImplementation.h"
-#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
-#include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterColor
 {
 	FRegisterColor()
 	{
-		TReflectionClassBuilder<FColor>(NAMESPACE_LIBRARY)
-			.Function("DWColor", FColorImplementation::Color_DWColorImplementation)
-			.Function("FromRGBE", FColorImplementation::Color_FromRGBEImplementation)
-			.Function("FromHex", FColorImplementation::Color_FromHexImplementation)
-			.Function("MakeRandomColor", FColorImplementation::Color_MakeRandomColorImplementation)
-			.Function("MakeRedToGreenColorFromScalar",
-			          FColorImplementation::Color_MakeRedToGreenColorFromScalarImplementation)
-			.Function("MakeFromColorTemperature", FColorImplementation::Color_MakeFromColorTemperatureImplementation)
-			.Function("WithAlpha", FColorImplementation::Color_WithAlphaImplementation)
-			.Function("ReinterpretAsLinear", FColorImplementation::Color_ReinterpretAsLinearImplementation)
-			.Function("ToHex", FColorImplementation::Color_ToHexImplementation)
-			.Function("ToString", FColorImplementation::Color_ToStringImplementation)
-			.Function("InitFromString", FColorImplementation::Color_InitFromStringImplementation)
-			.Function("ToPackedARGB", FColorImplementation::Color_ToPackedARGBImplementation)
-			.Function("ToPackedABGR", FColorImplementation::Color_ToPackedABGRImplementation)
-			.Function("ToPackedRGBA", FColorImplementation::Color_ToPackedRGBAImplementation)
-			.Function("ToPackedBGRA", FColorImplementation::Color_ToPackedBGRAImplementation)
+		TReflectionClassBuilder<FColor>(NAMESPACE_BINDING)
+			.Constructor(BINDING_CONSTRUCTOR(FColor, uint8, uint8, uint8, uint8),
+			             {"R", "G", "B", "A"})
+			.Constructor(BINDING_CONSTRUCTOR(FColor, uint32),
+			             {"InColor"})
+			.Property("White", BINDING_PROPERTY(&FColor::White))
+			.Property("Black", BINDING_PROPERTY(&FColor::Black))
+			.Property("Transparent", BINDING_PROPERTY(&FColor::Transparent))
+			.Property("Red", BINDING_PROPERTY(&FColor::Red))
+			.Property("Green", BINDING_PROPERTY(&FColor::Green))
+			.Property("Blue", BINDING_PROPERTY(&FColor::Blue))
+			.Property("Yellow", BINDING_PROPERTY(&FColor::Yellow))
+			.Property("Cyan", BINDING_PROPERTY(&FColor::Cyan))
+			.Property("Magenta", BINDING_PROPERTY(&FColor::Magenta))
+			.Property("Orange", BINDING_PROPERTY(&FColor::Orange))
+			.Property("Purple", BINDING_PROPERTY(&FColor::Purple))
+			.Property("Turquoise", BINDING_PROPERTY(&FColor::Turquoise))
+			.Property("Silver", BINDING_PROPERTY(&FColor::Silver))
+			.Property("Emerald", BINDING_PROPERTY(&FColor::Emerald))
+			// @TODO
+			// DWColor
+			.Function("FromRGBE", BINDING_FUNCTION(&FColor::FromRGBE))
+			.Function("FromHex", BINDING_FUNCTION(&FColor::FromHex),
+			          {"HexString"})
+			.Function("MakeRandomColor", BINDING_FUNCTION(&FColor::MakeRandomColor))
+			.Function("MakeRedToGreenColorFromScalar", BINDING_FUNCTION(&FColor::MakeRedToGreenColorFromScalar),
+			          {"Scalar"})
+			.Function("MakeFromColorTemperature", BINDING_FUNCTION(&FColor::MakeFromColorTemperature),
+			          {"Temp"})
+			.Function("QuantizeUNormFloatTo8", BINDING_FUNCTION(&FColor::QuantizeUNormFloatTo8),
+			          {"UnitFloat"})
+			.Function("QuantizeUNormFloatTo16", BINDING_FUNCTION(&FColor::QuantizeUNormFloatTo16),
+			          {"UnitFloat"})
+			.Function("DequantizeUNorm8ToFloat", BINDING_FUNCTION(&FColor::DequantizeUNorm8ToFloat),
+			          {"Value8"})
+			.Function("DequantizeUNorm16ToFloat", BINDING_FUNCTION(&FColor::DequantizeUNorm16ToFloat),
+			          {"Value16"})
+			.Function("Requantize10to8", BINDING_FUNCTION(&FColor::Requantize10to8),
+			          {"Value10"})
+			.Function("Requantize16to8", BINDING_FUNCTION(&FColor::Requantize16to8),
+			          {"Value16"})
+			.Function("MakeRequantizeFrom1010102", BINDING_FUNCTION(&FColor::MakeRequantizeFrom1010102),
+			          {"R", "G", "B", "A"})
+			.Function("WithAlpha", BINDING_FUNCTION(&FColor::WithAlpha),
+			          {"Alpha"})
+			.Function("ReinterpretAsLinear", BINDING_FUNCTION(&FColor::ReinterpretAsLinear))
+			.Function("ToHex", BINDING_FUNCTION(&FColor::ToHex))
+			.Function("ToString", BINDING_FUNCTION(&FColor::ToString))
+			.Function("InitFromString", BINDING_FUNCTION(&FColor::InitFromString),
+			          {"InSourceString"})
+			.Function("ToPackedARGB", BINDING_FUNCTION(&FColor::ToPackedARGB))
+			.Function("ToPackedABGR", BINDING_FUNCTION(&FColor::ToPackedABGR))
+			.Function("ToPackedRGBA", BINDING_FUNCTION(&FColor::ToPackedRGBA))
+			.Function("ToPackedBGRA", BINDING_FUNCTION(&FColor::ToPackedBGRA))
 			.Register();
 	}
 };
 
 static FRegisterColor RegisterColor;
-
-uint32 FColorImplementation::Color_DWColorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	if (Color != nullptr)
-	{
-		return Color->DWColor();
-	}
-
-	return 0u;
-}
-
-void FColorImplementation::Color_FromRGBEImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                        MonoObject** OutValue)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
-
-	if (Color != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = Color->FromRGBE();
-	}
-}
-
-void FColorImplementation::Color_FromHexImplementation(MonoObject* HexString, MonoObject** OutValue)
-{
-	const auto String = UTF8_TO_TCHAR(
-		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-			GetDomain()->Object_To_String(HexString, nullptr)));
-
-	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
-
-	if (String != nullptr && OutColor != nullptr)
-	{
-		*OutColor = FColor::FromHex(String);
-	}
-}
-
-void FColorImplementation::Color_MakeRandomColorImplementation(MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
-
-	if (OutColor != nullptr)
-	{
-		*OutColor = FColor::MakeRandomColor();
-	}
-}
-
-void FColorImplementation::Color_MakeRedToGreenColorFromScalarImplementation(const float Scalar, MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
-
-	if (OutColor != nullptr)
-	{
-		*OutColor = FColor::MakeRedToGreenColorFromScalar(Scalar);
-	}
-}
-
-void FColorImplementation::Color_MakeFromColorTemperatureImplementation(const float Temp, MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
-
-	if (OutColor != nullptr)
-	{
-		*OutColor = FColor::MakeFromColorTemperature(Temp);
-	}
-}
-
-void FColorImplementation::Color_WithAlphaImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                         const uint8 Alpha, MonoObject** OutValue)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FColor, FColor>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
-
-	if (Color != nullptr && OutColor != nullptr)
-	{
-		*OutColor = Color->WithAlpha(Alpha);
-	}
-}
-
-void FColorImplementation::Color_ReinterpretAsLinearImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FLinearColor, FLinearColor>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
-
-	if (Color != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = Color->ReinterpretAsLinear();
-	}
-}
-
-void FColorImplementation::Color_ToHexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                     MonoObject** OutValue)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	if (Color != nullptr)
-	{
-		const auto ResultString = Color->ToHex();
-
-		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
-
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(*ResultString)));
-
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-			FoundMonoClass, 1, &NewMonoString);
-
-		*OutValue = NewMonoObject;
-	}
-}
-
-void FColorImplementation::Color_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                        MonoObject** OutValue)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	if (Color != nullptr)
-	{
-		const auto ResultString = Color->ToString();
-
-		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
-
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(*ResultString)));
-
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-			FoundMonoClass, 1, &NewMonoString);
-
-		*OutValue = NewMonoObject;
-	}
-}
-
-bool FColorImplementation::Color_InitFromStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                              MonoObject* InSourceString)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	if (Color != nullptr && InSourceString != nullptr)
-	{
-		return Color->InitFromString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(InSourceString, nullptr))));
-	}
-
-	return false;
-}
-
-uint32 FColorImplementation::Color_ToPackedARGBImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	if (Color != nullptr)
-	{
-		return Color->ToPackedARGB();
-	}
-
-	return 0u;
-}
-
-uint32 FColorImplementation::Color_ToPackedABGRImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	if (Color != nullptr)
-	{
-		return Color->ToPackedABGR();
-	}
-
-	return 0u;
-}
-
-uint32 FColorImplementation::Color_ToPackedRGBAImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	if (Color != nullptr)
-	{
-		return Color->ToPackedRGBA();
-	}
-
-	return 0u;
-}
-
-uint32 FColorImplementation::Color_ToPackedBGRAImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto Color = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FColor>(InGarbageCollectionHandle);
-
-	if (Color != nullptr)
-	{
-		return Color->ToPackedBGRA();
-	}
-
-	return 0u;
-}
