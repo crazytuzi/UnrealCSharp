@@ -27,6 +27,11 @@ struct FBindingTypeInfo
 		return Info != nullptr ? Info->IsRef() : false;
 	}
 
+	bool IsStatic() const
+	{
+		return Info != nullptr ? Info->IsStatic() : false;
+	}
+
 private:
 	FTypeInfo* Info;
 };

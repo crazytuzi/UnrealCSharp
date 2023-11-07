@@ -23,8 +23,18 @@ struct TPropertyBuilder
 {
 };
 
-template <typename Class, typename Result, Result Class::* Member>
+template <typename Class, typename Result, auto Member, typename Enable = void>
 struct TPropertyInfoBuilder
+{
+};
+
+template <typename Class, typename Result, auto Member, typename Enable = void>
+struct TParentPropertyBuilder
+{
+};
+
+template <typename Class, typename Result, auto Member>
+struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>>
 {
 	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
@@ -50,8 +60,27 @@ struct TPropertyInfoBuilder
 	}
 };
 
-template <typename Class, typename Result, Result Class::* Member>
-struct TParentPropertyBuilder :
+template <typename Class, typename Result, auto Member>
+struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>>
+{
+	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	{
+		*OutValue = TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member));
+	}
+
+	static void Set(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InValue)
+	{
+		*const_cast<std::remove_const_t<Result>*>(Member) = TPropertyValue<Result, Result>::Set(InValue);
+	}
+
+	static FTypeInfo* Info()
+	{
+		return TTypeInfo<Result, true>::Get();
+	}
+};
+
+template <typename Class, typename Result, auto Member>
+struct TParentPropertyBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
@@ -64,31 +93,43 @@ struct TParentPropertyBuilder :
 	}
 };
 
-template <typename Class, typename Result, Result Class::* Member>
+template <typename Class, typename Result, auto Member>
+struct TParentPropertyBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>> :
+	TPropertyInfoBuilder<Class, Result, Member>
+{
+	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	{
+		*OutValue = TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member),
+														InGarbageCollectionHandle,
+														false);
+	}
+};
+
+template <typename Class, typename Result, auto Member>
 struct TContainerPropertyBuilder :
 	TParentPropertyBuilder<Class, Result, Member>
 {
 };
 
-template <typename Class, typename Result, Result Class::* Member>
+template <typename Class, typename Result, auto Member>
 struct TMultiPropertyBuilder :
 	TParentPropertyBuilder<Class, Result, Member>
 {
 };
 
-template <typename Class, typename Result, Result Class::* Member>
+template <typename Class, typename Result, auto Member>
 struct TBindingPropertyBuilder :
 	TParentPropertyBuilder<Class, Result, Member>
 {
 };
 
-template <typename Class, typename Result, Result Class::* Member>
+template <typename Class, typename Result, auto Member>
 struct TScriptStructPropertyBuilder :
 	TParentPropertyBuilder<Class, Result, Member>
 {
 };
 
-template <typename Class, typename Result, Result Class::* Member>
+template <typename Class, typename Result, auto Member>
 struct TBindingEnumPropertyBuilder :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
@@ -272,5 +313,186 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTEnumAsByte
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSoftClassPtr<Result>::Value>> :
 	TMultiPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, uint8>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, uint16>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, uint32>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, uint64>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, int8>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, int16>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, int32>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, int64>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, bool>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, float>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member,
+                        std::enable_if_t<
+	                        std::is_base_of_v<UObject, std::remove_pointer_t<Result>> &&
+	                        !std::is_same_v<std::remove_pointer_t<Result>, UClass>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+#if UE_OBJECT_PTR
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTObjectPtr<Result>::Value>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+#endif
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, FName>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTScriptInterface<Result>::Value>> :
+	TMultiPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsUStruct<Result>::Value>> :
+	TParentPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, FString>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, FText>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTWeakObjectPtr<Result>::Value>> :
+	TMultiPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTLazyObjectPtr<Result>::Value>> :
+	TMultiPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftObjectPtr<Result>::Value>> :
+	TMultiPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, double>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTMap<Result>::Value>> :
+	TContainerPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSet<Result>::Value>> :
+	TContainerPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSubclassOf<Result>::Value>> :
+	TMultiPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member,
+                        std::enable_if_t<std::is_same_v<std::remove_pointer_t<Result>, UClass>>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTArray<Result>::Value>> :
+	TContainerPropertyBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member,
+                        std::enable_if_t<TIsEnum<Result>::Value && !TIsNotUEnum<Result>::Value>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTEnumAsByte<Result>::Value>> :
+	TPropertyInfoBuilder<void, Result, Member>
+{
+};
+
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftClassPtr<Result>::Value>> :
+	TMultiPropertyBuilder<void, Result, Member>
 {
 };
