@@ -4,7 +4,7 @@
 #include "TName.inl"
 #include "TNameSpace.inl"
 
-template <typename T>
+template <typename T, bool bIsStatic = false>
 struct TTypeInfo final : FTypeInfo
 {
 	constexpr static bool IsReference()
@@ -57,6 +57,11 @@ struct TTypeInfo final : FTypeInfo
 		}
 	}
 
+	virtual bool IsStatic() const override
+	{
+		return bIsStatic;
+	}
+
 	static FTypeInfo* Get()
 	{
 		static TTypeInfo Instance;
@@ -81,6 +86,11 @@ struct TTypeInfo<void> final : FTypeInfo
 	}
 
 	virtual bool IsRef() const override
+	{
+		return false;
+	}
+
+	virtual bool IsStatic() const override
 	{
 		return false;
 	}

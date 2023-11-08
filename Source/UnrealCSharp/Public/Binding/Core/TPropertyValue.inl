@@ -53,7 +53,8 @@ template <typename T>
 struct TMultiPropertyValue
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<std::decay_t<T>>(InMember);
 
@@ -64,7 +65,8 @@ struct TMultiPropertyValue
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>>(
-				SrcMonoObject, InMember, !InGarbageCollectionHandle.IsValid() && !TTypeInfo<T>::IsReference());
+				SrcMonoObject, InMember,
+				!InGarbageCollectionHandle.IsValid() && !TTypeInfo<T>::IsReference() && bNeedFree);
 		}
 
 		return SrcMonoObject;
@@ -80,7 +82,8 @@ template <typename T>
 struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
 
@@ -101,7 +104,8 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 			else
 			{
 				FCSharpEnvironment::GetEnvironment().AddBindingReference(
-					SrcMonoObject, InMember, !TTypeInfo<T>::IsReference());
+					SrcMonoObject, InMember,
+					!TTypeInfo<T>::IsReference() && bNeedFree);
 			}
 		}
 
@@ -118,7 +122,8 @@ template <typename T>
 struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(*InMember);
 
@@ -157,7 +162,8 @@ template <typename T>
 struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
 			TBaseStructure<std::decay_t<T>>::Get(), InMember);
@@ -184,7 +190,8 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 			{
 				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<std::decay_t<T>>::Get(),
 				                                                        InMember,
-				                                                        SrcMonoObject);
+				                                                        SrcMonoObject,
+				                                                        bNeedFree);
 			}
 		}
 
@@ -201,7 +208,8 @@ template <typename T>
 struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
 			TBaseStructure<std::remove_pointer_t<T>>::Get(), *InMember);
@@ -371,7 +379,8 @@ template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(std::decay_t<T>::StaticStruct(), InMember);
 
@@ -394,7 +403,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 			else
 			{
 				FCSharpEnvironment::GetEnvironment().AddStructReference(
-					std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject, !TTypeInfo<T>::IsReference());
+					std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject,
+					!TTypeInfo<T>::IsReference() && bNeedFree);
 			}
 		}
 
@@ -477,7 +487,8 @@ template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InMember);
 
@@ -564,7 +575,8 @@ template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InMember);
 
@@ -663,7 +675,8 @@ template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero())
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FArrayHelper>(InMember);
 

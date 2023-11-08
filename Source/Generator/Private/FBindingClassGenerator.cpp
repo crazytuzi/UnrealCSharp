@@ -79,13 +79,14 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 			PropertyGetContent = FString::Printf(TEXT(
 				"\t\t\tget\n"
 				"\t\t\t{\n"
-				"\t\t\t\t%s.%s(GetHandle(), out var value);\n\n"
+				"\t\t\t\t%s.%s(%s, out var value);\n\n"
 				"\t\t\t\treturn (%s)value;\n"
 				"\t\t\t}\n"
 			),
 			                                     *BINDING_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION(
 				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName)),
+			                                     Property.IsStatic() ? TEXT("IntPtr.Zero") : TEXT("GetHandle()"),
 			                                     *PropertyType
 			);
 		}
@@ -93,11 +94,12 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		if (bWrite)
 		{
 			PropertySetContent = FString::Printf(TEXT(
-				"\t\t\tset => %s.%s(GetHandle(), value);\n"
+				"\t\t\tset => %s.%s(%s, value);\n"
 			),
 			                                     *BINDING_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION(
-				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName))
+				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName)),
+			                                     Property.IsStatic() ? TEXT("IntPtr.Zero") : TEXT("GetHandle()")
 			);
 		}
 
@@ -105,7 +107,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		{
 			PropertyContent += FString::Printf(TEXT(
 				"%s"
-				"\t\tpublic %s %s\n"
+				"\t\tpublic %s%s %s\n"
 				"\t\t{\n"
 				"%s"
 				"%s"
@@ -113,6 +115,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 				"\t\t}\n"
 			),
 			                                   PropertyContent.IsEmpty() ? TEXT("") : TEXT("\n"),
+			                                   Property.IsStatic() ? TEXT("static ") : TEXT(""),
 			                                   *PropertyType,
 			                                   *PropertyName,
 			                                   *PropertyGetContent,

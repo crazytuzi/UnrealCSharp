@@ -76,6 +76,11 @@ struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same
 	TBindingPropertyBuilder<InClass, Result, Member> \
 { \
 }; \
+template <typename Result, Result* Member> \
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<Result>>, Class>>> : \
+	TBindingPropertyBuilder<void, Result, Member> \
+{ \
+}; \
 template <typename T> \
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> : \
 	TBindingArgument<T> \
@@ -126,6 +131,11 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remov
 template <typename InClass, typename Result, Result InClass::* Member> \
 struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, Class>>> : \
 	TScriptStructPropertyBuilder<InClass, Result, Member> \
+{ \
+}; \
+template <typename Result, Result* Member> \
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, Class>>> : \
+	TScriptStructPropertyBuilder<void, Result, Member> \
 { \
 }; \
 template <typename T> \
@@ -183,6 +193,11 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>
 template <typename InClass, typename Result, Result InClass::* Member> \
 struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, Class>>> : \
 	TBindingEnumPropertyBuilder<InClass, Result, Member> \
+{ \
+}; \
+template <typename Result, Result* Member> \
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, Class>>> : \
+	TBindingEnumPropertyBuilder<void, Result, Member> \
 { \
 }; \
 template <typename T> \
