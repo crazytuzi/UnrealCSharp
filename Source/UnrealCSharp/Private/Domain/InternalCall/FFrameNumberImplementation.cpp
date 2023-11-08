@@ -16,6 +16,8 @@ struct FRegisterFrameNumber
 	FRegisterFrameNumber()
 	{
 		TReflectionClassBuilder<FFrameNumber>(NAMESPACE_BINDING)
+			.Constructor(BINDING_CONSTRUCTOR(FFrameNumber, int32),
+			             {"InValue"})
 			.PreIncrement()
 			.PreDecrement()
 			.Less()
