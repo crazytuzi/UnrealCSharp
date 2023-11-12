@@ -112,8 +112,8 @@ public class Mono : ModuleRules
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
-            var Platform = String.Format("macOS_{0}", base.Target.Architecture);
-            
+			var Platform = String.Format("macOS_{0}", base.Target.Architecture);
+
 			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Platform, "libmonosgen-2.0.a"));
 
 			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Platform,
@@ -153,6 +153,52 @@ public class Mono : ModuleRules
 				Path.Combine(LibraryPath, Platform, "libSystem.IO.Ports.Native.dylib"));
 
 			var Files = GetFiles(Path.Combine(LibraryPath, Platform, "net7.0"));
+
+			foreach (var File in Files)
+			{
+				var ModuleLastDirectory = Path.GetFullPath(Path.Combine(ModuleDirectory, ".."));
+
+				var DestPath = File.Substring(ModuleLastDirectory.Length + 1,
+					File.Length - ModuleLastDirectory.Length - 1);
+
+				RuntimeDependencies.Add("$(BinaryOutputDir)/" + DestPath, File);
+			}
+		}
+		else if (Target.Platform == UnrealTargetPlatform.IOS)
+		{
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"System.Private.CoreLib.dll.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(), "libmonosgen-2.0.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-debugger-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-diagnostics_tracing-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libmono-component-hot_reload-static.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libicudata.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libicui18n.a"));
+
+			PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, Target.Platform.ToString(),
+				"libicuuc.a"));
+
+			PublicAdditionalFrameworks.Add(
+				new Framework(
+					"Mono",
+					Path.Combine(LibraryPath, Target.Platform.ToString(), "Mono.embeddendframework.zip"),
+					null,
+					true
+				)
+			);
+
+			var Files = GetFiles(Path.Combine(LibraryPath, Target.Platform.ToString(), "net7.0"));
 
 			foreach (var File in Files)
 			{
