@@ -33,7 +33,7 @@ void FPrimaryAssetTypeImplementation::PrimaryAssetType_GetNameImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString.ToString())));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -69,7 +69,7 @@ void FPrimaryAssetTypeImplementation::PrimaryAssetType_ToStringImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;

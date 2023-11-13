@@ -60,7 +60,7 @@ MonoObject* FClassPropertyDescriptor::Object_New(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(Class);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(Object, InAddress, false);
 	}

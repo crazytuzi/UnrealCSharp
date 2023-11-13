@@ -10,10 +10,6 @@ namespace Script.Common
     {
         public TMap() => MapUtils.Map_Register(this);
 
-        public TMap(Type InKeyType, Type InValueType)
-        {
-        }
-
         ~TMap() => MapUtils.Map_UnRegister(GCHandle);
 
         [Obsolete("It is not supported like UE.", true)]

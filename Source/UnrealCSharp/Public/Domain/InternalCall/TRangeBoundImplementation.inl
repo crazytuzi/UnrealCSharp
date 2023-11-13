@@ -99,12 +99,10 @@ auto TRangeBoundImplementation<T, U>::RangeBound_ExclusiveImplementation(const U
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = new T(T::Exclusive(Value));
 
-	if (OutRangeBound != nullptr)
-	{
-		*OutRangeBound = T::Exclusive(Value);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U>
@@ -116,12 +114,10 @@ auto TRangeBoundImplementation<T, U>::RangeBound_InclusiveImplementation(const U
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = new T(T::Inclusive(Value));
 
-	if (OutRangeBound != nullptr)
-	{
-		*OutRangeBound = T::Inclusive(Value);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U>
@@ -133,12 +129,10 @@ auto TRangeBoundImplementation<T, U>::RangeBound_OpenImplementation(MonoObject**
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = new T(T::Open());
 
-	if (OutRangeBound != nullptr)
-	{
-		*OutRangeBound = T::Open();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U>
@@ -154,12 +148,10 @@ auto TRangeBoundImplementation<T, U>::RangeBound_FlipInclusionImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = new T(T::FlipInclusion(*RangeBound));
 
-	if (RangeBound != nullptr && OutRangeBound != nullptr)
-	{
-		*OutRangeBound = T::FlipInclusion(*RangeBound);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U>
@@ -177,12 +169,10 @@ auto TRangeBoundImplementation<T, U>::RangeBound_MaxLowerImplementation(const FG
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = new T(T::MaxLower(*RangeBoundA, *RangeBoundB));
 
-	if (RangeBoundA != nullptr && RangeBoundB != nullptr && OutRangeBound != nullptr)
-	{
-		*OutRangeBound = T::MaxLower(*RangeBoundA, *RangeBoundB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U>
@@ -200,12 +190,10 @@ auto TRangeBoundImplementation<T, U>::RangeBound_MaxUpperImplementation(const FG
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = new T(T::MaxUpper(*RangeBoundA, *RangeBoundB));
 
-	if (RangeBoundA != nullptr && RangeBoundB != nullptr && OutRangeBound != nullptr)
-	{
-		*OutRangeBound = T::MaxUpper(*RangeBoundA, *RangeBoundB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U>
@@ -223,12 +211,10 @@ auto TRangeBoundImplementation<T, U>::RangeBound_MinLowerImplementation(const FG
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = new T(T::MinLower(*RangeBoundA, *RangeBoundB));
 
-	if (RangeBoundA != nullptr && RangeBoundB != nullptr && OutRangeBound != nullptr)
-	{
-		*OutRangeBound = T::MinLower(*RangeBoundA, *RangeBoundB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U>
@@ -246,10 +232,8 @@ auto TRangeBoundImplementation<T, U>::RangeBound_MinUpperImplementation(const FG
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRangeBound = new T(T::MinUpper(*RangeBoundA, *RangeBoundB));
 
-	if (RangeBoundA != nullptr && RangeBoundB != nullptr && OutRangeBound != nullptr)
-	{
-		*OutRangeBound = T::MinUpper(*RangeBoundA, *RangeBoundB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }

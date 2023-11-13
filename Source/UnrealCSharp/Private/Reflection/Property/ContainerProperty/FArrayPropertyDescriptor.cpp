@@ -1,21 +1,13 @@
 ﻿#include "Reflection/Property/ContainerProperty/FArrayPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FArrayHelper.h"
-#include "Template/TGetArrayLength.inl"
 #include "Bridge/FTypeBridge.h"
 
 FArrayPropertyDescriptor::FArrayPropertyDescriptor(FProperty* InProperty):
 	FContainerPropertyDescriptor(InProperty),
-	Class(nullptr),
-	Type(nullptr)
+	Class(nullptr)
 {
 	Class = FTypeBridge::GetMonoClass(ArrayProperty);
-
-	const auto FoundMonoClass = FTypeBridge::GetMonoClass(ArrayProperty->Inner);
-
-	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(FoundMonoClass);
-
-	Type = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(FoundMonoType);
 }
 
 void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
@@ -54,10 +46,7 @@ MonoObject* FArrayPropertyDescriptor::NewRef(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		auto InParams = static_cast<void*>(Type);
-
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-			Class, TGetArrayLength(InParams), &InParams);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, InAddress);
 
@@ -73,10 +62,7 @@ MonoObject* FArrayPropertyDescriptor::NewRef(void* InAddress) const
 
 MonoObject* FArrayPropertyDescriptor::NewWeakRef(void* InAddress) const
 {
-	auto InParams = static_cast<void*>(Type);
-
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-		Class, TGetArrayLength(InParams), &InParams);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 	const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, InAddress);
 

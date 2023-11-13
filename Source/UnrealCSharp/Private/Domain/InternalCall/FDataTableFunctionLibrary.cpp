@@ -42,7 +42,7 @@ bool FDataTableFunctionLibraryImplementation::DataTableFunctionLibrary_GetDataTa
 			DataTable->RowStruct))
 #endif
 		{
-			*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(ClassDescriptor->GetMonoClass());
+			*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(ClassDescriptor->GetMonoClass());
 
 			const auto FindRowData = *DataTable->GetRowMap().Find(InRowName);
 

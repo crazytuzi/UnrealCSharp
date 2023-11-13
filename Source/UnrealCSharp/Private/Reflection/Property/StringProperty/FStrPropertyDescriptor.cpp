@@ -16,7 +16,7 @@ void FStrPropertyDescriptor::Get(void* Src, void** Dest) const
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*StrProperty->GetPropertyValue(Src))));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			Class, 1, &NewMonoString);
 
 		*Dest = NewMonoObject;

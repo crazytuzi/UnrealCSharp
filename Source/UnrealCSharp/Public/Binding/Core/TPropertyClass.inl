@@ -286,7 +286,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 
 		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 1, FoundValueReflectionType);
 
-		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, ReflectionTypeMonoArray, ReflectionTypeMonoArray);
+		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, ReflectionTypeMonoArray);
 	}
 };
 
@@ -312,7 +312,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 
 		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
 
-		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass, ReflectionTypeMonoArray);
+		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
 };
 
@@ -351,7 +351,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 
 		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
 
-		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass, ReflectionTypeMonoArray);
+		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
 };
 

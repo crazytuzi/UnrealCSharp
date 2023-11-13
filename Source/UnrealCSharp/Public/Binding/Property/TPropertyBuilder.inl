@@ -100,8 +100,8 @@ struct TParentPropertyBuilder<Class, Result, Member, std::enable_if_t<std::is_sa
 	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
 		*OutValue = TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member),
-														InGarbageCollectionHandle,
-														false);
+		                                                InGarbageCollectionHandle,
+		                                                false);
 	}
 };
 
@@ -317,61 +317,61 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSoftClassP
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, uint8>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, uint8>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, uint16>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, uint16>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, uint32>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, uint32>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, uint64>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, uint64>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, int8>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, int8>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, int16>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, int16>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, int32>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, int32>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, int64>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, int64>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, bool>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, bool>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, float>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, float>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
@@ -379,120 +379,120 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result,
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member,
                         std::enable_if_t<
-	                        std::is_base_of_v<UObject, std::remove_pointer_t<Result>> &&
-	                        !std::is_same_v<std::remove_pointer_t<Result>, UClass>>> :
+	                        std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<Result>>> &&
+	                        !std::is_same_v<std::remove_pointer_t<std::decay_t<Result>>, UClass>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 #if UE_OBJECT_PTR
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTObjectPtr<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTObjectPtr<std::decay_t<Result>>::Value>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 #endif
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, FName>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FName>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTScriptInterface<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTScriptInterface<std::decay_t<Result>>::Value>> :
 	TMultiPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsUStruct<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsUStruct<std::decay_t<Result>>::Value>> :
 	TParentPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, FString>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FString>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, FText>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FText>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTWeakObjectPtr<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<Result>>::Value>> :
 	TMultiPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTLazyObjectPtr<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<Result>>::Value>> :
 	TMultiPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftObjectPtr<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<Result>>::Value>> :
 	TMultiPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<Result, double>>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, double>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTMap<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTMap<std::decay_t<Result>>::Value>> :
 	TContainerPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSet<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSet<std::decay_t<Result>>::Value>> :
 	TContainerPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSubclassOf<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSubclassOf<std::decay_t<Result>>::Value>> :
 	TMultiPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member,
-                        std::enable_if_t<std::is_same_v<std::remove_pointer_t<Result>, UClass>>> :
+                        std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<Result>>, UClass>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTArray<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTArray<std::decay_t<Result>>::Value>> :
 	TContainerPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member,
-                        std::enable_if_t<TIsEnum<Result>::Value && !TIsNotUEnum<Result>::Value>> :
+                        std::enable_if_t<TIsEnum<Result>::Value && !TIsNotUEnum<std::decay_t<Result>>::Value>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTEnumAsByte<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTEnumAsByte<std::decay_t<Result>>::Value>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftClassPtr<Result>::Value>> :
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<Result>>::Value>> :
 	TMultiPropertyBuilder<void, Result, Member>
 {
 };

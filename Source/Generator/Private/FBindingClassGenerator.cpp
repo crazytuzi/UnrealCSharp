@@ -37,23 +37,6 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 	FString GCHandleContent;
 
-	if (!InClass.IsReflection())
-	{
-		FunctionContent = FString::Printf(TEXT(
-			"\t\tprotected %s(Type InValue)%s\n"
-			"\t\t{\n"
-			"\t\t}\n"
-		),
-		                                  *FullClassContent,
-		                                  InClass.GetBase().IsEmpty()
-			                                  ? TEXT("")
-			                                  : *FString::Printf(TEXT(
-				                                  " : base(typeof(%s))"
-			                                  ),
-			                                                     *FullClassContent
-			                                  ));
-	}
-
 	for (const auto& Property : InClass.GetProperties())
 	{
 		UsingNameSpaces.Append(Property.GetNameSpace());
@@ -214,18 +197,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 			}
 		}
 
-		FString Base;
-
-		if (!InClass.IsReflection() && !InClass.GetBase().IsEmpty() && Function.IsConstructor())
-		{
-			Base = FString::Printf(TEXT(
-				" : base(typeof(%s))"
-			),
-			                       *FullClassContent);
-		}
-
 		auto FunctionDeclaration = FString::Printf(TEXT(
-			"%s%s%s%s%s%s%s(%s)%s"
+			"%s%s%s%s%s%s%s(%s)"
 		),
 		                                           Function.IsDestructor() == true
 			                                           ? TEXT("")
@@ -240,8 +213,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 			                                           ? TEXT("")
 			                                           : TEXT(" "),
 		                                           *Function.GetFunctionName(),
-		                                           *FunctionDeclarationBody,
-		                                           *Base
+		                                           *FunctionDeclarationBody
 		);
 
 		auto FunctionCallBody = FString::Printf(TEXT(
@@ -301,6 +273,19 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		                                                  FunctionReturnParamBody.IsEmpty() ? TEXT("") : TEXT("\n"),
 		                                                  *FunctionReturnParamBody
 		);
+
+		if (Function.IsConstructor())
+		{
+			FunctionImplementationBody = FString::Printf(TEXT(
+				"\t\t\tif (GetType() == typeof(%s))\n"
+				"\t\t\t{\n"
+				"\t%s"
+				"\t\t\t}\n"
+			),
+			                                             *FullClassContent,
+			                                             *FunctionImplementationBody
+			);
+		}
 
 		FunctionContent += FString::Printf(TEXT(
 			"%s"

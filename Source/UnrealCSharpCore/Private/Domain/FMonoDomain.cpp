@@ -74,46 +74,25 @@ void FMonoDomain::Deinitialize()
 
 MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass)
 {
-	if (Domain != nullptr && InMonoClass != nullptr)
+	return Domain != nullptr && InMonoClass != nullptr ? mono_object_new(Domain, InMonoClass) : nullptr;
+}
+
+MonoObject* FMonoDomain::Object_Init(MonoClass* InMonoClass, const int32 InParamCount, void** InParams)
+{
+	if (const auto NewMonoObject = Object_New(InMonoClass))
 	{
-		if (const auto NewMonoObject = mono_object_new(Domain, InMonoClass))
+		if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_OBJECT_CONSTRUCTOR,
+		                                                        InParamCount))
 		{
-			Runtime_Object_Init(NewMonoObject);
+			Runtime_Invoke(FoundMethod, NewMonoObject, InParams);
 
 			return NewMonoObject;
 		}
+
+		// @TODO
 	}
 
 	return nullptr;
-}
-
-MonoObject* FMonoDomain::Object_New(MonoClass* InMonoClass, const int32 InParamCount, void** InParams)
-{
-	if (Domain != nullptr && InMonoClass != nullptr)
-	{
-		if (const auto NewMonoObject = mono_object_new(Domain, InMonoClass))
-		{
-			if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_OBJECT_CONSTRUCTOR,
-			                                                        InParamCount))
-			{
-				Runtime_Invoke(FoundMethod, NewMonoObject, InParams);
-
-				return NewMonoObject;
-			}
-
-			// @TODO
-		}
-	}
-
-	return nullptr;
-}
-
-void FMonoDomain::Runtime_Object_Init(MonoObject* InMonoObject)
-{
-	if (InMonoObject != nullptr)
-	{
-		mono_runtime_object_init(InMonoObject);
-	}
 }
 
 MonoVTable* FMonoDomain::Class_VTable(MonoClass* InMonoClass)

@@ -67,12 +67,10 @@ void FTimespanImplementation::Timespan_AddImplementation(const FGarbageCollectio
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(TimespanA->operator+(*TimespanB));
 
-	if (TimespanA != nullptr && TimespanB != nullptr && OutTimespan != nullptr)
-	{
-		*OutTimespan = TimespanA->operator+(*TimespanB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_NegatedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -87,12 +85,10 @@ void FTimespanImplementation::Timespan_NegatedImplementation(const FGarbageColle
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(Timespan->operator-());
 
-	if (Timespan != nullptr && OutTimespan != nullptr)
-	{
-		*OutTimespan = Timespan->operator-();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_SubtractImplementation(const FGarbageCollectionHandle A,
@@ -108,12 +104,10 @@ void FTimespanImplementation::Timespan_SubtractImplementation(const FGarbageColl
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(TimespanA->operator-(*TimespanB));
 
-	if (TimespanA != nullptr && TimespanB != nullptr && OutTimespan != nullptr)
-	{
-		*OutTimespan = TimespanA->operator-(*TimespanB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_MultiplyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -128,12 +122,10 @@ void FTimespanImplementation::Timespan_MultiplyImplementation(const FGarbageColl
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(Timespan->operator*(Scalar));
 
-	if (Timespan != nullptr && OutTimespan != nullptr)
-	{
-		*OutTimespan = Timespan->operator*(Scalar);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_DivideImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -148,12 +140,10 @@ void FTimespanImplementation::Timespan_DivideImplementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(Timespan->operator/(Scalar));
 
-	if (Timespan != nullptr && OutTimespan != nullptr)
-	{
-		*OutTimespan = Timespan->operator/(Scalar);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_RemainderImplementation(const FGarbageCollectionHandle A,
@@ -169,12 +159,10 @@ void FTimespanImplementation::Timespan_RemainderImplementation(const FGarbageCol
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(TimespanA->operator%(*TimespanB));
 
-	if (TimespanA != nullptr && TimespanB != nullptr && OutTimespan != nullptr)
-	{
-		*OutTimespan = TimespanA->operator%(*TimespanB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 bool FTimespanImplementation::Timespan_GreaterThanImplementation(const FGarbageCollectionHandle A,
@@ -262,12 +250,10 @@ void FTimespanImplementation::Timespan_GetDurationImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(Timespan->GetDuration());
 
-	if (Timespan != nullptr && OutTimespan != nullptr)
-	{
-		*OutTimespan = Timespan->GetDuration();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 int32 FTimespanImplementation::Timespan_GetFractionMicroImplementation(
@@ -492,7 +478,7 @@ void FTimespanImplementation::Timespan_ToStringImplementation(const FGarbageColl
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -507,12 +493,10 @@ void FTimespanImplementation::Timespan_FromDaysImplementation(const double Days,
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::FromDays(Days));
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::FromDays(Days);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_FromHoursImplementation(const double Hours, MonoObject** OutValue)
@@ -523,12 +507,10 @@ void FTimespanImplementation::Timespan_FromHoursImplementation(const double Hour
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::FromHours(Hours));
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::FromHours(Hours);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_FromMicrosecondsImplementation(const double Microseconds, MonoObject** OutValue)
@@ -539,12 +521,10 @@ void FTimespanImplementation::Timespan_FromMicrosecondsImplementation(const doub
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::FromMicroseconds(Microseconds));
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::FromMicroseconds(Microseconds);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_FromMillisecondsImplementation(const double Milliseconds, MonoObject** OutValue)
@@ -555,12 +535,10 @@ void FTimespanImplementation::Timespan_FromMillisecondsImplementation(const doub
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::FromMilliseconds(Milliseconds));
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::FromMilliseconds(Milliseconds);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_FromMinutesImplementation(const double Minutes, MonoObject** OutValue)
@@ -571,12 +549,10 @@ void FTimespanImplementation::Timespan_FromMinutesImplementation(const double Mi
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::FromMinutes(Minutes));
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::FromMinutes(Minutes);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_FromSecondsImplementation(const double Seconds, MonoObject** OutValue)
@@ -587,12 +563,10 @@ void FTimespanImplementation::Timespan_FromSecondsImplementation(const double Se
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::FromSeconds(Seconds));
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::FromSeconds(Seconds);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_MaxValueImplementation(MonoObject** OutValue)
@@ -603,12 +577,10 @@ void FTimespanImplementation::Timespan_MaxValueImplementation(MonoObject** OutVa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::MaxValue());
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::MaxValue();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 void FTimespanImplementation::Timespan_MinValueImplementation(MonoObject** OutValue)
@@ -619,12 +591,10 @@ void FTimespanImplementation::Timespan_MinValueImplementation(MonoObject** OutVa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::MinValue());
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::MinValue();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }
 
 bool FTimespanImplementation::Timespan_ParseImplementation(MonoObject* TimespanString, MonoObject** OutValue)
@@ -635,17 +605,15 @@ bool FTimespanImplementation::Timespan_ParseImplementation(MonoObject* TimespanS
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::MinValue());
 
-	if (OutTimespan != nullptr)
-	{
-		return FTimespan::Parse(
-			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-					GetDomain()->Object_To_String(TimespanString, nullptr))), *OutTimespan);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 
-	return false;
+	return FTimespan::Parse(
+		UTF8_TO_TCHAR(
+			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
+				GetDomain()->Object_To_String(TimespanString, nullptr))), *OutTimespan);
 }
 
 double FTimespanImplementation::Timespan_RatioImplementation(const MonoObject* Dividend, const MonoObject* Divisor)
@@ -670,10 +638,8 @@ void FTimespanImplementation::Timespan_ZeroImplementation(MonoObject** OutValue)
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTimespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(NewMonoObject);
+	const auto OutTimespan = new FTimespan(FTimespan::Zero());
 
-	if (OutTimespan != nullptr)
-	{
-		*OutTimespan = FTimespan::Zero();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
+	                                                        NewMonoObject);
 }

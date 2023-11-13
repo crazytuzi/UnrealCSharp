@@ -10,10 +10,6 @@ namespace Script.Common
     {
         public TArray() => ArrayUtils.Array_Register(this);
 
-        public TArray(Type InValue)
-        {
-        }
-
         ~TArray() => ArrayUtils.Array_UnRegister(GetHandle());
 
         public static Boolean operator ==(TArray<T> A, TArray<T> B) =>

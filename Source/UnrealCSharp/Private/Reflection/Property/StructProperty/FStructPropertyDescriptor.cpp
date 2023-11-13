@@ -1,7 +1,6 @@
 ﻿#include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
-#include "Template/TGetArrayLength.inl"
 
 FStructPropertyDescriptor::FStructPropertyDescriptor(FProperty* InProperty):
 	FPropertyDescriptor(InProperty),
@@ -58,10 +57,7 @@ MonoObject* FStructPropertyDescriptor::NewRef(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		auto InParams = static_cast<void*>(Class);
-
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-			Class, TGetArrayLength(InParams), &InParams);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, StructProperty);
@@ -75,10 +71,7 @@ MonoObject* FStructPropertyDescriptor::NewRef(void* InAddress) const
 
 MonoObject* FStructPropertyDescriptor::NewWeakRef(const void* InAddress) const
 {
-	auto InParams = static_cast<void*>(Class);
-
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-		Class, TGetArrayLength(InParams), &InParams);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 	FCSharpEnvironment::GetEnvironment().AddStructReference(StructProperty->Struct, InAddress, Object, false);
 

@@ -10,10 +10,6 @@ namespace Script.Common
     {
         public TSet() => SetUtils.Set_Register(this);
 
-        public TSet(Type InValue)
-        {
-        }
-
         ~TSet() => SetUtils.Set_UnRegister(GetHandle());
 
         [Obsolete("It is not supported like UE.", true)]

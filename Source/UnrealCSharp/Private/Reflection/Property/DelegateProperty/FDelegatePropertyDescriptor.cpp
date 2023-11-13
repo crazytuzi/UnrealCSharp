@@ -2,7 +2,6 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Bridge/FTypeBridge.h"
-#include "Template/TGetArrayLength.inl"
 
 FDelegatePropertyDescriptor::FDelegatePropertyDescriptor(FProperty* InProperty):
 	FPropertyDescriptor(InProperty),
@@ -58,10 +57,7 @@ MonoObject* FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 		const auto DelegateHelper = new FDelegateHelper(DelegateProperty->GetPropertyValuePtr(InAddress),
 		                                                DelegateProperty->SignatureFunction);
 
-		auto InParams = static_cast<void*>(Type);
-
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-			Class, TGetArrayLength(InParams), &InParams);
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, DelegateProperty);
@@ -78,10 +74,7 @@ MonoObject* FDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
 	const auto DelegateHelper = new FDelegateHelper(DelegateProperty->GetPropertyValuePtr(InAddress),
 	                                                DelegateProperty->SignatureFunction);
 
-	auto InParams = static_cast<void*>(Type);
-
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-		Class, TGetArrayLength(InParams), &InParams);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 	FCSharpEnvironment::GetEnvironment().AddDelegateReference(InAddress, DelegateHelper, Object);
 

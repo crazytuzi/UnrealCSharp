@@ -136,12 +136,10 @@ void FRandomStreamImplementation::RandomStream_GetUnitVectorImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(RandomStream->GetUnitVector());
 
-	if (RandomStream != nullptr && OutVector != nullptr)
-	{
-		*OutVector = RandomStream->GetUnitVector();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 int32 FRandomStreamImplementation::RandomStream_GetCurrentSeedImplementation(
@@ -226,12 +224,10 @@ void FRandomStreamImplementation::RandomStream_VRandImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(RandomStream->VRand());
 
-	if (RandomStream != nullptr && OutVector != nullptr)
-	{
-		*OutVector = RandomStream->VRand();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FRandomStreamImplementation::RandomStream_VRandConeHalfAngleImplementation(
@@ -249,12 +245,10 @@ void FRandomStreamImplementation::RandomStream_VRandConeHalfAngleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(RandomStream->VRandCone(*Vector, ConeHalfAngleRad));
 
-	if (RandomStream != nullptr && OutVector != nullptr)
-	{
-		*OutVector = RandomStream->VRandCone(*Vector, ConeHalfAngleRad);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHalfAngleImplementation(
@@ -272,12 +266,11 @@ void FRandomStreamImplementation::RandomStream_VRandConeHorizontalAndVerticalHal
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(
+		RandomStream->VRandCone(*Vector, HorizontalConeHalfAngleRad, VerticalConeHalfAngleRad));
 
-	if (RandomStream != nullptr && OutVector != nullptr)
-	{
-		*OutVector = RandomStream->VRandCone(*Vector, HorizontalConeHalfAngleRad, VerticalConeHalfAngleRad);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FRandomStreamImplementation::RandomStream_ToStringImplementation(
@@ -295,7 +288,7 @@ void FRandomStreamImplementation::RandomStream_ToStringImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;

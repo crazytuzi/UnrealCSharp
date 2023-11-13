@@ -84,12 +84,10 @@ void FVector4Implementation::Vector4_NegatedImplementation(const FGarbageCollect
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4->operator-());
 
-	if (Vector4 != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4->operator-();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_AddImplementation(const FGarbageCollectionHandle A,
@@ -105,12 +103,10 @@ void FVector4Implementation::Vector4_AddImplementation(const FGarbageCollectionH
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4A->operator+(*Vector4B));
 
-	if (Vector4A != nullptr && Vector4B != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4A->operator+(*Vector4B);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_SubtractImplementation(const FGarbageCollectionHandle A,
@@ -126,12 +122,10 @@ void FVector4Implementation::Vector4_SubtractImplementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4A->operator-(*Vector4B));
 
-	if (Vector4A != nullptr && Vector4B != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4A->operator-(*Vector4B);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_MultiplyScaleImplementation(
@@ -146,12 +140,10 @@ void FVector4Implementation::Vector4_MultiplyScaleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4->operator*(Scale));
 
-	if (Vector4 != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4->operator*(Scale);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_DivideScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -166,12 +158,10 @@ void FVector4Implementation::Vector4_DivideScaleImplementation(const FGarbageCol
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4->operator/(Scale));
 
-	if (Vector4 != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4->operator/(Scale);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_DivideImplementation(const FGarbageCollectionHandle A,
@@ -187,12 +177,10 @@ void FVector4Implementation::Vector4_DivideImplementation(const FGarbageCollecti
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4A->operator/(*Vector4B));
 
-	if (Vector4A != nullptr && Vector4B != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4A->operator/(*Vector4B);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_MultiplyImplementation(const FGarbageCollectionHandle A,
@@ -208,12 +196,10 @@ void FVector4Implementation::Vector4_MultiplyImplementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4A->operator*(*Vector4B));
 
-	if (Vector4A != nullptr && Vector4B != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4A->operator*(*Vector4B);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 FVector4Implementation::LwcType FVector4Implementation::Vector4_Dot3Implementation(
@@ -259,12 +245,10 @@ void FVector4Implementation::Vector4_CrossProductImplementation(const FGarbageCo
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4A->operator^(*Vector4B));
 
-	if (Vector4A != nullptr && Vector4B != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4A->operator^(*Vector4B);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 FVector4Implementation::LwcType FVector4Implementation::Vector4_ComponentImplementation(
@@ -325,7 +309,7 @@ void FVector4Implementation::Vector4_ToStringImplementation(const FGarbageCollec
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -360,12 +344,10 @@ void FVector4Implementation::Vector4_GetSafeNormalImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4->GetSafeNormal(Tolerance));
 
-	if (Vector4 != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4->GetSafeNormal(Tolerance);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_GetUnsafeNormal3Implementation(
@@ -380,12 +362,10 @@ void FVector4Implementation::Vector4_GetUnsafeNormal3Implementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4->GetUnsafeNormal3());
 
-	if (Vector4 != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4->GetUnsafeNormal3();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_ToOrientationRotatorImplementation(
@@ -400,12 +380,10 @@ void FVector4Implementation::Vector4_ToOrientationRotatorImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(NewMonoObject);
+	const auto OutRotator = new FRotator(Vector4->ToOrientationRotator());
 
-	if (Vector4 != nullptr && OutRotator != nullptr)
-	{
-		*OutRotator = Vector4->ToOrientationRotator();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FRotator>::Get(), OutRotator,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_ToOrientationQuatImplementation(
@@ -420,12 +398,10 @@ void FVector4Implementation::Vector4_ToOrientationQuatImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Vector4->ToOrientationQuat());
 
-	if (Vector4 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Vector4->ToOrientationQuat();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_RotationImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -440,12 +416,10 @@ void FVector4Implementation::Vector4_RotationImplementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(NewMonoObject);
+	const auto OutRotator = new FRotator(Vector4->Rotation());
 
-	if (Vector4 != nullptr && OutRotator != nullptr)
-	{
-		*OutRotator = Vector4->Rotation();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FRotator>::Get(), OutRotator,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -558,12 +532,10 @@ void FVector4Implementation::Vector4_Reflect3Implementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Vector4->Reflect3(*Vector4Normal));
 
-	if (Vector4 != nullptr && Vector4Normal != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Vector4->Reflect3(*Vector4Normal);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FVector4Implementation::Vector4_FindBestAxisVectors3Implementation(
@@ -578,18 +550,19 @@ void FVector4Implementation::Vector4_FindBestAxisVectors3Implementation(
 
 	*Axis1 = NewMonoObject1;
 
-	const auto OutAxis1Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FVector4>(NewMonoObject1);
+	const auto OutAxis1Vector4 = new FVector4();
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutAxis1Vector4,
+	                                                        NewMonoObject1);
 
 	const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*Axis2 = NewMonoObject2;
 
-	const auto OutAxis2Vector4 = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FVector4>(NewMonoObject2);
+	const auto OutAxis2Vector4 = new FVector4();
 
-	if (Vector4 != nullptr && OutAxis1Vector4 != nullptr && OutAxis2Vector4 != nullptr)
-	{
-		Vector4->FindBestAxisVectors3(*OutAxis1Vector4, *OutAxis2Vector4);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutAxis2Vector4,
+	                                                        NewMonoObject2);
+
+	Vector4->FindBestAxisVectors3(*OutAxis1Vector4, *OutAxis2Vector4);
 }

@@ -131,7 +131,7 @@ void FTransformImplementation::Transform_ToHumanReadableStringImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -153,7 +153,7 @@ void FTransformImplementation::Transform_ToStringImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -188,12 +188,10 @@ void FTransformImplementation::Transform_ToMatrixWithScaleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutMatrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(NewMonoObject);
+	const auto OutMatrix = new FMatrix(Transform->ToMatrixWithScale());
 
-	if (Transform != nullptr && OutMatrix != nullptr)
-	{
-		*OutMatrix = Transform->ToMatrixWithScale();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FMatrix>::Get(), OutMatrix,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_ToInverseMatrixWithScaleImplementation(
@@ -208,12 +206,10 @@ void FTransformImplementation::Transform_ToInverseMatrixWithScaleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutMatrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(NewMonoObject);
+	const auto OutMatrix = new FMatrix(Transform->ToInverseMatrixWithScale());
 
-	if (Transform != nullptr && OutMatrix != nullptr)
-	{
-		*OutMatrix = Transform->ToInverseMatrixWithScale();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FMatrix>::Get(), OutMatrix,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_InverseImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -228,13 +224,10 @@ void FTransformImplementation::Transform_InverseImplementation(const FGarbageCol
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform(Transform->Inverse());
 
-	if (Transform != nullptr && OutTransform != nullptr)
-	{
-		*OutTransform = Transform->Inverse();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_ToMatrixNoScaleImplementation(
@@ -249,12 +242,10 @@ void FTransformImplementation::Transform_ToMatrixNoScaleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutMatrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(NewMonoObject);
+	const auto OutTransform = new FTransform(Transform->ToMatrixNoScale());
 
-	if (Transform != nullptr && OutMatrix != nullptr)
-	{
-		*OutMatrix = Transform->ToMatrixNoScale();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_BlendImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -302,13 +293,10 @@ void FTransformImplementation::Transform_AddImplementation(const FGarbageCollect
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform(TransformA->operator+(*TransformB));
 
-	if (TransformA != nullptr && TransformB != nullptr && OutTransform != nullptr)
-	{
-		*OutTransform = TransformA->operator+(*TransformB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_MultiplyImplementation(const FGarbageCollectionHandle A,
@@ -324,13 +312,10 @@ void FTransformImplementation::Transform_MultiplyImplementation(const FGarbageCo
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform(TransformA->operator*(*TransformB));
 
-	if (TransformA != nullptr && TransformB != nullptr && OutTransform != nullptr)
-	{
-		*OutTransform = TransformA->operator*(*TransformB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_MultiplyQuatImplementation(const FGarbageCollectionHandle A,
@@ -346,13 +331,10 @@ void FTransformImplementation::Transform_MultiplyQuatImplementation(const FGarba
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform(Transform->operator*(*Quat));
 
-	if (Transform != nullptr && Quat != nullptr && OutTransform != nullptr)
-	{
-		*OutTransform = Transform->operator*(*Quat);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 bool FTransformImplementation::Transform_AnyHasNegativeScaleImplementation(
@@ -451,13 +433,10 @@ void FTransformImplementation::Transform_GetRelativeTransformImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform(Transform->GetRelativeTransform(*TransformOther));
 
-	if (Transform != nullptr && TransformOther != nullptr && OutTransform != nullptr)
-	{
-		*OutTransform = Transform->GetRelativeTransform(*TransformOther);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_GetRelativeTransformReverseImplementation(
@@ -474,13 +453,10 @@ void FTransformImplementation::Transform_GetRelativeTransformReverseImplementati
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform(Transform->GetRelativeTransformReverse(*TransformOther));
 
-	if (Transform != nullptr && TransformOther != nullptr && OutTransform != nullptr)
-	{
-		*OutTransform = Transform->GetRelativeTransformReverse(*TransformOther);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_SetToRelativeTransformImplementation(
@@ -512,12 +488,10 @@ void FTransformImplementation::Transform_TransformFVector4Implementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Transform->TransformFVector4(*Vector4));
 
-	if (Transform != nullptr && Vector4 != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Transform->TransformFVector4(*Vector4);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_TransformFVector4NoScaleImplementation(
@@ -534,12 +508,10 @@ void FTransformImplementation::Transform_TransformFVector4NoScaleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector4 = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector4>(NewMonoObject);
+	const auto OutVector4 = new FVector4(Transform->TransformFVector4NoScale(*Vector4));
 
-	if (Transform != nullptr && Vector4 != nullptr && OutVector4 != nullptr)
-	{
-		*OutVector4 = Transform->TransformFVector4NoScale(*Vector4);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector4>::Get(), OutVector4,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_TransformPositionImplementation(
@@ -556,12 +528,10 @@ void FTransformImplementation::Transform_TransformPositionImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->TransformPosition(*Vector));
 
-	if (Transform != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->TransformPosition(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_TransformPositionNoScaleImplementation(
@@ -578,12 +548,10 @@ void FTransformImplementation::Transform_TransformPositionNoScaleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->TransformPositionNoScale(*Vector));
 
-	if (Transform != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->TransformPositionNoScale(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_InverseTransformPositionNoScaleImplementation(
@@ -600,12 +568,10 @@ void FTransformImplementation::Transform_InverseTransformPositionNoScaleImplemen
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->InverseTransformPositionNoScale(*Vector));
 
-	if (Transform != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->InverseTransformPositionNoScale(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_TransformVectorImplementation(
@@ -622,12 +588,10 @@ void FTransformImplementation::Transform_TransformVectorImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->TransformVector(*Vector));
 
-	if (Transform != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->TransformVector(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_TransformVectorNoScaleImplementation(
@@ -644,12 +608,10 @@ void FTransformImplementation::Transform_TransformVectorNoScaleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->TransformVectorNoScale(*Vector));
 
-	if (Transform != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->TransformVectorNoScale(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_InverseTransformVectorImplementation(
@@ -666,12 +628,10 @@ void FTransformImplementation::Transform_InverseTransformVectorImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->InverseTransformVector(*Vector));
 
-	if (Transform != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->InverseTransformVector(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_InverseTransformVectorNoScaleImplementation(
@@ -688,12 +648,10 @@ void FTransformImplementation::Transform_InverseTransformVectorNoScaleImplementa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->InverseTransformVectorNoScale(*Vector));
 
-	if (Transform != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->InverseTransformVectorNoScale(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_TransformRotationImplementation(
@@ -710,12 +668,10 @@ void FTransformImplementation::Transform_TransformRotationImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Transform->TransformRotation(*Quat));
 
-	if (Transform != nullptr && Quat != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Transform->TransformRotation(*Quat);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_InverseTransformRotationImplementation(
@@ -732,12 +688,10 @@ void FTransformImplementation::Transform_InverseTransformRotationImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Transform->InverseTransformRotation(*Quat));
 
-	if (Transform != nullptr && Quat != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Transform->InverseTransformRotation(*Quat);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_GetScaledScaleImplementation(
@@ -752,13 +706,10 @@ void FTransformImplementation::Transform_GetScaledScaleImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform(Transform->GetScaled(Scale));
 
-	if (Transform != nullptr && OutTransform != nullptr)
-	{
-		*OutTransform = Transform->GetScaled(Scale);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_GetScaledVectorImplementation(
@@ -775,13 +726,10 @@ void FTransformImplementation::Transform_GetScaledVectorImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform(Transform->GetScaled(*VectorScale));
 
-	if (Transform != nullptr && VectorScale != nullptr && OutTransform != nullptr)
-	{
-		*OutTransform = Transform->GetScaled(*VectorScale);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_GetSafeScaleReciprocalImplementation(
@@ -795,12 +743,10 @@ void FTransformImplementation::Transform_GetSafeScaleReciprocalImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(FTransform::GetSafeScaleReciprocal(*Vector, Tolerance));
 
-	if (Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = FTransform::GetSafeScaleReciprocal(*Vector, Tolerance);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_GetLocationImplementation(
@@ -815,12 +761,10 @@ void FTransformImplementation::Transform_GetLocationImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->GetLocation());
 
-	if (Transform != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->GetLocation();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_RotatorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -835,12 +779,10 @@ void FTransformImplementation::Transform_RotatorImplementation(const FGarbageCol
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(NewMonoObject);
+	const auto OutRotator = new FRotator(Transform->Rotator());
 
-	if (Transform != nullptr && OutRotator != nullptr)
-	{
-		*OutRotator = Transform->Rotator();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FRotator>::Get(), OutRotator,
+	                                                        NewMonoObject);
 }
 
 FTransformImplementation::LwcType FTransformImplementation::Transform_GetDeterminantImplementation(
@@ -1050,17 +992,16 @@ void FTransformImplementation::Transform_StaticMultiplyImplementation(MonoObject
 
 	*OutValue = NewMonoObject;
 
-	const auto OutTransform = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FTransform>(NewMonoObject);
+	const auto OutTransform = new FTransform();
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTransform>::Get(), OutTransform,
+	                                                        NewMonoObject);
 
 	const auto TransformA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(A);
 
 	const auto TransformB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTransform>(B);
 
-	if (OutTransform != nullptr && TransformA != nullptr && TransformB != nullptr)
-	{
-		FTransform::Multiply(OutTransform, TransformA, TransformB);
-	}
+	FTransform::Multiply(OutTransform, TransformA, TransformB);
 }
 
 void FTransformImplementation::Transform_SetComponentsImplementation(
@@ -1180,12 +1121,10 @@ void FTransformImplementation::Transform_AddTranslationsImplementation(const FGa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(FTransform::AddTranslations(*TransformA, *TransformB));
 
-	if (TransformA != nullptr && TransformB != nullptr && OutVector != nullptr)
-	{
-		*OutVector = FTransform::AddTranslations(*TransformA, *TransformB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_SubtractTranslationsImplementation(
@@ -1201,12 +1140,10 @@ void FTransformImplementation::Transform_SubtractTranslationsImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(FTransform::SubtractTranslations(*TransformA, *TransformB));
 
-	if (TransformA != nullptr && TransformB != nullptr && OutVector != nullptr)
-	{
-		*OutVector = FTransform::SubtractTranslations(*TransformA, *TransformB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_SetRotationImplementation(
@@ -1336,12 +1273,10 @@ void FTransformImplementation::Transform_GetRotationImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Transform->GetRotation());
 
-	if (Transform != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Transform->GetRotation();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_GetTranslationImplementation(
@@ -1356,12 +1291,10 @@ void FTransformImplementation::Transform_GetTranslationImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->GetTranslation());
 
-	if (Transform != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->GetTranslation();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_GetScale3DImplementation(
@@ -1376,12 +1309,10 @@ void FTransformImplementation::Transform_GetScale3DImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Transform->GetScale3D());
 
-	if (Transform != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Transform->GetScale3D();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FTransformImplementation::Transform_CopyRotationPartImplementation(
