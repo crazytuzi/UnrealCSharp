@@ -39,9 +39,6 @@ public:
 	FClassBuilder& Function(const FString& InName, const TArray<void*>& InMethod);
 #endif
 
-	void Register();
-
-protected:
 #if WITH_FUNCTION_INFO
 	FClassBuilder& Function(const FString& InName, const FString& InImplementationName,
 	                        const void* InMethod, FFunctionInfo* InFunctionInfo = nullptr,
@@ -51,6 +48,9 @@ protected:
 	                               const void* InMethod, const TArray<FString>& InParamNames = {});
 #endif
 
+	void Register();
+
+protected:
 	virtual bool IsReflection() const;
 
 	FBindingClass* GetBindingClass() const;

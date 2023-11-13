@@ -236,7 +236,7 @@ struct TIsNotUEnum<Class> \
 #define BINDING_READONLY_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), nullptr
 #endif
 
-#define BINDING_FUNCTION_BUILDER_INVOKE(Function) TFunctionPointer(&TFunctionBuilder<decltype(Function), Function>::Invoke).Value.Pointer
+#define BINDING_FUNCTION_BUILDER_INVOKE(Function) TFunctionPointer<decltype(&TFunctionBuilder<decltype(Function), Function>::Invoke)>(&TFunctionBuilder<decltype(Function), Function>::Invoke).Value.Pointer
 
 #define BINDING_FUNCTION_BUILDER_INFO(Function) TFunctionBuilder<decltype(Function), Function>::Info()
 
@@ -246,7 +246,7 @@ struct TIsNotUEnum<Class> \
 #define BINDING_FUNCTION(Function) BINDING_FUNCTION_BUILDER_INVOKE(Function)
 #endif
 
-#define BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function) TFunctionPointer(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
+#define BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function) TFunctionPointer<decltype(&TFunctionBuilder<Signature, Function>::Invoke)>(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
 
 #define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function) TFunctionBuilder<Signature, Function>::Info()
 
@@ -292,33 +292,34 @@ struct TIsNotUEnum<Class> \
 #define BINDING_OPERATOR(Signature, Function) BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function)
 #endif
 
-#define OPERATOR_BUILDER(Name, Signature) \
+#define OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
 TClassBuilder& Name() \
 { \
-	return Name(BINDING_OPERATOR(Signature, &Name##Implementation));\
+	Function(FunctionName, ImplementationName, BINDING_FUNCTION(&Name##Implementation)); \
+	return *this; \
 }
 
-#define PREFIX_UNARY_CONST_OPERATOR(Name, Signature, Operator) \
+#define PREFIX_UNARY_CONST_OPERATOR(Name, FunctionName, ImplementationName, Operator) \
 public: \
-OPERATOR_BUILDER(Name, Signature) \
+OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
 private: \
 static auto Name##Implementation(const T& In) \
 { \
 	return Operator In; \
 }
 
-#define PREFIX_UNARY_OPERATOR(Name, Signature, Operator) \
+#define PREFIX_UNARY_OPERATOR(Name, FunctionName, ImplementationName, Operator) \
 public: \
-OPERATOR_BUILDER(Name, Signature) \
+OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
 private: \
 static T& Name##Implementation(T& In) \
 { \
 	return Operator In; \
 }
 
-#define BINARY_OPERATOR(Name, Signature, Operator) \
+#define BINARY_OPERATOR(Name, FunctionName, ImplementationName, Operator) \
 public: \
-OPERATOR_BUILDER(Name, Signature) \
+OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
 private: \
 static auto Name##Implementation(const T& InA, const T& InB) \
 { \

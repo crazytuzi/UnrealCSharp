@@ -40,14 +40,6 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<void*
 	return *this;
 }
 
-void FClassBuilder::Register()
-{
-	for (const auto& Iterator : Functions)
-	{
-		FBinding::Get().RegisterBinding(Iterator.Key.GetFunctionImplementationName(), Iterator.Value);
-	}
-}
-
 #if WITH_FUNCTION_INFO
 FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
                                        const void* InMethod, FFunctionInfo* InFunctionInfo,
@@ -72,6 +64,14 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InI
 	                  }, InMethod);
 
 	return *this;
+}
+
+void FClassBuilder::Register()
+{
+	for (const auto& Iterator : Functions)
+	{
+		FBinding::Get().RegisterBinding(Iterator.Key.GetFunctionImplementationName(), Iterator.Value);
+	}
 }
 
 bool FClassBuilder::IsReflection() const

@@ -6,6 +6,10 @@ struct FRegisterAssetBundleEntry
 	FRegisterAssetBundleEntry()
 	{
 		TReflectionClassBuilder<FAssetBundleEntry>(NAMESPACE_BINDING)
+			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, FAssetBundleEntry),
+			             {"OldEntry"})
+			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, FName),
+			             {"InBundleName"})
 			.Function("IsValid", BINDING_FUNCTION(&FAssetBundleEntry::IsValid))
 			.Register();
 	}
