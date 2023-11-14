@@ -173,14 +173,6 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 	static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
-{ \
-	static TArray<FString> Get() \
-	{ \
-		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
-	} \
-}; \
-template <typename T> \
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> : \
 	TBindingEnumPropertyClass<T> \
 { \
@@ -216,6 +208,28 @@ template <> \
 struct TIsNotUEnum<Class> \
 { \
 	enum { Value = true }; \
+};
+
+#define BINDING_PROJECT_ENUM(Class) \
+BINDING_ENUM(Class) \
+template <typename T> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
+	} \
+};
+
+#define BINDING_ENGINE_ENUM(Class) \
+BINDING_ENUM(Class) \
+template <typename T> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return {static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))}; \
+	} \
 };
 
 #define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set
@@ -280,16 +294,6 @@ struct TIsNotUEnum<Class> \
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__), BINDING_DESTRUCTOR_BUILDER_INFO(##__VA_ARGS__)
 #else
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__)
-#endif
-
-#define BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function) TFunctionPointer<decltype(&TFunctionBuilder<Signature, Function>::Invoke)>(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
-
-#define BINDING_OPERATOR_BUILDER_INFO(Signature, Function) TFunctionBuilder<Signature, Function>::Info()
-
-#if WITH_FUNCTION_INFO
-#define BINDING_OPERATOR(Signature, Function) BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function), BINDING_OPERATOR_BUILDER_INFO(Signature, Function)
-#else
-#define BINDING_OPERATOR(Signature, Function) BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function)
 #endif
 
 #define OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
