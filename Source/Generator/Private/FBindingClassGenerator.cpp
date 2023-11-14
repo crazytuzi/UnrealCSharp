@@ -31,11 +31,61 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 	auto FullClassContent = InClass.GetFullClass();
 
+	FString SubscriptContent;
+
 	FString PropertyContent;
 
 	FString FunctionContent;
 
 	FString GCHandleContent;
+
+	if (InClass.GetSubscript() != nullptr)
+	{
+		UsingNameSpaces.Append(InClass.GetSubscript()->GetReturn()->GetNameSpace());
+
+		UsingNameSpaces.Append(InClass.GetSubscript()->GetParams()[0]->GetNameSpace());
+
+		auto SubscriptGetContent = FString::Printf(TEXT(
+			"\t\t\tget\n"
+			"\t\t\t{\n"
+			"\t\t\t\t%s.%s(GetHandle(), out var __ReturnValue, out var __OutValue, %s);\n\n"
+			"\t\t\t\treturn (%s)__ReturnValue;\n"
+			"\t\t\t}\n"
+		),
+		                                           *BINDING_CLASS_IMPLEMENTATION(ClassContent),
+		                                           *BINDING_COMBINE_FUNCTION(
+			                                           ClassContent,
+			                                           InClass.GetSubscript()->GetGetImplementationName()),
+		                                           *InClass.GetSubscript()->GetParamNames()[0],
+		                                           *InClass.GetSubscript()->GetReturn()->GetName()
+		);
+
+		auto SubscriptSetContent = FString::Printf(TEXT(
+			"\t\t\tset => %s.%s(GetHandle(), out var __ReturnValue, out var __OutValue, %s, value);\n"
+		),
+		                                           *BINDING_CLASS_IMPLEMENTATION(ClassContent),
+		                                           *BINDING_COMBINE_FUNCTION(
+			                                           ClassContent,
+			                                           InClass.GetSubscript()->GetSetImplementationName()),
+		                                           *InClass.GetSubscript()->GetParamNames()[0]
+		);
+
+		SubscriptContent = FString::Printf(TEXT(
+			"\t\tpublic %s %s[%s %s]\n"
+			"\t\t{\n"
+			"%s"
+			"\n"
+			"%s"
+			"\t\t}\n"
+		),
+		                                   *InClass.GetSubscript()->GetReturn()->GetName(),
+		                                   *InClass.GetSubscript()->GetFunctionName(),
+		                                   *InClass.GetSubscript()->GetParams()[0]->GetName(),
+		                                   *InClass.GetSubscript()->GetParamNames()[0],
+		                                   *SubscriptGetContent,
+		                                   *SubscriptSetContent
+		);
+	}
 
 	for (const auto& Property : InClass.GetProperties())
 	{
@@ -338,6 +388,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		"%s"
 		"%s"
 		"%s"
+		"%s"
+		"%s"
 		"\t}\n"
 		"}"
 	),
@@ -351,6 +403,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		                               ),
 		                                                  *InClass.GetBase()
 		                               ),
+	                               *SubscriptContent,
+	                               !SubscriptContent.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *PropertyContent,
 	                               !PropertyContent.IsEmpty() && !FunctionContent.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *FunctionContent,
@@ -385,6 +439,46 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 	auto ClassImplementationContent = BINDING_CLASS_IMPLEMENTATION(ClassContent);
 
 	FString FunctionContent;
+
+	if (InClass.GetSubscript() != nullptr)
+	{
+		for (auto Param : InClass.GetSubscript()->GetParams())
+		{
+			UsingNameSpaces.Append(Param->GetNameSpace());
+		}
+
+		auto FunctionDeclaration = FString::Printf(TEXT(
+			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
+			"\t\tpublic static extern void %s(IntPtr InObject, out Object ReturnValue, out Object[] OutValue, params Object[] InValue);\n"
+		),
+		                                           *BINDING_COMBINE_FUNCTION(
+			                                           ClassContent, InClass.GetSubscript()->GetGetImplementationName())
+		);
+
+		FunctionContent += FString::Printf(TEXT(
+			"%s"
+			"%s"
+		),
+		                                   FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                   *FunctionDeclaration
+		);
+
+		FunctionDeclaration = FString::Printf(TEXT(
+			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
+			"\t\tpublic static extern void %s(IntPtr InObject, out Object ReturnValue, out Object[] OutValue, params Object[] InValue);\n"
+		),
+		                                      *BINDING_COMBINE_FUNCTION(
+			                                      ClassContent, InClass.GetSubscript()->GetSetImplementationName())
+		);
+
+		FunctionContent += FString::Printf(TEXT(
+			"%s"
+			"%s"
+		),
+		                                   FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                   *FunctionDeclaration
+		);
+	}
 
 	for (const auto& Property : InClass.GetProperties())
 	{
@@ -444,8 +538,6 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 
 	for (const auto& Function : InClass.GetFunctions())
 	{
-		FString FunctionAccessSpecifiers = TEXT("public");
-
 		for (auto Param : Function.GetParams())
 		{
 			UsingNameSpaces.Append(Param->GetNameSpace());

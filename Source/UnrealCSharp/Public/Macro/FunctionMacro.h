@@ -20,6 +20,10 @@
 
 #define FUNCTION_DESTRUCTOR FString(TEXT("Destructor"))
 
+#define FUNCTION_GET_SUBSCRIPT FString(TEXT("GetSubscript"))
+
+#define FUNCTION_SET_SUBSCRIPT FString(TEXT("SetSubscript"))
+
 #define FUNCTION_LOGICAL_NOT FString(TEXT("LogicalNot"))
 
 #define FUNCTION_UNARY_PLUS FString(TEXT("UnaryPlus"))

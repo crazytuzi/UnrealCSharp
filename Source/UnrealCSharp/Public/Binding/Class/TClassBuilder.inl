@@ -66,6 +66,29 @@ public:
 		return *this;
 	}
 
+#if WITH_FUNCTION_INFO
+	TClassBuilder& Subscript(const void* InGetMethod, const void* InSetMethod,
+	                         FFunctionInfo* InFunctionInfo, const TArray<FString>& InParamNames)
+#else
+	TClassBuilder& Subscript(const void* InGetMethod, const void* InSetMethod,
+							   const TArray<FString>& InParamNames)
+#endif
+	{
+#if WITH_FUNCTION_INFO
+		if (InFunctionInfo != nullptr)
+		{
+			GetBindingClass()->BindingSubscript("this", FUNCTION_GET_SUBSCRIPT, FUNCTION_SET_SUBSCRIPT,
+			                                    InFunctionInfo, InParamNames);
+		}
+#endif
+
+		Function("this", FUNCTION_GET_SUBSCRIPT, TFunctionPointer<decltype(InGetMethod)>(InGetMethod));
+
+		Function("this", FUNCTION_SET_SUBSCRIPT, TFunctionPointer<decltype(InSetMethod)>(InSetMethod));
+
+		return *this;
+	}
+
 public:
 	PREFIX_UNARY_CONST_OPERATOR(LogicalNot, "operator !", FUNCTION_LOGICAL_NOT, !);
 

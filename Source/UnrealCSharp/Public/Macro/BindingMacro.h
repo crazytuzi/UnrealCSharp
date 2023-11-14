@@ -5,6 +5,7 @@
 #include "Binding/Function/TFunctionBuilder.inl"
 #include "Binding/Function/TConstructorBuilder.inl"
 #include "Binding/Function/TDestructorBuilder.inl"
+#include "Binding/Function/TSubscriptBuilder.inl"
 #include "Binding/Template/TClassName.inl"
 #include "Binding/Template/TClassFullName.inl"
 #include "Binding/TypeInfo/TName.inl"
@@ -294,6 +295,18 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__), BINDING_DESTRUCTOR_BUILDER_INFO(##__VA_ARGS__)
 #else
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__)
+#endif
+
+#define BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index) TFunctionPointer<decltype(&TSubscriptBuilder<T, Result, Index>::Get)>(&TSubscriptBuilder<T, Result, Index>::Get).Value.Pointer
+
+#define BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index) TFunctionPointer<decltype(&TSubscriptBuilder<T, Result, Index>::Set)>(&TSubscriptBuilder<T, Result, Index>::Set).Value.Pointer
+
+#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index) TSubscriptBuilder<T, Result, Index>::Info()
+
+#if WITH_FUNCTION_INFO
+#define BINDING_SUBSCRIPT(T, Result, Index) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index)
+#else
+#define BINDING_SUBSCRIPT(T, Result, Index) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index)
 #endif
 
 #define OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \

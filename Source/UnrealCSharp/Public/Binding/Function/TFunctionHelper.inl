@@ -5,7 +5,7 @@
 #include "TReturnValue.inl"
 #include "Environment/FCSharpEnvironment.h"
 
-inline MonoObject* Get(MonoArray* InMonoArray, const size_t InIndex)
+inline MonoObject* Array_Get(MonoArray* InMonoArray, const size_t InIndex)
 {
 	return ARRAY_GET(InMonoArray, MonoObject*, InIndex);
 }
@@ -21,7 +21,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 	template <typename Function, size_t... Index>
 	static void Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		std::tuple<TArgument<Args, Args>...> Argument(Get(InValue, Index)...);
+		std::tuple<TArgument<Args, Args>...> Argument(Array_Get(InValue, Index)...);
 
 		if constexpr (std::is_same_v<Result, void>)
 		{
@@ -45,7 +45,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			std::tuple<TArgument<Args, Args>...> Argument(Get(InValue, Index)...);
+			std::tuple<TArgument<Args, Args>...> Argument(Array_Get(InValue, Index)...);
 
 			if constexpr (std::is_same_v<Result, void>)
 			{

@@ -1,8 +1,6 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Binding/FBinding.h"
 #include "Kismet/KismetStringLibrary.h"
-#include "Macro/ClassMacro.h"
-#include "Macro/FunctionMacro.h"
 
 FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace):
 	Class(InClass),
@@ -56,12 +54,7 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InI
 	}
 #endif
 
-	Functions.Emplace(FBindingFunctionBase{
-		                  InName,
-		                  COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace),
-		                                BINDING_CLASS_IMPLEMENTATION(Class)) +
-		                  COMBINE_FUNCTION(BINDING_COMBINE_FUNCTION(Class, InImplementationName))
-	                  }, InMethod);
+	Function(InName, InImplementationName, TFunctionPointer<decltype(InMethod)>(InMethod));
 
 	return *this;
 }
