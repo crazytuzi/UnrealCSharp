@@ -86,29 +86,18 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(SuperStruct));
 
 		ConstructorContent = FString::Printf(TEXT(
-			"\t\tpublic %s() : base(typeof(%s)) => StructUtils.Struct_Register(this, \"%s\");\n"
-			"\n"
-			"\t\tprotected %s(Type InValue) : base(InValue)\n"
+			"\t\tpublic %s()\n"
 			"\t\t{\n"
 			"\t\t}\n"
 		),
-		                                     *FullClassContent,
-		                                     *FullClassContent,
-		                                     *PathNameAttributeContent,
 		                                     *FullClassContent
 		);
 	}
 	else
 	{
 		ConstructorContent = FString::Printf(TEXT(
-			"\t\tpublic %s() => StructUtils.Struct_Register(this, \"%s\");\n"
-			"\n"
-			"\t\tprotected %s(Type InValue)\n"
-			"\t\t{\n"
-			"\t\t}\n"
+			"\t\tpublic %s() => StructUtils.Struct_Register(this, Utils.GetPathName(GetType()));\n"
 		),
-		                                     *FullClassContent,
-		                                     *PathNameAttributeContent,
 		                                     *FullClassContent
 		);
 

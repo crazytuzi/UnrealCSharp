@@ -48,11 +48,7 @@ public:
 
 	static UNREALCSHARPCORE_API MonoClass* GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* InTypeMonoClass);
 
-	static UNREALCSHARPCORE_API MonoClass* GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* InTypeMonoClass,
-	                                                    MonoArray* InParamsArray);
-
-	static UNREALCSHARPCORE_API MonoClass* GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* InTypeMonoClassArray,
-	                                                    MonoArray* InParamsArray);
+	static UNREALCSHARPCORE_API MonoClass* GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* InTypeMonoClassArray);
 
 	static UNREALCSHARPCORE_API FProperty* Factory(MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
 	                                               const FName& InName, const EObjectFlags InObjectFlags);

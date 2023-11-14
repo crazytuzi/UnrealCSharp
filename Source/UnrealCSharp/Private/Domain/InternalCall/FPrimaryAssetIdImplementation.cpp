@@ -31,12 +31,12 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameNameImplement
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
-
-	*OutPrimaryAssetId = FPrimaryAssetId::ParseTypeAndName(FName(UTF8_TO_TCHAR(
+	const auto OutPrimaryAssetId = new FPrimaryAssetId(FPrimaryAssetId::ParseTypeAndName(FName(UTF8_TO_TCHAR(
 		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-			GetDomain()->Object_To_String(TypeAndName, nullptr)))));
+			GetDomain()->Object_To_String(TypeAndName, nullptr))))));
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPrimaryAssetId>::Get(), OutPrimaryAssetId,
+	                                                        NewMonoObject);
 }
 
 void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImplementation(
@@ -48,12 +48,12 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ParseTypeAndNameStringImpleme
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
-
-	*OutPrimaryAssetId = FPrimaryAssetId::ParseTypeAndName(FString(UTF8_TO_TCHAR(
+	const auto OutPrimaryAssetId = new FPrimaryAssetId(FPrimaryAssetId::ParseTypeAndName(FString(UTF8_TO_TCHAR(
 		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-			GetDomain()->Object_To_String(TypeAndName, nullptr)))));
+			GetDomain()->Object_To_String(TypeAndName, nullptr))))));
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPrimaryAssetId>::Get(), OutPrimaryAssetId,
+	                                                        NewMonoObject);
 }
 
 bool FPrimaryAssetIdImplementation::PrimaryAssetId_IsValidImplementation(
@@ -85,7 +85,7 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_ToStringImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -100,10 +100,10 @@ void FPrimaryAssetIdImplementation::PrimaryAssetId_FromStringImplementation(Mono
 
 	*OutValue = NewMonoObject;
 
-	const auto OutPrimaryAssetId = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPrimaryAssetId>(NewMonoObject);
-
-	*OutPrimaryAssetId = FPrimaryAssetId::FromString(FString(UTF8_TO_TCHAR(
+	const auto OutPrimaryAssetId = new FPrimaryAssetId(FPrimaryAssetId::FromString(FString(UTF8_TO_TCHAR(
 		FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-			GetDomain()->Object_To_String(String, nullptr)))));
+			GetDomain()->Object_To_String(String, nullptr))))));
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPrimaryAssetId>::Get(), OutPrimaryAssetId,
+	                                                        NewMonoObject);
 }

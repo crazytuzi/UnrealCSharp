@@ -113,7 +113,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UObject* InObject, const
 		return false;
 	}
 
-	const auto NewMonoObject = InDomain->Object_New(FoundMonoClass);
+	const auto NewMonoObject = InDomain->Object_Init(FoundMonoClass);
 
 	FCSharpEnvironment::GetEnvironment().AddObjectReference(InObject, NewMonoObject);
 

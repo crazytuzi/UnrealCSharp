@@ -5,6 +5,7 @@
 #include "Binding/Function/TFunctionBuilder.inl"
 #include "Binding/Function/TConstructorBuilder.inl"
 #include "Binding/Function/TDestructorBuilder.inl"
+#include "Binding/Function/TSubscriptBuilder.inl"
 #include "Binding/Template/TClassName.inl"
 #include "Binding/Template/TClassFullName.inl"
 #include "Binding/TypeInfo/TName.inl"
@@ -173,14 +174,6 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 	static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
-{ \
-	static TArray<FString> Get() \
-	{ \
-		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
-	} \
-}; \
-template <typename T> \
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> : \
 	TBindingEnumPropertyClass<T> \
 { \
@@ -216,6 +209,28 @@ template <> \
 struct TIsNotUEnum<Class> \
 { \
 	enum { Value = true }; \
+};
+
+#define BINDING_PROJECT_ENUM(Class) \
+BINDING_ENUM(Class) \
+template <typename T> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
+	} \
+};
+
+#define BINDING_ENGINE_ENUM(Class) \
+BINDING_ENUM(Class) \
+template <typename T> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return {static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))}; \
+	} \
 };
 
 #define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set
@@ -282,14 +297,16 @@ struct TIsNotUEnum<Class> \
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__)
 #endif
 
-#define BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function) TFunctionPointer<decltype(&TFunctionBuilder<Signature, Function>::Invoke)>(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
+#define BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index) TFunctionPointer<decltype(&TSubscriptBuilder<T, Result, Index>::Get)>(&TSubscriptBuilder<T, Result, Index>::Get).Value.Pointer
 
-#define BINDING_OPERATOR_BUILDER_INFO(Signature, Function) TFunctionBuilder<Signature, Function>::Info()
+#define BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index) TFunctionPointer<decltype(&TSubscriptBuilder<T, Result, Index>::Set)>(&TSubscriptBuilder<T, Result, Index>::Set).Value.Pointer
+
+#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index) TSubscriptBuilder<T, Result, Index>::Info()
 
 #if WITH_FUNCTION_INFO
-#define BINDING_OPERATOR(Signature, Function) BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function), BINDING_OPERATOR_BUILDER_INFO(Signature, Function)
+#define BINDING_SUBSCRIPT(T, Result, Index) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index)
 #else
-#define BINDING_OPERATOR(Signature, Function) BINDING_OPERATOR_BUILDER_INVOKE(Signature, Function)
+#define BINDING_SUBSCRIPT(T, Result, Index) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index)
 #endif
 
 #define OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \

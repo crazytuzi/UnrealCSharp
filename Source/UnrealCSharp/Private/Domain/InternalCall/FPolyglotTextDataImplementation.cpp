@@ -59,7 +59,7 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_IsValidImplementation(
 	auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 		TCHAR_TO_UTF8(*Text.ToString())));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 		FoundMonoClass, 1, &NewMonoString);
 
 	*OutFailureReason = NewMonoObject;
@@ -96,7 +96,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeCultureImplement
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -118,7 +118,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_ResolveNativeCultureImple
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -163,10 +163,10 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetIdentityImplementation
 		auto NewMonoString2 = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*StringOutKey)));
 
-		const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject1 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString1);
 
-		const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString2);
 
 		*OutNamespace = NewMonoObject1;
@@ -190,7 +190,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNamespaceImplementatio
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -212,7 +212,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetKeyImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -248,7 +248,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetNativeStringImplementa
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -305,7 +305,7 @@ bool FPolyglotTextDataImplementation::PolyglotTextData_GetLocalizedStringImpleme
 	auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 		TCHAR_TO_UTF8(*String)));
 
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 		FoundMonoClass, 1, &NewMonoString);
 
 	*OutLocalizedString = NewMonoObject;
@@ -366,7 +366,7 @@ void FPolyglotTextDataImplementation::PolyglotTextData_GetTextImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString.ToString())));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;

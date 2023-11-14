@@ -4,6 +4,8 @@
 #include "Macro/BindingMacro.h"
 #include "Binding/Class/FBindingClass.h"
 #include "Binding/Function/FBindingFunctionBase.inl"
+#include "Macro/ClassMacro.h"
+#include "Macro/FunctionMacro.h"
 
 class UNREALCSHARP_API FClassBuilder
 {
@@ -51,6 +53,17 @@ public:
 	void Register();
 
 protected:
+	template <typename T>
+	void Function(const FString& InName, const FString& InImplementationName, const TFunctionPointer<T>& InMethod)
+	{
+		Functions.Emplace(FBindingFunctionBase{
+			                  InName,
+			                  COMBINE_CLASS(COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace),
+			                                BINDING_CLASS_IMPLEMENTATION(Class)) +
+			                  COMBINE_FUNCTION(BINDING_COMBINE_FUNCTION(Class, InImplementationName))
+		                  }, InMethod.Value.Pointer);
+	}
+
 	virtual bool IsReflection() const;
 
 	FBindingClass* GetBindingClass() const;

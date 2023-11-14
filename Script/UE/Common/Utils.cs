@@ -21,10 +21,6 @@ namespace Script.Common
         public static string GetPathName(Type InType) =>
             InType.GetCustomAttribute<PathNameAttribute>(true).PathName;
 
-        private static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments,
-            Object[] InParams) =>
-            Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments), InParams);
-
         private static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments) =>
             Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments));
 

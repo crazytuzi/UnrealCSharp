@@ -83,12 +83,10 @@ void FQuatImplementation::Quat_AddImplementation(const FGarbageCollectionHandle 
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(QuatA->operator+(*QuatB));
 
-	if (QuatA != nullptr && QuatB != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = QuatA->operator+(*QuatB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_SubtractImplementation(const FGarbageCollectionHandle A,
@@ -104,12 +102,10 @@ void FQuatImplementation::Quat_SubtractImplementation(const FGarbageCollectionHa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(QuatA->operator-(*QuatB));
 
-	if (QuatA != nullptr && QuatB != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = QuatA->operator-(*QuatB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 bool FQuatImplementation::Quat_EqualsImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
@@ -153,12 +149,10 @@ void FQuatImplementation::Quat_MultiplyImplementation(const FGarbageCollectionHa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(QuatA->operator*(*QuatB));
 
-	if (QuatA != nullptr && QuatB != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = QuatA->operator*(*QuatB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_MultiplyVectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -174,12 +168,10 @@ void FQuatImplementation::Quat_MultiplyVectorImplementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->operator*(*Vector));
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->operator*(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_MultiplyMatrixImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -195,12 +187,10 @@ void FQuatImplementation::Quat_MultiplyMatrixImplementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutMatrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(NewMonoObject);
+	const auto OutMatrix = new FMatrix(Quat->operator*(*Matrix));
 
-	if (Quat != nullptr && OutMatrix != nullptr)
-	{
-		*OutMatrix = Quat->operator*(*Matrix);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FMatrix>::Get(), OutMatrix,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_MultiplyScaleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -214,12 +204,10 @@ void FQuatImplementation::Quat_MultiplyScaleImplementation(const FGarbageCollect
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Quat->operator*(Scale));
 
-	if (Quat != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Quat->operator*(Scale);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_DivideImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -233,12 +221,10 @@ void FQuatImplementation::Quat_DivideImplementation(const FGarbageCollectionHand
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Quat->operator/(Scale));
 
-	if (Quat != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Quat->operator/(Scale);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 bool FQuatImplementation::Quat_IdenticalImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -281,12 +267,10 @@ void FQuatImplementation::Quat_MakeFromEulerImplementation(const MonoObject* Eul
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::MakeFromEuler(*Vector));
 
-	if (Vector != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::MakeFromEuler(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_EulerImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -300,12 +284,10 @@ void FQuatImplementation::Quat_EulerImplementation(const FGarbageCollectionHandl
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->Euler());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->Euler();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_NormalizeImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -329,12 +311,10 @@ void FQuatImplementation::Quat_GetNormalizedImplementation(const FGarbageCollect
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Quat->GetNormalized(Tolerance));
 
-	if (Quat != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Quat->GetNormalized(Tolerance);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 bool FQuatImplementation::Quat_IsNormalizedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
@@ -395,12 +375,12 @@ void FQuatImplementation::Quat_ToAxisAndAngleImplementation(const FGarbageCollec
 
 	*Axis = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector();
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		Quat->ToAxisAndAngle(*OutVector, Angle);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
+
+	Quat->ToAxisAndAngle(*OutVector, Angle);
 }
 
 void FQuatImplementation::Quat_ToSwingTwistImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -417,13 +397,19 @@ void FQuatImplementation::Quat_ToSwingTwistImplementation(const FGarbageCollecti
 
 	*OutSwing = NewMonoObject1;
 
-	const auto OutSwingQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject1);
+	const auto OutSwingQuat = new FQuat();
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutSwingQuat,
+	                                                        NewMonoObject1);
 
 	const auto NewMonoObject2 = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 	*OutTwist = NewMonoObject2;
 
-	const auto OutTwistQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject2);
+	const auto OutTwistQuat = new FQuat();;
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutTwistQuat,
+	                                                        NewMonoObject2);
 
 	if (Quat != nullptr && Vector != nullptr && OutSwingQuat != nullptr && OutTwistQuat != nullptr)
 	{
@@ -459,12 +445,10 @@ void FQuatImplementation::Quat_RotateVectorImplementation(const FGarbageCollecti
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->RotateVector(*Vector));
 
-	if (Quat != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->RotateVector(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_UnrotateVectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -480,12 +464,10 @@ void FQuatImplementation::Quat_UnrotateVectorImplementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->UnrotateVector(*Vector));
 
-	if (Quat != nullptr && Vector != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->UnrotateVector(*Vector);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_LogImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -499,12 +481,10 @@ void FQuatImplementation::Quat_LogImplementation(const FGarbageCollectionHandle 
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Quat->Log());
 
-	if (Quat != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Quat->Log();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_ExpImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -518,12 +498,10 @@ void FQuatImplementation::Quat_ExpImplementation(const FGarbageCollectionHandle 
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Quat->Exp());
 
-	if (Quat != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Quat->Exp();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_InverseImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -537,12 +515,10 @@ void FQuatImplementation::Quat_InverseImplementation(const FGarbageCollectionHan
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(Quat->Inverse());
 
-	if (Quat != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = Quat->Inverse();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_EnforceShortestArcWithImplementation(
@@ -569,12 +545,10 @@ void FQuatImplementation::Quat_GetAxisXImplementation(const FGarbageCollectionHa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->GetAxisX());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->GetAxisX();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_GetAxisYImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -588,12 +562,10 @@ void FQuatImplementation::Quat_GetAxisYImplementation(const FGarbageCollectionHa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->GetAxisY());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->GetAxisY();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_GetAxisZImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -607,12 +579,10 @@ void FQuatImplementation::Quat_GetAxisZImplementation(const FGarbageCollectionHa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->GetAxisZ());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->GetAxisZ();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_GetForwardVectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -626,12 +596,10 @@ void FQuatImplementation::Quat_GetForwardVectorImplementation(const FGarbageColl
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->GetForwardVector());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->GetForwardVector();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_GetRightVectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -645,12 +613,10 @@ void FQuatImplementation::Quat_GetRightVectorImplementation(const FGarbageCollec
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->GetRightVector());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->GetRightVector();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_GetUpVectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -664,12 +630,10 @@ void FQuatImplementation::Quat_GetUpVectorImplementation(const FGarbageCollectio
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->GetUpVector());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->GetUpVector();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_VectorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -683,12 +647,10 @@ void FQuatImplementation::Quat_VectorImplementation(const FGarbageCollectionHand
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->Vector());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->Vector();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_RotatorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -702,12 +664,10 @@ void FQuatImplementation::Quat_RotatorImplementation(const FGarbageCollectionHan
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRotator = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FRotator>(NewMonoObject);
+	const auto OutRotator = new FRotator(Quat->Rotator());
 
-	if (Quat != nullptr && OutRotator != nullptr)
-	{
-		*OutRotator = Quat->Rotator();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FRotator>::Get(), OutRotator,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_GetRotationAxisImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -721,12 +681,10 @@ void FQuatImplementation::Quat_GetRotationAxisImplementation(const FGarbageColle
 
 	*OutValue = NewMonoObject;
 
-	const auto OutVector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(NewMonoObject);
+	const auto OutVector = new FVector(Quat->GetRotationAxis());
 
-	if (Quat != nullptr && OutVector != nullptr)
-	{
-		*OutVector = Quat->GetRotationAxis();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
+	                                                        NewMonoObject);
 }
 
 FQuatImplementation::LwcType FQuatImplementation::Quat_AngularDistanceImplementation(
@@ -770,7 +728,7 @@ void FQuatImplementation::Quat_ToStringImplementation(const FGarbageCollectionHa
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -805,12 +763,10 @@ void FQuatImplementation::Quat_FindBetweenImplementation(const MonoObject* Vecto
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::FindBetween(*VectorV1, *VectorV2));
 
-	if (VectorV1 != nullptr && VectorV2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::FindBetween(*VectorV1, *VectorV2);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_FindBetweenNormalsImplementation(const MonoObject* Normal1, const MonoObject* Normal2,
@@ -826,12 +782,10 @@ void FQuatImplementation::Quat_FindBetweenNormalsImplementation(const MonoObject
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::FindBetweenNormals(*Vector1, *Vector2));
 
-	if (Vector1 != nullptr && Vector2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::FindBetweenNormals(*Vector1, *Vector2);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_FindBetweenVectorsImplementation(const MonoObject* Vector1, const MonoObject* Vector2,
@@ -847,12 +801,10 @@ void FQuatImplementation::Quat_FindBetweenVectorsImplementation(const MonoObject
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::FindBetweenVectors(*VectorV1, *VectorV2));
 
-	if (VectorV1 != nullptr && VectorV2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::FindBetweenVectors(*VectorV1, *VectorV2);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 FQuatImplementation::LwcType FQuatImplementation::Quat_ErrorImplementation(
@@ -899,12 +851,10 @@ void FQuatImplementation::Quat_FastLerpImplementation(const FGarbageCollectionHa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::FastLerp(*QuatA, *QuatB, Alpha));
 
-	if (QuatA != nullptr && QuatB != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::FastLerp(*QuatA, *QuatB, Alpha);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_FastBilerpImplementation(const FGarbageCollectionHandle P00,
@@ -927,12 +877,10 @@ void FQuatImplementation::Quat_FastBilerpImplementation(const FGarbageCollection
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::FastBilerp(*QuatP00, *QuatP10, *QuatP01, *QuatP11, FracX, FracY));
 
-	if (QuatP00 != nullptr && QuatP10 != nullptr && QuatP01 != nullptr && QuatP11 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::FastBilerp(*QuatP00, *QuatP10, *QuatP01, *QuatP11, FracX, FracY);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_Slerp_NotNormalizedImplementation(const FGarbageCollectionHandle Quat1,
@@ -949,12 +897,10 @@ void FQuatImplementation::Quat_Slerp_NotNormalizedImplementation(const FGarbageC
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::Slerp_NotNormalized(*QuatQ1, *QuatQ2, Slerp));
 
-	if (QuatQ1 != nullptr && QuatQ2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::Slerp_NotNormalized(*QuatQ1, *QuatQ2, Slerp);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_SlerpImplementation(const FGarbageCollectionHandle Quat1,
@@ -971,12 +917,10 @@ void FQuatImplementation::Quat_SlerpImplementation(const FGarbageCollectionHandl
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::Slerp(*QuatQ1, *QuatQ2, Slerp));
 
-	if (QuatQ1 != nullptr && QuatQ2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::Slerp(*QuatQ1, *QuatQ2, Slerp);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_SlerpFullPath_NotNormalizedImplementation(
@@ -993,12 +937,10 @@ void FQuatImplementation::Quat_SlerpFullPath_NotNormalizedImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::SlerpFullPath_NotNormalized(*Quat1, *Quat2, Alpha));
 
-	if (Quat1 != nullptr && Quat2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::SlerpFullPath_NotNormalized(*Quat1, *Quat2, Alpha);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_SlerpFullPathImplementation(const FGarbageCollectionHandle quat1,
@@ -1015,12 +957,10 @@ void FQuatImplementation::Quat_SlerpFullPathImplementation(const FGarbageCollect
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::SlerpFullPath(*Quat1, *Quat2, Alpha));
 
-	if (Quat1 != nullptr && Quat2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::SlerpFullPath(*Quat1, *Quat2, Alpha);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_SquadImplementation(const FGarbageCollectionHandle quat1,
@@ -1043,12 +983,10 @@ void FQuatImplementation::Quat_SquadImplementation(const FGarbageCollectionHandl
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::Squad(*Quat1, *Tang1, *Quat2, *Tang2, Alpha));
 
-	if (Quat1 != nullptr && Tang1 != nullptr && Quat2 != nullptr && Tang2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::Squad(*Quat1, *Tang1, *Quat2, *Tang2, Alpha);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_SquadFullPathImplementation(const FGarbageCollectionHandle quat1,
@@ -1071,12 +1009,10 @@ void FQuatImplementation::Quat_SquadFullPathImplementation(const FGarbageCollect
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat(FQuat::SquadFullPath(*Quat1, *Tang1, *Quat2, *Tang2, Alpha));
 
-	if (Quat1 != nullptr && Tang1 != nullptr && Quat2 != nullptr && Tang2 != nullptr && OutQuat != nullptr)
-	{
-		*OutQuat = FQuat::SquadFullPath(*Quat1, *Tang1, *Quat2, *Tang2, Alpha);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
 }
 
 void FQuatImplementation::Quat_CalcTangentsImplementation(const FGarbageCollectionHandle PrevP,
@@ -1096,10 +1032,10 @@ void FQuatImplementation::Quat_CalcTangentsImplementation(const FGarbageCollecti
 
 	*OutValue = NewMonoObject;
 
-	const auto OutQuat = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FQuat>(NewMonoObject);
+	const auto OutQuat = new FQuat();
 
-	if (QuatPrevP != nullptr && QuatP != nullptr && QuatNextP != nullptr && OutQuat != nullptr)
-	{
-		FQuat::CalcTangents(*QuatPrevP, *QuatP, *QuatNextP, Tension, *OutQuat);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FQuat>::Get(), OutQuat,
+	                                                        NewMonoObject);
+
+	FQuat::CalcTangents(*QuatPrevP, *QuatP, *QuatNextP, Tension, *OutQuat);
 }

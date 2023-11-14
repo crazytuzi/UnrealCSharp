@@ -92,7 +92,7 @@ void FGuidImplementation::Guid_LexToStringImplementation(const MonoObject* Value
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -135,7 +135,7 @@ void FGuidImplementation::Guid_ToStringImplementation(const FGarbageCollectionHa
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;
@@ -150,12 +150,10 @@ void FGuidImplementation::Guid_NewGuidImplementation(MonoObject** OutValue)
 
 	*OutValue = NewMonoObject;
 
-	const auto OutGuid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(NewMonoObject);
+	const auto OutGuid = new FGuid(FGuid::NewGuid());
 
-	if (OutGuid != nullptr)
-	{
-		*OutGuid = FGuid::NewGuid();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FGuid>::Get(), OutGuid,
+	                                                        NewMonoObject);
 }
 
 bool FGuidImplementation::Guid_ParseImplementation(MonoObject* GuidString, MonoObject** OutGuid)
@@ -166,14 +164,12 @@ bool FGuidImplementation::Guid_ParseImplementation(MonoObject* GuidString, MonoO
 
 	*OutGuid = NewMonoObject;
 
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(NewMonoObject);
+	const auto Guid = new FGuid();
 
-	if (Guid != nullptr)
-	{
-		return FGuid::Parse(FString(UTF8_TO_TCHAR(
-			                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::
-				                    GetEnvironment().GetDomain()->Object_To_String(GuidString, nullptr)))), *Guid);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FGuid>::Get(), OutGuid,
+	                                                        NewMonoObject);
 
-	return false;
+	return FGuid::Parse(FString(UTF8_TO_TCHAR(
+		                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::
+			                    GetEnvironment().GetDomain()->Object_To_String(GuidString, nullptr)))), *Guid);
 }

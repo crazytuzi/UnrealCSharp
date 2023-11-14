@@ -29,9 +29,7 @@ public:
 public:
 	static MonoObject* Object_New(MonoClass* InMonoClass);
 
-	static MonoObject* Object_New(MonoClass* InMonoClass, const int32 InParamCount, void** InParams);
-
-	static void Runtime_Object_Init(MonoObject* InMonoObject);
+	static MonoObject* Object_Init(MonoClass* InMonoClass, const int32 InParamCount = 0, void** InParams = nullptr);
 
 	static MonoVTable* Class_VTable(MonoClass* InMonoClass);
 

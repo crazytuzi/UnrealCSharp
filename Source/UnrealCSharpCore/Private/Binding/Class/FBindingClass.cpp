@@ -2,6 +2,16 @@
 
 TMap<FString, FBindingClass> FBindingClass::Classes;
 
+FBindingClass::~FBindingClass()
+{
+	if (Subscript != nullptr)
+	{
+		delete Subscript;
+
+		Subscript = nullptr;
+	}
+}
+
 FBindingClass* FBindingClass::GetClass(const bool InIsReflection, const FString& InClass,
                                        const FString& InFullClass, const FString& InImplementationNameSpace,
                                        FTypeInfo* InTypeInfo)
@@ -49,6 +59,11 @@ const FBindingTypeInfo& FBindingClass::GetTypeInfo() const
 	return TypeInfo;
 }
 
+const FBindingSubscript* FBindingClass::GetSubscript() const
+{
+	return Subscript;
+}
+
 const TArray<FBindingProperty>& FBindingClass::GetProperties() const
 {
 	return Properties;
@@ -57,6 +72,18 @@ const TArray<FBindingProperty>& FBindingClass::GetProperties() const
 const TArray<FBindingFunction>& FBindingClass::GetFunctions() const
 {
 	return Functions;
+}
+
+void FBindingClass::BindingSubscript(const FString& InName, const FString& InGetImplementationName,
+                                     const FString& InSetImplementationName, FFunctionInfo* InTypeInfo,
+                                     const TArray<FString>& InParamNames)
+{
+	if (Subscript == nullptr)
+	{
+		Subscript = new FBindingSubscript(InTypeInfo, InName,
+		                                  InName, InParamNames,
+		                                  InGetImplementationName, InSetImplementationName);
+	}
 }
 
 void FBindingClass::BindingProperty(const FString& InName, FTypeInfo* InTypeInfo,

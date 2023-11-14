@@ -98,10 +98,8 @@ auto TIntervalImplementation<T, U>::Interval_IntersectImplementation(const FGarb
 
 	*OutValue = NewMonoObject;
 
-	const auto OutInterval = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutInterval = new T(Intersect(*IntervalA, *IntervalB));
 
-	if (IntervalA != nullptr && IntervalB != nullptr && OutInterval != nullptr)
-	{
-		*OutInterval = Intersect(*IntervalA, *IntervalB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutInterval,
+	                                                        NewMonoObject);
 }

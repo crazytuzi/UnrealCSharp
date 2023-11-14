@@ -28,11 +28,8 @@ void FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForClassImplementa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutSoftClassPath = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FSoftClassPath>(NewMonoObject);
+	const auto OutSoftClassPath = new FSoftClassPath(FSoftClassPath::GetOrCreateIDForClass(FoundClass));
 
-	if (FoundClass != nullptr && OutSoftClassPath != nullptr)
-	{
-		*OutSoftClassPath = FSoftClassPath::GetOrCreateIDForClass(FoundClass);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FSoftClassPath>::Get(), OutSoftClassPath,
+	                                                        NewMonoObject);
 }

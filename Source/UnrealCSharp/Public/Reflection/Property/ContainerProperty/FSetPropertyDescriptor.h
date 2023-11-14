@@ -21,6 +21,4 @@ private:
 	MonoObject* NewWeakRef(void* InAddress) const;
 
 	MonoClass* Class;
-
-	MonoReflectionType* Type;
 };

@@ -2,6 +2,7 @@
 
 #include "Binding/Property/FBindingProperty.h"
 #include "Binding/Function/FBindingFunction.h"
+#include "Binding/Function/FBindingSubscript.h"
 
 class UNREALCSHARPCORE_API FBindingClass
 {
@@ -12,9 +13,12 @@ public:
 		ImplementationNameSpace(InBindingNameSpace),
 		Class(InClass),
 		FullClass(InFullClass),
-		TypeInfo{InTypeInfo}
+		TypeInfo{InTypeInfo},
+		Subscript(nullptr)
 	{
 	}
+
+	~FBindingClass();
 
 	static FBindingClass* GetClass(bool InIsReflection, const FString& InClass, const FString& InFullClass,
 	                               const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
@@ -34,11 +38,17 @@ public:
 
 	const FBindingTypeInfo& GetTypeInfo() const;
 
+	const FBindingSubscript* GetSubscript() const;
+
 	const TArray<FBindingProperty>& GetProperties() const;
 
 	const TArray<FBindingFunction>& GetFunctions() const;
 
 public:
+	void BindingSubscript(const FString& InName, const FString& InGetImplementationName,
+	                      const FString& InSetImplementationName, FFunctionInfo* InTypeInfo,
+	                      const TArray<FString>& InParamNames);
+
 	void BindingProperty(const FString& InName, FTypeInfo* InTypeInfo, const void* InGetMethod,
 	                     const void* InSetMethod);
 
@@ -62,6 +72,8 @@ private:
 	FString FullClass;
 
 	FBindingTypeInfo TypeInfo;
+
+	FBindingSubscript* Subscript;
 
 	TArray<FBindingProperty> Properties;
 

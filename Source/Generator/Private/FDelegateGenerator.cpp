@@ -59,12 +59,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	const auto ConstructorContent = FString::Printf(TEXT(
 		"\t\tpublic %s() => DelegateUtils.Delegate_Register(this);\n"
-		"\n"
-		"\t\tprivate %s(Type InValue)\n"
-		"\t\t{\n"
-		"\t\t}\n"
 	),
-	                                                *FullClassContent,
 	                                                *FullClassContent
 	);
 
@@ -392,12 +387,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	const auto ConstructorContent = FString::Printf(TEXT(
 		"\t\tpublic %s() => MulticastDelegateUtils.MulticastDelegate_Register(this);\n"
-		"\n"
-		"\t\tprivate %s(Type InValue)\n"
-		"\t\t{\n"
-		"\t\t}\n"
 	),
-	                                                *FullClassContent,
 	                                                *FullClassContent
 	);
 

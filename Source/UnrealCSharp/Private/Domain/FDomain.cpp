@@ -59,14 +59,9 @@ MonoObject* FDomain::Object_New(MonoClass* InMonoClass) const
 	return FMonoDomain::Object_New(InMonoClass);
 }
 
-MonoObject* FDomain::Object_New(MonoClass* InMonoClass, const int32 InParamCount, void** InParams) const
+MonoObject* FDomain::Object_Init(MonoClass* InMonoClass, const int32 InParamCount, void** InParams) const
 {
-	return FMonoDomain::Object_New(InMonoClass, InParamCount, InParams);
-}
-
-void FDomain::Runtime_Object_Init(MonoObject* InMonoObject) const
-{
-	FMonoDomain::Runtime_Object_Init(InMonoObject);
+	return FMonoDomain::Object_Init(InMonoClass, InParamCount, InParams);
 }
 
 MonoVTable* FDomain::Class_VTable(MonoClass* InMonoClass)

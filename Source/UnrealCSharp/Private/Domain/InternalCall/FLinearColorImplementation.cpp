@@ -64,12 +64,10 @@ void FLinearColorImplementation::LinearColor_ToRGBEImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = new FColor(LinearColor->ToRGBE());
 
-	if (LinearColor != nullptr && OutColor != nullptr)
-	{
-		*OutColor = LinearColor->ToRGBE();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FColor>::Get(), OutColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_FromSRGBColorImplementation(const MonoObject* Color, MonoObject** OutValue)
@@ -82,13 +80,10 @@ void FLinearColorImplementation::LinearColor_FromSRGBColorImplementation(const M
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(FLinearColor::FromSRGBColor(*InColor));
 
-	if (InColor != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = FLinearColor::FromSRGBColor(*InColor);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_FromPow22ColorImplementation(
@@ -102,13 +97,10 @@ void FLinearColorImplementation::LinearColor_FromPow22ColorImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(FLinearColor::FromPow22Color(*InColor));
 
-	if (InColor != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = FLinearColor::FromPow22Color(*InColor);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 float FLinearColorImplementation::LinearColor_ComponentImplementation(
@@ -138,13 +130,10 @@ void FLinearColorImplementation::LinearColor_AddImplementation(const FGarbageCol
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColorA->operator+(*LinearColorB));
 
-	if (LinearColorA != nullptr && LinearColorB != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColorA->operator+(*LinearColorB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_SubtractImplementation(const FGarbageCollectionHandle A,
@@ -161,13 +150,10 @@ void FLinearColorImplementation::LinearColor_SubtractImplementation(const FGarba
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColorA->operator-(*LinearColorB));
 
-	if (LinearColorA != nullptr && LinearColorB != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColorA->operator-(*LinearColorB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_MultiplyImplementation(const FGarbageCollectionHandle A,
@@ -184,13 +170,10 @@ void FLinearColorImplementation::LinearColor_MultiplyImplementation(const FGarba
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColorA->operator*(*LinearColorB));
 
-	if (LinearColorA != nullptr && LinearColorB != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColorA->operator*(*LinearColorB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_MultiplyScalarImplementation(
@@ -205,13 +188,10 @@ void FLinearColorImplementation::LinearColor_MultiplyScalarImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColor->operator*(Scalar));
 
-	if (LinearColor != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColor->operator*(Scalar);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_DivideImplementation(const FGarbageCollectionHandle A,
@@ -228,13 +208,10 @@ void FLinearColorImplementation::LinearColor_DivideImplementation(const FGarbage
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColorA->operator/(*LinearColorB));
 
-	if (LinearColorA != nullptr && LinearColorB != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColorA->operator/(*LinearColorB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_DivideScalarImplementation(
@@ -249,13 +226,10 @@ void FLinearColorImplementation::LinearColor_DivideScalarImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColor->operator/(Scalar));
 
-	if (LinearColor != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColor->operator/(Scalar);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_GetClampedImplementation(
@@ -271,13 +245,10 @@ void FLinearColorImplementation::LinearColor_GetClampedImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColor->GetClamped(InMin, InMax));
 
-	if (LinearColor != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColor->GetClamped(InMin, InMax);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 bool FLinearColorImplementation::LinearColor_EqualsImplementation(const FGarbageCollectionHandle A,
@@ -308,13 +279,10 @@ void FLinearColorImplementation::LinearColor_CopyWithNewOpacityImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColor->CopyWithNewOpacity(NewOpacicty));
 
-	if (LinearColor != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColor->CopyWithNewOpacity(NewOpacicty);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation(const uint8 H, const uint8 S, const uint8 V,
@@ -326,13 +294,10 @@ void FLinearColorImplementation::LinearColor_MakeFromHSV8Implementation(const ui
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(FLinearColor::MakeFromHSV8(H, S, V));
 
-	if (OutLinearColor != nullptr)
-	{
-		*OutLinearColor = FLinearColor::MakeFromHSV8(H, S, V);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_MakeRandomColorImplementation(MonoObject** OutValue)
@@ -343,13 +308,10 @@ void FLinearColorImplementation::LinearColor_MakeRandomColorImplementation(MonoO
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(FLinearColor::MakeRandomColor());
 
-	if (OutLinearColor != nullptr)
-	{
-		*OutLinearColor = FLinearColor::MakeRandomColor();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_MakeFromColorTemperatureImplementation(
@@ -361,13 +323,10 @@ void FLinearColorImplementation::LinearColor_MakeFromColorTemperatureImplementat
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(FLinearColor::MakeFromColorTemperature(Temp));
 
-	if (OutLinearColor != nullptr)
-	{
-		*OutLinearColor = FLinearColor::MakeFromColorTemperature(Temp);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 float FLinearColorImplementation::LinearColor_DistImplementation(const FGarbageCollectionHandle V1,
@@ -397,13 +356,10 @@ void FLinearColorImplementation::LinearColor_LinearRGBToHSVImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColor->LinearRGBToHSV());
 
-	if (OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColor->LinearRGBToHSV();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation(
@@ -418,13 +374,10 @@ void FLinearColorImplementation::LinearColor_HSVToLinearRGBImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColor->HSVToLinearRGB());
 
-	if (OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColor->HSVToLinearRGB();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation(const MonoObject* From, const MonoObject* To,
@@ -440,13 +393,11 @@ void FLinearColorImplementation::LinearColor_LerpUsingHSVImplementation(const Mo
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new
+		FLinearColor(FLinearColor::LerpUsingHSV(*LinearColorFrom, *LinearColorTo, Progress));
 
-	if (LinearColorFrom != nullptr && LinearColorTo != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = FLinearColor::LerpUsingHSV(*LinearColorFrom, *LinearColorTo, Progress);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 #if UE_LINEAR_COLOR_QUANTIZE_FLOOR
@@ -462,12 +413,9 @@ void FLinearColorImplementation::LinearColor_QuantizeFloorImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = new FColor(LinearColor->QuantizeFloor());
 
-	if (LinearColor != nullptr && OutColor != nullptr)
-	{
-		*OutColor = LinearColor->QuantizeFloor();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FColor>::Get(), OutColor, NewMonoObject);
 }
 #endif
 
@@ -483,12 +431,10 @@ void FLinearColorImplementation::LinearColor_QuantizeImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = new FColor(LinearColor->Quantize());
 
-	if (LinearColor != nullptr && OutColor != nullptr)
-	{
-		*OutColor = LinearColor->Quantize();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FColor>::Get(), OutColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
@@ -503,12 +449,10 @@ void FLinearColorImplementation::LinearColor_QuantizeRoundImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = new FColor(LinearColor->QuantizeRound());
 
-	if (LinearColor != nullptr && OutColor != nullptr)
-	{
-		*OutColor = LinearColor->QuantizeRound();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FColor>::Get(), OutColor,
+	                                                        NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_ToFColorImplementation(
@@ -523,12 +467,9 @@ void FLinearColorImplementation::LinearColor_ToFColorImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FColor>(NewMonoObject);
+	const auto OutColor = new FColor(LinearColor->ToFColor(bSRGB));
 
-	if (LinearColor != nullptr && OutColor != nullptr)
-	{
-		*OutColor = LinearColor->ToFColor(bSRGB);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FColor>::Get(), OutColor, NewMonoObject);
 }
 
 void FLinearColorImplementation::LinearColor_DesaturateImplementation(
@@ -543,13 +484,10 @@ void FLinearColorImplementation::LinearColor_DesaturateImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutLinearColor = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FLinearColor>(
-		NewMonoObject);
+	const auto OutLinearColor = new FLinearColor(LinearColor->Desaturate(Desaturation));
 
-	if (LinearColor != nullptr && OutLinearColor != nullptr)
-	{
-		*OutLinearColor = LinearColor->Desaturate(Desaturation);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FLinearColor>::Get(), OutLinearColor,
+	                                                        NewMonoObject);
 }
 
 #if UE_LINEAR_COLOR_COMPUTE_LUMINANCE
@@ -639,7 +577,7 @@ void FLinearColorImplementation::LinearColor_ToStringImplementation(
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*ResultString)));
 
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
+		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
 			FoundMonoClass, 1, &NewMonoString);
 
 		*OutValue = NewMonoObject;

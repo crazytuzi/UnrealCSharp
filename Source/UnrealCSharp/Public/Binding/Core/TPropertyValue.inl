@@ -62,7 +62,7 @@ struct TMultiPropertyValue
 		{
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>>(
 				SrcMonoObject, InMember,
@@ -91,10 +91,7 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 		{
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-			auto InParams = static_cast<void*>(FoundMonoClass);
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			if (InGarbageCollectionHandle.IsValid())
 			{
@@ -131,10 +128,7 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 		{
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-			auto InParams = static_cast<void*>(FoundMonoClass);
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			if (InGarbageCollectionHandle.IsValid())
 			{
@@ -172,10 +166,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 		{
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-			auto InParams = static_cast<void*>(FoundMonoClass);
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<std::decay_t<T>>::Get(), false);
 
@@ -218,10 +209,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 		{
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-			auto InParams = static_cast<void*>(FoundMonoClass);
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<std::remove_pointer_t<T>>::Get(), false);
 
@@ -358,7 +346,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*InMember->ToString())));
 
-		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass, 1, &NewMonoString);
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(FoundMonoClass, 1, &NewMonoString);
 	}
 
 	static std::decay_t<T> Set(MonoObject* InValue)
@@ -388,10 +376,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 		{
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-			auto InParams = static_cast<void*>(FoundMonoClass);
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			FCSharpEnvironment::GetEnvironment().Bind(std::decay_t<T>::StaticStruct(), false);
 
@@ -427,7 +412,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FStrin
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(InMember->operator*())));
 
-		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass, 1, &NewMonoString);
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(FoundMonoClass, 1, &NewMonoString);
 	}
 
 	static std::decay_t<T> Set(MonoObject* InValue)
@@ -448,7 +433,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>
 		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
 			TCHAR_TO_UTF8(*InMember->ToString())));
 
-		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass, 1, &NewMonoString);
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(FoundMonoClass, 1, &NewMonoString);
 	}
 
 	static std::decay_t<T> Set(MonoObject* InValue)
@@ -518,10 +503,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 			const auto FoundValuePropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundValuePropertyMonoType);
 
-			void* InParams[2] = {FoundKeyPropertyReflectionType, FoundValuePropertyReflectionType};
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundMonoClass, TGetArrayLength(InParams), InParams);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			const auto KeyProperty = FTypeBridge::Factory(FoundKeyPropertyReflectionType, nullptr, "",
 			                                              EObjectFlags::RF_Transient);
@@ -595,10 +577,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundPropertyMonoType);
 
-			auto InParams = static_cast<void*>(FoundPropertyMonoClass);
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
 			                                           EObjectFlags::RF_Transient);
@@ -654,7 +633,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<s
 	{
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(FoundMonoClass);
 
 		auto SubclassOf = new TSubclassOf<UObject>(*InMember);
 
@@ -695,10 +674,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundPropertyMonoType);
 
-			auto InParams = static_cast<void*>(FoundPropertyMonoClass);
-
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(
-				FoundMonoClass, TGetArrayLength(InParams), &InParams);
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
 			                                           EObjectFlags::RF_Transient);

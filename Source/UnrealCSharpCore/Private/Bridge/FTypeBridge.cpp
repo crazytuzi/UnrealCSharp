@@ -452,7 +452,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FArrayProperty* InProperty)
 
 		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
 
-		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass, ReflectionTypeMonoArray);
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
 
 	return nullptr;
@@ -592,7 +592,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FMapProperty* InProperty)
 
 		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 1, FoundValueReflectionType);
 
-		return GetMonoClass(FoundGenericMonoClass, ReflectionTypeMonoArray, ReflectionTypeMonoArray);
+		return GetMonoClass(FoundGenericMonoClass, ReflectionTypeMonoArray);
 	}
 
 	return nullptr;
@@ -617,7 +617,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FSetProperty* InProperty)
 
 		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
 
-		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass, ReflectionTypeMonoArray);
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
 
 	return nullptr;
@@ -659,8 +659,7 @@ MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* I
 	return FMonoDomain::Object_Get_Class(GenericClassMonoObject);
 }
 
-MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* InTypeMonoClass,
-                                     MonoArray* InParamsArray)
+MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* InTypeMonoClassArray)
 {
 	const auto FoundGenericMonoType = FMonoDomain::Class_Get_Type(
 		InGenericMonoClass);
@@ -668,52 +667,11 @@ MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* I
 	const auto FoundGenericReflectionType = FMonoDomain::Type_Get_Object(
 		FoundGenericMonoType);
 
-	const auto FoundMonoType = FMonoDomain::Class_Get_Type(InTypeMonoClass);
-
-	const auto FoundReflectionType = FMonoDomain::Type_Get_Object(
-		FoundMonoType);
-
-	void* InParams[3];
-
-	InParams[0] = FoundGenericReflectionType;
-
-	const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
-		FMonoDomain::Get_Object_Class(), 1);
-
-	ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
-
-	InParams[1] = ReflectionTypeMonoArray;
-
-	InParams[2] = InParamsArray;
-
-	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
-
-	const auto CreateGenericTypeMethod = FMonoDomain::Class_Get_Method_From_Name(
-		UtilsMonoClass, FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE, TGetArrayLength(InParams));
-
-	const auto GenericClassMonoObject = FMonoDomain::Runtime_Invoke(
-		CreateGenericTypeMethod, nullptr, InParams);
-
-	return FMonoDomain::Object_Get_Class(GenericClassMonoObject);
-}
-
-MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* InTypeMonoClassArray,
-                                     MonoArray* InParamsArray)
-{
-	const auto FoundGenericMonoType = FMonoDomain::Class_Get_Type(
-		InGenericMonoClass);
-
-	const auto FoundGenericReflectionType = FMonoDomain::Type_Get_Object(
-		FoundGenericMonoType);
-
-	void* InParams[3];
+	void* InParams[2];
 
 	InParams[0] = FoundGenericReflectionType;
 
 	InParams[1] = InTypeMonoClassArray;
-
-	InParams[2] = InParamsArray;
 
 	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);

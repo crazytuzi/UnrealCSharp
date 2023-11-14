@@ -96,12 +96,10 @@ auto TRangeImplementation<T, U, V>::Range_GetLowerBoundImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, U>(NewMonoObject);
+	const auto OutRangeBound = new U(Range->GetLowerBound());
 
-	if (Range != nullptr && OutRangeBound != nullptr)
-	{
-		*OutRangeBound = Range->GetLowerBound();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<U>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -157,12 +155,10 @@ auto TRangeImplementation<T, U, V>::Range_GetUpperBoundImplementation(
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRangeBound = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, U>(NewMonoObject);
+	const auto OutRangeBound = new U(Range->GetUpperBound());
 
-	if (Range != nullptr && OutRangeBound != nullptr)
-	{
-		*OutRangeBound = Range->GetUpperBound();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<U>::Get(), OutRangeBound,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -292,12 +288,10 @@ auto TRangeImplementation<T, U, V>::Range_HullImplementation(const MonoObject* X
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::Hull(*RangeX, *RangeY));
 
-	if (RangeX != nullptr && RangeY != nullptr && OutRange != nullptr)
-	{
-		*OutRange = T::Hull(*RangeX, *RangeY);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -314,12 +308,10 @@ auto TRangeImplementation<T, U, V>::Range_IntersectionImplementation(const MonoO
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::Intersection(*RangeX, *RangeY));
 
-	if (RangeX != nullptr && RangeY != nullptr && OutRange != nullptr)
-	{
-		*OutRange = T::Intersection(*RangeX, *RangeY);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -331,12 +323,10 @@ auto TRangeImplementation<T, U, V>::Range_AllImplementation(MonoObject** OutValu
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::All());
 
-	if (OutRange != nullptr)
-	{
-		*OutRange = T::All();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -348,12 +338,10 @@ auto TRangeImplementation<T, U, V>::Range_AtLeastImplementation(const V Value, M
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::AtLeast(Value));
 
-	if (OutRange != nullptr)
-	{
-		*OutRange = T::AtLeast(Value);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -365,12 +353,10 @@ auto TRangeImplementation<T, U, V>::Range_AtMostImplementation(const V Value, Mo
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::AtMost(Value));
 
-	if (OutRange != nullptr)
-	{
-		*OutRange = T::AtMost(Value);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -382,12 +368,10 @@ auto TRangeImplementation<T, U, V>::Range_EmptyImplementation(MonoObject** OutVa
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::Empty());
 
-	if (OutRange != nullptr)
-	{
-		*OutRange = T::Empty();
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -399,12 +383,10 @@ auto TRangeImplementation<T, U, V>::Range_ExclusiveImplementation(const V Min, c
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::Exclusive(Min, Max));
 
-	if (OutRange != nullptr)
-	{
-		*OutRange = T::Exclusive(Min, Max);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -416,12 +398,10 @@ auto TRangeImplementation<T, U, V>::Range_GreaterThanImplementation(const V Valu
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::GreaterThan(Value));
 
-	if (OutRange != nullptr)
-	{
-		*OutRange = T::GreaterThan(Value);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -433,12 +413,10 @@ auto TRangeImplementation<T, U, V>::Range_InclusiveImplementation(const V Min, c
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::Inclusive(Min, Max));
 
-	if (OutRange != nullptr)
-	{
-		*OutRange = T::Inclusive(Min, Max);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
 
 template <typename T, typename U, typename V>
@@ -450,10 +428,8 @@ auto TRangeImplementation<T, U, V>::Range_LessThanImplementation(const V Value, 
 
 	*OutValue = NewMonoObject;
 
-	const auto OutRange = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, T>(NewMonoObject);
+	const auto OutRange = new T(T::LessThan(Value));
 
-	if (OutRange != nullptr)
-	{
-		*OutRange = T::LessThan(Value);
-	}
+	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<T>::Get(), OutRange,
+	                                                        NewMonoObject);
 }
