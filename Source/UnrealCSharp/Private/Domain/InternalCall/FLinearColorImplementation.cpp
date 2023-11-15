@@ -1,22 +1,6 @@
 ﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
-#include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/NamespaceMacro.h"
-
-BINDING_ENGINE_ENUM(EForceInit)
-
-struct FRegisterForceInit
-{
-	FRegisterForceInit()
-	{
-		TBindingEnumBuilder<EForceInit>()
-			.Enumerator("ForceInit", EForceInit::ForceInit)
-			.Enumerator("ForceInitToZero", EForceInit::ForceInitToZero)
-			.Register();
-	}
-};
-
-static FRegisterForceInit RegisterForceInit;
 
 struct FRegisterLinearColor
 {
@@ -32,11 +16,11 @@ struct FRegisterLinearColor
 
 	FRegisterLinearColor()
 	{
-		TReflectionClassBuilder<FLinearColor>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FLinearColor>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FLinearColor, EForceInit))
 			.Constructor(BINDING_CONSTRUCTOR(FLinearColor, float, float, float, float),
 			             {"InR", "InG", "InB", "InA"})
-			.Constructor(BINDING_CONSTRUCTOR(FLinearColor, FColor),
+			.Constructor(BINDING_CONSTRUCTOR(FLinearColor, const FColor&),
 			             {"Color"})
 			.Plus()
 			.Minus()

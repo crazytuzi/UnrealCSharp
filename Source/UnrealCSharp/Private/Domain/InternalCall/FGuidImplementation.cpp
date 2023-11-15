@@ -41,7 +41,7 @@ struct FRegisterGuid
 
 	FRegisterGuid()
 	{
-		TReflectionClassBuilder<FGuid>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FGuid>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FGuid, uint32, uint32, uint32, uint32),
 			             {"InA", "InB", "InC", "InD"})
 			.Constructor(BINDING_CONSTRUCTOR(FGuid, const FString&),

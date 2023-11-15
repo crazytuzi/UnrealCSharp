@@ -15,7 +15,7 @@ struct FRegisterFrameTime
 
 	FRegisterFrameTime()
 	{
-		TReflectionClassBuilder<FFrameTime>(NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<FFrameTime>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FFrameTime, int32),
 			             {"InFrameNumber"})
 			.Constructor(BINDING_CONSTRUCTOR(FFrameTime, FFrameNumber),

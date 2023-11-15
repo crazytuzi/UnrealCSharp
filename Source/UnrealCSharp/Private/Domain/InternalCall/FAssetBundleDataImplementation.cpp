@@ -6,7 +6,7 @@ struct FRegisterAssetBundleData
 	FRegisterAssetBundleData()
 	{
 		TReflectionClassBuilder<FAssetBundleData>(NAMESPACE_BINDING)
-			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleData, FAssetBundleData))
+			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleData, const FAssetBundleData&))
 			.Function("FindEntry",
 			          BINDING_OVERLOAD(FAssetBundleEntry*(FAssetBundleData::*)(FName),
 			                           &FAssetBundleData::FindEntry),

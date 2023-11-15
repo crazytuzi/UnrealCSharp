@@ -6,7 +6,7 @@ struct FRegisterAssetBundleEntry
 	FRegisterAssetBundleEntry()
 	{
 		TReflectionClassBuilder<FAssetBundleEntry>(NAMESPACE_BINDING)
-			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, FAssetBundleEntry),
+			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, const FAssetBundleEntry&),
 			             {"OldEntry"})
 			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, FName),
 			             {"InBundleName"})
