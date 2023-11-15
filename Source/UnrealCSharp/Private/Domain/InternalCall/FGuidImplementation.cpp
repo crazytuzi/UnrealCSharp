@@ -1,175 +1,67 @@
-﻿#include "Domain/InternalCall/FGuidImplementation.h"
-#include "Binding/Class/TReflectionClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStruct.inl"
-#include "Environment/FCSharpEnvironment.h"
+﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/NamespaceMacro.h"
+
+BINDING_ENGINE_ENUM(EGuidFormats)
+
+struct FRegisterGuidFormats
+{
+	FRegisterGuidFormats()
+	{
+		TBindingEnumBuilder<EGuidFormats>()
+			.Enumerator("Digits", EGuidFormats::Digits)
+			.Enumerator("DigitsWithHyphens", EGuidFormats::DigitsWithHyphens)
+			.Enumerator("DigitsWithHyphensLower", EGuidFormats::DigitsWithHyphensLower)
+			.Enumerator("DigitsWithHyphensInBraces", EGuidFormats::DigitsWithHyphensInBraces)
+			.Enumerator("DigitsWithHyphensInParentheses", EGuidFormats::DigitsWithHyphensInParentheses)
+			.Enumerator("HexValuesInBraces", EGuidFormats::HexValuesInBraces)
+			.Enumerator("UniqueObjectGuid", EGuidFormats::UniqueObjectGuid)
+			.Enumerator("Short", EGuidFormats::Short)
+			.Enumerator("Base36Encoded", EGuidFormats::Base36Encoded)
+			.Register();
+	}
+};
+
+static FRegisterGuidFormats RegisterGuidFormats;
 
 struct FRegisterGuid
 {
+	static bool GreaterThanImplementation(const FGuid& X, const FGuid& Y)
+	{
+		return	((X.A < Y.A) ? true : ((X.A > Y.A) ? false :
+				((X.B < Y.B) ? true : ((X.B > Y.B) ? false :
+				((X.C < Y.C) ? true : ((X.C > Y.C) ? false :
+				((X.D < Y.D) ? true : ((X.D > Y.D) ? false : false))))))));
+	}
+
+	static FString LexToStringImplementation(const FGuid& Value)
+	{
+		return LexToString(Value);
+	}
+
 	FRegisterGuid()
 	{
 		TReflectionClassBuilder<FGuid>(NAMESPACE_LIBRARY)
-			.Function("LessThan", FGuidImplementation::Guid_LessThanImplementation)
-			.Function("GreaterThan", FGuidImplementation::Guid_GreaterThanImplementation)
-			.Function("GetComponent", FGuidImplementation::Guid_GetComponentImplementation)
-			.Function("SetComponent", FGuidImplementation::Guid_SetComponentImplementation)
-			.Function("LexToString", FGuidImplementation::Guid_LexToStringImplementation)
-			.Function("Invalidate", FGuidImplementation::Guid_InvalidateImplementation)
-			.Function("IsValid", FGuidImplementation::Guid_IsValidImplementation)
-			.Function("ToString", FGuidImplementation::Guid_ToStringImplementation)
-			.Function("NewGuid", FGuidImplementation::Guid_NewGuidImplementation)
-			.Function("Parse", FGuidImplementation::Guid_ParseImplementation)
+			.Constructor(BINDING_CONSTRUCTOR(FGuid, uint32, uint32, uint32, uint32),
+			             {"InA", "InB", "InC", "InD"})
+			.Constructor(BINDING_CONSTRUCTOR(FGuid, const FString&),
+			             {"InGuidStr"})
+			.Less()
+			.Subscript(BINDING_SUBSCRIPT(FGuid, uint32, int32),
+			           {"Index"})
+			.Function("operator >", FUNCTION_GREATER, BINDING_FUNCTION(&GreaterThanImplementation))
+			.Function("LexToString", BINDING_FUNCTION(&LexToStringImplementation),
+			          {"Value"})
+			.Function("Invalidate", BINDING_FUNCTION(&FGuid::Invalidate))
+			.Function("IsValid", BINDING_FUNCTION(&FGuid::IsValid))
+			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString))
+			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString),
+			          {"Format"})
+			.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
+			.Function("Parse", BINDING_FUNCTION(&FGuid::Parse))
+			.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact))
 			.Register();
 	}
 };
 
 static FRegisterGuid RegisterGuid;
-
-bool FGuidImplementation::Guid_LessThanImplementation(const FGarbageCollectionHandle A,
-                                                      const FGarbageCollectionHandle B)
-{
-	const auto GuidA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(A);
-
-	const auto GuidB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(B);
-
-	if (GuidA != nullptr && GuidB != nullptr)
-	{
-		return operator<(*GuidA, *GuidB);
-	}
-
-	return false;
-}
-
-bool FGuidImplementation::Guid_GreaterThanImplementation(const FGarbageCollectionHandle A,
-                                                         const FGarbageCollectionHandle B)
-{
-	const auto GuidA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(A);
-
-	const auto GuidB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(B);
-
-	if (GuidA != nullptr && GuidB != nullptr)
-	{
-		return operator<(*GuidB, *GuidA);
-	}
-
-	return false;
-}
-
-uint32 FGuidImplementation::Guid_GetComponentImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                            const int32 Index)
-{
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
-
-	if (Guid != nullptr)
-	{
-		return Guid->operator[](Index);
-	}
-
-	return 0u;
-}
-
-void FGuidImplementation::Guid_SetComponentImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                          const int32 Index, const uint32 InValue)
-{
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
-
-	if (Guid != nullptr)
-	{
-		Guid->operator[](Index) = InValue;
-	}
-}
-
-void FGuidImplementation::Guid_LexToStringImplementation(const MonoObject* Value, MonoObject** OutValue)
-{
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(Value);
-
-	if (Guid != nullptr)
-	{
-		const auto ResultString = LexToString(*Guid);
-
-		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
-
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(*ResultString)));
-
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
-			FoundMonoClass, 1, &NewMonoString);
-
-		*OutValue = NewMonoObject;
-	}
-}
-
-void FGuidImplementation::Guid_InvalidateImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
-
-	if (Guid != nullptr)
-	{
-		Guid->Invalidate();
-	}
-}
-
-bool FGuidImplementation::Guid_IsValidImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
-
-	if (Guid != nullptr)
-	{
-		return Guid->IsValid();
-	}
-
-	return false;
-}
-
-void FGuidImplementation::Guid_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                      MonoObject** OutValue)
-{
-	const auto Guid = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FGuid>(InGarbageCollectionHandle);
-
-	if (Guid != nullptr)
-	{
-		const auto ResultString = Guid->ToString();
-
-		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
-
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(*ResultString)));
-
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
-			FoundMonoClass, 1, &NewMonoString);
-
-		*OutValue = NewMonoObject;
-	}
-}
-
-void FGuidImplementation::Guid_NewGuidImplementation(MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FGuid, FGuid>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutGuid = new FGuid(FGuid::NewGuid());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FGuid>::Get(), OutGuid,
-	                                                        NewMonoObject);
-}
-
-bool FGuidImplementation::Guid_ParseImplementation(MonoObject* GuidString, MonoObject** OutGuid)
-{
-	const auto FoundMonoClass = TPropertyClass<FGuid, FGuid>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutGuid = NewMonoObject;
-
-	const auto Guid = new FGuid();
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FGuid>::Get(), OutGuid,
-	                                                        NewMonoObject);
-
-	return FGuid::Parse(FString(UTF8_TO_TCHAR(
-		                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::
-			                    GetEnvironment().GetDomain()->Object_To_String(GuidString, nullptr)))), *Guid);
-}
