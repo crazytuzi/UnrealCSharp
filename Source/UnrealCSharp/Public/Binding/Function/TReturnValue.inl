@@ -20,7 +20,7 @@ struct TBaseReturnValue
 	}
 
 	explicit TBaseReturnValue(Type&& InValue):
-		Object{TPropertyValue<Type, Type>::Get(&InValue)}
+		Object{TPropertyValue<Type, Type>::Get(const_cast<std::decay_t<T>*>(&InValue))}
 	{
 	}
 

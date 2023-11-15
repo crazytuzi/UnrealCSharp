@@ -69,7 +69,7 @@ protected:
 	FBindingClass* GetBindingClass() const;
 
 private:
-	FString GetFunctionImplementationName(const FString& InName) const;
+	FString GetFunctionImplementationName(const FString& InName, const FString& InImplementationName) const;
 
 	int32 GetFunctionCount(const FString& InName) const;
 
@@ -97,13 +97,13 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod, const 
 
 #if WITH_FUNCTION_INFO
 	return Function(InName,
-	                GetFunctionImplementationName(InName),
+	                InName,
 	                FunctionPointer.Value.Pointer,
 	                InFunctionInfo,
 	                InParamNames);
 #else
 	return Function(InName,
-		GetFunctionImplementationName(InName),
+		InName,
 		FunctionPointer.Value.Pointer,
 		InParamNames);
 #endif
