@@ -1,256 +1,68 @@
-﻿#include "Domain/InternalCall/FPlaneImplementation.h"
-#include "Binding/Class/TReflectionClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStruct.inl"
-#include "Environment/FCSharpEnvironment.h"
+﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterPlane
 {
+	static FPlane::FReal BitOrImplementation(const FPlane& In, const FPlane& V)
+	{
+		return In | V;
+	}
+
+	static FPlane DividesImplementation(const FPlane& In, const FPlane::FReal Scale)
+	{
+		return In / Scale;
+	}
+
+	static FPlane MultipliesImplementation(const FPlane& In, const FPlane::FReal Scale)
+	{
+		return In * Scale;
+	}
+
+	static FPlane MultipliesImplementation(FPlane& In, const FPlane& V)
+	{
+		return In * V;
+	}
+
 	FRegisterPlane()
 	{
-		TReflectionClassBuilder<FPlane>(NAMESPACE_LIBRARY)
-			.Function("IsValid", FPlaneImplementation::Plane_IsValidImplementation)
-			.Function("GetOrigin", FPlaneImplementation::Plane_GetOriginImplementation)
-			.Function("PlaneDot", FPlaneImplementation::Plane_PlaneDotImplementation)
-			.Function("Normalize", FPlaneImplementation::Plane_NormalizeImplementation)
-			.Function("Flip", FPlaneImplementation::Plane_FlipImplementation)
-			.Function("TransformBy", FPlaneImplementation::Plane_TransformByImplementation)
-			.Function("TransformByUsingAdjointT", FPlaneImplementation::Plane_TransformByUsingAdjointTImplementation)
-			.Function("Equals", FPlaneImplementation::Plane_EqualsImplementation)
-			.Function("DotProduct", FPlaneImplementation::Plane_DotProductImplementation)
-			.Function("DotProduct", FPlaneImplementation::Plane_DotProductImplementation)
-			.Function("Add", FPlaneImplementation::Plane_AddImplementation)
-			.Function("Subtract", FPlaneImplementation::Plane_SubtractImplementation)
-			.Function("Divide", FPlaneImplementation::Plane_DivideImplementation)
-			.Function("Multiply", FPlaneImplementation::Plane_MultiplyImplementation)
+		TReflectionClassBuilder<FPlane>(NAMESPACE_BINDING)
+			.Constructor(BINDING_CONSTRUCTOR(FPlane, const FVector4&),
+			             {"V"})
+			.Constructor(BINDING_CONSTRUCTOR(FPlane, FPlane::FReal, FPlane::FReal, FPlane::FReal, FPlane::FReal),
+			             {"InX", "InY", "InZ", "InW"})
+			.Constructor(BINDING_CONSTRUCTOR(FPlane, FVector, FPlane::FReal),
+			             {"InNormal", "InW"})
+			.Constructor(BINDING_CONSTRUCTOR(FPlane, FVector, const FVector&),
+			             {"InBase", "InNormal"})
+			.Constructor(BINDING_CONSTRUCTOR(FPlane, FVector, FVector, FVector),
+			             {"A", "B", "C"})
+			.Constructor(BINDING_CONSTRUCTOR(FPlane, EForceInit))
+			.Plus()
+			.Minus()
+			.Function("operator |", FUNCTION_BIT_OR, BINDING_FUNCTION(&BitOrImplementation))
+			.Function("operator /", FUNCTION_DIVIDES, BINDING_FUNCTION(&DividesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FPlane(*)(const FPlane&, const FPlane::FReal), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FPlane(*)(FPlane&, const FPlane&), &MultipliesImplementation))
+			.Function("IsValid", BINDING_FUNCTION(&FPlane::IsValid))
+			.Function("GetOrigin", BINDING_FUNCTION(&FPlane::GetOrigin))
+			.Function("GetNormal", BINDING_FUNCTION(&FPlane::GetNormal))
+			.Function("PlaneDot",BINDING_FUNCTION(&FPlane::PlaneDot),
+			          {"P"})
+			.Function("Normalize", BINDING_FUNCTION(&FPlane::Normalize),
+			          {"Tolerance"})
+			.Function("Flip",BINDING_FUNCTION(&FPlane::Flip))
+			.Function("TransformBy", BINDING_FUNCTION(&FPlane::TransformBy),
+			          {"M"})
+			.Function("TransformByUsingAdjointT", BINDING_FUNCTION(&FPlane::TransformByUsingAdjointT),
+			          {"M", "DetM", "TA"})
+			.Function("TranslateBy", BINDING_FUNCTION(&FPlane::TranslateBy),
+			          {"V"})
+			.Function("Equals", BINDING_FUNCTION(&FPlane::Equals),
+			          {"V", "Tolerance"})
 			.Register();
 	}
 };
 
 static FRegisterPlane RegisterPlane;
-
-bool FPlaneImplementation::Plane_IsValidImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	if (Plane != nullptr)
-	{
-		return Plane->IsValid();
-	}
-
-	return false;
-}
-
-void FPlaneImplementation::Plane_GetOriginImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                         MonoObject** OutValue)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FVector, FVector>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutVector = new FVector(Plane->GetOrigin());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FVector>::Get(), OutVector,
-	                                                        NewMonoObject);
-}
-
-FPlaneImplementation::LwcType FPlaneImplementation::Plane_PlaneDotImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* P)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	const auto Vector = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FVector>(P);
-
-	if (Plane != nullptr && Vector != nullptr)
-	{
-		return Plane->PlaneDot(*Vector);
-	}
-
-	return 0.f;
-}
-
-bool FPlaneImplementation::Plane_NormalizeImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                         const LwcType Tolerance)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	if (Plane != nullptr)
-	{
-		return Plane->Normalize(Tolerance);
-	}
-
-	return false;
-}
-
-void FPlaneImplementation::Plane_FlipImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                    MonoObject** OutValue)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutPlane = new FPlane(Plane->Flip());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPlane>::Get(), OutPlane,
-	                                                        NewMonoObject);
-}
-
-void FPlaneImplementation::Plane_TransformByImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                           const MonoObject* M, MonoObject** OutValue)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	const auto Matrix = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(M);
-
-	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutPlane = new FPlane(Plane->TransformBy(*Matrix));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPlane>::Get(), OutPlane,
-	                                                        NewMonoObject);
-}
-
-void FPlaneImplementation::Plane_TransformByUsingAdjointTImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle, const MonoObject* M, const LwcType DetM,
-	const MonoObject* TA, MonoObject** OutValue)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	const auto MatrixM = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(M);
-
-	const auto MatrixTA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FMatrix>(TA);
-
-	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutPlane = new FPlane(Plane->TransformByUsingAdjointT(*MatrixM, DetM, *MatrixTA));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPlane>::Get(), OutPlane,
-	                                                        NewMonoObject);
-}
-
-bool FPlaneImplementation::Plane_EqualsImplementation(const FGarbageCollectionHandle A,
-                                                      const FGarbageCollectionHandle B, const LwcType Tolerance)
-{
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
-
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
-
-	if (PlaneA != nullptr && PlaneB != nullptr)
-	{
-		return PlaneA->Equals(*PlaneB, Tolerance);
-	}
-
-	return false;
-}
-
-FPlaneImplementation::LwcType FPlaneImplementation::Plane_DotProductImplementation(
-	const FGarbageCollectionHandle A, const FGarbageCollectionHandle B)
-{
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
-
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
-
-	if (PlaneA != nullptr && PlaneB != nullptr)
-	{
-		return PlaneA->operator|(*PlaneB);
-	}
-
-	return 0.f;
-}
-
-void FPlaneImplementation::Plane_AddImplementation(const FGarbageCollectionHandle A, const FGarbageCollectionHandle B,
-                                                   MonoObject** OutValue)
-{
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
-
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
-
-	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutPlane = new FPlane(PlaneA->operator+(*PlaneB));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPlane>::Get(), OutPlane,
-	                                                        NewMonoObject);
-}
-
-void FPlaneImplementation::Plane_SubtractImplementation(const FGarbageCollectionHandle A,
-                                                        const FGarbageCollectionHandle B, MonoObject** OutValue)
-{
-	const auto PlaneA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(A);
-
-	const auto PlaneB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FPlane>(B);
-
-	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutPlane = new FPlane(PlaneA->operator-(*PlaneB));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPlane>::Get(), OutPlane,
-	                                                        NewMonoObject);
-}
-
-void FPlaneImplementation::Plane_DivideImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                      const LwcType Scale, MonoObject** OutValue)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutPlane = new FPlane(Plane->operator/(Scale));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPlane>::Get(), OutPlane,
-	                                                        NewMonoObject);
-}
-
-void FPlaneImplementation::Plane_MultiplyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                        const LwcType Scale, MonoObject** OutValue)
-{
-	const auto Plane = FCSharpEnvironment::GetEnvironment().GetAddress<
-		UScriptStruct, FPlane>(InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FPlane, FPlane>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutPlane = new FPlane(Plane->operator*(Scale));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FPlane>::Get(), OutPlane,
-	                                                        NewMonoObject);
-}

@@ -52,7 +52,7 @@ struct TParentReturnValue :
 	{
 		if constexpr (TTypeInfo<T>::IsReference() || std::is_pointer_v<T>)
 		{
-			Super::Object = TPropertyValue<Type, Type>::Get(&InValue);
+			Super::Object = TPropertyValue<Type, Type>::Get(const_cast<std::decay_t<T>*>(&InValue));
 		}
 		else
 		{
