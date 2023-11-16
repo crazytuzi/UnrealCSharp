@@ -60,3 +60,12 @@ struct TBaseStructure<FAssetBundleEntry>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FAssetBundleEntry));
 	}
 };
+
+template <>
+struct TBaseStructure<FBox>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FBox));
+	}
+};
