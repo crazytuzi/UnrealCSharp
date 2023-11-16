@@ -203,7 +203,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 	                       bool bNeedFree = true)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
-			TBaseStructure<std::remove_pointer_t<T>>::Get(), *InMember);
+			TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), *InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
@@ -211,18 +211,23 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<std::remove_pointer_t<T>>::Get(), false);
+			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<
+				                                          std::decay_t<std::remove_pointer_t<T>>>::Get(), false);
 
 			if (InGarbageCollectionHandle.IsValid())
 			{
 				FCSharpEnvironment::GetEnvironment().AddStructReference(InGarbageCollectionHandle,
-				                                                        TBaseStructure<std::remove_pointer_t<T>>::Get(),
+				                                                        TBaseStructure<
+					                                                        std::decay_t<std::remove_pointer_t<
+						                                                        T>>>::Get(),
 				                                                        *InMember,
 				                                                        SrcMonoObject);
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<std::remove_pointer_t<T>>::Get(),
+				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<
+					                                                        std::decay_t<std::remove_pointer_t<
+						                                                        T>>>::Get(),
 				                                                        *InMember,
 				                                                        SrcMonoObject,
 				                                                        false);

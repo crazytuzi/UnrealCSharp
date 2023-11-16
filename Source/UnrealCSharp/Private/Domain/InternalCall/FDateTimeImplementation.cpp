@@ -1,672 +1,140 @@
-﻿#include "Domain/InternalCall/FDateTimeImplementation.h"
-#include "Binding/Class/TReflectionClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStruct.inl"
-#include "Environment/FCSharpEnvironment.h"
+﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/NamespaceMacro.h"
+
+BINDING_ENGINE_ENUM(EDayOfWeek)
+
+BINDING_ENGINE_ENUM(EMonthOfYear)
+
+struct FRegisterDayOfWeek
+{
+	FRegisterDayOfWeek()
+	{
+		TBindingEnumBuilder<EDayOfWeek>()
+			.Enumerator("Monday", EDayOfWeek::Monday)
+			.Enumerator("Tuesday", EDayOfWeek::Tuesday)
+			.Enumerator("Wednesday", EDayOfWeek::Wednesday)
+			.Enumerator("Thursday", EDayOfWeek::Thursday)
+			.Enumerator("Friday", EDayOfWeek::Friday)
+			.Enumerator("Saturday", EDayOfWeek::Saturday)
+			.Enumerator("Sunday", EDayOfWeek::Sunday)
+			.Register();
+	}
+};
+
+static FRegisterDayOfWeek RegisterDayOfWeek;
+
+struct FRegisterMonthOfYear
+{
+	FRegisterMonthOfYear()
+	{
+		TBindingEnumBuilder<EMonthOfYear>()
+			.Enumerator("January", EMonthOfYear::January)
+			.Enumerator("February", EMonthOfYear::February)
+			.Enumerator("March", EMonthOfYear::March)
+			.Enumerator("April", EMonthOfYear::April)
+			.Enumerator("May", EMonthOfYear::May)
+			.Enumerator("June", EMonthOfYear::June)
+			.Enumerator("July", EMonthOfYear::July)
+			.Enumerator("August", EMonthOfYear::August)
+			.Enumerator("September", EMonthOfYear::September)
+			.Enumerator("October", EMonthOfYear::October)
+			.Enumerator("November", EMonthOfYear::November)
+			.Enumerator("December", EMonthOfYear::December)
+			.Register();
+	}
+};
+
+static FRegisterMonthOfYear RegisterMonthOfYear;
 
 struct FRegisterDateTime
 {
+	static FDateTime PlusImplementation(const FDateTime& In, const FTimespan& Other)
+	{
+		return In + Other;
+	}
+
+	static FDateTime& PlusImplementation(FDateTime& In, const FDateTime& Other)
+	{
+		return In + Other;
+	}
+
+	static FTimespan MinusImplementation(const FDateTime& In, const FDateTime& Other)
+	{
+		return In - Other;
+	}
+
+	static FDateTime MinusImplementation(const FDateTime& In, const FTimespan& Other)
+	{
+		return In - Other;
+	}
+
 	FRegisterDateTime()
 	{
-		TReflectionClassBuilder<FDateTime>(NAMESPACE_LIBRARY)
-			.Function("AddTimespan", FDateTimeImplementation::DateTime_AddTimespanImplementation)
-			.Function("AddDateTime", FDateTimeImplementation::DateTime_AddDateTimeImplementation)
-			.Function("SubtractDateTime", FDateTimeImplementation::DateTime_SubtractDateTimeImplementation)
-			.Function("SubtractTimespan", FDateTimeImplementation::DateTime_SubtractTimespanImplementation)
-			.Function("GreaterThan", FDateTimeImplementation::DateTime_GreaterThanImplementation)
-			.Function("GreaterThanOrEqual", FDateTimeImplementation::DateTime_GreaterThanOrEqualImplementation)
-			.Function("LessThan", FDateTimeImplementation::DateTime_LessThanImplementation)
-			.Function("LessThanOrEqual", FDateTimeImplementation::DateTime_LessThanOrEqualImplementation)
-			.Function("GetDatePart", FDateTimeImplementation::DateTime_GetDatePartImplementation)
-			.Function("GetDateComponents", FDateTimeImplementation::DateTime_GetDateComponentsImplementation)
-			.Function("GetDay", FDateTimeImplementation::DateTime_GetDayImplementation)
-			.Function("GetDayOfYear", FDateTimeImplementation::DateTime_GetDayOfYearImplementation)
-			.Function("GetHour", FDateTimeImplementation::DateTime_GetHourImplementation)
-			.Function("GetHour12", FDateTimeImplementation::DateTime_GetHour12Implementation)
-			.Function("GetJulianDay", FDateTimeImplementation::DateTime_GetJulianDayImplementation)
-			.Function("GetModifiedJulianDay", FDateTimeImplementation::DateTime_GetModifiedJulianDayImplementation)
-			.Function("GetMillisecond", FDateTimeImplementation::DateTime_GetMillisecondImplementation)
-			.Function("GetMinute", FDateTimeImplementation::DateTime_GetMinuteImplementation)
-			.Function("GetMonth", FDateTimeImplementation::DateTime_GetMonthImplementation)
-			.Function("GetSecond", FDateTimeImplementation::DateTime_GetSecondImplementation)
-			.Function("GetTicks", FDateTimeImplementation::DateTime_GetTicksImplementation)
-			.Function("GetTimeOfDay", FDateTimeImplementation::DateTime_GetTimeOfDayImplementation)
-			.Function("GetYear", FDateTimeImplementation::DateTime_GetYearImplementation)
-			.Function("IsAfternoon", FDateTimeImplementation::DateTime_IsAfternoonImplementation)
-			.Function("IsMorning", FDateTimeImplementation::DateTime_IsMorningImplementation)
-			.Function("ToHttpDate", FDateTimeImplementation::DateTime_ToHttpDateImplementation)
-			.Function("ToIso8601", FDateTimeImplementation::DateTime_ToIso8601Implementation)
-			.Function("ToString", FDateTimeImplementation::DateTime_ToStringImplementation)
-			.Function("ToUnixTimestamp", FDateTimeImplementation::DateTime_ToUnixTimestampImplementation)
-			.Function("DaysInMonth", FDateTimeImplementation::DateTime_DaysInMonthImplementation)
-			.Function("DaysInYear", FDateTimeImplementation::DateTime_DaysInYearImplementation)
-			.Function("FromJulianDay", FDateTimeImplementation::DateTime_FromJulianDayImplementation)
-			.Function("FromUnixTimestamp", FDateTimeImplementation::DateTime_FromUnixTimestampImplementation)
-			.Function("IsLeapYear", FDateTimeImplementation::DateTime_IsLeapYearImplementation)
-			.Function("MaxValue", FDateTimeImplementation::DateTime_MaxValueImplementation)
-			.Function("MinValue", FDateTimeImplementation::DateTime_MinValueImplementation)
-			.Function("Now", FDateTimeImplementation::DateTime_NowImplementation)
-			.Function("Parse", FDateTimeImplementation::DateTime_ParseImplementation)
-			.Function("ParseHttpDate", FDateTimeImplementation::DateTime_ParseHttpDateImplementation)
-			.Function("Today", FDateTimeImplementation::DateTime_TodayImplementation)
-			.Function("UtcNow", FDateTimeImplementation::DateTime_UtcNowImplementation)
-			.Function("Validate", FDateTimeImplementation::DateTime_ValidateImplementation)
+		TReflectionClassBuilder<FDateTime>(NAMESPACE_BINDING)
+			.Constructor(BINDING_CONSTRUCTOR(FDateTime, int64),
+			             {"InTicks"})
+			.Constructor(BINDING_CONSTRUCTOR(FDateTime, int32, int32, int32, int32, int32, int32, int32),
+			             {"Year", "Month", "Day", "Hour", "Minute", "Second", "Millisecond"})
+			.Greater()
+			.GreaterEqual()
+			.Less()
+			.LessEqual()
+			.Function("operator +", FUNCTION_PLUS,
+			          BINDING_OVERLOAD(FDateTime(*)(const FDateTime&, const FTimespan&), &PlusImplementation))
+			.Function("operator +", FUNCTION_PLUS,
+			          BINDING_OVERLOAD(FDateTime&(*)(FDateTime&, const FDateTime&), &PlusImplementation))
+			.Function("operator -", FUNCTION_MINUS,
+			          BINDING_OVERLOAD(FTimespan(*)(const FDateTime&, const FDateTime&), &MinusImplementation))
+			.Function("operator -", FUNCTION_MINUS,
+			          BINDING_OVERLOAD(FDateTime(*)(const FDateTime&, const FTimespan&), &MinusImplementation))
+			.Function("GetDate", BINDING_OVERLOAD(FDateTime(FDateTime::*)()const, &FDateTime::GetDate))
+			.Function("GetDate", BINDING_OVERLOAD(void(FDateTime::*)(int32&, int32&, int32&)const, &FDateTime::GetDate),
+			          {"OutYear", "OutMonth", "OutDay"})
+			.Function("GetDay", BINDING_FUNCTION(&FDateTime::GetDay))
+			.Function("GetDayOfWeek", BINDING_FUNCTION(&FDateTime::GetDayOfWeek))
+			.Function("GetDayOfYear", BINDING_FUNCTION(&FDateTime::GetDayOfYear))
+			.Function("GetHour", BINDING_FUNCTION(&FDateTime::GetHour))
+			.Function("GetHour12", BINDING_FUNCTION(&FDateTime::GetHour12))
+			.Function("GetJulianDay", BINDING_FUNCTION(&FDateTime::GetJulianDay))
+			.Function("GetModifiedJulianDay", BINDING_FUNCTION(&FDateTime::GetModifiedJulianDay))
+			.Function("GetMillisecond", BINDING_FUNCTION(&FDateTime::GetMillisecond))
+			.Function("GetMinute", BINDING_FUNCTION(&FDateTime::GetMinute))
+			.Function("GetMonth", BINDING_FUNCTION(&FDateTime::GetMonth))
+			.Function("GetMonthOfYear", BINDING_FUNCTION(&FDateTime::GetMonthOfYear))
+			.Function("GetSecond", BINDING_FUNCTION(&FDateTime::GetSecond))
+			.Function("GetTicks", BINDING_FUNCTION(&FDateTime::GetTicks))
+			.Function("GetTimeOfDay", BINDING_FUNCTION(&FDateTime::GetTimeOfDay))
+			.Function("GetYear", BINDING_FUNCTION(&FDateTime::GetYear))
+			.Function("IsAfternoon", BINDING_FUNCTION(&FDateTime::IsAfternoon))
+			.Function("IsMorning", BINDING_FUNCTION(&FDateTime::IsMorning))
+			.Function("ToHttpDate", BINDING_FUNCTION(&FDateTime::ToHttpDate))
+			.Function("ToIso8601", BINDING_FUNCTION(&FDateTime::ToIso8601))
+			.Function("ToString", BINDING_OVERLOAD(FString(FDateTime::*)()const, &FDateTime::ToString))
+			.Function("ToUnixTimestamp", BINDING_FUNCTION(&FDateTime::ToUnixTimestamp))
+			.Function("DaysInMonth", BINDING_FUNCTION(&FDateTime::DaysInMonth),
+			          {"Year", "Month"})
+			.Function("DaysInYear", BINDING_FUNCTION(&FDateTime::DaysInYear),
+			          {"Year"})
+			.Function("FromJulianDay", BINDING_FUNCTION(&FDateTime::FromJulianDay),
+			          {"JulianDay"})
+			.Function("FromUnixTimestamp", BINDING_FUNCTION(&FDateTime::FromUnixTimestamp),
+			          {"UnixTime"})
+			.Function("IsLeapYear", BINDING_FUNCTION(&FDateTime::IsLeapYear),
+			          {"Year"})
+			.Function("MaxValue", BINDING_FUNCTION(&FDateTime::MaxValue))
+			.Function("MinValue", BINDING_FUNCTION(&FDateTime::MinValue))
+			.Function("Now", BINDING_FUNCTION(&FDateTime::Now))
+			.Function("Parse", BINDING_FUNCTION(&FDateTime::Parse),
+			          {"DateTimeString", "OutDateTime"})
+			.Function("ParseHttpDate", BINDING_FUNCTION(&FDateTime::ParseHttpDate),
+			          {"HttpDate", "OutDateTime"})
+			.Function("Today", BINDING_FUNCTION(&FDateTime::Today))
+			.Function("UtcNow", BINDING_FUNCTION(&FDateTime::UtcNow))
+			.Function("Validate", BINDING_FUNCTION(&FDateTime::Validate),
+			          {"Year", "Month", "Day", "Hour", "Minute", "Second", "Millisecond"})
 			.Register();
 	}
 };
 
 static FRegisterDateTime RegisterDateTime;
-
-void FDateTimeImplementation::DateTime_AddTimespanImplementation(const FGarbageCollectionHandle A,
-                                                                 const FGarbageCollectionHandle B,
-                                                                 MonoObject** OutValue)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
-
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(DateTime->operator+(*Timespan));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-void FDateTimeImplementation::DateTime_AddDateTimeImplementation(const FGarbageCollectionHandle A,
-                                                                 const FGarbageCollectionHandle B)
-{
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
-
-	if (DateTimeA != nullptr && DateTimeB != nullptr)
-	{
-		DateTimeA->operator+(*DateTimeB);
-	}
-}
-
-void FDateTimeImplementation::DateTime_SubtractDateTimeImplementation(const FGarbageCollectionHandle A,
-                                                                      const FGarbageCollectionHandle B,
-                                                                      MonoObject** OutValue)
-{
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
-
-	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutTimespan = new FTimespan(DateTimeA->operator-(*DateTimeB));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
-	                                                        NewMonoObject);
-}
-
-void FDateTimeImplementation::DateTime_SubtractTimespanImplementation(const FGarbageCollectionHandle A,
-                                                                      const FGarbageCollectionHandle B,
-                                                                      MonoObject** OutValue)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto Timespan = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FTimespan>(B);
-
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(DateTime->operator-(*Timespan));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-bool FDateTimeImplementation::DateTime_GreaterThanImplementation(const FGarbageCollectionHandle A,
-                                                                 const FGarbageCollectionHandle B)
-{
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
-
-	if (DateTimeA != nullptr && DateTimeB != nullptr)
-	{
-		return DateTimeA->operator>(*DateTimeB);
-	}
-
-	return false;
-}
-
-bool FDateTimeImplementation::DateTime_GreaterThanOrEqualImplementation(const FGarbageCollectionHandle A,
-                                                                        const FGarbageCollectionHandle B)
-{
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
-
-	if (DateTimeA != nullptr && DateTimeB != nullptr)
-	{
-		return DateTimeA->operator>=(*DateTimeB);
-	}
-
-	return false;
-}
-
-bool FDateTimeImplementation::DateTime_LessThanImplementation(const FGarbageCollectionHandle A,
-                                                              const FGarbageCollectionHandle B)
-{
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
-
-	if (DateTimeA != nullptr && DateTimeB != nullptr)
-	{
-		return DateTimeA->operator<(*DateTimeB);
-	}
-
-	return false;
-}
-
-bool FDateTimeImplementation::DateTime_LessThanOrEqualImplementation(const FGarbageCollectionHandle A,
-                                                                     const FGarbageCollectionHandle B)
-{
-	const auto DateTimeA = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(A);
-
-	const auto DateTimeB = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(B);
-
-	if (DateTimeA != nullptr && DateTimeB != nullptr)
-	{
-		return DateTimeA->operator<=(*DateTimeB);
-	}
-
-	return false;
-}
-
-void FDateTimeImplementation::DateTime_GetDatePartImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(DateTime->GetDate());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-void FDateTimeImplementation::DateTime_GetDateComponentsImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle, int32& OutYear, int32& OutMonth, int32& OutDay)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		DateTime->GetDate(OutYear, OutMonth, OutDay);
-	}
-}
-
-int32 FDateTimeImplementation::DateTime_GetDayImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetDay();
-	}
-
-	return 0;
-}
-
-int32 FDateTimeImplementation::DateTime_GetDayOfYearImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetDayOfYear();
-	}
-
-	return 0;
-}
-
-int32 FDateTimeImplementation::DateTime_GetHourImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetHour();
-	}
-
-	return 0;
-}
-
-int32 FDateTimeImplementation::DateTime_GetHour12Implementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetHour12();
-	}
-
-	return 0;
-}
-
-double FDateTimeImplementation::DateTime_GetJulianDayImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetJulianDay();
-	}
-
-	return 0.0;
-}
-
-double FDateTimeImplementation::DateTime_GetModifiedJulianDayImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetModifiedJulianDay();
-	}
-
-	return 0.0;
-}
-
-int32 FDateTimeImplementation::DateTime_GetMillisecondImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetMillisecond();
-	}
-
-	return 0;
-}
-
-int32 FDateTimeImplementation::DateTime_GetMinuteImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetMinute();
-	}
-
-	return 0;
-}
-
-int32 FDateTimeImplementation::DateTime_GetMonthImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetMonth();
-	}
-
-	return 0;
-}
-
-int32 FDateTimeImplementation::DateTime_GetSecondImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetSecond();
-	}
-
-	return 0;
-}
-
-int64 FDateTimeImplementation::DateTime_GetTicksImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetTicks();
-	}
-
-	return 0;
-}
-
-void FDateTimeImplementation::DateTime_GetTimeOfDayImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	const auto FoundMonoClass = TPropertyClass<FTimespan, FTimespan>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutTimespan = new FTimespan(DateTime->GetTimeOfDay());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FTimespan>::Get(), OutTimespan,
-	                                                        NewMonoObject);
-}
-
-int32 FDateTimeImplementation::DateTime_GetYearImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->GetYear();
-	}
-
-	return 0;
-}
-
-bool FDateTimeImplementation::DateTime_IsAfternoonImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->IsAfternoon();
-	}
-
-	return false;
-}
-
-bool FDateTimeImplementation::DateTime_IsMorningImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->IsMorning();
-	}
-
-	return false;
-}
-
-void FDateTimeImplementation::DateTime_ToHttpDateImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		const auto ResultString = DateTime->ToHttpDate();
-
-		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
-
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(*ResultString)));
-
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
-			FoundMonoClass, 1, &NewMonoString);
-
-		*OutValue = NewMonoObject;
-	}
-}
-
-void FDateTimeImplementation::DateTime_ToIso8601Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                               MonoObject** OutValue)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		const auto ResultString = DateTime->ToIso8601();
-
-		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
-
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(*ResultString)));
-
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
-			FoundMonoClass, 1, &NewMonoString);
-
-		*OutValue = NewMonoObject;
-	}
-}
-
-void FDateTimeImplementation::DateTime_ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-                                                              MonoObject** OutValue)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		const auto ResultString = DateTime->ToString();
-
-		const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
-
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(*ResultString)));
-
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
-			FoundMonoClass, 1, &NewMonoString);
-
-		*OutValue = NewMonoObject;
-	}
-}
-
-int64 FDateTimeImplementation::DateTime_ToUnixTimestampImplementation(
-	const FGarbageCollectionHandle InGarbageCollectionHandle)
-{
-	const auto DateTime = FCSharpEnvironment::GetEnvironment().GetAddress<UScriptStruct, FDateTime>(
-		InGarbageCollectionHandle);
-
-	if (DateTime != nullptr)
-	{
-		return DateTime->ToUnixTimestamp();
-	}
-
-	return 0;
-}
-
-int32 FDateTimeImplementation::DateTime_DaysInMonthImplementation(const int32 Year, const int32 Month)
-{
-	return FDateTime::DaysInMonth(Year, Month);
-}
-
-int32 FDateTimeImplementation::DateTime_DaysInYearImplementation(const int32 Year)
-{
-	return FDateTime::DaysInYear(Year);
-}
-
-void FDateTimeImplementation::DateTime_FromJulianDayImplementation(const double JulianDay, MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(FDateTime::FromJulianDay(JulianDay));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-void FDateTimeImplementation::DateTime_FromUnixTimestampImplementation(const int64 UnixTime, MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(FDateTime::FromUnixTimestamp(UnixTime));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-bool FDateTimeImplementation::DateTime_IsLeapYearImplementation(const int32 Year)
-{
-	return FDateTime::IsLeapYear(Year);
-}
-
-void FDateTimeImplementation::DateTime_MaxValueImplementation(MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(FDateTime::MaxValue());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-void FDateTimeImplementation::DateTime_MinValueImplementation(MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(FDateTime::MinValue());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-void FDateTimeImplementation::DateTime_NowImplementation(MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(FDateTime::Now());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-bool FDateTimeImplementation::DateTime_ParseImplementation(MonoObject* DateTimeString, MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime();
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-
-	if (OutDateTime != nullptr)
-	{
-		return FDateTime::Parse(
-			UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-					GetDomain()->Object_To_String(DateTimeString, nullptr))), *OutDateTime);
-	}
-
-	return false;
-}
-
-bool FDateTimeImplementation::DateTime_ParseHttpDateImplementation(MonoObject* HttpDate, MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime();
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-
-	return FDateTime::ParseHttpDate(
-		UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(HttpDate, nullptr))), *OutDateTime);
-}
-
-void FDateTimeImplementation::DateTime_TodayImplementation(MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(FDateTime::Today());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-void FDateTimeImplementation::DateTime_UtcNowImplementation(MonoObject** OutValue)
-{
-	const auto FoundMonoClass = TPropertyClass<FDateTime, FDateTime>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutDateTime = new FDateTime(FDateTime::UtcNow());
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FDateTime>::Get(), OutDateTime,
-	                                                        NewMonoObject);
-}
-
-bool FDateTimeImplementation::DateTime_ValidateImplementation(const int32 Year, const int32 Month, const int32 Day,
-                                                              const int32 Hour, const int32 Minute, const int32 Second,
-                                                              const int32 Millisecond)
-{
-	return FDateTime::Validate(Year, Month, Day, Hour, Minute, Second, Millisecond);;
-}

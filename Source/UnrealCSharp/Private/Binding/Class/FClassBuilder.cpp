@@ -50,11 +50,13 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InI
 #if WITH_FUNCTION_INFO
 	if (InFunctionInfo != nullptr)
 	{
-		GetBindingClass()->BindingFunction(InName, InImplementationName, InFunctionInfo, InParamNames);
+		GetBindingClass()->BindingFunction(InName, GetFunctionImplementationName(InName, InImplementationName),
+		                                   InFunctionInfo, InParamNames);
 	}
 #endif
 
-	Function(InName, InImplementationName, TFunctionPointer<decltype(InMethod)>(InMethod));
+	Function(InName, GetFunctionImplementationName(InName, InImplementationName),
+	         TFunctionPointer<decltype(InMethod)>(InMethod));
 
 	return *this;
 }
@@ -81,13 +83,13 @@ FBindingClass* FClassBuilder::GetBindingClass() const
 	                               TypeInfo);
 }
 
-FString FClassBuilder::GetFunctionImplementationName(const FString& InName) const
+FString FClassBuilder::GetFunctionImplementationName(const FString& InName, const FString& InImplementationName) const
 {
 	const auto Count = GetFunctionCount(InName);
 
 	return FString::Printf(TEXT(
 		"%s%s"),
-	                       *InName,
+	                       *InImplementationName,
 	                       Count == 0 ? TEXT("") : *UKismetStringLibrary::Conv_IntToString(Count)
 	);
 }
