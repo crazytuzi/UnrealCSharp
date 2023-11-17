@@ -1,35 +1,22 @@
-﻿#include "Domain/InternalCall/FSoftClassPathImplementation.h"
-#include "Binding/Class/TReflectionClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStruct.inl"
-#include "Environment/FCSharpEnvironment.h"
+﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterSoftClassPath
 {
 	FRegisterSoftClassPath()
 	{
-		TReflectionClassBuilder<FSoftClassPath>(NAMESPACE_LIBRARY)
-			.Function("GetOrCreateIDForClass",
-			          FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForClassImplementation)
+		TReflectionClassBuilder<FSoftClassPath>(NAMESPACE_BINDING)
+			.Constructor(BINDING_CONSTRUCTOR(FSoftClassPath, FSoftClassPath const&),
+			             {"Other"})
+			.Constructor(BINDING_CONSTRUCTOR(FSoftClassPath, const FString&),
+			             {"PathString"})
+			.Constructor(BINDING_CONSTRUCTOR(FSoftClassPath, const UClass*),
+			             {"InClass"})
+			.Function("ResolveClass", BINDING_FUNCTION(&FSoftClassPath::ResolveClass))
+			.Function("GetOrCreateIDForClass", BINDING_FUNCTION(&FSoftClassPath::GetOrCreateIDForClass),
+			          {"InClass"})
 			.Register();
 	}
 };
 
 static FRegisterSoftClassPath RegisterSoftClassPath;
-
-void FSoftClassPathImplementation::SoftClassPath_GetOrCreateIDForClassImplementation(
-	const MonoObject* InMonoObject, MonoObject** OutValue)
-{
-	const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InMonoObject);
-
-	const auto FoundMonoClass = TPropertyClass<FSoftClassPath, FSoftClassPath>::Get();
-
-	const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-	*OutValue = NewMonoObject;
-
-	const auto OutSoftClassPath = new FSoftClassPath(FSoftClassPath::GetOrCreateIDForClass(FoundClass));
-
-	FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<FSoftClassPath>::Get(), OutSoftClassPath,
-	                                                        NewMonoObject);
-}
