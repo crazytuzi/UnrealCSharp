@@ -19,7 +19,9 @@ struct FRegisterAssetBundleData
 			          BINDING_OVERLOAD(void(FAssetBundleData::*)(FName, const TArray<FSoftObjectPath>&),
 			                           &FAssetBundleData::AddBundleAssets),
 			          {"BundleName", "AssetPaths"})
-			.Function("SetBundleAssets", BINDING_FUNCTION(&FAssetBundleData::SetBundleAssets),
+			.Function("SetBundleAssets",
+			          BINDING_OVERLOAD(void(FAssetBundleData::*)(FName, TArray<FSoftObjectPath>&&),
+			                           &FAssetBundleData::SetBundleAssets),
 			          {"BundleName", "AssetPaths"})
 			.Function("Reset", BINDING_FUNCTION(&FAssetBundleData::Reset))
 			.Function("ToDebugString", BINDING_FUNCTION(&FAssetBundleData::ToDebugString))

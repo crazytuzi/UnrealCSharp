@@ -1,6 +1,7 @@
 ﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/NamespaceMacro.h"
+#include "UEVersion.h"
 
 BINDING_ENGINE_ENUM(EDayOfWeek)
 
@@ -54,10 +55,12 @@ struct FRegisterDateTime
 		return In + Other;
 	}
 
+#if UE_DATETIME_PLUS
 	static FDateTime& PlusImplementation(FDateTime& In, const FDateTime& Other)
 	{
 		return In + Other;
 	}
+#endif
 
 	static FTimespan MinusImplementation(const FDateTime& In, const FDateTime& Other)
 	{
@@ -82,8 +85,10 @@ struct FRegisterDateTime
 			.LessEqual()
 			.Function("operator +", FUNCTION_PLUS,
 			          BINDING_OVERLOAD(FDateTime(*)(const FDateTime&, const FTimespan&), &PlusImplementation))
+#if UE_DATETIME_PLUS
 			.Function("operator +", FUNCTION_PLUS,
 			          BINDING_OVERLOAD(FDateTime&(*)(FDateTime&, const FDateTime&), &PlusImplementation))
+#endif
 			.Function("operator -", FUNCTION_MINUS,
 			          BINDING_OVERLOAD(FTimespan(*)(const FDateTime&, const FDateTime&), &MinusImplementation))
 			.Function("operator -", FUNCTION_MINUS,

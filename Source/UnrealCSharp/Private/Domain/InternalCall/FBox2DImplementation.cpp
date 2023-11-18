@@ -1,6 +1,7 @@
 ﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
+#include "UEVersion.h"
 
 struct FRegisterBox2D
 {
@@ -25,8 +26,12 @@ struct FRegisterBox2D
 			.Function("operator +", FUNCTION_PLUS, BINDING_FUNCTION(&PlusImplementation))
 			.Function("ComputeSquaredDistanceToPoint", BINDING_FUNCTION(&FBox2D::ComputeSquaredDistanceToPoint),
 			          {"Point"})
-			.Function("ExpandBy", BINDING_FUNCTION(&FBox2D::ExpandBy),
+			.Function("ExpandBy", BINDING_OVERLOAD(FBox2D(FBox2D::*)(const FBox2D::FReal)const, &FBox2D::ExpandBy),
 			          {"W"})
+#if UE_BOX_2D_EXPAND_BY_VECTOR2
+			.Function("ExpandBy", BINDING_OVERLOAD(FBox2D(FBox2D::*)(const FVector2D&)const, &FBox2D::ExpandBy),
+			          {"V"})
+#endif
 			.Function("GetArea", BINDING_FUNCTION(&FBox2D::GetArea))
 			.Function("GetCenter", BINDING_FUNCTION(&FBox2D::GetCenter))
 			.Function("GetCenterAndExtents", BINDING_FUNCTION(&FBox2D::GetCenterAndExtents),
