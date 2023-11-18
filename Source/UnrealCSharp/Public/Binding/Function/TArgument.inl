@@ -81,7 +81,7 @@ struct TParentArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_refere
 		}
 		else
 		{
-			return TPropertyValue<Type, Type>::Get(new Type(Super::Value));
+			return TPropertyValue<Type, Type>::Get(const_cast<std::decay_t<T>*>(new Type(Super::Value)));
 		}
 	}
 };
