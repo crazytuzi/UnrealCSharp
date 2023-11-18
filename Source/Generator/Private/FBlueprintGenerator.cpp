@@ -5,7 +5,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Engine/UserDefinedStruct.h"
-#include "UMGEditor/Public/WidgetBlueprint.h"
+#include "WidgetBlueprint.h"
 #include "FGeneratorCore.h"
 #include "UEVersion.h"
 
