@@ -1,6 +1,7 @@
 ﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/NamespaceMacro.h"
+#include "UEVersion.h"
 
 BINDING_ENGINE_ENUM(EGuidFormats)
 
@@ -54,7 +55,9 @@ struct FRegisterGuid
 			          {"Value"})
 			.Function("Invalidate", BINDING_FUNCTION(&FGuid::Invalidate))
 			.Function("IsValid", BINDING_FUNCTION(&FGuid::IsValid))
+#if UE_GUID_TO_STRING
 			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString))
+#endif
 			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString),
 			          {"Format"})
 			.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
