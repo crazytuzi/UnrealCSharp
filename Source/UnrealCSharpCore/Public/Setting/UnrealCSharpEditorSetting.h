@@ -35,13 +35,13 @@ public:
 
 private:
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(Config, EditAnywhere, meta = (GetOptions = "GetDotNetPathArray"))
+	UPROPERTY(Config, EditAnywhere, Category = DotNet, meta = (GetOptions = "GetDotNetPathArray"))
 	FString DotNetPath = TEXT("");
 
-	UPROPERTY(Config, EditAnywhere, meta = (GetOptions = "GetModuleList"))
+	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (GetOptions = "GetModuleList"))
 	TArray<FString> SupportedModule;
 
-	UPROPERTY(Config, EditAnywhere, meta = (GetOptions = "GetModuleList"))
+	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (GetOptions = "GetModuleList"))
 	TArray<FString> SupportedAssetsPath;
 #endif
 };
