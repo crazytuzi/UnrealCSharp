@@ -27,6 +27,9 @@ public:
 	const TArray<FString>& GetSupportedModule();
 
 	UFUNCTION()
+	const TArray<FString>& GetSupportedAssetsPath();
+
+	UFUNCTION()
 	TArray<FString> GetModuleList();
 #endif
 
@@ -37,5 +40,8 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, meta = (GetOptions = "GetModuleList"))
 	TArray<FString> SupportedModule;
+
+	UPROPERTY(Config, EditAnywhere, meta = (GetOptions = "GetModuleList"))
+	TArray<FString> SupportedAssetsPath;
 #endif
 };

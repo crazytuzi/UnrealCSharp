@@ -12,6 +12,10 @@
 
 TArray<FString> FGeneratorCore::SupportedModule;
 
+TArray<FName> FGeneratorCore::SupportedAssetsPath;
+
+TArray<FString> FGeneratorCore::SupportedAssetsPathNameSpace;
+
 TMap<TWeakObjectPtr<const UObject>, bool> FGeneratorCore::SupportedMap;
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
@@ -567,28 +571,6 @@ bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& St
 	                                     FILEWRITE_None);
 }
 
-FString FGeneratorCore::GetPluginConfig()
-{
-	return FPaths::ConvertRelativePathToFull(FPaths::Combine(
-		FPaths::ProjectPluginsDir(), PLUGIN_NAME, CONFIG, FString::Printf(TEXT(
-			"%s%s"
-		),
-		                                                                  *PLUGIN_NAME,
-		                                                                  *INI_SUFFIX
-		)));
-}
-
-FString FGeneratorCore::GetProjectConfig()
-{
-	return FPaths::ConvertRelativePathToFull(FPaths::Combine(
-		FPaths::ProjectConfigDir(), FString::Printf(TEXT(
-			"%s%s"
-		),
-		                                            *PLUGIN_NAME,
-		                                            *INI_SUFFIX
-		)));
-}
-
 bool FGeneratorCore::IsSupported(FProperty* Property)
 {
 	if (Property == nullptr) return false;
@@ -811,41 +793,21 @@ bool FGeneratorCore::IsSupported(const UEnum* InEnum)
 
 bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 {
-	static auto GameRoot = FString::Printf(TEXT(
-		"%s.Game"
-	),
-	                                       *SCRIPT
-	);
-
-	static auto Game = FString::Printf(TEXT(
-		"%s.Game."
-	),
-	                                   *SCRIPT
-	);
-
-	if (InModule == GameRoot || InModule.StartsWith(Game))
+	for (auto Index = 0; Index < SupportedAssetsPathNameSpace.Num(); Index += 2)
 	{
-		return true;
+		if (InModule == SupportedAssetsPathNameSpace[Index] ||
+			InModule.StartsWith(SupportedAssetsPathNameSpace[Index + 1]))
+		{
+			return true;
+		}
 	}
 
 	return SupportedModule.Contains(InModule);
 }
 
-TArray<FName> FGeneratorCore::GetAssetsPaths()
+const TArray<FName>& FGeneratorCore::GetSupportedAssetsPath()
 {
-	TArray<FName> AssetsPaths;
-
-	TArray<FString> OutArray;
-
-	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), OutArray, GetPluginConfig());
-
-	AssetsPaths.Append(OutArray);
-
-	GConfig->GetArray(TEXT("Generator"), TEXT("AssetsPaths"), OutArray, GetProjectConfig());
-
-	AssetsPaths.Append(OutArray);
-
-	return AssetsPaths;
+	return SupportedAssetsPath;
 }
 
 void FGeneratorCore::BeginGenerator()
@@ -861,11 +823,44 @@ void FGeneratorCore::BeginGenerator()
 			));
 		}
 	}
+
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	{
+		for (auto AssetsPath : UnrealCSharpEditorSetting->GetSupportedAssetsPath())
+		{
+			AssetsPath = AssetsPath == FApp::GetProjectName() ? TEXT("Game") : AssetsPath;
+
+			SupportedAssetsPath.Add(*FString::Printf(TEXT(
+				"/%s"),
+			                                         *AssetsPath
+			));
+
+			SupportedAssetsPathNameSpace.Append({
+				FString::Printf(TEXT(
+					"%s.%s"
+				),
+				                *SCRIPT,
+				                *AssetsPath
+
+				),
+				FString::Printf(TEXT(
+					"%s.%s."
+				),
+				                *SCRIPT,
+				                *AssetsPath
+				)
+			});
+		}
+	}
 }
 
 void FGeneratorCore::EndGenerator()
 {
 	SupportedModule.Empty();
+
+	SupportedAssetsPath.Empty();
+
+	SupportedAssetsPathNameSpace.Empty();
 
 	SupportedMap.Empty();
 
