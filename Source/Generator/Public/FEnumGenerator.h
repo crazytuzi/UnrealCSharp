@@ -24,14 +24,13 @@ public:
 
 	static void AddEnumUnderlyingType(const UEnum* InEnum, const FNumericProperty* InNumericProperty);
 
-	// @TODO
-	static GENERATOR_API void EmptyEnumUnderlyingType();
-
 private:
 	static void GeneratorCollisionChannel();
 
 	static FString GetEnumUnderlyingTypeName(const UEnum* InEnum);
 
 private:
+	friend class FGeneratorCore;
+
 	static TMap<const UEnum*, EEnumUnderlyingType> EnumUnderlyingType;
 };

@@ -33,7 +33,26 @@ public:
 
 	static FString GetProjectConfig();
 
+	static bool IsSupported(FProperty* Property);
+
+	static bool IsSupported(const UClass* InClass);
+
+	static bool IsSupported(const UFunction* InFunction);
+
+	static bool IsSupported(const UStruct* InStruct);
+
+	static bool IsSupported(const UEnum* InEnum);
+
 	static bool IsSupportedModule(const FString& InModule);
 
 	static TArray<FName> GetAssetsPaths();
+
+	static GENERATOR_API void BeginGenerator();
+
+	static GENERATOR_API void EndGenerator();
+
+private:
+	static TArray<FString> SupportedModule;
+
+	static TMap<TWeakObjectPtr<const UObject>, bool> SupportedMap;
 };

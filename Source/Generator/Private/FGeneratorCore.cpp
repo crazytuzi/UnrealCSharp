@@ -8,8 +8,11 @@
 #include "Dynamic/CSharpBlueprintGeneratedClass.h"
 #include "Dynamic/CSharpScriptStruct.h"
 #include "Dynamic/CSharpEnum.h"
-#include "UEVersion.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+
+TArray<FString> FGeneratorCore::SupportedModule;
+
+TMap<TWeakObjectPtr<const UObject>, bool> FGeneratorCore::SupportedMap;
 
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
@@ -586,52 +589,228 @@ FString FGeneratorCore::GetProjectConfig()
 		)));
 }
 
-bool FGeneratorCore::IsSupportedModule(const FString& InModule)
+bool FGeneratorCore::IsSupported(FProperty* Property)
 {
-	static TArray<FString> Modules;
+	if (Property == nullptr) return false;
 
-#if UE_ARRAY_IS_EMPTY
-	if (Modules.IsEmpty())
-#else
-	if (Modules.Num() == 0)
-#endif
+	if (const auto ByteProperty = CastField<FByteProperty>(Property))
 	{
-		TArray<FString> OutArray;
-
-		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), OutArray, GetPluginConfig());
-
-		if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
-		{
-			OutArray.Append(UnrealCSharpEditorSetting->GetGeneratorModules());
-		}
-
-		for (const auto& Module : OutArray)
-		{
-			Modules.Add(FString::Printf(TEXT(
-				"%s.%s"),
-			                            *SCRIPT,
-			                            *Module
-			));
-		}
-
-		GConfig->GetArray(TEXT("Generator"), TEXT("SupportedModules"), OutArray, GetProjectConfig());
-
-		for (const auto& Module : OutArray)
-		{
-			Modules.Add(FString::Printf(TEXT(
-				"%s.%s"),
-			                            *SCRIPT,
-			                            *Module
-			));
-		}
-
-		Modules.Add(FString::Printf(TEXT(
-			"%s.%s"),
-		                            *SCRIPT,
-		                            FApp::GetProjectName()
-		));
+		return ByteProperty->Enum != nullptr ? IsSupported(ByteProperty->Enum) : true;
 	}
 
+	if (CastField<FUInt16Property>(Property)) return true;
+
+	if (CastField<FUInt32Property>(Property)) return true;
+
+	if (CastField<FUInt64Property>(Property)) return true;
+
+	if (CastField<FInt8Property>(Property)) return true;
+
+	if (CastField<FInt16Property>(Property)) return true;
+
+	if (CastField<FIntProperty>(Property)) return true;
+
+	if (CastField<FInt64Property>(Property)) return true;
+
+	if (CastField<FBoolProperty>(Property)) return true;
+
+	if (CastField<FFloatProperty>(Property)) return true;
+
+	if (const auto ClassProperty = CastField<FClassProperty>(Property))
+	{
+		return IsSupported(ClassProperty->MetaClass);
+	}
+
+	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
+	{
+		return IsSupported(ObjectProperty->PropertyClass);
+	}
+
+	if (CastField<FNameProperty>(Property)) return true;
+
+	if (const auto DelegateProperty = CastField<FDelegateProperty>(Property))
+	{
+		return IsSupported(DelegateProperty->SignatureFunction);
+	}
+
+	if (const auto InterfaceProperty = CastField<FInterfaceProperty>(Property))
+	{
+		return IsSupported(InterfaceProperty->InterfaceClass);
+	}
+
+	if (const auto StructProperty = CastField<FStructProperty>(Property))
+	{
+		return IsSupported(StructProperty->Struct);
+	}
+
+	if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
+	{
+		return IsSupported(ArrayProperty->Inner);
+	}
+
+	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
+	{
+		return IsSupported(EnumProperty->GetEnum());
+	}
+
+	if (CastField<FStrProperty>(Property)) return true;
+
+	if (CastField<FTextProperty>(Property)) return true;
+
+	if (const auto MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(Property))
+	{
+		return IsSupported(MulticastDelegateProperty->SignatureFunction);
+	}
+
+	if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
+	{
+		return IsSupported(WeakObjectProperty->PropertyClass);
+	}
+
+	if (const auto LazyObjectProperty = CastField<FLazyObjectProperty>(Property))
+	{
+		return IsSupported(LazyObjectProperty->PropertyClass);
+	}
+
+	if (const auto SoftClassProperty = CastField<FSoftClassProperty>(Property))
+	{
+		return IsSupported(SoftClassProperty->MetaClass);
+	}
+
+	if (const auto SoftObjectProperty = CastField<FSoftObjectProperty>(Property))
+	{
+		return IsSupported(SoftObjectProperty->PropertyClass);
+	}
+
+	if (CastField<FDoubleProperty>(Property)) return true;
+
+	if (const auto MapProperty = CastField<FMapProperty>(Property))
+	{
+		return IsSupported(MapProperty->KeyProp) && IsSupported(MapProperty->ValueProp);
+	}
+
+	if (const auto SetProperty = CastField<FSetProperty>(Property))
+	{
+		return IsSupported(SetProperty->ElementProp);
+	}
+
+	if (CastField<FFieldPathProperty>(Property)) return false;
+
+	return false;
+}
+
+bool FGeneratorCore::IsSupported(const UClass* InClass)
+{
+	if (const auto FoundSupported = SupportedMap.Find(InClass))
+	{
+		return *FoundSupported;
+	}
+
+	if (!IsSupportedModule(FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass)))
+	{
+		SupportedMap.Add(InClass, false);
+
+		return false;
+	}
+
+	if (const auto SuperClass = InClass->GetSuperClass())
+	{
+		if (!IsSupported(SuperClass))
+		{
+			SupportedMap.Add(InClass, false);
+
+			return false;
+		}
+	}
+
+	for (const auto Interface : InClass->Interfaces)
+	{
+		if (!IsSupported(Interface.Class))
+		{
+			SupportedMap.Add(InClass, false);
+
+			return false;
+		}
+	}
+
+	SupportedMap.Add(InClass, true);
+
+	return true;
+}
+
+bool FGeneratorCore::IsSupported(const UFunction* InFunction)
+{
+	if (const auto FoundSupported = SupportedMap.Find(InFunction))
+	{
+		return *FoundSupported;
+	}
+
+	for (TFieldIterator<FProperty> ParamIterator(InFunction); ParamIterator && (ParamIterator->PropertyFlags
+		     & CPF_Parm); ++ParamIterator)
+	{
+		if (!IsSupported(*ParamIterator))
+		{
+			SupportedMap.Add(InFunction, false);
+
+			return false;
+		}
+	}
+
+	SupportedMap.Add(InFunction, true);
+
+	return true;
+}
+
+bool FGeneratorCore::IsSupported(const UStruct* InStruct)
+{
+	if (const auto FoundSupported = SupportedMap.Find(InStruct))
+	{
+		return *FoundSupported;
+	}
+
+	if (!IsSupportedModule(FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct)))
+	{
+		SupportedMap.Add(InStruct, false);
+
+		return false;
+	}
+
+	if (const auto SuperStruct = InStruct->GetSuperStruct())
+	{
+		if (!IsSupported(SuperStruct))
+		{
+			SupportedMap.Add(InStruct, false);
+
+			return false;
+		}
+	}
+
+	SupportedMap.Add(InStruct, true);
+
+	return true;
+}
+
+bool FGeneratorCore::IsSupported(const UEnum* InEnum)
+{
+	if (const auto FoundSupported = SupportedMap.Find(InEnum))
+	{
+		return *FoundSupported;
+	}
+
+	if (!IsSupportedModule(FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum)))
+	{
+		SupportedMap.Add(InEnum, false);
+
+		return false;
+	}
+
+	SupportedMap.Add(InEnum, true);
+
+	return true;
+}
+
+bool FGeneratorCore::IsSupportedModule(const FString& InModule)
+{
 	static auto GameRoot = FString::Printf(TEXT(
 		"%s.Game"
 	),
@@ -649,7 +828,7 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 		return true;
 	}
 
-	return Modules.Contains(InModule);
+	return SupportedModule.Contains(InModule);
 }
 
 TArray<FName> FGeneratorCore::GetAssetsPaths()
@@ -667,4 +846,28 @@ TArray<FName> FGeneratorCore::GetAssetsPaths()
 	AssetsPaths.Append(OutArray);
 
 	return AssetsPaths;
+}
+
+void FGeneratorCore::BeginGenerator()
+{
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	{
+		for (const auto& Module : UnrealCSharpEditorSetting->GetSupportedModule())
+		{
+			SupportedModule.Add(FString::Printf(TEXT(
+				"%s.%s"),
+			                                    *SCRIPT,
+			                                    *Module
+			));
+		}
+	}
+}
+
+void FGeneratorCore::EndGenerator()
+{
+	SupportedModule.Empty();
+
+	SupportedMap.Empty();
+
+	FEnumGenerator::EnumUnderlyingType.Empty();
 }

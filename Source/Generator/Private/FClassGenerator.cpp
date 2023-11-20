@@ -6,6 +6,7 @@
 #include "Misc/FileHelper.h"
 #include "Dynamic/CSharpClass.h"
 #include "Dynamic/CSharpBlueprintGeneratedClass.h"
+#include "Dynamic/CSharpScriptStruct.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
@@ -28,12 +29,18 @@ void FClassGenerator::Generator(const UClass* InClass)
 	if (Cast<UCSharpClass>(InClass) ||
 		Cast<UCSharpBlueprintGeneratedClass>(InClass) ||
 		UCSharpClass::StaticClass() == InClass ||
-		UCSharpBlueprintGeneratedClass::StaticClass() == InClass)
+		UCSharpBlueprintGeneratedClass::StaticClass() == InClass ||
+		UCSharpScriptStruct::StaticClass() == InClass)
 	{
 		return;
 	}
 
 	if (Cast<UAnimBlueprintGeneratedClass>(InClass))
+	{
+		return;
+	}
+
+	if (!FGeneratorCore::IsSupported(InClass))
 	{
 		return;
 	}
@@ -50,11 +57,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FString UsingNameSpaceContent;
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass);
-
-	if (!FGeneratorCore::IsSupportedModule(NameSpaceContent))
-	{
-		return;
-	}
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InClass);
 
@@ -90,11 +92,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 	{
 		auto SuperClassNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass);
 
-		if (!FGeneratorCore::IsSupportedModule(SuperClassNameSpace))
-		{
-			return;
-		}
-
 		if (NameSpaceContent != SuperClassNameSpace)
 		{
 			UsingNameSpaces.Add(SuperClassNameSpace);
@@ -128,6 +125,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                                                EFieldIteratorFlags::ExcludeDeprecated); PropertyIterator; ++
 	     PropertyIterator)
 	{
+		if (!FGeneratorCore::IsSupported(*PropertyIterator))
+		{
+			continue;
+		}
+
 		FDelegateGenerator::Generator(*PropertyIterator);
 
 		if (bHasProperty == true)
@@ -266,6 +268,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
+		if (!FGeneratorCore::IsSupported(*FunctionIterator))
+		{
+			continue;
+		}
+
 		Functions.Add(*FunctionIterator);
 	}
 
@@ -281,6 +288,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 		     FunctionIterator)
 		{
 			if (OverrideFunctions.Contains(FunctionIterator->GetName()))
+			{
+				continue;
+			}
+
+			if (!FGeneratorCore::IsSupported(*FunctionIterator))
 			{
 				continue;
 			}
