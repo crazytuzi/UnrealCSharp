@@ -18,11 +18,11 @@ void FBlueprintGenerator::Generator()
 	TArray<UUserDefinedEnum*> UserDefinedEnums;
 
 #if UE_GET_ASSETS_BY_PATHS
-	for (const auto& AssetsPath : FGeneratorCore::GetSupportedAssetsPath())
+	for (const auto& AssetsPath : FGeneratorCore::GetSupportedAssetPath())
 	{
 		AssetRegistryModule.Get().GetAssetsByPath(AssetsPath, OutAssetData, true);
 #else
-	AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetSupportedAssetsPath(), OutAssetData, true);
+	AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetSupportedAssetPath(), OutAssetData, true);
 #endif
 
 	for (const auto& AssetData : OutAssetData)

@@ -188,9 +188,9 @@ const TArray<FString>& UUnrealCSharpEditorSetting::GetSupportedModule()
 	return SupportedModule;
 }
 
-const TArray<FString>& UUnrealCSharpEditorSetting::GetSupportedAssetsPath()
+const TArray<FString>& UUnrealCSharpEditorSetting::GetSupportedAssetPath()
 {
-	return SupportedAssetsPath;
+	return SupportedAssetPath;
 }
 
 TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()

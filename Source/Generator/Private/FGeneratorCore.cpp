@@ -12,9 +12,9 @@
 
 TArray<FString> FGeneratorCore::SupportedModule;
 
-TArray<FName> FGeneratorCore::SupportedAssetsPath;
+TArray<FName> FGeneratorCore::SupportedAssetPath;
 
-TArray<FString> FGeneratorCore::SupportedAssetsPathNameSpace;
+TArray<FString> FGeneratorCore::SupportedAssetPathNameSpace;
 
 TMap<TWeakObjectPtr<const UObject>, bool> FGeneratorCore::SupportedMap;
 
@@ -793,10 +793,10 @@ bool FGeneratorCore::IsSupported(const UEnum* InEnum)
 
 bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 {
-	for (auto Index = 0; Index < SupportedAssetsPathNameSpace.Num(); Index += 2)
+	for (auto Index = 0; Index < SupportedAssetPathNameSpace.Num(); Index += 2)
 	{
-		if (InModule == SupportedAssetsPathNameSpace[Index] ||
-			InModule.StartsWith(SupportedAssetsPathNameSpace[Index + 1]))
+		if (InModule == SupportedAssetPathNameSpace[Index] ||
+			InModule.StartsWith(SupportedAssetPathNameSpace[Index + 1]))
 		{
 			return true;
 		}
@@ -805,9 +805,9 @@ bool FGeneratorCore::IsSupportedModule(const FString& InModule)
 	return SupportedModule.Contains(InModule);
 }
 
-const TArray<FName>& FGeneratorCore::GetSupportedAssetsPath()
+const TArray<FName>& FGeneratorCore::GetSupportedAssetPath()
 {
-	return SupportedAssetsPath;
+	return SupportedAssetPath;
 }
 
 void FGeneratorCore::BeginGenerator()
@@ -826,28 +826,28 @@ void FGeneratorCore::BeginGenerator()
 
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
 	{
-		for (auto AssetsPath : UnrealCSharpEditorSetting->GetSupportedAssetsPath())
+		for (auto AssetPath : UnrealCSharpEditorSetting->GetSupportedAssetPath())
 		{
-			AssetsPath = AssetsPath == FApp::GetProjectName() ? TEXT("Game") : AssetsPath;
+			AssetPath = AssetPath == FApp::GetProjectName() ? TEXT("Game") : AssetPath;
 
-			SupportedAssetsPath.Add(*FString::Printf(TEXT(
+			SupportedAssetPath.Add(*FString::Printf(TEXT(
 				"/%s"),
-			                                         *AssetsPath
+			                                        *AssetPath
 			));
 
-			SupportedAssetsPathNameSpace.Append({
+			SupportedAssetPathNameSpace.Append({
 				FString::Printf(TEXT(
 					"%s.%s"
 				),
 				                *SCRIPT,
-				                *AssetsPath
+				                *AssetPath
 
 				),
 				FString::Printf(TEXT(
 					"%s.%s."
 				),
 				                *SCRIPT,
-				                *AssetsPath
+				                *AssetPath
 				)
 			});
 		}
@@ -858,9 +858,9 @@ void FGeneratorCore::EndGenerator()
 {
 	SupportedModule.Empty();
 
-	SupportedAssetsPath.Empty();
+	SupportedAssetPath.Empty();
 
-	SupportedAssetsPathNameSpace.Empty();
+	SupportedAssetPathNameSpace.Empty();
 
 	SupportedMap.Empty();
 

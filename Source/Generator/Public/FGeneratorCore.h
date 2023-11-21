@@ -41,7 +41,7 @@ public:
 
 	static bool IsSupportedModule(const FString& InModule);
 
-	static const TArray<FName>& GetSupportedAssetsPath();
+	static const TArray<FName>& GetSupportedAssetPath();
 
 	static GENERATOR_API void BeginGenerator();
 
@@ -50,9 +50,9 @@ public:
 private:
 	static TArray<FString> SupportedModule;
 
-	static TArray<FName> SupportedAssetsPath;
+	static TArray<FName> SupportedAssetPath;
 
-	static TArray<FString> SupportedAssetsPathNameSpace;
+	static TArray<FString> SupportedAssetPathNameSpace;
 
 	static TMap<TWeakObjectPtr<const UObject>, bool> SupportedMap;
 };
