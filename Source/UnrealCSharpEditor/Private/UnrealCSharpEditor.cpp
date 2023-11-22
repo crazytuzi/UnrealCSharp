@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UnrealCSharpEditor.h"
-#include "FBlueprintGenerator.h"
+#include "FAssetGenerator.h"
 #include "FClassGenerator.h"
 #include "FCSharpCompiler.h"
 #include "FGeneratorCore.h"
@@ -124,7 +124,7 @@ void FUnrealCSharpEditorModule::Generator()
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Blueprint Generator"));
 
-	FBlueprintGenerator::Generator();
+	FAssetGenerator::Generator();
 
 	FGeneratorCore::EndGenerator();
 

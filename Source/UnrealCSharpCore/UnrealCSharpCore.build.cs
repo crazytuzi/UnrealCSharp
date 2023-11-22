@@ -77,6 +77,16 @@ public class UnrealCSharpCore : ModuleRules
 			}
 		);
 
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"UMGEditor"
+					// ... add private dependencies that you statically link with here ...	
+				}
+			);
+		}
 
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]

@@ -18,6 +18,8 @@ TArray<FString> FGeneratorCore::SupportedAssetPathNameSpace;
 
 TMap<TWeakObjectPtr<const UObject>, bool> FGeneratorCore::SupportedMap;
 
+TArray<FName> FGeneratorCore::SupportedAssetClassName;
+
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
 	if (InField == nullptr)
@@ -810,6 +812,11 @@ const TArray<FName>& FGeneratorCore::GetSupportedAssetPath()
 	return SupportedAssetPath;
 }
 
+const TArray<FName>& FGeneratorCore::GetSupportedAssetClassName()
+{
+	return SupportedAssetClassName;
+}
+
 void FGeneratorCore::BeginGenerator()
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
@@ -822,10 +829,7 @@ void FGeneratorCore::BeginGenerator()
 			                                    *Module
 			));
 		}
-	}
 
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
-	{
 		for (auto AssetPath : UnrealCSharpEditorSetting->GetSupportedAssetPath())
 		{
 			AssetPath = AssetPath == FApp::GetProjectName() ? TEXT("Game") : AssetPath;
@@ -851,6 +855,11 @@ void FGeneratorCore::BeginGenerator()
 				)
 			});
 		}
+
+		for (const auto& AssetClass : UnrealCSharpEditorSetting->GetSupportedAssetClass())
+		{
+			SupportedAssetClassName.Add(AssetClass->GetFName());
+		}
 	}
 }
 
@@ -863,6 +872,8 @@ void FGeneratorCore::EndGenerator()
 	SupportedAssetPathNameSpace.Empty();
 
 	SupportedMap.Empty();
+
+	SupportedAssetClassName.Empty();
 
 	FEnumGenerator::EnumUnderlyingType.Empty();
 }

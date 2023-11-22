@@ -24,10 +24,13 @@ public:
 	TArray<FString> GetDotNetPathArray() const;
 
 	UFUNCTION()
-	const TArray<FString>& GetSupportedModule();
+	const TArray<FString>& GetSupportedModule() const;
 
 	UFUNCTION()
-	const TArray<FString>& GetSupportedAssetPath();
+	const TArray<FString>& GetSupportedAssetPath() const;
+
+	UFUNCTION()
+	const TArray<TSubclassOf<UObject>>& GetSupportedAssetClass() const;
 
 	UFUNCTION()
 	TArray<FString> GetModuleList();
@@ -43,5 +46,8 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (GetOptions = "GetModuleList"))
 	TArray<FString> SupportedAssetPath;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	TArray<TSubclassOf<UObject>> SupportedAssetClass;
 #endif
 };

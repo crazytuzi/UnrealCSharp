@@ -30,9 +30,13 @@ public:
 
 	static FString GetClassNameSpace(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 
-	static FString GetFileName(const UField* InField);
+#if WITH_EDITOR
+	static FString GetFileName(const FAssetData& InAssetData);
 
-	static FString GetOldFileName(const UField* InField, const FString& OldName);
+	static FString GetFileName(const FAssetData& InAssetData, const FString& InAssetName);
+
+	static FString GetOldFileName(const FAssetData& InAssetData, const FString& InOldObjectPath);
+#endif
 
 	static FString GetBaseName();
 

@@ -20,7 +20,7 @@ class FEnumGenerator
 public:
 	static GENERATOR_API void Generator();
 
-	static GENERATOR_API void Generator(const UEnum* InEnum);
+	static void Generator(const UEnum* InEnum);
 
 	static void AddEnumUnderlyingType(const UEnum* InEnum, const FNumericProperty* InNumericProperty);
 

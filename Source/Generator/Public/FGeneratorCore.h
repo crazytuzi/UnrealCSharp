@@ -43,6 +43,8 @@ public:
 
 	static const TArray<FName>& GetSupportedAssetPath();
 
+	static GENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
+
 	static GENERATOR_API void BeginGenerator();
 
 	static GENERATOR_API void EndGenerator();
@@ -55,4 +57,6 @@ private:
 	static TArray<FString> SupportedAssetPathNameSpace;
 
 	static TMap<TWeakObjectPtr<const UObject>, bool> SupportedMap;
+
+	static TArray<FName> SupportedAssetClassName;
 };

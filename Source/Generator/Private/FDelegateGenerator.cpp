@@ -173,11 +173,6 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		                                                 *FGeneratorCore::GetReturnParamName(DelegateReturnParam));
 	}
 
-	if (bIsSafeExecuteFunction == false)
-	{
-		UsingNameSpaces.Add(TEXT("IntPtr = Script.Common.IntPtr"));
-	}
-
 	FString ExecuteFunctionOutParamBody;
 
 	for (auto ExecuteFunctionOutParam : ExecuteFunctionOutParams)
@@ -494,11 +489,6 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 			"return %s;"
 		),
 		                                                   *FGeneratorCore::GetReturnParamName(DelegateReturnParam));
-	}
-
-	if (bIsSafeBroadcastFunction == false)
-	{
-		UsingNameSpaces.Add(TEXT("IntPtr = Script.Common.IntPtr"));
 	}
 
 	FString BroadcastFunctionOutParamBody;

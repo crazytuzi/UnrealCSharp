@@ -7,7 +7,7 @@ class FClassGenerator
 public:
 	static GENERATOR_API void Generator();
 
-	static GENERATOR_API void Generator(const UClass* InClass);
+	static void Generator(const UClass* InClass);
 
 private:
 	static bool GeneratorFunctionDefaultParam(const TArray<int32>& InFunctionOutParamIndex,
