@@ -26,6 +26,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		return;
 	}
 
+	if (!FGeneratorCore::IsSupported(InScriptStruct))
+	{
+		return;
+	}
+
 	auto ClassName = InScriptStruct->GetName();
 
 	if (ClassName.StartsWith(TEXT("STRUCT_REINST_")))
@@ -38,11 +43,6 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	FString UsingNameSpaceContent;
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct);
-
-	if (!FGeneratorCore::IsSupportedModule(NameSpaceContent))
-	{
-		return;
-	}
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InScriptStruct);
 
@@ -69,11 +69,6 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	if (SuperStruct != nullptr)
 	{
 		auto SuperStructNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperStruct);
-
-		if (!FGeneratorCore::IsSupportedModule(SuperStructNameSpace))
-		{
-			return;
-		}
 
 		if (NameSpaceContent != SuperStructNameSpace)
 		{
@@ -157,6 +152,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                                                EFieldIteratorFlags::ExcludeDeprecated); PropertyIterator; ++
 	     PropertyIterator)
 	{
+		if (!FGeneratorCore::IsSupported(*PropertyIterator))
+		{
+			continue;
+		}
+
 		FDelegateGenerator::Generator(*PropertyIterator);
 
 		if (bHasProperty == true)

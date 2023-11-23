@@ -77,6 +77,16 @@ public class UnrealCSharpCore : ModuleRules
 			}
 		);
 
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(
+				new string[]
+				{
+					"UMGEditor"
+					// ... add private dependencies that you statically link with here ...	
+				}
+			);
+		}
 
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
@@ -168,14 +178,14 @@ public class UnrealCSharpCore : ModuleRules
 
 		foreach (var Item in DirectoryInfo.GetFiles(Suffix))
 		{
-			Modules.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length - 1));
+			Modules.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length + 1));
 		}
 
 		foreach (var Directories in DirectoryInfo.GetDirectories())
 		{
 			foreach (var Item in Directories.GetFiles(Suffix, SearchOption.AllDirectories))
 			{
-				Modules.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length - 1));
+				Modules.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length + 1));
 			}
 		}
 	}

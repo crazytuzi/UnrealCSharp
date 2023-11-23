@@ -31,10 +31,7 @@ private:
 	void OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges);
 
 private:
-	void OnAssetChanged(const FAssetData& InAssetData,
-	                    const TFunction<void(const UClass*)> InBlueprint,
-	                    const TFunction<void(const class UUserDefinedStruct*)> InUserDefinedStruct,
-	                    const TFunction<void(const class UUserDefinedEnum*)> InUserDefinedEnum) const;
+	static void OnAssetChanged(const TFunction<void()>& InGenerator);
 
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;

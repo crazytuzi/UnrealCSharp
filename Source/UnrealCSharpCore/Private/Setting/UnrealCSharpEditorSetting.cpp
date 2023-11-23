@@ -183,12 +183,22 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 	return ResultArray;
 }
 
-const TArray<FString>& UUnrealCSharpEditorSetting::GetGeneratorModules()
+const TArray<FString>& UUnrealCSharpEditorSetting::GetSupportedModule() const
 {
-	return GeneratorModules;
+	return SupportedModule;
 }
 
-TArray<FString> UUnrealCSharpEditorSetting::GetModuleArray()
+const TArray<FString>& UUnrealCSharpEditorSetting::GetSupportedAssetPath() const
+{
+	return SupportedAssetPath;
+}
+
+const TArray<TSubclassOf<UObject>>& UUnrealCSharpEditorSetting::GetSupportedAssetClass() const
+{
+	return SupportedAssetClass;
+}
+
+TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 {
 	TArray<FString> ModuleArray;
 

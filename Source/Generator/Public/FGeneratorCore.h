@@ -29,11 +29,34 @@ public:
 
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 
-	static FString GetPluginConfig();
+	static bool IsSupported(FProperty* Property);
 
-	static FString GetProjectConfig();
+	static bool IsSupported(const UClass* InClass);
+
+	static bool IsSupported(const UFunction* InFunction);
+
+	static bool IsSupported(const UStruct* InStruct);
+
+	static bool IsSupported(const UEnum* InEnum);
 
 	static bool IsSupportedModule(const FString& InModule);
 
-	static TArray<FName> GetAssetsPaths();
+	static const TArray<FName>& GetSupportedAssetPath();
+
+	static GENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
+
+	static GENERATOR_API void BeginGenerator();
+
+	static GENERATOR_API void EndGenerator();
+
+private:
+	static TArray<FString> SupportedModule;
+
+	static TArray<FName> SupportedAssetPath;
+
+	static TArray<FString> SupportedAssetPathNameSpace;
+
+	static TMap<TWeakObjectPtr<const UObject>, bool> SupportedMap;
+
+	static TArray<FName> SupportedAssetClassName;
 };

@@ -28,16 +28,16 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		return;
 	}
 
+	if (!FGeneratorCore::IsSupported(InEnum))
+	{
+		return;
+	}
+
 	const auto UserDefinedEnum = Cast<UUserDefinedEnum>(InEnum);
 
 	FString UsingNameSpaceContent;
 
 	const auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum);
-
-	if (!FGeneratorCore::IsSupportedModule(NameSpaceContent))
-	{
-		return;
-	}
 
 	const auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InEnum);
 
@@ -154,11 +154,6 @@ void FEnumGenerator::AddEnumUnderlyingType(const UEnum* InEnum, const FNumericPr
 	}
 
 	EnumUnderlyingType.Emplace(InEnum, UnderlyingType);
-}
-
-void FEnumGenerator::EmptyEnumUnderlyingType()
-{
-	EnumUnderlyingType.Empty();
 }
 
 void FEnumGenerator::GeneratorCollisionChannel()

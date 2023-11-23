@@ -1,9 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UnrealCSharpEditor.h"
-#include "FBlueprintGenerator.h"
+#include "FAssetGenerator.h"
 #include "FClassGenerator.h"
 #include "FCSharpCompiler.h"
+#include "FGeneratorCore.h"
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"
 #include "FSolutionGenerator.h"
@@ -107,6 +108,8 @@ void FUnrealCSharpEditorModule::Generator()
 
 	FDynamicGenerator::CodeAnalysisGenerator();
 
+	FGeneratorCore::BeginGenerator();
+
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Class Generator"));
 
 	FClassGenerator::Generator();
@@ -121,9 +124,9 @@ void FUnrealCSharpEditorModule::Generator()
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Blueprint Generator"));
 
-	FBlueprintGenerator::Generator();
+	FAssetGenerator::Generator();
 
-	FEnumGenerator::EmptyEnumUnderlyingType();
+	FGeneratorCore::EndGenerator();
 
 	if (!CurrentCultureName.Equals(DefaultCultureName))
 	{

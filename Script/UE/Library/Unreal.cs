@@ -48,6 +48,14 @@ namespace Script.Library
             return OutValue;
         }
 
+        public static T LoadObject<T>(UObject Outer) where T : UObject
+        {
+            UnrealImplementation.Unreal_LoadObjectImplementation<T>(Outer.GetHandle(), Utils.GetPathName(typeof(T)),
+                out var OutValue);
+
+            return OutValue;
+        }
+
         // @TODO
         public static UClass LoadClass(UObject Outer, string Name)
         {

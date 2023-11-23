@@ -10,6 +10,9 @@
 #include "Serialization/JsonSerializer.h"
 #include "UEVersion.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+#if WITH_EDITOR
+#include "WidgetBlueprint.h"
+#endif
 
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
@@ -301,33 +304,31 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 	return TEXT("");
 }
 
-FString FUnrealCSharpFunctionLibrary::GetFileName(const UField* InField)
+#if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData)
 {
-	auto ModuleName = GetModuleName(InField);
-
-	auto DirectoryName = FPaths::Combine(GetGenerationPath(InField), ModuleName);
-
-	return FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-			"%s.cs"
-		),
-	                                                         *FPaths::Combine(DirectoryName,
-	                                                                          InField->GetName()))
-	);
+	return GetFileName(InAssetData, InAssetData.AssetName.ToString());
 }
 
-FString FUnrealCSharpFunctionLibrary::GetOldFileName(const UField* InField, const FString& OldName)
+FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData, const FString& InAssetName)
 {
-	auto ModuleName = GetModuleName(InField);
+	auto ModuleName = InAssetData.PackagePath.ToString();
 
-	auto DirectoryName = FPaths::Combine(GetGenerationPath(InField), ModuleName);
+	auto DirectoryName = FPaths::Combine(GetGenerationPath(ModuleName), ModuleName);
 
-	return FPaths::ConvertRelativePathToFull(FString::Printf(TEXT(
-			"%s.cs"
-		),
-	                                                         *FPaths::Combine(DirectoryName,
-	                                                                          OldName))
-	);
+	return FPaths::Combine(DirectoryName, InAssetName)
+		+ (InAssetData.GetClass()->GetFName() == UBlueprint::StaticClass()->GetFName() ||
+		   InAssetData.GetClass()->GetFName() == UWidgetBlueprint::StaticClass()->GetFName()
+			   ? TEXT("_C")
+			   : TEXT(""))
+		+ TEXT(".cs");
 }
+
+FString FUnrealCSharpFunctionLibrary::GetOldFileName(const FAssetData& InAssetData, const FString& InOldObjectPath)
+{
+	return GetFileName(InAssetData, InOldObjectPath.Right(InOldObjectPath.Len() - InOldObjectPath.Find(TEXT(".")) - 1));
+}
+#endif
 
 FString FUnrealCSharpFunctionLibrary::GetBaseName()
 {
