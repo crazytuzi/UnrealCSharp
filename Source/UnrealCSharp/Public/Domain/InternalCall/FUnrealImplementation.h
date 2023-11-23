@@ -20,5 +20,9 @@ public:
 	static void Unreal_LoadClassImplementation(const FGarbageCollectionHandle Outer, MonoString* Name,
 	                                           MonoObject** OutValue);
 
+	static void Unreal_CreateWidgetImplementation(const FGarbageCollectionHandle OwningObject,
+	                                              const FGarbageCollectionHandle UserWidgetClass,
+	                                              MonoObject** OutValue);
+
 	static void Unreal_GWorldImplementation(MonoObject** OutValue);
 };

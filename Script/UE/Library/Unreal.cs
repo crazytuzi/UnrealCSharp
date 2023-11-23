@@ -1,6 +1,7 @@
 ﻿using Script.Common;
 using Script.CoreUObject;
 using Script.Engine;
+using Script.UMG;
 
 namespace Script.Library
 {
@@ -60,6 +61,14 @@ namespace Script.Library
         public static UClass LoadClass(UObject Outer, string Name)
         {
             UnrealImplementation.Unreal_LoadClassImplementation(Outer.GetHandle(), Name, out var OutValue);
+
+            return OutValue;
+        }
+
+        public static T CreateWidget<T>(APlayerController OwningObject) where T : UUserWidget, IStaticClass
+        {
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GetHandle(),
+                T.StaticClass().GetHandle(), out var OutValue);
 
             return OutValue;
         }
