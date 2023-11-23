@@ -14,6 +14,8 @@ private:
 
 	static void OnPreBeginPIE(const bool);
 
+	static void OnPrePIEEnded(const bool);
+
 	void OnFilesLoaded();
 
 	void OnAssetAdded(const FAssetData& InAssetData) const;
@@ -38,10 +40,14 @@ private:
 
 	FDelegateHandle OnPreBeginPIEDelegateHandle;
 
+	FDelegateHandle OnPrePIEEndedDelegateHandle;
+
 	FDelegateHandle OnMainFrameCreationFinishedDelegateHandle;
 
 	FDelegateHandle OnDirectoryChangedDelegateHandle;
 
 private:
 	TArray<FFileChangeData> FileChanges;
+
+	static bool bIsPIEPlaying;
 };

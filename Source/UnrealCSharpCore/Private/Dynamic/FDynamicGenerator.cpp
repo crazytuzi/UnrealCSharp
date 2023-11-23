@@ -47,6 +47,11 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 #if WITH_EDITOR
 void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 {
+	if (FMonoDomain::bLoadSucceed)
+	{
+		FMonoDomain::Deinitialize();
+	}
+
 	FMonoDomain::Initialize({
 		"",
 		FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
@@ -65,7 +70,8 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 		{
 			auto Filename = FPaths::GetBaseFilename(Data.Filename);
 
-			if (const auto MonoClass = FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), Filename))
+			if (const auto MonoClass = FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(),
+			                                                        Filename))
 			{
 				if (FDynamicClassGenerator::IsDynamicClass(MonoClass))
 				{

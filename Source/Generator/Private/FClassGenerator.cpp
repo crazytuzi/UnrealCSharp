@@ -263,7 +263,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		if (OverrideFunctions.Contains(FunctionIterator->GetName()))
+		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
 		{
 			continue;
 		}
@@ -287,7 +287,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 		     FunctionIterator)
 		{
-			if (OverrideFunctions.Contains(FunctionIterator->GetName()))
+			if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
 			{
 				continue;
 			}
