@@ -462,7 +462,7 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 			return FString::Printf(TEXT(
 				"(Byte) %s"
 			),
-			                       *GetName(ByteProperty->GetName()));
+			                       *FUnrealCSharpFunctionLibrary::Encode(ByteProperty->GetName()));
 		}
 	}
 
@@ -472,10 +472,10 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 			"(%s) %s"
 		),
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()),
-		                       *GetName(EnumProperty->GetName()));
+		                       *FUnrealCSharpFunctionLibrary::Encode(EnumProperty->GetName()));
 	}
 
-	return GetName(Property->GetName());
+	return FUnrealCSharpFunctionLibrary::Encode(Property->GetName());
 }
 
 FString FGeneratorCore::GetReturnParamType(FProperty* Property)
@@ -499,61 +499,6 @@ FString FGeneratorCore::GetReturnParamName(FProperty* Property)
 		"(%s) __ReturnValue"
 	),
 	                       *GetPropertyType(Property));
-}
-
-FString FGeneratorCore::GetName(FString InName)
-{
-	static TArray<FString, TInlineAllocator<77>> KeyWords{
-		TEXT("abstract"), TEXT("as"),
-		TEXT("base"), TEXT("bool"), TEXT("break"), TEXT("byte"),
-		TEXT("case"), TEXT("catch"), TEXT("char"), TEXT("checked"), TEXT("class"), TEXT("const"), TEXT("continue"),
-		TEXT("decimal"), TEXT("default"), TEXT("delegate"), TEXT("do"), TEXT("double"),
-		TEXT("else"), TEXT("enum"), TEXT("event"), TEXT("explicit"), TEXT("extern"),
-		TEXT("false"), TEXT("finally"), TEXT("fixed"), TEXT("float"), TEXT("for"), TEXT("foreach"),
-		TEXT("goto"),
-		TEXT("if"), TEXT("implicit"), TEXT("in"), TEXT("int"), TEXT("interface"), TEXT("internal"), TEXT("is"),
-		TEXT("lock"), TEXT("long"),
-		TEXT("namespace"), TEXT("new"), TEXT("null"),
-		TEXT("object"), TEXT("operator"), TEXT("out"), TEXT("override"),
-		TEXT("params"), TEXT("private"), TEXT("protected"), TEXT("public"),
-		TEXT("readonly"), TEXT("ref"), TEXT("return"),
-		TEXT("sbyte"), TEXT("sealed"), TEXT("short"), TEXT("sizeof"), TEXT("stackalloc"), TEXT("static"),
-		TEXT("string"), TEXT("struct"), TEXT("switch"),
-		TEXT("this"), TEXT("throw"), TEXT("true"), TEXT("try"), TEXT("typeof"),
-		TEXT("uint"), TEXT("ulong"), TEXT("unchecked"), TEXT("unsafe"), TEXT("ushort"), TEXT("using"),
-		TEXT("virtual"), TEXT("void"), TEXT("volatile"),
-		TEXT("while")
-	};
-
-	if (KeyWords.ContainsByPredicate([&](const FString& Name)
-	{
-		return InName.Equals(Name);
-	}))
-	{
-		return FString::Printf(TEXT("@%s"), *InName);
-	}
-
-	for (auto& Char : InName)
-	{
-		if (!(Char >= '0' && Char <= '9' || Char >= 'a' && Char <= 'z' || Char >= 'A' && Char <= 'Z'))
-		{
-			Char = '_';
-		}
-	}
-
-	if (InName.Len() > 0)
-	{
-		if (InName[0] >= '0' && InName[0] <= '9')
-		{
-			InName = FString::Printf(TEXT(
-				"_%s"
-			),
-			                         *InName
-			);
-		}
-	}
-
-	return InName;
 }
 
 bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& String)

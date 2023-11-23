@@ -24,7 +24,7 @@ void FFunctionDescriptor::Initialize()
 		return;
 	}
 
-	const auto IsNativeClass = Function->GetOwnerClass()->IsNative();
+	const auto IsNativeClass = Function->GetOuter()->IsNative();
 
 	PropertyDescriptors.Reserve(Function->ReturnValueOffset != MAX_uint16
 		                            ? (Function->NumParms > 0

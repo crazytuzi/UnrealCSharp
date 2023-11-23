@@ -143,6 +143,8 @@ public class UnrealCSharpCore : ModuleRules
 
 		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Runtime/"))), EngineModules);
 
+		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/"))), EngineModules);
+
 		var EnginePlugins = new List<string>();
 
 		var EnginePluginInfos =
