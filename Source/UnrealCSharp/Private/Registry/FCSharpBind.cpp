@@ -157,16 +157,13 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 						*FUnrealCSharpFunctionLibrary::Encode(Property->GetName())
 					))))
 				{
-					const auto PropertyDescriptor = FPropertyDescriptor::Factory(Property);
-
-					auto PropertyHash = GetTypeHash(PropertyDescriptor);
-
-					NewClassDescriptor->PropertyHashSet.Add(PropertyHash);
+					auto PropertyHash = GetTypeHash(Property);
 
 					InDomain->Field_Static_Set_Value(InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
 					                                 FoundClassField, &PropertyHash);
 
-					FCSharpEnvironment::GetEnvironment().AddPropertyDescriptor(PropertyHash, PropertyDescriptor);
+					FCSharpEnvironment::GetEnvironment().AddPropertyHash(
+						PropertyHash, NewClassDescriptor, Property->GetFName());
 				}
 			}
 		}

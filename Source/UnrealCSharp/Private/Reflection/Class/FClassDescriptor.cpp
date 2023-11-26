@@ -94,6 +94,20 @@ FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FName& InFunc
 	return nullptr;
 }
 
+FPropertyDescriptor* FClassDescriptor::GetPropertyDescriptor(const FName& InPropertyName)
+{
+	if (const auto FoundProperty = Struct->FindPropertyByName(InPropertyName))
+	{
+		const auto NewPropertyDescriptor = FPropertyDescriptor::Factory(FoundProperty);
+
+		PropertyHashSet.Add(GetTypeHash(FoundProperty));
+
+		return NewPropertyDescriptor;
+	}
+
+	return nullptr;
+}
+
 bool FClassDescriptor::HasFunctionDescriptor(const uint32 InFunctionHash) const
 {
 	return FunctionHashSet.Contains(InFunctionHash);

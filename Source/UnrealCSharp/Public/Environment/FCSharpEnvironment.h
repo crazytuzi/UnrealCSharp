@@ -75,6 +75,8 @@ public:
 
 	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor) const;
 
+	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor, const FName& InPropertyName) const;
+
 	void RemovePropertyDescriptor(uint32 InPropertyHash) const;
 
 public:

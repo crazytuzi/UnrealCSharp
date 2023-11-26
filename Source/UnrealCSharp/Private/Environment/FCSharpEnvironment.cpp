@@ -407,6 +407,15 @@ void FCSharpEnvironment::AddPropertyDescriptor(const uint32 InPropertyHash,
 	}
 }
 
+void FCSharpEnvironment::AddPropertyHash(const uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
+                                         const FName& InPropertyName) const
+{
+	if (ClassRegistry != nullptr)
+	{
+		ClassRegistry->AddPropertyHash(InPropertyHash, InClassDescriptor, InPropertyName);
+	}
+}
+
 void FCSharpEnvironment::RemovePropertyDescriptor(const uint32 InPropertyHash) const
 {
 	if (ClassRegistry != nullptr)

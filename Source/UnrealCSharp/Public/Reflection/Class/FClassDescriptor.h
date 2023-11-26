@@ -21,6 +21,8 @@ public:
 public:
 	FFunctionDescriptor* GetFunctionDescriptor(const FName& InFunctionName);
 
+	FPropertyDescriptor* GetPropertyDescriptor(const FName& InPropertyName);
+
 	bool HasFunctionDescriptor(uint32 InFunctionHash) const;
 
 	bool HasPropertyDescriptor(const FName& InPropertyName);
