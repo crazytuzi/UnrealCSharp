@@ -150,19 +150,19 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 		{
 			if (!NewClassDescriptor->HasPropertyDescriptor(Property->GetFName()))
 			{
-				const auto PropertyDescriptor = FPropertyDescriptor::Factory(Property);
-
-				auto PropertyHash = GetTypeHash(PropertyDescriptor);
-
-				NewClassDescriptor->PropertyHashSet.Add(PropertyHash);
-
 				if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),
-						*Property->GetFName().ToString()
+						*FUnrealCSharpFunctionLibrary::Encode(Property->GetName())
 					))))
 				{
+					const auto PropertyDescriptor = FPropertyDescriptor::Factory(Property);
+
+					auto PropertyHash = GetTypeHash(PropertyDescriptor);
+
+					NewClassDescriptor->PropertyHashSet.Add(PropertyHash);
+
 					InDomain->Field_Static_Set_Value(InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
 					                                 FoundClassField, &PropertyHash);
 
@@ -190,7 +190,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 						NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 								"__%s"
 							),
-							*Function->GetName()
+							*FUnrealCSharpFunctionLibrary::Encode(Function->GetName())
 						))))
 					{
 						auto FunctionHash = GetTypeHash(Function);

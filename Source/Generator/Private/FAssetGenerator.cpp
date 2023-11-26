@@ -108,7 +108,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 		return;
 	}
 
-	auto ClassName = InAssetData.AssetName.ToString();
+	auto ClassName = FUnrealCSharpFunctionLibrary::Encode(InAssetData.AssetName.ToString());
 
 	FString UsingNameSpaceContent;
 

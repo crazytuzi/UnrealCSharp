@@ -145,13 +145,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		auto PropertyType = FGeneratorCore::GetPropertyType(*PropertyIterator);
 
-		auto PropertyName = PropertyIterator->GetName();
+		auto PropertyName = FUnrealCSharpFunctionLibrary::Encode(PropertyIterator->GetName());
 
 		PropertyNames.Add(TPair<FString, FString>{
 			FString::Printf(TEXT(
 				"__%s"
 			),
-			                *FUnrealCSharpFunctionLibrary::Encode(PropertyName)
+			                *PropertyName
 			),
 			PropertyName
 		});
@@ -175,7 +175,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
-			                                   *FGeneratorCore::GetName(PropertyName),
+			                                   *PropertyName,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
@@ -200,7 +200,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
-			                                   *FGeneratorCore::GetName(PropertyName),
+			                                   *PropertyName,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
 			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
@@ -263,7 +263,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		if (OverrideFunctions.Contains(FunctionIterator->GetName()))
+		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
 		{
 			continue;
 		}
@@ -287,7 +287,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 		     FunctionIterator)
 		{
-			if (OverrideFunctions.Contains(FunctionIterator->GetName()))
+			if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
 			{
 				continue;
 			}
@@ -330,7 +330,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FString FunctionPolymorphism = TEXT("virtual");
 
-		auto FunctionName = Function->GetName();
+		auto FunctionName = FUnrealCSharpFunctionLibrary::Encode(Function->GetName());
 
 		if (bIsInterface == true)
 		{
@@ -480,7 +480,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionDeclarationBody += FString::Printf(TEXT(
 				"%s %s%s%s"),
 			                                           *FGeneratorCore::GetPropertyType(FunctionParams[Index]),
-			                                           *FGeneratorCore::GetName(FunctionParams[Index]->GetName()),
+			                                           *FUnrealCSharpFunctionLibrary::Encode(
+				                                           FunctionParams[Index]->GetName()),
 			                                           bGeneratorFunctionDefaultParam
 				                                           ? *GetFunctionDefaultParam(
 					                                           Function, FunctionParams[Index])
@@ -502,7 +503,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                           *FunctionStatic,
 		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
 		                                           *FunctionReturnType,
-		                                           *FGeneratorCore::GetName(FunctionName),
+		                                           *FunctionName,
 		                                           *FunctionDeclarationBody
 		);
 
@@ -515,7 +516,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FString::Printf(TEXT(
 				"__%s"
 			),
-			                *FUnrealCSharpFunctionLibrary::Encode(FunctionName)
+			                *FunctionName
 			),
 			FunctionName
 		});
@@ -556,7 +557,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionOutParams.Emplace(FString::Printf(TEXT(
 				"%s = %s;"
 			),
-			                                          *FGeneratorCore::GetName(
+			                                          *FUnrealCSharpFunctionLibrary::Encode(
 				                                          FunctionParams[FunctionOutParamIndex[Index]]->GetName()),
 			                                          *FGeneratorCore::GetOutParamString(
 				                                          FunctionParams[FunctionOutParamIndex[Index]],
@@ -568,7 +569,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionOutParams.Emplace(FString::Printf(TEXT(
 				"%s = %s;"
 			),
-			                                          *FGeneratorCore::GetName(
+			                                          *FUnrealCSharpFunctionLibrary::Encode(
 				                                          FunctionParams[FunctionRefParamIndex[Index]]->GetName()),
 			                                          *FGeneratorCore::GetOutParamString(
 				                                          FunctionParams[FunctionRefParamIndex[Index]],
@@ -1015,7 +1016,10 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(InProperty))
 	{
-		return FString::Printf(TEXT(" = %s.%s"), *EnumProperty->GetEnum()->GetName(), *MetaData);
+		return FString::Printf(TEXT(" = %s.%s"), *EnumProperty->GetEnum()->GetName(),
+		                       MetaData.IsEmpty()
+			                       ? *EnumProperty->GetEnum()->GetDisplayNameTextByIndex(0).ToString()
+			                       : *MetaData);
 	}
 
 	if (CastField<FStrProperty>(InProperty))
@@ -1120,7 +1124,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s ??= new FName(\"%s\");\n\n"
 		),
-		                       *FGeneratorCore::GetName(InProperty->GetName()),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 		                       *InMetaData
 		);
 	}
@@ -1141,7 +1145,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 					"\t\t\t\tRoll = %ff\n"
 					"\t\t\t};\n\n"
 				),
-				                       *InProperty->GetName(),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.Pitch,
 				                       Value.Yaw,
 				                       Value.Roll
@@ -1164,7 +1168,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 					"\t\t\t\tW = %ff\n"
 					"\t\t\t};\n\n"
 				),
-				                       *InProperty->GetName(),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.X,
 				                       Value.Y,
 				                       Value.Z,
@@ -1188,7 +1192,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 					"\t\t\t\tA = %ff\n"
 					"\t\t\t};\n\n"
 				),
-				                       *InProperty->GetName(),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.R,
 				                       Value.G,
 				                       Value.B,
@@ -1212,7 +1216,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 					"\t\t\t\tA = %hhu\n"
 					"\t\t\t};\n\n"
 				),
-				                       *InProperty->GetName(),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.R,
 				                       Value.G,
 				                       Value.B,
@@ -1236,7 +1240,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 					"\t\t\t\tW = %ff\n"
 					"\t\t\t};\n\n"
 				),
-				                       *InProperty->GetName(),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.X,
 				                       Value.Y,
 				                       Value.Z,
@@ -1259,7 +1263,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 					"\t\t\t\tZ = %ff\n"
 					"\t\t\t};\n\n"
 				),
-				                       *InProperty->GetName(),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.X,
 				                       Value.Y,
 				                       Value.Z
@@ -1280,7 +1284,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 					"\t\t\t\tY = %ff,\n"
 					"\t\t\t};\n\n"
 				),
-				                       *InProperty->GetName(),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.X,
 				                       Value.Y
 				);
@@ -1302,7 +1306,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 					"\t\t\t\tW = %ff\n"
 					"\t\t\t};\n\n"
 				),
-				                       *InProperty->GetName(),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.X,
 				                       Value.Y,
 				                       Value.Z,
@@ -1314,7 +1318,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s ??= new %s%s();\n\n"
 		),
-		                       *InProperty->GetName(),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 		                       StructProperty->Struct->IsNative() ? TEXT("F") : TEXT(""),
 		                       *StructProperty->Struct->GetName()
 		);
@@ -1325,7 +1329,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s ??= new FString(\"%s\");\n\n"
 		),
-		                       *InProperty->GetName(),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 		                       *InMetaData
 		);
 	}
@@ -1344,7 +1348,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s ??= new FText(\"%s\");\n\n"
 		),
-		                       *InProperty->GetName(),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 		                       *Value
 		);
 	}

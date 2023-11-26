@@ -9,11 +9,15 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Dynamic/FDynamicGenerator.h"
 
+bool FEditorListener::bIsPIEPlaying = false;
+
 FEditorListener::FEditorListener()
 {
 	OnPostEngineInitDelegateHandle = FCoreDelegates::OnPostEngineInit.AddStatic(&FEditorListener::OnPostEngineInit);
 
 	OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddStatic(&FEditorListener::OnPreBeginPIE);
+
+	OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddStatic(&FEditorListener::OnPrePIEEnded);
 
 	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
@@ -62,9 +66,14 @@ FEditorListener::~FEditorListener()
 		MainFrameModule.OnMainFrameCreationFinished().Remove(OnMainFrameCreationFinishedDelegateHandle);
 	}
 
+	if (OnPrePIEEndedDelegateHandle.IsValid())
+	{
+		FEditorDelegates::PrePIEEnded.Remove(OnPrePIEEndedDelegateHandle);
+	}
+
 	if (OnPreBeginPIEDelegateHandle.IsValid())
 	{
-		FCoreDelegates::OnPostEngineInit.Remove(OnPreBeginPIEDelegateHandle);
+		FEditorDelegates::PrePIEEnded.Remove(OnPreBeginPIEDelegateHandle);
 	}
 
 	if (OnPostEngineInitDelegateHandle.IsValid())
@@ -82,12 +91,12 @@ void FEditorListener::OnPostEngineInit()
 
 void FEditorListener::OnPreBeginPIE(const bool)
 {
-	while (FCSharpCompiler::Get().IsCompiling())
-	{
-		// @TODO
+	bIsPIEPlaying = true;
+}
 
-		FPlatformProcess::Sleep(0.01f);
-	}
+void FEditorListener::OnPrePIEEnded(const bool)
+{
+	bIsPIEPlaying = false;
 }
 
 void FEditorListener::OnFilesLoaded()
@@ -161,11 +170,14 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 
 void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator)
 {
-	FGeneratorCore::BeginGenerator();
+	if (!bIsPIEPlaying)
+	{
+		FGeneratorCore::BeginGenerator();
 
-	InGenerator();
+		InGenerator();
 
-	FCSharpCompiler::Get().Compile();
+		FCSharpCompiler::Get().Compile();
 
-	FGeneratorCore::EndGenerator();
+		FGeneratorCore::EndGenerator();
+	}
 }

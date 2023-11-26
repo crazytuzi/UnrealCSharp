@@ -24,6 +24,10 @@ namespace Script.Library
         public static extern void Unreal_LoadClassImplementation(IntPtr Outer, string Name, out UClass OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Unreal_CreateWidgetImplementation<T>(IntPtr OwningObject, IntPtr UserWidgetClass,
+            out T OutValue) where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Unreal_GWorldImplementation(out UWorld OutValue);
     }
 }

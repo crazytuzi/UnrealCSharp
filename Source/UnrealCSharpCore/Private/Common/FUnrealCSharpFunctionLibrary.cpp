@@ -193,10 +193,10 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FDelegateProperty* InDe
 
 	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
 
-	return FString::Printf(TEXT(
+	return Encode(FString::Printf(TEXT(
 		"F%s"
 	),
-	                       *DelegateName);
+	                              *DelegateName));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FDelegateProperty* InDelegateProperty)
@@ -218,7 +218,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FDelegateProperty*
 		return FString::Printf(TEXT(
 			"%s.%s"
 		),
-		                       *FUnrealCSharpFunctionLibrary::GetClassNameSpace(Class),
+		                       *GetClassNameSpace(Class),
 		                       *SignatureFunction->GetOuter()->GetName());
 	}
 
@@ -254,10 +254,10 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FMulticastDelegatePrope
 
 	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
 
-	return FString::Printf(TEXT(
+	return Encode(FString::Printf(TEXT(
 		"F%s"
 	),
-	                       *DelegateName);
+	                              *DelegateName));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegateProperty* InMulticastDelegateProperty)
@@ -316,7 +316,7 @@ FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData,
 
 	auto DirectoryName = FPaths::Combine(GetGenerationPath(ModuleName), ModuleName);
 
-	return FPaths::Combine(DirectoryName, InAssetName)
+	return FPaths::Combine(DirectoryName, Encode(InAssetName))
 		+ (InAssetData.GetClass()->GetFName() == UBlueprint::StaticClass()->GetFName() ||
 		   InAssetData.GetClass()->GetFName() == UWidgetBlueprint::StaticClass()->GetFName()
 			   ? TEXT("_C")
@@ -460,6 +460,36 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 
 FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool bEncodeWideString)
 {
+	static TArray<FString, TInlineAllocator<77>> KeyWords{
+		TEXT("abstract"), TEXT("as"),
+		TEXT("base"), TEXT("bool"), TEXT("break"), TEXT("byte"),
+		TEXT("case"), TEXT("catch"), TEXT("char"), TEXT("checked"), TEXT("class"), TEXT("const"), TEXT("continue"),
+		TEXT("decimal"), TEXT("default"), TEXT("delegate"), TEXT("do"), TEXT("double"),
+		TEXT("else"), TEXT("enum"), TEXT("event"), TEXT("explicit"), TEXT("extern"),
+		TEXT("false"), TEXT("finally"), TEXT("fixed"), TEXT("float"), TEXT("for"), TEXT("foreach"),
+		TEXT("goto"),
+		TEXT("if"), TEXT("implicit"), TEXT("in"), TEXT("int"), TEXT("interface"), TEXT("internal"), TEXT("is"),
+		TEXT("lock"), TEXT("long"),
+		TEXT("namespace"), TEXT("new"), TEXT("null"),
+		TEXT("object"), TEXT("operator"), TEXT("out"), TEXT("override"),
+		TEXT("params"), TEXT("private"), TEXT("protected"), TEXT("public"),
+		TEXT("readonly"), TEXT("ref"), TEXT("return"),
+		TEXT("sbyte"), TEXT("sealed"), TEXT("short"), TEXT("sizeof"), TEXT("stackalloc"), TEXT("static"),
+		TEXT("string"), TEXT("struct"), TEXT("switch"),
+		TEXT("this"), TEXT("throw"), TEXT("true"), TEXT("try"), TEXT("typeof"),
+		TEXT("uint"), TEXT("ulong"), TEXT("unchecked"), TEXT("unsafe"), TEXT("ushort"), TEXT("using"),
+		TEXT("virtual"), TEXT("void"), TEXT("volatile"),
+		TEXT("while")
+	};
+
+	if (KeyWords.ContainsByPredicate([&](const FString& Name)
+	{
+		return InName.Equals(Name);
+	}))
+	{
+		return FString::Printf(TEXT("@%s"), *InName);
+	}
+
 	return FNameEncode::Encode(InName, bEncodeWideString);
 }
 

@@ -2,6 +2,7 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
+#include "Blueprint/UserWidget.h"
 
 struct FRegisterUnreal
 {
@@ -12,6 +13,7 @@ struct FRegisterUnreal
 			.Function("DuplicateObject", FUnrealImplementation::Unreal_DuplicateObjectImplementation)
 			.Function("LoadObject", FUnrealImplementation::Unreal_LoadObjectImplementation)
 			.Function("LoadClass", FUnrealImplementation::Unreal_LoadClassImplementation)
+			.Function("CreateWidget", FUnrealImplementation::Unreal_CreateWidgetImplementation)
 			.Function("GWorld", FUnrealImplementation::Unreal_GWorldImplementation)
 			.Register();
 	}
@@ -75,6 +77,19 @@ void FUnrealImplementation::Unreal_LoadClassImplementation(const FGarbageCollect
 	const auto Class = LoadClass<UObject>(ObjectOuter, ObjectName);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Class);
+}
+
+void FUnrealImplementation::Unreal_CreateWidgetImplementation(const FGarbageCollectionHandle OwningObject,
+                                                              const FGarbageCollectionHandle UserWidgetClass,
+                                                              MonoObject** OutValue)
+{
+	const auto PlayerController = FCSharpEnvironment::GetEnvironment().GetObject<APlayerController>(OwningObject);
+
+	const auto Class = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(UserWidgetClass);
+
+	const auto Widget = CreateWidget(PlayerController, Class);
+
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Widget);
 }
 
 void FUnrealImplementation::Unreal_GWorldImplementation(MonoObject** OutValue)
