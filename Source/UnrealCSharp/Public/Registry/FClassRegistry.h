@@ -25,7 +25,9 @@ public:
 
 	FFunctionDescriptor* GetFunctionDescriptor(uint32 InFunctionHash);
 
-	FPropertyDescriptor* GetPropertyDescriptor(uint32 InPropertyHash);
+	FFunctionDescriptor* GetOrAddFunctionDescriptor(uint32 InFunctionHash);
+
+	FPropertyDescriptor* GetOrAddPropertyDescriptor(uint32 InPropertyHash);
 
 	void AddFunctionDescriptor(uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor);
 

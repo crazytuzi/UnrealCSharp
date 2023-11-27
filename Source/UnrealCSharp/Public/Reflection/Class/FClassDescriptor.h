@@ -19,9 +19,11 @@ public:
 	MonoClass* GetMonoClass() const;
 
 public:
-	FFunctionDescriptor* GetFunctionDescriptor(const FName& InFunctionName);
+	FFunctionDescriptor* AddFunctionDescriptor(const FName& InFunctionName);
 
-	FPropertyDescriptor* GetPropertyDescriptor(const FName& InPropertyName);
+	FFunctionDescriptor* GetOrAddFunctionDescriptor(const FName& InFunctionName);
+
+	FPropertyDescriptor* AddPropertyDescriptor(const FName& InPropertyName);
 
 	bool HasFunctionDescriptor(uint32 InFunctionHash) const;
 

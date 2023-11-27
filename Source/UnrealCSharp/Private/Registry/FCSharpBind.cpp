@@ -372,7 +372,7 @@ UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor,
 		return InFunction;
 	}
 
-	const auto FoundFunctionDescriptor = InClassDescriptor->GetFunctionDescriptor(InFunction->GetFName());
+	const auto FoundFunctionDescriptor = InClassDescriptor->GetOrAddFunctionDescriptor(InFunction->GetFName());
 
 	const auto OriginalFunction = FoundFunctionDescriptor != nullptr
 		                              ? FoundFunctionDescriptor->OriginalFunction.Get()

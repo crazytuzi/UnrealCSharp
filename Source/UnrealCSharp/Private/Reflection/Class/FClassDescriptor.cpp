@@ -48,19 +48,8 @@ MonoClass* FClassDescriptor::GetMonoClass() const
 	return BindMonoClass;
 }
 
-FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FName& InFunctionName)
+FFunctionDescriptor* FClassDescriptor::AddFunctionDescriptor(const FName& InFunctionName)
 {
-	for (const auto FunctionHash : FunctionHashSet)
-	{
-		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor(FunctionHash))
-		{
-			if (FunctionDescriptor->GetFName() == InFunctionName)
-			{
-				return FunctionDescriptor;
-			}
-		}
-	}
-
 	if (auto InClass = Cast<UClass>(Struct))
 	{
 		while (InClass != nullptr)
@@ -94,7 +83,23 @@ FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FName& InFunc
 	return nullptr;
 }
 
-FPropertyDescriptor* FClassDescriptor::GetPropertyDescriptor(const FName& InPropertyName)
+FFunctionDescriptor* FClassDescriptor::GetOrAddFunctionDescriptor(const FName& InFunctionName)
+{
+	for (const auto FunctionHash : FunctionHashSet)
+	{
+		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor(FunctionHash))
+		{
+			if (FunctionDescriptor->GetFName() == InFunctionName)
+			{
+				return FunctionDescriptor;
+			}
+		}
+	}
+
+	return AddFunctionDescriptor(InFunctionName);
+}
+
+FPropertyDescriptor* FClassDescriptor::AddPropertyDescriptor(const FName& InPropertyName)
 {
 	if (const auto FoundProperty = Struct->FindPropertyByName(InPropertyName))
 	{
@@ -117,7 +122,8 @@ bool FClassDescriptor::HasPropertyDescriptor(const FName& InPropertyName)
 {
 	for (const auto PropertyHash : PropertyHashSet)
 	{
-		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetPropertyDescriptor(PropertyHash))
+		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().
+			GetOrAddPropertyDescriptor(PropertyHash))
 		{
 			if (PropertyDescriptor->GetFName() == InPropertyName)
 			{

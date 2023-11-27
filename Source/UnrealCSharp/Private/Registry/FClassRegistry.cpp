@@ -101,15 +101,22 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 
 FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const uint32 InFunctionHash)
 {
-	if (const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionHash))
+	const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionHash);
+
+	return FoundFunctionDescriptor != nullptr ? *FoundFunctionDescriptor : nullptr;
+}
+
+FFunctionDescriptor* FClassRegistry::GetOrAddFunctionDescriptor(const uint32 InFunctionHash)
+{
+	if (const auto FoundFunctionDescriptor = GetFunctionDescriptor(InFunctionHash))
 	{
-		return *FoundFunctionDescriptor;
+		return FoundFunctionDescriptor;
 	}
 
 	if (const auto FoundFunctionHash = FunctionHashMap.Find(InFunctionHash))
 	{
 		if (const auto FoundFunctionDescriptor = FoundFunctionHash->Key->
-		                                                            GetFunctionDescriptor(FoundFunctionHash->Value))
+		                                                            AddFunctionDescriptor(FoundFunctionHash->Value))
 		{
 			FunctionHashMap.Remove(InFunctionHash);
 
@@ -122,7 +129,7 @@ FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const uint32 InFuncti
 	return nullptr;
 }
 
-FPropertyDescriptor* FClassRegistry::GetPropertyDescriptor(const uint32 InPropertyHash)
+FPropertyDescriptor* FClassRegistry::GetOrAddPropertyDescriptor(const uint32 InPropertyHash)
 {
 	if (const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyHash))
 	{
@@ -132,7 +139,7 @@ FPropertyDescriptor* FClassRegistry::GetPropertyDescriptor(const uint32 InProper
 	if (const auto FoundPropertyHash = PropertyHashMap.Find(InPropertyHash))
 	{
 		if (const auto FoundPropertyDescriptor = FoundPropertyHash->Key->
-		                                                            GetPropertyDescriptor(FoundPropertyHash->Value))
+		                                                            AddPropertyDescriptor(FoundPropertyHash->Value))
 		{
 			PropertyHashMap.Remove(InPropertyHash);
 

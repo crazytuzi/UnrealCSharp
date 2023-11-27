@@ -354,17 +354,22 @@ void FCSharpEnvironment::RemoveClassDescriptor(const UStruct* InStruct) const
 	}
 }
 
-FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const UStruct* InStruct,
-                                                               const FName& InFunctionName) const
+FFunctionDescriptor* FCSharpEnvironment::GetOrAddFunctionDescriptor(const UStruct* InStruct,
+                                                                    const FName& InFunctionName) const
 {
 	const auto FoundClassDescriptor = GetClassDescriptor(InStruct);
 
-	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetFunctionDescriptor(InFunctionName) : nullptr;
+	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetOrAddFunctionDescriptor(InFunctionName) : nullptr;
 }
 
 FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const uint32 InFunctionHash) const
 {
 	return ClassRegistry != nullptr ? ClassRegistry->GetFunctionDescriptor(InFunctionHash) : nullptr;
+}
+
+FFunctionDescriptor* FCSharpEnvironment::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) const
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetOrAddFunctionDescriptor(InFunctionHash) : nullptr;
 }
 
 void FCSharpEnvironment::AddFunctionDescriptor(const uint32 InFunctionHash,
@@ -393,9 +398,9 @@ void FCSharpEnvironment::RemoveFunctionDescriptor(const uint32 InFunctionHash) c
 	}
 }
 
-FPropertyDescriptor* FCSharpEnvironment::GetPropertyDescriptor(const uint32 InPropertyHash) const
+FPropertyDescriptor* FCSharpEnvironment::GetOrAddPropertyDescriptor(const uint32 InPropertyHash) const
 {
-	return ClassRegistry != nullptr ? ClassRegistry->GetPropertyDescriptor(InPropertyHash) : nullptr;
+	return ClassRegistry != nullptr ? ClassRegistry->GetOrAddPropertyDescriptor(InPropertyHash) : nullptr;
 }
 
 void FCSharpEnvironment::AddPropertyDescriptor(const uint32 InPropertyHash,

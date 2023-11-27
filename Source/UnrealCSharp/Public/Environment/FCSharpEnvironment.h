@@ -61,9 +61,11 @@ public:
 
 	void RemoveClassDescriptor(const UStruct* InStruct) const;
 
-	FFunctionDescriptor* GetFunctionDescriptor(const UStruct* InStruct, const FName& InFunctionName) const;
+	FFunctionDescriptor* GetOrAddFunctionDescriptor(const UStruct* InStruct, const FName& InFunctionName) const;
 
 	FFunctionDescriptor* GetFunctionDescriptor(uint32 InFunctionHash) const;
+
+	FFunctionDescriptor* GetOrAddFunctionDescriptor(uint32 InFunctionHash) const;
 
 	void AddFunctionDescriptor(uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor) const;
 
@@ -71,7 +73,7 @@ public:
 
 	void RemoveFunctionDescriptor(uint32 InFunctionHash) const;
 
-	FPropertyDescriptor* GetPropertyDescriptor(uint32 InPropertyHash) const;
+	FPropertyDescriptor* GetOrAddPropertyDescriptor(uint32 InPropertyHash) const;
 
 	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor) const;
 
