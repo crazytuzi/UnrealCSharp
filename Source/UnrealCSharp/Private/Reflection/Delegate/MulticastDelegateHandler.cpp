@@ -49,10 +49,10 @@ void UMulticastDelegateHandler::Deinitialize()
 {
 	if (MulticastScriptDelegate != nullptr)
 	{
-		MulticastScriptDelegate->RemoveAll(this);
-
 		if (bNeedFree)
 		{
+			MulticastScriptDelegate->RemoveAll(this);
+
 			delete MulticastScriptDelegate;
 		}
 
