@@ -219,7 +219,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			for (const auto& FunctionPair : Functions)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
-					FoundMonoClass, FunctionPair.Key.ToString(),
+					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key.ToString()),
 					FunctionPair.Value->ReturnValueOffset != MAX_uint16
 						? (FunctionPair.Value->NumParms > 0
 							   ? FunctionPair.Value->NumParms - 1

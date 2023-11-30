@@ -1,5 +1,6 @@
 ﻿#include "Reflection/Function/FFunctionDescriptor.h"
 #include "Bridge/FTypeBridge.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/MonoMacro.h"
 
@@ -120,7 +121,9 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 				Stack.Object->GetClass())->GetMonoClass())
 			{
 				if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Parent_Class_Get_Method_From_Name(FoundMonoClass, TCHAR_TO_UTF8(*Stack.Node->GetName()),
+					Parent_Class_Get_Method_From_Name(FoundMonoClass,
+					                                  TCHAR_TO_UTF8(
+						                                  *FUnrealCSharpFunctionLibrary::Encode(Stack.Node->GetName())),
 					                                  PropertyDescriptors.Num()))
 				{
 					const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
@@ -199,7 +202,9 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 				Stack.Object->GetClass())->GetMonoClass())
 			{
 				if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Parent_Class_Get_Method_From_Name(FoundMonoClass, TCHAR_TO_UTF8(*Stack.Node->GetName()),
+					Parent_Class_Get_Method_From_Name(FoundMonoClass,
+					                                  TCHAR_TO_UTF8(
+						                                  *FUnrealCSharpFunctionLibrary::Encode(Stack.Node->GetName())),
 					                                  PropertyDescriptors.Num()))
 				{
 					const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
