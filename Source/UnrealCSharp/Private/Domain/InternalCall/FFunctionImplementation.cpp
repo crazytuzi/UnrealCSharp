@@ -21,7 +21,8 @@ void FFunctionImplementation::Function_ReflectionImplementation(
 {
 	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 	{
-		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor(InFunctionHash))
+		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().
+			GetOrAddFunctionDescriptor(InFunctionHash))
 		{
 			FunctionDescriptor->CallUnreal(FoundObject, ReturnValue, OutValue, InValue);
 		}

@@ -157,16 +157,13 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 						*FUnrealCSharpFunctionLibrary::Encode(Property->GetName())
 					))))
 				{
-					const auto PropertyDescriptor = FPropertyDescriptor::Factory(Property);
-
-					auto PropertyHash = GetTypeHash(PropertyDescriptor);
-
-					NewClassDescriptor->PropertyHashSet.Add(PropertyHash);
+					auto PropertyHash = GetTypeHash(Property);
 
 					InDomain->Field_Static_Set_Value(InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
 					                                 FoundClassField, &PropertyHash);
 
-					FCSharpEnvironment::GetEnvironment().AddPropertyDescriptor(PropertyHash, PropertyDescriptor);
+					FCSharpEnvironment::GetEnvironment().AddPropertyHash(
+						PropertyHash, NewClassDescriptor, Property->GetFName());
 				}
 			}
 		}
@@ -222,7 +219,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			for (const auto& FunctionPair : Functions)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
-					FoundMonoClass, FunctionPair.Key.ToString(),
+					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key.ToString()),
 					FunctionPair.Value->ReturnValueOffset != MAX_uint16
 						? (FunctionPair.Value->NumParms > 0
 							   ? FunctionPair.Value->NumParms - 1
@@ -375,7 +372,7 @@ UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor,
 		return InFunction;
 	}
 
-	const auto FoundFunctionDescriptor = InClassDescriptor->GetFunctionDescriptor(InFunction->GetFName());
+	const auto FoundFunctionDescriptor = InClassDescriptor->GetOrAddFunctionDescriptor(InFunction->GetFName());
 
 	const auto OriginalFunction = FoundFunctionDescriptor != nullptr
 		                              ? FoundFunctionDescriptor->OriginalFunction.Get()

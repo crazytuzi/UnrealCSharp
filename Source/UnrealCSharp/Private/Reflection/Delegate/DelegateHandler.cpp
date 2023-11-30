@@ -40,11 +40,10 @@ void UDelegateHandler::Deinitialize()
 
 	if (ScriptDelegate != nullptr)
 	{
-		// @TODO
-		ScriptDelegate->Unbind();
-
 		if (bNeedFree)
 		{
+			ScriptDelegate->Unbind();
+
 			delete ScriptDelegate;
 		}
 

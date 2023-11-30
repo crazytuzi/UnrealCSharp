@@ -111,10 +111,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 	{
 		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(Interface.Class));
 
-		InterfaceContent = FString::Printf(TEXT(
+		InterfaceContent += FString::Printf(TEXT(
 			", %s"
 		),
-		                                   *FUnrealCSharpFunctionLibrary::GetFullInterface(Interface.Class));
+		                                    *FUnrealCSharpFunctionLibrary::GetFullInterface(Interface.Class));
 	}
 
 	auto bHasProperty = false;

@@ -17,7 +17,7 @@ FEditorListener::FEditorListener()
 
 	OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddStatic(&FEditorListener::OnPreBeginPIE);
 
-	OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddStatic(&FEditorListener::OnPrePIEEnded);
+	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddStatic(&FEditorListener::OnCancelPIEEnded);
 
 	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
@@ -66,14 +66,14 @@ FEditorListener::~FEditorListener()
 		MainFrameModule.OnMainFrameCreationFinished().Remove(OnMainFrameCreationFinishedDelegateHandle);
 	}
 
-	if (OnPrePIEEndedDelegateHandle.IsValid())
+	if (OnCancelPIEDelegateHandle.IsValid())
 	{
-		FEditorDelegates::PrePIEEnded.Remove(OnPrePIEEndedDelegateHandle);
+		FEditorDelegates::CancelPIE.Remove(OnCancelPIEDelegateHandle);
 	}
 
 	if (OnPreBeginPIEDelegateHandle.IsValid())
 	{
-		FEditorDelegates::PrePIEEnded.Remove(OnPreBeginPIEDelegateHandle);
+		FEditorDelegates::PreBeginPIE.Remove(OnPreBeginPIEDelegateHandle);
 	}
 
 	if (OnPostEngineInitDelegateHandle.IsValid())
@@ -94,7 +94,7 @@ void FEditorListener::OnPreBeginPIE(const bool)
 	bIsPIEPlaying = true;
 }
 
-void FEditorListener::OnPrePIEEnded(const bool)
+void FEditorListener::OnCancelPIEEnded()
 {
 	bIsPIEPlaying = false;
 }

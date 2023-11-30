@@ -27,6 +27,8 @@ void FClassRegistry::Deinitialize()
 
 	ClassDescriptorMap.Empty();
 
+	PropertyHashMap.Empty();
+
 	for (auto& PropertyDescriptorPair : PropertyDescriptorMap)
 	{
 		delete PropertyDescriptorPair.Value;
@@ -99,16 +101,25 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 
 FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const uint32 InFunctionHash)
 {
-	if (const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionHash))
+	const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionHash);
+
+	return FoundFunctionDescriptor != nullptr ? *FoundFunctionDescriptor : nullptr;
+}
+
+FFunctionDescriptor* FClassRegistry::GetOrAddFunctionDescriptor(const uint32 InFunctionHash)
+{
+	if (const auto FoundFunctionDescriptor = GetFunctionDescriptor(InFunctionHash))
 	{
-		return *FoundFunctionDescriptor;
+		return FoundFunctionDescriptor;
 	}
 
 	if (const auto FoundFunctionHash = FunctionHashMap.Find(InFunctionHash))
 	{
 		if (const auto FoundFunctionDescriptor = FoundFunctionHash->Key->
-		                                                            GetFunctionDescriptor(FoundFunctionHash->Value))
+		                                                            AddFunctionDescriptor(FoundFunctionHash->Value))
 		{
+			FunctionHashMap.Remove(InFunctionHash);
+
 			FunctionDescriptorMap.Add(InFunctionHash, FoundFunctionDescriptor);
 
 			return FoundFunctionDescriptor;
@@ -118,11 +129,27 @@ FFunctionDescriptor* FClassRegistry::GetFunctionDescriptor(const uint32 InFuncti
 	return nullptr;
 }
 
-FPropertyDescriptor* FClassRegistry::GetPropertyDescriptor(const uint32 InPropertyHash)
+FPropertyDescriptor* FClassRegistry::GetOrAddPropertyDescriptor(const uint32 InPropertyHash)
 {
-	const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyHash);
+	if (const auto FoundPropertyDescriptor = PropertyDescriptorMap.Find(InPropertyHash))
+	{
+		return *FoundPropertyDescriptor;
+	}
 
-	return FoundPropertyDescriptor != nullptr ? *FoundPropertyDescriptor : nullptr;
+	if (const auto FoundPropertyHash = PropertyHashMap.Find(InPropertyHash))
+	{
+		if (const auto FoundPropertyDescriptor = FoundPropertyHash->Key->
+		                                                            AddPropertyDescriptor(FoundPropertyHash->Value))
+		{
+			PropertyHashMap.Remove(InPropertyHash);
+
+			PropertyDescriptorMap.Add(InPropertyHash, FoundPropertyDescriptor);
+
+			return FoundPropertyDescriptor;
+		}
+	}
+
+	return nullptr;
 }
 
 void FClassRegistry::AddFunctionDescriptor(const uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor)
@@ -151,6 +178,12 @@ void FClassRegistry::RemoveFunctionDescriptor(const uint32 InFunctionHash)
 void FClassRegistry::AddPropertyDescriptor(const uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor)
 {
 	PropertyDescriptorMap.Add(InPropertyHash, InPropertyDescriptor);
+}
+
+void FClassRegistry::AddPropertyHash(const uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
+                                     const FName& InPropertyName)
+{
+	PropertyHashMap.Add(InPropertyHash, TPair<FClassDescriptor*, FName>(InClassDescriptor, InPropertyName));
 }
 
 void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)
