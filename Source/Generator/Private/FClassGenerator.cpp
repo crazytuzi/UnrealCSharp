@@ -1133,46 +1133,19 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 	{
 		if (StructProperty->Struct == TBaseStructure<FRotator>::Get())
 		{
-			FRotator Value;
+			TArray<FString> Value;
 
-			if (Value.InitFromString(InMetaData))
+			InMetaData.ParseIntoArray(Value, TEXT(","));
+
+			if (Value.Num() == 3)
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s \?\?= new FRotator\n"
-					"\t\t\t{\n"
-					"\t\t\t\tPitch = %ff,\n"
-					"\t\t\t\tYaw = %ff,\n"
-					"\t\t\t\tRoll = %ff\n"
-					"\t\t\t};\n\n"
+					"\t\t\t%s \?\?= new FRotator(%lf, %lf, %lf);\n\n"
 				),
 				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
-				                       Value.Pitch,
-				                       Value.Yaw,
-				                       Value.Roll
-				);
-			}
-		}
-
-		if (StructProperty->Struct == TBaseStructure<FQuat>::Get())
-		{
-			FQuat Value;
-
-			if (Value.InitFromString(InMetaData))
-			{
-				return FString::Printf(TEXT(
-					"\t\t\t%s \?\?= new FQuat\n"
-					"\t\t\t{\n"
-					"\t\t\t\tX = %ff,\n"
-					"\t\t\t\tY = %ff,\n"
-					"\t\t\t\tZ = %ff\n"
-					"\t\t\t\tW = %ff\n"
-					"\t\t\t};\n\n"
-				),
-				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
-				                       Value.X,
-				                       Value.Y,
-				                       Value.Z,
-				                       Value.W
+				                       TCString<TCHAR>::Atod(*Value[0]),
+				                       TCString<TCHAR>::Atod(*Value[1]),
+				                       TCString<TCHAR>::Atod(*Value[2])
 				);
 			}
 		}
@@ -1184,89 +1157,32 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s \?\?= new FLinearColor\n"
-					"\t\t\t{\n"
-					"\t\t\t\tR = %ff,\n"
-					"\t\t\t\tG = %ff,\n"
-					"\t\t\t\tB = %ff,\n"
-					"\t\t\t\tA = %ff\n"
-					"\t\t\t};\n\n"
+					"\t\t\t%s \?\?= new FLinearColor(%ff, %ff, %ff, %ff);\n\n"
 				),
 				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.R,
 				                       Value.G,
 				                       Value.B,
 				                       Value.A
-				);
-			}
-		}
-
-		if (StructProperty->Struct == TBaseStructure<FColor>::Get())
-		{
-			FColor Value;
-
-			if (Value.InitFromString(InMetaData))
-			{
-				return FString::Printf(TEXT(
-					"\t\t\t%s \?\?= new FColor\n"
-					"\t\t\t{\n"
-					"\t\t\t\tR = %hhu,\n"
-					"\t\t\t\tG = %hhu,\n"
-					"\t\t\t\tB = %hhu,\n"
-					"\t\t\t\tA = %hhu\n"
-					"\t\t\t};\n\n"
-				),
-				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
-				                       Value.R,
-				                       Value.G,
-				                       Value.B,
-				                       Value.A
-				);
-			}
-		}
-
-		if (StructProperty->Struct == TBaseStructure<FPlane>::Get())
-		{
-			FPlane Value;
-
-			if (Value.InitFromString(InMetaData))
-			{
-				return FString::Printf(TEXT(
-					"\t\t\t%s \?\?= new FPlane\n"
-					"\t\t\t{\n"
-					"\t\t\t\tX = %ff,\n"
-					"\t\t\t\tY = %ff,\n"
-					"\t\t\t\tZ = %ff\n"
-					"\t\t\t\tW = %ff\n"
-					"\t\t\t};\n\n"
-				),
-				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
-				                       Value.X,
-				                       Value.Y,
-				                       Value.Z,
-				                       Value.W
 				);
 			}
 		}
 
 		if (StructProperty->Struct == TBaseStructure<FVector>::Get())
 		{
-			FVector Value;
+			TArray<FString> Value;
 
-			if (Value.InitFromString(InMetaData))
+			InMetaData.ParseIntoArray(Value, TEXT(","));
+
+			if (Value.Num() == 3)
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s \?\?= new FVector\n"
-					"\t\t\t{\n"
-					"\t\t\t\tX = %ff,\n"
-					"\t\t\t\tY = %ff,\n"
-					"\t\t\t\tZ = %ff\n"
-					"\t\t\t};\n\n"
+					"\t\t\t%s \?\?= new FVector(%lf, %lf, %lf);\n\n"
 				),
 				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
-				                       Value.X,
-				                       Value.Y,
-				                       Value.Z
+				                       TCString<TCHAR>::Atod(*Value[0]),
+				                       TCString<TCHAR>::Atod(*Value[1]),
+				                       TCString<TCHAR>::Atod(*Value[2])
 				);
 			}
 		}
@@ -1278,39 +1194,11 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 			if (Value.InitFromString(InMetaData))
 			{
 				return FString::Printf(TEXT(
-					"\t\t\t%s \?\?= new FVector2D\n"
-					"\t\t\t{\n"
-					"\t\t\t\tX = %ff,\n"
-					"\t\t\t\tY = %ff,\n"
-					"\t\t\t};\n\n"
+					"\t\t\t%s \?\?= new FVector2D(%lf, %lf);\n\n"
 				),
 				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
 				                       Value.X,
 				                       Value.Y
-				);
-			}
-		}
-
-		if (StructProperty->Struct == TBaseStructure<FVector4>::Get())
-		{
-			FVector4 Value;
-
-			if (Value.InitFromString(InMetaData))
-			{
-				return FString::Printf(TEXT(
-					"\t\t\t%s \?\?= new FVector4\n"
-					"\t\t\t{\n"
-					"\t\t\t\tX = %ff,\n"
-					"\t\t\t\tY = %ff,\n"
-					"\t\t\t\tZ = %ff\n"
-					"\t\t\t\tW = %ff\n"
-					"\t\t\t};\n\n"
-				),
-				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
-				                       Value.X,
-				                       Value.Y,
-				                       Value.Z,
-				                       Value.W
 				);
 			}
 		}
