@@ -29,6 +29,10 @@ TArray<MonoImage*> FMonoDomain::Images;
 
 bool FMonoDomain::bLoadSucceed;
 
+#if PLATFORM_IOS
+extern void* mono_aot_module_System_Private_CoreLib_info;
+#endif
+
 void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 {
 	RegisterMonoTrace();
@@ -44,7 +48,23 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 	if (Domain == nullptr)
 	{
+#if PLATFORM_IOS
+		mono_jit_set_aot_mode(MONO_AOT_MODE_INTERP);
+
+		mono_aot_register_module(static_cast<void**>(mono_aot_module_System_Private_CoreLib_info));
+
+		mono_dllmap_insert(NULL, "System.Native", NULL, "__Internal", NULL);
+
+		mono_dllmap_insert(NULL, "System.Net.Security.Native", NULL, "__Internal", NULL);
+
+		mono_dllmap_insert(NULL, "System.IO.Compression.Native", NULL, "__Internal", NULL);
+
+		mono_dllmap_insert(NULL, "System.Security.Cryptography.Native.Apple", NULL, "__Internal", NULL);
+
+		setenv("DOTNET_SYSTEM_GLOBALIZATION_INVARIANT", "1", TRUE);
+#else
 		mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
+#endif
 
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
@@ -555,6 +575,8 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 	                            *PLUGIN_NAME,
 #if PLATFORM_WINDOWS
 	                            TEXT("Win64")
+#elif PLATFORM_MAC_X86
+	                            TEXT("macOS_x86_64")
 #endif
 	);
 #else
@@ -567,6 +589,9 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 #elif PLATFORM_ANDROID
 	                            TEXT("Android"),
 	                            TEXT("Android"));
+#elif PLATFORM_IOS
+								TEXT("IOS"),
+								TEXT("IOS"));
 #elif PLATFORM_LINUX
 	                            TEXT("Linux"),
 	                            TEXT("Linux"));
