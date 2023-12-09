@@ -240,7 +240,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
 					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key.ToString()),
-					FunctionPair.Value->ReturnValueOffset != MAX_uint16
+					InClass->IsNative() && FunctionPair.Value->ReturnValueOffset != MAX_uint16
 						? (FunctionPair.Value->NumParms > 0
 							   ? FunctionPair.Value->NumParms - 1
 							   : 0)
@@ -562,7 +562,7 @@ void FCSharpBind::OnCSharpEnvironmentInitialize()
 		// @TODO
 		if (Class->IsChildOf(UBlueprintFunctionLibrary::StaticClass()))
 		{
-			FCSharpEnvironment::GetEnvironment().Bind(Class);
+			FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, true);
 		}
 	}
 }
