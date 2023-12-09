@@ -30,6 +30,13 @@ namespace Script.Common
             return OutValue;
         }
 
+        public UClass LoadSynchronous()
+        {
+            SoftClassPtrImplementation.SoftClassPtr_LoadSynchronousImplementation(GetHandle(), out var OutValue);
+
+            return OutValue;
+        }
+
         public unsafe void SetHandle(void* InGCHandle)
         {
             GCHandle = new IntPtr(InGCHandle);

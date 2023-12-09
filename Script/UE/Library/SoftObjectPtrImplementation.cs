@@ -20,5 +20,9 @@ namespace Script.Library
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SoftObjectPtr_GetImplementation<T>(IntPtr InSoftObjectPtr, out T OutValue)
             where T : UObject;
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SoftObjectPtr_LoadSynchronousImplementation<T>(IntPtr InSoftObjectPtr, out T OutValue)
+            where T : UObject;
     }
 }
