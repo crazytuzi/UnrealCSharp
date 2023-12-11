@@ -13,6 +13,7 @@ struct FRegisterSoftClassPtr
 			.Function("Identical", FSoftClassPtrImplementation::SoftClassPtr_IdenticalImplementation)
 			.Function("UnRegister", FSoftClassPtrImplementation::SoftClassPtr_UnRegisterImplementation)
 			.Function("Get", FSoftClassPtrImplementation::SoftClassPtr_GetImplementation)
+			.Function("LoadSynchronous", FSoftClassPtrImplementation::SoftClassPtr_LoadSynchronousImplementation)
 			.Register();
 	}
 };
@@ -59,4 +60,12 @@ void FSoftClassPtrImplementation::SoftClassPtr_GetImplementation(
 	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InGarbageCollectionHandle);
 
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+}
+
+void FSoftClassPtrImplementation::SoftClassPtr_LoadSynchronousImplementation(
+	const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+{
+	const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InGarbageCollectionHandle);
+
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous());
 }

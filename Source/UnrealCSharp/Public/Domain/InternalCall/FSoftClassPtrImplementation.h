@@ -15,4 +15,7 @@ public:
 
 	static void SoftClassPtr_GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                           MonoObject** OutValue);
+
+	static void SoftClassPtr_LoadSynchronousImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                       MonoObject** OutValue);
 };

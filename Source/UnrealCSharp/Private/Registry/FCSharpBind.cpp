@@ -179,32 +179,52 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 
 			for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::ExcludeSuper,
 			                                  EFieldIteratorFlags::ExcludeDeprecated,
-			                                  EFieldIteratorFlags::IncludeInterfaces); It; ++It)
+			                                  EFieldIteratorFlags::ExcludeInterfaces); It; ++It)
 			{
 				if (const auto Function = *It)
 				{
-					if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
-						NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
-								"__%s"
-							),
-							*FUnrealCSharpFunctionLibrary::Encode(Function->GetName())
-						))))
+					Functions.Add(Function->GetFName(), Function);
+				}
+			}
+
+			for (const auto& Interface : InClass->Interfaces)
+			{
+				for (TFieldIterator<UFunction> It(Interface.Class, EFieldIteratorFlags::ExcludeSuper,
+				                                  EFieldIteratorFlags::ExcludeDeprecated,
+				                                  EFieldIteratorFlags::ExcludeInterfaces); It; ++It)
+				{
+					if (const auto Function = InClass->FindFunctionByName(It->GetFName()))
 					{
-						auto FunctionHash = GetTypeHash(Function);
-
-						InDomain->Field_Static_Set_Value(
-							InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
-							FoundClassField, &FunctionHash);
-
-						FCSharpEnvironment::GetEnvironment().AddFunctionHash(
-							FunctionHash, NewClassDescriptor, Function->GetFName());
+						Functions.Add(Function->GetFName(), Function);
 					}
 				}
 			}
 
+			for (const auto& FunctionPair : Functions)
+			{
+				if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
+					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
+							"__%s"
+						),
+						*FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key.ToString())
+					))))
+				{
+					auto FunctionHash = GetTypeHash(FunctionPair.Value);
+
+					InDomain->Field_Static_Set_Value(
+						InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
+						FoundClassField, &FunctionHash);
+
+					FCSharpEnvironment::GetEnvironment().AddFunctionHash(
+						FunctionHash, NewClassDescriptor, FunctionPair.Key);
+				}
+			}
+
+			Functions.Empty();
+
 			for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::IncludeSuper,
 			                                  EFieldIteratorFlags::ExcludeDeprecated,
-			                                  EFieldIteratorFlags::IncludeInterfaces); It; ++It)
+			                                  EFieldIteratorFlags::ExcludeInterfaces); It; ++It)
 			{
 				if (auto Function = *It)
 				{
@@ -220,7 +240,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
 					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key.ToString()),
-					FunctionPair.Value->ReturnValueOffset != MAX_uint16
+					InClass->IsNative() && FunctionPair.Value->ReturnValueOffset != MAX_uint16
 						? (FunctionPair.Value->NumParms > 0
 							   ? FunctionPair.Value->NumParms - 1
 							   : 0)
@@ -542,7 +562,7 @@ void FCSharpBind::OnCSharpEnvironmentInitialize()
 		// @TODO
 		if (Class->IsChildOf(UBlueprintFunctionLibrary::StaticClass()))
 		{
-			FCSharpEnvironment::GetEnvironment().Bind(Class);
+			FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, true);
 		}
 	}
 }

@@ -21,5 +21,9 @@ namespace Script.Library
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SoftClassPtr_GetImplementation(IntPtr InSoftClassPtr,
             out UClass OutValue);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SoftClassPtr_LoadSynchronousImplementation(IntPtr InSoftClassPtr,
+            out UClass OutValue);
     }
 }

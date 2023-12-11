@@ -98,138 +98,79 @@ FName FFunctionDescriptor::GetFName() const
 
 bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 {
-	if (ReferencePropertyIndexes.Num() > 0)
+	const auto InParams = Stack.Locals;
+
+	const auto CSharpParams = FCSharpEnvironment::GetEnvironment().GetDomain()->Array_New(
+		FCSharpEnvironment::GetEnvironment().GetDomain()->Get_Object_Class(), PropertyDescriptors.Num());
+
+	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
-		const auto InParams = Stack.Locals;
+		void* Object = nullptr;
 
-		const auto CSharpParams = FCSharpEnvironment::GetEnvironment().GetDomain()->Array_New(
-			FCSharpEnvironment::GetEnvironment().GetDomain()->Get_Object_Class(), PropertyDescriptors.Num());
+		PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
+		                                &Object);
 
-		for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
-		{
-			void* Object = nullptr;
-
-			PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
-			                                &Object);
-
-			ARRAY_SET(CSharpParams, MonoObject*, Index, static_cast<MonoObject*>(Object));
-		}
-
-		if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(Stack.Object))
-		{
-			if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
-				Stack.Object->GetClass())->GetMonoClass())
-			{
-				if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Parent_Class_Get_Method_From_Name(FoundMonoClass,
-					                                  TCHAR_TO_UTF8(
-						                                  *FUnrealCSharpFunctionLibrary::Encode(Stack.Node->GetName())),
-					                                  PropertyDescriptors.Num()))
-				{
-					const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
-						FoundMonoMethod, FoundMonoObject, CSharpParams);
-
-					if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
-					{
-						if (ReturnPropertyDescriptor->IsPrimitiveProperty())
-						{
-							if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-								Object_Unbox(ReturnValue))
-							{
-								ReturnPropertyDescriptor->Set(UnBoxResultValue, Z_Param__Result);
-							}
-						}
-						else
-						{
-							ReturnPropertyDescriptor->Set(ReturnValue, Z_Param__Result);
-						}
-					}
-
-					auto OutParams = Stack.OutParms;
-
-					for (const auto& Index : ReferencePropertyIndexes)
-					{
-						if (const auto ReferencePropertyDescriptor = PropertyDescriptors[Index])
-						{
-							OutParams = FindOutParmRec(OutParams, ReferencePropertyDescriptor->GetProperty());
-
-							if (OutParams != nullptr)
-							{
-								if (ReferencePropertyDescriptor->IsPrimitiveProperty())
-								{
-									if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-										Object_Unbox(ARRAY_GET(CSharpParams, MonoObject*, Index)))
-									{
-										ReferencePropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
-									}
-								}
-								else
-								{
-									ReferencePropertyDescriptor->Set(
-										ARRAY_GET(CSharpParams, MonoObject*, Index), OutParams->PropAddr);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		ARRAY_SET(CSharpParams, MonoObject*, Index, static_cast<MonoObject*>(Object));
 	}
-	else
+
+	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(Stack.Object))
 	{
-		const auto InParams = Stack.Locals;
-
-		TArray<void*> CSharpParams;
-
-		CSharpParams.AddZeroed(PropertyDescriptors.Num());
-
-		for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
+		if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
+			Stack.Object->GetClass())->GetMonoClass())
 		{
-			if (PropertyDescriptors[Index]->IsPrimitiveProperty())
+			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
+				Parent_Class_Get_Method_From_Name(FoundMonoClass,
+				                                  TCHAR_TO_UTF8(
+					                                  *FUnrealCSharpFunctionLibrary::Encode(Stack.Node->GetName())),
+				                                  PropertyDescriptors.Num()))
 			{
-				CSharpParams[Index] = PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams);
-			}
-			else
-			{
-				PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
-				                                &CSharpParams[Index]);
-			}
-		}
+				const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
+					FoundMonoMethod, FoundMonoObject, CSharpParams);
 
-		if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(Stack.Object))
-		{
-			if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
-				Stack.Object->GetClass())->GetMonoClass())
-			{
-				if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Parent_Class_Get_Method_From_Name(FoundMonoClass,
-					                                  TCHAR_TO_UTF8(
-						                                  *FUnrealCSharpFunctionLibrary::Encode(Stack.Node->GetName())),
-					                                  PropertyDescriptors.Num()))
+				if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 				{
-					const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
-						FoundMonoMethod, FoundMonoObject, CSharpParams.GetData());
-
-					if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
+					if (ReturnPropertyDescriptor->IsPrimitiveProperty())
 					{
-						if (ReturnPropertyDescriptor->IsPrimitiveProperty())
+						if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
+							Object_Unbox(ReturnValue))
 						{
-							if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-								Object_Unbox(ReturnValue))
-							{
-								ReturnPropertyDescriptor->Set(UnBoxResultValue, Z_Param__Result);
-							}
+							ReturnPropertyDescriptor->Set(UnBoxResultValue, Z_Param__Result);
 						}
-						else
+					}
+					else
+					{
+						ReturnPropertyDescriptor->Set(ReturnValue, Z_Param__Result);
+					}
+				}
+
+				auto OutParams = Stack.OutParms;
+
+				for (const auto& Index : OutPropertyIndexes)
+				{
+					if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
+					{
+						OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
+
+						if (OutParams != nullptr)
 						{
-							ReturnPropertyDescriptor->Set(ReturnValue, Z_Param__Result);
+							if (OutPropertyDescriptor->IsPrimitiveProperty())
+							{
+								if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
+									Object_Unbox(ARRAY_GET(CSharpParams, MonoObject*, Index)))
+								{
+									OutPropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
+								}
+							}
+							else
+							{
+								OutPropertyDescriptor->Set(
+									ARRAY_GET(CSharpParams, MonoObject*, Index), OutParams->PropAddr);
+							}
 						}
 					}
 				}
 			}
 		}
-
-		CSharpParams.Empty();
 	}
 
 	return true;

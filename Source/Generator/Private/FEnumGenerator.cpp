@@ -252,5 +252,5 @@ FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
 		return EnumUnderlyingTypeName[*FoundEnumUnderlyingType];
 	}
 
-	return TEXT("Int64");
+	return InEnum->IsA(UUserDefinedEnum::StaticClass()) ? TEXT("Byte") : TEXT("Int64");
 }
