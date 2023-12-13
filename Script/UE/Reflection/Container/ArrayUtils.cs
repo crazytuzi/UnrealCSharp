@@ -21,8 +21,8 @@ namespace Script.Reflection.Container
         public static Int32 Array_GetSlack(IntPtr InArray) =>
             ArrayImplementation.Array_GetSlackImplementation(InArray);
 
-        public static Boolean Array_IsValidIndex(IntPtr InArray) =>
-            ArrayImplementation.Array_IsValidIndexImplementation(InArray);
+        public static Boolean Array_IsValidIndex(IntPtr InArray, Int32 InIndex) =>
+            ArrayImplementation.Array_IsValidIndexImplementation(InArray, InIndex);
 
         public static Int32 Array_Num(IntPtr InArray) =>
             ArrayImplementation.Array_NumImplementation(InArray);

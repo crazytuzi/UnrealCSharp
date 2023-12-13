@@ -22,7 +22,7 @@ namespace Script.Library
         public static extern Int32 Array_GetSlackImplementation(IntPtr InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Array_IsValidIndexImplementation(IntPtr InArray);
+        public static extern Boolean Array_IsValidIndexImplementation(IntPtr InArray, Int32 InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Array_NumImplementation(IntPtr InArray);
