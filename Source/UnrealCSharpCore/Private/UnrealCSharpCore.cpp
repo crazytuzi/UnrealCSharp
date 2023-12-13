@@ -3,6 +3,7 @@
 #include "UnrealCSharpCore.h"
 #if WITH_EDITOR
 #include "Setting/UnrealCSharpEditorSetting.h"
+#include "Setting/UnrealCSharpSetting.h"
 #endif
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpCoreModule"
@@ -13,6 +14,8 @@ void FUnrealCSharpCoreModule::StartupModule()
 
 #if WITH_EDITOR
 	UUnrealCSharpEditorSetting::RegisterSettings();
+
+	UUnrealCSharpSetting::RegisterSettings();
 #endif
 }
 
@@ -23,6 +26,8 @@ void FUnrealCSharpCoreModule::ShutdownModule()
 
 #if WITH_EDITOR
 	UUnrealCSharpEditorSetting::UnregisterSettings();
+
+	UUnrealCSharpSetting::UnregisterSettings();
 #endif
 }
 

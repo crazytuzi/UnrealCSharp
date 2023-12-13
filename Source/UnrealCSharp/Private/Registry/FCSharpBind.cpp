@@ -7,6 +7,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Template/TGetArrayLength.inl"
+#include "Setting/UnrealCSharpSetting.h"
 
 #if !WITH_EDITOR
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
@@ -559,10 +560,15 @@ void FCSharpBind::OnCSharpEnvironmentInitialize()
 {
 	for (const auto Class : TObjectRange<UClass>())
 	{
-		// @TODO
-		if (Class->IsChildOf(UBlueprintFunctionLibrary::StaticClass()))
+		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
 		{
-			FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, true);
+			for (const auto& PreBindClass : UnrealCSharpSetting->GetPreBindClass())
+			{
+				if (Class->IsChildOf(PreBindClass))
+				{
+					FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, true);
+				}
+			}
 		}
 	}
 }
