@@ -82,8 +82,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto bIsInterface = InClass->IsChildOf(UInterface::StaticClass());
 
-	auto bIsNativeClass = InClass->IsNative();
-
 	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
 
 	auto SuperClass = InClass->GetSuperClass();
@@ -258,11 +256,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		if (SuperClass != nullptr && SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
-		{
-			continue;
-		}
-
 		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
 		{
 			continue;
@@ -273,7 +266,21 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		Functions.Add(*FunctionIterator);
+		if (SuperClass != nullptr)
+		{
+			if (const auto& Function = SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
+			{
+				Functions.Add(Function);
+			}
+			else
+			{
+				Functions.Add(*FunctionIterator);
+			}
+		}
+		else
+		{
+			Functions.Add(*FunctionIterator);
+		}
 	}
 
 	for (const auto InInterface : InClass->Interfaces)
@@ -438,7 +445,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 			if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->HasAnyPropertyFlags(
 				CPF_ConstParm))
 			{
-				if (bIsNativeClass || FunctionParams[Index]->HasAnyPropertyFlags(CPF_ReferenceParm))
+				if (Function->GetOwnerClass()->IsNative() ||
+					FunctionParams[Index]->HasAnyPropertyFlags(CPF_ReferenceParm))
 				{
 					FunctionOutParamIndexMapping[FunctionParams.Num() - 1 - FunctionRefParamIndex.Num()] =
 						FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();
