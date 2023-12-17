@@ -7,6 +7,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
+#include "Setting/UnrealCSharpSetting.h"
 #include <signal.h>
 
 void SignalHandler(int32)
@@ -209,6 +210,19 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 	{
 		if (InObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject | EObjectFlags::RF_ArchetypeObject))
 		{
+			if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
+			{
+				for (const auto& PreBindClass : UnrealCSharpSetting->GetPreBindClass())
+				{
+					if (InObject->IsA(PreBindClass))
+					{
+						FScopeLock Lock(&CriticalSection);
+
+						AsyncLoadingObjectArray.Add(InObject);
+					}
+				}
+			}
+
 			return;
 		}
 
