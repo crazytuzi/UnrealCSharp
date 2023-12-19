@@ -349,7 +349,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 			if (SuperClass != nullptr)
 			{
-				if (SuperClass->FindFunctionByName(*FunctionName))
+				if (SuperClass->FindFunctionByName(*Function->GetName()))
 				{
 					FunctionPolymorphism = TEXT("override");
 				}
