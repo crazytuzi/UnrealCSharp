@@ -745,7 +745,7 @@ bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& InFunct
                                                     const TArray<int32>& InFunctionRefParamIndex)
 {
 	return InFunctionOutParamIndex.Num() == 0 && InFunctionRefParamIndex.Num() == 0 ||
-	(InFunctionOutParamIndex.Num() > InFunctionRefParamIndex.Num()
+	(InFunctionOutParamIndex.Num() >= InFunctionRefParamIndex.Num()
 		 ? InFunctionOutParamIndex[InFunctionOutParamIndex.Num() - 1] == InFunctionOutParamIndex.Num() - 1
 		 : InFunctionRefParamIndex[InFunctionRefParamIndex.Num() - 1] == InFunctionRefParamIndex.Num() - 1);
 }
