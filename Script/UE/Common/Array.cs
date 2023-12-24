@@ -38,7 +38,7 @@ namespace Script.Common
 
         public Int32 GetSlack() => ArrayUtils.Array_GetSlack(GetHandle());
 
-        public Boolean IsValidIndex() => ArrayUtils.Array_IsValidIndex(GetHandle());
+        public Boolean IsValidIndex(Int32 InIndex) => ArrayUtils.Array_IsValidIndex(GetHandle(), InIndex);
 
         public Int32 Num() => ArrayUtils.Array_Num(GetHandle());
 

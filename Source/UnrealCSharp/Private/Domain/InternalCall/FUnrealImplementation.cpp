@@ -3,6 +3,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetTree.h"
 
 struct FRegisterUnreal
 {
@@ -79,17 +80,38 @@ void FUnrealImplementation::Unreal_LoadClassImplementation(const FGarbageCollect
 	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Class);
 }
 
-void FUnrealImplementation::Unreal_CreateWidgetImplementation(const FGarbageCollectionHandle OwningObject,
-                                                              const FGarbageCollectionHandle UserWidgetClass,
+void FUnrealImplementation::Unreal_CreateWidgetImplementation(const FGarbageCollectionHandle InOwningObject,
+                                                              const FGarbageCollectionHandle InUserWidgetClass,
                                                               MonoObject** OutValue)
 {
-	const auto PlayerController = FCSharpEnvironment::GetEnvironment().GetObject<APlayerController>(OwningObject);
+	const auto OwningObject = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InOwningObject);
 
-	const auto Class = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(UserWidgetClass);
+	const auto Class = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InUserWidgetClass);
 
-	const auto Widget = CreateWidget(PlayerController, Class);
+	UUserWidget* UserWidget = nullptr;
 
-	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Widget);
+	if (OwningObject->IsA(UWidget::StaticClass()))
+	{
+		UserWidget = CreateWidget(Cast<UWidget>(OwningObject), Class);
+	}
+	else if (OwningObject->IsA(UWidgetTree::StaticClass()))
+	{
+		UserWidget = CreateWidget(Cast<UWidgetTree>(OwningObject), Class);
+	}
+	else if (OwningObject->IsA(APlayerController::StaticClass()))
+	{
+		UserWidget = CreateWidget(Cast<APlayerController>(OwningObject), Class);
+	}
+	else if (OwningObject->IsA(UGameInstance::StaticClass()))
+	{
+		UserWidget = CreateWidget(Cast<UGameInstance>(OwningObject), Class);
+	}
+	else if (OwningObject->IsA(UWorld::StaticClass()))
+	{
+		UserWidget = CreateWidget(Cast<UWorld>(OwningObject), Class);
+	}
+
+	*OutValue = FCSharpEnvironment::GetEnvironment().Bind(UserWidget);
 }
 
 void FUnrealImplementation::Unreal_GWorldImplementation(MonoObject** OutValue)

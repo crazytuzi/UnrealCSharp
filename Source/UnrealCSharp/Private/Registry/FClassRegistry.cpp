@@ -93,7 +93,7 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 {
 	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
-		delete FoundClassDescriptor;
+		delete *FoundClassDescriptor;
 
 		ClassDescriptorMap.Remove(InStruct);
 	}

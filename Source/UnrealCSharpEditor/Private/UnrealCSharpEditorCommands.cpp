@@ -11,6 +11,9 @@ void FUnrealCSharpEditorCommands::RegisterCommands()
 
 	UI_COMMAND(OpenEditorSettings, "Open Editor Settings", "Open UnrealCSharpEditor Settings action",
 	           EUserInterfaceActionType::Button, FInputChord());
+
+	UI_COMMAND(OpenRuntimeSettings, "Open Runtime Settings", "Open UnrealCSharpRuntime Settings action",
+	           EUserInterfaceActionType::Button, FInputChord());
 }
 
 #undef LOCTEXT_NAMESPACE

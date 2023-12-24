@@ -65,7 +65,39 @@ namespace Script.Library
             return OutValue;
         }
 
+        public static T CreateWidget<T>(UWidget OwningObject) where T : UUserWidget, IStaticClass
+        {
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GetHandle(),
+                T.StaticClass().GetHandle(), out var OutValue);
+
+            return OutValue;
+        }
+
+        public static T CreateWidget<T>(UWidgetTree OwningObject) where T : UUserWidget, IStaticClass
+        {
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GetHandle(),
+                T.StaticClass().GetHandle(), out var OutValue);
+
+            return OutValue;
+        }
+
         public static T CreateWidget<T>(APlayerController OwningObject) where T : UUserWidget, IStaticClass
+        {
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GetHandle(),
+                T.StaticClass().GetHandle(), out var OutValue);
+
+            return OutValue;
+        }
+
+        public static T CreateWidget<T>(UGameInstance OwningObject) where T : UUserWidget, IStaticClass
+        {
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GetHandle(),
+                T.StaticClass().GetHandle(), out var OutValue);
+
+            return OutValue;
+        }
+
+        public static T CreateWidget<T>(UWorld OwningObject) where T : UUserWidget, IStaticClass
         {
             UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GetHandle(),
                 T.StaticClass().GetHandle(), out var OutValue);

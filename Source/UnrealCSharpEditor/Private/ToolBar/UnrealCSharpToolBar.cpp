@@ -77,6 +77,16 @@ void FUnrealCSharpToolBar::BuildAction()
 				SettingsModule->ShowViewer("Editor", "Plugins", "UnrealCSharpEditorSettings");
 			}
 		}), FCanExecuteAction());
+
+	PluginCommands->MapAction(
+		FUnrealCSharpEditorCommands::Get().OpenRuntimeSettings,
+		FExecuteAction::CreateLambda([]
+		{
+			if (const auto SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
+			{
+				SettingsModule->ShowViewer("Project", "Plugins", "UnrealCSharpSettings");
+			}
+		}), FCanExecuteAction());
 }
 
 TSharedRef<SWidget> FUnrealCSharpToolBar::GenerateToolBarMenu()
@@ -93,7 +103,16 @@ TSharedRef<SWidget> FUnrealCSharpToolBar::GenerateToolBarMenu()
 
 	MenuBuilder.BeginSection(NAME_None, LOCTEXT("Section_Help", "Help"));
 
-	MenuBuilder.AddMenuEntry(Commands.OpenEditorSettings, NAME_None, LOCTEXT("OpenEditorSettings", "Open Settings"));
+	MenuBuilder.AddSubMenu(LOCTEXT("Section_SettingsMenu", "Settings"),
+	                       LOCTEXT("Section_SettingsMenu_ToolTip", "UnrealCSharp Settings"),
+	                       FNewMenuDelegate::CreateLambda([Commands](FMenuBuilder& SubMenuBuilder)
+	                       {
+		                       SubMenuBuilder.AddMenuEntry(Commands.OpenEditorSettings, NAME_None,
+		                                                   LOCTEXT("OpenEditorSettings", "Editor"));
+
+		                       SubMenuBuilder.AddMenuEntry(Commands.OpenRuntimeSettings, NAME_None,
+		                                                   LOCTEXT("OpenRuntimeSettings", "Runtime"));
+	                       }));
 
 	MenuBuilder.EndSection();
 

@@ -25,4 +25,6 @@ public:
 	TSharedPtr<FUICommandInfo> PluginAction;
 
 	TSharedPtr<FUICommandInfo> OpenEditorSettings;
+
+	TSharedPtr<FUICommandInfo> OpenRuntimeSettings;
 };
