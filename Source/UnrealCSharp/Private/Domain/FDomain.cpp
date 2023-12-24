@@ -456,6 +456,11 @@ MonoMethod* FDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, c
 	return FMonoDomain::Parent_Class_Get_Method_From_Name(InMonoClass, InFunctionName, InParamCount);
 }
 
+MonoClassField* FDomain::Self_Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName)
+{
+	return FMonoDomain::Self_Class_Get_Field_From_Name(InMonoClass, InName);
+}
+
 MonoType* FDomain::Property_Get_Type(MonoProperty* InMonoProperty) const
 {
 	return FMonoDomain::Property_Get_Type(InMonoProperty);

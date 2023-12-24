@@ -151,7 +151,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 		{
 			if (!NewClassDescriptor->HasPropertyDescriptor(Property->GetFName()))
 			{
-				if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
+				if (const auto FoundClassField = InDomain->Self_Class_Get_Field_From_Name(
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),
@@ -203,7 +203,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 
 			for (const auto& FunctionPair : Functions)
 			{
-				if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
+				if (const auto FoundClassField = InDomain->Self_Class_Get_Field_From_Name(
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),

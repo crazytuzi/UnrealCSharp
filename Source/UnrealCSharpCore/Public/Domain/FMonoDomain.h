@@ -179,6 +179,8 @@ public:
 	static MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                                     int32 InParamCount);
 
+	static MonoClassField* Self_Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName);
+
 	static MonoType* Property_Get_Type(MonoProperty* InMonoProperty);
 
 public:
