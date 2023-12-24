@@ -108,7 +108,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 		return;
 	}
 
-	auto ClassName = FUnrealCSharpFunctionLibrary::Encode(InAssetData.AssetName.ToString());
+	auto ClassName = FUnrealCSharpFunctionLibrary::GetAssetName(InAssetData, InAssetData.AssetName.ToString());
 
 	FString UsingNameSpaceContent;
 
@@ -142,9 +142,11 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 	),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
-	                                     *InAssetData.ObjectPath.ToString(),
+	                                     *FUnrealCSharpFunctionLibrary::GetObjectPathName(
+		                                     InAssetData, InAssetData.ObjectPath.ToString()),
 	                                     *ClassName,
-	                                     *FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass)
+	                                     *FUnrealCSharpFunctionLibrary::GetAssetClass(
+		                                     InAssetData, FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass))
 	);
 
 	auto ModuleName = InAssetData.PackagePath.ToString();

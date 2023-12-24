@@ -12,6 +12,8 @@
 #include "Setting/UnrealCSharpEditorSetting.h"
 #if WITH_EDITOR
 #include "WidgetBlueprint.h"
+#include "Animation/AnimBlueprint.h"
+#include "Animation/AnimInstance.h"
 #endif
 
 #if WITH_EDITOR
@@ -305,6 +307,47 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 }
 
 #if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetSuffixName(const FAssetData& InAssetData)
+{
+	return InAssetData.GetClass()->GetFName() == UBlueprint::StaticClass()->GetFName() ||
+	       InAssetData.GetClass()->GetFName() == UWidgetBlueprint::StaticClass()->GetFName() ||
+	       InAssetData.GetClass()->GetFName() == UAnimBlueprint::StaticClass()->GetFName()
+		       ? TEXT("_C")
+		       : TEXT("");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetAssetName(const FAssetData& InAssetData, const FString& InAssetName)
+{
+	return FString::Printf(TEXT(
+		"%s%s"
+	),
+	                       *Encode(InAssetName),
+	                       *GetSuffixName(InAssetData)
+	);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetObjectPathName(const FAssetData& InAssetData, const FString& InObjectPathName)
+{
+	return FString::Printf(TEXT(
+		"%s%s"
+	),
+	                       *InObjectPathName,
+	                       *GetSuffixName(InAssetData)
+	);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetAssetClass(const FAssetData& InAssetData, const FString& InClass)
+{
+	static TMap<UClass*, FString> AssetClass = {
+		{
+			UAnimBlueprint::StaticClass(),
+			UAnimInstance::StaticClass()->GetPrefixCPP() + UAnimInstance::StaticClass()->GetName()
+		}
+	};
+
+	return AssetClass.Contains(InAssetData.GetClass()) ? AssetClass[InAssetData.GetClass()] : InClass;
+}
+
 FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData)
 {
 	return GetFileName(InAssetData, InAssetData.AssetName.ToString());
@@ -316,12 +359,7 @@ FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData,
 
 	auto DirectoryName = FPaths::Combine(GetGenerationPath(ModuleName), ModuleName);
 
-	return FPaths::Combine(DirectoryName, Encode(InAssetName))
-		+ (InAssetData.GetClass()->GetFName() == UBlueprint::StaticClass()->GetFName() ||
-		   InAssetData.GetClass()->GetFName() == UWidgetBlueprint::StaticClass()->GetFName()
-			   ? TEXT("_C")
-			   : TEXT(""))
-		+ TEXT(".cs");
+	return FPaths::Combine(DirectoryName, GetAssetName(InAssetData, InAssetName) + TEXT(".cs"));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetOldFileName(const FAssetData& InAssetData, const FString& InOldObjectPath)

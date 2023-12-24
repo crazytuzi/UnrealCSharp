@@ -562,11 +562,11 @@ void FCSharpBind::OnCSharpEnvironmentInitialize()
 	{
 		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
 		{
-			for (const auto& PreBindClass : UnrealCSharpSetting->GetPreBindClass())
+			for (const auto& BindClass : UnrealCSharpSetting->GetBindClass())
 			{
-				if (Class->IsChildOf(PreBindClass))
+				if (Class->IsChildOf(BindClass.Class))
 				{
-					FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, true);
+					FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, BindClass.bNeedMonoClass);
 				}
 			}
 		}

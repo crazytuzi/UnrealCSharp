@@ -32,9 +32,9 @@ void UUnrealCSharpSetting::UnregisterSettings()
 }
 #endif
 
-const TArray<TSubclassOf<UObject>>& UUnrealCSharpSetting::GetPreBindClass() const
+const TArray<FBindClass>& UUnrealCSharpSetting::GetBindClass() const
 {
-	return PreBindClass;
+	return BindClass;
 }
 
 #undef LOCTEXT_NAMESPACE

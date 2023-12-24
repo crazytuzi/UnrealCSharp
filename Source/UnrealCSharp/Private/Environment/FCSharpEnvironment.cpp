@@ -212,13 +212,22 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 		{
 			if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
 			{
-				for (const auto& PreBindClass : UnrealCSharpSetting->GetPreBindClass())
+				for (const auto& BindClass : UnrealCSharpSetting->GetBindClass())
 				{
-					if (InObject->IsA(PreBindClass))
+					if (InObject->IsA(BindClass.Class))
 					{
-						FScopeLock Lock(&CriticalSection);
+						if (BindClass.bNeedMonoClass)
+						{
+							FScopeLock Lock(&CriticalSection);
 
-						AsyncLoadingObjectArray.Add(InObject);
+							AsyncLoadingObjectArray.Add(InObject);
+						}
+						else
+						{
+							Bind(InObject, false);
+						}
+
+						return;
 					}
 				}
 			}
