@@ -354,6 +354,18 @@ bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructNam
 	return FCSharpBind::Bind(Domain, InMonoObject, InStructName);
 }
 
+bool FCSharpEnvironment::Bind(UFunction* InFunction) const
+{
+	if (ClassRegistry != nullptr)
+	{
+		const auto Class = Cast<UClass>(InFunction->GetOuter());
+
+		return FCSharpBind::Bind(ClassRegistry->GetClassDescriptor(Class), Class, InFunction);
+	}
+
+	return false;
+}
+
 FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const UStruct* InStruct) const
 {
 	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InStruct) : nullptr;
