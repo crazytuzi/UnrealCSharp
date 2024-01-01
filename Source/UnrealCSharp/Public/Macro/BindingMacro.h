@@ -55,14 +55,6 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer
 	} \
 }; \
 template <typename T> \
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
-{ \
-	static TArray<FString> Get() \
-	{ \
-		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
-	} \
-}; \
-template <typename T> \
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> : \
 	TBindingPropertyClass<T> \
 { \
@@ -93,6 +85,28 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_
 	TBindingReturnValue<T> \
 { \
 	using TBindingReturnValue<T>::TBindingReturnValue; \
+};
+
+#define BINDING_PROJECT_CLASS(Class) \
+BINDING_CLASS(Class) \
+template <typename T> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
+	} \
+};
+
+#define BINDING_ENGINE_CLASS(Class) \
+BINDING_CLASS(Class) \
+template <typename T> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return {static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))}; \
+	} \
 };
 
 #define BINDING_SCRIPT_STRUCT(Class) \

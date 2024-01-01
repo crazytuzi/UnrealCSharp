@@ -6,6 +6,18 @@
 #include "UObject/NoExportTypes.h"
 #include "UnrealCSharpSetting.generated.h"
 
+USTRUCT()
+struct FBindClass
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UObject> Class;
+
+	UPROPERTY(EditAnywhere)
+	bool bNeedMonoClass;
+};
+
 /**
  * 
  */
@@ -22,9 +34,9 @@ public:
 #endif
 
 public:
-	const TArray<TSubclassOf<UObject>>& GetPreBindClass() const;
+	const TArray<FBindClass>& GetBindClass() const;
 
 private:
 	UPROPERTY(Config, EditAnywhere, Category = Bind)
-	TArray<TSubclassOf<UObject>> PreBindClass;
+	TArray<FBindClass> BindClass;
 };

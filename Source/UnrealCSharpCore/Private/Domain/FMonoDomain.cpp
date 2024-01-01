@@ -548,6 +548,19 @@ MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClas
 	return nullptr;
 }
 
+MonoClassField* FMonoDomain::Self_Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName)
+{
+	if (const auto Field = Class_Get_Field_From_Name(InMonoClass, InName))
+	{
+		if (mono_field_get_parent(Field) == InMonoClass)
+		{
+			return Field;
+		}
+	}
+
+	return nullptr;
+}
+
 MonoType* FMonoDomain::Property_Get_Type(MonoProperty* InMonoProperty)
 {
 	if (const auto Method = Property_Get_Get_Method(InMonoProperty))

@@ -31,6 +31,14 @@ public:
 	static FString GetClassNameSpace(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 
 #if WITH_EDITOR
+	static FString GetSuffixName(const FAssetData& InAssetData);
+
+	static FString GetAssetName(const FAssetData& InAssetData, const FString& InAssetName);
+
+	static FString GetObjectPathName(const FAssetData& InAssetData, const FString& InObjectPathName);
+
+	static FString GetAssetClass(const FAssetData& InAssetData, const FString& InClass);
+
 	static FString GetFileName(const FAssetData& InAssetData);
 
 	static FString GetFileName(const FAssetData& InAssetData, const FString& InAssetName);

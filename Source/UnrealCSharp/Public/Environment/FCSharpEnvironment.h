@@ -52,6 +52,8 @@ public:
 
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
 
+	bool Bind(UFunction* InFunction) const;
+
 public:
 	FClassDescriptor* GetClassDescriptor(const UStruct* InStruct) const;
 

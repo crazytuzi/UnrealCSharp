@@ -34,7 +34,6 @@ public:
 	template <typename T>
 	static auto Bind(MonoObject* InMonoObject);
 
-private:
 	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
 private:

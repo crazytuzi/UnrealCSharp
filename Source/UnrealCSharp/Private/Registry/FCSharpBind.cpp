@@ -151,7 +151,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 		{
 			if (!NewClassDescriptor->HasPropertyDescriptor(Property->GetFName()))
 			{
-				if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
+				if (const auto FoundClassField = InDomain->Self_Class_Get_Field_From_Name(
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),
@@ -203,7 +203,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 
 			for (const auto& FunctionPair : Functions)
 			{
-				if (const auto FoundClassField = InDomain->Class_Get_Field_From_Name(
+				if (const auto FoundClassField = InDomain->Self_Class_Get_Field_From_Name(
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),
@@ -241,10 +241,8 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
 					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key.ToString()),
-					InClass->IsNative() && FunctionPair.Value->ReturnValueOffset != MAX_uint16
-						? (FunctionPair.Value->NumParms > 0
-							   ? FunctionPair.Value->NumParms - 1
-							   : 0)
+					FunctionPair.Value->ReturnValueOffset != MAX_uint16
+						? FunctionPair.Value->NumParms - 1
 						: FunctionPair.Value->NumParms))
 				{
 					if (IsOverrideMethod(InDomain,
@@ -562,11 +560,11 @@ void FCSharpBind::OnCSharpEnvironmentInitialize()
 	{
 		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
 		{
-			for (const auto& PreBindClass : UnrealCSharpSetting->GetPreBindClass())
+			for (const auto& BindClass : UnrealCSharpSetting->GetBindClass())
 			{
-				if (Class->IsChildOf(PreBindClass))
+				if (Class->IsChildOf(BindClass.Class))
 				{
-					FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, true);
+					FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, BindClass.bNeedMonoClass);
 				}
 			}
 		}
