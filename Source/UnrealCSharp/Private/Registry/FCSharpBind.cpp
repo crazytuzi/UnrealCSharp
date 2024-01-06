@@ -470,7 +470,7 @@ void FCSharpBind::UpdateCallCSharpFunction(UFunction* InFunction)
 
 	UpdateCallCSharpFunctionFlags(InFunction);
 
-	if (!InFunction->HasAnyFunctionFlags(FUNC_Native) && InFunction->Script.Num() > 0)
+	if (!InFunction->HasAnyFunctionFlags(FUNC_Native) && !InFunction->Script.IsEmpty())
 	{
 		InFunction->Script.Empty(3 + sizeof(void*));
 	}

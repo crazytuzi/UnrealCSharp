@@ -1,7 +1,6 @@
 ﻿#include "FCSharpCompilerRunnable.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
-#include "UEVersion.h"
 #include "Dynamic/FDynamicGenerator.h"
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
@@ -12,11 +11,7 @@ FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 
 bool FCSharpCompilerRunnable::Init()
 {
-#if UE_PLATFORM_PROCESS_GET_SYNCH_EVENT_FROM_POOL
 	Event = FPlatformProcess::GetSynchEventFromPool(true);
-#else
-	Event = FPlatformProcess::CreateSynchEvent(true);
-#endif
 
 	return FRunnable::Init();
 }

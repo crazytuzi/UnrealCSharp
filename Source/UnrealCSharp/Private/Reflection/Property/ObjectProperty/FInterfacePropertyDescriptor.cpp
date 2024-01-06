@@ -1,7 +1,6 @@
 ﻿#include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
-#include "UEVersion.h"
 
 FInterfacePropertyDescriptor::FInterfacePropertyDescriptor(FProperty* InProperty):
 	FObjectPropertyDescriptor(InProperty),
@@ -29,9 +28,6 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 
 		InterfaceProperty->InitializeValue(Dest);
 
-#if UE_INTERFACE_PROPERTY_SET_PROPERTY_VALUE
-		InterfaceProperty->SetPropertyValue(Dest, SrcMulti->GetObject());
-#else
 		const auto Interface = static_cast<FScriptInterface*>(Dest);
 
 		const auto Object = SrcMulti->GetObject();
@@ -39,7 +35,6 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 		Interface->SetObject(Object);
 
 		Interface->SetInterface(Object ? Object->GetInterfaceAddress(InterfaceProperty->InterfaceClass) : nullptr);
-#endif
 	}
 }
 

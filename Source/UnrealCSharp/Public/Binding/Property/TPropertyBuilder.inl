@@ -11,9 +11,6 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
-#include "Template/TIsTSubclassOf.inl"
-#include "Template/TIsTSet.inl"
-#include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
@@ -204,13 +201,11 @@ struct TPropertyBuilder<Result Class::*, Member,
 {
 };
 
-#if UE_OBJECT_PTR
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTObjectPtr<Result>::Value>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
-#endif
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FName>>> :
@@ -385,13 +380,11 @@ struct TPropertyBuilder<Result*, Member,
 {
 };
 
-#if UE_OBJECT_PTR
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTObjectPtr<std::decay_t<Result>>::Value>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
-#endif
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FName>>> :

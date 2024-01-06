@@ -176,14 +176,12 @@ struct TReturnValue<T,
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
-#if UE_OBJECT_PTR
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value>> :
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
-#endif
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>>> :

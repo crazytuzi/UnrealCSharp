@@ -225,14 +225,12 @@ struct TArgument<T,
 	}
 };
 
-#if UE_OBJECT_PTR
 template <typename T>
 struct TArgument<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
-#endif
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>> :

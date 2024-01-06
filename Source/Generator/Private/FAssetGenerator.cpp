@@ -7,7 +7,6 @@
 #include "Engine/UserDefinedStruct.h"
 #include "WidgetBlueprint.h"
 #include "FGeneratorCore.h"
-#include "UEVersion.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 TArray<UUserDefinedEnum*> FAssetGenerator::UserDefinedEnums;
@@ -18,22 +17,12 @@ void FAssetGenerator::Generator()
 
 	TArray<FAssetData> OutAssetData;
 
-#if UE_GET_ASSETS_BY_PATHS
-	for (const auto& AssetsPath : FGeneratorCore::GetSupportedAssetPath())
-	{
-		AssetRegistryModule.Get().GetAssetsByPath(AssetsPath, OutAssetData, true);
-#else
 	AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetSupportedAssetPath(), OutAssetData, true);
-#endif
 
 	for (const auto& AssetData : OutAssetData)
 	{
 		Generator(AssetData, true);
 	}
-
-#if UE_GET_ASSETS_BY_PATHS
-	}
-#endif
 
 	for (const auto& UserDefinedEnum : UserDefinedEnums)
 	{

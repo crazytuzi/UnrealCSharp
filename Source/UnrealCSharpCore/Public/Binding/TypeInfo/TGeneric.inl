@@ -7,9 +7,6 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
-#include "Template/TIsTSubclassOf.inl"
-#include "Template/TIsTSet.inl"
-#include "Template/TIsTMap.inl"
 
 template <typename T, typename Enable = void>
 struct TGeneric

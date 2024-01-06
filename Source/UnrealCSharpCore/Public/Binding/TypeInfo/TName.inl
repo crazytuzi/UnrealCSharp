@@ -8,9 +8,6 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
-#include "Template/TIsTSubclassOf.inl"
-#include "Template/TIsTSet.inl"
-#include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
@@ -134,7 +131,6 @@ struct TName<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_
 	}
 };
 
-#if UE_OBJECT_PTR
 template <typename T>
 struct TName<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 {
@@ -143,7 +139,6 @@ struct TName<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 		return FUnrealCSharpFunctionLibrary::GetFullClass(std::decay_t<T>::ElementType::StaticClass());
 	}
 };
-#endif
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>

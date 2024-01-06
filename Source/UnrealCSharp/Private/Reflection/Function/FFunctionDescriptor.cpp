@@ -227,7 +227,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 			                              reinterpret_cast<void**>(ReturnValue));
 		}
 
-		if (OutPropertyIndexes.Num() > 0)
+		if (!OutPropertyIndexes.IsEmpty())
 		{
 			const auto MonoObjectArray = FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(),
 			                                                    OutPropertyIndexes.Num());
