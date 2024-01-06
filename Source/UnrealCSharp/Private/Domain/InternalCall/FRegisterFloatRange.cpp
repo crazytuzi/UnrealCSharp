@@ -1,9 +1,9 @@
 #include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Macro/NamespaceMacro.h"
 
-struct FRegisterFloat
+struct FRegisterFloatRange
 {
-	FRegisterFloat()
+	FRegisterFloatRange()
 	{
 		TReflectionClassBuilder<FFloatRange>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FFloatRange, const float&),
@@ -57,4 +57,4 @@ struct FRegisterFloat
 	}
 };
 
-static FRegisterFloat RegisterFloat;
+static FRegisterFloatRange RegisterFloatRange;

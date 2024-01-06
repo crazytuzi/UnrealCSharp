@@ -1,9 +1,9 @@
 #include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Macro/NamespaceMacro.h"
 
-struct FRegisterInt32
+struct FRegisterInt32Range
 {
-	FRegisterInt32()
+	FRegisterInt32Range()
 	{
 		TReflectionClassBuilder<FInt32Range>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FInt32Range, const int32&),
@@ -57,4 +57,4 @@ struct FRegisterInt32
 	}
 };
 
-static FRegisterInt32 RegisterInt32;
+static FRegisterInt32Range RegisterInt32Range;
