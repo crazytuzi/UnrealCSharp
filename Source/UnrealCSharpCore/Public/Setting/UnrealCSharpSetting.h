@@ -36,7 +36,22 @@ public:
 public:
 	const TArray<FBindClass>& GetBindClass() const;
 
+	bool IsEnableDebug() const;
+
+	const FString& GetHost() const;
+
+	int32 GetPort() const;
+
 private:
 	UPROPERTY(Config, EditAnywhere, Category = Bind)
 	TArray<FBindClass> BindClass;
+
+	UPROPERTY(Config, EditAnywhere, Category = Debug)
+	bool bEnableDebug;
+
+	UPROPERTY(Config, EditAnywhere, Category = Debug)
+	FString Host;
+
+	UPROPERTY(Config, EditAnywhere, Category = Debug)
+	int32 Port;
 };
