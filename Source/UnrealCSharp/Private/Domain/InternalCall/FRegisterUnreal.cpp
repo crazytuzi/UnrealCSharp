@@ -7,34 +7,31 @@
 struct FRegisterUnreal
 {
 	static void NewObjectImplementation(const FGarbageCollectionHandle Outer,
-	                                    const FGarbageCollectionHandle Class, MonoObject* Name, MonoObject** OutValue)
+	                                    const FGarbageCollectionHandle Class, const MonoObject* Name,
+	                                    MonoObject** OutValue)
 	{
 		const auto ObjectOuter = FCSharpEnvironment::GetEnvironment().GetObject(Outer);
 
 		const auto ObjectClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(Class);
 
-		const auto ObjectName = FName(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(Name, nullptr))));
+		const auto ObjectName = FCSharpEnvironment::GetEnvironment().GetString<FName>(Name);
 
-		const auto Object = NewObject<UObject>(ObjectOuter, ObjectClass, ObjectName);
+		const auto Object = NewObject<UObject>(ObjectOuter, ObjectClass, *ObjectName);
 
 		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Object);
 	}
 
 	static void DuplicateObjectImplementation(const FGarbageCollectionHandle SourceObject,
-	                                          const FGarbageCollectionHandle Outer, MonoObject* Name,
+	                                          const FGarbageCollectionHandle Outer, const MonoObject* Name,
 	                                          MonoObject** OutValue)
 	{
 		const auto ObjectSourceObject = FCSharpEnvironment::GetEnvironment().GetObject(SourceObject);
 
 		const auto ObjectOuter = FCSharpEnvironment::GetEnvironment().GetObject(Outer);
 
-		const auto ObjectName = FName(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(Name, nullptr))));
+		const auto ObjectName = FCSharpEnvironment::GetEnvironment().GetString<FName>(Name);
 
-		const auto Object = DuplicateObject<UObject>(ObjectSourceObject, ObjectOuter, ObjectName);
+		const auto Object = DuplicateObject<UObject>(ObjectSourceObject, ObjectOuter, *ObjectName);
 
 		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Object);
 	}

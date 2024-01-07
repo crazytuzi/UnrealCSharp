@@ -28,7 +28,7 @@ namespace Script.CoreUObject
             return OutValue;
         }
 
-        public override string ToString()
+        public override String ToString()
         {
             return GetName().ToString();
         }

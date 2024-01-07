@@ -5,8 +5,7 @@
 
 struct FRegisterScriptInterface
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject,
-	                                   MonoString* InInterfaceName)
+	static void RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject)
 	{
 		const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 

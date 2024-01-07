@@ -18,7 +18,7 @@ namespace Script.Common
             return InMethodInfo.IsDefined(typeof(IsOverrideAttribute), true);
         }
 
-        public static string GetPathName(Type InType) =>
+        public static String GetPathName(Type InType) =>
             InType.GetCustomAttribute<PathNameAttribute>(true).PathName;
 
         private static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments) =>
@@ -43,7 +43,7 @@ namespace Script.Common
             Console.SetOut(Log.Log.Create());
         }
 
-        private static string GetTraceback()
+        private static String GetTraceback()
         {
             var Traceback = new StringBuilder();
 

@@ -1,4 +1,5 @@
-﻿using Script.Common;
+﻿using System;
+using Script.Common;
 using Script.CoreUObject;
 using Script.Engine;
 using Script.UMG;
@@ -42,7 +43,7 @@ namespace Script.Library
         }
 
         // @TODO
-        public static T LoadObject<T>(UObject Outer, string Name) where T : UObject
+        public static T LoadObject<T>(UObject Outer, String Name) where T : UObject
         {
             UnrealImplementation.Unreal_LoadObjectImplementation<T>(Outer.GetHandle(), Name, out var OutValue);
 
@@ -58,7 +59,7 @@ namespace Script.Library
         }
 
         // @TODO
-        public static UClass LoadClass(UObject Outer, string Name)
+        public static UClass LoadClass(UObject Outer, String Name)
         {
             UnrealImplementation.Unreal_LoadClassImplementation(Outer.GetHandle(), Name, out var OutValue);
 

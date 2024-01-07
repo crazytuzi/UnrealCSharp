@@ -1,19 +1,44 @@
 ﻿using System;
+using Script.CoreUObject;
+using Script.Library;
 
 namespace Script.Common
 {
-    public class FString
+    public class FString : IGCHandle
     {
-        public FString(string InValue) => Value = InValue;
+        public FString()
+        {
+        }
 
-        public static implicit operator FString(string InValue) => new FString(InValue);
+        ~FString() => StringImplementation.String_UnRegisterImplementation(GetHandle());
 
-        public static Boolean operator ==(FString A, FString B) => A.Value == B.Value;
+        public FString(String InValue) => StringImplementation.String_RegisterImplementation(this, InValue);
 
-        public static Boolean operator !=(FString A, FString B) => A.Value != B.Value;
+        public static implicit operator FString(String InValue) => new FString(InValue);
 
-        public override string ToString() => Value;
+        public static Boolean operator ==(FString A, FString B) =>
+            StringImplementation.String_IdenticalImplementation(A.GetHandle(), B.GCHandle);
 
-        private readonly string Value;
+        public static Boolean operator !=(FString A, FString B) =>
+            !StringImplementation.String_IdenticalImplementation(A.GetHandle(), B.GCHandle);
+
+        public override String ToString()
+        {
+            StringImplementation.String_ToStringImplementation(GetHandle(), out var OutValue);
+
+            return OutValue;
+        }
+
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new IntPtr(InGCHandle);
+        }
+
+        public IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private IntPtr GCHandle;
     }
 }

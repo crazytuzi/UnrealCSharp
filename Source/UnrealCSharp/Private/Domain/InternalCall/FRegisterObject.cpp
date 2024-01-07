@@ -38,13 +38,9 @@ struct FRegisterObject
 
 			const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
 
-			auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-				TCHAR_TO_UTF8(*Name)));
+			*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(FoundMonoClass);
 
-			const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
-				FoundMonoClass, 1, &NewMonoString);
-
-			*OutValue = NewMonoObject;
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FString>(*OutValue, new FString(Name), true);
 		}
 	}
 

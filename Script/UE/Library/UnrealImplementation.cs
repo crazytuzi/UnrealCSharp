@@ -17,11 +17,11 @@ namespace Script.Library
             out T OutValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Unreal_LoadObjectImplementation<T>(IntPtr Outer, string Name, out T OutValue)
+        public static extern void Unreal_LoadObjectImplementation<T>(IntPtr Outer, String Name, out T OutValue)
             where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Unreal_LoadClassImplementation(IntPtr Outer, string Name, out UClass OutValue);
+        public static extern void Unreal_LoadClassImplementation(IntPtr Outer, String Name, out UClass OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Unreal_CreateWidgetImplementation<T>(IntPtr OwningObject, IntPtr UserWidgetClass,

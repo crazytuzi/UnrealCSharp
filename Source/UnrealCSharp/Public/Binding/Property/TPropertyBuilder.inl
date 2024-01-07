@@ -103,6 +103,12 @@ struct TParentPropertyBuilder<Class, Result, Member, std::enable_if_t<std::is_sa
 };
 
 template <typename Class, typename Result, auto Member>
+struct TStringPropertyBuilder :
+	TParentPropertyBuilder<Class, Result, Member>
+{
+};
+
+template <typename Class, typename Result, auto Member>
 struct TContainerPropertyBuilder :
 	TParentPropertyBuilder<Class, Result, Member>
 {
@@ -209,7 +215,7 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTObjectPtr<
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FName>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TStringPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -227,13 +233,13 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsUStruct<Res
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FString>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TStringPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FText>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TStringPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -388,7 +394,7 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTObjectPtr<std::dec
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FName>>> :
-	TPropertyInfoBuilder<void, Result, Member>
+	TStringPropertyBuilder<void, Result, Member>
 {
 };
 
@@ -406,13 +412,13 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsUStruct<std::decay_
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FString>>> :
-	TPropertyInfoBuilder<void, Result, Member>
+	TStringPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FText>>> :
-	TPropertyInfoBuilder<void, Result, Member>
+	TStringPropertyBuilder<void, Result, Member>
 {
 };
 

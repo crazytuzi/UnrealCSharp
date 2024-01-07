@@ -13,8 +13,7 @@ namespace Script.Common
         ~TScriptInterface() => ScriptInterfaceImplementation.ScriptInterface_UnRegisterImplementation(GetHandle());
 
         public TScriptInterface(T InObject) =>
-            ScriptInterfaceImplementation.ScriptInterface_RegisterImplementation(this, InObject,
-                Utils.GetPathName(typeof(T)));
+            ScriptInterfaceImplementation.ScriptInterface_RegisterImplementation(this, InObject);
 
         public static implicit operator TScriptInterface<T>(T InObject) => new TScriptInterface<T>(InObject);
 

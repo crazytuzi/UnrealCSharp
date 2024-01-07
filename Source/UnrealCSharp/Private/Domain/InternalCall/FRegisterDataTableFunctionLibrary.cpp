@@ -10,9 +10,9 @@ BINDING_REFLECTION_CLASS(UDataTableFunctionLibrary);
 struct FRegisterDataTableFunctionLibrary
 {
 	static bool GetDataTableRowFromNameImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                                  MonoString* RowName, MonoObject** OutRow)
+	                                                  const MonoObject* RowName, MonoObject** OutRow)
 	{
-		const auto InRowName = UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(RowName));
+		const auto InRowName = FCSharpEnvironment::GetEnvironment().GetString<FName>(RowName);
 
 		if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<
 			UDataTable>(InGarbageCollectionHandle))
@@ -25,7 +25,7 @@ struct FRegisterDataTableFunctionLibrary
 				*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				                                               Object_Init(ClassDescriptor->GetMonoClass());
 
-				const auto FindRowData = *DataTable->GetRowMap().Find(InRowName);
+				const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
 
 				const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct(*OutRow);
 

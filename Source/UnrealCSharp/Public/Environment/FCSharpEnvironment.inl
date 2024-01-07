@@ -256,6 +256,46 @@ auto FCSharpEnvironment::RemoveMultiReference(const FGarbageCollectionHandle& In
 }
 
 template <typename T>
+auto FCSharpEnvironment::GetString(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+{
+	return StringRegistry != nullptr
+		       ? FStringRegistry::TStringRegistry<T>::GetString(StringRegistry, InGarbageCollectionHandle)
+		       : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::GetString(const MonoObject* InMonoObject) const
+{
+	return StringRegistry != nullptr
+		       ? FStringRegistry::TStringRegistry<T>::GetString(StringRegistry, InMonoObject)
+		       : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::GetStringObject(void* InAddress) const
+{
+	return StringRegistry != nullptr
+		       ? FStringRegistry::TStringRegistry<T>::GetObject(StringRegistry, InAddress)
+		       : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::AddStringReference(MonoObject* InMonoObject, void* InValue, const bool bNeedFree) const
+{
+	return StringRegistry != nullptr
+		       ? FStringRegistry::TStringRegistry<T>::AddReference(StringRegistry, InMonoObject, InValue, bNeedFree)
+		       : false;
+}
+
+template <typename T>
+auto FCSharpEnvironment::RemoveStringReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+{
+	return StringRegistry != nullptr
+		       ? FStringRegistry::TStringRegistry<T>::RemoveReference(StringRegistry, InGarbageCollectionHandle)
+		       : false;
+}
+
+template <typename T>
 auto FCSharpEnvironment::GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return BindingRegistry != nullptr
