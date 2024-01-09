@@ -7,10 +7,10 @@ namespace Script.Library
     public static class StructImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Struct_StaticStructImplementation(string InStructName, out UScriptStruct OutValue);
+        public static extern void Struct_StaticStructImplementation(String InStructName, out UScriptStruct OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Struct_RegisterImplementation(Object InMonoObject, string InStructName);
+        public static extern void Struct_RegisterImplementation(Object InMonoObject, String InStructName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean Struct_IdenticalImplementation(IntPtr InScriptStruct, IntPtr InA, IntPtr InB);

@@ -188,11 +188,7 @@ void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 		}
 	}
 
-#if UE_ARRAY_IS_EMPTY
 	if (DelegateGarbageCollectionHandles.IsEmpty())
-#else
-	if (DelegateGarbageCollectionHandles.Num() == 0)
-#endif
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -233,11 +229,7 @@ void UMulticastDelegateHandler::RemoveAll(MonoObject* InObject)
 		return false;
 	});
 
-#if UE_ARRAY_IS_EMPTY
 	if (DelegateGarbageCollectionHandles.IsEmpty())
-#else
-	if (DelegateGarbageCollectionHandles.Num() == 0)
-#endif
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{

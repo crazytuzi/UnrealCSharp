@@ -9,7 +9,7 @@ namespace Script.Library
     public static class ObjectImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Object_StaticClassImplementation(string InClassName, out UClass OutValue);
+        public static extern void Object_StaticClassImplementation(String InClassName, out UClass OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Object_GetClassImplementation(IntPtr InObject, out UClass OutValue);

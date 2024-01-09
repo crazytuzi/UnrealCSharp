@@ -1,19 +1,44 @@
 ﻿using System;
+using Script.CoreUObject;
+using Script.Library;
 
 namespace Script.Common
 {
-    public class FName
+    public class FName : IGCHandle
     {
-        public FName(string InValue) => Value = InValue;
+        public FName()
+        {
+        }
 
-        public static implicit operator FName(string InValue) => new FName(InValue);
+        ~FName() => NameImplementation.Name_UnRegisterImplementation(GetHandle());
 
-        public static Boolean operator ==(FName A, FName B) => A.Value == B.Value;
+        public FName(String InValue) => NameImplementation.Name_RegisterImplementation(this, InValue);
 
-        public static Boolean operator !=(FName A, FName B) => A.Value != B.Value;
+        public static implicit operator FName(String InValue) => new FName(InValue);
 
-        public override string ToString() => Value;
+        public static Boolean operator ==(FName A, FName B) =>
+            NameImplementation.Name_IdenticalImplementation(A.GetHandle(), B.GCHandle);
 
-        private readonly string Value;
+        public static Boolean operator !=(FName A, FName B) =>
+            !NameImplementation.Name_IdenticalImplementation(A.GetHandle(), B.GCHandle);
+
+        public override String ToString()
+        {
+            NameImplementation.Name_ToStringImplementation(GetHandle(), out var OutValue);
+
+            return OutValue;
+        }
+
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new IntPtr(InGCHandle);
+        }
+
+        public IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private IntPtr GCHandle;
     }
 }

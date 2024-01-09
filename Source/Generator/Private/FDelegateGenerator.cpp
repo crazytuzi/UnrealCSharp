@@ -211,7 +211,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                                         *ExecuteFunctionImplementationBody
 	);
 
-	if (DelegateOutParamIndex.Num() > 0)
+	if (!DelegateOutParamIndex.IsEmpty())
 	{
 		SuperClassContent = TEXT("FRefDelegate");
 
@@ -237,7 +237,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		}
 		else
 		{
-			if (DelegateParams.Num() > 0)
+			if (!DelegateParams.IsEmpty())
 			{
 				SuperClassContent = TEXT("FDelegate<Action<");
 			}
@@ -258,7 +258,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 		if (DelegateReturnParam != nullptr)
 		{
-			SuperClassContent += DelegateParams.Num() > 0
+			SuperClassContent += !DelegateParams.IsEmpty()
 				                     ? FString::Printf(TEXT(
 					                     ", %s"
 				                     ),
@@ -275,7 +275,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		}
 		else
 		{
-			if (DelegateParams.Num() > 0)
+			if (!DelegateParams.IsEmpty())
 			{
 				SuperClassContent += TEXT(">>");
 			}
@@ -322,9 +322,9 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *ConstructorContent,
 	                               *DestructorContent,
 	                               *BindFunctionContent,
-	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
+	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *ExecuteFunctionContent,
-	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
+	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *DelegateDeclarationContent
 	);
 
@@ -529,7 +529,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                                           *BroadcastFunctionImplementationBody
 	);
 
-	if (DelegateOutParamIndex.Num() > 0)
+	if (!DelegateOutParamIndex.IsEmpty())
 	{
 		SuperClassContent = TEXT("FRefMulticastDelegate");
 
@@ -573,7 +573,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		}
 		else
 		{
-			if (DelegateParams.Num() > 0)
+			if (!DelegateParams.IsEmpty())
 			{
 				SuperClassContent = TEXT("FMulticastDelegate<Action<");
 			}
@@ -594,7 +594,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 		if (DelegateReturnParam != nullptr)
 		{
-			SuperClassContent += DelegateParams.Num() > 0
+			SuperClassContent += !DelegateParams.IsEmpty()
 				                     ? FString::Printf(TEXT(
 					                     ", %s"
 				                     ),
@@ -611,7 +611,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		}
 		else
 		{
-			if (DelegateParams.Num() > 0)
+			if (!DelegateParams.IsEmpty())
 			{
 				SuperClassContent += TEXT(">>");
 			}
@@ -664,15 +664,15 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *ConstructorContent,
 	                               *DestructorContent,
 	                               *ContainsFunctionContent,
-	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
+	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *AddFunctionContent,
-	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
+	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *AddUniqueFunctionContent,
-	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
+	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *RemoveFunctionContent,
-	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
+	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *BroadcastFunctionContent,
-	                               DelegateOutParamIndex.Num() > 0 ? TEXT("\n") : TEXT(""),
+	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *DelegateDeclarationContent
 	);
 

@@ -3,6 +3,7 @@
 #include "Domain/FDomain.h"
 #include "Registry/FClassRegistry.h"
 #include "Registry/FMultiRegistry.h"
+#include "Registry/FStringRegistry.h"
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
@@ -205,6 +206,22 @@ public:
 	auto RemoveMultiReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 public:
+	template <typename T>
+	auto GetString(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+
+	template <typename T>
+	auto GetString(const MonoObject* InMonoObject) const;
+
+	template <typename T>
+	auto GetStringObject(void* InAddress) const;
+
+	template <typename T>
+	auto AddStringReference(MonoObject* InMonoObject, void* InValue, bool bNeedFree = true) const;
+
+	template <typename T>
+	auto RemoveStringReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+
+public:
 	MonoObject* GetBinding(void* InObject) const;
 
 	template <typename T>
@@ -323,6 +340,8 @@ private:
 	class FDelegateRegistry* DelegateRegistry;
 
 	FMultiRegistry* MultiRegistry;
+
+	FStringRegistry* StringRegistry;
 
 	FDynamicRegistry* DynamicRegistry;
 

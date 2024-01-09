@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using Script.Common;
 
 namespace Script.Library
 {
@@ -7,6 +8,6 @@ namespace Script.Library
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean DataTableFunctionLibrary_GetDataTableRowFromNameImplementation<T>(IntPtr Table,
-            string RowName, out T OutRow);
+            FName RowName, out T OutRow);
     }
 }

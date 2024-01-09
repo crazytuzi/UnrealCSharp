@@ -2,7 +2,6 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BindingMacro.h"
-#include "UEVersion.h"
 
 void FBindingClassGenerator::Generator()
 {
@@ -186,11 +185,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 		TArray<FString> FunctionParamName;
 
-#if UE_ARRAY_IS_EMPTY
 		if (!Function.GetParamNames().IsEmpty())
-#else
-		if (Function.GetParamNames().Num() > 0)
-#endif
 		{
 			FunctionParamName = Function.GetParamNames();
 
