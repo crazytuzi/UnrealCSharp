@@ -84,10 +84,10 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 				};
 
 				mono_jit_parse_options(sizeof(Options) / sizeof(char*), Options);
-
-				mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 			}
 		}
+
+		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
 		Domain = mono_jit_init("UnrealCSharp");
 
@@ -738,7 +738,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 			{
 				if (!FPaths::FileExists(AssemblyPath))
 				{
-					continue;;
+					continue;
 				}
 
 				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
@@ -765,7 +765,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 	{
 		if (!FPaths::FileExists(AssemblyPath))
 		{
-			continue;;
+			continue;
 		}
 
 		MonoImage* Image = nullptr;
