@@ -5,7 +5,7 @@
 
 struct FRegisterSubclassOf
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InClass)
+	static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InClass)
 	{
 		const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
 
@@ -36,13 +36,12 @@ struct FRegisterSubclassOf
 		});
 	}
 
-	static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                              MonoObject** OutValue)
+	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
 			InGarbageCollectionHandle);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+		return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 	}
 
 	FRegisterSubclassOf()

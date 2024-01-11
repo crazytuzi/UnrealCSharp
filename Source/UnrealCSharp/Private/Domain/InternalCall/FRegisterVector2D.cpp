@@ -65,9 +65,9 @@ struct FRegisterVector2D
 			.Function("operator -", FUNCTION_MINUS, BINDING_FUNCTION(&MinusImplementation))
 			.Function("operator |", FUNCTION_BIT_OR, BINDING_FUNCTION(&BitOrImplementation))
 			.Function("operator ^", FUNCTION_BIT_XOR, BINDING_FUNCTION(&BitXorImplementation))
-			.Property("ZeroVector", BINDING_PROPERTY(&FVector2D::ZeroVector))
-			.Property("UnitVector", BINDING_PROPERTY(&FVector2D::UnitVector))
-			.Property("Unit45Deg", BINDING_PROPERTY(&FVector2D::Unit45Deg))
+			.Property("ZeroVector", BINDING_READONLY_PROPERTY(&FVector2D::ZeroVector))
+			.Property("UnitVector", BINDING_READONLY_PROPERTY(&FVector2D::UnitVector))
+			.Property("Unit45Deg", BINDING_READONLY_PROPERTY(&FVector2D::Unit45Deg))
 			.Function("Zero", BINDING_FUNCTION(&FVector2D::Zero))
 			.Function("One", BINDING_FUNCTION(&FVector2D::One))
 			.Function("UnitX", BINDING_FUNCTION(&FVector2D::UnitX))
@@ -120,7 +120,8 @@ struct FRegisterVector2D
 			          {"MinAxisVal", "MaxAxisVal"})
 			.Function("GetSignVector", BINDING_FUNCTION(&FVector2D::GetSignVector))
 			.Function("GetAbs", BINDING_FUNCTION(&FVector2D::GetAbs))
-			.Function("ToString", BINDING_FUNCTION(&FVector2D::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FVector2D::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("InitFromString", BINDING_FUNCTION(&FVector2D::InitFromString),
 			          {"InSourceString"})
 			.Function("ContainsNaN", BINDING_FUNCTION(&FVector2D::ContainsNaN))

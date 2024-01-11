@@ -388,38 +388,38 @@ FString FGeneratorCore::GetGetAccessorReturnParamName(FProperty* Property)
 		if (ByteProperty->Enum != nullptr)
 		{
 			return FString::Printf(TEXT(
-				"(%s) value"
+				"(%s)"
 			),
 			                       *FUnrealCSharpFunctionLibrary::GetFullClass(ByteProperty->Enum));
 		}
 		else
 		{
-			return TEXT("value");
+			return TEXT("");
 		}
 	}
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
 		return FString::Printf(TEXT(
-			"(%s) value"
+			"(%s)"
 		),
 		                       *FUnrealCSharpFunctionLibrary::GetFullClass(EnumProperty->GetEnum()));
 	}
 
-	return TEXT("value");
+	return TEXT("");
 }
 
 FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property))
 	{
-		return TEXT("(Byte) value");
+		return TEXT("(Byte)value");
 	}
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
 		return FString::Printf(TEXT(
-			"(%s) value"
+			"(%s)value"
 		),
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()));
 	}
@@ -427,7 +427,7 @@ FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 	return TEXT("value");
 }
 
-bool FGeneratorCore::IsSafeProperty(FProperty* Property)
+bool FGeneratorCore::IsPrimitiveProperty(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property) || CastField<FUInt16Property>(Property) ||
 		CastField<FUInt32Property>(Property) || CastField<FUInt64Property>(Property) ||
@@ -436,10 +436,10 @@ bool FGeneratorCore::IsSafeProperty(FProperty* Property)
 		CastField<FBoolProperty>(Property) || CastField<FFloatProperty>(Property) ||
 		CastField<FEnumProperty>(Property) || CastField<FDoubleProperty>(Property))
 	{
-		return false;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 FString FGeneratorCore::GetOutParamString(FProperty* Property, const uint32 Index)
@@ -447,10 +447,22 @@ FString FGeneratorCore::GetOutParamString(FProperty* Property, const uint32 Inde
 	if (Property == nullptr) return TEXT("");
 
 	return FString::Printf(TEXT(
-		"(%s) __OutValue[%d]"
+		"%s__OutValue[%d]%s"
 	),
-	                       *GetPropertyType(Property),
-	                       Index);
+	                       IsPrimitiveProperty(Property)
+		                       ? *FString::Printf(TEXT(
+			                       "(%s)"
+		                       ),
+		                                          *GetPropertyType(Property))
+		                       : TEXT(""),
+	                       Index,
+	                       !IsPrimitiveProperty(Property)
+		                       ? *FString::Printf(TEXT(
+			                       "as %s"
+		                       ),
+		                                          *GetPropertyType(Property))
+		                       : TEXT("")
+	);
 }
 
 FString FGeneratorCore::GetParamName(FProperty* Property)
@@ -469,7 +481,7 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
 		return FString::Printf(TEXT(
-			"(%s) %s"
+			"(%s)%s"
 		),
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()),
 		                       *FUnrealCSharpFunctionLibrary::Encode(EnumProperty->GetName()));
@@ -493,12 +505,11 @@ FString FGeneratorCore::GetReturnParamType(FProperty* Property)
 	return GetPropertyType(Property);
 }
 
-FString FGeneratorCore::GetReturnParamName(FProperty* Property)
+int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput, const bool bHasOutput)
 {
-	return FString::Printf(TEXT(
-		"(%s) __ReturnValue"
-	),
-	                       *GetPropertyType(Property));
+	return static_cast<int32>(bHasReturn) |
+		static_cast<int32>(bHasInput) << 1 |
+		static_cast<int32>(bHasOutput) << 2;
 }
 
 bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& String)

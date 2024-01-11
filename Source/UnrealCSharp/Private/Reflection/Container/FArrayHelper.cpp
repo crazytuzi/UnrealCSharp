@@ -115,6 +115,11 @@ int32 FArrayHelper::Num() const
 	return ScriptArrayHelper.Num();
 }
 
+bool FArrayHelper::IsEmpty() const
+{
+	return Num() == 0;
+}
+
 int32 FArrayHelper::Max() const
 {
 	return GetSlack() + Num();

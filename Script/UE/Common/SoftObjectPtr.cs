@@ -13,28 +13,30 @@ namespace Script.Common
         ~TSoftObjectPtr() => SoftObjectPtrImplementation.SoftObjectPtr_UnRegisterImplementation(GetHandle());
 
         public TSoftObjectPtr(T InObject) =>
-            SoftObjectPtrImplementation.SoftObjectPtr_RegisterImplementation(this, InObject);
+            SoftObjectPtrImplementation.SoftObjectPtr_RegisterImplementation(this, InObject.GetHandle());
 
-        public static implicit operator TSoftObjectPtr<T>(T InObject) => new TSoftObjectPtr<T>(InObject);
+        public static implicit operator TSoftObjectPtr<T>(T InObject) => new(InObject);
 
         public static Boolean operator ==(TSoftObjectPtr<T> A, TSoftObjectPtr<T> B) =>
-            SoftObjectPtrImplementation.SoftObjectPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+            SoftObjectPtrImplementation.SoftObjectPtr_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
 
         public static Boolean operator !=(TSoftObjectPtr<T> A, TSoftObjectPtr<T> B) =>
-            !SoftObjectPtrImplementation.SoftObjectPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+            !SoftObjectPtrImplementation.SoftObjectPtr_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+
+        public override Boolean Equals(Object Other) => this == Other as TSoftObjectPtr<T>;
+
+        public override Int32 GetHashCode() => GetHandle().ToInt32();
 
         public T Get()
         {
-            SoftObjectPtrImplementation.SoftObjectPtr_GetImplementation<T>(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return SoftObjectPtrImplementation.SoftObjectPtr_GetImplementation(GetHandle()) as T;
         }
 
         public T LoadSynchronous()
         {
-            SoftObjectPtrImplementation.SoftObjectPtr_LoadSynchronousImplementation<T>(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return SoftObjectPtrImplementation.SoftObjectPtr_LoadSynchronousImplementation(GetHandle()) as T;
         }
 
         public unsafe void SetHandle(void* InGCHandle)

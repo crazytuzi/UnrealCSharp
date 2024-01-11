@@ -9,16 +9,16 @@ namespace Script.Library
     public static class ObjectImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Object_StaticClassImplementation(String InClassName, out UClass OutValue);
+        public static extern UClass Object_StaticClassImplementation(String InClassName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Object_GetClassImplementation(IntPtr InObject, out UClass OutValue);
+        public static extern UClass Object_GetClassImplementation(IntPtr InObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Object_GetNameImplementation(IntPtr InObject, out FString OutValue);
+        public static extern FString Object_GetNameImplementation(IntPtr InObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Object_GetWorldImplementation(IntPtr InObject, out UWorld OutValue);
+        public static extern UWorld Object_GetWorldImplementation(IntPtr InObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool Object_IsValidImplementation(IntPtr InObject);

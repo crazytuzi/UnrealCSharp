@@ -8,8 +8,8 @@ namespace Script.Library
     public static class SoftObjectPtrImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SoftObjectPtr_RegisterImplementation<T>(TSoftObjectPtr<T> InSoftObjectPtr, T InObject)
-            where T : UObject;
+        public static extern void SoftObjectPtr_RegisterImplementation<T>(TSoftObjectPtr<T> InSoftObjectPtr,
+            IntPtr InObject) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean SoftObjectPtr_IdenticalImplementation(IntPtr InA, IntPtr InB);
@@ -18,11 +18,9 @@ namespace Script.Library
         public static extern void SoftObjectPtr_UnRegisterImplementation(IntPtr InSoftObjectPtr);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SoftObjectPtr_GetImplementation<T>(IntPtr InSoftObjectPtr, out T OutValue)
-            where T : UObject;
+        public static extern Object SoftObjectPtr_GetImplementation(IntPtr InSoftObjectPtr);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SoftObjectPtr_LoadSynchronousImplementation<T>(IntPtr InSoftObjectPtr, out T OutValue)
-            where T : UObject;
+        public static extern Object SoftObjectPtr_LoadSynchronousImplementation(IntPtr InSoftObjectPtr);
     }
 }

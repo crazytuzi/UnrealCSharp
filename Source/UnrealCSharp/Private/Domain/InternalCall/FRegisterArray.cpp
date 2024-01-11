@@ -80,6 +80,17 @@ struct FRegisterArray
 		return 0;
 	}
 
+	static bool IsEmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+	{
+		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
+			InGarbageCollectionHandle))
+		{
+			return ArrayHelper->IsEmpty();
+		}
+
+		return false;
+	}
+
 	static int32 MaxImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
@@ -91,16 +102,19 @@ struct FRegisterArray
 		return 0;
 	}
 
-	static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                              const int32 InIndex, MonoObject** OutValue)
+	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const int32 InIndex)
 	{
+		MonoObject* ReturnValue{};
+
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
 			const auto Value = ArrayHelper->Get(InIndex);
 
-			ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
+			ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
 		}
+
+		return ReturnValue;
 	}
 
 	static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -344,7 +358,7 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			return ArrayHelper->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap);
+			ArrayHelper->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap);
 		}
 	}
 
@@ -354,8 +368,13 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			return ArrayHelper->Swap(InFirstIndexToSwap, InSecondIndexToSwap);
+			ArrayHelper->Swap(InFirstIndexToSwap, InSecondIndexToSwap);
 		}
+	}
+
+	static int32 INDEX_NONEImplementation()
+	{
+		return INDEX_NONE;
 	}
 
 	FRegisterArray()
@@ -368,6 +387,7 @@ struct FRegisterArray
 			.Function("GetSlack", GetSlackImplementation)
 			.Function("IsValidIndex", IsValidIndexImplementation)
 			.Function("Num", NumImplementation)
+			.Function("IsEmpty", IsEmptyImplementation)
 			.Function("Max", MaxImplementation)
 			.Function("Get", GetImplementation)
 			.Function("Set", SetImplementation)
@@ -388,6 +408,7 @@ struct FRegisterArray
 			.Function("Remove", RemoveImplementation)
 			.Function("SwapMemory", SwapMemoryImplementation)
 			.Function("Swap", SwapImplementation)
+			.Function("INDEX_NONE", INDEX_NONEImplementation)
 			.Register();
 	}
 };

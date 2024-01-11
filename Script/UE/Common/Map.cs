@@ -2,21 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using Script.CoreUObject;
-using Script.Reflection.Container;
+using Script.Library;
 
 namespace Script.Common
 {
     public class TMap<TKey, TValue> : IGCHandle, IEnumerable<KeyValuePair<TKey, TValue>>
     {
-        public TMap() => MapUtils.Map_Register(this);
+        public TMap() => MapImplementation.Map_RegisterImplementation(this);
 
-        ~TMap() => MapUtils.Map_UnRegister(GCHandle);
+        ~TMap() => MapImplementation.Map_UnRegisterImplementation(GCHandle);
 
         [Obsolete("It is not supported like UE.", true)]
         public static Boolean operator ==(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
 
         [Obsolete("It is not supported like UE.", true)]
         public static Boolean operator !=(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
+
+        public override Boolean Equals(Object Other) => false;
+
+        public override Int32 GetHashCode() => GetHandle().ToInt32();
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
@@ -34,35 +38,41 @@ namespace Script.Common
             return GetEnumerator();
         }
 
-        public void Empty(Int32 InExpectedNumElements = 0) => MapUtils.Map_Empty(GCHandle, InExpectedNumElements);
+        public void Empty(Int32 InExpectedNumElements = 0) =>
+            MapImplementation.Map_EmptyImplementation(GCHandle, InExpectedNumElements);
 
-        public Int32 Num() => MapUtils.Map_Num(GCHandle);
+        public Int32 Num() => MapImplementation.Map_NumImplementation(GCHandle);
 
-        public void Add(TKey InKey, TValue InValue) => MapUtils.Map_Add(GCHandle, InKey, InValue);
+        public Boolean IsEmpty() => MapImplementation.Map_IsEmptyImplementation(GCHandle);
 
-        public Int32 Remove(TKey InKey) => MapUtils.Map_Remove<TKey, TValue>(GCHandle, InKey);
+        public void Add(TKey InKey, TValue InValue) =>
+            MapImplementation.Map_AddImplementation(GCHandle, InKey, InValue);
 
-        public TKey FindKey(TValue InValue) => MapUtils.Map_FindKey<TKey, TValue>(GCHandle, InValue);
+        public Int32 Remove(TKey InKey) => MapImplementation.Map_RemoveImplementation(GCHandle, InKey);
 
-        public TValue Find(TKey InKey) => MapUtils.Map_Find<TKey, TValue>(GCHandle, InKey);
+        public TKey FindKey(TValue InValue) => (TKey)MapImplementation.Map_FindKeyImplementation(GCHandle, InValue);
 
-        public Boolean Contains(TKey InKey) => MapUtils.Map_Contains<TKey, TValue>(GCHandle, InKey);
+        public TValue Find(TKey InKey) => (TValue)MapImplementation.Map_FindImplementation(GCHandle, InKey);
+
+        public Boolean Contains(TKey InKey) => MapImplementation.Map_ContainsImplementation(GCHandle, InKey);
 
         public TValue this[TKey InKey]
         {
-            get => MapUtils.Map_Get<TKey, TValue>(GCHandle, InKey);
+            get => (TValue)MapImplementation.Map_GetImplementation(GCHandle, InKey);
 
-            set => MapUtils.Map_Set(GCHandle, InKey, value);
+            set => MapImplementation.Map_SetImplementation(GCHandle, InKey, value);
         }
 
-        private Int32 GetMaxIndex() => MapUtils.Map_GetMaxIndex(GCHandle);
+        private Int32 GetMaxIndex() => MapImplementation.Map_GetMaxIndexImplementation(GCHandle);
 
-        private Boolean IsValidIndex(Int32 InIndex) => MapUtils.Map_IsValidIndex(GCHandle, InIndex);
+        private Boolean IsValidIndex(Int32 InIndex) =>
+            MapImplementation.Map_IsValidIndexImplementation(GCHandle, InIndex);
 
-        private TKey GetEnumeratorKey(Int32 InIndex) => MapUtils.Map_GetEnumeratorKey<TKey, TValue>(GCHandle, InIndex);
+        private TKey GetEnumeratorKey(Int32 InIndex) =>
+            (TKey)MapImplementation.Map_GetEnumeratorKeyImplementation(GCHandle, InIndex);
 
         private TValue GetEnumeratorValue(Int32 InIndex) =>
-            MapUtils.Map_GetEnumeratorValue<TKey, TValue>(GCHandle, InIndex);
+            (TValue)MapImplementation.Map_GetEnumeratorValueImplementation(GCHandle, InIndex);
 
         public unsafe void SetHandle(void* InGCHandle)
         {

@@ -56,7 +56,8 @@ struct FRegisterGuid
 			.Function("Invalidate", BINDING_FUNCTION(&FGuid::Invalidate))
 			.Function("IsValid", BINDING_FUNCTION(&FGuid::IsValid))
 #if UE_GUID_TO_STRING
-			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString))
+			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString),
+			          {}, EFunctionInteract::New)
 #endif
 			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString),
 			          {"Format"})

@@ -1,14 +1,14 @@
 ﻿using System;
-using Script.Reflection.Delegate;
+using Script.Library;
 
 namespace Script.Common
 {
     public class FRefDelegate : FDelegateBase
     {
-        public Boolean IsBound() => DelegateUtils.Delegate_IsBound(GetHandle());
+        public Boolean IsBound() => DelegateImplementation.Delegate_IsBoundImplementation(GetHandle());
 
-        public void Unbind() => DelegateUtils.Delegate_UnBind(GetHandle());
+        public void Unbind() => DelegateImplementation.Delegate_UnBindImplementation(GetHandle());
 
-        public void Clear() => DelegateUtils.Delegate_Clear(GetHandle());
+        public void Clear() => DelegateImplementation.Delegate_ClearImplementation(GetHandle());
     }
 }

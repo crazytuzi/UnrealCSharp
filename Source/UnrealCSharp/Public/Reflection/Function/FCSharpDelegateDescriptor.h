@@ -10,9 +10,9 @@ public:
 public:
 	bool CallDelegate(MonoObject* InDelegate, void* InParams);
 
-	bool ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** ReturnValue, MonoObject** OutValue,
-	                     MonoArray* InValue);
+	MonoObject* ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** OutValue,
+	                            MonoArray* InValue);
 
-	bool ProcessMulticastDelegate(const FMulticastScriptDelegate* InMulticastScriptDelegate, MonoObject** OutValue,
-	                              MonoArray* InValue);
+	MonoObject* ProcessMulticastDelegate(const FMulticastScriptDelegate* InMulticastScriptDelegate,
+	                                     MonoObject** OutValue, MonoArray* InValue);
 };

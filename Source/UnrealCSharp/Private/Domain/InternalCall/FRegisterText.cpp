@@ -34,11 +34,11 @@ struct FRegisterText
 		});
 	}
 
-	static void ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString** OutValue)
+	static MonoString* ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		const auto Text = FCSharpEnvironment::GetEnvironment().GetString<FText>(InGarbageCollectionHandle);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*Text->ToString()));
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*Text->ToString()));
 	}
 
 	FRegisterText()

@@ -14,19 +14,23 @@ namespace Script.Common
 
         public FName(String InValue) => NameImplementation.Name_RegisterImplementation(this, InValue);
 
-        public static implicit operator FName(String InValue) => new FName(InValue);
+        public static implicit operator FName(String InValue) => new(InValue);
 
         public static Boolean operator ==(FName A, FName B) =>
-            NameImplementation.Name_IdenticalImplementation(A.GetHandle(), B.GCHandle);
+            NameImplementation.Name_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
 
         public static Boolean operator !=(FName A, FName B) =>
-            !NameImplementation.Name_IdenticalImplementation(A.GetHandle(), B.GCHandle);
+            !NameImplementation.Name_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+
+        public override Boolean Equals(Object Other) => this == Other as FName;
+
+        public override Int32 GetHashCode() => GetHandle().ToInt32();
 
         public override String ToString()
         {
-            NameImplementation.Name_ToStringImplementation(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return NameImplementation.Name_ToStringImplementation(GetHandle());
         }
 
         public unsafe void SetHandle(void* InGCHandle)
@@ -38,6 +42,8 @@ namespace Script.Common
         {
             return GCHandle;
         }
+
+        public static FName NAME_None => NameImplementation.Name_NAME_NoneImplementation();
 
         private IntPtr GCHandle;
     }

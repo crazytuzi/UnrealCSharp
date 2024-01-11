@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Binding/Function/EFunctionInteract.h"
 #include "Binding/Property/FBindingProperty.h"
 #include "Binding/Function/FBindingFunction.h"
 #include "Binding/Function/FBindingSubscript.h"
@@ -53,7 +54,8 @@ public:
 	                     const void* InSetMethod);
 
 	void BindingFunction(const FString& InName, const FString& InImplementationName,
-	                     FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames);
+	                     FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames,
+	                     const EFunctionInteract InFunctionInteract);
 
 	void Inheritance(const FString& InClass, const FString& InFullClass,
 	                 const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);

@@ -17,13 +17,13 @@ struct FRegisterProperty
 
 	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int16, int16)
 
-	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int, int32)
+	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int32, int32)
 
 	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int64, int64)
 
-	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Bool, bool)
+	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Boolean, bool)
 
-	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Float, float)
+	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Single, float)
 
 	OBJECT_COMPOUND_PROPERTY_IMPLEMENTATION(Compound)
 
@@ -41,13 +41,13 @@ struct FRegisterProperty
 
 	STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int16, int16)
 
-	STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int, int32)
+	STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int32, int32)
 
 	STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Int64, int64)
 
-	STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Bool, bool)
+	STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Boolean, bool)
 
-	STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Float, float)
+	STRUCT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Single, float)
 
 	STRUCT_COMPOUND_PROPERTY_IMPLEMENTATION(Compound)
 
@@ -68,14 +68,14 @@ struct FRegisterProperty
 			.Function("SetObjectSByteProperty", SetObjectSBytePropertyImplementation)
 			.Function("GetObjectInt16Property", GetObjectInt16PropertyImplementation)
 			.Function("SetObjectInt16Property", SetObjectInt16PropertyImplementation)
-			.Function("GetObjectIntProperty", GetObjectIntPropertyImplementation)
-			.Function("SetObjectIntProperty", SetObjectIntPropertyImplementation)
+			.Function("GetObjectInt32Property", GetObjectInt32PropertyImplementation)
+			.Function("SetObjectInt32Property", SetObjectInt32PropertyImplementation)
 			.Function("GetObjectInt64Property", GetObjectInt64PropertyImplementation)
 			.Function("SetObjectInt64Property", SetObjectInt64PropertyImplementation)
-			.Function("GetObjectBoolProperty", GetObjectBoolPropertyImplementation)
-			.Function("SetObjectBoolProperty", SetObjectBoolPropertyImplementation)
-			.Function("GetObjectFloatProperty", GetObjectFloatPropertyImplementation)
-			.Function("SetObjectFloatProperty", SetObjectFloatPropertyImplementation)
+			.Function("GetObjectBooleanProperty", GetObjectBooleanPropertyImplementation)
+			.Function("SetObjectBooleanProperty", SetObjectBooleanPropertyImplementation)
+			.Function("GetObjectSingleProperty", GetObjectSinglePropertyImplementation)
+			.Function("SetObjectSingleProperty", SetObjectSinglePropertyImplementation)
 			.Function("GetObjectCompoundProperty", GetObjectCompoundPropertyImplementation)
 			.Function("SetObjectCompoundProperty", SetObjectCompoundPropertyImplementation)
 			.Function("GetObjectDoubleProperty", GetObjectDoublePropertyImplementation)
@@ -92,14 +92,14 @@ struct FRegisterProperty
 			.Function("SetStructSByteProperty", SetStructSBytePropertyImplementation)
 			.Function("GetStructInt16Property", GetStructInt16PropertyImplementation)
 			.Function("SetStructInt16Property", SetStructInt16PropertyImplementation)
-			.Function("GetStructIntProperty", GetStructIntPropertyImplementation)
-			.Function("SetStructIntProperty", SetStructIntPropertyImplementation)
+			.Function("GetStructInt32Property", GetStructInt32PropertyImplementation)
+			.Function("SetStructInt32Property", SetStructInt32PropertyImplementation)
 			.Function("GetStructInt64Property", GetStructInt64PropertyImplementation)
 			.Function("SetStructInt64Property", SetStructInt64PropertyImplementation)
-			.Function("GetStructBoolProperty", GetStructBoolPropertyImplementation)
-			.Function("SetStructBoolProperty", SetStructBoolPropertyImplementation)
-			.Function("GetStructFloatProperty", GetStructFloatPropertyImplementation)
-			.Function("SetStructFloatProperty", SetStructFloatPropertyImplementation)
+			.Function("GetStructBooleanProperty", GetStructBooleanPropertyImplementation)
+			.Function("SetStructBooleanProperty", SetStructBooleanPropertyImplementation)
+			.Function("GetStructSingleProperty", GetStructSinglePropertyImplementation)
+			.Function("SetStructSingleProperty", SetStructSinglePropertyImplementation)
 			.Function("GetStructCompoundProperty", GetStructCompoundPropertyImplementation)
 			.Function("SetStructCompoundProperty", SetStructCompoundPropertyImplementation)
 			.Function("GetStructDoubleProperty", GetStructDoublePropertyImplementation)

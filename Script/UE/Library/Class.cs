@@ -7,9 +7,7 @@ namespace Script.CoreUObject
     {
         public UObject GetDefaultObject(Boolean bCreateIfNeeded = true)
         {
-            ClassImplementation.Class_GetDefaultObjectImplementation(GetHandle(), bCreateIfNeeded, out var __OutValue);
-
-            return __OutValue;
+            return ClassImplementation.Class_GetDefaultObjectImplementation(GetHandle(), bCreateIfNeeded);
         }
     }
 }

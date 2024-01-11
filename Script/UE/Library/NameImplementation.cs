@@ -16,6 +16,9 @@ namespace Script.Library
         public static extern void Name_UnRegisterImplementation(IntPtr InName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Name_ToStringImplementation(IntPtr InName, out String OutValue);
+        public static extern String Name_ToStringImplementation(IntPtr InName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern FName Name_NAME_NoneImplementation();
     }
 }

@@ -42,6 +42,17 @@ struct FRegisterSet
 		return 0;
 	}
 
+	static bool IsEmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+	{
+		if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
+			InGarbageCollectionHandle))
+		{
+			return SetHelper->IsEmpty();
+		}
+
+		return false;
+	}
+
 	static int32 GetMaxIndexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
@@ -120,16 +131,20 @@ struct FRegisterSet
 		return false;
 	}
 
-	static void GetEnumeratorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                        const int32 InIndex, MonoObject** OutValue)
+	static MonoObject* GetEnumeratorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                               const int32 InIndex)
 	{
+		MonoObject* ReturnValue{};
+
 		if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 			InGarbageCollectionHandle))
 		{
 			const auto Value = SetHelper->GetEnumerator(InIndex);
 
-			SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
+			SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
 		}
+
+		return ReturnValue;
 	}
 
 	FRegisterSet()
@@ -139,6 +154,7 @@ struct FRegisterSet
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Empty", EmptyImplementation)
 			.Function("Num", NumImplementation)
+			.Function("IsEmpty", IsEmptyImplementation)
 			.Function("GetMaxIndex", GetMaxIndexImplementation)
 			.Function("Add", AddImplementation)
 			.Function("Remove", RemoveImplementation)

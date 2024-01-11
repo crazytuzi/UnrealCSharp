@@ -68,12 +68,14 @@ void FDelegateHelper::Clear() const
 	}
 }
 
-void FDelegateHelper::Execute(MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue) const
+MonoObject* FDelegateHelper::Execute(MonoObject** OutValue, MonoArray* InValue) const
 {
 	if (DelegateHandler != nullptr)
 	{
-		DelegateHandler->Execute(ReturnValue, OutValue, InValue);
+		return DelegateHandler->Execute(OutValue, InValue);
 	}
+
+	return nullptr;
 }
 
 UObject* FDelegateHelper::GetUObject() const

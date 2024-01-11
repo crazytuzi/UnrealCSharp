@@ -156,27 +156,23 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
-		if (!FGeneratorCore::IsSafeProperty(*PropertyIterator))
+		if (FGeneratorCore::IsPrimitiveProperty(*PropertyIterator))
 		{
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget\n"
-				"\t\t\t{\n"
-				"\t\t\t\tPropertyUtils.GetObjectProperty(GetHandle(), %s, out %s value);\n"
+				"\t\t\tget => %sPropertyImplementation.Property_GetObject%sPropertyImplementation(GetHandle(), %s);\n"
 				"\n"
-				"\t\t\t\treturn %s;\n"
-				"\t\t\t}\n"
-				"\n"
-				"\t\t\tset => PropertyUtils.SetObjectProperty(GetHandle(), %s, %s);\n"
+				"\t\t\tset => PropertyImplementation.Property_SetObject%sPropertyImplementation(GetHandle(), %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
 			                                   *PropertyName,
+			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
-			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
@@ -186,21 +182,15 @@ void FClassGenerator::Generator(const UClass* InClass)
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget\n"
-				"\t\t\t{\n"
-				"\t\t\t\tPropertyUtils.GetObjectProperty(GetHandle(), %s, out Object value);\n"
+				"\t\t\tget => PropertyImplementation.Property_GetObjectCompoundPropertyImplementation(GetHandle(), %s) as %s;\n"
 				"\n"
-				"\t\t\t\treturn %s as %s;\n"
-				"\t\t\t}\n"
-				"\n"
-				"\t\t\tset => PropertyUtils.SetObjectProperty(GetHandle(), %s, %s);\n"
+				"\t\t\tset => PropertyImplementation.Property_SetObjectCompoundPropertyImplementation(GetHandle(), %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
 			                                   *PropertyName,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
-			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
 			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
@@ -208,15 +198,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 	}
 
-	if (bHasProperty == true)
-	{
-		UsingNameSpaces.Add(TEXT("Script.Reflection.Property"));
-	}
-
 	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
 	{
 		PropertyNameContent += FString::Printf(TEXT(
-			"%s\t\tprivate static UInt32 %s;\n"
+			"%s\t\tprivate static UInt32 %s = 0;\n"
 		),
 		                                       Index == 0 ? TEXT("") : TEXT("\n"),
 		                                       *PropertyNames[Index].Key
@@ -230,9 +215,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FunctionContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UClass StaticClass()\n"
 		"\t\t{\n"
-		"\t\t\tObjectImplementation.Object_StaticClassImplementation(\"%s\", out var __OutValue);\n"
-		"\n"
-		"\t\t\treturn __OutValue;\n"
+		"\t\t\treturn ObjectImplementation.Object_StaticClassImplementation(\"%s\");\n"
 		"\t\t}\n"
 	),
 	                                  SuperClass != nullptr ? TEXT(" new") : TEXT(""),
@@ -363,10 +346,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionStatic = TEXT("static");
 
 			FunctionPolymorphism = TEXT("");
-
-			UsingNameSpaces.Add(TEXT("System.Reflection"));
-
-			UsingNameSpaces.Add(TEXT("Script.Reflection.Struct"));
 		}
 
 		TArray<FProperty*> FunctionParams;
@@ -541,12 +520,21 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		auto FunctionCallBody = FString::Printf(
-			TEXT(
-				"FunctionUtils.Function_Reflection(%s, %s, out var __ReturnValue, out var __OutValue"
-			),
-			bIsStatic == true ? TEXT("StaticClass().GetDefaultObject().GetHandle()") : TEXT("GetHandle()"),
-			*FunctionNames[FunctionNames.Num() - 1].Key);
+		auto FunctionCallBody = FString::Printf(TEXT(
+			"FunctionImplementation.Function_Reflection%dImplementation(%s, %s%s"
+		),
+		                                        FGeneratorCore::GetFunctionIndex(FunctionReturnParam != nullptr,
+			                                        FunctionParams.Num() - FunctionOutParamIndex.Num() != 0,
+			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
+			                                        IsEmpty()),
+		                                        bIsStatic == true
+			                                        ? TEXT("StaticClass().GetDefaultObject().GetHandle()")
+			                                        : TEXT("GetHandle()"),
+		                                        *FunctionNames[FunctionNames.Num() - 1].Key,
+		                                        FunctionRefParamIndex.IsEmpty() && FunctionOutParamIndex.IsEmpty()
+			                                        ? TEXT("")
+			                                        : TEXT(", out var __OutValue")
+		);
 
 		for (auto Index = 0; Index < FunctionParams.Num(); ++Index)
 		{
@@ -556,7 +544,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			}
 		}
 
-		FunctionCallBody += TEXT(");");
+		FunctionCallBody += TEXT(")");
 
 		TArray<FString> FunctionOutParams;
 
@@ -592,7 +580,33 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionReturnParamBody = FString::Printf(TEXT(
 				"return %s;"
 			),
-			                                          *FGeneratorCore::GetReturnParamName(FunctionReturnParam));
+			                                          FunctionRefParamIndex.IsEmpty()
+				                                          ? FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
+					                                            ? *FString::Printf(TEXT(
+						                                            "(%s)%s"
+					                                            ),
+						                                            *FGeneratorCore::GetPropertyType(
+							                                            FunctionReturnParam),
+						                                            *FunctionCallBody)
+					                                            : *FString::Printf(TEXT(
+						                                            "%s as %s"
+					                                            ),
+						                                            *FunctionCallBody,
+						                                            *FGeneratorCore::GetPropertyType(
+							                                            FunctionReturnParam))
+				                                          : FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
+				                                          ? *FString::Printf(TEXT(
+					                                          "(%s)__ReturnValue"
+				                                          ),
+				                                                             *FGeneratorCore::GetPropertyType(
+					                                                             FunctionReturnParam))
+				                                          : *FString::Printf(TEXT(
+					                                          "__ReturnValue as %s"
+				                                          ),
+				                                                             *FGeneratorCore::GetPropertyType(
+					                                                             FunctionReturnParam))
+
+			);
 		}
 
 		FString FunctionDefaultParamBody;
@@ -616,21 +630,40 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		auto FunctionImplementationBody = FString::Printf(TEXT(
-			"%s\t\t\t%s\n"
+			"%s"
+			"\t\t\t%s"
+			"%s"
+			"%s"
 			"%s"
 			"%s"
 			"%s"
 		),
 		                                                  *FunctionDefaultParamBody,
-		                                                  *FunctionCallBody,
+		                                                  FunctionReturnParam != nullptr && !FunctionRefParamIndex.
+		                                                  IsEmpty()
+			                                                  ? TEXT("var __ReturnValue = ")
+			                                                  : TEXT(""),
+		                                                  FunctionReturnParam == nullptr || !FunctionRefParamIndex.
+		                                                  IsEmpty()
+			                                                  ? *FunctionCallBody
+			                                                  : TEXT(""),
+		                                                  FunctionReturnParam == nullptr || !FunctionRefParamIndex.
+		                                                  IsEmpty()
+			                                                  ? TEXT(";\n")
+			                                                  : TEXT(""),
 		                                                  *FunctionOutParamBody,
-		                                                  FunctionReturnParamBody.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                                  !FunctionOutParamBody.IsEmpty() && !FunctionReturnParamBody.
+		                                                  IsEmpty()
+			                                                  ? TEXT("\n")
+			                                                  : TEXT(""),
 		                                                  FunctionReturnParamBody.IsEmpty()
 			                                                  ? TEXT("")
-			                                                  : *FString::Printf(
-				                                                  TEXT(
-					                                                  "\t\t\t%s\n"
-				                                                  ),
+			                                                  : *FString::Printf(TEXT(
+				                                                  "%s%s\n"
+			                                                  ),
+				                                                  !FunctionRefParamIndex.IsEmpty()
+					                                                  ? TEXT("\t\t\t")
+					                                                  : TEXT(""),
 				                                                  *FunctionReturnParamBody));
 
 		FunctionContent += FString::Printf(TEXT(
@@ -643,16 +676,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                   *FunctionComment,
 		                                   *FunctionDeclaration,
 		                                   *FunctionImplementationBody
-		);
-	}
-
-	for (auto Index = 0; Index < FunctionNames.Num(); ++Index)
-	{
-		FunctionNameContent += FString::Printf(TEXT(
-			"%s\t\tprivate static UInt32 %s;\n"
-		),
-		                                       Index == 0 ? TEXT("") : TEXT("\n"),
-		                                       *FunctionNames[Index].Key
 		);
 	}
 
@@ -678,9 +701,14 @@ void FClassGenerator::Generator(const UClass* InClass)
 	}
 	else
 	{
-		if (bHasFunction == true)
+		for (auto Index = 0; Index < FunctionNames.Num(); ++Index)
 		{
-			UsingNameSpaces.Add(TEXT("Script.Reflection.Function"));
+			FunctionNameContent += FString::Printf(TEXT(
+				"%s\t\tprivate static UInt32 %s = 0;\n"
+			),
+			                                       Index == 0 ? TEXT("") : TEXT("\n"),
+			                                       *FunctionNames[Index].Key
+			);
 		}
 	}
 
@@ -726,7 +754,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                               *FunctionContent,
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
 	                               *PropertyNameContent,
-	                               bHasFunction == true ? TEXT("\n") : TEXT(""),
+	                               bIsInterface == false && bHasFunction == true ? TEXT("\n") : TEXT(""),
 	                               *FunctionNameContent,
 	                               bIsInterface == true ? TEXT("\n") : TEXT(""),
 	                               *IInterfaceContent
@@ -781,7 +809,7 @@ bool FClassGenerator::HasBlueprintFunctionDefaultParam(const UFunction* InFuncti
 {
 	if (InProperty->HasAnyPropertyFlags(CPF_OutParm) && !InProperty->HasAnyPropertyFlags(CPF_ConstParm))
 	{
-		return false;;
+		return false;
 	}
 
 	const auto Key = InProperty->GetName();
@@ -1079,7 +1107,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(const UFunction* InFuncti
 		return TEXT("");
 	}
 
-	if (!FGeneratorCore::IsSafeProperty(InProperty))
+	if (!FGeneratorCore::IsPrimitiveProperty(InProperty))
 	{
 		return TEXT("");
 	}

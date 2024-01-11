@@ -9,7 +9,7 @@ namespace Script.Library
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void ScriptInterface_RegisterImplementation<T>(TScriptInterface<T> InScriptInterface,
-            T InObject) where T : IInterface;
+            IntPtr InObject) where T : IInterface;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Boolean ScriptInterface_IdenticalImplementation(IntPtr InA, IntPtr InB);
@@ -18,7 +18,6 @@ namespace Script.Library
         public static extern void ScriptInterface_UnRegisterImplementation(IntPtr InScriptInterface);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void ScriptInterface_GetObjectImplementation<U>(IntPtr InScriptInterface,
-            out U OutValue) where U : UObject;
+        public static extern Object ScriptInterface_GetObjectImplementation(IntPtr InScriptInterface);
     }
 }

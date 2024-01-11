@@ -9,23 +9,17 @@ namespace Script.CoreUObject
     {
         public UClass GetClass()
         {
-            ObjectImplementation.Object_GetClassImplementation(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return ObjectImplementation.Object_GetClassImplementation(GetHandle());
         }
 
         public FString GetName()
         {
-            ObjectImplementation.Object_GetNameImplementation(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return ObjectImplementation.Object_GetNameImplementation(GetHandle());
         }
 
         public UWorld GetWorld()
         {
-            ObjectImplementation.Object_GetWorldImplementation(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return ObjectImplementation.Object_GetWorldImplementation(GetHandle());
         }
 
         public override String ToString()

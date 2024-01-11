@@ -14,19 +14,23 @@ namespace Script.Common
 
         public FString(String InValue) => StringImplementation.String_RegisterImplementation(this, InValue);
 
-        public static implicit operator FString(String InValue) => new FString(InValue);
+        public static implicit operator FString(String InValue) => new(InValue);
 
         public static Boolean operator ==(FString A, FString B) =>
-            StringImplementation.String_IdenticalImplementation(A.GetHandle(), B.GCHandle);
+            StringImplementation.String_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
 
         public static Boolean operator !=(FString A, FString B) =>
-            !StringImplementation.String_IdenticalImplementation(A.GetHandle(), B.GCHandle);
+            !StringImplementation.String_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+
+        public override Boolean Equals(Object Other) => this == Other as FString;
+
+        public override Int32 GetHashCode() => GetHandle().ToInt32();
 
         public override String ToString()
         {
-            StringImplementation.String_ToStringImplementation(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return StringImplementation.String_ToStringImplementation(GetHandle());
         }
 
         public unsafe void SetHandle(void* InGCHandle)

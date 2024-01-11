@@ -33,13 +33,15 @@ struct TParentPropertyBuilder
 template <typename Class, typename Result, auto Member>
 struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>>
 {
-	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* Get(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member));
+			return TPropertyValue<Result, Result>::Get(&(FoundObject->*Member));
 		}
+
+		return nullptr;
 	}
 
 	static void Set(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InValue)
@@ -60,9 +62,9 @@ struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<!std::is_sam
 template <typename Class, typename Result, auto Member>
 struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>>
 {
-	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
-		*OutValue = TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member));
+		return TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member));
 	}
 
 	static void Set(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InValue)
@@ -80,13 +82,15 @@ template <typename Class, typename Result, auto Member>
 struct TParentPropertyBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
-	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InGarbageCollectionHandle);
+			return TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InGarbageCollectionHandle);
 		}
+
+		return nullptr;
 	}
 };
 
@@ -94,11 +98,11 @@ template <typename Class, typename Result, auto Member>
 struct TParentPropertyBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
-	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
-		*OutValue = TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member),
-		                                                InGarbageCollectionHandle,
-		                                                false);
+		return TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member),
+		                                           InGarbageCollectionHandle,
+		                                           false);
 	}
 };
 

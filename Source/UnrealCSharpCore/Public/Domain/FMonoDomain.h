@@ -137,7 +137,7 @@ public:
 
 	static MonoClass* Get_Object_Class();
 
-	static MonoClass* Get_UInt16_Class();;
+	static MonoClass* Get_UInt16_Class();
 
 	static MonoClass* Get_UInt32_Class();
 

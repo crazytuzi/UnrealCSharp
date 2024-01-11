@@ -7,15 +7,17 @@
 #define NEW_PROPERTY_DESCRIPTOR(FPropertyType) NEW_PROPERTY_DESCRIPTOR_IMPLEMENTATION(FPropertyType, FPropertyType##Descriptor)
 
 #define GET_PRIMITIVE_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType, Type) \
-static void Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, Type& OutValue) \
+static Type Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash) \
 { \
+	Type Value{}; \
 	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType, void*>(InGarbageCollectionHandle)) \
 	{ \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddPropertyDescriptor(InPropertyHash)) \
 		{ \
-			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), &OutValue); \
+			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), &Value); \
 		} \
 	} \
+	return Value; \
 }
 
 #define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType, Type) \
@@ -31,15 +33,17 @@ static void Set##StructType##PropertyType##PropertyImplementation(const FGarbage
 }
 
 #define GET_COMPOUND_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType) \
-static void Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, MonoObject** OutValue) \
+static MonoObject* Get##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash) \
 { \
+	MonoObject* Value{}; \
 	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType, void*>(InGarbageCollectionHandle)) \
 	{ \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddPropertyDescriptor(InPropertyHash)) \
 		{ \
-			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), OutValue); \
+			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), &Value); \
 		} \
 	} \
+	return Value; \
 }
 
 #define SET_COMPOUND_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType) \

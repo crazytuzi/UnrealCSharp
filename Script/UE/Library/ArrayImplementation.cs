@@ -28,10 +28,13 @@ namespace Script.Library
         public static extern Int32 Array_NumImplementation(IntPtr InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean Array_IsEmptyImplementation(IntPtr InArray);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Array_MaxImplementation(IntPtr InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_GetImplementation(IntPtr InArray, Int32 InIndex, out Object OutValue);
+        public static extern Object Array_GetImplementation(IntPtr InArray, Int32 InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Array_SetImplementation(IntPtr InArray, Int32 InIndex, Object InValue);
@@ -52,8 +55,7 @@ namespace Script.Library
         public static extern void Array_InsertZeroedImplementation(IntPtr InArray, Int32 InIndex, Int32 InCount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_InsertDefaultedImplementation(IntPtr InArray, Int32 InIndex,
-            Int32 InCount);
+        public static extern void Array_InsertDefaultedImplementation(IntPtr InArray, Int32 InIndex, Int32 InCount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Array_RemoveAtImplementation(IntPtr InArray, Int32 InIndex, Int32 InCount,
@@ -66,8 +68,7 @@ namespace Script.Library
         public static extern void Array_EmptyImplementation(IntPtr InArray, Int32 InSlack);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_SetNumImplementation(IntPtr InArray, Int32 InNewNum,
-            Boolean bAllowShrinking);
+        public static extern void Array_SetNumImplementation(IntPtr InArray, Int32 InNewNum, Boolean bAllowShrinking);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Array_AddImplementation(IntPtr InArray, Object InValue);
@@ -85,11 +86,14 @@ namespace Script.Library
         public static extern Int32 Array_RemoveImplementation(IntPtr InArray, Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_SwapMemoryImplementation(IntPtr InArray, Int32 InFirstIndexToSwap,
+        public static extern void Array_SwapMemoryImplementation(IntPtr InArray, Int32 InFirstIndexToSwap,
             Int32 InSecondIndexToSwap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_SwapImplementation(IntPtr InArray, Int32 InFirstIndexToSwap,
+        public static extern void Array_SwapImplementation(IntPtr InArray, Int32 InFirstIndexToSwap,
             Int32 InSecondIndexToSwap);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Int32 Array_INDEX_NONEImplementation();
     }
 }

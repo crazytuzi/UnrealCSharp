@@ -13,21 +13,25 @@ namespace Script.Common
         ~TScriptInterface() => ScriptInterfaceImplementation.ScriptInterface_UnRegisterImplementation(GetHandle());
 
         public TScriptInterface(T InObject) =>
-            ScriptInterfaceImplementation.ScriptInterface_RegisterImplementation(this, InObject);
+            ScriptInterfaceImplementation.ScriptInterface_RegisterImplementation(this, InObject.GetHashCode());
 
-        public static implicit operator TScriptInterface<T>(T InObject) => new TScriptInterface<T>(InObject);
+        public static implicit operator TScriptInterface<T>(T InObject) => new(InObject);
 
         public static Boolean operator ==(TScriptInterface<T> A, TScriptInterface<T> B) =>
-            ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+            ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
 
         public static Boolean operator !=(TScriptInterface<T> A, TScriptInterface<T> B) =>
-            !ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+            !ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+
+        public override Boolean Equals(Object Other) => this == Other as TScriptInterface<T>;
+
+        public override Int32 GetHashCode() => GetHandle().ToInt32();
 
         public U GetObject<U>() where U : UObject
         {
-            ScriptInterfaceImplementation.ScriptInterface_GetObjectImplementation<U>(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return ScriptInterfaceImplementation.ScriptInterface_GetObjectImplementation(GetHandle()) as U;
         }
 
         public unsafe void SetHandle(void* InGCHandle)

@@ -2,21 +2,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using Script.CoreUObject;
-using Script.Reflection.Container;
+using Script.Library;
 
 namespace Script.Common
 {
+    public static class TArray
+    {
+        public static Int32 INDEX_NONE => ArrayImplementation.Array_INDEX_NONEImplementation();
+    }
+
     public class TArray<T> : IGCHandle, IEnumerable<T>
     {
-        public TArray() => ArrayUtils.Array_Register(this);
+        public TArray() => ArrayImplementation.Array_RegisterImplementation(this);
 
-        ~TArray() => ArrayUtils.Array_UnRegister(GetHandle());
+        ~TArray() => ArrayImplementation.Array_UnRegisterImplementation(GetHandle());
 
         public static Boolean operator ==(TArray<T> A, TArray<T> B) =>
-            ArrayUtils.Array_Identical(A.GetHandle(), B.GetHandle());
+            ArrayImplementation.Array_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
 
         public static Boolean operator !=(TArray<T> A, TArray<T> B) =>
-            !ArrayUtils.Array_Identical(A.GetHandle(), B.GetHandle());
+            !ArrayImplementation.Array_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+
+        public override Boolean Equals(Object Other) => this == Other as TArray<T>;
+
+        public override Int32 GetHashCode() => GetHandle().ToInt32();
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -34,62 +45,68 @@ namespace Script.Common
             }
         }
 
-        public Int32 GetTypeSize() => ArrayUtils.Array_GetTypeSize(GetHandle());
+        public Int32 GetTypeSize() => ArrayImplementation.Array_GetTypeSizeImplementation(GetHandle());
 
-        public Int32 GetSlack() => ArrayUtils.Array_GetSlack(GetHandle());
+        public Int32 GetSlack() => ArrayImplementation.Array_GetSlackImplementation(GetHandle());
 
-        public Boolean IsValidIndex(Int32 InIndex) => ArrayUtils.Array_IsValidIndex(GetHandle(), InIndex);
+        public Boolean IsValidIndex(Int32 InIndex) =>
+            ArrayImplementation.Array_IsValidIndexImplementation(GetHandle(), InIndex);
 
-        public Int32 Num() => ArrayUtils.Array_Num(GetHandle());
+        public Int32 Num() => ArrayImplementation.Array_NumImplementation(GetHandle());
 
-        public Int32 Max() => ArrayUtils.Array_Max(GetHandle());
+        public Boolean IsEmpty() => ArrayImplementation.Array_IsEmptyImplementation(GetHandle());
+
+        public Int32 Max() => ArrayImplementation.Array_MaxImplementation(GetHandle());
 
         public T this[Int32 InIndex]
         {
-            get => ArrayUtils.Array_Get<T>(GetHandle(), InIndex);
+            get => (T)ArrayImplementation.Array_GetImplementation(GetHandle(), InIndex);
 
-            set => ArrayUtils.Array_Set(GetHandle(), InIndex, value);
+            set => ArrayImplementation.Array_SetImplementation(GetHandle(), InIndex, value);
         }
 
-        public Int32 Find(T InValue) => ArrayUtils.Array_Find(GetHandle(), InValue);
+        public Int32 Find(T InValue) => ArrayImplementation.Array_FindImplementation(GetHandle(), InValue);
 
-        public Int32 FindLast(T InValue) => ArrayUtils.Array_FindLast(GetHandle(), InValue);
+        public Int32 FindLast(T InValue) => ArrayImplementation.Array_FindLastImplementation(GetHandle(), InValue);
 
-        public Boolean Contains(T InValue) => ArrayUtils.Array_Contains(GetHandle(), InValue);
+        public Boolean Contains(T InValue) => ArrayImplementation.Array_ContainsImplementation(GetHandle(), InValue);
 
-        public Int32 AddUninitialized(Int32 InCount = 1) => ArrayUtils.Array_AddUninitialized(GetHandle(), InCount);
+        public Int32 AddUninitialized(Int32 InCount = 1) =>
+            ArrayImplementation.Array_AddUninitializedImplementation(GetHandle(), InCount);
 
         public void InsertZeroed(Int32 InIndex, Int32 InCount = 1) =>
-            ArrayUtils.Array_InsertZeroed(GetHandle(), InIndex, InCount);
+            ArrayImplementation.Array_InsertZeroedImplementation(GetHandle(), InIndex, InCount);
 
         public void InsertDefaulted(Int32 InIndex, Int32 InCount) =>
-            ArrayUtils.Array_InsertDefaulted(GetHandle(), InIndex, InCount);
+            ArrayImplementation.Array_InsertDefaultedImplementation(GetHandle(), InIndex, InCount);
 
         public void RemoveAt(Int32 InIndex, Int32 InCount, Boolean bAllowShrinking = true) =>
-            ArrayUtils.Array_RemoveAt(GetHandle(), InIndex, InCount, bAllowShrinking);
+            ArrayImplementation.Array_RemoveAtImplementation(GetHandle(), InIndex, InCount, bAllowShrinking);
 
-        public void Reset(Int32 InNewSize = 0) => ArrayUtils.Array_Reset(GetHandle(), InNewSize);
+        public void Reset(Int32 InNewSize = 0) => ArrayImplementation.Array_ResetImplementation(GetHandle(), InNewSize);
 
-        public void Empty(Int32 InSlack = 0) => ArrayUtils.Array_Empty(GetHandle(), InSlack);
+        public void Empty(Int32 InSlack = 0) => ArrayImplementation.Array_EmptyImplementation(GetHandle(), InSlack);
 
         public void SetNum(Int32 InNewNum, Boolean bAllowShrinking = true) =>
-            ArrayUtils.Array_SetNum(GetHandle(), InNewNum, bAllowShrinking);
+            ArrayImplementation.Array_SetNumImplementation(GetHandle(), InNewNum, bAllowShrinking);
 
-        public Int32 Add(T InValue) => ArrayUtils.Array_Add(GetHandle(), InValue);
+        public Int32 Add(T InValue) => ArrayImplementation.Array_AddImplementation(GetHandle(), InValue);
 
-        public Int32 AddZeroed(Int32 InCount = 1) => ArrayUtils.Array_AddZeroed(GetHandle(), InCount);
+        public Int32 AddZeroed(Int32 InCount = 1) =>
+            ArrayImplementation.Array_AddZeroedImplementation(GetHandle(), InCount);
 
-        public Int32 AddUnique(T InValue) => ArrayUtils.Array_AddUnique(GetHandle(), InValue);
+        public Int32 AddUnique(T InValue) => ArrayImplementation.Array_AddUniqueImplementation(GetHandle(), InValue);
 
-        public Int32 RemoveSingle(T InValue) => ArrayUtils.Array_RemoveSingle(GetHandle(), InValue);
+        public Int32 RemoveSingle(T InValue) =>
+            ArrayImplementation.Array_RemoveSingleImplementation(GetHandle(), InValue);
 
-        public Int32 Remove(T InValue) => ArrayUtils.Array_Remove(GetHandle(), InValue);
+        public Int32 Remove(T InValue) => ArrayImplementation.Array_RemoveImplementation(GetHandle(), InValue);
 
         public void SwapMemory(Int32 InFirstIndexToSwap, Int32 InSecondIndexToSwap) =>
-            ArrayUtils.Array_SwapMemory(GetHandle(), InFirstIndexToSwap, InSecondIndexToSwap);
+            ArrayImplementation.Array_SwapMemoryImplementation(GetHandle(), InFirstIndexToSwap, InSecondIndexToSwap);
 
         public void Swap(Int32 InFirstIndexToSwap, Int32 InSecondIndexToSwap) =>
-            ArrayUtils.Array_Swap(GetHandle(), InFirstIndexToSwap, InSecondIndexToSwap);
+            ArrayImplementation.Array_SwapImplementation(GetHandle(), InFirstIndexToSwap, InSecondIndexToSwap);
 
         public unsafe void SetHandle(void* InGCHandle)
         {

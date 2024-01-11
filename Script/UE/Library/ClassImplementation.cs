@@ -7,7 +7,6 @@ namespace Script.Library
     public static partial class ClassImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Class_GetDefaultObjectImplementation(IntPtr InClass, Boolean bCreateIfNeeded,
-            out UObject OutValue);
+        public static extern UObject Class_GetDefaultObjectImplementation(IntPtr InClass, Boolean bCreateIfNeeded);
     }
 }

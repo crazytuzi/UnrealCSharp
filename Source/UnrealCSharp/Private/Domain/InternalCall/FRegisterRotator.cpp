@@ -3,6 +3,21 @@
 
 struct FRegisterRotator
 {
+	static FRotator MultipliesImplementation(const FRotator& In, const int32 Scale)
+	{
+		return In * Scale;
+	}
+
+	static FRotator MultipliesImplementation(const FRotator& In, const float Scale)
+	{
+		return In * Scale;
+	}
+
+	static FRotator MultipliesImplementation(const FRotator& In, const double Scale)
+	{
+		return In * Scale;
+	}
+
 	FRegisterRotator()
 	{
 		TReflectionClassBuilder<FRotator>(NAMESPACE_BINDING)
@@ -15,6 +30,12 @@ struct FRegisterRotator
 			             {"Quat"})
 			.Plus()
 			.Minus()
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FRotator(*)(const FRotator&, const int32), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FRotator(*)(const FRotator&, const float), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FRotator(*)(const FRotator&, const double), &MultipliesImplementation))
 			.Function("IsNearlyZero", BINDING_FUNCTION(&FRotator::IsNearlyZero),
 			          {"Tolerance"})
 			.Function("IsZero", BINDING_FUNCTION(&FRotator::IsZero))
@@ -47,7 +68,8 @@ struct FRegisterRotator
 			.Function("GetEquivalentRotator", BINDING_FUNCTION(&FRotator::GetEquivalentRotator))
 			.Function("SetClosestToMe", BINDING_FUNCTION(&FRotator::SetClosestToMe),
 			          {"MakeClosest"})
-			.Function("ToString", BINDING_FUNCTION(&FRotator::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FRotator::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("ToCompactString", BINDING_FUNCTION(&FRotator::ToCompactString))
 			.Function("InitFromString", BINDING_FUNCTION(&FRotator::InitFromString),
 			          {"InSourceString"})

@@ -21,7 +21,10 @@
 
 #define BINDING_STR(Str) #Str
 
-#define BINDING_REMOVE_PREFIX_CLASS_STR(Class) BINDING_REMOVE_PREFIX_CLASS(FString(TEXT(BINDING_STR(Class))))
+#define BINDING_REMOVE_NAMESPACE_CLASS_STR(Class) FString(TEXT(BINDING_STR(Class))).RightChop( \
+	FString(TEXT(BINDING_STR(Class))).Find(TEXT(":"), ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1)
+
+#define BINDING_REMOVE_PREFIX_CLASS_STR(Class) BINDING_REMOVE_NAMESPACE_CLASS_STR(Class).RightChop(1)
 
 #define BINDING_REFLECTION_CLASS(Class) \
 template <> \
@@ -32,7 +35,7 @@ struct TClassName<Class> \
 template <> \
 struct TClassFullName<Class> \
 { \
-	static FString Get() { return BINDING_STR(Class); } \
+	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 };
 
 #define BINDING_CLASS(Class) \
@@ -44,14 +47,14 @@ struct TClassName<Class> \
 template <> \
 struct TClassFullName<Class> \
 { \
-static FString Get() { return BINDING_STR(Class); } \
+static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
 	static FString Get() \
 	{ \
-		return BINDING_STR(Class); \
+		return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); \
 	} \
 }; \
 template <typename T> \
@@ -118,12 +121,12 @@ struct TClassName<Class> \
 template <> \
 struct TClassFullName<Class> \
 { \
-	static FString Get() { return BINDING_STR(Class); } \
+	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static FString Get() { return BINDING_STR(Class); } \
+	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
@@ -180,12 +183,12 @@ struct TClassName<Class> \
 template <> \
 struct TClassFullName<Class> \
 { \
-	static FString Get() { return BINDING_STR(Class); } \
+	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 { \
-	static FString Get() { return BINDING_STR(Class); } \
+	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \
 template <typename T> \
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> : \

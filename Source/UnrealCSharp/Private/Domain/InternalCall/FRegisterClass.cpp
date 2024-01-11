@@ -4,22 +4,24 @@
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-BINDING_REFLECTION_CLASS(UClass);
+BINDING_REFLECTION_CLASS(UClass)
 
-struct FRegisterUClass
+struct FRegisterClass
 {
-	static void GetDefaultObjectImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                           const bool bCreateIfNeeded, MonoObject** OutValue)
+	static MonoObject* GetDefaultObjectImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                  const bool bCreateIfNeeded)
 	{
 		if (const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InGarbageCollectionHandle))
 		{
 			const auto Object = FoundClass->GetDefaultObject(bCreateIfNeeded);
 
-			*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Object);
+			return FCSharpEnvironment::GetEnvironment().Bind(Object);
 		}
+
+		return nullptr;
 	}
 
-	FRegisterUClass()
+	FRegisterClass()
 	{
 		TReflectionClassBuilder<UClass>(NAMESPACE_LIBRARY)
 			.Property("ClassDefaultObject", BINDING_READONLY_PROPERTY(&UClass::ClassDefaultObject))
@@ -28,4 +30,4 @@ struct FRegisterUClass
 	}
 };
 
-static FRegisterUClass RegisterUClass;
+static FRegisterClass RegisterClass;

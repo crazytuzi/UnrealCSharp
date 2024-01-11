@@ -51,7 +51,8 @@ struct FRegisterTimespan
 			.Function("GetTotalMinutes", BINDING_FUNCTION(&FTimespan::GetTotalMinutes))
 			.Function("GetTotalSeconds", BINDING_FUNCTION(&FTimespan::GetTotalSeconds))
 			.Function("IsZero", BINDING_FUNCTION(&FTimespan::IsZero))
-			.Function("ToString", BINDING_OVERLOAD(FString(FTimespan::*)()const, &FTimespan::ToString))
+			.Function("ToString", BINDING_OVERLOAD(FString(FTimespan::*)()const, &FTimespan::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("FromDays", BINDING_FUNCTION(&FTimespan::FromDays),
 			          {"Days"})
 			.Function("FromHours", BINDING_FUNCTION(&FTimespan::FromHours),

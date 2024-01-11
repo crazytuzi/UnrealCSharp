@@ -6,27 +6,19 @@ namespace Script.Engine
 {
     public partial class UWorld
     {
-        // @TODO
-        public T SpawnActor<T>(UClass Class, FTransform Transform, AActor Owner = null, APawn Instigator = null,
-            ESpawnActorCollisionHandlingMethod CollisionHandlingOverride = ESpawnActorCollisionHandlingMethod.Undefined)
-            where T : UObject
+        public T SpawnActor<T>(UClass Class, FTransform Transform, FActorSpawnParameters ActorSpawnParameters = null)
+            where T : AActor
         {
-            WorldImplementation.World_SpawnActorImplementation<T>(GetHandle(), Class.GetHandle(), Transform,
-                Owner?.GetHandle() ?? IntPtr.Zero, Instigator?.GetHandle() ?? IntPtr.Zero, CollisionHandlingOverride,
-                out var OutValue);
-
-            return OutValue;
+            return WorldImplementation.World_SpawnActorImplementation(GetHandle(),
+                Class.GetHandle(),
+                Transform.GetHandle(),
+                ActorSpawnParameters?.GetHandle() ?? IntPtr.Zero) as T;
         }
 
-        public T SpawnActor<T>(FTransform Transform, AActor Owner = null, APawn Instigator = null,
-            ESpawnActorCollisionHandlingMethod CollisionHandlingOverride = ESpawnActorCollisionHandlingMethod.Undefined)
-            where T : UObject, IStaticClass
+        public T SpawnActor<T>(FTransform Transform, FActorSpawnParameters ActorSpawnParameters = null)
+            where T : AActor, IStaticClass
         {
-            WorldImplementation.World_SpawnActorImplementation<T>(GetHandle(), T.StaticClass().GetHandle(), Transform,
-                Owner?.GetHandle() ?? IntPtr.Zero, Instigator?.GetHandle() ?? IntPtr.Zero, CollisionHandlingOverride,
-                out var OutValue);
-
-            return OutValue;
+            return SpawnActor<T>(T.StaticClass(), Transform, ActorSpawnParameters);
         }
     }
 }

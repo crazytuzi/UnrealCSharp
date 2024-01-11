@@ -19,6 +19,9 @@ namespace Script.Library
         public static extern Int32 Set_NumImplementation(IntPtr InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern Boolean Set_IsEmptyImplementation(IntPtr InSet);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern Int32 Set_GetMaxIndexImplementation(IntPtr InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -34,6 +37,6 @@ namespace Script.Library
         public static extern Boolean Set_IsValidIndexImplementation(IntPtr InSet, Int32 InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Set_GetEnumeratorImplementation<T>(IntPtr InSet, Int32 Index, out Object OutValue);
+        public static extern Object Set_GetEnumeratorImplementation(IntPtr InSet, Int32 Index);
     }
 }

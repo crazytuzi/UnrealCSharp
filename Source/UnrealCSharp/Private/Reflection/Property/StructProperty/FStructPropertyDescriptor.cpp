@@ -28,11 +28,12 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (StructProperty != nullptr)
 	{
-		const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(static_cast<MonoObject*>(Src));
+		if (const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(static_cast<MonoObject*>(Src)))
+		{
+			StructProperty->InitializeValue(Dest);
 
-		StructProperty->InitializeValue(Dest);
-
-		StructProperty->CopySingleValue(Dest, SrcStruct);
+			StructProperty->CopySingleValue(Dest, SrcStruct);
+		}
 	}
 }
 

@@ -19,7 +19,7 @@ namespace Script.Common
         }
 
         public static String GetPathName(Type InType) =>
-            InType.GetCustomAttribute<PathNameAttribute>(true).PathName;
+            InType.GetCustomAttribute<PathNameAttribute>(true)?.PathName;
 
         private static Object MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments) =>
             Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments));
@@ -34,9 +34,9 @@ namespace Script.Common
             return InType.IsGenericType ? InType.GetGenericTypeDefinition() : InType;
         }
 
-        private static Object MulticastDelegate_GetTarget(System.Delegate InDelegate) => InDelegate.Target;
+        private static Object MulticastDelegate_GetTarget(Delegate InDelegate) => InDelegate.Target;
 
-        private static Boolean MulticastDelegate_Equals(System.Delegate A, System.Delegate B) => A == B;
+        private static Boolean MulticastDelegate_Equals(Delegate A, Delegate B) => A == B;
 
         private static void SetOut()
         {

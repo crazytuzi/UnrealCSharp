@@ -70,6 +70,11 @@ int32 FSetHelper::Num() const
 	return ScriptSet->Num();
 }
 
+bool FSetHelper::IsEmpty() const
+{
+	return Num() == 0;
+}
+
 int32 FSetHelper::GetMaxIndex() const
 {
 	return ScriptSet->GetMaxIndex();
@@ -107,9 +112,9 @@ void FSetHelper::Add(void* InValue) const
 #else
 		ScriptSet->Rehash(ScriptSetLayout, [=](const void* Src)
 #endif
-		{
-			return ElementPropertyDescriptor->GetValueTypeHash(Src);
-		});
+		                  {
+			                  return ElementPropertyDescriptor->GetValueTypeHash(Src);
+		                  });
 	}
 }
 

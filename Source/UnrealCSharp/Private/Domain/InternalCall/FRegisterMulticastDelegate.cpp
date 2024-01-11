@@ -89,14 +89,61 @@ struct FRegisterMulticastDelegate
 		}
 	}
 
-	static void BroadcastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue,
-	                                    MonoArray* InValue)
+	static MonoObject* BroadcastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                           MonoObject** OutValue, MonoArray* InValue)
 	{
 		if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 			FMulticastDelegateHelper>(InGarbageCollectionHandle))
 		{
 			return MulticastDelegateHelper->Broadcast(OutValue, InValue);
 		}
+
+		return nullptr;
+	}
+
+	static void Broadcast0Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+	{
+		BroadcastImplementation(InGarbageCollectionHandle, nullptr, nullptr);
+	}
+
+	static MonoObject* Broadcast1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+	{
+		return BroadcastImplementation(InGarbageCollectionHandle, nullptr, nullptr);
+	}
+
+	static void Broadcast2Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoArray* InValue)
+	{
+		BroadcastImplementation(InGarbageCollectionHandle, nullptr, InValue);
+	}
+
+	static MonoObject* Broadcast3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                            MonoArray* InValue)
+	{
+		return BroadcastImplementation(InGarbageCollectionHandle, nullptr, InValue);
+	}
+
+	static void Broadcast4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                     MonoObject** OutValue)
+	{
+		BroadcastImplementation(InGarbageCollectionHandle, OutValue, nullptr);
+	}
+
+	static MonoObject* Broadcast5Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                            MonoObject** OutValue)
+	{
+		return BroadcastImplementation(InGarbageCollectionHandle, OutValue, nullptr);
+	}
+
+	static void Broadcast6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                     MonoObject** OutValue, MonoArray* InValue)
+	{
+		BroadcastImplementation(InGarbageCollectionHandle, OutValue, InValue);
+	}
+
+	static MonoObject* Broadcast7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                            MonoObject** OutValue, MonoArray* InValue)
+	{
+		return BroadcastImplementation(InGarbageCollectionHandle, OutValue, InValue);
 	}
 
 	FRegisterMulticastDelegate()
@@ -112,7 +159,14 @@ struct FRegisterMulticastDelegate
 			.Function("Remove", RemoveImplementation)
 			.Function("RemoveAll", RemoveAllImplementation)
 			.Function("Clear", ClearImplementation)
-			.Function("Broadcast", BroadcastImplementation)
+			.Function("Broadcast0", Broadcast0Implementation)
+			.Function("Broadcast1", Broadcast1Implementation)
+			.Function("Broadcast2", Broadcast2Implementation)
+			.Function("Broadcast3", Broadcast3Implementation)
+			.Function("Broadcast4", Broadcast4Implementation)
+			.Function("Broadcast5", Broadcast5Implementation)
+			.Function("Broadcast6", Broadcast6Implementation)
+			.Function("Broadcast7", Broadcast7Implementation)
 			.Register();
 	}
 };

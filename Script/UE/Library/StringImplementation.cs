@@ -16,6 +16,6 @@ namespace Script.Library
         public static extern void String_UnRegisterImplementation(IntPtr InString);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void String_ToStringImplementation(IntPtr InString, out String OutValue);
+        public static extern String String_ToStringImplementation(IntPtr InString);
     }
 }

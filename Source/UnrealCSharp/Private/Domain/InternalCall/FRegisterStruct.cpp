@@ -5,14 +5,14 @@
 
 struct FRegisterStruct
 {
-	static void StaticStructImplementation(MonoString* InStructName, MonoObject** OutValue)
+	static MonoObject* StaticStructImplementation(MonoString* InStructName)
 	{
 		const auto StructName = UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
 
 		const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(InStruct);
+		return FCSharpEnvironment::GetEnvironment().Bind(InStruct);
 	}
 
 	static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InStructName)

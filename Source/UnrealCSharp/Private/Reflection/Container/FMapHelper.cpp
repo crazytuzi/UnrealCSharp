@@ -86,6 +86,11 @@ int32 FMapHelper::Num() const
 	return ScriptMap->Num();
 }
 
+bool FMapHelper::IsEmpty() const
+{
+	return Num() == 0;
+}
+
 void FMapHelper::Add(void* InKey, void* InValue) const
 {
 	Set(InKey, InValue);
@@ -214,9 +219,9 @@ void FMapHelper::Set(void* InKey, void* InValue) const
 #else
 		ScriptMap->Rehash(ScriptMapLayout, [=](const void* Src)
 #endif
-		{
-			return KeyPropertyDescriptor->GetValueTypeHash(Src);
-		});
+		                  {
+			                  return KeyPropertyDescriptor->GetValueTypeHash(Src);
+		                  });
 	}
 	else
 	{

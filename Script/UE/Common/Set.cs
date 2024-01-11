@@ -1,22 +1,26 @@
 ﻿using System;
-using Script.Reflection.Container;
 using System.Collections;
 using System.Collections.Generic;
 using Script.CoreUObject;
+using Script.Library;
 
 namespace Script.Common
 {
     public class TSet<T> : IGCHandle, IEnumerable<T>
     {
-        public TSet() => SetUtils.Set_Register(this);
+        public TSet() => SetImplementation.Set_RegisterImplementation(this);
 
-        ~TSet() => SetUtils.Set_UnRegister(GetHandle());
+        ~TSet() => SetImplementation.Set_UnRegisterImplementation(GetHandle());
 
         [Obsolete("It is not supported like UE.", true)]
         public static Boolean operator ==(TSet<T> A, TSet<T> B) => false;
 
         [Obsolete("It is not supported like UE.", true)]
         public static Boolean operator !=(TSet<T> A, TSet<T> B) => false;
+
+        public override Boolean Equals(Object Other) => false;
+
+        public override Int32 GetHashCode() => GetHandle().ToInt32();
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -40,21 +44,25 @@ namespace Script.Common
             }
         }
 
-        public void Empty(Int32 InExpectedNumElements = 0) => SetUtils.Set_Empty(GetHandle(), InExpectedNumElements);
+        public void Empty(Int32 InExpectedNumElements = 0) =>
+            SetImplementation.Set_EmptyImplementation(GetHandle(), InExpectedNumElements);
 
-        public Int32 Num() => SetUtils.Set_Num(GetHandle());
+        public Int32 Num() => SetImplementation.Set_NumImplementation(GetHandle());
 
-        public Int32 GetMaxIndex() => SetUtils.Set_GetMaxIndex(GetHandle());
+        public Boolean IsEmpty() => SetImplementation.Set_IsEmptyImplementation(GetHandle());
 
-        public void Add(T InValue) => SetUtils.Set_Add(GetHandle(), InValue);
+        public Int32 GetMaxIndex() => SetImplementation.Set_GetMaxIndexImplementation(GetHandle());
 
-        public Int32 Remove(T InValue) => SetUtils.Set_Remove(GetHandle(), InValue);
+        public void Add(T InValue) => SetImplementation.Set_AddImplementation(GetHandle(), InValue);
 
-        public Boolean Contains(T InValue) => SetUtils.Set_Contains(GetHandle(), InValue);
+        public Int32 Remove(T InValue) => SetImplementation.Set_RemoveImplementation(GetHandle(), InValue);
 
-        private Boolean IsValidIndex(Int32 InIndex) => SetUtils.Set_IsValidIndex(GetHandle(), InIndex);
+        public Boolean Contains(T InValue) => SetImplementation.Set_ContainsImplementation(GetHandle(), InValue);
 
-        private T this[Int32 InIndex] => SetUtils.Set_GetEnumerator<T>(GetHandle(), InIndex);
+        private Boolean IsValidIndex(Int32 InIndex) =>
+            SetImplementation.Set_IsValidIndexImplementation(GetHandle(), InIndex);
+
+        private T this[Int32 InIndex] => (T)SetImplementation.Set_GetEnumeratorImplementation(GetHandle(), InIndex);
 
         public unsafe void SetHandle(void* InGCHandle)
         {

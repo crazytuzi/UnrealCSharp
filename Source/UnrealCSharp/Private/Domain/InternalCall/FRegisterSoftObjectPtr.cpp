@@ -5,7 +5,7 @@
 
 struct FRegisterSoftObjectPtr
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject)
+	static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InObject)
 	{
 		const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
@@ -36,21 +36,20 @@ struct FRegisterSoftObjectPtr
 		});
 	}
 
-	static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<
 			UObject>>(InGarbageCollectionHandle);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+		return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 	}
 
-	static void LoadSynchronousImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                          MonoObject** OutValue)
+	static MonoObject* LoadSynchronousImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<
 			UObject>>(InGarbageCollectionHandle);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous());
+		return FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous());
 	}
 
 	FRegisterSoftObjectPtr()

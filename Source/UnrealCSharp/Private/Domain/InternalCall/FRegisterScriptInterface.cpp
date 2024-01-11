@@ -5,7 +5,7 @@
 
 struct FRegisterScriptInterface
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject)
+	static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InObject)
 	{
 		const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
@@ -37,12 +37,12 @@ struct FRegisterScriptInterface
 		});
 	}
 
-	static void GetObjectImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* GetObjectImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 			InGarbageCollectionHandle);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject());
+		return FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject());
 	}
 
 	FRegisterScriptInterface()

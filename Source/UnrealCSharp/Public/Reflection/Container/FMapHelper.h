@@ -21,6 +21,8 @@ public:
 
 	int32 Num() const;
 
+	bool IsEmpty() const;
+
 	void Add(void* InKey, void* InValue) const;
 
 	int32 Remove(const void* InKey) const;

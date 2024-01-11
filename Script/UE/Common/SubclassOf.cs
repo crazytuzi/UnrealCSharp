@@ -12,21 +12,26 @@ namespace Script.Common
 
         ~TSubclassOf() => SubclassOfImplementation.SubclassOf_UnRegisterImplementation(GetHandle());
 
-        public TSubclassOf(UClass InClass) => SubclassOfImplementation.SubclassOf_RegisterImplementation(this, InClass);
+        public TSubclassOf(UClass InClass) =>
+            SubclassOfImplementation.SubclassOf_RegisterImplementation(this, InClass.GetHandle());
 
-        public static implicit operator TSubclassOf<T>(UClass InClass) => new TSubclassOf<T>(InClass);
+        public static implicit operator TSubclassOf<T>(UClass InClass) => new(InClass);
 
         public static Boolean operator ==(TSubclassOf<T> A, TSubclassOf<T> B) =>
-            SubclassOfImplementation.SubclassOf_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+            SubclassOfImplementation.SubclassOf_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
 
         public static Boolean operator !=(TSubclassOf<T> A, TSubclassOf<T> B) =>
-            !SubclassOfImplementation.SubclassOf_IdenticalImplementation(A.GetHandle(), B.GetHandle());
+            !SubclassOfImplementation.SubclassOf_IdenticalImplementation(
+                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+
+        public override Boolean Equals(Object Other) => this == Other as TSubclassOf<T>;
+
+        public override Int32 GetHashCode() => GetHandle().ToInt32();
 
         public UClass Get()
         {
-            SubclassOfImplementation.SubclassOf_GetImplementation(GetHandle(), out var OutValue);
-
-            return OutValue;
+            return SubclassOfImplementation.SubclassOf_GetImplementation(GetHandle());
         }
 
         public unsafe void SetHandle(void* InGCHandle)

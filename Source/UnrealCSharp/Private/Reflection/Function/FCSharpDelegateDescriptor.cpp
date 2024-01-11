@@ -73,8 +73,8 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 	return true;
 }
 
-bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** ReturnValue,
-                                                MonoObject** OutValue, MonoArray* InValue)
+MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** OutValue,
+                                                       MonoArray* InValue)
 {
 	auto ParamIndex = 0;
 
@@ -110,12 +110,6 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 
 	InScriptDelegate->ProcessDelegate<UObject>(Params);
 
-	if (ReturnPropertyDescriptor != nullptr)
-	{
-		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
-		                              reinterpret_cast<void**>(ReturnValue));
-	}
-
 	if (!OutPropertyIndexes.IsEmpty())
 	{
 		const auto MonoObjectArray = FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(),
@@ -137,11 +131,21 @@ bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptD
 		*OutValue = (MonoObject*)MonoObjectArray;
 	}
 
-	return true;
+	if (ReturnPropertyDescriptor != nullptr)
+	{
+		MonoObject* ReturnValue{};
+
+		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
+		                              reinterpret_cast<void**>(&ReturnValue));
+
+		return ReturnValue;
+	}
+
+	return nullptr;
 }
 
-bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptDelegate* InMulticastScriptDelegate,
-                                                         MonoObject** OutValue, MonoArray* InValue)
+MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
+	const FMulticastScriptDelegate* InMulticastScriptDelegate, MonoObject** OutValue, MonoArray* InValue)
 {
 	auto ParamIndex = 0;
 
@@ -193,5 +197,5 @@ bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptD
 		*OutValue = (MonoObject*)MonoObjectArray;
 	}
 
-	return true;
+	return nullptr;
 }

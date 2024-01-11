@@ -5,12 +5,12 @@
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-BINDING_REFLECTION_CLASS(UDataTableFunctionLibrary);
+BINDING_REFLECTION_CLASS(UDataTableFunctionLibrary)
 
 struct FRegisterDataTableFunctionLibrary
 {
 	static bool GetDataTableRowFromNameImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                                  const MonoObject* RowName, MonoObject** OutRow)
+	                                                  const FGarbageCollectionHandle RowName, MonoObject** OutRow)
 	{
 		const auto InRowName = FCSharpEnvironment::GetEnvironment().GetString<FName>(RowName);
 

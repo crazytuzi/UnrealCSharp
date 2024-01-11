@@ -132,7 +132,7 @@ public:
 
 	MonoClass* Get_Object_Class() const;
 
-	MonoClass* Get_UInt16_Class() const;;
+	MonoClass* Get_UInt16_Class() const;
 
 	MonoClass* Get_UInt32_Class() const;
 

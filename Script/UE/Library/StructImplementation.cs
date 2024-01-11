@@ -7,7 +7,7 @@ namespace Script.Library
     public static class StructImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Struct_StaticStructImplementation(String InStructName, out UScriptStruct OutValue);
+        public static extern UScriptStruct Struct_StaticStructImplementation(String InStructName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Struct_RegisterImplementation(Object InMonoObject, String InStructName);
