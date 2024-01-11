@@ -14,6 +14,7 @@
 #include "mono/metadata/reflection.h"
 #include "Misc/FileHelper.h"
 #include "Binding/FBinding.h"
+#include "Setting/UnrealCSharpSetting.h"
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
@@ -65,6 +66,26 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 #else
 		mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
 #endif
+
+		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
+		{
+			if (UnrealCSharpSetting->IsEnableDebug())
+			{
+				const auto Config = FString::Printf(TEXT(
+					"--debugger-agent=transport=dt_socket,server=y,suspend=n,address=%s:%d"
+				),
+				                                    *UnrealCSharpSetting->GetHost(),
+				                                    UnrealCSharpSetting->GetPort()
+				);
+
+				char* Options[] = {
+					TCHAR_TO_ANSI(TEXT("--soft-breakpoints")),
+					TCHAR_TO_ANSI(*Config)
+				};
+
+				mono_jit_parse_options(sizeof(Options) / sizeof(char*), Options);
+			}
+		}
 
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
@@ -717,7 +738,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 			{
 				if (!FPaths::FileExists(AssemblyPath))
 				{
-					continue;;
+					continue;
 				}
 
 				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
@@ -744,7 +765,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 	{
 		if (!FPaths::FileExists(AssemblyPath))
 		{
-			continue;;
+			continue;
 		}
 
 		MonoImage* Image = nullptr;
