@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Script.CoreUObject;
 using Script.Library;
@@ -8,26 +7,26 @@ namespace Script.Common
 {
     public static class TArray
     {
-        public static Int32 INDEX_NONE => ArrayImplementation.Array_INDEX_NONEImplementation();
+        public static int INDEX_NONE => ArrayImplementation.Array_INDEX_NONEImplementation();
     }
 
-    public class TArray<T> : IGCHandle, IEnumerable<T>
+    public class TArray<T> : IGarbageCollectionHandle, IEnumerable<T>
     {
         public TArray() => ArrayImplementation.Array_RegisterImplementation(this);
 
-        ~TArray() => ArrayImplementation.Array_UnRegisterImplementation(GetHandle());
+        ~TArray() => ArrayImplementation.Array_UnRegisterImplementation(GarbageCollectionHandle);
 
-        public static Boolean operator ==(TArray<T> A, TArray<T> B) =>
+        public static bool operator ==(TArray<T> A, TArray<T> B) =>
             ArrayImplementation.Array_IdenticalImplementation(
-                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
 
-        public static Boolean operator !=(TArray<T> A, TArray<T> B) =>
+        public static bool operator !=(TArray<T> A, TArray<T> B) =>
             !ArrayImplementation.Array_IdenticalImplementation(
-                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
 
-        public override Boolean Equals(Object Other) => this == Other as TArray<T>;
+        public override bool Equals(object Other) => this == Other as TArray<T>;
 
-        public override Int32 GetHashCode() => GetHandle().ToInt32();
+        public override int GetHashCode() => (int)GarbageCollectionHandle;
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -45,79 +44,78 @@ namespace Script.Common
             }
         }
 
-        public Int32 GetTypeSize() => ArrayImplementation.Array_GetTypeSizeImplementation(GetHandle());
+        public int GetTypeSize() => ArrayImplementation.Array_GetTypeSizeImplementation(GarbageCollectionHandle);
 
-        public Int32 GetSlack() => ArrayImplementation.Array_GetSlackImplementation(GetHandle());
+        public int GetSlack() => ArrayImplementation.Array_GetSlackImplementation(GarbageCollectionHandle);
 
-        public Boolean IsValidIndex(Int32 InIndex) =>
-            ArrayImplementation.Array_IsValidIndexImplementation(GetHandle(), InIndex);
+        public bool IsValidIndex(int InIndex) =>
+            ArrayImplementation.Array_IsValidIndexImplementation(GarbageCollectionHandle, InIndex);
 
-        public Int32 Num() => ArrayImplementation.Array_NumImplementation(GetHandle());
+        public int Num() => ArrayImplementation.Array_NumImplementation(GarbageCollectionHandle);
 
-        public Boolean IsEmpty() => ArrayImplementation.Array_IsEmptyImplementation(GetHandle());
+        public bool IsEmpty() => ArrayImplementation.Array_IsEmptyImplementation(GarbageCollectionHandle);
 
-        public Int32 Max() => ArrayImplementation.Array_MaxImplementation(GetHandle());
+        public int Max() => ArrayImplementation.Array_MaxImplementation(GarbageCollectionHandle);
 
-        public T this[Int32 InIndex]
+        public T this[int InIndex]
         {
-            get => (T)ArrayImplementation.Array_GetImplementation(GetHandle(), InIndex);
+            get => (T)ArrayImplementation.Array_GetImplementation(GarbageCollectionHandle, InIndex);
 
-            set => ArrayImplementation.Array_SetImplementation(GetHandle(), InIndex, value);
+            set => ArrayImplementation.Array_SetImplementation(GarbageCollectionHandle, InIndex, value);
         }
 
-        public Int32 Find(T InValue) => ArrayImplementation.Array_FindImplementation(GetHandle(), InValue);
+        public int Find(T InValue) => ArrayImplementation.Array_FindImplementation(GarbageCollectionHandle, InValue);
 
-        public Int32 FindLast(T InValue) => ArrayImplementation.Array_FindLastImplementation(GetHandle(), InValue);
+        public int FindLast(T InValue) =>
+            ArrayImplementation.Array_FindLastImplementation(GarbageCollectionHandle, InValue);
 
-        public Boolean Contains(T InValue) => ArrayImplementation.Array_ContainsImplementation(GetHandle(), InValue);
+        public bool Contains(T InValue) =>
+            ArrayImplementation.Array_ContainsImplementation(GarbageCollectionHandle, InValue);
 
-        public Int32 AddUninitialized(Int32 InCount = 1) =>
-            ArrayImplementation.Array_AddUninitializedImplementation(GetHandle(), InCount);
+        public int AddUninitialized(int InCount = 1) =>
+            ArrayImplementation.Array_AddUninitializedImplementation(GarbageCollectionHandle, InCount);
 
-        public void InsertZeroed(Int32 InIndex, Int32 InCount = 1) =>
-            ArrayImplementation.Array_InsertZeroedImplementation(GetHandle(), InIndex, InCount);
+        public void InsertZeroed(int InIndex, int InCount = 1) =>
+            ArrayImplementation.Array_InsertZeroedImplementation(GarbageCollectionHandle, InIndex, InCount);
 
-        public void InsertDefaulted(Int32 InIndex, Int32 InCount) =>
-            ArrayImplementation.Array_InsertDefaultedImplementation(GetHandle(), InIndex, InCount);
+        public void InsertDefaulted(int InIndex, int InCount) =>
+            ArrayImplementation.Array_InsertDefaultedImplementation(GarbageCollectionHandle, InIndex, InCount);
 
-        public void RemoveAt(Int32 InIndex, Int32 InCount, Boolean bAllowShrinking = true) =>
-            ArrayImplementation.Array_RemoveAtImplementation(GetHandle(), InIndex, InCount, bAllowShrinking);
+        public void RemoveAt(int InIndex, int InCount, bool bAllowShrinking = true) =>
+            ArrayImplementation.Array_RemoveAtImplementation(GarbageCollectionHandle, InIndex, InCount,
+                bAllowShrinking);
 
-        public void Reset(Int32 InNewSize = 0) => ArrayImplementation.Array_ResetImplementation(GetHandle(), InNewSize);
+        public void Reset(int InNewSize = 0) =>
+            ArrayImplementation.Array_ResetImplementation(GarbageCollectionHandle, InNewSize);
 
-        public void Empty(Int32 InSlack = 0) => ArrayImplementation.Array_EmptyImplementation(GetHandle(), InSlack);
+        public void Empty(int InSlack = 0) =>
+            ArrayImplementation.Array_EmptyImplementation(GarbageCollectionHandle, InSlack);
 
-        public void SetNum(Int32 InNewNum, Boolean bAllowShrinking = true) =>
-            ArrayImplementation.Array_SetNumImplementation(GetHandle(), InNewNum, bAllowShrinking);
+        public void SetNum(int InNewNum, bool bAllowShrinking = true) =>
+            ArrayImplementation.Array_SetNumImplementation(GarbageCollectionHandle, InNewNum, bAllowShrinking);
 
-        public Int32 Add(T InValue) => ArrayImplementation.Array_AddImplementation(GetHandle(), InValue);
+        public int Add(T InValue) => ArrayImplementation.Array_AddImplementation(GarbageCollectionHandle, InValue);
 
-        public Int32 AddZeroed(Int32 InCount = 1) =>
-            ArrayImplementation.Array_AddZeroedImplementation(GetHandle(), InCount);
+        public int AddZeroed(int InCount = 1) =>
+            ArrayImplementation.Array_AddZeroedImplementation(GarbageCollectionHandle, InCount);
 
-        public Int32 AddUnique(T InValue) => ArrayImplementation.Array_AddUniqueImplementation(GetHandle(), InValue);
+        public int AddUnique(T InValue) =>
+            ArrayImplementation.Array_AddUniqueImplementation(GarbageCollectionHandle, InValue);
 
-        public Int32 RemoveSingle(T InValue) =>
-            ArrayImplementation.Array_RemoveSingleImplementation(GetHandle(), InValue);
+        public int RemoveSingle(T InValue) =>
+            ArrayImplementation.Array_RemoveSingleImplementation(GarbageCollectionHandle, InValue);
 
-        public Int32 Remove(T InValue) => ArrayImplementation.Array_RemoveImplementation(GetHandle(), InValue);
+        public int Remove(T InValue) =>
+            ArrayImplementation.Array_RemoveImplementation(GarbageCollectionHandle, InValue);
 
-        public void SwapMemory(Int32 InFirstIndexToSwap, Int32 InSecondIndexToSwap) =>
-            ArrayImplementation.Array_SwapMemoryImplementation(GetHandle(), InFirstIndexToSwap, InSecondIndexToSwap);
+        public void SwapMemory(int InFirstIndexToSwap, int InSecondIndexToSwap) =>
+            ArrayImplementation.Array_SwapMemoryImplementation(GarbageCollectionHandle, InFirstIndexToSwap,
+                InSecondIndexToSwap);
 
-        public void Swap(Int32 InFirstIndexToSwap, Int32 InSecondIndexToSwap) =>
-            ArrayImplementation.Array_SwapImplementation(GetHandle(), InFirstIndexToSwap, InSecondIndexToSwap);
+        public void Swap(int InFirstIndexToSwap, int InSecondIndexToSwap) =>
+            ArrayImplementation.Array_SwapImplementation(GarbageCollectionHandle, InFirstIndexToSwap,
+                InSecondIndexToSwap);
 
-        public unsafe void SetHandle(void* InGCHandle)
-        {
-            GCHandle = new IntPtr(InGCHandle);
-        }
-
-        public IntPtr GetHandle()
-        {
-            return GCHandle;
-        }
-
-        private IntPtr GCHandle;
+        public nint GarbageCollectionHandle { get; set; }
     }
 }

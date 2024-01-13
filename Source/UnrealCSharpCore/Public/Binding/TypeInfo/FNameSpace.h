@@ -6,7 +6,7 @@ struct FPrimitiveNameSpace
 {
 	static TArray<FString> Get()
 	{
-		return {TEXT("System")};
+		return {};
 	}
 };
 

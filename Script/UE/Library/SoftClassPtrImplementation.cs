@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
 
@@ -9,18 +8,18 @@ namespace Script.Library
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SoftClassPtr_RegisterImplementation<T>(TSoftClassPtr<T> InSoftClassPtr,
-            IntPtr InClass) where T : UObject;
+            nint InClass) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean SoftClassPtr_IdenticalImplementation(IntPtr InA, IntPtr InB);
+        public static extern bool SoftClassPtr_IdenticalImplementation(nint InA, nint InB);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SoftClassPtr_UnRegisterImplementation(IntPtr InSoftClassPtr);
+        public static extern void SoftClassPtr_UnRegisterImplementation(nint InSoftClassPtr);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass SoftClassPtr_GetImplementation(IntPtr InSoftClassPtr);
+        public static extern UClass SoftClassPtr_GetImplementation(nint InSoftClassPtr);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass SoftClassPtr_LoadSynchronousImplementation(IntPtr InSoftClassPtr);
+        public static extern UClass SoftClassPtr_LoadSynchronousImplementation(nint InSoftClassPtr);
     }
 }

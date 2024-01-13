@@ -6,36 +6,42 @@ namespace Script.Common
 {
     public class FMulticastDelegate<T> : FDelegateBase where T : Delegate
     {
-        public Boolean IsBound() =>
-            MulticastDelegateImplementation.MulticastDelegate_IsBoundImplementation(GetHandle());
+        public bool IsBound() =>
+            MulticastDelegateImplementation.MulticastDelegate_IsBoundImplementation(GarbageCollectionHandle);
 
-        public Boolean Contains(UObject _, T InDelegate) =>
-            MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(GetHandle(), InDelegate);
+        public bool Contains(UObject _, T InDelegate) =>
+            MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(GarbageCollectionHandle,
+                InDelegate);
 
-        public Boolean Contains(T InDelegate) =>
-            MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(GetHandle(), InDelegate);
+        public bool Contains(T InDelegate) =>
+            MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(GarbageCollectionHandle,
+                InDelegate);
 
         public void Add(UObject _, T InDelegate) =>
-            MulticastDelegateImplementation.MulticastDelegate_AddImplementation(GetHandle(), InDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_AddImplementation(GarbageCollectionHandle, InDelegate);
 
         public void Add(T InDelegate) =>
-            MulticastDelegateImplementation.MulticastDelegate_AddImplementation(GetHandle(), InDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_AddImplementation(GarbageCollectionHandle, InDelegate);
 
         public void AddUnique(UObject _, T InDelegate) =>
-            MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(GetHandle(), InDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(GarbageCollectionHandle,
+                InDelegate);
 
         public void AddUnique(T InDelegate) =>
-            MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(GetHandle(), InDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(GarbageCollectionHandle,
+                InDelegate);
 
         public void Remove(UObject _, T InDelegate) =>
-            MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(GetHandle(), InDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(GarbageCollectionHandle, InDelegate);
 
         public void Remove(T InDelegate) =>
-            MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(GetHandle(), InDelegate);
+            MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(GarbageCollectionHandle, InDelegate);
 
         public void RemoveAll(UObject InObject) =>
-            MulticastDelegateImplementation.MulticastDelegate_RemoveAllImplementation(GetHandle(), InObject);
+            MulticastDelegateImplementation.MulticastDelegate_RemoveAllImplementation(GarbageCollectionHandle,
+                InObject);
 
-        public void Clear() => MulticastDelegateImplementation.MulticastDelegate_ClearImplementation(GetHandle());
+        public void Clear() =>
+            MulticastDelegateImplementation.MulticastDelegate_ClearImplementation(GarbageCollectionHandle);
     }
 }

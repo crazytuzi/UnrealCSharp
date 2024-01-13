@@ -9,7 +9,7 @@ public:
 
 	static TSet<FString> GetPropertyTypeNameSpace(FProperty* Property);
 
-	static FString GetGetAccessorType(FProperty* Property);
+	static FString GetGetPrimitiveAccessorType(FProperty* Property);
 
 	static FString GetGetAccessorReturnParamName(FProperty* Property);
 

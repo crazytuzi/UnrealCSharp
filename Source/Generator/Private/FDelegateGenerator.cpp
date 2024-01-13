@@ -2,6 +2,7 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/PropertyMacro.h"
 
 void FDelegateGenerator::Generator(FProperty* InProperty)
 {
@@ -64,9 +65,10 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => DelegateImplementation.Delegate_UnRegisterImplementation(GetHandle());\n"
+		"\n\t\t~%s() => DelegateImplementation.Delegate_UnRegisterImplementation(%s);\n"
 	),
-	                                               *FullClassContent
+	                                               *FullClassContent,
+	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);
 
 	for (TFieldIterator<FProperty> ParamIterator(SignatureFunction); ParamIterator && (ParamIterator->PropertyFlags &
@@ -121,11 +123,12 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	);
 
 	auto ExecuteFunctionCallBody = FString::Printf(TEXT(
-		"DelegateImplementation.Delegate_Execute%dImplementation(GetHandle()%s"
+		"DelegateImplementation.Delegate_Execute%dImplementation(%s%s"
 	),
 	                                               FGeneratorCore::GetFunctionIndex(DelegateReturnParam != nullptr,
 		                                               !DelegateParams.IsEmpty(),
 		                                               !DelegateRefParamIndex.IsEmpty()),
+	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                               DelegateRefParamIndex.IsEmpty()
 		                                               ? TEXT("")
 		                                               : TEXT(", out var __OutValue")
@@ -244,10 +247,13 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	{
 		SuperClassContent = TEXT("FRefDelegate");
 
-		BindFunctionContent = TEXT(
-			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => DelegateImplementation.Delegate_BindImplementation(GetHandle(), InDelegate);\n"
+		BindFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => DelegateImplementation.Delegate_BindImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic void Bind(Delegate InDelegate) => DelegateImplementation.Delegate_BindImplementation(GetHandle(), InDelegate);\n"
+			"\t\tpublic void Bind(Delegate InDelegate) => DelegateImplementation.Delegate_BindImplementation(%s, InDelegate);\n"
+		),
+		                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
 		DelegateDeclarationContent = FString::Printf(TEXT(
@@ -417,9 +423,10 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => MulticastDelegateImplementation.MulticastDelegate_UnRegisterImplementation(GetHandle());\n"
+		"\n\t\t~%s() => MulticastDelegateImplementation.MulticastDelegate_UnRegisterImplementation(%s);\n"
 	),
-	                                               *FullClassContent
+	                                               *FullClassContent,
+	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);
 
 	for (TFieldIterator<FProperty> ParamIterator(SignatureFunction); ParamIterator && (ParamIterator->PropertyFlags &
@@ -474,11 +481,12 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	);
 
 	auto BroadcastFunctionCallBody = FString::Printf(TEXT(
-		"MulticastDelegateImplementation.MulticastDelegate_Broadcast%dImplementation(GetHandle()%s"
+		"MulticastDelegateImplementation.MulticastDelegate_Broadcast%dImplementation(%s%s"
 	),
 	                                                 FGeneratorCore::GetFunctionIndex(DelegateReturnParam != nullptr,
 		                                                 !DelegateParams.IsEmpty(),
 		                                                 !DelegateRefParamIndex.IsEmpty()),
+	                                                 *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                                 DelegateRefParamIndex.IsEmpty()
 		                                                 ? TEXT("")
 		                                                 : TEXT(", out var __OutValue")
@@ -600,28 +608,40 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	{
 		SuperClassContent = TEXT("FRefMulticastDelegate");
 
-		ContainsFunctionContent = TEXT(
-			"\t\tpublic Boolean Contains(UObject _, Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(GetHandle(), InDelegate);\n"
+		ContainsFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic bool Contains(UObject _, Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic Boolean Contains(Delegate InDelegate)=> MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(GetHandle(), InDelegate);\n"
+			"\t\tpublic bool Contains(Delegate InDelegate)=> MulticastDelegateImplementation.MulticastDelegate_ContainsImplementation(%s, InDelegate);\n"
+		),
+		                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
-		AddFunctionContent = TEXT(
-			"\t\tpublic void Add(UObject _, Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_AddImplementation(GetHandle(), InDelegate);\n"
+		AddFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic void Add(UObject _, Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_AddImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic void Add(Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_AddImplementation(GetHandle(), InDelegate);\n"
+			"\t\tpublic void Add(Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_AddImplementation(%s, InDelegate);\n"
+		),
+		                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
-		AddUniqueFunctionContent = TEXT(
-			"\t\tpublic void AddUnique(UObject _, Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(GetHandle(), InDelegate);\n"
+		AddUniqueFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic void AddUnique(UObject _, Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic void AddUnique(Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(GetHandle(), InDelegate);\n"
+			"\t\tpublic void AddUnique(Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_AddUniqueImplementation(%s, InDelegate);\n"
+		),
+		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
-		RemoveFunctionContent = TEXT(
-			"\t\tpublic void Remove(UObject _, Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(GetHandle(), InDelegate);\n"
+		RemoveFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic void Remove(UObject _, Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic void Remove(Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(GetHandle(), InDelegate);\n"
+			"\t\tpublic void Remove(Delegate InDelegate) => MulticastDelegateImplementation.MulticastDelegate_RemoveImplementation(%s, InDelegate);\n"
+		),
+		                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
 		DelegateDeclarationContent = FString::Printf(TEXT(

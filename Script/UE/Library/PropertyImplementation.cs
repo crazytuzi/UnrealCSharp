@@ -1,200 +1,199 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Script.Library
 {
     public static class PropertyImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Byte Property_GetObjectBytePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern byte Property_GetObjectBytePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectBytePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Byte InValue);
+        public static extern void Property_SetObjectBytePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, byte InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UInt16 Property_GetObjectUInt16PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern ushort Property_GetObjectUInt16PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectUInt16PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, UInt16 InValue);
+        public static extern void Property_SetObjectUInt16PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, ushort InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UInt32 Property_GetObjectUInt32PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern uint Property_GetObjectUInt32PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectUInt32PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, UInt32 InValue);
+        public static extern void Property_SetObjectUInt32PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, uint InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UInt64 Property_GetObjectUInt64PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern ulong Property_GetObjectUInt64PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectUInt64PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, UInt64 InValue);
+        public static extern void Property_SetObjectUInt64PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, ulong InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern SByte Property_GetObjectSBytePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern sbyte Property_GetObjectSBytePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectSBytePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, SByte InValue);
+        public static extern void Property_SetObjectSBytePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, sbyte InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int16 Property_GetObjectInt16PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern short Property_GetObjectInt16PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectInt16PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Int16 InValue);
+        public static extern void Property_SetObjectInt16PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, short InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Property_GetObjectInt32PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern int Property_GetObjectInt32PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectInt32PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Int32 InValue);
+        public static extern void Property_SetObjectInt32PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, int InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int64 Property_GetObjectInt64PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern long Property_GetObjectInt64PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectInt64PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Int64 InValue);
+        public static extern void Property_SetObjectInt64PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, long InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Property_GetObjectBooleanPropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern bool Property_GetObjectBooleanPropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectBooleanPropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Boolean InValue);
+        public static extern void Property_SetObjectBooleanPropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, bool InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Property_GetObjectSinglePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern float Property_GetObjectSinglePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectSinglePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Single InValue);
+        public static extern void Property_SetObjectSinglePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, float InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Object Property_GetObjectCompoundPropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern object Property_GetObjectCompoundPropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectCompoundPropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Object InValue);
+        public static extern void Property_SetObjectCompoundPropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double Property_GetObjectDoublePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern double Property_GetObjectDoublePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetObjectDoublePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Double InValue);
+        public static extern void Property_SetObjectDoublePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, double InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Byte Property_GetStructBytePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern byte Property_GetStructBytePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructBytePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Byte InValue);
+        public static extern void Property_SetStructBytePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, byte InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UInt16 Property_GetStructUInt16PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern ushort Property_GetStructUInt16PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructUInt16PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, UInt16 InValue);
+        public static extern void Property_SetStructUInt16PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, ushort InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UInt32 Property_GetStructUInt32PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern uint Property_GetStructUInt32PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructUInt32PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, UInt32 InValue);
+        public static extern void Property_SetStructUInt32PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, uint InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UInt64 Property_GetStructUInt64PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern ulong Property_GetStructUInt64PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructUInt64PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, UInt64 InValue);
+        public static extern void Property_SetStructUInt64PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, ulong InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern SByte Property_GetStructSBytePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern sbyte Property_GetStructSBytePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructSBytePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, SByte InValue);
+        public static extern void Property_SetStructSBytePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, sbyte InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int16 Property_GetStructInt16PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern short Property_GetStructInt16PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructInt16PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Int16 InValue);
+        public static extern void Property_SetStructInt16PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, short InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Property_GetStructInt32PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern int Property_GetStructInt32PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructInt32PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Int32 InValue);
+        public static extern void Property_SetStructInt32PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, int InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int64 Property_GetStructInt64PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern long Property_GetStructInt64PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructInt64PropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Int64 InValue);
+        public static extern void Property_SetStructInt64PropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, long InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Property_GetStructBooleanPropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern bool Property_GetStructBooleanPropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructBooleanPropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Boolean InValue);
+        public static extern void Property_SetStructBooleanPropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, bool InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Single Property_GetStructSinglePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern float Property_GetStructSinglePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructSinglePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Single InValue);
+        public static extern void Property_SetStructSinglePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, float InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Object Property_GetStructCompoundPropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern object Property_GetStructCompoundPropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructCompoundPropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Object InValue);
+        public static extern void Property_SetStructCompoundPropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Double Property_GetStructDoublePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash);
+        public static extern double Property_GetStructDoublePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Property_SetStructDoublePropertyImplementation(IntPtr InMonoObject,
-            UInt32 InPropertyHash, Double InValue);
+        public static extern void Property_SetStructDoublePropertyImplementation(nint InMonoObject,
+            uint InPropertyHash, double InValue);
     }
 }

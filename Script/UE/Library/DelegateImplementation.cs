@@ -10,44 +10,44 @@ namespace Script.Library
         public static extern void Delegate_RegisterImplementation(FDelegateBase InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_UnRegisterImplementation(IntPtr InMonoObject);
+        public static extern void Delegate_UnRegisterImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_BindImplementation<T>(IntPtr InMonoObject, T InDelegate) where T : Delegate;
+        public static extern void Delegate_BindImplementation<T>(nint InMonoObject, T InDelegate) where T : Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Delegate_IsBoundImplementation(IntPtr InMonoObject);
+        public static extern bool Delegate_IsBoundImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_UnBindImplementation(IntPtr InMonoObject);
+        public static extern void Delegate_UnBindImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_ClearImplementation(IntPtr InMonoObject);
+        public static extern void Delegate_ClearImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_Execute0Implementation(IntPtr InMonoObject);
+        public static extern void Delegate_Execute0Implementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Object Delegate_Execute1Implementation(IntPtr InMonoObject);
+        public static extern object Delegate_Execute1Implementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_Execute2Implementation(IntPtr InMonoObject, params Object[] InValue);
+        public static extern void Delegate_Execute2Implementation(nint InMonoObject, params object[] InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Object Delegate_Execute3Implementation(IntPtr InMonoObject, params Object[] InValue);
+        public static extern object Delegate_Execute3Implementation(nint InMonoObject, params object[] InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_Execute4Implementation(IntPtr InMonoObject, out Object[] OutValue);
+        public static extern void Delegate_Execute4Implementation(nint InMonoObject, out object[] OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Object Delegate_Execute5Implementation(IntPtr InMonoObject, out Object[] OutValue);
+        public static extern object Delegate_Execute5Implementation(nint InMonoObject, out object[] OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Delegate_Execute6Implementation(IntPtr InMonoObject, out Object[] OutValue,
-            params Object[] InValue);
+        public static extern void Delegate_Execute6Implementation(nint InMonoObject, out object[] OutValue,
+            params object[] InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Object Delegate_Execute7Implementation(IntPtr InMonoObject, out Object[] OutValue,
-            params Object[] InValue);
+        public static extern object Delegate_Execute7Implementation(nint InMonoObject, out object[] OutValue,
+            params object[] InValue);
     }
 }

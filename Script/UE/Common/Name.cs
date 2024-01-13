@@ -1,50 +1,36 @@
-﻿using System;
-using Script.CoreUObject;
+﻿using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Common
 {
-    public class FName : IGCHandle
+    public class FName : IGarbageCollectionHandle
     {
         public FName()
         {
         }
 
-        ~FName() => NameImplementation.Name_UnRegisterImplementation(GetHandle());
+        ~FName() => NameImplementation.Name_UnRegisterImplementation(GarbageCollectionHandle);
 
-        public FName(String InValue) => NameImplementation.Name_RegisterImplementation(this, InValue);
+        public FName(string InValue) => NameImplementation.Name_RegisterImplementation(this, InValue);
 
-        public static implicit operator FName(String InValue) => new(InValue);
+        public static implicit operator FName(string InValue) => new(InValue);
 
-        public static Boolean operator ==(FName A, FName B) =>
+        public static bool operator ==(FName A, FName B) =>
             NameImplementation.Name_IdenticalImplementation(
-                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
 
-        public static Boolean operator !=(FName A, FName B) =>
+        public static bool operator !=(FName A, FName B) =>
             !NameImplementation.Name_IdenticalImplementation(
-                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
 
-        public override Boolean Equals(Object Other) => this == Other as FName;
+        public override bool Equals(object Other) => this == Other as FName;
 
-        public override Int32 GetHashCode() => GetHandle().ToInt32();
+        public override int GetHashCode() => (int)GarbageCollectionHandle;
 
-        public override String ToString()
-        {
-            return NameImplementation.Name_ToStringImplementation(GetHandle());
-        }
-
-        public unsafe void SetHandle(void* InGCHandle)
-        {
-            GCHandle = new IntPtr(InGCHandle);
-        }
-
-        public IntPtr GetHandle()
-        {
-            return GCHandle;
-        }
+        public override string ToString() => NameImplementation.Name_ToStringImplementation(GarbageCollectionHandle);
 
         public static FName NAME_None => NameImplementation.Name_NAME_NoneImplementation();
 
-        private IntPtr GCHandle;
+        public nint GarbageCollectionHandle { get; set; }
     }
 }

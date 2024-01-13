@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Threading;
 
 namespace Script.Common;
@@ -8,7 +7,7 @@ public struct TaskInfo
 {
     public SendOrPostCallback CallBack;
 
-    public Object? State;
+    public object? State;
 
     public ManualResetEvent? WaitHandle;
 

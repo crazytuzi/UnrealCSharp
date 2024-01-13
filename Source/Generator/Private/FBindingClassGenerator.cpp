@@ -2,6 +2,7 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BindingMacro.h"
+#include "CoreMacro/PropertyMacro.h"
 
 void FBindingClassGenerator::Generator()
 {
@@ -22,7 +23,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 {
 	FString UsingNameSpaceContent;
 
-	TSet<FString> UsingNameSpaces{InClass.GetImplementationNameSpace(), TEXT("System")};
+	TSet<FString> UsingNameSpaces{InClass.GetImplementationNameSpace()};
 
 	const auto& NameSpaceContent = InClass.GetTypeInfo().GetNameSpace();
 
@@ -47,7 +48,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		UsingNameSpaces.Append(InClass.GetSubscript()->GetParams()[0]->GetNameSpace());
 
 		auto SubscriptGetContent = FString::Printf(TEXT(
-			"\t\t\tget => %s%s.%s(GetHandle(), %s)%s;\n"
+			"\t\t\tget => %s%s.%s(%s, %s)%s;\n"
 		),
 		                                           InClass.GetSubscript()->GetReturn()->IsPrimitive()
 			                                           ? *FString::Printf(TEXT(
@@ -61,6 +62,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		                                           *BINDING_COMBINE_FUNCTION(
 			                                           ClassContent,
 			                                           InClass.GetSubscript()->GetGetImplementationName()),
+		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                           *InClass.GetSubscript()->GetParamNames()[0],
 		                                           !InClass.GetSubscript()->GetReturn()->IsPrimitive()
 			                                           ? *FString::Printf(TEXT(
@@ -73,12 +75,13 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		);
 
 		auto SubscriptSetContent = FString::Printf(TEXT(
-			"\t\t\tset => %s.%s(GetHandle(), %s, value);\n"
+			"\t\t\tset => %s.%s(%s, %s, value);\n"
 		),
 		                                           *BINDING_CLASS_IMPLEMENTATION(ClassContent),
 		                                           *BINDING_COMBINE_FUNCTION(
 			                                           ClassContent,
 			                                           InClass.GetSubscript()->GetSetImplementationName()),
+		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                           *InClass.GetSubscript()->GetParamNames()[0]
 		);
 
@@ -134,7 +137,9 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 			                                     *BINDING_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION(
 				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName)),
-			                                     Property.IsStatic() ? TEXT("IntPtr.Zero") : TEXT("GetHandle()"),
+			                                     Property.IsStatic()
+				                                     ? TEXT("nint.Zero")
+				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                     !Property.IsPrimitive()
 				                                     ? *FString::Printf(TEXT(
 					                                     " as %s"
@@ -152,7 +157,9 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 			                                     *BINDING_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION(
 				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName)),
-			                                     Property.IsStatic() ? TEXT("IntPtr.Zero") : TEXT("GetHandle()")
+			                                     Property.IsStatic()
+				                                     ? TEXT("nint.Zero")
+				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE
 			);
 		}
 
@@ -302,10 +309,10 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		                                        *BINDING_COMBINE_FUNCTION(
 			                                        ClassContent, Function.GetFunctionImplementationName()),
 		                                        Function.IsStatic() == true
-			                                        ? TEXT("IntPtr.Zero")
+			                                        ? TEXT("nint.Zero")
 			                                        : Function.IsConstructor()
 			                                        ? TEXT("this")
-			                                        : TEXT("GetHandle()"),
+			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                        FunctionRefParamIndex.IsEmpty()
 			                                        ? TEXT("")
 			                                        : TEXT(", out var __OutValue")
@@ -445,27 +452,21 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 	if (bHasEqualTo)
 	{
 		FunctionContent += FString::Printf(TEXT(
-			"\n\t\tpublic override Boolean Equals(Object Other) => this == Other as %s;\n\n"
-			"\t\tpublic override Int32 GetHashCode() => GetHandle().ToInt32();\n"
+			"\n\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
+			"\t\tpublic override int GetHashCode() => (int)%s;\n"
 		),
-		                                   *FullClassContent
+		                                   *FullClassContent,
+		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 	}
 
 	if (!InClass.IsReflection() && InClass.GetBase().IsEmpty())
 	{
-		GCHandleContent = TEXT(
-			"\t\tpublic unsafe void SetHandle(void* InHandle)\n"
-			"\t\t{\n"
-			"\t\t\tGCHandle = new IntPtr(InHandle);\n"
-			"\t\t}\n"
-			"\n"
-			"\t\tpublic IntPtr GetHandle()\n"
-			"\t\t{\n"
-			"\t\t\treturn GCHandle;\n"
-			"\t\t}\n"
-			"\n"
-			"\t\tprivate IntPtr GCHandle;\n");
+		GCHandleContent = FString::Printf(TEXT(
+			"\t\tpublic nint %s { get; set; }\n"
+		),
+		                                  *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		);
 
 		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 	}
@@ -500,7 +501,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 	                               *NameSpaceContent[0],
 	                               *FullClassContent,
 	                               InClass.GetBase().IsEmpty()
-		                               ? (InClass.IsReflection() ? TEXT("") : TEXT(" : IGCHandle"))
+		                               ? (InClass.IsReflection() ? TEXT("") : TEXT(" : IGarbageCollectionHandle"))
 		                               : *FString::Printf(TEXT(
 			                               " : %s"
 		                               ),
@@ -532,7 +533,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 
 	auto ImplementationNameSpaceContent = InClass.GetImplementationNameSpace();
 
-	TSet<FString> UsingNameSpaces = {TEXT("System"), TEXT("System.Runtime.CompilerServices")};
+	TSet<FString> UsingNameSpaces = {TEXT("System.Runtime.CompilerServices")};
 
 	UsingNameSpaces.Append(NameSpaceContent);
 
@@ -553,7 +554,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern Object %s(IntPtr InObject, params Object[] InValue);\n"
+			"\t\tpublic static extern object %s(nint InObject, params object[] InValue);\n"
 		),
 		                                           *BINDING_COMBINE_FUNCTION(
 			                                           ClassContent, InClass.GetSubscript()->GetGetImplementationName())
@@ -569,7 +570,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 
 		FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern void %s(IntPtr InObject, params Object[] InValue);\n"
+			"\t\tpublic static extern void %s(nint InObject, params object[] InValue);\n"
 		),
 		                                      *BINDING_COMBINE_FUNCTION(
 			                                      ClassContent, InClass.GetSubscript()->GetSetImplementationName())
@@ -606,7 +607,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 		{
 			GetFunctionContent = FString::Printf(TEXT(
 				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern Object %s(IntPtr InObject);\n"
+				"\t\tpublic static extern object %s(nint InObject);\n"
 			),
 			                                     *BINDING_COMBINE_FUNCTION(
 				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName))
@@ -617,7 +618,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 		{
 			SetFunctionContent = FString::Printf(TEXT(
 				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern void %s(IntPtr InObject, Object InValue);\n"
+				"\t\tpublic static extern void %s(nint InObject, object InValue);\n"
 			),
 			                                     *BINDING_COMBINE_FUNCTION(
 				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName))
@@ -655,13 +656,13 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
 			"\t\tpublic static extern %s %s(%s InObject%s%s);\n"
 		),
-		                                           Function.GetReturn() != nullptr ? TEXT("Object") : TEXT("void"),
+		                                           Function.GetReturn() != nullptr ? TEXT("object") : TEXT("void"),
 		                                           *BINDING_COMBINE_FUNCTION(
 			                                           ClassContent, Function.GetFunctionImplementationName()),
-		                                           Function.IsConstructor() ? *FullClassContent : TEXT("IntPtr"),
-		                                           bHasRef ? TEXT(", out Object[] OutValue") : TEXT(""),
+		                                           Function.IsConstructor() ? *FullClassContent : TEXT("nint"),
+		                                           bHasRef ? TEXT(", out object[] OutValue") : TEXT(""),
 		                                           !Function.GetParams().IsEmpty()
-			                                           ? TEXT(", params Object[] InValue")
+			                                           ? TEXT(", params object[] InValue")
 			                                           : TEXT("")
 		);
 

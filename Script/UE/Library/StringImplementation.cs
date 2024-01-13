@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.CompilerServices;
 using Script.Common;
 
@@ -7,15 +6,15 @@ namespace Script.Library
     public static class StringImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void String_RegisterImplementation(FString InString, String InValue);
+        public static extern void String_RegisterImplementation(FString InString, string InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean String_IdenticalImplementation(IntPtr InA, IntPtr InB);
+        public static extern bool String_IdenticalImplementation(nint InA, nint InB);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void String_UnRegisterImplementation(IntPtr InString);
+        public static extern void String_UnRegisterImplementation(nint InString);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern String String_ToStringImplementation(IntPtr InString);
+        public static extern string String_ToStringImplementation(nint InString);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Script.Common;
 
 namespace Script.Library
@@ -10,90 +9,90 @@ namespace Script.Library
         public static extern void Array_RegisterImplementation<T>(TArray<T> InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Array_IdenticalImplementation(IntPtr InA, IntPtr InB);
+        public static extern bool Array_IdenticalImplementation(nint InA, nint InB);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_UnRegisterImplementation(IntPtr InArray);
+        public static extern void Array_UnRegisterImplementation(nint InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_GetTypeSizeImplementation(IntPtr InArray);
+        public static extern int Array_GetTypeSizeImplementation(nint InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_GetSlackImplementation(IntPtr InArray);
+        public static extern int Array_GetSlackImplementation(nint InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Array_IsValidIndexImplementation(IntPtr InArray, Int32 InIndex);
+        public static extern bool Array_IsValidIndexImplementation(nint InArray, int InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_NumImplementation(IntPtr InArray);
+        public static extern int Array_NumImplementation(nint InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Array_IsEmptyImplementation(IntPtr InArray);
+        public static extern bool Array_IsEmptyImplementation(nint InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_MaxImplementation(IntPtr InArray);
+        public static extern int Array_MaxImplementation(nint InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Object Array_GetImplementation(IntPtr InArray, Int32 InIndex);
+        public static extern object Array_GetImplementation(nint InArray, int InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_SetImplementation(IntPtr InArray, Int32 InIndex, Object InValue);
+        public static extern void Array_SetImplementation(nint InArray, int InIndex, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_FindImplementation(IntPtr InArray, Object InValue);
+        public static extern int Array_FindImplementation(nint InArray, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_FindLastImplementation(IntPtr InArray, Object InValue);
+        public static extern int Array_FindLastImplementation(nint InArray, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Array_ContainsImplementation(IntPtr InArray, Object InValue);
+        public static extern bool Array_ContainsImplementation(nint InArray, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_AddUninitializedImplementation(IntPtr InArray, Int32 InCount);
+        public static extern int Array_AddUninitializedImplementation(nint InArray, int InCount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_InsertZeroedImplementation(IntPtr InArray, Int32 InIndex, Int32 InCount);
+        public static extern void Array_InsertZeroedImplementation(nint InArray, int InIndex, int InCount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_InsertDefaultedImplementation(IntPtr InArray, Int32 InIndex, Int32 InCount);
+        public static extern void Array_InsertDefaultedImplementation(nint InArray, int InIndex, int InCount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_RemoveAtImplementation(IntPtr InArray, Int32 InIndex, Int32 InCount,
-            Boolean bAllowShrinking);
+        public static extern int Array_RemoveAtImplementation(nint InArray, int InIndex, int InCount,
+            bool bAllowShrinking);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_ResetImplementation(IntPtr InArray, Int32 InNewSize);
+        public static extern void Array_ResetImplementation(nint InArray, int InNewSize);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_EmptyImplementation(IntPtr InArray, Int32 InSlack);
+        public static extern void Array_EmptyImplementation(nint InArray, int InSlack);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_SetNumImplementation(IntPtr InArray, Int32 InNewNum, Boolean bAllowShrinking);
+        public static extern void Array_SetNumImplementation(nint InArray, int InNewNum, bool bAllowShrinking);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_AddImplementation(IntPtr InArray, Object InValue);
+        public static extern int Array_AddImplementation(nint InArray, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_AddZeroedImplementation(IntPtr InArray, Int32 InCount);
+        public static extern int Array_AddZeroedImplementation(nint InArray, int InCount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_AddUniqueImplementation(IntPtr InArray, Object InValue);
+        public static extern int Array_AddUniqueImplementation(nint InArray, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_RemoveSingleImplementation(IntPtr InArray, Object InValue);
+        public static extern int Array_RemoveSingleImplementation(nint InArray, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_RemoveImplementation(IntPtr InArray, Object InValue);
+        public static extern int Array_RemoveImplementation(nint InArray, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_SwapMemoryImplementation(IntPtr InArray, Int32 InFirstIndexToSwap,
-            Int32 InSecondIndexToSwap);
+        public static extern void Array_SwapMemoryImplementation(nint InArray, int InFirstIndexToSwap,
+            int InSecondIndexToSwap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Array_SwapImplementation(IntPtr InArray, Int32 InFirstIndexToSwap,
-            Int32 InSecondIndexToSwap);
+        public static extern void Array_SwapImplementation(nint InArray, int InFirstIndexToSwap,
+            int InSecondIndexToSwap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Array_INDEX_NONEImplementation();
+        public static extern int Array_INDEX_NONEImplementation();
     }
 }

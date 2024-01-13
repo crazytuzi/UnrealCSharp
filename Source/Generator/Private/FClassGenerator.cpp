@@ -10,6 +10,7 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
+#include "CoreMacro/PropertyMacro.h"
 
 void FClassGenerator::Generator()
 {
@@ -82,7 +83,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto bIsInterface = InClass->IsChildOf(UInterface::StaticClass());
 
-	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
 
 	auto SuperClass = InClass->GetSuperClass();
 
@@ -161,18 +162,20 @@ void FClassGenerator::Generator(const UClass* InClass)
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget => %sPropertyImplementation.Property_GetObject%sPropertyImplementation(GetHandle(), %s);\n"
+				"\t\t\tget => %sPropertyImplementation.Property_GetObject%sPropertyImplementation(%s, %s);\n"
 				"\n"
-				"\t\t\tset => PropertyImplementation.Property_SetObject%sPropertyImplementation(GetHandle(), %s, %s);\n"
+				"\t\t\tset => PropertyImplementation.Property_SetObject%sPropertyImplementation(%s, %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
 			                                   *PropertyName,
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
+			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
-			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
+			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
@@ -182,16 +185,18 @@ void FClassGenerator::Generator(const UClass* InClass)
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget => PropertyImplementation.Property_GetObjectCompoundPropertyImplementation(GetHandle(), %s) as %s;\n"
+				"\t\t\tget => PropertyImplementation.Property_GetObjectCompoundPropertyImplementation(%s, %s) as %s;\n"
 				"\n"
-				"\t\t\tset => PropertyImplementation.Property_SetObjectCompoundPropertyImplementation(GetHandle(), %s, %s);\n"
+				"\t\t\tset => PropertyImplementation.Property_SetObjectCompoundPropertyImplementation(%s, %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
 			                                   *PropertyName,
+			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
-			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
+			                                   *FGeneratorCore::GetPropertyType(*PropertyIterator),
+			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
@@ -201,7 +206,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
 	{
 		PropertyNameContent += FString::Printf(TEXT(
-			"%s\t\tprivate static UInt32 %s = 0;\n"
+			"%s\t\tprivate static uint %s = 0;\n"
 		),
 		                                       Index == 0 ? TEXT("") : TEXT("\n"),
 		                                       *PropertyNames[Index].Key
@@ -528,8 +533,12 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
 			                                        IsEmpty()),
 		                                        bIsStatic == true
-			                                        ? TEXT("StaticClass().GetDefaultObject().GetHandle()")
-			                                        : TEXT("GetHandle()"),
+			                                        ? *FString::Printf(TEXT(
+				                                        "StaticClass().GetDefaultObject().%s"
+			                                        ),
+			                                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
+			                                        )
+			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                        *FunctionNames[FunctionNames.Num() - 1].Key,
 		                                        FunctionRefParamIndex.IsEmpty() && FunctionOutParamIndex.IsEmpty()
 			                                        ? TEXT("")
@@ -704,7 +713,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		for (auto Index = 0; Index < FunctionNames.Num(); ++Index)
 		{
 			FunctionNameContent += FString::Printf(TEXT(
-				"%s\t\tprivate static UInt32 %s = 0;\n"
+				"%s\t\tprivate static uint %s = 0;\n"
 			),
 			                                       Index == 0 ? TEXT("") : TEXT("\n"),
 			                                       *FunctionNames[Index].Key

@@ -1,5 +1,4 @@
-﻿using System;
-using Script.CoreUObject;
+﻿using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Engine
@@ -7,18 +6,14 @@ namespace Script.Engine
     public partial class UWorld
     {
         public T SpawnActor<T>(UClass Class, FTransform Transform, FActorSpawnParameters ActorSpawnParameters = null)
-            where T : AActor
-        {
-            return WorldImplementation.World_SpawnActorImplementation(GetHandle(),
-                Class.GetHandle(),
-                Transform.GetHandle(),
-                ActorSpawnParameters?.GetHandle() ?? IntPtr.Zero) as T;
-        }
+            where T : AActor =>
+            WorldImplementation.World_SpawnActorImplementation<T>(GarbageCollectionHandle,
+                Class.GarbageCollectionHandle,
+                Transform.GarbageCollectionHandle,
+                ActorSpawnParameters?.GarbageCollectionHandle ?? nint.Zero);
 
         public T SpawnActor<T>(FTransform Transform, FActorSpawnParameters ActorSpawnParameters = null)
-            where T : AActor, IStaticClass
-        {
-            return SpawnActor<T>(T.StaticClass(), Transform, ActorSpawnParameters);
-        }
+            where T : AActor, IStaticClass =>
+            SpawnActor<T>(T.StaticClass(), Transform, ActorSpawnParameters);
     }
 }

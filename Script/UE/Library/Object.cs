@@ -1,52 +1,25 @@
-﻿using System;
-using Script.Library;
+﻿using Script.Library;
 using Script.Common;
 using Script.Engine;
 
 namespace Script.CoreUObject
 {
-    public partial class UObject : IGCHandle
+    public partial class UObject : IGarbageCollectionHandle
     {
-        public UClass GetClass()
-        {
-            return ObjectImplementation.Object_GetClassImplementation(GetHandle());
-        }
+        public UClass GetClass() => ObjectImplementation.Object_GetClassImplementation(GarbageCollectionHandle);
 
-        public FString GetName()
-        {
-            return ObjectImplementation.Object_GetNameImplementation(GetHandle());
-        }
+        public FString GetName() => ObjectImplementation.Object_GetNameImplementation(GarbageCollectionHandle);
 
-        public UWorld GetWorld()
-        {
-            return ObjectImplementation.Object_GetWorldImplementation(GetHandle());
-        }
+        public UWorld GetWorld() => ObjectImplementation.Object_GetWorldImplementation(GarbageCollectionHandle);
 
-        public override String ToString()
-        {
-            return GetName().ToString();
-        }
+        public override string ToString() => GetName().ToString();
 
-        public Boolean IsValid()
-        {
-            return ObjectImplementation.Object_IsValidImplementation(GetHandle());
-        }
+        public bool IsValid() => ObjectImplementation.Object_IsValidImplementation(GarbageCollectionHandle);
 
-        public Boolean IsA<T>() where T : UObject, IStaticClass
-        {
-            return ObjectImplementation.Object_IsAImplementation(GetHandle(), T.StaticClass().GetHandle());
-        }
+        public bool IsA<T>() where T : UObject, IStaticClass =>
+            ObjectImplementation.Object_IsAImplementation(GarbageCollectionHandle,
+                T.StaticClass().GarbageCollectionHandle);
 
-        public unsafe void SetHandle(void* InHandle)
-        {
-            GCHandle = new IntPtr(InHandle);
-        }
-
-        public IntPtr GetHandle()
-        {
-            return GCHandle;
-        }
-
-        private IntPtr GCHandle;
+        public nint GarbageCollectionHandle { get; set; }
     }
 }

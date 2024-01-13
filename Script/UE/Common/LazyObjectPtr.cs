@@ -1,49 +1,36 @@
-﻿using System;
-using Script.CoreUObject;
+﻿using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Common
 {
-    public class TLazyObjectPtr<T> : IGCHandle where T : UObject
+    public class TLazyObjectPtr<T> : IGarbageCollectionHandle where T : UObject
     {
         public TLazyObjectPtr()
         {
         }
 
-        ~TLazyObjectPtr() => LazyObjectPtrImplementation.LazyObjectPtr_UnRegisterImplementation(GetHandle());
+        ~TLazyObjectPtr() =>
+            LazyObjectPtrImplementation.LazyObjectPtr_UnRegisterImplementation(GarbageCollectionHandle);
 
         public TLazyObjectPtr(T InObject) =>
-            LazyObjectPtrImplementation.LazyObjectPtr_RegisterImplementation(this, InObject.GetHandle());
+            LazyObjectPtrImplementation.LazyObjectPtr_RegisterImplementation(this, InObject.GarbageCollectionHandle);
 
         public static implicit operator TLazyObjectPtr<T>(T InObject) => new(InObject);
 
-        public static Boolean operator ==(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B) =>
+        public static bool operator ==(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B) =>
             LazyObjectPtrImplementation.LazyObjectPtr_IdenticalImplementation(
-                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
 
-        public static Boolean operator !=(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B) =>
+        public static bool operator !=(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B) =>
             !LazyObjectPtrImplementation.LazyObjectPtr_IdenticalImplementation(
-                A?.GetHandle() ?? IntPtr.Zero, B?.GetHandle() ?? IntPtr.Zero);
+                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
 
-        public override Boolean Equals(Object Other) => this == Other as TLazyObjectPtr<T>;
+        public override bool Equals(object Other) => this == Other as TLazyObjectPtr<T>;
 
-        public override Int32 GetHashCode() => GetHandle().ToInt32();
+        public override int GetHashCode() => (int)GarbageCollectionHandle;
 
-        public T Get()
-        {
-            return LazyObjectPtrImplementation.LazyObjectPtr_GetImplementation(GetHandle()) as T;
-        }
+        public T Get() => LazyObjectPtrImplementation.LazyObjectPtr_GetImplementation<T>(GarbageCollectionHandle);
 
-        public unsafe void SetHandle(void* InGCHandle)
-        {
-            GCHandle = new IntPtr(InGCHandle);
-        }
-
-        public IntPtr GetHandle()
-        {
-            return GCHandle;
-        }
-
-        private IntPtr GCHandle;
+        public nint GarbageCollectionHandle { get; set; }
     }
 }

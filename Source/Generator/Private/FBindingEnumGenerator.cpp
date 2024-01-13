@@ -12,7 +12,7 @@ void FBindingEnumGenerator::Generator()
 
 void FBindingEnumGenerator::Generator(const FBindingEnum& InEnum)
 {
-	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
 
 	FString UsingNameSpaceContent;
 

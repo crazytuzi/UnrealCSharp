@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
 namespace Script.Library
@@ -7,15 +6,15 @@ namespace Script.Library
     public static class StructImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UScriptStruct Struct_StaticStructImplementation(String InStructName);
+        public static extern UScriptStruct Struct_StaticStructImplementation(string InStructName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Struct_RegisterImplementation(Object InMonoObject, String InStructName);
+        public static extern void Struct_RegisterImplementation(object InMonoObject, string InStructName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Struct_IdenticalImplementation(IntPtr InScriptStruct, IntPtr InA, IntPtr InB);
+        public static extern bool Struct_IdenticalImplementation(nint InScriptStruct, nint InA, nint InB);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Struct_UnRegisterImplementation(IntPtr InMonoObject);
+        public static extern void Struct_UnRegisterImplementation(nint InMonoObject);
     }
 }

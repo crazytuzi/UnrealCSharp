@@ -6,21 +6,21 @@ using Script.Library;
 
 namespace Script.Common
 {
-    public class TMap<TKey, TValue> : IGCHandle, IEnumerable<KeyValuePair<TKey, TValue>>
+    public class TMap<TKey, TValue> : IGarbageCollectionHandle, IEnumerable<KeyValuePair<TKey, TValue>>
     {
         public TMap() => MapImplementation.Map_RegisterImplementation(this);
 
-        ~TMap() => MapImplementation.Map_UnRegisterImplementation(GCHandle);
+        ~TMap() => MapImplementation.Map_UnRegisterImplementation(GarbageCollectionHandle);
 
         [Obsolete("It is not supported like UE.", true)]
-        public static Boolean operator ==(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
+        public static bool operator ==(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
 
         [Obsolete("It is not supported like UE.", true)]
-        public static Boolean operator !=(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
+        public static bool operator !=(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
 
-        public override Boolean Equals(Object Other) => false;
+        public override bool Equals(object Other) => false;
 
-        public override Int32 GetHashCode() => GetHandle().ToInt32();
+        public override int GetHashCode() => (int)GarbageCollectionHandle;
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
@@ -38,52 +38,42 @@ namespace Script.Common
             return GetEnumerator();
         }
 
-        public void Empty(Int32 InExpectedNumElements = 0) =>
-            MapImplementation.Map_EmptyImplementation(GCHandle, InExpectedNumElements);
+        public void Empty(int InExpectedNumElements = 0) =>
+            MapImplementation.Map_EmptyImplementation(GarbageCollectionHandle, InExpectedNumElements);
 
-        public Int32 Num() => MapImplementation.Map_NumImplementation(GCHandle);
+        public int Num() => MapImplementation.Map_NumImplementation(GarbageCollectionHandle);
 
-        public Boolean IsEmpty() => MapImplementation.Map_IsEmptyImplementation(GCHandle);
+        public bool IsEmpty() => MapImplementation.Map_IsEmptyImplementation(GarbageCollectionHandle);
 
         public void Add(TKey InKey, TValue InValue) =>
-            MapImplementation.Map_AddImplementation(GCHandle, InKey, InValue);
+            MapImplementation.Map_AddImplementation(GarbageCollectionHandle, InKey, InValue);
 
-        public Int32 Remove(TKey InKey) => MapImplementation.Map_RemoveImplementation(GCHandle, InKey);
+        public int Remove(TKey InKey) => MapImplementation.Map_RemoveImplementation(GarbageCollectionHandle, InKey);
 
-        public TKey FindKey(TValue InValue) => (TKey)MapImplementation.Map_FindKeyImplementation(GCHandle, InValue);
+        public TKey FindKey(TValue InValue) => (TKey)MapImplementation.Map_FindKeyImplementation(GarbageCollectionHandle, InValue);
 
-        public TValue Find(TKey InKey) => (TValue)MapImplementation.Map_FindImplementation(GCHandle, InKey);
+        public TValue Find(TKey InKey) => (TValue)MapImplementation.Map_FindImplementation(GarbageCollectionHandle, InKey);
 
-        public Boolean Contains(TKey InKey) => MapImplementation.Map_ContainsImplementation(GCHandle, InKey);
+        public bool Contains(TKey InKey) => MapImplementation.Map_ContainsImplementation(GarbageCollectionHandle, InKey);
 
         public TValue this[TKey InKey]
         {
-            get => (TValue)MapImplementation.Map_GetImplementation(GCHandle, InKey);
+            get => (TValue)MapImplementation.Map_GetImplementation(GarbageCollectionHandle, InKey);
 
-            set => MapImplementation.Map_SetImplementation(GCHandle, InKey, value);
+            set => MapImplementation.Map_SetImplementation(GarbageCollectionHandle, InKey, value);
         }
 
-        private Int32 GetMaxIndex() => MapImplementation.Map_GetMaxIndexImplementation(GCHandle);
+        private int GetMaxIndex() => MapImplementation.Map_GetMaxIndexImplementation(GarbageCollectionHandle);
 
-        private Boolean IsValidIndex(Int32 InIndex) =>
-            MapImplementation.Map_IsValidIndexImplementation(GCHandle, InIndex);
+        private bool IsValidIndex(int InIndex) =>
+            MapImplementation.Map_IsValidIndexImplementation(GarbageCollectionHandle, InIndex);
 
-        private TKey GetEnumeratorKey(Int32 InIndex) =>
-            (TKey)MapImplementation.Map_GetEnumeratorKeyImplementation(GCHandle, InIndex);
+        private TKey GetEnumeratorKey(int InIndex) =>
+            (TKey)MapImplementation.Map_GetEnumeratorKeyImplementation(GarbageCollectionHandle, InIndex);
 
-        private TValue GetEnumeratorValue(Int32 InIndex) =>
-            (TValue)MapImplementation.Map_GetEnumeratorValueImplementation(GCHandle, InIndex);
+        private TValue GetEnumeratorValue(int InIndex) =>
+            (TValue)MapImplementation.Map_GetEnumeratorValueImplementation(GarbageCollectionHandle, InIndex);
 
-        public unsafe void SetHandle(void* InGCHandle)
-        {
-            GCHandle = new IntPtr(InGCHandle);
-        }
-
-        public IntPtr GetHandle()
-        {
-            return GCHandle;
-        }
-
-        private IntPtr GCHandle;
+        public nint GarbageCollectionHandle { get; set; }
     }
 }

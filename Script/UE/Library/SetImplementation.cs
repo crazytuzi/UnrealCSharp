@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Script.Common;
 
 namespace Script.Library
@@ -10,33 +9,33 @@ namespace Script.Library
         public static extern void Set_RegisterImplementation<T>(TSet<T> InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Set_UnRegisterImplementation(IntPtr InSet);
+        public static extern void Set_UnRegisterImplementation(nint InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Set_EmptyImplementation(IntPtr InSet, Int32 InExpectedNumElements);
+        public static extern void Set_EmptyImplementation(nint InSet, int InExpectedNumElements);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Set_NumImplementation(IntPtr InSet);
+        public static extern int Set_NumImplementation(nint InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Set_IsEmptyImplementation(IntPtr InSet);
+        public static extern bool Set_IsEmptyImplementation(nint InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Set_GetMaxIndexImplementation(IntPtr InSet);
+        public static extern int Set_GetMaxIndexImplementation(nint InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Set_AddImplementation(IntPtr InSet, Object InValue);
+        public static extern void Set_AddImplementation(nint InSet, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Int32 Set_RemoveImplementation(IntPtr InSet, Object InValue);
+        public static extern int Set_RemoveImplementation(nint InSet, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Set_ContainsImplementation(IntPtr InSet, Object InValue);
+        public static extern bool Set_ContainsImplementation(nint InSet, object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Boolean Set_IsValidIndexImplementation(IntPtr InSet, Int32 InIndex);
+        public static extern bool Set_IsValidIndexImplementation(nint InSet, int InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern Object Set_GetEnumeratorImplementation(IntPtr InSet, Int32 Index);
+        public static extern object Set_GetEnumeratorImplementation(nint InSet, int Index);
     }
 }
