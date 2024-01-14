@@ -8,10 +8,10 @@ namespace Script.Common
 {
     public static class Utils
     {
-        private static bool IsOverrideType(Type InType) => InType.IsDefined(typeof(IsOverrideAttribute), true);
+        private static bool IsOverrideType(Type InType) => InType.IsDefined(typeof(OverrideAttribute), true);
 
         private static bool IsOverrideMethod(MethodInfo InMethodInfo) =>
-            InMethodInfo.IsDefined(typeof(IsOverrideAttribute), true);
+            InMethodInfo.IsDefined(typeof(OverrideAttribute), true);
 
         public static string GetPathName(Type InType) => InType.GetCustomAttribute<PathNameAttribute>(true)?.PathName;
 
