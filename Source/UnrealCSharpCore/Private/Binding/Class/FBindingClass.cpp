@@ -103,15 +103,13 @@ void FBindingClass::BindingProperty(const FString& InName, FTypeInfo* InTypeInfo
 }
 
 void FBindingClass::BindingFunction(const FString& InName, const FString& InImplementationName,
-                                    FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames,
-                                    const EFunctionInteract InFunctionInteract)
+                                    FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames)
 {
 	Functions.Emplace(
 		InTypeInfo,
 		InName,
 		InImplementationName,
-		InParamNames,
-		InFunctionInteract
+		InParamNames
 	);
 }
 

@@ -1,21 +1,19 @@
 ﻿using System;
 using Script.CoreUObject;
-using Script.Library;
+using Script.Reflection.Delegate;
 
 namespace Script.Common
 {
     public class FDelegate<T> : FDelegateBase where T : Delegate
     {
-        public void Bind(UObject _, T InDelegate) =>
-            DelegateImplementation.Delegate_BindImplementation(GarbageCollectionHandle, InDelegate);
+        public void Bind(UObject _, T InDelegate) => DelegateUtils.Delegate_Bind(GetHandle(), InDelegate);
 
-        public void Bind(T InDelegate) =>
-            DelegateImplementation.Delegate_BindImplementation(GarbageCollectionHandle, InDelegate);
+        public void Bind(T InDelegate) => DelegateUtils.Delegate_Bind(GetHandle(), InDelegate);
 
-        public bool IsBound() => DelegateImplementation.Delegate_IsBoundImplementation(GarbageCollectionHandle);
+        public Boolean IsBound() => DelegateUtils.Delegate_IsBound(GetHandle());
 
-        public void Unbind() => DelegateImplementation.Delegate_UnBindImplementation(GarbageCollectionHandle);
+        public void Unbind() => DelegateUtils.Delegate_UnBind(GetHandle());
 
-        public void Clear() => DelegateImplementation.Delegate_ClearImplementation(GarbageCollectionHandle);
+        public void Clear() => DelegateUtils.Delegate_Clear(GetHandle());
     }
 }

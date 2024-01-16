@@ -3,7 +3,6 @@
 #include "Template/TGetArrayLength.inl"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "Macro/FunctionMacro.h"
 
 FDomain::FDomain(const FMonoDomainInitializeParams& InParams)
@@ -176,16 +175,6 @@ const char* FDomain::Property_Get_Name(MonoProperty* InMonoProperty) const
 MonoMethod* FDomain::Property_Get_Get_Method(MonoProperty* InMonoProperty) const
 {
 	return FMonoDomain::Property_Get_Get_Method(InMonoProperty);
-}
-
-MonoProperty* FDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, const FString& InName)
-{
-	return FMonoDomain::Class_Get_Property_From_Name(InMonoClass, InName);
-}
-
-void FDomain::Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams, MonoObject** InExc)
-{
-	FMonoDomain::Property_Set_Value(InMonoProperty, InMonoObject, InParams, InExc);
 }
 
 const char* FDomain::Method_Get_Name(MonoMethod* InMonoMethod) const
@@ -417,13 +406,14 @@ MonoGCHandle FDomain::GCHandle_New_V2(MonoObject* InMonoObject, const mono_bool 
 
 MonoGCHandle FDomain::GCHandle_New_V2(MonoObject* InMonoObject, MonoClass* InMonoClass, const mono_bool bPinned)
 {
-	auto GarbageCollectionHandle = FMonoDomain::GCHandle_New_V2(InMonoObject, bPinned);
+	const auto GarbageCollectionHandle = FMonoDomain::GCHandle_New_V2(InMonoObject, bPinned);
 
-	void* InParams[] = {&GarbageCollectionHandle};
+	auto InParams = static_cast<void*>(GarbageCollectionHandle);
 
-	if (const auto FoundProperty = Class_Get_Property_From_Name(InMonoClass, PROPERTY_GARBAGE_COLLECTION_HANDLE))
+	if (const auto SetGCHandleMonoMethod = Parent_Class_Get_Method_From_Name(
+		InMonoClass, FUNCTION_SET_HANDLE, TGetArrayLength(InParams)))
 	{
-		Property_Set_Value(FoundProperty, InMonoObject, InParams, nullptr);
+		Runtime_Invoke(SetGCHandleMonoMethod, InMonoObject, &InParams);
 	}
 
 	return GarbageCollectionHandle;
@@ -437,13 +427,14 @@ MonoGCHandle FDomain::GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, const mo
 MonoGCHandle FDomain::GCHandle_New_WeakRef_V2(MonoObject* InMonoObject, MonoClass* InMonoClass,
                                               mono_bool bTrackResurrection)
 {
-	auto GarbageCollectionHandle = FMonoDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
+	const auto GarbageCollectionHandle = FMonoDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
 
-	void* InParams[] = {&GarbageCollectionHandle};
+	auto InParams = static_cast<void*>(GarbageCollectionHandle);
 
-	if (const auto FoundProperty = Class_Get_Property_From_Name(InMonoClass, PROPERTY_GARBAGE_COLLECTION_HANDLE))
+	if (const auto SetGCHandleMonoMethod = Parent_Class_Get_Method_From_Name(
+		InMonoClass, FUNCTION_SET_HANDLE, TGetArrayLength(InParams)))
 	{
-		Property_Set_Value(FoundProperty, InMonoObject, InParams, nullptr);
+		Runtime_Invoke(SetGCHandleMonoMethod, InMonoObject, &InParams);
 	}
 
 	return GarbageCollectionHandle;

@@ -19,10 +19,8 @@ template <typename Result, typename... Args>
 struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 {
 	template <typename Function, size_t... Index>
-	static MonoObject* Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
+	static void Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		MonoObject* ReturnValue{};
-
 		std::tuple<TArgument<Args, Args>...> Argument(Array_Get(InValue, Index)...);
 
 		if constexpr (std::is_same_v<Result, void>)
@@ -31,7 +29,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 		}
 		else
 		{
-			ReturnValue = TReturnValue<Result>(std::forward<Result>(
+			*ReturnValue = TReturnValue<Result>(std::forward<Result>(
 					InFunction(std::forward<Args>(std::get<Index>(Argument).Get())...)))
 				.Get();
 		}
@@ -39,15 +37,11 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 		TOut<std::tuple<TArgument<Args, Args>...>>(OutValue, Argument)
 			.template Initialize<0, Args...>()
 			.template Get<0, Args...>();
-
-		return ReturnValue;
 	}
 
 	template <typename Class, typename Function, size_t... Index>
-	static MonoObject* Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
+	static void Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		MonoObject* ReturnValue{};
-
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
@@ -59,7 +53,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 			}
 			else
 			{
-				ReturnValue = TReturnValue<Result>(std::forward<Result>(
+				*ReturnValue = TReturnValue<Result>(std::forward<Result>(
 						(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...)))
 					.Get();
 			}
@@ -68,7 +62,5 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 				.template Initialize<0, Args...>()
 				.template Get<0, Args...>();
 		}
-
-		return ReturnValue;
 	}
 };

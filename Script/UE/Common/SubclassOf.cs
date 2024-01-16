@@ -1,35 +1,44 @@
-﻿using Script.CoreUObject;
+﻿using System;
+using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Common
 {
-    public class TSubclassOf<T> : IGarbageCollectionHandle where T : UObject
+    public class TSubclassOf<T> : IGCHandle where T : UObject
     {
         public TSubclassOf()
         {
         }
 
-        ~TSubclassOf() => SubclassOfImplementation.SubclassOf_UnRegisterImplementation(GarbageCollectionHandle);
+        ~TSubclassOf() => SubclassOfImplementation.SubclassOf_UnRegisterImplementation(GetHandle());
 
-        public TSubclassOf(UClass InClass) =>
-            SubclassOfImplementation.SubclassOf_RegisterImplementation(this, InClass.GarbageCollectionHandle);
+        public TSubclassOf(UClass InClass) => SubclassOfImplementation.SubclassOf_RegisterImplementation(this, InClass);
 
-        public static implicit operator TSubclassOf<T>(UClass InClass) => new(InClass);
+        public static implicit operator TSubclassOf<T>(UClass InClass) => new TSubclassOf<T>(InClass);
 
-        public static bool operator ==(TSubclassOf<T> A, TSubclassOf<T> B) =>
-            SubclassOfImplementation.SubclassOf_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static Boolean operator ==(TSubclassOf<T> A, TSubclassOf<T> B) =>
+            SubclassOfImplementation.SubclassOf_IdenticalImplementation(A.GetHandle(), B.GetHandle());
 
-        public static bool operator !=(TSubclassOf<T> A, TSubclassOf<T> B) =>
-            !SubclassOfImplementation.SubclassOf_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static Boolean operator !=(TSubclassOf<T> A, TSubclassOf<T> B) =>
+            !SubclassOfImplementation.SubclassOf_IdenticalImplementation(A.GetHandle(), B.GetHandle());
 
-        public override bool Equals(object Other) => this == Other as TSubclassOf<T>;
+        public UClass Get()
+        {
+            SubclassOfImplementation.SubclassOf_GetImplementation(GetHandle(), out var OutValue);
 
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
+            return OutValue;
+        }
 
-        public UClass Get() => SubclassOfImplementation.SubclassOf_GetImplementation(GarbageCollectionHandle);
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new IntPtr(InGCHandle);
+        }
 
-        public nint GarbageCollectionHandle { get; set; }
+        public IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private IntPtr GCHandle;
     }
 }

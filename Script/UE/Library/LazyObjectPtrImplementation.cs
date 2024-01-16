@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
 
@@ -7,16 +8,17 @@ namespace Script.Library
     public static class LazyObjectPtrImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void LazyObjectPtr_RegisterImplementation<T>(TLazyObjectPtr<T> InLazyObjectPtr,
-            nint InObject) where T : UObject;
+        public static extern void LazyObjectPtr_RegisterImplementation<T>(TLazyObjectPtr<T> InLazyObjectPtr, T InObject)
+            where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool LazyObjectPtr_IdenticalImplementation(nint InA, nint InB);
+        public static extern Boolean LazyObjectPtr_IdenticalImplementation(IntPtr InA, IntPtr InB);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void LazyObjectPtr_UnRegisterImplementation(nint InLazyObjectPtr);
+        public static extern void LazyObjectPtr_UnRegisterImplementation(IntPtr InLazyObjectPtr);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T LazyObjectPtr_GetImplementation<T>(nint InLazyObjectPtr);
+        public static extern void LazyObjectPtr_GetImplementation<T>(IntPtr InLazyObjectPtr, out T OutValue)
+            where T : UObject;
     }
 }

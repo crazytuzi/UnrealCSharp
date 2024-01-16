@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
 
@@ -8,15 +9,16 @@ namespace Script.Library
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void ScriptInterface_RegisterImplementation<T>(TScriptInterface<T> InScriptInterface,
-            nint InObject) where T : IInterface;
+            T InObject, string InInterfaceName) where T : IInterface;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool ScriptInterface_IdenticalImplementation(nint InA, nint InB);
+        public static extern Boolean ScriptInterface_IdenticalImplementation(IntPtr InA, IntPtr InB);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void ScriptInterface_UnRegisterImplementation(nint InScriptInterface);
+        public static extern void ScriptInterface_UnRegisterImplementation(IntPtr InScriptInterface);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T ScriptInterface_GetObjectImplementation<T>(nint InScriptInterface);
+        public static extern void ScriptInterface_GetObjectImplementation<U>(IntPtr InScriptInterface,
+            out U OutValue) where U : UObject;
     }
 }

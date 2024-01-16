@@ -26,8 +26,6 @@ public:
 
 	int32 Num() const;
 
-	bool IsEmpty() const;
-
 	int32 Max() const;
 
 	void* Get(int32 Index) const;

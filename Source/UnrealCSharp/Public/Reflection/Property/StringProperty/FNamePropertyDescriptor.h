@@ -17,7 +17,5 @@ public:
 	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const override;
 
 private:
-	MonoObject* Object_New(void* InAddress) const;
-
 	MonoClass* Class;
 };

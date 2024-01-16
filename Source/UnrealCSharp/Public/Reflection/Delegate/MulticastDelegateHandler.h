@@ -42,7 +42,7 @@ public:
 
 	void Clear();
 
-	MonoObject* Broadcast(MonoObject** OutValue, MonoArray* InValue) const;
+	void Broadcast(MonoObject** OutValue, MonoArray* InValue) const;
 
 	UObject* GetUObject() const;
 

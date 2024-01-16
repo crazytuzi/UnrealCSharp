@@ -8,6 +8,7 @@
 #if WITH_EDITOR
 #include "Kismet2/BlueprintEditorUtils.h"
 #endif
+#include "UEVersion.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 
@@ -204,7 +205,11 @@ void FDynamicEnumGenerator::GeneratorEnumerator(MonoClass* InMonoClass, UEnum* I
 			auto FieldValue = *(int64*)FMonoDomain::Object_Unbox(
 				FMonoDomain::Field_Get_Value_Object(FMonoDomain::Domain, Field, (MonoObject*)InMonoClass));
 
+#if !UE_TUPLE_EXPLICIT_CONSTRUCTOR
 			InNames.Add({FieldName, FieldValue});
+#else
+			InNames.Add(TPair<FName, int64>{FieldName, FieldValue});
+#endif
 		}
 	}
 

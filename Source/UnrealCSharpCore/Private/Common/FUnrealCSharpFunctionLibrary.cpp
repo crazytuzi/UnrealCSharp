@@ -8,6 +8,7 @@
 #include "Dynamic/CSharpEnum.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "UEVersion.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #if WITH_EDITOR
 #include "WidgetBlueprint.h"
@@ -534,7 +535,11 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 {
 	static TArray<FString> GameModuleList;
 
+#if UE_ARRAY_IS_EMPTY
 	if (GameModuleList.IsEmpty())
+#else
+	if (GameModuleList.Num() == 0)
+#endif
 	{
 		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 
@@ -561,7 +566,11 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 {
 	static TArray<FString> GameModuleList;
 
+#if UE_ARRAY_IS_EMPTY
 	if (GameModuleList.IsEmpty())
+#else
+	if (GameModuleList.Num() == 0)
+#endif
 	{
 		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 

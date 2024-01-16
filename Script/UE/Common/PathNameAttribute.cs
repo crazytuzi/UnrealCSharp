@@ -7,6 +7,6 @@ namespace Script.Common
     {
         public PathNameAttribute(string InPathName) => PathName = InPathName;
 
-        public string PathName { get; }
+        public string PathName { get; set; }
     }
 }

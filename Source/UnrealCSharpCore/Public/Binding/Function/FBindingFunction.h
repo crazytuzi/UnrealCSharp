@@ -2,19 +2,16 @@
 
 #include "FBindingFunctionBase.inl"
 #include "FFunctionInfo.h"
-#include "EFunctionInteract.h"
 
 struct FBindingFunction : FBindingFunctionBase
 {
 	FBindingFunction() = default;
 
 	FBindingFunction(FFunctionInfo* InInfo, const FString& InName,
-	                 const FString& InImplementationName, const TArray<FString>& InParamNames,
-	                 const EFunctionInteract InFunctionInteract = EFunctionInteract::None):
+	                 const FString& InImplementationName, const TArray<FString>& InParamNames):
 		FBindingFunctionBase(InName, InImplementationName),
 		Info(InInfo),
-		ParamNames(InParamNames),
-		FunctionInteract(InFunctionInteract)
+		ParamNames(InParamNames)
 	{
 	}
 
@@ -50,15 +47,8 @@ struct FBindingFunction : FBindingFunctionBase
 		return ParamNames;
 	}
 
-	EFunctionInteract GetFunctionInteract() const
-	{
-		return FunctionInteract;
-	}
-
 private:
 	FFunctionInfo* Info;
 
 	TArray<FString> ParamNames;
-
-	EFunctionInteract FunctionInteract;
 };

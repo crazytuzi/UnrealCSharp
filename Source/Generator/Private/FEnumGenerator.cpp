@@ -47,7 +47,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	auto ClassName = InEnum->GetName();
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
 
 	for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
 	{
@@ -176,7 +176,7 @@ void FEnumGenerator::GeneratorCollisionChannel()
 
 	auto ClassName = InEnum->GetName();
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
 
 	const auto CollisionProfile = UCollisionProfile::Get();
 
@@ -236,15 +236,15 @@ FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
 {
 	static TMap<EEnumUnderlyingType, FString> EnumUnderlyingTypeName
 	{
-		{EEnumUnderlyingType::None, TEXT("byte")},
-		{EEnumUnderlyingType::Int8, TEXT("sbyte")},
-		{EEnumUnderlyingType::UInt8, TEXT("byte")},
-		{EEnumUnderlyingType::Int16, TEXT("short")},
-		{EEnumUnderlyingType::UInt16, TEXT("ushort")},
-		{EEnumUnderlyingType::Int, TEXT("int")},
-		{EEnumUnderlyingType::UInt32, TEXT("uint")},
-		{EEnumUnderlyingType::Int64, TEXT("long")},
-		{EEnumUnderlyingType::UInt64, TEXT("ulong")}
+		{EEnumUnderlyingType::None, TEXT("UInt64")},
+		{EEnumUnderlyingType::Int8, TEXT("SByte")},
+		{EEnumUnderlyingType::UInt8, TEXT("Byte")},
+		{EEnumUnderlyingType::Int16, TEXT("Int16")},
+		{EEnumUnderlyingType::UInt16, TEXT("UInt16")},
+		{EEnumUnderlyingType::Int, TEXT("Int32")},
+		{EEnumUnderlyingType::UInt32, TEXT("UInt32")},
+		{EEnumUnderlyingType::Int64, TEXT("Int64")},
+		{EEnumUnderlyingType::UInt64, TEXT("UInt64")}
 	};
 
 	if (const auto FoundEnumUnderlyingType = EnumUnderlyingType.Find(InEnum))
@@ -252,5 +252,5 @@ FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
 		return EnumUnderlyingTypeName[*FoundEnumUnderlyingType];
 	}
 
-	return InEnum->IsA(UUserDefinedEnum::StaticClass()) ? TEXT("byte") : TEXT("long");
+	return InEnum->IsA(UUserDefinedEnum::StaticClass()) ? TEXT("Byte") : TEXT("Int64");
 }

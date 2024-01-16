@@ -4,7 +4,7 @@ using Script.Common;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class UStructAttribute : OverrideAttribute
+    public class UStructAttribute : IsOverrideAttribute
     {
     }
 }

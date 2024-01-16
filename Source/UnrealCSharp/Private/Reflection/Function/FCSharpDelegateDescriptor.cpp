@@ -53,7 +53,7 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 		}
 	}
 
-	if (!OutPropertyIndexes.IsEmpty())
+	if (OutPropertyIndexes.Num() > 0)
 	{
 		for (const auto& Index : OutPropertyIndexes)
 		{
@@ -73,8 +73,8 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 	return true;
 }
 
-MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** OutValue,
-                                                       MonoArray* InValue)
+bool FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** ReturnValue,
+                                                MonoObject** OutValue, MonoArray* InValue)
 {
 	auto ParamIndex = 0;
 
@@ -110,7 +110,13 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 
 	InScriptDelegate->ProcessDelegate<UObject>(Params);
 
-	if (!OutPropertyIndexes.IsEmpty())
+	if (ReturnPropertyDescriptor != nullptr)
+	{
+		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
+		                              reinterpret_cast<void**>(ReturnValue));
+	}
+
+	if (OutPropertyIndexes.Num() > 0)
 	{
 		const auto MonoObjectArray = FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(),
 		                                                    OutPropertyIndexes.Num());
@@ -131,21 +137,11 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 		*OutValue = (MonoObject*)MonoObjectArray;
 	}
 
-	if (ReturnPropertyDescriptor != nullptr)
-	{
-		MonoObject* ReturnValue{};
-
-		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
-		                              reinterpret_cast<void**>(&ReturnValue));
-
-		return ReturnValue;
-	}
-
-	return nullptr;
+	return true;
 }
 
-MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
-	const FMulticastScriptDelegate* InMulticastScriptDelegate, MonoObject** OutValue, MonoArray* InValue)
+bool FCSharpDelegateDescriptor::ProcessMulticastDelegate(const FMulticastScriptDelegate* InMulticastScriptDelegate,
+                                                         MonoObject** OutValue, MonoArray* InValue)
 {
 	auto ParamIndex = 0;
 
@@ -176,7 +172,7 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 
 	InMulticastScriptDelegate->ProcessMulticastDelegate<UObject>(Params);
 
-	if (!OutPropertyIndexes.IsEmpty())
+	if (OutPropertyIndexes.Num() > 0)
 	{
 		const auto MonoObjectArray = FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(),
 		                                                    OutPropertyIndexes.Num());
@@ -197,5 +193,5 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 		*OutValue = (MonoObject*)MonoObjectArray;
 	}
 
-	return nullptr;
+	return true;
 }

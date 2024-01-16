@@ -65,6 +65,12 @@ public:
 
 	static mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
 
+	static MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName);
+
+	static MonoObject* Custom_Attrs_Get_Attr(MonoCustomAttrInfo *Info, MonoClass *Attr_klass);
+	
+	static MonoObject* Property_Get_Value(MonoProperty* InMonoCustomProp, void *obj,void **params, MonoObject** exc);
+
 	static void Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue);
 
 	static const char* Field_Get_Name(MonoClassField* InMonoClassField);
@@ -77,11 +83,6 @@ public:
 	static const char* Property_Get_Name(MonoProperty* InMonoProperty);
 
 	static MonoMethod* Property_Get_Get_Method(MonoProperty* InMonoProperty);
-
-	static MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const FString& InName);
-
-	static void Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
-	                               MonoObject** InExc);
 
 	static const char* Method_Get_Name(MonoMethod* InMonoMethod);
 
@@ -142,7 +143,7 @@ public:
 
 	static MonoClass* Get_Object_Class();
 
-	static MonoClass* Get_UInt16_Class();
+	static MonoClass* Get_UInt16_Class();;
 
 	static MonoClass* Get_UInt32_Class();
 

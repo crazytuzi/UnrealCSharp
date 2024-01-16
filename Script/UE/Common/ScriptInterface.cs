@@ -1,38 +1,46 @@
-﻿using Script.CoreUObject;
+﻿using System;
+using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Common
 {
-    public class TScriptInterface<T> : IGarbageCollectionHandle where T : IInterface
+    public class TScriptInterface<T> : IGCHandle where T : IInterface
     {
         public TScriptInterface()
         {
         }
 
-        ~TScriptInterface() =>
-            ScriptInterfaceImplementation.ScriptInterface_UnRegisterImplementation(GarbageCollectionHandle);
+        ~TScriptInterface() => ScriptInterfaceImplementation.ScriptInterface_UnRegisterImplementation(GetHandle());
 
         public TScriptInterface(T InObject) =>
-            ScriptInterfaceImplementation.ScriptInterface_RegisterImplementation(this,
-                (InObject as UObject)!.GarbageCollectionHandle);
+            ScriptInterfaceImplementation.ScriptInterface_RegisterImplementation(this, InObject,
+                Utils.GetPathName(typeof(T)));
 
-        public static implicit operator TScriptInterface<T>(T InObject) => new(InObject);
+        public static implicit operator TScriptInterface<T>(T InObject) => new TScriptInterface<T>(InObject);
 
-        public static bool operator ==(TScriptInterface<T> A, TScriptInterface<T> B) =>
-            ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static Boolean operator ==(TScriptInterface<T> A, TScriptInterface<T> B) =>
+            ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(A.GetHandle(), B.GetHandle());
 
-        public static bool operator !=(TScriptInterface<T> A, TScriptInterface<T> B) =>
-            !ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static Boolean operator !=(TScriptInterface<T> A, TScriptInterface<T> B) =>
+            !ScriptInterfaceImplementation.ScriptInterface_IdenticalImplementation(A.GetHandle(), B.GetHandle());
 
-        public override bool Equals(object Other) => this == Other as TScriptInterface<T>;
+        public U GetObject<U>() where U : UObject
+        {
+            ScriptInterfaceImplementation.ScriptInterface_GetObjectImplementation<U>(GetHandle(), out var OutValue);
 
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
+            return OutValue;
+        }
 
-        public U GetObject<U>() where U : UObject =>
-            ScriptInterfaceImplementation.ScriptInterface_GetObjectImplementation<U>(GarbageCollectionHandle);
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new IntPtr(InGCHandle);
+        }
 
-        public nint GarbageCollectionHandle { get; set; }
+        public IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private IntPtr GCHandle;
     }
 }

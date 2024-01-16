@@ -1,19 +1,32 @@
-﻿using Script.CoreUObject;
+﻿using System;
+using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Engine
 {
     public partial class UWorld
     {
-        public T SpawnActor<T>(UClass Class, FTransform Transform, FActorSpawnParameters ActorSpawnParameters = null)
-            where T : AActor =>
-            WorldImplementation.World_SpawnActorImplementation<T>(GarbageCollectionHandle,
-                Class.GarbageCollectionHandle,
-                Transform.GarbageCollectionHandle,
-                ActorSpawnParameters?.GarbageCollectionHandle ?? nint.Zero);
+        // @TODO
+        public T SpawnActor<T>(UClass Class, FTransform Transform, AActor Owner = null, APawn Instigator = null,
+            ESpawnActorCollisionHandlingMethod CollisionHandlingOverride = ESpawnActorCollisionHandlingMethod.Undefined)
+            where T : UObject
+        {
+            WorldImplementation.World_SpawnActorImplementation<T>(GetHandle(), Class.GetHandle(), Transform,
+                Owner?.GetHandle() ?? IntPtr.Zero, Instigator?.GetHandle() ?? IntPtr.Zero, CollisionHandlingOverride,
+                out var OutValue);
 
-        public T SpawnActor<T>(FTransform Transform, FActorSpawnParameters ActorSpawnParameters = null)
-            where T : AActor, IStaticClass =>
-            SpawnActor<T>(T.StaticClass(), Transform, ActorSpawnParameters);
+            return OutValue;
+        }
+
+        public T SpawnActor<T>(FTransform Transform, AActor Owner = null, APawn Instigator = null,
+            ESpawnActorCollisionHandlingMethod CollisionHandlingOverride = ESpawnActorCollisionHandlingMethod.Undefined)
+            where T : UObject, IStaticClass
+        {
+            WorldImplementation.World_SpawnActorImplementation<T>(GetHandle(), T.StaticClass().GetHandle(), Transform,
+                Owner?.GetHandle() ?? IntPtr.Zero, Instigator?.GetHandle() ?? IntPtr.Zero, CollisionHandlingOverride,
+                out var OutValue);
+
+            return OutValue;
+        }
     }
 }

@@ -1,35 +1,19 @@
-﻿using Script.CoreUObject;
-using Script.Library;
+﻿using System;
 
 namespace Script.Common
 {
-    public class FString : IGarbageCollectionHandle
+    public class FString
     {
-        public FString()
-        {
-        }
+        public FString(string InValue) => Value = InValue;
 
-        ~FString() => StringImplementation.String_UnRegisterImplementation(GarbageCollectionHandle);
+        public static implicit operator FString(string InValue) => new FString(InValue);
 
-        public FString(string InValue) => StringImplementation.String_RegisterImplementation(this, InValue);
+        public static Boolean operator ==(FString A, FString B) => A.Value == B.Value;
 
-        public static implicit operator FString(string InValue) => new(InValue);
+        public static Boolean operator !=(FString A, FString B) => A.Value != B.Value;
 
-        public static bool operator ==(FString A, FString B) =>
-            StringImplementation.String_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public override string ToString() => Value;
 
-        public static bool operator !=(FString A, FString B) =>
-            !StringImplementation.String_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
-
-        public override bool Equals(object Other) => this == Other as FString;
-
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
-
-        public override string ToString() =>
-            StringImplementation.String_ToStringImplementation(GarbageCollectionHandle);
-
-        public nint GarbageCollectionHandle { get; set; }
+        private readonly string Value;
     }
 }

@@ -4,7 +4,7 @@ using Script.Common;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class UFunctionAttribute : OverrideAttribute
+    public class UFunctionAttribute : IsOverrideAttribute
     {
     }
 }

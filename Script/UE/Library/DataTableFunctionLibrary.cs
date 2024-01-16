@@ -1,16 +1,15 @@
-﻿using Script.Common;
+﻿using System;
+using Script.Common;
 using Script.Library;
 
 namespace Script.Engine
 {
-    public abstract partial class UDataTableFunctionLibrary
+    public partial class UDataTableFunctionLibrary
     {
-        public static bool GetDataTableRowFromName<T>(UDataTable Table, FName RowName, out T OutRow)
+        public static Boolean GetDataTableRowFromName<T>(UDataTable Table, FName RowName, out T OutRow)
         {
             return DataTableFunctionLibraryImplementation
-                .DataTableFunctionLibrary_GetDataTableRowFromNameImplementation(
-                    Table.GarbageCollectionHandle,
-                    RowName.GarbageCollectionHandle,
+                .DataTableFunctionLibrary_GetDataTableRowFromNameImplementation(Table.GetHandle(), RowName.ToString(),
                     out OutRow);
         }
     }

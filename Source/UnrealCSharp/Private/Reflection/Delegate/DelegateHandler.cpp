@@ -102,7 +102,7 @@ void UDelegateHandler::Clear()
 	}
 }
 
-MonoObject* UDelegateHandler::Execute(MonoObject** OutValue, MonoArray* InValue) const
+void UDelegateHandler::Execute(MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue) const
 {
 	if (ScriptDelegate != nullptr)
 	{
@@ -110,12 +110,10 @@ MonoObject* UDelegateHandler::Execute(MonoObject** OutValue, MonoArray* InValue)
 		{
 			if (DelegateDescriptor != nullptr)
 			{
-				return DelegateDescriptor->ProcessDelegate(ScriptDelegate, OutValue, InValue);
+				DelegateDescriptor->ProcessDelegate(ScriptDelegate, ReturnValue, OutValue, InValue);
 			}
 		}
 	}
-
-	return nullptr;
 }
 
 UObject* UDelegateHandler::GetUObject() const

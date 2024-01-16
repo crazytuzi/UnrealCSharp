@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
+using Script.Common;
 using Script.CoreUObject;
 using Script.Engine;
 
@@ -7,40 +9,25 @@ namespace Script.Library
     public static class UnrealImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Unreal_NewObjectImplementation<T>(nint Outer,
-            nint Class,
-            nint Name,
-            EObjectFlags Flags,
-            nint Template,
-            bool bCopyTransientsFromClassDefaults
-        );
+        public static extern void Unreal_NewObjectImplementation<T>(IntPtr Outer, IntPtr Class, FName Name,
+            out T OutValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Unreal_DuplicateObjectImplementation<T>(nint SourceObject,
-            nint Outer,
-            nint Name
-        );
+        public static extern void Unreal_DuplicateObjectImplementation<T>(IntPtr SourceObject, IntPtr Outer, FName Name,
+            out T OutValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Unreal_LoadObjectImplementation<T>(nint Outer,
-            nint Name,
-            nint Filename,
-            ELoadFlags LoadFlags,
-            nint Sandbox
-        );
+        public static extern void Unreal_LoadObjectImplementation<T>(IntPtr Outer, string Name, out T OutValue)
+            where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass Unreal_LoadClassImplementation(nint Outer,
-            nint Name,
-            nint Filename,
-            ELoadFlags LoadFlags,
-            nint Sandbox
-        );
+        public static extern void Unreal_LoadClassImplementation(IntPtr Outer, string Name, out UClass OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Unreal_CreateWidgetImplementation<T>(nint OwningObject, nint UserWidgetClass);
+        public static extern void Unreal_CreateWidgetImplementation<T>(IntPtr OwningObject, IntPtr UserWidgetClass,
+            out T OutValue) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UWorld Unreal_GWorldImplementation();
+        public static extern void Unreal_GWorldImplementation(out UWorld OutValue);
     }
 }

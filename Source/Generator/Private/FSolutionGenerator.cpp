@@ -106,16 +106,31 @@ void FSolutionGenerator::CopyCSProj(const FString& Dest, const FString& Src)
 
 	FString DefineConstants;
 
-	for (auto MajorVersion = 5; MajorVersion <= ENGINE_MAJOR_VERSION; ++MajorVersion)
+	for (auto MajorVersion = 4; MajorVersion <= ENGINE_MAJOR_VERSION; ++MajorVersion)
 	{
-		for (auto MinorVersion = 0; MinorVersion <= ENGINE_MINOR_VERSION; ++MinorVersion)
+		if (MajorVersion == ENGINE_MAJOR_VERSION)
 		{
-			DefineConstants += FString::Printf(TEXT(
-				"UE_%d_%d_OR_LATER;"
-			),
-			                                   MajorVersion,
-			                                   MinorVersion
-			);
+			for (auto MinorVersion = 0; MinorVersion <= ENGINE_MINOR_VERSION; ++MinorVersion)
+			{
+				DefineConstants += FString::Printf(TEXT(
+					"UE_%d_%d_OR_LATER;"
+				),
+				                                   MajorVersion,
+				                                   MinorVersion
+				);
+			}
+		}
+		else
+		{
+			for (auto MinorVersion = 0; MinorVersion <= 30; ++MinorVersion)
+			{
+				DefineConstants += FString::Printf(TEXT(
+					"UE_%d_%d_OR_LATER;"
+				),
+				                                   MajorVersion,
+				                                   MinorVersion
+				);
+			}
 		}
 	}
 

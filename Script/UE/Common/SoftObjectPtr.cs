@@ -1,39 +1,52 @@
-﻿using Script.CoreUObject;
+﻿using System;
+using Script.CoreUObject;
 using Script.Library;
 
 namespace Script.Common
 {
-    public class TSoftObjectPtr<T> : IGarbageCollectionHandle where T : UObject
+    public class TSoftObjectPtr<T> : IGCHandle where T : UObject
     {
         public TSoftObjectPtr()
         {
         }
 
-        ~TSoftObjectPtr() =>
-            SoftObjectPtrImplementation.SoftObjectPtr_UnRegisterImplementation(GarbageCollectionHandle);
+        ~TSoftObjectPtr() => SoftObjectPtrImplementation.SoftObjectPtr_UnRegisterImplementation(GetHandle());
 
         public TSoftObjectPtr(T InObject) =>
-            SoftObjectPtrImplementation.SoftObjectPtr_RegisterImplementation(this, InObject.GarbageCollectionHandle);
+            SoftObjectPtrImplementation.SoftObjectPtr_RegisterImplementation(this, InObject);
 
-        public static implicit operator TSoftObjectPtr<T>(T InObject) => new(InObject);
+        public static implicit operator TSoftObjectPtr<T>(T InObject) => new TSoftObjectPtr<T>(InObject);
 
-        public static bool operator ==(TSoftObjectPtr<T> A, TSoftObjectPtr<T> B) =>
-            SoftObjectPtrImplementation.SoftObjectPtr_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static Boolean operator ==(TSoftObjectPtr<T> A, TSoftObjectPtr<T> B) =>
+            SoftObjectPtrImplementation.SoftObjectPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
 
-        public static bool operator !=(TSoftObjectPtr<T> A, TSoftObjectPtr<T> B) =>
-            !SoftObjectPtrImplementation.SoftObjectPtr_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static Boolean operator !=(TSoftObjectPtr<T> A, TSoftObjectPtr<T> B) =>
+            !SoftObjectPtrImplementation.SoftObjectPtr_IdenticalImplementation(A.GetHandle(), B.GetHandle());
 
-        public override bool Equals(object Other) => this == Other as TSoftObjectPtr<T>;
+        public T Get()
+        {
+            SoftObjectPtrImplementation.SoftObjectPtr_GetImplementation<T>(GetHandle(), out var OutValue);
 
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
+            return OutValue;
+        }
 
-        public T Get() => SoftObjectPtrImplementation.SoftObjectPtr_GetImplementation<T>(GarbageCollectionHandle);
+        public T LoadSynchronous()
+        {
+            SoftObjectPtrImplementation.SoftObjectPtr_LoadSynchronousImplementation<T>(GetHandle(), out var OutValue);
 
-        public T LoadSynchronous() =>
-            SoftObjectPtrImplementation.SoftObjectPtr_LoadSynchronousImplementation<T>(GarbageCollectionHandle);
+            return OutValue;
+        }
 
-        public nint GarbageCollectionHandle { get; set; }
+        public unsafe void SetHandle(void* InGCHandle)
+        {
+            GCHandle = new IntPtr(InGCHandle);
+        }
+
+        public IntPtr GetHandle()
+        {
+            return GCHandle;
+        }
+
+        private IntPtr GCHandle;
     }
 }

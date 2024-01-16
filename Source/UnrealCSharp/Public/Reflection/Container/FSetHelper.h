@@ -20,8 +20,6 @@ public:
 
 	int32 Num() const;
 
-	bool IsEmpty() const;
-
 	int32 GetMaxIndex() const;
 
 	void Add(void* InValue) const;

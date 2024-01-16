@@ -2,6 +2,7 @@
 #if WITH_EDITOR
 #include "ISettingsModule.h"
 #endif
+#include "UEVersion.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorSettings"
@@ -162,7 +163,11 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 		Result = Right;
 	}
 
+#if UE_ARRAY_IS_EMPTY
 	if (ResultArray.IsEmpty())
+#else
+	if (ResultArray.Num() <= 0)
+#endif
 	{
 		ResultArray.Add(TEXT(""));
 	}

@@ -1,18 +1,16 @@
-﻿using Script.CoreUObject;
-using Script.Library;
+﻿using System;
+using Script.CoreUObject;
+using Script.Reflection.Delegate;
 
 namespace Script.Common
 {
     public class FRefMulticastDelegate : FDelegateBase
     {
-        public bool IsBound() =>
-            MulticastDelegateImplementation.MulticastDelegate_IsBoundImplementation(GarbageCollectionHandle);
+        public Boolean IsBound() => MulticastDelegateUtils.MulticastDelegate_IsBound(GetHandle());
 
         public void RemoveAll(UObject InObject) =>
-            MulticastDelegateImplementation.MulticastDelegate_RemoveAllImplementation(GarbageCollectionHandle,
-                InObject);
+            MulticastDelegateUtils.MulticastDelegate_RemoveAll(GetHandle(), InObject);
 
-        public void Clear() =>
-            MulticastDelegateImplementation.MulticastDelegate_ClearImplementation(GarbageCollectionHandle);
+        public void Clear() => MulticastDelegateUtils.MulticastDelegate_Clear(GetHandle());
     }
 }

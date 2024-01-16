@@ -90,14 +90,12 @@ void FMulticastDelegateHelper::Clear() const
 	}
 }
 
-MonoObject* FMulticastDelegateHelper::Broadcast(MonoObject** OutValue, MonoArray* InValue) const
+void FMulticastDelegateHelper::Broadcast(MonoObject** OutValue, MonoArray* InValue) const
 {
 	if (MulticastDelegateHandler != nullptr)
 	{
-		return MulticastDelegateHandler->Broadcast(OutValue, InValue);
+		MulticastDelegateHandler->Broadcast(OutValue, InValue);
 	}
-
-	return nullptr;
 }
 
 UObject* FMulticastDelegateHelper::GetUObject() const

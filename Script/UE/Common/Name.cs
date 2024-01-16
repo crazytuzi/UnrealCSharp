@@ -1,36 +1,19 @@
-﻿using Script.CoreUObject;
-using Script.Library;
+﻿using System;
 
 namespace Script.Common
 {
-    public class FName : IGarbageCollectionHandle
+    public class FName
     {
-        public FName()
-        {
-        }
+        public FName(string InValue) => Value = InValue;
 
-        ~FName() => NameImplementation.Name_UnRegisterImplementation(GarbageCollectionHandle);
+        public static implicit operator FName(string InValue) => new FName(InValue);
 
-        public FName(string InValue) => NameImplementation.Name_RegisterImplementation(this, InValue);
+        public static Boolean operator ==(FName A, FName B) => A.Value == B.Value;
 
-        public static implicit operator FName(string InValue) => new(InValue);
+        public static Boolean operator !=(FName A, FName B) => A.Value != B.Value;
 
-        public static bool operator ==(FName A, FName B) =>
-            NameImplementation.Name_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public override string ToString() => Value;
 
-        public static bool operator !=(FName A, FName B) =>
-            !NameImplementation.Name_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
-
-        public override bool Equals(object Other) => this == Other as FName;
-
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
-
-        public override string ToString() => NameImplementation.Name_ToStringImplementation(GarbageCollectionHandle);
-
-        public static FName NAME_None => NameImplementation.Name_NAME_NoneImplementation();
-
-        public nint GarbageCollectionHandle { get; set; }
+        private readonly string Value;
     }
 }

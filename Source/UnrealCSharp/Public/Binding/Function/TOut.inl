@@ -31,7 +31,7 @@ struct TOut
 			++Count;
 		}
 
-		return Initialize<Index + 1, Args...>();
+		return Initialize<Index + 1, Args...>();;
 	}
 
 	template <size_t Index>

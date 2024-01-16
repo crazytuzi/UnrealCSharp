@@ -8,6 +8,9 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
+#include "Template/TIsTSubclassOf.inl"
+#include "Template/TIsTSet.inl"
+#include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
@@ -36,7 +39,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("byte");
+		return TEXT("Byte");
 	}
 };
 
@@ -45,7 +48,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("ushort");
+		return TEXT("UInt16");
 	}
 };
 
@@ -54,7 +57,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("uint");
+		return TEXT("UInt32");
 	}
 };
 
@@ -63,7 +66,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("ulong");
+		return TEXT("UInt64");
 	}
 };
 
@@ -72,7 +75,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("sbyte");
+		return TEXT("SByte");
 	}
 };
 
@@ -81,7 +84,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("short");
+		return TEXT("Int16");
 	}
 };
 
@@ -90,7 +93,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("int");
+		return TEXT("Int32");
 	}
 };
 
@@ -99,7 +102,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("long");
+		return TEXT("Int64");
 	}
 };
 
@@ -108,7 +111,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("bool");
+		return TEXT("Boolean");
 	}
 };
 
@@ -117,7 +120,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("float");
+		return TEXT("Single");
 	}
 };
 
@@ -131,6 +134,7 @@ struct TName<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_
 	}
 };
 
+#if UE_OBJECT_PTR
 template <typename T>
 struct TName<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 {
@@ -139,6 +143,7 @@ struct TName<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 		return FUnrealCSharpFunctionLibrary::GetFullClass(std::decay_t<T>::ElementType::StaticClass());
 	}
 };
+#endif
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>
@@ -214,7 +219,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>>
 {
 	static FString Get()
 	{
-		return TEXT("double");
+		return TEXT("Double");
 	}
 };
 

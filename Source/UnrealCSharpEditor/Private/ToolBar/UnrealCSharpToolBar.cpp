@@ -3,6 +3,7 @@
 #include "ToolMenus.h"
 #include "UnrealCSharpEditor.h"
 #include "UnrealCSharpEditorCommands.h"
+#include "UEVersion.h"
 
 #define LOCTEXT_NAMESPACE "UnrealCSharpToolBar"
 
@@ -14,6 +15,7 @@ FUnrealCSharpToolBar::FUnrealCSharpToolBar()
 
 void FUnrealCSharpToolBar::Initialize()
 {
+#if UE_TOOL_MENU
 	// 注册到菜单选项中
 	const auto ToolMenus = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.PlayToolBar");
 
@@ -27,6 +29,29 @@ void FUnrealCSharpToolBar::Initialize()
 		LOCTEXT("UnrealCSharpEditor_ToolTip", "UnrealCSharpEditor"),
 		FSlateIcon(FUnrealCSharpEditorStyle::GetStyleSetName(), "UnrealCSharpEditor.PluginAction")
 	));
+#else
+	auto Extender = MakeShared<FExtender>);
+	
+	Extender->AddToolBarExtension("Settings", EExtensionHook::After, CommandList,
+								  FToolBarExtensionDelegate::CreateLambda([this](FToolBarBuilder& Builder)
+								  {
+									  Builder.BeginSection(NAME_None);
+								  	
+									  Builder.AddComboButton(FUIAction(),
+															 FOnGetContent::CreateRaw(this, &FUnrealCSharpToolBar::GenerateGameTableSettingsMenu),
+															 LOCTEXT("UnrealCSharpEditor_Label", "UnrealCSharpEditor"),
+															 LOCTEXT("UnrealCSharpEditor_ToolTip", "UnrealCSharpEditor"),
+															 FSlateIcon(FUnrealCSharpEditorStyle::GetStyleSetName(), "UnrealCSharpEditor.PluginAction")
+									  );
+								  	
+									  Builder.EndSection();
+								  })
+	);
+	
+	auto& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+
+	LevelEditorModule.GetToolBarExtensibilityManager()->AddExtender(Extender);
+#endif
 }
 
 void FUnrealCSharpToolBar::BuildAction()

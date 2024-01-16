@@ -241,8 +241,10 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
 					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key.ToString()),
-					FunctionPair.Value->ReturnValueOffset != MAX_uint16
-						? FunctionPair.Value->NumParms - 1
+					InClass->IsNative() && FunctionPair.Value->ReturnValueOffset != MAX_uint16
+						? (FunctionPair.Value->NumParms > 0
+							   ? FunctionPair.Value->NumParms - 1
+							   : 0)
 						: FunctionPair.Value->NumParms))
 				{
 					if (IsOverrideMethod(InDomain,
@@ -470,7 +472,7 @@ void FCSharpBind::UpdateCallCSharpFunction(UFunction* InFunction)
 
 	UpdateCallCSharpFunctionFlags(InFunction);
 
-	if (!InFunction->HasAnyFunctionFlags(FUNC_Native) && !InFunction->Script.IsEmpty())
+	if (!InFunction->HasAnyFunctionFlags(FUNC_Native) && InFunction->Script.Num() > 0)
 	{
 		InFunction->Script.Empty(3 + sizeof(void*));
 	}

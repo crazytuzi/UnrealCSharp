@@ -62,13 +62,6 @@ struct TParentReturnValue :
 };
 
 template <typename T>
-struct TStringReturnValue :
-	TParentReturnValue<T>
-{
-	using TParentReturnValue<T>::TParentReturnValue;
-};
-
-template <typename T>
 struct TContainerReturnValue :
 	TParentReturnValue<T>
 {
@@ -183,18 +176,20 @@ struct TReturnValue<T,
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
+#if UE_OBJECT_PTR
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value>> :
 	TSingleReturnValue<T>
 {
 	using TSingleReturnValue<T>::TSingleReturnValue;
 };
+#endif
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>>> :
-	TStringReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TStringReturnValue<T>::TStringReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
@@ -213,16 +208,16 @@ struct TReturnValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value>> :
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>>> :
-	TStringReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TStringReturnValue<T>::TStringReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>>> :
-	TStringReturnValue<T>
+	TSingleReturnValue<T>
 {
-	using TStringReturnValue<T>::TStringReturnValue;
+	using TSingleReturnValue<T>::TSingleReturnValue;
 };
 
 template <typename T>

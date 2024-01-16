@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.Common;
 
 namespace Script.Library
@@ -9,48 +10,54 @@ namespace Script.Library
         public static extern void Map_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Map_UnRegisterImplementation(nint InMap);
+        public static extern void Map_UnRegisterImplementation(IntPtr InMap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Map_EmptyImplementation(nint InMap, int InExpectedNumElements);
+        public static extern void Map_EmptyImplementation(IntPtr InMap,
+            Int32 InExpectedNumElements);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int Map_NumImplementation(nint InMap);
+        public static extern Int32 Map_NumImplementation(IntPtr InMap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Map_IsEmptyImplementation(nint InMap);
+        public static extern void Map_AddImplementation(IntPtr InMap, Object InKey,
+            Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Map_AddImplementation(nint InMap, object InKey, object InValue);
+        public static extern Int32 Map_RemoveImplementation(IntPtr InMap, Object InKey);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int Map_RemoveImplementation(nint InMap, object InKey);
+        public static extern void Map_FindKeyImplementation(IntPtr InMap, Object InValue,
+            out Object OutKey);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object Map_FindKeyImplementation(nint InMap, object InValue);
+        public static extern void Map_FindImplementation(IntPtr InMap, Object InKey,
+            out Object OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object Map_FindImplementation(nint InMap, object InKey);
+        public static extern Boolean Map_ContainsImplementation(IntPtr InMap, Object InKey);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Map_ContainsImplementation(nint InMap, object InKey);
+        public static extern void Map_GetImplementation(IntPtr InMap, Object InKey,
+            out Object OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object Map_GetImplementation(nint InMap, object InKey);
+        public static extern void Map_SetImplementation(IntPtr InMap, Object InKey,
+            Object InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Map_SetImplementation(nint InMap, object InKey, object InValue);
+        public static extern Int32 Map_GetMaxIndexImplementation(IntPtr InMap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int Map_GetMaxIndexImplementation(nint InMap);
+        public static extern Boolean Map_IsValidIndexImplementation(IntPtr InMap,
+            Int32 InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Map_IsValidIndexImplementation(nint InMap, int InIndex);
+        public static extern void Map_GetEnumeratorKeyImplementation(IntPtr InMap,
+            Int32 InIndex, out Object OutKey);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object Map_GetEnumeratorKeyImplementation(nint InMap, int InIndex);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object Map_GetEnumeratorValueImplementation(nint InMap, int InIndex);
+        public static extern void Map_GetEnumeratorValueImplementation(IntPtr InMap,
+            Int32 InIndex, out Object OutValue);
     }
 }

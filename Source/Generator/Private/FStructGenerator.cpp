@@ -5,7 +5,6 @@
 #include "Kismet2/StructureEditorUtils.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Dynamic/CSharpScriptStruct.h"
-#include "CoreMacro/PropertyMacro.h"
 
 void FStructGenerator::Generator()
 {
@@ -63,7 +62,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	FString GCHandleContent;
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common"), TEXT("Script.Library")};
+	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common")};
 
 	auto SuperStruct = InScriptStruct->GetSuperStruct();
 
@@ -92,23 +91,29 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	else
 	{
 		ConstructorContent = FString::Printf(TEXT(
-			"\t\tpublic %s() => StructImplementation.Struct_RegisterImplementation(this, Utils.GetPathName(GetType()));\n"
+			"\t\tpublic %s() => StructUtils.Struct_Register(this, Utils.GetPathName(GetType()));\n"
 		),
 		                                     *FullClassContent
 		);
 
 		DestructorContent = FString::Printf(TEXT(
-			"\n\t\t~%s() => StructImplementation.Struct_UnRegisterImplementation(%s);\n"
+			"\n\t\t~%s() => StructUtils.Struct_UnRegister(GetHandle());\n"
 		),
-		                                    *FullClassContent,
-		                                    *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		                                    *FullClassContent
 		);
 
-		GCHandleContent = FString::Printf(TEXT(
-			"\t\tpublic nint %s { get; set; }\n"
-		),
-		                                  *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
+		GCHandleContent = TEXT(
+			"\t\tpublic unsafe void SetHandle(void* InHandle)\n"
+			"\t\t{\n"
+			"\t\t\tGCHandle = new IntPtr(InHandle);\n"
+			"\t\t}\n"
+			"\n"
+			"\t\tpublic IntPtr GetHandle()\n"
+			"\t\t{\n"
+			"\t\t\treturn GCHandle;\n"
+			"\t\t}\n"
+			"\n"
+			"\t\tprivate IntPtr GCHandle;\n");
 
 		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 	}
@@ -116,7 +121,9 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	auto StaticStructContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UScriptStruct StaticStruct()\n"
 		"\t\t{\n"
-		"\t\t\treturn StructImplementation.Struct_StaticStructImplementation(\"%s\");\n"
+		"\t\t\tStructUtils.Struct_StaticStruct(\"%s\", out var __OutValue);\n"
+		"\n"
+		"\t\t\treturn __OutValue;\n"
 		"\t\t}\n"
 	),
 	                                           SuperStruct != nullptr ? TEXT(" new") : TEXT(""),
@@ -124,24 +131,16 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	);
 
 	IdenticalContent = FString::Printf(TEXT(
-		"\t\tpublic static bool operator ==(%s A, %s B) => StructImplementation.Struct_IdenticalImplementation(StaticStruct().%s, A?.%s??nint.Zero, B?.%s??nint.Zero);\n\n"
-		"\t\tpublic static bool operator !=(%s A, %s B) => !StructImplementation.Struct_IdenticalImplementation(StaticStruct().%s, A?.%s??nint.Zero, B?.%s??nint.Zero);\n\n"
-		"\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
-		"\t\tpublic override int GetHashCode() => (int)%s;\n"
+		"\t\tpublic static Boolean operator ==(%s A, %s B) => StructUtils.Struct_Identical(StaticStruct().GetHandle(), A.GetHandle(), B.GetHandle());\n\n"
+		"\t\tpublic static Boolean operator !=(%s A, %s B) => !StructUtils.Struct_Identical(StaticStruct().GetHandle(), A.GetHandle(), B.GetHandle());\n"
 	),
 	                                   *FullClassContent,
 	                                   *FullClassContent,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *FullClassContent,
-	                                   *FullClassContent,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *FullClassContent,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	                                   *FullClassContent
 	);
+
+	UsingNameSpaces.Add(TEXT("Script.Reflection.Struct"));
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UScriptStruct::StaticClass()));
 
@@ -194,25 +193,27 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 				UserDefinedStruct, *PropertyIterator);
 		}
 
-		if (FGeneratorCore::IsPrimitiveProperty(*PropertyIterator))
+		if (!FGeneratorCore::IsSafeProperty(*PropertyIterator))
 		{
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget => %sPropertyImplementation.Property_GetStruct%sPropertyImplementation(%s, %s);\n"
+				"\t\t\tget\n"
+				"\t\t\t{\n"
+				"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), %s, out %s value);\n"
 				"\n"
-				"\t\t\tset => PropertyImplementation.Property_SetStruct%sPropertyImplementation(%s, %s, %s);\n"
+				"\t\t\t\treturn %s;\n"
+				"\t\t\t}\n"
+				"\n"
+				"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
 			                                   *FUnrealCSharpFunctionLibrary::Encode(VariableFriendlyPropertyName),
-			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
-			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
@@ -222,18 +223,22 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget => PropertyImplementation.Property_GetStructCompoundPropertyImplementation(%s, %s) as %s;\n"
+				"\t\t\tget\n"
+				"\t\t\t{\n"
+				"\t\t\t\tPropertyUtils.GetStructProperty(GetHandle(), %s, out Object value);\n"
 				"\n"
-				"\t\t\tset => PropertyImplementation.Property_SetStructCompoundPropertyImplementation(%s, %s, %s);\n"
+				"\t\t\t\treturn %s as %s;\n"
+				"\t\t\t}\n"
+				"\n"
+				"\t\t\tset => PropertyUtils.SetStructProperty(GetHandle(), %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
 			                                   *FUnrealCSharpFunctionLibrary::Encode(VariableFriendlyPropertyName),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
-			                                   *FGeneratorCore::GetPropertyType(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
+			                                   *FGeneratorCore::GetGetAccessorType(*PropertyIterator),
 			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
@@ -242,13 +247,13 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	if (bHasProperty == true)
 	{
-		UsingNameSpaces.Add(TEXT("Script.Library"));
+		UsingNameSpaces.Add(TEXT("Script.Reflection.Property"));
 	}
 
 	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
 	{
 		PropertyNameContent += FString::Printf(TEXT(
-			"%s\t\tprivate static uint %s = 0;\n"
+			"%s\t\tprivate static UInt32 %s;\n"
 		),
 		                                       Index == 0 ? TEXT("") : TEXT("\n"),
 		                                       *PropertyNames[Index].Key
@@ -292,7 +297,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *NameSpaceContent,
 	                               *PathNameAttributeContent,
 	                               *FullClassContent,
-	                               SuperStruct != nullptr ? *SuperStructContent : TEXT(" : IGarbageCollectionHandle"),
+	                               SuperStruct != nullptr ? *SuperStructContent : TEXT(" : IGCHandle"),
 	                               *StaticStructContent,
 	                               *ConstructorContent,
 	                               *DestructorContent,

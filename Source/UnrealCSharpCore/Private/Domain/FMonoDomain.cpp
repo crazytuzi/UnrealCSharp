@@ -14,7 +14,6 @@
 #include "mono/metadata/reflection.h"
 #include "Misc/FileHelper.h"
 #include "Binding/FBinding.h"
-#include "Setting/UnrealCSharpSetting.h"
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
@@ -66,26 +65,6 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 #else
 		mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
 #endif
-
-		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
-		{
-			if (UnrealCSharpSetting->IsEnableDebug())
-			{
-				const auto Config = FString::Printf(TEXT(
-					"--debugger-agent=transport=dt_socket,server=y,suspend=n,address=%s:%d"
-				),
-				                                    *UnrealCSharpSetting->GetHost(),
-				                                    UnrealCSharpSetting->GetPort()
-				);
-
-				char* Options[] = {
-					TCHAR_TO_ANSI(TEXT("--soft-breakpoints")),
-					TCHAR_TO_ANSI(*Config)
-				};
-
-				mono_jit_parse_options(sizeof(Options) / sizeof(char*), Options);
-			}
-		}
 
 		mono_debug_init(MONO_DEBUG_FORMAT_MONO);
 
@@ -245,6 +224,26 @@ mono_bool FMonoDomain::Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAtt
 		       : false;
 }
 
+MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName)
+{
+	return InMonoClass != nullptr ? mono_class_get_property_from_name(InMonoClass, InName) : nullptr;
+}
+
+MonoObject* FMonoDomain::Custom_Attrs_Get_Attr(MonoCustomAttrInfo* Info, MonoClass* Attr_klass)
+{
+	return Info != nullptr && Attr_klass != nullptr ? mono_custom_attrs_get_attr(Info, Attr_klass) : nullptr;
+}
+
+MonoObject* FMonoDomain::Property_Get_Value(MonoProperty* InMonoCustomProp, void* obj, void** params, MonoObject** exc)
+{
+	return InMonoCustomProp != nullptr ? mono_property_get_value(InMonoCustomProp, obj, params, exc) : nullptr;
+}
+
+char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
+{
+	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
+}
+
 const char* FMonoDomain::Field_Get_Name(MonoClassField* InMonoClassField)
 {
 	return InMonoClassField != nullptr ? mono_field_get_name(InMonoClassField) : nullptr;
@@ -271,20 +270,6 @@ const char* FMonoDomain::Property_Get_Name(MonoProperty* InMonoProperty)
 MonoMethod* FMonoDomain::Property_Get_Get_Method(MonoProperty* InMonoProperty)
 {
 	return InMonoProperty != nullptr ? mono_property_get_get_method(InMonoProperty) : nullptr;
-}
-
-MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, const FString& InName)
-{
-	return InMonoClass != nullptr ? mono_class_get_property_from_name(InMonoClass, TCHAR_TO_ANSI(*InName)) : nullptr;
-}
-
-void FMonoDomain::Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
-                                     MonoObject** InExc)
-{
-	if (InMonoProperty != nullptr && InMonoObject != nullptr)
-	{
-		mono_property_set_value(InMonoProperty, InMonoObject, InParams, InExc);
-	}
 }
 
 const char* FMonoDomain::Method_Get_Name(MonoMethod* InMonoMethod)
@@ -447,10 +432,6 @@ MonoString* FMonoDomain::Object_To_String(MonoObject* InMonoObject, MonoObject**
 	return InMonoObject != nullptr ? mono_object_to_string(InMonoObject, InExc) : nullptr;
 }
 
-char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
-{
-	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
-}
 
 MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
 {
@@ -752,7 +733,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 			{
 				if (!FPaths::FileExists(AssemblyPath))
 				{
-					continue;
+					continue;;
 				}
 
 				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
@@ -779,7 +760,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 	{
 		if (!FPaths::FileExists(AssemblyPath))
 		{
-			continue;
+			continue;;
 		}
 
 		MonoImage* Image = nullptr;

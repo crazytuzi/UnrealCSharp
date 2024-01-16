@@ -20,7 +20,7 @@ void FDynamicClassGenerator::Generator()
 {
 	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_CLASS_ATTRIBUTE);
-
+	
 	const auto AttributeMonoType = FMonoDomain::Class_Get_Type(AttributeMonoClass);
 
 	const auto AttributeMonoReflectionType = FMonoDomain::Type_Get_Object(AttributeMonoType);
@@ -104,7 +104,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 	{
 		return;
 	}
-
+	
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
@@ -151,6 +151,17 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 			Class = GeneratorCSharpClass(Outer, ClassName, ParentClass);
 
 			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
+		}
+	}
+	
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_CLASS_ATTRIBUTE);
+		
+	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
+	{
+		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+		{
+			FDynamicGeneratorCore::SetClassMetaData(Class, Attrs);
 		}
 	}
 
@@ -307,8 +318,10 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 				                                              EObjectFlags::RF_Public);
 
 				FDynamicGeneratorCore::SetPropertyFlags(CppProperty, Attrs);
-
+				
 				InClass->AddCppProperty(CppProperty);
+		
+			
 
 #if WITH_EDITOR
 				if (const auto ClassGeneratedBy = Cast<UCSharpBlueprint>(InClass->ClassGeneratedBy))

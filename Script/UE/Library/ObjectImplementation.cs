@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.Common;
 using Script.CoreUObject;
 using Script.Engine;
@@ -8,21 +9,21 @@ namespace Script.Library
     public static class ObjectImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass Object_StaticClassImplementation(string InClassName);
+        public static extern void Object_StaticClassImplementation(string InClassName, out UClass OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass Object_GetClassImplementation(nint InObject);
+        public static extern void Object_GetClassImplementation(IntPtr InObject, out UClass OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern FString Object_GetNameImplementation(nint InObject);
+        public static extern void Object_GetNameImplementation(IntPtr InObject, out FString OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UWorld Object_GetWorldImplementation(nint InObject);
+        public static extern void Object_GetWorldImplementation(IntPtr InObject, out UWorld OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Object_IsValidImplementation(nint InObject);
+        public static extern bool Object_IsValidImplementation(IntPtr InObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool Object_IsAImplementation(nint InObject, nint SomeBase);
+        public static extern bool Object_IsAImplementation(IntPtr InObject, IntPtr SomeBase);
     }
 }

@@ -1,34 +1,19 @@
-﻿using Script.CoreUObject;
-using Script.Library;
+﻿using System;
 
 namespace Script.Common
 {
-    public class FText : IGarbageCollectionHandle
+    public class FText
     {
-        public FText()
-        {
-        }
+        public FText(string InValue) => Value = InValue;
 
-        ~FText() => TextImplementation.Text_UnRegisterImplementation(GarbageCollectionHandle);
+        public static implicit operator FText(string InValue) => new FText(InValue);
 
-        public FText(string InValue) => TextImplementation.Text_RegisterImplementation(this, InValue);
+        public static Boolean operator ==(FText A, FText B) => A.Value == B.Value;
 
-        public static implicit operator FText(string InValue) => new(InValue);
+        public static Boolean operator !=(FText A, FText B) => A.Value != B.Value;
 
-        public static bool operator ==(FText A, FText B) =>
-            TextImplementation.Text_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public override string ToString() => Value;
 
-        public static bool operator !=(FText A, FText B) =>
-            !TextImplementation.Text_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
-
-        public override bool Equals(object Other) => this == Other as FText;
-
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
-
-        public override string ToString() => TextImplementation.Text_ToStringImplementation(GarbageCollectionHandle);
-
-        public nint GarbageCollectionHandle { get; set; }
+        private readonly string Value;
     }
 }

@@ -13,6 +13,4 @@ struct FTypeInfo
 	virtual bool IsRef() const = 0;
 
 	virtual bool IsStatic() const = 0;
-
-	virtual bool IsPrimitive() const = 0;
 };

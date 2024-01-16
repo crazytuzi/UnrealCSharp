@@ -5,6 +5,7 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsTScriptInterface.inl"
+#include "Template/TIsTSubclassOf.inl"
 #include "TValue.inl"
 #include "TValueMapping.inl"
 

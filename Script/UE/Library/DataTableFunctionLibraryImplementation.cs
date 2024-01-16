@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Script.Library
@@ -5,7 +6,7 @@ namespace Script.Library
     public static class DataTableFunctionLibraryImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool DataTableFunctionLibrary_GetDataTableRowFromNameImplementation<T>(nint Table,
-            nint RowName, out T OutRow);
+        public static extern Boolean DataTableFunctionLibrary_GetDataTableRowFromNameImplementation<T>(IntPtr Table,
+            string RowName, out T OutRow);
     }
 }

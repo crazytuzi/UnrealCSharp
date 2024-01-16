@@ -26,7 +26,7 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 	{
 		return;
 	}
-
+	
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_ANYWHERE_ATTRIBUTE))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit);
@@ -220,6 +220,26 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_FIELD_NOTIFY_ATTRIBUTE))
 	{
 		// @TODO
+	}
+
+	SetPropertyMetaData(InProperty, InMonoCustomAttrInfo);
+}
+
+void FDynamicGeneratorCore::SetPropertyMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	for(auto &PropertyMetadataName:PropertyMetadata)
+	{
+		if (AttrsHasAttr(InMonoCustomAttrInfo, PropertyMetadataName))
+		{
+			MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), PropertyMetadataName);
+			MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
+			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "DisplayValue");
+			MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
+			MonoString* MetaValueString = (MonoString*)DisplayValue;
+			char* MetaValue = StringToUTF8 (MetaValueString);
+			FString FMetaKey = PropertyMetadataName.LeftChop(9);
+			InProperty->SetMetaData(*FMetaKey,MetaValue);
+		}
 	}
 }
 
@@ -496,6 +516,48 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 			UE_LOG(LogUnrealCSharp, Error, TEXT("'reliable' and 'unreliable' are mutually exclusive"));
 		}
 	}
+
+	SetFunctionMetaData(InFunction, InMonoCustomAttrInfo);
+}
+
+void FDynamicGeneratorCore::SetFunctionMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	for(auto &FunctionMetadataName:FunctionMetadata)
+	{
+		if (AttrsHasAttr(InMonoCustomAttrInfo, FunctionMetadataName))
+		{
+			MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), FunctionMetadataName);
+			MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
+			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "DisplayValue");
+			MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
+			MonoString* MetaValueString = (MonoString*)DisplayValue;
+			char* MetaValue = StringToUTF8 (MetaValueString);
+			FString FMetaValue = FString(UTF8_TO_TCHAR(MetaValue));
+			const TCHAR* TMetaValue = *FMetaValue;
+			FString FMetaKey = FunctionMetadataName.LeftChop(9);
+			InFunction->SetMetaData(*FMetaKey,TMetaValue);
+		}
+	}
+}
+
+void FDynamicGeneratorCore::SetClassMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	for(auto &ClassMetadataName:ClassMetadata)
+	{
+		if (AttrsHasAttr(InMonoCustomAttrInfo, ClassMetadataName))
+		{
+			MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), ClassMetadataName);
+			MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
+			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "DisplayValue");
+			MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
+			MonoString* MetaValueString = (MonoString*)DisplayValue;
+			char* MetaValue = StringToUTF8 (MetaValueString);
+			FString FMetaValue = FString(UTF8_TO_TCHAR(MetaValue));
+			const TCHAR* TMetaValue = *FMetaValue;
+			FString FMetaKey = ClassMetadataName.LeftChop(9);
+			InClass->SetMetaData(*FMetaKey,TMetaValue);
+		}
+	}
 }
 
 #if WITH_EDITOR
@@ -536,6 +598,29 @@ bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInf
 	{
 		return !!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass);
 	}
-
+	
 	return false;
 }
+
+MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* Info, MonoClass* Attr_klass)
+{
+	return FMonoDomain::Custom_Attrs_Get_Attr(Info, Attr_klass);
+}
+
+MonoProperty* FDynamicGeneratorCore::AttrGetProperty(MonoClass* InMonoClass, const char* InName)
+{
+	return FMonoDomain::Class_Get_Property_From_Name(InMonoClass, InName);
+}
+
+MonoObject* FDynamicGeneratorCore::PropertyGetValue(MonoProperty* InMonoCustomProp, void* obj, void** params, MonoObject** exc)
+{
+	return FMonoDomain::Property_Get_Value(InMonoCustomProp, obj, params, exc);
+}
+
+char* FDynamicGeneratorCore::StringToUTF8(MonoString* InMonoString)
+{
+	return FMonoDomain::String_To_UTF8(InMonoString);
+}
+
+
+
