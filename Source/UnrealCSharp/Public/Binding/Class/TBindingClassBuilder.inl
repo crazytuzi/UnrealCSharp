@@ -20,8 +20,8 @@ public:
 	template <typename Class>
 	TBindingClassBuilder& Inheritance(const FString& InImplementationNameSpace)
 	{
-		TClassBuilder<T>::GetBindingClass()->Inheritance(TClassName<Class>::Get(), TClassFullName<Class>::Get(),
-		                                                 InImplementationNameSpace, TTypeInfo<Class>::Get());
+		TClassBuilder<T>::GetBindingClass()->Inheritance(TClassName<Class>::Get(), InImplementationNameSpace,
+		                                                 TTypeInfo<Class>::Get());
 
 		return *this;
 	}

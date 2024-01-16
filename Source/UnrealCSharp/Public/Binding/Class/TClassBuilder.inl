@@ -2,7 +2,6 @@
 
 #include "FClassBuilder.h"
 #include "Binding/Template/TClassName.inl"
-#include "Binding/Template/TClassFullName.inl"
 #include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Macro/FunctionMacro.h"
 
@@ -12,8 +11,7 @@ class TClassBuilder : public FClassBuilder
 public:
 	explicit TClassBuilder(const FString& InImplementationNameSpace):
 #if WITH_PROPERTY_INFO
-		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace,
-		              TClassFullName<T>::Get(), TTypeInfo<T>::Get())
+		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace, TTypeInfo<T>::Get())
 #else
 		FClassBuilder(TClassName<T>::Get(), InImplementationNameSpace)
 #endif
@@ -30,9 +28,9 @@ public:
 #endif
 	{
 #if WITH_FUNCTION_INFO
-		Function(TClassFullName<T>::Get(), InMethod, InFunctionInfo, InParamNames);
+		Function(TClassName<T>::Get(), InMethod, InFunctionInfo, InParamNames);
 #else
-		Function(TClassFullName<T>::Get(), InMethod, InParamNames);
+		Function(TClassName<T>::Get(), InMethod, InParamNames);
 #endif
 
 		return *this;
@@ -48,7 +46,7 @@ public:
 		Function(FString::Printf(TEXT(
 			         "~%s"
 		         ),
-		                         *TClassFullName<T>::Get()
+		                         *TClassName<T>::Get()
 		         ),
 		         FUNCTION_DESTRUCTOR,
 		         InMethod,
@@ -57,7 +55,7 @@ public:
 		Function(FString::Printf(TEXT(
 					 "~%s"
 				 ),
-								 *TClassFullName<T>::Get()
+								 *TClassName<T>::Get()
 				 ),
 				 FUNCTION_DESTRUCTOR,
 				 InMethod);

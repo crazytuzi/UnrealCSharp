@@ -10,10 +10,8 @@ FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementa
 }
 
 #if WITH_PROPERTY_INFO
-FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace,
-                             const FString& InFullClass, FTypeInfo* InTypeInfo):
+FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo):
 	Class(InClass),
-	FullClass(InFullClass),
 	TypeInfo(InTypeInfo),
 	ImplementationNameSpace(InImplementationNameSpace)
 {
@@ -79,7 +77,6 @@ FBindingClass* FClassBuilder::GetBindingClass() const
 {
 	return FBindingClass::GetClass(IsReflection(),
 	                               Class,
-	                               FullClass,
 	                               COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace),
 	                               TypeInfo);
 }

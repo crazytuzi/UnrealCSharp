@@ -54,7 +54,7 @@ struct FRegisterSoftObjectPtr
 
 	FRegisterSoftObjectPtr()
 	{
-		FClassBuilder(TEXT("SoftObjectPtr"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TSoftObjectPtr"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)

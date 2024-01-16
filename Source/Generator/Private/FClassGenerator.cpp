@@ -61,9 +61,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InClass);
 
-	auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InClass);
+	auto ClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InClass);
 
-	const auto& OverrideFunctions = GetOverrideFunctions(NameSpaceContent, FullClassContent);
+	const auto& OverrideFunctions = GetOverrideFunctions(NameSpaceContent, ClassContent);
 
 	FString SuperClassContent;
 
@@ -162,9 +162,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget => %sPropertyImplementation.Property_GetObject%sPropertyImplementation(%s, %s);\n"
+				"\t\t\tget => %sFPropertyImplementation.FProperty_GetObject%sPropertyImplementation(%s, %s);\n"
 				"\n"
-				"\t\t\tset => PropertyImplementation.Property_SetObject%sPropertyImplementation(%s, %s, %s);\n"
+				"\t\t\tset => FPropertyImplementation.FProperty_SetObject%sPropertyImplementation(%s, %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
@@ -185,9 +185,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget => PropertyImplementation.Property_GetObjectCompoundPropertyImplementation(%s, %s) as %s;\n"
+				"\t\t\tget => FPropertyImplementation.FProperty_GetObjectCompoundPropertyImplementation(%s, %s) as %s;\n"
 				"\n"
-				"\t\t\tset => PropertyImplementation.Property_SetObjectCompoundPropertyImplementation(%s, %s, %s);\n"
+				"\t\t\tset => FPropertyImplementation.FProperty_SetObjectCompoundPropertyImplementation(%s, %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
@@ -220,7 +220,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FunctionContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UClass StaticClass()\n"
 		"\t\t{\n"
-		"\t\t\treturn ObjectImplementation.Object_StaticClassImplementation(\"%s\");\n"
+		"\t\t\treturn UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
 		"\t\t}\n"
 	),
 	                                  SuperClass != nullptr ? TEXT(" new") : TEXT(""),
@@ -526,7 +526,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		auto FunctionCallBody = FString::Printf(TEXT(
-			"FunctionImplementation.Function_Reflection%dImplementation(%s, %s%s"
+			"FFunctionImplementation.FFunction_Reflection%dImplementation(%s, %s%s"
 		),
 		                                        FGeneratorCore::GetFunctionIndex(FunctionReturnParam != nullptr,
 			                                        FunctionParams.Num() - FunctionOutParamIndex.Num() != 0,
@@ -721,7 +721,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 	}
 
-	UsingNameSpaces.Remove(UsingNameSpaceContent);
+	UsingNameSpaces.Remove(NameSpaceContent);
 
 	UsingNameSpaces.Remove(TEXT(""));
 
@@ -755,7 +755,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *PathNameAttributeContent,
-	                               *FullClassContent,
+	                               *ClassContent,
 	                               *SuperClassContent,
 	                               *InterfaceContent,
 	                               *PropertyContent,
@@ -773,7 +773,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InClass), ModuleName);
 
-	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
+	auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }

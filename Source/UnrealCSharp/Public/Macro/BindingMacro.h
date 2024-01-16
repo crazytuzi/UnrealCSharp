@@ -7,7 +7,6 @@
 #include "Binding/Function/TDestructorBuilder.inl"
 #include "Binding/Function/TSubscriptBuilder.inl"
 #include "Binding/Template/TClassName.inl"
-#include "Binding/Template/TClassFullName.inl"
 #include "Binding/TypeInfo/TName.inl"
 #include "Binding/TypeInfo/TNameSpace.inl"
 #include "Binding/Core/TPropertyClass.inl"
@@ -30,11 +29,6 @@
 template <> \
 struct TClassName<Class> \
 { \
-	static FString Get() { return BINDING_REMOVE_PREFIX_CLASS_STR(Class); } \
-}; \
-template <> \
-struct TClassFullName<Class> \
-{ \
 	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 };
 
@@ -42,12 +36,7 @@ struct TClassFullName<Class> \
 template <> \
 struct TClassName<Class> \
 { \
-	static FString Get() { return BINDING_REMOVE_PREFIX_CLASS_STR(Class); } \
-}; \
-template <> \
-struct TClassFullName<Class> \
-{ \
-static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
+	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
@@ -116,11 +105,6 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_po
 template <> \
 struct TClassName<Class> \
 { \
-	static FString Get() { return BINDING_REMOVE_PREFIX_CLASS_STR(Class); } \
-}; \
-template <> \
-struct TClassFullName<Class> \
-{ \
 	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \
 template <typename T> \
@@ -177,11 +161,6 @@ struct TIsScriptStruct<Class> \
 #define BINDING_ENUM(Class) \
 template <> \
 struct TClassName<Class> \
-{ \
-	static FString Get() { return BINDING_REMOVE_PREFIX_CLASS_STR(Class); } \
-}; \
-template <> \
-struct TClassFullName<Class> \
 { \
 	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \

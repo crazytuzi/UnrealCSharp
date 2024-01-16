@@ -4,10 +4,10 @@ namespace Script.Common
 {
     public class FRefDelegate : FDelegateBase
     {
-        public bool IsBound() => DelegateImplementation.Delegate_IsBoundImplementation(GarbageCollectionHandle);
+        public bool IsBound() => FDelegateImplementation.FDelegate_IsBoundImplementation(GarbageCollectionHandle);
 
-        public void Unbind() => DelegateImplementation.Delegate_UnBindImplementation(GarbageCollectionHandle);
+        public void Unbind() => FDelegateImplementation.FDelegate_UnBindImplementation(GarbageCollectionHandle);
 
-        public void Clear() => DelegateImplementation.Delegate_ClearImplementation(GarbageCollectionHandle);
+        public void Clear() => FDelegateImplementation.FDelegate_ClearImplementation(GarbageCollectionHandle);
     }
 }

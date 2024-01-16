@@ -12,15 +12,9 @@ void FBindingEnumGenerator::Generator()
 
 void FBindingEnumGenerator::Generator(const FBindingEnum& InEnum)
 {
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
-
-	FString UsingNameSpaceContent;
-
 	const auto& NameSpaceContent = InEnum.GetTypeInfo().GetNameSpace();
 
 	auto ClassContent = InEnum.GetEnum();
-
-	const auto FullClassContent = InEnum.GetFullEnum();
 
 	FString EnumeratorContent;
 
@@ -42,16 +36,7 @@ void FBindingEnumGenerator::Generator(const FBindingEnum& InEnum)
 		                                     Index == Keys.Num() - 1 ? TEXT("") : TEXT(","));
 	}
 
-	for (auto UsingNameSpace : UsingNameSpaces)
-	{
-		UsingNameSpaceContent += FString::Printf(TEXT(
-			"using %s;\n"
-		),
-		                                         *UsingNameSpace);
-	}
-
 	const auto Content = FString::Printf(TEXT(
-		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\tpublic enum %s : %s\n"
@@ -60,9 +45,8 @@ void FBindingEnumGenerator::Generator(const FBindingEnum& InEnum)
 		"\t}\n"
 		"}"
 	),
-	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent[0],
-	                                     *FullClassContent,
+	                                     *ClassContent,
 	                                     *InEnum.GetUnderlyingType(),
 	                                     *EnumeratorContent
 	);

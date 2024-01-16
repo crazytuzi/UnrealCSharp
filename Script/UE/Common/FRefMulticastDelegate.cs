@@ -6,13 +6,13 @@ namespace Script.Common
     public class FRefMulticastDelegate : FDelegateBase
     {
         public bool IsBound() =>
-            MulticastDelegateImplementation.MulticastDelegate_IsBoundImplementation(GarbageCollectionHandle);
+            FMulticastDelegateImplementation.FMulticastDelegate_IsBoundImplementation(GarbageCollectionHandle);
 
         public void RemoveAll(UObject InObject) =>
-            MulticastDelegateImplementation.MulticastDelegate_RemoveAllImplementation(GarbageCollectionHandle,
+            FMulticastDelegateImplementation.FMulticastDelegate_RemoveAllImplementation(GarbageCollectionHandle,
                 InObject);
 
         public void Clear() =>
-            MulticastDelegateImplementation.MulticastDelegate_ClearImplementation(GarbageCollectionHandle);
+            FMulticastDelegateImplementation.FMulticastDelegate_ClearImplementation(GarbageCollectionHandle);
     }
 }

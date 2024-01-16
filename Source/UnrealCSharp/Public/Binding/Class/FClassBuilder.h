@@ -14,8 +14,7 @@ public:
 	explicit FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace);
 
 #if WITH_PROPERTY_INFO
-	explicit FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace,
-	                       const FString& InFullClass, FTypeInfo* InTypeInfo);
+	explicit FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
 #endif
 
 	virtual ~FClassBuilder() = default;
@@ -80,8 +79,6 @@ private:
 
 private:
 	FString Class;
-
-	FString FullClass;
 
 	FTypeInfo* TypeInfo;
 

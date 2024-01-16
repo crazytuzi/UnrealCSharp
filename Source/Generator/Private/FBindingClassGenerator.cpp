@@ -29,8 +29,6 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 	auto ClassContent = InClass.GetClass();
 
-	auto FullClassContent = InClass.GetFullClass();
-
 	FString SubscriptContent;
 
 	FString PropertyContent;
@@ -431,7 +429,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 				"\t%s"
 				"\t\t\t}\n"
 			),
-			                                             *FullClassContent,
+			                                             *ClassContent,
 			                                             *FunctionImplementationBody
 			);
 		}
@@ -455,7 +453,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 			"\n\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
 			"\t\tpublic override int GetHashCode() => (int)%s;\n"
 		),
-		                                   *FullClassContent,
+		                                   *ClassContent,
 		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 	}
@@ -499,7 +497,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 	),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent[0],
-	                               *FullClassContent,
+	                               *ClassContent,
 	                               InClass.GetBase().IsEmpty()
 		                               ? (InClass.IsReflection() ? TEXT("") : TEXT(" : IGarbageCollectionHandle"))
 		                               : *FString::Printf(TEXT(
@@ -538,8 +536,6 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 	UsingNameSpaces.Append(NameSpaceContent);
 
 	auto ClassContent = InClass.GetClass();
-
-	auto FullClassContent = InClass.GetFullClass();
 
 	auto ClassImplementationContent = BINDING_CLASS_IMPLEMENTATION(ClassContent);
 
@@ -659,7 +655,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 		                                           Function.GetReturn() != nullptr ? TEXT("object") : TEXT("void"),
 		                                           *BINDING_COMBINE_FUNCTION(
 			                                           ClassContent, Function.GetFunctionImplementationName()),
-		                                           Function.IsConstructor() ? *FullClassContent : TEXT("nint"),
+		                                           Function.IsConstructor() ? *ClassContent : TEXT("nint"),
 		                                           bHasRef ? TEXT(", out object[] OutValue") : TEXT(""),
 		                                           !Function.GetParams().IsEmpty()
 			                                           ? TEXT(", params object[] InValue")

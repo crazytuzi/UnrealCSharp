@@ -148,7 +148,7 @@ struct FRegisterMulticastDelegate
 
 	FRegisterMulticastDelegate()
 	{
-		FClassBuilder(TEXT("MulticastDelegate"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FMulticastDelegate"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Contains", ContainsImplementation)

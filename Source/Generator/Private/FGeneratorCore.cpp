@@ -856,5 +856,7 @@ void FGeneratorCore::EndGenerator()
 
 	SupportedAssetClassName.Empty();
 
+	FDelegateGenerator::Delegate.Empty();
+
 	FEnumGenerator::EnumUnderlyingType.Empty();
 }

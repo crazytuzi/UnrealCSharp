@@ -7,15 +7,15 @@ namespace Script.Common
     public class FDelegate<T> : FDelegateBase where T : Delegate
     {
         public void Bind(UObject _, T InDelegate) =>
-            DelegateImplementation.Delegate_BindImplementation(GarbageCollectionHandle, InDelegate);
+            FDelegateImplementation.FDelegate_BindImplementation(GarbageCollectionHandle, InDelegate);
 
         public void Bind(T InDelegate) =>
-            DelegateImplementation.Delegate_BindImplementation(GarbageCollectionHandle, InDelegate);
+            FDelegateImplementation.FDelegate_BindImplementation(GarbageCollectionHandle, InDelegate);
 
-        public bool IsBound() => DelegateImplementation.Delegate_IsBoundImplementation(GarbageCollectionHandle);
+        public bool IsBound() => FDelegateImplementation.FDelegate_IsBoundImplementation(GarbageCollectionHandle);
 
-        public void Unbind() => DelegateImplementation.Delegate_UnBindImplementation(GarbageCollectionHandle);
+        public void Unbind() => FDelegateImplementation.FDelegate_UnBindImplementation(GarbageCollectionHandle);
 
-        public void Clear() => DelegateImplementation.Delegate_ClearImplementation(GarbageCollectionHandle);
+        public void Clear() => FDelegateImplementation.FDelegate_ClearImplementation(GarbageCollectionHandle);
     }
 }

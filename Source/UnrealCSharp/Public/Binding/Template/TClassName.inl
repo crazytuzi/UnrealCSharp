@@ -3,5 +3,5 @@
 template <class T>
 struct TClassName
 {
-	static FString Get() { return T::StaticClass()->GetName(); }
+	static FString Get() { return TEXT(""); }
 };

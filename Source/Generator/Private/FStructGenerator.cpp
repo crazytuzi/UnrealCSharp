@@ -47,7 +47,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InScriptStruct);
 
-	auto FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct);
+	auto ClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct);
 
 	FString SuperStructContent;
 
@@ -77,7 +77,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		}
 
 		SuperStructContent = FString::Printf(TEXT(
-			" : %s"
+			" : %s, IStaticStruct, IGarbageCollectionHandle"
 		),
 		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(SuperStruct));
 
@@ -86,21 +86,23 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\t\t{\n"
 			"\t\t}\n"
 		),
-		                                     *FullClassContent
+		                                     *ClassContent
 		);
 	}
 	else
 	{
+		SuperStructContent = TEXT(" : IStaticStruct, IGarbageCollectionHandle");
+
 		ConstructorContent = FString::Printf(TEXT(
-			"\t\tpublic %s() => StructImplementation.Struct_RegisterImplementation(this, Utils.GetPathName(GetType()));\n"
+			"\t\tpublic %s() => UStructImplementation.UStruct_RegisterImplementation(this, Utils.GetPathName(GetType()));\n"
 		),
-		                                     *FullClassContent
+		                                     *ClassContent
 		);
 
 		DestructorContent = FString::Printf(TEXT(
-			"\n\t\t~%s() => StructImplementation.Struct_UnRegisterImplementation(%s);\n"
+			"\n\t\t~%s() => UStructImplementation.UStruct_UnRegisterImplementation(%s);\n"
 		),
-		                                    *FullClassContent,
+		                                    *ClassContent,
 		                                    *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
@@ -116,7 +118,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	auto StaticStructContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UScriptStruct StaticStruct()\n"
 		"\t\t{\n"
-		"\t\t\treturn StructImplementation.Struct_StaticStructImplementation(\"%s\");\n"
+		"\t\t\treturn UStructImplementation.UStruct_StaticStructImplementation(\"%s\");\n"
 		"\t\t}\n"
 	),
 	                                           SuperStruct != nullptr ? TEXT(" new") : TEXT(""),
@@ -124,22 +126,22 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	);
 
 	IdenticalContent = FString::Printf(TEXT(
-		"\t\tpublic static bool operator ==(%s A, %s B) => StructImplementation.Struct_IdenticalImplementation(StaticStruct().%s, A?.%s??nint.Zero, B?.%s??nint.Zero);\n\n"
-		"\t\tpublic static bool operator !=(%s A, %s B) => !StructImplementation.Struct_IdenticalImplementation(StaticStruct().%s, A?.%s??nint.Zero, B?.%s??nint.Zero);\n\n"
+		"\t\tpublic static bool operator ==(%s A, %s B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A?.%s??nint.Zero, B?.%s??nint.Zero);\n\n"
+		"\t\tpublic static bool operator !=(%s A, %s B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A?.%s??nint.Zero, B?.%s??nint.Zero);\n\n"
 		"\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
 		"\t\tpublic override int GetHashCode() => (int)%s;\n"
 	),
-	                                   *FullClassContent,
-	                                   *FullClassContent,
+	                                   *ClassContent,
+	                                   *ClassContent,
 	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *FullClassContent,
-	                                   *FullClassContent,
+	                                   *ClassContent,
+	                                   *ClassContent,
 	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *FullClassContent,
+	                                   *ClassContent,
 	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);
 
@@ -199,9 +201,9 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget => %sPropertyImplementation.Property_GetStruct%sPropertyImplementation(%s, %s);\n"
+				"\t\t\tget => %sFPropertyImplementation.FProperty_GetStruct%sPropertyImplementation(%s, %s);\n"
 				"\n"
-				"\t\t\tset => PropertyImplementation.Property_SetStruct%sPropertyImplementation(%s, %s, %s);\n"
+				"\t\t\tset => FPropertyImplementation.FProperty_SetStruct%sPropertyImplementation(%s, %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
@@ -222,9 +224,9 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			PropertyContent += FString::Printf(TEXT(
 				"\t\t%s %s %s\n"
 				"\t\t{\n"
-				"\t\t\tget => PropertyImplementation.Property_GetStructCompoundPropertyImplementation(%s, %s) as %s;\n"
+				"\t\t\tget => FPropertyImplementation.FProperty_GetStructCompoundPropertyImplementation(%s, %s) as %s;\n"
 				"\n"
-				"\t\t\tset => PropertyImplementation.Property_SetStructCompoundPropertyImplementation(%s, %s, %s);\n"
+				"\t\t\tset => FPropertyImplementation.FProperty_SetStructCompoundPropertyImplementation(%s, %s, %s);\n"
 				"\t\t}\n"
 			),
 			                                   *PropertyAccessSpecifiers,
@@ -255,7 +257,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		);
 	}
 
-	UsingNameSpaces.Remove(UsingNameSpaceContent);
+	UsingNameSpaces.Remove(NameSpaceContent);
 
 	UsingNameSpaces.Remove(TEXT(""));
 
@@ -291,8 +293,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *PathNameAttributeContent,
-	                               *FullClassContent,
-	                               SuperStruct != nullptr ? *SuperStructContent : TEXT(" : IGarbageCollectionHandle"),
+	                               *ClassContent,
+	                               *SuperStructContent,
 	                               *StaticStructContent,
 	                               *ConstructorContent,
 	                               *DestructorContent,
@@ -308,7 +310,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InScriptStruct), ModuleName);
 
-	auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
+	auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
