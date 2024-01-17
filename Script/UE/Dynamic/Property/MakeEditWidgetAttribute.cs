@@ -15,5 +15,9 @@ namespace Script.Dynamic
     {
         this.MetaValue = MetaValue;
     }
+    public MakeEditWidgetAttribute()
+    {
+        this.MetaValue = "true";
+    }
     }
 }

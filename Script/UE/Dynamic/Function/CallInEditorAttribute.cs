@@ -11,9 +11,13 @@ namespace Script.Dynamic
 			get { return MetaValue; }
 			set { MetaValue = value; }
 		}
-		public CallInEditorAttribute(string MetaValue)
+		public CallInEditorAttribute ()
 		{
-			this.MetaValue = MetaValue;
+			this.MetaValue = "true";
+		}
+		public CallInEditorAttribute (string value)
+		{
+			MetaValue = value;
 		}
 	}
 }

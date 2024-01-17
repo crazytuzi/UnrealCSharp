@@ -15,5 +15,9 @@ namespace Script.Dynamic
     {
         this.MetaValue = MetaValue;
     }
+    public IsBlueprintBaseAttribute()
+    {
+        this.MetaValue = "true";
+    }
     }
 }
