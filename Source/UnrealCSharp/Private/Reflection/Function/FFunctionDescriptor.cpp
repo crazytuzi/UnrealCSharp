@@ -176,8 +176,7 @@ bool FFunctionDescriptor::CallCSharp(FFrame& Stack, void* const Z_Param__Result)
 	return true;
 }
 
-bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue, MonoObject** OutValue,
-                                     MonoArray* InValue)
+MonoObject* FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** OutValue, MonoArray* InValue)
 {
 	auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);
 
@@ -221,13 +220,7 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 	{
 		InObject->UObject::ProcessEvent(Function.Get(), Params);
 
-		if (ReturnPropertyDescriptor != nullptr)
-		{
-			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
-			                              reinterpret_cast<void**>(ReturnValue));
-		}
-
-		if (OutPropertyIndexes.Num() > 0)
+		if (!OutPropertyIndexes.IsEmpty())
 		{
 			const auto MonoObjectArray = FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(),
 			                                                    OutPropertyIndexes.Num());
@@ -247,13 +240,23 @@ bool FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** ReturnValue
 
 			*OutValue = (MonoObject*)MonoObjectArray;
 		}
+
+		if (ReturnPropertyDescriptor != nullptr)
+		{
+			MonoObject* ReturnValue{};
+
+			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
+			                              reinterpret_cast<void**>(&ReturnValue));
+
+			return ReturnValue;
+		}
 	}
 	else if (bIsRemote)
 	{
 		InObject->CallRemoteFunction(Function.Get(), Params, nullptr, nullptr);
 	}
 
-	return true;
+	return nullptr;
 }
 
 FOutParmRec* FFunctionDescriptor::FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty)

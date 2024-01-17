@@ -155,7 +155,7 @@ void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow> InRo
 
 void FEditorListener::OnWindowActivatedEvent()
 {
-	if (FileChanges.Num() > 0)
+	if (!FileChanges.IsEmpty())
 	{
 		FCSharpCompiler::Get().Compile(FileChanges);
 

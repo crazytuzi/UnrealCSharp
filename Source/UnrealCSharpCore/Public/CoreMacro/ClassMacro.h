@@ -10,8 +10,6 @@
 
 #define CLASS_U_CLASS_ATTRIBUTE FString(TEXT("UClassAttribute"))
 
-#define CLASS_U_Blueprint_ATTRIBUTE FString(TEXT("UBlueprintAttribute"))
-
 #define CLASS_U_STRUCT_ATTRIBUTE FString(TEXT("UStructAttribute"))
 
 #define CLASS_U_ENUM_ATTRIBUTE FString(TEXT("UEnumAttribute"))

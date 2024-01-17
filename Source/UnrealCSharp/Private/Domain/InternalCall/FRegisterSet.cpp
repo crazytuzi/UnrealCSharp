@@ -149,7 +149,7 @@ struct FRegisterSet
 
 	FRegisterSet()
 	{
-		FClassBuilder(TEXT("Set"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TSet"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Empty", EmptyImplementation)

@@ -54,7 +54,7 @@ struct FRegisterName
 
 	FRegisterName()
 	{
-		FClassBuilder(TEXT("Name"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FName"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)

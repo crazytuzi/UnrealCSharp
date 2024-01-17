@@ -379,7 +379,7 @@ struct FRegisterArray
 
 	FRegisterArray()
 	{
-		FClassBuilder(TEXT("Array"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TArray"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)

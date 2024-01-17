@@ -19,18 +19,6 @@
 #include "Misc/ScopedSlowTask.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "ToolBar/UnrealCSharpToolBar.h"
-#include "UEVersion.h"
-
-#if UE_IS_RUNNING_COOK_COMMANDLET
-static bool IsRunningCookCommandlet()
-{
-	const FString Commandline = FCommandLine::Get();
-
-	const auto bIsCookCommandlet = IsRunningCommandlet() && Commandline.Contains(TEXT("run=cook"));
-
-	return bIsCookCommandlet;
-}
-#endif
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 

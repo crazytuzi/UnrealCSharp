@@ -11,9 +11,22 @@ struct TConstructorBuilder
 		return TFunctionInfo<EFunctionType::Constructor, void, Args...>::Get();
 	}
 
-	static void Invoke(BINDING_CONSTRUCTOR_SIGNATURE)
+	static void Invoke(BINDING_CONSTRUCTOR_PLACEHOLDER_SIGNATURE)
 	{
-		TConstructorHelper<std::tuple<Args...>>::template Call<Class>(
-			std::make_index_sequence<sizeof...(Args)>(), BINDING_CONSTRUCTOR_PARAM);
+		if constexpr (sizeof...(Args) == 0)
+		{
+			TConstructorHelper<std::tuple<Args...>>::template Call<Class>(
+				std::make_index_sequence<sizeof...(Args)>(), BINDING_CONSTRUCTOR_PLACEHOLDER_PARAM0);
+		}
+		else if constexpr (!THasRef<Args...>::Value)
+		{
+			TConstructorHelper<std::tuple<Args...>>::template Call<Class>(
+				std::make_index_sequence<sizeof...(Args)>(), BINDING_CONSTRUCTOR_PLACEHOLDER_PARAM2);
+		}
+		else
+		{
+			TConstructorHelper<std::tuple<Args...>>::template Call<Class>(
+				std::make_index_sequence<sizeof...(Args)>(), BINDING_CONSTRUCTOR_PLACEHOLDER_PARAM3);
+		}
 	}
 };

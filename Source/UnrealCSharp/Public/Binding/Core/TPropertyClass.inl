@@ -11,9 +11,6 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
-#include "Template/TIsTSubclassOf.inl"
-#include "Template/TIsTSet.inl"
-#include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
@@ -164,7 +161,6 @@ struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove
 	}
 };
 
-#if UE_OBJECT_PTR
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 {
@@ -173,7 +169,6 @@ struct TPropertyClass<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value,
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
 };
-#endif
 
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>

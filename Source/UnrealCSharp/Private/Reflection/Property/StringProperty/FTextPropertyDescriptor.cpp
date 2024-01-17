@@ -13,13 +13,7 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (TextProperty != nullptr)
 	{
-		auto NewMonoString = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-			TCHAR_TO_UTF8(*TextProperty->GetPropertyValue(Src).ToString())));
-
-		const auto NewMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(
-			Class, 1, &NewMonoString);
-
-		*Dest = NewMonoObject;
+		*Dest = Object_New(Src);
 	}
 }
 
@@ -27,15 +21,14 @@ void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (TextProperty != nullptr)
 	{
-		const auto SrcObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcValue = FString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(SrcObject, nullptr))));
+		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FText>(SrcMonoObject))
+		{
+			TextProperty->InitializeValue(Dest);
 
-		TextProperty->InitializeValue(Dest);
-
-		TextProperty->SetPropertyValue(Dest, FText::FromString(SrcValue));
+			TextProperty->SetPropertyValue(Dest, *SrcValue);
+		}
 	}
 }
 
@@ -43,14 +36,27 @@ bool FTextPropertyDescriptor::Identical(const void* A, const void* B, uint32 Por
 {
 	if (TextProperty != nullptr)
 	{
-		const auto StringA = TextProperty->GetPropertyValue(A).ToString();
+		const auto TextA = TextProperty->GetPropertyValue(A);
 
-		const auto StringB = FString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(FCSharpEnvironment::GetEnvironment().
-				GetDomain()->Object_To_String(static_cast<MonoObject*>(const_cast<void*>(B)), nullptr))));
+		const auto TextB = FCSharpEnvironment::GetEnvironment().GetString<FText>(
+			static_cast<MonoObject*>(const_cast<void*>(B)));
 
-		return StringA.Equals(StringB);
+		return TextA.EqualTo(*TextB);
 	}
 
 	return false;
+}
+
+MonoObject* FTextPropertyDescriptor::Object_New(void* InAddress) const
+{
+	auto Object = FCSharpEnvironment::GetEnvironment().GetStringObject<FText>(InAddress);
+
+	if (Object == nullptr)
+	{
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(Class);
+
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FText>(Object, InAddress, false);
+	}
+
+	return Object;
 }

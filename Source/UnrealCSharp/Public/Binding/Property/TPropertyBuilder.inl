@@ -11,9 +11,6 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
-#include "Template/TIsTSubclassOf.inl"
-#include "Template/TIsTSet.inl"
-#include "Template/TIsTMap.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
@@ -36,13 +33,15 @@ struct TParentPropertyBuilder
 template <typename Class, typename Result, auto Member>
 struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>>
 {
-	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* Get(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member));
+			return TPropertyValue<Result, Result>::Get(&(FoundObject->*Member));
 		}
+
+		return nullptr;
 	}
 
 	static void Set(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InValue)
@@ -63,9 +62,9 @@ struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<!std::is_sam
 template <typename Class, typename Result, auto Member>
 struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>>
 {
-	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
-		*OutValue = TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member));
+		return TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member));
 	}
 
 	static void Set(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InValue)
@@ -83,13 +82,15 @@ template <typename Class, typename Result, auto Member>
 struct TParentPropertyBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
-	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			*OutValue = TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InGarbageCollectionHandle);
+			return TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InGarbageCollectionHandle);
 		}
+
+		return nullptr;
 	}
 };
 
@@ -97,12 +98,18 @@ template <typename Class, typename Result, auto Member>
 struct TParentPropertyBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
-	static void Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
 	{
-		*OutValue = TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member),
-		                                                InGarbageCollectionHandle,
-		                                                false);
+		return TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member),
+		                                           InGarbageCollectionHandle,
+		                                           false);
 	}
+};
+
+template <typename Class, typename Result, auto Member>
+struct TStringPropertyBuilder :
+	TParentPropertyBuilder<Class, Result, Member>
+{
 };
 
 template <typename Class, typename Result, auto Member>
@@ -204,17 +211,15 @@ struct TPropertyBuilder<Result Class::*, Member,
 {
 };
 
-#if UE_OBJECT_PTR
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTObjectPtr<Result>::Value>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
-#endif
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FName>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TStringPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -232,13 +237,13 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsUStruct<Res
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FString>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TStringPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FText>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TStringPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -385,17 +390,15 @@ struct TPropertyBuilder<Result*, Member,
 {
 };
 
-#if UE_OBJECT_PTR
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTObjectPtr<std::decay_t<Result>>::Value>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
-#endif
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FName>>> :
-	TPropertyInfoBuilder<void, Result, Member>
+	TStringPropertyBuilder<void, Result, Member>
 {
 };
 
@@ -413,13 +416,13 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsUStruct<std::decay_
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FString>>> :
-	TPropertyInfoBuilder<void, Result, Member>
+	TStringPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FText>>> :
-	TPropertyInfoBuilder<void, Result, Member>
+	TStringPropertyBuilder<void, Result, Member>
 {
 };
 

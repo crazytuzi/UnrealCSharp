@@ -1,7 +1,5 @@
 ﻿#include "FCSharpCompilerRunnable.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "CoreMacro/Macro.h"
-#include "UEVersion.h"
 #include "Dynamic/FDynamicGenerator.h"
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
@@ -12,11 +10,7 @@ FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 
 bool FCSharpCompilerRunnable::Init()
 {
-#if UE_PLATFORM_PROCESS_GET_SYNCH_EVENT_FROM_POOL
 	Event = FPlatformProcess::GetSynchEventFromPool(true);
-#else
-	Event = FPlatformProcess::CreateSynchEvent(true);
-#endif
 
 	return FRunnable::Init();
 }
@@ -112,8 +106,6 @@ void FCSharpCompilerRunnable::DoWork()
 
 	Compile();
 
-	Pdb2Mdb();
-
 	const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
 	{
 		FDynamicGenerator::Generator(FileChanges);
@@ -189,58 +181,4 @@ void FCSharpCompilerRunnable::Compile()
 	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
 
 	FPlatformProcess::CloseProc(ProcessHandle);
-}
-
-void FCSharpCompilerRunnable::Pdb2Mdb()
-{
-	auto OutProcessID = 0u;
-
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
-
-	static auto Pdb2MdbPath = TEXT("C:\\Program Files\\Mono\\lib\\mono\\4.5\\pdb2mdb.exe");
-
-	const auto Pdb2MdbTasks = {
-		FString::Printf(TEXT(
-			"\"%s\" %s\\%s\\%s%s"
-		),
-		                Pdb2MdbPath,
-		                *FPaths::ProjectContentDir(),
-		                *SCRIPT,
-		                *FUnrealCSharpFunctionLibrary::GetGameProjectName(),
-		                *DLL_SUFFIX),
-		FString::Printf(TEXT(
-			"\"%s\" %s\\%s\\%s%s"
-		),
-		                Pdb2MdbPath,
-		                *FPaths::ProjectContentDir(),
-		                *SCRIPT,
-		                *FUnrealCSharpFunctionLibrary::GetUEProjectName(),
-		                *DLL_SUFFIX),
-	};
-
-	for (const auto& Params : Pdb2MdbTasks)
-	{
-		static auto MonoPath = TEXT("C:\\Program Files\\Mono\\bin\\mono.exe");
-
-		auto ProcessHandle = FPlatformProcess::CreateProc(
-			MonoPath,
-			*Params,
-			false,
-			true,
-			true,
-			&OutProcessID,
-			1,
-			nullptr,
-			WritePipe,
-			ReadPipe);
-
-		while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
-		{
-			FPlatformProcess::Sleep(0.01f);
-		}
-	}
 }

@@ -20,7 +20,7 @@ void FDynamicClassGenerator::Generator()
 {
 	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_CLASS_ATTRIBUTE);
-	
+
 	const auto AttributeMonoType = FMonoDomain::Class_Get_Type(AttributeMonoClass);
 
 	const auto AttributeMonoReflectionType = FMonoDomain::Type_Get_Object(AttributeMonoType);
@@ -104,7 +104,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 	{
 		return;
 	}
-	
+
 	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
@@ -318,10 +318,8 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 				                                              EObjectFlags::RF_Public);
 
 				FDynamicGeneratorCore::SetPropertyFlags(CppProperty, Attrs);
-				
+
 				InClass->AddCppProperty(CppProperty);
-		
-			
 
 #if WITH_EDITOR
 				if (const auto ClassGeneratedBy = Cast<UCSharpBlueprint>(InClass->ClassGeneratedBy))
@@ -417,10 +415,11 @@ void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* I
 
 					const auto Property = FTypeBridge::Factory(ReturnParamReflectionType, Function, "",
 					                                           RF_Public | RF_Transient);
-
-					Property->SetPropertyFlags(CPF_Parm | CPF_ReturnParm);
-
-					Function->AddCppProperty(Property);
+					if(Property)
+					{
+						Property->SetPropertyFlags(CPF_Parm | CPF_ReturnParm);
+						Function->AddCppProperty(Property);
+					}
 				}
 
 				for (auto Index = ParamDescriptors.Num() - 1; Index >= 0; --Index)

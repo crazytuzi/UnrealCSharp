@@ -51,18 +51,6 @@ struct TSingleArgument :
 };
 
 template <typename T>
-struct TStringArgument :
-	TBaseArgument<std::decay_t<T>>
-{
-	using TBaseArgument<std::decay_t<T>>::TBaseArgument;
-
-	constexpr bool IsRef() const
-	{
-		return TTypeInfo<T>::Get()->IsRef();
-	}
-};
-
-template <typename T>
 struct TParentArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>> || std::is_same_v<
 	                                           std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
 	TBaseArgument<T>
@@ -99,6 +87,17 @@ struct TParentArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_referen
 	}
 };
 
+template <typename T>
+struct TStringArgument :
+	TParentArgument<std::decay_t<T>, std::decay_t<T>>
+{
+	using TParentArgument<std::decay_t<T>, std::decay_t<T>>::TParentArgument;
+
+	constexpr bool IsRef() const
+	{
+		return TTypeInfo<T>::Get()->IsRef();
+	}
+};
 
 template <typename T>
 struct TContainerArgument :
@@ -225,14 +224,12 @@ struct TArgument<T,
 	}
 };
 
-#if UE_OBJECT_PTR
 template <typename T>
 struct TArgument<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value>> :
 	TSingleArgument<T>
 {
 	using TSingleArgument<T>::TSingleArgument;
 };
-#endif
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>> :

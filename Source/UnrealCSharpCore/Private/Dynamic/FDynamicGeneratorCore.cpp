@@ -26,7 +26,7 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 	{
 		return;
 	}
-	
+
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_ANYWHERE_ATTRIBUTE))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit);
@@ -526,16 +526,16 @@ void FDynamicGeneratorCore::SetFunctionMetaData(UFunction* InFunction, MonoCusto
 	{
 		if (AttrsHasAttr(InMonoCustomAttrInfo, FunctionMetadataName))
 		{
-			MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), FunctionMetadataName);
-			MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
-			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "DisplayValue");
-			MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
-			MonoString* MetaValueString = (MonoString*)DisplayValue;
-			char* MetaValue = StringToUTF8 (MetaValueString);
-			FString FMetaValue = FString(UTF8_TO_TCHAR(MetaValue));
-			const TCHAR* TMetaValue = *FMetaValue;
-			FString FMetaKey = FunctionMetadataName.LeftChop(9);
-			InFunction->SetMetaData(*FMetaKey,TMetaValue);
+				MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), FunctionMetadataName);
+				MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
+				MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "DisplayValue");
+				MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
+				MonoString* MetaValueString = (MonoString*)DisplayValue;
+				char* MetaValue = StringToUTF8 (MetaValueString);
+				FString FMetaValue = FString(UTF8_TO_TCHAR(MetaValue));
+				const TCHAR* TMetaValue = *FMetaValue;
+				FString FMetaKey = FunctionMetadataName.LeftChop(9);
+				InFunction->SetMetaData(*FMetaKey,TMetaValue);
 		}
 	}
 }
@@ -598,7 +598,7 @@ bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInf
 	{
 		return !!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass);
 	}
-	
+
 	return false;
 }
 

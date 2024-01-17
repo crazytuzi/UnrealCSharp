@@ -1,6 +1,5 @@
 ﻿#include "Reflection/Property/ObjectProperty/FObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "UEVersion.h"
 
 void FObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -35,11 +34,7 @@ bool FObjectPropertyDescriptor::Identical(const void* A, const void* B, const ui
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetObject(
 			static_cast<MonoObject*>(const_cast<void*>(B)));
 
-#if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
 		return ObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
-#else
-		return ObjectA == ObjectB;
-#endif
 	}
 
 	return false;

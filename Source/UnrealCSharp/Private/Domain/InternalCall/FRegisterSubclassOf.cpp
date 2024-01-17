@@ -46,7 +46,7 @@ struct FRegisterSubclassOf
 
 	FRegisterSubclassOf()
 	{
-		FClassBuilder(TEXT("SubclassOf"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TSubclassOf"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)

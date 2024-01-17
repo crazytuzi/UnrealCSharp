@@ -14,7 +14,7 @@ template <typename... Args>
 struct TDestructorHelper<std::tuple<Args...>>
 {
 	template <size_t... Index>
-	static void Call(std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
+	static void Call(std::index_sequence<Index...>, BINDING_DESTRUCTOR_SIGNATURE)
 	{
 		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InGarbageCollectionHandle);
 	}

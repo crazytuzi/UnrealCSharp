@@ -188,11 +188,7 @@ void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 		}
 	}
 
-#if UE_ARRAY_IS_EMPTY
 	if (DelegateGarbageCollectionHandles.IsEmpty())
-#else
-	if (DelegateGarbageCollectionHandles.Num() == 0)
-#endif
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -226,18 +222,14 @@ void UMulticastDelegateHandler::RemoveAll(MonoObject* InObject)
 				const auto TargetMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
 					FoundMonoMethod, nullptr, &Params);
 
-				return TargetMonoObject == InObject ? true : false;
+				return TargetMonoObject == InObject;
 			}
 		}
 
 		return false;
 	});
 
-#if UE_ARRAY_IS_EMPTY
 	if (DelegateGarbageCollectionHandles.IsEmpty())
-#else
-	if (DelegateGarbageCollectionHandles.Num() == 0)
-#endif
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -268,7 +260,7 @@ void UMulticastDelegateHandler::Clear()
 	ScriptDelegate.Unbind();
 }
 
-void UMulticastDelegateHandler::Broadcast(MonoObject** OutValue, MonoArray* InValue) const
+MonoObject* UMulticastDelegateHandler::Broadcast(MonoObject** OutValue, MonoArray* InValue) const
 {
 	if (MulticastScriptDelegate != nullptr)
 	{
@@ -276,10 +268,12 @@ void UMulticastDelegateHandler::Broadcast(MonoObject** OutValue, MonoArray* InVa
 		{
 			if (DelegateDescriptor != nullptr)
 			{
-				DelegateDescriptor->ProcessMulticastDelegate(MulticastScriptDelegate, OutValue, InValue);
+				return DelegateDescriptor->ProcessMulticastDelegate(MulticastScriptDelegate, OutValue, InValue);
 			}
 		}
 	}
+
+	return nullptr;
 }
 
 UObject* UMulticastDelegateHandler::GetUObject() const

@@ -9,13 +9,13 @@ public:
 
 	static TSet<FString> GetPropertyTypeNameSpace(FProperty* Property);
 
-	static FString GetGetAccessorType(FProperty* Property);
+	static FString GetGetPrimitiveAccessorType(FProperty* Property);
 
 	static FString GetGetAccessorReturnParamName(FProperty* Property);
 
 	static FString GetSetAccessorParamName(FProperty* Property);
 
-	static bool IsSafeProperty(FProperty* Property);
+	static bool IsPrimitiveProperty(FProperty* Property);
 
 	static FString GetOutParamString(FProperty* Property, uint32 Index);
 
@@ -23,7 +23,7 @@ public:
 
 	static FString GetReturnParamType(FProperty* Property);
 
-	static FString GetReturnParamName(FProperty* Property);
+	static int32 GetFunctionIndex(bool bHasReturn, bool bHasInput, bool bHasOutput);
 
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 

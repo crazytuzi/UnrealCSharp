@@ -1,7 +1,9 @@
-﻿#include "Binding/Class/FClassBuilder.h"
+﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 #include "Async/Async.h"
+
+BINDING_REFLECTION_CLASS(UStruct)
 
 struct FRegisterStruct
 {
@@ -52,7 +54,7 @@ struct FRegisterStruct
 
 	FRegisterStruct()
 	{
-		FClassBuilder(TEXT("Struct"), NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<UStruct>(NAMESPACE_LIBRARY)
 			.Function("StaticStruct", StaticStructImplementation)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)

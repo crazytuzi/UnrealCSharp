@@ -2,21 +2,18 @@
 
 TMap<FString, FBindingEnum> FBindingEnum::Enums;
 
-FBindingEnum::FBindingEnum(const FString& InEnum, const FString& InFullEnum,
-                           const FString& InUnderlyingType, FTypeInfo* InTypeInfo):
+FBindingEnum::FBindingEnum(const FString& InEnum, const FString& InUnderlyingType, FTypeInfo* InTypeInfo):
 	Enum(InEnum),
-	FullEnum(InFullEnum),
 	UnderlyingType(InUnderlyingType),
 	TypeInfo(InTypeInfo)
 {
 }
 
-FBindingEnum* FBindingEnum::GetEnum(const FString& InEnum, const FString& InFullEnum,
-                                    const FString& InUnderlyingType, FTypeInfo* InTypeInfo)
+FBindingEnum* FBindingEnum::GetEnum(const FString& InEnum, const FString& InUnderlyingType, FTypeInfo* InTypeInfo)
 {
 	if (!Enums.Contains(InEnum))
 	{
-		Enums.Add(InEnum, {InEnum, InFullEnum, InUnderlyingType, InTypeInfo});
+		Enums.Add(InEnum, {InEnum, InUnderlyingType, InTypeInfo});
 	}
 
 	return Enums.Find(InEnum);
@@ -30,11 +27,6 @@ const TMap<FString, FBindingEnum>& FBindingEnum::GetEnums()
 const FString& FBindingEnum::GetEnum() const
 {
 	return Enum;
-}
-
-const FString& FBindingEnum::GetFullEnum() const
-{
-	return FullEnum;
 }
 
 const FString& FBindingEnum::GetUnderlyingType() const

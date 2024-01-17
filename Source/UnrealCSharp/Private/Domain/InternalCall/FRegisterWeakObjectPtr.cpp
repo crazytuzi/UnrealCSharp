@@ -46,7 +46,7 @@ struct FRegisterWeakObjectPtr
 
 	FRegisterWeakObjectPtr()
 	{
-		FClassBuilder(TEXT("WeakObjectPtr"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TWeakObjectPtr"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)

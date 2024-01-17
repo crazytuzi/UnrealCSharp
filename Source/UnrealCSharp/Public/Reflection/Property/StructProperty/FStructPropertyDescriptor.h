@@ -6,7 +6,7 @@
 class FStructPropertyDescriptor final : public FPropertyDescriptor
 {
 public:
-	explicit FStructPropertyDescriptor(FProperty* InProperty);;
+	explicit FStructPropertyDescriptor(FProperty* InProperty);
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

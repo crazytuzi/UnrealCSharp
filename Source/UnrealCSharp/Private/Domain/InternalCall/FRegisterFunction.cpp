@@ -69,7 +69,7 @@ struct FRegisterFunction
 
 	FRegisterFunction()
 	{
-		FClassBuilder(TEXT("Function"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FFunction"), NAMESPACE_LIBRARY)
 			.Function("Reflection0", Reflection0Implementation)
 			.Function("Reflection1", Reflection1Implementation)
 			.Function("Reflection2", Reflection2Implementation)

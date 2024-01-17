@@ -265,7 +265,7 @@ struct FRegisterMap
 
 	FRegisterMap()
 	{
-		FClassBuilder(TEXT("Map"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TMap"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Empty", EmptyImplementation)

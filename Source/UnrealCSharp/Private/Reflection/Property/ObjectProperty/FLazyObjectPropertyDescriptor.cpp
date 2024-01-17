@@ -1,7 +1,6 @@
 ﻿#include "Reflection/Property/ObjectProperty/FLazyObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
-#include "UEVersion.h"
 
 FLazyObjectPropertyDescriptor::FLazyObjectPropertyDescriptor(FProperty* InProperty):
 	FObjectPropertyDescriptor(InProperty),
@@ -41,11 +40,7 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
 			static_cast<MonoObject*>(const_cast<void*>(B)))->Get();
 
-#if UE_OBJECT_PROPERTY_STATIC_IDENTICAL
 		return LazyObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
-#else
-		return ObjectA == ObjectB;
-#endif
 	}
 
 	return false;

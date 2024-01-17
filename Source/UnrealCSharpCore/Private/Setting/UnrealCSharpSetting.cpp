@@ -37,4 +37,19 @@ const TArray<FBindClass>& UUnrealCSharpSetting::GetBindClass() const
 	return BindClass;
 }
 
+bool UUnrealCSharpSetting::IsEnableDebug() const
+{
+	return bEnableDebug;
+}
+
+const FString& UUnrealCSharpSetting::GetHost() const
+{
+	return Host;
+}
+
+int32 UUnrealCSharpSetting::GetPort() const
+{
+	return Port;
+}
+
 #undef LOCTEXT_NAMESPACE

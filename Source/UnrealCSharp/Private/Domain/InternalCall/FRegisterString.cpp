@@ -43,7 +43,7 @@ struct FRegisterString
 
 	FRegisterString()
 	{
-		FClassBuilder(TEXT("String"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FString"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)

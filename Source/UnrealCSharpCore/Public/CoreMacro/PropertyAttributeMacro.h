@@ -179,6 +179,7 @@ TArray<FString>ClassMetadata={
 };
 
 TArray<FString>FunctionMetadata={
+	"CallInEditorAttribute",
 	"VariadicAttribute",
 	"ReturnDisplayNameAttribute",
 	"InternalUseParamAttribute",

@@ -28,8 +28,6 @@ public:
 private:
 	static void Compile();
 
-	static void Pdb2Mdb();
-
 private:
 	TQueue<bool> Tasks;
 

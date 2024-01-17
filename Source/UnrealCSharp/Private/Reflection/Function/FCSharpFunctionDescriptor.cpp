@@ -1,5 +1,4 @@
 ﻿#include "Reflection/Function/FCSharpFunctionDescriptor.h"
-#include "UEVersion.h"
 
 FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction):
 	Super(InFunction),
@@ -29,7 +28,7 @@ void FCSharpFunctionDescriptor::Deinitialize()
 
 			InCallCSharpFunction->SetNativeFunc(OriginalNativeFuncPtr);
 
-			if (OriginalScript.Num() > 0)
+			if (!OriginalScript.IsEmpty())
 			{
 				InCallCSharpFunction->Script.Empty();
 
@@ -60,11 +59,7 @@ void FCSharpFunctionDescriptor::Deinitialize()
 			}
 			else
 			{
-#if UE_OBJECT_BASE_UTILITY_MARK_AS_GARBAGE
 				FunctionRemove->MarkAsGarbage();
-#else
-				FunctionRemove->MarkPendingKill();
-#endif
 			}
 		}
 	}
