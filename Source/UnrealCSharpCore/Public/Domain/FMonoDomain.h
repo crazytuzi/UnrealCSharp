@@ -65,6 +65,12 @@ public:
 
 	static mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
 
+	static MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName);
+
+	static MonoObject* Custom_Attrs_Get_Attr(MonoCustomAttrInfo *Info, MonoClass *Attr_klass);
+	
+	static MonoObject* Property_Get_Value(MonoProperty* InMonoCustomProp, void *obj,void **params, MonoObject** exc);
+
 	static void Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue);
 
 	static const char* Field_Get_Name(MonoClassField* InMonoClassField);
@@ -165,6 +171,8 @@ public:
 	static MonoClass* Get_Double_Class();
 
 	static uint32 GCHandle_New(MonoObject* InMonoObject, mono_bool bPinned);
+
+	static char* StringToUTF8(MonoString* InMonoString);
 
 	static uint32 GCHandle_New_WeakRef(MonoObject* InMonoObject, mono_bool bTrackResurrection);
 

@@ -153,6 +153,17 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 		}
 	}
+	
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_CLASS_ATTRIBUTE);
+		
+	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
+	{
+		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+		{
+			FDynamicGeneratorCore::SetClassMetaData(Class, Attrs);
+		}
+	}
 
 	GeneratorProperty(InMonoClass, Class);
 
@@ -404,10 +415,11 @@ void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* I
 
 					const auto Property = FTypeBridge::Factory(ReturnParamReflectionType, Function, "",
 					                                           RF_Public | RF_Transient);
-
-					Property->SetPropertyFlags(CPF_Parm | CPF_ReturnParm);
-
-					Function->AddCppProperty(Property);
+					if(Property)
+					{
+						Property->SetPropertyFlags(CPF_Parm | CPF_ReturnParm);
+						Function->AddCppProperty(Property);
+					}
 				}
 
 				for (auto Index = ParamDescriptors.Num() - 1; Index >= 0; --Index)
