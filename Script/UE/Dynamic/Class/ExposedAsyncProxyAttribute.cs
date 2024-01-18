@@ -3,7 +3,7 @@ using System;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class ExposedAsyncProxyAttribute : UClassAttribute
+    public class ExposedAsyncProxyAttribute : Attribute
     {
     public string MetaValue { get; set; }
     public ExposedAsyncProxyAttribute(string MetaValue)

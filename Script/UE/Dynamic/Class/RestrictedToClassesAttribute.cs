@@ -3,7 +3,7 @@ using System;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class RestrictedToClassesAttribute : UClassAttribute
+    public class RestrictedToClassesAttribute : Attribute
     {
     public string MetaValue { get; set; }
     public RestrictedToClassesAttribute(string MetaValue)

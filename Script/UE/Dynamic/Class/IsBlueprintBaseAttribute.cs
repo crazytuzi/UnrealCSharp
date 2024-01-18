@@ -3,7 +3,7 @@ using System;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class IsBlueprintBaseAttribute : UClassAttribute
+    public class IsBlueprintBaseAttribute : Attribute
     {
     public string MetaValue { get; set; }
     public IsBlueprintBaseAttribute(string MetaValue)

@@ -3,7 +3,7 @@ using System;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
-    public class LoadBehaviorAttribute : UClassAttribute
+    public class LoadBehaviorAttribute : Attribute
     {
     public string MetaValue { get; set; }
     public LoadBehaviorAttribute(string MetaValue)

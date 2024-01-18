@@ -10,5 +10,9 @@ namespace Script.Dynamic
     {
         this.MetaValue = MetaValue;
     }
+    public FilePathFilterAttribute()
+    {
+        this.MetaValue = "true";
+    }
     }
 }

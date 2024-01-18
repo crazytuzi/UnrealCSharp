@@ -3,7 +3,7 @@ using System;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class ChildCanTickAttribute : UClassAttribute
+    public class ChildCanTickAttribute : Attribute
     {
     public string MetaValue { get; set; }
     public ChildCanTickAttribute(string MetaValue)

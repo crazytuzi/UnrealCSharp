@@ -3,7 +3,7 @@ using System;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class IgnoreCategoryKeywordsInSubclassesAttribute : UClassAttribute
+    public class IgnoreCategoryKeywordsInSubclassesAttribute : Attribute
     {
     public string MetaValue { get; set; }
     public IgnoreCategoryKeywordsInSubclassesAttribute(string MetaValue)

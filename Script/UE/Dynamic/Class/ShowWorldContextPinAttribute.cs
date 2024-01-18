@@ -3,7 +3,7 @@ using System;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class ShowWorldContextPinAttribute : UClassAttribute
+    public class ShowWorldContextPinAttribute : Attribute
     {
     public string MetaValue { get; set; }
     public ShowWorldContextPinAttribute(string MetaValue)
