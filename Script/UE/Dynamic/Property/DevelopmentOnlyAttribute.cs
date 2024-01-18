@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class DevelopmentOnlyAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public DevelopmentOnlyAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public DevelopmentOnlyAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

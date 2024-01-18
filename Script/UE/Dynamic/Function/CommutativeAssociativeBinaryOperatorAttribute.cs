@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class CommutativeAssociativeBinaryOperatorAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public CommutativeAssociativeBinaryOperatorAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public CommutativeAssociativeBinaryOperatorAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

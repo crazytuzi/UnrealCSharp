@@ -5,12 +5,7 @@ namespace Script.Dynamic
 	[AttributeUsage(AttributeTargets.Method)]
 	public class CallInEditorAttribute : Attribute
 	{
-		private string MetaValue;
-		public string DisplayValue
-		{
-			get { return MetaValue; }
-			set { MetaValue = value; }
-		}
+		public string MetaValue { get; set; }
 		public CallInEditorAttribute ()
 		{
 			this.MetaValue = "true";

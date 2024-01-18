@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class ScriptOperatorAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public ScriptOperatorAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public ScriptOperatorAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

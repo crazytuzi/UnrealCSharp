@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class BlueprintProtectedAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public BlueprintProtectedAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public BlueprintProtectedAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

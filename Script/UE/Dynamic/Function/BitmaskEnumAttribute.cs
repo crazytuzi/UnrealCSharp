@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class BitmaskEnumAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public BitmaskEnumAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public BitmaskEnumAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

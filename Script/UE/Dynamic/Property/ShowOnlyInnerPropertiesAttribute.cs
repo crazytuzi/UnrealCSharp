@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class ShowOnlyInnerPropertiesAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public ShowOnlyInnerPropertiesAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;

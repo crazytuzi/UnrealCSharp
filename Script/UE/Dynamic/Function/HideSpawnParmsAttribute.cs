@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class HideSpawnParmsAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public HideSpawnParmsAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public HideSpawnParmsAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class DisallowedClassesAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public DisallowedClassesAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public DisallowedClassesAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

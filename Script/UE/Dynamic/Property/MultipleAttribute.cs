@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class MultipleAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public MultipleAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public MultipleAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

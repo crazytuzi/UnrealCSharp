@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class)]
     public class DisableSplitPinAttribute : UStructAttribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public DisableSplitPinAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public DisableSplitPinAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

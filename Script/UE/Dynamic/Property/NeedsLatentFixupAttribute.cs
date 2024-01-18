@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class NeedsLatentFixupAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public NeedsLatentFixupAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public NeedsLatentFixupAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class InlineEditConditionToggleAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public InlineEditConditionToggleAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public InlineEditConditionToggleAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class HideAssetPickerAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public HideAssetPickerAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public HideAssetPickerAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class HidePinAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public HidePinAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public HidePinAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

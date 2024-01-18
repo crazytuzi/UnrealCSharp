@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class DefaultToSelfAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public DefaultToSelfAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public DefaultToSelfAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class ValidEnumValuesAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public ValidEnumValuesAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public ValidEnumValuesAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

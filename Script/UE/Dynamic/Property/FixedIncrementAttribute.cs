@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class FixedIncrementAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public FixedIncrementAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public FixedIncrementAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

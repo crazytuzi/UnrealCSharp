@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class AllowPreserveRatioAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public AllowPreserveRatioAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public AllowPreserveRatioAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

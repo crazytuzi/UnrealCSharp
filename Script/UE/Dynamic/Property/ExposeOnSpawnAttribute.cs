@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class ExposeOnSpawnAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public ExposeOnSpawnAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;

@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class ForceShowPluginContentAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public ForceShowPluginContentAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public ForceShowPluginContentAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

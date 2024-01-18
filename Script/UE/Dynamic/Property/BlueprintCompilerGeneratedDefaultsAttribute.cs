@@ -5,12 +5,7 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Property)]
     public class BlueprintCompilerGeneratedDefaultsAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public BlueprintCompilerGeneratedDefaultsAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
@@ -19,5 +14,6 @@ namespace Script.Dynamic
     {
         this.MetaValue = "true";
     }
+    
     }
 }

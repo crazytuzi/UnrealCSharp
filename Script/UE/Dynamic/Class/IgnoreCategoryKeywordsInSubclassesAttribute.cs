@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class)]
     public class IgnoreCategoryKeywordsInSubclassesAttribute : UClassAttribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public IgnoreCategoryKeywordsInSubclassesAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public IgnoreCategoryKeywordsInSubclassesAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

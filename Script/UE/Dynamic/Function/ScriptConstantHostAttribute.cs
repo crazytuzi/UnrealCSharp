@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class ScriptConstantHostAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public ScriptConstantHostAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public ScriptConstantHostAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }

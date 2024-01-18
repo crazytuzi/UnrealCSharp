@@ -233,7 +233,7 @@ void FDynamicGeneratorCore::SetPropertyMetaData(FProperty* InProperty, MonoCusto
 		{
 			MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), PropertyMetadataName);
 			MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
-			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "DisplayValue");
+			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "MetaValue");
 			MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
 			MonoString* MetaValueString = (MonoString*)DisplayValue;
 			char* MetaValue = StringToUTF8 (MetaValueString);
@@ -528,7 +528,7 @@ void FDynamicGeneratorCore::SetFunctionMetaData(UFunction* InFunction, MonoCusto
 		{
 				MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), FunctionMetadataName);
 				MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
-				MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "DisplayValue");
+				MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "MetaValue");
 				MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
 				MonoString* MetaValueString = (MonoString*)DisplayValue;
 				char* MetaValue = StringToUTF8 (MetaValueString);
@@ -548,7 +548,7 @@ void FDynamicGeneratorCore::SetClassMetaData(UClass* InClass, MonoCustomAttrInfo
 		{
 			MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), ClassMetadataName);
 			MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
-			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "DisplayValue");
+			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "MetaValue");
 			MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
 			MonoString* MetaValueString = (MonoString*)DisplayValue;
 			char* MetaValue = StringToUTF8 (MetaValueString);

@@ -5,15 +5,14 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method)]
     public class UnsafeDuringActorConstructionAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
+    public string MetaValue { get; set; }
     public UnsafeDuringActorConstructionAttribute(string MetaValue)
     {
         this.MetaValue = MetaValue;
+    }
+    public UnsafeDuringActorConstructionAttribute()
+    {
+        this.MetaValue = "true";
     }
     }
 }
