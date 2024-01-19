@@ -5,14 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
     public class LoadBehaviorAttribute : Attribute
     {
-    public string MetaValue { get; set; }
-    public LoadBehaviorAttribute(string MetaValue)
-    {
-        this.MetaValue = MetaValue;
-    }
-    public LoadBehaviorAttribute()
-    {
-        this.MetaValue = "true";
-    }
+        public LoadBehaviorAttribute(string InValue)
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

@@ -1,18 +1,15 @@
 using System;
-using Script.Common;
+
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class FilePathFilterAttribute : Attribute
     {
-    public string MetaValue { get; set; }
-    public FilePathFilterAttribute(string MetaValue)
-    {
-        this.MetaValue = MetaValue;
-    }
-    public FilePathFilterAttribute()
-    {
-        this.MetaValue = "true";
-    }
+        public FilePathFilterAttribute(string InValue)
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

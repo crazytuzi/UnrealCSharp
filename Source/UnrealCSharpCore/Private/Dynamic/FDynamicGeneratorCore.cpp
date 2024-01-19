@@ -10,6 +10,185 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
+TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
+{
+	CLASS_BLUEPRINT_SPAWNABLE_COMPONENT_ATTRIBUTE,
+	CLASS_CHILD_CAN_TICK_ATTRIBUTE,
+	CLASS_CHILD_CANNOT_TICK_ATTRIBUTE,
+	CLASS_DEBUG_TREE_LEAF_ATTRIBUTE,
+	CLASS_IGNORE_CATEGORY_KEYWORDS_IN_SUBCLASSES_ATTRIBUTE,
+	CLASS_DEPRECATED_NODE_ATTRIBUTE,
+	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
+	CLASS_DISPLAY_NAME_ATTRIBUTE,
+	CLASS_SCRIPT_NAME_ATTRIBUTE,
+	CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE,
+	CLASS_KISMET_HIDE_OVERRIDES_ATTRIBUTE,
+	CLASS_LOAD_BEHAVIOR_ATTRIBUTE,
+	CLASS_PROHIBITED_INTERFACES_ATTRIBUTE,
+	CLASS_RESTRICTED_TO_CLASSES_ATTRIBUTE,
+	CLASS_SHOW_WORLD_CONTEXT_PIN_ATTRIBUTE,
+	CLASS_DONT_USE_GENERIC_SPAWN_OBJECT_ATTRIBUTE,
+	CLASS_EXPOSED_ASYNC_PROXY_ATTRIBUTE,
+	CLASS_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
+	CLASS_USES_HIERARCHY_ATTRIBUTE
+};
+
+TArray<FString> FDynamicGeneratorCore::StructMetaDataAttrs =
+{
+	CLASS_HAS_NATIVE_BREAK_ATTRIBUTE,
+	CLASS_HAS_NATIVE_MAKE_ATTRIBUTE,
+	CLASS_HIDDEN_BY_DEFAULT_ATTRIBUTE,
+	CLASS_DISABLE_SPLIT_PIN_ATTRIBUTE
+};
+
+TArray<FString> FDynamicGeneratorCore::EnumMetaDataAttrs =
+{
+	CLASS_BITFLAGS_ATTRIBUTE,
+	CLASS_USE_ENUM_VALUES_AS_MASK_VALUES_IN_EDITOR
+};
+
+TArray<FString> FDynamicGeneratorCore::PropertyMetaDataAttrs =
+{
+	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
+	CLASS_DISPLAY_NAME_ATTRIBUTE,
+	CLASS_SCRIPT_NAME_ATTRIBUTE,
+	CLASS_LOAD_BEHAVIOR_ATTRIBUTE,
+	CLASS_ALLOW_ABSTRACT_ATTRIBUTE,
+	CLASS_ALLOW_ANY_ACTOR_ATTRIBUTE,
+	CLASS_ALLOWED_CLASSES_ATTRIBUTE,
+	CLASS_ALLOW_PRESERVE_RATIO_ATTRIBUTE,
+	CLASS_ALLOW_PRIVATE_ACCESS_ATTRIBUTE,
+	CLASS_ARRAY_CLAMP_ATTRIBUTE,
+	CLASS_ASSET_BUNDLES_ATTRIBUTE,
+	CLASS_BLUEPRINT_BASE_ONLY_ATTRIBUTE,
+	CLASS_BLUEPRINT_COMPILER_GENERATED_DEFAULTS_ATTRIBUTE,
+	CLASS_CLAMP_MIN_ATTRIBUTE,
+	CLASS_CLAMP_MAX_ATTRIBUTE,
+	CLASS_CONFIG_HIERARCHY_EDITABLE_ATTRIBUTE,
+	CLASS_CONTENT_DIR_ATTRIBUTE,
+	CLASS_DELTA_ATTRIBUTE,
+	CLASS_DEPRECATED_PROPERTY_ATTRIBUTE,
+	CLASS_DISALLOWED_ASSET_DATA_TAGS_ATTRIBUTE,
+	CLASS_DISALLOWED_CLASSES_ATTRIBUTE,
+	CLASS_DISPLAY_AFTER_ATTRIBUTE,
+	CLASS_DISPLAY_PRIORITY_ATTRIBUTE,
+	CLASS_DISPLAY_THUMBNAIL_ATTRIBUTE,
+	CLASS_EDIT_CONDITION_ATTRIBUTE,
+	CLASS_EDIT_CONDITION_HIDES_ATTRIBUTE,
+	CLASS_EDIT_FIXED_ORDER_ATTRIBUTE,
+	CLASS_EXACT_CLASS_ATTRIBUTE,
+	CLASS_EXPOSE_FUNCTION_CATEGORIES_ATTRIBUTE,
+	CLASS_EXPOSE_ON_SPAWN_ATTRIBUTE,
+	CLASS_FILE_PATH_FILTER_ATTRIBUTE,
+	CLASS_RELATIVE_TO_GAME_DIR_ATTRIBUTE,
+	CLASS_FIXED_INCREMENT_ATTRIBUTE,
+	CLASS_FORCE_SHOW_ENGINE_CONTENT_ATTRIBUTE,
+	CLASS_FORCE_SHOW_PLUGIN_CONTENT_ATTRIBUTE,
+	CLASS_HIDE_ALPHA_CHANNEL_ATTRIBUTE,
+	CLASS_HIDE_IN_DETAIL_PANEL_ATTRIBUTE,
+	CLASS_HIDE_VIEW_OPTIONS_ATTRIBUTE,
+	CLASS_IGNORE_FOR_MEMBER_INITIALIZATION_TEST_ATTRIBUTE,
+	CLASS_INLINE_EDIT_CONDITION_TOGGLE_ATTRIBUTE,
+	CLASS_LINEAR_DELTA_SENSITIVITY_ATTRIBUTE,
+	CLASS_LONG_PACKAGE_NAME_ATTRIBUTE,
+	CLASS_MAKE_EDIT_WIDGET_ATTRIBUTE,
+	CLASS_MAKE_STRUCTURE_DEFAULT_VALUE_ATTRIBUTE,
+	CLASS_META_CLASS_ATTRIBUTE,
+	CLASS_MUST_IMPLEMENT_ATTRIBUTE,
+	CLASS_MULTIPLE_ATTRIBUTE,
+	CLASS_MAX_LENGTH_ATTRIBUTE,
+	CLASS_MULTILINE_ATTRIBUTE,
+	CLASS_PASSWORD_FIELD_ATTRIBUTE,
+	CLASS_NO_ELEMENT_DUPLICATE_ATTRIBUTE,
+	CLASS_NO_RESET_TO_DEFAULT_ATTRIBUTE,
+	CLASS_NO_EDIT_INLINE_ATTRIBUTE,
+	CLASS_NO_SPINBOX_ATTRIBUTE,
+	CLASS_ONLY_PLACEABLE_ATTRIBUTE,
+	CLASS_RELATIVE_PATH_ATTRIBUTE,
+	CLASS_RELATIVE_TO_GAME_CONTENT_DIR_ATTRIBUTE,
+	CLASS_REQUIRED_ASSET_DATA_TAGS_ATTRIBUTE,
+	CLASS_SCRIPT_NO_EXPORT_ATTRIBUTE,
+	CLASS_SHOW_ONLY_INNER_PROPERTIES_ATTRIBUTE,
+	CLASS_SHOW_TREE_VIEW_ATTRIBUTE,
+	CLASS_SLIDER_EXPONENT_ATTRIBUTE,
+	CLASS_TITLE_PROPERTY_ATTRIBUTE,
+	CLASS_UI_MIN_ATTRIBUTE,
+	CLASS_UI_MAX_ATTRIBUTE,
+	CLASS_UNITS_ATTRIBUTE,
+	CLASS_FORCE_UNITS_ATTRIBUTE,
+	CLASS_UNTRACKED_ATTRIBUTE,
+	CLASS_DEVELOPMENT_ONLY_ATTRIBUTE,
+	CLASS_NEEDS_LATENT_FIXUP_ATTRIBUTE,
+	CLASS_LATENT_CALLBACK_TARGET_ATTRIBUTE,
+	CLASS_GET_OPTIONS_ATTRIBUTE,
+	CLASS_PIN_HIDDEN_BY_DEFAULT_ATTRIBUTE,
+	CLASS_VALID_ENUM_VALUES_ATTRIBUTE,
+	CLASS_INVALID_ENUM_VALUES_ATTRIBUTE,
+	CLASS_OVERRIDING_INPUT_PROPERTY_ATTRIBUTE,
+	CLASS_REQUIRED_INPUT_ATTRIBUTE,
+	CLASS_NEVER_AS_PIN_ATTRIBUTE,
+	CLASS_PIN_SHOWN_BY_DEFAULT_ATTRIBUTE,
+	CLASS_ALWAYS_AS_PIN_ATTRIBUTE,
+	CLASS_CUSTOMIZE_PROPERTY_ATTRIBUTE
+};
+
+TArray<FString> FDynamicGeneratorCore::FunctionMetaDataAttrs =
+{
+	CLASS_CALL_IN_EDITOR_ATTRIBUTE,
+	CLASS_VARIADIC_ATTRIBUTE,
+	CLASS_RETURN_DISPLAY_NAME_ATTRIBUTE,
+	CLASS_INTERNAL_USE_PARAM_ATTRIBUTE,
+	CLASS_FORCE_AS_FUNCTION_ATTRIBUTE,
+	CLASS_IGNORE_TYPE_PROMOTION_ATTRIBUTE,
+	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
+	CLASS_DISPLAY_NAME_ATTRIBUTE,
+	CLASS_SCRIPT_NAME_ATTRIBUTE,
+	CLASS_SCRIPT_NO_EXPORT_ATTRIBUTE,
+	CLASS_ADVANCED_DISPLAY_ATTRIBUTE,
+	CLASS_ARRAY_PARM_ATTRIBUTE,
+	CLASS_ARRAY_TYPE_DEPENDENT_PARAMS_ATTRIBUTE,
+	CLASS_AUTO_CREATE_REF_TERM_ATTRIBUTE,
+	CLASS_HIDE_ASSET_PICKER_ATTRIBUTE,
+	CLASS_BLUEPRINT_INTERNAL_USE_ONLY_ATTRIBUTE,
+	CLASS_BLUEPRINT_PROTECTED_ATTRIBUTE,
+	CLASS_CALLABLE_WITHOUT_WORLD_CONTEXT_ATTRIBUTE,
+	CLASS_COMMUTATIVE_ASSOCIATIVE_BINARY_OPERATOR_ATTRIBUTE,
+	CLASS_COMPACT_NODE_TITLE_ATTRIBUTE,
+	CLASS_CUSTOM_STRUCTURE_PARAM_ATTRIBUTE,
+	CLASS_DEFAULT_TO_SELF_ATTRIBUTE,
+	CLASS_DEPRECATED_FUNCTION_ATTRIBUTE,
+	CLASS_EXPAND_ENUM_AS_EXECS_ATTRIBUTE,
+	CLASS_EXPAND_BOOL_AS_EXECS_ATTRIBUTE,
+	CLASS_SCRIPT_METHOD_ATTRIBUTE,
+	CLASS_SCRIPT_METHOD_SELF_RETURN_ATTRIBUTE,
+	CLASS_SCRIPT_OPERATOR_ATTRIBUTE,
+	CLASS_SCRIPT_CONSTANT_ATTRIBUTE,
+	CLASS_SCRIPT_CONSTANT_HOST_ATTRIBUTE,
+	CLASS_HIDE_PIN_ATTRIBUTE,
+	CLASS_HIDE_SPAWN_PARMS_ATTRIBUTE,
+	CLASS_KEYWORDS_ATTRIBUTE,
+	CLASS_LATENT_ATTRIBUTE,
+	CLASS_LATENT_INFO_ATTRIBUTE,
+	CLASS_MATERIAL_PARAMETER_COLLECTION_FUNCTION_ATTRIBUTE,
+	CLASS_NATIVE_BREAK_FUNC_ATTRIBUTE,
+	CLASS_NATIVE_MAKE_FUNC_ATTRIBUTE,
+	CLASS_UNSAFE_DURING_ACTOR_CONSTRUCTION_ATTRIBUTE,
+	CLASS_WORLD_CONTEXT_ATTRIBUTE,
+	CLASS_BLUEPRINT_AUTOCAST_ATTRIBUTE,
+	CLASS_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
+	CLASS_NOT_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
+	CLASS_DETERMINES_OUTPUT_TYPE_ATTRIBUTE,
+	CLASS_DYNAMIC_OUTPUT_PARAM_ATTRIBUTE,
+	CLASS_DATA_TABLE_PIN_ATTRIBUTE,
+	CLASS_SET_PARAM_ATTRIBUTE,
+	CLASS_MAP_PARAM_ATTRIBUTE,
+	CLASS_MAP_KEY_PARAM_ATTRIBUTE,
+	CLASS_MAP_VALUE_PARAM_ATTRIBUTE,
+	CLASS_BIT_MASK_ATTRIBUTE,
+	CLASS_BIT_MASK_ENUM_ATTRIBUTE,
+	CLASS_ARRAY_PARAM_ATTRIBUTE
+};
+
 UPackage* FDynamicGeneratorCore::GetOuter()
 {
 	return UObject::StaticClass()->GetPackage();
@@ -222,25 +401,9 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 		// @TODO
 	}
 
-	SetPropertyMetaData(InProperty, InMonoCustomAttrInfo);
-}
-
-void FDynamicGeneratorCore::SetPropertyMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
-{
-	for(auto &PropertyMetadataName:PropertyMetadata)
-	{
-		if (AttrsHasAttr(InMonoCustomAttrInfo, PropertyMetadataName))
-		{
-			MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), PropertyMetadataName);
-			MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
-			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "MetaValue");
-			MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
-			MonoString* MetaValueString = (MonoString*)DisplayValue;
-			char* MetaValue = StringToUTF8 (MetaValueString);
-			FString FMetaKey = PropertyMetadataName.LeftChop(9);
-			InProperty->SetMetaData(*FMetaKey,MetaValue);
-		}
-	}
+#if WITH_EDITOR
+	SetMetaData(InProperty, InMonoCustomAttrInfo);
+#endif
 }
 
 enum class EDynamicFunctionExportFlags
@@ -517,50 +680,61 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 		}
 	}
 
-	SetFunctionMetaData(InFunction, InMonoCustomAttrInfo);
-}
-
-void FDynamicGeneratorCore::SetFunctionMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
-{
-	for(auto &FunctionMetadataName:FunctionMetadata)
-	{
-		if (AttrsHasAttr(InMonoCustomAttrInfo, FunctionMetadataName))
-		{
-				MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), FunctionMetadataName);
-				MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
-				MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "MetaValue");
-				MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
-				MonoString* MetaValueString = (MonoString*)DisplayValue;
-				char* MetaValue = StringToUTF8 (MetaValueString);
-				FString FMetaValue = FString(UTF8_TO_TCHAR(MetaValue));
-				const TCHAR* TMetaValue = *FMetaValue;
-				FString FMetaKey = FunctionMetadataName.LeftChop(9);
-				InFunction->SetMetaData(*FMetaKey,TMetaValue);
-		}
-	}
-}
-
-void FDynamicGeneratorCore::SetClassMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
-{
-	for(auto &ClassMetadataName:ClassMetadata)
-	{
-		if (AttrsHasAttr(InMonoCustomAttrInfo, ClassMetadataName))
-		{
-			MonoClass* monoClass = FMonoDomain::Class_From_Name(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), ClassMetadataName);
-			MonoObject* monoProperty=AttrsGetAttr(InMonoCustomAttrInfo, monoClass);
-			MonoProperty* MetaValueObject =AttrGetProperty(monoClass, "MetaValue");
-			MonoObject* DisplayValue = PropertyGetValue (MetaValueObject, monoProperty, NULL, NULL);
-			MonoString* MetaValueString = (MonoString*)DisplayValue;
-			char* MetaValue = StringToUTF8 (MetaValueString);
-			FString FMetaValue = FString(UTF8_TO_TCHAR(MetaValue));
-			const TCHAR* TMetaValue = *FMetaValue;
-			FString FMetaKey = ClassMetadataName.LeftChop(9);
-			InClass->SetMetaData(*FMetaKey,TMetaValue);
-		}
-	}
+#if WITH_EDITOR
+	SetMetaData(InFunction, InMonoCustomAttrInfo);
+#endif
 }
 
 #if WITH_EDITOR
+template <typename T>
+static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
+                             MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	for (const auto& MetaDataAttr : InMetaDataAttrs)
+	{
+		if (FDynamicGeneratorCore::AttrsHasAttr(InMonoCustomAttrInfo, MetaDataAttr))
+		{
+			const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), MetaDataAttr);
+
+			const auto FoundMonoObject = FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, FoundMonoClass);
+
+			const auto FoundMonoProperty = FMonoDomain::Class_Get_Property_From_Name(FoundMonoClass, TEXT("Value"));
+
+			const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
+
+			InField->SetMetaData(*MetaDataAttr.LeftChop(9),
+			                     *FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(
+				                     FMonoDomain::Object_To_String(Value, nullptr)))));
+		}
+	}
+}
+
+void FDynamicGeneratorCore::SetMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	SetFieldMetaData(InClass, ClassMetaDataAttrs, InMonoCustomAttrInfo);
+}
+
+void FDynamicGeneratorCore::SetMetaData(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo);
+}
+
+void FDynamicGeneratorCore::SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo);
+}
+
+void FDynamicGeneratorCore::SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	SetFieldMetaData(InProperty, PropertyMetaDataAttrs, InMonoCustomAttrInfo);
+}
+
+void FDynamicGeneratorCore::SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	SetFieldMetaData(InFunction, FunctionMetaDataAttrs, InMonoCustomAttrInfo);
+}
+
 TArray<FString> FDynamicGeneratorCore::GetDynamic(const FString& InFile, const FString& InField)
 {
 	auto& FileManager = IFileManager::Get();
@@ -601,26 +775,3 @@ bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInf
 
 	return false;
 }
-
-MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* Info, MonoClass* Attr_klass)
-{
-	return FMonoDomain::Custom_Attrs_Get_Attr(Info, Attr_klass);
-}
-
-MonoProperty* FDynamicGeneratorCore::AttrGetProperty(MonoClass* InMonoClass, const char* InName)
-{
-	return FMonoDomain::Class_Get_Property_From_Name(InMonoClass, InName);
-}
-
-MonoObject* FDynamicGeneratorCore::PropertyGetValue(MonoProperty* InMonoCustomProp, void* obj, void** params, MonoObject** exc)
-{
-	return FMonoDomain::Property_Get_Value(InMonoCustomProp, obj, params, exc);
-}
-
-char* FDynamicGeneratorCore::StringToUTF8(MonoString* InMonoString)
-{
-	return FMonoDomain::String_To_UTF8(InMonoString);
-}
-
-
-

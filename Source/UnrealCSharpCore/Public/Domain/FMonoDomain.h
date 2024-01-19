@@ -53,6 +53,8 @@ public:
 
 	static MonoProperty* Class_Get_Properties(MonoClass* InMonoClass, void** InIterator);
 
+	static MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName);
+
 	static MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator);
 
 	static MonoCustomAttrInfo* Custom_Attrs_From_Class(MonoClass* InMonoClass);
@@ -65,11 +67,7 @@ public:
 
 	static mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
 
-	static MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName);
-
-	static MonoObject* Custom_Attrs_Get_Attr(MonoCustomAttrInfo *Info, MonoClass *Attr_klass);
-	
-	static MonoObject* Property_Get_Value(MonoProperty* InMonoCustomProp, void *obj,void **params, MonoObject** exc);
+	static MonoObject* Custom_Attrs_Get_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
 
 	static void Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue);
 
@@ -88,6 +86,9 @@ public:
 
 	static void Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
 	                               MonoObject** InExc);
+
+	static MonoObject* Property_Get_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
+	                                      MonoObject** InExc);
 
 	static const char* Method_Get_Name(MonoMethod* InMonoMethod);
 
@@ -171,8 +172,6 @@ public:
 	static MonoClass* Get_Double_Class();
 
 	static uint32 GCHandle_New(MonoObject* InMonoObject, mono_bool bPinned);
-
-	static char* StringToUTF8(MonoString* InMonoString);
 
 	static uint32 GCHandle_New_WeakRef(MonoObject* InMonoObject, mono_bool bTrackResurrection);
 

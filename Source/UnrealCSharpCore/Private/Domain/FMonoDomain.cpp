@@ -204,6 +204,11 @@ MonoProperty* FMonoDomain::Class_Get_Properties(MonoClass* InMonoClass, void** I
 	return InMonoClass != nullptr ? mono_class_get_properties(InMonoClass, InIterator) : nullptr;
 }
 
+MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName)
+{
+	return InMonoClass != nullptr ? mono_class_get_property_from_name(InMonoClass, InName) : nullptr;
+}
+
 MonoMethod* FMonoDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator)
 {
 	return InMonoClass != nullptr ? mono_class_get_methods(InMonoClass, InIterator) : nullptr;
@@ -245,24 +250,11 @@ mono_bool FMonoDomain::Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAtt
 		       : false;
 }
 
-MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName)
+MonoObject* FMonoDomain::Custom_Attrs_Get_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
 {
-	return InMonoClass != nullptr ? mono_class_get_property_from_name(InMonoClass, InName) : nullptr;
-}
-
-MonoObject* FMonoDomain::Custom_Attrs_Get_Attr(MonoCustomAttrInfo* Info, MonoClass* Attr_klass)
-{
-	return Info != nullptr && Attr_klass != nullptr ? mono_custom_attrs_get_attr(Info, Attr_klass) : nullptr;
-}
-
-MonoObject* FMonoDomain::Property_Get_Value(MonoProperty* InMonoCustomProp, void* obj, void** params, MonoObject** exc)
-{
-	return InMonoCustomProp != nullptr ? mono_property_get_value(InMonoCustomProp, obj, params, exc) : nullptr;
-}
-
-char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
-{
-	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
+	return InMonoCustomAttrInfo != nullptr && InMonoClass != nullptr
+		       ? mono_custom_attrs_get_attr(InMonoCustomAttrInfo, InMonoClass)
+		       : nullptr;
 }
 
 const char* FMonoDomain::Field_Get_Name(MonoClassField* InMonoClassField)
@@ -305,6 +297,12 @@ void FMonoDomain::Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoO
 	{
 		mono_property_set_value(InMonoProperty, InMonoObject, InParams, InExc);
 	}
+}
+
+MonoObject* FMonoDomain::Property_Get_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
+                                            MonoObject** InExc)
+{
+	return InMonoProperty != nullptr ? mono_property_get_value(InMonoProperty, InMonoObject, InParams, InExc) : nullptr;
 }
 
 const char* FMonoDomain::Method_Get_Name(MonoMethod* InMonoMethod)
@@ -467,6 +465,11 @@ MonoString* FMonoDomain::Object_To_String(MonoObject* InMonoObject, MonoObject**
 	return InMonoObject != nullptr ? mono_object_to_string(InMonoObject, InExc) : nullptr;
 }
 
+char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
+{
+	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
+}
+
 MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
 {
 	return mono_array_new(Domain, InMonoClass, InNum);
@@ -545,11 +548,6 @@ MonoClass* FMonoDomain::Get_Double_Class()
 uint32 FMonoDomain::GCHandle_New(MonoObject* InMonoObject, const mono_bool bPinned)
 {
 	return mono_gchandle_new(InMonoObject, bPinned);
-}
-
-char* FMonoDomain::StringToUTF8(MonoString* InMonoString)
-{
-	return mono_string_to_utf8(InMonoString);
 }
 
 uint32 FMonoDomain::GCHandle_New_WeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)

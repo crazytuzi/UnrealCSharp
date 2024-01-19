@@ -143,6 +143,10 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 	Enum->SetMetaData(*FBlueprintMetadata::MD_AllowableBlueprintVariableType.ToString(), TEXT("true"));
 #endif
 
+#if WITH_EDITOR
+	GeneratorMetaData(InMonoClass, Enum);
+#endif
+
 	GeneratorEnumerator(InMonoClass, Enum);
 
 #if WITH_EDITOR
@@ -178,6 +182,25 @@ void FDynamicEnumGenerator::ReInstance(const TArray<UBlueprint*>& InBlueprints)
 	for (const auto Blueprint : InBlueprints)
 	{
 		FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+	}
+}
+
+void FDynamicEnumGenerator::GeneratorMetaData(MonoClass* InMonoClass, UEnum* InEnum)
+{
+	if (InMonoClass == nullptr || InEnum == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_ENUM_ATTRIBUTE);
+
+	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
+	{
+		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+		{
+			FDynamicGeneratorCore::SetMetaData(InEnum, Attrs);
+		}
 	}
 }
 #endif

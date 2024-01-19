@@ -1,21 +1,15 @@
 using System;
-using Script.Common;
 
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class ScriptConstantAttribute : Attribute
     {
-        public string MetaValue { get; set; }
-
-        public ScriptConstantAttribute(string MetaValue)
+        public ScriptConstantAttribute(string InValue)
         {
-            this.MetaValue = MetaValue;
+            Value = InValue;
         }
 
-        public ScriptConstantAttribute()
-        {
-            this.MetaValue = "true";
-        }
+        private string Value { get; set; }
     }
 }

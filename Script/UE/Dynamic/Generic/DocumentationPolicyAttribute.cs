@@ -5,15 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
     public class DocumentationPolicyAttribute : Attribute
     {
-    private string MetaValue;
-    public string DisplayValue
-    {
-        get { return MetaValue; }
-        set { MetaValue = value; }
-    }
-    public DocumentationPolicyAttribute(string MetaValue)
-    {
-        this.MetaValue = MetaValue;
-    }
+        public DocumentationPolicyAttribute(string InValue)
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

@@ -5,10 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property)]
     public class DeprecationMessageAttribute : Attribute
     {
-    public string MetaValue { get; set; }
-    public DeprecationMessageAttribute(string MetaValue)
-    {
-        this.MetaValue = MetaValue;
-    }
+        public DeprecationMessageAttribute(string InValue)
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

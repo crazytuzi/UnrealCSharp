@@ -21,6 +21,8 @@ private:
 
 #if WITH_EDITOR
 	static void ReInstance(const TArray<UBlueprint*>& InBlueprints);
+
+	static void GeneratorMetaData(MonoClass* InMonoClass, UEnum* InEnum);
 #endif
 
 	static void GeneratorEnumerator(MonoClass* InMonoClass, UEnum* InEnum);

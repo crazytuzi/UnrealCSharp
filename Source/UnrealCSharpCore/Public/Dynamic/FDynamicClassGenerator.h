@@ -32,6 +32,8 @@ private:
 
 #if WITH_EDITOR
 	static void ReInstance(UClass* InClass);
+
+	static void GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass);
 #endif
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UClass* InClass);

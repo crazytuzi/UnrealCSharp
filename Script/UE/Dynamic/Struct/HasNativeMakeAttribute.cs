@@ -1,18 +1,15 @@
 using System;
-using Script.Common;
+
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class HasNativeMakeAttribute : UStructAttribute
+    public class HasNativeMakeAttribute : Attribute
     {
-    public string MetaValue { get; set; }
-    public HasNativeMakeAttribute(string MetaValue)
-    {
-        this.MetaValue = MetaValue;
-    }
-    public HasNativeMakeAttribute()
-    {
-        this.MetaValue = "true";
-    }
+        public HasNativeMakeAttribute(string InValue)
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

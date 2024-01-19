@@ -156,6 +156,10 @@ void FDynamicStructGenerator::Generator(MonoClass* InMonoClass, const bool bReIn
 
 	BeginGenerator(ScriptStruct);
 
+#if WITH_EDITOR
+	GeneratorMetaData(InMonoClass, ScriptStruct);
+#endif
+
 	GeneratorProperty(InMonoClass, ScriptStruct);
 
 	EndGenerator(ScriptStruct);
@@ -223,6 +227,25 @@ void FDynamicStructGenerator::ReInstance(UScriptStruct* InScriptStruct, const TA
 		}
 
 		FBlueprintEditorUtils::RefreshExternalBlueprintDependencyNodes(Blueprint, InScriptStruct);
+	}
+}
+
+void FDynamicStructGenerator::GeneratorMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct)
+{
+	if (InMonoClass == nullptr || InScriptStruct == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_STRUCT_ATTRIBUTE);
+
+	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
+	{
+		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+		{
+			FDynamicGeneratorCore::SetMetaData(InScriptStruct, Attrs);
+		}
 	}
 }
 #endif

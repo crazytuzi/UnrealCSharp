@@ -1,18 +1,10 @@
 using System;
-using Script.Common;
+
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class NoEditInlineAttribute : Attribute
     {
-    public string MetaValue { get; set; }
-    public NoEditInlineAttribute(string MetaValue)
-    {
-        this.MetaValue = MetaValue;
-    }
-    public NoEditInlineAttribute()
-    {
-        this.MetaValue = "true";
-    }
+        private string Value { get; set; } = "true";
     }
 }

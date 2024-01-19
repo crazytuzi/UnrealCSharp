@@ -11,26 +11,32 @@ public:
 
 	static void SetPropertyFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
-	static void SetPropertyMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
-	
 	static void SetFunctionFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
-	static void SetFunctionMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
-
-	static void SetClassMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo);
-
 #if WITH_EDITOR
+	static void SetMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetMetaData(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
 	static TArray<FString> GetDynamic(const FString& InFile, const FString& InField);
 #endif
 
-private:
 	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
 
-	static MonoObject* AttrsGetAttr(MonoCustomAttrInfo* Info, MonoClass* Attr_klass);
+private:
+	static TArray<FString> ClassMetaDataAttrs;
 
-	static MonoProperty* AttrGetProperty(MonoClass* InMonoClass, const char* InName);
+	static TArray<FString> StructMetaDataAttrs;
 
-	static MonoObject* PropertyGetValue(MonoProperty* InMonoCustomProp, void* obj, void** params, MonoObject** exc);
+	static TArray<FString> EnumMetaDataAttrs;
 
-	static char* StringToUTF8(MonoString* InMonoString);
+	static TArray<FString> PropertyMetaDataAttrs;
+
+	static TArray<FString> FunctionMetaDataAttrs;
 };

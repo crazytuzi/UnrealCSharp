@@ -153,17 +153,10 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 		}
 	}
-	
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_CLASS_ATTRIBUTE);
-		
-	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
-	{
-		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
-		{
-			FDynamicGeneratorCore::SetClassMetaData(Class, Attrs);
-		}
-	}
+
+#if WITH_EDITOR
+	GeneratorMetaData(InMonoClass, Class);
+#endif
 
 	GeneratorProperty(InMonoClass, Class);
 
@@ -285,6 +278,25 @@ void FDynamicClassGenerator::ReInstance(UClass* InClass)
 			ClassIterator->Bind();
 
 			ClassIterator->StaticLink(true);
+		}
+	}
+}
+
+void FDynamicClassGenerator::GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass)
+{
+	if (InMonoClass == nullptr || InClass == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_CLASS_ATTRIBUTE);
+
+	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
+	{
+		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+		{
+			FDynamicGeneratorCore::SetMetaData(InClass, Attrs);
 		}
 	}
 }
@@ -413,11 +425,11 @@ void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* I
 				{
 					const auto ReturnParamReflectionType = FMonoDomain::Type_Get_Object(ReturnParamType);
 
-					const auto Property = FTypeBridge::Factory(ReturnParamReflectionType, Function, "",
-					                                           RF_Public | RF_Transient);
-					if(Property)
+					if (const auto Property = FTypeBridge::Factory(ReturnParamReflectionType, Function, "",
+					                                               RF_Public | RF_Transient))
 					{
 						Property->SetPropertyFlags(CPF_Parm | CPF_ReturnParm);
+
 						Function->AddCppProperty(Property);
 					}
 				}

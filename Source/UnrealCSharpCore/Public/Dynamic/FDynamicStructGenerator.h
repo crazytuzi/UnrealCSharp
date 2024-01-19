@@ -25,6 +25,8 @@ private:
 
 #if WITH_EDITOR
 	static void ReInstance(UScriptStruct* InScriptStruct, const TArray<UBlueprint*>& InBlueprints);
+
+	static void GeneratorMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);
 #endif
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);

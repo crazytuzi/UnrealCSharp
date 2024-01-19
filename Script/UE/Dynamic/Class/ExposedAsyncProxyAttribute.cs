@@ -5,14 +5,11 @@ namespace Script.Dynamic
     [AttributeUsage(AttributeTargets.Class)]
     public class ExposedAsyncProxyAttribute : Attribute
     {
-    public string MetaValue { get; set; }
-    public ExposedAsyncProxyAttribute(string MetaValue)
-    {
-        this.MetaValue = MetaValue;
-    }
-    public ExposedAsyncProxyAttribute()
-    {
-        this.MetaValue = "true";
-    }
+        public ExposedAsyncProxyAttribute(string InValue)
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }

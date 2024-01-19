@@ -1,18 +1,20 @@
 using System;
-using Script.Common;
+
 namespace Script.Dynamic
 {
-	[AttributeUsage(AttributeTargets.Method)]
-	public class CallInEditorAttribute : Attribute
-	{
-		public string MetaValue { get; set; }
-		public CallInEditorAttribute ()
-		{
-			this.MetaValue = "true";
-		}
-		public CallInEditorAttribute (string value)
-		{
-			MetaValue = value;
-		}
-	}
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CallInEditorAttribute : Attribute
+    {
+        public CallInEditorAttribute()
+        {
+            Value = "true";
+        }
+
+        public CallInEditorAttribute(string InValue)
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
+    }
 }

@@ -1,18 +1,15 @@
 using System;
-using Script.Common;
+
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class HasNativeBreakAttribute : UStructAttribute
+    public class HasNativeBreakAttribute : Attribute
     {
-    public string MetaValue { get; set; }
-    public HasNativeBreakAttribute(string MetaValue)
-    {
-        this.MetaValue = MetaValue;
-    }
-    public HasNativeBreakAttribute()
-    {
-        this.MetaValue = "true";
-    }
+        public HasNativeBreakAttribute(string InValue)
+        {
+            Value = InValue;
+        }
+
+        private string Value { get; set; }
     }
 }
