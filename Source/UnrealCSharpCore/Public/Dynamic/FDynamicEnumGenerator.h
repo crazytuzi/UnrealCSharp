@@ -20,10 +20,12 @@ private:
 	static UCSharpEnum* GeneratorCSharpEnum(UPackage* InOuter, const FString& InName);
 
 #if WITH_EDITOR
-	static void ReInstance(const TArray<UBlueprint*>& InBlueprints);
+	static void ReInstance(UEnum* InEnum);
 
 	static void GeneratorMetaData(MonoClass* InMonoClass, UEnum* InEnum);
 #endif
 
 	static void GeneratorEnumerator(MonoClass* InMonoClass, UEnum* InEnum);
+
+	static TMap<FString, UCSharpEnum*> DynamicEnum;
 };

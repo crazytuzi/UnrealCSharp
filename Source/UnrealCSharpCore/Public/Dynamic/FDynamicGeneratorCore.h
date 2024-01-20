@@ -25,6 +25,8 @@ public:
 	static void SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 	static TArray<FString> GetDynamic(const FString& InFile, const FString& InField);
+
+	static void ReloadPackages(const TFunction<bool(const TObjectIterator<UBlueprintGeneratedClass>&)>& InPredicate);
 #endif
 
 	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);

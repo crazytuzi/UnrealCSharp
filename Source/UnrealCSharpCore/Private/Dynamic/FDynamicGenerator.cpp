@@ -64,27 +64,31 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 		}
 	});
 
+	TArray<FString> FileChange;
+
 	for (const auto& Data : FileChangeData)
 	{
 		if (FPaths::GetExtension(Data.Filename) == TEXT("cs"))
 		{
-			auto Filename = FPaths::GetBaseFilename(Data.Filename);
+			FileChange.AddUnique(FPaths::GetBaseFilename(Data.Filename));
+		}
+	}
 
-			if (const auto MonoClass = FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(),
-			                                                        Filename))
+	for (const auto& File : FileChange)
+	{
+		if (const auto MonoClass = FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), File))
+		{
+			if (FDynamicClassGenerator::IsDynamicClass(MonoClass))
 			{
-				if (FDynamicClassGenerator::IsDynamicClass(MonoClass))
-				{
-					FDynamicClassGenerator::Generator(MonoClass, true);
-				}
-				else if (FDynamicStructGenerator::IsDynamicStruct(MonoClass))
-				{
-					FDynamicStructGenerator::Generator(MonoClass, true);
-				}
-				else if (FDynamicEnumGenerator::IsDynamicEnum(MonoClass))
-				{
-					FDynamicEnumGenerator::Generator(MonoClass, true);
-				}
+				FDynamicClassGenerator::Generator(MonoClass, true);
+			}
+			else if (FDynamicStructGenerator::IsDynamicStruct(MonoClass))
+			{
+				FDynamicStructGenerator::Generator(MonoClass, true);
+			}
+			else if (FDynamicEnumGenerator::IsDynamicEnum(MonoClass))
+			{
+				FDynamicEnumGenerator::Generator(MonoClass, true);
 			}
 		}
 	}

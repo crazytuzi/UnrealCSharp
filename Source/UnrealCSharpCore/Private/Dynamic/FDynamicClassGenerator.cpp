@@ -16,6 +16,8 @@
 #include "UEVersion.h"
 #include "Dynamic/CSharpBlueprint.h"
 
+TMap<FString, UClass*> FDynamicClassGenerator::DynamicClass;
+
 void FDynamicClassGenerator::Generator()
 {
 	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
@@ -66,13 +68,11 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 
 	for (const auto& ClassName : CSharpGeneratedClass)
 	{
-		const auto Outer = FDynamicGeneratorCore::GetOuter();
-
-		const auto Class = LoadObject<UClass>(Outer, *FString(ClassName));
-
-		if (Class == nullptr)
+		if (!DynamicClass.Contains(ClassName))
 		{
-			GeneratorCSharpClass(Outer, ClassName, AActor::StaticClass());
+			DynamicClass.Add(
+				ClassName,
+				GeneratorCSharpClass(FDynamicGeneratorCore::GetOuter(), ClassName, AActor::StaticClass()));
 		}
 	}
 
@@ -86,13 +86,12 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 
 	for (const auto& ClassName : CSharpBlueprintGeneratedClass)
 	{
-		const auto Outer = FDynamicGeneratorCore::GetOuter();
-
-		const auto Class = LoadObject<UClass>(Outer, *FString(ClassName));
-
-		if (Class == nullptr)
+		if (!DynamicClass.Contains(ClassName))
 		{
-			GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName, AActor::StaticClass());
+			DynamicClass.Add(
+				ClassName,
+				GeneratorCSharpBlueprintGeneratedClass(FDynamicGeneratorCore::GetOuter(), ClassName,
+				                                       AActor::StaticClass()));
 		}
 	}
 }
@@ -105,7 +104,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 		return;
 	}
 
-	const auto ClassName = FMonoDomain::Class_Get_Name(InMonoClass);
+	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
@@ -119,17 +118,19 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 
 	const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName);
 
-	auto Class = LoadObject<UClass>(Outer, *FString(ClassName));
+	UClass* Class{};
 
-	if (Class != nullptr)
+	if (DynamicClass.Contains(ClassName))
 	{
+		Class = DynamicClass[ClassName];
+
 		Class->PurgeClass(false);
 
-		if (const auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(ParentClass))
+		if (Cast<UBlueprintGeneratedClass>(ParentClass))
 		{
 			Class->ClassFlags |= ParentClass->ClassFlags;
 
-			BeginGenerator(BlueprintGeneratedClass, ParentClass);
+			BeginGenerator(Class, ParentClass);
 		}
 		else
 		{
@@ -148,10 +149,12 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 		}
 		else
 		{
-			Class = GeneratorCSharpClass(Outer, ClassName, ParentClass);
+			Class = GeneratorCSharpClass(Outer, ClassName.RightChop(1), ParentClass);
 
 			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 		}
+
+		DynamicClass.Add(ClassName, Class);
 	}
 
 #if WITH_EDITOR
@@ -163,8 +166,6 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 	GeneratorFunction(InMonoClass, Class);
 
 	EndGenerator(Class);
-
-	(void)Class->GetDefaultObject();
 
 #if WITH_EDITOR
 	if (bReInstance == true)
@@ -182,6 +183,15 @@ bool FDynamicClassGenerator::IsDynamicClass(MonoClass* InMonoClass)
 	const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
 
 	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
+}
+
+UClass* FDynamicClassGenerator::GetDynamicClass(MonoClass* InMonoClass)
+{
+	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+	const auto FoundDynamicClass = DynamicClass.Find(ClassName);
+
+	return FoundDynamicClass != nullptr ? *FoundDynamicClass : nullptr;
 }
 
 void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentClass)
@@ -212,11 +222,29 @@ void FDynamicClassGenerator::BeginGenerator(UCSharpBlueprintGeneratedClass* InCl
 
 void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 {
+	if (InClass->GetSuperClass()->HasAnyInternalFlags(EInternalObjectFlags::Native))
+	{
+		InClass->ClearInternalFlags(EInternalObjectFlags::Native);
+	}
+
 	InClass->Bind();
 
 	InClass->StaticLink(true);
 
 	InClass->AssembleReferenceTokenStream();
+
+	(void)InClass->GetDefaultObject();
+
+	if (InClass->GetSuperClass()->HasAnyInternalFlags(EInternalObjectFlags::Native))
+	{
+		InClass->SetInternalFlags(EInternalObjectFlags::Native);
+	}
+
+	for (TFieldIterator<FProperty> It(InClass, EFieldIteratorFlags::ExcludeSuper,
+	                                  EFieldIteratorFlags::ExcludeDeprecated); It; ++It)
+	{
+		It->InitializeValue(It->ContainerPtrToValuePtr<void>(InClass->ClassDefaultObject));
+	}
 }
 
 UCSharpClass* FDynamicClassGenerator::GeneratorCSharpClass(
@@ -271,15 +299,11 @@ void FDynamicClassGenerator::ReInstance(UClass* InClass)
 		ActionDatabase.RefreshClassActions(InClass);
 	}
 
-	for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
-	{
-		if (ClassIterator->IsChildOf(InClass))
+	FDynamicGeneratorCore::ReloadPackages(
+		[InClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
-			ClassIterator->Bind();
-
-			ClassIterator->StaticLink(true);
-		}
-	}
+			return InBlueprintGeneratedClass->IsChildOf(InClass);
+		});
 }
 
 void FDynamicClassGenerator::GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass)

@@ -9,6 +9,9 @@
 #include "Misc/FileHelper.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#if WITH_EDITOR
+#include "PackageTools.h"
+#endif
 
 TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
 {
@@ -762,6 +765,26 @@ TArray<FString> FDynamicGeneratorCore::GetDynamic(const FString& InFile, const F
 	}
 
 	return {};
+}
+
+void FDynamicGeneratorCore::ReloadPackages(
+	const TFunction<bool(const TObjectIterator<UBlueprintGeneratedClass>&)>& InPredicate)
+{
+	TArray<UPackage*> PackagesToReload;
+
+	for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
+	{
+		if (InPredicate(ClassIterator))
+		{
+			PackagesToReload.AddUnique(ClassIterator->GetPackage());
+		}
+	}
+
+	PackagesToReload.Remove(GetTransientPackage());
+
+	PackagesToReload.Remove(GetOuter());
+
+	UPackageTools::ReloadPackages(PackagesToReload);
 }
 #endif
 

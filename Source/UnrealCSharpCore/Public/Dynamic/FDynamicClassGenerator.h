@@ -17,6 +17,8 @@ public:
 
 	static bool IsDynamicClass(MonoClass* InMonoClass);
 
+	static UNREALCSHARPCORE_API UClass* GetDynamicClass(MonoClass* InMonoClass);
+
 private:
 	static void BeginGenerator(UClass* InClass, UClass* InParentClass);
 
@@ -39,4 +41,6 @@ private:
 	static void GeneratorProperty(MonoClass* InMonoClass, UClass* InClass);
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
+
+	static TMap<FString, UClass*> DynamicClass;
 };
