@@ -26,6 +26,10 @@ public:
 
 	static TArray<FString> GetDynamic(const FString& InFile, const FString& InField);
 
+	static void IteratorBlueprintGeneratedClass(
+		const TFunction<bool(const TObjectIterator<UBlueprintGeneratedClass>&)>& InPredicate,
+		const TUniqueFunction<void(const TObjectIterator<UBlueprintGeneratedClass>&)>& InFunction);
+
 	static void ReloadPackages(const TFunction<bool(const TObjectIterator<UBlueprintGeneratedClass>&)>& InPredicate);
 #endif
 

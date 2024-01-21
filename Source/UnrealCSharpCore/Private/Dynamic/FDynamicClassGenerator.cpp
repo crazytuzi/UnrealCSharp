@@ -12,6 +12,7 @@
 #include "mono/metadata/object.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
+#include "Kismet2/KismetEditorUtilities.h"
 #endif
 #include "UEVersion.h"
 #include "Dynamic/CSharpBlueprint.h"
@@ -118,11 +119,19 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 
 	const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName);
 
+#if WITH_EDITOR
+	auto PrevStructSize = 0;
+#endif
+
 	UClass* Class{};
 
 	if (DynamicClass.Contains(ClassName))
 	{
 		Class = DynamicClass[ClassName];
+
+#if WITH_EDITOR
+		PrevStructSize = Class->GetStructureSize();
+#endif
 
 		Class->PurgeClass(false);
 
@@ -168,9 +177,11 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 	EndGenerator(Class);
 
 #if WITH_EDITOR
+	const auto NewStructSize = Class->GetStructureSize();
+
 	if (bReInstance == true)
 	{
-		ReInstance(Class);
+		ReInstance(Class, NewStructSize - PrevStructSize);
 	}
 #endif
 }
@@ -288,7 +299,7 @@ UCSharpBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorCSharpBlueprint
 }
 
 #if WITH_EDITOR
-void FDynamicClassGenerator::ReInstance(UClass* InClass)
+void FDynamicClassGenerator::ReInstance(UClass* InClass, const int32 InChangedStructSize)
 {
 	if (GEditor)
 	{
@@ -299,11 +310,32 @@ void FDynamicClassGenerator::ReInstance(UClass* InClass)
 		ActionDatabase.RefreshClassActions(InClass);
 	}
 
-	FDynamicGeneratorCore::ReloadPackages(
-		[InClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
+	if (Cast<UCSharpBlueprintGeneratedClass>(InClass))
+	{
+		if (InChangedStructSize != 0)
 		{
-			return InBlueprintGeneratedClass->IsChildOf(InClass);
-		});
+			FDynamicGeneratorCore::IteratorBlueprintGeneratedClass(
+				[InClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
+				{
+					return InBlueprintGeneratedClass->IsChildOf(InClass) &&
+						InBlueprintGeneratedClass->GetPackage() != InClass->GetPackage() &&
+						FKismetEditorUtilities::IsClassABlueprintSkeleton(*InBlueprintGeneratedClass);
+				},
+				[InChangedStructSize](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
+				{
+					InBlueprintGeneratedClass->SetPropertiesSize(
+						InBlueprintGeneratedClass->GetPropertiesSize() + InChangedStructSize);
+				});
+		}
+	}
+	else
+	{
+		FDynamicGeneratorCore::ReloadPackages(
+			[InClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
+			{
+				return InBlueprintGeneratedClass->IsChildOf(InClass);
+			});
+	}
 }
 
 void FDynamicClassGenerator::GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass)

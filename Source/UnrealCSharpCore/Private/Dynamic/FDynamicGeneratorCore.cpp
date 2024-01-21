@@ -767,18 +767,30 @@ TArray<FString> FDynamicGeneratorCore::GetDynamic(const FString& InFile, const F
 	return {};
 }
 
+void FDynamicGeneratorCore::IteratorBlueprintGeneratedClass(
+	const TFunction<bool(const TObjectIterator<UBlueprintGeneratedClass>&)>& InPredicate,
+	const TUniqueFunction<void(const TObjectIterator<UBlueprintGeneratedClass>&)>& InFunction)
+{
+	for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
+	{
+		if (InPredicate(ClassIterator))
+		{
+			InFunction(ClassIterator);
+		}
+	}
+}
+
 void FDynamicGeneratorCore::ReloadPackages(
 	const TFunction<bool(const TObjectIterator<UBlueprintGeneratedClass>&)>& InPredicate)
 {
 	TArray<UPackage*> PackagesToReload;
 
-	for (TObjectIterator<UBlueprintGeneratedClass> ClassIterator; ClassIterator; ++ClassIterator)
-	{
-		if (InPredicate(ClassIterator))
+	IteratorBlueprintGeneratedClass(
+		InPredicate,
+		[&PackagesToReload](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
-			PackagesToReload.AddUnique(ClassIterator->GetPackage());
-		}
-	}
+			PackagesToReload.AddUnique(InBlueprintGeneratedClass->GetPackage());
+		});
 
 	PackagesToReload.Remove(GetTransientPackage());
 
