@@ -28,14 +28,14 @@ struct FRegisterLinearColor
 			.Divides()
 			.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
 			.Function("operator /", FUNCTION_DIVIDES, BINDING_FUNCTION(&DividesImplementation))
-			.Property("White", BINDING_PROPERTY(&FLinearColor::White))
-			.Property("Gray", BINDING_PROPERTY(&FLinearColor::Gray))
-			.Property("Black", BINDING_PROPERTY(&FLinearColor::Black))
-			.Property("Transparent", BINDING_PROPERTY(&FLinearColor::Transparent))
-			.Property("Red", BINDING_PROPERTY(&FLinearColor::Red))
-			.Property("Green", BINDING_PROPERTY(&FLinearColor::Green))
-			.Property("Blue", BINDING_PROPERTY(&FLinearColor::Blue))
-			.Property("Yellow", BINDING_PROPERTY(&FLinearColor::Yellow))
+			.Property("White", BINDING_READONLY_PROPERTY(&FLinearColor::White))
+			.Property("Gray", BINDING_READONLY_PROPERTY(&FLinearColor::Gray))
+			.Property("Black", BINDING_READONLY_PROPERTY(&FLinearColor::Black))
+			.Property("Transparent", BINDING_READONLY_PROPERTY(&FLinearColor::Transparent))
+			.Property("Red", BINDING_READONLY_PROPERTY(&FLinearColor::Red))
+			.Property("Green", BINDING_READONLY_PROPERTY(&FLinearColor::Green))
+			.Property("Blue", BINDING_READONLY_PROPERTY(&FLinearColor::Blue))
+			.Property("Yellow", BINDING_READONLY_PROPERTY(&FLinearColor::Yellow))
 			.Function("ToRGBE", BINDING_FUNCTION(&FLinearColor::ToRGBE))
 			.Function("FromSRGBColor", BINDING_FUNCTION(&FLinearColor::FromSRGBColor),
 			          {"Color"})
@@ -74,7 +74,8 @@ struct FRegisterLinearColor
 			.Function("GetMax", BINDING_FUNCTION(&FLinearColor::GetMax))
 			.Function("IsAlmostBlack", BINDING_FUNCTION(&FLinearColor::IsAlmostBlack))
 			.Function("GetMin", BINDING_FUNCTION(&FLinearColor::GetMin))
-			.Function("ToString", BINDING_FUNCTION(&FLinearColor::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FLinearColor::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("InitFromString", BINDING_FUNCTION(&FLinearColor::InitFromString),
 			          {"InSourceString"})
 			.Register();

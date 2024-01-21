@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Binding/Function/EFunctionInteract.h"
 #include "Binding/Property/FBindingProperty.h"
 #include "Binding/Function/FBindingFunction.h"
 #include "Binding/Function/FBindingSubscript.h"
@@ -7,12 +8,11 @@
 class UNREALCSHARPCORE_API FBindingClass
 {
 public:
-	FBindingClass(const bool InIsReflection, const FString& InClass, const FString& InFullClass,
+	FBindingClass(const bool InIsReflection, const FString& InClass,
 	              const FString& InBindingNameSpace, FTypeInfo* InTypeInfo):
 		bIsReflection(InIsReflection),
 		ImplementationNameSpace(InBindingNameSpace),
 		Class(InClass),
-		FullClass(InFullClass),
 		TypeInfo{InTypeInfo},
 		Subscript(nullptr)
 	{
@@ -20,7 +20,7 @@ public:
 
 	~FBindingClass();
 
-	static FBindingClass* GetClass(bool InIsReflection, const FString& InClass, const FString& InFullClass,
+	static FBindingClass* GetClass(bool InIsReflection, const FString& InClass,
 	                               const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
 
 	static const TMap<FString, FBindingClass>& GetClasses();
@@ -33,8 +33,6 @@ public:
 	const FString& GetBase() const;
 
 	const FString& GetClass() const;
-
-	const FString& GetFullClass() const;
 
 	const FBindingTypeInfo& GetTypeInfo() const;
 
@@ -53,10 +51,10 @@ public:
 	                     const void* InSetMethod);
 
 	void BindingFunction(const FString& InName, const FString& InImplementationName,
-	                     FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames);
+	                     FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames,
+	                     const EFunctionInteract InFunctionInteract);
 
-	void Inheritance(const FString& InClass, const FString& InFullClass,
-	                 const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
+	void Inheritance(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
 
 private:
 	static TMap<FString, FBindingClass> Classes;
@@ -68,8 +66,6 @@ private:
 	FString Base;
 
 	FString Class;
-
-	FString FullClass;
 
 	FBindingTypeInfo TypeInfo;
 

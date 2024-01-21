@@ -51,7 +51,7 @@ struct FRegisterPlane
 			.Function("PlaneDot",BINDING_FUNCTION(&FPlane::PlaneDot),
 			          {"P"})
 			.Function("Normalize", BINDING_FUNCTION(&FPlane::Normalize),
-			          {"Tolerance"})
+			          {"Tolerance"}, EFunctionInteract::New)
 			.Function("Flip",BINDING_FUNCTION(&FPlane::Flip))
 			.Function("TransformBy", BINDING_FUNCTION(&FPlane::TransformBy),
 			          {"M"})

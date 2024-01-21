@@ -3,6 +3,36 @@
 
 struct FRegisterVector4
 {
+	static FVector4 MultipliesImplementation(const FVector4& In, const int32 Scale)
+	{
+		return In * Scale;
+	}
+
+	static FVector4 MultipliesImplementation(const FVector4& In, const float Scale)
+	{
+		return In * Scale;
+	}
+
+	static FVector4 MultipliesImplementation(const FVector4& In, const double Scale)
+	{
+		return In * Scale;
+	}
+
+	static FVector4 DividesImplementation(const FVector4& In, const int32 Scale)
+	{
+		return In / Scale;
+	}
+
+	static FVector4 DividesImplementation(const FVector4& In, const float Scale)
+	{
+		return In / Scale;
+	}
+
+	static FVector4 DividesImplementation(const FVector4& In, const double Scale)
+	{
+		return In / Scale;
+	}
+
 	FRegisterVector4()
 	{
 		TReflectionClassBuilder<FVector4>(NAMESPACE_BINDING)
@@ -26,6 +56,18 @@ struct FRegisterVector4
 			.Multiplies()
 			.Divides()
 			.BitXor()
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const int32), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const float), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const double), &MultipliesImplementation))
+			.Function("operator /", FUNCTION_DIVIDES,
+			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const int32), &DividesImplementation))
+			.Function("operator /", FUNCTION_DIVIDES,
+			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const float), &DividesImplementation))
+			.Function("operator /", FUNCTION_DIVIDES,
+			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const double), &DividesImplementation))
 			.Function("Zero", BINDING_FUNCTION(&FVector4::Zero))
 			.Function("One", BINDING_FUNCTION(&FVector4::One))
 			.Function("Component",
@@ -35,7 +77,8 @@ struct FRegisterVector4
 			          {"V", "Tolerance"})
 			.Function("IsUnit3", BINDING_FUNCTION(&FVector4::IsUnit3),
 			          {"LengthSquaredTolerance"})
-			.Function("ToString", BINDING_FUNCTION(&FVector4::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FVector4::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("InitFromString", BINDING_FUNCTION(&FVector4::InitFromString),
 			          {"InSourceString"})
 			.Function("GetSafeNormal", BINDING_FUNCTION(&FVector4::GetSafeNormal),

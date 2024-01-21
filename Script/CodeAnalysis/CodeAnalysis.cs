@@ -102,7 +102,7 @@ namespace CodeAnalysis
 
                             foreach (var Attribute in ClassDeclaration.AttributeLists)
                             {
-                                if (Attribute.ToString().Equals("[IsOverride]"))
+                                if (Attribute.ToString().Equals("[Override]"))
                                 {
                                     bIsOverride = true;
 
@@ -120,7 +120,7 @@ namespace CodeAnalysis
 
                                         foreach (var Attribute in MethodDeclaration.AttributeLists)
                                         {
-                                            if (Attribute.ToString().Equals("[IsOverride]"))
+                                            if (Attribute.ToString().Equals("[Override]"))
                                             {
                                                 bIsOverride = true;
 

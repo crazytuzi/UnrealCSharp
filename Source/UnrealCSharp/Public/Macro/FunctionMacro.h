@@ -67,5 +67,3 @@
 #define FUNCTION_GREATER FString(TEXT("Greater"))
 
 #define FUNCTION_GREATER_EQUAL FString(TEXT("GreaterEqual"))
-
-#define FUNCTION_SET_HANDLE FString(TEXT("SetHandle"))

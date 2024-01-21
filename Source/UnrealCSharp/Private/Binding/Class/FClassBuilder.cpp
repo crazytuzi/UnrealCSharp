@@ -10,10 +10,8 @@ FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementa
 }
 
 #if WITH_PROPERTY_INFO
-FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace,
-                             const FString& InFullClass, FTypeInfo* InTypeInfo):
+FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo):
 	Class(InClass),
-	FullClass(InFullClass),
 	TypeInfo(InTypeInfo),
 	ImplementationNameSpace(InImplementationNameSpace)
 {
@@ -41,17 +39,18 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<void*
 #if WITH_FUNCTION_INFO
 FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
                                        const void* InMethod, FFunctionInfo* InFunctionInfo,
-                                       const TArray<FString>& InParamNames)
+                                       const TArray<FString>& InParamNames, const EFunctionInteract InFunctionInteract)
 #else
 FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
-                                       const void* InMethod, const TArray<FString>& InParamNames)
+                                       const void* InMethod, const TArray<FString>& InParamNames,
+                                       const EFunctionInteract InFunctionInteract)
 #endif
 {
 #if WITH_FUNCTION_INFO
 	if (InFunctionInfo != nullptr)
 	{
 		GetBindingClass()->BindingFunction(InName, GetFunctionImplementationName(InName, InImplementationName),
-		                                   InFunctionInfo, InParamNames);
+		                                   InFunctionInfo, InParamNames, InFunctionInteract);
 	}
 #endif
 
@@ -78,7 +77,6 @@ FBindingClass* FClassBuilder::GetBindingClass() const
 {
 	return FBindingClass::GetClass(IsReflection(),
 	                               Class,
-	                               FullClass,
 	                               COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace),
 	                               TypeInfo);
 }

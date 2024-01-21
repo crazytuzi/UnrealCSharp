@@ -2,6 +2,9 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/PropertyMacro.h"
+
+TSet<TPair<FString, FString>> FDelegateGenerator::Delegate;
 
 void FDelegateGenerator::Generator(FProperty* InProperty)
 {
@@ -33,7 +36,14 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InDelegateProperty);
 
-	FString FullClassContent;
+	auto ClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InDelegateProperty);
+
+	if (Delegate.Contains({NameSpaceContent, ClassContent}))
+	{
+		return;
+	}
+
+	Delegate.Add({NameSpaceContent, ClassContent});
 
 	FString SuperClassContent;
 
@@ -43,30 +53,25 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	FString DelegateDeclarationContent;
 
-	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common"), TEXT("Script.Reflection.Delegate")};
-
-	FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InDelegateProperty);
-
-	auto DelegateFullName = FullClassContent;
-
-	auto DelegateName = DelegateFullName.RightChop(1);
+	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common"), TEXT("Script.Library")};
 
 	TArray<FProperty*> DelegateParams;
 
-	TArray<int32> DelegateOutParamIndex;
+	TArray<int32> DelegateRefParamIndex;
 
 	FProperty* DelegateReturnParam = nullptr;
 
 	const auto ConstructorContent = FString::Printf(TEXT(
-		"\t\tpublic %s() => DelegateUtils.Delegate_Register(this);\n"
+		"\t\tpublic %s() => FDelegateImplementation.FDelegate_RegisterImplementation(this);\n"
 	),
-	                                                *FullClassContent
+	                                                *ClassContent
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => DelegateUtils.Delegate_UnRegister(GetHandle());\n"
+		"\n\t\t~%s() => FDelegateImplementation.FDelegate_UnRegisterImplementation(%s);\n"
 	),
-	                                               *FullClassContent
+	                                               *ClassContent,
+	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);
 
 	for (TFieldIterator<FProperty> ParamIterator(SignatureFunction); ParamIterator && (ParamIterator->PropertyFlags &
@@ -98,7 +103,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		if (DelegateParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !DelegateParams[Index]->HasAnyPropertyFlags(
 			CPF_ConstParm))
 		{
-			DelegateOutParamIndex.Emplace(Index);
+			DelegateRefParamIndex.Emplace(Index);
 
 			DelegateDeclarationBody += TEXT("ref ");
 		}
@@ -113,55 +118,46 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		);
 	}
 
-	auto bIsSafeExecuteFunction = true;
-
-	for (auto Index = 0; Index < DelegateOutParamIndex.Num(); ++Index)
-	{
-		if (!FGeneratorCore::IsSafeProperty(DelegateParams[DelegateOutParamIndex[Index]]))
-		{
-			bIsSafeExecuteFunction = false;
-
-			break;
-		}
-	}
-
 	auto ExecuteFunctionDeclaration = FString::Printf(TEXT(
-		"public %s%s Execute(%s)\n"
+		"public %s Execute(%s)\n"
 	),
-	                                                  bIsSafeExecuteFunction == true ? TEXT("") : TEXT("unsafe "),
 	                                                  *DelegateReturnType,
 	                                                  *DelegateDeclarationBody
 	);
 
 	auto ExecuteFunctionCallBody = FString::Printf(TEXT(
-		"DelegateUtils.Delegate_Execute<%s>(GetHandle(), out var __ReturnValue, out var __OutValue"
+		"FDelegateImplementation.FDelegate_Execute%dImplementation(%s%s"
 	),
-	                                               DelegateReturnParam != nullptr
-		                                               ? *FGeneratorCore::GetReturnParamType(DelegateReturnParam)
-		                                               : TEXT("Object")
+	                                               FGeneratorCore::GetFunctionIndex(DelegateReturnParam != nullptr,
+		                                               !DelegateParams.IsEmpty(),
+		                                               !DelegateRefParamIndex.IsEmpty()),
+	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                               DelegateRefParamIndex.IsEmpty()
+		                                               ? TEXT("")
+		                                               : TEXT(", out var __OutValue")
 	);
 
 	for (auto Index = 0; Index < DelegateParams.Num(); ++Index)
 	{
-		if (DelegateOutParamIndex.Contains(Index) == false)
+		if (DelegateRefParamIndex.Contains(Index) == false)
 		{
 			ExecuteFunctionCallBody += ", " + FGeneratorCore::GetParamName(DelegateParams[Index]);
 		}
 	}
 
-	ExecuteFunctionCallBody += TEXT(");");
+	ExecuteFunctionCallBody += TEXT(")");
 
 	TArray<FString> ExecuteFunctionOutParams;
 
-	for (auto Index = 0; Index < DelegateOutParamIndex.Num(); ++Index)
+	for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
 	{
 		ExecuteFunctionOutParams.Emplace(FString::Printf(TEXT(
 			"%s = %s;"
 		),
 		                                                 *FUnrealCSharpFunctionLibrary::Encode(
-			                                                 DelegateParams[DelegateOutParamIndex[Index]]->GetName()),
+			                                                 DelegateParams[DelegateRefParamIndex[Index]]->GetName()),
 		                                                 *FGeneratorCore::GetOutParamString(
-			                                                 DelegateParams[DelegateOutParamIndex[Index]], Index)));
+			                                                 DelegateParams[DelegateRefParamIndex[Index]], Index)));
 	}
 
 	FString ExecuteFunctionReturnParamBody;
@@ -171,7 +167,29 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		ExecuteFunctionReturnParamBody = FString::Printf(TEXT(
 			"return %s;"
 		),
-		                                                 *FGeneratorCore::GetReturnParamName(DelegateReturnParam));
+		                                                 DelegateRefParamIndex.IsEmpty()
+			                                                 ? FGeneratorCore::IsPrimitiveProperty(DelegateReturnParam)
+				                                                   ? *FString::Printf(TEXT(
+					                                                   "(%s)%s"
+				                                                   ),
+					                                                   *FGeneratorCore::GetPropertyType(
+						                                                   DelegateReturnParam),
+					                                                   *ExecuteFunctionCallBody)
+				                                                   : *FString::Printf(TEXT(
+					                                                   "%s as %s"
+				                                                   ),
+					                                                   *ExecuteFunctionCallBody,
+					                                                   *FGeneratorCore::GetPropertyType(
+						                                                   DelegateReturnParam))
+			                                                 : FGeneratorCore::IsPrimitiveProperty(DelegateReturnParam)
+			                                                 ? *FString::Printf(TEXT(
+				                                                 "(%s)__ReturnValue"
+			                                                 ),
+				                                                 *FGeneratorCore::GetPropertyType(DelegateReturnParam))
+			                                                 : *FString::Printf(TEXT(
+				                                                 "__ReturnValue as %s"),
+				                                                 *FGeneratorCore::GetPropertyType(DelegateReturnParam))
+		);
 	}
 
 	FString ExecuteFunctionOutParamBody;
@@ -185,20 +203,37 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	}
 
 	auto ExecuteFunctionImplementationBody = FString::Printf(TEXT(
-		"\t\t\t%s\n"
+		"\t\t\t%s"
+		"%s"
+		"%s"
 		"%s"
 		"%s"
 		"%s"
 	),
-	                                                         *ExecuteFunctionCallBody,
+	                                                         DelegateReturnParam != nullptr && !DelegateRefParamIndex.
+	                                                         IsEmpty()
+		                                                         ? TEXT("var __ReturnValue = ")
+		                                                         : TEXT(""),
+	                                                         DelegateReturnParam == nullptr || !DelegateRefParamIndex.
+	                                                         IsEmpty()
+		                                                         ? *ExecuteFunctionCallBody
+		                                                         : TEXT(""),
+	                                                         DelegateReturnParam == nullptr || !DelegateRefParamIndex.
+	                                                         IsEmpty()
+		                                                         ? TEXT(";\n")
+		                                                         : TEXT(""),
 	                                                         *ExecuteFunctionOutParamBody,
-	                                                         ExecuteFunctionReturnParamBody.IsEmpty()
-		                                                         ? TEXT("")
-		                                                         : TEXT("\n"),
+	                                                         !ExecuteFunctionOutParamBody.IsEmpty()
+		                                                         ? TEXT("\n")
+		                                                         : TEXT(""),
 	                                                         ExecuteFunctionReturnParamBody.IsEmpty()
 		                                                         ? TEXT("")
 		                                                         : *FString::Printf(TEXT(
-			                                                         "\t\t\t%s\n"),
+			                                                         "%s%s\n"
+		                                                         ),
+			                                                         !DelegateRefParamIndex.IsEmpty()
+				                                                         ? TEXT("\t\t\t")
+				                                                         : TEXT(""),
 			                                                         *ExecuteFunctionReturnParamBody));
 
 	ExecuteFunctionContent = FString::Printf(TEXT(
@@ -211,14 +246,17 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                                         *ExecuteFunctionImplementationBody
 	);
 
-	if (!DelegateOutParamIndex.IsEmpty())
+	if (!DelegateRefParamIndex.IsEmpty())
 	{
 		SuperClassContent = TEXT("FRefDelegate");
 
-		BindFunctionContent = TEXT(
-			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => DelegateUtils.Delegate_Bind(GetHandle(), InDelegate);\n"
+		BindFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic void Bind(Delegate InDelegate) => DelegateUtils.Delegate_Bind(GetHandle(), InDelegate);\n"
+			"\t\tpublic void Bind(Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, InDelegate);\n"
+		),
+		                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
 		DelegateDeclarationContent = FString::Printf(TEXT(
@@ -317,14 +355,14 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
-	                               *FullClassContent,
+	                               *ClassContent,
 	                               *SuperClassContent,
 	                               *ConstructorContent,
 	                               *DestructorContent,
 	                               *BindFunctionContent,
-	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
+	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *ExecuteFunctionContent,
-	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
+	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *DelegateDeclarationContent
 	);
 
@@ -333,7 +371,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(InDelegateProperty->SignatureFunction), ModuleName);
 
-	auto FileName = FPaths::Combine(DirectoryName, DelegateName) + TEXT(".cs");
+	auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
@@ -351,7 +389,14 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InMulticastDelegateProperty);
 
-	FString FullClassContent;
+	auto ClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InMulticastDelegateProperty);
+
+	if (Delegate.Contains({NameSpaceContent, ClassContent}))
+	{
+		return;
+	}
+
+	Delegate.Add({NameSpaceContent, ClassContent});
 
 	FString SuperClassContent;
 
@@ -367,30 +412,25 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	FString DelegateDeclarationContent;
 
-	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common"), TEXT("Script.Reflection.Delegate")};
-
-	FullClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InMulticastDelegateProperty);
-
-	auto DelegateFullName = FullClassContent;
-
-	auto DelegateName = DelegateFullName.RightChop(1);
+	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common"), TEXT("Script.Library")};
 
 	TArray<FProperty*> DelegateParams;
 
-	TArray<int32> DelegateOutParamIndex;
+	TArray<int32> DelegateRefParamIndex;
 
 	FProperty* DelegateReturnParam = nullptr;
 
 	const auto ConstructorContent = FString::Printf(TEXT(
-		"\t\tpublic %s() => MulticastDelegateUtils.MulticastDelegate_Register(this);\n"
+		"\t\tpublic %s() => FMulticastDelegateImplementation.FMulticastDelegate_RegisterImplementation(this);\n"
 	),
-	                                                *FullClassContent
+	                                                *ClassContent
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => MulticastDelegateUtils.MulticastDelegate_UnRegister(GetHandle());\n"
+		"\n\t\t~%s() => FMulticastDelegateImplementation.FMulticastDelegate_UnRegisterImplementation(%s);\n"
 	),
-	                                               *FullClassContent
+	                                               *ClassContent,
+	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);
 
 	for (TFieldIterator<FProperty> ParamIterator(SignatureFunction); ParamIterator && (ParamIterator->PropertyFlags &
@@ -422,7 +462,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		if (DelegateParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !DelegateParams[Index]->HasAnyPropertyFlags(
 			CPF_ConstParm))
 		{
-			DelegateOutParamIndex.Emplace(Index);
+			DelegateRefParamIndex.Emplace(Index);
 
 			DelegateDeclarationBody += TEXT("ref ");
 		}
@@ -437,50 +477,46 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		);
 	}
 
-	auto bIsSafeBroadcastFunction = true;
-
-	for (auto Index = 0; Index < DelegateOutParamIndex.Num(); ++Index)
-	{
-		if (!FGeneratorCore::IsSafeProperty(DelegateParams[DelegateOutParamIndex[Index]]))
-		{
-			bIsSafeBroadcastFunction = false;
-
-			break;
-		}
-	}
-
 	auto BroadcastFunctionDeclaration = FString::Printf(TEXT(
-		"public %s%s Broadcast(%s)\n"
+		"public %s Broadcast(%s)\n"
 	),
-	                                                    bIsSafeBroadcastFunction == true ? TEXT("") : TEXT("unsafe "),
 	                                                    *DelegateReturnType,
 	                                                    *DelegateDeclarationBody
 	);
 
-	auto BroadcastFunctionCallBody = FString(TEXT(
-		"MulticastDelegateUtils.MulticastDelegate_Broadcast(GetHandle(), out var __OutValue"));
+	auto BroadcastFunctionCallBody = FString::Printf(TEXT(
+		"FMulticastDelegateImplementation.FMulticastDelegate_Broadcast%dImplementation(%s%s"
+	),
+	                                                 FGeneratorCore::GetFunctionIndex(DelegateReturnParam != nullptr,
+		                                                 !DelegateParams.IsEmpty(),
+		                                                 !DelegateRefParamIndex.IsEmpty()),
+	                                                 *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                                 DelegateRefParamIndex.IsEmpty()
+		                                                 ? TEXT("")
+		                                                 : TEXT(", out var __OutValue")
+	);
 
 	for (auto Index = 0; Index < DelegateParams.Num(); ++Index)
 	{
-		if (DelegateOutParamIndex.Contains(Index) == false)
+		if (DelegateRefParamIndex.Contains(Index) == false)
 		{
 			BroadcastFunctionCallBody += ", " + FGeneratorCore::GetParamName(DelegateParams[Index]);
 		}
 	}
 
-	BroadcastFunctionCallBody += TEXT(");");
+	BroadcastFunctionCallBody += TEXT(")");
 
 	TArray<FString> BroadcastFunctionOutParams;
 
-	for (auto Index = 0; Index < DelegateOutParamIndex.Num(); ++Index)
+	for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
 	{
 		BroadcastFunctionOutParams.Emplace(FString::Printf(TEXT(
 			"%s = %s;"
 		),
 		                                                   *FUnrealCSharpFunctionLibrary::Encode(
-			                                                   DelegateParams[DelegateOutParamIndex[Index]]->GetName()),
+			                                                   DelegateParams[DelegateRefParamIndex[Index]]->GetName()),
 		                                                   *FGeneratorCore::GetOutParamString(
-			                                                   DelegateParams[DelegateOutParamIndex[Index]], Index)));
+			                                                   DelegateParams[DelegateRefParamIndex[Index]], Index)));
 	}
 
 	FString BroadcastFunctionReturnParamBody;
@@ -490,7 +526,33 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		BroadcastFunctionReturnParamBody = FString::Printf(TEXT(
 			"return %s;"
 		),
-		                                                   *FGeneratorCore::GetReturnParamName(DelegateReturnParam));
+		                                                   DelegateRefParamIndex.IsEmpty()
+			                                                   ? FGeneratorCore::IsPrimitiveProperty(
+				                                                     DelegateReturnParam)
+				                                                     ? *FString::Printf(TEXT(
+					                                                     "(%s)%s"
+				                                                     ),
+					                                                     *FGeneratorCore::GetPropertyType(
+						                                                     DelegateReturnParam),
+					                                                     *BroadcastFunctionCallBody)
+				                                                     : *FString::Printf(TEXT(
+					                                                     "%s as %s"
+				                                                     ),
+					                                                     *BroadcastFunctionCallBody,
+					                                                     *FGeneratorCore::GetPropertyType(
+						                                                     DelegateReturnParam))
+			                                                   : FGeneratorCore::IsPrimitiveProperty(
+				                                                   DelegateReturnParam)
+			                                                   ? *FString::Printf(TEXT(
+				                                                   "(%s)__ReturnValue"
+			                                                   ),
+				                                                   *FGeneratorCore::GetPropertyType(
+					                                                   DelegateReturnParam))
+			                                                   : *FString::Printf(TEXT(
+				                                                   "__ReturnValue as %s"),
+				                                                   *FGeneratorCore::GetPropertyType(
+					                                                   DelegateReturnParam))
+		);
 	}
 
 	FString BroadcastFunctionOutParamBody;
@@ -503,20 +565,37 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	}
 
 	auto BroadcastFunctionImplementationBody = FString::Printf(TEXT(
-		"\t\t\t%s\n"
+		"\t\t\t%s"
+		"%s"
+		"%s"
 		"%s"
 		"%s"
 		"%s"
 	),
-	                                                           *BroadcastFunctionCallBody,
+	                                                           DelegateReturnParam != nullptr && !DelegateRefParamIndex.
+	                                                           IsEmpty()
+		                                                           ? TEXT("var __ReturnValue = ")
+		                                                           : TEXT(""),
+	                                                           DelegateReturnParam == nullptr || !DelegateRefParamIndex.
+	                                                           IsEmpty()
+		                                                           ? *BroadcastFunctionCallBody
+		                                                           : TEXT(""),
+	                                                           DelegateReturnParam == nullptr || !DelegateRefParamIndex.
+	                                                           IsEmpty()
+		                                                           ? TEXT(";\n")
+		                                                           : TEXT(""),
 	                                                           *BroadcastFunctionOutParamBody,
-	                                                           BroadcastFunctionReturnParamBody.IsEmpty()
-		                                                           ? TEXT("")
-		                                                           : TEXT("\n"),
+	                                                           !BroadcastFunctionOutParamBody.IsEmpty()
+		                                                           ? TEXT("\n")
+		                                                           : TEXT(""),
 	                                                           BroadcastFunctionReturnParamBody.IsEmpty()
 		                                                           ? TEXT("")
 		                                                           : *FString::Printf(TEXT(
-			                                                           "\t\t\t%s\n"),
+			                                                           "%s%s\n"
+		                                                           ),
+			                                                           !DelegateRefParamIndex.IsEmpty()
+				                                                           ? TEXT("\t\t\t")
+				                                                           : TEXT(""),
 			                                                           *BroadcastFunctionReturnParamBody));
 
 	BroadcastFunctionContent = FString::Printf(TEXT(
@@ -529,32 +608,44 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                                           *BroadcastFunctionImplementationBody
 	);
 
-	if (!DelegateOutParamIndex.IsEmpty())
+	if (!DelegateRefParamIndex.IsEmpty())
 	{
 		SuperClassContent = TEXT("FRefMulticastDelegate");
 
-		ContainsFunctionContent = TEXT(
-			"\t\tpublic Boolean Contains(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Contains(GetHandle(), InDelegate);\n"
+		ContainsFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic bool Contains(UObject _, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic Boolean Contains(Delegate InDelegate)=> MulticastDelegateUtils.MulticastDelegate_Contains(GetHandle(), InDelegate);\n"
+			"\t\tpublic bool Contains(Delegate InDelegate)=> FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, InDelegate);\n"
+		),
+		                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
-		AddFunctionContent = TEXT(
-			"\t\tpublic void Add(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(GetHandle(), InDelegate);\n"
+		AddFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic void Add(UObject _, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic void Add(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Add(GetHandle(), InDelegate);\n"
+			"\t\tpublic void Add(Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, InDelegate);\n"
+		),
+		                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
-		AddUniqueFunctionContent = TEXT(
-			"\t\tpublic void AddUnique(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(GetHandle(), InDelegate);\n"
+		AddUniqueFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic void AddUnique(UObject _, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic void AddUnique(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_AddUnique(GetHandle(), InDelegate);\n"
+			"\t\tpublic void AddUnique(Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, InDelegate);\n"
+		),
+		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
-		RemoveFunctionContent = TEXT(
-			"\t\tpublic void Remove(UObject _, Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(GetHandle(), InDelegate);\n"
+		RemoveFunctionContent = FString::Printf(TEXT(
+			"\t\tpublic void Remove(UObject _, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, InDelegate);\n"
 			"\n"
-			"\t\tpublic void Remove(Delegate InDelegate) => MulticastDelegateUtils.MulticastDelegate_Remove(GetHandle(), InDelegate);\n"
+			"\t\tpublic void Remove(Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, InDelegate);\n"
+		),
+		                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
 		DelegateDeclarationContent = FString::Printf(TEXT(
@@ -622,7 +713,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		}
 	}
 
-	UsingNameSpaces.Remove(UsingNameSpaceContent);
+	UsingNameSpaces.Remove(NameSpaceContent);
 
 	UsingNameSpaces.Remove(TEXT(""));
 
@@ -659,20 +750,20 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
-	                               *FullClassContent,
+	                               *ClassContent,
 	                               *SuperClassContent,
 	                               *ConstructorContent,
 	                               *DestructorContent,
 	                               *ContainsFunctionContent,
-	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
+	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *AddFunctionContent,
-	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
+	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *AddUniqueFunctionContent,
-	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
+	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *RemoveFunctionContent,
-	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
+	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *BroadcastFunctionContent,
-	                               !DelegateOutParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
+	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *DelegateDeclarationContent
 	);
 
@@ -681,7 +772,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(InMulticastDelegateProperty->SignatureFunction), ModuleName);
 
-	auto FileName = FPaths::Combine(DirectoryName, DelegateName) + TEXT(".cs");
+	auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }

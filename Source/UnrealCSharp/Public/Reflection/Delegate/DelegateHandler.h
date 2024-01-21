@@ -36,7 +36,7 @@ public:
 
 	void Clear();
 
-	void Execute(MonoObject** ReturnValue, MonoObject** OutValue, MonoArray* InValue) const;
+	MonoObject* Execute(MonoObject** OutValue, MonoArray* InValue) const;
 
 	UObject* GetUObject() const;
 

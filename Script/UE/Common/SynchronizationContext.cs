@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable enable
 using System.Collections.Generic;
 using System.Threading;
 
@@ -22,7 +22,7 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
         Context = null;
     }
 
-    public static void Tick(Single DeltaTime)
+    public static void Tick(float DeltaTime)
     {
         Context?.Tick();
     }

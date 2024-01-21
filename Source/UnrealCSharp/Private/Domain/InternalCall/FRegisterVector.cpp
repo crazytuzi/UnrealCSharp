@@ -9,6 +9,66 @@ struct FRegisterVector
 		return In | V;
 	}
 
+	static FVector MinusImplementation(const FVector& In, const int32 Bias)
+	{
+		return In - Bias;
+	}
+
+	static FVector MinusImplementation(const FVector& In, const float Bias)
+	{
+		return In - Bias;
+	}
+
+	static FVector MinusImplementation(const FVector& In, const double Bias)
+	{
+		return In - Bias;
+	}
+
+	static FVector PlusImplementation(const FVector& In, const int32 Bias)
+	{
+		return In + Bias;
+	}
+
+	static FVector PlusImplementation(const FVector& In, const float Bias)
+	{
+		return In + Bias;
+	}
+
+	static FVector PlusImplementation(const FVector& In, const double Bias)
+	{
+		return In + Bias;
+	}
+
+	static FVector MultipliesImplementation(const FVector& In, const int32 Scale)
+	{
+		return In * Scale;
+	}
+
+	static FVector MultipliesImplementation(const FVector& In, const float Scale)
+	{
+		return In * Scale;
+	}
+
+	static FVector MultipliesImplementation(const FVector& In, const double Scale)
+	{
+		return In * Scale;
+	}
+
+	static FVector DividesImplementation(const FVector& In, const int32 Scale)
+	{
+		return In / Scale;
+	}
+
+	static FVector DividesImplementation(const FVector& In, const float Scale)
+	{
+		return In / Scale;
+	}
+
+	static FVector DividesImplementation(const FVector& In, const double Scale)
+	{
+		return In / Scale;
+	}
+
 	FRegisterVector()
 	{
 		TReflectionClassBuilder<FVector>(NAMESPACE_BINDING)
@@ -31,17 +91,41 @@ struct FRegisterVector
 			.Subscript(BINDING_SUBSCRIPT(FVector, FVector::FReal, int32),
 			           {"Index"})
 			.Function("operator |", FUNCTION_BIT_OR, BINDING_FUNCTION(&BitOrImplementation))
-			.Property("ZeroVector", BINDING_PROPERTY(&FVector::ZeroVector))
-			.Property("OneVector", BINDING_PROPERTY(&FVector::OneVector))
-			.Property("UpVector", BINDING_PROPERTY(&FVector::UpVector))
-			.Property("DownVector", BINDING_PROPERTY(&FVector::DownVector))
-			.Property("ForwardVector", BINDING_PROPERTY(&FVector::ForwardVector))
-			.Property("BackwardVector", BINDING_PROPERTY(&FVector::BackwardVector))
-			.Property("RightVector", BINDING_PROPERTY(&FVector::RightVector))
-			.Property("LeftVector", BINDING_PROPERTY(&FVector::LeftVector))
-			.Property("XAxisVector", BINDING_PROPERTY(&FVector::XAxisVector))
-			.Property("YAxisVector", BINDING_PROPERTY(&FVector::YAxisVector))
-			.Property("ZAxisVector", BINDING_PROPERTY(&FVector::ZAxisVector))
+			.Function("operator -", FUNCTION_MINUS,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const int32), &MinusImplementation))
+			.Function("operator -", FUNCTION_MINUS,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const float), &MinusImplementation))
+			.Function("operator -", FUNCTION_MINUS,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const double), &MinusImplementation))
+			.Function("operator +", FUNCTION_PLUS,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const int32), &PlusImplementation))
+			.Function("operator +", FUNCTION_PLUS,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const float), &PlusImplementation))
+			.Function("operator +", FUNCTION_PLUS,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const double), &PlusImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const int32), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const float), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const double), &MultipliesImplementation))
+			.Function("operator /", FUNCTION_DIVIDES,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const int32), &DividesImplementation))
+			.Function("operator /", FUNCTION_DIVIDES,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const float), &DividesImplementation))
+			.Function("operator /", FUNCTION_DIVIDES,
+			          BINDING_OVERLOAD(FVector(*)(const FVector&, const double), &DividesImplementation))
+			.Property("ZeroVector", BINDING_READONLY_PROPERTY(&FVector::ZeroVector))
+			.Property("OneVector", BINDING_READONLY_PROPERTY(&FVector::OneVector))
+			.Property("UpVector", BINDING_READONLY_PROPERTY(&FVector::UpVector))
+			.Property("DownVector", BINDING_READONLY_PROPERTY(&FVector::DownVector))
+			.Property("ForwardVector", BINDING_READONLY_PROPERTY(&FVector::ForwardVector))
+			.Property("BackwardVector", BINDING_READONLY_PROPERTY(&FVector::BackwardVector))
+			.Property("RightVector", BINDING_READONLY_PROPERTY(&FVector::RightVector))
+			.Property("LeftVector", BINDING_READONLY_PROPERTY(&FVector::LeftVector))
+			.Property("XAxisVector", BINDING_READONLY_PROPERTY(&FVector::XAxisVector))
+			.Property("YAxisVector", BINDING_READONLY_PROPERTY(&FVector::YAxisVector))
+			.Property("ZAxisVector", BINDING_READONLY_PROPERTY(&FVector::ZAxisVector))
 			.Function("Zero", BINDING_FUNCTION(&FVector::Zero))
 			.Function("One", BINDING_FUNCTION(&FVector::One))
 			.Function("UnitX", BINDING_FUNCTION(&FVector::UnitX))
@@ -142,7 +226,8 @@ struct FRegisterVector
 			          {"Axis1", "Axis2"})
 			.Function("UnwindEuler", BINDING_FUNCTION(&FVector::UnwindEuler))
 			.Function("ContainsNaN", BINDING_FUNCTION(&FVector::ContainsNaN))
-			.Function("ToString", BINDING_FUNCTION(&FVector::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FVector::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("ToText", BINDING_FUNCTION(&FVector::ToText))
 			.Function("ToCompactString", BINDING_FUNCTION(&FVector::ToCompactString))
 			.Function("ToCompactText", BINDING_FUNCTION(&FVector::ToCompactText))

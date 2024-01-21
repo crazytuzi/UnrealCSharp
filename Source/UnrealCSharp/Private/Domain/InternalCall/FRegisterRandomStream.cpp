@@ -39,7 +39,8 @@ struct FRegisterRandomStream
 			          BINDING_OVERLOAD(FVector(FRandomStream::*)(FVector const&, float, float)const,
 			                           &FRandomStream::VRandCone),
 			          {"Dir", "HorizontalConeHalfAngleRad", "VerticalConeHalfAngleRad"})
-			.Function("ToString", BINDING_FUNCTION(&FRandomStream::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FRandomStream::ToString),
+			          {}, EFunctionInteract::New)
 			.Register();
 	}
 };

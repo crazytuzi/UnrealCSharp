@@ -19,7 +19,7 @@ struct FRegisterMatrix
 			             {"InX", "InY", "InZ", "InW"})
 			.Multiplies()
 			.Plus()
-			.Property("Identity", BINDING_PROPERTY(&FMatrix::Identity))
+			.Property("Identity", BINDING_READONLY_PROPERTY(&FMatrix::Identity))
 			.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
 			.Function("SetIdentity", BINDING_FUNCTION(&FMatrix::SetIdentity))
 			.Function("Equals", BINDING_FUNCTION(&FMatrix::Equals),
@@ -90,7 +90,8 @@ struct FRegisterMatrix
 			          {"OuTPln"})
 			.Function("Mirror", BINDING_FUNCTION(&FMatrix::Mirror),
 			          {"MirrorAxis", "FlipAxis"})
-			.Function("ToString", BINDING_FUNCTION(&FMatrix::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FMatrix::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("DebugPrint", BINDING_FUNCTION(&FMatrix::DebugPrint))
 			.Function("ComputeHash", BINDING_FUNCTION(&FMatrix::ComputeHash))
 			.Register();

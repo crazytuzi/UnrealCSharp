@@ -44,6 +44,17 @@ struct FRegisterMap
 		return 0;
 	}
 
+	static bool IsEmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+	{
+		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
+			InGarbageCollectionHandle))
+		{
+			return MapHelper->IsEmpty();
+		}
+
+		return false;
+	}
+
 	static void AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                              MonoObject* InKey, MonoObject* InValue)
 	{
@@ -87,9 +98,11 @@ struct FRegisterMap
 		return 0;
 	}
 
-	static void FindKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                  MonoObject* InValue, MonoObject** OutKey)
+	static MonoObject* FindKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                         MonoObject* InValue)
 	{
+		MonoObject* ReturnValue{};
+
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
@@ -102,13 +115,16 @@ struct FRegisterMap
 
 			const auto Key = MapHelper->FindKey(Value);
 
-			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(OutKey));
+			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(&ReturnValue));
 		}
+
+		return ReturnValue;
 	}
 
-	static void FindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                               MonoObject* InKey, MonoObject** OutValue)
+	static MonoObject* FindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InKey)
 	{
+		MonoObject* ReturnValue{};
+
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
@@ -121,8 +137,10 @@ struct FRegisterMap
 
 			const auto Value = MapHelper->Find(Key);
 
-			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
+			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
 		}
+
+		return ReturnValue;
 	}
 
 	static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -144,9 +162,10 @@ struct FRegisterMap
 		return false;
 	}
 
-	static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                              MonoObject* InKey, MonoObject** OutValue)
+	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InKey)
 	{
+		MonoObject* ReturnValue{};
+
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
@@ -159,12 +178,14 @@ struct FRegisterMap
 
 			const auto Value = MapHelper->Get(Key);
 
-			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
+			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
 		}
+
+		return ReturnValue;
 	}
 
-	static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                              MonoObject* InKey, MonoObject* InValue)
+	static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InKey,
+	                              MonoObject* InValue)
 	{
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
@@ -210,37 +231,46 @@ struct FRegisterMap
 		return false;
 	}
 
-	static void GetEnumeratorKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                           const int32 InIndex, MonoObject** OutKey)
+	static MonoObject* GetEnumeratorKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                  const int32 InIndex)
 	{
+		MonoObject* ReturnValue{};
+
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
 			const auto Key = MapHelper->GetEnumeratorKey(InIndex);
 
-			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(OutKey));
+			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(&ReturnValue));
 		}
+
+		return ReturnValue;
 	}
 
-	static void GetEnumeratorValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                             const int32 InIndex, MonoObject** OutValue)
+	static MonoObject* GetEnumeratorValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                    const int32 InIndex)
 	{
+		MonoObject* ReturnValue{};
+
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
 			const auto Value = MapHelper->GetEnumeratorValue(InIndex);
 
-			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(OutValue));
+			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
 		}
+
+		return ReturnValue;
 	}
 
 	FRegisterMap()
 	{
-		FClassBuilder(TEXT("Map"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TMap"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Empty", EmptyImplementation)
 			.Function("Num", NumImplementation)
+			.Function("IsEmpty", IsEmptyImplementation)
 			.Function("Add", AddImplementation)
 			.Function("Remove", RemoveImplementation)
 			.Function("FindKey", FindKeyImplementation)

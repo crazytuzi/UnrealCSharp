@@ -51,7 +51,8 @@ struct FRegisterBox2D
 			          {"Other"})
 			.Function("ShiftBy", BINDING_FUNCTION(&FBox2D::ShiftBy),
 			          {"Offset"})
-			.Function("ToString", BINDING_FUNCTION(&FBox2D::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FBox2D::ToString),
+			          {}, EFunctionInteract::New)
 			.Register();
 	}
 };

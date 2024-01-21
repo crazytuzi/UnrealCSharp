@@ -5,7 +5,7 @@
 
 struct FRegisterWeakObjectPtr
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, const MonoObject* InObject)
+	static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InObject)
 	{
 		const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
@@ -36,17 +36,17 @@ struct FRegisterWeakObjectPtr
 		});
 	}
 
-	static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
+	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<
 			UObject>>(InGarbageCollectionHandle);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+		return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 	}
 
 	FRegisterWeakObjectPtr()
 	{
-		FClassBuilder(TEXT("WeakObjectPtr"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TWeakObjectPtr"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)

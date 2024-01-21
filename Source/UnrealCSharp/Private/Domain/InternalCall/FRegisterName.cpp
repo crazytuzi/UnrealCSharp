@@ -34,20 +34,32 @@ struct FRegisterName
 		});
 	}
 
-	static void ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString** OutValue)
+	static MonoString* ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InGarbageCollectionHandle);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*Name->ToString()));
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*Name->ToString()));
+	}
+
+	static MonoObject* NAME_NoneImplementation()
+	{
+		const auto FoundMonoClass = TPropertyClass<FName, FName>::Get();
+
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(FoundMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FName>(Object, new FName(NAME_None), true);
+
+		return Object;
 	}
 
 	FRegisterName()
 	{
-		FClassBuilder(TEXT("Name"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FName"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("ToString", ToStringImplementation)
+			.Function("NAME_None", NAME_NoneImplementation)
 			.Register();
 	}
 };

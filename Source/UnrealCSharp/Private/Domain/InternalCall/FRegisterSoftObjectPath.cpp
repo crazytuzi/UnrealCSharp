@@ -16,7 +16,8 @@ struct FRegisterSoftObjectPath
 			             {"InAssetPathName", "InSubPathString"})
 			.Constructor(BINDING_CONSTRUCTOR(FSoftObjectPath, const UObject*),
 			             {"InObject"})
-			.Function("ToString", BINDING_OVERLOAD(FString(FSoftObjectPath::*)()const, &FSoftObjectPath::ToString))
+			.Function("ToString", BINDING_OVERLOAD(FString(FSoftObjectPath::*)()const, &FSoftObjectPath::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("GetAssetPathName", BINDING_FUNCTION(&FSoftObjectPath::GetAssetName))
 			.Function("SetAssetPathName", BINDING_FUNCTION(&FSoftObjectPath::SetAssetPathName),
 			          {"InAssetPathName"})

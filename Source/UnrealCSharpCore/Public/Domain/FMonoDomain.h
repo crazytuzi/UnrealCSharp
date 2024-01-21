@@ -78,6 +78,11 @@ public:
 
 	static MonoMethod* Property_Get_Get_Method(MonoProperty* InMonoProperty);
 
+	static MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const FString& InName);
+
+	static void Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
+	                               MonoObject** InExc);
+
 	static const char* Method_Get_Name(MonoMethod* InMonoMethod);
 
 	static void Method_Get_Param_Names(MonoMethod* InMonoMethod, const char** InNames);
@@ -137,7 +142,7 @@ public:
 
 	static MonoClass* Get_Object_Class();
 
-	static MonoClass* Get_UInt16_Class();;
+	static MonoClass* Get_UInt16_Class();
 
 	static MonoClass* Get_UInt32_Class();
 

@@ -11,9 +11,9 @@ struct TDestructorBuilder
 		return TFunctionInfo<EFunctionType::Destructor, void>::Get();
 	}
 
-	static void Invoke(BINDING_FUNCTION_SIGNATURE)
+	static void Invoke(BINDING_DESTRUCTOR_SIGNATURE)
 	{
 		TDestructorHelper<std::tuple<Args...>>::template Call(
-			std::make_index_sequence<sizeof...(Args)>(), BINDING_FUNCTION_PARAM);
+			std::make_index_sequence<sizeof...(Args)>(), BINDING_DESTRUCTOR_PARAM);
 	}
 };

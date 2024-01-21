@@ -273,6 +273,20 @@ MonoMethod* FMonoDomain::Property_Get_Get_Method(MonoProperty* InMonoProperty)
 	return InMonoProperty != nullptr ? mono_property_get_get_method(InMonoProperty) : nullptr;
 }
 
+MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, const FString& InName)
+{
+	return InMonoClass != nullptr ? mono_class_get_property_from_name(InMonoClass, TCHAR_TO_ANSI(*InName)) : nullptr;
+}
+
+void FMonoDomain::Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
+                                     MonoObject** InExc)
+{
+	if (InMonoProperty != nullptr && InMonoObject != nullptr)
+	{
+		mono_property_set_value(InMonoProperty, InMonoObject, InParams, InExc);
+	}
+}
+
 const char* FMonoDomain::Method_Get_Name(MonoMethod* InMonoMethod)
 {
 	return InMonoMethod != nullptr ? mono_method_get_name(InMonoMethod) : nullptr;

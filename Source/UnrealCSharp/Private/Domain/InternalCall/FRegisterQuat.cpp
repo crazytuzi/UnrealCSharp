@@ -9,6 +9,26 @@ struct FRegisterQuat
 		return In * Scalar;
 	}
 
+	static FQuat MultipliesImplementation(const FQuat& In, const float Scale)
+	{
+		return In * Scale;
+	}
+
+	static FQuat MultipliesImplementation(const FQuat& In, const double Scale)
+	{
+		return In * Scale;
+	}
+
+	static FQuat DividesImplementation(const FQuat& In, const float Scale)
+	{
+		return In / Scale;
+	}
+
+	static FQuat DividesImplementation(const FQuat& In, const double Scale)
+	{
+		return In / Scale;
+	}
+
 	static FQuat::FReal BitOrImplementation(const FQuat& In, const FQuat& Q)
 	{
 		return In | Q;
@@ -32,9 +52,18 @@ struct FRegisterQuat
 			.Minus()
 			.UnaryMinus()
 			.Multiplies()
-			.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector(*)(const FQuat&, const FVector&), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FQuat(*)(const FQuat&, const float), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FQuat(*)(const FQuat&, const double), &MultipliesImplementation))
+			.Function("operator /", FUNCTION_DIVIDES,
+			          BINDING_OVERLOAD(FQuat(*)(const FQuat&, const float), &DividesImplementation))
+			.Function("operator /", FUNCTION_DIVIDES,
+			          BINDING_OVERLOAD(FQuat(*)(const FQuat&, const double), &DividesImplementation))
 			.Function("operator |", FUNCTION_BIT_OR, BINDING_FUNCTION(&BitOrImplementation))
-			.Property("Identity", BINDING_PROPERTY(&FQuat::Identity))
+			.Property("Identity", BINDING_READONLY_PROPERTY(&FQuat::Identity))
 			.Function("MakeFromRotator", BINDING_FUNCTION(&FQuat::MakeFromRotator))
 			.Function("Equals", BINDING_FUNCTION(&FQuat::Equals),
 			          {"Q", "Tolerance"})
@@ -86,7 +115,8 @@ struct FRegisterQuat
 			.Function("AngularDistance", BINDING_FUNCTION(&FQuat::AngularDistance),
 			          {"Q"})
 			.Function("ContainsNaN", BINDING_FUNCTION(&FQuat::ContainsNaN))
-			.Function("ToString", BINDING_FUNCTION(&FQuat::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FQuat::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("InitFromString", BINDING_FUNCTION(&FQuat::InitFromString),
 			          {"InSourceString"})
 			.Function("FindBetween", BINDING_FUNCTION(&FQuat::FindBetween),

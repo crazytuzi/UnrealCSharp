@@ -10,7 +10,8 @@ struct FRegisterPrimaryAssetType
 			             {"InName"})
 			.Function("GetName", BINDING_FUNCTION(&FPrimaryAssetType::GetName))
 			.Function("IsValid", BINDING_FUNCTION(&FPrimaryAssetType::IsValid))
-			.Function("ToString", BINDING_FUNCTION(&FPrimaryAssetType::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FPrimaryAssetType::ToString),
+			          {}, EFunctionInteract::New)
 			.Register();
 	}
 };

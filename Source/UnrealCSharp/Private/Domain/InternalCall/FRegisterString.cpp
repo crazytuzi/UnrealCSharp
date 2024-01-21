@@ -34,16 +34,16 @@ struct FRegisterString
 		});
 	}
 
-	static void ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoString** OutValue)
+	static MonoString* ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		auto String = FCSharpEnvironment::GetEnvironment().GetString<FString>(InGarbageCollectionHandle);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*FString(*String)));
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*FString(*String)));
 	}
 
 	FRegisterString()
 	{
-		FClassBuilder(TEXT("String"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FString"), NAMESPACE_LIBRARY)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)

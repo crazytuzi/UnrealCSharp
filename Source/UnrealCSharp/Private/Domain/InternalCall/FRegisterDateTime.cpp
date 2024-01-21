@@ -115,7 +115,8 @@ struct FRegisterDateTime
 			.Function("IsMorning", BINDING_FUNCTION(&FDateTime::IsMorning))
 			.Function("ToHttpDate", BINDING_FUNCTION(&FDateTime::ToHttpDate))
 			.Function("ToIso8601", BINDING_FUNCTION(&FDateTime::ToIso8601))
-			.Function("ToString", BINDING_OVERLOAD(FString(FDateTime::*)()const, &FDateTime::ToString))
+			.Function("ToString", BINDING_OVERLOAD(FString(FDateTime::*)()const, &FDateTime::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("ToUnixTimestamp", BINDING_FUNCTION(&FDateTime::ToUnixTimestamp))
 			.Function("DaysInMonth", BINDING_FUNCTION(&FDateTime::DaysInMonth),
 			          {"Year", "Month"})

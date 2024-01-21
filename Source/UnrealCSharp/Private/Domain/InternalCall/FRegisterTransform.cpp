@@ -27,10 +27,11 @@ struct FRegisterTransform
 			.Plus()
 			.Multiplies()
 			.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
-			.Property("Identity", BINDING_PROPERTY(&FTransform::Identity))
+			.Property("Identity", BINDING_READONLY_PROPERTY(&FTransform::Identity))
 			.Function("DebugPrint", BINDING_FUNCTION(&FTransform::DebugPrint))
 			.Function("ToHumanReadableString", BINDING_FUNCTION(&FTransform::ToHumanReadableString))
-			.Function("ToString", BINDING_FUNCTION(&FTransform::ToString))
+			.Function("ToString", BINDING_FUNCTION(&FTransform::ToString),
+			          {}, EFunctionInteract::New)
 			.Function("InitFromString", BINDING_FUNCTION(&FTransform::InitFromString),
 			          {"InSourceString"})
 			.Function("ToMatrixWithScale", BINDING_FUNCTION(&FTransform::ToMatrixWithScale))

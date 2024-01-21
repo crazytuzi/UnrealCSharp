@@ -23,11 +23,12 @@ void FStrPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FString>(SrcMonoObject);
+		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FString>(SrcMonoObject))
+		{
+			StrProperty->InitializeValue(Dest);
 
-		StrProperty->InitializeValue(Dest);
-
-		StrProperty->SetPropertyValue(Dest, *SrcValue);
+			StrProperty->SetPropertyValue(Dest, *SrcValue);
+		}
 	}
 }
 

@@ -1,6 +1,8 @@
 ﻿#include "FGeneratorCore.h"
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
+#include "Binding/TypeInfo/TName.inl"
+#include "Binding/TypeInfo/TNameSpace.inl"
 #include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
@@ -82,26 +84,26 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 			return FUnrealCSharpFunctionLibrary::GetFullClass(ByteProperty->Enum);
 		}
 
-		return TEXT("Byte");
+		return TName<uint8, uint8>::Get();
 	}
 
-	if (CastField<FUInt16Property>(Property)) return TEXT("UInt16");
+	if (CastField<FUInt16Property>(Property)) return TName<uint16, uint16>::Get();
 
-	if (CastField<FUInt32Property>(Property)) return TEXT("UInt32");
+	if (CastField<FUInt32Property>(Property)) return TName<uint32, uint32>::Get();
 
-	if (CastField<FUInt64Property>(Property)) return TEXT("UInt64");
+	if (CastField<FUInt64Property>(Property)) return TName<uint64, uint64>::Get();
 
-	if (CastField<FInt8Property>(Property)) return TEXT("SByte");
+	if (CastField<FInt8Property>(Property)) return TName<int8, int8>::Get();
 
-	if (CastField<FInt16Property>(Property)) return TEXT("Int16");
+	if (CastField<FInt16Property>(Property)) return TName<int16, int16>::Get();
 
-	if (CastField<FIntProperty>(Property)) return TEXT("Int32");
+	if (CastField<FIntProperty>(Property)) return TName<int32, int32>::Get();
 
-	if (CastField<FInt64Property>(Property)) return TEXT("Int64");
+	if (CastField<FInt64Property>(Property)) return TName<int64, int64>::Get();
 
-	if (CastField<FBoolProperty>(Property)) return TEXT("Boolean");
+	if (CastField<FBoolProperty>(Property)) return TName<bool, bool>::Get();
 
-	if (CastField<FFloatProperty>(Property)) return TEXT("Single");
+	if (CastField<FFloatProperty>(Property)) return TName<float, float>::Get();
 
 	if (const auto ClassProperty = CastField<FClassProperty>(Property))
 	{
@@ -117,7 +119,7 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		return FUnrealCSharpFunctionLibrary::GetFullClass(ObjectProperty->PropertyClass);
 	}
 
-	if (CastField<FNameProperty>(Property)) return TEXT("FName");
+	if (CastField<FNameProperty>(Property)) return TName<FName, FName>::Get();
 
 	if (const auto DelegateProperty = CastField<FDelegateProperty>(Property))
 	{
@@ -156,9 +158,9 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		return FUnrealCSharpFunctionLibrary::GetFullClass(EnumProperty->GetEnum());
 	}
 
-	if (CastField<FStrProperty>(Property)) return TEXT("FString");
+	if (CastField<FStrProperty>(Property)) return TName<FString, FString>::Get();
 
-	if (CastField<FTextProperty>(Property)) return TEXT("FText");
+	if (CastField<FTextProperty>(Property)) return TName<FText, FText>::Get();
 
 	if (const auto MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(Property))
 	{
@@ -201,7 +203,7 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		);
 	}
 
-	if (CastField<FDoubleProperty>(Property)) return TEXT("Double");
+	if (CastField<FDoubleProperty>(Property)) return TName<double, double>::Get();
 
 	if (const auto MapProperty = CastField<FMapProperty>(Property))
 	{
@@ -246,30 +248,28 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
 	{
-		return {
-			ByteProperty->Enum != nullptr
-				? FUnrealCSharpFunctionLibrary::GetClassNameSpace(ByteProperty->Enum)
-				: TEXT("System")
-		};
+		return ByteProperty->Enum != nullptr
+			       ? TSet<FString>{FUnrealCSharpFunctionLibrary::GetClassNameSpace(ByteProperty->Enum)}
+			       : TSet<FString>{TNameSpace<uint8, uint8>::Get()};
 	}
 
-	if (CastField<FUInt16Property>(Property)) return {TEXT("System")};
+	if (CastField<FUInt16Property>(Property)) return TSet<FString>{TNameSpace<uint16, uint16>::Get()};
 
-	if (CastField<FUInt32Property>(Property)) return {TEXT("System")};
+	if (CastField<FUInt32Property>(Property)) return TSet<FString>{TNameSpace<uint32, uint32>::Get()};
 
-	if (CastField<FUInt64Property>(Property)) return {TEXT("System")};
+	if (CastField<FUInt64Property>(Property)) return TSet<FString>{TNameSpace<uint64, uint64>::Get()};
 
-	if (CastField<FInt8Property>(Property)) return {TEXT("System")};
+	if (CastField<FInt8Property>(Property)) return TSet<FString>{TNameSpace<int8, int8>::Get()};
 
-	if (CastField<FInt16Property>(Property)) return {TEXT("System")};
+	if (CastField<FInt16Property>(Property)) return TSet<FString>{TNameSpace<int16, int16>::Get()};
 
-	if (CastField<FIntProperty>(Property)) return {TEXT("System")};
+	if (CastField<FIntProperty>(Property)) return TSet<FString>{TNameSpace<int32, int32>::Get()};
 
-	if (CastField<FInt64Property>(Property)) return {TEXT("System")};
+	if (CastField<FInt64Property>(Property)) return TSet<FString>{TNameSpace<int64, int64>::Get()};
 
-	if (CastField<FBoolProperty>(Property)) return {TEXT("System")};
+	if (CastField<FBoolProperty>(Property)) return TSet<FString>{TNameSpace<bool, bool>::Get()};
 
-	if (CastField<FFloatProperty>(Property)) return {TEXT("System")};
+	if (CastField<FFloatProperty>(Property)) return TSet<FString>{TNameSpace<float, float>::Get()};
 
 	if (const auto ClassProperty = CastField<FClassProperty>(Property))
 	{
@@ -281,7 +281,7 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(ObjectProperty->PropertyClass)};
 	}
 
-	if (CastField<FNameProperty>(Property)) return {TEXT("Script.Common")};
+	if (CastField<FNameProperty>(Property)) return TSet<FString>{TNameSpace<FName, FName>::Get()};
 
 	if (const auto DelegateProperty = CastField<FDelegateProperty>(Property))
 	{
@@ -307,12 +307,12 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(EnumProperty->GetEnum()), TEXT("System")};
+		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(EnumProperty->GetEnum())};
 	}
 
-	if (CastField<FStrProperty>(Property)) return {"Script.Common"};
+	if (CastField<FStrProperty>(Property)) return TSet<FString>{TNameSpace<FString, FString>::Get()};
 
-	if (CastField<FTextProperty>(Property)) return {"Script.Common"};
+	if (CastField<FTextProperty>(Property)) return TSet<FString>{TNameSpace<FText, FText>::Get()};
 
 	if (const auto MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(Property))
 	{
@@ -347,7 +347,7 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 		};
 	}
 
-	if (CastField<FDoubleProperty>(Property)) return {TEXT("System")};
+	if (CastField<FDoubleProperty>(Property)) return TSet<FString>{TNameSpace<double, double>::Get()};
 
 	if (const auto MapProperty = CastField<FMapProperty>(Property))
 	{
@@ -366,7 +366,7 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	return {TEXT("")};
 }
 
-FString FGeneratorCore::GetGetAccessorType(FProperty* Property)
+FString FGeneratorCore::GetGetPrimitiveAccessorType(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property))
 	{
@@ -375,10 +375,30 @@ FString FGeneratorCore::GetGetAccessorType(FProperty* Property)
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
-		return *GetPropertyType(EnumProperty->GetUnderlyingProperty());
+		return *GetGetPrimitiveAccessorType(EnumProperty->GetUnderlyingProperty());
 	}
 
-	return *GetPropertyType(Property);
+	if (CastField<FUInt16Property>(Property)) return TEXT("UInt16");
+
+	if (CastField<FUInt32Property>(Property)) return TEXT("UInt32");
+
+	if (CastField<FUInt64Property>(Property)) return TEXT("UInt64");
+
+	if (CastField<FInt8Property>(Property)) return TEXT("SByte");
+
+	if (CastField<FInt16Property>(Property)) return TEXT("Int16");
+
+	if (CastField<FIntProperty>(Property)) return TEXT("Int32");
+
+	if (CastField<FInt64Property>(Property)) return TEXT("Int64");
+
+	if (CastField<FBoolProperty>(Property)) return TEXT("Boolean");
+
+	if (CastField<FFloatProperty>(Property)) return TEXT("Single");
+
+	if (CastField<FDoubleProperty>(Property)) return TEXT("Double");
+
+	return TEXT("");
 }
 
 FString FGeneratorCore::GetGetAccessorReturnParamName(FProperty* Property)
@@ -388,38 +408,42 @@ FString FGeneratorCore::GetGetAccessorReturnParamName(FProperty* Property)
 		if (ByteProperty->Enum != nullptr)
 		{
 			return FString::Printf(TEXT(
-				"(%s) value"
+				"(%s)"
 			),
 			                       *FUnrealCSharpFunctionLibrary::GetFullClass(ByteProperty->Enum));
 		}
 		else
 		{
-			return TEXT("value");
+			return TEXT("");
 		}
 	}
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
 		return FString::Printf(TEXT(
-			"(%s) value"
+			"(%s)"
 		),
 		                       *FUnrealCSharpFunctionLibrary::GetFullClass(EnumProperty->GetEnum()));
 	}
 
-	return TEXT("value");
+	return TEXT("");
 }
 
 FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property))
 	{
-		return TEXT("(Byte) value");
+		return FString::Printf(TEXT(
+			"(%s)value"
+		),
+		                       *TName<uint8, uint8>::Get()
+		);
 	}
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
 		return FString::Printf(TEXT(
-			"(%s) value"
+			"(%s)value"
 		),
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()));
 	}
@@ -427,7 +451,7 @@ FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 	return TEXT("value");
 }
 
-bool FGeneratorCore::IsSafeProperty(FProperty* Property)
+bool FGeneratorCore::IsPrimitiveProperty(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property) || CastField<FUInt16Property>(Property) ||
 		CastField<FUInt32Property>(Property) || CastField<FUInt64Property>(Property) ||
@@ -436,10 +460,10 @@ bool FGeneratorCore::IsSafeProperty(FProperty* Property)
 		CastField<FBoolProperty>(Property) || CastField<FFloatProperty>(Property) ||
 		CastField<FEnumProperty>(Property) || CastField<FDoubleProperty>(Property))
 	{
-		return false;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 FString FGeneratorCore::GetOutParamString(FProperty* Property, const uint32 Index)
@@ -447,10 +471,22 @@ FString FGeneratorCore::GetOutParamString(FProperty* Property, const uint32 Inde
 	if (Property == nullptr) return TEXT("");
 
 	return FString::Printf(TEXT(
-		"(%s) __OutValue[%d]"
+		"%s__OutValue[%d]%s"
 	),
-	                       *GetPropertyType(Property),
-	                       Index);
+	                       IsPrimitiveProperty(Property)
+		                       ? *FString::Printf(TEXT(
+			                       "(%s)"
+		                       ),
+		                                          *GetPropertyType(Property))
+		                       : TEXT(""),
+	                       Index,
+	                       !IsPrimitiveProperty(Property)
+		                       ? *FString::Printf(TEXT(
+			                       "as %s"
+		                       ),
+		                                          *GetPropertyType(Property))
+		                       : TEXT("")
+	);
 }
 
 FString FGeneratorCore::GetParamName(FProperty* Property)
@@ -460,8 +496,9 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 		if (ByteProperty->Enum != nullptr)
 		{
 			return FString::Printf(TEXT(
-				"(Byte) %s"
+				"(%s)%s"
 			),
+			                       *TName<uint8, uint8>::Get(),
 			                       *FUnrealCSharpFunctionLibrary::Encode(ByteProperty->GetName()));
 		}
 	}
@@ -469,7 +506,7 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
 		return FString::Printf(TEXT(
-			"(%s) %s"
+			"(%s)%s"
 		),
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()),
 		                       *FUnrealCSharpFunctionLibrary::Encode(EnumProperty->GetName()));
@@ -482,7 +519,7 @@ FString FGeneratorCore::GetReturnParamType(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property))
 	{
-		return TEXT("Byte");
+		return TName<uint8, uint8>::Get();
 	}
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
@@ -493,12 +530,11 @@ FString FGeneratorCore::GetReturnParamType(FProperty* Property)
 	return GetPropertyType(Property);
 }
 
-FString FGeneratorCore::GetReturnParamName(FProperty* Property)
+int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput, const bool bHasOutput)
 {
-	return FString::Printf(TEXT(
-		"(%s) __ReturnValue"
-	),
-	                       *GetPropertyType(Property));
+	return static_cast<int32>(bHasReturn) |
+		static_cast<int32>(bHasInput) << 1 |
+		static_cast<int32>(bHasOutput) << 2;
 }
 
 bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& String)
@@ -819,6 +855,8 @@ void FGeneratorCore::EndGenerator()
 	SupportedMap.Empty();
 
 	SupportedAssetClassName.Empty();
+
+	FDelegateGenerator::Delegate.Empty();
 
 	FEnumGenerator::EnumUnderlyingType.Empty();
 }

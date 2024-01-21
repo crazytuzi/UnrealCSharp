@@ -1,18 +1,20 @@
-﻿#include "Binding/Class/FClassBuilder.h"
+﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/NamespaceMacro.h"
 #include "Async/Async.h"
 
+BINDING_REFLECTION_CLASS(UStruct)
+
 struct FRegisterStruct
 {
-	static void StaticStructImplementation(MonoString* InStructName, MonoObject** OutValue)
+	static MonoObject* StaticStructImplementation(MonoString* InStructName)
 	{
 		const auto StructName = UTF8_TO_TCHAR(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
 
 		const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName);
 
-		*OutValue = FCSharpEnvironment::GetEnvironment().Bind(InStruct);
+		return FCSharpEnvironment::GetEnvironment().Bind(InStruct);
 	}
 
 	static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InStructName)
@@ -52,7 +54,7 @@ struct FRegisterStruct
 
 	FRegisterStruct()
 	{
-		FClassBuilder(TEXT("Struct"), NAMESPACE_LIBRARY)
+		TReflectionClassBuilder<UStruct>(NAMESPACE_LIBRARY)
 			.Function("StaticStruct", StaticStructImplementation)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
