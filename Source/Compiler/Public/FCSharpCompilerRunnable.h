@@ -25,6 +25,10 @@ public:
 
 	void DoWork();
 
+	void ImmediatelyDoWork();
+
+	void Compile(const TFunction<void()>& InFunction);
+
 private:
 	static void Compile();
 

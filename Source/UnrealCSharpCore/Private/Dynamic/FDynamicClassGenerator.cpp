@@ -248,7 +248,10 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 
 	if (InClass->GetSuperClass()->HasAnyInternalFlags(EInternalObjectFlags::Native))
 	{
-		InClass->SetInternalFlags(EInternalObjectFlags::Native);
+		if (Cast<UCSharpClass>(InClass))
+		{
+			InClass->SetInternalFlags(EInternalObjectFlags::Native);
+		}
 	}
 
 	for (TFieldIterator<FProperty> It(InClass, EFieldIteratorFlags::ExcludeSuper,
