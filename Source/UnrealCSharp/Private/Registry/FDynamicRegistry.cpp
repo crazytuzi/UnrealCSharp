@@ -4,6 +4,7 @@
 #include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
+#include "Dynamic/FDynamicClassGenerator.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Template/TGetArrayLength.inl"
 
@@ -70,10 +71,9 @@ void FDynamicRegistry::RegisterDynamic() const
 
 		const auto Class = FMonoDomain::Type_Get_Class(Type);
 
-		const auto ClassName = FMonoDomain::Class_Get_Name(Class);
-
-		const auto Outer = UObject::StaticClass()->GetPackage();
-
-		FCSharpEnvironment::GetEnvironment().Bind(LoadClass<UObject>(Outer, *FString(ClassName)), true);
+		if (const auto DynamicClass = FDynamicClassGenerator::GetDynamicClass(Class))
+		{
+			FCSharpEnvironment::GetEnvironment().Bind(DynamicClass, true);
+		}
 	}
 }
