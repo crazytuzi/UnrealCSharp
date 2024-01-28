@@ -48,6 +48,8 @@ public:
 
 	MonoProperty* Class_Get_Properties(MonoClass* InMonoClass, void** InIterator) const;
 
+	MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName) const;
+
 	MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator) const;
 
 	MonoCustomAttrInfo* Custom_Attrs_From_Class(MonoClass* InMonoClass) const;
@@ -59,6 +61,8 @@ public:
 	MonoCustomAttrInfo* Custom_Attrs_From_Method(MonoMethod* InMonoMethod) const;
 
 	mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass) const;
+
+	MonoObject* Custom_Attrs_Get_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass) const;
 
 	void Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue);
 
@@ -77,6 +81,9 @@ public:
 
 	static void Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
 	                               MonoObject** InExc);
+
+	static MonoObject* Property_Get_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
+	                                      MonoObject** InExc);
 
 	const char* Method_Get_Name(MonoMethod* InMonoMethod) const;
 

@@ -38,7 +38,7 @@ void FCSharpCompiler::ImmediatelyCompile() const
 {
 	if (Runnable != nullptr)
 	{
-		Runnable->DoWork();
+		Runnable->ImmediatelyDoWork();
 	}
 }
 

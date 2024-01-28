@@ -102,16 +102,33 @@ bool FCSharpCompilerRunnable::IsCompiling() const
 
 void FCSharpCompilerRunnable::DoWork()
 {
-	bIsCompiling = true;
-
-	Compile();
-
-	const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
+	Compile([&]()
 	{
 		FDynamicGenerator::Generator(FileChanges);
 
 		FileChanges.Empty();
-	}, TStatId(), nullptr, ENamedThreads::GameThread);
+	});
+}
+
+void FCSharpCompilerRunnable::ImmediatelyDoWork()
+{
+	Compile([]()
+	{
+		FDynamicGenerator::Generator();
+	});
+}
+
+void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
+{
+	bIsCompiling = true;
+
+	Compile();
+
+	const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
+		InFunction,
+		TStatId(),
+		nullptr,
+		ENamedThreads::GameThread);
 
 	FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
 

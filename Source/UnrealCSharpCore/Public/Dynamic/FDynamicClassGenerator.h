@@ -17,6 +17,8 @@ public:
 
 	static bool IsDynamicClass(MonoClass* InMonoClass);
 
+	static UNREALCSHARPCORE_API UClass* GetDynamicClass(MonoClass* InMonoClass);
+
 private:
 	static void BeginGenerator(UClass* InClass, UClass* InParentClass);
 
@@ -31,10 +33,14 @@ private:
 		UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
 #if WITH_EDITOR
-	static void ReInstance(UClass* InClass);
+	static void ReInstance(UClass* InClass, int32 InChangedStructSize);
+
+	static void GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass);
 #endif
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UClass* InClass);
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
+
+	static TMap<FString, UClass*> DynamicClass;
 };

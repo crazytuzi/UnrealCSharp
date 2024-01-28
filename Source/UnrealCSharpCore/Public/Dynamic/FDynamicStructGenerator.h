@@ -24,8 +24,12 @@ private:
 	static UCSharpScriptStruct* GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName);
 
 #if WITH_EDITOR
-	static void ReInstance(UScriptStruct* InScriptStruct, const TArray<UBlueprint*>& InBlueprints);
+	static void ReInstance(UScriptStruct* InScriptStruct);
+
+	static void GeneratorMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);
 #endif
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);
+
+	static TMap<FString, UCSharpScriptStruct*> DynamicStruct;
 };

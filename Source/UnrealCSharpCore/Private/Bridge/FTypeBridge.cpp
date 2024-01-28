@@ -182,6 +182,33 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 		return EPropertyTypeExtent::Double;
 	}
 
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_MAP))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			return EPropertyTypeExtent::Map;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SET))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			return EPropertyTypeExtent::Set;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_ARRAY))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			return EPropertyTypeExtent::Array;
+		}
+	}
+
 	return EPropertyTypeExtent::None;
 }
 
@@ -765,6 +792,21 @@ FProperty* FTypeBridge::Factory(MonoReflectionType* InReflectionType, const FFie
 
 	case EPropertyTypeExtent::Double: return new FDoubleProperty(InOwner, InName, InObjectFlags);
 
+	case EPropertyTypeExtent::Map:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
+
+	case EPropertyTypeExtent::Set:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
+
+	case EPropertyTypeExtent::Array:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
+
 	default: return nullptr;
 	}
 }
@@ -827,6 +869,39 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 			StructProperty->Struct = InScriptStruct;
 
 			return StructProperty;
+		}
+
+	case EPropertyTypeExtent::Map:
+		{
+			const auto MapProperty = new FMapProperty(InOwner, InName, InObjectFlags);
+
+			MapProperty->KeyProp = Factory(GetGenericArgument(InReflectionType), MapProperty, "",
+			                               EObjectFlags::RF_Transient);
+
+			MapProperty->ValueProp = Factory(GetGenericArgument(InReflectionType, 1), MapProperty, "",
+			                                 EObjectFlags::RF_Transient);
+
+			return MapProperty;
+		}
+
+	case EPropertyTypeExtent::Set:
+		{
+			const auto SetProperty = new FSetProperty(InOwner, InName, InObjectFlags);
+
+			SetProperty->ElementProp = Factory(GetGenericArgument(InReflectionType), SetProperty, "",
+			                                   EObjectFlags::RF_Transient);
+
+			return SetProperty;
+		}
+
+	case EPropertyTypeExtent::Array:
+		{
+			const auto ArrayProperty = new FArrayProperty(InOwner, InName, InObjectFlags);
+
+			ArrayProperty->Inner = Factory(GetGenericArgument(InReflectionType), ArrayProperty, "",
+			                               EObjectFlags::RF_Transient);
+
+			return ArrayProperty;
 		}
 
 	case EPropertyTypeExtent::Enum:
