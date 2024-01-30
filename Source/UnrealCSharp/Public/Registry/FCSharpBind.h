@@ -36,6 +36,8 @@ public:
 
 	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
+	static bool BindClassDefaultObject(FDomain* InDomain, UObject* InObject);
+
 private:
 	static bool BindImplementation(FDomain* InDomain, UObject* InObject, bool bNeedMonoClass);
 

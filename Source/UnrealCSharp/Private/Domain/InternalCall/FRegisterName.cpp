@@ -45,7 +45,7 @@ struct FRegisterName
 	{
 		const auto FoundMonoClass = TPropertyClass<FName, FName>::Get();
 
-		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(FoundMonoClass);
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 		FCSharpEnvironment::GetEnvironment().AddStringReference<FName>(Object, new FName(NAME_None), true);
 

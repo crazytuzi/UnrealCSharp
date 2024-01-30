@@ -21,6 +21,8 @@ public:
 
 	FClassDescriptor* AddClassDescriptor(const class FDomain* InDomain, UStruct* InStruct);
 
+	static void AddClassConstructor(UClass* InClass);
+
 	void RemoveClassDescriptor(const UStruct* InStruct);
 
 	FFunctionDescriptor* GetFunctionDescriptor(uint32 InFunctionHash);
@@ -42,6 +44,9 @@ public:
 	void RemovePropertyDescriptor(uint32 InPropertyHash);
 
 private:
+	static void ClassConstructor(const FObjectInitializer& InObjectInitializer);
+
+private:
 	TMap<TWeakObjectPtr<const UStruct>, FClassDescriptor*> ClassDescriptorMap;
 
 	TMap<uint32, TPair<FClassDescriptor*, FName>> PropertyHashMap;
@@ -51,4 +56,6 @@ private:
 	TMap<uint32, TPair<FClassDescriptor*, FName>> FunctionHashMap;
 
 	TMap<uint32, FFunctionDescriptor*> FunctionDescriptorMap;
+
+	static TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> ClassConstructorMap;
 };

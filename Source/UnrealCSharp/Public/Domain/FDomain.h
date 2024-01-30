@@ -187,6 +187,8 @@ public:
 
 	static void GCHandle_Free_V2(MonoGCHandle InGCHandle);
 
+	static void Object_Constructor(MonoObject* InMonoObject, int32 InParamCount = 0, void** InParams = nullptr);
+
 	static MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                                     int32 InParamCount);
 

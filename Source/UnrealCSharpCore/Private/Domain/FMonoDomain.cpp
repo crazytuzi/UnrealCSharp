@@ -122,15 +122,9 @@ MonoObject* FMonoDomain::Object_Init(MonoClass* InMonoClass, const int32 InParam
 {
 	if (const auto NewMonoObject = Object_New(InMonoClass))
 	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_OBJECT_CONSTRUCTOR,
-		                                                        InParamCount))
-		{
-			Runtime_Invoke(FoundMethod, NewMonoObject, InParams);
+		Object_Constructor(NewMonoObject, InParamCount, InParams);
 
-			return NewMonoObject;
-		}
-
-		// @TODO
+		return NewMonoObject;
 	}
 
 	return nullptr;
@@ -585,6 +579,18 @@ void FMonoDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
 	return mono_gchandle_free_v2(InGCHandle);
 }
 
+void FMonoDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InParamCount, void** InParams)
+{
+	if (const auto FoundMonoClass = Object_Get_Class(InMonoObject))
+	{
+		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_OBJECT_CONSTRUCTOR,
+		                                                        InParamCount))
+		{
+			Runtime_Invoke(FoundMethod, InMonoObject, InParams);
+		}
+	}
+}
+
 MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
                                                            const int32 InParamCount)
 {
@@ -844,6 +850,8 @@ void FMonoDomain::UnloadAssembly()
 	Images.Reset();
 
 	Assemblies.Reset();
+
+	bLoadSucceed = false;
 }
 
 void FMonoDomain::RegisterAssemblyPreloadHook()

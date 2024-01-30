@@ -1,13 +1,13 @@
 ﻿#pragma once
 
 #include "Domain/FDomain.h"
+#include "Registry/FDynamicRegistry.h"
 #include "Registry/FClassRegistry.h"
 #include "Registry/FMultiRegistry.h"
 #include "Registry/FStringRegistry.h"
 #include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
-#include "Registry/FDynamicRegistry.h"
 #include "Template/TIsUObject.inl"
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsScriptStruct.inl"
@@ -325,6 +325,8 @@ private:
 	TArray<FWeakObjectPtr> AsyncLoadingObjectArray;
 
 private:
+	FDynamicRegistry* DynamicRegistry;
+
 	class FCSharpBind* CSharpBind;
 
 	FClassRegistry* ClassRegistry;
@@ -342,8 +344,6 @@ private:
 	FMultiRegistry* MultiRegistry;
 
 	FStringRegistry* StringRegistry;
-
-	FDynamicRegistry* DynamicRegistry;
 
 	class FBindingRegistry* BindingRegistry;
 };

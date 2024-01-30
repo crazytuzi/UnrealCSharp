@@ -475,6 +475,11 @@ void FDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
 	return FMonoDomain::GCHandle_Free_V2(InGCHandle);
 }
 
+void FDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InParamCount, void** InParams)
+{
+	FMonoDomain::Object_Constructor(InMonoObject, InParamCount, InParams);
+}
+
 MonoMethod* FDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
                                                        const int32 InParamCount)
 {

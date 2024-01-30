@@ -81,6 +81,33 @@ bool FCSharpBind::Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFu
 	return BindImplementation(InClassDescriptor, InClass, InFunction);
 }
 
+bool FCSharpBind::BindClassDefaultObject(FDomain* InDomain, UObject* InObject)
+{
+	if (CanBind(InDomain, InObject->GetClass()))
+	{
+		FClassRegistry::AddClassConstructor(InObject->GetClass());
+
+		Bind(InDomain, InObject);
+
+		return true;
+	}
+	else
+	{
+		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
+		{
+			for (const auto& BindClass : UnrealCSharpSetting->GetBindClass())
+			{
+				if (InObject->IsA(BindClass.Class))
+				{
+					return BindClass.bNeedMonoClass ? false : Bind(InDomain, InObject, false);
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 bool FCSharpBind::BindImplementation(FDomain* InDomain, UObject* InObject, const bool bNeedMonoClass)
 {
 	if (InDomain == nullptr || InObject == nullptr)
@@ -114,7 +141,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UObject* InObject, const
 		return false;
 	}
 
-	const auto NewMonoObject = InDomain->Object_Init(FoundMonoClass);
+	const auto NewMonoObject = InDomain->Object_New(FoundMonoClass);
 
 	FCSharpEnvironment::GetEnvironment().AddObjectReference(InObject, NewMonoObject);
 
@@ -558,15 +585,9 @@ void FCSharpBind::OnCSharpEnvironmentInitialize()
 {
 	for (const auto Class : TObjectRange<UClass>())
 	{
-		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
+		if (Class->ClassDefaultObject)
 		{
-			for (const auto& BindClass : UnrealCSharpSetting->GetBindClass())
-			{
-				if (Class->IsChildOf(BindClass.Class))
-				{
-					FCSharpEnvironment::GetEnvironment().Bind(Class->ClassDefaultObject, BindClass.bNeedMonoClass);
-				}
-			}
+			BindClassDefaultObject(FCSharpEnvironment::GetEnvironment().GetDomain(), Class->ClassDefaultObject);
 		}
 	}
 }

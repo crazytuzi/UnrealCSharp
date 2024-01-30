@@ -7,7 +7,6 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
-#include "Setting/UnrealCSharpSetting.h"
 #include <signal.h>
 
 void SignalHandler(int32)
@@ -57,6 +56,8 @@ void FCSharpEnvironment::Initialize()
 		}
 	});
 
+	DynamicRegistry = new FDynamicRegistry();
+
 	CSharpBind = new FCSharpBind();
 
 	ClassRegistry = new FClassRegistry();
@@ -74,8 +75,6 @@ void FCSharpEnvironment::Initialize()
 	MultiRegistry = new FMultiRegistry();
 
 	StringRegistry = new FStringRegistry();
-
-	DynamicRegistry = new FDynamicRegistry();
 
 	BindingRegistry = new FBindingRegistry();
 
@@ -123,13 +122,6 @@ void FCSharpEnvironment::Deinitialize()
 		delete BindingRegistry;
 
 		BindingRegistry = nullptr;
-	}
-
-	if (DynamicRegistry != nullptr)
-	{
-		delete DynamicRegistry;
-
-		DynamicRegistry = nullptr;
 	}
 
 	if (StringRegistry != nullptr)
@@ -195,6 +187,13 @@ void FCSharpEnvironment::Deinitialize()
 		CSharpBind = nullptr;
 	}
 
+	if (DynamicRegistry != nullptr)
+	{
+		delete DynamicRegistry;
+
+		DynamicRegistry = nullptr;
+	}
+
 	if (Domain != nullptr)
 	{
 		delete Domain;
@@ -219,26 +218,15 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 	{
 		if (InObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject | EObjectFlags::RF_ArchetypeObject))
 		{
-			if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
+			if (IsInGameThread())
 			{
-				for (const auto& BindClass : UnrealCSharpSetting->GetBindClass())
-				{
-					if (InObject->IsA(BindClass.Class))
-					{
-						if (BindClass.bNeedMonoClass)
-						{
-							FScopeLock Lock(&CriticalSection);
+				FCSharpBind::BindClassDefaultObject(Domain, InObject);
+			}
+			else
+			{
+				FScopeLock Lock(&CriticalSection);
 
-							AsyncLoadingObjectArray.Add(InObject);
-						}
-						else
-						{
-							Bind(InObject, false);
-						}
-
-						return;
-					}
-				}
+				AsyncLoadingObjectArray.Add(InObject);
 			}
 
 			return;
@@ -337,9 +325,16 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 		}
 	}
 
-	for (auto i = 0; i < PendingBindObjects.Num(); ++i)
+	for (const auto& PendingBindObject : PendingBindObjects)
 	{
-		Bind(PendingBindObjects[i], true);
+		if (PendingBindObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject | EObjectFlags::RF_ArchetypeObject))
+		{
+			FCSharpBind::BindClassDefaultObject(Domain, PendingBindObject);
+		}
+		else
+		{
+			Bind(PendingBindObject, true);
+		}
 	}
 }
 
