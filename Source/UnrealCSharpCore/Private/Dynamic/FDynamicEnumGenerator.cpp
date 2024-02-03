@@ -67,7 +67,7 @@ void FDynamicEnumGenerator::CodeAnalysisGenerator()
 		{
 			DynamicEnum.Add(
 				EnumName,
-				GeneratorCSharpEnum(FDynamicGeneratorCore::GetOuter(), EnumName));
+				GeneratorCSharpEnum(FDynamicGeneratorCore::GetOuter(), EnumName.RightChop(1)));
 		}
 	}
 }
@@ -92,7 +92,7 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 	}
 	else
 	{
-		Enum = GeneratorCSharpEnum(Outer, ClassName);
+		Enum = GeneratorCSharpEnum(Outer, ClassName.RightChop(1));
 
 		DynamicEnum.Add(ClassName, Enum);
 	}

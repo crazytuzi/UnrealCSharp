@@ -42,5 +42,11 @@ private:
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
 
+	static void ClassConstructor(const FObjectInitializer& InObjectInitializer);
+
+public:
+	static UNREALCSHARPCORE_API TSet<void*> ClassConstructorSet;
+
+private:
 	static TMap<FString, UClass*> DynamicClass;
 };

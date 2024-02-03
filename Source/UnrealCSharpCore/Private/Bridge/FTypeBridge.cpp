@@ -435,6 +435,13 @@ MonoClass* FTypeBridge::GetMonoClass(const FInterfaceProperty* InProperty)
 {
 	if (InProperty != nullptr)
 	{
+#if WITH_EDITOR
+		if (FBlueprintSupport::IsClassPlaceholder(InProperty->InterfaceClass))
+		{
+			return nullptr;
+		}
+#endif
+
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SCRIPT_INTERFACE);
 
@@ -834,7 +841,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 		{
 			const auto PathName = GetPathName(InReflectionType);
 
-			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
+			const auto InClass = LoadObject<UClass>(nullptr, *PathName);
 
 			const auto ObjectProperty = new FObjectProperty(InOwner, InName, InObjectFlags);
 
@@ -860,7 +867,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 		{
 			const auto PathName = GetPathName(InReflectionType);
 
-			const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *FString(PathName));
+			const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *PathName);
 
 			const auto StructProperty = new FStructProperty(InOwner, InName, InObjectFlags);
 
@@ -908,12 +915,12 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 		{
 			const auto PathName = GetPathName(InReflectionType);
 
-			const auto InEnum = LoadObject<UEnum>(nullptr, *FString(PathName));
+			const auto InEnum = LoadObject<UEnum>(nullptr, *PathName);
 
 			const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
 
 			const auto InType = FMonoDomain::Reflection_Type_Get_Type(
-				InReflectionType);
+				GetType(InReflectionType));
 
 			const auto UnderlyingType = FMonoDomain::
 				Type_Get_Underlying_Type(InType);

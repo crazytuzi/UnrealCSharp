@@ -20,7 +20,14 @@ namespace Script.Common
 
         private static Type[] GetGenericArguments(Type InType) => InType.GetGenericArguments();
 
-        private static Type GetType(Type InType) => InType.IsGenericType ? InType.GetGenericTypeDefinition() : InType;
+        private static Type GetType(Type InType) =>
+            InType.IsByRef
+                ? InType.GetElementType()!.IsGenericType
+                    ? InType.GetElementType()?.GetGenericTypeDefinition()
+                    : InType.GetElementType()
+                : InType.IsGenericType
+                    ? InType.GetGenericTypeDefinition()
+                    : InType;
 
         private static object MulticastDelegate_GetTarget(Delegate InDelegate) => InDelegate.Target;
 

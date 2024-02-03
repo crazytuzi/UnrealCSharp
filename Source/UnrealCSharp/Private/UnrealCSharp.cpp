@@ -2,13 +2,11 @@
 
 #include "UnrealCSharp.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
-#include "Dynamic/FDynamicGenerator.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpModule"
 
 void FUnrealCSharpModule::StartupModule()
 {
-	FDynamicGenerator::Generator();
 }
 
 void FUnrealCSharpModule::ShutdownModule()

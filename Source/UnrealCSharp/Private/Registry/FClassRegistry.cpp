@@ -1,6 +1,7 @@
 ﻿#include "Registry/FClassRegistry.h"
 #include "Domain/FDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Dynamic/FDynamicClassGenerator.h"
 #include "Environment/FCSharpEnvironment.h"
 
 TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> FClassRegistry::ClassConstructorMap;
@@ -17,10 +18,13 @@ FClassRegistry::~FClassRegistry()
 
 void FClassRegistry::Initialize()
 {
+	FDynamicClassGenerator::ClassConstructorSet.Add(&FClassRegistry::ClassConstructor);
 }
 
 void FClassRegistry::Deinitialize()
 {
+	FDynamicClassGenerator::ClassConstructorSet.Remove(&FClassRegistry::ClassConstructor);
+
 	for (const auto& ClassConstructorPair : ClassConstructorMap)
 	{
 		if (ClassConstructorPair.Key.IsValid())
@@ -232,7 +236,7 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 
 	while (Class != nullptr)
 	{
-		if (ClassConstructorMap.Contains(Class))
+		if (ClassConstructorMap.Contains(Class) && ClassConstructorMap[Class] != &FClassRegistry::ClassConstructor)
 		{
 			ClassConstructorMap[Class](InObjectInitializer);
 

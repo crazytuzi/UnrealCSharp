@@ -17,6 +17,8 @@
 #include "UEVersion.h"
 #include "Dynamic/CSharpBlueprint.h"
 
+TSet<void*> FDynamicClassGenerator::ClassConstructorSet = {&FDynamicClassGenerator::ClassConstructor};
+
 TMap<FString, UClass*> FDynamicClassGenerator::DynamicClass;
 
 void FDynamicClassGenerator::Generator()
@@ -73,7 +75,7 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 		{
 			DynamicClass.Add(
 				ClassName,
-				GeneratorCSharpClass(FDynamicGeneratorCore::GetOuter(), ClassName, AActor::StaticClass()));
+				GeneratorCSharpClass(FDynamicGeneratorCore::GetOuter(), ClassName.RightChop(1), AActor::StaticClass()));
 		}
 	}
 
@@ -220,6 +222,8 @@ void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentCla
 #endif
 
 	InClass->ClassCastFlags |= InParentClass->ClassCastFlags;
+
+	InClass->ClassConstructor = &FDynamicClassGenerator::ClassConstructor;
 }
 
 void FDynamicClassGenerator::BeginGenerator(UCSharpBlueprintGeneratedClass* InClass, UClass* InParentClass)
@@ -233,10 +237,7 @@ void FDynamicClassGenerator::BeginGenerator(UCSharpBlueprintGeneratedClass* InCl
 
 void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 {
-	if (InClass->GetSuperClass()->HasAnyInternalFlags(EInternalObjectFlags::Native))
-	{
-		InClass->ClearInternalFlags(EInternalObjectFlags::Native);
-	}
+	InClass->ClearInternalFlags(EInternalObjectFlags::Native);
 
 	InClass->Bind();
 
@@ -244,21 +245,18 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 
 	InClass->AssembleReferenceTokenStream();
 
-	(void)InClass->GetDefaultObject();
-
-	if (InClass->GetSuperClass()->HasAnyInternalFlags(EInternalObjectFlags::Native))
+	if (InClass->ClassDefaultObject != nullptr)
 	{
-		if (Cast<UCSharpClass>(InClass))
-		{
-			InClass->SetInternalFlags(EInternalObjectFlags::Native);
-		}
+		InClass->ClassDefaultObject->SetFlags(RF_NewerVersionExists);
+
+		InClass->ClassDefaultObject->MarkAsGarbage();
+
+		InClass->ClassDefaultObject = nullptr;
 	}
 
-	for (TFieldIterator<FProperty> It(InClass, EFieldIteratorFlags::ExcludeSuper,
-	                                  EFieldIteratorFlags::ExcludeDeprecated); It; ++It)
-	{
-		It->InitializeValue(It->ContainerPtrToValuePtr<void>(InClass->ClassDefaultObject));
-	}
+	(void)InClass->GetDefaultObject(true);
+
+	InClass->SetInternalFlags(EInternalObjectFlags::Native);
 }
 
 UCSharpClass* FDynamicClassGenerator::GeneratorCSharpClass(
@@ -521,9 +519,42 @@ void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* I
 				FDynamicGeneratorCore::SetFunctionFlags(Function, Attrs);
 
 				InClass->AddFunctionToFunctionMap(Function, MethodName);
-
-				Function->AddToRoot();
 			}
 		}
+	}
+}
+
+void FDynamicClassGenerator::ClassConstructor(const FObjectInitializer& InObjectInitializer)
+{
+	const auto Object = InObjectInitializer.GetObj();
+
+	auto SuperClass = InObjectInitializer.GetClass();
+
+	while (SuperClass != nullptr)
+	{
+		if (Cast<UCSharpClass>(SuperClass) || Cast<UCSharpBlueprintGeneratedClass>(SuperClass))
+		{
+			for (TFieldIterator<FProperty> It(SuperClass, EFieldIteratorFlags::ExcludeSuper,
+			                                  EFieldIteratorFlags::ExcludeDeprecated); It; ++It)
+			{
+				It->InitializeValue(It->ContainerPtrToValuePtr<void>(Object));
+			}
+		}
+
+		SuperClass = SuperClass->GetSuperClass();
+	}
+
+	SuperClass = InObjectInitializer.GetClass();
+
+	while (SuperClass != nullptr)
+	{
+		if (SuperClass->ClassConstructor != nullptr && !ClassConstructorSet.Contains(SuperClass->ClassConstructor))
+		{
+			SuperClass->ClassConstructor(InObjectInitializer);
+
+			break;
+		}
+
+		SuperClass = SuperClass->GetSuperClass();
 	}
 }
