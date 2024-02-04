@@ -33,7 +33,7 @@ private:
 		UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
 #if WITH_EDITOR
-	static void ReInstance(UClass* InClass, int32 InChangedStructSize);
+	static void ReInstance(UClass* InOldClass, UClass* InNewClass);
 
 	static void GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass);
 #endif

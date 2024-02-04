@@ -13,6 +13,10 @@
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/KismetEditorUtilities.h"
+#include "Engine/SCS_Node.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "Kismet2/BlueprintEditorUtils.h"
+#include "Kismet2/KismetReinstanceUtilities.h"
 #endif
 #include "UEVersion.h"
 #include "Dynamic/CSharpBlueprint.h"
@@ -121,52 +125,55 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 
 	const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName);
 
-#if WITH_EDITOR
-	auto PrevStructSize = 0;
-#endif
-
 	UClass* Class{};
+
+#if WITH_EDITOR
+	UClass* OldClass{};
 
 	if (DynamicClass.Contains(ClassName))
 	{
-		Class = DynamicClass[ClassName];
+		OldClass = DynamicClass[ClassName];
 
-#if WITH_EDITOR
-		PrevStructSize = Class->GetStructureSize();
-#endif
-
-		Class->PurgeClass(false);
-
-		if (Cast<UBlueprintGeneratedClass>(ParentClass))
+		if (const auto BlueprintGeneratedClass = Cast<UCSharpBlueprintGeneratedClass>(OldClass))
 		{
-			Class->ClassFlags |= ParentClass->ClassFlags;
-
-			BeginGenerator(Class, ParentClass);
+			if (const auto Blueprint = Cast<UCSharpBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
+			{
+				Blueprint->Rename(
+					*MakeUniqueObjectName(
+						BlueprintGeneratedClass->GetOuter(),
+						BlueprintGeneratedClass->GetClass())
+					.ToString(),
+					nullptr,
+					REN_DontCreateRedirectors);
+			}
 		}
 		else
 		{
-			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
-
-			BeginGenerator(Class, ParentClass);
+			OldClass->Rename(
+				*MakeUniqueObjectName(
+					OldClass->GetOuter(),
+					OldClass->GetClass())
+				.ToString(),
+				nullptr,
+				REN_DontCreateRedirectors);
 		}
+	}
+#endif
+
+	if (Cast<UBlueprintGeneratedClass>(ParentClass))
+	{
+		Class = GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName, ParentClass);
+
+		Class->ClassFlags |= ParentClass->ClassFlags;
 	}
 	else
 	{
-		if (Cast<UBlueprintGeneratedClass>(ParentClass))
-		{
-			Class = GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName, ParentClass);
+		Class = GeneratorCSharpClass(Outer, ClassName.RightChop(1), ParentClass);
 
-			Class->ClassFlags |= ParentClass->ClassFlags;
-		}
-		else
-		{
-			Class = GeneratorCSharpClass(Outer, ClassName.RightChop(1), ParentClass);
-
-			Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
-		}
-
-		DynamicClass.Add(ClassName, Class);
+		Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 	}
+
+	DynamicClass.Add(ClassName, Class);
 
 #if WITH_EDITOR
 	GeneratorMetaData(InMonoClass, Class);
@@ -179,11 +186,9 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 	EndGenerator(Class);
 
 #if WITH_EDITOR
-	const auto NewStructSize = Class->GetStructureSize();
-
-	if (bReInstance == true)
+	if (OldClass != nullptr)
 	{
-		ReInstance(Class, NewStructSize - PrevStructSize);
+		ReInstance(OldClass, Class);
 	}
 #endif
 }
@@ -247,14 +252,16 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 
 	if (InClass->ClassDefaultObject != nullptr)
 	{
-		InClass->ClassDefaultObject->SetFlags(RF_NewerVersionExists);
+		InClass->ClassDefaultObject = StaticAllocateObject(InClass, InClass->ClassDefaultObject->GetOuter(),
+		                                                   *InClass->ClassDefaultObject->GetName(),
+		                                                   InClass->ClassDefaultObject->GetFlags(),
+		                                                   EInternalObjectFlags::None,
+		                                                   false);
 
-		InClass->ClassDefaultObject->MarkAsGarbage();
-
-		InClass->ClassDefaultObject = nullptr;
+		(*InClass->ClassConstructor)(FObjectInitializer(InClass->ClassDefaultObject,
+		                                                InClass->GetSuperClass()->GetDefaultObject(),
+		                                                EObjectInitializerOptions::None));
 	}
-
-	(void)InClass->GetDefaultObject(true);
 
 	InClass->SetInternalFlags(EInternalObjectFlags::Native);
 }
@@ -280,7 +287,7 @@ UCSharpBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorCSharpBlueprint
 
 	Class->UpdateCustomPropertyListForPostConstruction();
 
-	const auto Blueprint = NewObject<UCSharpBlueprint>(Class);
+	const auto Blueprint = NewObject<UCSharpBlueprint>(Class, *InName.LeftChop(2));
 
 	Blueprint->AddToRoot();
 
@@ -300,42 +307,87 @@ UCSharpBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorCSharpBlueprint
 }
 
 #if WITH_EDITOR
-void FDynamicClassGenerator::ReInstance(UClass* InClass, const int32 InChangedStructSize)
+void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 {
 	if (GEditor)
 	{
 		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
 
-		ActionDatabase.ClearAssetActions(InClass);
+		ActionDatabase.ClearAssetActions(InNewClass);
 
-		ActionDatabase.RefreshClassActions(InClass);
+		ActionDatabase.RefreshClassActions(InNewClass);
 	}
 
-	if (Cast<UCSharpBlueprintGeneratedClass>(InClass))
-	{
-		if (InChangedStructSize != 0)
+	FBlueprintCompileReinstancer::ReplaceInstancesOfClass(InOldClass, InNewClass, InOldClass->ClassDefaultObject);
+
+	TArray<UBlueprintGeneratedClass*> BlueprintGeneratedClasses;
+
+	FDynamicGeneratorCore::IteratorBlueprintGeneratedClass(
+		[InOldClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
-			FDynamicGeneratorCore::IteratorBlueprintGeneratedClass(
-				[InClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
-				{
-					return InBlueprintGeneratedClass->IsChildOf(InClass) &&
-						InBlueprintGeneratedClass->GetPackage() != InClass->GetPackage() &&
-						FKismetEditorUtilities::IsClassABlueprintSkeleton(*InBlueprintGeneratedClass);
-				},
-				[InChangedStructSize](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
-				{
-					InBlueprintGeneratedClass->SetPropertiesSize(
-						InBlueprintGeneratedClass->GetPropertiesSize() + InChangedStructSize);
-				});
+			return InBlueprintGeneratedClass->IsChildOf(InOldClass) && *InBlueprintGeneratedClass != InOldClass;
+		},
+		[&BlueprintGeneratedClasses](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
+		{
+			if (const auto ClassName = InBlueprintGeneratedClass->GetName();
+				ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
+				ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")) ||
+				ClassName.StartsWith(TEXT("HOTRELOADED_")))
+			{
+				return;
+			}
+
+			BlueprintGeneratedClasses.AddUnique(*InBlueprintGeneratedClass);
+		});
+
+	InOldClass->ClassDefaultObject = nullptr;
+
+	(void)InOldClass->GetDefaultObject(true);
+
+	for (const auto BlueprintGeneratedClass : BlueprintGeneratedClasses)
+	{
+		const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy);
+
+		Blueprint->Modify();
+
+		if (const auto SimpleConstructionScript = Blueprint->SimpleConstructionScript)
+		{
+			SimpleConstructionScript->Modify();
+
+			const auto& AllNodes = SimpleConstructionScript->GetAllNodes();
+
+			for (const auto& Node : AllNodes)
+			{
+				Node->Modify();
+			}
+		}
+
+		Blueprint->ParentClass = InNewClass;
+
+		FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+
+		FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+
+		constexpr auto BlueprintCompileOptions = EBlueprintCompileOptions::SkipGarbageCollection |
+			EBlueprintCompileOptions::SkipSave;
+
+		FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
+	}
+
+	if (const auto BlueprintGeneratedClass = Cast<UCSharpBlueprintGeneratedClass>(InOldClass))
+	{
+		if (const auto Blueprint = Cast<UCSharpBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
+		{
+			Blueprint->RemoveFromRoot();
+
+			Blueprint->MarkAsGarbage();
 		}
 	}
 	else
 	{
-		FDynamicGeneratorCore::ReloadPackages(
-			[InClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
-			{
-				return InBlueprintGeneratedClass->IsChildOf(InClass);
-			});
+		InOldClass->RemoveFromRoot();
+
+		InOldClass->MarkAsGarbage();
 	}
 }
 
