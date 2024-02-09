@@ -2,32 +2,35 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "Domain/FMonoDomain.h"
-#include "Dynamic/FDynamicClassGenerator.h"
-#include "Dynamic/FDynamicStructGenerator.h"
 #include "Dynamic/FDynamicEnumGenerator.h"
+#include "Dynamic/FDynamicStructGenerator.h"
+#include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 
 void FDynamicGenerator::Generator()
 {
-	FMonoDomain::Initialize({
-		"",
-		FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
-		FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + DLL_SUFFIX,
-		{
-			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
-			DLL_SUFFIX,
-			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
-			DLL_SUFFIX
-		}
-	});
+	if (!FMonoDomain::bLoadSucceed)
+	{
+		FMonoDomain::Initialize({
+			"",
+			FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
+			FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + DLL_SUFFIX,
+			{
+				FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
+				DLL_SUFFIX,
+				FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
+				DLL_SUFFIX
+			}
+		});
+	}
 
 	if (FMonoDomain::bLoadSucceed)
 	{
-		FDynamicClassGenerator::Generator();
+		FDynamicEnumGenerator::Generator();
 
 		FDynamicStructGenerator::Generator();
 
-		FDynamicEnumGenerator::Generator();
+		FDynamicClassGenerator::Generator();
 
 		FMonoDomain::Deinitialize();
 	}
@@ -36,11 +39,16 @@ void FDynamicGenerator::Generator()
 #if WITH_EDITOR
 void FDynamicGenerator::CodeAnalysisGenerator()
 {
-	FDynamicClassGenerator::CodeAnalysisGenerator();
+	FDynamicEnumGenerator::CodeAnalysisGenerator();
 
 	FDynamicStructGenerator::CodeAnalysisGenerator();
 
-	FDynamicEnumGenerator::CodeAnalysisGenerator();
+	FDynamicClassGenerator::CodeAnalysisGenerator();
+
+	if (IsRunningCookCommandlet())
+	{
+		CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS, true);
+	}
 }
 #endif
 

@@ -72,7 +72,9 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 	return Encode(FString::Printf(TEXT(
 		"%s%s"
 	),
-	                              InStruct->IsNative() ? InStruct->GetPrefixCPP() : TEXT(""),
+	                              InStruct->IsNative() && !Cast<UCSharpBlueprintGeneratedClass>(InStruct)
+		                              ? InStruct->GetPrefixCPP()
+		                              : TEXT(""),
 	                              *InStruct->GetName()));
 }
 

@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UnrealCSharpCore.h"
+#include "Dynamic/FDynamicGenerator.h"
 #if WITH_EDITOR
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Setting/UnrealCSharpSetting.h"
@@ -17,6 +18,8 @@ void FUnrealCSharpCoreModule::StartupModule()
 
 	UUnrealCSharpSetting::RegisterSettings();
 #endif
+
+	FDynamicGenerator::Generator();
 }
 
 void FUnrealCSharpCoreModule::ShutdownModule()

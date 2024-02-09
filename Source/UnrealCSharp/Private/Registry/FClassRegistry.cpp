@@ -1,6 +1,10 @@
 ﻿#include "Registry/FClassRegistry.h"
 #include "Domain/FDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Dynamic/FDynamicClassGenerator.h"
+#include "Environment/FCSharpEnvironment.h"
+
+TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> FClassRegistry::ClassConstructorMap;
 
 FClassRegistry::FClassRegistry()
 {
@@ -14,10 +18,23 @@ FClassRegistry::~FClassRegistry()
 
 void FClassRegistry::Initialize()
 {
+	FDynamicClassGenerator::ClassConstructorSet.Add(&FClassRegistry::ClassConstructor);
 }
 
 void FClassRegistry::Deinitialize()
 {
+	FDynamicClassGenerator::ClassConstructorSet.Remove(&FClassRegistry::ClassConstructor);
+
+	for (const auto& ClassConstructorPair : ClassConstructorMap)
+	{
+		if (ClassConstructorPair.Key.IsValid())
+		{
+			ClassConstructorPair.Key->ClassConstructor = ClassConstructorPair.Value;
+		}
+	}
+
+	ClassConstructorMap.Empty();
+
 	for (auto& ClassDescriptorPair : ClassDescriptorMap)
 	{
 		delete ClassDescriptorPair.Value;
@@ -89,10 +106,27 @@ FClassDescriptor* FClassRegistry::AddClassDescriptor(const FDomain* InDomain, US
 	return ClassDescriptor;
 }
 
+void FClassRegistry::AddClassConstructor(UClass* InClass)
+{
+	if (!ClassConstructorMap.Contains(InClass))
+	{
+		ClassConstructorMap.Add(InClass, InClass->ClassConstructor);
+
+		InClass->ClassConstructor = &FClassRegistry::ClassConstructor;
+	}
+}
+
 void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 {
 	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
+		if (const auto Class = Cast<UClass>(const_cast<UStruct*>(InStruct)))
+		{
+			Class->ClassConstructor = ClassConstructorMap[Class];
+
+			ClassConstructorMap.Remove(Class);
+		}
+
 		delete *FoundClassDescriptor;
 
 		ClassDescriptorMap.Remove(InStruct);
@@ -193,5 +227,30 @@ void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)
 		delete *FoundPropertyDescriptor;
 
 		PropertyDescriptorMap.Remove(InPropertyHash);
+	}
+}
+
+void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitializer)
+{
+	auto Class = InObjectInitializer.GetClass();
+
+	while (Class != nullptr)
+	{
+		if (ClassConstructorMap.Contains(Class) && ClassConstructorMap[Class] != &FClassRegistry::ClassConstructor)
+		{
+			ClassConstructorMap[Class](InObjectInitializer);
+
+			break;
+		}
+
+		Class = Class->GetSuperClass();
+	}
+
+	if (FMonoDomain::bLoadSucceed)
+	{
+		if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InObjectInitializer.GetObj()))
+		{
+			FDomain::Object_Constructor(FoundMonoObject);
+		}
 	}
 }

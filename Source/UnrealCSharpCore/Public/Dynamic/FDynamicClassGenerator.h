@@ -33,7 +33,7 @@ private:
 		UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
 #if WITH_EDITOR
-	static void ReInstance(UClass* InClass, int32 InChangedStructSize);
+	static void ReInstance(UClass* InOldClass, UClass* InNewClass);
 
 	static void GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass);
 #endif
@@ -42,5 +42,11 @@ private:
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
 
+	static void ClassConstructor(const FObjectInitializer& InObjectInitializer);
+
+public:
+	static UNREALCSHARPCORE_API TSet<void*> ClassConstructorSet;
+
+private:
 	static TMap<FString, UClass*> DynamicClass;
 };

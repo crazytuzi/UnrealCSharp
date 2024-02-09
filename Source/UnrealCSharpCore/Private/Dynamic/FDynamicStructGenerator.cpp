@@ -66,7 +66,7 @@ void FDynamicStructGenerator::CodeAnalysisGenerator()
 		{
 			DynamicStruct.Add(
 				StructName,
-				GeneratorCSharpScriptStruct(FDynamicGeneratorCore::GetOuter(), StructName));
+				GeneratorCSharpScriptStruct(FDynamicGeneratorCore::GetOuter(), StructName.RightChop(1)));
 		}
 	}
 }
@@ -93,7 +93,7 @@ void FDynamicStructGenerator::Generator(MonoClass* InMonoClass, const bool bReIn
 	}
 	else
 	{
-		ScriptStruct = GeneratorCSharpScriptStruct(Outer, ClassName);
+		ScriptStruct = GeneratorCSharpScriptStruct(Outer, ClassName.RightChop(1));
 
 		DynamicStruct.Add(ClassName, ScriptStruct);
 	}
@@ -164,6 +164,8 @@ void FDynamicStructGenerator::EndGenerator(UScriptStruct* InScriptStruct)
 	{
 		InScriptStruct->SetPropertiesSize(1);
 	}
+
+	InScriptStruct->SetInternalFlags(EInternalObjectFlags::Native);
 
 	InScriptStruct->StructFlags = STRUCT_Native;
 }
