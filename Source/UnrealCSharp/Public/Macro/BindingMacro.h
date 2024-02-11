@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "CoreMacro/BindingMacro.h"
-#include "Binding/Function/TFunctionPointer.inl"
 #include "Binding/Function/TFunctionBuilder.inl"
 #include "Binding/Function/TConstructorBuilder.inl"
 #include "Binding/Function/TDestructorBuilder.inl"
@@ -15,6 +14,7 @@
 #include "Binding/Function/TArgument.inl"
 #include "Binding/Function/TReturnValue.inl"
 #include "Binding/Function/TOverloadBuilder.inl"
+#include "Template/TFunctionPointer.inl"
 #include "Template/TIsScriptStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 

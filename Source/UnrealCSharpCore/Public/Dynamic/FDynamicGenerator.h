@@ -4,16 +4,16 @@
 #include "IDirectoryWatcher.h"
 #endif
 
-class FDynamicGenerator
+class UNREALCSHARPCORE_API FDynamicGenerator
 {
 public:
-	static UNREALCSHARPCORE_API void Generator();
+	static void Generator();
 
 #if WITH_EDITOR
-	static UNREALCSHARPCORE_API void CodeAnalysisGenerator();
-#endif
+	static void CodeAnalysisGenerator();
 
-#if WITH_EDITOR
-	static UNREALCSHARPCORE_API void Generator(const TArray<FFileChangeData>& FileChangeData);
+	static void Generator(const TArray<FFileChangeData>& FileChangeData);
+
+	static void OnPrePIEEnded();
 #endif
 };

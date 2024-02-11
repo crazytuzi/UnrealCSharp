@@ -43,6 +43,6 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 
 	if (FunctionDescriptor != nullptr)
 	{
-		FunctionDescriptor->CallCSharp(Stack, RESULT_PARAM);
+		FunctionDescriptor->CallCSharp(Stack);
 	}
 }

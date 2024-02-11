@@ -14,6 +14,8 @@ private:
 
 	static void OnPreBeginPIE(const bool);
 
+	static void OnPrePIEEnded(const bool);
+
 	static void OnCancelPIEEnded();
 
 	void OnFilesLoaded();
@@ -39,6 +41,8 @@ private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
 
 	FDelegateHandle OnPreBeginPIEDelegateHandle;
+
+	FDelegateHandle OnPrePIEEndedDelegateHandle;
 
 	FDelegateHandle OnCancelPIEDelegateHandle;
 

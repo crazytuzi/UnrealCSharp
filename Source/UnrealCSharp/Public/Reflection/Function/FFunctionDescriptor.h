@@ -19,7 +19,7 @@ public:
 	FName GetFName() const;
 
 public:
-	bool CallCSharp(FFrame& Stack, RESULT_DECL);
+	bool CallCSharp(const FFrame& InStack);
 
 	MonoObject* CallUnreal(UObject* InObject, MonoObject** OutValue, MonoArray* InValue);
 

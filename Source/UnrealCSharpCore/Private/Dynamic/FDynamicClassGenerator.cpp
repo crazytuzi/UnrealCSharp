@@ -21,9 +21,12 @@
 #include "UEVersion.h"
 #include "Dynamic/CSharpBlueprint.h"
 
-TSet<void*> FDynamicClassGenerator::ClassConstructorSet = {&FDynamicClassGenerator::ClassConstructor};
+TSet<UClass::ClassConstructorType> FDynamicClassGenerator::ClassConstructorSet
+{
+	&FDynamicClassGenerator::ClassConstructor
+};
 
-TMap<FString, UClass*> FDynamicClassGenerator::DynamicClass;
+TMap<FString, UClass*> FDynamicClassGenerator::DynamicClasses;
 
 void FDynamicClassGenerator::Generator()
 {
@@ -75,9 +78,9 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 
 	for (const auto& ClassName : CSharpGeneratedClass)
 	{
-		if (!DynamicClass.Contains(ClassName))
+		if (!DynamicClasses.Contains(ClassName))
 		{
-			DynamicClass.Add(
+			DynamicClasses.Add(
 				ClassName,
 				GeneratorCSharpClass(FDynamicGeneratorCore::GetOuter(), ClassName.RightChop(1), AActor::StaticClass()));
 		}
@@ -93,18 +96,39 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 
 	for (const auto& ClassName : CSharpBlueprintGeneratedClass)
 	{
-		if (!DynamicClass.Contains(ClassName))
+		if (!DynamicClasses.Contains(ClassName))
 		{
-			DynamicClass.Add(
+			DynamicClasses.Add(
 				ClassName,
 				GeneratorCSharpBlueprintGeneratedClass(FDynamicGeneratorCore::GetOuter(), ClassName,
 				                                       AActor::StaticClass()));
 		}
 	}
 }
+
+void FDynamicClassGenerator::OnPrePIEEnded()
+{
+	FDynamicGeneratorCore::IteratorBlueprintGeneratedClass(
+		[](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
+		{
+			for (const auto& DynamicClass : DynamicClasses)
+			{
+				if (InBlueprintGeneratedClass->IsChildOf(DynamicClass.Value))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		},
+		[](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
+		{
+			InBlueprintGeneratedClass->ClassConstructor = &FDynamicClassGenerator::ClassConstructor;
+		});
+}
 #endif
 
-void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReInstance)
+void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 {
 	if (InMonoClass == nullptr)
 	{
@@ -130,9 +154,9 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 #if WITH_EDITOR
 	UClass* OldClass{};
 
-	if (DynamicClass.Contains(ClassName))
+	if (DynamicClasses.Contains(ClassName))
 	{
-		OldClass = DynamicClass[ClassName];
+		OldClass = DynamicClasses[ClassName];
 
 		if (const auto BlueprintGeneratedClass = Cast<UCSharpBlueprintGeneratedClass>(OldClass))
 		{
@@ -173,7 +197,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass, const bool bReIns
 		Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 	}
 
-	DynamicClass.Add(ClassName, Class);
+	DynamicClasses.Add(ClassName, Class);
 
 #if WITH_EDITOR
 	GeneratorMetaData(InMonoClass, Class);
@@ -207,7 +231,7 @@ UClass* FDynamicClassGenerator::GetDynamicClass(MonoClass* InMonoClass)
 {
 	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
 
-	const auto FoundDynamicClass = DynamicClass.Find(ClassName);
+	const auto FoundDynamicClass = DynamicClasses.Find(ClassName);
 
 	return FoundDynamicClass != nullptr ? *FoundDynamicClass : nullptr;
 }
@@ -537,7 +561,7 @@ void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* I
 					if (const auto Property = FTypeBridge::Factory(ReturnParamReflectionType, Function, "",
 					                                               RF_Public | RF_Transient))
 					{
-						Property->SetPropertyFlags(CPF_Parm | CPF_ReturnParm);
+						Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
 
 						Function->AddCppProperty(Property);
 					}
@@ -554,7 +578,7 @@ void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* I
 
 					if (ParamDescriptors[Index].bIsRef)
 					{
-						Property->SetPropertyFlags(CPF_OutParm);
+						Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
 					}
 
 					Function->AddCppProperty(Property);

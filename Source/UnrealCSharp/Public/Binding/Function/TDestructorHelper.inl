@@ -2,6 +2,7 @@
 
 #include "TArgument.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "Macro/SignatureMacro.h"
 
 extern MonoObject* Get(MonoArray* InMonoArray, const size_t InIndex);
 

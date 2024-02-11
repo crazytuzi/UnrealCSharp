@@ -29,7 +29,10 @@ void FClassRegistry::Deinitialize()
 	{
 		if (ClassConstructorPair.Key.IsValid())
 		{
-			ClassConstructorPair.Key->ClassConstructor = ClassConstructorPair.Value;
+			if (ClassConstructorPair.Key->ClassConstructor == &FClassRegistry::ClassConstructor)
+			{
+				ClassConstructorPair.Key->ClassConstructor = ClassConstructorPair.Value;
+			}
 		}
 	}
 
