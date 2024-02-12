@@ -15,5 +15,10 @@ public:
 	static void Generator(const TArray<FFileChangeData>& FileChangeData);
 
 	static void OnPrePIEEnded();
+
+	static bool IsFullGenerator();
+
+private:
+	static bool bIsFullGenerator;
 #endif
 };

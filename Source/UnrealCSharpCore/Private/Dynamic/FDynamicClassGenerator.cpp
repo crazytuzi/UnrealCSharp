@@ -17,6 +17,7 @@
 #include "Engine/SimpleConstructionScript.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetReinstanceUtilities.h"
+#include "Dynamic/FDynamicGenerator.h"
 #endif
 #include "UEVersion.h"
 #include "Dynamic/CSharpBlueprint.h"
@@ -187,14 +188,10 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 	if (Cast<UBlueprintGeneratedClass>(ParentClass))
 	{
 		Class = GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName, ParentClass);
-
-		Class->ClassFlags |= ParentClass->ClassFlags;
 	}
 	else
 	{
 		Class = GeneratorCSharpClass(Outer, ClassName.RightChop(1), ParentClass);
-
-		Class->ClassFlags |= ParentClass->ClassFlags & CLASS_Native;
 	}
 
 	DynamicClasses.Add(ClassName, Class);
@@ -249,6 +246,8 @@ void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentCla
 #if UE_CLASS_ADD_REFERENCED_OBJECTS
 	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
+
+	InClass->ClassFlags |= CLASS_Native;
 
 	InClass->ClassCastFlags |= InParentClass->ClassCastFlags;
 
@@ -388,7 +387,35 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 
 		Blueprint->ParentClass = InNewClass;
 
-		FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+		if (FDynamicGenerator::IsFullGenerator())
+		{
+			const auto OriginalBlueprintType = Blueprint->BlueprintType;
+
+			Blueprint->BlueprintType = BPTYPE_MacroLibrary;
+
+			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+
+			Blueprint->BlueprintType = OriginalBlueprintType;
+
+			TArray<UK2Node*> AllNodes;
+
+			FBlueprintEditorUtils::GetAllNodesOfClass(Blueprint, AllNodes);
+
+			for (const auto Node : AllNodes)
+			{
+				for (const auto Pin : Node->Pins)
+				{
+					if (Pin->PinType.PinSubCategoryObject == InOldClass)
+					{
+						Pin->PinType.PinSubCategoryObject = InNewClass;
+					}
+				}
+			}
+		}
+		else
+		{
+			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+		}
 
 		FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
 
@@ -564,6 +591,8 @@ void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* I
 						Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
 
 						Function->AddCppProperty(Property);
+
+						Function->FunctionFlags |= FUNC_HasOutParms;
 					}
 				}
 
