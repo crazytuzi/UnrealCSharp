@@ -7,8 +7,16 @@
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 
+#if WITH_EDITOR
+bool FDynamicGenerator::bIsFullGenerator{};
+#endif
+
 void FDynamicGenerator::Generator()
 {
+#if WITH_EDITOR
+	bIsFullGenerator = true;
+#endif
+
 	if (!FMonoDomain::bLoadSucceed)
 	{
 		FMonoDomain::Initialize({
@@ -34,6 +42,10 @@ void FDynamicGenerator::Generator()
 
 		FMonoDomain::Deinitialize();
 	}
+
+#if WITH_EDITOR
+	bIsFullGenerator = false;
+#endif
 }
 
 #if WITH_EDITOR
@@ -50,9 +62,7 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 		CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS, true);
 	}
 }
-#endif
 
-#if WITH_EDITOR
 void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 {
 	if (FMonoDomain::bLoadSucceed)
@@ -88,7 +98,7 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 		{
 			if (FDynamicClassGenerator::IsDynamicClass(MonoClass))
 			{
-				FDynamicClassGenerator::Generator(MonoClass, true);
+				FDynamicClassGenerator::Generator(MonoClass);
 			}
 			else if (FDynamicStructGenerator::IsDynamicStruct(MonoClass))
 			{
@@ -105,5 +115,15 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 	{
 		FMonoDomain::Deinitialize();
 	}
+}
+
+void FDynamicGenerator::OnPrePIEEnded()
+{
+	FDynamicClassGenerator::OnPrePIEEnded();
+}
+
+bool FDynamicGenerator::IsFullGenerator()
+{
+	return bIsFullGenerator;
 }
 #endif

@@ -4,6 +4,7 @@
 #include "TOut.inl"
 #include "TReturnValue.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "Macro/SignatureMacro.h"
 
 inline MonoObject* Array_Get(MonoArray* InMonoArray, const size_t InIndex)
 {

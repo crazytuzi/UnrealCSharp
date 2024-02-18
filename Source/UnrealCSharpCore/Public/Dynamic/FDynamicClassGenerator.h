@@ -2,7 +2,13 @@
 
 #include "Dynamic/CSharpClass.h"
 #include "Dynamic/CSharpBlueprintGeneratedClass.h"
+#include "Template/TFunctionPointer.inl"
 #include "mono/metadata/object.h"
+
+inline uint32 GetTypeHash(const UClass::ClassConstructorType& InClassConstructor)
+{
+	return GetTypeHash(TFunctionPointer(InClassConstructor).Value.Pointer);
+}
 
 class FDynamicClassGenerator
 {
@@ -11,9 +17,11 @@ public:
 
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
+
+	static void OnPrePIEEnded();
 #endif
 
-	static void Generator(MonoClass* InMonoClass, bool bReInstance = false);
+	static void Generator(MonoClass* InMonoClass);
 
 	static bool IsDynamicClass(MonoClass* InMonoClass);
 
@@ -45,8 +53,8 @@ private:
 	static void ClassConstructor(const FObjectInitializer& InObjectInitializer);
 
 public:
-	static UNREALCSHARPCORE_API TSet<void*> ClassConstructorSet;
+	static UNREALCSHARPCORE_API TSet<UClass::ClassConstructorType> ClassConstructorSet;
 
 private:
-	static TMap<FString, UClass*> DynamicClass;
+	static TMap<FString, UClass*> DynamicClasses;
 };

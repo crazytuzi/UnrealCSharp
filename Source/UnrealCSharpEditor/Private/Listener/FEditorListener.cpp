@@ -17,6 +17,8 @@ FEditorListener::FEditorListener()
 
 	OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddStatic(&FEditorListener::OnPreBeginPIE);
 
+	OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddStatic(&FEditorListener::OnPrePIEEnded);
+
 	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddStatic(&FEditorListener::OnCancelPIEEnded);
 
 	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
@@ -71,6 +73,11 @@ FEditorListener::~FEditorListener()
 		FEditorDelegates::CancelPIE.Remove(OnCancelPIEDelegateHandle);
 	}
 
+	if (OnPrePIEEndedDelegateHandle.IsValid())
+	{
+		FEditorDelegates::PrePIEEnded.Remove(OnPrePIEEndedDelegateHandle);
+	}
+
 	if (OnPreBeginPIEDelegateHandle.IsValid())
 	{
 		FEditorDelegates::PreBeginPIE.Remove(OnPreBeginPIEDelegateHandle);
@@ -92,6 +99,11 @@ void FEditorListener::OnPostEngineInit()
 void FEditorListener::OnPreBeginPIE(const bool)
 {
 	bIsPIEPlaying = true;
+}
+
+void FEditorListener::OnPrePIEEnded(const bool)
+{
+	FDynamicGenerator::OnPrePIEEnded();
 }
 
 void FEditorListener::OnCancelPIEEnded()

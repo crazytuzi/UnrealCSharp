@@ -218,16 +218,9 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 	{
 		if (InObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject | EObjectFlags::RF_ArchetypeObject))
 		{
-			if (IsInGameThread())
-			{
-				FCSharpBind::BindClassDefaultObject(Domain, InObject);
-			}
-			else
-			{
-				FScopeLock Lock(&CriticalSection);
+			FScopeLock Lock(&CriticalSection);
 
-				AsyncLoadingObjectArray.Add(InObject);
-			}
+			AsyncLoadingObjectArray.Add(InObject);
 
 			return;
 		}
