@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CSharpScriptStruct.h"
 #include "mono/metadata/object.h"
 
 class FDynamicStructGenerator
@@ -16,12 +15,14 @@ public:
 
 	static bool IsDynamicStruct(MonoClass* InMonoClass);
 
+	static bool UNREALCSHARPCORE_API IsDynamicStruct(const UScriptStruct* InScriptStruct);
+
 private:
 	static void BeginGenerator(UScriptStruct* InScriptStruct);
 
 	static void EndGenerator(UScriptStruct* InScriptStruct);
 
-	static UCSharpScriptStruct* GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName);
+	static UScriptStruct* GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName);
 
 #if WITH_EDITOR
 	static void ReInstance(UScriptStruct* InScriptStruct);
@@ -31,5 +32,7 @@ private:
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);
 
-	static TMap<FString, UCSharpScriptStruct*> DynamicStruct;
+	static TMap<FString, UScriptStruct*> DynamicStructMap;
+
+	static TSet<UScriptStruct*> DynamicStructSet;
 };

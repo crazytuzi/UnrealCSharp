@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CSharpEnum.h"
 #include "mono/metadata/object.h"
 
 class FDynamicEnumGenerator
@@ -16,8 +15,10 @@ public:
 
 	static bool IsDynamicEnum(MonoClass* InMonoClass);
 
+	static bool UNREALCSHARPCORE_API IsDynamicEnum(const UEnum* InEnum);
+
 private:
-	static UCSharpEnum* GeneratorCSharpEnum(UPackage* InOuter, const FString& InName);
+	static UEnum* GeneratorCSharpEnum(UPackage* InOuter, const FString& InName);
 
 #if WITH_EDITOR
 	static void ReInstance(UEnum* InEnum);
@@ -27,5 +28,7 @@ private:
 
 	static void GeneratorEnumerator(MonoClass* InMonoClass, UEnum* InEnum);
 
-	static TMap<FString, UCSharpEnum*> DynamicEnum;
+	static TMap<FString, UEnum*> DynamicEnumMap;
+
+	static TSet<UEnum*> DynamicEnumSet;
 };

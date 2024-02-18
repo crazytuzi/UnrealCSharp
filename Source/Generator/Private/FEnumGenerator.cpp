@@ -2,7 +2,7 @@
 #include "FGeneratorCore.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Dynamic/CSharpEnum.h"
+#include "Dynamic/FDynamicEnumGenerator.h"
 
 TMap<const UEnum*, EEnumUnderlyingType> FEnumGenerator::EnumUnderlyingType;
 
@@ -23,7 +23,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		return;
 	}
 
-	if (Cast<UCSharpEnum>(InEnum))
+	if (FDynamicEnumGenerator::IsDynamicEnum(InEnum))
 	{
 		return;
 	}

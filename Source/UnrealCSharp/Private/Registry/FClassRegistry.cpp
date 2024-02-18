@@ -249,11 +249,15 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 		Class = Class->GetSuperClass();
 	}
 
-	if (FMonoDomain::bLoadSucceed)
+	if (IsInGameThread())
 	{
-		if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InObjectInitializer.GetObj()))
+		if (FMonoDomain::bLoadSucceed)
 		{
-			FDomain::Object_Constructor(FoundMonoObject);
+			if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
+				InObjectInitializer.GetObj()))
+			{
+				FDomain::Object_Constructor(FoundMonoObject);
+			}
 		}
 	}
 }

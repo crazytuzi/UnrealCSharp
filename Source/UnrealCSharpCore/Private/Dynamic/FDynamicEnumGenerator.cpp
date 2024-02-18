@@ -11,7 +11,9 @@
 #include "BlueprintActionDatabase.h"
 #endif
 
-TMap<FString, UCSharpEnum*> FDynamicEnumGenerator::DynamicEnum;
+TMap<FString, UEnum*> FDynamicEnumGenerator::DynamicEnumMap;
+
+TSet<UEnum*> FDynamicEnumGenerator::DynamicEnumSet;
 
 void FDynamicEnumGenerator::Generator()
 {
@@ -53,19 +55,21 @@ void FDynamicEnumGenerator::Generator()
 #if WITH_EDITOR
 void FDynamicEnumGenerator::CodeAnalysisGenerator()
 {
-	auto CSharpEnum = FDynamicGeneratorCore::GetDynamic(
+	static FString CSharpEnum = TEXT("CSharpEnum");
+
+	auto EnumNames = FDynamicGeneratorCore::GetDynamic(
 		FString::Printf(TEXT(
 			"%s/%s.json"),
 		                *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-		                *UCSharpEnum::StaticClass()->GetName()),
-		UCSharpEnum::StaticClass()->GetName()
+		                *CSharpEnum),
+		CSharpEnum
 	);
 
-	for (const auto& EnumName : CSharpEnum)
+	for (const auto& EnumName : EnumNames)
 	{
-		if (!DynamicEnum.Contains(EnumName))
+		if (!DynamicEnumMap.Contains(EnumName))
 		{
-			DynamicEnum.Add(
+			DynamicEnumMap.Add(
 				EnumName,
 				GeneratorCSharpEnum(FDynamicGeneratorCore::GetOuter(), EnumName));
 		}
@@ -84,17 +88,17 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
-	UCSharpEnum* Enum{};
+	UEnum* Enum{};
 
-	if (DynamicEnum.Contains(ClassName))
+	if (DynamicEnumMap.Contains(ClassName))
 	{
-		Enum = DynamicEnum[ClassName];
+		Enum = DynamicEnumMap[ClassName];
 	}
 	else
 	{
 		Enum = GeneratorCSharpEnum(Outer, ClassName);
 
-		DynamicEnum.Add(ClassName, Enum);
+		DynamicEnumMap.Add(ClassName, Enum);
 	}
 
 	// @TODO
@@ -126,11 +130,20 @@ bool FDynamicEnumGenerator::IsDynamicEnum(MonoClass* InMonoClass)
 	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
 }
 
-UCSharpEnum* FDynamicEnumGenerator::GeneratorCSharpEnum(UPackage* InOuter, const FString& InName)
+bool FDynamicEnumGenerator::IsDynamicEnum(const UEnum* InEnum)
 {
-	const auto Enum = NewObject<UCSharpEnum>(InOuter, *InName, RF_Public);
+	return DynamicEnumSet.Contains(InEnum);
+}
+
+UEnum* FDynamicEnumGenerator::GeneratorCSharpEnum(UPackage* InOuter, const FString& InName)
+{
+	const auto Enum = NewObject<UEnum>(InOuter, *InName, RF_Public);
+
+	Enum->SetInternalFlags(EInternalObjectFlags::Native);
 
 	Enum->AddToRoot();
+
+	DynamicEnumSet.Add(Enum);
 
 	return Enum;
 }

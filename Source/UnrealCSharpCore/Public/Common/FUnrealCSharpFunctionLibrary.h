@@ -20,7 +20,7 @@ public:
 
 	static FString GetFullClass(const UEnum* InEnum);
 
-	static FString GetClassNameSpace(const UEnum* InStruct);
+	static FString GetClassNameSpace(const UEnum* InEnum);
 
 	static FString GetFullClass(const FDelegateProperty* InDelegateProperty);
 

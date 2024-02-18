@@ -26,7 +26,7 @@ namespace CodeAnalysis
 
             Dynamic = new Dictionary<string, List<string>>
             {
-                ["CSharpGeneratedClass"] = new List<string>(),
+                ["CSharpClass"] = new List<string>(),
                 ["CSharpBlueprintGeneratedClass"] = new List<string>(),
                 ["CSharpScriptStruct"] = new List<string>(),
                 ["CSharpEnum"] = new List<string>()
@@ -166,7 +166,7 @@ namespace CodeAnalysis
                             {
                                 if (Attribute.ToString().Equals("[UClass]"))
                                 {
-                                    Dynamic["CSharpGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
+                                    Dynamic["CSharpClass"].Add(ClassDeclaration.Identifier.ToString());
 
                                     return;
                                 }

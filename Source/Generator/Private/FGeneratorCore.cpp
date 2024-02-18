@@ -6,10 +6,6 @@
 #include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
-#include "Dynamic/CSharpClass.h"
-#include "Dynamic/CSharpBlueprintGeneratedClass.h"
-#include "Dynamic/CSharpScriptStruct.h"
-#include "Dynamic/CSharpEnum.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 
 TArray<FString> FGeneratorCore::SupportedModule;
@@ -31,11 +27,7 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 
 	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
 
-	if (InField->IsNative() == false ||
-		Cast<UCSharpClass>(InField) ||
-		Cast<UCSharpBlueprintGeneratedClass>(InField) ||
-		Cast<UCSharpScriptStruct>(InField) ||
-		Cast<UCSharpEnum>(InField))
+	if (!InField->IsNative())
 	{
 		auto Index = 0;
 

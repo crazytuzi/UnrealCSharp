@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Dynamic/CSharpClass.h"
-#include "Dynamic/CSharpBlueprintGeneratedClass.h"
 #include "Template/TFunctionPointer.inl"
 #include "mono/metadata/object.h"
 
@@ -25,20 +23,49 @@ public:
 
 	static bool IsDynamicClass(MonoClass* InMonoClass);
 
+	static bool UNREALCSHARPCORE_API IsDynamicClass(const UClass* InClass);
+
+	static bool IsDynamicBlueprintGeneratedClass(const UField* InField);
+
+	static bool IsDynamicBlueprintGeneratedClass(const UClass* InClass);
+
 	static UNREALCSHARPCORE_API UClass* GetDynamicClass(MonoClass* InMonoClass);
 
 private:
 	static void BeginGenerator(UClass* InClass, UClass* InParentClass);
 
-	static void BeginGenerator(UCSharpBlueprintGeneratedClass* InClass, UClass* InParentClass);
+	static void BeginGenerator(UBlueprintGeneratedClass* InClass, UClass* InParentClass);
+
+	static void ProcessGenerator(MonoClass* InMonoClass, UClass* InClass);
 
 	static void EndGenerator(UClass* InClass);
 
-	static UCSharpClass* GeneratorCSharpClass(
+	template <typename T>
+	static void GeneratorClass(const FString& InName, T InClass, UClass* InParentClass,
+	                           const TFunction<void(UClass*)>& InProcessGenerator)
+	{
+		DynamicClassMap.Add(InName, InClass);
+
+		DynamicClassSet.Add(InClass);
+
+		BeginGenerator(InClass, InParentClass);
+
+		InProcessGenerator(InClass);
+
+		EndGenerator(InClass);
+	}
+
+	static UClass* GeneratorCSharpClass(UPackage* InOuter, const FString& InName, UClass* InParentClass);
+
+	static UClass* GeneratorCSharpClass(UPackage* InOuter, const FString& InName, UClass* InParentClass,
+	                                    const TFunction<void(UClass*)>& InProcessGenerator);
+
+	static UBlueprintGeneratedClass* GeneratorCSharpBlueprintGeneratedClass(
 		UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
-	static UCSharpBlueprintGeneratedClass* GeneratorCSharpBlueprintGeneratedClass(
-		UPackage* InOuter, const FString& InName, UClass* InParentClass);
+	static UBlueprintGeneratedClass* GeneratorCSharpBlueprintGeneratedClass(
+		UPackage* InOuter, const FString& InName, UClass* InParentClass,
+		const TFunction<void(UClass*)>& InProcessGenerator);
 
 #if WITH_EDITOR
 	static void ReInstance(UClass* InOldClass, UClass* InNewClass);
@@ -56,5 +83,7 @@ public:
 	static UNREALCSHARPCORE_API TSet<UClass::ClassConstructorType> ClassConstructorSet;
 
 private:
-	static TMap<FString, UClass*> DynamicClasses;
+	static TMap<FString, UClass*> DynamicClassMap;
+
+	static TSet<UClass*> DynamicClassSet;
 };
