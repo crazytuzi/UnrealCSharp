@@ -573,3 +573,18 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 
 	return GameModuleList;
 }
+
+bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
+{
+	if (InClass != nullptr)
+	{
+		if (const auto ClassName = InClass->GetName();
+			ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
+			ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}

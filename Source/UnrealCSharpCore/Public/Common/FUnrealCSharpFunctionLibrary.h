@@ -83,4 +83,6 @@ public:
 	static const TArray<FString>& GetEngineModuleList();
 
 	static const TArray<FString>& GetProjectModuleList();
+
+	static bool IsSpecialClass(const UClass* InClass);
 };

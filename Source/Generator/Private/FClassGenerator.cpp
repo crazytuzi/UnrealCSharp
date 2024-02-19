@@ -40,11 +40,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
-	auto ClassName = InClass->GetName();
-
-	if (ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
-		ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")) ||
-		ClassName.StartsWith(TEXT("HOTRELOADED_")))
+	if (FUnrealCSharpFunctionLibrary::IsSpecialClass(InClass))
 	{
 		return;
 	}

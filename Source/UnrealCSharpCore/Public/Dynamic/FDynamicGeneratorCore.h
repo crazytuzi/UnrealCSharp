@@ -26,11 +26,19 @@ public:
 
 	static TArray<FString> GetDynamic(const FString& InFile, const FString& InField);
 
-	static void IteratorBlueprintGeneratedClass(
-		const TFunction<bool(const TObjectIterator<UBlueprintGeneratedClass>&)>& InPredicate,
-		const TUniqueFunction<void(const TObjectIterator<UBlueprintGeneratedClass>&)>& InFunction);
-
-	static void ReloadPackages(const TFunction<bool(const TObjectIterator<UBlueprintGeneratedClass>&)>& InPredicate);
+	template <typename T>
+	static void IteratorObject(
+		const TFunction<bool(const TObjectIterator<T>&)>& InPredicate,
+		const TUniqueFunction<void(const TObjectIterator<T>&)>& InFunction)
+	{
+		for (TObjectIterator<T> ObjectIterator; ObjectIterator; ++ObjectIterator)
+		{
+			if (InPredicate(ObjectIterator))
+			{
+				InFunction(ObjectIterator);
+			}
+		}
+	}
 #endif
 
 	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);

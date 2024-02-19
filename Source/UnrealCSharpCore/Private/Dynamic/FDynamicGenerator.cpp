@@ -102,11 +102,11 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 			}
 			else if (FDynamicStructGenerator::IsDynamicStruct(MonoClass))
 			{
-				FDynamicStructGenerator::Generator(MonoClass, true);
+				FDynamicStructGenerator::Generator(MonoClass);
 			}
 			else if (FDynamicEnumGenerator::IsDynamicEnum(MonoClass))
 			{
-				FDynamicEnumGenerator::Generator(MonoClass, true);
+				FDynamicEnumGenerator::Generator(MonoClass);
 			}
 		}
 	}

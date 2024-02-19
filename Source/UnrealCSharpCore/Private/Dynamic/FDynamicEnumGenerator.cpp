@@ -6,9 +6,12 @@
 #include "Domain/FMonoDomain.h"
 #include "Template/TGetArrayLength.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
+#include "Kismet2/BlueprintEditorUtils.h"
+#include "Kismet2/KismetEditorUtilities.h"
 #endif
 
 TMap<FString, UEnum*> FDynamicEnumGenerator::DynamicEnumMap;
@@ -69,15 +72,13 @@ void FDynamicEnumGenerator::CodeAnalysisGenerator()
 	{
 		if (!DynamicEnumMap.Contains(EnumName))
 		{
-			DynamicEnumMap.Add(
-				EnumName,
-				GeneratorCSharpEnum(FDynamicGeneratorCore::GetOuter(), EnumName));
+			GeneratorCSharpEnum(FDynamicGeneratorCore::GetOuter(), EnumName);
 		}
 	}
 }
 #endif
 
-void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInstance)
+void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
 {
 	if (InMonoClass == nullptr)
 	{
@@ -88,32 +89,36 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass, const bool bReInst
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
+#if WITH_EDITOR
+	const UEnum* OldEnum{};
+#endif
+
 	UEnum* Enum{};
 
 	if (DynamicEnumMap.Contains(ClassName))
 	{
 		Enum = DynamicEnumMap[ClassName];
+
+		GeneratorEnum(ClassName, Enum, [InMonoClass](UEnum* InEnum)
+		{
+			ProcessGenerator(InMonoClass, InEnum);
+		});
+
+#if WITH_EDITOR
+		OldEnum = Enum;
+#endif
 	}
 	else
 	{
-		Enum = GeneratorCSharpEnum(Outer, ClassName);
-
-		DynamicEnumMap.Add(ClassName, Enum);
+		Enum = GeneratorCSharpEnum(Outer, ClassName,
+		                           [InMonoClass](UEnum* InEnum)
+		                           {
+			                           ProcessGenerator(InMonoClass, InEnum);
+		                           });
 	}
 
-	// @TODO
 #if WITH_EDITOR
-	Enum->SetMetaData(*FBlueprintMetadata::MD_AllowableBlueprintVariableType.ToString(), TEXT("true"));
-#endif
-
-#if WITH_EDITOR
-	GeneratorMetaData(InMonoClass, Enum);
-#endif
-
-	GeneratorEnumerator(InMonoClass, Enum);
-
-#if WITH_EDITOR
-	if (bReInstance == true)
+	if (OldEnum != nullptr)
 	{
 		ReInstance(Enum);
 	}
@@ -135,15 +140,59 @@ bool FDynamicEnumGenerator::IsDynamicEnum(const UEnum* InEnum)
 	return DynamicEnumSet.Contains(InEnum);
 }
 
+void FDynamicEnumGenerator::BeginGenerator(const UEnum* InEnum)
+{
+	InEnum->SetInternalFlags(EInternalObjectFlags::Native);
+}
+
+void FDynamicEnumGenerator::ProcessGenerator(MonoClass* InMonoClass, UEnum* InEnum)
+{
+	// @TODO
+#if WITH_EDITOR
+	InEnum->SetMetaData(*FBlueprintMetadata::MD_AllowableBlueprintVariableType.ToString(), TEXT("true"));
+#endif
+
+#if WITH_EDITOR
+	GeneratorMetaData(InMonoClass, InEnum);
+#endif
+
+	GeneratorEnumerator(InMonoClass, InEnum);
+}
+
+void FDynamicEnumGenerator::EndGenerator(UEnum* InEnum)
+{
+}
+
+void FDynamicEnumGenerator::GeneratorEnum(const FString& InName, UEnum* InEnum,
+                                          const TFunction<void(UEnum*)>& InProcessGenerator)
+{
+	DynamicEnumMap.Add(InName, InEnum);
+
+	DynamicEnumSet.Add(InEnum);
+
+	BeginGenerator(InEnum);
+
+	InProcessGenerator(InEnum);
+
+	EndGenerator(InEnum);
+}
+
 UEnum* FDynamicEnumGenerator::GeneratorCSharpEnum(UPackage* InOuter, const FString& InName)
+{
+	return GeneratorCSharpEnum(InOuter, InName,
+	                           [](UEnum*)
+	                           {
+	                           });
+}
+
+UEnum* FDynamicEnumGenerator::GeneratorCSharpEnum(UPackage* InOuter, const FString& InName,
+                                                  const TFunction<void(UEnum*)>& InProcessGenerator)
 {
 	const auto Enum = NewObject<UEnum>(InOuter, *InName, RF_Public);
 
-	Enum->SetInternalFlags(EInternalObjectFlags::Native);
-
 	Enum->AddToRoot();
 
-	DynamicEnumSet.Add(Enum);
+	GeneratorEnum(InName, Enum, InProcessGenerator);
 
 	return Enum;
 }
@@ -160,9 +209,16 @@ void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 		ActionDatabase.RefreshAssetActions(InEnum);
 	}
 
-	FDynamicGeneratorCore::ReloadPackages(
+	TArray<UBlueprintGeneratedClass*> BlueprintGeneratedClasses;
+
+	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(
 		[InEnum](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
+			if (FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(*InBlueprintGeneratedClass))
+			{
+				return false;
+			}
+
 			for (TFieldIterator<FProperty> It(*InBlueprintGeneratedClass, EFieldIteratorFlags::ExcludeSuper,
 			                                  EFieldIteratorFlags::ExcludeDeprecated); It; ++It)
 			{
@@ -183,7 +239,31 @@ void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 			}
 
 			return false;
+		},
+		[&BlueprintGeneratedClasses](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
+		{
+			if (!FUnrealCSharpFunctionLibrary::IsSpecialClass(*InBlueprintGeneratedClass))
+			{
+				BlueprintGeneratedClasses.AddUnique(*InBlueprintGeneratedClass);
+			}
 		});
+
+
+	for (const auto BlueprintGeneratedClass : BlueprintGeneratedClasses)
+	{
+		const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy);
+
+		Blueprint->Modify();
+
+		FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+
+		FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+
+		constexpr auto BlueprintCompileOptions = EBlueprintCompileOptions::SkipGarbageCollection |
+			EBlueprintCompileOptions::SkipSave;
+
+		FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
+	}
 }
 
 void FDynamicEnumGenerator::GeneratorMetaData(MonoClass* InMonoClass, UEnum* InEnum)

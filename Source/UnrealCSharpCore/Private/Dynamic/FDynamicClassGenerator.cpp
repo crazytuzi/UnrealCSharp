@@ -109,7 +109,7 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 
 void FDynamicClassGenerator::OnPrePIEEnded()
 {
-	FDynamicGeneratorCore::IteratorBlueprintGeneratedClass(
+	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(
 		[](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
 			for (const auto& DynamicClass : DynamicClassMap)
@@ -229,12 +229,25 @@ bool FDynamicClassGenerator::IsDynamicClass(const UClass* InClass)
 
 bool FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(const UField* InField)
 {
-	return IsDynamicBlueprintGeneratedClass(Cast<UClass>(InField));
+	return IsDynamicBlueprintGeneratedClass(Cast<UBlueprintGeneratedClass>(InField));
 }
 
-bool FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(const UClass* InClass)
+bool FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(const UBlueprintGeneratedClass* InClass)
 {
-	return IsDynamicClass(InClass) && !!Cast<UBlueprintGeneratedClass>(InClass);
+	return IsDynamicClass(InClass);
+}
+
+bool FDynamicClassGenerator::IsDynamicBlueprintGeneratedSubClass(const UBlueprintGeneratedClass* InClass)
+{
+	for (const auto DynamicClass : DynamicClassSet)
+	{
+		if (InClass->IsChildOf(DynamicClass) && InClass != DynamicClass)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 UClass* FDynamicClassGenerator::GetDynamicClass(MonoClass* InMonoClass)
@@ -380,22 +393,17 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 
 	TArray<UBlueprintGeneratedClass*> BlueprintGeneratedClasses;
 
-	FDynamicGeneratorCore::IteratorBlueprintGeneratedClass(
+	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(
 		[InOldClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
 			return InBlueprintGeneratedClass->IsChildOf(InOldClass) && *InBlueprintGeneratedClass != InOldClass;
 		},
 		[&BlueprintGeneratedClasses](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
-			if (const auto ClassName = InBlueprintGeneratedClass->GetName();
-				ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
-				ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")) ||
-				ClassName.StartsWith(TEXT("HOTRELOADED_")))
+			if (!FUnrealCSharpFunctionLibrary::IsSpecialClass(*InBlueprintGeneratedClass))
 			{
-				return;
+				BlueprintGeneratedClasses.AddUnique(*InBlueprintGeneratedClass);
 			}
-
-			BlueprintGeneratedClasses.AddUnique(*InBlueprintGeneratedClass);
 		});
 
 	InOldClass->ClassDefaultObject = nullptr;
