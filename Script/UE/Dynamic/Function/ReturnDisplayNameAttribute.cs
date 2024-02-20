@@ -3,9 +3,9 @@ using System;
 namespace Script.Dynamic
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class BlueprintInternalUseOnlyAttribute : Attribute
+    public class ReturnDisplayNameAttribute : Attribute
     {
-        public BlueprintInternalUseOnlyAttribute(string InValue)
+        public ReturnDisplayNameAttribute(string InValue)
         {
             Value = InValue;
         }

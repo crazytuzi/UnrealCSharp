@@ -2,8 +2,8 @@ using System;
 
 namespace Script.Dynamic
 {
-    [AttributeUsage(AttributeTargets.Method)]
-    public class BlueprintAutocastAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ConstAttribute : Attribute
     {
         private string Value { get; set; } = "true";
     }

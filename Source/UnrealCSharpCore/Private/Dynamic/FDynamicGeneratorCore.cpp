@@ -3,6 +3,7 @@
 #include "CoreMacro/PropertyAttributeMacro.h"
 #include "CoreMacro/FunctionAttributeMacro.h"
 #include "CoreMacro/GenericAttributeMacro.h"
+#include "CoreMacro/MetaDataAttributeMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Log/UnrealCSharpLog.h"
@@ -102,7 +103,7 @@ TArray<FString> FDynamicGeneratorCore::PropertyMetaDataAttrs =
 	CLASS_NO_ELEMENT_DUPLICATE_ATTRIBUTE,
 	CLASS_NO_RESET_TO_DEFAULT_ATTRIBUTE,
 	CLASS_NO_EDIT_INLINE_ATTRIBUTE,
-	CLASS_NO_SPINBOX_ATTRIBUTE,
+	CLASS_NO_SPIN_BOX_ATTRIBUTE,
 	CLASS_ONLY_PLACEABLE_ATTRIBUTE,
 	CLASS_RELATIVE_PATH_ATTRIBUTE,
 	CLASS_RELATIVE_TO_GAME_CONTENT_DIR_ATTRIBUTE,
@@ -174,7 +175,7 @@ TArray<FString> FDynamicGeneratorCore::FunctionMetaDataAttrs =
 	CLASS_NATIVE_MAKE_FUNC_ATTRIBUTE,
 	CLASS_UNSAFE_DURING_ACTOR_CONSTRUCTION_ATTRIBUTE,
 	CLASS_WORLD_CONTEXT_ATTRIBUTE,
-	CLASS_BLUEPRINT_AUTOCAST_ATTRIBUTE,
+	CLASS_BLUEPRINT_AUTO_CAST_ATTRIBUTE,
 	CLASS_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
 	CLASS_NOT_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
 	CLASS_DETERMINES_OUTPUT_TYPE_ATTRIBUTE,
@@ -296,11 +297,6 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 		InProperty->SetPropertyFlags(CPF_ExportObject);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_INLINE_ATTRIBUTE))
-	{
-		// @TODO
-	}
-
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NO_CLEAR_ATTRIBUTE))
 	{
 		InProperty->SetPropertyFlags(CPF_NoClear);
@@ -324,11 +320,6 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NOT_REPLICATED_ATTRIBUTE))
 	{
 		InProperty->SetPropertyFlags(CPF_RepSkip);
-	}
-
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_REP_RETRY_ATTRIBUTE))
-	{
-		// @TODO
 	}
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_INTERP_ATTRIBUTE))
@@ -384,16 +375,6 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SKIP_SERIALIZATION_ATTRIBUTE))
 	{
 		InProperty->SetPropertyFlags(CPF_SkipSerialization);
-	}
-
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SETTER_ATTRIBUTE))
-	{
-		// @TODO
-	}
-
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_GETTER_ATTRIBUTE))
-	{
-		// @TODO
 	}
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_FIELD_NOTIFY_ATTRIBUTE))
