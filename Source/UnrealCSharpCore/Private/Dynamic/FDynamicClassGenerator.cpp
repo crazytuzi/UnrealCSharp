@@ -84,25 +84,15 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 	{
 		if (!DynamicClassMap.Contains(ClassName))
 		{
-			GeneratorCSharpClass(FDynamicGeneratorCore::GetOuter(), ClassName, AActor::StaticClass());
-		}
-	}
-
-	static FString CSharpBlueprintGeneratedClass = TEXT("CSharpBlueprintGeneratedClass");
-
-	auto BlueprintGeneratedClassNames = FDynamicGeneratorCore::GetDynamic(
-		FString::Printf(TEXT(
-			"%s/%s.json"),
-		                *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-		                *CSharpBlueprintGeneratedClass),
-		CSharpBlueprintGeneratedClass
-	);
-
-	for (const auto& ClassName : BlueprintGeneratedClassNames)
-	{
-		if (!DynamicClassMap.Contains(ClassName))
-		{
-			GeneratorCSharpBlueprintGeneratedClass(FDynamicGeneratorCore::GetOuter(), ClassName, AActor::StaticClass());
+			if (IsDynamicBlueprintGeneratedClass(ClassName))
+			{
+				GeneratorCSharpBlueprintGeneratedClass(FDynamicGeneratorCore::GetOuter(), ClassName,
+				                                       AActor::StaticClass());
+			}
+			else
+			{
+				GeneratorCSharpClass(FDynamicGeneratorCore::GetOuter(), ClassName, AActor::StaticClass());
+			}
 		}
 	}
 }
@@ -187,7 +177,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 	}
 #endif
 
-	if (Cast<UBlueprintGeneratedClass>(ParentClass))
+	if (IsDynamicBlueprintGeneratedClass(ClassName))
 	{
 		Class = GeneratorCSharpBlueprintGeneratedClass(Outer, ClassName, ParentClass,
 		                                               [InMonoClass](UClass* InClass)
@@ -705,4 +695,9 @@ void FDynamicClassGenerator::ClassConstructor(const FObjectInitializer& InObject
 
 		SuperClass = SuperClass->GetSuperClass();
 	}
+}
+
+bool FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(const FString& InName)
+{
+	return InName.EndsWith(TEXT("_C"));
 }

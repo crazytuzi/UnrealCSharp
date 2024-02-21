@@ -36,6 +36,7 @@ TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
 
 TArray<FString> FDynamicGeneratorCore::StructMetaDataAttrs =
 {
+	CLASS_BLUEPRINT_TYPE_ATTRIBUTE,
 	CLASS_HAS_NATIVE_BREAK_ATTRIBUTE,
 	CLASS_HAS_NATIVE_MAKE_ATTRIBUTE,
 	CLASS_HIDDEN_BY_DEFAULT_ATTRIBUTE,
@@ -44,6 +45,7 @@ TArray<FString> FDynamicGeneratorCore::StructMetaDataAttrs =
 
 TArray<FString> FDynamicGeneratorCore::EnumMetaDataAttrs =
 {
+	CLASS_BLUEPRINT_TYPE_ATTRIBUTE,
 	CLASS_BITFLAGS_ATTRIBUTE,
 	CLASS_USE_ENUM_VALUES_AS_MASK_VALUES_IN_EDITOR
 };

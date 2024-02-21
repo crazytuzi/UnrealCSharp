@@ -81,6 +81,8 @@ private:
 
 	static void ClassConstructor(const FObjectInitializer& InObjectInitializer);
 
+	static bool IsDynamicBlueprintGeneratedClass(const FString& InName);
+
 public:
 	static UNREALCSHARPCORE_API TSet<UClass::ClassConstructorType> ClassConstructorSet;
 

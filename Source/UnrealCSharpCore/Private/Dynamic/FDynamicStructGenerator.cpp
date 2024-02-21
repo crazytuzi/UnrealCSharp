@@ -168,11 +168,6 @@ void FDynamicStructGenerator::BeginGenerator(UScriptStruct* InScriptStruct, UScr
 
 void FDynamicStructGenerator::ProcessGenerator(MonoClass* InMonoClass, UScriptStruct* InScriptStruct)
 {
-	// @TODO
-#if WITH_EDITOR
-	InScriptStruct->SetMetaData(FBlueprintMetadata::MD_AllowableBlueprintVariableType, TEXT("true"));
-#endif
-
 #if WITH_EDITOR
 	GeneratorMetaData(InMonoClass, InScriptStruct);
 #endif

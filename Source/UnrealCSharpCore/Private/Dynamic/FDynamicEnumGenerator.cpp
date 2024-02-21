@@ -147,11 +147,6 @@ void FDynamicEnumGenerator::BeginGenerator(const UEnum* InEnum)
 
 void FDynamicEnumGenerator::ProcessGenerator(MonoClass* InMonoClass, UEnum* InEnum)
 {
-	// @TODO
-#if WITH_EDITOR
-	InEnum->SetMetaData(*FBlueprintMetadata::MD_AllowableBlueprintVariableType.ToString(), TEXT("true"));
-#endif
-
 #if WITH_EDITOR
 	GeneratorMetaData(InMonoClass, InEnum);
 #endif
