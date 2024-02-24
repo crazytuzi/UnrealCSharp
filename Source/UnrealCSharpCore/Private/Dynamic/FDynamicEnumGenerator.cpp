@@ -13,6 +13,7 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #endif
+#include "UEVersion.h"
 
 TMap<FString, UEnum*> FDynamicEnumGenerator::DynamicEnumMap;
 
@@ -156,6 +157,17 @@ void FDynamicEnumGenerator::ProcessGenerator(MonoClass* InMonoClass, UEnum* InEn
 
 void FDynamicEnumGenerator::EndGenerator(UEnum* InEnum)
 {
+#if UE_NOTIFY_REGISTRATION_EVENT
+#if !WITH_EDITOR
+	NotifyRegistrationEvent(*InEnum->GetPackage()->GetName(),
+	                        *InEnum->GetName(),
+	                        ENotifyRegistrationType::NRT_Enum,
+	                        ENotifyRegistrationPhase::NRP_Finished,
+	                        nullptr,
+	                        false,
+	                        InEnum);
+#endif
+#endif
 }
 
 void FDynamicEnumGenerator::GeneratorEnum(const FString& InName, UEnum* InEnum,

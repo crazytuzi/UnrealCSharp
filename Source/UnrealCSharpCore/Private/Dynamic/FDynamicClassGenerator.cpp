@@ -277,6 +277,8 @@ void FDynamicClassGenerator::BeginGenerator(UBlueprintGeneratedClass* InClass, U
 #if WITH_EDITOR
 	Cast<UBlueprint>(InClass->ClassGeneratedBy)->ParentClass = InParentClass;
 #endif
+
+	InClass->ClassFlags &= ~CLASS_Native;
 }
 
 void FDynamicClassGenerator::ProcessGenerator(MonoClass* InMonoClass, UClass* InClass)
@@ -311,6 +313,27 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 	                                                EObjectInitializerOptions::None));
 
 	InClass->SetInternalFlags(EInternalObjectFlags::Native);
+
+#if UE_NOTIFY_REGISTRATION_EVENT
+#if !WITH_EDITOR
+	NotifyRegistrationEvent(*InClass->ClassDefaultObject->GetPackage()->GetName(),
+	                        *InClass->ClassDefaultObject->GetName(),
+	                        ENotifyRegistrationType::NRT_ClassCDO,
+	                        ENotifyRegistrationPhase::NRP_Finished,
+	                        nullptr,
+	                        false,
+	                        InClass->ClassDefaultObject);
+
+
+	NotifyRegistrationEvent(*InClass->GetPackage()->GetName(),
+	                        *InClass->GetName(),
+	                        ENotifyRegistrationType::NRT_Class,
+	                        ENotifyRegistrationPhase::NRP_Finished,
+	                        nullptr,
+	                        false,
+	                        InClass);
+#endif
+#endif
 }
 
 UClass* FDynamicClassGenerator::GeneratorCSharpClass(

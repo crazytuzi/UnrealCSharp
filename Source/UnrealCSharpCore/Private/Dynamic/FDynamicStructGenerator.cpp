@@ -16,6 +16,7 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "BlueprintActionDatabase.h"
 #endif
+#include "UEVersion.h"
 
 TMap<FString, UScriptStruct*> FDynamicStructGenerator::DynamicStructMap;
 
@@ -189,6 +190,18 @@ void FDynamicStructGenerator::EndGenerator(UScriptStruct* InScriptStruct)
 	InScriptStruct->SetInternalFlags(EInternalObjectFlags::Native);
 
 	InScriptStruct->StructFlags = STRUCT_Native;
+
+#if UE_NOTIFY_REGISTRATION_EVENT
+#if !WITH_EDITOR
+	NotifyRegistrationEvent(*InScriptStruct->GetPackage()->GetName(),
+	                        *InScriptStruct->GetName(),
+	                        ENotifyRegistrationType::NRT_Class,
+	                        ENotifyRegistrationPhase::NRP_Finished,
+	                        nullptr,
+	                        false,
+	                        InScriptStruct);
+#endif
+#endif
 }
 
 void FDynamicStructGenerator::GeneratorScriptStruct(const FString& InName, UScriptStruct* InScriptStruct,
