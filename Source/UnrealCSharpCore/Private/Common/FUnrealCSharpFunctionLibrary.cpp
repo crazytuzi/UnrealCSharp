@@ -2,10 +2,7 @@
 #include "CoreMacro/Macro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
-#include "Dynamic/CSharpClass.h"
-#include "Dynamic/CSharpBlueprintGeneratedClass.h"
-#include "Dynamic/CSharpScriptStruct.h"
-#include "Dynamic/CSharpEnum.h"
+#include "Dynamic/FDynamicClassGenerator.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
@@ -72,7 +69,8 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 	return Encode(FString::Printf(TEXT(
 		"%s%s"
 	),
-	                              InStruct->IsNative() && !Cast<UCSharpBlueprintGeneratedClass>(InStruct)
+	                              InStruct->IsNative() &&
+	                              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
 		                              ? InStruct->GetPrefixCPP()
 		                              : TEXT(""),
 	                              *InStruct->GetName()));
@@ -98,19 +96,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 
 	auto ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
 
-	const auto bIsDynamicClass = Cast<UCSharpClass>(InStruct) ||
-		Cast<UCSharpBlueprintGeneratedClass>(InStruct) ||
-		Cast<UCSharpScriptStruct>(InStruct) ||
-		UCSharpClass::StaticClass() == InStruct ||
-		UCSharpBlueprintGeneratedClass::StaticClass() == InStruct ||
-		UCSharpScriptStruct::StaticClass() == InStruct;
-
-	if (bIsDynamicClass)
-	{
-		ModuleName = TEXT("/Script/CoreUObject");
-	}
-
-	if (InStruct->IsNative() || bIsDynamicClass)
+	if (InStruct->IsNative())
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}
@@ -149,16 +135,16 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UEnum* InEnum)
 	return InEnum->GetName();
 }
 
-FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InStruct)
+FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InEnum)
 {
-	if (InStruct == nullptr)
+	if (InEnum == nullptr)
 	{
 		return "";
 	}
 
-	FString ModuleName = InStruct->GetOuter() ? InStruct->GetOuter()->GetName() : TEXT("");
+	FString ModuleName = InEnum->GetOuter() ? InEnum->GetOuter()->GetName() : TEXT("");
 
-	if (InStruct->IsNative() || Cast<UCSharpEnum>(InStruct))
+	if (InEnum->IsNative())
 	{
 		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
 	}
@@ -167,7 +153,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InStruct)
 		ModuleName = ModuleName.Replace(*FString::Printf(TEXT(
 			                                "/%s"
 		                                ),
-		                                                 *InStruct->GetName()),
+		                                                 *InEnum->GetName()),
 		                                TEXT(""));
 	}
 
@@ -586,4 +572,19 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 	}
 
 	return GameModuleList;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
+{
+	if (InClass != nullptr)
+	{
+		if (const auto ClassName = InClass->GetName();
+			ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
+			ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

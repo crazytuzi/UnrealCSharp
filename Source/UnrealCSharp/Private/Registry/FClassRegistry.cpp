@@ -3,6 +3,8 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Template/TAccessPrivate.inl"
+#include "Template/TAccessPrivateStub.inl"
 
 TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> FClassRegistry::ClassConstructorMap;
 
@@ -233,6 +235,14 @@ void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)
 	}
 }
 
+struct FObjectInitializer_bIsDeferredInitializer
+{
+	typedef bool (FObjectInitializer::*Type);
+};
+
+template struct TAccessPrivateStub<FObjectInitializer_bIsDeferredInitializer,
+                                   &FObjectInitializer::bIsDeferredInitializer>;
+
 void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitializer)
 {
 	auto Class = InObjectInitializer.GetClass();
@@ -249,11 +259,21 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 		Class = Class->GetSuperClass();
 	}
 
-	if (FMonoDomain::bLoadSucceed)
+	if (IsInGameThread())
 	{
-		if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InObjectInitializer.GetObj()))
+		if (FMonoDomain::bLoadSucceed)
 		{
-			FDomain::Object_Constructor(FoundMonoObject);
+			if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
+				InObjectInitializer.GetObj()))
+			{
+				auto& ObjectInitializer = FObjectInitializer::Get();
+
+				ObjectInitializer.~FObjectInitializer();
+
+				ObjectInitializer.*TAccessPrivate<FObjectInitializer_bIsDeferredInitializer>::Value = true;
+
+				FDomain::Object_Constructor(FoundMonoObject);
+			}
 		}
 	}
 }

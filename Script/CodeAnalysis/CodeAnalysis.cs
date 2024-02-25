@@ -18,26 +18,25 @@ namespace CodeAnalysis
             Analysis.Analysis();
         }
 
-        private CodeAnalysis(string InInputPathName, string InOutputPathName)
+        private CodeAnalysis(string inInputPathName, string inOutputPathName)
         {
-            InputPathName = InInputPathName;
+            _inputPathName = inInputPathName;
 
-            OutputPathName = InOutputPathName;
+            _outputPathName = inOutputPathName;
 
-            Dynamic = new Dictionary<string, List<string>>
+            _dynamic = new Dictionary<string, List<string>>
             {
-                ["CSharpGeneratedClass"] = new List<string>(),
-                ["CSharpBlueprintGeneratedClass"] = new List<string>(),
+                ["CSharpClass"] = new List<string>(),
                 ["CSharpScriptStruct"] = new List<string>(),
                 ["CSharpEnum"] = new List<string>()
             };
         }
 
-        private static List<string> GetFiles(string InPathName)
+        private static List<string> GetFiles(string inPathName)
         {
             var Files = new List<string>();
 
-            var DirectoryInfo = new DirectoryInfo(InPathName);
+            var DirectoryInfo = new DirectoryInfo(inPathName);
 
             foreach (var Item in DirectoryInfo.GetFiles("*.cs"))
             {
@@ -60,17 +59,17 @@ namespace CodeAnalysis
 
         private void Analysis()
         {
-            if (!Directory.Exists(OutputPathName))
+            if (!Directory.Exists(_outputPathName))
             {
-                Directory.CreateDirectory(OutputPathName);
+                Directory.CreateDirectory(_outputPathName);
             }
 
-            foreach (var Item in Directory.GetFiles(OutputPathName))
+            foreach (var Item in Directory.GetFiles(_outputPathName))
             {
                 File.Delete(Item);
             }
 
-            var Files = GetFiles(InputPathName);
+            var Files = GetFiles(_inputPathName);
 
             foreach (var Item in Files)
             {
@@ -86,9 +85,9 @@ namespace CodeAnalysis
             WriteAll();
         }
 
-        private void AnalysisIsOverride(CompilationUnitSyntax InRoot)
+        private void AnalysisIsOverride(CompilationUnitSyntax inRoot)
         {
-            foreach (var RootMember in InRoot.Members)
+            foreach (var RootMember in inRoot.Members)
             {
                 if (RootMember is BaseNamespaceDeclarationSyntax NamespaceDeclaration)
                 {
@@ -98,37 +97,37 @@ namespace CodeAnalysis
                         {
                             var Functions = new List<string>();
 
-                            var bIsOverride = false;
+                            var IsOverride = false;
 
                             foreach (var Attribute in ClassDeclaration.AttributeLists)
                             {
                                 if (Attribute.ToString().Equals("[Override]"))
                                 {
-                                    bIsOverride = true;
+                                    IsOverride = true;
 
                                     break;
                                 }
                             }
 
-                            if (bIsOverride)
+                            if (IsOverride)
                             {
                                 foreach (var MemberDeclaration in ClassDeclaration.Members)
                                 {
                                     if (MemberDeclaration is MethodDeclarationSyntax MethodDeclaration)
                                     {
-                                        bIsOverride = false;
+                                        IsOverride = false;
 
                                         foreach (var Attribute in MethodDeclaration.AttributeLists)
                                         {
                                             if (Attribute.ToString().Equals("[Override]"))
                                             {
-                                                bIsOverride = true;
+                                                IsOverride = true;
 
                                                 break;
                                             }
                                         }
 
-                                        if (bIsOverride)
+                                        if (IsOverride)
                                         {
                                             Functions.Add(MethodDeclaration.Identifier.ToString());
                                         }
@@ -138,11 +137,10 @@ namespace CodeAnalysis
 
                             if (Functions.Count > 0)
                             {
-                                var FileName = Path.Combine(OutputPathName,
-                                    String.Format("{0}.{1}.json", NamespaceDeclaration.Name,
-                                        ClassDeclaration.Identifier));
+                                var FileName = Path.Combine(_outputPathName,
+                                    $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}.json");
 
-                                var Value = String.Format("{{\"Override\":{0}}}", JsonSerializer.Serialize(Functions));
+                                var Value = $"{{\"Override\":{JsonSerializer.Serialize(Functions)}}}";
 
                                 File.WriteAllText(FileName, Value);
                             }
@@ -152,9 +150,9 @@ namespace CodeAnalysis
             }
         }
 
-        private void AnalysisDynamic(CompilationUnitSyntax InRoot)
+        private void AnalysisDynamic(CompilationUnitSyntax inRoot)
         {
-            foreach (var RootMember in InRoot.Members)
+            foreach (var RootMember in inRoot.Members)
             {
                 if (RootMember is BaseNamespaceDeclarationSyntax NamespaceDeclaration)
                 {
@@ -166,21 +164,14 @@ namespace CodeAnalysis
                             {
                                 if (Attribute.ToString().Equals("[UClass]"))
                                 {
-                                    Dynamic["CSharpGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
-
-                                    return;
-                                }
-
-                                if (Attribute.ToString().Equals("[UBlueprint]"))
-                                {
-                                    Dynamic["CSharpBlueprintGeneratedClass"].Add(ClassDeclaration.Identifier.ToString());
+                                    _dynamic["CSharpClass"].Add(ClassDeclaration.Identifier.ToString());
 
                                     return;
                                 }
 
                                 if (Attribute.ToString().Equals("[UStruct]"))
                                 {
-                                    Dynamic["CSharpScriptStruct"].Add(ClassDeclaration.Identifier.ToString());
+                                    _dynamic["CSharpScriptStruct"].Add(ClassDeclaration.Identifier.ToString());
 
                                     return;
                                 }
@@ -192,7 +183,7 @@ namespace CodeAnalysis
                             {
                                 if (Attribute.ToString().Equals("[UEnum]"))
                                 {
-                                    Dynamic["CSharpEnum"].Add(EnumDeclaration.Identifier.ToString());
+                                    _dynamic["CSharpEnum"].Add(EnumDeclaration.Identifier.ToString());
 
                                     return;
                                 }
@@ -205,20 +196,20 @@ namespace CodeAnalysis
 
         private void WriteAll()
         {
-            foreach (var Pair in Dynamic)
+            foreach (var Pair in _dynamic)
             {
-                var FileName = Path.Combine(OutputPathName, Pair.Key + ".json");
+                var FileName = Path.Combine(_outputPathName, Pair.Key + ".json");
 
-                var Value = String.Format("{{\"{0}\":{1}}}", Pair.Key, JsonSerializer.Serialize(Pair.Value));
+                var Value = $"{{\"{Pair.Key}\":{JsonSerializer.Serialize(Pair.Value)}}}";
 
                 File.WriteAllText(FileName, Value);
             }
         }
 
-        private string InputPathName;
+        private readonly string _inputPathName;
 
-        private string OutputPathName;
+        private readonly string _outputPathName;
 
-        private Dictionary<string, List<string>> Dynamic;
+        private readonly Dictionary<string, List<string>> _dynamic;
     }
 }

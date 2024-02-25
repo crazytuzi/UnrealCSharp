@@ -20,7 +20,7 @@ public:
 
 	static FString GetFullClass(const UEnum* InEnum);
 
-	static FString GetClassNameSpace(const UEnum* InStruct);
+	static FString GetClassNameSpace(const UEnum* InEnum);
 
 	static FString GetFullClass(const FDelegateProperty* InDelegateProperty);
 
@@ -83,4 +83,6 @@ public:
 	static const TArray<FString>& GetEngineModuleList();
 
 	static const TArray<FString>& GetProjectModuleList();
+
+	static bool IsSpecialClass(const UClass* InClass);
 };

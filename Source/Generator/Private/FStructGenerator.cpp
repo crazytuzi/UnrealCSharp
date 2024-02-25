@@ -4,8 +4,8 @@
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Dynamic/CSharpScriptStruct.h"
 #include "CoreMacro/PropertyMacro.h"
+#include "Dynamic/FDynamicStructGenerator.h"
 
 void FStructGenerator::Generator()
 {
@@ -22,7 +22,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		return;
 	}
 
-	if (Cast<UCSharpScriptStruct>(InScriptStruct))
+	if (FDynamicStructGenerator::IsDynamicStruct(InScriptStruct))
 	{
 		return;
 	}

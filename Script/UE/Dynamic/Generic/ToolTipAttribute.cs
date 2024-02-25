@@ -2,7 +2,7 @@ using System;
 
 namespace Script.Dynamic
 {
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property)]
     public class ToolTipAttribute : Attribute
     {
         public ToolTipAttribute(string InValue)

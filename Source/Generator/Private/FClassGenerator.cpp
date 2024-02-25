@@ -4,13 +4,11 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Misc/FileHelper.h"
-#include "Dynamic/CSharpClass.h"
-#include "Dynamic/CSharpBlueprintGeneratedClass.h"
-#include "Dynamic/CSharpScriptStruct.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
 #include "CoreMacro/PropertyMacro.h"
+#include "Dynamic/FDynamicClassGenerator.h"
 
 void FClassGenerator::Generator()
 {
@@ -27,11 +25,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
-	if (Cast<UCSharpClass>(InClass) ||
-		Cast<UCSharpBlueprintGeneratedClass>(InClass) ||
-		UCSharpClass::StaticClass() == InClass ||
-		UCSharpBlueprintGeneratedClass::StaticClass() == InClass ||
-		UCSharpScriptStruct::StaticClass() == InClass)
+	if (FDynamicClassGenerator::IsDynamicClass(InClass))
 	{
 		return;
 	}
@@ -46,11 +40,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
-	auto ClassName = InClass->GetName();
-
-	if (ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
-		ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")) ||
-		ClassName.StartsWith(TEXT("HOTRELOADED_")))
+	if (FUnrealCSharpFunctionLibrary::IsSpecialClass(InClass))
 	{
 		return;
 	}

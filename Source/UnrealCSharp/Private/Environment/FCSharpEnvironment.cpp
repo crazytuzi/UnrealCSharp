@@ -328,6 +328,11 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 		{
 			Bind(PendingBindObject, true);
 		}
+
+		if (const auto FoundMonoObject = GetObject(PendingBindObject))
+		{
+			FDomain::Object_Constructor(FoundMonoObject);
+		}
 	}
 }
 
