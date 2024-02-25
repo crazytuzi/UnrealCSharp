@@ -314,6 +314,17 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 
 	InClass->SetInternalFlags(EInternalObjectFlags::Native);
 
+#if WITH_EDITOR
+	if (GEditor)
+	{
+		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
+
+		ActionDatabase.ClearAssetActions(InClass);
+
+		ActionDatabase.RefreshClassActions(InClass);
+	}
+#endif
+
 #if UE_NOTIFY_REGISTRATION_EVENT
 #if !WITH_EDITOR
 	NotifyRegistrationEvent(*InClass->ClassDefaultObject->GetPackage()->GetName(),
@@ -393,15 +404,6 @@ UBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorCSharpBlueprintGenera
 #if WITH_EDITOR
 void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 {
-	if (GEditor)
-	{
-		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
-
-		ActionDatabase.ClearAssetActions(InNewClass);
-
-		ActionDatabase.RefreshClassActions(InNewClass);
-	}
-
 	FBlueprintCompileReinstancer::ReplaceInstancesOfClass(InOldClass, InNewClass, InOldClass->ClassDefaultObject);
 
 	TArray<UBlueprintGeneratedClass*> BlueprintGeneratedClasses;

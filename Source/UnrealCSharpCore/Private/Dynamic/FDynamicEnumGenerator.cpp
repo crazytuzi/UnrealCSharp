@@ -157,6 +157,17 @@ void FDynamicEnumGenerator::ProcessGenerator(MonoClass* InMonoClass, UEnum* InEn
 
 void FDynamicEnumGenerator::EndGenerator(UEnum* InEnum)
 {
+#if WITH_EDITOR
+	if (GEditor)
+	{
+		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
+
+		ActionDatabase.ClearAssetActions(InEnum);
+
+		ActionDatabase.RefreshAssetActions(InEnum);
+	}
+#endif
+
 #if UE_NOTIFY_REGISTRATION_EVENT
 #if !WITH_EDITOR
 	NotifyRegistrationEvent(*InEnum->GetPackage()->GetName(),
@@ -207,15 +218,6 @@ UEnum* FDynamicEnumGenerator::GeneratorCSharpEnum(UPackage* InOuter, const FStri
 #if WITH_EDITOR
 void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 {
-	if (GEditor)
-	{
-		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
-
-		ActionDatabase.ClearAssetActions(InEnum);
-
-		ActionDatabase.RefreshAssetActions(InEnum);
-	}
-
 	TArray<UBlueprintGeneratedClass*> BlueprintGeneratedClasses;
 
 	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(

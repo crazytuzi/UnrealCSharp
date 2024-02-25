@@ -191,6 +191,17 @@ void FDynamicStructGenerator::EndGenerator(UScriptStruct* InScriptStruct)
 
 	InScriptStruct->StructFlags = STRUCT_Native;
 
+#if WITH_EDITOR
+	if (GEditor)
+	{
+		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
+
+		ActionDatabase.ClearAssetActions(InScriptStruct);
+
+		ActionDatabase.RefreshAssetActions(InScriptStruct);
+	}
+#endif
+
 #if UE_NOTIFY_REGISTRATION_EVENT
 #if !WITH_EDITOR
 	NotifyRegistrationEvent(*InScriptStruct->GetPackage()->GetName(),
@@ -245,15 +256,6 @@ UScriptStruct* FDynamicStructGenerator::GeneratorCSharpScriptStruct(UPackage* In
 #if WITH_EDITOR
 void FDynamicStructGenerator::ReInstance(UScriptStruct* InOldScriptStruct, UScriptStruct* InNewScriptStruct)
 {
-	if (GEditor)
-	{
-		FBlueprintActionDatabase& ActionDatabase = FBlueprintActionDatabase::Get();
-
-		ActionDatabase.ClearAssetActions(InNewScriptStruct);
-
-		ActionDatabase.RefreshAssetActions(InNewScriptStruct);
-	}
-
 	TArray<UClass*> DynamicClasses;
 
 	TArray<UBlueprintGeneratedClass*> BlueprintGeneratedClasses;
