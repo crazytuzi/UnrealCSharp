@@ -3,7 +3,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FArrayHelper.h"
-#include "Macro/NamespaceMacro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
 struct FRegisterArray

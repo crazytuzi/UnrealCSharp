@@ -1,5 +1,5 @@
 ﻿using System;
-using Script.Common;
+using Script.CoreUObject;
 
 namespace Script.Dynamic
 {

@@ -1,7 +1,7 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/NamespaceMacro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
 

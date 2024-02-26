@@ -1,6 +1,6 @@
 ﻿using Script.Library;
 
-namespace Script.Common
+namespace Script.CoreUObject
 {
     public class FRefDelegate : FDelegateBase
     {

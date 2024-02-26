@@ -33,7 +33,7 @@ void FDomain::Deinitialize()
 void FDomain::Tick(float DeltaTime)
 {
 	if (const auto SynchronizationContextClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_SYNCHRONIZATION_CONTEXT))
 	{
 		auto InParams = static_cast<void*>(&DeltaTime);
 
@@ -499,7 +499,7 @@ MonoType* FDomain::Property_Get_Type(MonoProperty* InMonoProperty) const
 void FDomain::InitializeSynchronizationContext()
 {
 	if (const auto SynchronizationContextClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_SYNCHRONIZATION_CONTEXT))
 	{
 		if (const auto InitializeMonoMethod = Class_Get_Method_From_Name(
 			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE, 0))
@@ -512,7 +512,7 @@ void FDomain::InitializeSynchronizationContext()
 void FDomain::DeinitializeSynchronizationContext()
 {
 	if (const auto SynchronizationContextClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_SYNCHRONIZATION_CONTEXT))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_SYNCHRONIZATION_CONTEXT))
 	{
 		if (const auto DeinitializeMonoMethod = Class_Get_Method_From_Name(
 			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_DEINITIALIZE, 0))
@@ -527,7 +527,7 @@ MonoString* FDomain::GetTraceback() const
 	if (FMonoDomain::Domain != nullptr)
 	{
 		if (const auto FoundMonoClass = Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
 		{
 			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_GET_TRACEBACK, 0))
 			{

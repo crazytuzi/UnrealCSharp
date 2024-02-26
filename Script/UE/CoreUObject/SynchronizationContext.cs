@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Script.Common;
+namespace Script.CoreUObject;
 
 public class SynchronizationContext : System.Threading.SynchronizationContext
 {

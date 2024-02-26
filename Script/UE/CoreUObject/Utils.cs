@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Collections.Generic;
 
-namespace Script.Common
+namespace Script.CoreUObject
 {
     public static class Utils
     {

@@ -67,7 +67,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SUB_CLASS_OF))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SUB_CLASS_OF))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -87,7 +87,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_NAME))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -96,7 +96,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SCRIPT_INTERFACE))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SCRIPT_INTERFACE))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -124,7 +124,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_STRING))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -133,7 +133,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_TEXT))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -142,7 +142,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_WEAK_OBJECT_PTR))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_WEAK_OBJECT_PTR))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -151,7 +151,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_LAZY_OBJECT_PTR))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_LAZY_OBJECT_PTR))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -160,7 +160,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SOFT_CLASS_PTR))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_CLASS_PTR))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -169,7 +169,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SOFT_OBJECT_PTR))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_OBJECT_PTR))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -183,7 +183,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_MAP))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_MAP))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -192,7 +192,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SET))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SET))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -201,7 +201,7 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_ARRAY))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_ARRAY))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -389,7 +389,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FClassProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SUB_CLASS_OF);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SUB_CLASS_OF);
 
 		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->MetaClass),
@@ -416,7 +416,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FObjectProperty* InProperty)
 MonoClass* FTypeBridge::GetMonoClass(const FNameProperty*)
 {
 	return FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_NAME);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_NAME);
 }
 
 MonoClass* FTypeBridge::GetMonoClass(const FDelegateProperty* InProperty)
@@ -443,7 +443,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FInterfaceProperty* InProperty)
 #endif
 
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SCRIPT_INTERFACE);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SCRIPT_INTERFACE);
 
 		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->InterfaceClass),
@@ -472,7 +472,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FArrayProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_ARRAY);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_ARRAY);
 
 		const auto FoundMonoClass = GetMonoClass(InProperty->Inner);
 
@@ -507,13 +507,13 @@ MonoClass* FTypeBridge::GetMonoClass(const FEnumProperty* InProperty)
 MonoClass* FTypeBridge::GetMonoClass(const FStrProperty*)
 {
 	return FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_STRING);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_STRING);
 }
 
 MonoClass* FTypeBridge::GetMonoClass(const FTextProperty*)
 {
 	return FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_F_TEXT);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_TEXT);
 }
 
 MonoClass* FTypeBridge::GetMonoClass(const FMulticastDelegateProperty* InProperty)
@@ -533,7 +533,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FWeakObjectProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_WEAK_OBJECT_PTR);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_WEAK_OBJECT_PTR);
 
 		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->PropertyClass),
@@ -550,7 +550,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FLazyObjectProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_LAZY_OBJECT_PTR);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_LAZY_OBJECT_PTR);
 
 		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->PropertyClass),
@@ -567,7 +567,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FSoftClassProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SOFT_CLASS_PTR);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_CLASS_PTR);
 
 		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->MetaClass),
@@ -584,7 +584,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FSoftObjectProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SOFT_OBJECT_PTR);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_OBJECT_PTR);
 
 		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->PropertyClass),
@@ -601,7 +601,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FMapProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_MAP);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_MAP);
 
 		const auto FoundKeyMonoClass = GetMonoClass(InProperty->KeyProp);
 
@@ -637,7 +637,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FSetProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), GENERIC_T_SET);
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SET);
 
 		const auto FoundMonoClass = GetMonoClass(InProperty->ElementProp);
 
@@ -682,7 +682,7 @@ MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* I
 	InParams[1] = ReflectionTypeMonoArray;
 
 	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
 
 	const auto CreateGenericTypeMethod = FMonoDomain::Class_Get_Method_From_Name(
 		UtilsMonoClass, FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE, TGetArrayLength(InParams));
@@ -708,7 +708,7 @@ MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* I
 	InParams[1] = InTypeMonoClassArray;
 
 	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
 
 	const auto CreateGenericTypeMethod = FMonoDomain::Class_Get_Method_From_Name(
 		UtilsMonoClass, FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE, TGetArrayLength(InParams));
@@ -1001,7 +1001,7 @@ MonoReflectionType* FTypeBridge::GetType(MonoReflectionType* InReflectionType)
 	auto InParams = static_cast<void*>(InReflectionType);
 
 	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
 
 	const auto GetTypeMethod = FMonoDomain::Class_Get_Method_From_Name(
 		UtilsMonoClass, FUNCTION_UTILS_GET_TYPE, TGetArrayLength(InParams));
@@ -1050,7 +1050,7 @@ MonoArray* FTypeBridge::GetGenericArguments(MonoType* InMonoType)
 MonoArray* FTypeBridge::GetGenericArguments(MonoReflectionType* InReflectionType)
 {
 	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
 
 	auto InParams = static_cast<void*>(InReflectionType);
 
@@ -1065,7 +1065,7 @@ MonoArray* FTypeBridge::GetGenericArguments(MonoReflectionType* InReflectionType
 FString FTypeBridge::GetPathName(MonoReflectionType* InReflectionType)
 {
 	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
 
 	auto InParams = static_cast<void*>(InReflectionType);
 

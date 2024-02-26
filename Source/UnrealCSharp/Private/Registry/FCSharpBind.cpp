@@ -537,7 +537,7 @@ bool FCSharpBind::IsOverrideType(const FDomain* InDomain, MonoReflectionType* In
 	}
 
 	if (const auto UtilsMonoClass = InDomain->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
 	{
 		auto InParams = static_cast<void*>(InMonoReflectionType);
 
@@ -563,7 +563,7 @@ bool FCSharpBind::IsOverrideMethod(const FDomain* InDomain, MonoReflectionMethod
 	}
 
 	if (const auto UtilsMonoClass = InDomain->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
 	{
 		auto InParams = static_cast<void*>(InMonoReflectionMethod);
 

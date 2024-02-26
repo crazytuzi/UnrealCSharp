@@ -7,6 +7,7 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 
@@ -73,7 +74,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto bIsInterface = InClass->IsChildOf(UInterface::StaticClass());
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
 	auto SuperClass = InClass->GetSuperClass();
 
@@ -217,7 +218,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                                  *PathNameAttributeContent
 	);
 
-	UsingNameSpaces.Add(TEXT("Script.Library"));
+	UsingNameSpaces.Add(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY));
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()));
 

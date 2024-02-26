@@ -8,6 +8,7 @@
 #include "WidgetBlueprint.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/NamespaceMacro.h"
 
 TArray<UUserDefinedEnum*> FAssetGenerator::UserDefinedEnums;
 
@@ -107,7 +108,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 	                                              TEXT("Script"),
 	                                              *InAssetData.PackagePath.ToString().Replace(TEXT("/"), TEXT(".")));
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass));
 

@@ -1,6 +1,6 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Log/UnrealCSharpLog.h"
-#include "Macro/NamespaceMacro.h"
+#include "CoreMacro/NamespaceMacro.h"
 
 struct FRegisterLog
 {

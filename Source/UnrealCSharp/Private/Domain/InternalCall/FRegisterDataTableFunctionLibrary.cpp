@@ -2,8 +2,8 @@
 #include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Kismet/DataTableFunctionLibrary.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
-#include "Macro/NamespaceMacro.h"
 
 BINDING_REFLECTION_CLASS(UDataTableFunctionLibrary)
 

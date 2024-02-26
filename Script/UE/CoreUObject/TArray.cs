@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Script.CoreUObject;
 using Script.Library;
 
-namespace Script.Common
+namespace Script.CoreUObject
 {
     public static class TArray
     {
