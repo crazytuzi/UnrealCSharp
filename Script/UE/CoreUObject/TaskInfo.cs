@@ -1,7 +1,7 @@
 #nullable enable
 using System.Threading;
 
-namespace Script.Common;
+namespace Script.CoreUObject;
 
 public struct TaskInfo
 {

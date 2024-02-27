@@ -1,6 +1,6 @@
 ﻿using Script.Reflection.Property;
 
-namespace Script.Common
+namespace Script.CoreUObject
 {
     public class TFieldPath<T> where T : FField
     {

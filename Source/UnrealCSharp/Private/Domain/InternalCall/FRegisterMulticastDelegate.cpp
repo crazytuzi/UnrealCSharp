@@ -1,7 +1,7 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
-#include "Macro/NamespaceMacro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 #include "Registry/FCSharpBind.h"
 

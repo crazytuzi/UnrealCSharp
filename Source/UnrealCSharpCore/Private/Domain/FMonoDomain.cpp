@@ -873,7 +873,7 @@ void FMonoDomain::RegisterLog()
 	if (Domain != nullptr)
 	{
 		if (const auto FoundMonoClass = Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
 		{
 			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_SET_OUT, 0))
 			{

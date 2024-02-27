@@ -87,7 +87,7 @@ bool UMulticastDelegateHandler::IsBound() const
 bool UMulticastDelegateHandler::Contains(MonoObject* InMulticastDelegate) const
 {
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
 	{
 		void* Params[2];
 
@@ -158,7 +158,7 @@ void UMulticastDelegateHandler::AddUnique(MonoObject* InMulticastDelegate)
 void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 {
 	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
 	{
 		void* Params[2];
 
@@ -211,7 +211,7 @@ void UMulticastDelegateHandler::RemoveAll(MonoObject* InObject)
 		const auto FoundMonoObject = static_cast<MonoObject*>(Element);
 
 		if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS))
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
 		{
 			auto Params = static_cast<void*>(FoundMonoObject);
 

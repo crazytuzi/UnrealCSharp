@@ -1,9 +1,8 @@
-﻿using Script.Common;
-using Script.CoreUObject;
-using Script.Engine;
+﻿using Script.Engine;
+using Script.Library;
 using Script.UMG;
 
-namespace Script.Library
+namespace Script.CoreUObject
 {
     public static class Unreal
     {

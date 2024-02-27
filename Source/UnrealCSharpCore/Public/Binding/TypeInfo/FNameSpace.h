@@ -14,6 +14,6 @@ struct FCommonNameSpace
 {
 	static TArray<FString> Get()
 	{
-		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON)};
+		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 	}
 };

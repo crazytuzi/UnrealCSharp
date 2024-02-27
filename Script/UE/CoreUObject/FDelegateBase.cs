@@ -1,6 +1,4 @@
-﻿using Script.CoreUObject;
-
-namespace Script.Common
+﻿namespace Script.CoreUObject
 {
     public class FDelegateBase : IGarbageCollectionHandle
     {

@@ -2,6 +2,7 @@
 #include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 

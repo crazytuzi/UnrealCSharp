@@ -265,7 +265,10 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 
 	if (const auto ClassProperty = CastField<FClassProperty>(Property))
 	{
-		return {TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(ClassProperty->MetaClass)};
+		return {
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(ClassProperty->MetaClass)
+		};
 	}
 
 	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
@@ -283,7 +286,8 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	if (const auto InterfaceProperty = CastField<FInterfaceProperty>(Property))
 	{
 		return {
-			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(InterfaceProperty->InterfaceClass)
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InterfaceProperty->InterfaceClass)
 		};
 	}
 
@@ -294,7 +298,9 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 
 	if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
 	{
-		return GetPropertyTypeNameSpace(ArrayProperty->Inner).Union({TEXT("Script.Common")});
+		return GetPropertyTypeNameSpace(ArrayProperty->Inner).Union({
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)
+		});
 	}
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
@@ -314,28 +320,32 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	if (const auto WeakObjectProperty = CastField<FWeakObjectProperty>(Property))
 	{
 		return {
-			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(WeakObjectProperty->PropertyClass)
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(WeakObjectProperty->PropertyClass)
 		};
 	}
 
 	if (const auto LazyObjectProperty = CastField<FLazyObjectProperty>(Property))
 	{
 		return {
-			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(LazyObjectProperty->PropertyClass)
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(LazyObjectProperty->PropertyClass)
 		};
 	}
 
 	if (const auto SoftClassProperty = CastField<FSoftClassProperty>(Property))
 	{
 		return {
-			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(SoftClassProperty->MetaClass)
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(SoftClassProperty->MetaClass)
 		};
 	}
 
 	if (const auto SoftObjectProperty = CastField<FSoftObjectProperty>(Property))
 	{
 		return {
-			TEXT("Script.Common"), FUnrealCSharpFunctionLibrary::GetClassNameSpace(SoftObjectProperty->PropertyClass)
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(SoftObjectProperty->PropertyClass)
 		};
 	}
 
@@ -345,15 +355,20 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	{
 		return GetPropertyTypeNameSpace(MapProperty->KeyProp).
 		       Union(GetPropertyTypeNameSpace(MapProperty->ValueProp)).
-		       Union({TEXT("Script.Common")});
+		       Union({COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)});
 	}
 
 	if (const auto SetProperty = CastField<FSetProperty>(Property))
 	{
-		return GetPropertyTypeNameSpace(SetProperty->ElementProp).Union({TEXT("Script.Common")});
+		return GetPropertyTypeNameSpace(SetProperty->ElementProp).Union({
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)
+		});
 	}
 
-	if (CastField<FFieldPathProperty>(Property)) return {TEXT("Script.Common"), TEXT("Script.Reflection.Property")};
+	if (CastField<FFieldPathProperty>(Property))
+		return {
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), TEXT("Script.Reflection.Property")
+		};
 
 	return {TEXT("")};
 }

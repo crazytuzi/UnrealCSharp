@@ -1,8 +1,8 @@
 ﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/Core/TPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
-#include "Macro/NamespaceMacro.h"
 
 BINDING_REFLECTION_CLASS(UObject)
 

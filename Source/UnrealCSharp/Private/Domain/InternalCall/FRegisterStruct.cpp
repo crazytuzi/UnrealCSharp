@@ -1,6 +1,6 @@
 ﻿#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Macro/NamespaceMacro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
 BINDING_REFLECTION_CLASS(UStruct)

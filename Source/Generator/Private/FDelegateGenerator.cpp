@@ -2,6 +2,7 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 
 TSet<TPair<FString, FString>> FDelegateGenerator::Delegate;
@@ -53,7 +54,11 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	FString DelegateDeclarationContent;
 
-	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common"), TEXT("Script.Library")};
+	TSet<FString> UsingNameSpaces{
+		NAMESPACE_SYSTEM,
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
+	};
 
 	TArray<FProperty*> DelegateParams;
 
@@ -412,7 +417,11 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	FString DelegateDeclarationContent;
 
-	TSet<FString> UsingNameSpaces{TEXT("System"), TEXT("Script.Common"), TEXT("Script.Library")};
+	TSet<FString> UsingNameSpaces{
+		NAMESPACE_SYSTEM,
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
+	};
 
 	TArray<FProperty*> DelegateParams;
 

@@ -2,7 +2,7 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
-#include "Macro/NamespaceMacro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
 struct FRegisterDelegate

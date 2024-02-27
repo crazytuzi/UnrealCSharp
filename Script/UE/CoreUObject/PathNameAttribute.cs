@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Script.Common
+namespace Script.CoreUObject
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Interface)]
     public class PathNameAttribute : Attribute

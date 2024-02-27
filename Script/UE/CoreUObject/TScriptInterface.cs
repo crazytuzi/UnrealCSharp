@@ -1,7 +1,6 @@
-﻿using Script.CoreUObject;
-using Script.Library;
+﻿using Script.Library;
 
-namespace Script.Common
+namespace Script.CoreUObject
 {
     public class TScriptInterface<T> : IGarbageCollectionHandle where T : IInterface
     {

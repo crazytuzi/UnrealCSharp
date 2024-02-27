@@ -4,6 +4,7 @@
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicStructGenerator.h"
 
@@ -63,7 +64,10 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	FString GCHandleContent;
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common"), TEXT("Script.Library")};
+	TSet<FString> UsingNameSpaces{
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
+	};
 
 	auto SuperStruct = InScriptStruct->GetSuperStruct();
 
@@ -244,7 +248,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	if (bHasProperty == true)
 	{
-		UsingNameSpaces.Add(TEXT("Script.Library"));
+		UsingNameSpaces.Add(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY));
 	}
 
 	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)

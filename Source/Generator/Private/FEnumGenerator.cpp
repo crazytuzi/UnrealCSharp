@@ -2,6 +2,7 @@
 #include "FGeneratorCore.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Dynamic/FDynamicEnumGenerator.h"
 
 TMap<const UEnum*, EEnumUnderlyingType> FEnumGenerator::EnumUnderlyingType;
@@ -47,7 +48,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	auto ClassName = InEnum->GetName();
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
 	for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
 	{
@@ -176,7 +177,7 @@ void FEnumGenerator::GeneratorCollisionChannel()
 
 	auto ClassName = InEnum->GetName();
 
-	TSet<FString> UsingNameSpaces{TEXT("Script.Common")};
+	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
 	const auto CollisionProfile = UCollisionProfile::Get();
 

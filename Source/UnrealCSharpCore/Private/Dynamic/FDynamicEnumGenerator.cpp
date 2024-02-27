@@ -29,7 +29,7 @@ void FDynamicEnumGenerator::Generator()
 	const auto AttributeMonoReflectionType = FMonoDomain::Type_Get_Object(AttributeMonoType);
 
 	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_COMMON), CLASS_UTILS);
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
 
 	void* InParams[2] = {
 		AttributeMonoReflectionType,
