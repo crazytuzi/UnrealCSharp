@@ -1,11 +1,12 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterAssetBundleEntry
 {
 	FRegisterAssetBundleEntry()
 	{
-		TReflectionClassBuilder<FAssetBundleEntry>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FAssetBundleEntry>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, const FAssetBundleEntry&),
 			             {"OldEntry"})
 			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, FName),

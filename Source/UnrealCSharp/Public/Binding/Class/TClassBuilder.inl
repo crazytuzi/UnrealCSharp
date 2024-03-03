@@ -3,6 +3,7 @@
 #include "FClassBuilder.h"
 #include "Binding/Template/TClassName.inl"
 #include "Binding/TypeInfo/TTypeInfo.inl"
+#include "CoreMacro/BindingMacro.h"
 #include "Macro/FunctionMacro.h"
 
 template <typename T>

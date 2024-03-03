@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterPlane
@@ -25,7 +26,7 @@ struct FRegisterPlane
 
 	FRegisterPlane()
 	{
-		TReflectionClassBuilder<FPlane>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FPlane>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FPlane, const FVector4&),
 			             {"V"})
 			.Constructor(BINDING_CONSTRUCTOR(FPlane, FPlane::FReal, FPlane::FReal, FPlane::FReal, FPlane::FReal),

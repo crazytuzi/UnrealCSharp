@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Binding/Function/EFunctionInteract.h"
 #include "Binding/Property/FBindingProperty.h"
+#include "Binding/Function/EFunctionInteract.h"
 #include "Binding/Function/FBindingFunction.h"
 #include "Binding/Function/FBindingSubscript.h"
 

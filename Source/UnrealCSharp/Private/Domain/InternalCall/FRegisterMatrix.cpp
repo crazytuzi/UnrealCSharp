@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
@@ -11,7 +11,7 @@ struct FRegisterMatrix
 
 	FRegisterMatrix()
 	{
-		TReflectionClassBuilder<FMatrix>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FMatrix>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FMatrix, EForceInit))
 			.Constructor(BINDING_CONSTRUCTOR(FMatrix, FPlane, FPlane, FPlane, FPlane),
 			             {"InX", "InY", "InZ", "InW"})

@@ -1,11 +1,12 @@
-#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterFloatRange
 {
 	FRegisterFloatRange()
 	{
-		TReflectionClassBuilder<FFloatRange>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FFloatRange>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FFloatRange, const float&),
 			             {"A"})
 			.Constructor(BINDING_CONSTRUCTOR(FFloatRange, const float&, const float&),

@@ -1,11 +1,12 @@
-#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterInt32Range
 {
 	FRegisterInt32Range()
 	{
-		TReflectionClassBuilder<FInt32Range>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FInt32Range>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FInt32Range, const int32&),
 			             {"A"})
 			.Constructor(BINDING_CONSTRUCTOR(FInt32Range, const int32&, const int32&),

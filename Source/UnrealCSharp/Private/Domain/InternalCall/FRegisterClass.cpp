@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/Property/TPropertyBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -23,7 +23,7 @@ struct FRegisterClass
 
 	FRegisterClass()
 	{
-		TReflectionClassBuilder<UClass>(NAMESPACE_LIBRARY)
+		TBindingClassBuilder<UClass>(NAMESPACE_LIBRARY)
 			.Property("ClassDefaultObject", BINDING_READONLY_PROPERTY(&UClass::ClassDefaultObject))
 			.Function("GetDefaultObject", GetDefaultObjectImplementation)
 			.Register();

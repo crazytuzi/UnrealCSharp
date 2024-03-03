@@ -1,5 +1,4 @@
 ﻿#include "Binding/Class/TBindingClassBuilder.inl"
-#include "Binding/Class/TReflectionClassBuilder.inl"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -84,7 +83,7 @@ struct FRegisterWorld
 
 	FRegisterWorld()
 	{
-		TReflectionClassBuilder<UWorld>(NAMESPACE_LIBRARY)
+		TBindingClassBuilder<UWorld>(NAMESPACE_LIBRARY)
 			.Function("SpawnActor", SpawnActorImplementation)
 			.Register();
 	}

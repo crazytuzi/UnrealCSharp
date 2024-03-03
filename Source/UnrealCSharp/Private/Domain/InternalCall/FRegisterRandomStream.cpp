@@ -1,11 +1,12 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterRandomStream
 {
 	FRegisterRandomStream()
 	{
-		TReflectionClassBuilder<FRandomStream>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FRandomStream>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FRandomStream, int32),
 			             {"InSeed"})
 			.Constructor(BINDING_CONSTRUCTOR(FRandomStream, FName),

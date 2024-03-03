@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Internationalization/PolyglotTextData.h"
 #include "Macro/NamespaceMacro.h"
 
@@ -6,7 +7,7 @@ struct FRegisterPolyglotTextData
 {
 	FRegisterPolyglotTextData()
 	{
-		TReflectionClassBuilder<FPolyglotTextData>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FPolyglotTextData>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FPolyglotTextData, const ELocalizedTextSourceCategory&, const FString&,
 			                                 const FString&, const FString&, const FString&)			             ,
 			             {"InCategory", "InNamespace", "InKey", "InNativeString", "InNativeCulture"})

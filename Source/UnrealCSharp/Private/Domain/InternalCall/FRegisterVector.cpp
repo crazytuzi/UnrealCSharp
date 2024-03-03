@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
@@ -71,7 +71,7 @@ struct FRegisterVector
 
 	FRegisterVector()
 	{
-		TReflectionClassBuilder<FVector>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FVector>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FVector, FVector::FReal),
 			             {"InF"})
 			.Constructor(BINDING_CONSTRUCTOR(FVector, FVector::FReal, FVector::FReal, FVector::FReal),

@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
@@ -36,7 +36,7 @@ struct FRegisterQuat
 
 	FRegisterQuat()
 	{
-		TReflectionClassBuilder<FQuat>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FQuat>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FQuat, EForceInit))
 			.Constructor(BINDING_CONSTRUCTOR(FQuat, FQuat::FReal, FQuat::FReal, FQuat::FReal, FQuat::FReal),
 			             {"InX", "InY", "InZ", "InW"})

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Binding/Function/FFunctionInfo.h"
+#include "CoreMacro/BindingMacro.h"
 
 #if WITH_FUNCTION_INFO
 template <typename FunctionType, typename InfoType>

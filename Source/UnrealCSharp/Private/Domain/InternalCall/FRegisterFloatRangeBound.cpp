@@ -1,11 +1,12 @@
-#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterFloatRangeBound
 {
 	FRegisterFloatRangeBound()
 	{
-		TReflectionClassBuilder<FFloatRangeBound>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FFloatRangeBound>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FFloatRangeBound, const float&),
 			             {"InValue"})
 			.Function("GetValue", BINDING_FUNCTION(&FFloatRangeBound::GetValue))

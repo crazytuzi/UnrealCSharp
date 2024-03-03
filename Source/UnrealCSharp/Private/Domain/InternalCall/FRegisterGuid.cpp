@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
@@ -42,7 +43,7 @@ struct FRegisterGuid
 
 	FRegisterGuid()
 	{
-		TReflectionClassBuilder<FGuid>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FGuid>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FGuid, uint32, uint32, uint32, uint32),
 			             {"InA", "InB", "InC", "InD"})
 			.Constructor(BINDING_CONSTRUCTOR(FGuid, const FString&),

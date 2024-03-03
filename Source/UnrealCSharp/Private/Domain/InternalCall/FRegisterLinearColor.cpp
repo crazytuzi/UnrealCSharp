@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
@@ -16,7 +17,7 @@ struct FRegisterLinearColor
 
 	FRegisterLinearColor()
 	{
-		TReflectionClassBuilder<FLinearColor>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FLinearColor>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FLinearColor, EForceInit))
 			.Constructor(BINDING_CONSTRUCTOR(FLinearColor, float, float, float, float),
 			             {"InR", "InG", "InB", "InA"})

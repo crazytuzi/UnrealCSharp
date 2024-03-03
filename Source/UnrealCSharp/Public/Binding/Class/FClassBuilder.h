@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Binding/TypeInfo/FTypeInfo.h"
+#include "CoreMacro/BindingMacro.h"
 #include "Macro/BindingMacro.h"
 #include "Binding/Class/FBindingClass.h"
 #include "Binding/Function/FBindingFunctionBase.inl"

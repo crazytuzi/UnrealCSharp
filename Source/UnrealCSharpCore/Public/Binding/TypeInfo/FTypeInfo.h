@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#define WITH_PROPERTY_INFO WITH_EDITOR
-
 struct FTypeInfo
 {
 	virtual ~FTypeInfo() = default;
