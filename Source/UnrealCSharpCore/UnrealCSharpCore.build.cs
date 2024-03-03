@@ -1,15 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-using System;
 using System.IO;
-#if UE_5_0_OR_LATER
 using EpicGames.Core;
-#else
-using Tools.DotNETCommon;
-#endif
 using UnrealBuildTool;
 using System.Collections.Generic;
-using System.Linq;
 
 public class UnrealCSharpCore : ModuleRules
 {
@@ -100,11 +94,7 @@ public class UnrealCSharpCore : ModuleRules
 
 	private void GeneratorModules()
 	{
-#if UE_5_0_OR_LATER
 		var ProjectPath = Path.GetDirectoryName(Target.ProjectFile?.FullName);
-#else
-		var ProjectPath = Path.GetDirectoryName(Target.ProjectFile.FullName);
-#endif
 
 		if (ProjectPath == null)
 		{
@@ -120,18 +110,11 @@ public class UnrealCSharpCore : ModuleRules
 			Directory.CreateDirectory(Intermediate);
 		}
 
-		var ProjectPlugins = new List<string>();
+		var ProjectPlugins = new HashSet<string>();
 
-		var ProjectPluginInfos =
-			Plugins.ReadProjectPlugins(
-				new DirectoryReference(Path.GetFullPath(Path.Combine(PluginDirectory, "../../"))));
+		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(ProjectPath, "Plugins/"))), ProjectPlugins);
 
-		foreach (var ProjectPluginInfo in ProjectPluginInfos)
-		{
-			ProjectPlugins.Add(ProjectPluginInfo.Name);
-		}
-
-		var EngineModules = new List<string>();
+		var EngineModules = new HashSet<string>();
 
 		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Developer/"))),
 			EngineModules);
@@ -143,36 +126,26 @@ public class UnrealCSharpCore : ModuleRules
 
 		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Runtime/"))), EngineModules);
 
-		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/"))), EngineModules);
+		var EnginePlugins = new HashSet<string>();
 
-		var EnginePlugins = new List<string>();
+		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/"))), EnginePlugins);
 
-		var EnginePluginInfos =
-			Plugins.ReadEnginePlugins(
-				new DirectoryReference(Path.GetFullPath(EngineDirectory)));
+		using var Writer = new JsonWriter(JsonFullFilename);
 
-		foreach (var EnginePluginInfo in EnginePluginInfos)
-		{
-			EnginePlugins.Add(EnginePluginInfo.Name);
-		}
+		Writer.WriteObjectStart();
 
-		using (var Writer = new JsonWriter(JsonFullFilename))
-		{
-			Writer.WriteObjectStart();
+		Writer.WriteStringArrayField("ProjectModules", Target.ExtraModuleNames);
 
-			Writer.WriteStringArrayField("ProjectModules", Target.ExtraModuleNames);
+		Writer.WriteStringArrayField("ProjectPlugins", ProjectPlugins);
 
-			Writer.WriteStringArrayField("ProjectPlugins", ProjectPlugins);
+		Writer.WriteStringArrayField("EngineModules", EngineModules);
 
-			Writer.WriteStringArrayField("EngineModules", EngineModules);
+		Writer.WriteStringArrayField("EnginePlugins", EnginePlugins);
 
-			Writer.WriteStringArrayField("EnginePlugins", EnginePlugins);
-
-			Writer.WriteObjectEnd();
-		}
+		Writer.WriteObjectEnd();
 	}
 
-	private void GetModules(string InPathName, List<string> Modules)
+	private void GetModules(string InPathName, HashSet<string> Modules)
 	{
 		var Suffix = "*.Build.cs";
 

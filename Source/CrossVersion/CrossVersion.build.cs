@@ -1,7 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-using System;
-using System.IO;
 using UnrealBuildTool;
 
 public class CrossVersion : ModuleRules
