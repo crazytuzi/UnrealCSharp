@@ -99,13 +99,16 @@ namespace CodeAnalysis
 
                             var IsOverride = false;
 
-                            foreach (var Attribute in ClassDeclaration.AttributeLists)
+                            foreach (var AttributeList in ClassDeclaration.AttributeLists)
                             {
-                                if (Attribute.ToString().Equals("[Override]"))
+                                foreach (var Attribute in AttributeList.Attributes)
                                 {
-                                    IsOverride = true;
+                                    if (Attribute.ToString().Equals("Override"))
+                                    {
+                                        IsOverride = true;
 
-                                    break;
+                                        break;
+                                    }
                                 }
                             }
 
@@ -117,13 +120,16 @@ namespace CodeAnalysis
                                     {
                                         IsOverride = false;
 
-                                        foreach (var Attribute in MethodDeclaration.AttributeLists)
+                                        foreach (var AttributeList in MethodDeclaration.AttributeLists)
                                         {
-                                            if (Attribute.ToString().Equals("[Override]"))
+                                            foreach (var Attribute in AttributeList.Attributes)
                                             {
-                                                IsOverride = true;
+                                                if (Attribute.ToString().Equals("Override"))
+                                                {
+                                                    IsOverride = true;
 
-                                                break;
+                                                    break;
+                                                }
                                             }
                                         }
 
@@ -140,9 +146,15 @@ namespace CodeAnalysis
                                 var FileName = Path.Combine(_outputPathName,
                                     $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}.json");
 
-                                var Value = $"{{\"Override\":{JsonSerializer.Serialize(Functions)}}}";
-
-                                File.WriteAllText(FileName, Value);
+                                File.WriteAllText(FileName, JsonSerializer.Serialize(
+                                    new Dictionary<string, List<string>>
+                                    {
+                                        { "Override", Functions }
+                                    },
+                                    new JsonSerializerOptions
+                                    {
+                                        WriteIndented = true,
+                                    }));
                             }
                         }
                     }
@@ -160,32 +172,38 @@ namespace CodeAnalysis
                     {
                         if (NameSpaceMember is ClassDeclarationSyntax ClassDeclaration)
                         {
-                            foreach (var Attribute in ClassDeclaration.AttributeLists)
+                            foreach (var AttributeList in ClassDeclaration.AttributeLists)
                             {
-                                if (Attribute.ToString().Equals("[UClass]"))
+                                foreach (var Attribute in AttributeList.Attributes)
                                 {
-                                    _dynamic["CSharpClass"].Add(ClassDeclaration.Identifier.ToString());
+                                    if (Attribute.ToString().Equals("UClass"))
+                                    {
+                                        _dynamic["CSharpClass"].Add(ClassDeclaration.Identifier.ToString());
 
-                                    return;
-                                }
+                                        return;
+                                    }
 
-                                if (Attribute.ToString().Equals("[UStruct]"))
-                                {
-                                    _dynamic["CSharpScriptStruct"].Add(ClassDeclaration.Identifier.ToString());
+                                    if (Attribute.ToString().Equals("UStruct"))
+                                    {
+                                        _dynamic["CSharpScriptStruct"].Add(ClassDeclaration.Identifier.ToString());
 
-                                    return;
+                                        return;
+                                    }
                                 }
                             }
                         }
                         else if (NameSpaceMember is EnumDeclarationSyntax EnumDeclaration)
                         {
-                            foreach (var Attribute in EnumDeclaration.AttributeLists)
+                            foreach (var AttributeList in EnumDeclaration.AttributeLists)
                             {
-                                if (Attribute.ToString().Equals("[UEnum]"))
+                                foreach (var Attribute in AttributeList.Attributes)
                                 {
-                                    _dynamic["CSharpEnum"].Add(EnumDeclaration.Identifier.ToString());
+                                    if (Attribute.ToString().Equals("UEnum"))
+                                    {
+                                        _dynamic["CSharpEnum"].Add(EnumDeclaration.Identifier.ToString());
 
-                                    return;
+                                        return;
+                                    }
                                 }
                             }
                         }
@@ -200,9 +218,15 @@ namespace CodeAnalysis
             {
                 var FileName = Path.Combine(_outputPathName, Pair.Key + ".json");
 
-                var Value = $"{{\"{Pair.Key}\":{JsonSerializer.Serialize(Pair.Value)}}}";
-
-                File.WriteAllText(FileName, Value);
+                File.WriteAllText(FileName, JsonSerializer.Serialize(
+                    new Dictionary<string, List<string>>
+                    {
+                        { Pair.Key, Pair.Value }
+                    },
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                    }));
             }
         }
 
