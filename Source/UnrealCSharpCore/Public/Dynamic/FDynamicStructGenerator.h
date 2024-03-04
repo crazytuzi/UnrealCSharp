@@ -10,11 +10,11 @@ public:
 
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
+
+	static bool IsDynamicStruct(MonoClass* InMonoClass);
 #endif
 
 	static void Generator(MonoClass* InMonoClass);
-
-	static bool IsDynamicStruct(MonoClass* InMonoClass);
 
 	static bool UNREALCSHARPCORE_API IsDynamicStruct(const UScriptStruct* InScriptStruct);
 
@@ -25,17 +25,17 @@ private:
 
 	static void EndGenerator(UDynamicScriptStruct* InScriptStruct);
 
-	static void GeneratorScriptStruct(const FString& InName, UDynamicScriptStruct* InScriptStruct,
-	                                  UScriptStruct* InParentScriptStruct,
-	                                  const TFunction<void(UDynamicScriptStruct*)>& InProcessGenerator);
+	static void GeneratorStruct(const FString& InName, UDynamicScriptStruct* InScriptStruct,
+	                            UScriptStruct* InParentScriptStruct,
+	                            const TFunction<void(UDynamicScriptStruct*)>& InProcessGenerator);
 
-	static UDynamicScriptStruct* GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName,
-	                                                         UScriptStruct* InParentScriptStruct);
+	static UDynamicScriptStruct* GeneratorStruct(UPackage* InOuter, const FString& InName,
+	                                             UScriptStruct* InParentScriptStruct);
 
-	static UDynamicScriptStruct* GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName,
-	                                                         UScriptStruct* InParentScriptStruct,
-	                                                         const TFunction<void(UDynamicScriptStruct*)>&
-	                                                         InProcessGenerator);
+	static UDynamicScriptStruct* GeneratorStruct(UPackage* InOuter, const FString& InName,
+	                                             UScriptStruct* InParentScriptStruct,
+	                                             const TFunction<void(UDynamicScriptStruct*)>&
+	                                             InProcessGenerator);
 
 #if WITH_EDITOR
 	static void ReInstance(UDynamicScriptStruct* InOldScriptStruct, UDynamicScriptStruct* InNewScriptStruct);

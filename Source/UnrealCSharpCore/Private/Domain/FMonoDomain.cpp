@@ -173,6 +173,11 @@ const char* FMonoDomain::Class_Get_Name(MonoClass* InMonoClass)
 	return InMonoClass != nullptr ? mono_class_get_name(InMonoClass) : nullptr;
 }
 
+const char* FMonoDomain::Class_Get_Namespace(MonoClass* InMonoClass)
+{
+	return InMonoClass != nullptr ? mono_class_get_namespace(InMonoClass) : nullptr;
+}
+
 MonoClass* FMonoDomain::Class_Get_Parent(MonoClass* InMonoClass)
 {
 	return InMonoClass != nullptr ? mono_class_get_parent(InMonoClass) : nullptr;

@@ -16,12 +16,12 @@ public:
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
 
+	static bool IsDynamicClass(MonoClass* InMonoClass);
+
 	static void OnPrePIEEnded();
 #endif
 
 	static void Generator(MonoClass* InMonoClass);
-
-	static bool IsDynamicClass(MonoClass* InMonoClass);
 
 	static bool UNREALCSHARPCORE_API IsDynamicClass(const UClass* InClass);
 
@@ -57,15 +57,15 @@ private:
 		EndGenerator(InClass);
 	}
 
-	static UClass* GeneratorCSharpClass(UPackage* InOuter, const FString& InName, UClass* InParentClass);
+	static UClass* GeneratorClass(UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
-	static UClass* GeneratorCSharpClass(UPackage* InOuter, const FString& InName, UClass* InParentClass,
-	                                    const TFunction<void(UClass*)>& InProcessGenerator);
+	static UClass* GeneratorClass(UPackage* InOuter, const FString& InName, UClass* InParentClass,
+	                              const TFunction<void(UClass*)>& InProcessGenerator);
 
-	static UBlueprintGeneratedClass* GeneratorCSharpBlueprintGeneratedClass(
+	static UBlueprintGeneratedClass* GeneratorBlueprintGeneratedClass(
 		UPackage* InOuter, const FString& InName, UClass* InParentClass);
 
-	static UBlueprintGeneratedClass* GeneratorCSharpBlueprintGeneratedClass(
+	static UBlueprintGeneratedClass* GeneratorBlueprintGeneratedClass(
 		UPackage* InOuter, const FString& InName, UClass* InParentClass,
 		const TFunction<void(UClass*)>& InProcessGenerator);
 

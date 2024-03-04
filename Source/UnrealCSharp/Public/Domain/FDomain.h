@@ -38,6 +38,8 @@ public:
 
 	const char* Class_Get_Name(MonoClass* InMonoClass) const;
 
+	const char* Class_Get_Namespace(MonoClass* InMonoClass) const;
+
 	MonoClass* Class_Get_Parent(MonoClass* InMonoClass) const;
 
 	MonoType* Class_Get_Type(MonoClass* InMonoClass) const;

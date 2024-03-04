@@ -27,6 +27,8 @@ public:
 
 	static const char* Class_Get_Name(MonoClass* InMonoClass);
 
+	static const char* Class_Get_Namespace(MonoClass* InMonoClass);
+
 	static MonoClass* Class_Get_Parent(MonoClass* InMonoClass);
 
 	static MonoClassField* Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName);

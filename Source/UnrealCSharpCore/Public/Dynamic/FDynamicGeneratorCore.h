@@ -5,6 +5,14 @@
 class FDynamicGeneratorCore
 {
 public:
+#if WITH_EDITOR
+	static void CodeAnalysisGenerator(const FString& InName, const TFunction<void(const FString&)>& InGenerator);
+
+	static bool IsDynamic(MonoClass* InMonoClass, const FString& InAttribute);
+#endif
+
+	static void Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator);
+
 	static UPackage* GetOuter();
 
 	static FString GetClassNameSpace();
@@ -14,11 +22,14 @@ public:
 	static void SetFunctionFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 #if WITH_EDITOR
-	static void SetMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+	static void SetMetaData(MonoClass* InMonoClass, const FString& InAttribute,
+	                        const TFunction<void(MonoCustomAttrInfo*)>& InSetMetaData);
 
-	static void SetMetaData(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+	static void SetMetaData(MonoClass* InMonoClass, UClass* InClass, const FString& InAttribute);
 
-	static void SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+	static void SetMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct, const FString& InAttribute);
+
+	static void SetMetaData(MonoClass* InMonoClass, UEnum* InEnum, const FString& InAttribute);
 
 	static void SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
@@ -43,12 +54,19 @@ public:
 
 	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
 
+	static void GeneratorProperty(MonoClass* InMonoClass, UField* InField,
+	                              const TFunction<void(const FProperty* InProperty)>& InGenerator);
+
+	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
+
 private:
 	static TArray<FString> ClassMetaDataAttrs;
 
 	static TArray<FString> StructMetaDataAttrs;
 
 	static TArray<FString> EnumMetaDataAttrs;
+
+	static TArray<FString> InterfaceMetaDataAttrs;
 
 	static TArray<FString> PropertyMetaDataAttrs;
 

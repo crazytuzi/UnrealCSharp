@@ -4,6 +4,7 @@
 #include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicEnumGenerator.h"
 #include "Dynamic/FDynamicStructGenerator.h"
+#include "Dynamic/FDynamicInterfaceGenerator.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 
@@ -38,6 +39,8 @@ void FDynamicGenerator::Generator()
 
 		FDynamicStructGenerator::Generator();
 
+		FDynamicInterfaceGenerator::Generator();
+
 		FDynamicClassGenerator::Generator();
 
 		FMonoDomain::Deinitialize();
@@ -54,6 +57,8 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 	FDynamicEnumGenerator::CodeAnalysisGenerator();
 
 	FDynamicStructGenerator::CodeAnalysisGenerator();
+
+	FDynamicInterfaceGenerator::CodeAnalysisGenerator();
 
 	FDynamicClassGenerator::CodeAnalysisGenerator();
 
@@ -107,6 +112,10 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 			else if (FDynamicEnumGenerator::IsDynamicEnum(MonoClass))
 			{
 				FDynamicEnumGenerator::Generator(MonoClass);
+			}
+			else if (FDynamicInterfaceGenerator::IsDynamicInterface(MonoClass))
+			{
+				FDynamicInterfaceGenerator::Generator(MonoClass);
 			}
 		}
 	}

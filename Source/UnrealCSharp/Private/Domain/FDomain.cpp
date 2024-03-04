@@ -92,6 +92,11 @@ const char* FDomain::Class_Get_Name(MonoClass* InMonoClass) const
 	return FMonoDomain::Class_Get_Name(InMonoClass);
 }
 
+const char* FDomain::Class_Get_Namespace(MonoClass* InMonoClass) const
+{
+	return FMonoDomain::Class_Get_Namespace(InMonoClass);
+}
+
 MonoClass* FDomain::Class_Get_Parent(MonoClass* InMonoClass) const
 {
 	return FMonoDomain::Class_Get_Parent(InMonoClass);

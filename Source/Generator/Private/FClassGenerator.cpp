@@ -10,6 +10,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
+#include "Dynamic/FDynamicInterfaceGenerator.h"
 
 void FClassGenerator::Generator()
 {
@@ -27,6 +28,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 	}
 
 	if (FDynamicClassGenerator::IsDynamicClass(InClass))
+	{
+		return;
+	}
+
+	if (FDynamicInterfaceGenerator::IsDynamicInterface(InClass))
 	{
 		return;
 	}
@@ -206,7 +212,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto bHasFunction = false;
 
-	TArray<FString> FunctionDeclarations;
+	TSet<FString> FunctionNameSet;
 
 	FunctionContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UClass StaticClass()\n"
@@ -225,42 +231,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 	TArray<UFunction*> Functions;
 
 	TArray<TPair<FString, FString>> FunctionNames;
-
-	for (TFieldIterator<UFunction> FunctionIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
-	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
-	     FunctionIterator)
-	{
-		if (FunctionIterator->HasAnyFunctionFlags(FUNC_Delegate))
-		{
-			continue;
-		}
-
-		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
-		{
-			continue;
-		}
-
-		if (!FGeneratorCore::IsSupported(*FunctionIterator))
-		{
-			continue;
-		}
-
-		if (SuperClass != nullptr)
-		{
-			if (const auto& Function = SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
-			{
-				Functions.Add(Function);
-			}
-			else
-			{
-				Functions.Add(*FunctionIterator);
-			}
-		}
-		else
-		{
-			Functions.Add(*FunctionIterator);
-		}
-	}
 
 	for (const auto InInterface : InClass->Interfaces)
 	{
@@ -283,6 +253,56 @@ void FClassGenerator::Generator(const UClass* InClass)
 				continue;
 			}
 
+			if (FunctionNameSet.Contains(FunctionIterator->GetName()))
+			{
+				continue;
+			}
+
+			FunctionNameSet.Add(FunctionIterator->GetName());
+
+			Functions.Add(*FunctionIterator);
+		}
+	}
+
+	for (TFieldIterator<UFunction> FunctionIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
+	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
+	     FunctionIterator)
+	{
+		if (FunctionIterator->HasAnyFunctionFlags(FUNC_Delegate))
+		{
+			continue;
+		}
+
+		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
+		{
+			continue;
+		}
+
+		if (!FGeneratorCore::IsSupported(*FunctionIterator))
+		{
+			continue;
+		}
+
+		if (FunctionNameSet.Contains(FunctionIterator->GetName()))
+		{
+			continue;
+		}
+
+		FunctionNameSet.Add(FunctionIterator->GetName());
+
+		if (SuperClass != nullptr)
+		{
+			if (const auto& Function = SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
+			{
+				Functions.Add(Function);
+			}
+			else
+			{
+				Functions.Add(*FunctionIterator);
+			}
+		}
+		else
+		{
 			Functions.Add(*FunctionIterator);
 		}
 	}
@@ -490,11 +510,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                           *FunctionDeclarationBody
 		);
 
-		if (FunctionDeclarations.Contains(FunctionDeclaration))
-		{
-			continue;
-		}
-
 		FunctionNames.Add(TPair<FString, FString>{
 			FString::Printf(TEXT(
 				"__%s"
@@ -503,8 +518,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 			),
 			FunctionName
 		});
-
-		FunctionDeclarations.Emplace(FunctionDeclaration);
 
 		if (bIsInterface == true)
 		{

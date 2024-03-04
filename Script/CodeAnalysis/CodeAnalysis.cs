@@ -26,9 +26,10 @@ namespace CodeAnalysis
 
             _dynamic = new Dictionary<string, List<string>>
             {
-                ["CSharpClass"] = new List<string>(),
-                ["CSharpScriptStruct"] = new List<string>(),
-                ["CSharpEnum"] = new List<string>()
+                ["DynamicClass"] = new List<string>(),
+                ["DynamicStruct"] = new List<string>(),
+                ["DynamicEnum"] = new List<string>(),
+                ["DynamicInterface"] = new List<string>()
             };
         }
 
@@ -178,14 +179,21 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UClass"))
                                     {
-                                        _dynamic["CSharpClass"].Add(ClassDeclaration.Identifier.ToString());
+                                        _dynamic["DynamicClass"].Add(ClassDeclaration.Identifier.ToString());
 
                                         return;
                                     }
 
                                     if (Attribute.ToString().Equals("UStruct"))
                                     {
-                                        _dynamic["CSharpScriptStruct"].Add(ClassDeclaration.Identifier.ToString());
+                                        _dynamic["DynamicStruct"].Add(ClassDeclaration.Identifier.ToString());
+
+                                        return;
+                                    }
+
+                                    if (Attribute.ToString().Equals("UInterface"))
+                                    {
+                                        _dynamic["DynamicInterface"].Add(ClassDeclaration.Identifier.ToString());
 
                                         return;
                                     }
@@ -200,7 +208,7 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UEnum"))
                                     {
-                                        _dynamic["CSharpEnum"].Add(EnumDeclaration.Identifier.ToString());
+                                        _dynamic["DynamicEnum"].Add(EnumDeclaration.Identifier.ToString());
 
                                         return;
                                     }
