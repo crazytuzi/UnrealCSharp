@@ -87,6 +87,11 @@ mono_bool FDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSup
 	return FMonoDomain::Class_Is_Subclass_Of(InMonoClass, InSuperMonoClass, bCheckInterfaces);
 }
 
+MonoClass* FDomain::Class_Get_Parent(MonoClass* InMonoClass) const
+{
+	return FMonoDomain::Class_Get_Parent(InMonoClass);
+}
+
 const char* FDomain::Class_Get_Name(MonoClass* InMonoClass) const
 {
 	return FMonoDomain::Class_Get_Name(InMonoClass);
@@ -95,11 +100,6 @@ const char* FDomain::Class_Get_Name(MonoClass* InMonoClass) const
 const char* FDomain::Class_Get_Namespace(MonoClass* InMonoClass) const
 {
 	return FMonoDomain::Class_Get_Namespace(InMonoClass);
-}
-
-MonoClass* FDomain::Class_Get_Parent(MonoClass* InMonoClass) const
-{
-	return FMonoDomain::Class_Get_Parent(InMonoClass);
 }
 
 MonoType* FDomain::Class_Get_Type(MonoClass* InMonoClass) const
@@ -130,6 +130,11 @@ MonoProperty* FDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, cons
 MonoMethod* FDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator) const
 {
 	return FMonoDomain::Class_Get_Methods(InMonoClass, InIterator);
+}
+
+MonoClass* FDomain::Class_Get_Interfaces(MonoClass* InMonoClass, void** InIterator) const
+{
+	return FMonoDomain::Class_Get_Interfaces(InMonoClass, InIterator);
 }
 
 MonoCustomAttrInfo* FDomain::Custom_Attrs_From_Class(MonoClass* InMonoClass) const

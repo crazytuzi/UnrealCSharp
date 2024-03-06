@@ -60,8 +60,10 @@ TArray<FString> FDynamicGeneratorCore::EnumMetaDataAttrs =
 TArray<FString> FDynamicGeneratorCore::InterfaceMetaDataAttrs =
 {
 	CLASS_MINIMAL_API_ATTRIBUTE,
+	CLASS_BLUEPRINT_TYPE_ATTRIBUTE,
 	CLASS_BLUEPRINTABLE_ATTRIBUTE,
 	CLASS_NOT_BLUEPRINTABLE_ATTRIBUTE,
+	CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE,
 	CLASS_CONVERSION_ROOT_ATTRIBUTE,
 	CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE
 };
@@ -925,7 +927,8 @@ void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* In
 	}
 }
 
-void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)
+void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass,
+                                              const TFunction<void(const UFunction* InFunction)>& InGenerator)
 {
 	struct FParamDescriptor
 	{
@@ -1024,6 +1027,8 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* In
 				SetFunctionFlags(Function, Attrs);
 
 				InClass->AddFunctionToFunctionMap(Function, MethodName);
+
+				InGenerator(Function);
 			}
 		}
 	}

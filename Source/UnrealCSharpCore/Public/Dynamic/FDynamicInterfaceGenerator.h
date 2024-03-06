@@ -40,6 +40,8 @@ private:
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
 
+	static MonoClass* UInterfaceToIInterface(MonoClass* InMonoClass);
+
 private:
 	static TMap<FString, UClass*> DynamicInterfaceMap;
 

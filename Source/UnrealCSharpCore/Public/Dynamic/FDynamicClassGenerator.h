@@ -79,6 +79,8 @@ private:
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
 
+	static void GeneratorInterface(MonoClass* InMonoClass, UClass* InClass);
+
 	static void ClassConstructor(const FObjectInitializer& InObjectInitializer);
 
 	static bool IsDynamicBlueprintGeneratedClass(const FString& InName);

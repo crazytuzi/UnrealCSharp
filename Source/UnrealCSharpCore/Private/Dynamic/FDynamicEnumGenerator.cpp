@@ -3,7 +3,6 @@
 #include "Domain/FMonoDomain.h"
 #include "Template/TGetArrayLength.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
@@ -178,7 +177,7 @@ void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(
 		[InEnum](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
-			if (FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(*InBlueprintGeneratedClass))
+			if (InBlueprintGeneratedClass->IsNative())
 			{
 				return false;
 			}

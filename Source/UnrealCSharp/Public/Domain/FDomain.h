@@ -36,11 +36,11 @@ public:
 	mono_bool Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
 	                               mono_bool bCheckInterfaces) const;
 
+	MonoClass* Class_Get_Parent(MonoClass* InMonoClass) const;
+
 	const char* Class_Get_Name(MonoClass* InMonoClass) const;
 
 	const char* Class_Get_Namespace(MonoClass* InMonoClass) const;
-
-	MonoClass* Class_Get_Parent(MonoClass* InMonoClass) const;
 
 	MonoType* Class_Get_Type(MonoClass* InMonoClass) const;
 
@@ -53,6 +53,8 @@ public:
 	MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName) const;
 
 	MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator) const;
+
+	MonoClass* Class_Get_Interfaces(MonoClass* InMonoClass, void** InIterator) const;
 
 	MonoCustomAttrInfo* Custom_Attrs_From_Class(MonoClass* InMonoClass) const;
 

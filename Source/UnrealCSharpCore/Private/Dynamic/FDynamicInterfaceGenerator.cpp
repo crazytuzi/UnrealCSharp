@@ -4,7 +4,6 @@
 #include "CoreMacro/ClassMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
-#include "Dynamic/FDynamicClassGenerator.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/KismetEditorUtilities.h"
@@ -236,7 +235,7 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(
 		[InClass](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
-			if (FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(*InBlueprintGeneratedClass))
+			if (InBlueprintGeneratedClass->IsNative())
 			{
 				return false;
 			}
@@ -278,15 +277,24 @@ void FDynamicInterfaceGenerator::GeneratorMetaData(MonoClass* InMonoClass, UClas
 
 void FDynamicInterfaceGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)
 {
+	FDynamicGeneratorCore::GeneratorFunction(UInterfaceToIInterface(InMonoClass),
+	                                         InClass,
+	                                         [](const UFunction* InFunction)
+	                                         {
+		                                         InFunction->SetInternalFlags(EInternalObjectFlags::Native);
+	                                         });
+}
+
+MonoClass* FDynamicInterfaceGenerator::UInterfaceToIInterface(MonoClass* InMonoClass)
+{
 	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
 
 	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
 
-	FDynamicGeneratorCore::GeneratorFunction(FMonoDomain::Class_From_Name(NameSpace,
-	                                                                      FString::Printf(TEXT(
-		                                                                      "I%s"
-	                                                                      ),
-		                                                                      *ClassName.RightChop(1)
-	                                                                      )),
-	                                         InClass);
+	return FMonoDomain::Class_From_Name(NameSpace,
+	                                    FString::Printf(TEXT(
+		                                    "I%s"
+	                                    ),
+	                                                    *ClassName.RightChop(1)
+	                                    ));
 }

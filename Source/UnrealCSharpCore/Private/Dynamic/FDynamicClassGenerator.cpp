@@ -247,6 +247,8 @@ void FDynamicClassGenerator::ProcessGenerator(MonoClass* InMonoClass, UClass* In
 	GeneratorProperty(InMonoClass, InClass);
 
 	GeneratorFunction(InMonoClass, InClass);
+
+	GeneratorInterface(InMonoClass, InClass);
 }
 
 void FDynamicClassGenerator::EndGenerator(UClass* InClass)
@@ -499,7 +501,39 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 
 void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)
 {
-	FDynamicGeneratorCore::GeneratorFunction(InMonoClass, InClass);
+	FDynamicGeneratorCore::GeneratorFunction(InMonoClass, InClass,
+	                                         [](const UFunction* InFunction)
+	                                         {
+	                                         });
+}
+
+void FDynamicClassGenerator::GeneratorInterface(MonoClass* InMonoClass, UClass* InClass)
+{
+	if (InMonoClass == nullptr || InClass == nullptr)
+	{
+		return;
+	}
+
+	void* Iterator = nullptr;
+
+	while (const auto Interface = FMonoDomain::Class_Get_Interfaces(InMonoClass, &Iterator))
+	{
+		const auto InterfaceMonoType = FMonoDomain::Class_Get_Type(Interface);
+
+		const auto InterfaceMonoReflectionType = FMonoDomain::Type_Get_Object(InterfaceMonoType);
+
+		if (const auto InterfacePathName = FTypeBridge::GetPathName(InterfaceMonoReflectionType);
+			!InterfacePathName.IsEmpty())
+		{
+			if (const auto InterfaceClass = LoadClass<UObject>(nullptr, *InterfacePathName))
+			{
+				if (InterfaceClass != UInterface::StaticClass())
+				{
+					InClass->Interfaces.Emplace(InterfaceClass, 0, true);
+				}
+			}
+		}
+	}
 }
 
 void FDynamicClassGenerator::ClassConstructor(const FObjectInitializer& InObjectInitializer)

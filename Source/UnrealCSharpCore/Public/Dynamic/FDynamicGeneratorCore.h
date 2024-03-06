@@ -57,7 +57,8 @@ public:
 	static void GeneratorProperty(MonoClass* InMonoClass, UField* InField,
 	                              const TFunction<void(const FProperty* InProperty)>& InGenerator);
 
-	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
+	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass,
+	                              const TFunction<void(const UFunction* InFunction)>& InGenerator);
 
 private:
 	static TArray<FString> ClassMetaDataAttrs;
