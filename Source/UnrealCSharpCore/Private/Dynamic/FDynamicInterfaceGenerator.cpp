@@ -253,18 +253,19 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 
 	for (const auto BlueprintGeneratedClass : BlueprintGeneratedClasses)
 	{
-		const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy);
+		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
+		{
+			Blueprint->Modify();
 
-		Blueprint->Modify();
+			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
 
-		FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
 
-		FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+			constexpr auto BlueprintCompileOptions = EBlueprintCompileOptions::SkipGarbageCollection |
+				EBlueprintCompileOptions::SkipSave;
 
-		constexpr auto BlueprintCompileOptions = EBlueprintCompileOptions::SkipGarbageCollection |
-			EBlueprintCompileOptions::SkipSave;
-
-		FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
+			FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
+		}
 	}
 }
 

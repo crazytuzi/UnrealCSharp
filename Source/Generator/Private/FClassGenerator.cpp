@@ -52,6 +52,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
+	if (FUnrealCSharpFunctionLibrary::IsDynamicReInstanceField(InClass))
+	{
+		return;
+	}
+
 	FString UsingNameSpaceContent;
 
 	auto NameSpaceContent = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass);

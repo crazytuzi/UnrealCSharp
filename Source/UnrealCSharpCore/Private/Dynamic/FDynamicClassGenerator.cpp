@@ -125,7 +125,8 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 				Blueprint->Rename(
 					*MakeUniqueObjectName(
 						BlueprintGeneratedClass->GetOuter(),
-						BlueprintGeneratedClass->GetClass())
+						BlueprintGeneratedClass->GetClass(),
+						*FDynamicGeneratorCore::DynamicReInstanceBaseName())
 					.ToString(),
 					nullptr,
 					REN_DontCreateRedirectors);
@@ -136,7 +137,8 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 			OldClass->Rename(
 				*MakeUniqueObjectName(
 					OldClass->GetOuter(),
-					OldClass->GetClass())
+					OldClass->GetClass(),
+					*FDynamicGeneratorCore::DynamicReInstanceBaseName())
 				.ToString(),
 				nullptr,
 				REN_DontCreateRedirectors);
@@ -385,60 +387,61 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 
 	for (const auto BlueprintGeneratedClass : BlueprintGeneratedClasses)
 	{
-		const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy);
-
-		Blueprint->Modify();
-
-		if (const auto SimpleConstructionScript = Blueprint->SimpleConstructionScript)
+		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
-			SimpleConstructionScript->Modify();
+			Blueprint->Modify();
 
-			const auto& AllNodes = SimpleConstructionScript->GetAllNodes();
-
-			for (const auto& Node : AllNodes)
+			if (const auto SimpleConstructionScript = Blueprint->SimpleConstructionScript)
 			{
-				Node->Modify();
-			}
-		}
+				SimpleConstructionScript->Modify();
 
-		Blueprint->ParentClass = InNewClass;
+				const auto& AllNodes = SimpleConstructionScript->GetAllNodes();
 
-		if (FDynamicGenerator::IsFullGenerator())
-		{
-			const auto OriginalBlueprintType = Blueprint->BlueprintType;
-
-			Blueprint->BlueprintType = BPTYPE_MacroLibrary;
-
-			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
-
-			Blueprint->BlueprintType = OriginalBlueprintType;
-
-			TArray<UK2Node*> AllNodes;
-
-			FBlueprintEditorUtils::GetAllNodesOfClass(Blueprint, AllNodes);
-
-			for (const auto Node : AllNodes)
-			{
-				for (const auto Pin : Node->Pins)
+				for (const auto& Node : AllNodes)
 				{
-					if (Pin->PinType.PinSubCategoryObject == InOldClass)
+					Node->Modify();
+				}
+			}
+
+			Blueprint->ParentClass = InNewClass;
+
+			if (FDynamicGenerator::IsFullGenerator())
+			{
+				const auto OriginalBlueprintType = Blueprint->BlueprintType;
+
+				Blueprint->BlueprintType = BPTYPE_MacroLibrary;
+
+				FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+
+				Blueprint->BlueprintType = OriginalBlueprintType;
+
+				TArray<UK2Node*> AllNodes;
+
+				FBlueprintEditorUtils::GetAllNodesOfClass(Blueprint, AllNodes);
+
+				for (const auto Node : AllNodes)
+				{
+					for (const auto Pin : Node->Pins)
 					{
-						Pin->PinType.PinSubCategoryObject = InNewClass;
+						if (Pin->PinType.PinSubCategoryObject == InOldClass)
+						{
+							Pin->PinType.PinSubCategoryObject = InNewClass;
+						}
 					}
 				}
 			}
+			else
+			{
+				FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+			}
+
+			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+
+			constexpr auto BlueprintCompileOptions = EBlueprintCompileOptions::SkipGarbageCollection |
+				EBlueprintCompileOptions::SkipSave;
+
+			FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
 		}
-		else
-		{
-			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
-		}
-
-		FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
-
-		constexpr auto BlueprintCompileOptions = EBlueprintCompileOptions::SkipGarbageCollection |
-			EBlueprintCompileOptions::SkipSave;
-
-		FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
 	}
 
 	if (const auto BlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(InOldClass))

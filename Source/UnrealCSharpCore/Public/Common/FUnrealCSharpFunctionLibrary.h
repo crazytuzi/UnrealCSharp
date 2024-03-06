@@ -84,5 +84,11 @@ public:
 
 	static const TArray<FString>& GetProjectModuleList();
 
+#if WITH_EDITOR
 	static bool IsSpecialClass(const UClass* InClass);
+
+	static bool IsSpecialStruct(const UScriptStruct* InScriptStruct);
+
+	static bool IsDynamicReInstanceField(const UField* InField);
+#endif
 };

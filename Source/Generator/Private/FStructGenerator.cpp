@@ -33,9 +33,12 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		return;
 	}
 
-	auto ClassName = InScriptStruct->GetName();
+	if (FUnrealCSharpFunctionLibrary::IsSpecialStruct(InScriptStruct))
+	{
+		return;
+	}
 
-	if (ClassName.StartsWith(TEXT("STRUCT_REINST_")))
+	if (FUnrealCSharpFunctionLibrary::IsDynamicReInstanceField(InScriptStruct))
 	{
 		return;
 	}

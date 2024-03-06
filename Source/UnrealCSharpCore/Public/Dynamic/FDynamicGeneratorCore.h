@@ -9,6 +9,8 @@ public:
 	static void CodeAnalysisGenerator(const FString& InName, const TFunction<void(const FString&)>& InGenerator);
 
 	static bool IsDynamic(MonoClass* InMonoClass, const FString& InAttribute);
+
+	static const FString& DynamicReInstanceBaseName();
 #endif
 
 	static void Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator);
