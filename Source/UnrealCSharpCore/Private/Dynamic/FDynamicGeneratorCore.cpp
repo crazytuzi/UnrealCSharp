@@ -236,6 +236,13 @@ bool FDynamicGeneratorCore::IsDynamic(MonoClass* InMonoClass, const FString& InA
 
 	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
 }
+
+const FString& FDynamicGeneratorCore::DynamicReInstanceBaseName()
+{
+	static FString DynamicReInstance = TEXT("DynamicReInstance");
+
+	return DynamicReInstance;
+}
 #endif
 
 void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator)

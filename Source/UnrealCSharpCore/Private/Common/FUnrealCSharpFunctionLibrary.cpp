@@ -2,6 +2,7 @@
 #include "CoreMacro/Macro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
+#include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -574,6 +575,7 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 	return GameModuleList;
 }
 
+#if WITH_EDITOR
 bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
 {
 	if (InClass != nullptr)
@@ -588,3 +590,18 @@ bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
 
 	return false;
 }
+
+bool FUnrealCSharpFunctionLibrary::IsSpecialStruct(const UScriptStruct* InScriptStruct)
+{
+	return InScriptStruct != nullptr
+		       ? InScriptStruct->GetName().StartsWith(TEXT("STRUCT_REINST_"))
+		       : false;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsDynamicReInstanceField(const UField* InField)
+{
+	return InField != nullptr
+		       ? InField->GetName().StartsWith(FDynamicGeneratorCore::DynamicReInstanceBaseName())
+		       : false;
+}
+#endif
