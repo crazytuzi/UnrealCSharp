@@ -14,7 +14,7 @@
 
 #define CLASS_U_ENUM_ATTRIBUTE FString(TEXT("UEnumAttribute"))
 
-#define CLASS_U_FUNCTION_ATTRIBUTE FString(TEXT("UFunctionAttribute"))
+#define CLASS_U_INTERFACE_ATTRIBUTE FString(TEXT("UInterfaceAttribute"))
 
 #define CLASS_F_STRING FString(TEXT("FString"))
 

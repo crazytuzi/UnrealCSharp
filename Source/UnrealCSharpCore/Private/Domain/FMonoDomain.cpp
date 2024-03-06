@@ -168,14 +168,19 @@ mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* I
 		       : false;
 }
 
+MonoClass* FMonoDomain::Class_Get_Parent(MonoClass* InMonoClass)
+{
+	return InMonoClass != nullptr ? mono_class_get_parent(InMonoClass) : nullptr;
+}
+
 const char* FMonoDomain::Class_Get_Name(MonoClass* InMonoClass)
 {
 	return InMonoClass != nullptr ? mono_class_get_name(InMonoClass) : nullptr;
 }
 
-MonoClass* FMonoDomain::Class_Get_Parent(MonoClass* InMonoClass)
+const char* FMonoDomain::Class_Get_Namespace(MonoClass* InMonoClass)
 {
-	return InMonoClass != nullptr ? mono_class_get_parent(InMonoClass) : nullptr;
+	return InMonoClass != nullptr ? mono_class_get_namespace(InMonoClass) : nullptr;
 }
 
 MonoClassField* FMonoDomain::Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName)
@@ -206,6 +211,11 @@ MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, 
 MonoMethod* FMonoDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator)
 {
 	return InMonoClass != nullptr ? mono_class_get_methods(InMonoClass, InIterator) : nullptr;
+}
+
+MonoClass* FMonoDomain::Class_Get_Interfaces(MonoClass* InMonoClass, void** InIterator)
+{
+	return InMonoClass != nullptr ? mono_class_get_interfaces(InMonoClass, InIterator) : nullptr;
 }
 
 MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Class(MonoClass* InMonoClass)

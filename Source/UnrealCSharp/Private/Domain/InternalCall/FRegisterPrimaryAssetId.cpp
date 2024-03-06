@@ -1,11 +1,12 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterPrimaryAssetId
 {
 	FRegisterPrimaryAssetId()
 	{
-		TReflectionClassBuilder<FPrimaryAssetId>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FPrimaryAssetId>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FPrimaryAssetId, FPrimaryAssetType, FName),
 			             {"InAssetType", "InAssetName"})
 			.Constructor(BINDING_CONSTRUCTOR(FPrimaryAssetId, const FString&),

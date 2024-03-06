@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterRotator
@@ -20,7 +21,7 @@ struct FRegisterRotator
 
 	FRegisterRotator()
 	{
-		TReflectionClassBuilder<FRotator>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FRotator>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FRotator, FRotator::FReal),
 			             {"InF"})
 			.Constructor(BINDING_CONSTRUCTOR(FRotator, FRotator::FReal, FRotator::FReal, FRotator::FReal),

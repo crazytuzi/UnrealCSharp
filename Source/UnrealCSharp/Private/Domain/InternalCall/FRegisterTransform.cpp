@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
@@ -11,7 +11,7 @@ struct FRegisterTransform
 
 	FRegisterTransform()
 	{
-		TReflectionClassBuilder<FTransform>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FTransform>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FTransform, FVector),
 			             {"InTranslation"})
 			.Constructor(BINDING_CONSTRUCTOR(FTransform, FRotator),

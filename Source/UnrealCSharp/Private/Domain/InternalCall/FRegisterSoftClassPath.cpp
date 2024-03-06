@@ -1,11 +1,12 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterSoftClassPath
 {
 	FRegisterSoftClassPath()
 	{
-		TReflectionClassBuilder<FSoftClassPath>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FSoftClassPath>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FSoftClassPath, FSoftClassPath const&),
 			             {"Other"})
 			.Constructor(BINDING_CONSTRUCTOR(FSoftClassPath, const FString&),

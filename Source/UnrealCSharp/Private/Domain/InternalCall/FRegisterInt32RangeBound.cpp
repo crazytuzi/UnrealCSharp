@@ -1,11 +1,12 @@
-#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterInt32RangeBound
 {
 	FRegisterInt32RangeBound()
 	{
-		TReflectionClassBuilder<FInt32RangeBound>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FInt32RangeBound>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FInt32RangeBound, const int32&),
 			             {"InValue"})
 			.Function("GetValue", BINDING_FUNCTION(&FInt32RangeBound::GetValue))

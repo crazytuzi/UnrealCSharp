@@ -1,11 +1,12 @@
-#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterInt32Interval
 {
 	FRegisterInt32Interval()
 	{
-		TReflectionClassBuilder<FInt32Interval>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FInt32Interval>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FInt32Interval, int32, int32),
 			             {"InMin", "InMax"})
 			.Function("Size", BINDING_FUNCTION(&FInt32Interval::Size))

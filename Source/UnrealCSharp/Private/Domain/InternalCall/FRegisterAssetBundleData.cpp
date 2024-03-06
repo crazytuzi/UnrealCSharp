@@ -1,11 +1,12 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterAssetBundleData
 {
 	FRegisterAssetBundleData()
 	{
-		TReflectionClassBuilder<FAssetBundleData>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FAssetBundleData>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleData, const FAssetBundleData&))
 			.Function("FindEntry",
 			          BINDING_OVERLOAD(FAssetBundleEntry*(FAssetBundleData::*)(FName),

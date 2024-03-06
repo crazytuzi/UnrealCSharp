@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterFrameNumber
@@ -15,7 +16,7 @@ struct FRegisterFrameNumber
 
 	FRegisterFrameNumber()
 	{
-		TReflectionClassBuilder<FFrameNumber>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FFrameNumber>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FFrameNumber, int32),
 			             {"InValue"})
 			.PreIncrement()

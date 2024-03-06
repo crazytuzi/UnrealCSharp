@@ -57,3 +57,5 @@
 #define CLASS_EARLY_ACCESS_PREVIEW_ATTRIBUTE FString(TEXT("EarlyAccessPreviewAttribute"))
 
 #define CLASS_SPARSE_CLASS_DATA_TYPE_ATTRIBUTE FString(TEXT("SparseClassDataTypeAttribute"))
+
+#define CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE FString(TEXT("CannotImplementInterfaceInBlueprintAttribute"))

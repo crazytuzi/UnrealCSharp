@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/Core/TPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -86,7 +86,7 @@ struct FRegisterObject
 
 	FRegisterObject()
 	{
-		TReflectionClassBuilder<UObject>(NAMESPACE_LIBRARY)
+		TBindingClassBuilder<UObject>(NAMESPACE_LIBRARY)
 			.Function("StaticClass", StaticClassImplementation)
 			.Function("GetClass", GetClassImplementation)
 			.Function("GetName", GetNameImplementation)

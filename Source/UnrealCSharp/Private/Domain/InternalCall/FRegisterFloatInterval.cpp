@@ -1,11 +1,12 @@
-#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterFloatInterval
 {
 	FRegisterFloatInterval()
 	{
-		TReflectionClassBuilder<FFloatInterval>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FFloatInterval>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FFloatInterval, float, float),
 			             {"InMin", "InMax"})
 			.Function("Size", BINDING_FUNCTION(&FFloatInterval::Size))

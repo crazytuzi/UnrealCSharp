@@ -1,5 +1,10 @@
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "Bridge/FTypeBridge.h"
+#include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/ClassAttributeMacro.h"
+#include "CoreMacro/FunctionMacro.h"
+#include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/PropertyAttributeMacro.h"
 #include "CoreMacro/FunctionAttributeMacro.h"
 #include "CoreMacro/GenericAttributeMacro.h"
@@ -10,6 +15,8 @@
 #include "Misc/FileHelper.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "Template/TGetArrayLength.inl"
+#include "mono/metadata/object.h"
 
 TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
 {
@@ -48,6 +55,17 @@ TArray<FString> FDynamicGeneratorCore::EnumMetaDataAttrs =
 	CLASS_BLUEPRINT_TYPE_ATTRIBUTE,
 	CLASS_BITFLAGS_ATTRIBUTE,
 	CLASS_USE_ENUM_VALUES_AS_MASK_VALUES_IN_EDITOR
+};
+
+TArray<FString> FDynamicGeneratorCore::InterfaceMetaDataAttrs =
+{
+	CLASS_MINIMAL_API_ATTRIBUTE,
+	CLASS_BLUEPRINT_TYPE_ATTRIBUTE,
+	CLASS_BLUEPRINTABLE_ATTRIBUTE,
+	CLASS_NOT_BLUEPRINTABLE_ATTRIBUTE,
+	CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE,
+	CLASS_CONVERSION_ROOT_ATTRIBUTE,
+	CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE
 };
 
 TArray<FString> FDynamicGeneratorCore::PropertyMetaDataAttrs =
@@ -191,6 +209,71 @@ TArray<FString> FDynamicGeneratorCore::FunctionMetaDataAttrs =
 	CLASS_BIT_MASK_ENUM_ATTRIBUTE,
 	CLASS_ARRAY_PARAM_ATTRIBUTE
 };
+
+#if WITH_EDITOR
+void FDynamicGeneratorCore::CodeAnalysisGenerator(const FString& InName,
+                                                  const TFunction<void(const FString&)>& InGenerator)
+{
+	auto Names = GetDynamic(FString::Printf(TEXT(
+		                        "%s/%s.json"),
+	                                        *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+	                                        *InName),
+	                        InName
+	);
+
+	for (const auto& Name : Names)
+	{
+		InGenerator(Name);
+	}
+}
+
+bool FDynamicGeneratorCore::IsDynamic(MonoClass* InMonoClass, const FString& InAttribute)
+{
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttribute);
+
+	const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
+
+	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
+}
+#endif
+
+void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator)
+{
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttribute);
+
+	const auto AttributeMonoType = FMonoDomain::Class_Get_Type(AttributeMonoClass);
+
+	const auto AttributeMonoReflectionType = FMonoDomain::Type_Get_Object(AttributeMonoType);
+
+	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
+
+	void* InParams[2] = {
+		AttributeMonoReflectionType,
+		FMonoDomain::GCHandle_Get_Target_V2(FMonoDomain::AssemblyGCHandles[1])
+	};
+
+	const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
+		UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
+
+	const auto Types = reinterpret_cast<MonoArray*>(FMonoDomain::Runtime_Invoke(
+		GetTypesWithAttributeMethod, nullptr, InParams));
+
+	const auto Length = FMonoDomain::Array_Length(Types);
+
+	for (auto Index = 0; Index < Length; ++Index)
+	{
+		const auto ReflectionType = ARRAY_GET(Types, MonoReflectionType*, Index);
+
+		const auto Type = FMonoDomain::Reflection_Type_Get_Type(ReflectionType);
+
+		const auto Class = FMonoDomain::Type_Get_Class(Type);
+
+		InGenerator(Class);
+	}
+}
 
 UPackage* FDynamicGeneratorCore::GetOuter()
 {
@@ -693,19 +776,66 @@ static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
 	}
 }
 
-void FDynamicGeneratorCore::SetMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, const FString& InAttribute,
+                                        const TFunction<void(MonoCustomAttrInfo*)>& InSetMetaData)
 {
-	SetFieldMetaData(InClass, ClassMetaDataAttrs, InMonoCustomAttrInfo);
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttribute);
+
+	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
+	{
+		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+		{
+			InSetMetaData(Attrs);
+		}
+	}
 }
 
-void FDynamicGeneratorCore::SetMetaData(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UClass* InClass, const FString& InAttribute)
 {
-	SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo);
+	if (InMonoClass == nullptr || InClass == nullptr)
+	{
+		return;
+	}
+
+	SetMetaData(InMonoClass, InAttribute,
+	            [InClass](MonoCustomAttrInfo* InMonoCustomAttrInfo)
+	            {
+		            SetFieldMetaData(InClass,
+		                             InClass->IsChildOf(UInterface::StaticClass())
+			                             ? InterfaceMetaDataAttrs
+			                             : ClassMetaDataAttrs,
+		                             InMonoCustomAttrInfo);
+	            });
 }
 
-void FDynamicGeneratorCore::SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct,
+                                        const FString& InAttribute)
 {
-	SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo);
+	if (InMonoClass == nullptr || InScriptStruct == nullptr)
+	{
+		return;
+	}
+
+	SetMetaData(InMonoClass, InAttribute,
+	            [InScriptStruct](MonoCustomAttrInfo* InMonoCustomAttrInfo)
+	            {
+		            SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo);
+	            });
+}
+
+void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UEnum* InEnum, const FString& InAttribute)
+{
+	if (InMonoClass == nullptr || InEnum == nullptr)
+	{
+		return;
+	}
+
+	SetMetaData(InMonoClass, InAttribute,
+	            [InEnum](MonoCustomAttrInfo* InMonoCustomAttrInfo)
+	            {
+		            SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo);
+	            });
 }
 
 void FDynamicGeneratorCore::SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
@@ -757,4 +887,149 @@ bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInf
 	}
 
 	return false;
+}
+
+void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* InField,
+                                              const TFunction<void(const FProperty* InProperty)>& InGenerator)
+{
+	if (InMonoClass == nullptr || InField == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_PROPERTY_ATTRIBUTE);
+
+	void* Iterator = nullptr;
+
+	while (const auto Property = FMonoDomain::Class_Get_Properties(InMonoClass, &Iterator))
+	{
+		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Property(InMonoClass, Property))
+		{
+			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			{
+				const auto PropertyName = FMonoDomain::Property_Get_Name(Property);
+
+				const auto PropertyType = FMonoDomain::Property_Get_Type(Property);
+
+				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
+
+				const auto CppProperty = FTypeBridge::Factory(ReflectionType, InField, PropertyName,
+				                                              EObjectFlags::RF_Public);
+
+				SetPropertyFlags(CppProperty, Attrs);
+
+				InField->AddCppProperty(CppProperty);
+
+				InGenerator(CppProperty);
+			}
+		}
+	}
+}
+
+void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass,
+                                              const TFunction<void(const UFunction* InFunction)>& InGenerator)
+{
+	struct FParamDescriptor
+	{
+		MonoReflectionType* ReflectionType;
+
+		FName Name;
+
+		bool bIsRef;
+	};
+
+	if (InMonoClass == nullptr || InClass == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_FUNCTION_ATTRIBUTE);
+
+	void* MethodIterator = nullptr;
+
+	while (const auto Method = FMonoDomain::Class_Get_Methods(InMonoClass, &MethodIterator))
+	{
+		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Method(Method))
+		{
+			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			{
+				const auto MethodName = FMonoDomain::Method_Get_Name(Method);
+
+				const auto Signature = FMonoDomain::Method_Signature(Method);
+
+				void* ParamIterator = nullptr;
+
+				const auto ParamCount = FMonoDomain::Signature_Get_Param_Count(Signature);
+
+				const auto ParamNames = static_cast<const char**>(FMemory_Alloca(ParamCount * sizeof(const char*)));
+
+				FMonoDomain::Method_Get_Param_Names(Method, ParamNames);
+
+				auto ParamIndex = 0;
+
+				TArray<FParamDescriptor> ParamDescriptors;
+
+				while (const auto Param = FMonoDomain::Signature_Get_Params(Signature, &ParamIterator))
+				{
+					ParamDescriptors.Add({
+						FMonoDomain::Type_Get_Object(Param),
+						ParamNames[ParamIndex++],
+						!!FMonoDomain::Type_Is_ByRef(Param)
+					});
+				}
+
+				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
+
+				Function->MinAlignment = 1;
+
+				if (const auto ReturnParamType = FMonoDomain::Signature_Get_Return_Type(Signature))
+				{
+					const auto ReturnParamReflectionType = FMonoDomain::Type_Get_Object(ReturnParamType);
+
+					if (const auto Property = FTypeBridge::Factory(ReturnParamReflectionType, Function, "",
+					                                               RF_Public | RF_Transient))
+					{
+						Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
+
+						Function->AddCppProperty(Property);
+
+						Function->FunctionFlags |= FUNC_HasOutParms;
+					}
+				}
+
+				for (auto Index = ParamDescriptors.Num() - 1; Index >= 0; --Index)
+				{
+					const auto Property = FTypeBridge::Factory(ParamDescriptors[Index].ReflectionType,
+					                                           Function,
+					                                           ParamDescriptors[Index].Name,
+					                                           RF_Public | RF_Transient);
+
+					Property->SetPropertyFlags(CPF_Parm);
+
+					if (ParamDescriptors[Index].bIsRef)
+					{
+						Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
+					}
+
+					Function->AddCppProperty(Property);
+				}
+
+				Function->Bind();
+
+				Function->StaticLink(true);
+
+				Function->Next = InClass->Children;
+
+				InClass->Children = Function;
+
+				SetFunctionFlags(Function, Attrs);
+
+				InClass->AddFunctionToFunctionMap(Function, MethodName);
+
+				InGenerator(Function);
+			}
+		}
+	}
 }

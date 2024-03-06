@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterTimespan
@@ -15,7 +16,7 @@ struct FRegisterTimespan
 
 	FRegisterTimespan()
 	{
-		TReflectionClassBuilder<FTimespan>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FTimespan>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FTimespan, int64),
 			             {"InTicks"})
 			.Constructor(BINDING_CONSTRUCTOR(FTimespan, int32, int32, int32),

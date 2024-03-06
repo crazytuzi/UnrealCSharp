@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
@@ -12,7 +12,7 @@ struct FRegisterBox2D
 
 	FRegisterBox2D()
 	{
-		TReflectionClassBuilder<FBox2D>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FBox2D>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FBox2D, EForceInit))
 			.Constructor(BINDING_CONSTRUCTOR(FBox2D, const FVector2D&, const FVector2D&),
 			             {"InMin", "InMax"})

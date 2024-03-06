@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
@@ -74,7 +75,7 @@ struct FRegisterDateTime
 
 	FRegisterDateTime()
 	{
-		TReflectionClassBuilder<FDateTime>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FDateTime>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FDateTime, int64),
 			             {"InTicks"})
 			.Constructor(BINDING_CONSTRUCTOR(FDateTime, int32, int32, int32, int32, int32, int32, int32),

@@ -1,5 +1,5 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
-#include "Binding/Class/TReflectionClassBuilder.inl"
+#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -46,7 +46,7 @@ struct FRegisterDataTableFunctionLibrary
 
 	FRegisterDataTableFunctionLibrary()
 	{
-		TReflectionClassBuilder<UDataTableFunctionLibrary>(NAMESPACE_LIBRARY)
+		TBindingClassBuilder<UDataTableFunctionLibrary>(NAMESPACE_LIBRARY)
 			.Function("GetDataTableRowFromName", GetDataTableRowFromNameImplementation)
 			.Register();
 	}

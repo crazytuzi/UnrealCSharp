@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TReflectionClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
+#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
 struct FRegisterFrameTime
@@ -15,7 +16,7 @@ struct FRegisterFrameTime
 
 	FRegisterFrameTime()
 	{
-		TReflectionClassBuilder<FFrameTime>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FFrameTime>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FFrameTime, int32),
 			             {"InFrameNumber"})
 			.Constructor(BINDING_CONSTRUCTOR(FFrameTime, FFrameNumber),

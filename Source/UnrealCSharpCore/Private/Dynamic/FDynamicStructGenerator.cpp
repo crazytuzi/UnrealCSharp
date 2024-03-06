@@ -2,14 +2,9 @@
 #include "Bridge/FTypeBridge.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/ClassMacro.h"
-#include "CoreMacro/FunctionMacro.h"
-#include "CoreMacro/MonoMacro.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/PropertyAttributeMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
-#include "Template/TGetArrayLength.inl"
 #if WITH_EDITOR
 #include "K2Node_StructOperation.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -18,67 +13,37 @@
 #endif
 #include "UEVersion.h"
 
-TMap<FString, UScriptStruct*> FDynamicStructGenerator::DynamicStructMap;
+TMap<FString, UDynamicScriptStruct*> FDynamicStructGenerator::DynamicStructMap;
 
-TSet<UScriptStruct*> FDynamicStructGenerator::DynamicStructSet;
+TSet<UDynamicScriptStruct*> FDynamicStructGenerator::DynamicStructSet;
 
 void FDynamicStructGenerator::Generator()
 {
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_STRUCT_ATTRIBUTE);
-
-	const auto AttributeMonoType = FMonoDomain::Class_Get_Type(AttributeMonoClass);
-
-	const auto AttributeMonoReflectionType = FMonoDomain::Type_Get_Object(AttributeMonoType);
-
-	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
-
-	void* InParams[2] = {
-		AttributeMonoReflectionType,
-		FMonoDomain::GCHandle_Get_Target_V2(FMonoDomain::AssemblyGCHandles[1])
-	};
-
-	const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
-		UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
-
-	const auto Types = reinterpret_cast<MonoArray*>(FMonoDomain::Runtime_Invoke(
-		GetTypesWithAttributeMethod, nullptr, InParams));
-
-	const auto Length = FMonoDomain::Array_Length(Types);
-
-	for (auto Index = 0; Index < Length; ++Index)
-	{
-		const auto ReflectionType = ARRAY_GET(Types, MonoReflectionType*, Index);
-
-		const auto Type = FMonoDomain::Reflection_Type_Get_Type(ReflectionType);
-
-		const auto Class = FMonoDomain::Type_Get_Class(Type);
-
-		Generator(Class);
-	}
+	FDynamicGeneratorCore::Generator(CLASS_U_STRUCT_ATTRIBUTE,
+	                                 [](MonoClass* InMonoClass)
+	                                 {
+		                                 Generator(InMonoClass);
+	                                 });
 }
 
 #if WITH_EDITOR
 void FDynamicStructGenerator::CodeAnalysisGenerator()
 {
-	static FString CSharpScriptStruct = TEXT("CSharpScriptStruct");
+	FDynamicGeneratorCore::CodeAnalysisGenerator(TEXT("DynamicStruct"),
+	                                             [](const FString& InName)
+	                                             {
+		                                             if (!DynamicStructMap.Contains(InName))
+		                                             {
+			                                             GeneratorStruct(FDynamicGeneratorCore::GetOuter(),
+			                                                             InName,
+			                                                             nullptr);
+		                                             }
+	                                             });
+}
 
-	auto StructNames = FDynamicGeneratorCore::GetDynamic(
-		FString::Printf(TEXT(
-			"%s/%s.json"),
-		                *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-		                *CSharpScriptStruct),
-		CSharpScriptStruct
-	);
-
-	for (const auto& StructName : StructNames)
-	{
-		if (!DynamicStructMap.Contains(StructName))
-		{
-			GeneratorCSharpScriptStruct(FDynamicGeneratorCore::GetOuter(), StructName, nullptr);
-		}
-	}
+bool FDynamicStructGenerator::IsDynamicStruct(MonoClass* InMonoClass)
+{
+	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_STRUCT_ATTRIBUTE);
 }
 #endif
 
@@ -94,7 +59,7 @@ void FDynamicStructGenerator::Generator(MonoClass* InMonoClass)
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
 #if WITH_EDITOR
-	UScriptStruct* OldScriptStruct{};
+	UDynamicScriptStruct* OldScriptStruct{};
 
 	if (DynamicStructMap.Contains(ClassName))
 	{
@@ -112,7 +77,7 @@ void FDynamicStructGenerator::Generator(MonoClass* InMonoClass)
 	}
 #endif
 
-	UScriptStruct* ParentClass{};
+	UScriptStruct* ParentScriptStruct{};
 
 	if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
 	{
@@ -124,42 +89,39 @@ void FDynamicStructGenerator::Generator(MonoClass* InMonoClass)
 				{
 					const auto ParentPathName = FTypeBridge::GetPathName(ParentMonoReflectionType);
 
-					ParentClass = LoadObject<UScriptStruct>(nullptr, *ParentPathName);
+					ParentScriptStruct = LoadObject<UScriptStruct>(nullptr, *ParentPathName);
 				}
 			}
 		}
 	}
 
-	const auto ScriptStruct = GeneratorCSharpScriptStruct(Outer, ClassName, ParentClass,
-	                                                      [InMonoClass](UScriptStruct* InScriptStruct)
-	                                                      {
-		                                                      ProcessGenerator(InMonoClass, InScriptStruct);
-	                                                      });
+	const auto ScriptStruct = GeneratorStruct(Outer, ClassName, ParentScriptStruct,
+	                                          [InMonoClass](UDynamicScriptStruct* InScriptStruct)
+	                                          {
+		                                          ProcessGenerator(InMonoClass, InScriptStruct);
+	                                          });
 
 #if WITH_EDITOR
 	if (OldScriptStruct != nullptr)
 	{
+		ScriptStruct->Guid = OldScriptStruct->Guid;
+
 		ReInstance(OldScriptStruct, ScriptStruct);
+	}
+	else
+	{
+		ScriptStruct->Guid = FGuid::NewGuid();
 	}
 #endif
 }
 
-bool FDynamicStructGenerator::IsDynamicStruct(MonoClass* InMonoClass)
-{
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_STRUCT_ATTRIBUTE);
-
-	const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
-
-	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
-}
-
 bool FDynamicStructGenerator::IsDynamicStruct(const UScriptStruct* InScriptStruct)
 {
-	return DynamicStructSet.Contains(InScriptStruct);
+	return DynamicStructSet.Contains(Cast<UDynamicScriptStruct>(InScriptStruct));
 }
 
-void FDynamicStructGenerator::BeginGenerator(UScriptStruct* InScriptStruct, UScriptStruct* InParentScriptStruct)
+void FDynamicStructGenerator::BeginGenerator(UDynamicScriptStruct* InScriptStruct,
+                                             UScriptStruct* InParentScriptStruct)
 {
 	if (InParentScriptStruct != nullptr)
 	{
@@ -167,7 +129,7 @@ void FDynamicStructGenerator::BeginGenerator(UScriptStruct* InScriptStruct, UScr
 	}
 }
 
-void FDynamicStructGenerator::ProcessGenerator(MonoClass* InMonoClass, UScriptStruct* InScriptStruct)
+void FDynamicStructGenerator::ProcessGenerator(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct)
 {
 #if WITH_EDITOR
 	GeneratorMetaData(InMonoClass, InScriptStruct);
@@ -176,7 +138,7 @@ void FDynamicStructGenerator::ProcessGenerator(MonoClass* InMonoClass, UScriptSt
 	GeneratorProperty(InMonoClass, InScriptStruct);
 }
 
-void FDynamicStructGenerator::EndGenerator(UScriptStruct* InScriptStruct)
+void FDynamicStructGenerator::EndGenerator(UDynamicScriptStruct* InScriptStruct)
 {
 	InScriptStruct->Bind();
 
@@ -215,9 +177,9 @@ void FDynamicStructGenerator::EndGenerator(UScriptStruct* InScriptStruct)
 #endif
 }
 
-void FDynamicStructGenerator::GeneratorScriptStruct(const FString& InName, UScriptStruct* InScriptStruct,
-                                                    UScriptStruct* InParentScriptStruct,
-                                                    const TFunction<void(UScriptStruct*)>& InProcessGenerator)
+void FDynamicStructGenerator::GeneratorStruct(const FString& InName, UDynamicScriptStruct* InScriptStruct,
+                                              UScriptStruct* InParentScriptStruct,
+                                              const TFunction<void(UDynamicScriptStruct*)>& InProcessGenerator)
 {
 	DynamicStructMap.Add(InName, InScriptStruct);
 
@@ -230,31 +192,32 @@ void FDynamicStructGenerator::GeneratorScriptStruct(const FString& InName, UScri
 	EndGenerator(InScriptStruct);
 }
 
-UScriptStruct* FDynamicStructGenerator::GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName,
-                                                                    UScriptStruct* InParentScriptStruct)
+UDynamicScriptStruct* FDynamicStructGenerator::GeneratorStruct(UPackage* InOuter, const FString& InName,
+                                                               UScriptStruct* InParentScriptStruct)
 {
-	return GeneratorCSharpScriptStruct(InOuter, InName, InParentScriptStruct,
-	                                   [](UScriptStruct*)
-	                                   {
-	                                   });
+	return GeneratorStruct(InOuter, InName, InParentScriptStruct,
+	                       [](UDynamicScriptStruct* InScriptStruct)
+	                       {
+	                       });
 }
 
-UScriptStruct* FDynamicStructGenerator::GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName,
-                                                                    UScriptStruct* InParentScriptStruct,
-                                                                    const TFunction<void(UScriptStruct*)>&
-                                                                    InProcessGenerator)
+UDynamicScriptStruct* FDynamicStructGenerator::GeneratorStruct(UPackage* InOuter, const FString& InName,
+                                                               UScriptStruct* InParentScriptStruct,
+                                                               const TFunction<void(UDynamicScriptStruct*)>&
+                                                               InProcessGenerator)
 {
-	const auto ScriptStruct = NewObject<UScriptStruct>(InOuter, *InName.RightChop(1), RF_Public);
+	const auto ScriptStruct = NewObject<UDynamicScriptStruct>(InOuter, *InName.RightChop(1), RF_Public);
 
 	ScriptStruct->AddToRoot();
 
-	GeneratorScriptStruct(InName, ScriptStruct, InParentScriptStruct, InProcessGenerator);
+	GeneratorStruct(InName, ScriptStruct, InParentScriptStruct, InProcessGenerator);
 
 	return ScriptStruct;
 }
 
 #if WITH_EDITOR
-void FDynamicStructGenerator::ReInstance(UScriptStruct* InOldScriptStruct, UScriptStruct* InNewScriptStruct)
+void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct,
+                                         UDynamicScriptStruct* InNewScriptStruct)
 {
 	TArray<UClass*> DynamicClasses;
 
@@ -384,57 +347,16 @@ void FDynamicStructGenerator::ReInstance(UScriptStruct* InOldScriptStruct, UScri
 	InOldScriptStruct->MarkAsGarbage();
 }
 
-void FDynamicStructGenerator::GeneratorMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct)
+void FDynamicStructGenerator::GeneratorMetaData(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct)
 {
-	if (InMonoClass == nullptr || InScriptStruct == nullptr)
-	{
-		return;
-	}
-
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_STRUCT_ATTRIBUTE);
-
-	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
-	{
-		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
-		{
-			FDynamicGeneratorCore::SetMetaData(InScriptStruct, Attrs);
-		}
-	}
+	FDynamicGeneratorCore::SetMetaData(InMonoClass, InScriptStruct, CLASS_U_STRUCT_ATTRIBUTE);
 }
 #endif
 
-void FDynamicStructGenerator::GeneratorProperty(MonoClass* InMonoClass, UScriptStruct* InScriptStruct)
+void FDynamicStructGenerator::GeneratorProperty(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct)
 {
-	if (InMonoClass == nullptr || InScriptStruct == nullptr)
-	{
-		return;
-	}
-
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_PROPERTY_ATTRIBUTE);
-
-	void* Iterator = nullptr;
-
-	while (const auto Property = FMonoDomain::Class_Get_Properties(InMonoClass, &Iterator))
-	{
-		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Property(InMonoClass, Property))
-		{
-			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
-			{
-				const auto PropertyName = FMonoDomain::Property_Get_Name(Property);
-
-				const auto PropertyType = FMonoDomain::Property_Get_Type(Property);
-
-				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
-
-				const auto CppProperty = FTypeBridge::Factory(ReflectionType, InScriptStruct, PropertyName,
-				                                              EObjectFlags::RF_Public);
-
-				FDynamicGeneratorCore::SetPropertyFlags(CppProperty, Attrs);
-
-				InScriptStruct->AddCppProperty(CppProperty);
-			}
-		}
-	}
+	FDynamicGeneratorCore::GeneratorProperty(InMonoClass, InScriptStruct,
+	                                         [](const FProperty* InProperty)
+	                                         {
+	                                         });
 }

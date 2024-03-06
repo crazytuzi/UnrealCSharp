@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Dynamic/DynamicScriptStruct.h"
 #include "mono/metadata/object.h"
 
 class FDynamicStructGenerator
@@ -9,41 +10,42 @@ public:
 
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
+
+	static bool IsDynamicStruct(MonoClass* InMonoClass);
 #endif
 
 	static void Generator(MonoClass* InMonoClass);
 
-	static bool IsDynamicStruct(MonoClass* InMonoClass);
-
 	static bool UNREALCSHARPCORE_API IsDynamicStruct(const UScriptStruct* InScriptStruct);
 
 private:
-	static void BeginGenerator(UScriptStruct* InScriptStruct, UScriptStruct* InParentScriptStruct);
+	static void BeginGenerator(UDynamicScriptStruct* InScriptStruct, UScriptStruct* InParentScriptStruct);
 
-	static void ProcessGenerator(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);
+	static void ProcessGenerator(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct);
 
-	static void EndGenerator(UScriptStruct* InScriptStruct);
+	static void EndGenerator(UDynamicScriptStruct* InScriptStruct);
 
-	static void GeneratorScriptStruct(const FString& InName, UScriptStruct* InScriptStruct,
-	                                  UScriptStruct* InParentScriptStruct,
-	                                  const TFunction<void(UScriptStruct*)>& InProcessGenerator);
+	static void GeneratorStruct(const FString& InName, UDynamicScriptStruct* InScriptStruct,
+	                            UScriptStruct* InParentScriptStruct,
+	                            const TFunction<void(UDynamicScriptStruct*)>& InProcessGenerator);
 
-	static UScriptStruct* GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName,
-	                                                  UScriptStruct* InParentScriptStruct);
+	static UDynamicScriptStruct* GeneratorStruct(UPackage* InOuter, const FString& InName,
+	                                             UScriptStruct* InParentScriptStruct);
 
-	static UScriptStruct* GeneratorCSharpScriptStruct(UPackage* InOuter, const FString& InName,
-	                                                  UScriptStruct* InParentScriptStruct,
-	                                                  const TFunction<void(UScriptStruct*)>& InProcessGenerator);
+	static UDynamicScriptStruct* GeneratorStruct(UPackage* InOuter, const FString& InName,
+	                                             UScriptStruct* InParentScriptStruct,
+	                                             const TFunction<void(UDynamicScriptStruct*)>&
+	                                             InProcessGenerator);
 
 #if WITH_EDITOR
-	static void ReInstance(UScriptStruct* InOldScriptStruct, UScriptStruct* InNewScriptStruct);
+	static void ReInstance(UDynamicScriptStruct* InOldScriptStruct, UDynamicScriptStruct* InNewScriptStruct);
 
-	static void GeneratorMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);
+	static void GeneratorMetaData(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct);
 #endif
 
-	static void GeneratorProperty(MonoClass* InMonoClass, UScriptStruct* InScriptStruct);
+	static void GeneratorProperty(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct);
 
-	static TMap<FString, UScriptStruct*> DynamicStructMap;
+	static TMap<FString, UDynamicScriptStruct*> DynamicStructMap;
 
-	static TSet<UScriptStruct*> DynamicStructSet;
+	static TSet<UDynamicScriptStruct*> DynamicStructSet;
 };
