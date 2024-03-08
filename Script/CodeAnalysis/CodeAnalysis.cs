@@ -31,6 +31,8 @@ namespace CodeAnalysis
                 ["DynamicEnum"] = new List<string>(),
                 ["DynamicInterface"] = new List<string>()
             };
+
+            _override = new Dictionary<string, List<string>>();
         }
 
         private static List<string> GetFiles(string inPathName)
@@ -144,18 +146,7 @@ namespace CodeAnalysis
 
                             if (Functions.Count > 0)
                             {
-                                var FileName = Path.Combine(_outputPathName,
-                                    $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}.json");
-
-                                File.WriteAllText(FileName, JsonSerializer.Serialize(
-                                    new Dictionary<string, List<string>>
-                                    {
-                                        { "Override", Functions }
-                                    },
-                                    new JsonSerializerOptions
-                                    {
-                                        WriteIndented = true,
-                                    }));
+                                _override.Add($"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}", Functions);
                             }
                         }
                     }
@@ -222,25 +213,26 @@ namespace CodeAnalysis
 
         private void WriteAll()
         {
-            foreach (var Pair in _dynamic)
-            {
-                var FileName = Path.Combine(_outputPathName, Pair.Key + ".json");
-
-                File.WriteAllText(FileName, JsonSerializer.Serialize(
-                    new Dictionary<string, List<string>>
-                    {
-                        { Pair.Key, Pair.Value }
-                    },
+            File.WriteAllText(Path.Combine(_outputPathName, "Override.json"),
+                JsonSerializer.Serialize(_override,
                     new JsonSerializerOptions
                     {
                         WriteIndented = true,
                     }));
-            }
+
+            File.WriteAllText(Path.Combine(_outputPathName, "Dynamic.json"),
+                JsonSerializer.Serialize(_dynamic,
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                    }));
         }
 
         private readonly string _inputPathName;
 
         private readonly string _outputPathName;
+
+        private readonly Dictionary<string, List<string>> _override;
 
         private readonly Dictionary<string, List<string>> _dynamic;
     }

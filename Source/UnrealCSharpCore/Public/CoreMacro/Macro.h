@@ -12,6 +12,10 @@
 
 #define CODE_ANALYSIS FString(TEXT("CodeAnalysis"))
 
+#define OVERRIDE FString(TEXT("Override"))
+
+#define DYNAMIC FString(TEXT("Dynamic"))
+
 #define ASSEMBLY_UTIL FString(TEXT("AssemblyUtil"))
 
 #define TEMPLATE FString(TEXT("Template"))

@@ -3,14 +3,13 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
-#include "Misc/FileHelper.h"
-#include "Serialization/JsonReader.h"
-#include "Serialization/JsonSerializer.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicInterfaceGenerator.h"
+
+TMap<FString, TArray<FString>> FClassGenerator::OverrideFunctionsMap;
 
 void FClassGenerator::Generator()
 {
@@ -1300,37 +1299,12 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 
 TArray<FString> FClassGenerator::GetOverrideFunctions(const FString& InNameSpace, const FString& InClass)
 {
-	const auto FileName = FString::Printf(TEXT(
-		"%s/%s.%s.json"
+	const auto FoundFunctions = OverrideFunctionsMap.Find(FString::Printf(TEXT(
+		"%s.%s"
 	),
-	                                      *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-	                                      *InNameSpace,
-	                                      *InClass
-	);
+	                                                                      *InNameSpace,
+	                                                                      *InClass
+	));
 
-	auto& FileManager = IFileManager::Get();
-
-	if (!FileManager.FileExists(*FileName))
-	{
-		return {};
-	}
-
-	FString JsonStr;
-
-	if (FFileHelper::LoadFileToString(JsonStr, *FileName))
-	{
-		TSharedPtr<FJsonObject> JsonObj;
-
-		TArray<FString> OverrideFunctions;
-
-		const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
-
-		FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-		JsonObj->TryGetStringArrayField(TEXT("Override"), OverrideFunctions);
-
-		return OverrideFunctions;
-	}
-
-	return {};
+	return FoundFunctions != nullptr ? *FoundFunctions : TArray<FString>{};
 }
