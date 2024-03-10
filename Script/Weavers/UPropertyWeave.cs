@@ -270,7 +270,7 @@ namespace Weavers
                 }
                 if (GetGarbageCollectionHandle(type.Resolve()) != null)
                 {
-                    PropertyGetMethod = ObjectSetMethodMap[ModuleDefinition.TypeSystem.Object.FullName];
+                    PropertyGetMethod = MethodMap[ModuleDefinition.TypeSystem.Object.FullName];
                 }
             }
 
