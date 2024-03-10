@@ -3,6 +3,7 @@
 #include "DirectoryWatcherModule.h"
 #include "FAssetGenerator.h"
 #include "FCodeAnalysis.h"
+#include "FFodyWeavers.h"
 #include "FCSharpCompiler.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -92,7 +93,7 @@ FEditorListener::~FEditorListener()
 void FEditorListener::OnPostEngineInit()
 {
 	FCodeAnalysis::CodeAnalysis();
-
+	FFodyWeavers::Compile();
 	FDynamicGenerator::CodeAnalysisGenerator();
 }
 

@@ -11,4 +11,8 @@
   <ItemGroup>
     <Compile Include="../../Plugins/UnrealCSharp/Script/UE/**"></Compile>
   </ItemGroup>
+   <ItemGroup>
+    <PackageReference Include="Fody" Version="6.8.0" PrivateAssets="all" />
+    <WeaverFiles Include="$(SolutionDir)..\Plugins\UnrealCSharp\Script\Weavers\publish\Weavers.dll" WeaverClassNames="UPropertyWeave" />
+ </ItemGroup>
 </Project>
