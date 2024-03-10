@@ -1,4 +1,5 @@
 ﻿#include "FGeneratorCore.h"
+#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Binding/TypeInfo/TName.inl"
@@ -849,6 +850,13 @@ void FGeneratorCore::BeginGenerator()
 			SupportedAssetClassName.Add(AssetClass->GetFName());
 		}
 	}
+
+	FClassGenerator::OverrideFunctionsMap = FUnrealCSharpFunctionLibrary::LoadFileToArray(FString::Printf(TEXT(
+		"%s/%s.json"
+	),
+		*FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+		*OVERRIDE
+	));
 }
 
 void FGeneratorCore::EndGenerator()

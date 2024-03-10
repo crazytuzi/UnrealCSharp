@@ -54,6 +54,8 @@ void FDynamicGenerator::Generator()
 #if WITH_EDITOR
 void FDynamicGenerator::CodeAnalysisGenerator()
 {
+	FDynamicGeneratorCore::BeginCodeAnalysisGenerator();
+
 	FDynamicEnumGenerator::CodeAnalysisGenerator();
 
 	FDynamicStructGenerator::CodeAnalysisGenerator();
@@ -61,6 +63,8 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 	FDynamicInterfaceGenerator::CodeAnalysisGenerator();
 
 	FDynamicClassGenerator::CodeAnalysisGenerator();
+
+	FDynamicGeneratorCore::EndCodeAnalysisGenerator();
 
 	if (IsRunningCookCommandlet())
 	{

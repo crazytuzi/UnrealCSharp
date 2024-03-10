@@ -6,6 +6,10 @@ class FDynamicGeneratorCore
 {
 public:
 #if WITH_EDITOR
+	static void BeginCodeAnalysisGenerator();
+
+	static void EndCodeAnalysisGenerator();
+
 	static void CodeAnalysisGenerator(const FString& InName, const TFunction<void(const FString&)>& InGenerator);
 
 	static bool IsDynamic(MonoClass* InMonoClass, const FString& InAttribute);
@@ -37,8 +41,6 @@ public:
 
 	static void SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
-	static TArray<FString> GetDynamic(const FString& InFile, const FString& InField);
-
 	template <typename T>
 	static void IteratorObject(
 		const TFunction<bool(const TObjectIterator<T>&)>& InPredicate,
@@ -63,6 +65,10 @@ public:
 	                              const TFunction<void(const UFunction* InFunction)>& InGenerator);
 
 private:
+#if WITH_EDITOR
+	static TMap<FString, TArray<FString>> DynamicMap;
+#endif
+
 	static TArray<FString> ClassMetaDataAttrs;
 
 	static TArray<FString> StructMetaDataAttrs;

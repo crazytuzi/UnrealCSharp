@@ -455,6 +455,42 @@ FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
 	return FPaths::Combine(FPaths::ProjectIntermediateDir(), CODE_ANALYSIS);
 }
 
+TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(const FString& InFileName)
+{
+	TMap<FString, TArray<FString>> Result;
+
+	if (auto& FileManager = IFileManager::Get(); FileManager.FileExists(*InFileName))
+	{
+		if (FString ResultString; FFileHelper::LoadFileToString(ResultString, *InFileName))
+		{
+			TSharedPtr<FJsonObject> JsonObject;
+
+			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
+
+			FJsonSerializer::Deserialize(JsonReader, JsonObject);
+
+			for (const auto& Value : JsonObject->Values)
+			{
+				TArray<FString> Array;
+
+				const auto& JsonValueArray = Value.Value->AsArray();
+
+				for (auto Index = 0; Index < JsonValueArray.Num(); Index++)
+				{
+					if (FString Element; JsonValueArray[Index]->TryGetString(Element))
+					{
+						Array.Add(Element);
+					}
+				}
+
+				Result.Add(Value.Key, Array);
+			}
+		}
+	}
+
+	return Result;
+}
+
 TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
 	static auto GamePath = GetGamePath();
