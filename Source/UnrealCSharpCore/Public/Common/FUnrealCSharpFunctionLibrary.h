@@ -76,6 +76,8 @@ public:
 
 	static FString GetCodeAnalysisPath();
 
+	static TMap<FString, TArray<FString>> LoadFileToArray(const FString& InFileName);
+
 	static TArray<FString> GetChangedDirectories();
 
 	static FString Encode(const FString& InName, bool bEncodeWideString = false);
@@ -84,5 +86,11 @@ public:
 
 	static const TArray<FString>& GetProjectModuleList();
 
+#if WITH_EDITOR
 	static bool IsSpecialClass(const UClass* InClass);
+
+	static bool IsSpecialStruct(const UScriptStruct* InScriptStruct);
+
+	static bool IsDynamicReInstanceField(const UField* InField);
+#endif
 };
