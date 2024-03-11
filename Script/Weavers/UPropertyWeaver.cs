@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Weavers
 {
-    public class UPropertyWeave : BaseModuleWeaver
+    public class UPropertyWeaver : BaseModuleWeaver
     {
         Dictionary<string, MethodDefinition> ObjectSetMethodMap = new Dictionary<string, MethodDefinition>();
         Dictionary<string, MethodDefinition> ObjectGetMethodMap = new Dictionary<string, MethodDefinition>();
