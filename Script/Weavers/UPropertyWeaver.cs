@@ -22,6 +22,15 @@ namespace Weavers
         List<TypeDefinition> UEnumTypes = new List<TypeDefinition>();
         List<TypeDefinition> UInterfaceTypes = new List<TypeDefinition>();
 
+        TypeDefinition IStaticClassType;
+        TypeDefinition IStaticStructType;
+
+
+        TypeDefinition UScriptStructType;
+        TypeDefinition UClassType;
+
+        MethodDefinition UObject_StaticClassImplementation;
+        MethodDefinition UStruct_StaticStructImplementation;
 
         TypeDefinition PathAttributeType = null;
 
@@ -29,16 +38,21 @@ namespace Weavers
         {
             GetAllMeta();
             GetAllUClass();
-            // 处理UProperty
-            UClassTypes.ForEach(ProcessUClassType);
-            UStructTypes.ForEach(ProcessUStructType);
             // 处理PathName
             UClassTypes.ForEach(AddPathNameAttributeToUEType);
             UStructTypes.ForEach(AddPathNameAttributeToUEType);
             UEnumTypes.ForEach(AddPathNameAttributeToUEType);
             UInterfaceTypes.ForEach(AddPathNameAttributeToUEType);
 
+            // 处理IStaticClass
+            UClassTypes.ForEach(ProcessStaticClass);
+            UInterfaceTypes.ForEach(ProcessStaticClass);
+            UStructTypes.ForEach(ProcessStaticStruct);
 
+
+            // 处理UProperty
+            UClassTypes.ForEach(ProcessUClassType);
+            UStructTypes.ForEach(ProcessUStructType);
         }
 
         public override IEnumerable<string> GetAssembliesForScanning()
@@ -47,6 +61,54 @@ namespace Weavers
             yield return "Game";
         }
 
+        public void ProcessStaticClass(TypeDefinition type)
+        {
+            if (type.IsClass == false)
+                return;
+            if (type.Interfaces.Any(interf => interf.InterfaceType.FullName == "Script.CoreUObject.IStaticClass") == false)
+            {
+                var IStaticClassInterface = new InterfaceImplementation(ModuleDefinition.ImportReference(IStaticClassType));
+                type.Interfaces.Add(IStaticClassInterface);
+            }
+
+            if (type.Methods.Any(method => method.IsStatic && method.Name == "StaticClass" && method.Parameters.Count == 0) == false)
+            {
+                var StaticClassMethod = IStaticClassType.Methods.FirstOrDefault(method => method.Name == "StaticClass");
+                var StaticClassFunction = new MethodDefinition("StaticClass", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig, ModuleDefinition.ImportReference(UClassType));
+                StaticClassFunction.Overrides.Add(ModuleDefinition.ImportReference(StaticClassMethod));
+                var Instructions = StaticClassFunction.Body.Instructions;
+                Instructions.Add(Instruction.Create(OpCodes.Nop));
+                Instructions.Add(Instruction.Create(OpCodes.Ldstr, GetPath(type)));
+                Instructions.Add(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UObject_StaticClassImplementation)));
+                Instructions.Add(Instruction.Create(OpCodes.Ret));
+                
+                type.Methods.Add(StaticClassFunction);
+            }
+        }
+
+        public void ProcessStaticStruct(TypeDefinition type)
+        {
+            if (type.IsClass == false)
+                return;
+            if (type.Interfaces.Any(interf => interf.InterfaceType.FullName == "Script.CoreUObject.IStaticStruct") == false)
+            {
+                var IStaticStructInterface = new InterfaceImplementation(ModuleDefinition.ImportReference(IStaticStructType));
+                type.Interfaces.Add(IStaticStructInterface);
+            }
+            if (type.Methods.Any(method => method.IsStatic && method.Name == "StaticStruct" && method.Parameters.Count == 0) == false)
+            {
+                var StaticStructMethod = IStaticStructType.Methods.FirstOrDefault(method => method.Name == "StaticStruct");
+                var StaticStructFunction = new MethodDefinition("StaticStruct", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig, ModuleDefinition.ImportReference(UScriptStructType));
+                StaticStructFunction.Overrides.Add(ModuleDefinition.ImportReference(StaticStructMethod));
+                var Instructions = StaticStructFunction.Body.Instructions;
+                Instructions.Add(Instruction.Create(OpCodes.Nop));
+                Instructions.Add(Instruction.Create(OpCodes.Ldstr, GetPath(type)));
+                Instructions.Add(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_StaticStructImplementation)));
+                Instructions.Add(Instruction.Create(OpCodes.Ret));
+
+                type.Methods.Add(StaticStructFunction);
+            }  
+        }
 
         public void AddPathNameAttributeToUEType(TypeDefinition type)
         {
@@ -57,20 +119,29 @@ namespace Weavers
 
                 var constructorRef = ModuleDefinition.ImportReference(constructor);
                 var attribute = new CustomAttribute(constructorRef);
-
-                var FullPath = "/Script/CoreUObject.";
-                if (type.Name[0] == 'A' || type.Name[0] == 'U' || type.Name[0] == 'F')
-                {
-                    FullPath += type.Name.Substring(1);
-                }
-                else
-                {
-                    FullPath += type.Name;
-                }
+                var FullPath = GetPath(type);
                 attribute.ConstructorArguments.Add(new CustomAttributeArgument(ModuleDefinition.TypeSystem.String, FullPath));
                 type.CustomAttributes.Add(attribute);
             }
 
+        }
+
+        private string GetPath(TypeDefinition type)
+        {
+            var FullPath = "/Script/CoreUObject.";
+            if (type.Name[0] == 'A' || type.Name[0] == 'U' || type.Name[0] == 'F')
+            {
+                FullPath += type.Name.Substring(1);
+            }
+            else if (type.IsInterface && type.Name[0] == 'I')
+            {
+                FullPath += type.Name.Substring(1);
+            }
+            else
+            {
+                FullPath += type.Name;
+            }
+            return FullPath;
         }
         private void ProcessUClassType(TypeDefinition type)
         {
@@ -313,6 +384,18 @@ namespace Weavers
                 }
             }
         }
+
+
+        private void GetBaseType(ModuleDefinition module)
+        {
+            IStaticClassType = module.GetType("Script.CoreUObject.IStaticClass");
+            IStaticStructType = module.GetType("Script.CoreUObject.IStaticStruct");
+            UClassType = module.GetType("Script.CoreUObject.UClass");
+            UScriptStructType = module.GetType("Script.CoreUObject.UScriptStruct");
+            UStruct_StaticStructImplementation = module.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_StaticStructImplementation");
+            UObject_StaticClassImplementation = module.GetType("Script.Library.UObjectImplementation").Methods.FirstOrDefault(method => method.Name == "UObject_StaticClassImplementation");
+            
+        }
         private void GetAllMeta()
         {
 
@@ -324,6 +407,11 @@ namespace Weavers
                 var Module = ModuleDefinition.ReadModule("../../Content/Script/UE.dll");
                 PropertyImplementationClass = Module.Types.FirstOrDefault(type => type.FullName == "Script.Library.FPropertyImplementation");
                 PathAttributeType = Module.Types.FirstOrDefault(type => type.FullName == "Script.CoreUObject.PathNameAttribute");
+                GetBaseType(Module);
+            }
+            else
+            {
+                GetBaseType(ModuleDefinition);
             }
             if (PropertyImplementationClass == null || PathAttributeType == null)
             {
