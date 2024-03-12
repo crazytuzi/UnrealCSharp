@@ -55,6 +55,22 @@ namespace SourceGenerator
                     {
                         souce += "\tpublic nint GarbageCollectionHandle { get; set; }\n";
                     }
+                    if (kv.Value.HasEqualsMethod == false)
+                    {
+                        souce += $"\tpublic override bool Equals(object Other) => this == Other as {kv.Value.Name};\n";
+                    }
+                    if (kv.Value.HasHashCodeMethod == false)
+                    {
+                        souce += $"\tpublic override int GetHashCode() => (int)GarbageCollectionHandle;\n";
+                    }
+                    if (kv.Value.HasOperatorEqualTo == false)
+                    {
+                        souce += $"\tpublic static bool operator ==({kv.Value.Name} A, {kv.Value.Name} B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
+                    }
+                    if (kv.Value.HasOperatorNotEqualTo == false)
+                    {
+                        souce += $"\tpublic static bool operator !=({kv.Value.Name} A, {kv.Value.Name} B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
+                    }
                     souce += "}";
                     context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + "gen.cs", souce);
                 }
@@ -132,6 +148,50 @@ namespace SourceGenerator
             bool HasStaticStruct = methods.Any(m => ((MethodDeclarationSyntax)m).Identifier.ToString() == "StaticStruct");
             bool HasGarbageCollectionHandle = cds.Members.Any(mem => mem is PropertyDeclarationSyntax && ((PropertyDeclarationSyntax)mem).Identifier.ToString() == "GarbageCollectionHandle");
 
+            bool HasEqualsMethod = methods.Any(m => {
+                var method = ((MethodDeclarationSyntax)m);
+                if (method.Identifier.ToString() != "Equals")
+                    return false;
+                if (method.ParameterList.Parameters.Count != 1)
+                    return false;
+                return true;
+            });
+            bool HasHashCodeMethod = methods.Any(m => {
+                var method = ((MethodDeclarationSyntax)m);
+                if (method.Identifier.ToString() != "GetHashCode")
+                    return false;
+                if (method.ParameterList.Parameters.Count > 0)
+                    return false;
+                return true;
+            });
+
+            var operators = cds.Members.Where(mem => mem is OperatorDeclarationSyntax).ToList();
+            var HasOperatorEqualTo = operators.Any(o => {
+                var op = ((OperatorDeclarationSyntax)o);
+                if (op.OperatorToken.Text != "==")
+                    return false;
+                foreach(var param in op.ParameterList.Parameters)
+                {
+                    var t = (IdentifierNameSyntax)param.Type;
+                    if (t.Identifier.Text != Name)
+                        return false;
+                }
+                return true;
+            });
+
+            var HasOperatorNotEqualTo = operators.Any(o => {
+                var op = ((OperatorDeclarationSyntax)o);
+                if (op.OperatorToken.Text != "!=")
+                    return false;
+                foreach (var param in op.ParameterList.Parameters)
+                {
+                    var t = (IdentifierNameSyntax)param.Type;
+                    if (t.Identifier.Text != Name)
+                        return false;
+                }
+                return true;
+            });
+
             if (Types.TryGetValue(NameSpace + "." + Name, out var type) == false)
             {
                 type = new TypeInfo();
@@ -155,6 +215,10 @@ namespace SourceGenerator
             type.HasStaticStruct |= HasStaticStruct;
             type.HasStaticClass |= HasStaticClass;
             type.HasGarbageCollectionHandle |= HasGarbageCollectionHandle;
+            type.HasHashCodeMethod |= HasHashCodeMethod;
+            type.HasEqualsMethod |= HasEqualsMethod;
+            type.HasOperatorEqualTo |= HasOperatorEqualTo;
+            type.HasOperatorNotEqualTo |= HasOperatorNotEqualTo;
             return;
         }
     }
@@ -180,7 +244,14 @@ namespace SourceGenerator
         public bool HasStaticClass { get; set; }
         public bool HasStaticStruct { get; set; }
 
+        public bool HasOperatorEqualTo { get; set; }
+        public bool HasOperatorNotEqualTo { get; set; }
+        public bool HasEqualsMethod { get; set; }
+
+        public bool HasHashCodeMethod { get; set; }
+
     }
+
 
 
     public static class CodeAnalysisHelper

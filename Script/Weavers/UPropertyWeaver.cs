@@ -5,6 +5,7 @@ using Mono.Cecil.Rocks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Weavers
 {
@@ -32,6 +33,10 @@ namespace Weavers
         MethodDefinition UObject_StaticClassImplementation;
         MethodDefinition UStruct_StaticStructImplementation;
 
+
+        MethodDefinition UStruct_RegisterImplementation;
+        MethodDefinition UStruct_UnRegisterImplementation;
+
         TypeDefinition PathAttributeType = null;
 
         public override void Execute()
@@ -44,11 +49,14 @@ namespace Weavers
             UEnumTypes.ForEach(AddPathNameAttributeToUEType);
             UInterfaceTypes.ForEach(AddPathNameAttributeToUEType);
 
+            
             // 处理IStaticClass
             UClassTypes.ForEach(ProcessStaticClass);
             UInterfaceTypes.ForEach(ProcessStaticClass);
             UStructTypes.ForEach(ProcessStaticStruct);
-
+            UStructTypes.ForEach(ProcessStructGCHandle);
+            UStructTypes.ForEach(ProcessStructRegister);
+            
 
             // 处理UProperty
             UClassTypes.ForEach(ProcessUClassType);
@@ -61,6 +69,7 @@ namespace Weavers
             yield return "Game";
         }
 
+        
         public void ProcessStaticClass(TypeDefinition type)
         {
             if (type.IsClass == false)
@@ -86,6 +95,84 @@ namespace Weavers
             }
         }
 
+        private void ProcessStructRegister(TypeDefinition type)
+        {
+            if (type.BaseType.FullName != typeof(object).FullName)
+                return;
+
+            // 构造函数处理
+            var ctors = type.GetConstructors();
+            var ctor = ctors.FirstOrDefault(method => method.Parameters.Count() == 0);
+            if (ctor == null)
+            {
+                throw new WeavingException("UStruct must have a constructor with 0 parameters: " + type.FullName);
+            }
+            var ilProcessor = ctor.Body.GetILProcessor();
+            ilProcessor.InsertAfter(ctor.Body.Instructions[1], Instruction.Create(OpCodes.Ldarg_0));
+            ilProcessor.InsertAfter(ctor.Body.Instructions[2], Instruction.Create(OpCodes.Ldarg_0));
+            ilProcessor.InsertAfter(ctor.Body.Instructions[3], Instruction.Create(OpCodes.Ldstr, GetPath(type)));
+            ilProcessor.InsertAfter(ctor.Body.Instructions[4], Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_RegisterImplementation)));
+
+            if (type.Methods.Any(m => m.Name == "Finalize") == false)
+            {
+                var superFinalize = type.BaseType.Resolve().Methods.FirstOrDefault(m => m.Name == "Finalize");
+                var destructor = new MethodDefinition("Finalize", MethodAttributes.HideBySig | MethodAttributes.Family | MethodAttributes.Virtual, ModuleDefinition.TypeSystem.Void);
+                destructor.Overrides.Add(ModuleDefinition.ImportReference(superFinalize));
+                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, type.Methods.FirstOrDefault(m => m.Name == "get_GarbageCollectionHandle")));
+                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_UnRegisterImplementation)));
+                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+                
+                type.Methods.Add(destructor);
+            } else
+            {
+                var Finalize = type.Methods.FirstOrDefault(m => m.Name == "Finalize");
+                ilProcessor = Finalize.Body.GetILProcessor(); 
+                ilProcessor.InsertBefore(Finalize.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+                ilProcessor.InsertBefore(Finalize.Body.Instructions[1], Instruction.Create(OpCodes.Call, type.Methods.FirstOrDefault(m => m.Name == "get_GarbageCollectionHandle")));
+                ilProcessor.InsertBefore(Finalize.Body.Instructions[2], Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_UnRegisterImplementation)));
+           
+            }
+
+            
+
+
+
+        }
+        private void ProcessStructGCHandle(TypeDefinition type)
+        {
+            if (type.Properties.Any(property => property.Name == "GarbageCollectionHandle") == true)
+                return;
+            var GarbageCollectionHandle = new PropertyDefinition("GarbageCollectionHandle", PropertyAttributes.None, ModuleDefinition.TypeSystem.IntPtr);
+            
+            var GarbageCollectionHandleBackingField = new FieldDefinition("<GarbageCollectionHandle>k__BackingField", FieldAttributes.Private, ModuleDefinition.TypeSystem.IntPtr);
+            type.Fields.Add(GarbageCollectionHandleBackingField);
+
+            var cga = ModuleDefinition.ImportReference(typeof(CompilerGeneratedAttribute));
+            var constructor = cga.Resolve().GetConstructors().FirstOrDefault();
+            var constructorRef = ModuleDefinition.ImportReference(constructor);
+            var attribute = new CustomAttribute(constructorRef);
+            GarbageCollectionHandleBackingField.CustomAttributes.Add(attribute);
+
+            var getter = new MethodDefinition("get_GarbageCollectionHandle", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final, ModuleDefinition.TypeSystem.IntPtr);
+            var Instructions = getter.Body.Instructions;
+            Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+            Instructions.Add(Instruction.Create(OpCodes.Ldfld, GarbageCollectionHandleBackingField));
+            Instructions.Add(Instruction.Create(OpCodes.Ret));
+            type.Methods.Add(getter);
+            GarbageCollectionHandle.GetMethod = getter;
+
+            var setter = new MethodDefinition("set_GarbageCollectionHandle", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final, ModuleDefinition.TypeSystem.Void);
+            setter.Parameters.Add(new ParameterDefinition(ModuleDefinition.TypeSystem.IntPtr));
+            Instructions = setter.Body.Instructions;
+            Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+            Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+            Instructions.Add(Instruction.Create(OpCodes.Stfld, GarbageCollectionHandleBackingField));
+            Instructions.Add(Instruction.Create(OpCodes.Ret));
+            type.Methods.Add(setter);
+            GarbageCollectionHandle.SetMethod = setter;
+            type.Properties.Add(GarbageCollectionHandle);
+        }
         public void ProcessStaticStruct(TypeDefinition type)
         {
             if (type.IsClass == false)
@@ -385,40 +472,10 @@ namespace Weavers
             }
         }
 
-
-        private void GetBaseType(ModuleDefinition module)
+        private void SearchAllPropertyAccessors(ModuleDefinition UEDefinition)
         {
-            IStaticClassType = module.GetType("Script.CoreUObject.IStaticClass");
-            IStaticStructType = module.GetType("Script.CoreUObject.IStaticStruct");
-            UClassType = module.GetType("Script.CoreUObject.UClass");
-            UScriptStructType = module.GetType("Script.CoreUObject.UScriptStruct");
-            UStruct_StaticStructImplementation = module.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_StaticStructImplementation");
-            UObject_StaticClassImplementation = module.GetType("Script.Library.UObjectImplementation").Methods.FirstOrDefault(method => method.Name == "UObject_StaticClassImplementation");
-            
-        }
-        private void GetAllMeta()
-        {
-
-
-            TypeDefinition PropertyImplementationClass = ModuleDefinition.Types.FirstOrDefault(type => type.FullName == "Script.Library.FPropertyImplementation");
-            PathAttributeType = ModuleDefinition.Types.FirstOrDefault(type => type.FullName == "Script.CoreUObject.PathNameAttribute");
-            if (PropertyImplementationClass == null)
-            {
-                var Module = ModuleDefinition.ReadModule("../../Content/Script/UE.dll");
-                PropertyImplementationClass = Module.Types.FirstOrDefault(type => type.FullName == "Script.Library.FPropertyImplementation");
-                PathAttributeType = Module.Types.FirstOrDefault(type => type.FullName == "Script.CoreUObject.PathNameAttribute");
-                GetBaseType(Module);
-            }
-            else
-            {
-                GetBaseType(ModuleDefinition);
-            }
-            if (PropertyImplementationClass == null || PathAttributeType == null)
-            {
-                throw new WeavingException("Not Found build in class: 'Script.Library.FPropertyImplementation'");
-            }
-
-            foreach(var method in PropertyImplementationClass.Methods)
+            TypeDefinition PropertyImplementationClass = UEDefinition.GetType("Script.Library.FPropertyImplementation");
+            foreach (var method in PropertyImplementationClass.Methods)
             {
                 if (method.IsStatic == false)
                     continue;
@@ -440,7 +497,7 @@ namespace Weavers
                 }
                 // Set函数
                 else if (method.ReturnType.FullName == ModuleDefinition.TypeSystem.Void.FullName
-                    && method.Name.IndexOf("FProperty_Set") >= 0 && method.Name.IndexOf("PropertyImplementation") > 0 
+                    && method.Name.IndexOf("FProperty_Set") >= 0 && method.Name.IndexOf("PropertyImplementation") > 0
                     && method.Parameters.Count == 3)
                 {
                     var PropertyType = method.Parameters[2].ParameterType;
@@ -456,6 +513,26 @@ namespace Weavers
                     }
                 }
             }
+        }
+        private void GetAllMeta()
+        {
+            ModuleDefinition UEDefinition = ModuleDefinition;
+            if (UEDefinition.Name != "UE.dll")
+            {
+                UEDefinition = ModuleDefinition.ReadModule("../../Content/Script/UE.dll");
+            }
+            
+            PathAttributeType = UEDefinition.GetType("Script.CoreUObject.PathNameAttribute");
+            IStaticClassType = UEDefinition.GetType("Script.CoreUObject.IStaticClass");
+            IStaticStructType = UEDefinition.GetType("Script.CoreUObject.IStaticStruct");
+            UClassType = UEDefinition.GetType("Script.CoreUObject.UClass");
+            UScriptStructType = UEDefinition.GetType("Script.CoreUObject.UScriptStruct");
+            UStruct_StaticStructImplementation = UEDefinition.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_StaticStructImplementation");
+            UObject_StaticClassImplementation = UEDefinition.GetType("Script.Library.UObjectImplementation").Methods.FirstOrDefault(method => method.Name == "UObject_StaticClassImplementation");
+            UStruct_RegisterImplementation = UEDefinition.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_RegisterImplementation");
+            UStruct_UnRegisterImplementation = UEDefinition.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_UnRegisterImplementation");
+            SearchAllPropertyAccessors(UEDefinition);
+
         }
     }
 }
