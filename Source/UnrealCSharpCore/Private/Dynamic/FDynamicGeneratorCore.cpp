@@ -1,5 +1,6 @@
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Bridge/FTypeBridge.h"
+#include "CoreMacro/Macro.h"
 #include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/ClassAttributeMacro.h"
@@ -12,11 +13,12 @@
 #include "Domain/FMonoDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Log/UnrealCSharpLog.h"
-#include "Misc/FileHelper.h"
-#include "Serialization/JsonReader.h"
-#include "Serialization/JsonSerializer.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
+
+#if WITH_EDITOR
+TMap<FString, TArray<FString>> FDynamicGeneratorCore::DynamicMap;
+#endif
 
 TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
 {
@@ -211,19 +213,30 @@ TArray<FString> FDynamicGeneratorCore::FunctionMetaDataAttrs =
 };
 
 #if WITH_EDITOR
+void FDynamicGeneratorCore::BeginCodeAnalysisGenerator()
+{
+	DynamicMap = FUnrealCSharpFunctionLibrary::LoadFileToArray(FString::Printf(TEXT(
+		"%s/%s.json"
+	),
+	                                                                           *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+	                                                                           *DYNAMIC
+	));
+}
+
+void FDynamicGeneratorCore::EndCodeAnalysisGenerator()
+{
+	DynamicMap.Empty();
+}
+
 void FDynamicGeneratorCore::CodeAnalysisGenerator(const FString& InName,
                                                   const TFunction<void(const FString&)>& InGenerator)
 {
-	auto Names = GetDynamic(FString::Printf(TEXT(
-		                        "%s/%s.json"),
-	                                        *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-	                                        *InName),
-	                        InName
-	);
-
-	for (const auto& Name : Names)
+	if (const auto Names = DynamicMap.Find(InName))
 	{
-		InGenerator(Name);
+		for (const auto& Name : *Names)
+		{
+			InGenerator(Name);
+		}
 	}
 }
 
@@ -239,7 +252,8 @@ bool FDynamicGeneratorCore::IsDynamic(MonoClass* InMonoClass, const FString& InA
 
 const FString& FDynamicGeneratorCore::DynamicReInstanceBaseName()
 {
-	static FString DynamicReInstance = TEXT("DynamicReInstance");
+
+	static FString DynamicReInstance = TEXT("DYNAMIC_REINSTANCE");
 
 	return DynamicReInstance;
 }
@@ -853,35 +867,6 @@ void FDynamicGeneratorCore::SetMetaData(FProperty* InProperty, MonoCustomAttrInf
 void FDynamicGeneratorCore::SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
 	SetFieldMetaData(InFunction, FunctionMetaDataAttrs, InMonoCustomAttrInfo);
-}
-
-TArray<FString> FDynamicGeneratorCore::GetDynamic(const FString& InFile, const FString& InField)
-{
-	auto& FileManager = IFileManager::Get();
-
-	if (!FileManager.FileExists(*InFile))
-	{
-		return {};
-	}
-
-	FString JsonStr;
-
-	if (FFileHelper::LoadFileToString(JsonStr, *InFile))
-	{
-		TSharedPtr<FJsonObject> JsonObj;
-
-		TArray<FString> Dynamic;
-
-		const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
-
-		FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-		JsonObj->TryGetStringArrayField(InField, Dynamic);
-
-		return Dynamic;
-	}
-
-	return {};
 }
 #endif
 
