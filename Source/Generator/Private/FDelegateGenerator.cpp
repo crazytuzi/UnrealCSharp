@@ -376,12 +376,11 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(InDelegateProperty->SignatureFunction), ModuleName);
 
-	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath"))),
-		(!SignatureFunction->GetOuterUClass()->IsChildOf(UBlueprintGeneratedClass::StaticClass()) ? TEXT("F") : TEXT("")) + InDelegateProperty->GetName());
+	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath"))), ClassContent);
 
 	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile);
 
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FGeneratorCore::SaveStringToFile(FileName + TEXT(".cs"), Content);
 }
 
 void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelegateProperty)
@@ -784,8 +783,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(InMulticastDelegateProperty->SignatureFunction), ModuleName);
 
-	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath"))),
-		(!SignatureFunction->GetOuterUClass()->IsChildOf(UBlueprintGeneratedClass::StaticClass()) ? TEXT("F") : TEXT("")) + InMulticastDelegateProperty->GetName());
+	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath"))), ClassContent);
 
 	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile);
 
