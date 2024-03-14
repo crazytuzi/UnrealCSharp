@@ -2,5 +2,8 @@
 
 void FBoolPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	BoolProperty->SetPropertyValue(Dest, *((bool*)Src));
+	if (BoolProperty != nullptr)
+	{
+		BoolProperty->SetPropertyValue(Dest, *((bool*)Src));
+	}
 }
