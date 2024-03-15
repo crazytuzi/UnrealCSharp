@@ -3,14 +3,13 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
-#include "Misc/FileHelper.h"
-#include "Serialization/JsonReader.h"
-#include "Serialization/JsonSerializer.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicInterfaceGenerator.h"
+
+TMap<FString, TArray<FString>> FClassGenerator::OverrideFunctionsMap;
 
 void FClassGenerator::Generator()
 {
@@ -48,6 +47,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 	}
 
 	if (FUnrealCSharpFunctionLibrary::IsSpecialClass(InClass))
+	{
+		return;
+	}
+
+	if (FUnrealCSharpFunctionLibrary::IsDynamicReInstanceField(InClass))
 	{
 		return;
 	}
@@ -777,7 +781,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InClass), ModuleName);
 
-	auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
+	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InClass)),
+	                                          InClass->GetName());
+
+	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
@@ -1295,37 +1302,12 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 
 TArray<FString> FClassGenerator::GetOverrideFunctions(const FString& InNameSpace, const FString& InClass)
 {
-	const auto FileName = FString::Printf(TEXT(
-		"%s/%s.%s.json"
+	const auto FoundFunctions = OverrideFunctionsMap.Find(FString::Printf(TEXT(
+		"%s.%s"
 	),
-	                                      *FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-	                                      *InNameSpace,
-	                                      *InClass
-	);
+	                                                                      *InNameSpace,
+	                                                                      *InClass
+	));
 
-	auto& FileManager = IFileManager::Get();
-
-	if (!FileManager.FileExists(*FileName))
-	{
-		return {};
-	}
-
-	FString JsonStr;
-
-	if (FFileHelper::LoadFileToString(JsonStr, *FileName))
-	{
-		TSharedPtr<FJsonObject> JsonObj;
-
-		TArray<FString> OverrideFunctions;
-
-		const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
-
-		FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-		JsonObj->TryGetStringArrayField(TEXT("Override"), OverrideFunctions);
-
-		return OverrideFunctions;
-	}
-
-	return {};
+	return FoundFunctions != nullptr ? *FoundFunctions : TArray<FString>{};
 }

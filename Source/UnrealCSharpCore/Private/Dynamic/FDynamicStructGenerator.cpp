@@ -70,7 +70,8 @@ void FDynamicStructGenerator::Generator(MonoClass* InMonoClass)
 		OldScriptStruct->Rename(
 			*MakeUniqueObjectName(
 				OldScriptStruct->GetOuter(),
-				OldScriptStruct->GetClass())
+				OldScriptStruct->GetClass(),
+				*FDynamicGeneratorCore::DynamicReInstanceBaseName())
 			.ToString(),
 			nullptr,
 			REN_DontCreateRedirectors);
@@ -270,65 +271,66 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 
 	for (const auto BlueprintGeneratedClass : BlueprintGeneratedClasses)
 	{
-		const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy);
-
-		auto bIsRefresh = false;
-
-		TArray<UK2Node*> AllNodes;
-
-		FBlueprintEditorUtils::GetAllNodesOfClass(Blueprint, AllNodes);
-
-		for (const auto Node : AllNodes)
+		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
-			if (const auto StructOperation = Cast<UK2Node_StructOperation>(Node))
-			{
-				if (StructOperation->StructType == InOldScriptStruct)
-				{
-					StructOperation->StructType = InNewScriptStruct;
+			auto bIsRefresh = false;
 
-					bIsRefresh = true;
-				}
-			}
-			else
+			TArray<UK2Node*> AllNodes;
+
+			FBlueprintEditorUtils::GetAllNodesOfClass(Blueprint, AllNodes);
+
+			for (const auto Node : AllNodes)
 			{
-				for (const auto Pin : Node->Pins)
+				if (const auto StructOperation = Cast<UK2Node_StructOperation>(Node))
 				{
-					if (Pin->PinType.PinSubCategoryObject == InOldScriptStruct)
+					if (StructOperation->StructType == InOldScriptStruct)
 					{
-						Pin->PinType.PinSubCategoryObject = InNewScriptStruct;
-
-						Pin->Modify();
+						StructOperation->StructType = InNewScriptStruct;
 
 						bIsRefresh = true;
 					}
 				}
-			}
-		}
+				else
+				{
+					for (const auto Pin : Node->Pins)
+					{
+						if (Pin->PinType.PinSubCategoryObject == InOldScriptStruct)
+						{
+							Pin->PinType.PinSubCategoryObject = InNewScriptStruct;
 
-		for (const auto& Variable : Blueprint->NewVariables)
-		{
-			if (Variable.VarType.PinSubCategoryObject == InOldScriptStruct)
+							Pin->Modify();
+
+							bIsRefresh = true;
+						}
+					}
+				}
+			}
+
+			for (const auto& Variable : Blueprint->NewVariables)
 			{
-				auto NewVarType = Variable.VarType;
+				if (Variable.VarType.PinSubCategoryObject == InOldScriptStruct)
+				{
+					auto NewVarType = Variable.VarType;
 
-				NewVarType.PinSubCategoryObject = InNewScriptStruct;
+					NewVarType.PinSubCategoryObject = InNewScriptStruct;
 
-				FBlueprintEditorUtils::ChangeMemberVariableType(Blueprint, Variable.VarName, NewVarType);
+					FBlueprintEditorUtils::ChangeMemberVariableType(Blueprint, Variable.VarName, NewVarType);
 
-				bIsRefresh = true;
+					bIsRefresh = true;
+				}
 			}
-		}
 
-		if (bIsRefresh)
-		{
-			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
+			if (bIsRefresh)
+			{
+				FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
 
-			FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
+				FBlueprintEditorUtils::MarkBlueprintAsModified(Blueprint);
 
-			constexpr auto BlueprintCompileOptions = EBlueprintCompileOptions::SkipGarbageCollection |
-				EBlueprintCompileOptions::SkipSave;
+				constexpr auto BlueprintCompileOptions = EBlueprintCompileOptions::SkipGarbageCollection |
+					EBlueprintCompileOptions::SkipSave;
 
-			FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
+				FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
+			}
 		}
 	}
 

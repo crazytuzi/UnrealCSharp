@@ -33,9 +33,12 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		return;
 	}
 
-	auto ClassName = InScriptStruct->GetName();
+	if (FUnrealCSharpFunctionLibrary::IsSpecialStruct(InScriptStruct))
+	{
+		return;
+	}
 
-	if (ClassName.StartsWith(TEXT("STRUCT_REINST_")))
+	if (FUnrealCSharpFunctionLibrary::IsDynamicReInstanceField(InScriptStruct))
 	{
 		return;
 	}
@@ -314,7 +317,10 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InScriptStruct), ModuleName);
 
-	auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
+	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InScriptStruct)),
+	                                          InScriptStruct->GetName());
+
+	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }

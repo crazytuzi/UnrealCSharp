@@ -1,4 +1,5 @@
 ﻿#include "FGeneratorCore.h"
+#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Binding/TypeInfo/TName.inl"
@@ -544,6 +545,39 @@ int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInp
 		static_cast<int32>(bHasOutput) << 2;
 }
 
+FString FGeneratorCore::GetModuleRelativePath(const UField* InField)
+{
+	return InField != nullptr
+		       ? GetModuleRelativePath(InField->GetMetaData(TEXT("ModuleRelativePath")))
+		       : FString();
+}
+
+FString FGeneratorCore::GetModuleRelativePath(const UEnum* InEnum)
+{
+	return InEnum != nullptr
+		       ? GetModuleRelativePath(InEnum->GetMetaData(TEXT("ModuleRelativePath")))
+		       : FString();
+}
+
+FString FGeneratorCore::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
+{
+	return InDelegateProperty != nullptr
+		       ? GetModuleRelativePath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))
+		       : FString();
+}
+
+FString FGeneratorCore::GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty)
+{
+	return InMulticastDelegateProperty != nullptr
+		       ? GetModuleRelativePath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))
+		       : FString();
+}
+
+FString FGeneratorCore::GetModuleRelativePath(const FString& InModuleRelativePath)
+{
+	return InModuleRelativePath.Replace(TEXT("Public/"), TEXT("")).Replace(TEXT("Private/"), TEXT(""));
+}
+
 bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& String)
 {
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
@@ -849,6 +883,13 @@ void FGeneratorCore::BeginGenerator()
 			SupportedAssetClassName.Add(AssetClass->GetFName());
 		}
 	}
+
+	FClassGenerator::OverrideFunctionsMap = FUnrealCSharpFunctionLibrary::LoadFileToArray(FString::Printf(TEXT(
+		"%s/%s.json"
+	),
+		*FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+		*OVERRIDE
+	));
 }
 
 void FGeneratorCore::EndGenerator()

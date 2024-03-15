@@ -2,6 +2,7 @@
 #include "CoreMacro/Macro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
+#include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -454,6 +455,42 @@ FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
 	return FPaths::Combine(FPaths::ProjectIntermediateDir(), CODE_ANALYSIS);
 }
 
+TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(const FString& InFileName)
+{
+	TMap<FString, TArray<FString>> Result;
+
+	if (auto& FileManager = IFileManager::Get(); FileManager.FileExists(*InFileName))
+	{
+		if (FString ResultString; FFileHelper::LoadFileToString(ResultString, *InFileName))
+		{
+			TSharedPtr<FJsonObject> JsonObject;
+
+			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
+
+			FJsonSerializer::Deserialize(JsonReader, JsonObject);
+
+			for (const auto& Value : JsonObject->Values)
+			{
+				TArray<FString> Array;
+
+				const auto& JsonValueArray = Value.Value->AsArray();
+
+				for (auto Index = 0; Index < JsonValueArray.Num(); Index++)
+				{
+					if (FString Element; JsonValueArray[Index]->TryGetString(Element))
+					{
+						Array.Add(Element);
+					}
+				}
+
+				Result.Add(Value.Key, Array);
+			}
+		}
+	}
+
+	return Result;
+}
+
 TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
 	static auto GamePath = GetGamePath();
@@ -574,6 +611,7 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 	return GameModuleList;
 }
 
+#if WITH_EDITOR
 bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
 {
 	if (InClass != nullptr)
@@ -588,3 +626,18 @@ bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
 
 	return false;
 }
+
+bool FUnrealCSharpFunctionLibrary::IsSpecialStruct(const UScriptStruct* InScriptStruct)
+{
+	return InScriptStruct != nullptr
+		       ? InScriptStruct->GetName().StartsWith(TEXT("STRUCT_REINST_"))
+		       : false;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsDynamicReInstanceField(const UField* InField)
+{
+	return InField != nullptr
+		       ? InField->GetName().StartsWith(FDynamicGeneratorCore::DynamicReInstanceBaseName())
+		       : false;
+}
+#endif
