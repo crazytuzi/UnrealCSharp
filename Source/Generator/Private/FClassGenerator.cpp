@@ -781,11 +781,12 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InClass), ModuleName);
 
-	FString ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(InClass->GetMetaData(TEXT("ModuleRelativePath"))), InClass->GetName());
+	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InClass)),
+	                                          InClass->GetName());
 
-	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile);
+	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
 
-	FGeneratorCore::SaveStringToFile(FileName + TEXT(".cs") , Content);
+	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
 
 bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& InFunctionOutParamIndex,

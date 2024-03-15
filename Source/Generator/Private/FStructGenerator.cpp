@@ -317,9 +317,10 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InScriptStruct), ModuleName);
 
-	FString ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(InScriptStruct->GetMetaData(TEXT("ModuleRelativePath"))), InScriptStruct->GetName());
+	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InScriptStruct)),
+	                                          InScriptStruct->GetName());
 
-	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile);
+	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
 
-	FGeneratorCore::SaveStringToFile(FileName + TEXT(".cs"), Content);
+	FGeneratorCore::SaveStringToFile(FileName, Content);
 }

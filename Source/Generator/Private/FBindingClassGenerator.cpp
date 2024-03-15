@@ -518,7 +518,9 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent[0].Replace(TEXT("."), TEXT("/"))),
 		FUnrealCSharpFunctionLibrary::GetBindingPath());
 
-	const auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
+	auto FileBaseName = InClass.IsReflection() ? ClassContent.RightChop(1) : ClassContent;
+
+	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
@@ -699,7 +701,9 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent[0].Replace(TEXT("."), TEXT("/"))),
 		FUnrealCSharpFunctionLibrary::GetBindingPath());
 
-	const auto FileName = FPaths::Combine(DirectoryName, ClassImplementationContent) + TEXT(".cs");
+	auto FileBaseName = InClass.IsReflection() ? ClassContent.RightChop(1) : ClassContent;
+
+	const auto FileName = FPaths::Combine(DirectoryName, BINDING_CLASS_IMPLEMENTATION(FileBaseName)) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
 }
