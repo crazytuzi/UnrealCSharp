@@ -64,6 +64,30 @@ bool FDynamicClassGenerator::IsDynamicClass(MonoClass* InMonoClass)
 	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_CLASS_ATTRIBUTE);
 }
 
+FString FDynamicClassGenerator::GetMonoClassName(const FString& InName)
+{
+	static auto A = AActor::StaticClass()->GetPrefixCPP();
+
+	static auto U = UObject::StaticClass()->GetPrefixCPP();
+
+	if (DynamicClassMap.Find(InName))
+	{
+		return InName;
+	}
+
+	if (auto MonoClassName = A + InName; DynamicClassMap.Contains(MonoClassName))
+	{
+		return MonoClassName;
+	}
+
+	if (auto MonoClassName = U + InName; DynamicClassMap.Contains(MonoClassName))
+	{
+		return MonoClassName;
+	}
+
+	return {};
+}
+
 void FDynamicClassGenerator::OnPrePIEEnded()
 {
 	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(

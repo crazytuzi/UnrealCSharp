@@ -18,6 +18,8 @@ public:
 
 	static bool IsDynamicClass(MonoClass* InMonoClass);
 
+	static FString GetMonoClassName(const FString& InName);
+
 	static void OnPrePIEEnded();
 #endif
 

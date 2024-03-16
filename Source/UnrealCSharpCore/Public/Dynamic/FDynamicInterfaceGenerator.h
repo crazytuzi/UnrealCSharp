@@ -11,6 +11,8 @@ public:
 	static void CodeAnalysisGenerator();
 
 	static bool IsDynamicInterface(MonoClass* InMonoClass);
+
+	static FString GetMonoClassName(const FString& InName);
 #endif
 
 	static void Generator(MonoClass* InMonoClass);
