@@ -509,7 +509,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(InMember, MapHelper, SrcMonoObject);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, SrcMonoObject);
 			}
 		}
 
@@ -577,7 +577,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(InMember, SetHelper, SrcMonoObject);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, SrcMonoObject);
 			}
 		}
 
@@ -674,7 +674,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 			}
 			else
 			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(InMember, ArrayHelper, SrcMonoObject);
+				FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, SrcMonoObject);
 			}
 		}
 

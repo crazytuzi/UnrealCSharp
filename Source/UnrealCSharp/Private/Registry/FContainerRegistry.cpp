@@ -16,63 +16,57 @@ void FContainerRegistry::Initialize()
 
 void FContainerRegistry::Deinitialize()
 {
-	for (auto& Pair : GarbageCollectionHandle2ArrayHelperAddress.Get())
+	for (auto& Pair : ArrayGarbageCollectionHandle2Helper.Get())
 	{
-		if (Pair.Value.Value != nullptr)
+		if (Pair.Value != nullptr)
 		{
-			delete Pair.Value.Value;
+			delete Pair.Value;
 
-			Pair.Value.Value = nullptr;
+			Pair.Value = nullptr;
 		}
 
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
-	GarbageCollectionHandle2ArrayHelperAddress.Empty();
+	ArrayGarbageCollectionHandle2Helper.Empty();
 
-	ArrayHelperAddress2GarbageCollectionHandle.Empty();
-
-	MonoObject2ArrayHelperAddress.Empty();
+	ArrayMonoObject2Helper.Empty();
 
 	ArrayAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : GarbageCollectionHandle2MapHelperAddress.Get())
+	for (auto& Pair : MapGarbageCollectionHandle2Helper.Get())
 	{
-		if (Pair.Value.Value != nullptr)
+		if (Pair.Value != nullptr)
 		{
-			delete Pair.Value.Value;
+			delete Pair.Value;
 
-			Pair.Value.Value = nullptr;
+			Pair.Value = nullptr;
 		}
 
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
-	GarbageCollectionHandle2MapHelperAddress.Empty();
+	MapGarbageCollectionHandle2Helper.Empty();
 
-	MapHelperAddress2GarbageCollectionHandle.Empty();
-
-	MonoObject2MapHelperAddress.Empty();
+	MapMonoObject2Helper.Empty();
 
 	MapAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : GarbageCollectionHandle2SetHelperAddress.Get())
+	for (auto& Pair : SetGarbageCollectionHandle2Helper.Get())
 	{
-		if (Pair.Value.Value != nullptr)
+		if (Pair.Value != nullptr)
 		{
-			delete Pair.Value.Value;
+			delete Pair.Value;
 
-			Pair.Value.Value = nullptr;
+			Pair.Value = nullptr;
 		}
 
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
-	GarbageCollectionHandle2SetHelperAddress.Empty();
+	SetGarbageCollectionHandle2Helper.Empty();
 
-	SetHelperAddress2GarbageCollectionHandle.Empty();
-
-	MonoObject2SetHelperAddress.Empty();
+	SetMonoObject2Helper.Empty();
 
 	SetAddress2GarbageCollectionHandle.Empty();
 }

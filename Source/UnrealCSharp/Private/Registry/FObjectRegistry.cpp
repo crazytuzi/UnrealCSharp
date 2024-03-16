@@ -24,9 +24,9 @@ void FObjectRegistry::Deinitialize()
 
 	GarbageCollectionHandle2Object.Empty();
 
-	Object2GarbageCollectionHandleMap.Empty();
-
 	MonoObject2Object.Empty();
+
+	Object2GarbageCollectionHandleMap.Empty();
 }
 
 void* FObjectRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle)

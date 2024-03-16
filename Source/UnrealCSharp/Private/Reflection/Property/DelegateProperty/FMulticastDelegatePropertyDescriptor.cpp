@@ -89,7 +89,7 @@ MonoObject* FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress) co
 
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(InAddress, MulticastDelegateHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(MulticastDelegateHelper, Object);
 
 	return Object;
 }

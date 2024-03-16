@@ -16,7 +16,7 @@ void FStringRegistry::Initialize()
 
 void FStringRegistry::Deinitialize()
 {
-	for (auto& Pair : GarbageCollectionHandle2NameAddress.Get())
+	for (auto& Pair : NameGarbageCollectionHandle2Address.Get())
 	{
 		FGarbageCollectionHandle::Free(Pair.Key);
 
@@ -28,13 +28,13 @@ void FStringRegistry::Deinitialize()
 		}
 	}
 
-	GarbageCollectionHandle2NameAddress.Empty();
+	NameGarbageCollectionHandle2Address.Empty();
+
+	NameMonoObject2Address.Empty();
 
 	NameAddress2GarbageCollectionHandle.Empty();
 
-	MonoObject2NameAddress.Empty();
-
-	for (auto& Pair : GarbageCollectionHandle2StringAddress.Get())
+	for (auto& Pair : StringGarbageCollectionHandle2Address.Get())
 	{
 		FGarbageCollectionHandle::Free(Pair.Key);
 
@@ -46,13 +46,13 @@ void FStringRegistry::Deinitialize()
 		}
 	}
 
-	GarbageCollectionHandle2StringAddress.Empty();
+	StringGarbageCollectionHandle2Address.Empty();
+
+	StringMonoObject2Address.Empty();
 
 	StringAddress2GarbageCollectionHandle.Empty();
 
-	MonoObject2StringAddress.Empty();
-
-	for (auto& Pair : GarbageCollectionHandle2TextAddress.Get())
+	for (auto& Pair : TextGarbageCollectionHandle2Address.Get())
 	{
 		FGarbageCollectionHandle::Free(Pair.Key);
 
@@ -64,9 +64,9 @@ void FStringRegistry::Deinitialize()
 		}
 	}
 
-	GarbageCollectionHandle2TextAddress.Empty();
+	TextGarbageCollectionHandle2Address.Empty();
+
+	TextMonoObject2Address.Empty();
 
 	TextAddress2GarbageCollectionHandle.Empty();
-
-	MonoObject2TextAddress.Empty();
 }

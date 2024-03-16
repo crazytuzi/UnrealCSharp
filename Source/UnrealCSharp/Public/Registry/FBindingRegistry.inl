@@ -3,16 +3,6 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reference/FBindingReference.h"
 
-bool operator==(const FBindingAddress& A, const FBindingAddress& B)
-{
-	return A.AddressWrapper == B.AddressWrapper;
-}
-
-uint32 GetTypeHash(const FBindingAddress& InBindingAddress)
-{
-	return GetTypeHash(InBindingAddress.AddressWrapper);
-}
-
 template <typename T>
 auto FBindingRegistry::GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
@@ -34,7 +24,11 @@ auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject,
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-	BindingAddress2GarbageCollectionHandle.Add(static_cast<void*>(const_cast<T*>(InObject)), GarbageCollectionHandle);
+	if (bNeedFree == false)
+	{
+		BindingAddress2GarbageCollectionHandle.Add(static_cast<void*>(const_cast<T*>(InObject)),
+		                                           GarbageCollectionHandle);
+	}
 
 	auto BindingAddressWrapper = new TBindingAddressWrapper(InObject);
 

@@ -4,12 +4,15 @@
 #include "TValueMapping.inl"
 #include "mono/metadata/object-forward.h"
 
-struct FStructAddressBase : TAddressValue<TWeakObjectPtr<UScriptStruct>>
+struct FStructAddressBase : TValue<TWeakObjectPtr<UScriptStruct>>
 {
 	FStructAddressBase(UScriptStruct* InScriptStruct, void* InAddress):
-		TAddressValue(InScriptStruct, InAddress)
+		TValue(InScriptStruct),
+		Address(InAddress)
 	{
 	}
+
+	void* Address;
 };
 
 static bool operator==(const FStructAddressBase& A, const FStructAddressBase& B);
@@ -33,6 +36,7 @@ private:
 	template <typename Key, typename Value>
 	struct TStructMapping : TValueMapping<Key, Value>
 	{
+		typedef typename TStructMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
 	};
 
 	typedef TStructMapping<FStructAddressBase, FStructAddress> FStructMapping;
@@ -76,9 +80,9 @@ public:
 private:
 	FStructMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2StructAddress;
 
-	FStructMapping::FKey2GarbageCollectionHandle StructAddress2GarbageCollectionHandle;
-
 	FStructMapping::FMonoObject2Value MonoObject2StructAddress;
+
+	FStructMapping::FAddress2GarbageCollectionHandle StructAddress2GarbageCollectionHandle;
 };
 
 #include "FStructRegistry.inl"
