@@ -365,8 +365,12 @@ namespace Weavers
                 var PropertySetMethod = GetPropertyAccessor(property, StructSetMethodMap);
                 if (PropertySetMethod != null)
                 {
-                    var field = new FieldDefinition("__" + property.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-                    type.Fields.Add(field);
+                    var field = type.Fields.FirstOrDefault(f => f.Name == "__" + property.Name && f.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+                    if (field == null)
+                    {
+                        field = new FieldDefinition("__" + property.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
+                        type.Fields.Add(field);
+                    }
                     var ilProcessor = property.SetMethod.Body.GetILProcessor();
                     ilProcessor.Clear();
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
@@ -392,8 +396,12 @@ namespace Weavers
                 var PropertyGetMethod = GetPropertyAccessor(property, StructGetMethodMap);
                 if (PropertyGetMethod != null)
                 {
-                    var field = new FieldDefinition("__" + property.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-                    type.Fields.Add(field);
+                    var field = type.Fields.FirstOrDefault(f => f.Name == "__" + property.Name && f.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+                    if (field == null)
+                    {
+                        field = new FieldDefinition("__" + property.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
+                        type.Fields.Add(field);
+                    }
                     var ilProcessor = property.GetMethod.Body.GetILProcessor();
                     ilProcessor.Clear();
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
