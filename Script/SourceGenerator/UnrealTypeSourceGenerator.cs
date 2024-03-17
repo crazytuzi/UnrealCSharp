@@ -136,13 +136,13 @@ namespace SourceGenerator
             }
             string NameSpace = ns.GetFullNamespace();
             string Name = cds.Identifier.ToString();
-            bool IsUClass = cds.AttributeLists.ToList().Any(list => list.Attributes.All(att => att.GetText().ToString().IndexOf("UClass") >= 0));
-            bool IsUStruct = cds.AttributeLists.ToList().Any(list => list.Attributes.All(att => att.GetText().ToString().IndexOf("UStruct") >= 0));
-            bool IsUInterface = cds.AttributeLists.ToList().Any(list => list.Attributes.All(att => att.GetText().ToString().IndexOf("UInterface") >= 0));
+            bool IsUClass = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UClass") >= 0));
+            bool IsUStruct = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UStruct") >= 0));
+            bool IsUInterface = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UInterface") >= 0));
             string Modifiers = string.Join(" ", cds.Modifiers.ToArray().Select(modifier => modifier.Text));
 
 
-            var methods = cds.Members.Where(mem => mem is MethodDeclarationSyntax).ToList();
+            var methods = cds.Members.Where(mem => mem is MethodDeclarationSyntax);
 
             bool HasStaticClass = methods.Any(m => ((MethodDeclarationSyntax)m).Identifier.ToString() == "StaticClass");
             bool HasStaticStruct = methods.Any(m => ((MethodDeclarationSyntax)m).Identifier.ToString() == "StaticStruct");
@@ -165,7 +165,7 @@ namespace SourceGenerator
                 return true;
             });
 
-            var operators = cds.Members.Where(mem => mem is OperatorDeclarationSyntax).ToList();
+            var operators = cds.Members.Where(mem => mem is OperatorDeclarationSyntax);
             var HasOperatorEqualTo = operators.Any(o => {
                 var op = ((OperatorDeclarationSyntax)o);
                 if (op.OperatorToken.Text != "==")
