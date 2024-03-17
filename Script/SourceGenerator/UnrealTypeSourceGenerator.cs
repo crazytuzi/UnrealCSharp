@@ -202,7 +202,11 @@ namespace SourceGenerator
                 type.Name = Name;
                 type.Modifiers = Modifiers;
                 type.Type = EType.Other;
-                type.Using = new List<string>() { "using Script.Library;\n", "using Script.UnrealCSharpCore;\n" };
+                type.Using = new List<string>() { 
+                    "using Script.Library;\n", 
+                    "using Script.UnrealCSharpCore;\n", 
+                    "using Script.CoreUObject;\n" 
+                };
             }
 
             if (type.Type == EType.Other)
@@ -234,8 +238,13 @@ namespace SourceGenerator
             List<string> rtl = new List<string>();
             if (using1 == null && using2 == null)
                 return rtl;
-            rtl.AddRange(using1);
-            foreach(string s in using2)
+            foreach (string s in using1)
+            {
+                if (rtl.Contains(s))
+                    continue;
+                rtl.Add(s);
+            }
+            foreach (string s in using2)
             {
                 if (rtl.Contains(s))
                     continue;
@@ -285,7 +294,7 @@ namespace SourceGenerator
             {
                 foreach (var @using in cus.Usings)
                 {
-                    var str = @using.GetText().ToString().Replace(" ", "").Replace("\t", "");
+                    var str = @using.GetText().ToString().Replace(" ", "").Replace("\t", "").Replace("\n", "").Replace("\r", "").Trim() + "\n";
                     str = str.Replace("using", "using ");
                     rtl.Add(str);
 
