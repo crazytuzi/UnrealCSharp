@@ -38,7 +38,7 @@ namespace SourceGenerator
                     continue;
                 if (kv.Value.Type == EType.UStruct)
                 {
-                    string souce = "";
+                    string souce = "using Script.Library;\nusing Script.UnrealCSharpCore;\n";
                     kv.Value.Using.ForEach(str => souce += str);
                     souce += "namespace " + kv.Value.NameSpace + "\n" +
                         "{\n" +
@@ -76,11 +76,11 @@ namespace SourceGenerator
                     }
                     souce += "\t}\n";
                     souce += "}";
-                    context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + "gen.cs", souce);
+                    context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + ".gen.cs", souce);
                 }
                 else if (kv.Value.Type == EType.UClass || kv.Value.Type == EType.UInterface)
                 {
-                    string souce = "";
+                    string souce = "using Script.Library;\nusing Script.UnrealCSharpCore;\n";
                     kv.Value.Using.ForEach(str => souce += str);
                     souce +="namespace " + kv.Value.NameSpace + "\n" +
                         "{\n" +
@@ -98,7 +98,7 @@ namespace SourceGenerator
 
                     souce += "\t}\n";
                     souce += "}";
-                    context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + "gen.cs", souce);
+                    context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + ".gen.cs", souce);
                 }
             }
 
