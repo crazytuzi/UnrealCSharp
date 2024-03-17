@@ -229,8 +229,6 @@ namespace Weavers
             {
                 FullPath += type.Name;
             }
-            if (FullPath.EndsWith("_C"))
-                FullPath = FullPath.Substring(0, FullPath.Length - 2);
             return FullPath;
         }
         private void ProcessUClassType(TypeDefinition type)

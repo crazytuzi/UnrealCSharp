@@ -17,8 +17,6 @@ namespace SourceGenerator
                 FullPath += Name.Substring(1);
             else
                 FullPath += Name;
-            if (FullPath.EndsWith("_C"))
-                FullPath = FullPath.Substring(0, FullPath.Length - 2);
             return FullPath;
         }
         public void Execute(GeneratorExecutionContext context)
