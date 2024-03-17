@@ -109,9 +109,8 @@ namespace Weavers
             }
             var ilProcessor = ctor.Body.GetILProcessor();
             ilProcessor.InsertAfter(ctor.Body.Instructions[1], Instruction.Create(OpCodes.Ldarg_0));
-            ilProcessor.InsertAfter(ctor.Body.Instructions[2], Instruction.Create(OpCodes.Ldarg_0));
-            ilProcessor.InsertAfter(ctor.Body.Instructions[3], Instruction.Create(OpCodes.Ldstr, GetPath(type)));
-            ilProcessor.InsertAfter(ctor.Body.Instructions[4], Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_RegisterImplementation)));
+            ilProcessor.InsertAfter(ctor.Body.Instructions[2], Instruction.Create(OpCodes.Ldstr, GetPath(type)));
+            ilProcessor.InsertAfter(ctor.Body.Instructions[3], Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_RegisterImplementation)));
 
             if (type.Methods.Any(m => m.Name == "Finalize") == false)
             {
