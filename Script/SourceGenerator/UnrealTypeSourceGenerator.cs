@@ -10,6 +10,17 @@ namespace SourceGenerator
     [Generator]
     public class UnrealTypeSourceGenerator : ISourceGenerator
     {
+        public string GetPathName(string Name)
+        {
+            var FullPath = "/Script/CoreUObject.";
+            if (Name[0] == 'A' || Name[0] == 'U' || Name[0] == 'F')
+                FullPath += Name.Substring(1);
+            else
+                FullPath += Name;
+            if (FullPath.EndsWith("_C"))
+                FullPath = FullPath.Substring(0, FullPath.Length - 2);
+            return FullPath;
+        }
         public void Execute(GeneratorExecutionContext context)
         {
             var UnrealTypeReceiver = context.SyntaxReceiver as UnrealTypeReceiver;
@@ -27,79 +38,65 @@ namespace SourceGenerator
                     continue;
                 if (kv.Value.Type == EType.UStruct)
                 {
-                    string souce = "using Script.CoreUObject;\n"+
-                        "using Script.Library;\n"+
-                        "namespace " + kv.Value.NameSpace + ";\n" +
-                        "" + kv.Value.Modifiers + " class " + kv.Value.Name + ": IStaticStruct, IGarbageCollectionHandle\n" +
-                    "{\n";
+                    string souce = "";
+                    kv.Value.Using.ForEach(str => souce += str);
+                    souce += "namespace " + kv.Value.NameSpace + "\n" +
+                        "{\n" +
+                        "\t" + kv.Value.Modifiers + " class " + kv.Value.Name + ": IStaticStruct, IGarbageCollectionHandle\n" +
+                    "\t{\n";
                     if (kv.Value.HasStaticStruct == false)
                     {
-                        var FullPath = "/Script/CoreUObject.";
-                        if (kv.Value.Name[0] == 'A' || kv.Value.Name[0] == 'U' || kv.Value.Name[0] == 'F')
-                        {
-                            FullPath += kv.Value.Name.Substring(1);
-                        }
-                        else
-                        {
-                            FullPath += kv.Value.Name;
-                        }
-
+                        var FullPath = GetPathName(kv.Value.Name);
                         souce +=
-                            "\tpublic static UScriptStruct StaticStruct()\n" +
-                            "\t{\n" +
-                            $"\t\treturn UStructImplementation.UStruct_StaticStructImplementation(\"{FullPath}\");\n"+
-                            "\t}\n";
+                            "\t\tpublic static UScriptStruct StaticStruct()\n" +
+                            "\t\t{\n" +
+                            $"\t\t\treturn UStructImplementation.UStruct_StaticStructImplementation(\"{FullPath}\");\n"+
+                            "\t\t}\n";
                     }
 
                     if (kv.Value.HasGarbageCollectionHandle == false)
                     {
-                        souce += "\tpublic nint GarbageCollectionHandle { get; set; }\n";
+                        souce += "\t\tpublic nint GarbageCollectionHandle { get; set; }\n";
                     }
                     if (kv.Value.HasEqualsMethod == false)
                     {
-                        souce += $"\tpublic override bool Equals(object Other) => this == Other as {kv.Value.Name};\n";
+                        souce += $"\t\tpublic override bool Equals(object Other) => this == Other as {kv.Value.Name};\n";
                     }
                     if (kv.Value.HasHashCodeMethod == false)
                     {
-                        souce += $"\tpublic override int GetHashCode() => (int)GarbageCollectionHandle;\n";
+                        souce += $"\t\tpublic override int GetHashCode() => (int)GarbageCollectionHandle;\n";
                     }
                     if (kv.Value.HasOperatorEqualTo == false)
                     {
-                        souce += $"\tpublic static bool operator ==({kv.Value.Name} A, {kv.Value.Name} B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
+                        souce += $"\t\tpublic static bool operator ==({kv.Value.Name} A, {kv.Value.Name} B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
                     }
                     if (kv.Value.HasOperatorNotEqualTo == false)
                     {
-                        souce += $"\tpublic static bool operator !=({kv.Value.Name} A, {kv.Value.Name} B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
+                        souce += $"\t\tpublic static bool operator !=({kv.Value.Name} A, {kv.Value.Name} B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
                     }
+                    souce += "\t}\n";
                     souce += "}";
                     context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + "gen.cs", souce);
                 }
                 else if (kv.Value.Type == EType.UClass || kv.Value.Type == EType.UInterface)
                 {
-                    string souce = "using Script.CoreUObject;\n" +
-                        "using Script.Library;\n" +
-                        "namespace " + kv.Value.NameSpace + ";\n" +
-                       "" + kv.Value.Modifiers + " class " + kv.Value.Name + ": IStaticClass\n" +
-                   "{\n";
+                    string souce = "";
+                    kv.Value.Using.ForEach(str => souce += str);
+                    souce +="namespace " + kv.Value.NameSpace + "\n" +
+                        "{\n" +
+                       "\t" + kv.Value.Modifiers + " class " + kv.Value.Name + ": IStaticClass\n" +
+                   "\t{\n";
                     if (kv.Value.HasStaticStruct == false)
                     {
-                        var FullPath = "/Script/CoreUObject.";
-                        if (kv.Value.Name[0] == 'A' || kv.Value.Name[0] == 'U' || kv.Value.Name[0] == 'F')
-                        {
-                            FullPath += kv.Value.Name.Substring(1);
-                        }
-                        else
-                        {
-                            FullPath += kv.Value.Name;
-                        }
-
+                        var FullPath = GetPathName(kv.Value.Name);
                         souce +=
-                            "\tpublic new static UClass StaticClass()\n" +
-                            "\t{\n" +
-                            $"\t\treturn UObjectImplementation.UObject_StaticClassImplementation(\"{FullPath}\");\n" +
-                            "\t}\n";
+                            "\t\tpublic new static UClass StaticClass()\n" +
+                            "\t\t{\n" +
+                            $"\t\t\treturn UObjectImplementation.UObject_StaticClassImplementation(\"{FullPath}\");\n" +
+                            "\t\t}\n";
                     }
 
+                    souce += "\t}\n";
                     souce += "}";
                     context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + "gen.cs", souce);
                 }
@@ -119,7 +116,7 @@ namespace SourceGenerator
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            if (syntaxNode is ClassDeclarationSyntax cds ==true  )
+            if (syntaxNode is ClassDeclarationSyntax cds == true)
             {
                 ProcessClass(cds);
             }
@@ -136,6 +133,7 @@ namespace SourceGenerator
             }
             string NameSpace = ns.GetFullNamespace();
             string Name = cds.Identifier.ToString();
+            List<string> Using = cds.GetUsings();
             bool IsUClass = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UClass") >= 0));
             bool IsUStruct = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UStruct") >= 0));
             bool IsUInterface = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UInterface") >= 0));
@@ -148,7 +146,8 @@ namespace SourceGenerator
             bool HasStaticStruct = methods.Any(m => ((MethodDeclarationSyntax)m).Identifier.ToString() == "StaticStruct");
             bool HasGarbageCollectionHandle = cds.Members.Any(mem => mem is PropertyDeclarationSyntax && ((PropertyDeclarationSyntax)mem).Identifier.ToString() == "GarbageCollectionHandle");
 
-            bool HasEqualsMethod = methods.Any(m => {
+            bool HasEqualsMethod = methods.Any(m =>
+            {
                 var method = ((MethodDeclarationSyntax)m);
                 if (method.Identifier.ToString() != "Equals")
                     return false;
@@ -156,7 +155,8 @@ namespace SourceGenerator
                     return false;
                 return true;
             });
-            bool HasHashCodeMethod = methods.Any(m => {
+            bool HasHashCodeMethod = methods.Any(m =>
+            {
                 var method = ((MethodDeclarationSyntax)m);
                 if (method.Identifier.ToString() != "GetHashCode")
                     return false;
@@ -166,11 +166,12 @@ namespace SourceGenerator
             });
 
             var operators = cds.Members.Where(mem => mem is OperatorDeclarationSyntax);
-            var HasOperatorEqualTo = operators.Any(o => {
+            var HasOperatorEqualTo = operators.Any(o =>
+            {
                 var op = ((OperatorDeclarationSyntax)o);
                 if (op.OperatorToken.Text != "==")
                     return false;
-                foreach(var param in op.ParameterList.Parameters)
+                foreach (var param in op.ParameterList.Parameters)
                 {
                     var t = (IdentifierNameSyntax)param.Type;
                     if (t.Identifier.Text != Name)
@@ -179,7 +180,8 @@ namespace SourceGenerator
                 return true;
             });
 
-            var HasOperatorNotEqualTo = operators.Any(o => {
+            var HasOperatorNotEqualTo = operators.Any(o =>
+            {
                 var op = ((OperatorDeclarationSyntax)o);
                 if (op.OperatorToken.Text != "!=")
                     return false;
@@ -211,7 +213,7 @@ namespace SourceGenerator
                 else if (IsUInterface)
                     type.Type = EType.UInterface;
             }
-
+            type.Using = MerageUsing(Using, type.Using);
             type.HasStaticStruct |= HasStaticStruct;
             type.HasStaticClass |= HasStaticClass;
             type.HasGarbageCollectionHandle |= HasGarbageCollectionHandle;
@@ -221,8 +223,26 @@ namespace SourceGenerator
             type.HasOperatorNotEqualTo |= HasOperatorNotEqualTo;
             return;
         }
-    }
 
+        private List<string> MerageUsing(List<string> using1, List<string> using2)
+        {
+            if (using1 == null && using2 != null)
+                return using2;
+            if (using2 == null && using1 != null)
+                return using1;
+            List<string> rtl = new List<string>();
+            if (using1 == null && using2 == null)
+                return rtl;
+            rtl.AddRange(using1);
+            foreach(string s in using2)
+            {
+                if (rtl.Contains(s))
+                    continue;
+                rtl.Add(s);
+            }
+            return rtl;
+        }
+    }
    
     public enum EType
     {
@@ -235,6 +255,7 @@ namespace SourceGenerator
     {
         public EType Type { get; set; }
 
+        public List<string> Using { get; set; }   
         public string Name { get; set; }
         public string NameSpace { get; set; }
 
@@ -256,6 +277,26 @@ namespace SourceGenerator
 
     public static class CodeAnalysisHelper
     {
+        public static List<string> GetUsings(this SyntaxNode cds)
+        {
+            List<string> rtl = new List<string>();
+            if (cds is CompilationUnitSyntax cus)
+            {
+                foreach (var @using in cus.Usings)
+                {
+                    var str = @using.GetText().ToString().Replace(" ", "").Replace("\t", "");
+                    str = str.Replace("using", "using ");
+                    rtl.Add(str);
+
+                }
+                return rtl;
+            }
+            if (cds.Parent == null)
+                return rtl;
+            return cds.Parent.GetUsings();
+        }
+
+        
         public static string GetFullNamespace(this BaseNamespaceDeclarationSyntax ns)
         {
             if (ns.Parent is BaseNamespaceDeclarationSyntax bns == false) 
