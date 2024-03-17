@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Weavers
 {
-    public class UPropertyWeaver : BaseModuleWeaver
+    public class UnrealTypeWeaver : BaseModuleWeaver
     {
         Dictionary<string, MethodDefinition> ObjectSetMethodMap = new Dictionary<string, MethodDefinition>();
         Dictionary<string, MethodDefinition> ObjectGetMethodMap = new Dictionary<string, MethodDefinition>();
