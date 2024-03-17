@@ -38,7 +38,7 @@ namespace SourceGenerator
                     continue;
                 if (kv.Value.Type == EType.UStruct)
                 {
-                    string souce = "using Script.Library;\nusing Script.UnrealCSharpCore;\n";
+                    string souce = "";
                     kv.Value.Using.ForEach(str => souce += str);
                     souce += "namespace " + kv.Value.NameSpace + "\n" +
                         "{\n" +
@@ -80,7 +80,7 @@ namespace SourceGenerator
                 }
                 else if (kv.Value.Type == EType.UClass || kv.Value.Type == EType.UInterface)
                 {
-                    string souce = "using Script.Library;\nusing Script.UnrealCSharpCore;\n";
+                    string souce = "";
                     kv.Value.Using.ForEach(str => souce += str);
                     souce +="namespace " + kv.Value.NameSpace + "\n" +
                         "{\n" +
@@ -202,6 +202,7 @@ namespace SourceGenerator
                 type.Name = Name;
                 type.Modifiers = Modifiers;
                 type.Type = EType.Other;
+                type.Using = new List<string>() { "using Script.Library;\n", "using Script.UnrealCSharpCore;\n" };
             }
 
             if (type.Type == EType.Other)
