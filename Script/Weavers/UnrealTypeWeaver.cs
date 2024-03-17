@@ -476,7 +476,7 @@ namespace Weavers
                 {
                     UInterfaceTypes.Add(type);
                 }
-                else if (type.IsInterface && type.BaseType != null && type.FullName == "Script.CoreUObject.IInterface")
+                else if (type.IsInterface && type.Interfaces.ToList().Any(interf => interf.InterfaceType.FullName == "Script.CoreUObject.IInterface"))
                 {
                     UInterfaceTypes.Add(type);
                 }
