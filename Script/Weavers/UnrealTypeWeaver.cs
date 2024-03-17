@@ -97,7 +97,7 @@ namespace Weavers
 
         private void ProcessStructRegister(TypeDefinition type)
         {
-            if (type.BaseType.FullName != typeof(object).FullName)
+            if (type.BaseType.FullName != ModuleDefinition.TypeSystem.Object.FullName)
                 return;
 
             // 构造函数处理
@@ -147,12 +147,14 @@ namespace Weavers
             
             var GarbageCollectionHandleBackingField = new FieldDefinition("<GarbageCollectionHandle>k__BackingField", FieldAttributes.Private, ModuleDefinition.TypeSystem.IntPtr);
             type.Fields.Add(GarbageCollectionHandleBackingField);
-
+            
+            /*
             var cga = ModuleDefinition.ImportReference(typeof(CompilerGeneratedAttribute));
             var constructor = cga.Resolve().GetConstructors().FirstOrDefault();
             var constructorRef = ModuleDefinition.ImportReference(constructor);
             var attribute = new CustomAttribute(constructorRef);
             GarbageCollectionHandleBackingField.CustomAttributes.Add(attribute);
+            */
 
             var getter = new MethodDefinition("get_GarbageCollectionHandle", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final, ModuleDefinition.TypeSystem.IntPtr);
             var Instructions = getter.Body.Instructions;
