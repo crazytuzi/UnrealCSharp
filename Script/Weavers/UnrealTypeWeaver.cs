@@ -23,17 +23,6 @@ namespace Weavers
         List<TypeDefinition> UEnumTypes = new List<TypeDefinition>();
         List<TypeDefinition> UInterfaceTypes = new List<TypeDefinition>();
 
-        TypeDefinition IStaticClassType;
-        TypeDefinition IStaticStructType;
-
-
-        TypeDefinition UScriptStructType;
-        TypeDefinition UClassType;
-
-        MethodDefinition UObject_StaticClassImplementation;
-        MethodDefinition UStruct_StaticStructImplementation;
-
-
         MethodDefinition UStruct_RegisterImplementation;
         MethodDefinition UStruct_UnRegisterImplementation;
 
@@ -49,12 +38,9 @@ namespace Weavers
             UEnumTypes.ForEach(AddPathNameAttributeToUEType);
             UInterfaceTypes.ForEach(AddPathNameAttributeToUEType);
 
-            
-            // 处理IStaticClass
-            UClassTypes.ForEach(ProcessStaticClass);
-            UInterfaceTypes.ForEach(ProcessStaticClass);
-            UStructTypes.ForEach(ProcessStaticStruct);
+            // 处理GCHandle
             UStructTypes.ForEach(ProcessStructGCHandle);
+            // 处理结构体注册和注销
             UStructTypes.ForEach(ProcessStructRegister);
             
 
@@ -70,30 +56,6 @@ namespace Weavers
         }
 
         
-        public void ProcessStaticClass(TypeDefinition type)
-        {
-            if (type.IsClass == false)
-                return;
-            if (type.Interfaces.Any(interf => interf.InterfaceType.FullName == "Script.CoreUObject.IStaticClass") == false)
-            {
-                var IStaticClassInterface = new InterfaceImplementation(ModuleDefinition.ImportReference(IStaticClassType));
-                type.Interfaces.Add(IStaticClassInterface);
-            }
-
-            if (type.Methods.Any(method => method.IsStatic && method.Name == "StaticClass" && method.Parameters.Count == 0) == false)
-            {
-                var StaticClassMethod = IStaticClassType.Methods.FirstOrDefault(method => method.Name == "StaticClass");
-                var StaticClassFunction = new MethodDefinition("StaticClass", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig, ModuleDefinition.ImportReference(UClassType));
-                StaticClassFunction.Overrides.Add(ModuleDefinition.ImportReference(StaticClassMethod));
-                var Instructions = StaticClassFunction.Body.Instructions;
-                Instructions.Add(Instruction.Create(OpCodes.Nop));
-                Instructions.Add(Instruction.Create(OpCodes.Ldstr, GetPath(type)));
-                Instructions.Add(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UObject_StaticClassImplementation)));
-                Instructions.Add(Instruction.Create(OpCodes.Ret));
-                
-                type.Methods.Add(StaticClassFunction);
-            }
-        }
 
         private void ProcessStructRegister(TypeDefinition type)
         {
@@ -147,14 +109,6 @@ namespace Weavers
             var GarbageCollectionHandleBackingField = new FieldDefinition("<GarbageCollectionHandle>k__BackingField", FieldAttributes.Private, ModuleDefinition.TypeSystem.IntPtr);
             type.Fields.Add(GarbageCollectionHandleBackingField);
             
-            /*
-            var cga = ModuleDefinition.ImportReference(typeof(CompilerGeneratedAttribute));
-            var constructor = cga.Resolve().GetConstructors().FirstOrDefault();
-            var constructorRef = ModuleDefinition.ImportReference(constructor);
-            var attribute = new CustomAttribute(constructorRef);
-            GarbageCollectionHandleBackingField.CustomAttributes.Add(attribute);
-            */
-
             var getter = new MethodDefinition("get_GarbageCollectionHandle", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final, ModuleDefinition.TypeSystem.IntPtr);
             var Instructions = getter.Body.Instructions;
             Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
@@ -173,29 +127,6 @@ namespace Weavers
             type.Methods.Add(setter);
             GarbageCollectionHandle.SetMethod = setter;
             type.Properties.Add(GarbageCollectionHandle);
-        }
-        public void ProcessStaticStruct(TypeDefinition type)
-        {
-            if (type.IsClass == false)
-                return;
-            if (type.Interfaces.Any(interf => interf.InterfaceType.FullName == "Script.CoreUObject.IStaticStruct") == false)
-            {
-                var IStaticStructInterface = new InterfaceImplementation(ModuleDefinition.ImportReference(IStaticStructType));
-                type.Interfaces.Add(IStaticStructInterface);
-            }
-            if (type.Methods.Any(method => method.IsStatic && method.Name == "StaticStruct" && method.Parameters.Count == 0) == false)
-            {
-                var StaticStructMethod = IStaticStructType.Methods.FirstOrDefault(method => method.Name == "StaticStruct");
-                var StaticStructFunction = new MethodDefinition("StaticStruct", MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig, ModuleDefinition.ImportReference(UScriptStructType));
-                StaticStructFunction.Overrides.Add(ModuleDefinition.ImportReference(StaticStructMethod));
-                var Instructions = StaticStructFunction.Body.Instructions;
-                Instructions.Add(Instruction.Create(OpCodes.Nop));
-                Instructions.Add(Instruction.Create(OpCodes.Ldstr, GetPath(type)));
-                Instructions.Add(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_StaticStructImplementation)));
-                Instructions.Add(Instruction.Create(OpCodes.Ret));
-
-                type.Methods.Add(StaticStructFunction);
-            }  
         }
 
         public void AddPathNameAttributeToUEType(TypeDefinition type)
@@ -532,12 +463,6 @@ namespace Weavers
             }
             
             PathAttributeType = UEDefinition.GetType("Script.CoreUObject.PathNameAttribute");
-            IStaticClassType = UEDefinition.GetType("Script.CoreUObject.IStaticClass");
-            IStaticStructType = UEDefinition.GetType("Script.CoreUObject.IStaticStruct");
-            UClassType = UEDefinition.GetType("Script.CoreUObject.UClass");
-            UScriptStructType = UEDefinition.GetType("Script.CoreUObject.UScriptStruct");
-            UStruct_StaticStructImplementation = UEDefinition.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_StaticStructImplementation");
-            UObject_StaticClassImplementation = UEDefinition.GetType("Script.Library.UObjectImplementation").Methods.FirstOrDefault(method => method.Name == "UObject_StaticClassImplementation");
             UStruct_RegisterImplementation = UEDefinition.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_RegisterImplementation");
             UStruct_UnRegisterImplementation = UEDefinition.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_UnRegisterImplementation");
             SearchAllPropertyAccessors(UEDefinition);
