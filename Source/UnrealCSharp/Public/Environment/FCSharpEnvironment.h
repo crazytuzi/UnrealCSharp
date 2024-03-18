@@ -47,13 +47,13 @@ public:
 public:
 	MonoObject* Bind(UObject* Object) const;
 
+	MonoObject* Bind(UClass* Class) const;
+
 	bool Bind(UObject* Object, bool bNeedMonoClass) const;
 
 	bool Bind(UStruct* InStruct, bool bNeedMonoClass) const;
 
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
-
-	bool Bind(UFunction* InFunction) const;
 
 public:
 	FClassDescriptor* GetClassDescriptor(const UStruct* InStruct) const;

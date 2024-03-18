@@ -47,6 +47,13 @@ MonoObject* FCSharpBind::Bind(FDomain* InDomain, UObject* InObject)
 	return Bind(InDomain, InObject, false) ? FCSharpEnvironment::GetEnvironment().GetObject(InObject) : nullptr;
 }
 
+MonoObject* FCSharpBind::Bind(FDomain* InDomain, UClass* InClass)
+{
+	Bind(InDomain, InClass, false);
+
+	return Bind(InDomain, static_cast<UObject*>(InClass));
+}
+
 bool FCSharpBind::Bind(FDomain* InDomain, UObject* InObject, const bool bNeedMonoClass)
 {
 	return BindImplementation(InDomain, InObject, bNeedMonoClass);

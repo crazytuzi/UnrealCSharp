@@ -341,6 +341,11 @@ MonoObject* FCSharpEnvironment::Bind(UObject* Object) const
 	return FCSharpBind::Bind(Domain, Object);
 }
 
+MonoObject* FCSharpEnvironment::Bind(UClass* Class) const
+{
+	return FCSharpBind::Bind(Domain, Class);
+}
+
 bool FCSharpEnvironment::Bind(UObject* Object, const bool bNeedMonoClass) const
 {
 	return FCSharpBind::Bind(Domain, Object, bNeedMonoClass);
@@ -354,18 +359,6 @@ bool FCSharpEnvironment::Bind(UStruct* InStruct, const bool bNeedMonoClass) cons
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
 {
 	return FCSharpBind::Bind(Domain, InMonoObject, InStructName);
-}
-
-bool FCSharpEnvironment::Bind(UFunction* InFunction) const
-{
-	if (ClassRegistry != nullptr)
-	{
-		const auto Class = Cast<UClass>(InFunction->GetOuter());
-
-		return FCSharpBind::Bind(ClassRegistry->GetClassDescriptor(Class), Class, InFunction);
-	}
-
-	return false;
 }
 
 FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const UStruct* InStruct) const

@@ -18,6 +18,8 @@ public:
 public:
 	static MonoObject* Bind(FDomain* InDomain, UObject* InObject);
 
+	static MonoObject* Bind(FDomain* InDomain, UClass* InClass);
+
 	static bool Bind(FDomain* InDomain, UObject* InObject, bool bNeedMonoClass);
 
 	static bool Bind(FDomain* InDomain, UStruct* InStruct, bool bNeedMonoClass);

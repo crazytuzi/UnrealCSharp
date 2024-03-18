@@ -221,8 +221,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FunctionContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UClass StaticClass()\n"
 		"\t\t{\n"
-		"\t\t\treturn UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
-		"\t\t}\n"
+		"\t\t\treturn Class ??= UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
+		"\t\t}\n\n"
+		"\t\tprivate static UClass Class { get; set; }\n"
 	),
 	                                  SuperClass != nullptr ? TEXT(" new") : TEXT(""),
 	                                  *PathNameAttributeContent
@@ -541,11 +542,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
 			                                        IsEmpty()),
 		                                        bIsStatic == true
-			                                        ? *FString::Printf(TEXT(
-				                                        "StaticClass().GetDefaultObject().%s"
-			                                        ),
-			                                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
-			                                        )
+			                                        ? TEXT("StaticClass().GarbageCollectionHandle")
 			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                        *FunctionNames[FunctionNames.Num() - 1].Key,
 		                                        FunctionRefParamIndex.IsEmpty() && FunctionOutParamIndex.IsEmpty()
