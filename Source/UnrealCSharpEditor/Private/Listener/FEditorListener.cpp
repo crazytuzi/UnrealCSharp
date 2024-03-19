@@ -92,6 +92,7 @@ FEditorListener::~FEditorListener()
 void FEditorListener::OnPostEngineInit()
 {
 	FCodeAnalysis::CodeAnalysis();
+
 	FDynamicGenerator::CodeAnalysisGenerator();
 }
 

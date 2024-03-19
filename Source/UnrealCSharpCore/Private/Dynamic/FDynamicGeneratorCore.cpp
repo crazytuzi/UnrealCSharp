@@ -252,7 +252,6 @@ bool FDynamicGeneratorCore::IsDynamic(MonoClass* InMonoClass, const FString& InA
 
 const FString& FDynamicGeneratorCore::DynamicReInstanceBaseName()
 {
-
 	static FString DynamicReInstance = TEXT("DYNAMIC_REINSTANCE");
 
 	return DynamicReInstance;
