@@ -10,6 +10,12 @@ namespace SourceGenerator
     [Generator]
     public class UnrealTypeSourceGenerator : ISourceGenerator
     {
+        private static readonly DiagnosticDescriptor ErrorDymaticClass = new DiagnosticDescriptor(
+            "UC_ERROR_01", 
+            "Dynamic Class Must be partial", "{0} \"{1}\" must be a partial class", 
+            "UnrealCSharp", 
+            DiagnosticSeverity.Error, 
+            isEnabledByDefault: true);
         public string GetPathName(string Name)
         {
             var FullPath = "/Script/CoreUObject.";
@@ -24,6 +30,11 @@ namespace SourceGenerator
             var UnrealTypeReceiver = context.SyntaxReceiver as UnrealTypeReceiver;
             if (UnrealTypeReceiver == null)
                 return;
+            foreach(var error in UnrealTypeReceiver.Errors)
+            {
+
+                context.ReportDiagnostic(Diagnostic.Create(ErrorDymaticClass, error.ErrorLocation, error.UnrealType == EType.UClass ?"UClass" : "UStruct", error.Name));
+            }
             foreach(var kv in UnrealTypeReceiver.Types)
             {
                 if (kv.Value.Type == EType.Other)
@@ -111,7 +122,7 @@ namespace SourceGenerator
     public class UnrealTypeReceiver : ISyntaxReceiver
     {
         public Dictionary<string, TypeInfo> Types = new Dictionary<string, TypeInfo>();
-
+        public List<ErrorInfo> Errors = new List<ErrorInfo>();
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
             if (syntaxNode is ClassDeclarationSyntax cds == true)
@@ -121,8 +132,28 @@ namespace SourceGenerator
         }
         private void ProcessClass(ClassDeclarationSyntax cds)
         {
+            string Name = cds.Identifier.ToString();
+            var UClassAttribute = GetAttributeFromClass(cds, "UClass");
+            var UStructAttribute =  GetAttributeFromClass(cds, "UStruct");
+            bool IsUClass = UClassAttribute != null;
+            bool IsUStruct = UStructAttribute != null;
             if (cds.Modifiers.ToArray().Any(modifier => modifier.Text == "partial") == false)
             {
+                AttributeSyntax ErrorAttribue = null;
+                if (IsUClass)
+                    ErrorAttribue = UClassAttribute;
+                else
+                    ErrorAttribue = UStructAttribute;
+                if (IsUClass || IsUStruct)
+                {
+                    Errors.Add(new ErrorInfo
+                    {
+                        Name = Name,
+                        UnrealType = IsUClass ? EType.UClass : EType.UStruct,
+                        ErrorLocation = Location.Create(ErrorAttribue.SyntaxTree, ErrorAttribue.Span)
+                    }); ;
+                }
+
                 return;
             }
             if (cds.Parent is BaseNamespaceDeclarationSyntax ns == false)
@@ -130,10 +161,7 @@ namespace SourceGenerator
                 return;
             }
             string NameSpace = ns.GetFullNamespace();
-            string Name = cds.Identifier.ToString();
             List<string> Using = cds.GetUsings();
-            bool IsUClass = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UClass") >= 0));
-            bool IsUStruct = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UStruct") >= 0));
             bool IsUInterface = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UInterface") >= 0));
             string Modifiers = string.Join(" ", cds.Modifiers.ToArray().Select(modifier => modifier.Text));
 
@@ -227,6 +255,20 @@ namespace SourceGenerator
             return;
         }
 
+        private AttributeSyntax GetAttributeFromClass(ClassDeclarationSyntax cds, string name)
+        {
+            foreach (var atts in cds.AttributeLists)
+            {
+                foreach (var att in atts.Attributes)
+                {
+                    if (att.GetText().ToString().IndexOf(name) >= 0)
+                    {
+                        return att;
+                    }
+                }
+            }
+            return null;
+        }
         private List<string> MerageUsing(List<string> using1, List<string> using2)
         {
             if (using1 == null && using2 != null)
@@ -251,7 +293,12 @@ namespace SourceGenerator
             return rtl;
         }
     }
-   
+    public class ErrorInfo
+    {
+        public string Name = "";
+        public EType UnrealType;
+        public Location ErrorLocation;
+    }
     public enum EType
     {
         UClass,
