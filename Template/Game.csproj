@@ -9,6 +9,15 @@
     <DefineConstants>$(DefineConstants);</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UE\UE.csproj" />
+    <ProjectReference Include="..\UE\UE.csproj" /> 
+    <ProjectReference Include="..\..\Plugins\UnrealCSharp\Script\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+  </ItemGroup>	
+  <ItemGroup>
+    <PackageReference Include="Fody" Version="6.8.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <None Remove="FodyWeavers.xml" />
+    <WeaverFiles Include="$(SolutionDir)..\Plugins\UnrealCSharp\Script\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
   </ItemGroup>
 </Project>

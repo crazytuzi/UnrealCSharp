@@ -6,6 +6,15 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UE", "UE\UE.csproj", "{7AF881DC-664B-4AF7-BCB6-8FA8CC5E8780}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Game", "Game\Game.csproj", "{A2B210E9-51AE-490B-8B87-F8492CB2A417}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DB42848F-4C21-4581-99BA-C92CB37D4024} = {DB42848F-4C21-4581-99BA-C92CB37D4024}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{B447E954-3688-418A-9A1C-CD5FC12EC316}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGenerator", "..\Plugins\UnrealCSharp\Script\SourceGenerator\SourceGenerator.csproj", "{095D641F-E823-4EE2-89A8-EBC636049F98}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weavers", "..\Plugins\UnrealCSharp\Script\Weavers\Weavers.csproj", "{DB42848F-4C21-4581-99BA-C92CB37D4024}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +30,21 @@ Global
 		{A2B210E9-51AE-490B-8B87-F8492CB2A417}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2B210E9-51AE-490B-8B87-F8492CB2A417}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2B210E9-51AE-490B-8B87-F8492CB2A417}.Release|Any CPU.Build.0 = Release|Any CPU
+		{095D641F-E823-4EE2-89A8-EBC636049F98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{095D641F-E823-4EE2-89A8-EBC636049F98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{095D641F-E823-4EE2-89A8-EBC636049F98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{095D641F-E823-4EE2-89A8-EBC636049F98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB42848F-4C21-4581-99BA-C92CB37D4024}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB42848F-4C21-4581-99BA-C92CB37D4024}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB42848F-4C21-4581-99BA-C92CB37D4024}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB42848F-4C21-4581-99BA-C92CB37D4024}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{095D641F-E823-4EE2-89A8-EBC636049F98} = {B447E954-3688-418A-9A1C-CD5FC12EC316}
+		{DB42848F-4C21-4581-99BA-C92CB37D4024} = {B447E954-3688-418A-9A1C-CD5FC12EC316}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D8693EC-9298-4C45-A732-DD6F22FBFE64}

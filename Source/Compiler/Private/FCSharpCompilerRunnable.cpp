@@ -146,7 +146,7 @@ void FCSharpCompilerRunnable::Compile()
 	);
 
 	const auto CompileParam = FString::Printf(TEXT(
-		"publish %sScript/Game/Game.csproj --nologo -c Debug -o %s"
+		"publish %sScript/Script.sln --nologo -c Debug -o %s"
 	),
 	                                          *FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()),
 	                                          *OutDirectory

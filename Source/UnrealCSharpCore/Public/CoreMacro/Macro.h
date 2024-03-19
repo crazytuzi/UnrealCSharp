@@ -19,3 +19,7 @@
 #define ASSEMBLY_UTIL FString(TEXT("AssemblyUtil"))
 
 #define TEMPLATE FString(TEXT("Template"))
+
+#define FODY_WEAVER_XML FString(TEXT("FodyWeavers.xml"))
+
+#define CODE_FODY_WEAVER_ADDIN FString(TEXT("Weavers"))
