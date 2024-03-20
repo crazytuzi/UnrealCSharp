@@ -76,7 +76,7 @@ MonoObject* FDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
 
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(InAddress, DelegateHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(DelegateHelper, Object);
 
 	return Object;
 }

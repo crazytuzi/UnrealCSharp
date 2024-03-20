@@ -12,17 +12,3 @@ struct TValue
 
 	Type Value;
 };
-
-template <typename T, typename R = void*>
-struct TAddressValue : TValue<T>
-{
-	typedef R FAddressType;
-
-	explicit TAddressValue(typename TValue<T>::Type InValue, FAddressType InAddress):
-		TValue<T>(InValue),
-		Address(InAddress)
-	{
-	}
-
-	FAddressType Address;
-};

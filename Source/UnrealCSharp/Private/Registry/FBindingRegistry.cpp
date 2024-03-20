@@ -30,14 +30,14 @@ void FBindingRegistry::Deinitialize()
 
 	GarbageCollectionHandle2BindingAddress.Empty();
 
-	BindingAddress2GarbageCollectionHandle.Empty();
-
 	MonoObject2BindingAddress.Empty();
+
+	BindingAddress2GarbageCollectionHandle.Empty();
 }
 
-MonoObject* FBindingRegistry::GetObject(const FBindingValueMapping::KeyType InObject)
+MonoObject* FBindingRegistry::GetObject(const FBindingValueMapping::FAddressType InAddress)
 {
-	const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find(InObject);
+	const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find(InAddress);
 
 	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
 }

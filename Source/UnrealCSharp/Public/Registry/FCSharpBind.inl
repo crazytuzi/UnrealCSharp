@@ -31,7 +31,7 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 
 	const auto ContainerHelper = new T(Property);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(nullptr, ContainerHelper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InMonoObject);
 
 	return true;
 }
@@ -51,7 +51,7 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 
 	const auto ContainerHelper = new T(KeyProperty, ValueProperty);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(nullptr, ContainerHelper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InMonoObject);
 
 	return true;
 }
@@ -61,7 +61,7 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject)
 {
 	const auto Helper = new T();
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(Helper, Helper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(Helper, InMonoObject);
 
 	return true;
 }

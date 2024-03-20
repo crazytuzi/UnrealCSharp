@@ -40,27 +40,26 @@ struct FBindingAddress
 {
 	typedef FBindingAddressWrapper FWrapperType;
 
-	FWrapperType* AddressWrapper;
-
-	bool bNeedFree;
-
 	explicit FBindingAddress(FWrapperType* InAddressWrapper, const bool InNeedFree = true):
 		AddressWrapper(InAddressWrapper),
 		bNeedFree(InNeedFree)
 	{
 	}
+
+	FWrapperType* AddressWrapper;
+
+	bool bNeedFree;
 };
-
-static bool operator==(const FBindingAddress& A, const FBindingAddress& B);
-
-static uint32 GetTypeHash(const FBindingAddress& InBindingAddress);
 
 class UNREALCSHARP_API FBindingRegistry
 {
 public:
-	template <typename Key, typename Value>
-	struct TBindingValueMapping : TValueMapping<Key, Value>
+	template <typename Address, typename Value>
+	struct TBindingValueMapping : TValueMapping<Address, Value>
 	{
+		typedef Address FAddressType;
+
+		typedef typename TBindingValueMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
 	};
 
 	typedef TBindingValueMapping<void*, FBindingAddress> FBindingValueMapping;
@@ -82,7 +81,7 @@ public:
 	template <typename T>
 	auto GetBinding(const MonoObject* InMonoObject);
 
-	MonoObject* GetObject(const FBindingValueMapping::KeyType InObject);
+	MonoObject* GetObject(const FBindingValueMapping::FAddressType InAddress);
 
 public:
 	template <typename T>
@@ -96,9 +95,9 @@ public:
 private:
 	FBindingValueMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2BindingAddress;
 
-	FBindingValueMapping::FKey2GarbageCollectionHandle BindingAddress2GarbageCollectionHandle;
-
 	FBindingValueMapping::FMonoObject2Value MonoObject2BindingAddress;
+
+	FBindingValueMapping::FAddress2GarbageCollectionHandle BindingAddress2GarbageCollectionHandle;
 };
 
 #include "FBindingRegistry.inl"

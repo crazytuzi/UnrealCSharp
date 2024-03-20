@@ -47,13 +47,13 @@ public:
 public:
 	MonoObject* Bind(UObject* Object) const;
 
+	MonoObject* Bind(UClass* Class) const;
+
 	bool Bind(UObject* Object, bool bNeedMonoClass) const;
 
 	bool Bind(UStruct* InStruct, bool bNeedMonoClass) const;
 
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
-
-	bool Bind(UFunction* InFunction) const;
 
 public:
 	FClassDescriptor* GetClassDescriptor(const UStruct* InStruct) const;
@@ -137,7 +137,7 @@ public:
 	auto GetContainerObject(void* InAddress) const;
 
 	template <typename T>
-	auto AddContainerReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
+	auto AddContainerReference(T* InValue, MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
@@ -154,7 +154,7 @@ public:
 	auto GetDelegateObject(void* InAddress) const;
 
 	template <typename T>
-	auto AddDelegateReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
+	auto AddDelegateReference(T* InValue, MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,

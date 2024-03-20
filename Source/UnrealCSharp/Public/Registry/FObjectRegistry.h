@@ -9,6 +9,7 @@ public:
 	template <typename Key>
 	struct TObjectMapping : TValueMapping<Key>
 	{
+		typedef typename TObjectMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
 	};
 
 	typedef TObjectMapping<TWeakObjectPtr<const UObject>> FObjectMapping;
@@ -50,7 +51,7 @@ public:
 private:
 	FObjectMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2Object;
 
-	FObjectMapping::FKey2GarbageCollectionHandle Object2GarbageCollectionHandleMap;
-
 	FObjectMapping::FMonoObject2Value MonoObject2Object;
+
+	FObjectMapping::FAddress2GarbageCollectionHandle Object2GarbageCollectionHandleMap;
 };

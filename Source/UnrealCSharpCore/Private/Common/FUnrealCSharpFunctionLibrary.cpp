@@ -549,7 +549,7 @@ FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool b
 		return InName.Equals(Name);
 	}))
 	{
-		return FString::Printf(TEXT("@%s"), *InName);
+		return FString::Printf(TEXT("__%s"), *InName);
 	}
 
 	return FNameEncode::Encode(InName, bEncodeWideString);

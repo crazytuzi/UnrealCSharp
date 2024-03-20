@@ -2,47 +2,10 @@
 
 #include "Reference/TContainerReference.h"
 
-static bool operator==(const FArrayHelperAddress& A, const FArrayHelperAddress& B)
-{
-	return A.Address == B.Address && A.Value == B.Value;
-}
-
-static bool operator==(const FMapHelperAddress& A, const FMapHelperAddress& B)
-{
-	return A.Address == B.Address && A.Value == B.Value;
-}
-
-static bool operator==(const FSetHelperAddress& A, const FSetHelperAddress& B)
-{
-	return A.Address == B.Address && A.Value == B.Value;
-}
-
-static uint32 GetTypeHash(const FArrayHelperAddress& InArrayHelperAddress)
-{
-	return GetTypeHash(InArrayHelperAddress.Address != nullptr
-		                   ? InArrayHelperAddress.Address
-		                   : InArrayHelperAddress.Value);
-}
-
-static uint32 GetTypeHash(const FMapHelperAddress& InMapHelperAddress)
-{
-	return GetTypeHash(InMapHelperAddress.Address != nullptr
-		                   ? InMapHelperAddress.Address
-		                   : InMapHelperAddress.Value);
-}
-
-static uint32 GetTypeHash(const FSetHelperAddress& InSetHelperAddress)
-{
-	return GetTypeHash(InSetHelperAddress.Address != nullptr
-		                   ? InSetHelperAddress.Address
-		                   : InSetHelperAddress.Value);
-}
-
 template <
 	typename Class,
 	typename FContainerValueMapping,
 	typename FContainerValueMapping::FGarbageCollectionHandle2Value Class::* GarbageCollectionHandle2Value,
-	typename FContainerValueMapping::FKey2GarbageCollectionHandle Class::* Key2GarbageCollectionHandle,
 	typename FContainerValueMapping::FMonoObject2Value Class::* MonoObject2Value,
 	typename FContainerValueMapping::FAddress2GarbageCollectionHandle Class::* Address2GarbageCollectionHandle
 >
@@ -50,28 +13,26 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 		FContainerValueMapping,
 		typename FContainerValueMapping::FGarbageCollectionHandle2Value Class::*,
 		GarbageCollectionHandle2Value,
-		typename FContainerValueMapping::FKey2GarbageCollectionHandle Class::*,
-		Key2GarbageCollectionHandle,
 		typename FContainerValueMapping::FMonoObject2Value Class::*,
 		MonoObject2Value,
 		typename FContainerValueMapping::FAddress2GarbageCollectionHandle Class::*,
 		Address2GarbageCollectionHandle
 	>
 {
-	static typename FContainerValueMapping::ValueType::Type GetContainer(
+	static typename FContainerValueMapping::ValueType GetContainer(
 		Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle);
 
-		return FoundValue != nullptr ? FoundValue->Value : nullptr;
+		return FoundValue != nullptr ? *FoundValue : nullptr;
 	}
 
-	static typename FContainerValueMapping::ValueType::Type GetContainer(
+	static typename FContainerValueMapping::ValueType GetContainer(
 		Class* InRegistry, const MonoObject* InMonoObject)
 	{
 		const auto FoundValue = (InRegistry->*MonoObject2Value).Find(InMonoObject);
 
-		return FoundValue != nullptr ? FoundValue->Value : nullptr;
+		return FoundValue != nullptr ? *FoundValue : nullptr;
 	}
 
 	static MonoObject* GetObject(Class* InRegistry, const typename FContainerValueMapping::FAddressType InAddress)
@@ -83,50 +44,33 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 			       : nullptr;
 	}
 
-	static bool AddReference(Class* InRegistry, const typename FContainerValueMapping::FAddressType InAddress,
-	                         typename FContainerValueMapping::ValueType::Type InValue, MonoObject* InMonoObject)
+	static bool AddReference(Class* InRegistry, typename FContainerValueMapping::ValueType InValue,
+	                         MonoObject* InMonoObject)
 	{
 		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-		(InRegistry->*Key2GarbageCollectionHandle).Add(typename FContainerValueMapping::KeyType(InValue, InAddress),
-		                                               GarbageCollectionHandle);
+		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
 
-		if (InAddress != nullptr)
-		{
-			(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
-		}
-
-		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle,
-		                                                 typename FContainerValueMapping::ValueType(
-			                                                 InValue, InAddress));
-
-		(InRegistry->*MonoObject2Value).Add(InMonoObject,
-		                                    typename FContainerValueMapping::ValueType(InValue, InAddress));
+		(InRegistry->*MonoObject2Value).Add(InMonoObject, InValue);
 
 		return true;
 	}
 
 	static bool AddReference(Class* InRegistry, const FGarbageCollectionHandle& InOwner,
 	                         const typename FContainerValueMapping::FAddressType InAddress,
-	                         typename FContainerValueMapping::ValueType::Type InValue, MonoObject* InMonoObject)
+	                         typename FContainerValueMapping::ValueType InValue, MonoObject* InMonoObject)
 	{
 		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
 
-		(InRegistry->*Key2GarbageCollectionHandle).Add(typename FContainerValueMapping::KeyType(InValue, InAddress),
-		                                               GarbageCollectionHandle);
-
 		(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
 
-		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle,
-		                                                 typename FContainerValueMapping::ValueType(
-			                                                 InValue, InAddress));
+		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
 
-		(InRegistry->*MonoObject2Value).Add(InMonoObject,
-		                                    typename FContainerValueMapping::ValueType(InValue, InAddress));
+		(InRegistry->*MonoObject2Value).Add(InMonoObject, InValue);
 
 		return FCSharpEnvironment::GetEnvironment().AddReference(
 			InOwner,
-			new TContainerReference<std::remove_pointer_t<typename FContainerValueMapping::ValueType::Type>>(
+			new TContainerReference<std::remove_pointer_t<typename FContainerValueMapping::ValueType>>(
 				GarbageCollectionHandle));
 	}
 
@@ -134,19 +78,13 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 	{
 		if (const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle))
 		{
-			(InRegistry->*Key2GarbageCollectionHandle).Remove(*FoundValue);
-
-			if (FoundValue->Address != nullptr)
+			if (const auto FoundAddress = (InRegistry->*Address2GarbageCollectionHandle).FindKey(
+				InGarbageCollectionHandle))
 			{
-				(InRegistry->*Address2GarbageCollectionHandle).Remove(FoundValue->Address);
+				(InRegistry->*Address2GarbageCollectionHandle).Remove(*FoundAddress);
 			}
 
-			if (FoundValue->Value != nullptr)
-			{
-				delete FoundValue->Value;
-
-				FoundValue->Value = nullptr;
-			}
+			delete *FoundValue;
 
 			(InRegistry->*MonoObject2Value).Remove(InGarbageCollectionHandle);
 
@@ -161,15 +99,13 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 
 template <>
 struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
-		FContainerRegistry::FArrayHelperValueMapping::ValueType::Type>> :
+		FContainerRegistry::FArrayHelperValueMapping::ValueType>> :
 	TContainerRegistryImplementation<
 		FArrayHelperValueMapping,
-		decltype(&FContainerRegistry::GarbageCollectionHandle2ArrayHelperAddress),
-		&FContainerRegistry::GarbageCollectionHandle2ArrayHelperAddress,
-		decltype(&FContainerRegistry::ArrayHelperAddress2GarbageCollectionHandle),
-		&FContainerRegistry::ArrayHelperAddress2GarbageCollectionHandle,
-		decltype(&FContainerRegistry::MonoObject2ArrayHelperAddress),
-		&FContainerRegistry::MonoObject2ArrayHelperAddress,
+		decltype(&FContainerRegistry::ArrayGarbageCollectionHandle2Helper),
+		&FContainerRegistry::ArrayGarbageCollectionHandle2Helper,
+		decltype(&FContainerRegistry::ArrayMonoObject2Helper),
+		&FContainerRegistry::ArrayMonoObject2Helper,
 		decltype(&FContainerRegistry::ArrayAddress2GarbageCollectionHandle),
 		&FContainerRegistry::ArrayAddress2GarbageCollectionHandle
 	>
@@ -178,15 +114,13 @@ struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
 
 template <>
 struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
-		FContainerRegistry::FMapHelperValueMapping::ValueType::Type>> :
+		FContainerRegistry::FMapHelperValueMapping::ValueType>> :
 	TContainerRegistryImplementation<
 		FMapHelperValueMapping,
-		decltype(&FContainerRegistry::GarbageCollectionHandle2MapHelperAddress),
-		&FContainerRegistry::GarbageCollectionHandle2MapHelperAddress,
-		decltype(&FContainerRegistry::MapHelperAddress2GarbageCollectionHandle),
-		&FContainerRegistry::MapHelperAddress2GarbageCollectionHandle,
-		decltype(&FContainerRegistry::MonoObject2MapHelperAddress),
-		&FContainerRegistry::MonoObject2MapHelperAddress,
+		decltype(&FContainerRegistry::MapGarbageCollectionHandle2Helper),
+		&FContainerRegistry::MapGarbageCollectionHandle2Helper,
+		decltype(&FContainerRegistry::MapMonoObject2Helper),
+		&FContainerRegistry::MapMonoObject2Helper,
 		decltype(&FContainerRegistry::MapAddress2GarbageCollectionHandle),
 		&FContainerRegistry::MapAddress2GarbageCollectionHandle
 	>
@@ -195,15 +129,13 @@ struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
 
 template <>
 struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
-		FContainerRegistry::FSetHelperValueMapping::ValueType::Type>> :
+		FContainerRegistry::FSetHelperValueMapping::ValueType>> :
 	TContainerRegistryImplementation<
 		FSetHelperValueMapping,
-		decltype(&FContainerRegistry::GarbageCollectionHandle2SetHelperAddress),
-		&FContainerRegistry::GarbageCollectionHandle2SetHelperAddress,
-		decltype(&FContainerRegistry::SetHelperAddress2GarbageCollectionHandle),
-		&FContainerRegistry::SetHelperAddress2GarbageCollectionHandle,
-		decltype(&FContainerRegistry::MonoObject2SetHelperAddress),
-		&FContainerRegistry::MonoObject2SetHelperAddress,
+		decltype(&FContainerRegistry::SetGarbageCollectionHandle2Helper),
+		&FContainerRegistry::SetGarbageCollectionHandle2Helper,
+		decltype(&FContainerRegistry::SetMonoObject2Helper),
+		&FContainerRegistry::SetMonoObject2Helper,
 		decltype(&FContainerRegistry::SetAddress2GarbageCollectionHandle),
 		&FContainerRegistry::SetAddress2GarbageCollectionHandle
 	>

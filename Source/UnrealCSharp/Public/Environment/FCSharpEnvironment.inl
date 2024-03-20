@@ -145,11 +145,11 @@ auto FCSharpEnvironment::GetContainerObject(void* InAddress) const
 }
 
 template <typename T>
-auto FCSharpEnvironment::AddContainerReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const
+auto FCSharpEnvironment::AddContainerReference(T* InValue, MonoObject* InMonoObject) const
 {
 	return ContainerRegistry != nullptr
 		       ? FContainerRegistry::TContainerRegistry<T>::AddReference(
-			       ContainerRegistry, InAddress, InValue, InMonoObject)
+			       ContainerRegistry, InValue, InMonoObject)
 		       : false;
 }
 
@@ -189,11 +189,10 @@ auto FCSharpEnvironment::GetDelegateObject(void* InAddress) const
 }
 
 template <typename T>
-auto FCSharpEnvironment::AddDelegateReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const
+auto FCSharpEnvironment::AddDelegateReference(T* InValue, MonoObject* InMonoObject) const
 {
 	return DelegateRegistry != nullptr
-		       ? FDelegateRegistry::TDelegateRegistry<T>::AddReference(DelegateRegistry, InAddress, InValue,
-		                                                               InMonoObject)
+		       ? FDelegateRegistry::TDelegateRegistry<T>::AddReference(DelegateRegistry, InValue, InMonoObject)
 		       : false;
 }
 

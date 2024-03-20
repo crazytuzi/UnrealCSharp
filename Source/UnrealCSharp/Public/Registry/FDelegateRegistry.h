@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "TValue.inl"
 #include "TValueMapping.inl"
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
@@ -8,24 +7,17 @@
 class FDelegateRegistry
 {
 public:
-	template <typename T>
-	struct TDelegateAddress : TAddressValue<T>
+	template <typename Address, typename Value>
+	struct TDelegateValueMapping : TValueMapping<Address, Value>
 	{
-		using TAddressValue<T>::TAddressValue;
+		typedef Address FAddressType;
+
+		typedef typename TDelegateValueMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
 	};
 
-	typedef TDelegateAddress<FDelegateHelper*> FDelegateHelperAddress;
+	typedef TDelegateValueMapping<void*, FDelegateHelper*> FDelegateHelperMapping;
 
-	typedef TDelegateAddress<FMulticastDelegateHelper*> FMulticastDelegateHelperAddress;
-
-	template <typename Key, typename Value>
-	struct TDelegateValueMapping : TValueMapping<Key, Value>
-	{
-	};
-
-	typedef TDelegateValueMapping<void*, FDelegateHelperAddress> FDelegateHelperMapping;
-
-	typedef TDelegateValueMapping<void*, FMulticastDelegateHelperAddress> FMulticastDelegateHelperMapping;
+	typedef TDelegateValueMapping<void*, FMulticastDelegateHelper*> FMulticastDelegateHelperMapping;
 
 	template <typename T>
 	struct TDelegateRegistry
@@ -48,14 +40,13 @@ public:
 	void Deinitialize();
 
 private:
-	FDelegateHelperMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2DelegateHelperAddress;
+	FDelegateHelperMapping::FGarbageCollectionHandle2Value DelegateGarbageCollectionHandle2Helper;
 
-	FDelegateHelperMapping::FKey2GarbageCollectionHandle DelegateAddress2GarbageCollectionHandle;
+	FDelegateHelperMapping::FAddress2GarbageCollectionHandle DelegateAddress2GarbageCollectionHandle;
 
-	FMulticastDelegateHelperMapping::FGarbageCollectionHandle2Value
-	GarbageCollectionHandle2MulticastDelegateHelperAddress;
+	FMulticastDelegateHelperMapping::FGarbageCollectionHandle2Value MulticastDelegateGarbageCollectionHandle2Helper;
 
-	FMulticastDelegateHelperMapping::FKey2GarbageCollectionHandle MulticastDelegateAddress2GarbageCollectionHandle;
+	FMulticastDelegateHelperMapping::FAddress2GarbageCollectionHandle MulticastDelegateAddress2GarbageCollectionHandle;
 };
 
 #include "FDelegateRegistry.inl"

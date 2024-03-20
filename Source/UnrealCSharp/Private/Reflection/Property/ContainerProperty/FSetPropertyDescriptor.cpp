@@ -66,7 +66,7 @@ MonoObject* FSetPropertyDescriptor::NewWeakRef(void* InAddress) const
 
 	const auto SetHelper = new FSetHelper(SetProperty->ElementProp, InAddress);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, SetHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
 
 	return Object;
 }

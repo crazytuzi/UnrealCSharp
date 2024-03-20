@@ -40,9 +40,9 @@ void FStructRegistry::Deinitialize()
 
 	GarbageCollectionHandle2StructAddress.Empty();
 
-	StructAddress2GarbageCollectionHandle.Empty();
-
 	MonoObject2StructAddress.Empty();
+
+	StructAddress2GarbageCollectionHandle.Empty();
 }
 
 void* FStructRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle)
@@ -116,9 +116,6 @@ bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* In
                                    bool bNeedFree)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	StructAddress2GarbageCollectionHandle.Add(
-		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), GarbageCollectionHandle);
 
 	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
 		                                          InScriptStruct,

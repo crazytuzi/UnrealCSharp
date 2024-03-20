@@ -24,9 +24,12 @@ public:
 
 	typedef TStringAddress<FText*> FTextAddress;
 
-	template <typename Key, typename Value>
-	struct TStringValueMapping : TValueMapping<Key, Value>
+	template <typename Address, typename Value>
+	struct TStringValueMapping : TValueMapping<Address, Value>
 	{
+		typedef Address FAddressType;
+
+		typedef typename TStringValueMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
 	};
 
 	typedef TStringValueMapping<void*, FNameAddress> FNameMapping;
@@ -56,23 +59,23 @@ public:
 	void Deinitialize();
 
 private:
-	FNameMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2NameAddress;
+	FNameMapping::FGarbageCollectionHandle2Value NameGarbageCollectionHandle2Address;
 
-	FNameMapping::FKey2GarbageCollectionHandle NameAddress2GarbageCollectionHandle;
+	FNameMapping::FMonoObject2Value NameMonoObject2Address;
 
-	FNameMapping::FMonoObject2Value MonoObject2NameAddress;
+	FNameMapping::FAddress2GarbageCollectionHandle NameAddress2GarbageCollectionHandle;
 
-	FStringMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2StringAddress;
+	FStringMapping::FGarbageCollectionHandle2Value StringGarbageCollectionHandle2Address;
 
-	FStringMapping::FKey2GarbageCollectionHandle StringAddress2GarbageCollectionHandle;
+	FStringMapping::FMonoObject2Value StringMonoObject2Address;
 
-	FStringMapping::FMonoObject2Value MonoObject2StringAddress;
+	FStringMapping::FAddress2GarbageCollectionHandle StringAddress2GarbageCollectionHandle;
 
-	FTextMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2TextAddress;
+	FTextMapping::FGarbageCollectionHandle2Value TextGarbageCollectionHandle2Address;
 
-	FTextMapping::FKey2GarbageCollectionHandle TextAddress2GarbageCollectionHandle;
+	FTextMapping::FMonoObject2Value TextMonoObject2Address;
 
-	FTextMapping::FMonoObject2Value MonoObject2TextAddress;
+	FTextMapping::FAddress2GarbageCollectionHandle TextAddress2GarbageCollectionHandle;
 };
 
 #include "FStringRegistry.inl"

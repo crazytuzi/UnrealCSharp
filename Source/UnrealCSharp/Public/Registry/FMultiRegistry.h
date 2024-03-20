@@ -41,9 +41,12 @@ public:
 
 	typedef TMultiAddress<TSoftClassPtr<UObject>*, TIsTSoftClassPtr> FSoftClassPtrAddress;
 
-	template <typename Key, typename Value>
-	struct TMultiValueMapping : TValueMapping<Key, Value>
+	template <typename Address, typename Value>
+	struct TMultiValueMapping : TValueMapping<Address, Value>
 	{
+		typedef Address FAddressType;
+
+		typedef typename TValueMapping<FAddressType>::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
 	};
 
 	typedef TMultiValueMapping<void*, FSubclassOfAddress> FSubclassOfMapping;
@@ -63,7 +66,7 @@ public:
 	{
 	};
 
-	template <typename T, typename P, P, typename Q, Q, typename R, R>
+	template <typename T, typename O, O, typename P, P, typename Q, Q>
 	struct TMultiRegistryImplementation
 	{
 	};
@@ -79,41 +82,41 @@ public:
 	void Deinitialize();
 
 private:
-	FSubclassOfMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2SubclassOfAddress;
+	FSubclassOfMapping::FGarbageCollectionHandle2Value SubclassOfGarbageCollectionHandle2Address;
 
-	FSubclassOfMapping::FKey2GarbageCollectionHandle SubclassOfAddress2GarbageCollectionHandle;
+	FSubclassOfMapping::FMonoObject2Value SubclassOfMonoObject2Address;
 
-	FSubclassOfMapping::FMonoObject2Value MonoObject2SubclassOfAddress;
+	FSubclassOfMapping::FAddress2GarbageCollectionHandle SubclassOfAddress2GarbageCollectionHandle;
 
-	FWeakObjectPtrMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2WeakObjectPtrAddress;
+	FWeakObjectPtrMapping::FGarbageCollectionHandle2Value WeakObjectPtrGarbageCollectionHandle2Address;
 
-	FWeakObjectPtrMapping::FKey2GarbageCollectionHandle WeakObjectPtrAddress2GarbageCollectionHandle;
+	FWeakObjectPtrMapping::FMonoObject2Value WeakObjectPtrMonoObject2Address;
 
-	FWeakObjectPtrMapping::FMonoObject2Value MonoObject2WeakObjectPtrAddress;
+	FWeakObjectPtrMapping::FAddress2GarbageCollectionHandle WeakObjectPtrAddress2GarbageCollectionHandle;
 
-	FLazyObjectPtrMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2LazyObjectPtrAddress;
+	FLazyObjectPtrMapping::FGarbageCollectionHandle2Value LazyObjectPtrGarbageCollectionHandle2Address;
 
-	FLazyObjectPtrMapping::FKey2GarbageCollectionHandle LazyObjectPtrAddress2GarbageCollectionHandle;
+	FLazyObjectPtrMapping::FMonoObject2Value LazyObjectPtrMonoObject2Address;
 
-	FLazyObjectPtrMapping::FMonoObject2Value MonoObject2LazyObjectPtrAddress;
+	FLazyObjectPtrMapping::FAddress2GarbageCollectionHandle LazyObjectPtrAddress2GarbageCollectionHandle;
 
-	FSoftObjectPtrMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2SoftObjectPtrAddress;
+	FSoftObjectPtrMapping::FGarbageCollectionHandle2Value SoftObjectPtrGarbageCollectionHandle2Address;
 
-	FSoftObjectPtrMapping::FKey2GarbageCollectionHandle SoftObjectPtrAddress2GarbageCollectionHandle;
+	FSoftObjectPtrMapping::FMonoObject2Value SoftObjectPtrMonoObject2Address;
 
-	FSoftObjectPtrMapping::FMonoObject2Value MonoObject2SoftObjectPtrAddress;
+	FSoftObjectPtrMapping::FAddress2GarbageCollectionHandle SoftObjectPtrAddress2GarbageCollectionHandle;
 
-	FScriptInterfaceMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2ScriptInterfaceAddress;
+	FScriptInterfaceMapping::FGarbageCollectionHandle2Value ScriptInterfaceGarbageCollectionHandle2Address;
+
+	FScriptInterfaceMapping::FMonoObject2Value ScriptInterfaceMonoObject2Address;
 
 	FScriptInterfaceMapping::FKey2GarbageCollectionHandle ScriptInterfaceAddress2GarbageCollectionHandle;
 
-	FScriptInterfaceMapping::FMonoObject2Value MonoObject2ScriptInterfaceAddress;
+	FSoftClassPtrMapping::FGarbageCollectionHandle2Value SoftClassPtrGarbageCollectionHandle2Address;
 
-	FSoftClassPtrMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2SoftClassPtrAddress;
+	FSoftClassPtrMapping::FMonoObject2Value SoftClassPtrMonoObject2Address;
 
-	FSoftClassPtrMapping::FKey2GarbageCollectionHandle SoftClassPtrAddress2GarbageCollectionHandle;
-
-	FSoftClassPtrMapping::FMonoObject2Value MonoObject2SoftClassPtrAddress;
+	FSoftClassPtrMapping::FAddress2GarbageCollectionHandle SoftClassPtrAddress2GarbageCollectionHandle;
 };
 
 #include "FMultiRegistry.inl"

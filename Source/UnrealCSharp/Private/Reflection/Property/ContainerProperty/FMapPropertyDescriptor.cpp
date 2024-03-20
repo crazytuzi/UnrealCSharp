@@ -66,7 +66,7 @@ MonoObject* FMapPropertyDescriptor::NewWeakRef(void* InAddress) const
 
 	const auto MapHelper = new FMapHelper(MapProperty->KeyProp, MapProperty->ValueProp, InAddress);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(InAddress, MapHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Object);
 
 	return Object;
 }

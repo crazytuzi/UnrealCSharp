@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>    
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FodyHelpers" Version="6.8.0" />
+  </ItemGroup>
+</Project>

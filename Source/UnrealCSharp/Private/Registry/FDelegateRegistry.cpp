@@ -16,35 +16,35 @@ void FDelegateRegistry::Initialize()
 
 void FDelegateRegistry::Deinitialize()
 {
-	for (auto& Pair : GarbageCollectionHandle2DelegateHelperAddress.Get())
+	for (auto& Pair : DelegateGarbageCollectionHandle2Helper.Get())
 	{
-		if (Pair.Value.Value != nullptr)
+		if (Pair.Value != nullptr)
 		{
-			delete Pair.Value.Value;
+			delete Pair.Value;
 
-			Pair.Value.Value = nullptr;
+			Pair.Value = nullptr;
 		}
 
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
-	GarbageCollectionHandle2DelegateHelperAddress.Empty();
+	DelegateGarbageCollectionHandle2Helper.Empty();
 
 	DelegateAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : GarbageCollectionHandle2MulticastDelegateHelperAddress.Get())
+	for (auto& Pair : MulticastDelegateGarbageCollectionHandle2Helper.Get())
 	{
-		if (Pair.Value.Value != nullptr)
+		if (Pair.Value != nullptr)
 		{
-			delete Pair.Value.Value;
+			delete Pair.Value;
 
-			Pair.Value.Value = nullptr;
+			Pair.Value = nullptr;
 		}
 
 		FGarbageCollectionHandle::Free(Pair.Key);
 	}
 
-	GarbageCollectionHandle2MulticastDelegateHelperAddress.Empty();
+	MulticastDelegateGarbageCollectionHandle2Helper.Empty();
 
 	MulticastDelegateAddress2GarbageCollectionHandle.Empty();
 }
