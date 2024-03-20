@@ -77,11 +77,13 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
                                                        MonoArray* InValue)
 {
 	auto ParamIndex = 0;
-
+	
+	const auto Params = Buffer.IsValid()?Buffer->Get():nullptr;
+	
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
 		const auto& PropertyDescriptor = PropertyDescriptors[Index];
-
+		
 		PropertyDescriptor->InitializeValue_InContainer(Params);
 
 		if (!OutPropertyIndexes.Contains(Index))
@@ -137,10 +139,20 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 
 		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
 		                              reinterpret_cast<void**>(&ReturnValue));
-
+		
+		if(Params!=nullptr)
+		{
+			Buffer->Pop(Params);
+		}
+		
 		return ReturnValue;
 	}
-
+	
+	if(Params!=nullptr)
+	{
+		Buffer->Pop(Params);
+	}
+	
 	return nullptr;
 }
 
@@ -148,7 +160,9 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 	const FMulticastScriptDelegate* InMulticastScriptDelegate, MonoObject** OutValue, MonoArray* InValue)
 {
 	auto ParamIndex = 0;
-
+	
+	const auto Params = Buffer.IsValid()?Buffer->Get():nullptr;
+	
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
 		const auto& PropertyDescriptor = PropertyDescriptors[Index];
@@ -196,6 +210,11 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 
 		*OutValue = (MonoObject*)MonoObjectArray;
 	}
-
+	
+	if(Params!=nullptr)
+	{
+		Buffer->Pop(Params);
+	}
+	
 	return nullptr;
 }
