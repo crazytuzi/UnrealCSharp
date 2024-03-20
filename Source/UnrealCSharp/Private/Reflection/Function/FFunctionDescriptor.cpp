@@ -58,9 +58,9 @@ void FFunctionDescriptor::Initialize()
 			}
 		}
 	}
-	if(!Buffer.IsValid())
+	if(!BufferAllocator.IsValid())
 	{
-		Buffer = Function->ParmsSize > 0 ? MakeShareable(new FFunctionParamBufferAllocator(*Function)): nullptr;
+		BufferAllocator = Function->ParmsSize > 0 ? MakeShareable(new FFunctionParamBufferAllocator(*Function)): nullptr;
 	}
 }
 
@@ -205,7 +205,7 @@ MonoObject* FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** OutV
 
 	auto ParamIndex = 0;
 
-	const auto Params = Buffer.IsValid()?Buffer->Get():nullptr;
+	const auto Params = BufferAllocator.IsValid()?BufferAllocator->Get():nullptr;
 	
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
@@ -271,7 +271,7 @@ MonoObject* FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** OutV
 			
 			if(Params!=nullptr)
 			{
-				Buffer->Pop(Params);
+				BufferAllocator->Pop(Params);
 			}
 			
 			return ReturnValue;
@@ -284,7 +284,7 @@ MonoObject* FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** OutV
 	
 	if(Params!=nullptr)
 	{
-		Buffer->Pop(Params);
+		BufferAllocator->Pop(Params);
 	}
 	
 	return nullptr;

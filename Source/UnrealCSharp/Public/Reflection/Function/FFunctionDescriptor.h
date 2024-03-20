@@ -44,6 +44,6 @@ protected:
 
 	TArray<uint32> OutPropertyIndexes;
 
-	TSharedPtr<FFunctionParamBufferAllocator> Buffer;
+	TSharedPtr<FFunctionParamBufferAllocator> BufferAllocator;
 
 };

@@ -78,7 +78,7 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 {
 	auto ParamIndex = 0;
 	
-	const auto Params = Buffer.IsValid()?Buffer->Get():nullptr;
+	const auto Params = BufferAllocator.IsValid()?BufferAllocator->Get():nullptr;
 	
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
@@ -142,7 +142,7 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 		
 		if(Params!=nullptr)
 		{
-			Buffer->Pop(Params);
+			BufferAllocator->Pop(Params);
 		}
 		
 		return ReturnValue;
@@ -150,7 +150,7 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 	
 	if(Params!=nullptr)
 	{
-		Buffer->Pop(Params);
+		BufferAllocator->Pop(Params);
 	}
 	
 	return nullptr;
@@ -161,7 +161,7 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 {
 	auto ParamIndex = 0;
 	
-	const auto Params = Buffer.IsValid()?Buffer->Get():nullptr;
+	const auto Params = BufferAllocator.IsValid()?BufferAllocator->Get():nullptr;
 	
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
@@ -213,7 +213,7 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 	
 	if(Params!=nullptr)
 	{
-		Buffer->Pop(Params);
+		BufferAllocator->Pop(Params);
 	}
 	
 	return nullptr;
