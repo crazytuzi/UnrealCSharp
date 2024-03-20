@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "Stats/Stats.h"
-
 class FFunctionParamBufferAllocator
 {
 public:
