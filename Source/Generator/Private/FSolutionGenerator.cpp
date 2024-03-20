@@ -20,7 +20,7 @@ void FSolutionGenerator::Generator()
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGamePath(),
 		                FUnrealCSharpFunctionLibrary::GetGameProjectName() + PROJECT_SUFFIX),
 		TemplatePath / FUnrealCSharpFunctionLibrary::GetGameProjectName() + PROJECT_SUFFIX);
-	
+
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGamePath() / FODY_WEAVER_XML),
 		TemplatePath / FODY_WEAVER_XML);

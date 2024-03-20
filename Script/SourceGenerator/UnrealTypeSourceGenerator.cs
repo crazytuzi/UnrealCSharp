@@ -4,364 +4,512 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-
 namespace SourceGenerator
 {
     [Generator]
     public class UnrealTypeSourceGenerator : ISourceGenerator
     {
-        private static readonly DiagnosticDescriptor ErrorDymaticClass = new DiagnosticDescriptor(
-            "UC_ERROR_01", 
-            "Dynamic Class Must be partial", "{0} \"{1}\" must be a partial class", 
-            "UnrealCSharp", 
-            DiagnosticSeverity.Error, 
+        private static readonly DiagnosticDescriptor ErrorDynamicClass = new DiagnosticDescriptor(
+            "UC_ERROR_01",
+            "Dynamic Class Must be partial", "{0} \"{1}\" must be a partial class",
+            "UnrealCSharp",
+            DiagnosticSeverity.Error,
             isEnabledByDefault: true);
-        public string GetPathName(string Name)
-        {
-            var FullPath = "/Script/CoreUObject.";
-            if (Name[0] == 'A' || Name[0] == 'U' || Name[0] == 'F')
-                FullPath += Name.Substring(1);
-            else
-                FullPath += Name;
-            return FullPath;
-        }
-        public void Execute(GeneratorExecutionContext context)
-        {
-            var UnrealTypeReceiver = context.SyntaxReceiver as UnrealTypeReceiver;
-            if (UnrealTypeReceiver == null)
-                return;
-            foreach(var error in UnrealTypeReceiver.Errors)
-            {
 
-                context.ReportDiagnostic(Diagnostic.Create(ErrorDymaticClass, error.ErrorLocation, error.UnrealType == EType.UClass ?"UClass" : "UStruct", error.Name));
-            }
-            foreach(var kv in UnrealTypeReceiver.Types)
+        private static string GetPathName(string Name)
+        {
+            return "/Script/CoreUObject." + (Name.EndsWith("_C") ? Name : Name.Substring(1));
+        }
+
+        public void Execute(GeneratorExecutionContext Context)
+        {
+            if (!(Context.SyntaxReceiver is UnrealTypeReceiver unrealTypeReceiver))
             {
-                if (kv.Value.Type == EType.Other)
-                    continue;
-                if (kv.Value.Type == EType.UStruct && kv.Value.HasStaticStruct && kv.Value.HasGarbageCollectionHandle)
-                    continue;
-                if (kv.Value.Type == EType.UClass && kv.Value.HasStaticClass)
-                    continue;
-                if (kv.Value.Type == EType.UInterface && kv.Value.HasStaticClass)
-                    continue;
-                if (kv.Value.Type == EType.UStruct)
+                return;
+            }
+
+            foreach (var error in unrealTypeReceiver.Errors)
+            {
+                Context.ReportDiagnostic(Diagnostic.Create(ErrorDynamicClass, error.ErrorLocation,
+                    error.UnrealDynamicType.ToString().Replace("EType.", ""), error.Name));
+            }
+
+            foreach (var type in unrealTypeReceiver.Types)
+            {
+                if (type.Value.DynamicType == EDynamicType.Other)
                 {
-                    string souce = "";
-                    kv.Value.Using.ForEach(str => souce += str);
-                    souce += "namespace " + kv.Value.NameSpace + "\n" +
-                        "{\n" +
-                        "\t" + kv.Value.Modifiers + " class " + kv.Value.Name + ": IStaticStruct, IGarbageCollectionHandle\n" +
-                    "\t{\n";
-                    if (kv.Value.HasStaticStruct == false)
+                    continue;
+                }
+
+                if (type.Value.DynamicType == EDynamicType.UStruct &&
+                    type.Value.HasStaticStruct &&
+                    type.Value.HasGarbageCollectionHandle &&
+                    type.Value.HasEqualsMethod &&
+                    type.Value.HasHashCodeMethod &&
+                    type.Value.HasOperatorEqualTo &&
+                    type.Value.HasOperatorNotEqualTo)
+                {
+                    continue;
+                }
+
+                if (type.Value.DynamicType == EDynamicType.UClass && type.Value.HasStaticClass)
+                {
+                    continue;
+                }
+
+                if (type.Value.DynamicType == EDynamicType.UInterface && type.Value.HasStaticClass)
+                {
+                    continue;
+                }
+
+                if (type.Value.DynamicType == EDynamicType.UStruct)
+                {
+                    var source = "";
+
+                    type.Value.Using.ForEach(Str => source += Str);
+
+                    source +=
+                        $"namespace {type.Value.NameSpace}\n" +
+                        $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}: IStaticStruct, IGarbageCollectionHandle\n" +
+                        "\t{\n";
+
+                    if (type.Value.HasStaticStruct == false)
                     {
-                        var FullPath = GetPathName(kv.Value.Name);
-                        souce +=
+                        var fullPath = GetPathName(type.Value.Name);
+
+                        source +=
                             "\t\tpublic static UScriptStruct StaticStruct()\n" +
                             "\t\t{\n" +
-                            $"\t\t\treturn UStructImplementation.UStruct_StaticStructImplementation(\"{FullPath}\");\n"+
+                            $"\t\t\treturn UStructImplementation.UStruct_StaticStructImplementation(\"{fullPath}\");\n" +
                             "\t\t}\n";
                     }
 
-                    if (kv.Value.HasGarbageCollectionHandle == false)
+                    if (type.Value.HasGarbageCollectionHandle == false)
                     {
-                        souce += "\t\tpublic nint GarbageCollectionHandle { get; set; }\n";
+                        source += "\t\tpublic nint GarbageCollectionHandle { get; set; }\n";
                     }
-                    if (kv.Value.HasEqualsMethod == false)
+
+                    if (type.Value.HasEqualsMethod == false)
                     {
-                        souce += $"\t\tpublic override bool Equals(object Other) => this == Other as {kv.Value.Name};\n";
+                        source +=
+                            $"\t\tpublic override bool Equals(object Other) => this == Other as {type.Value.Name};\n";
                     }
-                    if (kv.Value.HasHashCodeMethod == false)
+
+                    if (type.Value.HasHashCodeMethod == false)
                     {
-                        souce += $"\t\tpublic override int GetHashCode() => (int)GarbageCollectionHandle;\n";
+                        source += "\t\tpublic override int GetHashCode() => (int)GarbageCollectionHandle;\n";
                     }
-                    if (kv.Value.HasOperatorEqualTo == false)
+
+                    if (type.Value.HasOperatorEqualTo == false)
                     {
-                        souce += $"\t\tpublic static bool operator ==({kv.Value.Name} A, {kv.Value.Name} B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
+                        source +=
+                            $"\t\tpublic static bool operator ==({type.Value.Name} A, {type.Value.Name} B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
                     }
-                    if (kv.Value.HasOperatorNotEqualTo == false)
+
+                    if (type.Value.HasOperatorNotEqualTo == false)
                     {
-                        souce += $"\t\tpublic static bool operator !=({kv.Value.Name} A, {kv.Value.Name} B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
+                        source +=
+                            $"\t\tpublic static bool operator !=({type.Value.Name} A, {type.Value.Name} B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
                     }
-                    souce += "\t}\n";
-                    souce += "}";
-                    context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + ".gen.cs", souce);
+
+                    source += "\t}\n";
+
+                    source += "}";
+
+                    Context.AddSource(type.Value.NameSpace + "." + type.Value.Name + ".gen.cs", source);
                 }
-                else if (kv.Value.Type == EType.UClass || kv.Value.Type == EType.UInterface)
+                else if (type.Value.DynamicType == EDynamicType.UClass ||
+                         type.Value.DynamicType == EDynamicType.UInterface)
                 {
-                    string souce = "";
-                    kv.Value.Using.ForEach(str => souce += str);
-                    souce +="namespace " + kv.Value.NameSpace + "\n" +
-                        "{\n" +
-                       "\t" + kv.Value.Modifiers + " class " + kv.Value.Name + ": IStaticClass\n" +
-                   "\t{\n";
-                    if (kv.Value.HasStaticStruct == false)
+                    var source = "";
+
+                    type.Value.Using.ForEach(Str => source += Str);
+
+                    source += $"namespace {type.Value.NameSpace}\n" +
+                              $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}: IStaticClass\n" +
+                              "\t{\n";
+
+                    if (type.Value.HasStaticClass == false)
                     {
-                        var FullPath = GetPathName(kv.Value.Name);
-                        souce +=
+                        var fullPath = GetPathName(type.Value.Name);
+
+                        source +=
                             "\t\tpublic new static UClass StaticClass()\n" +
                             "\t\t{\n" +
-                            $"\t\t\treturn UObjectImplementation.UObject_StaticClassImplementation(\"{FullPath}\");\n" +
+                            $"\t\t\treturn UObjectImplementation.UObject_StaticClassImplementation(\"{fullPath}\");\n" +
                             "\t\t}\n";
                     }
 
-                    souce += "\t}\n";
-                    souce += "}";
-                    context.AddSource(kv.Value.NameSpace + "." + kv.Value.Name + ".gen.cs", souce);
+                    source += "\t}\n";
+
+                    source += "}";
+
+                    Context.AddSource(type.Value.NameSpace + "." + type.Value.Name + ".gen.cs", source);
                 }
             }
-
         }
 
-        public void Initialize(GeneratorInitializationContext context)
+        public void Initialize(GeneratorInitializationContext Context)
         {
-            context.RegisterForSyntaxNotifications(() => new UnrealTypeReceiver());
+            Context.RegisterForSyntaxNotifications(() => new UnrealTypeReceiver());
         }
     }
 
     public class UnrealTypeReceiver : ISyntaxReceiver
     {
-        public Dictionary<string, TypeInfo> Types = new Dictionary<string, TypeInfo>();
-        public List<ErrorInfo> Errors = new List<ErrorInfo>();
-        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        public readonly Dictionary<string, TypeInfo> Types = new Dictionary<string, TypeInfo>();
+
+        public readonly List<ErrorInfo> Errors = new List<ErrorInfo>();
+
+        public void OnVisitSyntaxNode(SyntaxNode Node)
         {
-            if (syntaxNode is ClassDeclarationSyntax cds == true)
+            if (Node is ClassDeclarationSyntax classDeclarationSyntax)
             {
-                ProcessClass(cds);
+                ProcessClass(classDeclarationSyntax);
             }
         }
-        private void ProcessClass(ClassDeclarationSyntax cds)
+
+        private void ProcessClass(ClassDeclarationSyntax Syntax)
         {
-            string Name = cds.Identifier.ToString();
-            var UClassAttribute = GetAttributeFromClass(cds, "UClass");
-            var UStructAttribute =  GetAttributeFromClass(cds, "UStruct");
-            bool IsUClass = UClassAttribute != null;
-            bool IsUStruct = UStructAttribute != null;
-            if (cds.Modifiers.ToArray().Any(modifier => modifier.Text == "partial") == false)
+            var name = Syntax.Identifier.ToString();
+
+            var attributeUClass = GetAttributeFromClass(Syntax, "UClass");
+
+            var attributeUStruct = GetAttributeFromClass(Syntax, "UStruct");
+
+            var attributeUInterface = GetAttributeFromClass(Syntax, "UInterface");
+
+            var bIsUClass = attributeUClass != null;
+
+            var bIsUStruct = attributeUStruct != null;
+
+            var bIsUInterface = attributeUInterface != null;
+
+            if (Syntax.Modifiers.ToArray().Any(Modifier => Modifier.Text == "partial") == false)
             {
-                AttributeSyntax ErrorAttribue = null;
-                if (IsUClass)
-                    ErrorAttribue = UClassAttribute;
-                else
-                    ErrorAttribue = UStructAttribute;
-                if (IsUClass || IsUStruct)
+                if (bIsUClass || bIsUStruct || bIsUInterface)
                 {
+                    AttributeSyntax errorAttribute;
+
+                    EDynamicType dynamicType;
+
+                    if (bIsUClass)
+                    {
+                        errorAttribute = attributeUClass;
+
+                        dynamicType = EDynamicType.UClass;
+                    }
+                    else if (bIsUStruct)
+                    {
+                        errorAttribute = attributeUStruct;
+
+                        dynamicType = EDynamicType.UStruct;
+                    }
+                    else
+                    {
+                        errorAttribute = attributeUInterface;
+
+                        dynamicType = EDynamicType.UInterface;
+                    }
+
                     Errors.Add(new ErrorInfo
                     {
-                        Name = Name,
-                        UnrealType = IsUClass ? EType.UClass : EType.UStruct,
-                        ErrorLocation = Location.Create(ErrorAttribue.SyntaxTree, ErrorAttribue.Span)
-                    }); ;
+                        Name = name,
+                        UnrealDynamicType = dynamicType,
+                        ErrorLocation = Location.Create(errorAttribute.SyntaxTree, errorAttribute.Span)
+                    });
                 }
 
                 return;
             }
-            if (cds.Parent is BaseNamespaceDeclarationSyntax ns == false)
+
+            if (Syntax.Parent is BaseNamespaceDeclarationSyntax syntax == false)
             {
                 return;
             }
-            string NameSpace = ns.GetFullNamespace();
-            List<string> Using = cds.GetUsings();
-            bool IsUInterface = cds.AttributeLists.Any(list => list.Attributes.Any(att => att.GetText().ToString().IndexOf("UInterface") >= 0));
-            string Modifiers = string.Join(" ", cds.Modifiers.ToArray().Select(modifier => modifier.Text));
 
+            var nameSpace = syntax.GetFullNamespace();
 
-            var methods = cds.Members.Where(mem => mem is MethodDeclarationSyntax);
+            var usingList = Syntax.GetUsingList();
 
-            bool HasStaticClass = methods.Any(m => ((MethodDeclarationSyntax)m).Identifier.ToString() == "StaticClass");
-            bool HasStaticStruct = methods.Any(m => ((MethodDeclarationSyntax)m).Identifier.ToString() == "StaticStruct");
-            bool HasGarbageCollectionHandle = cds.Members.Any(mem => mem is PropertyDeclarationSyntax && ((PropertyDeclarationSyntax)mem).Identifier.ToString() == "GarbageCollectionHandle");
+            var modifiers = string.Join(" ", Syntax.Modifiers.ToArray().Select(Modifier => Modifier.Text));
 
-            bool HasEqualsMethod = methods.Any(m =>
+            var methods = Syntax.Members.Where(Member => Member is MethodDeclarationSyntax);
+
+            var methodArray = methods as MemberDeclarationSyntax[] ?? methods.ToArray();
+
+            var bHasStaticClass = methodArray.Any(Method =>
+                ((MethodDeclarationSyntax)Method).Identifier.ToString() == "StaticClass");
+
+            var bHasStaticStruct = methodArray.Any(Method =>
+                ((MethodDeclarationSyntax)Method).Identifier.ToString() == "StaticStruct");
+
+            var bHasGarbageCollectionHandle = Syntax.Members.Any(Member =>
+                Member is PropertyDeclarationSyntax declarationSyntax &&
+                declarationSyntax.Identifier.ToString() == "GarbageCollectionHandle");
+
+            var bHasEqualsMethod = methodArray.Any(Method =>
             {
-                var method = ((MethodDeclarationSyntax)m);
+                var method = (MethodDeclarationSyntax)Method;
+
                 if (method.Identifier.ToString() != "Equals")
+                {
                     return false;
-                if (method.ParameterList.Parameters.Count != 1)
-                    return false;
-                return true;
+                }
+
+                return method.ParameterList.Parameters.Count == 1;
             });
-            bool HasHashCodeMethod = methods.Any(m =>
+
+            var bHasHashCodeMethod = methodArray.Any(Method =>
             {
-                var method = ((MethodDeclarationSyntax)m);
+                var method = (MethodDeclarationSyntax)Method;
+
                 if (method.Identifier.ToString() != "GetHashCode")
+                {
                     return false;
-                if (method.ParameterList.Parameters.Count > 0)
-                    return false;
-                return true;
+                }
+
+                return method.ParameterList.Parameters.Count <= 0;
             });
 
-            var operators = cds.Members.Where(mem => mem is OperatorDeclarationSyntax);
-            var HasOperatorEqualTo = operators.Any(o =>
+            var operators = Syntax.Members.Where(Member => Member is OperatorDeclarationSyntax);
+
+            var operatorArray = operators as MemberDeclarationSyntax[] ?? operators.ToArray();
+
+            var bHasOperatorEqualTo = operatorArray.Any(Operator =>
             {
-                var op = ((OperatorDeclarationSyntax)o);
+                var op = (OperatorDeclarationSyntax)Operator;
+
                 if (op.OperatorToken.Text != "==")
-                    return false;
-                foreach (var param in op.ParameterList.Parameters)
                 {
-                    var t = (IdentifierNameSyntax)param.Type;
-                    if (t.Identifier.Text != Name)
-                        return false;
+                    return false;
                 }
+
+                foreach (var parameter in op.ParameterList.Parameters)
+                {
+                    var parameterType = (IdentifierNameSyntax)parameter.Type;
+
+                    if (parameterType != null && parameterType.Identifier.Text != name)
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             });
 
-            var HasOperatorNotEqualTo = operators.Any(o =>
+            var bHasOperatorNotEqualTo = operatorArray.Any(Operator =>
             {
-                var op = ((OperatorDeclarationSyntax)o);
+                var op = (OperatorDeclarationSyntax)Operator;
+
                 if (op.OperatorToken.Text != "!=")
-                    return false;
-                foreach (var param in op.ParameterList.Parameters)
                 {
-                    var t = (IdentifierNameSyntax)param.Type;
-                    if (t.Identifier.Text != Name)
-                        return false;
+                    return false;
                 }
+
+                foreach (var parameter in op.ParameterList.Parameters)
+                {
+                    var parameterType = (IdentifierNameSyntax)parameter.Type;
+
+                    if (parameterType != null && parameterType.Identifier.Text != name)
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             });
 
-            if (Types.TryGetValue(NameSpace + "." + Name, out var type) == false)
+            if (Types.TryGetValue(nameSpace + "." + name, out var type) == false)
             {
                 type = new TypeInfo();
-                Types.Add(NameSpace + "." + Name, type);
-                type.NameSpace = NameSpace;
-                type.Name = Name;
-                type.Modifiers = Modifiers;
-                type.Type = EType.Other;
-                type.Using = new List<string>() { 
-                    "using Script.Library;\n", 
-                    "using Script.UnrealCSharpCore;\n", 
-                    "using Script.CoreUObject;\n" 
+
+                Types.Add(nameSpace + "." + name, type);
+
+                type.NameSpace = nameSpace;
+
+                type.Name = name;
+
+                type.Modifiers = modifiers;
+
+                type.DynamicType = EDynamicType.Other;
+
+                type.Using = new List<string>
+                {
+                    "using Script.Library;\n",
+                    "using Script.UnrealCSharpCore;\n",
+                    "using Script.CoreUObject;\n"
                 };
             }
 
-            if (type.Type == EType.Other)
+            if (type.DynamicType == EDynamicType.Other)
             {
-                if (IsUClass)
-                    type.Type = EType.UClass;
-                else if (IsUStruct)
-                    type.Type = EType.UStruct;
-                else if (IsUInterface)
-                    type.Type = EType.UInterface;
+                if (bIsUClass)
+                {
+                    type.DynamicType = EDynamicType.UClass;
+                }
+                else if (bIsUStruct)
+                {
+                    type.DynamicType = EDynamicType.UStruct;
+                }
+                else if (bIsUInterface)
+                {
+                    type.DynamicType = EDynamicType.UInterface;
+                }
             }
-            type.Using = MerageUsing(Using, type.Using);
-            type.HasStaticStruct |= HasStaticStruct;
-            type.HasStaticClass |= HasStaticClass;
-            type.HasGarbageCollectionHandle |= HasGarbageCollectionHandle;
-            type.HasHashCodeMethod |= HasHashCodeMethod;
-            type.HasEqualsMethod |= HasEqualsMethod;
-            type.HasOperatorEqualTo |= HasOperatorEqualTo;
-            type.HasOperatorNotEqualTo |= HasOperatorNotEqualTo;
-            return;
+
+            type.Using = MergeUsing(usingList, type.Using);
+
+            type.HasStaticStruct |= bHasStaticStruct;
+
+            type.HasStaticClass |= bHasStaticClass;
+
+            type.HasGarbageCollectionHandle |= bHasGarbageCollectionHandle;
+
+            type.HasHashCodeMethod |= bHasHashCodeMethod;
+
+            type.HasEqualsMethod |= bHasEqualsMethod;
+
+            type.HasOperatorEqualTo |= bHasOperatorEqualTo;
+
+            type.HasOperatorNotEqualTo |= bHasOperatorNotEqualTo;
         }
 
-        private AttributeSyntax GetAttributeFromClass(ClassDeclarationSyntax cds, string name)
+        private static AttributeSyntax GetAttributeFromClass(ClassDeclarationSyntax Syntax, string Name)
         {
-            foreach (var atts in cds.AttributeLists)
+            foreach (var attributeList in Syntax.AttributeLists)
             {
-                foreach (var att in atts.Attributes)
+                foreach (var attribute in attributeList.Attributes)
                 {
-                    if (att.GetText().ToString().IndexOf(name) >= 0)
+                    if (attribute.GetText().ToString().IndexOf(Name, StringComparison.Ordinal) >= 0)
                     {
-                        return att;
+                        return attribute;
                     }
                 }
             }
+
             return null;
         }
-        private List<string> MerageUsing(List<string> using1, List<string> using2)
+
+        private static List<string> MergeUsing(List<string> UsingListA, List<string> UsingListB)
         {
-            if (using1 == null && using2 != null)
-                return using2;
-            if (using2 == null && using1 != null)
-                return using1;
-            List<string> rtl = new List<string>();
-            if (using1 == null && using2 == null)
-                return rtl;
-            foreach (string s in using1)
+            if (UsingListA == null && UsingListB != null)
             {
-                if (rtl.Contains(s))
-                    continue;
-                rtl.Add(s);
+                return UsingListB;
             }
-            foreach (string s in using2)
+
+            if (UsingListB == null && UsingListA != null)
             {
-                if (rtl.Contains(s))
-                    continue;
-                rtl.Add(s);
+                return UsingListA;
             }
-            return rtl;
+
+            var result = new List<string>();
+
+            if (UsingListA == null)
+            {
+                return result;
+            }
+
+            foreach (var elem in UsingListA)
+            {
+                if (result.Contains(elem))
+                {
+                    continue;
+                }
+
+                result.Add(elem);
+            }
+
+            foreach (var elem in UsingListB)
+            {
+                if (result.Contains(elem))
+                {
+                    continue;
+                }
+
+                result.Add(elem);
+            }
+
+            return result;
         }
     }
+
     public class ErrorInfo
     {
         public string Name = "";
-        public EType UnrealType;
+
+        public EDynamicType UnrealDynamicType;
+
         public Location ErrorLocation;
     }
-    public enum EType
+
+    public enum EDynamicType
     {
         UClass,
         UStruct,
         UInterface,
         Other
     }
+
     public class TypeInfo
     {
-        public EType Type { get; set; }
+        public EDynamicType DynamicType { get; set; }
 
-        public List<string> Using { get; set; }   
+        public List<string> Using { get; set; }
+
         public string Name { get; set; }
+
         public string NameSpace { get; set; }
 
         public string Modifiers { get; set; }
 
         public bool HasGarbageCollectionHandle { get; set; }
+
         public bool HasStaticClass { get; set; }
+
         public bool HasStaticStruct { get; set; }
 
         public bool HasOperatorEqualTo { get; set; }
+
         public bool HasOperatorNotEqualTo { get; set; }
+
         public bool HasEqualsMethod { get; set; }
 
         public bool HasHashCodeMethod { get; set; }
-
     }
-
-
 
     public static class CodeAnalysisHelper
     {
-        public static List<string> GetUsings(this SyntaxNode cds)
+        public static List<string> GetUsingList(this SyntaxNode Node)
         {
-            List<string> rtl = new List<string>();
-            if (cds is CompilationUnitSyntax cus)
-            {
-                foreach (var @using in cus.Usings)
-                {
-                    var str = @using.GetText().ToString().Replace(" ", "").Replace("\t", "").Replace("\n", "").Replace("\r", "").Trim() + "\n";
-                    str = str.Replace("using", "using ");
-                    rtl.Add(str);
+            var result = new List<string>();
 
+            if (Node is CompilationUnitSyntax compilationUnitSyntax)
+            {
+                foreach (var @using in compilationUnitSyntax.Usings)
+                {
+                    var str = @using.GetText().ToString().Replace(" ", "").Replace("\t", "").Replace("\n", "")
+                        .Replace("\r", "").Trim() + "\n";
+
+                    str = str.Replace("using", "using ");
+
+                    result.Add(str);
                 }
-                return rtl;
+
+                return result;
             }
-            if (cds.Parent == null)
-                return rtl;
-            return cds.Parent.GetUsings();
+
+            return Node.Parent == null ? result : Node.Parent.GetUsingList();
         }
 
-        
-        public static string GetFullNamespace(this BaseNamespaceDeclarationSyntax ns)
+        public static string GetFullNamespace(this BaseNamespaceDeclarationSyntax Syntax)
         {
-            if (ns.Parent is BaseNamespaceDeclarationSyntax bns == false) 
+            if (Syntax.Parent is BaseNamespaceDeclarationSyntax baseNamespaceDeclarationSyntax == false)
             {
-                return ns.Name.ToString();
+                return Syntax.Name.ToString();
             }
-            else
-            {
-                return bns.GetFullNamespace() + "." + ns.Name.ToString();
-            }
+
+            return baseNamespaceDeclarationSyntax.GetFullNamespace() + "." + Syntax.Name;
         }
     }
 }

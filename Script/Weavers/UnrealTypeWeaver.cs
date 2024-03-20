@@ -1,252 +1,349 @@
-﻿using Fody;
+﻿using System;
+using Fody;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Weavers
 {
     public class UnrealTypeWeaver : BaseModuleWeaver
     {
-        Dictionary<string, MethodDefinition> ObjectSetMethodMap = new Dictionary<string, MethodDefinition>();
-        Dictionary<string, MethodDefinition> ObjectGetMethodMap = new Dictionary<string, MethodDefinition>();
-        Dictionary<string, MethodDefinition> StructSetMethodMap = new Dictionary<string, MethodDefinition>();
-        Dictionary<string, MethodDefinition> StructGetMethodMap = new Dictionary<string, MethodDefinition>();
+        private readonly Dictionary<string, MethodDefinition> _objectSetMethodMap =
+            new Dictionary<string, MethodDefinition>();
 
-        List<TypeDefinition> UClassTypes = new List<TypeDefinition>();
-        List<TypeDefinition> UStructTypes = new List<TypeDefinition>();
+        private readonly Dictionary<string, MethodDefinition> _objectGetMethodMap =
+            new Dictionary<string, MethodDefinition>();
 
+        private readonly Dictionary<string, MethodDefinition> _structSetMethodMap =
+            new Dictionary<string, MethodDefinition>();
 
-        List<TypeDefinition> UEnumTypes = new List<TypeDefinition>();
-        List<TypeDefinition> UInterfaceTypes = new List<TypeDefinition>();
+        private readonly Dictionary<string, MethodDefinition> _structGetMethodMap =
+            new Dictionary<string, MethodDefinition>();
 
-        MethodDefinition UStruct_RegisterImplementation;
-        MethodDefinition UStruct_UnRegisterImplementation;
+        private readonly List<TypeDefinition> _classTypes = new List<TypeDefinition>();
 
-        TypeDefinition PathAttributeType = null;
+        private readonly List<TypeDefinition> _structTypes = new List<TypeDefinition>();
+
+        private readonly List<TypeDefinition> _enumTypes = new List<TypeDefinition>();
+
+        private readonly List<TypeDefinition> _interfaceTypes = new List<TypeDefinition>();
+
+        private MethodDefinition _structRegisterImplementation;
+
+        private MethodDefinition _structUnRegisterImplementation;
+
+        private TypeDefinition _pathAttributeType;
 
         public override void Execute()
         {
             GetAllMeta();
-            GetAllUClass();
+
+            GetAllDynamic();
+
             // 处理PathName
-            UClassTypes.ForEach(AddPathNameAttributeToUEType);
-            UStructTypes.ForEach(AddPathNameAttributeToUEType);
-            UEnumTypes.ForEach(AddPathNameAttributeToUEType);
-            UInterfaceTypes.ForEach(AddPathNameAttributeToUEType);
+            _classTypes.ForEach(AddPathNameAttributeToUnrealType);
+
+            _structTypes.ForEach(AddPathNameAttributeToUnrealType);
+
+            _enumTypes.ForEach(AddPathNameAttributeToUnrealType);
+
+            _interfaceTypes.ForEach(AddPathNameAttributeToUnrealType);
 
             // 处理GCHandle
-            UStructTypes.ForEach(ProcessStructGCHandle);
+            _structTypes.ForEach(ProcessStructGarbageCollectionHandle);
+
             // 处理结构体注册和注销
-            UStructTypes.ForEach(ProcessStructRegister);
-            
+            _structTypes.ForEach(ProcessStructRegister);
 
             // 处理UProperty
-            UClassTypes.ForEach(ProcessUClassType);
-            UStructTypes.ForEach(ProcessUStructType);
+            _classTypes.ForEach(ProcessUClassType);
+
+            _structTypes.ForEach(ProcessUStructType);
         }
 
         public override IEnumerable<string> GetAssembliesForScanning()
         {
             yield return "UE";
+
             yield return "Game";
         }
 
-        
-
-        private void ProcessStructRegister(TypeDefinition type)
+        private void ProcessStructRegister(TypeDefinition Type)
         {
-            if (type.BaseType.FullName != ModuleDefinition.TypeSystem.Object.FullName)
+            if (Type.BaseType.FullName != ModuleDefinition.TypeSystem.Object.FullName)
+            {
                 return;
+            }
 
             // 构造函数处理
-            var ctors = type.GetConstructors();
-            var ctor = ctors.FirstOrDefault(method => method.Parameters.Count() == 0);
-            if (ctor == null)
-            {
-                throw new WeavingException("UStruct must have a constructor with 0 parameters: " + type.FullName);
-            }
-            var ilProcessor = ctor.Body.GetILProcessor();
-            ilProcessor.InsertAfter(ctor.Body.Instructions[1], Instruction.Create(OpCodes.Ldarg_0));
-            ilProcessor.InsertAfter(ctor.Body.Instructions[2], Instruction.Create(OpCodes.Ldstr, GetPath(type)));
-            ilProcessor.InsertAfter(ctor.Body.Instructions[3], Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_RegisterImplementation)));
+            var constructors = Type.GetConstructors();
 
-            if (type.Methods.Any(m => m.Name == "Finalize") == false)
+            var constructor = constructors.FirstOrDefault(Method => !Method.Parameters.Any());
+
+            if (constructor == null)
             {
-                var superFinalize = type.BaseType.Resolve().Methods.FirstOrDefault(m => m.Name == "Finalize");
-                var destructor = new MethodDefinition("Finalize", MethodAttributes.HideBySig | MethodAttributes.Family | MethodAttributes.Virtual, ModuleDefinition.TypeSystem.Void);
+                throw new WeavingException("UStruct must have a constructor with 0 parameters: " + Type.FullName);
+            }
+
+            var ilProcessor = constructor.Body.GetILProcessor();
+
+            ilProcessor.InsertAfter(constructor.Body.Instructions[1], Instruction.Create(OpCodes.Ldarg_0));
+
+            ilProcessor.InsertAfter(constructor.Body.Instructions[2],
+                Instruction.Create(OpCodes.Ldstr, GetPathName(Type)));
+
+            ilProcessor.InsertAfter(constructor.Body.Instructions[3],
+                Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_structRegisterImplementation)));
+
+            if (Type.Methods.Any(Method => Method.Name == "Finalize") == false)
+            {
+                var superFinalize = Type.BaseType.Resolve().Methods.FirstOrDefault(Method => Method.Name == "Finalize");
+
+                var destructor = new MethodDefinition("Finalize",
+                    MethodAttributes.HideBySig | MethodAttributes.Family | MethodAttributes.Virtual,
+                    ModuleDefinition.TypeSystem.Void);
+
                 destructor.Overrides.Add(ModuleDefinition.ImportReference(superFinalize));
+
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, type.Methods.FirstOrDefault(m => m.Name == "get_GarbageCollectionHandle")));
-                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_UnRegisterImplementation)));
+
+                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call,
+                    Type.Methods.FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle")));
+
+                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(_structUnRegisterImplementation)));
+
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-                
-                type.Methods.Add(destructor);
-            } else
-            {
-                var Finalize = type.Methods.FirstOrDefault(m => m.Name == "Finalize");
-                ilProcessor = Finalize.Body.GetILProcessor(); 
-                ilProcessor.InsertBefore(Finalize.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
-                ilProcessor.InsertBefore(Finalize.Body.Instructions[1], Instruction.Create(OpCodes.Call, type.Methods.FirstOrDefault(m => m.Name == "get_GarbageCollectionHandle")));
-                ilProcessor.InsertBefore(Finalize.Body.Instructions[2], Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(UStruct_UnRegisterImplementation)));
-           
-            }
 
-            
-
-
-
-        }
-        private void ProcessStructGCHandle(TypeDefinition type)
-        {
-            if (type.Properties.Any(property => property.Name == "GarbageCollectionHandle") == true)
-                return;
-            var GarbageCollectionHandle = new PropertyDefinition("GarbageCollectionHandle", PropertyAttributes.None, ModuleDefinition.TypeSystem.IntPtr);
-            
-            var GarbageCollectionHandleBackingField = new FieldDefinition("<GarbageCollectionHandle>k__BackingField", FieldAttributes.Private, ModuleDefinition.TypeSystem.IntPtr);
-            type.Fields.Add(GarbageCollectionHandleBackingField);
-            
-            var getter = new MethodDefinition("get_GarbageCollectionHandle", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final, ModuleDefinition.TypeSystem.IntPtr);
-            var Instructions = getter.Body.Instructions;
-            Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-            Instructions.Add(Instruction.Create(OpCodes.Ldfld, GarbageCollectionHandleBackingField));
-            Instructions.Add(Instruction.Create(OpCodes.Ret));
-            type.Methods.Add(getter);
-            GarbageCollectionHandle.GetMethod = getter;
-
-            var setter = new MethodDefinition("set_GarbageCollectionHandle", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final, ModuleDefinition.TypeSystem.Void);
-            setter.Parameters.Add(new ParameterDefinition(ModuleDefinition.TypeSystem.IntPtr));
-            Instructions = setter.Body.Instructions;
-            Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-            Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
-            Instructions.Add(Instruction.Create(OpCodes.Stfld, GarbageCollectionHandleBackingField));
-            Instructions.Add(Instruction.Create(OpCodes.Ret));
-            type.Methods.Add(setter);
-            GarbageCollectionHandle.SetMethod = setter;
-            type.Properties.Add(GarbageCollectionHandle);
-        }
-
-        public void AddPathNameAttributeToUEType(TypeDefinition type)
-        {
-            if (type.CustomAttributes.Any(attribute => attribute.AttributeType == PathAttributeType) == false)
-            {
-
-                var constructor = PathAttributeType.GetConstructors().FirstOrDefault();
-
-                var constructorRef = ModuleDefinition.ImportReference(constructor);
-                var attribute = new CustomAttribute(constructorRef);
-                var FullPath = GetPath(type);
-                attribute.ConstructorArguments.Add(new CustomAttributeArgument(ModuleDefinition.TypeSystem.String, FullPath));
-                type.CustomAttributes.Add(attribute);
-            }
-
-        }
-
-        private string GetPath(TypeDefinition type)
-        {
-            var FullPath = "/Script/CoreUObject.";
-            if (type.Name[0] == 'A' || type.Name[0] == 'U' || type.Name[0] == 'F')
-            {
-                FullPath += type.Name.Substring(1);
-            }
-            else if (type.IsInterface && type.Name[0] == 'I')
-            {
-                FullPath += type.Name.Substring(1);
+                Type.Methods.Add(destructor);
             }
             else
             {
-                FullPath += type.Name;
-            }
-            return FullPath;
-        }
-        private void ProcessUClassType(TypeDefinition type)
-        {
-            foreach(var property in type.Properties)
-            {
-                if (property.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == "Script.Dynamic.UPropertyAttribute"))
+                var finalize = Type.Methods.FirstOrDefault(Method => Method.Name == "Finalize");
+
+                if (finalize != null)
                 {
-                    ProcessUClassProperty(type, property);
+                    ilProcessor = finalize.Body.GetILProcessor();
+
+                    ilProcessor.InsertBefore(finalize.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+
+                    ilProcessor.InsertBefore(finalize.Body.Instructions[1],
+                        Instruction.Create(OpCodes.Call,
+                            Type.Methods.FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle")));
+
+                    ilProcessor.InsertBefore(finalize.Body.Instructions[2],
+                        Instruction.Create(OpCodes.Call,
+                            ModuleDefinition.ImportReference(_structUnRegisterImplementation)));
                 }
             }
-
         }
 
-        private void ProcessUClassProperty(TypeDefinition type, PropertyDefinition property)
+        private void ProcessStructGarbageCollectionHandle(TypeDefinition Type)
+        {
+            if (Type.Properties.Any(Property => Property.Name == "GarbageCollectionHandle"))
+            {
+                return;
+            }
+
+            var garbageCollectionHandle = new PropertyDefinition("GarbageCollectionHandle", PropertyAttributes.None,
+                ModuleDefinition.TypeSystem.IntPtr);
+
+            var garbageCollectionHandleBackingField = new FieldDefinition("<GarbageCollectionHandle>k__BackingField",
+                FieldAttributes.Private, ModuleDefinition.TypeSystem.IntPtr);
+
+            Type.Fields.Add(garbageCollectionHandleBackingField);
+
+            var getter = new MethodDefinition("get_GarbageCollectionHandle",
+                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName |
+                MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final,
+                ModuleDefinition.TypeSystem.IntPtr);
+
+            var instructions = getter.Body.Instructions;
+
+            instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+
+            instructions.Add(Instruction.Create(OpCodes.Ldfld, garbageCollectionHandleBackingField));
+
+            instructions.Add(Instruction.Create(OpCodes.Ret));
+
+            Type.Methods.Add(getter);
+
+            garbageCollectionHandle.GetMethod = getter;
+
+            var setter = new MethodDefinition("set_GarbageCollectionHandle",
+                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName |
+                MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final,
+                ModuleDefinition.TypeSystem.Void);
+
+            setter.Parameters.Add(new ParameterDefinition(ModuleDefinition.TypeSystem.IntPtr));
+
+            instructions = setter.Body.Instructions;
+
+            instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+
+            instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+
+            instructions.Add(Instruction.Create(OpCodes.Stfld, garbageCollectionHandleBackingField));
+
+            instructions.Add(Instruction.Create(OpCodes.Ret));
+
+            Type.Methods.Add(setter);
+
+            garbageCollectionHandle.SetMethod = setter;
+
+            Type.Properties.Add(garbageCollectionHandle);
+        }
+
+        private void AddPathNameAttributeToUnrealType(TypeDefinition Type)
+        {
+            if (Type.CustomAttributes.Any(Attribute => Attribute.AttributeType == _pathAttributeType) == false)
+            {
+                var constructor = _pathAttributeType.GetConstructors().FirstOrDefault();
+
+                var constructorRef = ModuleDefinition.ImportReference(constructor);
+
+                var attribute = new CustomAttribute(constructorRef);
+
+                var fullPath = GetPathName(Type);
+
+                attribute.ConstructorArguments.Add(new CustomAttributeArgument(ModuleDefinition.TypeSystem.String,
+                    fullPath));
+
+                Type.CustomAttributes.Add(attribute);
+            }
+        }
+
+        private static string GetPathName(TypeDefinition Type)
+        {
+            var name = Type.Name;
+
+            return "/Script/CoreUObject." + (name.EndsWith("_C") || Type.IsEnum ? name : name.Substring(1));
+        }
+
+        private void ProcessUClassType(TypeDefinition Type)
+        {
+            foreach (var property in Type.Properties)
+            {
+                if (property.CustomAttributes.Any(Attribute =>
+                        Attribute.AttributeType.FullName == "Script.Dynamic.UPropertyAttribute"))
+                {
+                    ProcessUClassProperty(Type, property);
+                }
+            }
+        }
+
+        private void ProcessUClassProperty(TypeDefinition Type, PropertyDefinition Property)
         {
             // 删除默认生成
+            var fieldName = $"<{Property.Name}>k__BackingField";
 
-            var FieldName = $"<{property.Name}>k__BackingField";
-            var BackingField = type.Fields.FirstOrDefault(field => field.Name == FieldName && field.FieldType.FullName == property.PropertyType.FullName);
-            if (BackingField != null)
+            var backingField = Type.Fields.FirstOrDefault(Field =>
+                Field.Name == fieldName && Field.FieldType.FullName == Property.PropertyType.FullName);
+
+            if (backingField != null)
             {
-                type.Fields.Remove(BackingField);
-                // type.Fields.Clear();
+                Type.Fields.Remove(backingField);
             }
 
             // 获取GarbageCollectionHandle访问器
-            var GetGarbageCollectionHandleMethod = GetGarbageCollectionHandle(type);
-            if (GetGarbageCollectionHandleMethod == null)
+            var getGarbageCollectionHandleMethod = GetGarbageCollectionHandle(Type);
+
+            if (getGarbageCollectionHandleMethod == null)
             {
-                throw new WeavingException("Not Found GetGarbageCollectionHandle property's getter of class " + type.FullName);
+                throw new WeavingException("Not Found GetGarbageCollectionHandle property's getter of class " +
+                                           Type.FullName);
             }
+
             // 修改setter
-            if (property.SetMethod != null)
+            if (Property.SetMethod != null)
             {
-                var propertyType = property.PropertyType;
-                var PropertySetMethod = GetPropertyAccessor(property, ObjectSetMethodMap);
-                if (PropertySetMethod != null)
+                var propertyType = Property.PropertyType;
+
+                var propertySetMethod = GetPropertyAccessor(Property, _objectSetMethodMap);
+
+                if (propertySetMethod != null)
                 {
-                    var field = type.Fields.FirstOrDefault(f => f.Name == "__" + property.Name && f.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+                    var field = Type.Fields.FirstOrDefault(Field =>
+                        Field.Name == "__" + Property.Name &&
+                        Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+
                     if (field == null)
                     {
-                        field = new FieldDefinition("__" + property.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-                        type.Fields.Add(field);
+                        field = new FieldDefinition("__" + Property.Name,
+                            FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
+
+                        Type.Fields.Add(field);
                     }
 
-                    var ilProcessor = property.SetMethod.Body.GetILProcessor();
+                    var ilProcessor = Property.SetMethod.Body.GetILProcessor();
+
                     ilProcessor.Clear();
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(GetGarbageCollectionHandleMethod)));
+
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(PropertySetMethod)));
+
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(propertySetMethod)));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ret));
                 }
                 else
                 {
                     throw new WeavingException("Not found set function of type " + propertyType.FullName);
                 }
-
-
             }
 
-            if (property.GetMethod != null)
+            if (Property.GetMethod != null)
             {
-                var propertyType = property.PropertyType;
+                var propertyType = Property.PropertyType;
+
                 // 先找一下int, uint这些 函数的类型跟 property能直接对上的
-                var PropertyGetMethod = GetPropertyAccessor(property, ObjectGetMethodMap);
-                if (PropertyGetMethod != null)
+                var propertyGetMethod = GetPropertyAccessor(Property, _objectGetMethodMap);
+
+                if (propertyGetMethod != null)
                 {
-                    var field = type.Fields.FirstOrDefault(f => f.Name == "__" + property.Name && f.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+                    var field = Type.Fields.FirstOrDefault(Field =>
+                        Field.Name == "__" + Property.Name &&
+                        Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+
                     if (field == null)
                     {
-                        field = new FieldDefinition("__" + property.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-                        type.Fields.Add(field);
+                        field = new FieldDefinition("__" + Property.Name,
+                            FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
+
+                        Type.Fields.Add(field);
                     }
-                    var ilProcessor = property.GetMethod.Body.GetILProcessor();
+
+                    var ilProcessor = Property.GetMethod.Body.GetILProcessor();
+
                     ilProcessor.Clear();
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(GetGarbageCollectionHandleMethod)));
+
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(PropertyGetMethod)));
+
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(propertyGetMethod)));
+
                     if (propertyType.IsValueType == false)
                     {
-                        ilProcessor.Append(Instruction.Create(OpCodes.Isinst, ModuleDefinition.ImportReference(propertyType)));
+                        ilProcessor.Append(Instruction.Create(OpCodes.Isinst,
+                            ModuleDefinition.ImportReference(propertyType)));
                     }
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ret));
                 }
                 else
@@ -254,94 +351,130 @@ namespace Weavers
                     throw new WeavingException("Not found get function of type " + propertyType.FullName);
                 }
             }
-
-
         }
 
-
-        private void ProcessUStructType(TypeDefinition type)
+        private void ProcessUStructType(TypeDefinition Type)
         {
-            foreach (var property in type.Properties)
+            foreach (var property in Type.Properties)
             {
-                if (property.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == "Script.Dynamic.UPropertyAttribute"))
+                if (property.CustomAttributes.Any(Attribute =>
+                        Attribute.AttributeType.FullName == "Script.Dynamic.UPropertyAttribute"))
                 {
-                    ProcessUStructProperty(type, property);
+                    ProcessUStructProperty(Type, property);
                 }
             }
-
         }
-        private void ProcessUStructProperty(TypeDefinition type, PropertyDefinition property)
+
+        private void ProcessUStructProperty(TypeDefinition Type, PropertyDefinition Property)
         {
             // 删除默认生成
+            var fieldName = $"<{Property.Name}>k__BackingField";
 
-            var FieldName = $"<{property.Name}>k__BackingField";
-            var BackingField = type.Fields.FirstOrDefault(field => field.Name == FieldName && field.FieldType.FullName == property.PropertyType.FullName);
-            if (BackingField != null)
+            var backingField = Type.Fields.FirstOrDefault(Field =>
+                Field.Name == fieldName && Field.FieldType.FullName == Property.PropertyType.FullName);
+
+            if (backingField != null)
             {
-                type.Fields.Remove(BackingField);
-                // type.Fields.Clear();
+                Type.Fields.Remove(backingField);
             }
 
             // 获取GarbageCollectionHandle访问器
-            var GetGarbageCollectionHandleMethod = GetGarbageCollectionHandle(type);
-            if (GetGarbageCollectionHandleMethod == null)
+            var getGarbageCollectionHandleMethod = GetGarbageCollectionHandle(Type);
+
+            if (getGarbageCollectionHandleMethod == null)
             {
-                throw new WeavingException("Not Found GetGarbageCollectionHandle property's getter of class " + type.FullName);
+                throw new WeavingException("Not Found GetGarbageCollectionHandle property's getter of class " +
+                                           Type.FullName);
             }
+
             // 修改setter
-            if (property.SetMethod != null)
+            if (Property.SetMethod != null)
             {
-                var propertyType = property.PropertyType;
-                var PropertySetMethod = GetPropertyAccessor(property, StructSetMethodMap);
-                if (PropertySetMethod != null)
+                var propertyType = Property.PropertyType;
+
+                var propertySetMethod = GetPropertyAccessor(Property, _structSetMethodMap);
+
+                if (propertySetMethod != null)
                 {
-                    var field = type.Fields.FirstOrDefault(f => f.Name == "__" + property.Name && f.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+                    var field = Type.Fields.FirstOrDefault(Field =>
+                        Field.Name == "__" + Property.Name &&
+                        Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+
                     if (field == null)
                     {
-                        field = new FieldDefinition("__" + property.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-                        type.Fields.Add(field);
+                        field = new FieldDefinition("__" + Property.Name,
+                            FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
+
+                        Type.Fields.Add(field);
                     }
-                    var ilProcessor = property.SetMethod.Body.GetILProcessor();
+
+                    var ilProcessor = Property.SetMethod.Body.GetILProcessor();
+
                     ilProcessor.Clear();
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(GetGarbageCollectionHandleMethod)));
+
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(PropertySetMethod)));
+
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(propertySetMethod)));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ret));
                 }
                 else
                 {
                     throw new WeavingException("Not found set function of type " + propertyType.FullName);
                 }
-
-
             }
 
-            if (property.GetMethod != null)
+            if (Property.GetMethod != null)
             {
-                var propertyType = property.PropertyType;
+                var propertyType = Property.PropertyType;
+
                 // 先找一下int, uint这些 函数的类型跟 property能直接对上的
-                var PropertyGetMethod = GetPropertyAccessor(property, StructGetMethodMap);
-                if (PropertyGetMethod != null)
+                var propertyGetMethod = GetPropertyAccessor(Property, _structGetMethodMap);
+
+                if (propertyGetMethod != null)
                 {
-                    var field = type.Fields.FirstOrDefault(f => f.Name == "__" + property.Name && f.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+                    var field = Type.Fields.FirstOrDefault(Field =>
+                        Field.Name == "__" + Property.Name &&
+                        Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+
                     if (field == null)
                     {
-                        field = new FieldDefinition("__" + property.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-                        type.Fields.Add(field);
+                        field = new FieldDefinition("__" + Property.Name,
+                            FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
+
+                        Type.Fields.Add(field);
                     }
-                    var ilProcessor = property.GetMethod.Body.GetILProcessor();
+
+                    var ilProcessor = Property.GetMethod.Body.GetILProcessor();
+
                     ilProcessor.Clear();
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(GetGarbageCollectionHandleMethod)));
+
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(PropertyGetMethod)));
+
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(propertyGetMethod)));
+
                     if (propertyType.IsValueType == false)
                     {
-                        ilProcessor.Append(Instruction.Create(OpCodes.Isinst, ModuleDefinition.ImportReference(propertyType)));
+                        ilProcessor.Append(Instruction.Create(OpCodes.Isinst,
+                            ModuleDefinition.ImportReference(propertyType)));
                     }
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ret));
                 }
                 else
@@ -349,125 +482,156 @@ namespace Weavers
                     throw new WeavingException("Not found get function of type " + propertyType.FullName);
                 }
             }
-
-
         }
 
-        private MethodDefinition GetPropertyAccessor(PropertyDefinition property, Dictionary<string, MethodDefinition> MethodMap)
+        private MethodDefinition GetPropertyAccessor(PropertyDefinition Property,
+            Dictionary<string, MethodDefinition> MethodMap)
         {
-            var type = property.PropertyType.Resolve();
-            if (MethodMap.TryGetValue(property.PropertyType.FullName, out var PropertyGetMethod) == false)
+            var type = Property.PropertyType.Resolve();
+
+            if (MethodMap.TryGetValue(Property.PropertyType.FullName, out var propertyGetMethod) == false)
             {
                 // 然后找一下enum
                 if (type.IsEnum)
                 {
-                    if (MethodMap.TryGetValue(type.GetEnumUnderlyingType().FullName, out PropertyGetMethod) == false)
+                    if (MethodMap.TryGetValue(type.GetEnumUnderlyingType().FullName, out propertyGetMethod) == false)
                     {
-                        throw new WeavingException("Not found accessor Property Method: named " + property.Name + " property type is " + type.Resolve().GetEnumUnderlyingType().Resolve().FullName + " of type " + "type " + type.FullName);
+                        throw new WeavingException("Not found accessor Property Method: named " + Property.Name +
+                                                   " property type is " +
+                                                   type.Resolve().GetEnumUnderlyingType().Resolve().FullName +
+                                                   " of type " + "type " + type.FullName);
                     }
                 }
+
                 if (GetGarbageCollectionHandle(type.Resolve()) != null)
                 {
-                    PropertyGetMethod = MethodMap[ModuleDefinition.TypeSystem.Object.FullName];
+                    propertyGetMethod = MethodMap[ModuleDefinition.TypeSystem.Object.FullName];
                 }
             }
 
-            return PropertyGetMethod;
+            return propertyGetMethod;
         }
-        private MethodDefinition GetGarbageCollectionHandle(TypeDefinition type)
+
+        private MethodDefinition GetGarbageCollectionHandle(TypeDefinition Type)
         {
-            var property = type.Properties.FirstOrDefault(porperty => porperty.Name == "GarbageCollectionHandle"
-                && porperty.PropertyType.FullName == ModuleDefinition.TypeSystem.IntPtr.FullName
-                && porperty.GetMethod != null);
+            var property = Type.Properties.FirstOrDefault(Property => Property.Name == "GarbageCollectionHandle" &&
+                                                                      Property.PropertyType.FullName ==
+                                                                      ModuleDefinition.TypeSystem.IntPtr.FullName &&
+                                                                      Property.GetMethod != null);
+
             if (property != null)
+            {
                 return property.GetMethod;
-            if (type.BaseType != null)
-                return GetGarbageCollectionHandle(type.BaseType.Resolve());
-            return null;
+            }
+
+            return Type.BaseType != null ? GetGarbageCollectionHandle(Type.BaseType.Resolve()) : null;
         }
-        private void GetAllUClass()
+
+        private void GetAllDynamic()
         {
             foreach (var type in ModuleDefinition.Types)
             {
-                if (type.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == "Script.Dynamic.UClassAttribute"))
+                if (type.CustomAttributes.Any(Attribute =>
+                        Attribute.AttributeType.FullName == "Script.Dynamic.UClassAttribute"))
                 {
-                    UClassTypes.Add(type);
+                    _classTypes.Add(type);
                 }
-                else if (type.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == "Script.Dynamic.UStructAttribute"))
+
+                else if (type.CustomAttributes.Any(Attribute =>
+                             Attribute.AttributeType.FullName == "Script.Dynamic.UStructAttribute"))
                 {
-                    UStructTypes.Add(type);
+                    _structTypes.Add(type);
                 }
-                else if (type.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == "Script.Dynamic.UEnumAttribute"))
+
+                else if (type.CustomAttributes.Any(Attribute =>
+                             Attribute.AttributeType.FullName == "Script.Dynamic.UEnumAttribute"))
                 {
-                    UEnumTypes.Add(type);
+                    _enumTypes.Add(type);
                 }
-                else if (type.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == "Script.Dynamic.UInterfaceAttribute"))
+
+                else if (type.CustomAttributes.Any(Attribute =>
+                             Attribute.AttributeType.FullName == "Script.Dynamic.UInterfaceAttribute"))
                 {
-                    UInterfaceTypes.Add(type);
+                    _interfaceTypes.Add(type);
                 }
-                else if (type.IsInterface && type.Interfaces.ToList().Any(interf => interf.InterfaceType.FullName == "Script.CoreUObject.IInterface"))
+
+                else if (type.IsInterface && type.Interfaces.ToList().Any(Interface =>
+                             Interface.InterfaceType.FullName == "Script.CoreUObject.IInterface"))
                 {
-                    UInterfaceTypes.Add(type);
+                    _interfaceTypes.Add(type);
                 }
             }
         }
 
-        private void SearchAllPropertyAccessors(ModuleDefinition UEDefinition)
+        private void SearchAllPropertyAccessors(ModuleDefinition Definition)
         {
-            TypeDefinition PropertyImplementationClass = UEDefinition.GetType("Script.Library.FPropertyImplementation");
-            foreach (var method in PropertyImplementationClass.Methods)
+            var propertyImplementationClass = Definition.GetType("Script.Library.FPropertyImplementation");
+
+            foreach (var method in propertyImplementationClass.Methods)
             {
                 if (method.IsStatic == false)
-                    continue;
-                // Get函数
-                if (method.ReturnType.FullName != ModuleDefinition.TypeSystem.Void.FullName
-                    && method.Name.IndexOf("FProperty_Get") >= 0 && method.Name.IndexOf("PropertyImplementation") > 0)
                 {
-                    var PropertyType = method.ReturnType;
-                    if (method.Name.IndexOf("FProperty_GetObject") >= 0)
+                    continue;
+                }
+
+                // Get函数
+                if (method.ReturnType.FullName != ModuleDefinition.TypeSystem.Void.FullName &&
+                    method.Name.IndexOf("FProperty_Get", StringComparison.Ordinal) >= 0 &&
+                    method.Name.IndexOf("PropertyImplementation", StringComparison.Ordinal) > 0)
+                {
+                    var propertyType = method.ReturnType;
+
+                    if (method.Name.IndexOf("FProperty_GetObject", StringComparison.Ordinal) >= 0)
                     {
                         // UObject
-                        ObjectGetMethodMap.Add(PropertyType.FullName, method);
+                        _objectGetMethodMap.Add(propertyType.FullName, method);
                     }
-                    else if (method.Name.IndexOf("FProperty_GetStruct") >= 0)
+                    else if (method.Name.IndexOf("FProperty_GetStruct", StringComparison.Ordinal) >= 0)
                     {
                         // UStruct
-                        StructGetMethodMap.Add(PropertyType.FullName, method);
+                        _structGetMethodMap.Add(propertyType.FullName, method);
                     }
                 }
                 // Set函数
-                else if (method.ReturnType.FullName == ModuleDefinition.TypeSystem.Void.FullName
-                    && method.Name.IndexOf("FProperty_Set") >= 0 && method.Name.IndexOf("PropertyImplementation") > 0
-                    && method.Parameters.Count == 3)
+                else if (method.ReturnType.FullName == ModuleDefinition.TypeSystem.Void.FullName &&
+                         method.Name.IndexOf("FProperty_Set", StringComparison.Ordinal) >= 0 &&
+                         method.Name.IndexOf("PropertyImplementation", StringComparison.Ordinal) > 0 &&
+                         method.Parameters.Count == 3)
                 {
-                    var PropertyType = method.Parameters[2].ParameterType;
-                    if (method.Name.IndexOf("FProperty_SetObject") >= 0)
+                    var propertyType = method.Parameters[2].ParameterType;
+
+                    if (method.Name.IndexOf("FProperty_SetObject", StringComparison.Ordinal) >= 0)
                     {
                         // UObject
-                        ObjectSetMethodMap.Add(PropertyType.FullName, method);
+                        _objectSetMethodMap.Add(propertyType.FullName, method);
                     }
-                    else if (method.Name.IndexOf("FProperty_SetStruct") >= 0)
+                    else if (method.Name.IndexOf("FProperty_SetStruct", StringComparison.Ordinal) >= 0)
                     {
                         // UStruct
-                        StructSetMethodMap.Add(PropertyType.FullName, method);
+                        _structSetMethodMap.Add(propertyType.FullName, method);
                     }
                 }
             }
         }
+
         private void GetAllMeta()
         {
-            ModuleDefinition UEDefinition = ModuleDefinition;
-            if (UEDefinition.Name != "UE.dll")
-            {
-                UEDefinition = ModuleDefinition.ReadModule("../../Content/Script/UE.dll");
-            }
-            
-            PathAttributeType = UEDefinition.GetType("Script.CoreUObject.PathNameAttribute");
-            UStruct_RegisterImplementation = UEDefinition.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_RegisterImplementation");
-            UStruct_UnRegisterImplementation = UEDefinition.GetType("Script.Library.UStructImplementation").Methods.FirstOrDefault(method => method.Name == "UStruct_UnRegisterImplementation");
-            SearchAllPropertyAccessors(UEDefinition);
+            var definition = ModuleDefinition;
 
+            if (definition.Name != "UE.dll")
+            {
+                definition = ModuleDefinition.ReadModule("../../Content/Script/UE.dll");
+            }
+
+            _pathAttributeType = definition.GetType("Script.CoreUObject.PathNameAttribute");
+
+            _structRegisterImplementation = definition.GetType("Script.Library.UStructImplementation").Methods
+                .FirstOrDefault(Method => Method.Name == "UStruct_RegisterImplementation");
+
+            _structUnRegisterImplementation = definition.GetType("Script.Library.UStructImplementation").Methods
+                .FirstOrDefault(Method => Method.Name == "UStruct_UnRegisterImplementation");
+
+            SearchAllPropertyAccessors(definition);
         }
     }
 }
-
