@@ -7,8 +7,7 @@
 FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction):
 	Function(InFunction),
 	OriginalFunction(nullptr),
-	ReturnPropertyDescriptor(nullptr),
-	Params(nullptr)
+	ReturnPropertyDescriptor(nullptr)
 {
 	FFunctionDescriptor::Initialize();
 }
@@ -60,7 +59,9 @@ void FFunctionDescriptor::Initialize()
 		}
 	}
 
-	Params = Function->ParmsSize > 0 ? FMemory::Malloc(Function->ParmsSize, 16) : nullptr;
+	BufferAllocator = Function->ParmsSize > 0
+		                  ? MakeShareable(new FFunctionParamBufferAllocator(*Function))
+		                  : nullptr;
 }
 
 void FFunctionDescriptor::Deinitialize()
@@ -82,13 +83,6 @@ void FFunctionDescriptor::Deinitialize()
 	}
 
 	OutPropertyIndexes.Empty();
-
-	if (Params != nullptr)
-	{
-		FMemory::Free(Params);
-
-		Params = nullptr;
-	}
 }
 
 FName FFunctionDescriptor::GetFName() const
@@ -210,6 +204,8 @@ MonoObject* FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** OutV
 
 	auto ParamIndex = 0;
 
+	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Get() : nullptr;
+
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
 		const auto& PropertyDescriptor = PropertyDescriptors[Index];
@@ -272,12 +268,22 @@ MonoObject* FFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** OutV
 			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
 			                              reinterpret_cast<void**>(&ReturnValue));
 
+			if (Params != nullptr)
+			{
+				BufferAllocator->Pop(Params);
+			}
+
 			return ReturnValue;
 		}
 	}
 	else if (bIsRemote)
 	{
 		InObject->CallRemoteFunction(Function.Get(), Params, nullptr, nullptr);
+	}
+
+	if (Params != nullptr)
+	{
+		BufferAllocator->Pop(Params);
 	}
 
 	return nullptr;

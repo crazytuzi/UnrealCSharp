@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "FFunctionParamBufferAllocator.h"
 #include "mono/metadata/object.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
@@ -43,5 +44,6 @@ protected:
 
 	TArray<uint32> OutPropertyIndexes;
 
-	void* Params;
+	TSharedPtr<FFunctionParamBufferAllocator> BufferAllocator;
+
 };
