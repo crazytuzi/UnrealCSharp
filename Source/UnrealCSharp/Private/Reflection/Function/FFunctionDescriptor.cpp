@@ -58,12 +58,10 @@ void FFunctionDescriptor::Initialize()
 			}
 		}
 	}
-	if (!BufferAllocator.IsValid())
-	{
-		BufferAllocator = Function->ParmsSize > 0
-			                  ? MakeShareable(new FFunctionParamBufferAllocator(*Function))
-			                  : nullptr;
-	}
+
+	BufferAllocator = Function->ParmsSize > 0
+		                  ? MakeShareable(new FFunctionParamBufferAllocator(*Function))
+		                  : nullptr;
 }
 
 void FFunctionDescriptor::Deinitialize()
