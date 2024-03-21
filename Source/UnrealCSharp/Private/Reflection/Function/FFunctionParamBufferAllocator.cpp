@@ -1,7 +1,7 @@
 ﻿#include "Reflection/Function/FFunctionParamBufferAllocator.h"
 
 FFunctionParamBufferAllocator::FFunctionParamBufferAllocator(const UFunction& Func)
-: Counter(0)
+	: Counter(0)
 {
 	ParmsSize = Func.ParmsSize;
 }

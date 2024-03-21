@@ -5,16 +5,16 @@ class FFunctionParamBufferAllocator
 public:
 	explicit FFunctionParamBufferAllocator(const UFunction& Func);
 
-	 ~FFunctionParamBufferAllocator() ;
+	~FFunctionParamBufferAllocator();
 
-	void* Get() ;
+	void* Get();
 
-	void Pop(void* Memory) ;
+	void Pop(void* Memory);
 
 private:
 	uint8 Counter;
-	
+
 	uint16 ParmsSize;
-	
+
 	TArray<void*> Buffers;
 };
