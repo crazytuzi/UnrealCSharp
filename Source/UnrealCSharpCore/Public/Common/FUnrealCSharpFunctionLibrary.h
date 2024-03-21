@@ -10,7 +10,13 @@ public:
 #endif
 
 public:
+	static FString GetModuleName(const UClass* InField);
+	
 	static FString GetModuleName(const UField* InField);
+
+	static FString GetModuleName(const UFunction* SignatureFunction);
+
+	static FString GetModuleName(const UField* InField, const FString& InModuleName);
 
 	static FString GetFullClass(const UStruct* InStruct);
 

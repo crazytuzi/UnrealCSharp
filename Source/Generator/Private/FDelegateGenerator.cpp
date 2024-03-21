@@ -371,7 +371,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *DelegateDeclarationContent
 	);
 
-	auto ModuleName = NameSpaceContent.Replace(TEXT("Script."), TEXT("/")).Replace(TEXT("."), TEXT("/"));
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InDelegateProperty->SignatureFunction);
 
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(InDelegateProperty->SignatureFunction), ModuleName);
@@ -779,7 +779,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *DelegateDeclarationContent
 	);
 
-	auto ModuleName = NameSpaceContent.Replace(TEXT("Script."), TEXT("/")).Replace(TEXT("."), TEXT("/"));
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InMulticastDelegateProperty->SignatureFunction);
 
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(InMulticastDelegateProperty->SignatureFunction), ModuleName);

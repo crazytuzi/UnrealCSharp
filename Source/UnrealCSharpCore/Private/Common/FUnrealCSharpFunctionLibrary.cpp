@@ -36,16 +36,28 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	if (InField == nullptr)
-	{
-		return TEXT("");
-	}
+	const auto OuterClass = InField != nullptr ? InField->GetOuter() : nullptr;
+	
+	return OuterClass ? GetModuleName(InField, OuterClass->GetName()) : TEXT("");
+}
 
-	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UFunction* SignatureFunction)
+{
+	return SignatureFunction != nullptr
+		? GetModuleName(
+			SignatureFunction,
+			GetClassNameSpace(SignatureFunction).Replace(TEXT("."), TEXT("/"))
+			)
+		: TEXT("");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField, const FString& InModuleName)
+{
+	FString ModuleName;
 
 	if (InField->IsNative())
 	{
-		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
+		ModuleName = InModuleName.Replace(TEXT("Script/"), TEXT(""));
 	}
 	else
 	{
