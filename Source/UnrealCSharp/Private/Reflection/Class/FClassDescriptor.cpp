@@ -1,5 +1,6 @@
 ﻿#include "Reflection/Class/FClassDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reflection/Function/FUnrealFunctionDescriptor.h"
 
 FClassDescriptor::FClassDescriptor(UStruct* InStruct, MonoClass* InBindMonoClass):
 	Struct(InStruct),
@@ -56,7 +57,7 @@ FFunctionDescriptor* FClassDescriptor::AddFunctionDescriptor(const FName& InFunc
 		{
 			if (const auto FoundFunction = InClass->FindFunctionByName(InFunctionName, EIncludeSuperFlag::ExcludeSuper))
 			{
-				const auto NewFunctionDescriptor = new FFunctionDescriptor(FoundFunction);
+				const auto NewFunctionDescriptor = new FUnrealFunctionDescriptor(FoundFunction);
 
 				FunctionHashSet.Add(GetTypeHash(FoundFunction));
 
@@ -68,7 +69,7 @@ FFunctionDescriptor* FClassDescriptor::AddFunctionDescriptor(const FName& InFunc
 				if (const auto FoundFunction = Interface.Class->FindFunctionByName(
 					InFunctionName, EIncludeSuperFlag::IncludeSuper))
 				{
-					const auto NewFunctionDescriptor = new FFunctionDescriptor(FoundFunction);
+					const auto NewFunctionDescriptor = new FUnrealFunctionDescriptor(FoundFunction);
 
 					FunctionHashSet.Add(GetTypeHash(FoundFunction));
 

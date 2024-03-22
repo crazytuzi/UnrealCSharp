@@ -1,11 +1,16 @@
 ﻿#pragma once
 
 #include "FFunctionDescriptor.h"
+#include "FFunctionParamBufferAllocator.h"
+#include "mono/metadata/object.h"
 
 class FCSharpDelegateDescriptor final : public FFunctionDescriptor
 {
 public:
-	using FFunctionDescriptor::FFunctionDescriptor;
+	typedef FFunctionDescriptor Super;
+
+public:
+	explicit FCSharpDelegateDescriptor(UFunction* InFunction);
 
 public:
 	bool CallDelegate(MonoObject* InDelegate, void* InParams);
@@ -15,4 +20,7 @@ public:
 
 	MonoObject* ProcessMulticastDelegate(const FMulticastScriptDelegate* InMulticastScriptDelegate,
 	                                     MonoObject** OutValue, MonoArray* InValue);
+
+private:
+	TSharedPtr<FFunctionParamBufferAllocator> BufferAllocator;
 };

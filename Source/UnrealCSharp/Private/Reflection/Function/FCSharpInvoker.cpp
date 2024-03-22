@@ -1,6 +1,6 @@
 ﻿#include "Reflection/Function/FCSharpInvoker.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Reflection/Function/FFunctionDescriptor.h"
+#include "Reflection/Function/FCSharpFunctionDescriptor.h"
 
 static FNativeFunctionRegistrar CallCSharpRegistrar(UObject::StaticClass(), "execCallCSharp",
                                                     (FNativeFuncPtr)&FCSharpInvoker::execCallCSharp);
@@ -13,7 +13,7 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 {
 	auto Function = Stack.Node;
 
-	FFunctionDescriptor* FunctionDescriptor = nullptr;
+	FCSharpFunctionDescriptor* FunctionDescriptor = nullptr;
 
 	if (Stack.CurrentNativeFunction != nullptr)
 	{
@@ -21,8 +21,8 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 		{
 			Function = Stack.CurrentNativeFunction;
 
-			FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(
-				Cast<UClass>(Function->GetOuter()), Function->GetFName());
+			FunctionDescriptor = static_cast<FCSharpFunctionDescriptor*>(FCSharpEnvironment::GetEnvironment().
+				GetOrAddFunctionDescriptor(Cast<UClass>(Function->GetOuter()), Function->GetFName()));
 		}
 		else
 		{
@@ -37,8 +37,8 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 
 	if (FunctionDescriptor == nullptr)
 	{
-		FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(
-			Cast<UClass>(Function->GetOuter()), Function->GetFName());
+		FunctionDescriptor = static_cast<FCSharpFunctionDescriptor*>(FCSharpEnvironment::GetEnvironment().
+			GetOrAddFunctionDescriptor(Cast<UClass>(Function->GetOuter()), Function->GetFName()));
 	}
 
 	if (FunctionDescriptor != nullptr)

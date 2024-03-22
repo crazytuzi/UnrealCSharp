@@ -15,8 +15,16 @@ public:
 public:
 	virtual void Deinitialize() override;
 
+public:
+	bool CallCSharp(const FFrame& InStack);
+
+private:
+	static FOutParmRec* FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty);
+
 private:
 	friend class FCSharpBind;
+
+	TWeakObjectPtr<UFunction> OriginalFunction;
 
 	EFunctionFlags OriginalFunctionFlags;
 
