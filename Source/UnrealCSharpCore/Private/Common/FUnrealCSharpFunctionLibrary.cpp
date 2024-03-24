@@ -1,4 +1,5 @@
 ﻿#include "Common/FUnrealCSharpFunctionLibrary.h"
+
 #include "CoreMacro/Macro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
@@ -36,28 +37,13 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	const auto OuterClass = InField != nullptr ? InField->GetOuter() : nullptr;
-	
-	return OuterClass ? GetModuleName(InField, OuterClass->GetName()) : TEXT("");
-}
+	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
 
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const UFunction* SignatureFunction)
-{
-	return SignatureFunction != nullptr
-		? GetModuleName(
-			SignatureFunction,
-			GetClassNameSpace(SignatureFunction).Replace(TEXT("."), TEXT("/"))
-			)
-		: TEXT("");
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField, const FString& InModuleName)
-{
-	FString ModuleName;
+	auto ModuleName = Package ? Package->GetName() : TEXT("");
 
 	if (InField->IsNative())
 	{
-		ModuleName = InModuleName.Replace(TEXT("Script/"), TEXT(""));
+		ModuleName = ModuleName.Replace(TEXT("Script/"), TEXT(""));
 	}
 	else
 	{
@@ -67,6 +53,19 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField, const
 		{
 			ModuleName = ModuleName.Left(Index);
 		}
+	}
+
+	constexpr char Replace_ModuleName[] = "/Game";
+
+	if (ModuleName.StartsWith(Replace_ModuleName))
+	{
+		constexpr int32 Replace_Len = sizeof(Replace_ModuleName) - 1;
+
+		const int32 Size_ModuleName = ModuleName.Len();
+
+		const int32 Index = Size_ModuleName - Replace_Len;
+	
+		ModuleName = FApp::GetProjectName() + ModuleName.Right(Index);
 	}
 
 	return ModuleName;
@@ -304,6 +303,107 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 	}
 
 	return TEXT("");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InField)
+{
+	return InField != nullptr
+		       ? GetModuleRelativePath(InField->GetMetaData(TEXT("ModuleRelativePath")))
+		       : FString();
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UEnum* InEnum)
+{
+	return InEnum != nullptr
+		       ? GetModuleRelativePath(InEnum->GetMetaData(TEXT("ModuleRelativePath")))
+		       : FString();
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
+{
+	return InDelegateProperty != nullptr
+		       ? GetModuleRelativePath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))
+		       : FString();
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+	const FMulticastDelegateProperty* InMulticastDelegateProperty)
+{
+	return InMulticastDelegateProperty != nullptr
+		       ? GetModuleRelativePath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))
+		       : FString();
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FString& InModuleRelativePath)
+{
+	return InModuleRelativePath.Replace(TEXT("Public/"), TEXT("")).Replace(TEXT("Private/"), TEXT(""));
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFileName(const UField* InField)
+{
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InField);
+
+	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InField), ModuleName);
+
+	auto ModuleRelativeFile = FPaths::Combine(
+		FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField)),
+		InField->GetName());
+
+	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFileName(const UEnum* InEnum)
+{
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InEnum);
+
+	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InEnum), ModuleName);
+
+	auto ModuleRelativeFile = FPaths::Combine(
+		FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InEnum)),
+		InEnum->GetName());
+
+	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFileName(const UStruct* InStruct)
+{
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InStruct);
+
+	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InStruct), ModuleName);
+
+	auto ModuleRelativeFile = FPaths::Combine(
+		FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InStruct)),
+		InStruct->GetName());
+
+	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFileName(const FDelegateProperty* InDelegateProperty)
+{
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InDelegateProperty->SignatureFunction);
+
+	auto DirectoryName = FPaths::Combine(
+		FUnrealCSharpFunctionLibrary::GetGenerationPath(InDelegateProperty->SignatureFunction), ModuleName);
+
+	auto ModuleRelativeFile = FPaths::Combine(
+		FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InDelegateProperty)),
+		GetFullClass(InDelegateProperty));
+
+	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFileName(const FMulticastDelegateProperty* InMulticastDelegateProperty)
+{
+	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InMulticastDelegateProperty->SignatureFunction);
+
+	auto DirectoryName = FPaths::Combine(
+		FUnrealCSharpFunctionLibrary::GetGenerationPath(InMulticastDelegateProperty->SignatureFunction), ModuleName);
+
+	auto ModuleRelativeFile = FPaths::Combine(
+		FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InMulticastDelegateProperty)),
+		GetFullClass(InMulticastDelegateProperty));
+
+	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
 }
 
 #if WITH_EDITOR

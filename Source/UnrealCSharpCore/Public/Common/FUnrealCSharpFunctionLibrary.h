@@ -10,13 +10,7 @@ public:
 #endif
 
 public:
-	static FString GetModuleName(const UClass* InField);
-	
 	static FString GetModuleName(const UField* InField);
-
-	static FString GetModuleName(const UFunction* SignatureFunction);
-
-	static FString GetModuleName(const UField* InField, const FString& InModuleName);
 
 	static FString GetFullClass(const UStruct* InStruct);
 
@@ -35,6 +29,26 @@ public:
 	static FString GetFullClass(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 
 	static FString GetClassNameSpace(const FMulticastDelegateProperty* InMulticastDelegateProperty);
+
+	static FString GetModuleRelativePath(const UField* InField);
+
+	static FString GetModuleRelativePath(const UEnum* InEnum);
+
+	static FString GetModuleRelativePath(const FDelegateProperty* InDelegateProperty);
+
+	static FString GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty);
+
+	static FString GetModuleRelativePath(const FString& InModuleRelativePath);
+
+	static FString GetFileName(const UField* InField);
+
+	static FString GetFileName(const UEnum* InEnum);
+
+	static FString GetFileName(const UStruct* InStruct);
+
+	static FString GetFileName(const FDelegateProperty* InDelegateProperty);
+
+	static FString GetFileName(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 
 #if WITH_EDITOR
 	static FString GetSuffixName(const FAssetData& InAssetData);

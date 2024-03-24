@@ -25,16 +25,6 @@ public:
 
 	static int32 GetFunctionIndex(bool bHasReturn, bool bHasInput, bool bHasOutput);
 
-	static FString GetModuleRelativePath(const UField* InField);
-
-	static FString GetModuleRelativePath(const UEnum* InEnum);
-
-	static FString GetModuleRelativePath(const FDelegateProperty* InDelegateProperty);
-
-	static FString GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty);
-
-	static FString GetModuleRelativePath(const FString& InModuleRelativePath);
-
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 
 	static bool IsSupported(FProperty* Property);
