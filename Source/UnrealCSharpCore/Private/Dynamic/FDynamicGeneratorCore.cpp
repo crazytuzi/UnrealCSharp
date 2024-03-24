@@ -582,14 +582,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVER_ATTRIBUTE))
 	{
-		if ((InFunction->FunctionFlags & FUNC_BlueprintEvent) != 0)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as Client or Server"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetServer;
@@ -601,14 +593,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 	}
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLIENT_ATTRIBUTE))
 	{
-		if ((InFunction->FunctionFlags & FUNC_BlueprintEvent) != 0)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as Client or Server"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetClient;
@@ -616,14 +600,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NET_MULTICAST_ATTRIBUTE))
 	{
-		if ((InFunction->FunctionFlags & FUNC_BlueprintEvent) != 0)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as Client or Server"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetMulticast;
@@ -631,14 +607,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_REQUEST_ATTRIBUTE))
 	{
-		if ((InFunction->FunctionFlags & FUNC_BlueprintEvent) != 0)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as a ServiceRequest"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetReliable;
@@ -651,14 +619,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 	}
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_RESPONSE_ATTRIBUTE))
 	{
-		if (InFunction->FunctionFlags & FUNC_BlueprintEvent)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as a ServiceResponse"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetReliable;
@@ -743,8 +703,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 	if (InFunction->FunctionFlags & FUNC_Net)
 	{
 		InFunction->FunctionFlags |= FUNC_Event;
-
-		ensure(!(InFunction->FunctionFlags & (FUNC_BlueprintEvent | FUNC_Exec)));
 
 		const auto bIsNetService = !!(InFunction->FunctionFlags & (FUNC_NetRequest | FUNC_NetResponse));
 
