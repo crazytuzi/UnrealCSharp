@@ -31,9 +31,9 @@ auto FPropertyDescriptor::ContainerPtrToValuePtr(void* ContainerPtr, const int32
 	return Property != nullptr ? Property->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex) : nullptr;
 }
 
-FName FPropertyDescriptor::GetFName() const
+FString FPropertyDescriptor::GetName() const
 {
-	return Property != nullptr ? Property->GetFName() : NAME_None;
+	return Property != nullptr ? Property->GetName() : FString();
 }
 
 void FPropertyDescriptor::InitializeValue_InContainer(void* Dest) const

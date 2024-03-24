@@ -15,7 +15,7 @@ public:
 	virtual void Deinitialize();
 
 public:
-	FName GetFName() const;
+	FString GetName() const;
 
 protected:
 	TWeakObjectPtr<UFunction> Function;

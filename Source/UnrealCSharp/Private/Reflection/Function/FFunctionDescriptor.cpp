@@ -79,7 +79,7 @@ void FFunctionDescriptor::Deinitialize()
 	Function.Reset();
 }
 
-FName FFunctionDescriptor::GetFName() const
+FString FFunctionDescriptor::GetName() const
 {
-	return Function.IsValid() ? Function->GetFName() : NAME_None;
+	return Function.IsValid() ? Function->GetName() : FString();
 }

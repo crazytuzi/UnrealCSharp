@@ -22,7 +22,7 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 			Function = Stack.CurrentNativeFunction;
 
 			FunctionDescriptor = static_cast<FCSharpFunctionDescriptor*>(FCSharpEnvironment::GetEnvironment().
-				GetOrAddFunctionDescriptor(Cast<UClass>(Function->GetOuter()), Function->GetFName()));
+				GetOrAddFunctionDescriptor(Cast<UClass>(Function->GetOuter()), Function->GetName()));
 		}
 		else
 		{
@@ -38,7 +38,7 @@ DEFINE_FUNCTION(FCSharpInvoker::execCallCSharp)
 	if (FunctionDescriptor == nullptr)
 	{
 		FunctionDescriptor = static_cast<FCSharpFunctionDescriptor*>(FCSharpEnvironment::GetEnvironment().
-			GetOrAddFunctionDescriptor(Cast<UClass>(Function->GetOuter()), Function->GetFName()));
+			GetOrAddFunctionDescriptor(Cast<UClass>(Function->GetOuter()), Function->GetName()));
 	}
 
 	if (FunctionDescriptor != nullptr)

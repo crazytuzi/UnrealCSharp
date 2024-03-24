@@ -33,13 +33,13 @@ public:
 
 	void AddFunctionDescriptor(uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor);
 
-	void AddFunctionHash(uint32 InFunctionHash, FClassDescriptor* InClassDescriptor, const FName& InFunctionName);
+	void AddFunctionHash(uint32 InFunctionHash, FClassDescriptor* InClassDescriptor, const FString& InFunctionName);
 
 	void RemoveFunctionDescriptor(uint32 InFunctionHash);
 
 	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor);
 
-	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor, const FName& InPropertyName);
+	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor, const FString& InPropertyName);
 
 	void RemovePropertyDescriptor(uint32 InPropertyHash);
 
@@ -49,11 +49,11 @@ private:
 private:
 	TMap<TWeakObjectPtr<const UStruct>, FClassDescriptor*> ClassDescriptorMap;
 
-	TMap<uint32, TPair<FClassDescriptor*, FName>> PropertyHashMap;
+	TMap<uint32, TPair<FClassDescriptor*, FString>> PropertyHashMap;
 
 	TMap<uint32, FPropertyDescriptor*> PropertyDescriptorMap;
 
-	TMap<uint32, TPair<FClassDescriptor*, FName>> FunctionHashMap;
+	TMap<uint32, TPair<FClassDescriptor*, FString>> FunctionHashMap;
 
 	TMap<uint32, FFunctionDescriptor*> FunctionDescriptorMap;
 

@@ -38,7 +38,7 @@ public:
 
 	virtual void DestroyValue(void* Dest) const;
 
-	FORCEINLINE FName GetFName() const;
+	FORCEINLINE FString GetName() const;
 
 	FORCEINLINE void InitializeValue_InContainer(void* Dest) const;
 

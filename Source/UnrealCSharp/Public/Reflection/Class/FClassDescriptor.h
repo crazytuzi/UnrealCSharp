@@ -19,15 +19,15 @@ public:
 	MonoClass* GetMonoClass() const;
 
 public:
-	FFunctionDescriptor* AddFunctionDescriptor(const FName& InFunctionName);
+	FFunctionDescriptor* AddFunctionDescriptor(const FString& InFunctionName);
 
-	FFunctionDescriptor* GetOrAddFunctionDescriptor(const FName& InFunctionName);
+	FFunctionDescriptor* GetOrAddFunctionDescriptor(const FString& InFunctionName);
 
-	FPropertyDescriptor* AddPropertyDescriptor(const FName& InPropertyName);
+	FPropertyDescriptor* AddPropertyDescriptor(const FString& InPropertyName);
 
 	bool HasFunctionDescriptor(uint32 InFunctionHash) const;
 
-	bool HasPropertyDescriptor(const FName& InPropertyName);
+	bool HasPropertyDescriptor(const FString& InPropertyName);
 
 private:
 	friend class FCSharpBind;

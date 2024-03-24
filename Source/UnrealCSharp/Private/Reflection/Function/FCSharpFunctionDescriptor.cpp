@@ -3,8 +3,9 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/MonoMacro.h"
 
-FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction):
+FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(const FString& InName, UFunction* InFunction):
 	Super(InFunction),
+	Name(InName),
 	OriginalFunctionFlags(EFunctionFlags::FUNC_None),
 	OriginalNativeFuncPtr(nullptr)
 {
@@ -115,7 +116,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(const FFrame& InStack)
 			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Parent_Class_Get_Method_From_Name(FoundMonoClass,
 				                                  TCHAR_TO_UTF8(
-					                                  *FUnrealCSharpFunctionLibrary::Encode(InStack.Node->GetName())),
+					                                  *FUnrealCSharpFunctionLibrary::Encode(Name)),
 				                                  PropertyDescriptors.Num()))
 			{
 				const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(

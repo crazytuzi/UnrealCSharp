@@ -385,7 +385,7 @@ void FCSharpEnvironment::RemoveClassDescriptor(const UStruct* InStruct) const
 }
 
 FFunctionDescriptor* FCSharpEnvironment::GetOrAddFunctionDescriptor(const UStruct* InStruct,
-                                                                    const FName& InFunctionName) const
+                                                                    const FString& InFunctionName) const
 {
 	const auto FoundClassDescriptor = GetClassDescriptor(InStruct);
 
@@ -412,7 +412,7 @@ void FCSharpEnvironment::AddFunctionDescriptor(const uint32 InFunctionHash,
 }
 
 void FCSharpEnvironment::AddFunctionHash(const uint32 InFunctionHash, FClassDescriptor* InClassDescriptor,
-                                         const FName& InFunctionName) const
+                                         const FString& InFunctionName) const
 {
 	if (ClassRegistry != nullptr)
 	{
@@ -443,7 +443,7 @@ void FCSharpEnvironment::AddPropertyDescriptor(const uint32 InPropertyHash,
 }
 
 void FCSharpEnvironment::AddPropertyHash(const uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
-                                         const FName& InPropertyName) const
+                                         const FString& InPropertyName) const
 {
 	if (ClassRegistry != nullptr)
 	{

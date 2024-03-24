@@ -8,7 +8,7 @@ public:
 	typedef FFunctionDescriptor Super;
 
 public:
-	explicit FCSharpFunctionDescriptor(UFunction* InFunction);
+	explicit FCSharpFunctionDescriptor(const FString& InName, UFunction* InFunction);
 
 	virtual ~FCSharpFunctionDescriptor() override;
 
@@ -23,6 +23,8 @@ private:
 
 private:
 	friend class FCSharpBind;
+
+	FString Name;
 
 	TWeakObjectPtr<UFunction> OriginalFunction;
 
