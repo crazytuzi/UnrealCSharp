@@ -774,7 +774,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                               *IInterfaceContent
 	);
 
-	FGeneratorCore::SaveStringToFile(FUnrealCSharpFunctionLibrary::GetFileName(InClass), Content);
+	FGeneratorCore::SaveStringToFile(FGeneratorCore::GetFileName(InClass), Content);
 }
 
 bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& InFunctionOutParamIndex,
