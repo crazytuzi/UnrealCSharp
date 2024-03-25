@@ -35,15 +35,8 @@ public:
 
 	static FString GetModuleRelativePath(const FString& InModuleRelativePath);
 
-	static FString GetFileName(const UField* InField);
-
-	static FString GetFileName(const UEnum* InEnum);
-
-	static FString GetFileName(const UStruct* InStruct);
-
-	static FString GetFileName(const FDelegateProperty* InDelegateProperty);
-
-	static FString GetFileName(const FMulticastDelegateProperty* InMulticastDelegateProperty);
+	template <typename T>
+	static FString GetFileName(const T* InField);
 
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 

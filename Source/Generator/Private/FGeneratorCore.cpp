@@ -579,71 +579,42 @@ FString FGeneratorCore::GetModuleRelativePath(const FString& InModuleRelativePat
 	return InModuleRelativePath.Replace(TEXT("Public/"), TEXT("")).Replace(TEXT("Private/"), TEXT(""));
 }
 
-FString FGeneratorCore::GetFileName(const UField* InField)
+template <typename T>
+FString FGeneratorCore::GetFileName(const T* InField)
 {
-	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InField);
+	FString ModuleName;
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InField), ModuleName);
+	FString DirectoryName;
 
-	auto ModuleRelativeFile = FPaths::Combine(
-		FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InField)),
-		InField->GetName());
+	FString ModuleRelativeFile;
 
-	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
-}
+	if constexpr (std::is_same_v<T, FDelegateProperty> || std::is_same_v<T, FMulticastDelegateProperty>)
+	{
+		ModuleName = FPaths::Combine(
+			InField->SignatureFunction->GetPackage()->GetName().StartsWith(TEXT("/Game"))
+				? FApp::GetProjectName()
+				: TEXT("")
+			, FUnrealCSharpFunctionLibrary::GetClassNameSpace(InField)
+			  .Replace(TEXT("."), TEXT("/"))
+			  .Replace(TEXT("Script/"), TEXT("")));
 
-FString FGeneratorCore::GetFileName(const UEnum* InEnum)
-{
-	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InEnum);
+		DirectoryName = FPaths::Combine(
+			FUnrealCSharpFunctionLibrary::GetGenerationPath(InField->SignatureFunction), ModuleName);
 
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InEnum), ModuleName);
+		ModuleRelativeFile = FPaths::Combine(
+			FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InField)),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InField));
+	}
+	else
+	{
+		ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InField);
 
-	auto ModuleRelativeFile = FPaths::Combine(
-		FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InEnum)),
-		InEnum->GetName());
+		DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InField), ModuleName);
 
-	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
-}
-
-FString FGeneratorCore::GetFileName(const UStruct* InStruct)
-{
-	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InStruct);
-
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InStruct), ModuleName);
-
-	auto ModuleRelativeFile = FPaths::Combine(
-		FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InStruct)),
-		InStruct->GetName());
-	
-	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
-}
-
-FString FGeneratorCore::GetFileName(const FDelegateProperty* InDelegateProperty)
-{
-	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InDelegateProperty->SignatureFunction,
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InDelegateProperty).Replace(TEXT("."), TEXT("/")));
-
-	auto DirectoryName = FPaths::Combine(
-		FUnrealCSharpFunctionLibrary::GetGenerationPath(InDelegateProperty->SignatureFunction), ModuleName);
-
-	auto ModuleRelativeFile = FPaths::Combine(
-		FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InDelegateProperty)),
-		FUnrealCSharpFunctionLibrary::GetFullClass(InDelegateProperty));
-
-	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
-}
-
-FString FGeneratorCore::GetFileName(const FMulticastDelegateProperty* InMulticastDelegateProperty)
-{
-	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InMulticastDelegateProperty->SignatureFunction,
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InMulticastDelegateProperty).Replace(TEXT("."), TEXT("/")));
-
-	auto DirectoryName = FPaths::Combine(
-		FUnrealCSharpFunctionLibrary::GetGenerationPath(InMulticastDelegateProperty->SignatureFunction), ModuleName);
-
-	auto ModuleRelativeFile = FPaths::Combine(
-		FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InMulticastDelegateProperty)),
-		FUnrealCSharpFunctionLibrary::GetFullClass(InMulticastDelegateProperty));
+		ModuleRelativeFile = FPaths::Combine(
+			FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InField)),
+			InField->GetName());
+	}
 
 	return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
 }
