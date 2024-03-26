@@ -196,9 +196,6 @@ public:
 	auto GetMulti(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	template <typename T>
-	auto GetMulti(const MonoObject* InMonoObject) const;
-
-	template <typename T>
 	auto GetMultiObject(void* InAddress) const;
 
 	template <typename T>

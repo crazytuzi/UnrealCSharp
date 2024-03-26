@@ -223,14 +223,6 @@ auto FCSharpEnvironment::GetMulti(const FGarbageCollectionHandle& InGarbageColle
 }
 
 template <typename T>
-auto FCSharpEnvironment::GetMulti(const MonoObject* InMonoObject) const
-{
-	return MultiRegistry != nullptr
-		       ? FMultiRegistry::TMultiRegistry<T, T>::GetMulti(MultiRegistry, InMonoObject)
-		       : nullptr;
-}
-
-template <typename T>
 auto FCSharpEnvironment::GetMultiObject(void* InAddress) const
 {
 	return MultiRegistry != nullptr

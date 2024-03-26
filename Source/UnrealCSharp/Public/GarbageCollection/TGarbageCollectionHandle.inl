@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "mono/metadata/object-forward.h"
+#include "CoreMacro/PropertyMacro.h"
 #include "Domain/FDomain.h"
+#include "mono/metadata/object-forward.h"
 
 template <typename T>
 class TGarbageCollectionHandle
@@ -68,6 +69,20 @@ public:
 		{
 			InGarbageCollectionHandle = T();
 		}
+	}
+
+	static TGarbageCollectionHandle MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject, MonoProperty* InMonoProperty)
+	{
+		return *static_cast<T*>(FMonoDomain::Object_Unbox(
+			FMonoDomain::Property_Get_Value(InMonoProperty, InMonoObject, nullptr, nullptr)));
+	}
+
+	static TGarbageCollectionHandle MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject)
+	{
+		const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
+			FMonoDomain::Object_Get_Class(InMonoObject), PROPERTY_GARBAGE_COLLECTION_HANDLE);
+
+		return FoundProperty != nullptr ? MonoObject2GarbageCollectionHandle(InMonoObject, FoundProperty) : TGarbageCollectionHandle{};
 	}
 
 private:

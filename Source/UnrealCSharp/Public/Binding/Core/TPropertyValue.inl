@@ -97,9 +97,10 @@ struct TMultiPropertyValue
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(MonoObject* InValue)
 	{
-		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetMulti<std::decay_t<T>>(InValue);
+		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetMulti<std::decay_t<T>>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 	}
 };
 
@@ -627,9 +628,10 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<s
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InValue)->Get();
+		return FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue))->Get();
 	}
 };
 

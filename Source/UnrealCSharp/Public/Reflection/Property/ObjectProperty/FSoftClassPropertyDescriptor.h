@@ -2,6 +2,7 @@
 
 #include "FObjectPropertyDescriptor.h"
 #include "mono/metadata/object-forward.h"
+#include "mono/metadata/details/class-types.h"
 
 class FSoftClassPropertyDescriptor final : public FObjectPropertyDescriptor
 {
@@ -20,4 +21,6 @@ private:
 	MonoObject* Object_New(void* InAddress) const;
 
 	MonoClass* Class;
+
+	MonoProperty* Property;
 };
