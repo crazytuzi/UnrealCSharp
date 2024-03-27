@@ -496,6 +496,14 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 	FDynamicGeneratorCore::GeneratorProperty(InMonoClass, InClass,
 	                                         [InClass](const FProperty* InProperty)
 	                                         {
+		                                         if (InProperty->HasAnyPropertyFlags(CPF_Net))
+		                                         {
+			                                         if (const auto BlueprintGeneratedClass = Cast<
+				                                         UBlueprintGeneratedClass>(InClass))
+			                                         {
+				                                         BlueprintGeneratedClass->NumReplicatedProperties++;
+			                                         }
+		                                         }
 #if WITH_EDITOR
 		                                         if (const auto Blueprint = Cast<UBlueprint>(InClass->ClassGeneratedBy))
 		                                         {
