@@ -38,23 +38,18 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
 	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
 
-	auto ModuleName = Package ? Package->GetName() : TEXT("");
+	auto ModuleName = Package != nullptr ? Package->GetName() : TEXT("");
 
-	constexpr char Replace_ProModuleName[] = "/Game";
-
-	if (ModuleName.StartsWith(Replace_ProModuleName))
+	if (constexpr char ReplaceProjectModuleName[] = "/Game";
+		ModuleName.StartsWith(ReplaceProjectModuleName))
 	{
-		constexpr int32 Replace_Len = sizeof(Replace_ProModuleName) - 1;
+		constexpr auto ReplaceProjectModuleNameLength = sizeof(ReplaceProjectModuleName) - 1;
 
-		const int32 Size_ModuleName = ModuleName.Len();
+		const auto ModuleNameLength = ModuleName.Len();
 
-		const int32 Const_Index = Size_ModuleName - Replace_Len;
+		ModuleName = FApp::GetProjectName() + ModuleName.Right(ModuleNameLength - ReplaceProjectModuleNameLength);
 
-		ModuleName = FApp::GetProjectName() + ModuleName.Right(Const_Index);
-
-		auto Index = 0;
-
-		if (ModuleName.FindLastChar(TEXT('/'), Index))
+		if (auto Index = 0; ModuleName.FindLastChar(TEXT('/'), Index))
 		{
 			ModuleName = ModuleName.Left(Index);
 		}
