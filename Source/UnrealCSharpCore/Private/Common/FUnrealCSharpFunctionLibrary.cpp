@@ -36,25 +36,32 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	if (InField == nullptr)
-	{
-		return TEXT("");
-	}
+	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
 
-	auto ModuleName = InField->GetOuter() ? InField->GetOuter()->GetName() : TEXT("");
+	auto ModuleName = Package ? Package->GetName() : TEXT("");
 
-	if (InField->IsNative())
+	constexpr char Replace_ProModuleName[] = "/Game";
+
+	if (ModuleName.StartsWith(Replace_ProModuleName))
 	{
-		ModuleName = ModuleName.Replace(TEXT("/Script/"), TEXT("/"));
-	}
-	else
-	{
+		constexpr int32 Replace_Len = sizeof(Replace_ProModuleName) - 1;
+
+		const int32 Size_ModuleName = ModuleName.Len();
+
+		const int32 Const_Index = Size_ModuleName - Replace_Len;
+
+		ModuleName = FApp::GetProjectName() + ModuleName.Right(Const_Index);
+
 		auto Index = 0;
 
 		if (ModuleName.FindLastChar(TEXT('/'), Index))
 		{
 			ModuleName = ModuleName.Left(Index);
 		}
+	}
+	else
+	{
+		ModuleName = ModuleName.Replace(TEXT("Script/"), TEXT(""));
 	}
 
 	return ModuleName;

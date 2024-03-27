@@ -371,17 +371,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *DelegateDeclarationContent
 	);
 
-	auto ModuleName = NameSpaceContent.Replace(*SCRIPT, TEXT("")).Replace(TEXT("."), TEXT("/"));
-
-	auto DirectoryName = FPaths::Combine(
-		FUnrealCSharpFunctionLibrary::GetGenerationPath(InDelegateProperty->SignatureFunction), ModuleName);
-
-	auto ModuleRelativeFile = FPaths::Combine(
-		FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InDelegateProperty)), ClassContent);
-
-	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
-
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FGeneratorCore::SaveStringToFile(FGeneratorCore::GetFileName(InDelegateProperty), Content);
 }
 
 void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelegateProperty)
@@ -779,15 +769,5 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *DelegateDeclarationContent
 	);
 
-	auto ModuleName = NameSpaceContent.Replace(*SCRIPT, TEXT("")).Replace(TEXT("."), TEXT("/"));
-
-	auto DirectoryName = FPaths::Combine(
-		FUnrealCSharpFunctionLibrary::GetGenerationPath(InMulticastDelegateProperty->SignatureFunction), ModuleName);
-
-	auto ModuleRelativeFile = FPaths::Combine(
-		FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InMulticastDelegateProperty)), ClassContent);
-
-	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
-
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FGeneratorCore::SaveStringToFile(FGeneratorCore::GetFileName(InMulticastDelegateProperty), Content);
 }
