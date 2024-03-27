@@ -6,7 +6,7 @@
 class FWeakObjectPropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
-	explicit FWeakObjectPropertyDescriptor(FProperty* InProperty);
+	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

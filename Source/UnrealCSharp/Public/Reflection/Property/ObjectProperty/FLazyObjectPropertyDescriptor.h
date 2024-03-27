@@ -6,7 +6,7 @@
 class FLazyObjectPropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
-	explicit FLazyObjectPropertyDescriptor(FProperty* InProperty);
+	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

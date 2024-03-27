@@ -1,11 +1,6 @@
 ﻿#include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FInterfacePropertyDescriptor::FInterfacePropertyDescriptor(FProperty* InProperty):
-	FCompoundPropertyDescriptor(InProperty)
-{
-}
-
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (InterfaceProperty != nullptr)

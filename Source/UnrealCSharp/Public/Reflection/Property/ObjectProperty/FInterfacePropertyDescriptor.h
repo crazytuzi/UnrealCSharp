@@ -6,7 +6,7 @@
 class FInterfacePropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
-	explicit FInterfacePropertyDescriptor(FProperty* InProperty);
+	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

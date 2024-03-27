@@ -347,9 +347,10 @@ struct TPropertyValue<T,
 			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember));
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetObject<std::remove_pointer_t<std::decay_t<T>>>(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetObject<std::remove_pointer_t<std::decay_t<T>>>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 	}
 };
 
@@ -361,9 +362,10 @@ struct TPropertyValue<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
 		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(MonoObject* InValue)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType*>(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType*>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 	}
 };
 

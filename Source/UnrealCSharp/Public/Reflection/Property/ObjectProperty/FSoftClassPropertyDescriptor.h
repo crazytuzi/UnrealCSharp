@@ -6,7 +6,7 @@
 class FSoftClassPropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
-	explicit FSoftClassPropertyDescriptor(FProperty* InProperty);
+	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

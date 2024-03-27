@@ -1,11 +1,6 @@
 ﻿#include "Reflection/Property/ObjectProperty/FSoftObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FSoftObjectPropertyDescriptor::FSoftObjectPropertyDescriptor(FProperty* InProperty):
-	FCompoundPropertyDescriptor(InProperty)
-{
-}
-
 void FSoftObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (SoftObjectProperty != nullptr)

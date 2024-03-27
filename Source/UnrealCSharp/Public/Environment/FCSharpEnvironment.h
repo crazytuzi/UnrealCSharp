@@ -93,18 +93,12 @@ public:
 	template <typename T, typename U>
 	auto GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	template <typename T, typename U>
-	auto GetAddress(const MonoObject* InMonoObject) const;
-
 	bool AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const;
 
 	MonoObject* GetObject(const UObject* InObject) const;
 
 	template <typename T = UObject>
 	auto GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-	template <typename T = UObject>
-	auto GetObject(const MonoObject* InMonoObject) const;
 
 	bool RemoveObjectReference(const UObject* InObject) const;
 
@@ -177,8 +171,6 @@ private:
 	public:
 		T* operator()(const FCSharpEnvironment* InEnvironment,
 		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
 	};
 
 	template <typename T>
@@ -249,11 +241,6 @@ public:
 		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
 			return InEnvironment.GetObject<T>(InGarbageCollectionHandle);
-		}
-
-		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
-		{
-			return InEnvironment.GetObject<T>(InMonoObject);
 		}
 	};
 

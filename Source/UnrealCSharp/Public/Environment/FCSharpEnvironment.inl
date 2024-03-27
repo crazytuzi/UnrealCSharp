@@ -21,21 +21,6 @@ const
 }
 
 template <typename T>
-T* FCSharpEnvironment::TGetAddress<UObject, T>::operator()(const FCSharpEnvironment* InEnvironment,
-                                                           const MonoObject* InMonoObject) const
-{
-	if (InEnvironment != nullptr && InEnvironment->ObjectRegistry != nullptr)
-	{
-		if (const auto FoundObject = InEnvironment->ObjectRegistry->GetAddress(InMonoObject))
-		{
-			return static_cast<T*>(FoundObject);
-		}
-	}
-
-	return nullptr;
-}
-
-template <typename T>
 T* FCSharpEnvironment::TGetAddress<UScriptStruct, T>::operator()(const FCSharpEnvironment* InEnvironment,
                                                                  const FGarbageCollectionHandle&
                                                                  InGarbageCollectionHandle) const
@@ -102,22 +87,10 @@ inline void* FCSharpEnvironment::GetAddress<UScriptStruct>(const FGarbageCollect
 	return nullptr;
 }
 
-template <typename T, typename U>
-auto FCSharpEnvironment::GetAddress(const MonoObject* InMonoObject) const
-{
-	return TGetAddress<T, U>()(this, InMonoObject);
-}
-
 template <typename T>
 auto FCSharpEnvironment::GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return ObjectRegistry != nullptr ? Cast<T>(ObjectRegistry->GetObject(InGarbageCollectionHandle)) : nullptr;
-}
-
-template <typename T>
-auto FCSharpEnvironment::GetObject(const MonoObject* InMonoObject) const
-{
-	return ObjectRegistry != nullptr ? Cast<T>(ObjectRegistry->GetObject(InMonoObject)) : nullptr;
 }
 
 template <typename T>

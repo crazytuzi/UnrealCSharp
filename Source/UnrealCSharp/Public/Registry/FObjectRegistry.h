@@ -27,8 +27,6 @@ public:
 public:
 	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
-	void* GetAddress(const MonoObject* InMonoObject);
-
 	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct);
 
 	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
@@ -36,8 +34,6 @@ public:
 	MonoObject* GetObject(const UObject* InObject);
 
 	UObject* GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle);
-
-	UObject* GetObject(const MonoObject* InMonoObject);
 
 	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject);
 
@@ -50,8 +46,6 @@ public:
 
 private:
 	FObjectMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2Object;
-
-	FObjectMapping::FMonoObject2Value MonoObject2Object;
 
 	FObjectMapping::FAddress2GarbageCollectionHandle Object2GarbageCollectionHandleMap;
 };

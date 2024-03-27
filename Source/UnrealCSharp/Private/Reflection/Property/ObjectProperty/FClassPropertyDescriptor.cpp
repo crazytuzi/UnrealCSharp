@@ -1,11 +1,6 @@
 ﻿#include "Reflection/Property/ObjectProperty/FClassPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FClassPropertyDescriptor::FClassPropertyDescriptor(FProperty* InProperty):
-	FCompoundPropertyDescriptor(InProperty)
-{
-}
-
 void FClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (ClassProperty != nullptr)

@@ -1,11 +1,6 @@
 ﻿#include "Reflection/Property/ObjectProperty/FWeakObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FWeakObjectPropertyDescriptor::FWeakObjectPropertyDescriptor(FProperty* InProperty):
-	FCompoundPropertyDescriptor(InProperty)
-{
-}
-
 void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (WeakObjectProperty != nullptr)

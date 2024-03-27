@@ -1,11 +1,6 @@
 ﻿#include "Reflection/Property/ObjectProperty/FLazyObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FLazyObjectPropertyDescriptor::FLazyObjectPropertyDescriptor(FProperty* InProperty):
-	FCompoundPropertyDescriptor(InProperty)
-{
-}
-
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (LazyObjectProperty != nullptr)
