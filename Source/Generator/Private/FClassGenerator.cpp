@@ -1002,6 +1002,10 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 			}
 			else
 			{
+				if (MetaData.IsEmpty())
+				{
+					return TEXT("");
+				}
 				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
 			}
 		}
