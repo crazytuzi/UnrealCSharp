@@ -216,9 +216,10 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(MonoObject* InValue)
 	{
-		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 	}
 };
 
@@ -264,9 +265,10 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
-		return (std::decay_t<T>)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+		return (std::decay_t<T>)FCSharpEnvironment::GetEnvironment().GetStruct(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 	}
 };
 
@@ -414,9 +416,10 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(MonoObject* InValue)
 	{
-		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 	}
 };
 

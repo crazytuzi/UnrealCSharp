@@ -36,21 +36,6 @@ T* FCSharpEnvironment::TGetAddress<UScriptStruct, T>::operator()(const FCSharpEn
 	return nullptr;
 }
 
-template <typename T>
-T* FCSharpEnvironment::TGetAddress<UScriptStruct, T>::operator()(const FCSharpEnvironment* InEnvironment,
-                                                                 const MonoObject* InMonoObject) const
-{
-	if (InEnvironment != nullptr && InEnvironment->StructRegistry != nullptr)
-	{
-		if (const auto FoundStruct = InEnvironment->StructRegistry->GetAddress(InMonoObject))
-		{
-			return static_cast<T*>(FoundStruct);
-		}
-	}
-
-	return nullptr;
-}
-
 template <typename T, typename U>
 auto FCSharpEnvironment::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {

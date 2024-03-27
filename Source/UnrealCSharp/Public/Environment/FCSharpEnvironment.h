@@ -114,8 +114,6 @@ public:
 
 	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	void* GetStruct(const MonoObject* InMonoObject) const;
-
 	bool RemoveStructReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject) const;
@@ -176,8 +174,6 @@ private:
 	public:
 		T* operator()(const FCSharpEnvironment* InEnvironment,
 		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
 	};
 
 public:
@@ -249,11 +245,6 @@ public:
 		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
 			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
-		}
-
-		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
-		{
-			return static_cast<T*>(InEnvironment.GetStruct(InMonoObject));
 		}
 	};
 

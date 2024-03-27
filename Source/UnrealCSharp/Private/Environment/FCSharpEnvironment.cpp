@@ -505,11 +505,6 @@ void* FCSharpEnvironment::GetStruct(const FGarbageCollectionHandle& InGarbageCol
 	return StructRegistry != nullptr ? StructRegistry->GetStruct(InGarbageCollectionHandle) : nullptr;
 }
 
-void* FCSharpEnvironment::GetStruct(const MonoObject* InMonoObject) const
-{
-	return StructRegistry != nullptr ? StructRegistry->GetStruct(InMonoObject) : nullptr;
-}
-
 bool FCSharpEnvironment::RemoveStructReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InGarbageCollectionHandle) : false;
