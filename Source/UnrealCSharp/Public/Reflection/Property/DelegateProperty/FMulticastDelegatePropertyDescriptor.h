@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPropertyDescriptor.h"
-#include "mono/metadata/details/object-types.h"
+#include "Reflection/Property/FCompoundPropertyDescriptor.h"
+#include "mono/metadata/object-forward.h"
 
-class FMulticastDelegatePropertyDescriptor : public FPropertyDescriptor
+class FMulticastDelegatePropertyDescriptor : public FCompoundPropertyDescriptor
 {
 public:
-	explicit FMulticastDelegatePropertyDescriptor(FProperty* InProperty);
+	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;
@@ -22,8 +22,4 @@ private:
 	MonoObject* NewRef(void* InAddress) const;
 
 	MonoObject* NewWeakRef(void* InAddress) const;
-
-	MonoClass* Class;
-
-	MonoReflectionType* Type;
 };

@@ -1,20 +1,6 @@
 ﻿#include "Reflection/Property/DelegateProperty/FMulticastDelegatePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
-#include "Bridge/FTypeBridge.h"
-
-FMulticastDelegatePropertyDescriptor::FMulticastDelegatePropertyDescriptor(FProperty* InProperty):
-	FPropertyDescriptor(InProperty),
-	Class(nullptr),
-	Type(nullptr)
-{
-	Class = FTypeBridge::GetMonoClass(MulticastDelegateProperty);
-
-	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(Class);
-
-	Type = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
-		FoundMonoType);
-}
 
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -38,8 +24,8 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcMulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-			FMulticastDelegateHelper>(SrcMonoObject);
+		const auto SrcMulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FMulticastDelegateHelper>(
+			MonoObject2GarbageCollectionHandle(SrcMonoObject));
 
 		MulticastDelegateProperty->InitializeValue(Dest);
 
