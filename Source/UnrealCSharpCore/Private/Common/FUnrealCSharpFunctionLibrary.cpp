@@ -64,7 +64,6 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 		ModuleName = ModuleName.Replace(TEXT("Script/"), TEXT(""));
 	}
 
-
 	return ModuleName;
 }
 

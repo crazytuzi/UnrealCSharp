@@ -71,3 +71,5 @@ private:
 
 	static TArray<FName> SupportedAssetClassName;
 };
+
+#include "FGeneratorCore.inl"
