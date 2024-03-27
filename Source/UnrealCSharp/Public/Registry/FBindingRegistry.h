@@ -2,58 +2,58 @@
 
 #include "TValueMapping.inl"
 
-struct FBindingAddressWrapper
-{
-	virtual ~FBindingAddressWrapper()
-	{
-	}
-
-	virtual void* GetValue()
-	{
-		return nullptr;
-	}
-};
-
-template <typename T>
-struct TBindingAddressWrapper final : FBindingAddressWrapper
-{
-	explicit TBindingAddressWrapper(T* InValue):
-		Value(InValue)
-	{
-	}
-
-	virtual ~TBindingAddressWrapper() override
-	{
-		delete Value;
-	}
-
-	virtual void* GetValue() override
-	{
-		return (void*)Value;
-	}
-
-private:
-	T* Value;
-};
-
-struct FBindingAddress
-{
-	typedef FBindingAddressWrapper FWrapperType;
-
-	explicit FBindingAddress(FWrapperType* InAddressWrapper, const bool InNeedFree = true):
-		AddressWrapper(InAddressWrapper),
-		bNeedFree(InNeedFree)
-	{
-	}
-
-	FWrapperType* AddressWrapper;
-
-	bool bNeedFree;
-};
-
 class UNREALCSHARP_API FBindingRegistry
 {
-public:
+private:
+	struct FBindingAddressWrapper
+	{
+		virtual ~FBindingAddressWrapper()
+		{
+		}
+
+		virtual void* GetValue()
+		{
+			return nullptr;
+		}
+	};
+
+	template <typename T>
+	struct TBindingAddressWrapper final : FBindingAddressWrapper
+	{
+		explicit TBindingAddressWrapper(T* InValue):
+			Value(InValue)
+		{
+		}
+
+		virtual ~TBindingAddressWrapper() override
+		{
+			delete Value;
+		}
+
+		virtual void* GetValue() override
+		{
+			return (void*)Value;
+		}
+
+	private:
+		T* Value;
+	};
+
+	struct FBindingAddress
+	{
+		typedef FBindingAddressWrapper FWrapperType;
+
+		explicit FBindingAddress(FWrapperType* InAddressWrapper, const bool InNeedFree = true):
+			AddressWrapper(InAddressWrapper),
+			bNeedFree(InNeedFree)
+		{
+		}
+
+		FWrapperType* AddressWrapper;
+
+		bool bNeedFree;
+	};
+	
 	template <typename Address, typename Value>
 	struct TBindingValueMapping : TValueMapping<Address, Value>
 	{
@@ -78,9 +78,6 @@ public:
 	template <typename T>
 	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
-	template <typename T>
-	auto GetBinding(const MonoObject* InMonoObject);
-
 	MonoObject* GetObject(const FBindingValueMapping::FAddressType InAddress);
 
 public:
@@ -94,8 +91,6 @@ public:
 
 private:
 	FBindingValueMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2BindingAddress;
-
-	FBindingValueMapping::FMonoObject2Value MonoObject2BindingAddress;
 
 	FBindingValueMapping::FAddress2GarbageCollectionHandle BindingAddress2GarbageCollectionHandle;
 };

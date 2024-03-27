@@ -62,8 +62,6 @@ public:
 
 	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct);
 
-	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
-
 	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct);
 
 	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle);

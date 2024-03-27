@@ -136,9 +136,10 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(MonoObject* InValue)
 	{
-		return *FCSharpEnvironment::GetEnvironment().GetBinding<std::decay_t<T>>(InValue);
+		return *FCSharpEnvironment::GetEnvironment().GetBinding<std::decay_t<T>>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 	}
 };
 
@@ -172,10 +173,11 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetBinding<
-			std::remove_pointer_t<std::remove_reference_t<T>>>(InValue);
+			std::remove_pointer_t<std::remove_reference_t<T>>>(
+				FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 	}
 };
 

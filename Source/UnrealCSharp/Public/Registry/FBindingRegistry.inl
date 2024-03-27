@@ -12,14 +12,6 @@ auto FBindingRegistry::GetBinding(const FGarbageCollectionHandle& InGarbageColle
 }
 
 template <typename T>
-auto FBindingRegistry::GetBinding(const MonoObject* InMonoObject)
-{
-	const auto FoundValue = MonoObject2BindingAddress.Find(InMonoObject);
-
-	return FoundValue != nullptr ? static_cast<T*>(FoundValue->AddressWrapper->GetValue()) : nullptr;
-}
-
-template <typename T>
 auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject, bool bNeedFree)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
@@ -34,8 +26,6 @@ auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject,
 
 	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
 	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, bNeedFree));
-
-	MonoObject2BindingAddress.Add(InMonoObject, FBindingValueMapping::ValueType(BindingAddressWrapper, bNeedFree));
 
 	return true;
 }
@@ -52,8 +42,6 @@ auto FBindingRegistry::AddReference(const FGarbageCollectionHandle& InOwner, con
 
 	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
 	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, false));
-
-	MonoObject2BindingAddress.Add(InMonoObject, FBindingValueMapping::ValueType(BindingAddressWrapper, false));
 
 	return FCSharpEnvironment::GetEnvironment().
 		AddReference(InOwner, new FBindingReference(GarbageCollectionHandle));

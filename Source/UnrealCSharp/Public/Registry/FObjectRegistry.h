@@ -5,7 +5,7 @@
 
 class UNREALCSHARP_API FObjectRegistry
 {
-public:
+private:
 	template <typename Key>
 	struct TObjectMapping : TValueMapping<Key>
 	{
@@ -28,8 +28,6 @@ public:
 	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
 	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct);
-
-	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
 
 	MonoObject* GetObject(const UObject* InObject);
 

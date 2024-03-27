@@ -237,14 +237,6 @@ auto FCSharpEnvironment::GetBinding(const FGarbageCollectionHandle& InGarbageCol
 }
 
 template <typename T>
-auto FCSharpEnvironment::GetBinding(const MonoObject* InMonoObject) const
-{
-	return BindingRegistry != nullptr
-		       ? BindingRegistry->GetBinding<T>(InMonoObject)
-		       : nullptr;
-}
-
-template <typename T>
 auto FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const T* InObject, bool bNeedFree) const
 {
 	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InObject, InMonoObject) : false;
