@@ -1,15 +1,9 @@
 ﻿#include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
-#include "CoreMacro/PropertyMacro.h"
 
 FInterfacePropertyDescriptor::FInterfacePropertyDescriptor(FProperty* InProperty):
-	FObjectPropertyDescriptor(InProperty),
-	Class(nullptr)
+	FCompoundPropertyDescriptor(InProperty)
 {
-	Class = FTypeBridge::GetMonoClass(InterfaceProperty);
-
-	Property = FMonoDomain::Class_Get_Property_From_Name(Class, PROPERTY_GARBAGE_COLLECTION_HANDLE);
 }
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
@@ -27,7 +21,7 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
-			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(SrcMonoObject, Property));
+			MonoObject2GarbageCollectionHandle(SrcMonoObject));
 
 		InterfaceProperty->InitializeValue(Dest);
 
@@ -48,7 +42,7 @@ bool FInterfacePropertyDescriptor::Identical(const void* A, const void* B, const
 		const auto InterfaceA = static_cast<FScriptInterface*>(const_cast<void*>(A));
 
 		const auto InterfaceB = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
-			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B)), Property));
+			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))));
 
 		return InterfaceProperty->Identical(InterfaceA, &InterfaceB, PortFlags);
 	}

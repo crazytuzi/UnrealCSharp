@@ -4,9 +4,8 @@
 
 FEnumPropertyDescriptor::FEnumPropertyDescriptor(FProperty* InProperty):
 	FPropertyDescriptor(InProperty),
-	Class(nullptr)
+	Class(FTypeBridge::GetMonoClass(InProperty))
 {
-	Class = FTypeBridge::GetMonoClass(Property);
 }
 
 void FEnumPropertyDescriptor::Get(void* Src, void** Dest) const

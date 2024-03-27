@@ -1,15 +1,9 @@
 ﻿#include "Reflection/Property/ObjectProperty/FWeakObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
-#include "CoreMacro/PropertyMacro.h"
 
 FWeakObjectPropertyDescriptor::FWeakObjectPropertyDescriptor(FProperty* InProperty):
-	FObjectPropertyDescriptor(InProperty),
-	Class(nullptr)
+	FCompoundPropertyDescriptor(InProperty)
 {
-	Class = FTypeBridge::GetMonoClass(WeakObjectProperty);
-
-	Property = FMonoDomain::Class_Get_Property_From_Name(Class, PROPERTY_GARBAGE_COLLECTION_HANDLE);
 }
 
 void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
@@ -27,7 +21,7 @@ void FWeakObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(
-			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(SrcMonoObject, Property));
+			MonoObject2GarbageCollectionHandle(SrcMonoObject));
 
 		WeakObjectProperty->InitializeValue(Dest);
 
@@ -42,7 +36,7 @@ bool FWeakObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 		const auto ObjectA = WeakObjectProperty->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(
-			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B)), Property))->Get();
+			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))))->Get();
 
 		return WeakObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
 	}

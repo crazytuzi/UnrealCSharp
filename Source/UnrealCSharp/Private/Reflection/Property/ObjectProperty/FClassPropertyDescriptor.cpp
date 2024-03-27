@@ -1,15 +1,9 @@
 ﻿#include "Reflection/Property/ObjectProperty/FClassPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
-#include "CoreMacro/PropertyMacro.h"
 
 FClassPropertyDescriptor::FClassPropertyDescriptor(FProperty* InProperty):
-	FObjectPropertyDescriptor(InProperty),
-	Class(nullptr)
+	FCompoundPropertyDescriptor(InProperty)
 {
-	Class = FTypeBridge::GetMonoClass(ClassProperty);
-
-	Property = FMonoDomain::Class_Get_Property_From_Name(Class, PROPERTY_GARBAGE_COLLECTION_HANDLE);
 }
 
 void FClassPropertyDescriptor::Get(void* Src, void** Dest) const
@@ -27,7 +21,7 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(SrcMonoObject, Property));
+			MonoObject2GarbageCollectionHandle(SrcMonoObject));
 
 		ClassProperty->InitializeValue(Dest);
 
@@ -45,7 +39,7 @@ bool FClassPropertyDescriptor::Identical(const void* A, const void* B, const uin
 		const auto ClassA = Cast<UClass>(ClassProperty->GetObjectPropertyValue(A));
 
 		const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B)), Property))->Get();
+			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))))->Get();
 
 		return ClassProperty->StaticIdentical(ClassA, ClassB, PortFlags);
 	}

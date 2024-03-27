@@ -68,9 +68,10 @@ struct TStringPropertyValue
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
-		return std::decay_t<T>(*FCSharpEnvironment::GetEnvironment().GetString<std::decay_t<T>>(InValue));
+		return std::decay_t<T>(*FCSharpEnvironment::GetEnvironment().GetString<std::decay_t<T>>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 	}
 };
 

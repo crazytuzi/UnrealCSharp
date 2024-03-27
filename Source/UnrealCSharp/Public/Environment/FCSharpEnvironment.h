@@ -209,9 +209,6 @@ public:
 	auto GetString(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	template <typename T>
-	auto GetString(const MonoObject* InMonoObject) const;
-
-	template <typename T>
 	auto GetStringObject(void* InAddress) const;
 
 	template <typename T>

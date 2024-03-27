@@ -1,12 +1,9 @@
 ﻿#include "Reflection/Property/StringProperty/FTextPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
 
 FTextPropertyDescriptor::FTextPropertyDescriptor(FProperty* InProperty):
-	FPropertyDescriptor(InProperty),
-	Class(nullptr)
+	FCompoundPropertyDescriptor(InProperty)
 {
-	Class = FTypeBridge::GetMonoClass(TextProperty);
 }
 
 void FTextPropertyDescriptor::Get(void* Src, void** Dest) const
@@ -23,7 +20,8 @@ void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FText>(SrcMonoObject))
+		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FText>(
+			MonoObject2GarbageCollectionHandle(SrcMonoObject)))
 		{
 			TextProperty->InitializeValue(Dest);
 
@@ -39,7 +37,7 @@ bool FTextPropertyDescriptor::Identical(const void* A, const void* B, uint32 Por
 		const auto TextA = TextProperty->GetPropertyValue(A);
 
 		const auto TextB = FCSharpEnvironment::GetEnvironment().GetString<FText>(
-			static_cast<MonoObject*>(const_cast<void*>(B)));
+			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))));
 
 		return TextA.EqualTo(*TextB);
 	}

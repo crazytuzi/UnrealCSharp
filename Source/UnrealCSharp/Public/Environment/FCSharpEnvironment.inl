@@ -255,14 +255,6 @@ auto FCSharpEnvironment::GetString(const FGarbageCollectionHandle& InGarbageColl
 }
 
 template <typename T>
-auto FCSharpEnvironment::GetString(const MonoObject* InMonoObject) const
-{
-	return StringRegistry != nullptr
-		       ? FStringRegistry::TStringRegistry<T>::GetString(StringRegistry, InMonoObject)
-		       : nullptr;
-}
-
-template <typename T>
 auto FCSharpEnvironment::GetStringObject(void* InAddress) const
 {
 	return StringRegistry != nullptr

@@ -1,15 +1,9 @@
 ﻿#include "Reflection/Property/ObjectProperty/FLazyObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
-#include "CoreMacro/PropertyMacro.h"
 
 FLazyObjectPropertyDescriptor::FLazyObjectPropertyDescriptor(FProperty* InProperty):
-	FObjectPropertyDescriptor(InProperty),
-	Class(nullptr)
+	FCompoundPropertyDescriptor(InProperty)
 {
-	Class = FTypeBridge::GetMonoClass(LazyObjectProperty);
-
-	Property = FMonoDomain::Class_Get_Property_From_Name(Class, PROPERTY_GARBAGE_COLLECTION_HANDLE);
 }
 
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest) const
@@ -27,7 +21,7 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
-			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(SrcMonoObject, Property));
+			MonoObject2GarbageCollectionHandle(SrcMonoObject));
 
 		LazyObjectProperty->InitializeValue(Dest);
 
@@ -42,7 +36,7 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 		const auto ObjectA = LazyObjectProperty->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
-			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B)), Property))->Get();
+			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))))->Get();
 
 		return LazyObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
 	}

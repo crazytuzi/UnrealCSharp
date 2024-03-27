@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPropertyDescriptor.h"
+#include "Reflection/Property/FCompoundPropertyDescriptor.h"
 #include "mono/metadata/object-forward.h"
 
-class FTextPropertyDescriptor final : public FPropertyDescriptor
+class FTextPropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
 	explicit FTextPropertyDescriptor(FProperty* InProperty);
@@ -18,6 +18,4 @@ public:
 
 private:
 	MonoObject* Object_New(void* InAddress) const;
-
-	MonoClass* Class;
 };

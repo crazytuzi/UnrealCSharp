@@ -1,10 +1,9 @@
 ﻿#pragma once
 
-#include "FObjectPropertyDescriptor.h"
+#include "Reflection/Property/FCompoundPropertyDescriptor.h"
 #include "mono/metadata/object-forward.h"
-#include "mono/metadata/details/class-types.h"
 
-class FInterfacePropertyDescriptor final : public FObjectPropertyDescriptor
+class FInterfacePropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
 	explicit FInterfacePropertyDescriptor(FProperty* InProperty);
@@ -19,8 +18,4 @@ public:
 
 private:
 	MonoObject* Object_New(void* InAddress) const;
-
-	MonoClass* Class;
-
-	MonoProperty* Property;
 };
