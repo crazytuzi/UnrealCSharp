@@ -1,14 +1,6 @@
 ﻿#include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FMapHelper.h"
-#include "Bridge/FTypeBridge.h"
-
-FMapPropertyDescriptor::FMapPropertyDescriptor(FProperty* InProperty):
-	FContainerPropertyDescriptor(InProperty),
-	Class(nullptr)
-{
-	Class = FTypeBridge::GetMonoClass(MapProperty);
-}
 
 void FMapPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -32,7 +24,8 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 	{
 		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(SrcMonoObject);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
+			MonoObject2GarbageCollectionHandle(SrcMonoObject));
 
 		MapProperty->InitializeValue(Dest);
 

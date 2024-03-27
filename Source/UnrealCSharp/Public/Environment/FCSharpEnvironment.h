@@ -127,9 +127,6 @@ public:
 	auto GetContainer(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	template <typename T>
-	auto GetContainer(const MonoObject* InMonoObject) const;
-
-	template <typename T>
 	auto GetContainerObject(void* InAddress) const;
 
 	template <typename T>

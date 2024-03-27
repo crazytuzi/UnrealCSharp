@@ -520,11 +520,12 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
 		std::decay_t<T> Value;
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InValue);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 
 		for (auto Index = 0; Index < SrcContainer->GetMaxIndex(); ++Index)
 		{
@@ -588,11 +589,12 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
 		std::decay_t<T> Value;
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InValue);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 
 		for (auto Index = 0; Index < SrcContainer->GetMaxIndex(); ++Index)
 		{
@@ -686,9 +688,10 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(MonoObject* InValue)
 	{
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InValue);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
+			FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 
 		return std::decay_t<T>(
 			static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>*>

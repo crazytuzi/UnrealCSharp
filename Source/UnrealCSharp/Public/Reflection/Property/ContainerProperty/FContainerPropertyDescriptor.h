@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPropertyDescriptor.h"
+#include "Reflection/Property/FCompoundPropertyDescriptor.h"
 
-class FContainerPropertyDescriptor : public FPropertyDescriptor
+class FContainerPropertyDescriptor : public FCompoundPropertyDescriptor
 {
 public:
-	using FPropertyDescriptor::FPropertyDescriptor;
+	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
 };

@@ -102,14 +102,6 @@ auto FCSharpEnvironment::GetContainer(const FGarbageCollectionHandle& InGarbageC
 }
 
 template <typename T>
-auto FCSharpEnvironment::GetContainer(const MonoObject* InMonoObject) const
-{
-	return ContainerRegistry != nullptr
-		       ? FContainerRegistry::TContainerRegistry<T>::GetContainer(ContainerRegistry, InMonoObject)
-		       : nullptr;
-}
-
-template <typename T>
 auto FCSharpEnvironment::GetContainerObject(void* InAddress) const
 {
 	return ContainerRegistry != nullptr
