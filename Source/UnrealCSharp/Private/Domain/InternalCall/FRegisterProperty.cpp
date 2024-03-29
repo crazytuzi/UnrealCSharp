@@ -25,7 +25,37 @@ struct FRegisterProperty
 
 	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Single, float)
 
-	OBJECT_COMPOUND_PROPERTY_IMPLEMENTATION(Compound)
+	// OBJECT_COMPOUND_PROPERTY_IMPLEMENTATION(Compound)
+
+	static MonoObject* GetObjectCompoundPropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+														   const uint32 InPropertyHash)
+	{
+		MonoObject* Value{};
+		if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<
+			UObject, void*>(InGarbageCollectionHandle))
+		{
+			if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().
+				GetOrAddPropertyDescriptor(InPropertyHash))
+			{
+				PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), &Value);
+			}
+		}
+		return Value;
+	}
+
+	static void SetObjectCompoundPropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+														const uint32 InPropertyHash, const FGarbageCollectionHandle InValue)
+	{
+		if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<
+			UObject, void*>(InGarbageCollectionHandle))
+		{
+			if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().
+				GetOrAddPropertyDescriptor(InPropertyHash))
+			{
+				PropertyDescriptor->Set(InValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress));
+			}
+		}
+	}
 
 	OBJECT_PRIMITIVE_PROPERTY_IMPLEMENTATION(Double, double)
 

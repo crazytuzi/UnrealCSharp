@@ -13,10 +13,10 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (ClassProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject));
+			SrcMonoObject);
 
 		ClassProperty->InitializeValue(Dest);
 
@@ -34,7 +34,7 @@ bool FClassPropertyDescriptor::Identical(const void* A, const void* B, const uin
 		const auto ClassA = Cast<UClass>(ClassProperty->GetObjectPropertyValue(A));
 
 		const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))))->Get();
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
 
 		return ClassProperty->StaticIdentical(ClassA, ClassB, PortFlags);
 	}

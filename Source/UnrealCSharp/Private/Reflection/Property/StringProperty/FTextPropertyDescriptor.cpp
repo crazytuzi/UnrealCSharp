@@ -18,10 +18,10 @@ void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (TextProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FText>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject)))
+			SrcMonoObject))
 		{
 			TextProperty->InitializeValue(Dest);
 
@@ -37,7 +37,7 @@ bool FTextPropertyDescriptor::Identical(const void* A, const void* B, uint32 Por
 		const auto TextA = TextProperty->GetPropertyValue(A);
 
 		const auto TextB = FCSharpEnvironment::GetEnvironment().GetString<FText>(
-			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))));
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
 
 		return TextA.EqualTo(*TextB);
 	}

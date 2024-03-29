@@ -13,10 +13,10 @@ void FSoftObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (SoftObjectProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<UObject>>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject));
+			SrcMonoObject);
 
 		SoftObjectProperty->InitializeValue(Dest);
 
@@ -34,7 +34,7 @@ bool FSoftObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 		const auto ObjectA = SoftObjectProperty->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftObjectPtr<UObject>>(
-			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))))->Get();
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
 
 		return SoftObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
 	}

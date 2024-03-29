@@ -18,10 +18,10 @@ void FStrPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (StrProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FString>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject)))
+			SrcMonoObject))
 		{
 			StrProperty->InitializeValue(Dest);
 
@@ -37,7 +37,7 @@ bool FStrPropertyDescriptor::Identical(const void* A, const void* B, const uint3
 		const auto StringA = StrProperty->GetPropertyValue(A);
 
 		const auto StringB = FCSharpEnvironment::GetEnvironment().GetString<FString>(
-			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))));
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
 
 		return StringA == *StringB;
 	}

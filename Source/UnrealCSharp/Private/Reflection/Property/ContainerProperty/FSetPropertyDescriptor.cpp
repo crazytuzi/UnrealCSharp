@@ -22,10 +22,10 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (SetProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject));
+			SrcMonoObject);
 
 		SetProperty->InitializeValue(Dest);
 

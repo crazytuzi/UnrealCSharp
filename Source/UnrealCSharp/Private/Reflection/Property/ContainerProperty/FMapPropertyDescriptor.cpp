@@ -22,10 +22,10 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (MapProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject));
+			SrcMonoObject);
 
 		MapProperty->InitializeValue(Dest);
 

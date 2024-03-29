@@ -13,10 +13,10 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (LazyObjectProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject));
+			SrcMonoObject);
 
 		LazyObjectProperty->InitializeValue(Dest);
 
@@ -31,7 +31,7 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 		const auto ObjectA = LazyObjectProperty->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
-			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))))->Get();
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
 
 		return LazyObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
 	}

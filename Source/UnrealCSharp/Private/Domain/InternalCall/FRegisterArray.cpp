@@ -129,7 +129,7 @@ struct FRegisterArray
 			}
 			else
 			{
-				ArrayHelper->Set(InIndex, InValue);
+				ArrayHelper->Set(InIndex, FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 	}
@@ -146,7 +146,7 @@ struct FRegisterArray
 			}
 			else
 			{
-				return ArrayHelper->Find(InValue);
+				return ArrayHelper->Find(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 
@@ -165,7 +165,7 @@ struct FRegisterArray
 			}
 			else
 			{
-				return ArrayHelper->FindLast(InValue);
+				return ArrayHelper->FindLast(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 
@@ -184,7 +184,7 @@ struct FRegisterArray
 			}
 			else
 			{
-				return ArrayHelper->Contains(InValue);
+				return ArrayHelper->Contains(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 
@@ -275,7 +275,7 @@ struct FRegisterArray
 			}
 			else
 			{
-				return ArrayHelper->Add(InValue);
+				return ArrayHelper->Add(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 
@@ -306,7 +306,7 @@ struct FRegisterArray
 			}
 			else
 			{
-				return ArrayHelper->AddUnique(InValue);
+				return ArrayHelper->AddUnique(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 
@@ -326,7 +326,7 @@ struct FRegisterArray
 			}
 			else
 			{
-				return ArrayHelper->RemoveSingle(InValue);
+				return ArrayHelper->RemoveSingle(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 
@@ -345,7 +345,7 @@ struct FRegisterArray
 			}
 			else
 			{
-				return ArrayHelper->Remove(InValue);
+				return ArrayHelper->Remove(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 

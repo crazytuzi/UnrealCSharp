@@ -22,10 +22,10 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (DelegateProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject));
+			SrcMonoObject);
 
 		DelegateProperty->InitializeValue(Dest);
 

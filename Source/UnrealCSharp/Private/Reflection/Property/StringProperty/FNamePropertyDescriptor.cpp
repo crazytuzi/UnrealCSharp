@@ -18,10 +18,10 @@ void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (NameProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FName>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject)))
+			SrcMonoObject))
 		{
 			NameProperty->InitializeValue(Dest);
 
@@ -37,7 +37,7 @@ bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint
 		const auto NameA = NameProperty->GetPropertyValue(A);
 
 		const auto NameB = FCSharpEnvironment::GetEnvironment().GetString<FName>(
-			MonoObject2GarbageCollectionHandle(static_cast<MonoObject*>(const_cast<void*>(B))));
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
 
 		return NameA == *NameB;
 	}

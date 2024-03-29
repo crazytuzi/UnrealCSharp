@@ -22,10 +22,10 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (MulticastDelegateProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcMulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FMulticastDelegateHelper>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject));
+			SrcMonoObject);
 
 		MulticastDelegateProperty->InitializeValue(Dest);
 

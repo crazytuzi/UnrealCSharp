@@ -7,6 +7,7 @@
 #include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/PropertyMacro.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 
 TArray<FString> FGeneratorCore::SupportedModule;
@@ -456,7 +457,17 @@ FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()));
 	}
 
-	return TEXT("value");
+	if (IsPrimitiveProperty(Property))
+	{
+		return TEXT("value");
+	}
+	else
+	{
+		return FString::Printf(TEXT(
+			"value.%s"),
+		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		);
+	}
 }
 
 bool FGeneratorCore::IsPrimitiveProperty(FProperty* Property)
@@ -520,7 +531,32 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 		                       *FUnrealCSharpFunctionLibrary::Encode(EnumProperty->GetName()));
 	}
 
-	return FUnrealCSharpFunctionLibrary::Encode(Property->GetName());
+	if (IsPrimitiveProperty(Property))
+	{
+		return FUnrealCSharpFunctionLibrary::Encode(Property->GetName());
+	}
+	else
+	{
+		const auto Name = FUnrealCSharpFunctionLibrary::Encode(Property->GetName());
+
+		if(CastField<FSetProperty>(Property) || CastField<FMapProperty>(Property))
+		{
+			return FString::Printf(TEXT(
+			"%s.%s"),
+							   *Name,
+							   *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		);
+		}
+		else
+		{
+			
+		return FString::Printf(TEXT(
+			"%s?.%s ?? nint.Zero"),
+							   *Name,
+							   *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		);
+	}
+	}
 }
 
 FString FGeneratorCore::GetReturnParamType(FProperty* Property)

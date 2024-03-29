@@ -22,10 +22,10 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (ArrayProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcMonoObject = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-			MonoObject2GarbageCollectionHandle(SrcMonoObject));
+			SrcMonoObject);
 
 		ArrayProperty->InitializeValue(Dest);
 
