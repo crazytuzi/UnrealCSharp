@@ -72,9 +72,9 @@ namespace Weavers
             // 处理UProperty
             _classTypes.ForEach(ProcessUClassType);
 
-            _classTypes.ForEach(ProcessRpcMethods);
-
             _structTypes.ForEach(ProcessUStructType);
+
+            _classTypes.ForEach(ProcessRpcMethods);
         }
 
         public override IEnumerable<string> GetAssembliesForScanning()
@@ -514,75 +514,103 @@ namespace Weavers
             }
             foreach (var method in rpcMethods)
             {
-                var constructor = _overrideAttributeType.GetConstructors().FirstOrDefault();
-                var constructorRef = ModuleDefinition.ImportReference(constructor);
-                var attribute = new CustomAttribute(constructorRef);
-
-                var customAttributes = method.CustomAttributes.ToList();
-                var name = method.Name;
-                method.Name = method.Name + "_Implementation";
-                method.CustomAttributes.Clear();
-                method.CustomAttributes.Add(attribute);
-
-
-                var hashField = new FieldDefinition("__" + name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.IntPtr);
-                Type.Fields.Add(hashField);
-                var newMethod = new MethodDefinition(name, method.Attributes, method.ReturnType);
-                foreach(var attr in customAttributes)
-                {
-                    newMethod.CustomAttributes.Add(attr);
-                }
-
-                foreach(var param in method.Parameters)
-                {
-                    newMethod.Parameters.Add(param);
-                }
-                newMethod.Body.GetILProcessor().Clear();
-                newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Nop));
-                newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_0));
-                newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_getGarbageCollectionHandle)));
-                newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(hashField)));
-
-                if (method.Parameters.Count > 0)
-                {
-                    newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4, newMethod.Parameters.Count));
-                    newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Newarr, ModuleDefinition.ImportReference(ModuleDefinition.TypeSystem.Object)));
-
-                    var i = 0;
-                    foreach (var param in newMethod.Parameters)
-                    {
-                        newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Dup));
-                        newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4, i));
-                        newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_S, param));
-                        if (param.ParameterType.IsValueType)
-                        {
-                            newMethod.Body.GetILProcessor().Append(param.ParameterType.Resolve().IsEnum
-                                ? Instruction.Create(OpCodes.Box,
-                                    ModuleDefinition.ImportReference(param.ParameterType.Resolve()
-                                        .GetEnumUnderlyingType()))
-                                : Instruction.Create(OpCodes.Box,
-                                    ModuleDefinition.ImportReference(param.ParameterType)));
-                        }
-                        newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Stelem_Ref));
-                        i++;
-                    }
-                    newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_functionReflection2Implementation)));
-                }
-                else
-                {
-                   newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_functionReflection0Implementation)));
-                }
-                newMethod.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ret));
-
-                var index = Type.Methods.IndexOf(method);
-
-                if (index >= 0)
-                {
-                    Type.Methods.Insert(index, newMethod);
-                }
-
+                Type.Methods.Add(CreateRpcMethodImplementation(method));
+                ModifyRpcMethod(Type, method);
             }
+        }
 
+        private void ModifyRpcMethod(TypeDefinition Type, MethodDefinition method)
+        {
+            var hashField = new FieldDefinition("__" + method.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.IntPtr);
+            Type.Fields.Add(hashField);
+
+            method.Body.GetILProcessor().Clear();
+            method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Nop));
+            method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_0));
+            method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_getGarbageCollectionHandle)));
+            method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(hashField)));
+
+            if (method.Parameters.Count > 0)
+            {
+                method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4, method.Parameters.Count));
+                method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Newarr, ModuleDefinition.ImportReference(ModuleDefinition.TypeSystem.Object)));
+
+                var i = 0;
+                foreach (var param in method.Parameters)
+                {
+                    method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Dup));
+                    method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4, i));
+                    method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_S, param));
+                    if (param.ParameterType.IsValueType)
+                    {
+                        method.Body.GetILProcessor().Append(param.ParameterType.Resolve().IsEnum
+                            ? Instruction.Create(OpCodes.Box,
+                                ModuleDefinition.ImportReference(param.ParameterType.Resolve()
+                                    .GetEnumUnderlyingType()))
+                            : Instruction.Create(OpCodes.Box,
+                                ModuleDefinition.ImportReference(param.ParameterType)));
+                    }
+                    method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Stelem_Ref));
+                    i++;
+                }
+                method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_functionReflection2Implementation)));
+            }
+            else
+            {
+                method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_functionReflection0Implementation)));
+            }
+            method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ret));
+            method.Body.Variables.Clear();
+            method.Body.InitLocals = false;
+        }
+        private MethodDefinition CreateRpcMethodImplementation(MethodDefinition method)
+        {
+            var constructor = _overrideAttributeType.GetConstructors().FirstOrDefault();
+            var constructorRef = ModuleDefinition.ImportReference(constructor);
+            var attribute = new CustomAttribute(constructorRef);
+            var newMethod = new MethodDefinition(method.Name + "_Implementation", MethodAttributes.Public, method.ReturnType);
+            newMethod.CustomAttributes.Add(attribute);
+            foreach (var param in method.Parameters)
+            {
+                newMethod.Parameters.Add(new ParameterDefinition(param.ParameterType));
+            }
+            foreach (var variable in method.Body.Variables)
+            {
+                newMethod.Body.Variables.Add(new VariableDefinition(variable.VariableType));
+            }
+            newMethod.Body.InitLocals = method.Body.InitLocals;
+            newMethod.Body.GetILProcessor().Clear();
+            foreach (var instruction in method.Body.Instructions)
+            {
+                if (instruction == null)
+                    continue;
+                var opCode = instruction.OpCode;
+                var operand = instruction.Operand;
+
+                if (operand != null)
+                {
+                    if (operand is ParameterDefinition parameter)
+                    {
+                        var index = method.Parameters.IndexOf(parameter);
+                        if (index < 0)
+                            throw new WeavingException("not found param:" + parameter.ToString());
+                        var newParameter = newMethod.Parameters[index];
+                        newMethod.Body.GetILProcessor().Append(Instruction.Create(opCode, newParameter));
+                        continue;
+                    }
+                    else if (operand is VariableDefinition variable)
+                    {
+                        var index = method.Body.Variables.IndexOf(variable);
+                        if (index < 0)
+                            throw new WeavingException("not found param:" + variable.ToString());
+                        var newvariable = newMethod.Body.Variables[index];
+                        newMethod.Body.GetILProcessor().Append(Instruction.Create(opCode, newvariable));
+                        continue;
+                    }
+                }
+                newMethod.Body.GetILProcessor().Append(instruction);
+            }
+            return newMethod;
         }
         private MethodDefinition GetPropertyAccessor(PropertyDefinition Property,
             Dictionary<string, MethodDefinition> MethodMap)
