@@ -260,9 +260,16 @@ namespace Weavers
             if (Property.SetMethod != null)
             {
                 var propertyType = Property.PropertyType;
-
-                var propertySetMethod = GetPropertyAccessor(Property, _objectSetMethodMap);
-
+                MethodDefinition propertySetMethod = null;
+                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType.Resolve());
+                if (getParamGarbageCollectionHandle != null)
+                {
+                    _objectSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod); 
+                }
+                else
+                {
+                    propertySetMethod = GetPropertyAccessor(Property, _objectSetMethodMap);
+                }
                 if (propertySetMethod != null)
                 {
                     var field = Type.Fields.FirstOrDefault(Field =>
@@ -288,7 +295,16 @@ namespace Weavers
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
 
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                    if (getParamGarbageCollectionHandle == null)
+                    {
+                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                    }
+                    else
+                    {
+                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                        ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                            ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
+                    }
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
                         ModuleDefinition.ImportReference(propertySetMethod)));
@@ -392,8 +408,16 @@ namespace Weavers
             {
                 var propertyType = Property.PropertyType;
 
-                var propertySetMethod = GetPropertyAccessor(Property, _structSetMethodMap);
-
+                MethodDefinition propertySetMethod = null;
+                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType.Resolve());
+                if (getParamGarbageCollectionHandle != null)
+                {
+                    _structSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod);
+                }
+                else
+                {
+                    propertySetMethod = GetPropertyAccessor(Property, _structSetMethodMap);
+                }
                 if (propertySetMethod != null)
                 {
                     var field = Type.Fields.FirstOrDefault(Field =>
@@ -418,9 +442,16 @@ namespace Weavers
                         ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-
+                    if (getParamGarbageCollectionHandle == null)
+                    {
+                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                    }
+                    else
+                    {
+                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                        ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                            ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
+                    }
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
                         ModuleDefinition.ImportReference(propertySetMethod)));
 
