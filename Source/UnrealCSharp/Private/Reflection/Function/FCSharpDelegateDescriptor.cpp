@@ -2,6 +2,12 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/MonoMacro.h"
 
+FCSharpDelegateDescriptor::FCSharpDelegateDescriptor(UFunction* InFunction):
+	Super(InFunction),
+	BufferAllocator(FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPersistentBufferAllocator>(InFunction))
+{
+}
+
 bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InParams)
 {
 	TArray<void*> CSharpParams;
@@ -78,6 +84,8 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 {
 	auto ParamIndex = 0;
 
+	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
+
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
 		const auto& PropertyDescriptor = PropertyDescriptors[Index];
@@ -138,7 +146,17 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
 		                              reinterpret_cast<void**>(&ReturnValue));
 
+		if (Params != nullptr)
+		{
+			BufferAllocator->Free(Params);
+		}
+
 		return ReturnValue;
+	}
+
+	if (Params != nullptr)
+	{
+		BufferAllocator->Free(Params);
 	}
 
 	return nullptr;
@@ -148,6 +166,8 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 	const FMulticastScriptDelegate* InMulticastScriptDelegate, MonoObject** OutValue, MonoArray* InValue)
 {
 	auto ParamIndex = 0;
+
+	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
@@ -195,6 +215,11 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 		}
 
 		*OutValue = (MonoObject*)MonoObjectArray;
+	}
+
+	if (Params != nullptr)
+	{
+		BufferAllocator->Free(Params);
 	}
 
 	return nullptr;

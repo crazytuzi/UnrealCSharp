@@ -103,25 +103,21 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 
 	for (const auto& File : FileChange)
 	{
-		if (auto MonoClassName = FDynamicClassGenerator::GetMonoClassName(File); !MonoClassName.IsEmpty())
+		if (auto Class = FDynamicClassGenerator::GetMonoClass(File))
 		{
-			FDynamicClassGenerator::Generator(
-				FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), MonoClassName));
+			FDynamicClassGenerator::Generator(Class);
 		}
-		else if (MonoClassName = FDynamicStructGenerator::GetMonoClassName(File); !MonoClassName.IsEmpty())
+		else if (Class = FDynamicStructGenerator::GetMonoClass(File); Class != nullptr)
 		{
-			FDynamicStructGenerator::Generator(
-				FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), MonoClassName));
+			FDynamicStructGenerator::Generator(Class);
 		}
-		else if (MonoClassName = FDynamicEnumGenerator::GetMonoClassName(File); !MonoClassName.IsEmpty())
+		else if (Class = FDynamicEnumGenerator::GetMonoClass(File); Class != nullptr)
 		{
-			FDynamicEnumGenerator::Generator(
-				FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), MonoClassName));
+			FDynamicEnumGenerator::Generator(Class);
 		}
-		else if (MonoClassName = FDynamicInterfaceGenerator::GetMonoClassName(File); !MonoClassName.IsEmpty())
+		else if (Class = FDynamicInterfaceGenerator::GetMonoClass(File); Class != nullptr)
 		{
-			FDynamicInterfaceGenerator::Generator(
-				FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), MonoClassName));
+			FDynamicInterfaceGenerator::Generator(Class);
 		}
 	}
 

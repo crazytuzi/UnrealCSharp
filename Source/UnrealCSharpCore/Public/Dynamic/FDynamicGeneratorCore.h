@@ -58,6 +58,8 @@ public:
 
 	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
 
+	static MonoObject* AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
+
 	static void GeneratorProperty(MonoClass* InMonoClass, UField* InField,
 	                              const TFunction<void(const FProperty* InProperty)>& InGenerator);
 

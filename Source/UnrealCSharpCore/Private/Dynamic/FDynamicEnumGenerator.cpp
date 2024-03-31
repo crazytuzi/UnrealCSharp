@@ -42,9 +42,9 @@ bool FDynamicEnumGenerator::IsDynamicEnum(MonoClass* InMonoClass)
 	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_ENUM_ATTRIBUTE);
 }
 
-FString FDynamicEnumGenerator::GetMonoClassName(const FString& InName)
+MonoClass* FDynamicEnumGenerator::GetMonoClass(const FString& InName)
 {
-	return DynamicEnumMap.Contains(InName) ? InName : FString();
+	return FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), InName);
 }
 #endif
 

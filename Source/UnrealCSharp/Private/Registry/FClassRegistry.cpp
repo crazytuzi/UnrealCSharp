@@ -197,9 +197,9 @@ void FClassRegistry::AddFunctionDescriptor(const uint32 InFunctionHash, FFunctio
 }
 
 void FClassRegistry::AddFunctionHash(const uint32 InFunctionHash, FClassDescriptor* InClassDescriptor,
-                                     const FName& InFunctionName)
+                                     const FString& InFunctionName)
 {
-	FunctionHashMap.Add(InFunctionHash, TPair<FClassDescriptor*, FName>(InClassDescriptor, InFunctionName));
+	FunctionHashMap.Add(InFunctionHash, TPair<FClassDescriptor*, FString>(InClassDescriptor, InFunctionName));
 }
 
 void FClassRegistry::RemoveFunctionDescriptor(const uint32 InFunctionHash)
@@ -220,9 +220,9 @@ void FClassRegistry::AddPropertyDescriptor(const uint32 InPropertyHash, FPropert
 }
 
 void FClassRegistry::AddPropertyHash(const uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
-                                     const FName& InPropertyName)
+                                     const FString& InPropertyName)
 {
-	PropertyHashMap.Add(InPropertyHash, TPair<FClassDescriptor*, FName>(InClassDescriptor, InPropertyName));
+	PropertyHashMap.Add(InPropertyHash, TPair<FClassDescriptor*, FString>(InClassDescriptor, InPropertyName));
 }
 
 void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)

@@ -1,6 +1,7 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "Reflection/Function/FUnrealFunctionDescriptor.h"
 
 struct FRegisterFunction
 {
@@ -9,8 +10,8 @@ struct FRegisterFunction
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 		{
-			if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().
-				GetOrAddFunctionDescriptor(InFunctionHash))
+			if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
+				FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
 			{
 				return FunctionDescriptor->CallUnreal(FoundObject, OutValue, InValue);
 			}
