@@ -70,14 +70,10 @@ struct FRegisterSet
 		if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				SetHelper->Add(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				SetHelper->Add(InValue);
-			}
+			SetHelper->Add(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
+				               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				               : static_cast<void*>(
+					               FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 	}
 
@@ -87,14 +83,10 @@ struct FRegisterSet
 		if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return SetHelper->Remove(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return SetHelper->Remove(InValue);
-			}
+			return SetHelper->Remove(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
+				                         ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                         : static_cast<void*>(
+					                         FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 
 		return 0;
@@ -106,14 +98,10 @@ struct FRegisterSet
 		if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return SetHelper->Contains(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return SetHelper->Contains(InValue);
-			}
+			return SetHelper->Contains(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
+				                           ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                           : static_cast<void*>(
+					                           FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 
 		return false;

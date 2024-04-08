@@ -40,8 +40,6 @@ void FStructRegistry::Deinitialize()
 
 	GarbageCollectionHandle2StructAddress.Empty();
 
-	MonoObject2StructAddress.Empty();
-
 	StructAddress2GarbageCollectionHandle.Empty();
 }
 
@@ -52,28 +50,9 @@ void* FStructRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageColle
 	return FoundStructAddress != nullptr ? FoundStructAddress->Address : nullptr;
 }
 
-void* FStructRegistry::GetAddress(const MonoObject* InMonoObject)
-{
-	const auto FoundStructAddress = MonoObject2StructAddress.Find(InMonoObject);
-
-	return FoundStructAddress != nullptr ? FoundStructAddress->Address : nullptr;
-}
-
 void* FStructRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct)
 {
 	if (const auto FoundStructAddress = GarbageCollectionHandle2StructAddress.Find(InGarbageCollectionHandle))
-	{
-		InStruct = FoundStructAddress->Value.Get();
-
-		return FoundStructAddress->Address;
-	}
-
-	return nullptr;
-}
-
-void* FStructRegistry::GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct)
-{
-	if (const auto FoundStructAddress = MonoObject2StructAddress.Find(InMonoObject))
 	{
 		InStruct = FoundStructAddress->Value.Get();
 
@@ -97,11 +76,6 @@ void* FStructRegistry::GetStruct(const FGarbageCollectionHandle& InGarbageCollec
 	return GetAddress(InGarbageCollectionHandle);
 }
 
-void* FStructRegistry::GetStruct(const MonoObject* InMonoObject)
-{
-	return GetAddress(InMonoObject);
-}
-
 FGarbageCollectionHandle FStructRegistry::GetGarbageCollectionHandle(UScriptStruct* InScriptStruct,
                                                                      const void* InStruct)
 {
@@ -123,12 +97,6 @@ bool FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* In
 		                                          bNeedFree
 	                                          });
 
-	MonoObject2StructAddress.Add(InMonoObject, {
-		                             InScriptStruct,
-		                             const_cast<void*>(InStruct),
-		                             bNeedFree
-	                             });
-
 	return true;
 }
 
@@ -145,12 +113,6 @@ bool FStructRegistry::AddReference(const FGarbageCollectionHandle& InOwner, UScr
 		                                          const_cast<void*>(InStruct),
 		                                          false
 	                                          });
-
-	MonoObject2StructAddress.Add(InMonoObject, {
-		                             InScriptStruct,
-		                             const_cast<void*>(InStruct),
-		                             false
-	                             });
 
 	return FCSharpEnvironment::GetEnvironment().
 		AddReference(InOwner, new FStructReference(GarbageCollectionHandle));
@@ -180,8 +142,6 @@ bool FStructRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageC
 
 			FoundValue->Address = nullptr;
 		}
-
-		MonoObject2StructAddress.Remove(InGarbageCollectionHandle);
 
 		GarbageCollectionHandle2StructAddress.Remove(InGarbageCollectionHandle);
 

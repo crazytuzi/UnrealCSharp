@@ -4,15 +4,12 @@ template <
 	typename Class,
 	typename FMultiValueMapping,
 	typename FMultiValueMapping::FGarbageCollectionHandle2Value Class::* GarbageCollectionHandle2Value,
-	typename FMultiValueMapping::FMonoObject2Value Class::* MonoObject2Value,
 	typename FMultiValueMapping::FAddress2GarbageCollectionHandle Class::* Address2GarbageCollectionHandle
 >
 struct FMultiRegistry::TMultiRegistryImplementation<
 		FMultiValueMapping,
 		typename FMultiValueMapping::FGarbageCollectionHandle2Value Class::*,
 		GarbageCollectionHandle2Value,
-		typename FMultiValueMapping::FMonoObject2Value Class::*,
-		MonoObject2Value,
 		typename FMultiValueMapping::FAddress2GarbageCollectionHandle Class::*,
 		Address2GarbageCollectionHandle
 	>
@@ -22,15 +19,6 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 	                                                             InGarbageCollectionHandle)
 	{
 		const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle);
-
-		return FoundValue != nullptr
-			       ? static_cast<typename FMultiValueMapping::ValueType::Type>(FoundValue->Value)
-			       : nullptr;
-	}
-
-	static typename FMultiValueMapping::ValueType::Type GetMulti(Class* InRegistry, const MonoObject* InMonoObject)
-	{
-		const auto FoundValue = (InRegistry->*MonoObject2Value).Find(InMonoObject);
 
 		return FoundValue != nullptr
 			       ? static_cast<typename FMultiValueMapping::ValueType::Type>(FoundValue->Value)
@@ -62,11 +50,6 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 			                                                 static_cast<typename FMultiValueMapping::ValueType::Type>(
 				                                                 InAddress), bNeedFree));
 
-		(InRegistry->*MonoObject2Value).Add(InMonoObject,
-		                                    typename FMultiValueMapping::ValueType(
-			                                    static_cast<typename FMultiValueMapping::ValueType::Type>(InAddress),
-			                                    bNeedFree));
-
 		return true;
 	}
 
@@ -74,16 +57,16 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 	{
 		if (const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle))
 		{
-			(InRegistry->*Address2GarbageCollectionHandle).Remove(FoundValue->Value);
-
 			if (FoundValue->bNeedFree)
 			{
 				FMemory::Free(FoundValue->Value);
 
 				FoundValue->Value = nullptr;
 			}
-
-			(InRegistry->*MonoObject2Value).Remove(InGarbageCollectionHandle);
+			else
+			{
+				(InRegistry->*Address2GarbageCollectionHandle).Remove(FoundValue->Value);
+			}
 
 			(InRegistry->*GarbageCollectionHandle2Value).Remove(InGarbageCollectionHandle);
 
@@ -101,8 +84,6 @@ struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
 		FSubclassOfMapping,
 		decltype(&FMultiRegistry::SubclassOfGarbageCollectionHandle2Address),
 		&FMultiRegistry::SubclassOfGarbageCollectionHandle2Address,
-		decltype(&FMultiRegistry::SubclassOfMonoObject2Address),
-		&FMultiRegistry::SubclassOfMonoObject2Address,
 		decltype(&FMultiRegistry::SubclassOfAddress2GarbageCollectionHandle),
 		&FMultiRegistry::SubclassOfAddress2GarbageCollectionHandle
 	>
@@ -116,8 +97,6 @@ struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
 		FWeakObjectPtrMapping,
 		decltype(&FMultiRegistry::WeakObjectPtrGarbageCollectionHandle2Address),
 		&FMultiRegistry::WeakObjectPtrGarbageCollectionHandle2Address,
-		decltype(&FMultiRegistry::WeakObjectPtrMonoObject2Address),
-		&FMultiRegistry::WeakObjectPtrMonoObject2Address,
 		decltype(&FMultiRegistry::WeakObjectPtrAddress2GarbageCollectionHandle),
 		&FMultiRegistry::WeakObjectPtrAddress2GarbageCollectionHandle
 	>
@@ -131,8 +110,6 @@ struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
 		FLazyObjectPtrMapping,
 		decltype(&FMultiRegistry::LazyObjectPtrGarbageCollectionHandle2Address),
 		&FMultiRegistry::LazyObjectPtrGarbageCollectionHandle2Address,
-		decltype(&FMultiRegistry::LazyObjectPtrMonoObject2Address),
-		&FMultiRegistry::LazyObjectPtrMonoObject2Address,
 		decltype(&FMultiRegistry::LazyObjectPtrAddress2GarbageCollectionHandle),
 		&FMultiRegistry::LazyObjectPtrAddress2GarbageCollectionHandle
 	>
@@ -146,8 +123,6 @@ struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
 		FSoftObjectPtrMapping,
 		decltype(&FMultiRegistry::SoftObjectPtrGarbageCollectionHandle2Address),
 		&FMultiRegistry::SoftObjectPtrGarbageCollectionHandle2Address,
-		decltype(&FMultiRegistry::SoftObjectPtrMonoObject2Address),
-		&FMultiRegistry::SoftObjectPtrMonoObject2Address,
 		decltype(&FMultiRegistry::SoftObjectPtrAddress2GarbageCollectionHandle),
 		&FMultiRegistry::SoftObjectPtrAddress2GarbageCollectionHandle
 
@@ -162,8 +137,6 @@ struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
 		FScriptInterfaceMapping,
 		decltype(&FMultiRegistry::ScriptInterfaceGarbageCollectionHandle2Address),
 		&FMultiRegistry::ScriptInterfaceGarbageCollectionHandle2Address,
-		decltype(&FMultiRegistry::ScriptInterfaceMonoObject2Address),
-		&FMultiRegistry::ScriptInterfaceMonoObject2Address,
 		decltype(&FMultiRegistry::ScriptInterfaceAddress2GarbageCollectionHandle),
 		&FMultiRegistry::ScriptInterfaceAddress2GarbageCollectionHandle
 	>
@@ -177,8 +150,6 @@ struct FMultiRegistry::TMultiRegistry<T, std::enable_if_t<
 		FSoftClassPtrMapping,
 		decltype(&FMultiRegistry::SoftClassPtrGarbageCollectionHandle2Address),
 		&FMultiRegistry::SoftClassPtrGarbageCollectionHandle2Address,
-		decltype(&FMultiRegistry::SoftClassPtrMonoObject2Address),
-		&FMultiRegistry::SoftClassPtrMonoObject2Address,
 		decltype(&FMultiRegistry::SoftClassPtrAddress2GarbageCollectionHandle),
 		&FMultiRegistry::SoftClassPtrAddress2GarbageCollectionHandle
 	>

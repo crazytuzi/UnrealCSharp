@@ -137,7 +137,9 @@ bool FCSharpFunctionDescriptor::CallCSharp(const FFrame& InStack)
 						}
 						else
 						{
-							ReturnPropertyDescriptor->Set(ReturnValue, ReturnParam->PropAddr);
+							ReturnPropertyDescriptor->Set(
+								FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(ReturnValue),
+								ReturnParam->PropAddr);
 						}
 					}
 				}
@@ -163,7 +165,9 @@ bool FCSharpFunctionDescriptor::CallCSharp(const FFrame& InStack)
 							else
 							{
 								OutPropertyDescriptor->Set(
-									ARRAY_GET(CSharpParams, MonoObject*, Index), OutParam->PropAddr);
+									FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+										ARRAY_GET(CSharpParams, MonoObject*, Index)),
+									OutParam->PropAddr);
 							}
 						}
 					}

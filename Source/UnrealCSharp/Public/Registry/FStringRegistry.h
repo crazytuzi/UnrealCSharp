@@ -43,7 +43,7 @@ public:
 	{
 	};
 
-	template <typename T, typename P, P, typename Q, Q, typename R, R>
+	template <typename T, typename P, P, typename Q, Q>
 	struct TStringRegistryImplementation
 	{
 	};
@@ -61,19 +61,13 @@ public:
 private:
 	FNameMapping::FGarbageCollectionHandle2Value NameGarbageCollectionHandle2Address;
 
-	FNameMapping::FMonoObject2Value NameMonoObject2Address;
-
 	FNameMapping::FAddress2GarbageCollectionHandle NameAddress2GarbageCollectionHandle;
 
 	FStringMapping::FGarbageCollectionHandle2Value StringGarbageCollectionHandle2Address;
 
-	FStringMapping::FMonoObject2Value StringMonoObject2Address;
-
 	FStringMapping::FAddress2GarbageCollectionHandle StringAddress2GarbageCollectionHandle;
 
 	FTextMapping::FGarbageCollectionHandle2Value TextGarbageCollectionHandle2Address;
-
-	FTextMapping::FMonoObject2Value TextMonoObject2Address;
 
 	FTextMapping::FAddress2GarbageCollectionHandle TextAddress2GarbageCollectionHandle;
 };

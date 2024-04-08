@@ -1,19 +1,11 @@
 ﻿#include "Reflection/Property/ObjectProperty/FLazyObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
-
-FLazyObjectPropertyDescriptor::FLazyObjectPropertyDescriptor(FProperty* InProperty):
-	FObjectPropertyDescriptor(InProperty),
-	Class(nullptr)
-{
-	Class = FTypeBridge::GetMonoClass(LazyObjectProperty);
-}
 
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (LazyObjectProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
 	}
 }
 
@@ -21,9 +13,10 @@ void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (LazyObjectProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
-		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(SrcMonoObject);
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
+			SrcGarbageCollectionHandle);
 
 		LazyObjectProperty->InitializeValue(Dest);
 
@@ -38,7 +31,7 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 		const auto ObjectA = LazyObjectProperty->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<UObject>>(
-			static_cast<MonoObject*>(const_cast<void*>(B)))->Get();
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
 
 		return LazyObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
 	}
@@ -46,7 +39,7 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 	return false;
 }
 
-MonoObject* FLazyObjectPropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FLazyObjectPropertyDescriptor::NewWeakRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TLazyObjectPtr<UObject>>(InAddress);
 

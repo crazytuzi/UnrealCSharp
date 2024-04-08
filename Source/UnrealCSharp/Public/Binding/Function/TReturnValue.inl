@@ -34,21 +34,21 @@ protected:
 };
 
 template <typename T>
-struct TSingleReturnValue :
+struct TPrimitiveReturnValue :
 	TBaseReturnValue<T>
 {
 	using TBaseReturnValue<T>::TBaseReturnValue;
 };
 
 template <typename T>
-struct TParentReturnValue :
+struct TCompoundReturnValue :
 	TBaseReturnValue<T>
 {
 	using Super = TBaseReturnValue<T>;
 
 	using Type = typename Super::Type;
 
-	explicit TParentReturnValue(Type&& InValue)
+	explicit TCompoundReturnValue(Type&& InValue)
 	{
 		if constexpr (TTypeInfo<T>::IsReference() || std::is_pointer_v<T>)
 		{
@@ -63,114 +63,114 @@ struct TParentReturnValue :
 
 template <typename T>
 struct TStringReturnValue :
-	TParentReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TParentReturnValue<T>::TParentReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TContainerReturnValue :
-	TParentReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TParentReturnValue<T>::TParentReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TMultiReturnValue :
-	TParentReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TParentReturnValue<T>::TParentReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TBindingReturnValue :
-	TParentReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TParentReturnValue<T>::TParentReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TScriptStructReturnValue :
-	TParentReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TParentReturnValue<T>::TParentReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TBindingEnumReturnValue :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
@@ -178,16 +178,16 @@ struct TReturnValue<T,
                     std::enable_if_t<
 	                    std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
 	                    !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
@@ -206,9 +206,9 @@ struct TReturnValue<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Va
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value>> :
-	TParentReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TParentReturnValue<T>::TParentReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
@@ -248,9 +248,9 @@ struct TReturnValue<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Valu
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
@@ -290,16 +290,16 @@ struct TReturnValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value>> :
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value>> :
-	TSingleReturnValue<T>
+	TPrimitiveReturnValue<T>
 {
-	using TSingleReturnValue<T>::TSingleReturnValue;
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
