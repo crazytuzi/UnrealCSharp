@@ -35,6 +35,9 @@ public:
 
 	static FString GetModuleRelativePath(const FString& InModuleRelativePath);
 
+	template <typename T>
+	static FString GetFileName(const T* InField);
+
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 
 	static bool IsSupported(FProperty* Property);
@@ -68,3 +71,5 @@ private:
 
 	static TArray<FName> SupportedAssetClassName;
 };
+
+#include "FGeneratorCore.inl"

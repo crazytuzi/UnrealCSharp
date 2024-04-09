@@ -6,15 +6,12 @@ template <
 	typename Class,
 	typename FContainerValueMapping,
 	typename FContainerValueMapping::FGarbageCollectionHandle2Value Class::* GarbageCollectionHandle2Value,
-	typename FContainerValueMapping::FMonoObject2Value Class::* MonoObject2Value,
 	typename FContainerValueMapping::FAddress2GarbageCollectionHandle Class::* Address2GarbageCollectionHandle
 >
 struct FContainerRegistry::TContainerRegistryImplementation<
 		FContainerValueMapping,
 		typename FContainerValueMapping::FGarbageCollectionHandle2Value Class::*,
 		GarbageCollectionHandle2Value,
-		typename FContainerValueMapping::FMonoObject2Value Class::*,
-		MonoObject2Value,
 		typename FContainerValueMapping::FAddress2GarbageCollectionHandle Class::*,
 		Address2GarbageCollectionHandle
 	>
@@ -23,14 +20,6 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 		Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle);
-
-		return FoundValue != nullptr ? *FoundValue : nullptr;
-	}
-
-	static typename FContainerValueMapping::ValueType GetContainer(
-		Class* InRegistry, const MonoObject* InMonoObject)
-	{
-		const auto FoundValue = (InRegistry->*MonoObject2Value).Find(InMonoObject);
 
 		return FoundValue != nullptr ? *FoundValue : nullptr;
 	}
@@ -51,8 +40,6 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 
 		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
 
-		(InRegistry->*MonoObject2Value).Add(InMonoObject, InValue);
-
 		return true;
 	}
 
@@ -65,8 +52,6 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 		(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
 
 		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
-
-		(InRegistry->*MonoObject2Value).Add(InMonoObject, InValue);
 
 		return FCSharpEnvironment::GetEnvironment().AddReference(
 			InOwner,
@@ -86,8 +71,6 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 
 			delete *FoundValue;
 
-			(InRegistry->*MonoObject2Value).Remove(InGarbageCollectionHandle);
-
 			(InRegistry->*GarbageCollectionHandle2Value).Remove(InGarbageCollectionHandle);
 
 			return true;
@@ -104,8 +87,6 @@ struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
 		FArrayHelperValueMapping,
 		decltype(&FContainerRegistry::ArrayGarbageCollectionHandle2Helper),
 		&FContainerRegistry::ArrayGarbageCollectionHandle2Helper,
-		decltype(&FContainerRegistry::ArrayMonoObject2Helper),
-		&FContainerRegistry::ArrayMonoObject2Helper,
 		decltype(&FContainerRegistry::ArrayAddress2GarbageCollectionHandle),
 		&FContainerRegistry::ArrayAddress2GarbageCollectionHandle
 	>
@@ -119,8 +100,6 @@ struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
 		FMapHelperValueMapping,
 		decltype(&FContainerRegistry::MapGarbageCollectionHandle2Helper),
 		&FContainerRegistry::MapGarbageCollectionHandle2Helper,
-		decltype(&FContainerRegistry::MapMonoObject2Helper),
-		&FContainerRegistry::MapMonoObject2Helper,
 		decltype(&FContainerRegistry::MapAddress2GarbageCollectionHandle),
 		&FContainerRegistry::MapAddress2GarbageCollectionHandle
 	>
@@ -134,8 +113,6 @@ struct FContainerRegistry::TContainerRegistry<std::remove_pointer_t<
 		FSetHelperValueMapping,
 		decltype(&FContainerRegistry::SetGarbageCollectionHandle2Helper),
 		&FContainerRegistry::SetGarbageCollectionHandle2Helper,
-		decltype(&FContainerRegistry::SetMonoObject2Helper),
-		&FContainerRegistry::SetMonoObject2Helper,
 		decltype(&FContainerRegistry::SetAddress2GarbageCollectionHandle),
 		&FContainerRegistry::SetAddress2GarbageCollectionHandle
 	>

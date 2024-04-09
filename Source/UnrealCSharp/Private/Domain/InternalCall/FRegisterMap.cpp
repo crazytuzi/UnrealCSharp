@@ -61,21 +61,14 @@ struct FRegisterMap
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
-			auto Key = static_cast<void*>(InKey);
-
-			auto Value = static_cast<void*>(InValue);
-
-			if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				Key = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey);
-			}
-
-			if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
-			{
-				Value = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
-			}
-
-			MapHelper->Add(Key, Value);
+			MapHelper->Add(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
+				               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
+				               : static_cast<void*>(
+					               FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey)),
+			               MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
+				               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				               : static_cast<void*>(
+					               FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 	}
 
@@ -85,14 +78,10 @@ struct FRegisterMap
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return MapHelper->Remove(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey));
-			}
-			else
-			{
-				return MapHelper->Remove(InKey);
-			}
+			return MapHelper->Remove(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
+				                         ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
+				                         : static_cast<void*>(
+					                         FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey)));
 		}
 
 		return 0;
@@ -106,16 +95,12 @@ struct FRegisterMap
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
-			auto Value = static_cast<void*>(InValue);
-
-			if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
-			{
-				Value = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
-			}
-
-			const auto Key = MapHelper->FindKey(Value);
-
-			MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(&ReturnValue));
+			MapHelper->GetKeyPropertyDescriptor()->Get(
+				MapHelper->FindKey(MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
+					                   ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+					                   : static_cast<void*>(
+						                   FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue))),
+				reinterpret_cast<void**>(&ReturnValue));
 		}
 
 		return ReturnValue;
@@ -128,16 +113,12 @@ struct FRegisterMap
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
-			auto Key = static_cast<void*>(InKey);
-
-			if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				Key = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey);
-			}
-
-			const auto Value = MapHelper->Find(Key);
-
-			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
+			MapHelper->GetValuePropertyDescriptor()->Get(
+				MapHelper->Find(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
+					                ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
+					                : static_cast<void*>(
+						                FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey))),
+				reinterpret_cast<void**>(&ReturnValue));
 		}
 
 		return ReturnValue;
@@ -149,14 +130,10 @@ struct FRegisterMap
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return MapHelper->Contains(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey));
-			}
-			else
-			{
-				return MapHelper->Contains(InKey);
-			}
+			return MapHelper->Contains(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
+				                           ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
+				                           : static_cast<void*>(
+					                           FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey)));
 		}
 
 		return false;
@@ -169,16 +146,12 @@ struct FRegisterMap
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
-			auto Key = static_cast<void*>(InKey);
-
-			if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				Key = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey);
-			}
-
-			const auto Value = MapHelper->Get(Key);
-
-			MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
+			MapHelper->GetValuePropertyDescriptor()->Get(
+				MapHelper->Get(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
+					               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
+					               : static_cast<void*>(
+						               FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey))),
+				reinterpret_cast<void**>(&ReturnValue));
 		}
 
 		return ReturnValue;
@@ -190,21 +163,14 @@ struct FRegisterMap
 		if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 			InGarbageCollectionHandle))
 		{
-			auto Key = static_cast<void*>(InKey);
-
-			auto Value = static_cast<void*>(InValue);
-
-			if (MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				Key = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey);
-			}
-
-			if (MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
-			{
-				Value = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
-			}
-
-			MapHelper->Set(Key, Value);
+			MapHelper->Set(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
+				               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
+				               : static_cast<void*>(
+					               FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey)),
+			               MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
+				               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				               : static_cast<void*>(
+					               FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 	}
 

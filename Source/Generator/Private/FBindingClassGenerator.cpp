@@ -73,14 +73,20 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		);
 
 		auto SubscriptSetContent = FString::Printf(TEXT(
-			"\t\t\tset => %s.%s(%s, %s, value);\n"
+			"\t\t\tset => %s.%s(%s, %s, %s);\n"
 		),
 		                                           *BINDING_CLASS_IMPLEMENTATION(ClassContent),
 		                                           *BINDING_COMBINE_FUNCTION(
 			                                           ClassContent,
 			                                           InClass.GetSubscript()->GetSetImplementationName()),
 		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                           *InClass.GetSubscript()->GetParamNames()[0]
+		                                           *InClass.GetSubscript()->GetParamNames()[0],
+		                                           InClass.GetSubscript()->GetParams()[0]->IsPrimitive()
+			                                           ? TEXT("value")
+			                                           : *FString::Printf(TEXT(
+				                                           "value.%s"),
+			                                                              *PROPERTY_GARBAGE_COLLECTION_HANDLE
+			                                           )
 		);
 
 		SubscriptContent = FString::Printf(TEXT(
@@ -123,41 +129,34 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 		if (bRead)
 		{
 			PropertyGetContent = FString::Printf(TEXT(
-				"\t\t\tget => %s%s.%s(%s)%s;\n"
+				"\t\t\tget => %s.%s(%s);\n"
 			),
-			                                     Property.IsPrimitive()
-				                                     ? *FString::Printf(TEXT(
-					                                     "(%s)"
-				                                     ),
-				                                                        *PropertyType
-				                                     )
-				                                     : TEXT(""),
 			                                     *BINDING_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION(
 				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName)),
 			                                     Property.IsStatic()
 				                                     ? TEXT("nint.Zero")
-				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                     !Property.IsPrimitive()
-				                                     ? *FString::Printf(TEXT(
-					                                     " as %s"
-				                                     ),
-				                                                        *PropertyType)
-				                                     : TEXT("")
+				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE
 			);
 		}
 
 		if (bWrite)
 		{
 			PropertySetContent = FString::Printf(TEXT(
-				"\t\t\tset => %s.%s(%s, value);\n"
+				"\t\t\tset => %s.%s(%s, %s);\n"
 			),
 			                                     *BINDING_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION(
 				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName)),
 			                                     Property.IsStatic()
 				                                     ? TEXT("nint.Zero")
-				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE
+				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+			                                     Property.IsPrimitive()
+				                                     ? TEXT("value")
+				                                     : *FString::Printf(TEXT(
+					                                     "value.%s"),
+				                                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
+				                                     )
 			);
 		}
 
@@ -321,8 +320,13 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 			FunctionCallBody += FString::Printf(TEXT(
 				", %s"
 			),
-			                                    *FunctionParamName[Index]
-			);
+			                                    Params[Index]->IsPrimitive()
+				                                    ? *FunctionParamName[Index]
+				                                    : *FString::Printf(TEXT(
+					                                    "%s?.%s ?? nint.Zero"),
+				                                                       *FunctionParamName[Index],
+				                                                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
+				                                    ));
 		}
 
 		FunctionCallBody += TEXT(")");
@@ -585,6 +589,8 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 
 	for (const auto& Property : InClass.GetProperties())
 	{
+		UsingNameSpaces.Append(Property.GetNameSpace());
+
 		auto PropertyName = Property.GetPropertyName();
 
 		auto PropertyType = Property.GetName();
@@ -605,8 +611,9 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 		{
 			GetFunctionContent = FString::Printf(TEXT(
 				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern object %s(nint InObject);\n"
+				"\t\tpublic static extern %s %s(nint InObject);\n"
 			),
+			                                     *Property.GetName(),
 			                                     *BINDING_COMBINE_FUNCTION(
 				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName))
 			);
@@ -616,10 +623,13 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClas
 		{
 			SetFunctionContent = FString::Printf(TEXT(
 				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern void %s(nint InObject, object InValue);\n"
+				"\t\tpublic static extern void %s(nint InObject, %s InValue);\n"
 			),
 			                                     *BINDING_COMBINE_FUNCTION(
-				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName))
+				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName)),
+			                                     Property.IsPrimitive()
+				                                     ? *Property.GetName()
+				                                     : TEXT("nint")
 			);
 		}
 

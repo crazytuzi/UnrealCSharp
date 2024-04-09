@@ -542,7 +542,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
 			                                        IsEmpty()),
 		                                        bIsStatic == true
-			                                        ? TEXT("StaticClass().GarbageCollectionHandle")
+			                                        ? *FString::Printf(
+				                                        TEXT("StaticClass().%s"),
+				                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE)
 			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                        *FunctionNames[FunctionNames.Num() - 1].Key,
 		                                        FunctionRefParamIndex.IsEmpty() && FunctionOutParamIndex.IsEmpty()
@@ -774,16 +776,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                               *IInterfaceContent
 	);
 
-	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InClass);
-
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InClass), ModuleName);
-
-	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InClass)),
-	                                          InClass->GetName());
-
-	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
-
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FGeneratorCore::SaveStringToFile(FGeneratorCore::GetFileName(InClass), Content);
 }
 
 bool FClassGenerator::GeneratorFunctionDefaultParam(const TArray<int32>& InFunctionOutParamIndex,

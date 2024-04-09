@@ -1,14 +1,6 @@
 ﻿#include "Reflection/Property/ContainerProperty/FArrayPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FArrayHelper.h"
-#include "Bridge/FTypeBridge.h"
-
-FArrayPropertyDescriptor::FArrayPropertyDescriptor(FProperty* InProperty):
-	FContainerPropertyDescriptor(InProperty),
-	Class(nullptr)
-{
-	Class = FTypeBridge::GetMonoClass(ArrayProperty);
-}
 
 void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -30,9 +22,10 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (ArrayProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(SrcMonoObject);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
+			SrcGarbageCollectionHandle);
 
 		ArrayProperty->InitializeValue(Dest);
 
