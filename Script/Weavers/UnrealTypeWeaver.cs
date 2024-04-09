@@ -51,6 +51,7 @@ namespace Weavers
         private TypeDefinition _netMulticastAttributeAttributeType;
 
         private TypeDefinition _overrideAttributeType;
+
         public override void Execute()
         {
             GetAllMeta();
@@ -121,6 +122,7 @@ namespace Weavers
                 var destructor = new MethodDefinition("Finalize",
                     MethodAttributes.HideBySig | MethodAttributes.Family | MethodAttributes.Virtual,
                     ModuleDefinition.TypeSystem.Void);
+
                 destructor.Overrides.Add(ModuleDefinition.ImportReference(superFinalize));
 
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
@@ -131,17 +133,19 @@ namespace Weavers
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call,
                     ModuleDefinition.ImportReference(_structUnRegisterImplementation)));
 
-
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
 
-                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(ModuleDefinition.TypeSystem.Object.Resolve().Methods.FirstOrDefault(Method => Method.Name == "Finalize"))));
+                destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(ModuleDefinition.TypeSystem.Object.Resolve().Methods
+                        .FirstOrDefault(Method => Method.Name == "Finalize"))));
 
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Endfinally));
 
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 
-                destructor.Body.Instructions.Insert(3, Instruction.Create(OpCodes.Leave_S, destructor.Body.Instructions[6]));
-                
+                destructor.Body.Instructions.Insert(3,
+                    Instruction.Create(OpCodes.Leave_S, destructor.Body.Instructions[6]));
+
                 var exceptionHandler = new ExceptionHandler(ExceptionHandlerType.Finally)
                 {
                     TryStart = destructor.Body.Instructions[0],
@@ -151,14 +155,18 @@ namespace Weavers
                 };
 
                 destructor.Body.ExceptionHandlers.Add(exceptionHandler);
+
                 Type.Methods.Add(destructor);
             }
             else
             {
                 var finalize = Type.Methods.FirstOrDefault(Method => Method.Name == "Finalize");
 
-                if (finalize == null) 
+                if (finalize == null)
+                {
                     return;
+                }
+
                 ilProcessor = finalize.Body.GetILProcessor();
 
                 ilProcessor.InsertBefore(finalize.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
@@ -170,6 +178,7 @@ namespace Weavers
                 ilProcessor.InsertBefore(finalize.Body.Instructions[2],
                     Instruction.Create(OpCodes.Call,
                         ModuleDefinition.ImportReference(_structUnRegisterImplementation)));
+
                 finalize.Body.ExceptionHandlers[0].TryStart = finalize.Body.Instructions[0];
             }
         }
@@ -296,6 +305,7 @@ namespace Weavers
                 var propertyType = Property.PropertyType;
 
                 MethodDefinition propertySetMethod;
+
                 var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType);
 
                 if (getParamGarbageCollectionHandle != null)
@@ -334,23 +344,35 @@ namespace Weavers
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
 
-                    
                     if (getParamGarbageCollectionHandle != null)
                     {
-                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields.First(Field => Field.Name == "Zero");
+                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
+                            .First(Field => Field.Name == "Zero");
+
                         var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+
                         var il4 = Instruction.Create(OpCodes.Ldarg_1);
-                        var il5 = Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+
+                        var il5 = Instruction.Create(OpCodes.Call,
+                            ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+
                         var il6 = Instruction.Create(OpCodes.Nop);
+
                         var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
+
                         var il3 = Instruction.Create(OpCodes.Br_S, il6);
+
                         ilProcessor.Append(il1);
+
                         ilProcessor.Append(il2);
+
                         ilProcessor.Append(il3);
+
                         ilProcessor.Append(il4);
+
                         ilProcessor.Append(il5);
+
                         ilProcessor.Append(il6);
-                        //ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
                     }
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
@@ -456,7 +478,9 @@ namespace Weavers
                 var propertyType = Property.PropertyType;
 
                 MethodDefinition propertySetMethod;
+
                 var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType);
+
                 if (getParamGarbageCollectionHandle != null)
                 {
                     _structSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod);
@@ -490,22 +514,37 @@ namespace Weavers
                         ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
+
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-                    
+
                     if (getParamGarbageCollectionHandle != null)
                     {
-                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields.First(Field => Field.Name == "Zero");
+                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
+                            .First(Field => Field.Name == "Zero");
+
                         var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+
                         var il4 = Instruction.Create(OpCodes.Ldarg_1);
-                        var il5 = Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+
+                        var il5 = Instruction.Create(OpCodes.Call,
+                            ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+
                         var il6 = Instruction.Create(OpCodes.Nop);
+
                         var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
+
                         var il3 = Instruction.Create(OpCodes.Br_S, il6);
+
                         ilProcessor.Append(il1);
+
                         ilProcessor.Append(il2);
+
                         ilProcessor.Append(il3);
+
                         ilProcessor.Append(il4);
+
                         ilProcessor.Append(il5);
+
                         ilProcessor.Append(il6);
                     }
 
@@ -575,40 +614,59 @@ namespace Weavers
         private void ProcessRpcMethods(TypeDefinition Type)
         {
             var rpcMethods = Type.GetMethods()
-                .Where(Method => Method.CustomAttributes.Any(Attribute => Attribute.AttributeType.FullName == _ufunctionAttributeType.FullName))
-                .Where(Method => Method.CustomAttributes.Any(Attribute => Attribute.AttributeType.FullName == _serverAttributeType.FullName 
-                                                                          || Attribute.AttributeType.FullName == _clientAttributeType.FullName 
-                                                                          || Attribute.AttributeType.FullName == _serverAttributeType.FullName 
-                                                                          || Attribute.AttributeType.FullName == _netMulticastAttributeAttributeType.FullName))
+                .Where(Method => Method.CustomAttributes.Any(Attribute =>
+                    Attribute.AttributeType.FullName == _ufunctionAttributeType.FullName))
+                .Where(Method => Method.CustomAttributes.Any(Attribute =>
+                    Attribute.AttributeType.FullName == _serverAttributeType.FullName ||
+                    Attribute.AttributeType.FullName == _clientAttributeType.FullName ||
+                    Attribute.AttributeType.FullName == _serverAttributeType.FullName ||
+                    Attribute.AttributeType.FullName == _netMulticastAttributeAttributeType.FullName))
                 .ToList();
+
             foreach (var method in rpcMethods)
             {
                 Type.Methods.Add(CreateRpcMethodImplementation(method));
+
                 ModifyRpcMethod(Type, method);
             }
         }
+
         private void ModifyRpcMethod(TypeDefinition Type, MethodDefinition Method)
         {
-            var hashField = new FieldDefinition("__" + Method.Name, FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.IntPtr);
+            var hashField = new FieldDefinition("__" + Method.Name, FieldAttributes.Private | FieldAttributes.Static,
+                ModuleDefinition.TypeSystem.IntPtr);
+
             Type.Fields.Add(hashField);
 
             Method.Body.GetILProcessor().Clear();
+
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Nop));
+
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_0));
-            Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_getGarbageCollectionHandle)));
-            Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(hashField)));
+
+            Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call,
+                ModuleDefinition.ImportReference(_getGarbageCollectionHandle)));
+
+            Method.Body.GetILProcessor()
+                .Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(hashField)));
 
             if (Method.Parameters.Count > 0)
             {
                 Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4, Method.Parameters.Count));
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Newarr, ModuleDefinition.ImportReference(ModuleDefinition.TypeSystem.Object)));
+
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Newarr,
+                    ModuleDefinition.ImportReference(ModuleDefinition.TypeSystem.Object)));
 
                 var i = 0;
+
                 foreach (var param in Method.Parameters)
                 {
                     Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Dup));
+
                     Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4, i));
+
                     Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_S, param));
+
                     if (param.ParameterType.IsValueType)
                     {
                         Method.Body.GetILProcessor().Append(param.ParameterType.Resolve().IsEnum
@@ -621,54 +679,87 @@ namespace Weavers
                     else
                     {
                         var paramGetGarbageCollectionHandleMethod = GetGarbageCollectionHandle(param.ParameterType);
+
                         if (paramGetGarbageCollectionHandleMethod != null)
                         {
-                            var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields.First(Field => Field.Name == "Zero");
+                            var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
+                                .First(Field => Field.Name == "Zero");
+
                             var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+
                             var il4 = Instruction.Create(OpCodes.Ldarg_S, param);
-                            var il5 = Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(paramGetGarbageCollectionHandleMethod));
+
+                            var il5 = Instruction.Create(OpCodes.Call,
+                                ModuleDefinition.ImportReference(paramGetGarbageCollectionHandleMethod));
+
                             var il6 = Instruction.Create(OpCodes.Box, ModuleDefinition.TypeSystem.IntPtr);
+
                             var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
+
                             var il3 = Instruction.Create(OpCodes.Br_S, il6);
+
                             Method.Body.GetILProcessor().Append(il1);
+
                             Method.Body.GetILProcessor().Append(il2);
+
                             Method.Body.GetILProcessor().Append(il3);
+
                             Method.Body.GetILProcessor().Append(il4);
+
                             Method.Body.GetILProcessor().Append(il5);
+
                             Method.Body.GetILProcessor().Append(il6);
                         }
-
                     }
+
                     Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Stelem_Ref));
+
                     i++;
                 }
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_functionReflection2Implementation)));
+
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(_functionReflection2Implementation)));
             }
             else
             {
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_functionReflection0Implementation)));
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(_functionReflection0Implementation)));
             }
+
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ret));
+
             Method.Body.InitLocals = false;
+
             Method.Body.Variables.Clear();
+
             Method.Body.ExceptionHandlers.Clear();
         }
+
         private MethodDefinition CreateRpcMethodImplementation(MethodDefinition Method)
         {
             var constructor = _overrideAttributeType.GetConstructors().FirstOrDefault();
+
             var constructorRef = ModuleDefinition.ImportReference(constructor);
+
             var attribute = new CustomAttribute(constructorRef);
-            var newMethod = new MethodDefinition(Method.Name + "_Implementation", MethodAttributes.Public, Method.ReturnType);
+
+            var newMethod = new MethodDefinition(Method.Name + "_Implementation", MethodAttributes.Public,
+                Method.ReturnType);
+
             newMethod.CustomAttributes.Add(attribute);
+
             foreach (var param in Method.Parameters)
             {
                 newMethod.Parameters.Add(new ParameterDefinition(param.ParameterType));
             }
+
             foreach (var variable in Method.Body.Variables)
             {
                 newMethod.Body.Variables.Add(new VariableDefinition(variable.VariableType));
             }
+
             newMethod.Body.InitLocals = Method.Body.InitLocals;
+
             if (Method.HasBody)
             {
                 newMethod.Body.InitLocals = true;
@@ -678,7 +769,7 @@ namespace Weavers
                     newMethod.Body.Variables.Add(variableDefinition);
                 }
 
-                foreach (ExceptionHandler exceptionHandler in Method.Body.ExceptionHandlers)
+                foreach (var exceptionHandler in Method.Body.ExceptionHandlers)
                 {
                     newMethod.Body.ExceptionHandlers.Add(exceptionHandler);
                 }
@@ -687,17 +778,23 @@ namespace Weavers
                 {
                     newMethod.Body.Instructions.Add(instruction);
                 }
+
                 newMethod.Body.OptimizeMacros();
             }
+
             return newMethod;
         }
+
         private MethodDefinition GetPropertyAccessor(PropertyReference Property,
             IReadOnlyDictionary<string, MethodDefinition> MethodMap)
         {
             var type = Property.PropertyType.Resolve();
 
             if (MethodMap.TryGetValue(Property.PropertyType.FullName, out var propertyGetMethod))
+            {
                 return propertyGetMethod;
+            }
+
             // 然后找一下enum
             if (type.IsEnum)
             {
@@ -732,20 +829,24 @@ namespace Weavers
             return Type.BaseType != null ? GetGarbageCollectionHandle(Type.BaseType.Resolve()) : null;
         }
 
-
         private MethodReference GetGarbageCollectionHandle(TypeReference Type)
         {
             var method = GetGarbageCollectionHandle(Type.Resolve());
+
             if (method == null)
+            {
                 return null;
+            }
+
             if (Type.IsGenericInstance)
             {
-                List<TypeReference> arguments = new List<TypeReference>();
+                var arguments = new List<TypeReference>();
+
                 foreach (var argument in ((GenericInstanceType)Type).GenericArguments)
                 {
                     arguments.Add(argument.Resolve());
-
                 }
+
                 return method.MakeHostInstanceGeneric(arguments.ToArray());
             }
             else
@@ -753,6 +854,7 @@ namespace Weavers
                 return method;
             }
         }
+
         private void GetAllDynamic()
         {
             foreach (var type in ModuleDefinition.Types)
@@ -762,25 +864,21 @@ namespace Weavers
                 {
                     _classTypes.Add(type);
                 }
-
                 else if (type.CustomAttributes.Any(Attribute =>
                              Attribute.AttributeType.FullName == "Script.Dynamic.UStructAttribute"))
                 {
                     _structTypes.Add(type);
                 }
-
                 else if (type.CustomAttributes.Any(Attribute =>
                              Attribute.AttributeType.FullName == "Script.Dynamic.UEnumAttribute"))
                 {
                     _enumTypes.Add(type);
                 }
-
                 else if (type.CustomAttributes.Any(Attribute =>
                              Attribute.AttributeType.FullName == "Script.Dynamic.UInterfaceAttribute"))
                 {
                     _interfaceTypes.Add(type);
                 }
-
                 else if (type.IsInterface && type.Interfaces.ToList().Any(Interface =>
                              Interface.InterfaceType.FullName == "Script.CoreUObject.IInterface"))
                 {
@@ -875,6 +973,7 @@ namespace Weavers
 
             _getGarbageCollectionHandle = definition.GetType("Script.CoreUObject.UObject").Methods
                 .FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle");
+
             SearchAllPropertyAccessors(definition);
         }
     }
@@ -883,20 +982,24 @@ namespace Weavers
     {
         public static MethodReference MakeHostInstanceGeneric(this MethodReference Self, params TypeReference[] Args)
         {
-            var reference = new MethodReference(Self.Name, Self.ReturnType, Self.DeclaringType.MakeGenericInstanceType(Args))
-            {
-                HasThis = Self.HasThis,
-                ExplicitThis = Self.ExplicitThis,
-                CallingConvention = Self.CallingConvention
-            };
+            var reference =
+                new MethodReference(Self.Name, Self.ReturnType, Self.DeclaringType.MakeGenericInstanceType(Args))
+                {
+                    HasThis = Self.HasThis,
+                    ExplicitThis = Self.ExplicitThis,
+                    CallingConvention = Self.CallingConvention
+                };
+
             foreach (var parameter in Self.Parameters)
             {
                 reference.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
             }
+
             foreach (var genericParam in Self.GenericParameters)
             {
                 reference.GenericParameters.Add(new GenericParameter(genericParam.Name, reference));
             }
+
             return reference;
         }
     }
