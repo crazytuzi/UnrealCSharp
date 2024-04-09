@@ -295,7 +295,16 @@ namespace Weavers
             {
                 var propertyType = Property.PropertyType;
 
-                var propertySetMethod = GetPropertyAccessor(Property, _objectSetMethodMap);
+                MethodDefinition propertySetMethod = null;
+                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType.Resolve());
+                if (getParamGarbageCollectionHandle != null)
+                {
+                    _objectSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod);
+                }
+                else
+                {
+                    propertySetMethod = GetPropertyAccessor(Property, _objectSetMethodMap);
+                }
 
                 if (propertySetMethod != null)
                 {
@@ -322,7 +331,32 @@ namespace Weavers
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
 
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                    if (getParamGarbageCollectionHandle == null)
+                    {
+                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                    }
+                    else
+                    {
+                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                        if (propertyType.IsGenericInstance)
+                        {
+                            List<TypeReference> arguments = new List<TypeReference>();
+                            foreach (var param in (propertyType as GenericInstanceType).GenericArguments)
+                            {
+                                arguments.Add(param.Resolve());
+
+                            }
+                            var method = getParamGarbageCollectionHandle.MakeHostInstanceGeneric(arguments.ToArray());
+                            ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                                ModuleDefinition.ImportReference(method)));
+                        }
+                        else
+                        {
+
+                            ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                                ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
+                        }
+                    }
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
                         ModuleDefinition.ImportReference(propertySetMethod)));
@@ -426,7 +460,16 @@ namespace Weavers
             {
                 var propertyType = Property.PropertyType;
 
-                var propertySetMethod = GetPropertyAccessor(Property, _structSetMethodMap);
+                MethodDefinition propertySetMethod = null;
+                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType.Resolve());
+                if (getParamGarbageCollectionHandle != null)
+                {
+                    _structSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod);
+                }
+                else
+                {
+                    propertySetMethod = GetPropertyAccessor(Property, _structSetMethodMap);
+                }
 
                 if (propertySetMethod != null)
                 {
@@ -452,8 +495,32 @@ namespace Weavers
                         ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
+                    if (getParamGarbageCollectionHandle == null)
+                    {
+                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                    }
+                    else
+                    {
+                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                        if (propertyType.IsGenericInstance)
+                        {
+                            List<TypeReference> arguments = new List<TypeReference>();
+                            foreach (var param in (propertyType as GenericInstanceType).GenericArguments)
+                            {
+                                arguments.Add(param.Resolve());
 
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                            }
+                            var method = getParamGarbageCollectionHandle.MakeHostInstanceGeneric(arguments.ToArray());
+                            ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                                ModuleDefinition.ImportReference(method)));
+                        }
+                        else
+                        {
+
+                            ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                                ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
+                        }
+                    }
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
                         ModuleDefinition.ImportReference(propertySetMethod)));
@@ -781,6 +848,28 @@ namespace Weavers
             _getGarbageCollectionHandle = definition.GetType("Script.CoreUObject.UObject").Methods
                 .FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle");
             SearchAllPropertyAccessors(definition);
+        }
+    }
+
+    public static class CecilExtensions
+    {
+        public static MethodReference MakeHostInstanceGeneric(this MethodReference self, params TypeReference[] args)
+        {
+            var reference = new MethodReference(self.Name, self.ReturnType, self.DeclaringType.MakeGenericInstanceType(args))
+            {
+                HasThis = self.HasThis,
+                ExplicitThis = self.ExplicitThis,
+                CallingConvention = self.CallingConvention
+            };
+            foreach (var parameter in self.Parameters)
+            {
+                reference.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
+            }
+            foreach (var genericParam in self.GenericParameters)
+            {
+                reference.GenericParameters.Add(new GenericParameter(genericParam.Name, reference));
+            }
+            return reference;
         }
     }
 }
