@@ -295,8 +295,9 @@ namespace Weavers
             {
                 var propertyType = Property.PropertyType;
 
-                MethodDefinition propertySetMethod = null;
-                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType.Resolve());
+                MethodDefinition propertySetMethod;
+                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType);
+
                 if (getParamGarbageCollectionHandle != null)
                 {
                     _objectSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod);
@@ -331,31 +332,25 @@ namespace Weavers
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
 
-                    if (getParamGarbageCollectionHandle == null)
-                    {
-                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-                    }
-                    else
-                    {
-                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-                        if (propertyType.IsGenericInstance)
-                        {
-                            List<TypeReference> arguments = new List<TypeReference>();
-                            foreach (var param in (propertyType as GenericInstanceType).GenericArguments)
-                            {
-                                arguments.Add(param.Resolve());
+                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
 
-                            }
-                            var method = getParamGarbageCollectionHandle.MakeHostInstanceGeneric(arguments.ToArray());
-                            ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                                ModuleDefinition.ImportReference(method)));
-                        }
-                        else
-                        {
-
-                            ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                                ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
-                        }
+                    
+                    if (getParamGarbageCollectionHandle != null)
+                    {
+                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields.First(Field => Field.Name == "Zero");
+                        var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+                        var il4 = Instruction.Create(OpCodes.Ldarg_1);
+                        var il5 = Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+                        var il6 = Instruction.Create(OpCodes.Nop);
+                        var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
+                        var il3 = Instruction.Create(OpCodes.Br_S, il6);
+                        ilProcessor.Append(il1);
+                        ilProcessor.Append(il2);
+                        ilProcessor.Append(il3);
+                        ilProcessor.Append(il4);
+                        ilProcessor.Append(il5);
+                        ilProcessor.Append(il6);
+                        //ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
                     }
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
@@ -460,8 +455,8 @@ namespace Weavers
             {
                 var propertyType = Property.PropertyType;
 
-                MethodDefinition propertySetMethod = null;
-                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType.Resolve());
+                MethodDefinition propertySetMethod;
+                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType);
                 if (getParamGarbageCollectionHandle != null)
                 {
                     _structSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod);
@@ -495,31 +490,23 @@ namespace Weavers
                         ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
-                    if (getParamGarbageCollectionHandle == null)
+                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+                    
+                    if (getParamGarbageCollectionHandle != null)
                     {
-                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-                    }
-                    else
-                    {
-                        ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-                        if (propertyType.IsGenericInstance)
-                        {
-                            List<TypeReference> arguments = new List<TypeReference>();
-                            foreach (var param in (propertyType as GenericInstanceType).GenericArguments)
-                            {
-                                arguments.Add(param.Resolve());
-
-                            }
-                            var method = getParamGarbageCollectionHandle.MakeHostInstanceGeneric(arguments.ToArray());
-                            ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                                ModuleDefinition.ImportReference(method)));
-                        }
-                        else
-                        {
-
-                            ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                                ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
-                        }
+                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields.First(Field => Field.Name == "Zero");
+                        var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+                        var il4 = Instruction.Create(OpCodes.Ldarg_1);
+                        var il5 = Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+                        var il6 = Instruction.Create(OpCodes.Nop);
+                        var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
+                        var il3 = Instruction.Create(OpCodes.Br_S, il6);
+                        ilProcessor.Append(il1);
+                        ilProcessor.Append(il2);
+                        ilProcessor.Append(il3);
+                        ilProcessor.Append(il4);
+                        ilProcessor.Append(il5);
+                        ilProcessor.Append(il6);
                     }
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
@@ -631,6 +618,27 @@ namespace Weavers
                             : Instruction.Create(OpCodes.Box,
                                 ModuleDefinition.ImportReference(param.ParameterType)));
                     }
+                    else
+                    {
+                        var paramGetGarbageCollectionHandleMethod = GetGarbageCollectionHandle(param.ParameterType);
+                        if (paramGetGarbageCollectionHandleMethod != null)
+                        {
+                            var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields.First(Field => Field.Name == "Zero");
+                            var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+                            var il4 = Instruction.Create(OpCodes.Ldarg_S, param);
+                            var il5 = Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(paramGetGarbageCollectionHandleMethod));
+                            var il6 = Instruction.Create(OpCodes.Box, ModuleDefinition.TypeSystem.IntPtr);
+                            var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
+                            var il3 = Instruction.Create(OpCodes.Br_S, il6);
+                            Method.Body.GetILProcessor().Append(il1);
+                            Method.Body.GetILProcessor().Append(il2);
+                            Method.Body.GetILProcessor().Append(il3);
+                            Method.Body.GetILProcessor().Append(il4);
+                            Method.Body.GetILProcessor().Append(il5);
+                            Method.Body.GetILProcessor().Append(il6);
+                        }
+
+                    }
                     Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Stelem_Ref));
                     i++;
                 }
@@ -710,13 +718,12 @@ namespace Weavers
             return propertyGetMethod;
         }
 
-        private MethodDefinition GetGarbageCollectionHandle(TypeDefinition Type)
+        private MethodReference GetGarbageCollectionHandle(TypeDefinition Type)
         {
             var property = Type.Properties.FirstOrDefault(Property => Property.Name == "GarbageCollectionHandle" &&
                                                                       Property.PropertyType.FullName ==
                                                                       ModuleDefinition.TypeSystem.IntPtr.FullName &&
                                                                       Property.GetMethod != null);
-
             if (property != null)
             {
                 return property.GetMethod;
@@ -725,6 +732,27 @@ namespace Weavers
             return Type.BaseType != null ? GetGarbageCollectionHandle(Type.BaseType.Resolve()) : null;
         }
 
+
+        private MethodReference GetGarbageCollectionHandle(TypeReference Type)
+        {
+            var method = GetGarbageCollectionHandle(Type.Resolve());
+            if (method == null)
+                return null;
+            if (Type.IsGenericInstance)
+            {
+                List<TypeReference> arguments = new List<TypeReference>();
+                foreach (var argument in ((GenericInstanceType)Type).GenericArguments)
+                {
+                    arguments.Add(argument.Resolve());
+
+                }
+                return method.MakeHostInstanceGeneric(arguments.ToArray());
+            }
+            else
+            {
+                return method;
+            }
+        }
         private void GetAllDynamic()
         {
             foreach (var type in ModuleDefinition.Types)
@@ -853,19 +881,19 @@ namespace Weavers
 
     public static class CecilExtensions
     {
-        public static MethodReference MakeHostInstanceGeneric(this MethodReference self, params TypeReference[] args)
+        public static MethodReference MakeHostInstanceGeneric(this MethodReference Self, params TypeReference[] Args)
         {
-            var reference = new MethodReference(self.Name, self.ReturnType, self.DeclaringType.MakeGenericInstanceType(args))
+            var reference = new MethodReference(Self.Name, Self.ReturnType, Self.DeclaringType.MakeGenericInstanceType(Args))
             {
-                HasThis = self.HasThis,
-                ExplicitThis = self.ExplicitThis,
-                CallingConvention = self.CallingConvention
+                HasThis = Self.HasThis,
+                ExplicitThis = Self.ExplicitThis,
+                CallingConvention = Self.CallingConvention
             };
-            foreach (var parameter in self.Parameters)
+            foreach (var parameter in Self.Parameters)
             {
                 reference.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
             }
-            foreach (var genericParam in self.GenericParameters)
+            foreach (var genericParam in Self.GenericParameters)
             {
                 reference.GenericParameters.Add(new GenericParameter(genericParam.Name, reference));
             }
