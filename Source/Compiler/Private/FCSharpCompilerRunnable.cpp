@@ -1,6 +1,9 @@
 ﻿#include "FCSharpCompilerRunnable.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "Log/UnrealCSharpLog.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
@@ -146,7 +149,7 @@ void FCSharpCompilerRunnable::Compile()
 	);
 
 	const auto CompileParam = FString::Printf(TEXT(
-		"publish %sScript/Game/Game.csproj --nologo -c Debug -o %s"
+		"publish \"%sScript/Game/Game.csproj\" --nologo -c Debug -o \"%s\""
 	),
 	                                          *FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()),
 	                                          *OutDirectory
@@ -181,21 +184,52 @@ void FCSharpCompilerRunnable::Compile()
 		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
 	}
 
+	FNotificationInfo* NotificationInfo{};
+
 	auto ReturnCode = 0;
 
 	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
 	{
+		static const FName CompileStatusUnknown("Blueprint.CompileStatus.Overlay.Unknown");
+
+		static const FName CompileStatusError("Blueprint.CompileStatus.Overlay.Error");
+
+		static const FName CompileStatusGood("Blueprint.CompileStatus.Overlay.Good");
+
+		static const FName CompileStatusWarning("Blueprint.CompileStatus.Overlay.Warning");
+
 		if (ReturnCode == 0)
 		{
-			// @TODO
+			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation succeeded")));
+
+			NotificationInfo->bUseSuccessFailIcons = true;
+
+			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusGood);
 		}
 		else
 		{
-			// @TODO
+			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation failed")));
+
+			NotificationInfo->bUseSuccessFailIcons = true;
+
+			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusError);
+
+			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *Result);
 		}
 	}
 
 	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
 
 	FPlatformProcess::CloseProc(ProcessHandle);
+
+	if (NotificationInfo != nullptr)
+	{
+		NotificationInfo->bFireAndForget = true;
+
+		NotificationInfo->FadeOutDuration = 2.0f;
+
+		NotificationInfo->FadeInDuration = 0.5f;
+
+		FSlateNotificationManager::Get().QueueNotification(NotificationInfo);
+	}
 }

@@ -13,11 +13,10 @@ void FCodeAnalysis::Compile()
 {
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-	const auto CodeAnalysisPath = FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, CODE_ANALYSIS));
+	const auto CodeAnalysisPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetPluginPath(), SCRIPT, CODE_ANALYSIS);
 
 	const auto CompileParam = FString::Printf(TEXT(
-		"build %s/%s.csproj --nologo -c Debug"
+		"build \"%s/%s.csproj\" --nologo -c Debug"
 	),
 	                                          *CodeAnalysisPath,
 	                                          *CODE_ANALYSIS
@@ -73,16 +72,15 @@ void FCodeAnalysis::Compile()
 
 void FCodeAnalysis::Analysis()
 {
-	const auto Program = FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, CODE_ANALYSIS,
-		                FString::Printf(TEXT(
-			                "%s.exe"
-		                ),
-		                                *CODE_ANALYSIS
-		                )));
+	const auto Program = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetPluginPath(), SCRIPT, CODE_ANALYSIS,
+	                                     FString::Printf(TEXT(
+		                                     "%s.exe"
+	                                     ),
+	                                                     *CODE_ANALYSIS
+	                                     ));
 
 	const auto CompileParam = FString::Printf(TEXT(
-		"%s %s"
+		"\"%s\" \"%s\""
 	),
 	                                          *FPaths::ConvertRelativePathToFull(
 		                                          FUnrealCSharpFunctionLibrary::GetGamePath()),

@@ -66,6 +66,8 @@ public:
 
 	static FString GetAssemblyUtilProjectName();
 
+	static FString GetPluginPath();
+
 	static FString GetAssemblyUtilPath();
 
 	static FString GetGenerationPath(const UField* InField);

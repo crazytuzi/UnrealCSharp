@@ -15,6 +15,7 @@
 #include "Misc/FileHelper.h"
 #include "Binding/FBinding.h"
 #include "Setting/UnrealCSharpSetting.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
@@ -652,9 +653,8 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 
 #if WITH_EDITOR
 	auto Path = FString::Printf(TEXT(
-		"%s/%s/Source/ThirdParty/Mono/lib/%s/net7.0"),
-	                            *FPaths::ProjectPluginsDir(),
-	                            *PLUGIN_NAME,
+		"%s/Source/ThirdParty/Mono/lib/%s/net7.0"),
+	                            *FUnrealCSharpFunctionLibrary::GetPluginPath(),
 #if PLATFORM_WINDOWS
 	                            TEXT("Win64")
 #elif PLATFORM_MAC_X86

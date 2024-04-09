@@ -7,9 +7,7 @@ void FSolutionGenerator::Generator()
 {
 	Compile();
 
-	const auto PluginPath = FPaths::ConvertRelativePathToFull(FPaths::ProjectPluginsDir() / PLUGIN_NAME);
-
-	const auto TemplatePath = PluginPath / TEMPLATE;
+	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginPath() / TEMPLATE;
 
 	CopyCSProj(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetUEPath(),
@@ -38,7 +36,7 @@ void FSolutionGenerator::Compile()
 	const auto AssemblyUtilPath = FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath();
 
 	const auto CompileParam = FString::Printf(TEXT(
-		"build %s/%s.csproj --nologo -c Debug"
+		"build \"%s/%s.csproj\" --nologo -c Debug"
 	),
 	                                          *AssemblyUtilPath,
 	                                          *FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()

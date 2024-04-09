@@ -1041,6 +1041,11 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 		return FString::Printf(TEXT(" = null"));
 	}
 
+	if (CastField<FDelegateProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
+
 	if (CastField<FInterfaceProperty>(InProperty))
 	{
 		// @TODO

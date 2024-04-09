@@ -4,6 +4,7 @@
 #include "Common/NameEncode.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicClassGenerator.h"
+#include "Interfaces/IPluginManager.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
@@ -408,10 +409,14 @@ FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
 	return ASSEMBLY_UTIL;
 }
 
+FString FUnrealCSharpFunctionLibrary::GetPluginPath()
+{
+	return FPaths::ConvertRelativePathToFull(IPluginManager::Get().FindPlugin(PLUGIN_NAME)->GetBaseDir());
+}
+
 FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath()
 {
-	return FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, GetAssemblyUtilProjectName()));
+	return FPaths::Combine(GetPluginPath(), SCRIPT, GetAssemblyUtilProjectName());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const UField* InField)
