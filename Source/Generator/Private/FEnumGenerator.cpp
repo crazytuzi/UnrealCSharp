@@ -97,16 +97,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	                                     *EnumeratorContent
 	);
 
-	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InEnum);
-
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InEnum), ModuleName);
-
-	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InEnum)),
-	                                          InEnum->GetName());
-
-	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
-
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FGeneratorCore::SaveStringToFile(FGeneratorCore::GetFileName(InEnum), Content);
 }
 
 void FEnumGenerator::AddEnumUnderlyingType(const UEnum* InEnum, const FNumericProperty* InNumericProperty)
@@ -227,16 +218,7 @@ void FEnumGenerator::GeneratorCollisionChannel()
 	                                     *EnumeratorContent
 	);
 
-	auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InEnum);
-
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InEnum), ModuleName);
-
-	auto ModuleRelativeFile = FPaths::Combine(FPaths::GetPath(InEnum->GetMetaData(TEXT("ModuleRelativePath"))),
-	                                          InEnum->GetName());
-
-	auto FileName = FPaths::Combine(DirectoryName, ModuleRelativeFile);
-
-	FGeneratorCore::SaveStringToFile(FileName + TEXT(".cs"), Content);
+	FGeneratorCore::SaveStringToFile(FGeneratorCore::GetFileName(InEnum), Content);
 }
 
 FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
