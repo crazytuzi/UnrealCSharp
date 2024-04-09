@@ -32,7 +32,7 @@ struct TScriptStructPropertyValue
 };
 
 template <typename T>
-struct TSinglePropertyValue
+struct TPrimitivePropertyValue
 {
 	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
@@ -68,7 +68,7 @@ struct TStringPropertyValue
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
 	{
 		return std::decay_t<T>(*FCSharpEnvironment::GetEnvironment().GetString<std::decay_t<T>>(InValue));
 	}
@@ -97,7 +97,7 @@ struct TMultiPropertyValue
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(const FGarbageCollectionHandle InValue)
 	{
 		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetMulti<std::decay_t<T>>(InValue);
 	}
@@ -134,7 +134,7 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(const FGarbageCollectionHandle InValue)
 	{
 		return *FCSharpEnvironment::GetEnvironment().GetBinding<std::decay_t<T>>(InValue);
 	}
@@ -170,7 +170,7 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetBinding<
 			std::remove_pointer_t<std::remove_reference_t<T>>>(InValue);
@@ -214,7 +214,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(const FGarbageCollectionHandle InValue)
 	{
 		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
 	}
@@ -262,7 +262,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
 	{
 		return (std::decay_t<T>)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
 	}
@@ -270,67 +270,67 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 
 template <typename T>
 struct TBindingEnumPropertyValue :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
@@ -345,7 +345,7 @@ struct TPropertyValue<T,
 			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember));
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetObject<std::remove_pointer_t<std::decay_t<T>>>(InValue);
 	}
@@ -359,7 +359,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
 		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(const FGarbageCollectionHandle InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType*>(InValue);
 	}
@@ -410,7 +410,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 		return SrcMonoObject;
 	}
 
-	static T Set(const MonoObject* InValue)
+	static T Set(const FGarbageCollectionHandle InValue)
 	{
 		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
 	}
@@ -448,7 +448,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Va
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 };
 
@@ -516,7 +516,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
 	{
 		std::decay_t<T> Value;
 
@@ -584,7 +584,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
 	{
 		std::decay_t<T> Value;
 
@@ -627,7 +627,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<s
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InValue)->Get();
 	}
@@ -681,7 +681,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const MonoObject* InValue)
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
 	{
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InValue);
 
@@ -694,7 +694,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember)
 	{
@@ -705,7 +705,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TI
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value, T>> :
-	TSinglePropertyValue<T>
+	TPrimitivePropertyValue<T>
 {
 	static MonoObject* Get(std::decay_t<T>* InMember)
 	{

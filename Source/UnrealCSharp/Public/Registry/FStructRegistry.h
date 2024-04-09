@@ -54,17 +54,11 @@ public:
 public:
 	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
-	void* GetAddress(const MonoObject* InMonoObject);
-
 	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct);
-
-	void* GetAddress(const MonoObject* InMonoObject, UStruct*& InStruct);
 
 	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct);
 
 	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle);
-
-	void* GetStruct(const MonoObject* InMonoObject);
 
 	FGarbageCollectionHandle GetGarbageCollectionHandle(UScriptStruct* InScriptStruct, const void* InStruct);
 
@@ -79,8 +73,6 @@ public:
 
 private:
 	FStructMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2StructAddress;
-
-	FStructMapping::FMonoObject2Value MonoObject2StructAddress;
 
 	FStructMapping::FAddress2GarbageCollectionHandle StructAddress2GarbageCollectionHandle;
 };

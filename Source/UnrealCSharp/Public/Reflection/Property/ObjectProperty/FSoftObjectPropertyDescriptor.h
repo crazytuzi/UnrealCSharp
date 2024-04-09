@@ -1,12 +1,11 @@
 ﻿#pragma once
 
-#include "FObjectPropertyDescriptor.h"
-#include "mono/metadata/object-forward.h"
+#include "Reflection/Property/FCompoundPropertyDescriptor.h"
 
-class FSoftObjectPropertyDescriptor final : public FObjectPropertyDescriptor
+class FSoftObjectPropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
-	explicit FSoftObjectPropertyDescriptor(FProperty* InProperty);
+	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;
@@ -17,7 +16,5 @@ public:
 	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const override;
 
 private:
-	MonoObject* Object_New(void* InAddress) const;
-
-	MonoClass* Class;
+	MonoObject* NewWeakRef(void* InAddress) const;
 };

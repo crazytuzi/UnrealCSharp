@@ -66,7 +66,7 @@ public:
 	{
 	};
 
-	template <typename T, typename O, O, typename P, P, typename Q, Q>
+	template <typename T, typename P, P, typename Q, Q>
 	struct TMultiRegistryImplementation
 	{
 	};
@@ -84,37 +84,25 @@ public:
 private:
 	FSubclassOfMapping::FGarbageCollectionHandle2Value SubclassOfGarbageCollectionHandle2Address;
 
-	FSubclassOfMapping::FMonoObject2Value SubclassOfMonoObject2Address;
-
 	FSubclassOfMapping::FAddress2GarbageCollectionHandle SubclassOfAddress2GarbageCollectionHandle;
 
 	FWeakObjectPtrMapping::FGarbageCollectionHandle2Value WeakObjectPtrGarbageCollectionHandle2Address;
-
-	FWeakObjectPtrMapping::FMonoObject2Value WeakObjectPtrMonoObject2Address;
 
 	FWeakObjectPtrMapping::FAddress2GarbageCollectionHandle WeakObjectPtrAddress2GarbageCollectionHandle;
 
 	FLazyObjectPtrMapping::FGarbageCollectionHandle2Value LazyObjectPtrGarbageCollectionHandle2Address;
 
-	FLazyObjectPtrMapping::FMonoObject2Value LazyObjectPtrMonoObject2Address;
-
 	FLazyObjectPtrMapping::FAddress2GarbageCollectionHandle LazyObjectPtrAddress2GarbageCollectionHandle;
 
 	FSoftObjectPtrMapping::FGarbageCollectionHandle2Value SoftObjectPtrGarbageCollectionHandle2Address;
-
-	FSoftObjectPtrMapping::FMonoObject2Value SoftObjectPtrMonoObject2Address;
 
 	FSoftObjectPtrMapping::FAddress2GarbageCollectionHandle SoftObjectPtrAddress2GarbageCollectionHandle;
 
 	FScriptInterfaceMapping::FGarbageCollectionHandle2Value ScriptInterfaceGarbageCollectionHandle2Address;
 
-	FScriptInterfaceMapping::FMonoObject2Value ScriptInterfaceMonoObject2Address;
-
 	FScriptInterfaceMapping::FKey2GarbageCollectionHandle ScriptInterfaceAddress2GarbageCollectionHandle;
 
 	FSoftClassPtrMapping::FGarbageCollectionHandle2Value SoftClassPtrGarbageCollectionHandle2Address;
-
-	FSoftClassPtrMapping::FMonoObject2Value SoftClassPtrMonoObject2Address;
 
 	FSoftClassPtrMapping::FAddress2GarbageCollectionHandle SoftClassPtrAddress2GarbageCollectionHandle;
 };

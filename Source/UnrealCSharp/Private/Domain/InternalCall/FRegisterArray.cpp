@@ -123,14 +123,10 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				ArrayHelper->Set(InIndex, FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				ArrayHelper->Set(InIndex, InValue);
-			}
+			ArrayHelper->Set(InIndex, ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
+				                          ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                          : static_cast<void*>(
+					                          FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 	}
 
@@ -140,14 +136,10 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return ArrayHelper->Find(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return ArrayHelper->Find(InValue);
-			}
+			return ArrayHelper->Find(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
+				                         ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                         : static_cast<void*>(
+					                         FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 
 		return 0;
@@ -159,14 +151,11 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return ArrayHelper->FindLast(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return ArrayHelper->FindLast(InValue);
-			}
+			return ArrayHelper->FindLast(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
+				                             ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                             : static_cast<void*>(
+					                             FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+						                             InValue)));
 		}
 
 		return 0;
@@ -178,14 +167,11 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return ArrayHelper->Contains(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return ArrayHelper->Contains(InValue);
-			}
+			return ArrayHelper->Contains(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
+				                             ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                             : static_cast<void*>(
+					                             FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+						                             InValue)));
 		}
 
 		return false;
@@ -269,14 +255,10 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return ArrayHelper->Add(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return ArrayHelper->Add(InValue);
-			}
+			return ArrayHelper->Add(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
+				                        ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                        : static_cast<void*>(
+					                        FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 
 		return 0;
@@ -300,14 +282,11 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return ArrayHelper->AddUnique(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return ArrayHelper->AddUnique(InValue);
-			}
+			return ArrayHelper->AddUnique(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
+				                              ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                              : static_cast<void*>(
+					                              FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+						                              InValue)));
 		}
 
 		return 0;
@@ -319,15 +298,12 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return ArrayHelper->RemoveSingle(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return ArrayHelper->RemoveSingle(InValue);
-			}
+			return ArrayHelper->RemoveSingle(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
+				                                 ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
+					                                 InValue)
+				                                 : static_cast<void*>(
+					                                 FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+						                                 InValue)));
 		}
 
 		return 0;
@@ -339,14 +315,10 @@ struct FRegisterArray
 		if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			InGarbageCollectionHandle))
 		{
-			if (ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty())
-			{
-				return ArrayHelper->Remove(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue));
-			}
-			else
-			{
-				return ArrayHelper->Remove(InValue);
-			}
+			return ArrayHelper->Remove(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
+				                           ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                           : static_cast<void*>(
+					                           FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 
 		return 0;

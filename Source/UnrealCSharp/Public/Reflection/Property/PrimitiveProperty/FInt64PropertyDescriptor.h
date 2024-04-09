@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "FPrimitivePropertyDescriptor.h"
+#include "Reflection/Property/FPrimitivePropertyDescriptor.h"
 
 class FInt64PropertyDescriptor final : public FPrimitivePropertyDescriptor
 {

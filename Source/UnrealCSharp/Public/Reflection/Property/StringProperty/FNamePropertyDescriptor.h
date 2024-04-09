@@ -1,9 +1,8 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPropertyDescriptor.h"
-#include "mono/metadata/object-forward.h"
+#include "Reflection/Property/FCompoundPropertyDescriptor.h"
 
-class FNamePropertyDescriptor final : public FPropertyDescriptor
+class FNamePropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
 	explicit FNamePropertyDescriptor(FProperty* InProperty);
@@ -17,7 +16,5 @@ public:
 	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const override;
 
 private:
-	MonoObject* Object_New(void* InAddress) const;
-
-	MonoClass* Class;
+	MonoObject* NewWeakRef(void* InAddress) const;
 };
