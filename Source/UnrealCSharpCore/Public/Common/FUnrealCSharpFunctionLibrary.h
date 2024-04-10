@@ -12,6 +12,10 @@ public:
 public:
 	static FString GetModuleName(const UField* InField);
 
+	static FString GetModuleName(const UClass* InClass);
+
+	static FString GetModuleName(const FString& InModuleName);
+
 	static FString GetFullClass(const UStruct* InStruct);
 
 	static FString GetFullInterface(const UStruct* InStruct);

@@ -38,7 +38,33 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
 	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
 
+	const auto ModuleName = Package ? Package->GetName() : TEXT("");
+
+	return GetModuleName(ModuleName);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UClass* InClass)
+{
+	const auto Package = InClass != nullptr ? InClass->GetPackage() : nullptr;
+
 	auto ModuleName = Package ? Package->GetName() : TEXT("");
+
+	if (!InClass->IsNative())
+	{
+		auto Index = 0;
+
+		if (ModuleName.FindLastChar(TEXT('/'), Index))
+		{
+			ModuleName.LeftInline(Index);
+		}
+	}
+
+	return GetModuleName(ModuleName);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InModuleName)
+{
+	FString ModuleName = InModuleName;
 
 	constexpr char Replace_ProModuleName[] = "/Game";
 
@@ -51,13 +77,6 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 		const int32 Const_Index = Size_ModuleName - Replace_Len;
 
 		ModuleName = FApp::GetProjectName() + ModuleName.Right(Const_Index);
-
-		auto Index = 0;
-
-		if (ModuleName.FindLastChar(TEXT('/'), Index))
-		{
-			ModuleName = ModuleName.Left(Index);
-		}
 	}
 	else
 	{

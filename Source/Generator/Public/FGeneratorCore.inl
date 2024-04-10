@@ -7,13 +7,19 @@ FString FGeneratorCore::GetFileName(const T* InField)
 {
 	if constexpr (std::is_same_v<T, FDelegateProperty> || std::is_same_v<T, FMulticastDelegateProperty>)
 	{
-		auto ModuleName = FPaths::Combine(
-			InField->SignatureFunction->GetPackage()->GetName().StartsWith(TEXT("/Game"))
-				? FApp::GetProjectName()
-				: TEXT("")
-			, FUnrealCSharpFunctionLibrary::GetClassNameSpace(InField)
+		FString ModuleName;
+
+		if (InField->SignatureFunction->GetPackage()->GetName().StartsWith(TEXT("/Game")))
+		{
+			ModuleName = FPaths::Combine(FApp::GetProjectName(), FUnrealCSharpFunctionLibrary::GetClassNameSpace(InField)
+				.Replace(TEXT("."), TEXT("/")).Replace(TEXT("Script/"), TEXT("/")).Replace(TEXT("/Game/"), TEXT("/")));
+		}
+		else
+		{
+			ModuleName = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InField)
 			  .Replace(TEXT("."), TEXT("/"))
-			  .Replace(TEXT("Script/"), TEXT("")));
+			  .Replace(TEXT("Script/"), TEXT(""));
+		}
 
 		auto DirectoryName = FPaths::Combine(
 			FUnrealCSharpFunctionLibrary::GetGenerationPath(InField->SignatureFunction), ModuleName);
