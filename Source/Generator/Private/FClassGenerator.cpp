@@ -41,6 +41,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
+	if (FGeneratorCore::IsSkip(InClass))
+	{
+		return;
+	}
+
 	if (!FGeneratorCore::IsSupported(InClass))
 	{
 		return;

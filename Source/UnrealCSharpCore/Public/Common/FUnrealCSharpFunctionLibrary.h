@@ -68,7 +68,11 @@ public:
 
 	static FString GetPluginPath();
 
+	static FString GetUEScriptPath();
+
 	static FString GetAssemblyUtilPath();
+
+	static bool IsEngineType(const UField* InField);
 
 	static FString GetGenerationPath(const UField* InField);
 

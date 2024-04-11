@@ -2,7 +2,7 @@
 
 namespace Script.CoreUObject
 {
-    public class TFieldPath<T> where T : FField
+    public class TFieldPath<T> : IGarbageCollectionHandle where T : FField
     {
         public TFieldPath()
         {
@@ -13,5 +13,7 @@ namespace Script.CoreUObject
         public T Get() => Value;
 
         private readonly T Value;
+
+        public nint GarbageCollectionHandle { get; set; }
     }
 }

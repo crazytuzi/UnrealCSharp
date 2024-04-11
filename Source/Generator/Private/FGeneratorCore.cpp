@@ -10,6 +10,10 @@
 #include "CoreMacro/PropertyMacro.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 
+bool FGeneratorCore::bIsSkipGenerateEngineModules;
+
+bool FGeneratorCore::bIsGenerateAllModules;
+
 TArray<FString> FGeneratorCore::SupportedModule;
 
 TArray<FName> FGeneratorCore::SupportedAssetPath;
@@ -617,9 +621,16 @@ bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& St
 	                                     FILEWRITE_None);
 }
 
+bool FGeneratorCore::IsSkip(const UField* InField)
+{
+	return bIsSkipGenerateEngineModules && FUnrealCSharpFunctionLibrary::IsEngineType(InField);
+}
+
 bool FGeneratorCore::IsSupported(FProperty* Property)
 {
 	if (Property == nullptr) return false;
+
+	if (bIsGenerateAllModules) return true;
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
 	{
@@ -729,6 +740,8 @@ bool FGeneratorCore::IsSupported(FProperty* Property)
 
 bool FGeneratorCore::IsSupported(const UClass* InClass)
 {
+	if (bIsGenerateAllModules) return true;
+
 	if (const auto FoundSupported = SupportedMap.Find(InClass))
 	{
 		return *FoundSupported;
@@ -768,6 +781,8 @@ bool FGeneratorCore::IsSupported(const UClass* InClass)
 
 bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 {
+	if (bIsGenerateAllModules) return true;
+
 	if (const auto FoundSupported = SupportedMap.Find(InFunction))
 	{
 		return *FoundSupported;
@@ -791,6 +806,8 @@ bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 
 bool FGeneratorCore::IsSupported(const UStruct* InStruct)
 {
+	if (bIsGenerateAllModules) return true;
+
 	if (const auto FoundSupported = SupportedMap.Find(InStruct))
 	{
 		return *FoundSupported;
@@ -820,6 +837,8 @@ bool FGeneratorCore::IsSupported(const UStruct* InStruct)
 
 bool FGeneratorCore::IsSupported(const UEnum* InEnum)
 {
+	if (bIsGenerateAllModules) return true;
+
 	if (const auto FoundSupported = SupportedMap.Find(InEnum))
 	{
 		return *FoundSupported;
@@ -865,6 +884,10 @@ void FGeneratorCore::BeginGenerator()
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
 	{
+		bIsSkipGenerateEngineModules = UnrealCSharpEditorSetting->IsSkipGenerateEngineModules();
+
+		bIsGenerateAllModules = UnrealCSharpEditorSetting->IsGenerateAllModules();
+
 		for (const auto& Module : UnrealCSharpEditorSetting->GetSupportedModule())
 		{
 			SupportedModule.Add(FString::Printf(TEXT(
@@ -916,6 +939,10 @@ void FGeneratorCore::BeginGenerator()
 
 void FGeneratorCore::EndGenerator()
 {
+	bIsSkipGenerateEngineModules = false;
+
+	bIsGenerateAllModules = false;
+
 	SupportedModule.Empty();
 
 	SupportedAssetPath.Empty();

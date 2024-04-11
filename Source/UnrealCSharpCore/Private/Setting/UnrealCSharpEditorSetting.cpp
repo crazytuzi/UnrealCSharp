@@ -3,14 +3,49 @@
 #include "ISettingsModule.h"
 #endif
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "UEVersion.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorSettings"
+
+UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer& ObjectInitializer):
+#if WITH_EDITOR
+	Super(ObjectInitializer),
+	bEnableCompiled(true),
+	bEnableAssetChanged(true),
+	bEnableDirectoryChanged(true),
+	bIsSkipGenerateEngineModules(false),
+	bIsGenerateAllModules(false)
+#else
+	Super(ObjectInitializer)
+#endif
+{
+}
 
 #if WITH_EDITOR
 void UUnrealCSharpEditorSetting::RegisterSettings()
 {
 	if (const auto SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
+		static TSet<FString> DefaultSupportedModules =
+		{
+			TEXT("Core"),
+			TEXT("CoreUObject"),
+			TEXT("Engine"),
+			TEXT("SlateCore"),
+#if UE_FIELD_NOTIFICATION
+			TEXT("FieldNotification"),
+#endif
+			TEXT("UMG"),
+			TEXT("UnrealCSharpCore"),
+		};
+
+		const auto MutableDefaultUnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
+
+		for (const auto& DefaultSupportedModule : DefaultSupportedModules)
+		{
+			MutableDefaultUnrealCSharpEditorSetting->SupportedModule.AddUnique(DefaultSupportedModule);
+		}
+
 		SettingsModule->RegisterSettings("Editor",
 		                                 "Plugins",
 		                                 "UnrealCSharpEditorSettings",
@@ -18,7 +53,7 @@ void UUnrealCSharpEditorSetting::RegisterSettings()
 		                                         "UnrealCSharp Editor Setting"),
 		                                 LOCTEXT("UnrealCSharpEditorSettingsDescription",
 		                                         "UnrealCSharp Editor Setting"),
-		                                 GetMutableDefault<UUnrealCSharpEditorSetting>());
+		                                 MutableDefaultUnrealCSharpEditorSetting);
 	}
 }
 
@@ -176,6 +211,31 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 #elif PLATFORM_MAC
 	return {TEXT("/usr/local/share/dotnet/dotnet")};
 #endif
+}
+
+bool UUnrealCSharpEditorSetting::EnableCompiled() const
+{
+	return bEnableCompiled;
+}
+
+bool UUnrealCSharpEditorSetting::EnableAssetChanged() const
+{
+	return bEnableAssetChanged;
+}
+
+bool UUnrealCSharpEditorSetting::EnableDirectoryChanged() const
+{
+	return bEnableDirectoryChanged;
+}
+
+bool UUnrealCSharpEditorSetting::IsSkipGenerateEngineModules() const
+{
+	return bIsSkipGenerateEngineModules;
+}
+
+bool UUnrealCSharpEditorSetting::IsGenerateAllModules() const
+{
+	return bIsGenerateAllModules;
 }
 
 const TArray<FString>& UUnrealCSharpEditorSetting::GetSupportedModule() const

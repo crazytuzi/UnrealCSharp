@@ -28,6 +28,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		return;
 	}
 
+	if (FGeneratorCore::IsSkip(InScriptStruct))
+	{
+		return;
+	}
+
 	if (!FGeneratorCore::IsSupported(InScriptStruct))
 	{
 		return;
