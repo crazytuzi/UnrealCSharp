@@ -22,8 +22,6 @@ void FDynamicGenerator::Generator()
 	{
 		FMonoDomain::Initialize({
 			"",
-			FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
-			FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + DLL_SUFFIX,
 			{
 				FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
 				DLL_SUFFIX,
@@ -81,8 +79,6 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 
 	FMonoDomain::Initialize({
 		"",
-		FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath() /
-		FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName() + DLL_SUFFIX,
 		{
 			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
 			DLL_SUFFIX,

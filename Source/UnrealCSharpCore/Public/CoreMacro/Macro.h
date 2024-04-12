@@ -16,8 +16,6 @@
 
 #define DYNAMIC FString(TEXT("Dynamic"))
 
-#define ASSEMBLY_UTIL FString(TEXT("AssemblyUtil"))
-
 #define TEMPLATE FString(TEXT("Template"))
 
 #define FODY_WEAVER_XML FString(TEXT("FodyWeavers.xml"))

@@ -43,6 +43,8 @@ public:
 
 	static MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator);
 
+	static MonoMethod* Class_Get_Method_From_Params(MonoClass* InMonoClass, const FString InMethodName, const TArray<MonoType*> InParams);
+
 	static MonoClass* Class_Get_Interfaces(MonoClass* InMonoClass, void** InIterator);
 
 	static MonoCustomAttrInfo* Custom_Attrs_From_Class(MonoClass* InMonoClass);
@@ -212,12 +214,12 @@ private:
 
 	static void RegisterBinding();
 
+	static MonoGCHandle AssemblyLoadContextGCHandle;
+
+	static MonoClass* AssemblyLoadContextClass;
+
 public:
 	static MonoDomain* Domain;
-
-	static MonoAssembly* AssemblyUtilAssembly;
-
-	static MonoImage* AssemblyUtilImage;
 
 	static TArray<MonoGCHandle> AssemblyGCHandles;
 
