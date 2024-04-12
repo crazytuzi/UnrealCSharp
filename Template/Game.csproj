@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\UE\UE.csproj" /> 
     <ProjectReference Include="..\..\Plugins\UnrealCSharp\Script\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    <ProjectReference Include="..\..\Plugins\UnrealCSharp\Script\Weavers\Weavers.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>	
   <ItemGroup>
     <PackageReference Include="Fody" Version="6.8.0">
