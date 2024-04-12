@@ -36,28 +36,32 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
-
-	const auto ModuleName = Package ? Package->GetName() : TEXT("");
-
-	return GetModuleName(ModuleName);
+	return GetModuleName(InField, [](FString& InModuleName){});
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UClass* InClass)
 {
-	const auto Package = InClass != nullptr ? InClass->GetPackage() : nullptr;
+	return GetModuleName(InClass, [InClass](FString& InModuleName)
+	{
+		if (!InClass->IsNative())
+		{
+			auto Index = 0;
+
+			if (InModuleName.FindLastChar(TEXT('/'), Index))
+			{
+				InModuleName.LeftInline(Index);
+			}
+		}
+	});
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField, const TFunction<void(FString& InModuleName)>& InGetModuleName)
+{
+	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
 
 	auto ModuleName = Package ? Package->GetName() : TEXT("");
 
-	if (!InClass->IsNative())
-	{
-		auto Index = 0;
-
-		if (ModuleName.FindLastChar(TEXT('/'), Index))
-		{
-			ModuleName.LeftInline(Index);
-		}
-	}
+	InGetModuleName(ModuleName);
 
 	return GetModuleName(ModuleName);
 }
@@ -235,7 +239,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FDelegateProperty*
 			"%s.%s"
 		),
 		                       *GetClassNameSpace(Class),
-		                       *SignatureFunction->GetOuter()->GetName());
+		                       *Class->GetName());
 	}
 
 	if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
@@ -298,7 +302,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 				"%s.%s"
 			),
 			                       *GetClassNameSpace(Class),
-			                       *SignatureFunction->GetOuter()->GetName());
+			                       *Class->GetName());
 		}
 		else
 		{
