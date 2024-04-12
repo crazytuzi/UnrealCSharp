@@ -644,6 +644,11 @@ MonoType* FMonoDomain::Property_Get_Type(MonoProperty* InMonoProperty)
 	return nullptr;
 }
 
+void* FMonoDomain::MethodGetUnmanagedThunk(MonoMethod* InMonoMethod)
+{
+	return mono_method_get_unmanaged_thunk(InMonoMethod);
+}
+
 MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath,
                                                void* InUserData)
 {

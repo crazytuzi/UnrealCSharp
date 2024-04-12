@@ -185,6 +185,8 @@ public:
 
 	static MonoType* Property_Get_Type(MonoProperty* InMonoProperty);
 
+	static void* MethodGetUnmanagedThunk(MonoMethod* InMonoMethod);
+
 public:
 	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath, void* InUserData);
 
