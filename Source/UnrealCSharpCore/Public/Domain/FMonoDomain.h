@@ -216,8 +216,6 @@ private:
 
 	static MonoGCHandle AssemblyLoadContextGCHandle;
 
-	static MonoClass* AssemblyLoadContextClass;
-
 public:
 	static MonoDomain* Domain;
 

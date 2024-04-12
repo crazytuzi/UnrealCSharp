@@ -29,8 +29,6 @@ bool FMonoDomain::bLoadSucceed;
 
 MonoGCHandle FMonoDomain::AssemblyLoadContextGCHandle = nullptr;
 
-MonoClass* FMonoDomain::AssemblyLoadContextClass = nullptr;
-
 #if PLATFORM_IOS
 extern void* mono_aot_module_System_Private_CoreLib_info;
 #endif
@@ -775,7 +773,7 @@ void FMonoDomain::InitializeAssemblyLoadContext()
 	auto Image = mono_assembly_get_image(Assembly);
 	check(Image != nullptr);
 
-	AssemblyLoadContextClass = mono_class_from_name(Image, "System.Runtime.Loader", "AssemblyLoadContext");
+	auto AssemblyLoadContextClass = mono_class_from_name(Image, "System.Runtime.Loader", "AssemblyLoadContext");
 	check(AssemblyLoadContextClass != nullptr);
 
 	void* Params[2];
@@ -796,11 +794,14 @@ void FMonoDomain::InitializeAssemblyLoadContext()
 
 void FMonoDomain::DeinitializeAssemblyLoadContext()
 {
-	if (AssemblyLoadContextGCHandle == nullptr || AssemblyLoadContextClass == nullptr)
+	if (AssemblyLoadContextGCHandle == nullptr)
 		return;
 
 	auto AssemblyLoadContextObject = FMonoDomain::GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
 	check(AssemblyLoadContextObject != nullptr);
+
+	auto AssemblyLoadContextClass = FMonoDomain::Object_Get_Class(AssemblyLoadContextObject);
+	check(AssemblyLoadContextClass != nullptr);
 
 	auto UnloadMethod = FMonoDomain::Class_Get_Method_From_Name(AssemblyLoadContextClass, TEXT("Unload"), 0);
 	check(UnloadMethod != nullptr);
@@ -842,12 +843,16 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 
 	auto TextReaderDisposeMethod = FMonoDomain::Class_Get_Method_From_Name(TextReaderClass, TEXT("Dispose"), 0);
 	check(TextReaderDisposeMethod != nullptr);
-	
-	auto AlcLoadFromStreamMethod = FMonoDomain::Class_Get_Method_From_Name(AssemblyLoadContextClass, "LoadFromStream", 1);
-	check(AlcLoadFromStreamMethod != nullptr);
 
 	auto AssemblyLoadContextObject = FMonoDomain::GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
 	check(AssemblyLoadContextObject != nullptr);
+
+	auto AssemblyLoadContextClass = FMonoDomain::Object_Get_Class(AssemblyLoadContextObject);
+	check(AssemblyLoadContextClass != nullptr);
+
+	auto AlcLoadFromStreamMethod = FMonoDomain::Class_Get_Method_From_Name(AssemblyLoadContextClass, "LoadFromStream", 1);
+	check(AlcLoadFromStreamMethod != nullptr);
+
 
 	for (const auto& AssemblyPath : InAssemblies)
 	{
