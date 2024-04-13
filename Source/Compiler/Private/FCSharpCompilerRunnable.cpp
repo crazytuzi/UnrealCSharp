@@ -6,6 +6,7 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "EditorStyleSet.h"
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),

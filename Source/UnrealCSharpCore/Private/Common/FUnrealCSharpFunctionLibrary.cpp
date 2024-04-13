@@ -37,7 +37,9 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	return GetModuleName(InField, [](FString& InModuleName){});
+	return GetModuleName(InField, [](FString&)
+	{
+	});
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UClass* InClass)
@@ -46,9 +48,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UClass* InClass)
 	{
 		if (!InClass->IsNative())
 		{
-			auto Index = 0;
-
-			if (InModuleName.FindLastChar(TEXT('/'), Index))
+			if (auto Index = 0; InModuleName.FindLastChar(TEXT('/'), Index))
 			{
 				InModuleName.LeftInline(Index);
 			}
@@ -56,7 +56,8 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UClass* InClass)
 	});
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField, const TFunction<void(FString& InModuleName)>& InGetModuleName)
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField,
+                                                    const TFunction<void(FString& InModuleName)>& InGetModuleName)
 {
 	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
 
@@ -69,17 +70,16 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField, const
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InModuleName)
 {
-	FString ModuleName = InModuleName;
+	auto ModuleName = InModuleName;
 
-	constexpr char Replace_ProModuleName[] = "/Game";
-
-	if (ModuleName.StartsWith(Replace_ProModuleName))
+	if (constexpr char ReplaceProjectModuleName[] = "/Game";
+		ModuleName.StartsWith(ReplaceProjectModuleName))
 	{
-		constexpr int32 Replace_Len = sizeof(Replace_ProModuleName) - 1;
+		constexpr auto ReplaceProjectModuleNameLength = sizeof(ReplaceProjectModuleName) - 1;
 
-		const int32 Size_ModuleName = ModuleName.Len();
+		const auto Size_ModuleName = ModuleName.Len();
 
-		const int32 Const_Index = Size_ModuleName - Replace_Len;
+		const auto Const_Index = Size_ModuleName - ReplaceProjectModuleNameLength;
 
 		ModuleName = FApp::GetProjectName() + ModuleName.Right(Const_Index);
 	}
@@ -89,6 +89,34 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InModuleName)
 	}
 
 	return ModuleName;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
+{
+	if (InStruct == nullptr)
+	{
+		return TEXT("");
+	}
+
+	return Encode(FString::Printf(TEXT(
+		"%s%s"
+	),
+	                              InStruct->IsNative() &&
+	                              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
+		                              ? InStruct->GetPrefixCPP()
+		                              : TEXT(""),
+	                              *InStruct->GetName()));
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
+{
+	return Encode(FString::Printf(TEXT(
+			"I%s"
+		),
+	                              InStruct->IsInBlueprint()
+		                              ? *GetFullClass(InStruct)
+		                              : *GetFullClass(InStruct).RightChop(1))
+	);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)

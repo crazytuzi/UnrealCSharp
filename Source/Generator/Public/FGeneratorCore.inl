@@ -8,13 +8,8 @@ FString FGeneratorCore::GetFileName(const T* InField)
 	if constexpr (std::is_same_v<T, FDelegateProperty> || std::is_same_v<T, FMulticastDelegateProperty>)
 	{
 		FString RelativeModuleName;
-		
-		const auto SignatureFunction = InField->SignatureFunction;
 
-		if (SignatureFunction == nullptr)
-		{
-			RelativeModuleName = TEXT("");
-		}
+		const auto SignatureFunction = InField->SignatureFunction;
 
 		if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
 		{
@@ -23,8 +18,8 @@ FString FGeneratorCore::GetFileName(const T* InField)
 				RelativeModuleName = FString::Printf(TEXT(
 					"%s/%s"
 				),
-									   *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
-									   *Class->GetName());
+				                                     *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
+				                                     *Class->GetName());
 			}
 			else
 			{
@@ -39,9 +34,7 @@ FString FGeneratorCore::GetFileName(const T* InField)
 
 		if (!InField->IsNative())
 		{
-			auto Index = 0;
-
-			if (RelativeModuleName.FindLastChar(TEXT('/'), Index))
+			if (auto Index = 0; RelativeModuleName.FindLastChar(TEXT('/'), Index))
 			{
 				RelativeModuleName.LeftInline(Index);
 			}
