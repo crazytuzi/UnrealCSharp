@@ -40,6 +40,8 @@ public:
 
 	static bool SaveStringToFile(const FString& FileName, const FString& String);
 
+	static bool IsSkip(const UField* InField);
+
 	static bool IsSupported(FProperty* Property);
 
 	static bool IsSupported(const UClass* InClass);
@@ -61,6 +63,10 @@ public:
 	static GENERATOR_API void EndGenerator();
 
 private:
+	static bool bIsSkipGenerateEngineModules;
+
+	static bool bIsGenerateAllModules;
+
 	static TArray<FString> SupportedModule;
 
 	static TArray<FName> SupportedAssetPath;

@@ -1,19 +1,6 @@
 ﻿#include "Reflection/Property/DelegateProperty/FDelegatePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
-#include "Bridge/FTypeBridge.h"
-
-FDelegatePropertyDescriptor::FDelegatePropertyDescriptor(FProperty* InProperty):
-	FPropertyDescriptor(InProperty),
-	Class(nullptr),
-	Type(nullptr)
-{
-	Class = FTypeBridge::GetMonoClass(DelegateProperty);
-
-	const auto FoundMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(Class);
-
-	Type = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(FoundMonoType);
-}
 
 void FDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -35,10 +22,10 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (DelegateProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
-		const auto SrcDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-			FDelegateHelper>(SrcMonoObject);
+		const auto SrcDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+			SrcGarbageCollectionHandle);
 
 		DelegateProperty->InitializeValue(Dest);
 

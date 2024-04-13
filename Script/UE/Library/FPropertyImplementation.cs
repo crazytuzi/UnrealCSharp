@@ -90,7 +90,7 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FProperty_SetObjectCompoundPropertyImplementation(nint InMonoObject,
-            uint InPropertyHash, object InValue);
+            uint InPropertyHash, nint InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern double FProperty_GetObjectDoublePropertyImplementation(nint InMonoObject,
@@ -186,7 +186,7 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FProperty_SetStructCompoundPropertyImplementation(nint InMonoObject,
-            uint InPropertyHash, object InValue);
+            uint InPropertyHash, nint InValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern double FProperty_GetStructDoublePropertyImplementation(nint InMonoObject,

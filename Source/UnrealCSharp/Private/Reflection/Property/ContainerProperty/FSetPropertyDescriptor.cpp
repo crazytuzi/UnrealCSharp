@@ -1,14 +1,6 @@
 ﻿#include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
-#include "Bridge/FTypeBridge.h"
-
-FSetPropertyDescriptor::FSetPropertyDescriptor(FProperty* InProperty):
-	FContainerPropertyDescriptor(InProperty),
-	Class(nullptr)
-{
-	Class = FTypeBridge::GetMonoClass(SetProperty);
-}
 
 void FSetPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -30,9 +22,10 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (SetProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(SrcMonoObject);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
+			SrcGarbageCollectionHandle);
 
 		SetProperty->InitializeValue(Dest);
 

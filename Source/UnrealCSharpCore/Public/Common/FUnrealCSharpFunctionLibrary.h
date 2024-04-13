@@ -12,6 +12,12 @@ public:
 public:
 	static FString GetModuleName(const UField* InField);
 
+	static FString GetModuleName(const UClass* InClass);
+
+	static FString GetModuleName(const UField* InField, const TFunction<void(FString& InModuleName)>& InGetModuleName);
+
+	static FString GetModuleName(const FString& InModuleName);
+
 	static FString GetFullClass(const UStruct* InStruct);
 
 	static FString GetFullInterface(const UStruct* InStruct);
@@ -66,7 +72,13 @@ public:
 
 	static FString GetAssemblyUtilProjectName();
 
+	static FString GetPluginPath();
+
+	static FString GetUEScriptPath();
+
 	static FString GetAssemblyUtilPath();
+
+	static bool IsEngineType(const UField* InField);
 
 	static FString GetGenerationPath(const UField* InField);
 

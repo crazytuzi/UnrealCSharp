@@ -1,9 +1,8 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPropertyDescriptor.h"
-#include "mono/metadata/object-forward.h"
+#include "Reflection/Property/FCompoundPropertyDescriptor.h"
 
-class FStructPropertyDescriptor final : public FPropertyDescriptor
+class FStructPropertyDescriptor final : public FCompoundPropertyDescriptor
 {
 public:
 	explicit FStructPropertyDescriptor(FProperty* InProperty);
@@ -22,6 +21,4 @@ private:
 	MonoObject* NewRef(void* InAddress) const;
 
 	MonoObject* NewWeakRef(const void* InAddress) const;
-
-	MonoClass* Class;
 };

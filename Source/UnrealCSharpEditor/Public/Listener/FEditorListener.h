@@ -10,13 +10,17 @@ public:
 	~FEditorListener();
 
 private:
-	static void OnPostEngineInit();
+	void OnPostEngineInit();
 
-	static void OnPreBeginPIE(const bool);
+	void OnPreBeginPIE(const bool);
 
-	static void OnPrePIEEnded(const bool);
+	void OnPrePIEEnded(const bool);
 
-	static void OnCancelPIEEnded();
+	void OnCancelPIEEnded();
+
+	void OnBeginGenerator();
+
+	void OnEndGenerator();
 
 	void OnFilesLoaded();
 
@@ -35,7 +39,7 @@ private:
 	void OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges);
 
 private:
-	static void OnAssetChanged(const TFunction<void()>& InGenerator);
+	void OnAssetChanged(const TFunction<void()>& InGenerator) const;
 
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
@@ -46,6 +50,10 @@ private:
 
 	FDelegateHandle OnCancelPIEDelegateHandle;
 
+	FDelegateHandle OnBeginGeneratorDelegateHandle;
+
+	FDelegateHandle OnEndGeneratorDelegateHandle;
+
 	FDelegateHandle OnMainFrameCreationFinishedDelegateHandle;
 
 	FDelegateHandle OnDirectoryChangedDelegateHandle;
@@ -53,5 +61,7 @@ private:
 private:
 	TArray<FFileChangeData> FileChanges;
 
-	static bool bIsPIEPlaying;
+	bool bIsPIEPlaying;
+
+	bool bIsGenerating;
 };

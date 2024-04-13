@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
 
@@ -10,16 +9,6 @@ namespace Script.CoreUObject
         public TMap() => TMapImplementation.TMap_RegisterImplementation(this);
 
         ~TMap() => TMapImplementation.TMap_UnRegisterImplementation(GarbageCollectionHandle);
-
-        [Obsolete("It is not supported like UE.", true)]
-        public static bool operator ==(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
-
-        [Obsolete("It is not supported like UE.", true)]
-        public static bool operator !=(TMap<TKey, TValue> A, TMap<TKey, TValue> B) => false;
-
-        public override bool Equals(object Other) => false;
-
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {

@@ -41,6 +41,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
+	if (FGeneratorCore::IsSkip(InClass))
+	{
+		return;
+	}
+
 	if (!FGeneratorCore::IsSupported(InClass))
 	{
 		return;
@@ -542,7 +547,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
 			                                        IsEmpty()),
 		                                        bIsStatic == true
-			                                        ? TEXT("StaticClass().GarbageCollectionHandle")
+			                                        ? *FString::Printf(
+				                                        TEXT("StaticClass().%s"),
+				                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE)
 			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                        *FunctionNames[FunctionNames.Num() - 1].Key,
 		                                        FunctionRefParamIndex.IsEmpty() && FunctionOutParamIndex.IsEmpty()
@@ -1036,6 +1043,11 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	{
 		// @TODO
 
+		return FString::Printf(TEXT(" = null"));
+	}
+
+	if (CastField<FDelegateProperty>(InProperty))
+	{
 		return FString::Printf(TEXT(" = null"));
 	}
 

@@ -41,7 +41,8 @@ public class Compiler : ModuleRules
 				"SlateCore",
 				"Json",
 				"UnrealCSharpCore",
-				"CrossVersion"
+				"CrossVersion",
+				"EditorStyle"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

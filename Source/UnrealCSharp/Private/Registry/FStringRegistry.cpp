@@ -30,8 +30,6 @@ void FStringRegistry::Deinitialize()
 
 	NameGarbageCollectionHandle2Address.Empty();
 
-	NameMonoObject2Address.Empty();
-
 	NameAddress2GarbageCollectionHandle.Empty();
 
 	for (auto& Pair : StringGarbageCollectionHandle2Address.Get())
@@ -48,8 +46,6 @@ void FStringRegistry::Deinitialize()
 
 	StringGarbageCollectionHandle2Address.Empty();
 
-	StringMonoObject2Address.Empty();
-
 	StringAddress2GarbageCollectionHandle.Empty();
 
 	for (auto& Pair : TextGarbageCollectionHandle2Address.Get())
@@ -65,8 +61,6 @@ void FStringRegistry::Deinitialize()
 	}
 
 	TextGarbageCollectionHandle2Address.Empty();
-
-	TextMonoObject2Address.Empty();
 
 	TextAddress2GarbageCollectionHandle.Empty();
 }

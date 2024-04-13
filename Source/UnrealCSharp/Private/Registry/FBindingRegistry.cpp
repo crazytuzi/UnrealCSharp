@@ -30,8 +30,6 @@ void FBindingRegistry::Deinitialize()
 
 	GarbageCollectionHandle2BindingAddress.Empty();
 
-	MonoObject2BindingAddress.Empty();
-
 	BindingAddress2GarbageCollectionHandle.Empty();
 }
 
@@ -54,8 +52,6 @@ bool FBindingRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbage
 
 			FoundValue->AddressWrapper = nullptr;
 		}
-
-		MonoObject2BindingAddress.Remove(InGarbageCollectionHandle);
 
 		GarbageCollectionHandle2BindingAddress.Remove(InGarbageCollectionHandle);
 

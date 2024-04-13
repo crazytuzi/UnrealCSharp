@@ -66,7 +66,8 @@ public class UnrealCSharpCore : ModuleRules
 				"Slate",
 				"SlateCore",
 				"Json",
-				"CrossVersion"
+				"CrossVersion",
+				"Projects"
 				// ... add private dependencies that you statically link with here ...	
 			}
 		);

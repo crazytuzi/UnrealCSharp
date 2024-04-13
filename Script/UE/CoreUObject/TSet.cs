@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
 
@@ -10,16 +9,6 @@ namespace Script.CoreUObject
         public TSet() => TSetImplementation.TSet_RegisterImplementation(this);
 
         ~TSet() => TSetImplementation.TSet_UnRegisterImplementation(GarbageCollectionHandle);
-
-        [Obsolete("It is not supported like UE.", true)]
-        public static bool operator ==(TSet<T> A, TSet<T> B) => false;
-
-        [Obsolete("It is not supported like UE.", true)]
-        public static bool operator !=(TSet<T> A, TSet<T> B) => false;
-
-        public override bool Equals(object Other) => false;
-
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
 
         public IEnumerator<T> GetEnumerator()
         {

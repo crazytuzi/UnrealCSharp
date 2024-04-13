@@ -1,13 +1,9 @@
 ﻿#include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
 
 FStructPropertyDescriptor::FStructPropertyDescriptor(FProperty* InProperty):
-	FPropertyDescriptor(InProperty),
-	Class(nullptr)
+	FCompoundPropertyDescriptor(InProperty)
 {
-	Class = FTypeBridge::GetMonoClass(StructProperty);
-
 	FCSharpEnvironment::GetEnvironment().Bind(StructProperty->Struct, false);
 }
 
@@ -28,7 +24,10 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (StructProperty != nullptr)
 	{
-		if (const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(static_cast<MonoObject*>(Src)))
+		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+
+		if (const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(
+			SrcGarbageCollectionHandle))
 		{
 			StructProperty->InitializeValue(Dest);
 
@@ -44,7 +43,7 @@ bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const ui
 		const auto StructA = StructProperty->ContainerPtrToValuePtr<void>(A);
 
 		const auto StructB = FCSharpEnvironment::GetEnvironment().GetStruct(
-			static_cast<MonoObject*>(const_cast<void*>(B)));
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
 
 		return StructProperty->Identical(StructA, StructB, PortFlags);
 	}

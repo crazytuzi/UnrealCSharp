@@ -9,6 +9,9 @@ class UNREALCSHARPCORE_API UUnrealCSharpEditorSetting : public UObject
 	GENERATED_BODY()
 
 public:
+	explicit UUnrealCSharpEditorSetting(const FObjectInitializer& ObjectInitializer);
+
+public:
 #if WITH_EDITOR
 	static void RegisterSettings();
 
@@ -22,6 +25,21 @@ public:
 
 	UFUNCTION()
 	TArray<FString> GetDotNetPathArray() const;
+
+	UFUNCTION()
+	bool EnableCompiled() const;
+
+	UFUNCTION()
+	bool EnableAssetChanged() const;
+
+	UFUNCTION()
+	bool EnableDirectoryChanged() const;
+
+	UFUNCTION()
+	bool IsSkipGenerateEngineModules() const;
+
+	UFUNCTION()
+	bool IsGenerateAllModules() const;
 
 	UFUNCTION()
 	const TArray<FString>& GetSupportedModule() const;
@@ -41,7 +59,23 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = DotNet, meta = (GetOptions = "GetDotNetPathArray"))
 	FString DotNetPath = TEXT("");
 
-	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (GetOptions = "GetModuleList"))
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableCompiled;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableAssetChanged;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableDirectoryChanged;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bIsSkipGenerateEngineModules;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bIsGenerateAllModules;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator,
+		meta = (GetOptions = "GetModuleList", EditCondition = "!bIsGenerateAllModules"))
 	TArray<FString> SupportedModule;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (GetOptions = "GetModuleList"))

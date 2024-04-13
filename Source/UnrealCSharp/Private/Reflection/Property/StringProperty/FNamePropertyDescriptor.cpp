@@ -1,19 +1,16 @@
 ﻿#include "Reflection/Property/StringProperty/FNamePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
 
 FNamePropertyDescriptor::FNamePropertyDescriptor(FProperty* InProperty):
-	FPropertyDescriptor(InProperty),
-	Class(nullptr)
+	FCompoundPropertyDescriptor(InProperty)
 {
-	Class = FTypeBridge::GetMonoClass(NameProperty);
 }
 
 void FNamePropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (NameProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
 	}
 }
 
@@ -21,9 +18,10 @@ void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (NameProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
-		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FName>(SrcMonoObject))
+		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FName>(
+			SrcGarbageCollectionHandle))
 		{
 			NameProperty->InitializeValue(Dest);
 
@@ -39,7 +37,7 @@ bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint
 		const auto NameA = NameProperty->GetPropertyValue(A);
 
 		const auto NameB = FCSharpEnvironment::GetEnvironment().GetString<FName>(
-			static_cast<MonoObject*>(const_cast<void*>(B)));
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
 
 		return NameA == *NameB;
 	}
@@ -47,7 +45,7 @@ bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint
 	return false;
 }
 
-MonoObject* FNamePropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FNamePropertyDescriptor::NewWeakRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetStringObject<FName>(InAddress);
 
