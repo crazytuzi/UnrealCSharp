@@ -1,19 +1,11 @@
 ﻿#include "Reflection/Property/ObjectProperty/FSoftClassPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
-
-FSoftClassPropertyDescriptor::FSoftClassPropertyDescriptor(FProperty* InProperty):
-	FObjectPropertyDescriptor(InProperty),
-	Class(nullptr)
-{
-	Class = FTypeBridge::GetMonoClass(SoftClassProperty);
-}
 
 void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (SoftClassProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
 	}
 }
 
@@ -21,9 +13,10 @@ void FSoftClassPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (SoftClassProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
-		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(SrcMonoObject);
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
+			SrcGarbageCollectionHandle);
 
 		SoftClassProperty->InitializeValue(Dest);
 
@@ -38,7 +31,7 @@ bool FSoftClassPropertyDescriptor::Identical(const void* A, const void* B, const
 		const auto ClassA = SoftClassProperty->GetObjectPropertyValue(A);
 
 		const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
-			static_cast<MonoObject*>(const_cast<void*>(B)))->Get();
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
 
 		return SoftClassProperty->StaticIdentical(ClassA, ClassB, PortFlags);
 	}
@@ -46,7 +39,7 @@ bool FSoftClassPropertyDescriptor::Identical(const void* A, const void* B, const
 	return false;
 }
 
-MonoObject* FSoftClassPropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FSoftClassPropertyDescriptor::NewWeakRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftClassPtr<UObject>>(InAddress);
 

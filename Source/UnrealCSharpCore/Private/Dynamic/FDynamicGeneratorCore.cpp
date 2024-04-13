@@ -6,6 +6,7 @@
 #include "CoreMacro/ClassAttributeMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/ClassMacro.h"
+#include "CoreMacro/PropertyMacro.h"
 #include "CoreMacro/PropertyAttributeMacro.h"
 #include "CoreMacro/FunctionAttributeMacro.h"
 #include "CoreMacro/GenericAttributeMacro.h"
@@ -414,12 +415,41 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_ATTRIBUTE))
 	{
-		// @TODO
+		InProperty->SetPropertyFlags(CPF_Net);
+
+		if (const auto FoundMonoObject = AttrsGetAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_ATTRIBUTE))
+		{
+			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
+				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_LIFETIME_CONDITION))
+			{
+				InProperty->SetBlueprintReplicationCondition(
+					static_cast<ELifetimeCondition>(*static_cast<uint8*>(FMonoDomain::Object_Unbox(
+						FMonoDomain::Property_Get_Value(FoundProperty, FoundMonoObject, nullptr, nullptr)))));
+			}
+		}
 	}
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_USING_ATTRIBUTE))
 	{
-		// @TODO
+		InProperty->SetPropertyFlags(CPF_Net | CPF_RepNotify);
+
+		if (const auto FoundMonoObject = AttrsGetAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_USING_ATTRIBUTE))
+		{
+			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
+				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_LIFETIME_CONDITION))
+			{
+				InProperty->SetBlueprintReplicationCondition(
+					static_cast<ELifetimeCondition>(*static_cast<uint8*>(FMonoDomain::Object_Unbox(
+						FMonoDomain::Property_Get_Value(FoundProperty, FoundMonoObject, nullptr, nullptr)))));
+			}
+
+			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
+				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_REP_CALLBACK_NAME))
+			{
+				InProperty->RepNotifyFunc = FName(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(
+					(MonoString*)FMonoDomain::Property_Get_Value(FoundProperty, FoundMonoObject, nullptr, nullptr))));
+			}
+		}
 	}
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NOT_REPLICATED_ATTRIBUTE))
@@ -582,14 +612,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVER_ATTRIBUTE))
 	{
-		if ((InFunction->FunctionFlags & FUNC_BlueprintEvent) != 0)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as Client or Server"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetServer;
@@ -601,14 +623,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 	}
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLIENT_ATTRIBUTE))
 	{
-		if ((InFunction->FunctionFlags & FUNC_BlueprintEvent) != 0)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as Client or Server"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetClient;
@@ -616,14 +630,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NET_MULTICAST_ATTRIBUTE))
 	{
-		if ((InFunction->FunctionFlags & FUNC_BlueprintEvent) != 0)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as Client or Server"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetMulticast;
@@ -631,14 +637,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_REQUEST_ATTRIBUTE))
 	{
-		if ((InFunction->FunctionFlags & FUNC_BlueprintEvent) != 0)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as a ServiceRequest"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetReliable;
@@ -651,14 +649,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 	}
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_RESPONSE_ATTRIBUTE))
 	{
-		if (InFunction->FunctionFlags & FUNC_BlueprintEvent)
-		{
-			UE_LOG(LogUnrealCSharp, Error,
-			       TEXT(
-				       "BlueprintImplementableEvent or BlueprintNativeEvent functions cannot be declared as a ServiceResponse"
-			       ));
-		}
-
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetReliable;
@@ -743,8 +733,6 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 	if (InFunction->FunctionFlags & FUNC_Net)
 	{
 		InFunction->FunctionFlags |= FUNC_Event;
-
-		ensure(!(InFunction->FunctionFlags & (FUNC_BlueprintEvent | FUNC_Exec)));
 
 		const auto bIsNetService = !!(InFunction->FunctionFlags & (FUNC_NetRequest | FUNC_NetResponse));
 
@@ -878,6 +866,18 @@ bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInf
 	}
 
 	return false;
+}
+
+MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo,
+                                                const FString& InAttributeName)
+{
+	if (const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttributeName))
+	{
+		return FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, AttributeMonoClass);
+	}
+
+	return nullptr;
 }
 
 void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* InField,

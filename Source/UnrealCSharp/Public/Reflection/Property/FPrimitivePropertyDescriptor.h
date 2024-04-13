@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Reflection/Property/FPropertyDescriptor.h"
-#include "mono/metadata/object-forward.h"
+#include "mono/metadata/details/object-types.h"
 
 class FPrimitivePropertyDescriptor : public FPropertyDescriptor
 {
@@ -18,6 +18,6 @@ public:
 public:
 	virtual bool IsPrimitiveProperty() const override;
 
-private:
+protected:
 	MonoClass* Class;
 };

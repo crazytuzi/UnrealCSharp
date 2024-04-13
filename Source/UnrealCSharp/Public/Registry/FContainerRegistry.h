@@ -27,7 +27,7 @@ public:
 	{
 	};
 
-	template <typename T, typename O, O, typename P, P, typename Q, Q>
+	template <typename T, typename P, P, typename Q, Q>
 	struct TContainerRegistryImplementation
 	{
 	};
@@ -45,19 +45,13 @@ public:
 private:
 	FArrayHelperValueMapping::FGarbageCollectionHandle2Value ArrayGarbageCollectionHandle2Helper;
 
-	FArrayHelperValueMapping::FMonoObject2Value ArrayMonoObject2Helper;
-
 	FArrayHelperValueMapping::FAddress2GarbageCollectionHandle ArrayAddress2GarbageCollectionHandle;
 
 	FMapHelperValueMapping::FGarbageCollectionHandle2Value MapGarbageCollectionHandle2Helper;
 
-	FMapHelperValueMapping::FMonoObject2Value MapMonoObject2Helper;
-
 	FMapHelperValueMapping::FAddress2GarbageCollectionHandle MapAddress2GarbageCollectionHandle;
 
 	FSetHelperValueMapping::FGarbageCollectionHandle2Value SetGarbageCollectionHandle2Helper;
-
-	FSetHelperValueMapping::FMonoObject2Value SetMonoObject2Helper;
 
 	FSetHelperValueMapping::FAddress2GarbageCollectionHandle SetAddress2GarbageCollectionHandle;
 };

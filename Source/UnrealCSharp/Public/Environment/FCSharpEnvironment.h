@@ -64,7 +64,7 @@ public:
 
 	void RemoveClassDescriptor(const UStruct* InStruct) const;
 
-	FFunctionDescriptor* GetOrAddFunctionDescriptor(const UStruct* InStruct, const FName& InFunctionName) const;
+	FFunctionDescriptor* GetOrAddFunctionDescriptor(const UStruct* InStruct, const FString& InFunctionName) const;
 
 	FFunctionDescriptor* GetFunctionDescriptor(uint32 InFunctionHash) const;
 
@@ -72,7 +72,8 @@ public:
 
 	void AddFunctionDescriptor(uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor) const;
 
-	void AddFunctionHash(uint32 InFunctionHash, FClassDescriptor* InClassDescriptor, const FName& InFunctionName) const;
+	void AddFunctionHash(uint32 InFunctionHash, FClassDescriptor* InClassDescriptor,
+	                     const FString& InFunctionName) const;
 
 	void RemoveFunctionDescriptor(uint32 InFunctionHash) const;
 
@@ -80,7 +81,8 @@ public:
 
 	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor) const;
 
-	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor, const FName& InPropertyName) const;
+	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
+	                     const FString& InPropertyName) const;
 
 	void RemovePropertyDescriptor(uint32 InPropertyHash) const;
 
@@ -91,18 +93,12 @@ public:
 	template <typename T, typename U>
 	auto GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	template <typename T, typename U>
-	auto GetAddress(const MonoObject* InMonoObject) const;
-
 	bool AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const;
 
 	MonoObject* GetObject(const UObject* InObject) const;
 
 	template <typename T = UObject>
 	auto GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-	template <typename T = UObject>
-	auto GetObject(const MonoObject* InMonoObject) const;
 
 	bool RemoveObjectReference(const UObject* InObject) const;
 
@@ -118,8 +114,6 @@ public:
 
 	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	void* GetStruct(const MonoObject* InMonoObject) const;
-
 	bool RemoveStructReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject) const;
@@ -129,9 +123,6 @@ public:
 public:
 	template <typename T>
 	auto GetContainer(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-	template <typename T>
-	auto GetContainer(const MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto GetContainerObject(void* InAddress) const;
@@ -175,8 +166,6 @@ private:
 	public:
 		T* operator()(const FCSharpEnvironment* InEnvironment,
 		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
 	};
 
 	template <typename T>
@@ -185,16 +174,11 @@ private:
 	public:
 		T* operator()(const FCSharpEnvironment* InEnvironment,
 		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-		T* operator()(const FCSharpEnvironment* InEnvironment, const MonoObject* InMonoObject) const;
 	};
 
 public:
 	template <typename T>
 	auto GetMulti(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-	template <typename T>
-	auto GetMulti(const MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto GetMultiObject(void* InAddress) const;
@@ -210,9 +194,6 @@ public:
 	auto GetString(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	template <typename T>
-	auto GetString(const MonoObject* InMonoObject) const;
-
-	template <typename T>
 	auto GetStringObject(void* InAddress) const;
 
 	template <typename T>
@@ -226,9 +207,6 @@ public:
 
 	template <typename T>
 	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-	template <typename T>
-	auto GetBinding(const MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject, bool bNeedFree = true) const;
@@ -254,11 +232,6 @@ public:
 		{
 			return InEnvironment.GetObject<T>(InGarbageCollectionHandle);
 		}
-
-		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
-		{
-			return InEnvironment.GetObject<T>(InMonoObject);
-		}
 	};
 
 	template <typename T>
@@ -269,11 +242,6 @@ public:
 		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
 			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
-		}
-
-		T* operator()(const FCSharpEnvironment& InEnvironment, const MonoObject* InMonoObject) const
-		{
-			return static_cast<T*>(InEnvironment.GetStruct(InMonoObject));
 		}
 	};
 

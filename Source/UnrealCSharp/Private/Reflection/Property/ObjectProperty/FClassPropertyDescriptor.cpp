@@ -1,19 +1,11 @@
 ﻿#include "Reflection/Property/ObjectProperty/FClassPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Bridge/FTypeBridge.h"
-
-FClassPropertyDescriptor::FClassPropertyDescriptor(FProperty* InProperty):
-	FObjectPropertyDescriptor(InProperty),
-	Class(nullptr)
-{
-	Class = FTypeBridge::GetMonoClass(ClassProperty);
-}
 
 void FClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 	if (ClassProperty != nullptr)
 	{
-		*Dest = Object_New(Src);
+		*Dest = NewWeakRef(Src);
 	}
 }
 
@@ -21,9 +13,10 @@ void FClassPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (ClassProperty != nullptr)
 	{
-		const auto SrcMonoObject = static_cast<MonoObject*>(Src);
+		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
-		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(SrcMonoObject);
+		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
+			SrcGarbageCollectionHandle);
 
 		ClassProperty->InitializeValue(Dest);
 
@@ -41,7 +34,7 @@ bool FClassPropertyDescriptor::Identical(const void* A, const void* B, const uin
 		const auto ClassA = Cast<UClass>(ClassProperty->GetObjectPropertyValue(A));
 
 		const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-			static_cast<MonoObject*>(const_cast<void*>(B)))->Get();
+			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
 
 		return ClassProperty->StaticIdentical(ClassA, ClassB, PortFlags);
 	}
@@ -49,7 +42,7 @@ bool FClassPropertyDescriptor::Identical(const void* A, const void* B, const uin
 	return false;
 }
 
-MonoObject* FClassPropertyDescriptor::Object_New(void* InAddress) const
+MonoObject* FClassPropertyDescriptor::NewWeakRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(InAddress);
 

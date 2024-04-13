@@ -1,12 +1,11 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPropertyDescriptor.h"
-#include "mono/metadata/object-forward.h"
+#include "Reflection/Property/FPrimitivePropertyDescriptor.h"
 
-class FEnumPropertyDescriptor final : public FPropertyDescriptor
+class FEnumPropertyDescriptor final : public FPrimitivePropertyDescriptor
 {
 public:
-	explicit FEnumPropertyDescriptor(FProperty* InProperty);
+	using FPrimitivePropertyDescriptor::FPrimitivePropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;
@@ -17,9 +16,4 @@ public:
 
 public:
 	virtual void DestroyValue(void* Dest) const override;
-
-	virtual bool IsPrimitiveProperty() const override;
-
-private:
-	MonoClass* Class;
 };

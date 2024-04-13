@@ -7,20 +7,28 @@ struct TArgument
 {
 };
 
+template <typename T, bool bIsPrimitive = TIsPrimitive<T>::Value>
+struct TBaseArgument
+{
+};
+
 template <typename T, typename Enable = void>
-struct TParentArgument
+struct TCompoundArgument
 {
 };
 
 template <typename T>
-struct TBaseArgument
+struct TBaseArgument<T, true>
 {
 	using Type = T;
 
 	TBaseArgument() = default;
 
 	explicit TBaseArgument(MonoObject* InMonoObject):
-		Value{TPropertyValue<Type, Type>::Set(InMonoObject)}
+		Value
+		{
+			*(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InMonoObject)
+		}
 	{
 	}
 
@@ -40,24 +48,60 @@ struct TBaseArgument
 	}
 
 protected:
-	Type Value;
+	T Value;
 };
 
 template <typename T>
-struct TSingleArgument :
+struct TBaseArgument<T, false>
+{
+	using Type = T;
+
+	TBaseArgument() = default;
+
+	explicit TBaseArgument(MonoObject* InMonoObject):
+		Value
+		{
+			TPropertyValue<Type, Type>::Set(
+				*static_cast<FGarbageCollectionHandle*>(
+					FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InMonoObject)))
+		}
+	{
+	}
+
+	Type& Get()
+	{
+		return Value;
+	}
+
+	MonoObject* Set()
+	{
+		return TPropertyValue<Type, Type>::Get(const_cast<std::decay_t<T>*>(&Value));
+	}
+
+	constexpr bool IsRef() const
+	{
+		return TTypeInfo<T>::Get()->IsRef();
+	}
+
+protected:
+	T Value;
+};
+
+template <typename T>
+struct TPrimitiveArgument :
 	TBaseArgument<T>
 {
 	using TBaseArgument<T>::TBaseArgument;
 };
 
 template <typename T>
-struct TParentArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>> || std::is_same_v<
-	                                           std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
+struct TCompoundArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>> || std::is_same_v<
+	                                             std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
 	TBaseArgument<T>
 {
-	using Super = TBaseArgument<T>;
+	using TBaseArgument<T>::TBaseArgument;
 
-	using Super::TBaseArgument;
+	using Super = TBaseArgument<T>;
 
 	using Type = typename Super::Type;
 
@@ -75,8 +119,8 @@ struct TParentArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_refere
 };
 
 template <typename T>
-struct TParentArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>> && !std::is_same_v<
-	                                           std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
+struct TCompoundArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>> && !std::is_same_v<
+	                                             std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
 	TBaseArgument<std::decay_t<T>>
 {
 	using TBaseArgument<std::decay_t<T>>::TBaseArgument;
@@ -89,9 +133,9 @@ struct TParentArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_referen
 
 template <typename T>
 struct TStringArgument :
-	TParentArgument<std::decay_t<T>, std::decay_t<T>>
+	TCompoundArgument<std::decay_t<T>, std::decay_t<T>>
 {
-	using TParentArgument<std::decay_t<T>, std::decay_t<T>>::TParentArgument;
+	using TCompoundArgument<std::decay_t<T>, std::decay_t<T>>::TCompoundArgument;
 
 	constexpr bool IsRef() const
 	{
@@ -101,9 +145,9 @@ struct TStringArgument :
 
 template <typename T>
 struct TContainerArgument :
-	TParentArgument<std::decay_t<T>, std::decay_t<T>>
+	TCompoundArgument<std::decay_t<T>, std::decay_t<T>>
 {
-	using TParentArgument<std::decay_t<T>, std::decay_t<T>>::TParentArgument;
+	using TCompoundArgument<std::decay_t<T>, std::decay_t<T>>::TCompoundArgument;
 
 	constexpr bool IsRef() const
 	{
@@ -113,100 +157,100 @@ struct TContainerArgument :
 
 template <typename T>
 struct TMultiArgument :
-	TParentArgument<T, T>
+	TCompoundArgument<T, T>
 {
-	using TParentArgument<T, T>::TParentArgument;
+	using TCompoundArgument<T, T>::TCompoundArgument;
 };
 
 template <typename T>
 struct TBindingArgument :
-	TParentArgument<T, T>
+	TCompoundArgument<T, T>
 {
-	using TParentArgument<T, T>::TParentArgument;
+	using TCompoundArgument<T, T>::TCompoundArgument;
 };
 
 template <typename T>
 struct TScriptStructArgument :
-	TParentArgument<T, T>
+	TCompoundArgument<T, T>
 {
-	using TParentArgument<T, T>::TParentArgument;
+	using TCompoundArgument<T, T>::TCompoundArgument;
 };
 
 template <typename T>
 struct TBindingEnumArgument :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
@@ -226,9 +270,9 @@ struct TArgument<T,
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
@@ -247,9 +291,9 @@ struct TArgument<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>> :
-	TParentArgument<T, T>
+	TCompoundArgument<T, T>
 {
-	using TParentArgument<T, T>::TParentArgument;
+	using TCompoundArgument<T, T>::TCompoundArgument;
 };
 
 template <typename T>
@@ -289,9 +333,9 @@ struct TArgument<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value, 
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
@@ -337,16 +381,16 @@ struct TArgument<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>> :
 template <typename T>
 struct TArgument<T,
                  std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>
 struct TArgument<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value, T>> :
-	TSingleArgument<T>
+	TPrimitiveArgument<T>
 {
-	using TSingleArgument<T>::TSingleArgument;
+	using TPrimitiveArgument<T>::TPrimitiveArgument;
 };
 
 template <typename T>

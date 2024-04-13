@@ -30,8 +30,6 @@ void FContainerRegistry::Deinitialize()
 
 	ArrayGarbageCollectionHandle2Helper.Empty();
 
-	ArrayMonoObject2Helper.Empty();
-
 	ArrayAddress2GarbageCollectionHandle.Empty();
 
 	for (auto& Pair : MapGarbageCollectionHandle2Helper.Get())
@@ -48,8 +46,6 @@ void FContainerRegistry::Deinitialize()
 
 	MapGarbageCollectionHandle2Helper.Empty();
 
-	MapMonoObject2Helper.Empty();
-
 	MapAddress2GarbageCollectionHandle.Empty();
 
 	for (auto& Pair : SetGarbageCollectionHandle2Helper.Get())
@@ -65,8 +61,6 @@ void FContainerRegistry::Deinitialize()
 	}
 
 	SetGarbageCollectionHandle2Helper.Empty();
-
-	SetMonoObject2Helper.Empty();
 
 	SetAddress2GarbageCollectionHandle.Empty();
 }

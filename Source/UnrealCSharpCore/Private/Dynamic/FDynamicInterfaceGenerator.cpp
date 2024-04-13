@@ -44,16 +44,11 @@ bool FDynamicInterfaceGenerator::IsDynamicInterface(MonoClass* InMonoClass)
 	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_INTERFACE_ATTRIBUTE);
 }
 
-FString FDynamicInterfaceGenerator::GetMonoClassName(const FString& InName)
+MonoClass* FDynamicInterfaceGenerator::GetMonoClass(const FString& InName)
 {
 	static auto U = UInterface::StaticClass()->GetPrefixCPP();
 
-	if (auto MonoClassName = U + InName; DynamicInterfaceMap.Find(MonoClassName))
-	{
-		return MonoClassName;
-	}
-
-	return {};
+	return FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), U + InName);
 }
 #endif
 

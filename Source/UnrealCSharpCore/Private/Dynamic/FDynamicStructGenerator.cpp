@@ -46,16 +46,11 @@ bool FDynamicStructGenerator::IsDynamicStruct(MonoClass* InMonoClass)
 	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_STRUCT_ATTRIBUTE);
 }
 
-FString FDynamicStructGenerator::GetMonoClassName(const FString& InName)
+MonoClass* FDynamicStructGenerator::GetMonoClass(const FString& InName)
 {
 	static auto F = TBaseStructure<FVector>::Get()->GetPrefixCPP();
 
-	if (auto MonoClassName = F + InName; DynamicStructMap.Contains(MonoClassName))
-	{
-		return MonoClassName;
-	}
-
-	return FString();
+	return FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), F + InName);
 }
 #endif
 

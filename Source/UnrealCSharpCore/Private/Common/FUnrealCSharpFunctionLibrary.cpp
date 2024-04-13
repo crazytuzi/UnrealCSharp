@@ -4,6 +4,7 @@
 #include "Common/NameEncode.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicClassGenerator.h"
+#include "Interfaces/IPluginManager.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
@@ -88,34 +89,6 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InModuleName)
 	}
 
 	return ModuleName;
-}
-
-FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
-{
-	if (InStruct == nullptr)
-	{
-		return TEXT("");
-	}
-
-	return Encode(FString::Printf(TEXT(
-		"%s%s"
-	),
-	                              InStruct->IsNative() &&
-	                              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
-		                              ? InStruct->GetPrefixCPP()
-		                              : TEXT(""),
-	                              *InStruct->GetName()));
-}
-
-FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
-{
-	return Encode(FString::Printf(TEXT(
-			"I%s"
-		),
-	                              InStruct->IsInBlueprint()
-		                              ? *GetFullClass(InStruct)
-		                              : *GetFullClass(InStruct).RightChop(1))
-	);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
@@ -436,10 +409,26 @@ FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
 	return ASSEMBLY_UTIL;
 }
 
+FString FUnrealCSharpFunctionLibrary::GetPluginPath()
+{
+	return FPaths::ConvertRelativePathToFull(IPluginManager::Get().FindPlugin(PLUGIN_NAME)->GetBaseDir());
+}
+
+FString FUnrealCSharpFunctionLibrary::GetUEScriptPath()
+{
+	return FPaths::Combine(GetPluginPath(), SCRIPT, GetUEProjectName());
+}
+
 FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath()
 {
-	return FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(FPaths::ProjectPluginsDir() / PLUGIN_NAME, SCRIPT, GetAssemblyUtilProjectName()));
+	return FPaths::Combine(GetPluginPath(), SCRIPT, GetAssemblyUtilProjectName());
+}
+
+bool FUnrealCSharpFunctionLibrary::IsEngineType(const UField* InField)
+{
+	static auto UEProxyPath = GetUEProxyPath();
+
+	return GetGenerationPath(InField) == UEProxyPath;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const UField* InField)
@@ -467,11 +456,15 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 
 	if (ProjectModuleList.Contains(Splits[0]) || (Splits[0] == TEXT("Script") && ProjectModuleList.Contains(Splits[1])))
 	{
-		return GetGameProxyPath();
+		static auto GameProxyPath = GetGameProxyPath();
+
+		return GameProxyPath;
 	}
 	else
 	{
-		return GetUEProxyPath();
+		static auto UEProxyPath = GetUEProxyPath();
+
+		return UEProxyPath;
 	}
 }
 
@@ -523,31 +516,11 @@ TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(con
 
 TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
+	static auto UEScriptPath = GetUEScriptPath();
+
 	static auto GamePath = GetGamePath();
 
-	TArray<FString> Directories;
-
-	const auto& IgnoreDirectories = TArray<FString>{
-		FPaths::Combine(GamePath, TEXT("Proxy")),
-		FPaths::Combine(GamePath, TEXT("obj")),
-		FPaths::Combine(GamePath, TEXT(".vs"))
-	};
-
-	IFileManager::Get().IterateDirectory(
-		*GamePath, [&Directories, &IgnoreDirectories](const TCHAR* FilenameOrDirectory, const bool bIsDirectory)
-		{
-			if (bIsDirectory)
-			{
-				if (!IgnoreDirectories.Contains(FilenameOrDirectory))
-				{
-					Directories.Add(FilenameOrDirectory);
-				}
-			}
-
-			return true;
-		});
-
-	return Directories;
+	return {UEScriptPath, GamePath};
 }
 
 FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool bEncodeWideString)

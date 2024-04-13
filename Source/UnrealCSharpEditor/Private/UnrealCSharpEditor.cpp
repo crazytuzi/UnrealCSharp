@@ -16,6 +16,7 @@
 #include "ToolMenus.h"
 #include "Internationalization/Culture.h"
 #include "FCodeAnalysis.h"
+#include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Misc/ScopedSlowTask.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "ToolBar/UnrealCSharpToolBar.h"
@@ -75,6 +76,8 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 
 void FUnrealCSharpEditorModule::Generator()
 {
+	FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.Broadcast();
+
 	static FString DefaultCultureName = TEXT("en");
 
 	const auto CurrentCultureName = FInternationalization::Get().GetCurrentCulture().Get().GetName();
@@ -142,6 +145,8 @@ void FUnrealCSharpEditorModule::Generator()
 	FCSharpCompiler::Get().ImmediatelyCompile();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Completion"));
+
+	FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Broadcast();
 }
 
 #undef LOCTEXT_NAMESPACE

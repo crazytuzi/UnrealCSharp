@@ -12,7 +12,7 @@ public:
 
 	static bool IsDynamicInterface(MonoClass* InMonoClass);
 
-	static FString GetMonoClassName(const FString& InName);
+	static MonoClass* GetMonoClass(const FString& InName);
 #endif
 
 	static void Generator(MonoClass* InMonoClass);

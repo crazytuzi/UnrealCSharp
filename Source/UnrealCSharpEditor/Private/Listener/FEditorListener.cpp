@@ -7,19 +7,27 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "Setting/UnrealCSharpEditorSetting.h"
 
-bool FEditorListener::bIsPIEPlaying = false;
-
-FEditorListener::FEditorListener()
+FEditorListener::FEditorListener():
+	bIsPIEPlaying(false),
+	bIsGenerating(false)
 {
-	OnPostEngineInitDelegateHandle = FCoreDelegates::OnPostEngineInit.AddStatic(&FEditorListener::OnPostEngineInit);
+	OnPostEngineInitDelegateHandle = FCoreDelegates::OnPostEngineInit.AddRaw(this, &FEditorListener::OnPostEngineInit);
 
-	OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddStatic(&FEditorListener::OnPreBeginPIE);
+	OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddRaw(this, &FEditorListener::OnPreBeginPIE);
 
-	OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddStatic(&FEditorListener::OnPrePIEEnded);
+	OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddRaw(this, &FEditorListener::OnPrePIEEnded);
 
-	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddStatic(&FEditorListener::OnCancelPIEEnded);
+	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEditorListener::OnCancelPIEEnded);
+
+	OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
+		this, &FEditorListener::OnBeginGenerator);
+
+	OnEndGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnEndGenerator.AddRaw(
+		this, &FEditorListener::OnEndGenerator);
 
 	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
@@ -68,6 +76,16 @@ FEditorListener::~FEditorListener()
 		MainFrameModule.OnMainFrameCreationFinished().Remove(OnMainFrameCreationFinishedDelegateHandle);
 	}
 
+	if (OnEndGeneratorDelegateHandle.IsValid())
+	{
+		FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Remove(OnEndGeneratorDelegateHandle);
+	}
+
+	if (OnBeginGeneratorDelegateHandle.IsValid())
+	{
+		FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.Remove(OnBeginGeneratorDelegateHandle);
+	}
+
 	if (OnCancelPIEDelegateHandle.IsValid())
 	{
 		FEditorDelegates::CancelPIE.Remove(OnCancelPIEDelegateHandle);
@@ -109,6 +127,20 @@ void FEditorListener::OnPrePIEEnded(const bool)
 void FEditorListener::OnCancelPIEEnded()
 {
 	bIsPIEPlaying = false;
+}
+
+void FEditorListener::OnBeginGenerator()
+{
+	bIsGenerating = true;
+
+	FileChanges.Reset();
+}
+
+void FEditorListener::OnEndGenerator()
+{
+	bIsGenerating = false;
+
+	FileChanges.Reset();
 }
 
 void FEditorListener::OnFilesLoaded()
@@ -177,19 +209,58 @@ void FEditorListener::OnWindowActivatedEvent()
 
 void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges)
 {
-	FileChanges.Append(InFileChanges);
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	{
+		if (UnrealCSharpEditorSetting->EnableDirectoryChanged())
+		{
+			if (!bIsGenerating)
+			{
+				static auto IgnoreDirectories = TArray<FString>
+				{
+					TEXT("/Proxy/"),
+					TEXT("/obj/")
+				};
+
+				for (const auto& FileChange : InFileChanges)
+				{
+					auto bIsIgnored = false;
+
+					for (const auto& IgnoreDirectory : IgnoreDirectories)
+					{
+						if (FileChange.Filename.Contains(IgnoreDirectory))
+						{
+							bIsIgnored = true;
+
+							break;
+						}
+					}
+
+					if (!bIsIgnored)
+					{
+						FileChanges.Add(FileChange);
+					}
+				}
+			}
+		}
+	}
 }
 
-void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator)
+void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator) const
 {
-	if (!bIsPIEPlaying)
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
 	{
-		FGeneratorCore::BeginGenerator();
+		if (UnrealCSharpEditorSetting->EnableAssetChanged())
+		{
+			if (!bIsPIEPlaying && !bIsGenerating)
+			{
+				FGeneratorCore::BeginGenerator();
 
-		InGenerator();
+				InGenerator();
 
-		FCSharpCompiler::Get().Compile();
+				FCSharpCompiler::Get().Compile();
 
-		FGeneratorCore::EndGenerator();
+				FGeneratorCore::EndGenerator();
+			}
+		}
 	}
 }

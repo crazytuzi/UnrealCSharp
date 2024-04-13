@@ -7,7 +7,12 @@
 #include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/PropertyMacro.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+
+bool FGeneratorCore::bIsSkipGenerateEngineModules;
+
+bool FGeneratorCore::bIsGenerateAllModules;
 
 TArray<FString> FGeneratorCore::SupportedModule;
 
@@ -456,7 +461,17 @@ FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()));
 	}
 
-	return TEXT("value");
+	if (IsPrimitiveProperty(Property))
+	{
+		return TEXT("value");
+	}
+	else
+	{
+		return FString::Printf(TEXT(
+			"value.%s"),
+		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		);
+	}
 }
 
 bool FGeneratorCore::IsPrimitiveProperty(FProperty* Property)
@@ -520,7 +535,18 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 		                       *FUnrealCSharpFunctionLibrary::Encode(EnumProperty->GetName()));
 	}
 
-	return FUnrealCSharpFunctionLibrary::Encode(Property->GetName());
+	if (IsPrimitiveProperty(Property))
+	{
+		return FUnrealCSharpFunctionLibrary::Encode(Property->GetName());
+	}
+	else
+	{
+		return FString::Printf(TEXT(
+			"%s?.%s ?? nint.Zero"),
+		                       *FUnrealCSharpFunctionLibrary::Encode(Property->GetName()),
+		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		);
+	}
 }
 
 FString FGeneratorCore::GetReturnParamType(FProperty* Property)
@@ -595,9 +621,16 @@ bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& St
 	                                     FILEWRITE_None);
 }
 
+bool FGeneratorCore::IsSkip(const UField* InField)
+{
+	return bIsSkipGenerateEngineModules && FUnrealCSharpFunctionLibrary::IsEngineType(InField);
+}
+
 bool FGeneratorCore::IsSupported(FProperty* Property)
 {
 	if (Property == nullptr) return false;
+
+	if (bIsGenerateAllModules) return true;
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
 	{
@@ -707,6 +740,8 @@ bool FGeneratorCore::IsSupported(FProperty* Property)
 
 bool FGeneratorCore::IsSupported(const UClass* InClass)
 {
+	if (bIsGenerateAllModules) return true;
+
 	if (const auto FoundSupported = SupportedMap.Find(InClass))
 	{
 		return *FoundSupported;
@@ -746,6 +781,8 @@ bool FGeneratorCore::IsSupported(const UClass* InClass)
 
 bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 {
+	if (bIsGenerateAllModules) return true;
+
 	if (const auto FoundSupported = SupportedMap.Find(InFunction))
 	{
 		return *FoundSupported;
@@ -769,6 +806,8 @@ bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 
 bool FGeneratorCore::IsSupported(const UStruct* InStruct)
 {
+	if (bIsGenerateAllModules) return true;
+
 	if (const auto FoundSupported = SupportedMap.Find(InStruct))
 	{
 		return *FoundSupported;
@@ -798,6 +837,8 @@ bool FGeneratorCore::IsSupported(const UStruct* InStruct)
 
 bool FGeneratorCore::IsSupported(const UEnum* InEnum)
 {
+	if (bIsGenerateAllModules) return true;
+
 	if (const auto FoundSupported = SupportedMap.Find(InEnum))
 	{
 		return *FoundSupported;
@@ -843,6 +884,10 @@ void FGeneratorCore::BeginGenerator()
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
 	{
+		bIsSkipGenerateEngineModules = UnrealCSharpEditorSetting->IsSkipGenerateEngineModules();
+
+		bIsGenerateAllModules = UnrealCSharpEditorSetting->IsGenerateAllModules();
+
 		for (const auto& Module : UnrealCSharpEditorSetting->GetSupportedModule())
 		{
 			SupportedModule.Add(FString::Printf(TEXT(
@@ -894,6 +939,10 @@ void FGeneratorCore::BeginGenerator()
 
 void FGeneratorCore::EndGenerator()
 {
+	bIsSkipGenerateEngineModules = false;
+
+	bIsGenerateAllModules = false;
+
 	SupportedModule.Empty();
 
 	SupportedAssetPath.Empty();

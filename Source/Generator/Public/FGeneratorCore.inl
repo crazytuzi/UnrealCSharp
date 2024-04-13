@@ -62,7 +62,8 @@ FString FGeneratorCore::GetFileName(const T* InField)
 	{
 		auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(InField);
 
-		auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(InField), ModuleName);
+		auto DirectoryName = FPaths::Combine(
+			FUnrealCSharpFunctionLibrary::GetGenerationPath(InField), ModuleName);
 
 		auto ModuleRelativeFile = FPaths::Combine(
 			FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InField)),

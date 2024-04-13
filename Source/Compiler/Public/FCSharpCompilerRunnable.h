@@ -7,6 +7,8 @@ class FCSharpCompilerRunnable final : public FRunnable
 public:
 	FCSharpCompilerRunnable();
 
+	virtual ~FCSharpCompilerRunnable() override;
+
 public:
 	virtual bool Init() override;
 
@@ -33,6 +35,15 @@ private:
 	static void Compile();
 
 private:
+	void OnBeginGenerator();
+
+	void OnEndGenerator();
+
+private:
+	FDelegateHandle OnBeginGeneratorDelegateHandle;
+
+	FDelegateHandle OnEndGeneratorDelegateHandle;
+
 	TQueue<bool> Tasks;
 
 	TArray<FFileChangeData> FileChanges;
@@ -42,4 +53,6 @@ private:
 	FEvent* Event;
 
 	bool bIsCompiling;
+
+	bool bIsGenerating;
 };

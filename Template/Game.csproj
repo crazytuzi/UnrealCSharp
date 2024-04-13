@@ -18,6 +18,6 @@
     <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <None Remove="FodyWeavers.xml" />
-    <WeaverFiles Include="$(SolutionDir)..\Plugins\UnrealCSharp\Script\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
+    <WeaverFiles Include="$(ProjectDir)..\..\Plugins\UnrealCSharp\Script\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
   </ItemGroup>
 </Project>
