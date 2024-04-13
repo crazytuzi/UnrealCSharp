@@ -37,23 +37,51 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
+	return GetModuleName(InField, [](FString& InModuleName){});
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UClass* InClass)
+{
+	return GetModuleName(InClass, [InClass](FString& InModuleName)
+	{
+		if (!InClass->IsNative())
+		{
+			auto Index = 0;
+
+			if (InModuleName.FindLastChar(TEXT('/'), Index))
+			{
+				InModuleName.LeftInline(Index);
+			}
+		}
+	});
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField, const TFunction<void(FString& InModuleName)>& InGetModuleName)
+{
 	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
 
-	auto ModuleName = Package != nullptr ? Package->GetName() : TEXT("");
+	auto ModuleName = Package ? Package->GetName() : TEXT("");
 
-	if (constexpr char ReplaceProjectModuleName[] = "/Game";
-		ModuleName.StartsWith(ReplaceProjectModuleName))
+	InGetModuleName(ModuleName);
+
+	return GetModuleName(ModuleName);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InModuleName)
+{
+	FString ModuleName = InModuleName;
+
+	constexpr char Replace_ProModuleName[] = "/Game";
+
+	if (ModuleName.StartsWith(Replace_ProModuleName))
 	{
-		constexpr auto ReplaceProjectModuleNameLength = sizeof(ReplaceProjectModuleName) - 1;
+		constexpr int32 Replace_Len = sizeof(Replace_ProModuleName) - 1;
 
-		const auto ModuleNameLength = ModuleName.Len();
+		const int32 Size_ModuleName = ModuleName.Len();
 
-		ModuleName = FApp::GetProjectName() + ModuleName.Right(ModuleNameLength - ReplaceProjectModuleNameLength);
+		const int32 Const_Index = Size_ModuleName - Replace_Len;
 
-		if (auto Index = 0; ModuleName.FindLastChar(TEXT('/'), Index))
-		{
-			ModuleName = ModuleName.Left(Index);
-		}
+		ModuleName = FApp::GetProjectName() + ModuleName.Right(Const_Index);
 	}
 	else
 	{
@@ -61,34 +89,6 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 	}
 
 	return ModuleName;
-}
-
-FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
-{
-	if (InStruct == nullptr)
-	{
-		return TEXT("");
-	}
-
-	return Encode(FString::Printf(TEXT(
-		"%s%s"
-	),
-	                              InStruct->IsNative() &&
-	                              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
-		                              ? InStruct->GetPrefixCPP()
-		                              : TEXT(""),
-	                              *InStruct->GetName()));
-}
-
-FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
-{
-	return Encode(FString::Printf(TEXT(
-			"I%s"
-		),
-	                              InStruct->IsInBlueprint()
-		                              ? *GetFullClass(InStruct)
-		                              : *GetFullClass(InStruct).RightChop(1))
-	);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
@@ -212,7 +212,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FDelegateProperty*
 			"%s.%s"
 		),
 		                       *GetClassNameSpace(Class),
-		                       *SignatureFunction->GetOuter()->GetName());
+		                       *Class->GetName());
 	}
 
 	if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
@@ -275,7 +275,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 				"%s.%s"
 			),
 			                       *GetClassNameSpace(Class),
-			                       *SignatureFunction->GetOuter()->GetName());
+			                       *Class->GetName());
 		}
 		else
 		{
