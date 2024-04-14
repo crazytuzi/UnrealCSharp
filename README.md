@@ -33,7 +33,7 @@
 # 社区
 
 - [官方QQ群：326576868](https://qm.qq.com/q/JW43uTiOk4)
-- [Discord](https://discord.gg/UEYSugEJ)
+- [Discord](https://discord.gg/mPVWhRqxC7)
 
 # Contributors
 
