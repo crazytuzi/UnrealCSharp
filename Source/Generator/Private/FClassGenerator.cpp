@@ -226,9 +226,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FunctionContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UClass StaticClass()\n"
 		"\t\t{\n"
-		"\t\t\treturn Class ??= UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
+		"\t\t\treturn StaticClassSingleton ??= UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
 		"\t\t}\n\n"
-		"\t\tprivate static UClass Class { get; set; }\n"
+		"\t\tprivate static UClass StaticClassSingleton { get; set; }\n"
 	),
 	                                  SuperClass != nullptr ? TEXT(" new") : TEXT(""),
 	                                  *PathNameAttributeContent
@@ -361,6 +361,20 @@ void FClassGenerator::Generator(const UClass* InClass)
 				if (SuperClass->FindFunctionByName(*Function->GetName()))
 				{
 					FunctionPolymorphism = TEXT("override");
+				}
+
+				static TSet<FString> DefaultImplementations =
+				{
+					TEXT("GetClass"),
+					TEXT("GetName"),
+					TEXT("GetWorld"),
+					TEXT("ToString"),
+					TEXT("IsValid")
+				};
+
+				if (DefaultImplementations.Contains(Function->GetName()))
+				{
+					FunctionPolymorphism = TEXT("new");
 				}
 			}
 		}

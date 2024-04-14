@@ -130,8 +130,9 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	auto StaticStructContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UScriptStruct StaticStruct()\n"
 		"\t\t{\n"
-		"\t\t\treturn UStructImplementation.UStruct_StaticStructImplementation(\"%s\");\n"
-		"\t\t}\n"
+		"\t\t\treturn StaticStructSingleton ??= UStructImplementation.UStruct_StaticStructImplementation(\"%s\");\n"
+		"\t\t}\n\n"
+		"\t\tprivate static UScriptStruct StaticStructSingleton { get; set; }\n"
 	),
 	                                           SuperStruct != nullptr ? TEXT(" new") : TEXT(""),
 	                                           *PathNameAttributeContent

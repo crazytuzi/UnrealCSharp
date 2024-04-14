@@ -9,9 +9,9 @@ class UNREALCSHARPCORE_API FBindingClass
 {
 public:
 	FBindingClass(const bool InIsReflection, const FString& InClass,
-	              const FString& InBindingNameSpace, FTypeInfo* InTypeInfo):
+	              const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo):
 		bIsReflection(InIsReflection),
-		ImplementationNameSpace(InBindingNameSpace),
+		ImplementationNameSpace(InImplementationNameSpace),
 		Class(InClass),
 		TypeInfo{InTypeInfo},
 		Subscript(nullptr)
