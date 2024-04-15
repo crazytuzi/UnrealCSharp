@@ -2,6 +2,8 @@
 
 #include "Domain/FMonoDomain.h"
 
+typedef void(__stdcall* SynchronizationContextTick_fn) (float, MonoException**);
+
 class UNREALCSHARP_API FDomain final : public FTickableGameObject
 {
 public:
@@ -199,6 +201,10 @@ public:
 	static MonoClassField* Self_Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName);
 
 	MonoType* Property_Get_Type(MonoProperty* InMonoProperty) const;
+
+	static void* MethodGetUnmanagedThunk(MonoMethod* InMonoMethod);
+
+	SynchronizationContextTick_fn SynchronizationContextTick {nullptr};
 
 public:
 	void InitializeSynchronizationContext();

@@ -32,16 +32,11 @@ void FDomain::Deinitialize()
 
 void FDomain::Tick(float DeltaTime)
 {
-	if (const auto SynchronizationContextClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_SYNCHRONIZATION_CONTEXT))
+	if (SynchronizationContextTick != nullptr)
 	{
-		auto InParams = static_cast<void*>(&DeltaTime);
+		MonoException* monoException = NULL;
 
-		if (const auto TickMonoMethod = Class_Get_Method_From_Name(
-			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICK, TGetArrayLength(InParams)))
-		{
-			Runtime_Invoke(TickMonoMethod, nullptr, &InParams);
-		}
+		SynchronizationContextTick(DeltaTime, &monoException);
 	}
 }
 
@@ -506,6 +501,11 @@ MonoType* FDomain::Property_Get_Type(MonoProperty* InMonoProperty) const
 	return FMonoDomain::Property_Get_Type(InMonoProperty);
 }
 
+void* FDomain::MethodGetUnmanagedThunk(MonoMethod* InMonoMethod)
+{
+	return FMonoDomain::MethodGetUnmanagedThunk(InMonoMethod);
+}
+
 void FDomain::InitializeSynchronizationContext()
 {
 	if (const auto SynchronizationContextClass = Class_From_Name(
@@ -515,6 +515,14 @@ void FDomain::InitializeSynchronizationContext()
 			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE, 0))
 		{
 			Runtime_Invoke(InitializeMonoMethod, nullptr, nullptr, nullptr);
+		}
+
+		if (const auto TickMonoMethod = Class_Get_Method_From_Name(
+			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICK, 1))
+		{
+			SynchronizationContextTick = (SynchronizationContextTick_fn)MethodGetUnmanagedThunk(TickMonoMethod);
+
+			check(SynchronizationContextTick != nullptr);
 		}
 	}
 }
