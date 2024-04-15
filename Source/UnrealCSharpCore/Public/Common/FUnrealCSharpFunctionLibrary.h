@@ -70,15 +70,11 @@ public:
 
 	static FString GetBindingPath();
 
-	static FString GetAssemblyUtilProjectName();
-
 	static FString GetPluginBaseDir();
 
 	static FString GetPluginPath();
 
 	static FString GetUEScriptPath();
-
-	static FString GetAssemblyUtilPath();
 
 	static bool IsEngineType(const UField* InField);
 
