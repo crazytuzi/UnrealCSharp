@@ -43,8 +43,6 @@ public:
 
 	static MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator);
 
-	static MonoMethod* Class_Get_Method_From_Params(MonoClass* InMonoClass, const FString InMethodName, const TArray<MonoType*> InParams);
-
 	static MonoClass* Class_Get_Interfaces(MonoClass* InMonoClass, void** InIterator);
 
 	static MonoCustomAttrInfo* Custom_Attrs_From_Class(MonoClass* InMonoClass);
@@ -177,6 +175,8 @@ public:
 
 	static void GCHandle_Free_V2(MonoGCHandle InGCHandle);
 
+	static void* Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod);
+
 public:
 	static void Object_Constructor(MonoObject* InMonoObject, int32 InParamCount = 0, void** InParams = nullptr);
 
@@ -187,7 +187,8 @@ public:
 
 	static MonoType* Property_Get_Type(MonoProperty* InMonoProperty);
 
-	static void* MethodGetUnmanagedThunk(MonoMethod* InMonoMethod);
+	static MonoMethod* Class_Get_Method_From_Params(MonoClass* InMonoClass, const FString& InMethodName,
+	                                                const TArray<MonoType*>& InParams);
 
 public:
 	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath, void* InUserData);
@@ -216,10 +217,10 @@ private:
 
 	static void RegisterBinding();
 
-	static MonoGCHandle AssemblyLoadContextGCHandle;
-
 public:
 	static MonoDomain* Domain;
+
+	static MonoGCHandle AssemblyLoadContextGCHandle;
 
 	static TArray<MonoGCHandle> AssemblyGCHandles;
 

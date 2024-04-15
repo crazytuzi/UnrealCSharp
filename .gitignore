@@ -74,7 +74,6 @@ DerivedDataCache/*
 bin/
 obj/
 Script/CodeAnalysis/*
-Script/AssemblyUtil/*
 !Script/*/*.sln
 !Script/*/*.csproj
 !Script/*/*.cs

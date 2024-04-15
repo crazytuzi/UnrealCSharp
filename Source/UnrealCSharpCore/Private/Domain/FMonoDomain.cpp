@@ -19,6 +19,8 @@
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
+MonoGCHandle FMonoDomain::AssemblyLoadContextGCHandle = nullptr;
+
 TArray<MonoGCHandle> FMonoDomain::AssemblyGCHandles;
 
 TArray<MonoAssembly*> FMonoDomain::Assemblies;
@@ -26,8 +28,6 @@ TArray<MonoAssembly*> FMonoDomain::Assemblies;
 TArray<MonoImage*> FMonoDomain::Images;
 
 bool FMonoDomain::bLoadSucceed;
-
-MonoGCHandle FMonoDomain::AssemblyLoadContextGCHandle = nullptr;
 
 #if PLATFORM_IOS
 extern void* mono_aot_module_System_Private_CoreLib_info;
@@ -198,36 +198,6 @@ MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, 
 MonoMethod* FMonoDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator)
 {
 	return InMonoClass != nullptr ? mono_class_get_methods(InMonoClass, InIterator) : nullptr;
-}
-
-MonoMethod* FMonoDomain::Class_Get_Method_From_Params(MonoClass* InMonoClass, const FString InMethodName,const TArray<MonoType*> InParams)
-{
-	void* Iter = nullptr;
-	while (auto Method = mono_class_get_methods(InMonoClass, &Iter))
-	{
-		if (strcmp(mono_method_get_name(Method), TCHAR_TO_ANSI(*InMethodName)))
-			continue;
-		auto Signature = mono_method_signature(Method);
-		if (mono_signature_get_param_count(Signature) != InParams.Num())
-			continue;
-		void* ParamIter = nullptr;
-		int index = 0;
-		bool IsMath = true;
-		while (auto ParamType = mono_signature_get_params(Signature, &ParamIter))
-		{
-			if (strcmp(mono_type_get_name_full(ParamType, MONO_TYPE_NAME_FORMAT_FULL_NAME), mono_type_get_name_full(InParams[index], MONO_TYPE_NAME_FORMAT_FULL_NAME)))
-			{
-				IsMath = false;
-				break;
-			}
-			index++;
-		}
-		if (IsMath == true)
-		{
-			return Method;
-		}
-	}
-	return nullptr;
 }
 
 MonoClass* FMonoDomain::Class_Get_Interfaces(MonoClass* InMonoClass, void** InIterator)
@@ -606,6 +576,11 @@ void FMonoDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
 	return mono_gchandle_free_v2(InGCHandle);
 }
 
+void* FMonoDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
+{
+	return mono_method_get_unmanaged_thunk(InMonoMethod);
+}
+
 void FMonoDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InParamCount, void** InParams)
 {
 	if (const auto FoundMonoClass = Object_Get_Class(InMonoObject))
@@ -660,9 +635,51 @@ MonoType* FMonoDomain::Property_Get_Type(MonoProperty* InMonoProperty)
 	return nullptr;
 }
 
-void* FMonoDomain::MethodGetUnmanagedThunk(MonoMethod* InMonoMethod)
+MonoMethod* FMonoDomain::Class_Get_Method_From_Params(MonoClass* InMonoClass, const FString& InMethodName,
+                                                      const TArray<MonoType*>& InParams)
 {
-	return mono_method_get_unmanaged_thunk(InMonoMethod);
+	void* MethodIter{};
+
+	while (const auto Method = mono_class_get_methods(InMonoClass, &MethodIter))
+	{
+		if (strcmp(mono_method_get_name(Method), TCHAR_TO_ANSI(*InMethodName)))
+		{
+			continue;
+		}
+
+		const auto Signature = mono_method_signature(Method);
+
+		if (mono_signature_get_param_count(Signature) != InParams.Num())
+		{
+			continue;
+		}
+
+		void* ParamIter = {};
+
+		auto Index = 0;
+
+		auto bIsSame = true;
+
+		while (const auto ParamType = mono_signature_get_params(Signature, &ParamIter))
+		{
+			if (strcmp(mono_type_get_name_full(ParamType, MONO_TYPE_NAME_FORMAT_FULL_NAME),
+			           mono_type_get_name_full(InParams[Index], MONO_TYPE_NAME_FORMAT_FULL_NAME)))
+			{
+				bIsSame = false;
+
+				break;
+			}
+
+			Index++;
+		}
+
+		if (bIsSame == true)
+		{
+			return Method;
+		}
+	}
+
+	return nullptr;
 }
 
 MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath,
@@ -768,52 +785,48 @@ void FMonoDomain::DeinitializeAssembly()
 
 void FMonoDomain::InitializeAssemblyLoadContext()
 {
-	auto Name = mono_assembly_name_new("System.Runtime.Loader");
+	const auto Name = mono_assembly_name_new("System.Runtime.Loader");
 
 	auto Assembly = mono_assembly_loaded(Name);
+
 	if (Assembly == nullptr)
+	{
 		Assembly = mono_assembly_load(Name, nullptr, nullptr);
-	check(Assembly != nullptr);
+	}
 
-	auto Image = mono_assembly_get_image(Assembly);
-	check(Image != nullptr);
+	const auto Image = mono_assembly_get_image(Assembly);
 
-	auto AssemblyLoadContextClass = mono_class_from_name(Image, "System.Runtime.Loader", "AssemblyLoadContext");
-	check(AssemblyLoadContextClass != nullptr);
+	const auto AssemblyLoadContextClass = mono_class_from_name(Image, "System.Runtime.Loader", "AssemblyLoadContext");
 
 	void* Params[2];
 
-	bool isCollectible = true;
+	auto bIsCollectible = true;
 
-	Params[0] = FMonoDomain::String_New("MonoCSharp");
+	Params[0] = String_New("MonoCSharp");
 
-	Params[1] = FMonoDomain::Value_Box(FMonoDomain::Get_Boolean_Class(), &isCollectible);
+	Params[1] = Value_Box(Get_Boolean_Class(), &bIsCollectible);
 
-	auto AssemblyLoadContextObject = FMonoDomain::Object_Init(AssemblyLoadContextClass, 2, Params);
+	const auto AssemblyLoadContextObject = Object_Init(AssemblyLoadContextClass, 2, Params);
 
-	check(AssemblyLoadContextObject != nullptr);
-
-	AssemblyLoadContextGCHandle = FMonoDomain::GCHandle_New_V2(AssemblyLoadContextObject, false);
-
+	AssemblyLoadContextGCHandle = GCHandle_New_V2(AssemblyLoadContextObject, false);
 }
 
 void FMonoDomain::DeinitializeAssemblyLoadContext()
 {
 	if (AssemblyLoadContextGCHandle == nullptr)
+	{
 		return;
+	}
 
-	auto AssemblyLoadContextObject = FMonoDomain::GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
-	check(AssemblyLoadContextObject != nullptr);
+	const auto AssemblyLoadContextObject = GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
 
-	auto AssemblyLoadContextClass = FMonoDomain::Object_Get_Class(AssemblyLoadContextObject);
-	check(AssemblyLoadContextClass != nullptr);
+	const auto AssemblyLoadContextClass = Object_Get_Class(AssemblyLoadContextObject);
 
-	auto UnloadMethod = FMonoDomain::Class_Get_Method_From_Name(AssemblyLoadContextClass, TEXT("Unload"), 0);
-	check(UnloadMethod != nullptr);
+	const auto UnloadMethod = Class_Get_Method_From_Name(AssemblyLoadContextClass, TEXT("Unload"), 0);
 
-	FMonoDomain::Runtime_Invoke(UnloadMethod, AssemblyLoadContextObject, nullptr);
+	Runtime_Invoke(UnloadMethod, AssemblyLoadContextObject, nullptr);
 
-	FMonoDomain::GCHandle_Free_V2(AssemblyLoadContextGCHandle);
+	GCHandle_Free_V2(AssemblyLoadContextGCHandle);
 
 	AssemblyLoadContextGCHandle = nullptr;
 }
@@ -821,43 +834,38 @@ void FMonoDomain::DeinitializeAssemblyLoadContext()
 void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 {
 #if WITH_EDITOR
-	auto Name = mono_assembly_name_new("System.Runtime");
+	const auto Name = mono_assembly_name_new("System.Runtime");
 
 	auto Assembly = mono_assembly_loaded(Name);
+
 	if (Assembly == nullptr)
+	{
 		Assembly = mono_assembly_load(Name, nullptr, nullptr);
-	check(Assembly != nullptr);
+	}
 
 	auto Image = mono_assembly_get_image(Assembly);
-	check(Image != nullptr);
 
-	auto StreamReaderClass = mono_class_from_name(Image, "System.IO", "StreamReader");
-	check(StreamReaderClass != nullptr);
+	const auto StreamReaderClass = mono_class_from_name(Image, "System.IO", "StreamReader");
 
-	auto TextReaderClass = mono_class_from_name(Image, "System.IO", "TextReader");
-	check(TextReaderClass != nullptr);
+	const auto TextReaderClass = mono_class_from_name(Image, "System.IO", "TextReader");
 
-	auto BaseStreamProperty = FMonoDomain::Class_Get_Property_From_Name(StreamReaderClass, TEXT("BaseStream"));
-	check(BaseStreamProperty != nullptr);
+	const auto BaseStreamProperty = Class_Get_Property_From_Name(StreamReaderClass, TEXT("BaseStream"));
 
-	auto BaseStreamGetterMehod = FMonoDomain::Property_Get_Get_Method(BaseStreamProperty);
-	check(BaseStreamGetterMehod != nullptr);
-	
-	auto StreamReaderConstructorMethod = Class_Get_Method_From_Params(StreamReaderClass, FUNCTION_OBJECT_CONSTRUCTOR, TArray<MonoType*>{mono_class_get_type(mono_get_string_class())});
-	check(StreamReaderConstructorMethod != nullptr);
+	const auto BaseStreamGetterMethod = Property_Get_Get_Method(BaseStreamProperty);
 
-	auto TextReaderDisposeMethod = FMonoDomain::Class_Get_Method_From_Name(TextReaderClass, TEXT("Dispose"), 0);
-	check(TextReaderDisposeMethod != nullptr);
+	const auto StreamReaderConstructorMethod = Class_Get_Method_From_Params(
+		StreamReaderClass, FUNCTION_OBJECT_CONSTRUCTOR,
+		TArray<MonoType*>{
+			mono_class_get_type(mono_get_string_class())
+		});
 
-	auto AssemblyLoadContextObject = FMonoDomain::GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
-	check(AssemblyLoadContextObject != nullptr);
+	const auto TextReaderDisposeMethod = Class_Get_Method_From_Name(TextReaderClass, TEXT("Dispose"), 0);
 
-	auto AssemblyLoadContextClass = FMonoDomain::Object_Get_Class(AssemblyLoadContextObject);
-	check(AssemblyLoadContextClass != nullptr);
+	const auto AssemblyLoadContextObject = GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
 
-	auto AlcLoadFromStreamMethod = FMonoDomain::Class_Get_Method_From_Name(AssemblyLoadContextClass, "LoadFromStream", 1);
-	check(AlcLoadFromStreamMethod != nullptr);
+	const auto AssemblyLoadContextClass = Object_Get_Class(AssemblyLoadContextObject);
 
+	const auto AlcLoadFromStreamMethod = Class_Get_Method_From_Name(AssemblyLoadContextClass, "LoadFromStream", 1);
 
 	for (const auto& AssemblyPath : InAssemblies)
 	{
@@ -868,21 +876,19 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 
 		void* Params[1];
 
-		Params[0] = FMonoDomain::String_New(TCHAR_TO_UTF8(*AssemblyPath));
+		Params[0] = String_New(TCHAR_TO_UTF8(*AssemblyPath));
 
-		auto StreamObject = FMonoDomain::Object_New(StreamReaderClass);
-		check(StreamObject != nullptr);
+		const auto StreamObject = Object_New(StreamReaderClass);
 
-		FMonoDomain::Runtime_Invoke(StreamReaderConstructorMethod, StreamObject, Params);
+		Runtime_Invoke(StreamReaderConstructorMethod, StreamObject, Params);
 
-		auto BaseStream = FMonoDomain::Runtime_Invoke(BaseStreamGetterMehod, StreamObject, nullptr);
-		check(BaseStream != nullptr);
+		const auto BaseStream = Runtime_Invoke(BaseStreamGetterMethod, StreamObject, nullptr);
 
 		Params[0] = BaseStream;
 
-		auto Result = FMonoDomain::Runtime_Invoke(AlcLoadFromStreamMethod, AssemblyLoadContextObject, Params);
+		const auto Result = Runtime_Invoke(AlcLoadFromStreamMethod, AssemblyLoadContextObject, Params);
 
-		FMonoDomain::Runtime_Invoke(TextReaderDisposeMethod, StreamObject, nullptr);
+		Runtime_Invoke(TextReaderDisposeMethod, StreamObject, nullptr);
 
 		auto GCHandle = GCHandle_New_V2(Result, true);
 

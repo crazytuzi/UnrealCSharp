@@ -6,7 +6,8 @@
 #include "CoreMacro/PropertyMacro.h"
 #include "Macro/FunctionMacro.h"
 
-FDomain::FDomain(const FMonoDomainInitializeParams& InParams)
+FDomain::FDomain(const FMonoDomainInitializeParams& InParams):
+	SynchronizationContextTick{nullptr}
 {
 	Initialize(InParams);
 }
@@ -30,13 +31,13 @@ void FDomain::Deinitialize()
 	FMonoDomain::Deinitialize();
 }
 
-void FDomain::Tick(float DeltaTime)
+void FDomain::Tick(const float DeltaTime)
 {
 	if (SynchronizationContextTick != nullptr)
 	{
-		MonoException* monoException = NULL;
+		MonoException* Exception{};
 
-		SynchronizationContextTick(DeltaTime, &monoException);
+		SynchronizationContextTick(DeltaTime, &Exception);
 	}
 }
 
@@ -501,9 +502,9 @@ MonoType* FDomain::Property_Get_Type(MonoProperty* InMonoProperty) const
 	return FMonoDomain::Property_Get_Type(InMonoProperty);
 }
 
-void* FDomain::MethodGetUnmanagedThunk(MonoMethod* InMonoMethod)
+void* FDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
 {
-	return FMonoDomain::MethodGetUnmanagedThunk(InMonoMethod);
+	return FMonoDomain::Method_Get_Unmanaged_Thunk(InMonoMethod);
 }
 
 void FDomain::InitializeSynchronizationContext()
@@ -520,9 +521,7 @@ void FDomain::InitializeSynchronizationContext()
 		if (const auto TickMonoMethod = Class_Get_Method_From_Name(
 			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICK, 1))
 		{
-			SynchronizationContextTick = (SynchronizationContextTick_fn)MethodGetUnmanagedThunk(TickMonoMethod);
-
-			check(SynchronizationContextTick != nullptr);
+			SynchronizationContextTick = (SynchronizationContextTickType)Method_Get_Unmanaged_Thunk(TickMonoMethod);
 		}
 	}
 }
