@@ -72,6 +72,8 @@ public:
 
 	static FString GetAssemblyUtilProjectName();
 
+	static FString GetPluginBaseDir();
+
 	static FString GetPluginPath();
 
 	static FString GetUEScriptPath();
