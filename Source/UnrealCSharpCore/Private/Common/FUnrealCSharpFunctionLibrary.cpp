@@ -437,9 +437,14 @@ FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
 	return ASSEMBLY_UTIL;
 }
 
+FString FUnrealCSharpFunctionLibrary::GetPluginBaseDir()
+{
+	return IPluginManager::Get().FindPlugin(PLUGIN_NAME)->GetBaseDir();
+}
+
 FString FUnrealCSharpFunctionLibrary::GetPluginPath()
 {
-	return FPaths::ConvertRelativePathToFull(IPluginManager::Get().FindPlugin(PLUGIN_NAME)->GetBaseDir());
+	return FPaths::ConvertRelativePathToFull(GetPluginBaseDir());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetUEScriptPath()
