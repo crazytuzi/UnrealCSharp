@@ -80,8 +80,9 @@ namespace SourceGenerator
                         source +=
                             "\t\tpublic static UScriptStruct StaticStruct()\n" +
                             "\t\t{\n" +
-                            $"\t\t\treturn UStructImplementation.UStruct_StaticStructImplementation(\"{fullPath}\");\n" +
-                            "\t\t}\n";
+                            $"\t\t\treturn StaticStructSingleton ??= UStructImplementation.UStruct_StaticStructImplementation(\"{fullPath}\");\n" +
+                            "\t\t}\n" +
+                            "\t\tprivate static UScriptStruct StaticStructSingleton { get; set; }\n";
                     }
 
                     if (type.Value.HasGarbageCollectionHandle == false)
@@ -136,8 +137,9 @@ namespace SourceGenerator
                         source +=
                             "\t\tpublic new static UClass StaticClass()\n" +
                             "\t\t{\n" +
-                            $"\t\t\treturn UObjectImplementation.UObject_StaticClassImplementation(\"{fullPath}\");\n" +
-                            "\t\t}\n";
+                            $"\t\t\treturn StaticClassSingleton ??= UObjectImplementation.UObject_StaticClassImplementation(\"{fullPath}\");\n" +
+                            "\t\t}\n" +
+                            "\t\tprivate static UClass StaticClassSingleton { get; set; }\n";
                     }
 
                     source += "\t}\n";

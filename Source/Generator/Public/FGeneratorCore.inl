@@ -7,13 +7,40 @@ FString FGeneratorCore::GetFileName(const T* InField)
 {
 	if constexpr (std::is_same_v<T, FDelegateProperty> || std::is_same_v<T, FMulticastDelegateProperty>)
 	{
-		auto ModuleName = FPaths::Combine(
-			InField->SignatureFunction->GetPackage()->GetName().StartsWith(TEXT("/Game"))
-				? FApp::GetProjectName()
-				: TEXT(""),
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InField)
-			.Replace(TEXT("."), TEXT("/"))
-			.Replace(TEXT("Script/"), TEXT("")));
+		FString RelativeModuleName;
+
+		const auto SignatureFunction = InField->SignatureFunction;
+
+		if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
+		{
+			if (InField->IsNative())
+			{
+				RelativeModuleName = FString::Printf(TEXT(
+					"%s/%s"
+				),
+				                                     *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
+				                                     *Class->GetName());
+			}
+			else
+			{
+				RelativeModuleName = *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT(""));
+			}
+		}
+
+		if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
+		{
+			RelativeModuleName = Package->GetName().Replace(TEXT("/Script/"), TEXT("/"));
+		}
+
+		if (!InField->IsNative())
+		{
+			if (auto Index = 0; RelativeModuleName.FindLastChar(TEXT('/'), Index))
+			{
+				RelativeModuleName.LeftInline(Index);
+			}
+		}
+
+		auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(RelativeModuleName);
 
 		auto DirectoryName = FPaths::Combine(
 			FUnrealCSharpFunctionLibrary::GetGenerationPath(InField->SignatureFunction), ModuleName);

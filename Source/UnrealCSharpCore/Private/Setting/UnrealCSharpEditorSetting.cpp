@@ -4,6 +4,12 @@
 #endif
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "UEVersion.h"
+#if WITH_EDITOR
+#include "Engine/Blueprint.h"
+#include "WidgetBlueprint.h"
+#include "Engine/UserDefinedEnum.h"
+#include "Engine/UserDefinedStruct.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorSettings"
 
@@ -14,7 +20,7 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bEnableAssetChanged(true),
 	bEnableDirectoryChanged(true),
 	bIsSkipGenerateEngineModules(false),
-	bIsGenerateAllModules(false)
+	bIsGenerateAllModules(true)
 #else
 	Super(ObjectInitializer)
 #endif
@@ -37,6 +43,20 @@ void UUnrealCSharpEditorSetting::RegisterSettings()
 #endif
 			TEXT("UMG"),
 			TEXT("UnrealCSharpCore"),
+			FApp::GetProjectName()
+		};
+
+		static TSet<FString> DefaultSupportedAssetPaths =
+		{
+			FApp::GetProjectName()
+		};
+
+		static TSet<TSubclassOf<UObject>> DefaultSupportedAssetClasses =
+		{
+			UBlueprint::StaticClass(),
+			UUserDefinedStruct::StaticClass(),
+			UUserDefinedEnum::StaticClass(),
+			UWidgetBlueprint::StaticClass()
 		};
 
 		const auto MutableDefaultUnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
@@ -44,6 +64,16 @@ void UUnrealCSharpEditorSetting::RegisterSettings()
 		for (const auto& DefaultSupportedModule : DefaultSupportedModules)
 		{
 			MutableDefaultUnrealCSharpEditorSetting->SupportedModule.AddUnique(DefaultSupportedModule);
+		}
+
+		for (const auto& DefaultSupportedAssetPath : DefaultSupportedAssetPaths)
+		{
+			MutableDefaultUnrealCSharpEditorSetting->SupportedAssetPath.AddUnique(DefaultSupportedAssetPath);
+		}
+
+		for (const auto& DefaultSupportedAssetClass : DefaultSupportedAssetClasses)
+		{
+			MutableDefaultUnrealCSharpEditorSetting->SupportedAssetClass.AddUnique(DefaultSupportedAssetClass);
 		}
 
 		SettingsModule->RegisterSettings("Editor",
