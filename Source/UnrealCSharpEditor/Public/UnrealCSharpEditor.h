@@ -26,5 +26,13 @@ public:
 private:
 	TSharedPtr<class FUnrealCSharpToolBar> UnrealCSharpToolBar;
 
+	TUniquePtr<FAutoConsoleCommand> CodeAnalysisConsoleCommand;
+
+	TUniquePtr<FAutoConsoleCommand> SolutionGeneratorConsoleCommand;
+
+	TUniquePtr<FAutoConsoleCommand> CompileConsoleCommand;
+
+	TUniquePtr<FAutoConsoleCommand> GeneratorConsoleCommand;
+
 	FEditorListener EditorListener;
 };

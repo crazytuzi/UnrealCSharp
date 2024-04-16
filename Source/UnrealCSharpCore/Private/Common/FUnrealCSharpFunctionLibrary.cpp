@@ -432,11 +432,6 @@ FString FUnrealCSharpFunctionLibrary::GetBindingPath()
 	return TEXT("Binding");
 }
 
-FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
-{
-	return ASSEMBLY_UTIL;
-}
-
 FString FUnrealCSharpFunctionLibrary::GetPluginBaseDir()
 {
 	return IPluginManager::Get().FindPlugin(PLUGIN_NAME)->GetBaseDir();
@@ -450,11 +445,6 @@ FString FUnrealCSharpFunctionLibrary::GetPluginPath()
 FString FUnrealCSharpFunctionLibrary::GetUEScriptPath()
 {
 	return FPaths::Combine(GetPluginPath(), SCRIPT, GetUEProjectName());
-}
-
-FString FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath()
-{
-	return FPaths::Combine(GetPluginPath(), SCRIPT, GetAssemblyUtilProjectName());
 }
 
 bool FUnrealCSharpFunctionLibrary::IsEngineType(const UField* InField)

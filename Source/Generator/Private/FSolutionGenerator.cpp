@@ -5,8 +5,6 @@
 
 void FSolutionGenerator::Generator()
 {
-	Compile();
-
 	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginPath() / TEMPLATE;
 
 	CopyCSProj(
@@ -29,67 +27,6 @@ void FSolutionGenerator::Generator()
 		TemplatePath / FUnrealCSharpFunctionLibrary::GetBaseName() + SOLUTION_SUFFIX);
 }
 
-void FSolutionGenerator::Compile()
-{
-	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
-
-	const auto AssemblyUtilPath = FUnrealCSharpFunctionLibrary::GetAssemblyUtilPath();
-
-	const auto CompileParam = FString::Printf(TEXT(
-		"build \"%s/%s.csproj\" --nologo -c Debug"
-	),
-	                                          *AssemblyUtilPath,
-	                                          *FUnrealCSharpFunctionLibrary::GetAssemblyUtilProjectName()
-	);
-
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
-
-	FString Result;
-
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
-
-	auto ProcessHandle = FPlatformProcess::CreateProc(
-		*CompileTool,
-		*CompileParam,
-		false,
-		true,
-		true,
-		&OutProcessID,
-		1,
-		nullptr,
-		WritePipe,
-		ReadPipe);
-
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
-	{
-		FPlatformProcess::Sleep(0.01f);
-
-		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
-	}
-
-	auto ReturnCode = 0;
-
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
-	{
-		if (ReturnCode == 0)
-		{
-			// @TODO
-		}
-		else
-		{
-			// @TODO
-		}
-	}
-
-	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
-
-	FPlatformProcess::CloseProc(ProcessHandle);
-}
-
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src)
 {
 	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest))
@@ -99,7 +36,7 @@ void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src)
 }
 
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
-                                      const TFunction<void(FString& InResult)>& InCopyTemplate)
+                                      const TFunction<void(FString& InResult)>& InFunction)
 {
 	FString Result;
 
@@ -113,7 +50,7 @@ void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
 
 	Result = Result.Replace(*PLUGIN_NAME, *PluginBaseDir.Right(PluginBaseDir.Len() - Index - 1));
 
-	InCopyTemplate(Result);
+	InFunction(Result);
 
 	auto& FileManager = IFileManager::Get();
 

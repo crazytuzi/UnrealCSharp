@@ -6,7 +6,8 @@
 #include "CoreMacro/PropertyMacro.h"
 #include "Macro/FunctionMacro.h"
 
-FDomain::FDomain(const FMonoDomainInitializeParams& InParams)
+FDomain::FDomain(const FMonoDomainInitializeParams& InParams):
+	SynchronizationContextTick{nullptr}
 {
 	Initialize(InParams);
 }
@@ -30,18 +31,13 @@ void FDomain::Deinitialize()
 	FMonoDomain::Deinitialize();
 }
 
-void FDomain::Tick(float DeltaTime)
+void FDomain::Tick(const float DeltaTime)
 {
-	if (const auto SynchronizationContextClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_SYNCHRONIZATION_CONTEXT))
+	if (SynchronizationContextTick != nullptr)
 	{
-		auto InParams = static_cast<void*>(&DeltaTime);
+		MonoException* Exception{};
 
-		if (const auto TickMonoMethod = Class_Get_Method_From_Name(
-			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICK, TGetArrayLength(InParams)))
-		{
-			Runtime_Invoke(TickMonoMethod, nullptr, &InParams);
-		}
+		SynchronizationContextTick(DeltaTime, &Exception);
 	}
 }
 
@@ -506,6 +502,11 @@ MonoType* FDomain::Property_Get_Type(MonoProperty* InMonoProperty) const
 	return FMonoDomain::Property_Get_Type(InMonoProperty);
 }
 
+void* FDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
+{
+	return FMonoDomain::Method_Get_Unmanaged_Thunk(InMonoMethod);
+}
+
 void FDomain::InitializeSynchronizationContext()
 {
 	if (const auto SynchronizationContextClass = Class_From_Name(
@@ -515,6 +516,12 @@ void FDomain::InitializeSynchronizationContext()
 			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE, 0))
 		{
 			Runtime_Invoke(InitializeMonoMethod, nullptr, nullptr, nullptr);
+		}
+
+		if (const auto TickMonoMethod = Class_Get_Method_From_Name(
+			SynchronizationContextClass, FUNCTION_SYNCHRONIZATION_CONTEXT_TICK, 1))
+		{
+			SynchronizationContextTick = (SynchronizationContextTickType)Method_Get_Unmanaged_Thunk(TickMonoMethod);
 		}
 	}
 }

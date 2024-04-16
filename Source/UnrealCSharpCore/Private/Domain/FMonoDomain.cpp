@@ -19,9 +19,7 @@
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
-MonoAssembly* FMonoDomain::AssemblyUtilAssembly = nullptr;
-
-MonoImage* FMonoDomain::AssemblyUtilImage = nullptr;
+MonoGCHandle FMonoDomain::AssemblyLoadContextGCHandle = nullptr;
 
 TArray<MonoGCHandle> FMonoDomain::AssemblyGCHandles;
 
@@ -40,13 +38,6 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 	RegisterMonoTrace();
 
 	RegisterAssemblyPreloadHook();
-
-#if WITH_EDITOR
-	if (!FPaths::FileExists(InParams.AssemblyUtil))
-	{
-		return;
-	}
-#endif
 
 	if (Domain == nullptr)
 	{
@@ -94,11 +85,6 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 		mono_domain_set(Domain, false);
 	}
-
-#if WITH_EDITOR
-	LoadAssembly(TCHAR_TO_ANSI(*FPaths::GetBaseFilename(InParams.AssemblyUtil)), InParams.AssemblyUtil,
-	             &AssemblyUtilImage, &AssemblyUtilAssembly);
-#endif
 
 	InitializeAssembly(InParams.Assemblies);
 
@@ -590,6 +576,11 @@ void FMonoDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
 	return mono_gchandle_free_v2(InGCHandle);
 }
 
+void* FMonoDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
+{
+	return mono_method_get_unmanaged_thunk(InMonoMethod);
+}
+
 void FMonoDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InParamCount, void** InParams)
 {
 	if (const auto FoundMonoClass = Object_Get_Class(InMonoObject))
@@ -638,6 +629,53 @@ MonoType* FMonoDomain::Property_Get_Type(MonoProperty* InMonoProperty)
 		if (const auto Signature = Method_Signature(Method))
 		{
 			return Signature_Get_Return_Type(Signature);
+		}
+	}
+
+	return nullptr;
+}
+
+MonoMethod* FMonoDomain::Class_Get_Method_From_Params(MonoClass* InMonoClass, const FString& InMethodName,
+                                                      const TArray<MonoType*>& InParams)
+{
+	void* MethodIter{};
+
+	while (const auto Method = mono_class_get_methods(InMonoClass, &MethodIter))
+	{
+		if (strcmp(mono_method_get_name(Method), TCHAR_TO_ANSI(*InMethodName)))
+		{
+			continue;
+		}
+
+		const auto Signature = mono_method_signature(Method);
+
+		if (mono_signature_get_param_count(Signature) != InParams.Num())
+		{
+			continue;
+		}
+
+		void* ParamIter = {};
+
+		auto Index = 0;
+
+		auto bIsSame = true;
+
+		while (const auto ParamType = mono_signature_get_params(Signature, &ParamIter))
+		{
+			if (strcmp(mono_type_get_name_full(ParamType, MONO_TYPE_NAME_FORMAT_FULL_NAME),
+			           mono_type_get_name_full(InParams[Index], MONO_TYPE_NAME_FORMAT_FULL_NAME)))
+			{
+				bIsSame = false;
+
+				break;
+			}
+
+			Index++;
+		}
+
+		if (bIsSame == true)
+		{
+			return Method;
 		}
 	}
 
@@ -747,66 +785,122 @@ void FMonoDomain::DeinitializeAssembly()
 
 void FMonoDomain::InitializeAssemblyLoadContext()
 {
-	if (const auto AssemblyUtilMonoClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),
-	                                                            TCHAR_TO_ANSI(*CLASS_ASSEMBLY_UTIL)))
+	const auto Name = mono_assembly_name_new("System.Runtime.Loader");
+
+	auto Assembly = mono_assembly_loaded(Name);
+
+	if (Assembly == nullptr)
 	{
-		if (const auto InitializeMonoMethod = Class_Get_Method_From_Name(
-			AssemblyUtilMonoClass, FUNCTION_ASSEMBLY_UTIL_INITIALIZE, 0))
-		{
-			Runtime_Invoke(InitializeMonoMethod, nullptr, nullptr, nullptr);
-		}
+		Assembly = mono_assembly_load(Name, nullptr, nullptr);
 	}
+
+	const auto Image = mono_assembly_get_image(Assembly);
+
+	const auto AssemblyLoadContextClass = mono_class_from_name(Image, "System.Runtime.Loader", "AssemblyLoadContext");
+
+	void* Params[2];
+
+	auto bIsCollectible = true;
+
+	Params[0] = String_New("MonoCSharp");
+
+	Params[1] = Value_Box(Get_Boolean_Class(), &bIsCollectible);
+
+	const auto AssemblyLoadContextObject = Object_Init(AssemblyLoadContextClass, 2, Params);
+
+	AssemblyLoadContextGCHandle = GCHandle_New_V2(AssemblyLoadContextObject, false);
 }
 
 void FMonoDomain::DeinitializeAssemblyLoadContext()
 {
-	if (const auto AssemblyUtilMonoClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),
-	                                                            TCHAR_TO_ANSI(*CLASS_ASSEMBLY_UTIL)))
+	if (AssemblyLoadContextGCHandle == nullptr)
 	{
-		if (const auto DeinitializeMonoMethod = Class_Get_Method_From_Name(
-			AssemblyUtilMonoClass, FUNCTION_ASSEMBLY_UTIL_DEINITIALIZE, 0))
-		{
-			Runtime_Invoke(DeinitializeMonoMethod, nullptr, nullptr, nullptr);
-		}
+		return;
 	}
+
+	const auto AssemblyLoadContextObject = GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
+
+	const auto AssemblyLoadContextClass = Object_Get_Class(AssemblyLoadContextObject);
+
+	const auto UnloadMethod = Class_Get_Method_From_Name(AssemblyLoadContextClass, TEXT("Unload"), 0);
+
+	Runtime_Invoke(UnloadMethod, AssemblyLoadContextObject, nullptr);
+
+	GCHandle_Free_V2(AssemblyLoadContextGCHandle);
+
+	AssemblyLoadContextGCHandle = nullptr;
 }
 
 void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 {
 #if WITH_EDITOR
-	if (const auto AssemblyUtilMonoClass = mono_class_from_name(AssemblyUtilImage, TCHAR_TO_ANSI(*NAMESPACE_ROOT),
-	                                                            TCHAR_TO_ANSI(*CLASS_ASSEMBLY_UTIL)))
+	const auto Name = mono_assembly_name_new("System.Runtime");
+
+	auto Assembly = mono_assembly_loaded(Name);
+
+	if (Assembly == nullptr)
 	{
+		Assembly = mono_assembly_load(Name, nullptr, nullptr);
+	}
+
+	auto Image = mono_assembly_get_image(Assembly);
+
+	const auto StreamReaderClass = mono_class_from_name(Image, "System.IO", "StreamReader");
+
+	const auto TextReaderClass = mono_class_from_name(Image, "System.IO", "TextReader");
+
+	const auto BaseStreamProperty = Class_Get_Property_From_Name(StreamReaderClass, TEXT("BaseStream"));
+
+	const auto BaseStreamGetterMethod = Property_Get_Get_Method(BaseStreamProperty);
+
+	const auto StreamReaderConstructorMethod = Class_Get_Method_From_Params(
+		StreamReaderClass, FUNCTION_OBJECT_CONSTRUCTOR,
+		TArray<MonoType*>{
+			mono_class_get_type(mono_get_string_class())
+		});
+
+	const auto TextReaderDisposeMethod = Class_Get_Method_From_Name(TextReaderClass, TEXT("Dispose"), 0);
+
+	const auto AssemblyLoadContextObject = GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
+
+	const auto AssemblyLoadContextClass = Object_Get_Class(AssemblyLoadContextObject);
+
+	const auto AlcLoadFromStreamMethod = Class_Get_Method_From_Name(AssemblyLoadContextClass, "LoadFromStream", 1);
+
+	for (const auto& AssemblyPath : InAssemblies)
+	{
+		if (!FPaths::FileExists(AssemblyPath))
+		{
+			continue;
+		}
+
 		void* Params[1];
 
-		if (const auto LoadMonoMethod = Class_Get_Method_From_Name(AssemblyUtilMonoClass, FUNCTION_ASSEMBLY_UTIL_LOAD,
-		                                                           TGetArrayLength(Params)))
-		{
-			for (const auto& AssemblyPath : InAssemblies)
-			{
-				if (!FPaths::FileExists(AssemblyPath))
-				{
-					continue;
-				}
+		Params[0] = String_New(TCHAR_TO_UTF8(*AssemblyPath));
 
-				Params[0] = String_New(TCHAR_TO_ANSI(*AssemblyPath));
+		const auto StreamObject = Object_New(StreamReaderClass);
 
-				if (const auto Result = Runtime_Invoke(LoadMonoMethod, nullptr, Params, nullptr))
-				{
-					auto GCHandle = GCHandle_New_V2(Result, true);
+		Runtime_Invoke(StreamReaderConstructorMethod, StreamObject, Params);
 
-					AssemblyGCHandles.Add(GCHandle);
+		const auto BaseStream = Runtime_Invoke(BaseStreamGetterMethod, StreamObject, nullptr);
 
-					const auto ReflectionAssembly = (MonoReflectionAssembly*)GCHandle_Get_Target_V2(GCHandle);
+		Params[0] = BaseStream;
 
-					auto Assembly = mono_reflection_assembly_get_assembly(ReflectionAssembly);
+		const auto Result = Runtime_Invoke(AlcLoadFromStreamMethod, AssemblyLoadContextObject, Params);
 
-					Assemblies.Add(Assembly);
+		Runtime_Invoke(TextReaderDisposeMethod, StreamObject, nullptr);
 
-					Images.Add(mono_assembly_get_image(Assembly));
-				}
-			}
-		}
+		auto GCHandle = GCHandle_New_V2(Result, true);
+
+		AssemblyGCHandles.Add(GCHandle);
+
+		const auto ReflectionAssembly = (MonoReflectionAssembly*)GCHandle_Get_Target_V2(GCHandle);
+
+		Assembly = mono_reflection_assembly_get_assembly(ReflectionAssembly);
+
+		Assemblies.Add(Assembly);
+
+		Images.Add(mono_assembly_get_image(Assembly));
 	}
 #else
 	for (const auto& AssemblyPath : InAssemblies)
