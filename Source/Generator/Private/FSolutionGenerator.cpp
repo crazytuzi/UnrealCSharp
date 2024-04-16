@@ -36,7 +36,7 @@ void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src)
 }
 
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
-                                      const TFunction<void(FString& InResult)>& InCopyTemplate)
+                                      const TFunction<void(FString& InResult)>& InFunction)
 {
 	FString Result;
 
@@ -50,7 +50,7 @@ void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
 
 	Result = Result.Replace(*PLUGIN_NAME, *PluginBaseDir.Right(PluginBaseDir.Len() - Index - 1));
 
-	InCopyTemplate(Result);
+	InFunction(Result);
 
 	auto& FileManager = IFileManager::Get();
 

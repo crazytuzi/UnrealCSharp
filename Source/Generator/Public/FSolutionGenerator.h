@@ -11,7 +11,7 @@ private:
 	static void CopyTemplate(const FString& Dest, const FString& Src);
 
 	static void CopyTemplate(const FString& Dest, const FString& Src,
-	                         const TFunction<void(FString& InResult)>& InCopyTemplate);
+	                         const TFunction<void(FString& InResult)>& InFunction);
 
 	static void CopyCSProj(const FString& Dest, const FString& Src);
 

@@ -19,6 +19,8 @@ public:
 
 	void Compile(const TArray<FFileChangeData>& FileChangeData) const;
 
+	void Compile(const TFunction<void()>& InFunction) const;
+
 	bool IsCompiling() const;
 
 private:

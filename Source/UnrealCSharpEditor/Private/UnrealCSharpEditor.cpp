@@ -38,6 +38,40 @@ void FUnrealCSharpEditorModule::StartupModule()
 	UToolMenus::RegisterStartupCallback(
 		FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
 
+	CodeAnalysisConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+		TEXT("UnrealCSharp.Editor.CodeAnalysis"), TEXT(""),
+		FConsoleCommandDelegate::CreateLambda(
+			[]()
+			{
+				FCodeAnalysis::CodeAnalysis();
+			}));
+
+	SolutionGeneratorConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+		TEXT("UnrealCSharp.Editor.SolutionGenerator"), TEXT(""),
+		FConsoleCommandDelegate::CreateLambda(
+			[]()
+			{
+				FSolutionGenerator::Generator();
+			}));
+
+	CompileConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+		TEXT("UnrealCSharp.Editor.Compile"), TEXT(""),
+		FConsoleCommandDelegate::CreateLambda(
+			[]()
+			{
+				FCSharpCompiler::Get().Compile([]()
+				{
+				});
+			}));
+
+	GeneratorConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+		TEXT("UnrealCSharp.Editor.Generator"), TEXT(""),
+		FConsoleCommandDelegate::CreateLambda(
+			[]()
+			{
+				Generator();
+			}));
+
 	if (IsRunningCookCommandlet())
 	{
 		Generator();
@@ -113,7 +147,7 @@ void FUnrealCSharpEditorModule::Generator()
 
 	FEnumGenerator::Generator();
 
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Blueprint Generator"));
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Asset Generator"));
 
 	FAssetGenerator::Generator();
 
