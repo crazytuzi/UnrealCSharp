@@ -48,18 +48,6 @@ struct FRegisterObject
 		return nullptr;
 	}
 
-	static MonoObject* GetWorldImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
-		{
-			const auto World = FoundObject->GetWorld();
-
-			return FCSharpEnvironment::GetEnvironment().Bind(World);
-		}
-
-		return nullptr;
-	}
-
 	static bool IsValidImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
 		if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
@@ -90,7 +78,7 @@ struct FRegisterObject
 			.Function("StaticClass", StaticClassImplementation)
 			.Function("GetClass", GetClassImplementation)
 			.Function("GetName", GetNameImplementation)
-			.Function("GetWorld", GetWorldImplementation)
+			.Function("GetWorld", BINDING_FUNCTION(&UObject::GetWorld))
 			.Function("IsValid", IsValidImplementation)
 			.Function("IsA", IsAImplementation)
 			.Register();

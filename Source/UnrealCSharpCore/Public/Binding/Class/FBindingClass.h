@@ -25,6 +25,10 @@ public:
 
 	static const TMap<FString, FBindingClass>& GetClasses();
 
+	static TSet<FString> GetPropertyNames(const FString& InClass);
+
+	static TSet<FString> GetFunctionNames(const FString& InClass);
+
 public:
 	bool IsReflection() const;
 

@@ -28,6 +28,36 @@ const TMap<FString, FBindingClass>& FBindingClass::GetClasses()
 	return Classes;
 }
 
+TSet<FString> FBindingClass::GetPropertyNames(const FString& InClass)
+{
+	TSet<FString> PropertyNames;
+
+	if (const auto Class = Classes.Find(InClass))
+	{
+		for (const auto& Property : Class->Properties)
+		{
+			PropertyNames.Add(Property.GetPropertyName());
+		}
+	}
+
+	return PropertyNames;
+}
+
+TSet<FString> FBindingClass::GetFunctionNames(const FString& InClass)
+{
+	TSet<FString> FunctionNames;
+
+	if (const auto Class = Classes.Find(InClass))
+	{
+		for (const auto& Function : Class->Functions)
+		{
+			FunctionNames.Add(Function.GetFunctionName());
+		}
+	}
+
+	return FunctionNames;
+}
+
 bool FBindingClass::IsReflection() const
 {
 	return bIsReflection;

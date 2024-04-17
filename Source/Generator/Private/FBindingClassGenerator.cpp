@@ -514,7 +514,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 	                               *PropertyContent,
 	                               !PropertyContent.IsEmpty() && !FunctionContent.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *FunctionContent,
-	                               !FunctionContent.IsEmpty() ? TEXT("\n") : TEXT(""),
+	                               !GCHandleContent.IsEmpty() && !FunctionContent.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *GCHandleContent
 	);
 

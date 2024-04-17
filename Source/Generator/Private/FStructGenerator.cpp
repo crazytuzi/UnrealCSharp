@@ -1,6 +1,7 @@
 ﻿#include "FStructGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
+#include "Binding/Class/FBindingClass.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -57,6 +58,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	auto PathNameAttributeContent = FGeneratorCore::GetPathNameAttribute(InScriptStruct);
 
 	auto ClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct);
+
+	const auto& BindingProperties = FBindingClass::GetPropertyNames(ClassContent);
 
 	FString SuperStructContent;
 
@@ -173,6 +176,13 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			continue;
 		}
 
+		auto PropertyName = PropertyIterator->GetName();
+
+		if (BindingProperties.Contains(PropertyName))
+		{
+			continue;
+		}
+
 		FDelegateGenerator::Generator(*PropertyIterator);
 
 		if (bHasProperty == true)
@@ -187,8 +197,6 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		FString PropertyAccessSpecifiers = TEXT("public");
 
 		auto PropertyType = FGeneratorCore::GetPropertyType(*PropertyIterator);
-
-		auto PropertyName = PropertyIterator->GetName();
 
 		PropertyNames.Add(TPair<FString, FString>{
 			FString::Printf(TEXT(
