@@ -8,14 +8,14 @@ struct FRegisterSoftClassPath
 	{
 		TBindingClassBuilder<FSoftClassPath>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FSoftClassPath, FSoftClassPath const&),
-			             {"Other"})
+			             TArray<FString>{"Other", "x"})
 			.Constructor(BINDING_CONSTRUCTOR(FSoftClassPath, const FString&),
-			             {"PathString"})
+			             TArray<FString>{"PathString"})
 			.Constructor(BINDING_CONSTRUCTOR(FSoftClassPath, const UClass*),
-			             {"InClass"})
+			             TArray<FString>{"InClass"})
 			.Function("ResolveClass", BINDING_FUNCTION(&FSoftClassPath::ResolveClass))
-			.Function("GetOrCreateIDForClass", BINDING_FUNCTION(&FSoftClassPath::GetOrCreateIDForClass),
-			          {"InClass"})
+			.Function("GetOrCreateIDForClass", BINDING_FUNCTION(&FSoftClassPath::GetOrCreateIDForClass,
+			                                                    TArray<FString>{"InClass"}))
 			.Register();
 	}
 };

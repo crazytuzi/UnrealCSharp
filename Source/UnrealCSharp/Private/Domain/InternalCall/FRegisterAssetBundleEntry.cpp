@@ -8,9 +8,9 @@ struct FRegisterAssetBundleEntry
 	{
 		TBindingClassBuilder<FAssetBundleEntry>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, const FAssetBundleEntry&),
-			             {"OldEntry"})
+			             TArray<FString>{"OldEntry"})
 			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, FName),
-			             {"InBundleName"})
+			             TArray<FString>{"InBundleName"})
 			.Function("IsValid", BINDING_FUNCTION(&FAssetBundleEntry::IsValid))
 			.Register();
 	}

@@ -99,14 +99,15 @@ const TArray<FBindingFunction>& FBindingClass::GetFunctions() const
 }
 
 void FBindingClass::BindingSubscript(const FString& InName, const FString& InGetImplementationName,
-                                     const FString& InSetImplementationName, FFunctionInfo* InTypeInfo,
-                                     const TArray<FString>& InParamNames)
+                                     const FString& InSetImplementationName, FFunctionInfo* InTypeInfo)
 {
 	if (Subscript == nullptr)
 	{
-		Subscript = new FBindingSubscript(InTypeInfo, InName,
-		                                  InName, InParamNames,
-		                                  InGetImplementationName, InSetImplementationName);
+		Subscript = new FBindingSubscript(InTypeInfo,
+		                                  InName,
+		                                  InName,
+		                                  InGetImplementationName,
+		                                  InSetImplementationName);
 	}
 }
 
@@ -127,15 +128,12 @@ void FBindingClass::BindingProperty(const FString& InName, FTypeInfo* InTypeInfo
 }
 
 void FBindingClass::BindingFunction(const FString& InName, const FString& InImplementationName,
-                                    FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames,
-                                    const EFunctionInteract InFunctionInteract)
+                                    FFunctionInfo* InTypeInfo)
 {
 	Functions.Emplace(
 		InTypeInfo,
 		InName,
-		InImplementationName,
-		InParamNames,
-		InFunctionInteract
+		InImplementationName
 	);
 }
 

@@ -218,9 +218,13 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 
 		TArray<FString> FunctionParamName;
 
+		const auto& DefaultArguments = Function.GetDefaultArguments();
+
 		if (!Function.GetParamNames().IsEmpty())
 		{
 			FunctionParamName = Function.GetParamNames();
+
+			auto DefaultArgumentIndex = 0;
 
 			for (auto Index = 0; Index < Params.Num(); ++Index)
 			{
@@ -231,11 +235,21 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 					FunctionDeclarationBody += TEXT("ref ");
 				}
 
+				FString DefaultParam;
+
+				if (Params.Num() - Index <= DefaultArguments.Num())
+				{
+					DefaultParam = GetFunctionDefaultParam(Params[Index], DefaultArguments[DefaultArgumentIndex]);
+
+					DefaultArgumentIndex++;
+				}
+
 				FunctionDeclarationBody += FString::Printf(TEXT(
-					"%s %s%s"
+					"%s %s%s%s"
 				),
 				                                           *Params[Index]->GetName(),
 				                                           *FunctionParamName[Index],
+				                                           *DefaultParam,
 				                                           Index == Params.Num() - 1 ? TEXT("") : TEXT(", ")
 				);
 			}
@@ -527,6 +541,18 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass& InClass)
 	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + TEXT(".cs");
 
 	FGeneratorCore::SaveStringToFile(FileName, Content);
+}
+
+FString FBindingClassGenerator::GetFunctionDefaultParam(const FTypeInfo* InTypeInfo, const FString& InDefaultArgument)
+{
+	if (InTypeInfo->IsPrimitive())
+	{
+		return FString::Printf(TEXT(" = %s"), *InDefaultArgument);
+	}
+	else
+	{
+		return FString::Printf(TEXT(" = null"));
+	}
 }
 
 void FBindingClassGenerator::GeneratorImplementation(const FBindingClass& InClass)

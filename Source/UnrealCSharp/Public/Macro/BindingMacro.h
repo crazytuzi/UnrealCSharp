@@ -249,22 +249,22 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 
 #define BINDING_FUNCTION_BUILDER_INVOKE(Function) TFunctionPointer<decltype(&TFunctionBuilder<decltype(Function), Function>::Invoke)>(&TFunctionBuilder<decltype(Function), Function>::Invoke).Value.Pointer
 
-#define BINDING_FUNCTION_BUILDER_INFO(Function) TFunctionBuilder<decltype(Function), Function>::Info()
+#define BINDING_FUNCTION_BUILDER_INFO(Function, ...) TFunctionBuilder<decltype(Function), Function>::Info(##__VA_ARGS__)
 
 #if WITH_FUNCTION_INFO
-#define BINDING_FUNCTION(Function) BINDING_FUNCTION_BUILDER_INVOKE(Function), BINDING_FUNCTION_BUILDER_INFO(Function)
+#define BINDING_FUNCTION(Function, ...) BINDING_FUNCTION_BUILDER_INVOKE(Function), BINDING_FUNCTION_BUILDER_INFO(Function, ##__VA_ARGS__)
 #else
-#define BINDING_FUNCTION(Function) BINDING_FUNCTION_BUILDER_INVOKE(Function)
+#define BINDING_FUNCTION(Function, ...) BINDING_FUNCTION_BUILDER_INVOKE(Function)
 #endif
 
 #define BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function) TFunctionPointer<decltype(&TFunctionBuilder<Signature, Function>::Invoke)>(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
 
-#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function) TFunctionBuilder<Signature, Function>::Info()
+#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ...) TFunctionBuilder<Signature, Function>::Info(##__VA_ARGS__)
 
 #if WITH_FUNCTION_INFO
-#define BINDING_OVERLOAD(Signature, Function) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function), BINDING_OVERLOAD_BUILDER_INFO(Signature, Function)
+#define BINDING_OVERLOAD(Signature, Function, ...) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function), BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ##__VA_ARGS__)
 #else
-#define BINDING_OVERLOAD(Signature, Function) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function)
+#define BINDING_OVERLOAD(Signature, Function, ...) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function)
 #endif
 
 #if WITH_FUNCTION_INFO
@@ -297,12 +297,12 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 
 #define BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index) TFunctionPointer<decltype(&TSubscriptBuilder<T, Result, Index>::Set)>(&TSubscriptBuilder<T, Result, Index>::Set).Value.Pointer
 
-#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index) TSubscriptBuilder<T, Result, Index>::Info()
+#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ...) TSubscriptBuilder<T, Result, Index>::Info(##__VA_ARGS__)
 
 #if WITH_FUNCTION_INFO
-#define BINDING_SUBSCRIPT(T, Result, Index) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index)
+#define BINDING_SUBSCRIPT(T, Result, Index, ...) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ##__VA_ARGS__)
 #else
-#define BINDING_SUBSCRIPT(T, Result, Index) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index)
+#define BINDING_SUBSCRIPT(T, Result, Index, ...) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index)
 #endif
 
 #define OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \

@@ -8,11 +8,11 @@ struct FRegisterPrimaryAssetType
 	{
 		TBindingClassBuilder<FPrimaryAssetType>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FPrimaryAssetType, FName),
-			             {"InName"})
+			             TArray<FString>{"InName"})
 			.Function("GetName", BINDING_FUNCTION(&FPrimaryAssetType::GetName))
 			.Function("IsValid", BINDING_FUNCTION(&FPrimaryAssetType::IsValid))
-			.Function("ToString", BINDING_FUNCTION(&FPrimaryAssetType::ToString),
-			          {}, EFunctionInteract::New)
+			.Function("ToString", BINDING_FUNCTION(&FPrimaryAssetType::ToString,
+			                                       EFunctionInteract::New))
 			.Register();
 	}
 };

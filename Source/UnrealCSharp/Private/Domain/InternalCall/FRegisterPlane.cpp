@@ -28,15 +28,15 @@ struct FRegisterPlane
 	{
 		TBindingClassBuilder<FPlane>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FPlane, const FVector4&),
-			             {"V"})
+			             TArray<FString>{"V"})
 			.Constructor(BINDING_CONSTRUCTOR(FPlane, FPlane::FReal, FPlane::FReal, FPlane::FReal, FPlane::FReal),
-			             {"InX", "InY", "InZ", "InW"})
+			             TArray<FString>{"InX", "InY", "InZ", "InW"})
 			.Constructor(BINDING_CONSTRUCTOR(FPlane, FVector, FPlane::FReal),
-			             {"InNormal", "InW"})
+			             TArray<FString>{"InNormal", "InW"})
 			.Constructor(BINDING_CONSTRUCTOR(FPlane, FVector, const FVector&),
-			             {"InBase", "InNormal"})
+			             TArray<FString>{"InBase", "InNormal"})
 			.Constructor(BINDING_CONSTRUCTOR(FPlane, FVector, FVector, FVector),
-			             {"A", "B", "C"})
+			             TArray<FString>{"A", "B", "C"})
 			.Constructor(BINDING_CONSTRUCTOR(FPlane, EForceInit))
 			.Plus()
 			.Minus()
@@ -49,19 +49,19 @@ struct FRegisterPlane
 			.Function("IsValid", BINDING_FUNCTION(&FPlane::IsValid))
 			.Function("GetOrigin", BINDING_FUNCTION(&FPlane::GetOrigin))
 			.Function("GetNormal", BINDING_FUNCTION(&FPlane::GetNormal))
-			.Function("PlaneDot",BINDING_FUNCTION(&FPlane::PlaneDot),
-			          {"P"})
-			.Function("Normalize", BINDING_FUNCTION(&FPlane::Normalize),
-			          {"Tolerance"}, EFunctionInteract::New)
+			.Function("PlaneDot",BINDING_FUNCTION(&FPlane::PlaneDot,
+			                                      TArray<FString>{"P"}))
+			.Function("Normalize", BINDING_FUNCTION(&FPlane::Normalize,
+			                                        TArray<FString>{"Tolerance"}, EFunctionInteract::New, SMALL_NUMBER))
 			.Function("Flip",BINDING_FUNCTION(&FPlane::Flip))
-			.Function("TransformBy", BINDING_FUNCTION(&FPlane::TransformBy),
-			          {"M"})
-			.Function("TransformByUsingAdjointT", BINDING_FUNCTION(&FPlane::TransformByUsingAdjointT),
-			          {"M", "DetM", "TA"})
-			.Function("TranslateBy", BINDING_FUNCTION(&FPlane::TranslateBy),
-			          {"V"})
-			.Function("Equals", BINDING_FUNCTION(&FPlane::Equals),
-			          {"V", "Tolerance"})
+			.Function("TransformBy", BINDING_FUNCTION(&FPlane::TransformBy,
+			                                          TArray<FString>{"M"}))
+			.Function("TransformByUsingAdjointT", BINDING_FUNCTION(&FPlane::TransformByUsingAdjointT,
+			                                                       TArray<FString>{"M", "DetM", "TA"}))
+			.Function("TranslateBy", BINDING_FUNCTION(&FPlane::TranslateBy,
+			                                          TArray<FString>{"V"}))
+			.Function("Equals", BINDING_FUNCTION(&FPlane::Equals,
+			                                     TArray<FString>{"V", "Tolerance"}, KINDA_SMALL_NUMBER))
 			.Register();
 	}
 };

@@ -12,5 +12,7 @@ private:
 
 	static void GeneratorPartial(const FBindingClass& InClass);
 
+	static FString GetFunctionDefaultParam(const FTypeInfo* InTypeInfo, const FString& InDefaultArgument);
+
 	static void GeneratorImplementation(const FBindingClass& InClass);
 };

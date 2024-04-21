@@ -8,11 +8,11 @@ struct FRegisterInt32Range
 	{
 		TBindingClassBuilder<FInt32Range>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FInt32Range, const int32&),
-			             {"A"})
+			             TArray<FString>{"A"})
 			.Constructor(BINDING_CONSTRUCTOR(FInt32Range, const int32&, const int32&),
-			             {"A", "B"})
+			             TArray<FString>{"A", "B"})
 			.Constructor(BINDING_CONSTRUCTOR(FInt32Range, const FInt32RangeBound&, const FInt32RangeBound&),
-			             {"InLowerBound", "InUpperBound"})
+			             TArray<FString>{"InLowerBound", "InUpperBound"})
 			// @TODO
 			// Adjoins
 			// Conjoins
@@ -20,14 +20,14 @@ struct FRegisterInt32Range
 			// Contiguous
 			// GetLowerBound
 			// SetLowerBound
-			.Function("SetLowerBoundValue", BINDING_FUNCTION(&FInt32Range::SetLowerBoundValue),
-			          {"NewLowerBoundValue"})
+			.Function("SetLowerBoundValue", BINDING_FUNCTION(&FInt32Range::SetLowerBoundValue,
+			                                                 TArray<FString>{"NewLowerBoundValue"}))
 			.Function("GetLowerBoundValue", BINDING_FUNCTION(&FInt32Range::GetLowerBoundValue))
 			// @TODO
 			// GetUpperBound
 			// SetUpperBound
-			.Function("SetUpperBoundValue", BINDING_FUNCTION(&FInt32Range::SetUpperBoundValue),
-			          {"NewUpperBoundValue"})
+			.Function("SetUpperBoundValue", BINDING_FUNCTION(&FInt32Range::SetUpperBoundValue,
+			                                                 TArray<FString>{"NewUpperBoundValue"}))
 			.Function("GetUpperBoundValue", BINDING_FUNCTION(&FInt32Range::GetUpperBoundValue))
 			.Function("HasLowerBound", BINDING_FUNCTION(&FInt32Range::HasLowerBound))
 			.Function("HasUpperBound", BINDING_FUNCTION(&FInt32Range::HasUpperBound))
@@ -35,19 +35,19 @@ struct FRegisterInt32Range
 			.Function("IsEmpty", BINDING_FUNCTION(&FInt32Range::IsEmpty))
 			// @TODO
 			// Overlaps
-			.Function("Split", BINDING_FUNCTION(&FInt32Range::Split),
-			          {"Element"})
+			.Function("Split", BINDING_FUNCTION(&FInt32Range::Split,
+			                                    TArray<FString>{"Element"}))
 			// @TODO
 			// Difference
 			// Hull
 			// Intersection
-			.Function("Union", BINDING_FUNCTION(&FInt32Range::Union),
-			          {"X", "Y"})
+			.Function("Union", BINDING_FUNCTION(&FInt32Range::Union,
+			                                    TArray<FString>{"X", "Y"}))
 			.Function("All", BINDING_FUNCTION(&FInt32Range::All))
-			.Function("AtLeast", BINDING_FUNCTION(&FInt32Range::AtLeast),
-			          {"Value"})
-			.Function("AtMost", BINDING_FUNCTION(&FInt32Range::AtMost),
-			          {"Value"})
+			.Function("AtLeast", BINDING_FUNCTION(&FInt32Range::AtLeast,
+			                                      TArray<FString>{"Value"}))
+			.Function("AtMost", BINDING_FUNCTION(&FInt32Range::AtMost,
+			                                     TArray<FString>{"Value"}))
 			.Function("Empty", BINDING_FUNCTION(&FInt32Range::Empty))
 			// @TODO
 			// Exclusive
