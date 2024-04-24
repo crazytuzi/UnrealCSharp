@@ -77,9 +77,9 @@ struct FRegisterDateTime
 	{
 		TBindingClassBuilder<FDateTime>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FDateTime, int64),
-			             {"InTicks"})
+			             TArray<FString>{"InTicks"})
 			.Constructor(BINDING_CONSTRUCTOR(FDateTime, int32, int32, int32, int32, int32, int32, int32),
-			             {"Year", "Month", "Day", "Hour", "Minute", "Second", "Millisecond"})
+			             TArray<FString>{"Year", "Month", "Day", "Hour", "Minute", "Second", "Millisecond"})
 			.Greater()
 			.GreaterEqual()
 			.Less()
@@ -95,8 +95,8 @@ struct FRegisterDateTime
 			.Function("operator -", FUNCTION_MINUS,
 			          BINDING_OVERLOAD(FDateTime(*)(const FDateTime&, const FTimespan&), &MinusImplementation))
 			.Function("GetDate", BINDING_OVERLOAD(FDateTime(FDateTime::*)()const, &FDateTime::GetDate))
-			.Function("GetDate", BINDING_OVERLOAD(void(FDateTime::*)(int32&, int32&, int32&)const, &FDateTime::GetDate),
-			          {"OutYear", "OutMonth", "OutDay"})
+			.Function("GetDate", BINDING_OVERLOAD(void(FDateTime::*)(int32&, int32&, int32&)const, &FDateTime::GetDate,
+			                                      TArray<FString>{"OutYear", "OutMonth", "OutDay"}))
 			.Function("GetDay", BINDING_FUNCTION(&FDateTime::GetDay))
 			.Function("GetDayOfWeek", BINDING_FUNCTION(&FDateTime::GetDayOfWeek))
 			.Function("GetDayOfYear", BINDING_FUNCTION(&FDateTime::GetDayOfYear))
@@ -116,30 +116,31 @@ struct FRegisterDateTime
 			.Function("IsMorning", BINDING_FUNCTION(&FDateTime::IsMorning))
 			.Function("ToHttpDate", BINDING_FUNCTION(&FDateTime::ToHttpDate))
 			.Function("ToIso8601", BINDING_FUNCTION(&FDateTime::ToIso8601))
-			.Function("ToString", BINDING_OVERLOAD(FString(FDateTime::*)()const, &FDateTime::ToString),
-			          {}, EFunctionInteract::New)
+			.Function("ToString", BINDING_OVERLOAD(FString(FDateTime::*)()const, &FDateTime::ToString,
+			                                       EFunctionInteract::New))
 			.Function("ToUnixTimestamp", BINDING_FUNCTION(&FDateTime::ToUnixTimestamp))
-			.Function("DaysInMonth", BINDING_FUNCTION(&FDateTime::DaysInMonth),
-			          {"Year", "Month"})
-			.Function("DaysInYear", BINDING_FUNCTION(&FDateTime::DaysInYear),
-			          {"Year"})
-			.Function("FromJulianDay", BINDING_FUNCTION(&FDateTime::FromJulianDay),
-			          {"JulianDay"})
-			.Function("FromUnixTimestamp", BINDING_FUNCTION(&FDateTime::FromUnixTimestamp),
-			          {"UnixTime"})
-			.Function("IsLeapYear", BINDING_FUNCTION(&FDateTime::IsLeapYear),
-			          {"Year"})
+			.Function("DaysInMonth", BINDING_FUNCTION(&FDateTime::DaysInMonth,
+			                                          TArray<FString>{"Year", "Month"}))
+			.Function("DaysInYear", BINDING_FUNCTION(&FDateTime::DaysInYear,
+			                                         TArray<FString>{"Year"}))
+			.Function("FromJulianDay", BINDING_FUNCTION(&FDateTime::FromJulianDay,
+			                                            TArray<FString>{"JulianDay"}))
+			.Function("FromUnixTimestamp", BINDING_FUNCTION(&FDateTime::FromUnixTimestamp,
+			                                                TArray<FString>{"UnixTime"}))
+			.Function("IsLeapYear", BINDING_FUNCTION(&FDateTime::IsLeapYear,
+			                                         TArray<FString>{"Year"}))
 			.Function("MaxValue", BINDING_FUNCTION(&FDateTime::MaxValue))
 			.Function("MinValue", BINDING_FUNCTION(&FDateTime::MinValue))
 			.Function("Now", BINDING_FUNCTION(&FDateTime::Now))
-			.Function("Parse", BINDING_FUNCTION(&FDateTime::Parse),
-			          {"DateTimeString", "OutDateTime"})
-			.Function("ParseHttpDate", BINDING_FUNCTION(&FDateTime::ParseHttpDate),
-			          {"HttpDate", "OutDateTime"})
+			.Function("Parse", BINDING_FUNCTION(&FDateTime::Parse,
+			                                    TArray<FString>{"DateTimeString", "OutDateTime"}))
+			.Function("ParseHttpDate", BINDING_FUNCTION(&FDateTime::ParseHttpDate,
+			                                            TArray<FString>{"HttpDate", "OutDateTime"}))
 			.Function("Today", BINDING_FUNCTION(&FDateTime::Today))
 			.Function("UtcNow", BINDING_FUNCTION(&FDateTime::UtcNow))
-			.Function("Validate", BINDING_FUNCTION(&FDateTime::Validate),
-			          {"Year", "Month", "Day", "Hour", "Minute", "Second", "Millisecond"})
+			.Function("Validate", BINDING_FUNCTION(&FDateTime::Validate,
+			                                       TArray<FString>{"Year", "Month", "Day", "Hour",
+			                                       "Minute", "Second", "Millisecond"}))
 			.Register();
 	}
 };

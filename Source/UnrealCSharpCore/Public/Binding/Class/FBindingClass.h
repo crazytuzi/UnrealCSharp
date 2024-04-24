@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Binding/Property/FBindingProperty.h"
-#include "Binding/Function/EFunctionInteract.h"
 #include "Binding/Function/FBindingFunction.h"
 #include "Binding/Function/FBindingSubscript.h"
 
@@ -25,6 +24,10 @@ public:
 
 	static const TMap<FString, FBindingClass>& GetClasses();
 
+	static TSet<FString> GetPropertyNames(const FString& InClass);
+
+	static TSet<FString> GetFunctionNames(const FString& InClass);
+
 public:
 	bool IsReflection() const;
 
@@ -44,15 +47,12 @@ public:
 
 public:
 	void BindingSubscript(const FString& InName, const FString& InGetImplementationName,
-	                      const FString& InSetImplementationName, FFunctionInfo* InTypeInfo,
-	                      const TArray<FString>& InParamNames);
+	                      const FString& InSetImplementationName, FFunctionInfo* InTypeInfo);
 
 	void BindingProperty(const FString& InName, FTypeInfo* InTypeInfo, const void* InGetMethod,
 	                     const void* InSetMethod);
 
-	void BindingFunction(const FString& InName, const FString& InImplementationName,
-	                     FFunctionInfo* InTypeInfo, const TArray<FString>& InParamNames,
-	                     const EFunctionInteract InFunctionInteract);
+	void BindingFunction(const FString& InName, const FString& InImplementationName, FFunctionInfo* InTypeInfo);
 
 	void Inheritance(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
 

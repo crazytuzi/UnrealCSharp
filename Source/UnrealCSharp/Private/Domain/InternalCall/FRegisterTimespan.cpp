@@ -18,13 +18,13 @@ struct FRegisterTimespan
 	{
 		TBindingClassBuilder<FTimespan>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FTimespan, int64),
-			             {"InTicks"})
+			             TArray<FString>{"InTicks"})
 			.Constructor(BINDING_CONSTRUCTOR(FTimespan, int32, int32, int32),
-			             {"Hours", "Minutes", "Seconds"})
+			             TArray<FString>{"Hours", "Minutes", "Seconds"})
 			.Constructor(BINDING_CONSTRUCTOR(FTimespan, int32, int32, int32, int32),
-			             {"Days", "Hours", "Minutes", "Seconds"})
+			             TArray<FString>{"Days", "Hours", "Minutes", "Seconds"})
 			.Constructor(BINDING_CONSTRUCTOR(FTimespan, int32, int32, int32, int32, int32),
-			             {"Days", "Hours", "Minutes", "Seconds", "FractionNano"})
+			             TArray<FString>{"Days", "Hours", "Minutes", "Seconds", "FractionNano"})
 			.Plus()
 			.UnaryMinus()
 			.Minus()
@@ -52,26 +52,26 @@ struct FRegisterTimespan
 			.Function("GetTotalMinutes", BINDING_FUNCTION(&FTimespan::GetTotalMinutes))
 			.Function("GetTotalSeconds", BINDING_FUNCTION(&FTimespan::GetTotalSeconds))
 			.Function("IsZero", BINDING_FUNCTION(&FTimespan::IsZero))
-			.Function("ToString", BINDING_OVERLOAD(FString(FTimespan::*)()const, &FTimespan::ToString),
-			          {}, EFunctionInteract::New)
-			.Function("FromDays", BINDING_FUNCTION(&FTimespan::FromDays),
-			          {"Days"})
-			.Function("FromHours", BINDING_FUNCTION(&FTimespan::FromHours),
-			          {"Hours"})
-			.Function("FromMicroseconds", BINDING_FUNCTION(&FTimespan::FromMicroseconds),
-			          {"Microseconds"})
-			.Function("FromMilliseconds", BINDING_FUNCTION(&FTimespan::FromMilliseconds),
-			          {"Milliseconds"})
-			.Function("FromMinutes", BINDING_FUNCTION(&FTimespan::FromMinutes),
-			          {"Minutes"})
-			.Function("FromSeconds", BINDING_FUNCTION(&FTimespan::FromSeconds),
-			          {"Seconds"})
+			.Function("ToString", BINDING_OVERLOAD(FString(FTimespan::*)()const, &FTimespan::ToString,
+			                                       EFunctionInteract::New))
+			.Function("FromDays", BINDING_FUNCTION(&FTimespan::FromDays,
+			                                       TArray<FString>{"Days"}))
+			.Function("FromHours", BINDING_FUNCTION(&FTimespan::FromHours,
+			                                        TArray<FString>{"Hours"}))
+			.Function("FromMicroseconds", BINDING_FUNCTION(&FTimespan::FromMicroseconds,
+			                                               TArray<FString>{"Microseconds"}))
+			.Function("FromMilliseconds", BINDING_FUNCTION(&FTimespan::FromMilliseconds,
+			                                               TArray<FString>{"Milliseconds"}))
+			.Function("FromMinutes", BINDING_FUNCTION(&FTimespan::FromMinutes,
+			                                          TArray<FString>{"Minutes"}))
+			.Function("FromSeconds", BINDING_FUNCTION(&FTimespan::FromSeconds,
+			                                          TArray<FString>{"Seconds"}))
 			.Function("MaxValue", BINDING_FUNCTION(&FTimespan::MaxValue))
 			.Function("MinValue", BINDING_FUNCTION(&FTimespan::MinValue))
-			.Function("Parse", BINDING_FUNCTION(&FTimespan::Parse),
-			          {"TimespanString", "OutTimespan"})
-			.Function("Ratio", BINDING_FUNCTION(&FTimespan::Ratio),
-			          {"Dividend", "Divisor"})
+			.Function("Parse", BINDING_FUNCTION(&FTimespan::Parse,
+			                                    TArray<FString>{"TimespanString", "OutTimespan"}))
+			.Function("Ratio", BINDING_FUNCTION(&FTimespan::Ratio,
+			                                    TArray<FString>{"Dividend", "Divisor"}))
 			.Function("Zero", BINDING_FUNCTION(&FTimespan::Zero))
 			.Register();
 	}

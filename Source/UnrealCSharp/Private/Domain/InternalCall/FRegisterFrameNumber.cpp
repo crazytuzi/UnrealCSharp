@@ -18,7 +18,7 @@ struct FRegisterFrameNumber
 	{
 		TBindingClassBuilder<FFrameNumber>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FFrameNumber, int32),
-			             {"InValue"})
+			             TArray<FString>{"InValue"})
 			.PreIncrement()
 			.PreDecrement()
 			.Less()

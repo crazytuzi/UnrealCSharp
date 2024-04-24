@@ -2,25 +2,17 @@
 
 #include "TFunctionHelper.inl"
 #include "THasRef.inl"
-#include "Binding/Function/TFunctionInfo.inl"
+#include "Binding/Function/TFunctionInfoBuilder.inl"
 
 template <typename T, T>
 struct TFunctionBuilder
 {
 };
 
-template <EFunctionType FunctionType, typename Result, typename... Args>
-struct TFunctionInfoBuilder
-{
-	static FFunctionInfo* Info()
-	{
-		return TFunctionInfo<FunctionType, Result, Args...>::Get();
-	}
-};
-
 template <typename... Args, void (*Function)(Args...)>
 struct TFunctionBuilder<void (*)(Args...), Function> :
-	TFunctionInfoBuilder<EFunctionType::Static, void, Args...>
+	TFunctionInfoBuilder<TFunctionBuilder<void (*)(Args...), Function>,
+	                     EFunctionType::Static, void, Args...>
 {
 	static void Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
@@ -44,7 +36,8 @@ struct TFunctionBuilder<void (*)(Args...), Function> :
 
 template <typename Result, typename... Args, Result (*Function)(Args...)>
 struct TFunctionBuilder<Result (*)(Args...), Function> :
-	TFunctionInfoBuilder<EFunctionType::Static, Result, Args...>
+	TFunctionInfoBuilder<TFunctionBuilder<Result (*)(Args...), Function>,
+	                     EFunctionType::Static, Result, Args...>
 {
 	static MonoObject* Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
@@ -68,7 +61,8 @@ struct TFunctionBuilder<Result (*)(Args...), Function> :
 
 template <typename Class, typename... Args, void (Class::*Function)(Args...)>
 struct TFunctionBuilder<void (Class::*)(Args...), Function> :
-	TFunctionInfoBuilder<EFunctionType::Member, void, Args...>
+	TFunctionInfoBuilder<TFunctionBuilder<void (Class::*)(Args...), Function>,
+	                     EFunctionType::Member, void, Args...>
 {
 	static void Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
@@ -92,7 +86,8 @@ struct TFunctionBuilder<void (Class::*)(Args...), Function> :
 
 template <typename Class, typename Result, typename... Args, Result (Class::*Function)(Args...)>
 struct TFunctionBuilder<Result (Class::*)(Args...), Function> :
-	TFunctionInfoBuilder<EFunctionType::Member, Result, Args...>
+	TFunctionInfoBuilder<TFunctionBuilder<Result (Class::*)(Args...), Function>,
+	                     EFunctionType::Member, Result, Args...>
 {
 	static MonoObject* Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
@@ -116,7 +111,8 @@ struct TFunctionBuilder<Result (Class::*)(Args...), Function> :
 
 template <typename Class, typename... Args, void (Class::*Function)(Args...) const>
 struct TFunctionBuilder<void (Class::*)(Args...) const, Function> :
-	TFunctionInfoBuilder<EFunctionType::Member, void, Args...>
+	TFunctionInfoBuilder<TFunctionBuilder<void (Class::*)(Args...) const, Function>,
+	                     EFunctionType::Member, void, Args...>
 {
 	static void Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
@@ -140,7 +136,8 @@ struct TFunctionBuilder<void (Class::*)(Args...) const, Function> :
 
 template <typename Class, typename Result, typename... Args, Result (Class::*Function)(Args...) const>
 struct TFunctionBuilder<Result (Class::*)(Args...) const, Function> :
-	TFunctionInfoBuilder<EFunctionType::Member, Result, Args...>
+	TFunctionInfoBuilder<TFunctionBuilder<Result (Class::*)(Args...) const, Function>,
+	                     EFunctionType::Member, Result, Args...>
 {
 	static MonoObject* Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{

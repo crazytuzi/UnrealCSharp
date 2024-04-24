@@ -8,13 +8,13 @@ struct FRegisterRandomStream
 	{
 		TBindingClassBuilder<FRandomStream>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FRandomStream, int32),
-			             {"InSeed"})
+			             TArray<FString>{"InSeed"})
 			.Constructor(BINDING_CONSTRUCTOR(FRandomStream, FName),
-			             {"InName"})
-			.Function("Initialize", BINDING_OVERLOAD(void(FRandomStream::*)(int32), &FRandomStream::Initialize),
-			          {"InSeed"})
-			.Function("Initialize", BINDING_OVERLOAD(void(FRandomStream::*)(FName), &FRandomStream::Initialize),
-			          {"InName"})
+			             TArray<FString>{"InName"})
+			.Function("Initialize", BINDING_OVERLOAD(void(FRandomStream::*)(int32), &FRandomStream::Initialize,
+			                                         TArray<FString>{"InSeed"}))
+			.Function("Initialize", BINDING_OVERLOAD(void(FRandomStream::*)(FName), &FRandomStream::Initialize,
+			                                         TArray<FString>{"InName"}))
 			.Function("Reset", BINDING_FUNCTION(&FRandomStream::Reset))
 			.Function("GetInitialSeed", BINDING_FUNCTION(&FRandomStream::GetInitialSeed))
 			.Function("GenerateNewSeed", BINDING_FUNCTION(&FRandomStream::GenerateNewSeed))
@@ -23,25 +23,26 @@ struct FRegisterRandomStream
 			.Function("GetUnitVector", BINDING_FUNCTION(&FRandomStream::GetUnitVector))
 			.Function("GetCurrentSeed", BINDING_FUNCTION(&FRandomStream::GetCurrentSeed))
 			.Function("FRand", BINDING_FUNCTION(&FRandomStream::FRand))
-			.Function("RandHelper", BINDING_FUNCTION(&FRandomStream::RandHelper),
-			          {"A"})
-			.Function("RandRange", BINDING_FUNCTION(&FRandomStream::RandRange),
-			          {"Min", "Max"})
-			.Function("FRandRange", BINDING_FUNCTION(&FRandomStream::FRandRange),
-			          {"InMin", "InMax"})
+			.Function("RandHelper", BINDING_FUNCTION(&FRandomStream::RandHelper,
+			                                         TArray<FString>{"A"}))
+			.Function("RandRange", BINDING_FUNCTION(&FRandomStream::RandRange,
+			                                        TArray<FString>{"Min", "Max"}))
+			.Function("FRandRange", BINDING_FUNCTION(&FRandomStream::FRandRange,
+			                                         TArray<FString>{"InMin", "InMax"}))
 			.Function("VRand", BINDING_FUNCTION(&FRandomStream::VRand))
-			.Function("RandPointInBox", BINDING_FUNCTION(&FRandomStream::RandPointInBox),
-			          {"Box"})
+			.Function("RandPointInBox", BINDING_FUNCTION(&FRandomStream::RandPointInBox,
+			                                             TArray<FString>{"Box"}))
 			.Function("VRandCone",
 			          BINDING_OVERLOAD(FVector(FRandomStream::*)(FVector const&, float)const,
-			                           &FRandomStream::VRandCone),
-			          {"Dir", "ConeHalfAngleRad"})
+			                           &FRandomStream::VRandCone,
+			                           TArray<FString>{"Dir", "ConeHalfAngleRad"}))
 			.Function("VRandCone",
 			          BINDING_OVERLOAD(FVector(FRandomStream::*)(FVector const&, float, float)const,
-			                           &FRandomStream::VRandCone),
-			          {"Dir", "HorizontalConeHalfAngleRad", "VerticalConeHalfAngleRad"})
-			.Function("ToString", BINDING_FUNCTION(&FRandomStream::ToString),
-			          {}, EFunctionInteract::New)
+			                           &FRandomStream::VRandCone,
+			                           TArray<FString>{"Dir", "HorizontalConeHalfAngleRad",
+			                           "VerticalConeHalfAngleRad"}))
+			.Function("ToString", BINDING_FUNCTION(&FRandomStream::ToString,
+			                                       EFunctionInteract::New))
 			.Register();
 	}
 };

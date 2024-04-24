@@ -24,14 +24,15 @@ public:
 	TClassBuilder& Constructor(const void* InMethod, FFunctionInfo* InFunctionInfo,
 	                           const TArray<FString>& InParamNames = {})
 #else
-	TClassBuilder& Constructor(const void* InMethod,
-	                           const TArray<FString>& InParamNames = {})
+	TClassBuilder& Constructor(const void* InMethod, const TArray<FString>& InParamNames = {})
 #endif
 	{
 #if WITH_FUNCTION_INFO
-		Function(TClassName<T>::Get(), InMethod, InFunctionInfo, InParamNames);
+		InFunctionInfo->SetParamNames(InParamNames);
+
+		Function(TClassName<T>::Get(), InMethod, InFunctionInfo);
 #else
-		Function(TClassName<T>::Get(), InMethod, InParamNames);
+		Function(TClassName<T>::Get(), InMethod);
 #endif
 
 		return *this;
@@ -66,18 +67,15 @@ public:
 	}
 
 #if WITH_FUNCTION_INFO
-	TClassBuilder& Subscript(const void* InGetMethod, const void* InSetMethod,
-	                         FFunctionInfo* InFunctionInfo, const TArray<FString>& InParamNames)
+	TClassBuilder& Subscript(const void* InGetMethod, const void* InSetMethod, FFunctionInfo* InFunctionInfo)
 #else
-	TClassBuilder& Subscript(const void* InGetMethod, const void* InSetMethod,
-							   const TArray<FString>& InParamNames)
+	TClassBuilder& Subscript(const void* InGetMethod, const void* InSetMethod)
 #endif
 	{
 #if WITH_FUNCTION_INFO
 		if (InFunctionInfo != nullptr)
 		{
-			GetBindingClass()->BindingSubscript("this", FUNCTION_GET_SUBSCRIPT, FUNCTION_SET_SUBSCRIPT,
-			                                    InFunctionInfo, InParamNames);
+			GetBindingClass()->BindingSubscript("this", FUNCTION_GET_SUBSCRIPT, FUNCTION_SET_SUBSCRIPT, InFunctionInfo);
 		}
 #endif
 

@@ -1,16 +1,12 @@
 #pragma once
 
 #include "TDestructorHelper.inl"
-#include "Binding/Function/TFunctionInfo.inl"
+#include "Binding/Function/TFunctionInfoBuilder.inl"
 
 template <typename... Args>
-struct TDestructorBuilder
+struct TDestructorBuilder :
+	TFunctionInfoBuilder<TDestructorBuilder<Args...>, EFunctionType::Destructor, void, Args...>
 {
-	static FFunctionInfo* Info()
-	{
-		return TFunctionInfo<EFunctionType::Destructor, void>::Get();
-	}
-
 	static void Invoke(BINDING_DESTRUCTOR_SIGNATURE)
 	{
 		TDestructorHelper<std::tuple<Args...>>::template Call(

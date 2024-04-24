@@ -1,5 +1,4 @@
 ﻿using Script.Library;
-using Script.Engine;
 
 namespace Script.CoreUObject
 {
@@ -8,8 +7,6 @@ namespace Script.CoreUObject
         public UClass GetClass() => UObjectImplementation.UObject_GetClassImplementation(GarbageCollectionHandle);
 
         public FString GetName() => UObjectImplementation.UObject_GetNameImplementation(GarbageCollectionHandle);
-
-        public UWorld GetWorld() => UObjectImplementation.UObject_GetWorldImplementation(GarbageCollectionHandle);
 
         public override string ToString() => GetName().ToString();
 

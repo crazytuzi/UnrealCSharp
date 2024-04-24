@@ -38,16 +38,16 @@ struct FRegisterVector2D
 	{
 		TBindingClassBuilder<FVector2D>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FVector2D, FVector2D::FReal, FVector2D::FReal),
-			             {"InX", "InY"})
+			             TArray<FString>{"InX", "InY"})
 			.Constructor(BINDING_CONSTRUCTOR(FVector2D, FVector2D::FReal),
-			             {"InF"})
+			             TArray<FString>{"InF"})
 			.Constructor(BINDING_CONSTRUCTOR(FVector2D, FIntPoint),
-			             {"InPos"})
+			             TArray<FString>{"InPos"})
 			.Constructor(BINDING_CONSTRUCTOR(FVector2D, EForceInit))
 			.Constructor(BINDING_CONSTRUCTOR(FVector2D, const FVector&),
-			             {"V"})
+			             TArray<FString>{"V"})
 			.Constructor(BINDING_CONSTRUCTOR(FVector2D, const FVector4&),
-			             {"V"})
+			             TArray<FString>{"V"})
 			.Plus()
 			.Minus()
 			.Multiplies()
@@ -57,8 +57,8 @@ struct FRegisterVector2D
 			.LessEqual()
 			.GreaterEqual()
 			.UnaryMinus()
-			.Subscript(BINDING_SUBSCRIPT(FVector2D, FVector2D::FReal, int32),
-			           {"Index"})
+			.Subscript(BINDING_SUBSCRIPT(FVector2D, FVector2D::FReal, int32,
+			                             TArray<FString>{"Index"}))
 			.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
 			.Function("operator /", FUNCTION_DIVIDES, BINDING_FUNCTION(&DividesImplementation))
 			.Function("operator +", FUNCTION_PLUS, BINDING_FUNCTION(&PlusImplementation))
@@ -72,24 +72,24 @@ struct FRegisterVector2D
 			.Function("One", BINDING_FUNCTION(&FVector2D::One))
 			.Function("UnitX", BINDING_FUNCTION(&FVector2D::UnitX))
 			.Function("UnitY", BINDING_FUNCTION(&FVector2D::UnitY))
-			.Function("Component", BINDING_OVERLOAD(FVector2D::FReal(FVector2D::*)(int32)const, &FVector2D::Component),
-			          {"Index"})
-			.Function("DotProduct", BINDING_FUNCTION(&FVector2D::DotProduct),
-			          {"A", "B"})
-			.Function("DistSquared", BINDING_FUNCTION(&FVector2D::DistSquared),
-			          {"V1", "V2"})
-			.Function("Distance", BINDING_FUNCTION(&FVector2D::Distance),
-			          {"V1", "V2"})
-			.Function("CrossProduct", BINDING_FUNCTION(&FVector2D::CrossProduct),
-			          {"A", "B"})
-			.Function("Max", BINDING_FUNCTION(&FVector2D::Max),
-			          {"A", "B"})
-			.Function("Min", BINDING_FUNCTION(&FVector2D::Min),
-			          {"A", "B"})
-			.Function("Equals", BINDING_FUNCTION(&FVector2D::Equals),
-			          {"V", "Tolerance"})
-			.Function("Set", BINDING_FUNCTION(&FVector2D::Set),
-			          {"InX", "InY"})
+			.Function("Component", BINDING_OVERLOAD(FVector2D::FReal(FVector2D::*)(int32)const, &FVector2D::Component,
+			                                        TArray<FString>{"Index"}))
+			.Function("DotProduct", BINDING_FUNCTION(&FVector2D::DotProduct,
+			                                         TArray<FString>{"A", "B"}))
+			.Function("DistSquared", BINDING_FUNCTION(&FVector2D::DistSquared,
+			                                          TArray<FString>{"V1", "V2"}))
+			.Function("Distance", BINDING_FUNCTION(&FVector2D::Distance,
+			                                       TArray<FString>{"V1", "V2"}))
+			.Function("CrossProduct", BINDING_FUNCTION(&FVector2D::CrossProduct,
+			                                           TArray<FString>{"A", "B"}))
+			.Function("Max", BINDING_FUNCTION(&FVector2D::Max,
+			                                  TArray<FString>{"A", "B"}))
+			.Function("Min", BINDING_FUNCTION(&FVector2D::Min,
+			                                  TArray<FString>{"A", "B"}))
+			.Function("Equals", BINDING_FUNCTION(&FVector2D::Equals,
+			                                     TArray<FString>{"V", "Tolerance"}, KINDA_SMALL_NUMBER))
+			.Function("Set", BINDING_FUNCTION(&FVector2D::Set,
+			                                  TArray<FString>{"InX", "InY"}))
 			.Function("GetMax", BINDING_FUNCTION(&FVector2D::GetMax))
 			.Function("GetAbsMax", BINDING_FUNCTION(&FVector2D::GetAbsMax))
 			.Function("GetMin", BINDING_FUNCTION(&FVector2D::GetMin))
@@ -97,33 +97,33 @@ struct FRegisterVector2D
 			.Function("Length", BINDING_FUNCTION(&FVector2D::Length))
 			.Function("SizeSquared", BINDING_FUNCTION(&FVector2D::SizeSquared))
 			.Function("SquaredLength", BINDING_FUNCTION(&FVector2D::SquaredLength))
-			.Function("Dot", BINDING_FUNCTION(&FVector2D::Dot),
-			          {"V2"})
-			.Function("GetRotated", BINDING_FUNCTION(&FVector2D::GetRotated),
-			          {"AngleDeg"})
-			.Function("GetSafeNormal", BINDING_FUNCTION(&FVector2D::GetSafeNormal),
-			          {"Tolerance"})
-			.Function("Normalize", BINDING_FUNCTION(&FVector2D::Normalize),
-			          {"Tolerance"})
-			.Function("IsNearlyZero", BINDING_FUNCTION(&FVector2D::IsNearlyZero),
-			          {"Tolerance"})
+			.Function("Dot", BINDING_FUNCTION(&FVector2D::Dot,
+			                                  TArray<FString>{"V2"}))
+			.Function("GetRotated", BINDING_FUNCTION(&FVector2D::GetRotated,
+			                                         TArray<FString>{"AngleDeg"}))
+			.Function("GetSafeNormal", BINDING_FUNCTION(&FVector2D::GetSafeNormal,
+			                                            TArray<FString>{"Tolerance"}, SMALL_NUMBER))
+			.Function("Normalize", BINDING_FUNCTION(&FVector2D::Normalize,
+			                                        TArray<FString>{"Tolerance"}, SMALL_NUMBER))
+			.Function("IsNearlyZero", BINDING_FUNCTION(&FVector2D::IsNearlyZero,
+			                                           TArray<FString>{"Tolerance"}, KINDA_SMALL_NUMBER))
 			.Function("ToDirectionAndLength",
-			          BINDING_OVERLOAD(void(FVector2D::*)(FVector2D&, double&)const, &FVector2D::ToDirectionAndLength),
-			          {"OutDir", "OutLength"})
+			          BINDING_OVERLOAD(void(FVector2D::*)(FVector2D&, double&)const, &FVector2D::ToDirectionAndLength,
+			                           TArray<FString>{"OutDir", "OutLength"}))
 			.Function("ToDirectionAndLength",
-			          BINDING_OVERLOAD(void(FVector2D::*)(FVector2D&, float&)const, &FVector2D::ToDirectionAndLength),
-			          {"OutDir", "OutLength"})
+			          BINDING_OVERLOAD(void(FVector2D::*)(FVector2D&, float&)const, &FVector2D::ToDirectionAndLength,
+			                           TArray<FString>{"OutDir", "OutLength"}))
 			.Function("IsZero", BINDING_FUNCTION(&FVector2D::IsZero))
 			.Function("IntPoint", BINDING_FUNCTION(&FVector2D::IntPoint))
 			.Function("RoundToVector", BINDING_FUNCTION(&FVector2D::RoundToVector))
-			.Function("ClampAxes", BINDING_FUNCTION(&FVector2D::ClampAxes),
-			          {"MinAxisVal", "MaxAxisVal"})
+			.Function("ClampAxes", BINDING_FUNCTION(&FVector2D::ClampAxes,
+			                                        TArray<FString>{"MinAxisVal", "MaxAxisVal"}))
 			.Function("GetSignVector", BINDING_FUNCTION(&FVector2D::GetSignVector))
 			.Function("GetAbs", BINDING_FUNCTION(&FVector2D::GetAbs))
-			.Function("ToString", BINDING_FUNCTION(&FVector2D::ToString),
-			          {}, EFunctionInteract::New)
-			.Function("InitFromString", BINDING_FUNCTION(&FVector2D::InitFromString),
-			          {"InSourceString"})
+			.Function("ToString", BINDING_FUNCTION(&FVector2D::ToString,
+			                                       EFunctionInteract::New))
+			.Function("InitFromString", BINDING_FUNCTION(&FVector2D::InitFromString,
+			                                             TArray<FString>{"InSourceString"}))
 			.Function("ContainsNaN", BINDING_FUNCTION(&FVector2D::ContainsNaN))
 			.Function("SphericalToUnitCartesian", BINDING_FUNCTION(&FVector2D::SphericalToUnitCartesian))
 			.Register();

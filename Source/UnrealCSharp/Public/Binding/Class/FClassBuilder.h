@@ -5,7 +5,6 @@
 #include "Macro/BindingMacro.h"
 #include "Binding/Class/FBindingClass.h"
 #include "Binding/Function/FBindingFunctionBase.inl"
-#include "Binding/Function/EFunctionInteract.h"
 #include "Macro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 
@@ -22,12 +21,9 @@ public:
 
 	template <typename T>
 #if WITH_FUNCTION_INFO
-	FClassBuilder& Function(const FString& InName, T InMethod,
-	                        FFunctionInfo* InFunctionInfo = nullptr, const TArray<FString>& InParamNames = {},
-	                        const EFunctionInteract InFunctionInteract = EFunctionInteract::None);
+	FClassBuilder& Function(const FString& InName, T InMethod, FFunctionInfo* InFunctionInfo = nullptr);
 #else
-	FClassBuilder& Function(const FString& InName, T InMethod, const TArray<FString>& InParamNames = {},
-	                        const EFunctionInteract InFunctionInteract = EFunctionInteract::None);
+	FClassBuilder& Function(const FString& InName, T InMethod);
 #endif
 
 	template <typename T, typename U>
@@ -46,13 +42,10 @@ public:
 
 #if WITH_FUNCTION_INFO
 	FClassBuilder& Function(const FString& InName, const FString& InImplementationName,
-	                        const void* InMethod, FFunctionInfo* InFunctionInfo = nullptr,
-	                        const TArray<FString>& InParamNames = {},
-	                        const EFunctionInteract InFunctionInteract = EFunctionInteract::None);
+	                        const void* InMethod, FFunctionInfo* InFunctionInfo = nullptr);
 #else
 	FClassBuilder& Function(const FString& InName, const FString& InImplementationName,
-	                        const void* InMethod, const TArray<FString>& InParamNames = {},
-	                        const EFunctionInteract InFunctionInteract = EFunctionInteract::None);
+	                        const void* InMethod);
 #endif
 
 	void Register();
@@ -90,12 +83,9 @@ private:
 
 template <typename T>
 #if WITH_FUNCTION_INFO
-FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod,
-                                       FFunctionInfo* InFunctionInfo, const TArray<FString>& InParamNames,
-                                       const EFunctionInteract InFunctionInteract)
+FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod, FFunctionInfo* InFunctionInfo)
 #else
-FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod, const TArray<FString>& InParamNames,
-                                       const EFunctionInteract InFunctionInteract)
+FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod)
 #endif
 {
 	auto FunctionPointer = TFunctionPointer<decltype(InMethod)>(InMethod);
@@ -104,15 +94,11 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, T InMethod, const 
 	return Function(InName,
 	                InName,
 	                FunctionPointer.Value.Pointer,
-	                InFunctionInfo,
-	                InParamNames,
-	                InFunctionInteract);
+	                InFunctionInfo);
 #else
 	return Function(InName,
-		InName,
-		FunctionPointer.Value.Pointer,
-		InParamNames,
-		InFunctionInteract);
+	                InName,
+	                FunctionPointer.Value.Pointer);
 #endif
 }
 

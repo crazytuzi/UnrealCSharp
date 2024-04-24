@@ -10,20 +10,20 @@ struct FRegisterAssetBundleData
 			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleData, const FAssetBundleData&))
 			.Function("FindEntry",
 			          BINDING_OVERLOAD(FAssetBundleEntry*(FAssetBundleData::*)(FName),
-			                           &FAssetBundleData::FindEntry),
-			          {"SearchName"})
+			                           &FAssetBundleData::FindEntry,
+			                           TArray<FString>{"SearchName"}))
 			.Function("AddBundleAsset",
 			          BINDING_OVERLOAD(void(FAssetBundleData::*)(FName, const FSoftObjectPath&),
-			                           &FAssetBundleData::AddBundleAsset),
-			          {"BundleName", "AssetPath"})
+			                           &FAssetBundleData::AddBundleAsset,
+			                           TArray<FString>{"BundleName", "AssetPath"}))
 			.Function("AddBundleAssets",
 			          BINDING_OVERLOAD(void(FAssetBundleData::*)(FName, const TArray<FSoftObjectPath>&),
-			                           &FAssetBundleData::AddBundleAssets),
-			          {"BundleName", "AssetPaths"})
+			                           &FAssetBundleData::AddBundleAssets,
+			                           TArray<FString>{"BundleName", "AssetPaths"}))
 			.Function("SetBundleAssets",
 			          BINDING_OVERLOAD(void(FAssetBundleData::*)(FName, TArray<FSoftObjectPath>&&),
-			                           &FAssetBundleData::SetBundleAssets),
-			          {"BundleName", "AssetPaths"})
+			                           &FAssetBundleData::SetBundleAssets,
+			                           TArray<FString>{"BundleName", "AssetPaths"}))
 			.Function("Reset", BINDING_FUNCTION(&FAssetBundleData::Reset))
 			.Function("ToDebugString", BINDING_FUNCTION(&FAssetBundleData::ToDebugString))
 			.Register();

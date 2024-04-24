@@ -38,19 +38,17 @@ FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<void*
 
 #if WITH_FUNCTION_INFO
 FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
-                                       const void* InMethod, FFunctionInfo* InFunctionInfo,
-                                       const TArray<FString>& InParamNames, const EFunctionInteract InFunctionInteract)
+                                       const void* InMethod, FFunctionInfo* InFunctionInfo)
 #else
 FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
-                                       const void* InMethod, const TArray<FString>& InParamNames,
-                                       const EFunctionInteract InFunctionInteract)
+                                       const void* InMethod)
 #endif
 {
 #if WITH_FUNCTION_INFO
 	if (InFunctionInfo != nullptr)
 	{
 		GetBindingClass()->BindingFunction(InName, GetFunctionImplementationName(InName, InImplementationName),
-		                                   InFunctionInfo, InParamNames, InFunctionInteract);
+		                                   InFunctionInfo);
 	}
 #endif
 

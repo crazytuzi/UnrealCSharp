@@ -1,14 +1,14 @@
 #pragma once
 
 #include "TSubscriptHelper.inl"
-#include "Binding/Function/TFunctionInfo.inl"
+#include "Binding/Function/TFunctionInfoBuilder.inl"
 
 template <typename Class, typename Result, typename Index>
-struct TSubscriptBuilder
+struct TSubscriptBuilder :
+	TFunctionInfoBuilder<TSubscriptBuilder<Class, Result, Index>, EFunctionType::Member, Result, Index>
 {
-	static FFunctionInfo* Info()
+	static void Invoke()
 	{
-		return TFunctionInfo<EFunctionType::Member, Result, Index>::Get();
 	}
 
 	static void Get(BINDING_SUBSCRIPT_SIGNATURE)

@@ -45,23 +45,23 @@ struct FRegisterGuid
 	{
 		TBindingClassBuilder<FGuid>(NAMESPACE_BINDING)
 			.Constructor(BINDING_CONSTRUCTOR(FGuid, uint32, uint32, uint32, uint32),
-			             {"InA", "InB", "InC", "InD"})
+			             TArray<FString>{"InA", "InB", "InC", "InD"})
 			.Constructor(BINDING_CONSTRUCTOR(FGuid, const FString&),
-			             {"InGuidStr"})
+			             TArray<FString>{"InGuidStr"})
 			.Less()
-			.Subscript(BINDING_SUBSCRIPT(FGuid, uint32, int32),
-			           {"Index"})
+			.Subscript(BINDING_SUBSCRIPT(FGuid, uint32, int32,
+			                             TArray<FString>{"Index"}))
 			.Function("operator >", FUNCTION_GREATER, BINDING_FUNCTION(&GreaterThanImplementation))
-			.Function("LexToString", BINDING_FUNCTION(&LexToStringImplementation),
-			          {"Value"})
+			.Function("LexToString", BINDING_FUNCTION(&LexToStringImplementation,
+			                                          TArray<FString>{"Value"}))
 			.Function("Invalidate", BINDING_FUNCTION(&FGuid::Invalidate))
 			.Function("IsValid", BINDING_FUNCTION(&FGuid::IsValid))
 #if UE_GUID_TO_STRING
-			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString),
-			          {}, EFunctionInteract::New)
+			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString,
+			                                       EFunctionInteract::New))
 #endif
-			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString),
-			          {"Format"})
+			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString,
+			                                       TArray<FString>{"Format"}))
 			.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
 			.Function("Parse", BINDING_FUNCTION(&FGuid::Parse))
 			.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact))

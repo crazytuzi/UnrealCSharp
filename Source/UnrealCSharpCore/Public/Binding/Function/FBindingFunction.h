@@ -8,13 +8,9 @@ struct FBindingFunction : FBindingFunctionBase
 {
 	FBindingFunction() = default;
 
-	FBindingFunction(FFunctionInfo* InInfo, const FString& InName,
-	                 const FString& InImplementationName, const TArray<FString>& InParamNames,
-	                 const EFunctionInteract InFunctionInteract = EFunctionInteract::None):
+	FBindingFunction(FFunctionInfo* InInfo, const FString& InName, const FString& InImplementationName):
 		FBindingFunctionBase(InName, InImplementationName),
-		Info(InInfo),
-		ParamNames(InParamNames),
-		FunctionInteract(InFunctionInteract)
+		Info(InInfo)
 	{
 	}
 
@@ -47,18 +43,23 @@ struct FBindingFunction : FBindingFunctionBase
 
 	const TArray<FString>& GetParamNames() const
 	{
-		return ParamNames;
+		static TArray<FString> Instance;
+
+		return Info != nullptr ? Info->GetParamNames() : Instance;
+	}
+
+	const TArray<FString>& GetDefaultArguments() const
+	{
+		static TArray<FString> Instance;
+
+		return Info != nullptr ? Info->GetDefaultArguments() : Instance;
 	}
 
 	EFunctionInteract GetFunctionInteract() const
 	{
-		return FunctionInteract;
+		return Info != nullptr ? Info->GetFunctionInteract() : EFunctionInteract::None;
 	}
 
 private:
 	FFunctionInfo* Info;
-
-	TArray<FString> ParamNames;
-
-	EFunctionInteract FunctionInteract;
 };

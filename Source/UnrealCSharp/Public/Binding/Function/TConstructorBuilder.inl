@@ -1,16 +1,12 @@
 #pragma once
 
 #include "TConstructorHelper.inl"
-#include "Binding/Function/TFunctionInfo.inl"
+#include "Binding/Function/TFunctionInfoBuilder.inl"
 
 template <typename Class, typename... Args>
-struct TConstructorBuilder
+struct TConstructorBuilder :
+	TFunctionInfoBuilder<TConstructorBuilder<Class, Args...>, EFunctionType::Constructor, void, Args...>
 {
-	static FFunctionInfo* Info()
-	{
-		return TFunctionInfo<EFunctionType::Constructor, void, Args...>::Get();
-	}
-
 	static void Invoke(BINDING_CONSTRUCTOR_PLACEHOLDER_SIGNATURE)
 	{
 		if constexpr (sizeof...(Args) == 0)

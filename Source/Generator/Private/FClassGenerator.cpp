@@ -4,6 +4,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
+#include "Binding/Class/FBindingClass.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
@@ -71,6 +72,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	const auto& OverrideFunctions = GetOverrideFunctions(NameSpaceContent, ClassContent);
 
+	const auto& BindingFunctions = FBindingClass::GetFunctionNames(ClassContent);
+
+	const auto& BindingProperties = FBindingClass::GetPropertyNames(ClassContent);
+
 	FString SuperClassContent;
 
 	FString InterfaceContent;
@@ -131,6 +136,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 	     PropertyIterator)
 	{
 		if (!FGeneratorCore::IsSupported(*PropertyIterator))
+		{
+			continue;
+		}
+
+		if (BindingProperties.Contains(PropertyIterator->GetName()))
 		{
 			continue;
 		}
@@ -283,7 +293,14 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
+		const auto& FunctionName = FunctionIterator->GetName();
+
+		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionName)))
+		{
+			continue;
+		}
+
+		if (BindingFunctions.Contains(FunctionName))
 		{
 			continue;
 		}
@@ -293,16 +310,16 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		if (FunctionNameSet.Contains(FunctionIterator->GetName()))
+		if (FunctionNameSet.Contains(FunctionName))
 		{
 			continue;
 		}
 
-		FunctionNameSet.Add(FunctionIterator->GetName());
+		FunctionNameSet.Add(FunctionName);
 
 		if (SuperClass != nullptr)
 		{
-			if (const auto& Function = SuperClass->FindFunctionByName(FunctionIterator->GetFName()))
+			if (const auto& Function = SuperClass->FindFunctionByName(*FunctionName))
 			{
 				Functions.Add(Function);
 			}
@@ -358,7 +375,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 			if (SuperClass != nullptr)
 			{
-				if (SuperClass->FindFunctionByName(*Function->GetName()))
+				if (SuperClass->FindFunctionByName(*FunctionName))
 				{
 					FunctionPolymorphism = TEXT("override");
 				}
