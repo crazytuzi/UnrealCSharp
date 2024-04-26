@@ -15,8 +15,7 @@ struct FRegisterSoftClassPath
 			             TArray<FString>{"InClass"})
 			.Function("ResolveClass", BINDING_FUNCTION(&FSoftClassPath::ResolveClass))
 			.Function("GetOrCreateIDForClass", BINDING_FUNCTION(&FSoftClassPath::GetOrCreateIDForClass,
-			                                                    TArray<FString>{"InClass"}))
-			.Register();
+			                                                    TArray<FString>{"InClass"}));
 	}
 };
 

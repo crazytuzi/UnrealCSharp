@@ -1,77 +1,70 @@
 #pragma once
 
+#include "Binding/TypeInfo/FBindingTypeInfo.h"
+#include "Binding/Function/FBindingSubscript.h"
 #include "Binding/Property/FBindingProperty.h"
 #include "Binding/Function/FBindingFunction.h"
-#include "Binding/Function/FBindingSubscript.h"
+#include "Binding/Function/FBindingMethod.h"
 
 class UNREALCSHARPCORE_API FBindingClass
 {
 public:
-	FBindingClass(const bool InIsReflection, const FString& InClass,
-	              const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo):
-		bIsReflection(InIsReflection),
-		ImplementationNameSpace(InImplementationNameSpace),
-		Class(InClass),
-		TypeInfo{InTypeInfo},
-		Subscript(nullptr)
-	{
-	}
-
-	~FBindingClass();
-
-	static FBindingClass* GetClass(bool InIsReflection, const FString& InClass,
-	                               const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
-
-	static const TMap<FString, FBindingClass>& GetClasses();
+	FBindingClass(const FString& InBaseClass,
+	              const FString& InClass,
+	              const FString& InImplementationNameSpace,
+	              const bool InIsEngineClass,
+	              const bool InIsReflectionClass,
+	              const FBindingTypeInfo& InTypeInfo,
+	              const FBindingSubscript& InSubscript,
+	              const TArray<FBindingProperty>& InProperties,
+	              const TArray<FBindingFunction>& InFunctions,
+	              const TArray<FBindingMethod>& InMethods);
 
 	static TSet<FString> GetPropertyNames(const FString& InClass);
 
 	static TSet<FString> GetFunctionNames(const FString& InClass);
 
 public:
-	bool IsReflection() const;
-
-	const FString& GetImplementationNameSpace() const;
-
-	const FString& GetBase() const;
+	const FString& GetBaseClass() const;
 
 	const FString& GetClass() const;
 
+	const FString& GetImplementationNameSpace() const;
+
+	bool IsEngineClass() const;
+
+	bool IsReflectionClass() const;
+
+	bool IsSet() const;
+
 	const FBindingTypeInfo& GetTypeInfo() const;
 
-	const FBindingSubscript* GetSubscript() const;
+	const FBindingSubscript& GetSubscript() const;
 
 	const TArray<FBindingProperty>& GetProperties() const;
 
 	const TArray<FBindingFunction>& GetFunctions() const;
 
-public:
-	void BindingSubscript(const FString& InName, const FString& InGetImplementationName,
-	                      const FString& InSetImplementationName, FFunctionInfo* InTypeInfo);
-
-	void BindingProperty(const FString& InName, FTypeInfo* InTypeInfo, const void* InGetMethod,
-	                     const void* InSetMethod);
-
-	void BindingFunction(const FString& InName, const FString& InImplementationName, FFunctionInfo* InTypeInfo);
-
-	void Inheritance(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo);
+	const TArray<FBindingMethod>& GetMethods() const;
 
 private:
-	static TMap<FString, FBindingClass> Classes;
-
-	bool bIsReflection;
-
-	FString ImplementationNameSpace;
-
-	FString Base;
+	FString BaseClass;
 
 	FString Class;
 
+	FString ImplementationNameSpace;
+
+	bool bIsEngineClass;
+
+	bool bIsReflectionClass;
+
 	FBindingTypeInfo TypeInfo;
 
-	FBindingSubscript* Subscript;
+	FBindingSubscript Subscript;
 
 	TArray<FBindingProperty> Properties;
 
 	TArray<FBindingFunction> Functions;
+
+	TArray<FBindingMethod> Methods;
 };

@@ -42,8 +42,7 @@ struct FRegisterRandomStream
 			                           TArray<FString>{"Dir", "HorizontalConeHalfAngleRad",
 			                           "VerticalConeHalfAngleRad"}))
 			.Function("ToString", BINDING_FUNCTION(&FRandomStream::ToString,
-			                                       EFunctionInteract::New))
-			.Register();
+			                                       EFunctionInteract::New));
 	}
 };
 

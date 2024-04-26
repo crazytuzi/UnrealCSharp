@@ -231,7 +231,7 @@ struct FRegisterMap
 
 	FRegisterMap()
 	{
-		FClassBuilder(TEXT("TMap"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TMap"), NAMESPACE_LIBRARY, true)
 			.Function("Register", RegisterImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Empty", EmptyImplementation)
@@ -247,8 +247,7 @@ struct FRegisterMap
 			.Function("GetMaxIndex", GetMaxIndexImplementation)
 			.Function("IsValidIndex", IsValidIndexImplementation)
 			.Function("GetEnumeratorKey", GetEnumeratorKeyImplementation)
-			.Function("GetEnumeratorValue", GetEnumeratorValueImplementation)
-			.Register();
+			.Function("GetEnumeratorValue", GetEnumeratorValueImplementation);
 	}
 };
 

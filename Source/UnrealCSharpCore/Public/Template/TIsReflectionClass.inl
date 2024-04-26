@@ -5,7 +5,7 @@
 #include "TIsScriptStruct.inl"
 
 template <typename T>
-struct TIsReflection
+struct TIsReflectionClass
 {
 	enum { Value = TIsUObject<T>::Value || TIsUStruct<T>::Value || TIsScriptStruct<T>::Value };
 };

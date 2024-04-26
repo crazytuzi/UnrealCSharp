@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "CoreMacro/BindingMacro.h"
+#include "Binding/FBinding.h"
 #include "Binding/Function/TFunctionBuilder.inl"
 #include "Binding/Function/TConstructorBuilder.inl"
 #include "Binding/Function/TDestructorBuilder.inl"
 #include "Binding/Function/TSubscriptBuilder.inl"
-#include "Binding/Template/TClassName.inl"
 #include "Binding/TypeInfo/TName.inl"
 #include "Binding/TypeInfo/TNameSpace.inl"
 #include "Binding/Core/TPropertyClass.inl"
@@ -23,27 +23,25 @@
 #define BINDING_REMOVE_NAMESPACE_CLASS_STR(Class) FString(TEXT(BINDING_STR(Class))).RightChop( \
 	FString(TEXT(BINDING_STR(Class))).Find(TEXT(":"), ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1)
 
-#define BINDING_REMOVE_PREFIX_CLASS_STR(Class) BINDING_REMOVE_NAMESPACE_CLASS_STR(Class).RightChop(1)
-
-#define BINDING_REFLECTION_CLASS(Class) \
-template <> \
-struct TClassName<Class> \
-{ \
-	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
-};
+#define BINDING_REMOVE_PREFIX_CLASS_STR(Class) FString(TEXT(BINDING_STR(Class))).RightChop(1)
 
 #define BINDING_CLASS(Class) \
-template <> \
-struct TClassName<Class> \
-{ \
-	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
-}; \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
 	static FString Get() \
 	{ \
 		return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); \
+	} \
+}; \
+template <typename T> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return FBinding::Get().Register().IsEngineClass(TName<T, T>::Get()) \
+			? TArray<FString>{static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))} \
+			: TArray<FString>{COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
 	} \
 }; \
 template <typename T> \
@@ -79,38 +77,11 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_
 	using TBindingReturnValue<T>::TBindingReturnValue; \
 };
 
-#define BINDING_PROJECT_CLASS(Class) \
-BINDING_CLASS(Class) \
-template <typename T> \
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
-{ \
-	static TArray<FString> Get() \
-	{ \
-		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
-	} \
-};
-
-#define BINDING_ENGINE_CLASS(Class) \
-BINDING_CLASS(Class) \
-template <typename T> \
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
-{ \
-	static TArray<FString> Get() \
-	{ \
-		return {static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))}; \
-	} \
-};
-
 #define BINDING_SCRIPT_STRUCT(Class) \
-template <> \
-struct TClassName<Class> \
-{ \
-	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
-}; \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
+	static FString Get() { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
@@ -159,15 +130,20 @@ struct TIsScriptStruct<Class> \
 };
 
 #define BINDING_ENUM(Class) \
-template <> \
-struct TClassName<Class> \
-{ \
-	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
-}; \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 { \
 	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
+}; \
+template <typename T> \
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
+{ \
+	static TArray<FString> Get() \
+	{ \
+		return FBinding::Get().Register().IsEngineEnum(TName<T, T>::Get()) \
+			? TArray<FString>{static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))} \
+			: TArray<FString>{COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
+	} \
 }; \
 template <typename T> \
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> : \
@@ -207,33 +183,11 @@ struct TIsNotUEnum<Class> \
 	enum { Value = true }; \
 };
 
-#define BINDING_PROJECT_ENUM(Class) \
-BINDING_ENUM(Class) \
-template <typename T> \
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
-{ \
-	static TArray<FString> Get() \
-	{ \
-		return {COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
-	} \
-};
-
-#define BINDING_ENGINE_ENUM(Class) \
-BINDING_ENUM(Class) \
-template <typename T> \
-struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
-{ \
-	static TArray<FString> Get() \
-	{ \
-		return {static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))}; \
-	} \
-};
-
 #define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set
 
 #define BINDING_PROPERTY_BUILDER_GET(Property) TPropertyBuilder<decltype(Property), Property>::Get
 
-#define BINDING_PROPERTY_BUILDER_INFO(Property) TPropertyBuilder<decltype(Property), Property>::Info()
+#define BINDING_PROPERTY_BUILDER_INFO(Property) {[](){ return TPropertyBuilder<decltype(Property), Property>::Info(); }}
 
 #if WITH_PROPERTY_INFO
 #define BINDING_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), BINDING_PROPERTY_BUILDER_SET(Property), BINDING_PROPERTY_BUILDER_INFO(Property)
@@ -249,7 +203,7 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 
 #define BINDING_FUNCTION_BUILDER_INVOKE(Function) TFunctionPointer<decltype(&TFunctionBuilder<decltype(Function), Function>::Invoke)>(&TFunctionBuilder<decltype(Function), Function>::Invoke).Value.Pointer
 
-#define BINDING_FUNCTION_BUILDER_INFO(Function, ...) TFunctionBuilder<decltype(Function), Function>::Info(##__VA_ARGS__)
+#define BINDING_FUNCTION_BUILDER_INFO(Function, ...) {[](){ return TFunctionBuilder<decltype(Function), Function>::Info(##__VA_ARGS__); }}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_FUNCTION(Function, ...) BINDING_FUNCTION_BUILDER_INVOKE(Function), BINDING_FUNCTION_BUILDER_INFO(Function, ##__VA_ARGS__)
@@ -259,7 +213,7 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 
 #define BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function) TFunctionPointer<decltype(&TFunctionBuilder<Signature, Function>::Invoke)>(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
 
-#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ...) TFunctionBuilder<Signature, Function>::Info(##__VA_ARGS__)
+#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ...) {[](){ return TFunctionBuilder<Signature, Function>::Info(##__VA_ARGS__); }}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_OVERLOAD(Signature, Function, ...) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function), BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ##__VA_ARGS__)
@@ -268,14 +222,14 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 #endif
 
 #if WITH_FUNCTION_INFO
-#define BINDING_OVERLOADS(...) TOverloadBuilder<void*, FFunctionInfo*>::Get(##__VA_ARGS__)
+#define BINDING_OVERLOADS(...) TOverloadBuilder<void*, TFunction<FFunctionInfo*()>>::Get(##__VA_ARGS__)
 #else
 #define BINDING_OVERLOADS(...) TOverloadBuilder<void*>::Get(##__VA_ARGS__)
 #endif
 
 #define BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ...) TFunctionPointer<decltype(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke)>(&TConstructorBuilder<T, ##__VA_ARGS__>::Invoke).Value.Pointer
 
-#define BINDING_CONSTRUCTOR_BUILDER_INFO(T, ...) TConstructorBuilder<T, ##__VA_ARGS__>::Info()
+#define BINDING_CONSTRUCTOR_BUILDER_INFO(T, ...) {[](){ return TConstructorBuilder<T, ##__VA_ARGS__>::Info(); }}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_CONSTRUCTOR(T, ...) BINDING_CONSTRUCTOR_BUILDER_INVOKE(T, ##__VA_ARGS__), BINDING_CONSTRUCTOR_BUILDER_INFO(T, ##__VA_ARGS__)
@@ -285,7 +239,7 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 
 #define BINDING_DESTRUCTOR_BUILDER_INVOKE(...) TFunctionPointer<decltype(&TDestructorBuilder<##__VA_ARGS__>::Invoke)>(&TDestructorBuilder<##__VA_ARGS__>::Invoke).Value.Pointer
 
-#define BINDING_DESTRUCTOR_BUILDER_INFO(...) TDestructorBuilder<##__VA_ARGS__>::Info()
+#define BINDING_DESTRUCTOR_BUILDER_INFO(...) {[](){ return TDestructorBuilder<##__VA_ARGS__>::Info(); }}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_DESTRUCTOR(...) BINDING_DESTRUCTOR_BUILDER_INVOKE(##__VA_ARGS__), BINDING_DESTRUCTOR_BUILDER_INFO(##__VA_ARGS__)
@@ -297,7 +251,7 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 
 #define BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index) TFunctionPointer<decltype(&TSubscriptBuilder<T, Result, Index>::Set)>(&TSubscriptBuilder<T, Result, Index>::Set).Value.Pointer
 
-#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ...) TSubscriptBuilder<T, Result, Index>::Info(##__VA_ARGS__)
+#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ...) {[](){ return TSubscriptBuilder<T, Result, Index>::Info(##__VA_ARGS__); }}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_SUBSCRIPT(T, Result, Index, ...) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ##__VA_ARGS__)

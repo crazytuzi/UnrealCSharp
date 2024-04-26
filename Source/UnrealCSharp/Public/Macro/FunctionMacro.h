@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#define COMBINE_FUNCTION(Function) FString::Printf(TEXT("::%s"), *Function)
-
 #define FUNCTION_UTILS_IS_OVERRIDE_TYPE FString(TEXT("IsOverrideType"))
 
 #define FUNCTION_UTILS_IS_OVERRIDE_METHOD FString(TEXT("IsOverrideMethod"))

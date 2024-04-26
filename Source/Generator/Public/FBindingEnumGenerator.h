@@ -8,5 +8,5 @@ public:
 	static GENERATOR_API void Generator();
 
 private:
-	static void Generator(const FBindingEnum& InEnum);
+	static void Generator(const FBindingEnum* InEnum);
 };

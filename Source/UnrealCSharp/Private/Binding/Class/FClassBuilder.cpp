@@ -1,106 +1,88 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Binding/FBinding.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Algo/Count.h"
 
-FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace):
-	Class(InClass),
-	TypeInfo(nullptr),
-	ImplementationNameSpace(InImplementationNameSpace)
+FClassBuilder::FClassBuilder(const TFunction<FString()>& InClassFunction,
+                             const FString& InImplementationNameSpace,
+                             const TFunction<bool()>& InIsEngineClassFunction,
+                             const bool InIsReflectionClass,
+                             const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
+	ClassRegister(FBinding::Get().Register(InClassFunction,
+	                                       InImplementationNameSpace,
+	                                       InIsEngineClassFunction,
+	                                       InIsReflectionClass,
+	                                       InTypeInfoFunction))
 {
 }
 
-#if WITH_PROPERTY_INFO
-FClassBuilder::FClassBuilder(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo):
-	Class(InClass),
-	TypeInfo(InTypeInfo),
-	ImplementationNameSpace(InImplementationNameSpace)
+FClassBuilder::FClassBuilder(const FString& InClass,
+                             const FString& InImplementationNameSpace,
+                             const bool InIsEngineClass,
+                             const bool InIsReflectionClass,
+                             const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
+	FClassBuilder([InClass]() { return InClass; },
+	              InImplementationNameSpace,
+	              [InIsEngineClass]() { return InIsEngineClass; },
+	              InIsReflectionClass,
+	              InTypeInfoFunction)
 {
 }
-#endif
 
+FClassBuilder& FClassBuilder::Function(const FString& InName,
 #if WITH_FUNCTION_INFO
-FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<TPair<void*, FFunctionInfo*>>& InMethod)
+                                       const TArray<TPair<void*, TFunction<FFunctionInfo*()>>>& InMethod
 #else
-FClassBuilder& FClassBuilder::Function(const FString& InName, const TArray<void*>& InMethod)
+                                       const TArray<void*>& InMethod
 #endif
+)
 {
 	for (auto i = 0; i < InMethod.Num(); ++i)
 	{
-#if WITH_EDITOR
-		Function(InName, InMethod[i].Key, InMethod[i].Value);
+		Function(InName,
+#if WITH_FUNCTION_INFO
+		         InMethod[i].Key,
+		         InMethod[i].Value
 #else
-		Function(InName, InMethod[i]);
+		         InMethod[i]
 #endif
+		);
 	}
 
 	return *this;
 }
 
+FClassBuilder& FClassBuilder::Function(const FString& InName,
+                                       const FString& InImplementationName,
+                                       const void* InMethod
 #if WITH_FUNCTION_INFO
-FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
-                                       const void* InMethod, FFunctionInfo* InFunctionInfo)
-#else
-FClassBuilder& FClassBuilder::Function(const FString& InName, const FString& InImplementationName,
-                                       const void* InMethod)
+                                       , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction
 #endif
+)
 {
+	const auto FunctionImplementationName = GetFunctionImplementationName(InName, InImplementationName);
+
+	Functions.Add(InName);
+
 #if WITH_FUNCTION_INFO
-	if (InFunctionInfo != nullptr)
+	if (InFunctionInfoFunction.IsSet())
 	{
-		GetBindingClass()->BindingFunction(InName, GetFunctionImplementationName(InName, InImplementationName),
-		                                   InFunctionInfo);
+		ClassRegister->BindingFunction(InName, FunctionImplementationName, InFunctionInfoFunction);
 	}
 #endif
 
-	Function(InName, GetFunctionImplementationName(InName, InImplementationName),
-	         TFunctionPointer<decltype(InMethod)>(InMethod));
+	Function(FunctionImplementationName, TFunctionPointer<decltype(InMethod)>(InMethod));
 
 	return *this;
-}
-
-void FClassBuilder::Register()
-{
-	for (const auto& Iterator : Functions)
-	{
-		FBinding::Get().RegisterBinding(Iterator.Key.GetFunctionImplementationName(), Iterator.Value);
-	}
-}
-
-bool FClassBuilder::IsReflection() const
-{
-	return false;
-}
-
-FBindingClass* FClassBuilder::GetBindingClass() const
-{
-	return FBindingClass::GetClass(IsReflection(),
-	                               Class,
-	                               COMBINE_NAMESPACE(NAMESPACE_ROOT, ImplementationNameSpace),
-	                               TypeInfo);
 }
 
 FString FClassBuilder::GetFunctionImplementationName(const FString& InName, const FString& InImplementationName) const
 {
-	const auto Count = GetFunctionCount(InName);
+	const auto Count = Algo::Count(Functions, InName);
 
 	return FString::Printf(TEXT(
 		"%s%s"),
 	                       *InImplementationName,
 	                       Count == 0 ? TEXT("") : *UKismetStringLibrary::Conv_IntToString(Count)
 	);
-}
-
-int32 FClassBuilder::GetFunctionCount(const FString& InName) const
-{
-	auto Count = 0;
-
-	for (const auto& Function : Functions)
-	{
-		if (Function.Key.GetFunctionName() == InName)
-		{
-			++Count;
-		}
-	}
-
-	return Count;
 }

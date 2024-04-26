@@ -18,8 +18,7 @@ struct FRegisterInt32Interval
 			.Function("Include", BINDING_FUNCTION(&FInt32Interval::Include,
 			                                      TArray<FString>{"X"}))
 			.Function("Interpolate", BINDING_FUNCTION(&FInt32Interval::Interpolate,
-			                                          TArray<FString>{"Alpha"}))
-			.Register();
+			                                          TArray<FString>{"Alpha"}));
 	}
 };
 

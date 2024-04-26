@@ -1,16 +1,15 @@
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/BindingMacro.h"
 
-BINDING_ENGINE_ENUM(EForceInit)
+BINDING_ENUM(EForceInit)
 
 struct FRegisterForceInit
 {
 	FRegisterForceInit()
 	{
-		TBindingEnumBuilder<EForceInit>()
+		TBindingEnumBuilder<EForceInit, true>()
 			.Enumerator("ForceInit", EForceInit::ForceInit)
-			.Enumerator("ForceInitToZero", EForceInit::ForceInitToZero)
-			.Register();
+			.Enumerator("ForceInitToZero", EForceInit::ForceInitToZero);
 	}
 };
 

@@ -137,7 +137,7 @@ struct FRegisterSet
 
 	FRegisterSet()
 	{
-		FClassBuilder(TEXT("TSet"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TSet"), NAMESPACE_LIBRARY, true)
 			.Function("Register", RegisterImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Empty", EmptyImplementation)
@@ -148,8 +148,7 @@ struct FRegisterSet
 			.Function("Remove", RemoveImplementation)
 			.Function("Contains", ContainsImplementation)
 			.Function("IsValidIndex", IsValidIndexImplementation)
-			.Function("GetEnumerator", GetEnumeratorImplementation)
-			.Register();
+			.Function("GetEnumerator", GetEnumeratorImplementation);
 	}
 };
 

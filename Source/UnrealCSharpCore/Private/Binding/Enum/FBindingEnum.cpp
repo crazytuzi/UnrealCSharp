@@ -1,27 +1,16 @@
 #include "Binding/Enum/FBindingEnum.h"
 
-TMap<FString, FBindingEnum> FBindingEnum::Enums;
-
-FBindingEnum::FBindingEnum(const FString& InEnum, const FString& InUnderlyingType, FTypeInfo* InTypeInfo):
+FBindingEnum::FBindingEnum(const FString& InEnum,
+                           const FString& InUnderlyingType,
+                           const bool InIsEngineEnum,
+                           const FBindingTypeInfo& InTypeInfo,
+                           const TMap<FString, int64>& InEnumerators):
 	Enum(InEnum),
 	UnderlyingType(InUnderlyingType),
-	TypeInfo(InTypeInfo)
+	bIsEngineEnum(InIsEngineEnum),
+	TypeInfo(InTypeInfo),
+	Enumerators(InEnumerators)
 {
-}
-
-FBindingEnum* FBindingEnum::GetEnum(const FString& InEnum, const FString& InUnderlyingType, FTypeInfo* InTypeInfo)
-{
-	if (!Enums.Contains(InEnum))
-	{
-		Enums.Add(InEnum, {InEnum, InUnderlyingType, InTypeInfo});
-	}
-
-	return Enums.Find(InEnum);
-}
-
-const TMap<FString, FBindingEnum>& FBindingEnum::GetEnums()
-{
-	return Enums;
 }
 
 const FString& FBindingEnum::GetEnum() const
@@ -34,6 +23,11 @@ const FString& FBindingEnum::GetUnderlyingType() const
 	return UnderlyingType;
 }
 
+bool FBindingEnum::IsEngineEnum() const
+{
+	return bIsEngineEnum;
+}
+
 const FBindingTypeInfo& FBindingEnum::GetTypeInfo() const
 {
 	return TypeInfo;
@@ -42,9 +36,4 @@ const FBindingTypeInfo& FBindingEnum::GetTypeInfo() const
 const TMap<FString, int64>& FBindingEnum::GetEnumerators() const
 {
 	return Enumerators;
-}
-
-void FBindingEnum::BindingEnumerator(const FString& InKey, const int64 InEnumerator)
-{
-	Enumerators.Add(InKey, InEnumerator);
 }

@@ -88,8 +88,7 @@ struct FRegisterRotator
 			.Function("DecompressAxisFromShort", BINDING_FUNCTION(&FRotator::DecompressAxisFromShort,
 			                                                      TArray<FString>{"Angle"}))
 			.Function("MakeFromEuler", BINDING_FUNCTION(&FRotator::MakeFromEuler,
-			                                            TArray<FString>{"Euler"}))
-			.Register();
+			                                            TArray<FString>{"Euler"}));
 	}
 };
 

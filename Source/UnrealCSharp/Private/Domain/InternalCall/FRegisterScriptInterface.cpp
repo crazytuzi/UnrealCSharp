@@ -47,12 +47,11 @@ struct FRegisterScriptInterface
 
 	FRegisterScriptInterface()
 	{
-		FClassBuilder(TEXT("TScriptInterface"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TScriptInterface"), NAMESPACE_LIBRARY, true)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
-			.Function("GetObject", GetObjectImplementation)
-			.Register();
+			.Function("GetObject", GetObjectImplementation);
 	}
 };
 

@@ -55,7 +55,7 @@ struct FRegisterProperty
 
 	FRegisterProperty()
 	{
-		FClassBuilder(TEXT("FProperty"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FProperty"), NAMESPACE_LIBRARY, true)
 			.Function("GetObjectByteProperty", GetObjectBytePropertyImplementation)
 			.Function("SetObjectByteProperty", SetObjectBytePropertyImplementation)
 			.Function("GetObjectUInt16Property", GetObjectUInt16PropertyImplementation)
@@ -103,8 +103,7 @@ struct FRegisterProperty
 			.Function("GetStructCompoundProperty", GetStructCompoundPropertyImplementation)
 			.Function("SetStructCompoundProperty", SetStructCompoundPropertyImplementation)
 			.Function("GetStructDoubleProperty", GetStructDoublePropertyImplementation)
-			.Function("SetStructDoubleProperty", SetStructDoublePropertyImplementation)
-			.Register();
+			.Function("SetStructDoubleProperty", SetStructDoublePropertyImplementation);
 	}
 };
 

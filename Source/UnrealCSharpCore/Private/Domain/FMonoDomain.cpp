@@ -989,8 +989,11 @@ void FMonoDomain::RegisterLog()
 
 void FMonoDomain::RegisterBinding()
 {
-	for (const auto& Binding : FBinding::Get().GetBinding())
+	for (const auto& Class : FBinding::Get().Register().GetClasses())
 	{
-		mono_add_internal_call(TCHAR_TO_ANSI(*Binding.Key), Binding.Value);
+		for (const auto& Method : Class->GetMethods())
+		{
+			mono_add_internal_call(TCHAR_TO_ANSI(*Method.GetMethod()), Method.GetFunction());
+		}
 	}
 }

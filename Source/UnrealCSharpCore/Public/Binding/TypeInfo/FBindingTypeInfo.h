@@ -1,42 +1,46 @@
-﻿#pragma once
+#pragma once
 
 #include "Binding/TypeInfo/FTypeInfo.h"
 
 struct FBindingTypeInfo
 {
-	FBindingTypeInfo() = default;
-
-	explicit FBindingTypeInfo(FTypeInfo* InInfo): Info(InInfo)
+	explicit FBindingTypeInfo(FTypeInfo* InTypeInfo):
+		TypeInfo(InTypeInfo)
 	{
+	}
+
+	bool IsSet() const
+	{
+		return TypeInfo != nullptr;
 	}
 
 	FString GetName() const
 	{
-		return Info != nullptr ? Info->GetName() : FString();
+		return TypeInfo != nullptr ? TypeInfo->GetName() : FString();
 	}
 
 	const TArray<FString>& GetNameSpace() const
 	{
 		static TArray<FString> Instance;
 
-		return Info != nullptr ? Info->GetNameSpace() : Instance;
+		return TypeInfo != nullptr ? TypeInfo->GetNameSpace() : Instance;
 	}
 
 	bool IsRef() const
 	{
-		return Info != nullptr ? Info->IsRef() : false;
+		return TypeInfo != nullptr ? TypeInfo->IsRef() : false;
 	}
 
 	bool IsStatic() const
 	{
-		return Info != nullptr ? Info->IsStatic() : false;
+		return TypeInfo != nullptr ? TypeInfo->IsStatic() : false;
 	}
 
 	bool IsPrimitive() const
 	{
-		return Info != nullptr ? Info->IsPrimitive() : false;
+		return TypeInfo != nullptr ? TypeInfo->IsPrimitive() : false;
 	}
 
 private:
-	FTypeInfo* Info;
+	FTypeInfo* TypeInfo;
 };

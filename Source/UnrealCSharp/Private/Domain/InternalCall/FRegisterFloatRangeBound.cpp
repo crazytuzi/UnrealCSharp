@@ -30,8 +30,7 @@ struct FRegisterFloatRangeBound
 			.Function("MinLower", BINDING_FUNCTION(&FFloatRangeBound::MinLower,
 			                                       TArray<FString>{"A", "B"}))
 			.Function("MinUpper", BINDING_FUNCTION(&FFloatRangeBound::MinUpper,
-			                                       TArray<FString>{"A", "B"}))
-			.Register();
+			                                       TArray<FString>{"A", "B"}));
 	}
 };
 

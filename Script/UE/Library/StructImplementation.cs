@@ -3,7 +3,7 @@ using Script.CoreUObject;
 
 namespace Script.Library
 {
-    public static class UStructImplementation
+    public static partial class UStructImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern UScriptStruct UStruct_StaticStructImplementation(string InStructName);

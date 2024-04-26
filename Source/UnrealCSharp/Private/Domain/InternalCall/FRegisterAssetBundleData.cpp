@@ -25,8 +25,7 @@ struct FRegisterAssetBundleData
 			                           &FAssetBundleData::SetBundleAssets,
 			                           TArray<FString>{"BundleName", "AssetPaths"}))
 			.Function("Reset", BINDING_FUNCTION(&FAssetBundleData::Reset))
-			.Function("ToDebugString", BINDING_FUNCTION(&FAssetBundleData::ToDebugString))
-			.Register();
+			.Function("ToDebugString", BINDING_FUNCTION(&FAssetBundleData::ToDebugString));
 	}
 };
 

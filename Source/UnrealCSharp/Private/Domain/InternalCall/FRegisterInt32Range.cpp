@@ -48,13 +48,12 @@ struct FRegisterInt32Range
 			                                      TArray<FString>{"Value"}))
 			.Function("AtMost", BINDING_FUNCTION(&FInt32Range::AtMost,
 			                                     TArray<FString>{"Value"}))
-			.Function("Empty", BINDING_FUNCTION(&FInt32Range::Empty))
+			.Function("Empty", BINDING_FUNCTION(&FInt32Range::Empty));
 			// @TODO
 			// Exclusive
 			// GreaterThan
 			// Inclusive
 			// LessThan
-			.Register();
 	}
 };
 

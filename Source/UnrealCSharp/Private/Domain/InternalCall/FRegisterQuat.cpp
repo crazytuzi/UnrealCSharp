@@ -146,8 +146,7 @@ struct FRegisterQuat
 			.Function("SquadFullPath", BINDING_FUNCTION(&FQuat::SquadFullPath,
 			                                            TArray<FString>{"quat1", "tang1", "quat2", "tang2", "Alpha"}))
 			.Function("CalcTangents", BINDING_FUNCTION(&FQuat::CalcTangents,
-			                                           TArray<FString>{"PrevP", "P", "NextP", "Tension", "OutTan"}))
-			.Register();
+			                                           TArray<FString>{"PrevP", "P", "NextP", "Tension", "OutTan"}));
 	}
 };
 

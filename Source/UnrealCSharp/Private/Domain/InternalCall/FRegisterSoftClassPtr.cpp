@@ -54,13 +54,12 @@ struct FRegisterSoftClassPtr
 
 	FRegisterSoftClassPtr()
 	{
-		FClassBuilder(TEXT("TSoftClassPtr"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TSoftClassPtr"), NAMESPACE_LIBRARY, true)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Get", GetImplementation)
-			.Function("LoadSynchronous", LoadSynchronousImplementation)
-			.Register();
+			.Function("LoadSynchronous", LoadSynchronousImplementation);
 	}
 };
 

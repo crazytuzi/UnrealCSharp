@@ -46,8 +46,7 @@ struct FRegisterSoftObjectPath
 			                                                     TArray<FString>{"Object"}))
 			.Function("AddPIEPackageName", BINDING_FUNCTION(&FSoftObjectPath::AddPIEPackageName,
 			                                                TArray<FString>{"NewPIEPackageName"}))
-			.Function("ClearPIEPackageNames", BINDING_FUNCTION(&FSoftObjectPath::ClearPIEPackageNames))
-			.Register();
+			.Function("ClearPIEPackageNames", BINDING_FUNCTION(&FSoftObjectPath::ClearPIEPackageNames));
 	}
 };
 

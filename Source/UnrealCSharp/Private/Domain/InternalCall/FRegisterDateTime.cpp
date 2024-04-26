@@ -4,23 +4,22 @@
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
 
-BINDING_ENGINE_ENUM(EDayOfWeek)
+BINDING_ENUM(EDayOfWeek)
 
-BINDING_ENGINE_ENUM(EMonthOfYear)
+BINDING_ENUM(EMonthOfYear)
 
 struct FRegisterDayOfWeek
 {
 	FRegisterDayOfWeek()
 	{
-		TBindingEnumBuilder<EDayOfWeek>()
+		TBindingEnumBuilder<EDayOfWeek, true>()
 			.Enumerator("Monday", EDayOfWeek::Monday)
 			.Enumerator("Tuesday", EDayOfWeek::Tuesday)
 			.Enumerator("Wednesday", EDayOfWeek::Wednesday)
 			.Enumerator("Thursday", EDayOfWeek::Thursday)
 			.Enumerator("Friday", EDayOfWeek::Friday)
 			.Enumerator("Saturday", EDayOfWeek::Saturday)
-			.Enumerator("Sunday", EDayOfWeek::Sunday)
-			.Register();
+			.Enumerator("Sunday", EDayOfWeek::Sunday);
 	}
 };
 
@@ -30,7 +29,7 @@ struct FRegisterMonthOfYear
 {
 	FRegisterMonthOfYear()
 	{
-		TBindingEnumBuilder<EMonthOfYear>()
+		TBindingEnumBuilder<EMonthOfYear, true>()
 			.Enumerator("January", EMonthOfYear::January)
 			.Enumerator("February", EMonthOfYear::February)
 			.Enumerator("March", EMonthOfYear::March)
@@ -42,8 +41,7 @@ struct FRegisterMonthOfYear
 			.Enumerator("September", EMonthOfYear::September)
 			.Enumerator("October", EMonthOfYear::October)
 			.Enumerator("November", EMonthOfYear::November)
-			.Enumerator("December", EMonthOfYear::December)
-			.Register();
+			.Enumerator("December", EMonthOfYear::December);
 	}
 };
 
@@ -140,8 +138,7 @@ struct FRegisterDateTime
 			.Function("UtcNow", BINDING_FUNCTION(&FDateTime::UtcNow))
 			.Function("Validate", BINDING_FUNCTION(&FDateTime::Validate,
 			                                       TArray<FString>{"Year", "Month", "Day", "Hour",
-			                                       "Minute", "Second", "Millisecond"}))
-			.Register();
+			                                       "Minute", "Second", "Millisecond"}));
 	}
 };
 

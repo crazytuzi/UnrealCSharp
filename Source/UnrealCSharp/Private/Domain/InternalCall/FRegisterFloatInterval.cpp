@@ -18,8 +18,7 @@ struct FRegisterFloatInterval
 			.Function("Include", BINDING_FUNCTION(&FFloatInterval::Include,
 			                                      TArray<FString>{"X"}))
 			.Function("Interpolate", BINDING_FUNCTION(&FFloatInterval::Interpolate,
-			                                          TArray<FString>{"Alpha"}))
-			.Register();
+			                                          TArray<FString>{"Alpha"}));
 	}
 };
 

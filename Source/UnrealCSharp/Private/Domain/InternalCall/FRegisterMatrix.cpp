@@ -93,8 +93,7 @@ struct FRegisterMatrix
 			.Function("ToString", BINDING_FUNCTION(&FMatrix::ToString,
 			                                       EFunctionInteract::New))
 			.Function("DebugPrint", BINDING_FUNCTION(&FMatrix::DebugPrint))
-			.Function("ComputeHash", BINDING_FUNCTION(&FMatrix::ComputeHash))
-			.Register();
+			.Function("ComputeHash", BINDING_FUNCTION(&FMatrix::ComputeHash));
 	}
 };
 

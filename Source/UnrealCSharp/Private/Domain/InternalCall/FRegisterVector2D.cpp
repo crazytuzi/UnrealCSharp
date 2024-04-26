@@ -125,8 +125,7 @@ struct FRegisterVector2D
 			.Function("InitFromString", BINDING_FUNCTION(&FVector2D::InitFromString,
 			                                             TArray<FString>{"InSourceString"}))
 			.Function("ContainsNaN", BINDING_FUNCTION(&FVector2D::ContainsNaN))
-			.Function("SphericalToUnitCartesian", BINDING_FUNCTION(&FVector2D::SphericalToUnitCartesian))
-			.Register();
+			.Function("SphericalToUnitCartesian", BINDING_FUNCTION(&FVector2D::SphericalToUnitCartesian));
 	}
 };
 
