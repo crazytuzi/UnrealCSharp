@@ -4,8 +4,6 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
 
-BINDING_REFLECTION_CLASS(UObject)
-
 struct FRegisterObject
 {
 	static MonoObject* StaticClassImplementation(MonoString* InClassName)
@@ -80,8 +78,7 @@ struct FRegisterObject
 			.Function("GetName", GetNameImplementation)
 			.Function("GetWorld", BINDING_FUNCTION(&UObject::GetWorld))
 			.Function("IsValid", IsValidImplementation)
-			.Function("IsA", IsAImplementation)
-			.Register();
+			.Function("IsA", IsAImplementation);
 	}
 };
 

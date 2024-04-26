@@ -60,8 +60,7 @@ struct FRegisterColor
 			.Function("ToPackedARGB", BINDING_FUNCTION(&FColor::ToPackedARGB))
 			.Function("ToPackedABGR", BINDING_FUNCTION(&FColor::ToPackedABGR))
 			.Function("ToPackedRGBA", BINDING_FUNCTION(&FColor::ToPackedRGBA))
-			.Function("ToPackedBGRA", BINDING_FUNCTION(&FColor::ToPackedBGRA))
-			.Register();
+			.Function("ToPackedBGRA", BINDING_FUNCTION(&FColor::ToPackedBGRA));
 	}
 };
 

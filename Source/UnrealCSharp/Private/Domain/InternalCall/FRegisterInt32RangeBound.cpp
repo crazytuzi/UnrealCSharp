@@ -30,8 +30,7 @@ struct FRegisterInt32RangeBound
 			.Function("MinLower", BINDING_FUNCTION(&FInt32RangeBound::MinLower,
 			                                       TArray<FString>{"A", "B"}))
 			.Function("MinUpper", BINDING_FUNCTION(&FInt32RangeBound::MinUpper,
-			                                       TArray<FString>{"A", "B"}))
-			.Register();
+			                                       TArray<FString>{"A", "B"}));
 	}
 };
 

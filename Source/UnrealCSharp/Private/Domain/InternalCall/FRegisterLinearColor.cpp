@@ -78,8 +78,7 @@ struct FRegisterLinearColor
 			.Function("ToString", BINDING_FUNCTION(&FLinearColor::ToString,
 			                                       EFunctionInteract::New))
 			.Function("InitFromString", BINDING_FUNCTION(&FLinearColor::InitFromString,
-			                                             TArray<FString>{"InSourceString"}))
-			.Register();
+			                                             TArray<FString>{"InSourceString"}));
 	}
 };
 

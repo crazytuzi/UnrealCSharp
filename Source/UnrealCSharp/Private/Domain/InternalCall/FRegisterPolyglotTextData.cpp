@@ -40,8 +40,7 @@ struct FRegisterPolyglotTextData
 			                           TArray<FString>{"InCulture", "OutLocalizedString"}))
 			.Function("IsMinimalPatch",
 			          BINDING_OVERLOAD(bool(FPolyglotTextData::*)()const, &FPolyglotTextData::IsMinimalPatch))
-			.Function("GetText", BINDING_FUNCTION(&FPolyglotTextData::GetText))
-			.Register();
+			.Function("GetText", BINDING_FUNCTION(&FPolyglotTextData::GetText));
 	}
 };
 

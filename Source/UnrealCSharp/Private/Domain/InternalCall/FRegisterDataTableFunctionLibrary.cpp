@@ -3,9 +3,6 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "Macro/BindingMacro.h"
-
-BINDING_REFLECTION_CLASS(UDataTableFunctionLibrary)
 
 struct FRegisterDataTableFunctionLibrary
 {
@@ -48,8 +45,7 @@ struct FRegisterDataTableFunctionLibrary
 	FRegisterDataTableFunctionLibrary()
 	{
 		TBindingClassBuilder<UDataTableFunctionLibrary>(NAMESPACE_LIBRARY)
-			.Function("GetDataTableRowFromName", GetDataTableRowFromNameImplementation)
-			.Register();
+			.Function("GetDataTableRowFromName", GetDataTableRowFromNameImplementation);
 	}
 };
 

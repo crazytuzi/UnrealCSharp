@@ -42,12 +42,11 @@ struct FRegisterLazyObjectPtr
 
 	FRegisterLazyObjectPtr()
 	{
-		FClassBuilder(TEXT("TLazyObjectPtr"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TLazyObjectPtr"), NAMESPACE_LIBRARY, true)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
-			.Function("Get", GetImplementation)
-			.Register();
+			.Function("Get", GetImplementation);
 	}
 };
 

@@ -5,15 +5,15 @@
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
 
-BINDING_ENGINE_ENUM(EObjectFlags)
+BINDING_ENUM(EObjectFlags)
 
-BINDING_ENGINE_ENUM(ELoadFlags)
+BINDING_ENUM(ELoadFlags)
 
 struct FRegisterObjectFlags
 {
 	FRegisterObjectFlags()
 	{
-		TBindingEnumBuilder<EObjectFlags>()
+		TBindingEnumBuilder<EObjectFlags, true>()
 			.Enumerator("RF_NoFlags", EObjectFlags::RF_NoFlags)
 			.Enumerator("RF_Public", EObjectFlags::RF_Public)
 			.Enumerator("RF_Standalone", EObjectFlags::RF_Standalone)
@@ -42,8 +42,7 @@ struct FRegisterObjectFlags
 			.Enumerator("RF_StrongRefOnFrame", EObjectFlags::RF_StrongRefOnFrame)
 			.Enumerator("RF_NonPIEDuplicateTransient", EObjectFlags::RF_NonPIEDuplicateTransient)
 			.Enumerator("RF_WillBeLoaded", EObjectFlags::RF_WillBeLoaded)
-			.Enumerator("RF_AllocatedInSharedPage", EObjectFlags::RF_AllocatedInSharedPage)
-			.Register();
+			.Enumerator("RF_AllocatedInSharedPage", EObjectFlags::RF_AllocatedInSharedPage);
 	}
 };
 
@@ -53,7 +52,7 @@ struct FRegisterLoadFlags
 {
 	FRegisterLoadFlags()
 	{
-		TBindingEnumBuilder<ELoadFlags>()
+		TBindingEnumBuilder<ELoadFlags, true>()
 			.Enumerator("LOAD_None", ELoadFlags::LOAD_None)
 			.Enumerator("LOAD_Async", ELoadFlags::LOAD_Async)
 			.Enumerator("LOAD_NoWarn", ELoadFlags::LOAD_NoWarn)
@@ -71,8 +70,7 @@ struct FRegisterLoadFlags
 			.Enumerator("LOAD_PackageForPIE", ELoadFlags::LOAD_PackageForPIE)
 			.Enumerator("LOAD_DeferDependencyLoads", ELoadFlags::LOAD_DeferDependencyLoads)
 			.Enumerator("LOAD_ForFileDiff", ELoadFlags::LOAD_ForFileDiff)
-			.Enumerator("LOAD_DisableCompileOnLoad", ELoadFlags::LOAD_DisableCompileOnLoad)
-			.Register();
+			.Enumerator("LOAD_DisableCompileOnLoad", ELoadFlags::LOAD_DisableCompileOnLoad);
 	}
 };
 
@@ -210,14 +208,13 @@ struct FRegisterUnreal
 
 	FRegisterUnreal()
 	{
-		FClassBuilder(TEXT("Unreal"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("Unreal"), NAMESPACE_LIBRARY, true)
 			.Function("NewObject", NewObjectImplementation)
 			.Function("DuplicateObject", DuplicateObjectImplementation)
 			.Function("LoadObject", LoadObjectImplementation)
 			.Function("LoadClass", LoadClassImplementation)
 			.Function("CreateWidget", CreateWidgetImplementation)
-			.Function("GWorld", GWorldImplementation)
-			.Register();
+			.Function("GWorld", GWorldImplementation);
 	}
 };
 

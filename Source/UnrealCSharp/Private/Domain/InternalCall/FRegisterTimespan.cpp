@@ -72,8 +72,7 @@ struct FRegisterTimespan
 			                                    TArray<FString>{"TimespanString", "OutTimespan"}))
 			.Function("Ratio", BINDING_FUNCTION(&FTimespan::Ratio,
 			                                    TArray<FString>{"Dividend", "Divisor"}))
-			.Function("Zero", BINDING_FUNCTION(&FTimespan::Zero))
-			.Register();
+			.Function("Zero", BINDING_FUNCTION(&FTimespan::Zero));
 	}
 };
 

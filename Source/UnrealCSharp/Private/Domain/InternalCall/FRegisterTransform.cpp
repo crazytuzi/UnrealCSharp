@@ -167,8 +167,7 @@ struct FRegisterTransform
 			.Function("CopyTranslationAndScale3D", BINDING_FUNCTION(&FTransform::CopyTranslationAndScale3D,
 			                                                        TArray<FString>{"SrcBA"}))
 			.Function("SetFromMatrix", BINDING_FUNCTION(&FTransform::SetFromMatrix,
-			                                            TArray<FString>{"InMatrix"}))
-			.Register();
+			                                            TArray<FString>{"InMatrix"}));
 	}
 };
 

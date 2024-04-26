@@ -52,8 +52,7 @@ struct FRegisterBox2D
 			.Function("ShiftBy", BINDING_FUNCTION(&FBox2D::ShiftBy,
 			                                      TArray<FString>{"Offset"}))
 			.Function("ToString", BINDING_FUNCTION(&FBox2D::ToString,
-			                                       EFunctionInteract::New))
-			.Register();
+			                                       EFunctionInteract::New));
 	}
 };
 

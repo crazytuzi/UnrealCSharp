@@ -22,8 +22,7 @@ struct FRegisterPrimaryAssetId
 			.Function("IsValid", BINDING_FUNCTION(&FPrimaryAssetId::IsValid))
 			.Function("ToString", BINDING_FUNCTION(&FPrimaryAssetId::ToString,
 			                                       EFunctionInteract::New))
-			.Function("FromString", BINDING_FUNCTION(&FPrimaryAssetId::FromString))
-			.Register();
+			.Function("FromString", BINDING_FUNCTION(&FPrimaryAssetId::FromString));
 	}
 };
 

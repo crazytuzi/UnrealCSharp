@@ -351,7 +351,7 @@ struct FRegisterArray
 
 	FRegisterArray()
 	{
-		FClassBuilder(TEXT("TArray"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("TArray"), NAMESPACE_LIBRARY, true)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
@@ -380,8 +380,7 @@ struct FRegisterArray
 			.Function("Remove", RemoveImplementation)
 			.Function("SwapMemory", SwapMemoryImplementation)
 			.Function("Swap", SwapImplementation)
-			.Function("INDEX_NONE", INDEX_NONEImplementation)
-			.Register();
+			.Function("INDEX_NONE", INDEX_NONEImplementation);
 	}
 };
 

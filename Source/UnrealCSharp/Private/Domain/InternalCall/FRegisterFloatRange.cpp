@@ -48,13 +48,12 @@ struct FRegisterFloatRange
 			                                      TArray<FString>{"Value"}))
 			.Function("AtMost", BINDING_FUNCTION(&FFloatRange::AtMost,
 			                                     TArray<FString>{"Value"}))
-			.Function("Empty", BINDING_FUNCTION(&FFloatRange::Empty))
+			.Function("Empty", BINDING_FUNCTION(&FFloatRange::Empty));
 			// @TODO
 			// Exclusive
 			// GreaterThan
 			// Inclusive
 			// LessThan
-			.Register();
 	}
 };
 

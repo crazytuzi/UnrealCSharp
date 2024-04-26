@@ -1,30 +1,31 @@
 #include "FBindingEnumGenerator.h"
 #include "FGeneratorCore.h"
+#include "Binding/FBinding.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 void FBindingEnumGenerator::Generator()
 {
-	for (const auto& Enum : FBindingEnum::GetEnums())
+	for (const auto& Enum : FBinding::Get().Register().GetEnums())
 	{
-		Generator(Enum.Value);
+		Generator(Enum);
 	}
 }
 
-void FBindingEnumGenerator::Generator(const FBindingEnum& InEnum)
+void FBindingEnumGenerator::Generator(const FBindingEnum* InEnum)
 {
-	const auto& NameSpaceContent = InEnum.GetTypeInfo().GetNameSpace();
+	const auto& NameSpaceContent = InEnum->GetTypeInfo().GetNameSpace();
 
-	auto ClassContent = InEnum.GetEnum();
+	auto ClassContent = InEnum->GetEnum();
 
 	FString EnumeratorContent;
 
 	TArray<FString> Keys;
 
-	InEnum.GetEnumerators().GetKeys(Keys);
+	InEnum->GetEnumerators().GetKeys(Keys);
 
 	for (auto Index = 0; Index < Keys.Num(); ++Index)
 	{
-		const auto EnumeratorValue = InEnum.GetEnumerators()[Keys[Index]];
+		const auto EnumeratorValue = InEnum->GetEnumerators()[Keys[Index]];
 
 		auto EnumeratorString = Keys[Index];
 
@@ -47,7 +48,7 @@ void FBindingEnumGenerator::Generator(const FBindingEnum& InEnum)
 	),
 	                                     *NameSpaceContent[0],
 	                                     *ClassContent,
-	                                     *InEnum.GetUnderlyingType(),
+	                                     *InEnum->GetUnderlyingType(),
 	                                     *EnumeratorContent
 	);
 

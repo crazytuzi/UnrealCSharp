@@ -311,8 +311,7 @@ struct FRegisterVector
 			                                               TArray<FString>{"DegVector"}))
 			.Function("GenerateClusterCenters", BINDING_FUNCTION(&FVector::GenerateClusterCenters,
 			                                                     TArray<FString>{"Clusters", "Points",
-			                                                     "NumIterations", "NumConnectionsToBeValid"}))
-			.Register();
+			                                                     "NumIterations", "NumConnectionsToBeValid"}));
 	}
 };
 

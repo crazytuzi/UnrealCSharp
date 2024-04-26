@@ -100,8 +100,7 @@ struct FRegisterVector4
 			.Function("Reflect3", BINDING_FUNCTION(&FVector4::Reflect3,
 			                                       TArray<FString>{"Normal"}))
 			.Function("FindBestAxisVectors3", BINDING_FUNCTION(&FVector4::FindBestAxisVectors3,
-			                                                   TArray<FString>{"Axis1", "Axis2"}))
-			.Register();
+			                                                   TArray<FString>{"Axis1", "Axis2"}));
 	}
 };
 

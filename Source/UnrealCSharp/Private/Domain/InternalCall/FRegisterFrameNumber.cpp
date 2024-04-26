@@ -30,8 +30,7 @@ struct FRegisterFrameNumber
 			.Modulus()
 			.UnaryMinus()
 			.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
-			.Function("operator /", FUNCTION_DIVIDES, BINDING_FUNCTION(&DividesImplementation))
-			.Register();
+			.Function("operator /", FUNCTION_DIVIDES, BINDING_FUNCTION(&DividesImplementation));
 	}
 };
 

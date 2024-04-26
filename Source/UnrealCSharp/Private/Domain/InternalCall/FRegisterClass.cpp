@@ -3,8 +3,6 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
 
-BINDING_REFLECTION_CLASS(UClass)
-
 struct FRegisterClass
 {
 	FRegisterClass()
@@ -12,8 +10,7 @@ struct FRegisterClass
 		TBindingClassBuilder<UClass>(NAMESPACE_LIBRARY)
 			.Property("ClassDefaultObject", BINDING_READONLY_PROPERTY(&UClass::ClassDefaultObject))
 			.Function("GetDefaultObject", BINDING_OVERLOAD(UObject*(UClass::*)(bool)const, &UClass::GetDefaultObject,
-			                                               TArray<FString>{"bCreateIfNeeded"}, true))
-			.Register();
+			                                               TArray<FString>{"bCreateIfNeeded"}, true));
 	}
 };
 

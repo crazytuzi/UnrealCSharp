@@ -5,23 +5,20 @@
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
 
-BINDING_ENGINE_ENUM(FActorSpawnParameters::ESpawnActorNameMode)
+BINDING_ENUM(FActorSpawnParameters::ESpawnActorNameMode)
 
-BINDING_ENGINE_CLASS(FActorSpawnParameters)
-
-BINDING_REFLECTION_CLASS(UWorld)
+BINDING_CLASS(FActorSpawnParameters)
 
 struct FRegisterSpawnActorNameMode
 {
 	FRegisterSpawnActorNameMode()
 	{
-		TBindingEnumBuilder<FActorSpawnParameters::ESpawnActorNameMode>()
+		TBindingEnumBuilder<FActorSpawnParameters::ESpawnActorNameMode, true>()
 			.Enumerator("Required_Fatal", FActorSpawnParameters::ESpawnActorNameMode::Required_Fatal)
 			.Enumerator("Required_ErrorAndReturnNull",
 			            FActorSpawnParameters::ESpawnActorNameMode::Required_ErrorAndReturnNull)
 			.Enumerator("Required_ReturnNull", FActorSpawnParameters::ESpawnActorNameMode::Required_ReturnNull)
-			.Enumerator("Requested", FActorSpawnParameters::ESpawnActorNameMode::Requested)
-			.Register();
+			.Enumerator("Requested", FActorSpawnParameters::ESpawnActorNameMode::Requested);
 	}
 };
 
@@ -31,7 +28,7 @@ struct FRegisterActorSpawnParameters
 {
 	FRegisterActorSpawnParameters()
 	{
-		TBindingClassBuilder<FActorSpawnParameters>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FActorSpawnParameters, true>(NAMESPACE_BINDING)
 			.Property("Name", BINDING_PROPERTY(&FActorSpawnParameters::Name))
 			.Property("Template", BINDING_PROPERTY(&FActorSpawnParameters::Template))
 			.Property("Owner", BINDING_PROPERTY(&FActorSpawnParameters::Owner))
@@ -45,8 +42,7 @@ struct FRegisterActorSpawnParameters
 			// bDeferConstruction
 			// bAllowDuringConstructionScript
 			.Property("NameMode", BINDING_PROPERTY(&FActorSpawnParameters::NameMode))
-			.Property("ObjectFlags", BINDING_PROPERTY(&FActorSpawnParameters::ObjectFlags))
-			.Register();
+			.Property("ObjectFlags", BINDING_PROPERTY(&FActorSpawnParameters::ObjectFlags));
 	}
 };
 
@@ -84,8 +80,7 @@ struct FRegisterWorld
 	FRegisterWorld()
 	{
 		TBindingClassBuilder<UWorld>(NAMESPACE_LIBRARY)
-			.Function("SpawnActor", SpawnActorImplementation)
-			.Register();
+			.Function("SpawnActor", SpawnActorImplementation);
 	}
 };
 

@@ -61,8 +61,7 @@ struct FRegisterPlane
 			.Function("TranslateBy", BINDING_FUNCTION(&FPlane::TranslateBy,
 			                                          TArray<FString>{"V"}))
 			.Function("Equals", BINDING_FUNCTION(&FPlane::Equals,
-			                                     TArray<FString>{"V", "Tolerance"}, KINDA_SMALL_NUMBER))
-			.Register();
+			                                     TArray<FString>{"V", "Tolerance"}, KINDA_SMALL_NUMBER));
 	}
 };
 

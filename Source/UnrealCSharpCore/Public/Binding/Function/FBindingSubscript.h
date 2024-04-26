@@ -4,9 +4,12 @@
 
 struct FBindingSubscript : FBindingFunction
 {
-	FBindingSubscript(FFunctionInfo* InInfo, const FString& InName, const FString& InImplementationName,
-	                  const FString& InGetImplementationName, const FString& InSetImplementationName):
-		FBindingFunction(InInfo, InName, InImplementationName),
+	FBindingSubscript() = default;
+
+	FBindingSubscript(const FBindingFunction& InFunction,
+	                  const FString& InGetImplementationName,
+	                  const FString& InSetImplementationName):
+		FBindingFunction(InFunction),
 		GetImplementationName(InGetImplementationName),
 		SetImplementationName(InSetImplementationName)
 	{

@@ -1,42 +1,41 @@
 #include "Binding/Class/FBindingClass.h"
+#include "Binding/FBinding.h"
 
-TMap<FString, FBindingClass> FBindingClass::Classes;
-
-FBindingClass::~FBindingClass()
+FBindingClass::FBindingClass(const FString& InBaseClass,
+                             const FString& InClass,
+                             const FString& InImplementationNameSpace,
+                             const bool InIsEngineClass,
+                             const bool InIsReflectionClass,
+                             const FBindingTypeInfo& InTypeInfo,
+                             const FBindingSubscript& InSubscript,
+                             const TArray<FBindingProperty>& InProperties,
+                             const TArray<FBindingFunction>& InFunctions,
+                             const TArray<FBindingMethod>& InMethods):
+	BaseClass(InBaseClass),
+	Class(InClass),
+	ImplementationNameSpace(InImplementationNameSpace),
+	bIsEngineClass(InIsEngineClass),
+	bIsReflectionClass(InIsReflectionClass),
+	TypeInfo(InTypeInfo),
+	Subscript(InSubscript),
+	Properties(InProperties),
+	Functions(InFunctions),
+	Methods(InMethods)
 {
-	if (Subscript != nullptr)
-	{
-		delete Subscript;
-
-		Subscript = nullptr;
-	}
-}
-
-FBindingClass* FBindingClass::GetClass(const bool InIsReflection, const FString& InClass,
-                                       const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo)
-{
-	if (!Classes.Contains(InClass))
-	{
-		Classes.Add(InClass, {InIsReflection, InClass, InImplementationNameSpace, InTypeInfo});
-	}
-
-	return Classes.Find(InClass);
-}
-
-const TMap<FString, FBindingClass>& FBindingClass::GetClasses()
-{
-	return Classes;
 }
 
 TSet<FString> FBindingClass::GetPropertyNames(const FString& InClass)
 {
 	TSet<FString> PropertyNames;
 
-	if (const auto Class = Classes.Find(InClass))
+	for (const auto& Class : FBinding::Get().Register().GetClasses())
 	{
-		for (const auto& Property : Class->Properties)
+		if (Class->GetClass() == InClass)
 		{
-			PropertyNames.Add(Property.GetPropertyName());
+			for (const auto& Property : Class->GetProperties())
+			{
+				PropertyNames.Add(Property.GetPropertyName());
+			}
 		}
 	}
 
@@ -47,30 +46,23 @@ TSet<FString> FBindingClass::GetFunctionNames(const FString& InClass)
 {
 	TSet<FString> FunctionNames;
 
-	if (const auto Class = Classes.Find(InClass))
+	for (const auto& Class : FBinding::Get().Register().GetClasses())
 	{
-		for (const auto& Function : Class->Functions)
+		if (Class->GetClass() == InClass)
 		{
-			FunctionNames.Add(Function.GetFunctionName());
+			for (const auto& Function : Class->GetFunctions())
+			{
+				FunctionNames.Add(Function.GetFunctionName());
+			}
 		}
 	}
 
 	return FunctionNames;
 }
 
-bool FBindingClass::IsReflection() const
+const FString& FBindingClass::GetBaseClass() const
 {
-	return bIsReflection;
-}
-
-const FString& FBindingClass::GetImplementationNameSpace() const
-{
-	return ImplementationNameSpace;
-}
-
-const FString& FBindingClass::GetBase() const
-{
-	return Base;
+	return BaseClass;
 }
 
 const FString& FBindingClass::GetClass() const
@@ -78,12 +70,32 @@ const FString& FBindingClass::GetClass() const
 	return Class;
 }
 
+const FString& FBindingClass::GetImplementationNameSpace() const
+{
+	return ImplementationNameSpace;
+}
+
+bool FBindingClass::IsEngineClass() const
+{
+	return bIsEngineClass;
+}
+
+bool FBindingClass::IsReflectionClass() const
+{
+	return bIsReflectionClass;
+}
+
+bool FBindingClass::IsSet() const
+{
+	return TypeInfo.IsSet();
+}
+
 const FBindingTypeInfo& FBindingClass::GetTypeInfo() const
 {
 	return TypeInfo;
 }
 
-const FBindingSubscript* FBindingClass::GetSubscript() const
+const FBindingSubscript& FBindingClass::GetSubscript() const
 {
 	return Subscript;
 }
@@ -98,48 +110,7 @@ const TArray<FBindingFunction>& FBindingClass::GetFunctions() const
 	return Functions;
 }
 
-void FBindingClass::BindingSubscript(const FString& InName, const FString& InGetImplementationName,
-                                     const FString& InSetImplementationName, FFunctionInfo* InTypeInfo)
+const TArray<FBindingMethod>& FBindingClass::GetMethods() const
 {
-	if (Subscript == nullptr)
-	{
-		Subscript = new FBindingSubscript(InTypeInfo,
-		                                  InName,
-		                                  InName,
-		                                  InGetImplementationName,
-		                                  InSetImplementationName);
-	}
-}
-
-void FBindingClass::BindingProperty(const FString& InName, FTypeInfo* InTypeInfo,
-                                    const void* InGetMethod, const void* InSetMethod)
-{
-	Properties.Emplace(
-		InTypeInfo,
-		InName,
-		static_cast<EBindingPropertyAccess>(
-			static_cast<int32>((InGetMethod != nullptr
-				                    ? EBindingPropertyAccess::OnlyRead
-				                    : EBindingPropertyAccess::None)) +
-			static_cast<int32>(InSetMethod != nullptr
-				                   ? EBindingPropertyAccess::OnlyWrite
-				                   : EBindingPropertyAccess::None))
-	);
-}
-
-void FBindingClass::BindingFunction(const FString& InName, const FString& InImplementationName,
-                                    FFunctionInfo* InTypeInfo)
-{
-	Functions.Emplace(
-		InTypeInfo,
-		InName,
-		InImplementationName
-	);
-}
-
-void FBindingClass::Inheritance(const FString& InClass, const FString& InImplementationNameSpace, FTypeInfo* InTypeInfo)
-{
-	Base = InClass;
-
-	GetClass(IsReflection(), InClass, InImplementationNameSpace, InTypeInfo);
+	return Methods;
 }

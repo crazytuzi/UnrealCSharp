@@ -118,7 +118,7 @@ struct FRegisterDelegate
 
 	FRegisterDelegate()
 	{
-		FClassBuilder(TEXT("FDelegate"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FDelegate"), NAMESPACE_LIBRARY, true)
 			.Function("Register", RegisterImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("Bind", BindImplementation)
@@ -132,8 +132,7 @@ struct FRegisterDelegate
 			.Function("Execute4", Execute4Implementation)
 			.Function("Execute5", Execute5Implementation)
 			.Function("Execute6", Execute6Implementation)
-			.Function("Execute7", Execute7Implementation)
-			.Register();
+			.Function("Execute7", Execute7Implementation);
 	}
 };
 

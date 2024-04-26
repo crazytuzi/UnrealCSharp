@@ -3,8 +3,6 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
-BINDING_REFLECTION_CLASS(UStruct)
-
 struct FRegisterStruct
 {
 	static MonoObject* StaticStructImplementation(MonoString* InStructName)
@@ -58,8 +56,7 @@ struct FRegisterStruct
 			.Function("StaticStruct", StaticStructImplementation)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
-			.Function("UnRegister", UnRegisterImplementation)
-			.Register();
+			.Function("UnRegister", UnRegisterImplementation);
 	}
 };
 

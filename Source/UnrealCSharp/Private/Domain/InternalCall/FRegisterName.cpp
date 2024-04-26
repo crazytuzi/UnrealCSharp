@@ -54,13 +54,12 @@ struct FRegisterName
 
 	FRegisterName()
 	{
-		FClassBuilder(TEXT("FName"), NAMESPACE_LIBRARY)
+		FClassBuilder(TEXT("FName"), NAMESPACE_LIBRARY, true)
 			.Function("Register", RegisterImplementation)
 			.Function("Identical", IdenticalImplementation)
 			.Function("UnRegister", UnRegisterImplementation)
 			.Function("ToString", ToStringImplementation)
-			.Function("NAME_None", NAME_NoneImplementation)
-			.Register();
+			.Function("NAME_None", NAME_NoneImplementation);
 	}
 };
 

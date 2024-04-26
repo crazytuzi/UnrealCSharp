@@ -20,9 +20,8 @@ struct FRegisterLog
 
 	FRegisterLog()
 	{
-		FClassBuilder(TEXT("Log"), NAMESPACE_LIBRARY)
-			.Function("Log", LogImplementation)
-			.Register();
+		FClassBuilder(TEXT("Log"), NAMESPACE_LIBRARY, true)
+			.Function("Log", LogImplementation);
 	}
 };
 

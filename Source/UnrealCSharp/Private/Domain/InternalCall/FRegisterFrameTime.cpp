@@ -41,8 +41,7 @@ struct FRegisterFrameTime
 			.Function("RoundToFrame", BINDING_FUNCTION(&FFrameTime::RoundToFrame))
 			.Function("AsDecimal", BINDING_FUNCTION(&FFrameTime::AsDecimal))
 			.Function("FromDecimal", BINDING_FUNCTION(&FFrameTime::FromDecimal,
-			                                          TArray<FString>{"InDecimalFrame"}))
-			.Register();
+			                                          TArray<FString>{"InDecimalFrame"}));
 	}
 };
 

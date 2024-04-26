@@ -5,31 +5,29 @@
 class UNREALCSHARPCORE_API FBindingEnum
 {
 public:
-	FBindingEnum(const FString& InEnum, const FString& InUnderlyingType, FTypeInfo* InTypeInfo);
-
-	static FBindingEnum* GetEnum(const FString& InEnum, const FString& InUnderlyingType, FTypeInfo* InTypeInfo);
-
-public:
-	static const TMap<FString, FBindingEnum>& GetEnums();
+	FBindingEnum(const FString& InEnum,
+	             const FString& InUnderlyingType,
+	             bool InIsEngineEnum,
+	             const FBindingTypeInfo& InTypeInfo,
+	             const TMap<FString, int64>& InEnumerators);
 
 public:
 	const FString& GetEnum() const;
 
 	const FString& GetUnderlyingType() const;
 
+	bool IsEngineEnum() const;
+
 	const FBindingTypeInfo& GetTypeInfo() const;
 
 	const TMap<FString, int64>& GetEnumerators() const;
 
-public:
-	void BindingEnumerator(const FString& InKey, int64 InEnumerator);
-
 private:
-	static TMap<FString, FBindingEnum> Enums;
-
 	FString Enum;
 
 	FString UnderlyingType;
+
+	bool bIsEngineEnum;
 
 	FBindingTypeInfo TypeInfo;
 

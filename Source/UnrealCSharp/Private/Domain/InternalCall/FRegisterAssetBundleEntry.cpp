@@ -11,8 +11,7 @@ struct FRegisterAssetBundleEntry
 			             TArray<FString>{"OldEntry"})
 			.Constructor(BINDING_CONSTRUCTOR(FAssetBundleEntry, FName),
 			             TArray<FString>{"InBundleName"})
-			.Function("IsValid", BINDING_FUNCTION(&FAssetBundleEntry::IsValid))
-			.Register();
+			.Function("IsValid", BINDING_FUNCTION(&FAssetBundleEntry::IsValid));
 	}
 };
 

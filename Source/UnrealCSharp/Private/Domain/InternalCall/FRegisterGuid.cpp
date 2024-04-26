@@ -4,13 +4,13 @@
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
 
-BINDING_ENGINE_ENUM(EGuidFormats)
+BINDING_ENUM(EGuidFormats)
 
 struct FRegisterGuidFormats
 {
 	FRegisterGuidFormats()
 	{
-		TBindingEnumBuilder<EGuidFormats>()
+		TBindingEnumBuilder<EGuidFormats, true>()
 			.Enumerator("Digits", EGuidFormats::Digits)
 			.Enumerator("DigitsWithHyphens", EGuidFormats::DigitsWithHyphens)
 			.Enumerator("DigitsWithHyphensLower", EGuidFormats::DigitsWithHyphensLower)
@@ -19,8 +19,7 @@ struct FRegisterGuidFormats
 			.Enumerator("HexValuesInBraces", EGuidFormats::HexValuesInBraces)
 			.Enumerator("UniqueObjectGuid", EGuidFormats::UniqueObjectGuid)
 			.Enumerator("Short", EGuidFormats::Short)
-			.Enumerator("Base36Encoded", EGuidFormats::Base36Encoded)
-			.Register();
+			.Enumerator("Base36Encoded", EGuidFormats::Base36Encoded);
 	}
 };
 
@@ -64,8 +63,7 @@ struct FRegisterGuid
 			                                       TArray<FString>{"Format"}))
 			.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
 			.Function("Parse", BINDING_FUNCTION(&FGuid::Parse))
-			.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact))
-			.Register();
+			.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact));
 	}
 };
 

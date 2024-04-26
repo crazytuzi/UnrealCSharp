@@ -1,65 +1,84 @@
 #pragma once
 
-#include "FBindingFunctionBase.inl"
 #include "FFunctionInfo.h"
 #include "EFunctionInteract.h"
 
-struct FBindingFunction : FBindingFunctionBase
+struct FBindingFunction
 {
 	FBindingFunction() = default;
 
-	FBindingFunction(FFunctionInfo* InInfo, const FString& InName, const FString& InImplementationName):
-		FBindingFunctionBase(InName, InImplementationName),
-		Info(InInfo)
+	FBindingFunction(const FString& InName, const FString& InImplementationName, FFunctionInfo* InFunctionInfo):
+		Name(InName),
+		ImplementationName(InImplementationName),
+		FunctionInfo(InFunctionInfo)
 	{
+	}
+
+	const FString& GetFunctionName() const
+	{
+		return Name;
+	}
+
+	const FString& GetFunctionImplementationName() const
+	{
+		return ImplementationName;
+	}
+
+	bool IsSet() const
+	{
+		return FunctionInfo != nullptr;
 	}
 
 	bool IsConstructor() const
 	{
-		return Info != nullptr ? Info->IsConstructor() : false;
+		return FunctionInfo != nullptr ? FunctionInfo->IsConstructor() : false;
 	}
 
 	bool IsDestructor() const
 	{
-		return Info != nullptr ? Info->IsDestructor() : false;
+		return FunctionInfo != nullptr ? FunctionInfo->IsDestructor() : false;
 	}
 
 	bool IsStatic() const
 	{
-		return Info != nullptr ? Info->IsStatic() : false;
+		return FunctionInfo != nullptr ? FunctionInfo->IsStatic() : false;
 	}
 
 	FTypeInfo* GetReturn() const
 	{
-		return Info != nullptr ? Info->GetReturn() : nullptr;
+		return FunctionInfo != nullptr ? FunctionInfo->GetReturn() : nullptr;
 	}
 
 	const TArray<FTypeInfo*>& GetParams() const
 	{
 		static TArray<FTypeInfo*> Instance;
 
-		return Info != nullptr ? Info->GetParams() : Instance;
+		return FunctionInfo != nullptr ? FunctionInfo->GetParams() : Instance;
 	}
 
 	const TArray<FString>& GetParamNames() const
 	{
 		static TArray<FString> Instance;
 
-		return Info != nullptr ? Info->GetParamNames() : Instance;
+		return FunctionInfo != nullptr ? FunctionInfo->GetParamNames() : Instance;
 	}
 
 	const TArray<FString>& GetDefaultArguments() const
 	{
 		static TArray<FString> Instance;
 
-		return Info != nullptr ? Info->GetDefaultArguments() : Instance;
+		return FunctionInfo != nullptr ? FunctionInfo->GetDefaultArguments() : Instance;
 	}
 
 	EFunctionInteract GetFunctionInteract() const
 	{
-		return Info != nullptr ? Info->GetFunctionInteract() : EFunctionInteract::None;
+		return FunctionInfo != nullptr ? FunctionInfo->GetFunctionInteract() : EFunctionInteract::None;
 	}
 
 private:
-	FFunctionInfo* Info;
+	FString Name;
+
+	FString ImplementationName;
+
+	FFunctionInfo* FunctionInfo;
 };
