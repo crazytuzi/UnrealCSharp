@@ -1,6 +1,7 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "Async/Async.h"
 
 struct FRegisterLazyObjectPtr
 {
@@ -28,8 +29,11 @@ struct FRegisterLazyObjectPtr
 
 	static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(
-			InGarbageCollectionHandle);
+		AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+		{
+			(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TLazyObjectPtr<UObject>>(
+				InGarbageCollectionHandle);
+		});
 	}
 
 	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)

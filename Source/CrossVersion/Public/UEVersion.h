@@ -23,6 +23,8 @@
 
 #define UE_FIELD_NOTIFICATION UE_VERSION_START(5, 3, 0)
 
+#define UE_F_OPTIONAL_PROPERTY UE_VERSION_START(5, 3, 0)
+
 #define STD_CPP_11 __cplusplus >= 201103L
 
 #define STD_CPP_14 __cplusplus >= 201402L

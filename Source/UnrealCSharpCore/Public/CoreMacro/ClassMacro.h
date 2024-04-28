@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "UEVersion.h"
+
 #define COMBINE_GENERIC(Type, Arguments) FString::Printf(TEXT("%s`%s"), *Type, *Arguments)
 
 #define CLASS_UTILS FString(TEXT("Utils"))
@@ -55,3 +57,9 @@
 #define TEMPLATE_T_SOFT_CLASS_PTR FString(TEXT("TSoftClassPtr"))
 
 #define GENERIC_T_SOFT_CLASS_PTR COMBINE_GENERIC(TEMPLATE_T_SOFT_CLASS_PTR, FString(TEXT("1")))
+
+#if UE_F_OPTIONAL_PROPERTY
+#define TEMPLATE_T_OPTIONAL FString(TEXT("TOptional"))
+
+#define GENERIC_T_OPTIONAL COMBINE_GENERIC(TEMPLATE_T_OPTIONAL, FString(TEXT("1")))
+#endif

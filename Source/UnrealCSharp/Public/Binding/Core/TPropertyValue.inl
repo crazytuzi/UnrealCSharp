@@ -15,6 +15,11 @@
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
+#include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "Template/TIsTOptional.inl"
+#include "UObject/PropertyOptional.h"
+#endif
 
 template <typename T, typename Enable = void>
 struct TPropertyValue
@@ -719,3 +724,65 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Val
 	TMultiPropertyValue<T>
 {
 };
+
+#if UE_F_OPTIONAL_PROPERTY
+template <typename T>
+struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>>
+{
+	static MonoObject* Get(std::decay_t<T>* InMember,
+	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
+	                       bool bNeedFree = true)
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetOptionalObject<FOptionalHelper>(InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			const auto FoundPropertyMonoClass = TPropertyClass<
+					typename TTemplateTypeTraits<std::decay_t<T>>::Type,
+					typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+				::Get();
+
+			const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+				FoundPropertyMonoClass);
+
+			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+				Type_Get_Object(FoundPropertyMonoType);
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
+
+			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+			                                           EObjectFlags::RF_Transient);
+
+			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+			OptionalProperty->SetValueProperty(Property);
+
+			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, InMember,
+			                                                !InGarbageCollectionHandle.IsValid());
+
+			if (InGarbageCollectionHandle.IsValid())
+			{
+				FCSharpEnvironment::GetEnvironment().AddOptionalReference(
+					InMember, OptionalHelper, SrcMonoObject);
+			}
+			else
+			{
+				FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, SrcMonoObject);
+			}
+		}
+
+		return SrcMonoObject;
+	}
+
+	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	{
+		const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(InValue);
+
+		return *static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::Type*>(SrcOptional->GetData());
+	}
+};
+#endif

@@ -13,6 +13,10 @@
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
+#include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "Template/TIsTOptional.inl"
+#endif
 
 template <typename T, typename Enable = void>
 struct TNameSpace
@@ -239,3 +243,11 @@ struct TNameSpace<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value, 
 	TGenericNameSpace<T>
 {
 };
+
+#if UE_F_OPTIONAL_PROPERTY
+template <typename T>
+struct TNameSpace<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>> final :
+	TGenericNameSpace<T>
+{
+};
+#endif

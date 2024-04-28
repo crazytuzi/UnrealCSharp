@@ -2,6 +2,7 @@
 #include "Binding/FBinding.h"
 #include "CoreMacro/BindingMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "UEVersion.h"
 
 FBindingClassRegister::FBindingClassRegister(const TFunction<FString()>& InClassFunction,
                                              const FString& InImplementationNameSpace,
@@ -109,7 +110,11 @@ void FBindingClassRegister::BindingFunction(const FString& InName,
 
 void FBindingClassRegister::BindingMethod(const FString& InImplementationName, const void* InFunction)
 {
+#if STD_CPP_20
+	MethodRegisters.Emplace([=, this]()
+#else
 	MethodRegisters.Emplace([=]()
+#endif
 	                        {
 		                        return BINDING_COMBINE_CLASS(
 				                        ImplementationNameSpace,

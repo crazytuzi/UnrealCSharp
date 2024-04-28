@@ -31,6 +31,11 @@
 #include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
 #include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 #include "Reflection/Property/FieldPathProperty/FFieldPathPropertyDescriptor.h"
+#include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "UObject/PropertyOptional.h"
+#include "Reflection/Property/OptionalProperty/FOptionalPropertyDescriptor.h"
+#endif
 
 EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Property)
 {
@@ -97,6 +102,10 @@ EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Proper
 		GET_PROPERTY_TYPE(FSetProperty, EPropertyTypeExtent::Set)
 
 		GET_PROPERTY_TYPE(FFieldPathProperty, EPropertyTypeExtent::FieldPath)
+
+#if UE_F_OPTIONAL_PROPERTY
+		GET_PROPERTY_TYPE(FOptionalProperty, EPropertyTypeExtent::Optional)
+#endif
 	}
 
 	return EPropertyTypeExtent::None;
@@ -165,6 +174,10 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 	NEW_PROPERTY_DESCRIPTOR(FSetProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FFieldPathProperty)
+
+#if UE_F_OPTIONAL_PROPERTY
+	NEW_PROPERTY_DESCRIPTOR(FOptionalProperty)
+#endif
 
 	return nullptr;
 }

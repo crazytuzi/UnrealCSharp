@@ -76,6 +76,10 @@ void FCSharpEnvironment::Initialize()
 
 	BindingRegistry = new FBindingRegistry();
 
+#if UE_F_OPTIONAL_PROPERTY
+	OptionalRegistry = new FOptionalRegistry();
+#endif
+
 	OnAsyncLoadingFlushUpdateHandle = FCoreDelegates::OnAsyncLoadingFlushUpdate.AddRaw(
 		this, &FCSharpEnvironment::OnAsyncLoadingFlushUpdate);
 
@@ -114,6 +118,15 @@ void FCSharpEnvironment::Deinitialize()
 	{
 		FCoreDelegates::OnAsyncLoadingFlushUpdate.Remove(OnAsyncLoadingFlushUpdateHandle);
 	}
+
+#if UE_F_OPTIONAL_PROPERTY
+	if (OptionalRegistry != nullptr)
+	{
+		delete OptionalRegistry;
+
+		OptionalRegistry = nullptr;
+	}
+#endif
 
 	if (BindingRegistry != nullptr)
 	{
@@ -541,6 +554,20 @@ bool FCSharpEnvironment::RemoveBindingReference(const FGarbageCollectionHandle& 
 {
 	return BindingRegistry != nullptr ? BindingRegistry->RemoveReference(InGarbageCollectionHandle) : false;
 }
+
+#if UE_F_OPTIONAL_PROPERTY
+FOptionalHelper* FCSharpEnvironment::GetOptional(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+{
+	return OptionalRegistry != nullptr
+		       ? OptionalRegistry->GetOptional(InGarbageCollectionHandle)
+		       : nullptr;
+}
+
+bool FCSharpEnvironment::RemoveOptionalReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+{
+	return OptionalRegistry != nullptr ? OptionalRegistry->RemoveReference(InGarbageCollectionHandle) : false;
+}
+#endif
 
 bool FCSharpEnvironment::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference) const
 {

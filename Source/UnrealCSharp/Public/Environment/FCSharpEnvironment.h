@@ -12,6 +12,7 @@
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsScriptStruct.inl"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
+#include "UEVersion.h"
 
 class UNREALCSHARP_API FCSharpEnvironment
 {
@@ -217,6 +218,22 @@ public:
 
 	bool RemoveBindingReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
+#if UE_F_OPTIONAL_PROPERTY
+public:
+	class FOptionalHelper* GetOptional(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+
+	template <typename T>
+	auto GetOptionalObject(void* InAddress) const;
+
+	template <typename T>
+	auto AddOptionalReference(T* InValue, MonoObject* InMonoObject) const;
+
+	template <typename T>
+	auto AddOptionalReference(void* InAddress, T* InValue, MonoObject* InMonoObject, bool bNeedFree = true) const;
+
+	bool RemoveOptionalReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+#endif
+
 public:
 	template <typename T, typename Enable = void>
 	class TGetObject
@@ -314,6 +331,10 @@ private:
 	FStringRegistry* StringRegistry;
 
 	class FBindingRegistry* BindingRegistry;
+
+#if UE_F_OPTIONAL_PROPERTY
+	class FOptionalRegistry* OptionalRegistry;
+#endif
 };
 
 #include "FCSharpEnvironment.inl"

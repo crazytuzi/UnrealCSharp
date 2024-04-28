@@ -3,6 +3,9 @@
 #include "Registry/FContainerRegistry.h"
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FBindingRegistry.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "Registry/FOptionalRegistry.h"
+#endif
 
 template <typename T>
 T* FCSharpEnvironment::TGetAddress<UObject, T>::operator()(const FCSharpEnvironment* InEnvironment,
@@ -248,3 +251,30 @@ auto FCSharpEnvironment::AddBindingReference(const FGarbageCollectionHandle& InO
 {
 	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InOwner, InObject, InMonoObject) : false;
 }
+
+#if UE_F_OPTIONAL_PROPERTY
+template <typename T>
+auto FCSharpEnvironment::GetOptionalObject(void* InAddress) const
+{
+	return OptionalRegistry != nullptr
+		       ? OptionalRegistry->GetObject(InAddress)
+		       : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::AddOptionalReference(T* InValue, MonoObject* InMonoObject) const
+{
+	return OptionalRegistry != nullptr
+		       ? OptionalRegistry->AddReference(InValue, InMonoObject)
+		       : false;
+}
+
+template <typename T>
+auto FCSharpEnvironment::AddOptionalReference(void* InAddress, T* InValue, MonoObject* InMonoObject,
+                                              const bool bNeedFree) const
+{
+	return OptionalRegistry != nullptr
+		       ? OptionalRegistry->AddReference(InAddress, InValue, InMonoObject, bNeedFree)
+		       : false;
+}
+#endif

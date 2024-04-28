@@ -386,7 +386,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 					TEXT("GetName"),
 					TEXT("GetWorld"),
 					TEXT("ToString"),
-					TEXT("IsValid")
+					TEXT("IsValid"),
+					TEXT("GetType")
 				};
 
 				if (DefaultImplementations.Contains(Function->GetName()))
@@ -1158,7 +1159,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(const UFunction* InFuncti
 		return TEXT("");
 	}
 
-	if (!FGeneratorCore::IsPrimitiveProperty(InProperty))
+	if (FGeneratorCore::IsPrimitiveProperty(InProperty))
 	{
 		return TEXT("");
 	}

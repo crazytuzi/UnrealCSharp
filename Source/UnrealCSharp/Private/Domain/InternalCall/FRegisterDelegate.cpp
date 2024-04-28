@@ -113,7 +113,7 @@ struct FRegisterDelegate
 	static MonoObject* Execute7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 	                                          MonoObject** OutValue, MonoArray* InValue)
 	{
-		return ExecuteImplementation(InGarbageCollectionHandle, OutValue, InValue);;
+		return ExecuteImplementation(InGarbageCollectionHandle, OutValue, InValue);
 	}
 
 	FRegisterDelegate()
