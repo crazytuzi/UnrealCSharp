@@ -577,7 +577,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                        FGeneratorCore::GetFunctionIndex(FunctionReturnParam != nullptr,
 			                                        FunctionParams.Num() - FunctionOutParamIndex.Num() != 0,
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
-			                                        IsEmpty()),
+			                                        IsEmpty(),
+			                                        Function->FunctionFlags & FUNC_Native &&
+			                                        !(Function->FunctionFlags & FUNC_Net)),
 		                                        bIsStatic == true
 			                                        ? *FString::Printf(
 				                                        TEXT("StaticClass().%s"),

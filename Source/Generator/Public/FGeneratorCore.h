@@ -23,7 +23,7 @@ public:
 
 	static FString GetReturnParamType(FProperty* Property);
 
-	static int32 GetFunctionIndex(bool bHasReturn, bool bHasInput, bool bHasOutput);
+	static int32 GetFunctionIndex(bool bHasReturn, bool bHasInput, bool bHasOutput, bool bIsNative = false);
 
 	static FString GetModuleRelativePath(const UField* InField);
 

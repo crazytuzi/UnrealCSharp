@@ -588,11 +588,13 @@ FString FGeneratorCore::GetReturnParamType(FProperty* Property)
 	return GetPropertyType(Property);
 }
 
-int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput, const bool bHasOutput)
+int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput,
+                                       const bool bHasOutput, const bool bIsNative)
 {
 	return static_cast<int32>(bHasReturn) |
 		static_cast<int32>(bHasInput) << 1 |
-		static_cast<int32>(bHasOutput) << 2;
+		static_cast<int32>(bHasOutput) << 2 |
+		static_cast<int32>(bIsNative) << 3;
 }
 
 FString FGeneratorCore::GetModuleRelativePath(const UField* InField)
