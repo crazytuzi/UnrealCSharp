@@ -58,3 +58,8 @@ uint32 FPropertyDescriptor::GetValueTypeHash(const void* Src) const
 {
 	return Property != nullptr ? Property->GetValueTypeHash(Src) : 0u;
 }
+
+bool FPropertyDescriptor::SameType(const FPropertyDescriptor* Other) const
+{
+	return Property != nullptr && Other != nullptr ? Property->SameType(Other->Property) : false;
+}

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "UEVersion.h"
+
 enum class UNREALCSHARPCORE_API EPropertyTypeExtent
 {
 	None = CPT_None,
@@ -38,4 +40,7 @@ enum class UNREALCSHARPCORE_API EPropertyTypeExtent
 	SoftClassReference,
 	MulticastInlineDelegate,
 	MulticastSparseDelegate
+#if UE_F_OPTIONAL_PROPERTY
+	, Optional
+#endif
 };

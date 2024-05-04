@@ -9,6 +9,10 @@
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+#include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "UObject/PropertyOptional.h"
+#endif
 
 bool FGeneratorCore::bIsSkipGenerateEngineModules;
 
@@ -237,6 +241,17 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		);
 	}
 
+#if UE_F_OPTIONAL_PROPERTY
+	if (const auto OptionalProperty = CastField<FOptionalProperty>(Property))
+	{
+		return FString::Printf(TEXT(
+			"TOptional<%s>"
+		),
+		                       *GetPropertyType(OptionalProperty->GetValueProperty())
+		);
+	}
+#endif
+
 	return TEXT("");
 }
 
@@ -375,6 +390,15 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 		return {
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), TEXT("Script.Reflection.Property")
 		};
+
+#if UE_F_OPTIONAL_PROPERTY
+	if (const auto OptionalProperty = CastField<FOptionalProperty>(Property))
+	{
+		return GetPropertyTypeNameSpace(OptionalProperty->GetValueProperty()).Union({
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)
+		});
+	}
+#endif
 
 	return {TEXT("")};
 }
@@ -564,11 +588,13 @@ FString FGeneratorCore::GetReturnParamType(FProperty* Property)
 	return GetPropertyType(Property);
 }
 
-int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput, const bool bHasOutput)
+int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput,
+                                       const bool bHasOutput, const bool bIsNative)
 {
 	return static_cast<int32>(bHasReturn) |
 		static_cast<int32>(bHasInput) << 1 |
-		static_cast<int32>(bHasOutput) << 2;
+		static_cast<int32>(bHasOutput) << 2 |
+		static_cast<int32>(bIsNative) << 3;
 }
 
 FString FGeneratorCore::GetModuleRelativePath(const UField* InField)

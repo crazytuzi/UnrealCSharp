@@ -7,6 +7,10 @@
 #include "Template/TIsTLazyObjectPtr.inl"
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
+#include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "Template/TIsTOptional.inl"
+#endif
 
 template <typename T, typename Enable = void>
 struct TGeneric
@@ -155,3 +159,20 @@ struct TGeneric<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value, T>
 		return GENERIC_T_SOFT_CLASS_PTR;
 	}
 };
+
+#if UE_F_OPTIONAL_PROPERTY
+template <typename T>
+struct TGeneric<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>> :
+	FGenericNameSpace
+{
+	static FString GetTemplateName()
+	{
+		return TEMPLATE_T_OPTIONAL;
+	}
+
+	static FString GetGenericName()
+	{
+		return GENERIC_T_OPTIONAL;
+	}
+};
+#endif

@@ -386,7 +386,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 					TEXT("GetName"),
 					TEXT("GetWorld"),
 					TEXT("ToString"),
-					TEXT("IsValid")
+					TEXT("IsValid"),
+					TEXT("GetType")
 				};
 
 				if (DefaultImplementations.Contains(Function->GetName()))
@@ -576,7 +577,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                        FGeneratorCore::GetFunctionIndex(FunctionReturnParam != nullptr,
 			                                        FunctionParams.Num() - FunctionOutParamIndex.Num() != 0,
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
-			                                        IsEmpty()),
+			                                        IsEmpty(),
+			                                        Function->FunctionFlags & FUNC_Native &&
+			                                        !(Function->FunctionFlags & FUNC_Net)),
 		                                        bIsStatic == true
 			                                        ? *FString::Printf(
 				                                        TEXT("StaticClass().%s"),
@@ -1158,7 +1161,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(const UFunction* InFuncti
 		return TEXT("");
 	}
 
-	if (!FGeneratorCore::IsPrimitiveProperty(InProperty))
+	if (FGeneratorCore::IsPrimitiveProperty(InProperty))
 	{
 		return TEXT("");
 	}

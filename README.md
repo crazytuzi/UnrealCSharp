@@ -21,11 +21,11 @@
 # 平台支持
 
 - 运行平台：Windows / macOS / Linux / Android / IOS
-- 引擎版本：Unreal Engine 5.0 - Unreal Engine 5.3
+- 引擎版本：Unreal Engine 5.0 - Unreal Engine 5.4
 
 # 文档
 
-- [开始上手](https://unrealcsharp.github.io/docs/getting-started)
+- [开始上手](https://unrealcsharp.github.io/docs/document/getting-started)
 - [动态类](https://unrealcsharp.github.io/docs/document/getting-started/dynamic)
 - [调试](https://unrealcsharp.github.io/docs/document/guides/debug)
 - [FAQ](https://unrealcsharp.github.io/docs/document/FAQ)

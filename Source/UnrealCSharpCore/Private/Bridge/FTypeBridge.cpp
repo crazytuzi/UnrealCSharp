@@ -6,6 +6,10 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Template/TGetArrayLength.inl"
+#include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "UObject/PropertyOptional.h"
+#endif
 
 EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectionType)
 {
@@ -367,6 +371,13 @@ MonoClass* FTypeBridge::GetMonoClass(FProperty* InProperty)
 		return nullptr;
 	}
 
+#if UE_F_OPTIONAL_PROPERTY
+	if (const auto OptionalProperty = CastField<FOptionalProperty>(InProperty))
+	{
+		return GetMonoClass(OptionalProperty);
+	}
+#endif
+
 	return nullptr;
 }
 
@@ -656,6 +667,33 @@ MonoClass* FTypeBridge::GetMonoClass(const FSetProperty* InProperty)
 
 	return nullptr;
 }
+
+#if UE_F_OPTIONAL_PROPERTY
+MonoClass* FTypeBridge::GetMonoClass(const FOptionalProperty* InProperty)
+{
+	if (InProperty != nullptr)
+	{
+		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_OPTIONAL);
+
+		const auto FoundMonoClass = GetMonoClass(InProperty->GetValueProperty());
+
+		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);
+
+		const auto FoundReflectionType = FMonoDomain::Type_Get_Object(
+			FoundMonoType);
+
+		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
+			FMonoDomain::Get_Object_Class(), 1);
+
+		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+	}
+
+	return nullptr;
+}
+#endif
 
 MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* InTypeMonoClass)
 {

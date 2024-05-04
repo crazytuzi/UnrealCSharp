@@ -14,6 +14,10 @@
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
+#include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "Template/TIsTOptional.inl"
+#endif
 
 template <typename T, T, typename Enable = void>
 struct TPropertyBuilder
@@ -377,6 +381,14 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSoftClassP
 {
 };
 
+#if UE_F_OPTIONAL_PROPERTY
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTOptional<Result>::Value>> :
+	TCompoundPropertyBuilder<Class, Result, Member>
+{
+};
+#endif
+
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, uint8>>> :
 	TPrimitivePropertyBuilder<void, Result, Member>
@@ -560,3 +572,11 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftClassPtr<std::
 	TMultiPropertyBuilder<void, Result, Member>
 {
 };
+
+#if UE_F_OPTIONAL_PROPERTY
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTOptional<std::decay_t<Result>>::Value>> :
+	TCompoundPropertyBuilder<void, Result, Member>
+{
+};
+#endif

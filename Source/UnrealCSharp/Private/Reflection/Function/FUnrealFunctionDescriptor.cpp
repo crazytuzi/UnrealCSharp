@@ -1,7 +1,4 @@
 #include "Reflection/Function/FUnrealFunctionDescriptor.h"
-#include "Bridge/FTypeBridge.h"
-#include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/MonoMacro.h"
 
 FUnrealFunctionDescriptor::FUnrealFunctionDescriptor(UFunction* InFunction):
 	Super(InFunction),
@@ -9,89 +6,25 @@ FUnrealFunctionDescriptor::FUnrealFunctionDescriptor(UFunction* InFunction):
 {
 }
 
-MonoObject* FUnrealFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject** OutValue, MonoArray* InValue)
+MonoObject* FUnrealFunctionDescriptor::ProcessEvent(UObject* InObject, MonoObject** OutValue, MonoArray* InValue) const
 {
-	auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);
+	const auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);
 
 	const bool bIsRemote = FunctionCallspace & FunctionCallspace::Remote;
 
 	const bool bIsLocal = FunctionCallspace & FunctionCallspace::Local;
 
-	auto ParamIndex = 0;
-
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
-	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
-	{
-		const auto& PropertyDescriptor = PropertyDescriptors[Index];
-
-		PropertyDescriptor->InitializeValue_InContainer(Params);
-
-		if (ReferencePropertyIndexes.Contains(Index) || !OutPropertyIndexes.Contains(Index))
-		{
-			if (PropertyDescriptor->IsPrimitiveProperty())
-			{
-				if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-					ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
-				{
-					PropertyDescriptor->Set(UnBoxValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
-				}
-			}
-			else
-			{
-				PropertyDescriptor->Set(
-					*static_cast<FGarbageCollectionHandle*>(
-						FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-							ARRAY_GET(InValue, MonoObject*, ParamIndex++))),
-					PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
-			}
-		}
-	}
-
-	if (ReturnPropertyDescriptor != nullptr)
-	{
-		ReturnPropertyDescriptor->InitializeValue_InContainer(Params);
-	}
+	SlowProcessIn(InValue, Params);
 
 	if (bIsLocal)
 	{
 		InObject->UObject::ProcessEvent(Function.Get(), Params);
 
-		if (!OutPropertyIndexes.IsEmpty())
-		{
-			const auto MonoObjectArray = FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(),
-			                                                    OutPropertyIndexes.Num());
+		ProcessOut(OutValue, Params);
 
-			for (auto Index = 0; Index < OutPropertyIndexes.Num(); ++Index)
-			{
-				if (const auto OutPropertyDescriptor = PropertyDescriptors[OutPropertyIndexes[Index]])
-				{
-					MonoObject* Value = nullptr;
-
-					OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
-					                           reinterpret_cast<void**>(&Value));
-
-					ARRAY_SET(MonoObjectArray, MonoObject*, Index, Value);
-				}
-			}
-
-			*OutValue = (MonoObject*)MonoObjectArray;
-		}
-
-		if (ReturnPropertyDescriptor != nullptr)
-		{
-			MonoObject* ReturnValue{};
-
-			ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params),
-			                              reinterpret_cast<void**>(&ReturnValue));
-
-			if (Params != nullptr)
-			{
-				BufferAllocator->Free(Params);
-			}
-
-			return ReturnValue;
-		}
+		return ProcessReturn(Params);
 	}
 	else if (bIsRemote)
 	{
@@ -104,4 +37,23 @@ MonoObject* FUnrealFunctionDescriptor::CallUnreal(UObject* InObject, MonoObject*
 	}
 
 	return nullptr;
+}
+
+MonoObject* FUnrealFunctionDescriptor::Invoke(UObject* InObject, MonoObject** OutValue, MonoArray* InValue) const
+{
+	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
+
+	FFrame Stack(InObject, Function.Get(), Params, nullptr, Function->ChildProperties);
+
+	FastProcessIn(InValue, &Stack.OutParms, Params);
+
+	const auto ReturnValueAddress = ReturnPropertyDescriptor != nullptr
+		                                ? (uint8*)Params + Function->ReturnValueOffset
+		                                : nullptr;
+
+	Function->Invoke(InObject, Stack, ReturnValueAddress);
+
+	ProcessOut(OutValue, Params);
+
+	return ProcessReturn(Params);
 }

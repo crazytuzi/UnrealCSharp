@@ -113,23 +113,25 @@ public class UnrealCSharpCore : ModuleRules
 
 		var ProjectPlugins = new HashSet<string>();
 
-		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(ProjectPath, "Plugins/"))), ProjectPlugins);
+		GetModules(Path.GetFullPath(Path.Combine(ProjectPath, "Plugins/")), ProjectPlugins);
+
+		GetPlugins(Path.GetFullPath(Path.Combine(ProjectPath, "Plugins/")), ProjectPlugins);
 
 		var EngineModules = new HashSet<string>();
 
-		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Developer/"))),
-			EngineModules);
+		GetModules(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Developer/")), EngineModules);
 
-		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Editor/"))), EngineModules);
+		GetModules(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Editor/")), EngineModules);
 
-		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Programs/"))),
-			EngineModules);
+		GetModules(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Programs/")), EngineModules);
 
-		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Runtime/"))), EngineModules);
+		GetModules(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Runtime/")), EngineModules);
 
 		var EnginePlugins = new HashSet<string>();
 
-		GetModules(Path.GetFullPath(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/"))), EnginePlugins);
+		GetModules(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/")), EnginePlugins);
+
+		GetPlugins(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/")), EnginePlugins);
 
 		using var Writer = new JsonWriter(JsonFullFilename);
 
@@ -144,6 +146,26 @@ public class UnrealCSharpCore : ModuleRules
 		Writer.WriteStringArrayField("EnginePlugins", EnginePlugins);
 
 		Writer.WriteObjectEnd();
+	}
+
+	private void GetPlugins(string InPathName, HashSet<string> Plugins)
+	{
+		var Suffix = "*.uplugin";
+
+		var DirectoryInfo = new DirectoryInfo(InPathName);
+
+		foreach (var Item in DirectoryInfo.GetFiles(Suffix))
+		{
+			Plugins.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length + 1));
+		}
+
+		foreach (var Directories in DirectoryInfo.GetDirectories())
+		{
+			foreach (var Item in Directories.GetFiles(Suffix, SearchOption.AllDirectories))
+			{
+				Plugins.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length + 1));
+			}
+		}
 	}
 
 	private void GetModules(string InPathName, HashSet<string> Modules)

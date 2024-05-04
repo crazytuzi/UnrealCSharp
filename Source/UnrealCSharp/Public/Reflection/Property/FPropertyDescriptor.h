@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Bridge/EPropertyTypeExtent.h"
+#include "UEVersion.h"
 
 class FPropertyDescriptor
 {
@@ -47,6 +48,8 @@ public:
 	FORCEINLINE int32 GetMinAlignment() const;
 
 	FORCEINLINE uint32 GetValueTypeHash(const void* Src) const;
+
+	FORCEINLINE bool SameType(const FPropertyDescriptor* Other) const;
 
 	virtual bool IsPrimitiveProperty() const;
 
@@ -116,6 +119,10 @@ protected:
 		FMulticastInlineDelegateProperty* MulticastInlineDelegateProperty;
 
 		FMulticastSparseDelegateProperty* MulticastSparseDelegateProperty;
+
+#if UE_F_OPTIONAL_PROPERTY
+		FOptionalProperty* OptionalProperty;
+#endif
 	};
 };
 

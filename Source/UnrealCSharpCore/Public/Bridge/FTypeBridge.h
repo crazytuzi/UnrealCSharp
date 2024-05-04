@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "EPropertyTypeExtent.h"
+#include "UEVersion.h"
 #include "mono/metadata/object.h"
 
 class FTypeBridge
@@ -45,6 +46,10 @@ public:
 	static UNREALCSHARPCORE_API MonoClass* GetMonoClass(const FMapProperty* InProperty);
 
 	static UNREALCSHARPCORE_API MonoClass* GetMonoClass(const FSetProperty* InProperty);
+
+#if UE_F_OPTIONAL_PROPERTY
+	static UNREALCSHARPCORE_API MonoClass* GetMonoClass(const FOptionalProperty* InProperty);
+#endif
 
 	static UNREALCSHARPCORE_API MonoClass* GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* InTypeMonoClass);
 

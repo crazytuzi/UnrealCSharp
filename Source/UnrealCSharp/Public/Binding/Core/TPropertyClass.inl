@@ -14,6 +14,10 @@
 #include "Template/TIsUStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
+#include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "Template/TIsTOptional.inl"
+#endif
 
 template <typename T, typename Enable = void>
 struct TPropertyClass
@@ -370,3 +374,31 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Val
 	TMultiPropertyClass<T>
 {
 };
+
+#if UE_F_OPTIONAL_PROPERTY
+template <typename T>
+struct TPropertyClass<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>>
+{
+	static MonoClass* Get()
+	{
+		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
+			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
+
+		const auto FoundMonoClass = TPropertyClass<
+				typename TTemplateTypeTraits<std::decay_t<T>>::Type,
+				typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+			::Get();
+
+		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);
+
+		const auto FoundReflectionType = FMonoDomain::Type_Get_Object(FoundMonoType);
+
+		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
+			FMonoDomain::Get_Object_Class(), 1);
+
+		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+
+		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+	}
+};
+#endif
