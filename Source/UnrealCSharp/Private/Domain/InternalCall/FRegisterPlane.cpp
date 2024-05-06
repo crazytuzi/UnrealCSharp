@@ -1,6 +1,7 @@
 ﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
+#include "FRegisterForceInit.h"
 
 struct FRegisterPlane
 {

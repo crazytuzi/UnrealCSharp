@@ -2,6 +2,7 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
+#include "FRegisterForceInit.h"
 
 struct FRegisterLinearColor
 {

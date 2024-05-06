@@ -4,6 +4,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
 #include "Macro/NamespaceMacro.h"
+#include "FRegisterObjectFlags.h"
 
 BINDING_ENUM(FActorSpawnParameters::ESpawnActorNameMode)
 

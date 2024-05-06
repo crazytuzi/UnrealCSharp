@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/BindingMacro.h"
 
