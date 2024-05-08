@@ -165,18 +165,23 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto bHasProperty = false;
 
-	TArray<TPair<FString, FString>> PropertyNames;
+	TSet<FString> PropertyNameSet;
 
 	for (TFieldIterator<FProperty> PropertyIterator(InScriptStruct, EFieldIteratorFlags::ExcludeSuper,
 	                                                EFieldIteratorFlags::ExcludeDeprecated); PropertyIterator; ++
 	     PropertyIterator)
 	{
-		if (!FGeneratorCore::IsSupported(*PropertyIterator))
+		const auto& PropertyName = PropertyIterator->GetName();
+
+		if (PropertyNameSet.Contains(PropertyName))
 		{
 			continue;
 		}
 
-		auto PropertyName = PropertyIterator->GetName();
+		if (!FGeneratorCore::IsSupported(*PropertyIterator))
+		{
+			continue;
+		}
 
 		if (BindingProperties.Contains(PropertyName))
 		{
@@ -198,14 +203,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 		auto PropertyType = FGeneratorCore::GetPropertyType(*PropertyIterator);
 
-		PropertyNames.Add(TPair<FString, FString>{
-			FString::Printf(TEXT(
-				"__%s"
-			),
-			                *FUnrealCSharpFunctionLibrary::Encode(PropertyName)
-			),
-			PropertyName
-		});
+		auto DummyPropertyName = FString::Printf(TEXT(
+			"__%s"
+		),
+		                                         *FUnrealCSharpFunctionLibrary::Encode(PropertyName)
+		);
 
 		auto VariableFriendlyPropertyName = PropertyName;
 
@@ -233,10 +235,10 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
 			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
 		}
@@ -254,28 +256,27 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			                                   *PropertyType,
 			                                   *FUnrealCSharpFunctionLibrary::Encode(VariableFriendlyPropertyName),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetPropertyType(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
 		}
+
+		PropertyNameContent += FString::Printf(TEXT(
+			"%s\t\tprivate static uint %s = 0;\n"
+		),
+		                                       PropertyNameSet.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                       *DummyPropertyName
+		);
+
+		PropertyNameSet.Add(PropertyName);
 	}
 
 	if (bHasProperty == true)
 	{
 		UsingNameSpaces.Add(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY));
-	}
-
-	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
-	{
-		PropertyNameContent += FString::Printf(TEXT(
-			"%s\t\tprivate static uint %s = 0;\n"
-		),
-		                                       Index == 0 ? TEXT("") : TEXT("\n"),
-		                                       *PropertyNames[Index].Key
-		);
 	}
 
 	UsingNameSpaces.Remove(NameSpaceContent);
