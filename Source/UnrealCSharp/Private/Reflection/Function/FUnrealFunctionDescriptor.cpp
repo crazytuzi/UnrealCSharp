@@ -1,8 +1,8 @@
 #include "Reflection/Function/FUnrealFunctionDescriptor.h"
 
 FUnrealFunctionDescriptor::FUnrealFunctionDescriptor(UFunction* InFunction):
-	Super(InFunction),
-	BufferAllocator(FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction))
+	Super(InFunction,
+	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction))
 {
 }
 

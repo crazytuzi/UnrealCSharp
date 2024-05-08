@@ -1,9 +1,11 @@
 ﻿#include "Reflection/Function/FFunctionDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction):
+FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction,
+                                         const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator):
 	Function(InFunction),
-	ReturnPropertyDescriptor(nullptr)
+	ReturnPropertyDescriptor(nullptr),
+	BufferAllocator(InBufferAllocator)
 {
 	FFunctionDescriptor::Initialize();
 }

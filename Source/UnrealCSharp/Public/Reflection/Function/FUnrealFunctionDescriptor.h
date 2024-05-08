@@ -1,7 +1,6 @@
 #pragma once
 
 #include "FFunctionDescriptor.h"
-#include "FFunctionParamBufferAllocator.h"
 #include "CoreMacro/MonoMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Environment/FCSharpEnvironment.h"
@@ -146,7 +145,4 @@ private:
 
 		return ReturnValue;
 	}
-
-private:
-	TSharedPtr<FFunctionParamBufferAllocator> BufferAllocator;
 };

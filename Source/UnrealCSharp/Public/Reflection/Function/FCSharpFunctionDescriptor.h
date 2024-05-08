@@ -16,7 +16,7 @@ public:
 	virtual void Deinitialize() override;
 
 public:
-	bool CallCSharp(const FFrame& InStack);
+	bool CallCSharp(FFrame& InStack, RESULT_DECL);
 
 private:
 	static FOutParmRec* FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty);
@@ -31,6 +31,4 @@ private:
 	EFunctionFlags OriginalFunctionFlags;
 
 	FNativeFuncPtr OriginalNativeFuncPtr;
-
-	TArray<uint8> OriginalScript;
 };
