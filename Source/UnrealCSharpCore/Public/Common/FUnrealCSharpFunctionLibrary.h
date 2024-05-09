@@ -90,7 +90,11 @@ public:
 
 	static TArray<FString> GetChangedDirectories();
 
-	static FString Encode(const FString& InName, bool bEncodeWideString = false);
+	static FString Encode(const FString& InName, bool bIsNative = true, bool bEncodeWideString = false);
+
+	static FString Encode(const FProperty* InProperty);
+
+	static FString Encode(const UFunction* InFunction);
 
 	static const TArray<FString>& GetEngineModuleList();
 

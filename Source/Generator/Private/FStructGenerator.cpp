@@ -206,7 +206,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		auto DummyPropertyName = FString::Printf(TEXT(
 			"__%s"
 		),
-		                                         *FUnrealCSharpFunctionLibrary::Encode(PropertyName)
+		                                         *FUnrealCSharpFunctionLibrary::Encode(*PropertyIterator)
 		);
 
 		auto VariableFriendlyPropertyName = PropertyName;
@@ -231,7 +231,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
-			                                   *FUnrealCSharpFunctionLibrary::Encode(VariableFriendlyPropertyName),
+			                                   *FUnrealCSharpFunctionLibrary::Encode(
+				                                   VariableFriendlyPropertyName, PropertyIterator->IsNative()),
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
 			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
@@ -254,7 +255,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
-			                                   *FUnrealCSharpFunctionLibrary::Encode(VariableFriendlyPropertyName),
+			                                   *FUnrealCSharpFunctionLibrary::Encode(
+				                                   VariableFriendlyPropertyName, PropertyIterator->IsNative()),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetPropertyType(*PropertyIterator),

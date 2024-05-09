@@ -190,7 +190,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),
-						*FUnrealCSharpFunctionLibrary::Encode(Property->GetName())
+						*FUnrealCSharpFunctionLibrary::Encode(Property)
 					))))
 				{
 					auto PropertyHash = GetTypeHash(Property);
@@ -242,7 +242,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),
-						*FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key)
+						*FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Value)
 					))))
 				{
 					auto FunctionHash = GetTypeHash(FunctionPair.Value);
@@ -285,7 +285,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			for (const auto& FunctionPair : Functions)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
-					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key),
+					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Value),
 					FunctionPair.Value->ReturnValueOffset != MAX_uint16
 						? FunctionPair.Value->NumParms - 1
 						: FunctionPair.Value->NumParms))
@@ -327,7 +327,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 	if (OriginalFunction->GetOuter() == InClass)
 	{
-		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(InName, OriginalFunction);
+		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(OriginalFunction);
 
 		const auto FunctionHash = GetTypeHash(NewFunctionDescriptor);
 
@@ -358,7 +358,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		NewFunction = DuplicateFunction(OriginalFunction, InClass, FunctionName);
 
-		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(InName, NewFunction);
+		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(NewFunction);
 
 		const auto FunctionHash = GetTypeHash(NewFunctionDescriptor);
 

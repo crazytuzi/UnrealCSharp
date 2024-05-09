@@ -116,8 +116,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 			"%s %s%s"
 		),
 		                                           *FGeneratorCore::GetPropertyType(DelegateParams[Index]),
-		                                           *FUnrealCSharpFunctionLibrary::Encode(
-			                                           DelegateParams[Index]->GetName()),
+		                                           *FUnrealCSharpFunctionLibrary::Encode(DelegateParams[Index]),
 		                                           Index == DelegateParams.Num() - 1 ? TEXT("") : TEXT(", ")
 		);
 	}
@@ -159,7 +158,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 			"%s = %s;"
 		),
 		                                                 *FUnrealCSharpFunctionLibrary::Encode(
-			                                                 DelegateParams[DelegateRefParamIndex[Index]]->GetName()),
+			                                                 DelegateParams[DelegateRefParamIndex[Index]]),
 		                                                 *FGeneratorCore::GetOutParamString(
 			                                                 DelegateParams[DelegateRefParamIndex[Index]], Index)));
 	}
@@ -472,8 +471,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 			"%s %s%s"
 		),
 		                                           *FGeneratorCore::GetPropertyType(DelegateParams[Index]),
-		                                           *FUnrealCSharpFunctionLibrary::Encode(
-			                                           DelegateParams[Index]->GetName()),
+		                                           *FUnrealCSharpFunctionLibrary::Encode(DelegateParams[Index]),
 		                                           Index == DelegateParams.Num() - 1 ? TEXT("") : TEXT(", ")
 		);
 	}
@@ -515,7 +513,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 			"%s = %s;"
 		),
 		                                                   *FUnrealCSharpFunctionLibrary::Encode(
-			                                                   DelegateParams[DelegateRefParamIndex[Index]]->GetName()),
+			                                                   DelegateParams[DelegateRefParamIndex[Index]]),
 		                                                   *FGeneratorCore::GetOutParamString(
 			                                                   DelegateParams[DelegateRefParamIndex[Index]], Index)));
 	}
