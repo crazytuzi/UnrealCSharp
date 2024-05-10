@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "FFunctionDescriptor.h"
+#include "mono/metadata/object-forward.h"
 
 class FCSharpFunctionDescriptor final : public FFunctionDescriptor
 {
@@ -29,4 +30,6 @@ private:
 	EFunctionFlags OriginalFunctionFlags;
 
 	FNativeFuncPtr OriginalNativeFuncPtr;
+
+	MonoMethod* Method;
 };

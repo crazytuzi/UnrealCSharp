@@ -7,7 +7,11 @@ FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction):
 	Super(InFunction,
 	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction)),
 	OriginalFunctionFlags(EFunctionFlags::FUNC_None),
-	OriginalNativeFuncPtr(nullptr)
+	OriginalNativeFuncPtr(nullptr),
+	Method(FCSharpEnvironment::GetEnvironment().GetDomain()->Parent_Class_Get_Method_From_Name(
+		FCSharpEnvironment::GetEnvironment().GetClassDescriptor(InFunction->GetOwnerClass())->GetMonoClass(),
+		TCHAR_TO_UTF8(*FUnrealCSharpFunctionLibrary::Encode(InFunction)),
+		PropertyDescriptors.Num()))
 {
 }
 
@@ -160,60 +164,49 @@ bool FCSharpFunctionDescriptor::CallCSharp(FFrame& InStack, RESULT_DECL)
 
 	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InStack.Object))
 	{
-		if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
-			InStack.Object->GetClass())->GetMonoClass())
-		{
-			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
-				Parent_Class_Get_Method_From_Name(FoundMonoClass,
-				                                  TCHAR_TO_UTF8(
-					                                  *FUnrealCSharpFunctionLibrary::Encode(Function.Get())),
-				                                  PropertyDescriptors.Num()))
-			{
-				const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
-					FoundMonoMethod, FoundMonoObject, CSharpParams);
+		const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
+			Method, FoundMonoObject, CSharpParams);
 
-				if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
+		if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
+		{
+			if (ReturnPropertyDescriptor->IsPrimitiveProperty())
+			{
+				if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
+					Object_Unbox(ReturnValue))
 				{
-					if (ReturnPropertyDescriptor->IsPrimitiveProperty())
+					ReturnPropertyDescriptor->Set(UnBoxResultValue, RESULT_PARAM);
+				}
+			}
+			else
+			{
+				ReturnPropertyDescriptor->Set(
+					FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(ReturnValue),
+					RESULT_PARAM);
+			}
+		}
+
+		for (const auto& Index : OutPropertyIndexes)
+		{
+			if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
+			{
+				OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
+
+				if (OutParams != nullptr)
+				{
+					if (OutPropertyDescriptor->IsPrimitiveProperty())
 					{
 						if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-							Object_Unbox(ReturnValue))
+							Object_Unbox(ARRAY_GET(CSharpParams, MonoObject*, Index)))
 						{
-							ReturnPropertyDescriptor->Set(UnBoxResultValue, RESULT_PARAM);
+							OutPropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
 						}
 					}
 					else
 					{
-						ReturnPropertyDescriptor->Set(
-							FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(ReturnValue),
-							RESULT_PARAM);
-					}
-				}
-
-				for (const auto& Index : OutPropertyIndexes)
-				{
-					if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
-					{
-						OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
-
-						if (OutParams != nullptr)
-						{
-							if (OutPropertyDescriptor->IsPrimitiveProperty())
-							{
-								if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-									Object_Unbox(ARRAY_GET(CSharpParams, MonoObject*, Index)))
-								{
-									OutPropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
-								}
-							}
-							else
-							{
-								OutPropertyDescriptor->Set(
-									FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-										ARRAY_GET(CSharpParams, MonoObject*, Index)),
-									OutParams->PropAddr);
-							}
-						}
+						OutPropertyDescriptor->Set(
+							FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+								ARRAY_GET(CSharpParams, MonoObject*, Index)),
+							OutParams->PropAddr);
 					}
 				}
 			}
