@@ -546,7 +546,7 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 				"(%s)%s"
 			),
 			                       *TName<uint8, uint8>::Get(),
-			                       *FUnrealCSharpFunctionLibrary::Encode(ByteProperty->GetName()));
+			                       *FUnrealCSharpFunctionLibrary::Encode(ByteProperty));
 		}
 	}
 
@@ -556,18 +556,18 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 			"(%s)%s"
 		),
 		                       *GetPropertyType(EnumProperty->GetUnderlyingProperty()),
-		                       *FUnrealCSharpFunctionLibrary::Encode(EnumProperty->GetName()));
+		                       *FUnrealCSharpFunctionLibrary::Encode(EnumProperty));
 	}
 
 	if (IsPrimitiveProperty(Property))
 	{
-		return FUnrealCSharpFunctionLibrary::Encode(Property->GetName());
+		return FUnrealCSharpFunctionLibrary::Encode(Property);
 	}
 	else
 	{
 		return FString::Printf(TEXT(
 			"%s?.%s ?? nint.Zero"),
-		                       *FUnrealCSharpFunctionLibrary::Encode(Property->GetName()),
+		                       *FUnrealCSharpFunctionLibrary::Encode(Property),
 		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 	}

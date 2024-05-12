@@ -7,8 +7,9 @@ template <typename T, bool bIsEngineClass0 = false>
 class TBindingClassBuilder final : public TClassBuilder<T, bIsEngineClass0>
 {
 public:
-	explicit TBindingClassBuilder(const FString& InImplementationNameSpace):
-		TClassBuilder<T, bIsEngineClass0>(InImplementationNameSpace)
+	explicit TBindingClassBuilder(const FString& InImplementationNameSpace,
+	                              const TOptional<TFunction<FString()>>& InClassFunction = {}):
+		TClassBuilder<T, bIsEngineClass0>(InImplementationNameSpace, InClassFunction)
 	{
 		if constexpr (!TIsReflectionClass<T>::Value)
 		{

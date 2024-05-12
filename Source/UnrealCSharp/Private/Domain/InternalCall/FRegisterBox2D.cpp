@@ -2,6 +2,7 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
+#include "FRegisterForceInit.h"
 
 struct FRegisterBox2D
 {

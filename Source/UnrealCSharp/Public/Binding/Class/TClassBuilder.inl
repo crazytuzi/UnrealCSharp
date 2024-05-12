@@ -11,8 +11,14 @@ template <typename T, bool bIsEngineClass>
 class TClassBuilder : public FClassBuilder
 {
 public:
-	explicit TClassBuilder(const FString& InImplementationNameSpace):
-		FClassBuilder({[]() { return TName<T, T>::Get(); }},
+	explicit TClassBuilder(const FString& InImplementationNameSpace,
+	                       const TOptional<TFunction<FString()>>& InClassFunction):
+		FClassBuilder({
+			              [InClassFunction]()
+			              {
+				              return InClassFunction.IsSet() ? InClassFunction.GetValue()() : TName<T, T>::Get();
+			              }
+		              },
 		              InImplementationNameSpace,
 		              {[]() { return TIsEngineClass<T, bIsEngineClass>::Get(); }},
 		              TIsReflectionClass<T>::Value

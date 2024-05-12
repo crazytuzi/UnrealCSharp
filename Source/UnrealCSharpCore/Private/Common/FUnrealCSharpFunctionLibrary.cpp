@@ -546,7 +546,7 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 	return {UEScriptPath, GamePath};
 }
 
-FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool bEncodeWideString)
+FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool bIsNative, const bool bEncodeWideString)
 {
 	static TArray<FString, TInlineAllocator<77>> KeyWords{
 		TEXT("abstract"), TEXT("as"),
@@ -578,7 +578,17 @@ FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool b
 		return FString::Printf(TEXT("__%s"), *InName);
 	}
 
-	return FNameEncode::Encode(InName, bEncodeWideString);
+	return bIsNative ? InName : FNameEncode::Encode(InName, bEncodeWideString);
+}
+
+FString FUnrealCSharpFunctionLibrary::Encode(const FProperty* InProperty)
+{
+	return Encode(InProperty->GetName(), InProperty->IsNative());
+}
+
+FString FUnrealCSharpFunctionLibrary::Encode(const UFunction* InFunction)
+{
+	return Encode(InFunction->GetName(), InFunction->IsNative());
 }
 
 const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()

@@ -3,7 +3,7 @@
 #include "CoreMacro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
-#include "Reflection/Function/FCSharpInvoker.h"
+#include "Reflection/Function/CSharpFunction.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Template/TGetArrayLength.inl"
@@ -190,7 +190,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),
-						*FUnrealCSharpFunctionLibrary::Encode(Property->GetName())
+						*FUnrealCSharpFunctionLibrary::Encode(Property)
 					))))
 				{
 					auto PropertyHash = GetTypeHash(Property);
@@ -242,7 +242,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 					NewClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
 							"__%s"
 						),
-						*FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key)
+						*FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Value)
 					))))
 				{
 					auto FunctionHash = GetTypeHash(FunctionPair.Value);
@@ -285,7 +285,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			for (const auto& FunctionPair : Functions)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
-					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Key),
+					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(FunctionPair.Value),
 					FunctionPair.Value->ReturnValueOffset != MAX_uint16
 						? FunctionPair.Value->NumParms - 1
 						: FunctionPair.Value->NumParms))
@@ -327,7 +327,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 	if (OriginalFunction->GetOuter() == InClass)
 	{
-		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(InName, OriginalFunction);
+		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(OriginalFunction);
 
 		const auto FunctionHash = GetTypeHash(NewFunctionDescriptor);
 
@@ -341,11 +341,11 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		NewFunctionDescriptor->OriginalNativeFuncPtr = OriginalFunction->GetNativeFunc();
 
-		NewFunctionDescriptor->OriginalScript = OriginalFunction->Script;
-
 		NewFunctionDescriptor->OriginalFunction = DuplicateFunction(OriginalFunction, InClass, NewFunctionName);
 
-		UpdateCallCSharpFunction(OriginalFunction);
+		OriginalFunction->SetNativeFunc(UCSharpFunction::execCallCSharp);
+
+		OriginalFunction->FunctionFlags |= FUNC_Native;
 	}
 	else
 	{
@@ -358,7 +358,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		NewFunction = DuplicateFunction(OriginalFunction, InClass, FunctionName);
 
-		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(InName, NewFunction);
+		const auto NewFunctionDescriptor = new FCSharpFunctionDescriptor(NewFunction);
 
 		const auto FunctionHash = GetTypeHash(NewFunctionDescriptor);
 
@@ -368,7 +368,9 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 
 		NewFunctionDescriptor->OriginalFunction = OriginalFunction;
 
-		UpdateCallCSharpFunction(NewFunction);
+		NewFunction->SetNativeFunc(UCSharpFunction::execCallCSharp);
+
+		NewFunction->FunctionFlags |= FUNC_Native;
 	}
 
 	return true;
@@ -458,10 +460,9 @@ UFunction* FCSharpBind::GetOriginalFunction(FClassDescriptor* InClassDescriptor,
 	return GetOriginalFunction(InClassDescriptor, SuperOriginalFunction);
 }
 
-bool FCSharpBind::IsCallCSharpFunction(UFunction* InFunction)
+bool FCSharpBind::IsCallCSharpFunction(const UFunction* InFunction)
 {
-	return InFunction && (InFunction->GetNativeFunc() == &FCSharpInvoker::execCallCSharp) && (InFunction->Script.Num() >
-		0) && (InFunction->Script[0] == EX_CallCSharp);
+	return InFunction && InFunction->GetNativeFunc() == &UCSharpFunction::execCallCSharp;
 }
 
 UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass* InClass, const FName& InFunctionName)
@@ -476,6 +477,8 @@ UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass*
 	InOriginalFunction->FunctionFlags &= (~EFunctionFlags::FUNC_Native);
 
 	FObjectDuplicationParameters ObjectDuplicationParameters(InOriginalFunction, InClass);
+
+	ObjectDuplicationParameters.DestClass = UCSharpFunction::StaticClass();
 
 	ObjectDuplicationParameters.DestName = InFunctionName;
 
@@ -506,47 +509,6 @@ UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass*
 	}
 
 	return NewFunction;
-}
-
-void FCSharpBind::UpdateCallCSharpFunction(UFunction* InFunction)
-{
-	if (InFunction == nullptr)
-	{
-		return;
-	}
-
-	UpdateCallCSharpFunctionFlags(InFunction);
-
-	if (!InFunction->HasAnyFunctionFlags(FUNC_Native) && !InFunction->Script.IsEmpty())
-	{
-		InFunction->Script.Empty(3 + sizeof(void*));
-	}
-
-	InFunction->SetNativeFunc((FNativeFuncPtr)(&FCSharpInvoker::execCallCSharp));
-
-	if (InFunction->Script.Num() < 1)
-	{
-		InFunction->Script.Add(EX_CallCSharp);
-
-		InFunction->Script.Add(EX_Return);
-
-		InFunction->Script.Add(EX_Nothing);
-	}
-}
-
-void FCSharpBind::UpdateCallCSharpFunctionFlags(UFunction* InFunctionCallLua)
-{
-	if (InFunctionCallLua == nullptr)
-	{
-		return;
-	}
-
-	if (InFunctionCallLua->GetReturnProperty())
-	{
-		InFunctionCallLua->FunctionFlags |= FUNC_HasOutParms;
-	}
-
-	InFunctionCallLua->FunctionFlags &= (~FUNC_Native);
 }
 
 bool FCSharpBind::IsOverrideType(const FDomain* InDomain, MonoReflectionType* InMonoReflectionType)

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "FFunctionDescriptor.h"
+#include "mono/metadata/object-forward.h"
 
 class FCSharpFunctionDescriptor final : public FFunctionDescriptor
 {
@@ -8,7 +9,7 @@ public:
 	typedef FFunctionDescriptor Super;
 
 public:
-	explicit FCSharpFunctionDescriptor(const FString& InName, UFunction* InFunction);
+	explicit FCSharpFunctionDescriptor(UFunction* InFunction);
 
 	virtual ~FCSharpFunctionDescriptor() override;
 
@@ -16,7 +17,7 @@ public:
 	virtual void Deinitialize() override;
 
 public:
-	bool CallCSharp(const FFrame& InStack);
+	bool CallCSharp(FFrame& InStack, RESULT_DECL);
 
 private:
 	static FOutParmRec* FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty);
@@ -24,13 +25,11 @@ private:
 private:
 	friend class FCSharpBind;
 
-	FString Name;
-
 	TWeakObjectPtr<UFunction> OriginalFunction;
 
 	EFunctionFlags OriginalFunctionFlags;
 
 	FNativeFuncPtr OriginalNativeFuncPtr;
 
-	TArray<uint8> OriginalScript;
+	MonoMethod* Method;
 };

@@ -3,8 +3,8 @@
 #include "CoreMacro/MonoMacro.h"
 
 FCSharpDelegateDescriptor::FCSharpDelegateDescriptor(UFunction* InFunction):
-	Super(InFunction),
-	BufferAllocator(FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPersistentBufferAllocator>(InFunction))
+	Super(InFunction,
+	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPersistentBufferAllocator>(InFunction))
 {
 }
 

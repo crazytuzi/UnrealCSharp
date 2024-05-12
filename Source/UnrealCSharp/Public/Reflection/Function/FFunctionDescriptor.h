@@ -1,11 +1,13 @@
 ﻿#pragma once
 
 #include "Reflection/Property/FPropertyDescriptor.h"
+#include "FFunctionParamBufferAllocator.h"
 
 class FFunctionDescriptor
 {
 public:
-	explicit FFunctionDescriptor(UFunction* InFunction);
+	explicit FFunctionDescriptor(UFunction* InFunction,
+	                             const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator);
 
 	virtual ~FFunctionDescriptor();
 
@@ -27,4 +29,6 @@ protected:
 	TArray<uint32> ReferencePropertyIndexes;
 
 	TArray<uint32> OutPropertyIndexes;
+
+	TSharedPtr<FFunctionParamBufferAllocator> BufferAllocator;
 };

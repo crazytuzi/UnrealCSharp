@@ -69,7 +69,6 @@ public:
 private:
 #if WITH_EDITOR
 	static TMap<FString, TArray<FString>> DynamicMap;
-#endif
 
 	static TArray<FString> ClassMetaDataAttrs;
 
@@ -82,4 +81,5 @@ private:
 	static TArray<FString> PropertyMetaDataAttrs;
 
 	static TArray<FString> FunctionMetaDataAttrs;
+#endif
 };

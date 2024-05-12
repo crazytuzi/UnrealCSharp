@@ -129,18 +129,25 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto bHasProperty = false;
 
-	TArray<TPair<FString, FString>> PropertyNames;
+	TSet<FString> PropertyNameSet;
 
 	for (TFieldIterator<FProperty> PropertyIterator(InClass, EFieldIteratorFlags::ExcludeSuper,
 	                                                EFieldIteratorFlags::ExcludeDeprecated); PropertyIterator; ++
 	     PropertyIterator)
 	{
+		const auto& PropertyName = PropertyIterator->GetName();
+
+		if (PropertyNameSet.Contains(PropertyName))
+		{
+			continue;
+		}
+
 		if (!FGeneratorCore::IsSupported(*PropertyIterator))
 		{
 			continue;
 		}
 
-		if (BindingProperties.Contains(PropertyIterator->GetName()))
+		if (BindingProperties.Contains(PropertyName))
 		{
 			continue;
 		}
@@ -160,16 +167,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		auto PropertyType = FGeneratorCore::GetPropertyType(*PropertyIterator);
 
-		auto PropertyName = FUnrealCSharpFunctionLibrary::Encode(PropertyIterator->GetName());
+		auto EncodePropertyName = FUnrealCSharpFunctionLibrary::Encode(*PropertyIterator);
 
-		PropertyNames.Add(TPair<FString, FString>{
-			FString::Printf(TEXT(
-				"__%s"
-			),
-			                *PropertyName
-			),
-			PropertyName
-		});
+		auto DummyPropertyName = FString::Printf(TEXT(
+			"__%s"
+		),
+		                                         *EncodePropertyName
+		);
 
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
@@ -185,14 +189,14 @@ void FClassGenerator::Generator(const UClass* InClass)
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
-			                                   *PropertyName,
+			                                   *EncodePropertyName,
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
 			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
 		}
@@ -208,25 +212,24 @@ void FClassGenerator::Generator(const UClass* InClass)
 			),
 			                                   *PropertyAccessSpecifiers,
 			                                   *PropertyType,
-			                                   *PropertyName,
+			                                   *EncodePropertyName,
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetPropertyType(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *PropertyNames[PropertyNames.Num() - 1].Key,
+			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
 			);
 		}
-	}
 
-	for (auto Index = 0; Index < PropertyNames.Num(); ++Index)
-	{
 		PropertyNameContent += FString::Printf(TEXT(
 			"%s\t\tprivate static uint %s = 0;\n"
 		),
-		                                       Index == 0 ? TEXT("") : TEXT("\n"),
-		                                       *PropertyNames[Index].Key
+		                                       PropertyNameSet.IsEmpty() ? TEXT("") : TEXT("\n"),
+		                                       *DummyPropertyName
 		);
+
+		PropertyNameSet.Add(PropertyName);
 	}
 
 	auto bHasFunction = false;
@@ -250,8 +253,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	TArray<UFunction*> Functions;
 
-	TArray<TPair<FString, FString>> FunctionNames;
-
 	for (const auto InInterface : InClass->Interfaces)
 	{
 		if (SuperClass != nullptr && SuperClass->ImplementsInterface(InInterface.Class))
@@ -263,7 +264,14 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 		     FunctionIterator)
 		{
-			if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionIterator->GetName())))
+			const auto& FunctionName = FunctionIterator->GetName();
+
+			if (FunctionNameSet.Contains(FunctionName))
+			{
+				continue;
+			}
+
+			if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(*FunctionIterator)))
 			{
 				continue;
 			}
@@ -273,12 +281,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 				continue;
 			}
 
-			if (FunctionNameSet.Contains(FunctionIterator->GetName()))
-			{
-				continue;
-			}
-
-			FunctionNameSet.Add(FunctionIterator->GetName());
+			FunctionNameSet.Add(FunctionName);
 
 			Functions.Add(*FunctionIterator);
 		}
@@ -288,14 +291,19 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 	     FunctionIterator)
 	{
+		const auto& FunctionName = FunctionIterator->GetName();
+
+		if (FunctionNameSet.Contains(FunctionName))
+		{
+			continue;
+		}
+
 		if (FunctionIterator->HasAnyFunctionFlags(FUNC_Delegate))
 		{
 			continue;
 		}
 
-		const auto& FunctionName = FunctionIterator->GetName();
-
-		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(FunctionName)))
+		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(*FunctionIterator)))
 		{
 			continue;
 		}
@@ -306,11 +314,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		if (!FGeneratorCore::IsSupported(*FunctionIterator))
-		{
-			continue;
-		}
-
-		if (FunctionNameSet.Contains(FunctionName))
 		{
 			continue;
 		}
@@ -333,6 +336,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 			Functions.Add(*FunctionIterator);
 		}
 	}
+
+	FunctionNameSet.Empty();
 
 	for (const auto Function : Functions)
 	{
@@ -363,7 +368,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FString FunctionPolymorphism = TEXT("virtual");
 
-		auto FunctionName = FUnrealCSharpFunctionLibrary::Encode(Function->GetName());
+		const auto& FunctionName = Function->GetName();
+
+		auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(Function);
 
 		if (bIsInterface == true)
 		{
@@ -375,7 +382,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 			if (SuperClass != nullptr)
 			{
-				if (SuperClass->FindFunctionByName(*FunctionName))
+				if (SuperClass->FindFunctionByName(*EncodeFunctionName))
 				{
 					FunctionPolymorphism = TEXT("override");
 				}
@@ -390,7 +397,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 					TEXT("GetType")
 				};
 
-				if (DefaultImplementations.Contains(Function->GetName()))
+				if (DefaultImplementations.Contains(FunctionName))
 				{
 					FunctionPolymorphism = TEXT("new");
 				}
@@ -525,8 +532,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionDeclarationBody += FString::Printf(TEXT(
 				"%s %s%s%s"),
 			                                           *FGeneratorCore::GetPropertyType(FunctionParams[Index]),
-			                                           *FUnrealCSharpFunctionLibrary::Encode(
-				                                           FunctionParams[Index]->GetName()),
+			                                           *FUnrealCSharpFunctionLibrary::Encode(FunctionParams[Index]),
 			                                           bGeneratorFunctionDefaultParam
 				                                           ? *GetFunctionDefaultParam(
 					                                           Function, FunctionParams[Index])
@@ -548,18 +554,15 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                           *FunctionStatic,
 		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
 		                                           *FunctionReturnType,
-		                                           *FunctionName,
+		                                           *EncodeFunctionName,
 		                                           *FunctionDeclarationBody
 		);
 
-		FunctionNames.Add(TPair<FString, FString>{
-			FString::Printf(TEXT(
-				"__%s"
-			),
-			                *FunctionName
-			),
-			FunctionName
-		});
+		auto DummyFunctionName = FString::Printf(TEXT(
+			"__%s"
+		),
+		                                         *EncodeFunctionName
+		);
 
 		if (bIsInterface == true)
 		{
@@ -585,7 +588,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 				                                        TEXT("StaticClass().%s"),
 				                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE)
 			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                        *FunctionNames[FunctionNames.Num() - 1].Key,
+		                                        *DummyFunctionName,
 		                                        FunctionRefParamIndex.IsEmpty() && FunctionOutParamIndex.IsEmpty()
 			                                        ? TEXT("")
 			                                        : TEXT(", out var __OutValue")
@@ -609,7 +612,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 				"%s = %s;"
 			),
 			                                          *FUnrealCSharpFunctionLibrary::Encode(
-				                                          FunctionParams[FunctionOutParamIndex[Index]]->GetName()),
+				                                          FunctionParams[FunctionOutParamIndex[Index]]),
 			                                          *FGeneratorCore::GetOutParamString(
 				                                          FunctionParams[FunctionOutParamIndex[Index]],
 				                                          FunctionOutParamIndexMapping[Index])));
@@ -621,7 +624,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 				"%s = %s;"
 			),
 			                                          *FUnrealCSharpFunctionLibrary::Encode(
-				                                          FunctionParams[FunctionRefParamIndex[Index]]->GetName()),
+				                                          FunctionParams[FunctionRefParamIndex[Index]]),
 			                                          *FGeneratorCore::GetOutParamString(
 				                                          FunctionParams[FunctionRefParamIndex[Index]],
 				                                          FunctionOutParamIndexMapping[FunctionParams.Num() - 1 -
@@ -732,6 +735,18 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                   *FunctionDeclaration,
 		                                   *FunctionImplementationBody
 		);
+
+		if (bIsInterface == false)
+		{
+			FunctionNameContent += FString::Printf(TEXT(
+				"%s\t\tprivate static uint %s = 0;\n"
+			),
+			                                       FunctionNameSet.IsEmpty() ? TEXT("") : TEXT("\n"),
+			                                       *DummyFunctionName
+			);
+		}
+
+		FunctionNameSet.Add(FunctionName);
 	}
 
 	if (bIsInterface == true)
@@ -753,18 +768,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 				                                                       SuperClass))
 			                                    : TEXT(""),
 		                                    *InterfaceFunction);
-	}
-	else
-	{
-		for (auto Index = 0; Index < FunctionNames.Num(); ++Index)
-		{
-			FunctionNameContent += FString::Printf(TEXT(
-				"%s\t\tprivate static uint %s = 0;\n"
-			),
-			                                       Index == 0 ? TEXT("") : TEXT("\n"),
-			                                       *FunctionNames[Index].Key
-			);
-		}
 	}
 
 	UsingNameSpaces.Remove(NameSpaceContent);
@@ -1214,7 +1217,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s \?\?= new FName(\"%s\");\n\n"
 		),
-		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
 		                       *InMetaData
 		);
 	}
@@ -1232,7 +1235,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 				return FString::Printf(TEXT(
 					"\t\t\t%s \?\?= new FRotator(%lf, %lf, %lf);\n\n"
 				),
-				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
 				                       TCString<TCHAR>::Atod(*Value[0]),
 				                       TCString<TCHAR>::Atod(*Value[1]),
 				                       TCString<TCHAR>::Atod(*Value[2])
@@ -1249,7 +1252,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 				return FString::Printf(TEXT(
 					"\t\t\t%s \?\?= new FLinearColor(%ff, %ff, %ff, %ff);\n\n"
 				),
-				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
 				                       Value.R,
 				                       Value.G,
 				                       Value.B,
@@ -1269,7 +1272,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 				return FString::Printf(TEXT(
 					"\t\t\t%s \?\?= new FVector(%lf, %lf, %lf);\n\n"
 				),
-				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
 				                       TCString<TCHAR>::Atod(*Value[0]),
 				                       TCString<TCHAR>::Atod(*Value[1]),
 				                       TCString<TCHAR>::Atod(*Value[2])
@@ -1286,7 +1289,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 				return FString::Printf(TEXT(
 					"\t\t\t%s \?\?= new FVector2D(%lf, %lf);\n\n"
 				),
-				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
+				                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
 				                       Value.X,
 				                       Value.Y
 				);
@@ -1296,7 +1299,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s \?\?= new %s%s();\n\n"
 		),
-		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
 		                       StructProperty->Struct->IsNative() ? TEXT("F") : TEXT(""),
 		                       *StructProperty->Struct->GetName()
 		);
@@ -1307,7 +1310,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s \?\?= new FString(\"%s\");\n\n"
 		),
-		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
 		                       *InMetaData
 		);
 	}
@@ -1326,7 +1329,7 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t%s \?\?= new FText(\"%s\");\n\n"
 		),
-		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty->GetName()),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
 		                       *Value
 		);
 	}

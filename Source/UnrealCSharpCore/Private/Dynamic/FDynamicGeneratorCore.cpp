@@ -19,7 +19,6 @@
 
 #if WITH_EDITOR
 TMap<FString, TArray<FString>> FDynamicGeneratorCore::DynamicMap;
-#endif
 
 TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
 {
@@ -212,6 +211,7 @@ TArray<FString> FDynamicGeneratorCore::FunctionMetaDataAttrs =
 	CLASS_BIT_MASK_ENUM_ATTRIBUTE,
 	CLASS_ARRAY_PARAM_ATTRIBUTE
 };
+#endif
 
 #if WITH_EDITOR
 void FDynamicGeneratorCore::BeginCodeAnalysisGenerator()
@@ -313,6 +313,7 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 		return;
 	}
 
+#if WITH_EDITOR
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_ANYWHERE_ATTRIBUTE))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit);
@@ -412,6 +413,7 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 	{
 		InProperty->SetPropertyFlags(CPF_EditFixedSize);
 	}
+#endif
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_ATTRIBUTE))
 	{
@@ -457,6 +459,7 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 		InProperty->SetPropertyFlags(CPF_RepSkip);
 	}
 
+#if WITH_EDITOR
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_INTERP_ATTRIBUTE))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_BlueprintVisible | CPF_Interp);
@@ -516,6 +519,7 @@ void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAt
 	{
 		// @TODO
 	}
+#endif
 
 #if WITH_EDITOR
 	SetMetaData(InProperty, InMonoCustomAttrInfo);
@@ -596,6 +600,7 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 
 		InFunction->FunctionFlags &= ~FUNC_Native;
 	}
+
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EXEC_ATTRIBUTE))
 	{
 		InFunction->FunctionFlags |= FUNC_Exec;
@@ -606,9 +611,11 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 		}
 	}
 
+#if WITH_EDITOR
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SEALED_EVENT_ATTRIBUTE))
 	{
 	}
+#endif
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVER_ATTRIBUTE))
 	{
@@ -621,6 +628,7 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 			UE_LOG(LogUnrealCSharp, Error, TEXT("Exec functions cannot be replicated!"));
 		}
 	}
+
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLIENT_ATTRIBUTE))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
@@ -647,6 +655,7 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 
 		// @TODO ParseNetServiceIdentifiers(HeaderParser, FuncInfo, Specifier.Values)
 	}
+
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_RESPONSE_ATTRIBUTE))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
@@ -668,6 +677,7 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 		bSpecifiedUnreliable = true;
 	}
 
+#if WITH_EDITOR
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CUSTOM_THUNK_ATTRIBUTE))
 	{
 		FunctionExportFlags |= static_cast<uint32>(EDynamicFunctionExportFlags::FUNCEXPORT_CustomThunk);
@@ -720,15 +730,18 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintCosmetic;
 	}
+#endif
 
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_WITH_VALIDATION_ATTRIBUTE))
 	{
 		InFunction->FunctionFlags |= FUNC_NetValidate;
 	}
 
+#if WITH_EDITOR
 	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_FIELD_NOTIFY_ATTRIBUTE))
 	{
 	}
+#endif
 
 	if (InFunction->FunctionFlags & FUNC_Net)
 	{

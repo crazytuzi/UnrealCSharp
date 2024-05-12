@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TDefaultArgument.inl"
+
 template <typename... Args>
 struct TDefaultArguments
 {
@@ -22,32 +24,7 @@ struct TDefaultArguments
 		{
 			if constexpr (Position <= ArgumentsCount)
 			{
-				if constexpr (std::is_same_v<Argument, bool>)
-				{
-					OutValue.Add(InDefaultArgument ? TEXT("true") : TEXT("false"));
-				}
-				else if constexpr (std::is_same_v<Argument, int8> ||
-					std::is_same_v<Argument, int16> ||
-					std::is_same_v<Argument, int32> ||
-					std::is_same_v<Argument, uint8> ||
-					std::is_same_v<Argument, uint16> ||
-					std::is_same_v<Argument, uint32>)
-				{
-					OutValue.Add(FString::Printf(TEXT("%d"), InDefaultArgument));
-				}
-				else if constexpr (std::is_same_v<Argument, int64> ||
-					std::is_same_v<Argument, uint64>)
-				{
-					OutValue.Add(FString::Printf(TEXT("%lld"), InDefaultArgument));
-				}
-				else if constexpr (std::is_same_v<Argument, float>)
-				{
-					OutValue.Add(FString::Printf(TEXT("%sf"), *FString::SanitizeFloat(InDefaultArgument)));
-				}
-				else if constexpr (std::is_same_v<Argument, double>)
-				{
-					OutValue.Add(FString::SanitizeFloat(InDefaultArgument));
-				}
+				OutValue.Add(TDefaultArgument<Argument, Argument>::Get(InDefaultArgument));
 			}
 
 			TDefaultArgumentsBuilder<0, Position + 1, ArgumentsCount, Arguments...>::Set(
