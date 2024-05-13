@@ -2,6 +2,13 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 #include "FRegisterForceInit.h"
+#include "UEVersion.h"
+
+#ifdef _MSC_VER
+#pragma warning (push)
+
+#pragma warning (disable: 5103)
+#endif
 
 struct FRegisterVector2D
 {
@@ -53,10 +60,18 @@ struct FRegisterVector2D
 			.Minus()
 			.Multiplies()
 			.Divides()
+#if UE_VECTOR2_LESS
 			.Less()
+#endif
+#if UE_VECTOR2_GREATER
 			.Greater()
+#endif
+#if UE_VECTOR2_LESS_EQUAL
 			.LessEqual()
+#endif
+#if UE_VECTOR2_GREATER_EQUAL
 			.GreaterEqual()
+#endif
 			.UnaryMinus()
 			.Subscript(BINDING_SUBSCRIPT(FVector2D, FVector2D::FReal, int32,
 			                             TArray<FString>{"Index"}))
@@ -73,6 +88,18 @@ struct FRegisterVector2D
 			.Function("One", BINDING_FUNCTION(&FVector2D::One))
 			.Function("UnitX", BINDING_FUNCTION(&FVector2D::UnitX))
 			.Function("UnitY", BINDING_FUNCTION(&FVector2D::UnitY))
+#if UE_VECTOR2_COMPONENT_WISE_ALL_LESS_THAN
+			.Function("ComponentwiseAllLessThan", BINDING_FUNCTION(&FVector2D::ComponentwiseAllLessThan))
+#endif
+#if UE_VECTOR2_COMPONENT_WISE_ALL_GREATER_THAN
+			.Function("ComponentwiseAllGreaterThan", BINDING_FUNCTION(&FVector2D::ComponentwiseAllGreaterThan))
+#endif
+#if UE_VECTOR2_COMPONENT_WISE_ALL_LESS_OR_EQUAL
+			.Function("ComponentwiseAllLessOrEqual", BINDING_FUNCTION(&FVector2D::ComponentwiseAllLessOrEqual))
+#endif
+#if UE_VECTOR2_COMPONENT_WISE_ALL_GREATER_OR_EQUAL
+			.Function("ComponentwiseAllGreaterOrEqual", BINDING_FUNCTION(&FVector2D::ComponentwiseAllGreaterOrEqual))
+#endif
 			.Function("Component", BINDING_OVERLOAD(FVector2D::FReal(FVector2D::*)(int32)const, &FVector2D::Component,
 			                                        TArray<FString>{"Index"}))
 			.Function("DotProduct", BINDING_FUNCTION(&FVector2D::DotProduct,
@@ -131,3 +158,7 @@ struct FRegisterVector2D
 };
 
 static FRegisterVector2D RegisterVector2D;
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif

@@ -2,7 +2,7 @@
 #include "Binding/FBinding.h"
 #include "CoreMacro/BindingMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "UEVersion.h"
+#include "CppVersion.h"
 
 FBindingClassRegister::FBindingClassRegister(const TFunction<FString()>& InClassFunction,
                                              const FString& InImplementationNameSpace,

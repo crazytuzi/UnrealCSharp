@@ -3,6 +3,12 @@
 #include "Macro/NamespaceMacro.h"
 #include "FRegisterForceInit.h"
 
+#ifdef _MSC_VER
+#pragma warning (push)
+
+#pragma warning (disable: 5103)
+#endif
+
 struct FRegisterVector4
 {
 	static FVector4 MultipliesImplementation(const FVector4& In, const int32 Scale)
@@ -106,3 +112,7 @@ struct FRegisterVector4
 };
 
 static FRegisterVector4 RegisterVector4;
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif

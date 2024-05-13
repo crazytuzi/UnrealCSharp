@@ -3,6 +3,12 @@
 #include "Internationalization/PolyglotTextData.h"
 #include "Macro/NamespaceMacro.h"
 
+#ifdef _MSC_VER
+#pragma warning (push)
+
+#pragma warning (disable: 5103)
+#endif
+
 struct FRegisterPolyglotTextData
 {
 	FRegisterPolyglotTextData()
@@ -45,3 +51,7 @@ struct FRegisterPolyglotTextData
 };
 
 static FRegisterPolyglotTextData RegisterPolyglotTextData;
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif

@@ -2,6 +2,12 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
+#ifdef _MSC_VER
+#pragma warning (push)
+
+#pragma warning (disable: 5103)
+#endif
+
 struct FRegisterFrameNumber
 {
 	static FFrameNumber MultipliesImplementation(const FFrameNumber& In, const float Scalar)
@@ -35,3 +41,7 @@ struct FRegisterFrameNumber
 };
 
 static FRegisterFrameNumber RegisterFrameNumber;
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif

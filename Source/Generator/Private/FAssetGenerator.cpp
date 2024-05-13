@@ -9,6 +9,7 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "UEVersion.h"
 
 TArray<UUserDefinedEnum*> FAssetGenerator::UserDefinedEnums;
 
@@ -45,7 +46,11 @@ void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelay
 				AssetDataClassName == UWidgetBlueprint::StaticClass()->GetFName())
 			{
 				if (const auto Blueprint = LoadObject<
+#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+					UBlueprint>(nullptr, *InAssetData.GetObjectPathString()))
+#else
 					UBlueprint>(nullptr, *InAssetData.ObjectPath.ToString()))
+#endif
 				{
 					if (const auto Class = Cast<UClass>(Blueprint->GeneratedClass))
 					{
@@ -56,7 +61,11 @@ void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelay
 			else if (AssetDataClassName == UUserDefinedStruct::StaticClass()->GetFName())
 			{
 				if (const auto UserDefinedStruct = LoadObject<
+#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+					UUserDefinedStruct>(nullptr, *InAssetData.GetObjectPathString()))
+#else
 					UUserDefinedStruct>(nullptr, *InAssetData.ObjectPath.ToString()))
+#endif
 				{
 					FStructGenerator::Generator(UserDefinedStruct);
 				}
@@ -64,7 +73,11 @@ void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelay
 			else if (AssetDataClassName == UUserDefinedEnum::StaticClass()->GetFName())
 			{
 				if (const auto UserDefinedEnum = LoadObject<
+#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+					UUserDefinedEnum>(nullptr, *InAssetData.GetObjectPathString()))
+#else
 					UUserDefinedEnum>(nullptr, *InAssetData.ObjectPath.ToString()))
+#endif
 				{
 					if (bDelayedGeneratorUserDefinedEnum)
 					{
@@ -133,7 +146,11 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
 	                                     *FUnrealCSharpFunctionLibrary::GetObjectPathName(
+#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+		                                     InAssetData, InAssetData.GetObjectPathString()),
+#else
 		                                     InAssetData, InAssetData.ObjectPath.ToString()),
+#endif
 	                                     *ClassName,
 	                                     *FUnrealCSharpFunctionLibrary::GetAssetClass(
 		                                     InAssetData, FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass))

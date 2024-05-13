@@ -4,6 +4,12 @@
 #include "Macro/NamespaceMacro.h"
 #include "FRegisterForceInit.h"
 
+#ifdef _MSC_VER
+#pragma warning (push)
+
+#pragma warning (disable: 5103)
+#endif
+
 struct FRegisterLinearColor
 {
 	static FLinearColor MultipliesImplementation(const FLinearColor& In, const float Scalar)
@@ -84,3 +90,7 @@ struct FRegisterLinearColor
 };
 
 static FRegisterLinearColor RegisterLinearColor;
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif

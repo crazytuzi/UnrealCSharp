@@ -3,6 +3,12 @@
 #include "Macro/NamespaceMacro.h"
 #include "FRegisterForceInit.h"
 
+#ifdef _MSC_VER
+#pragma warning (push)
+
+#pragma warning (disable: 5103)
+#endif
+
 struct FRegisterRotator
 {
 	static FRotator MultipliesImplementation(const FRotator& In, const int32 Scale)
@@ -94,3 +100,7 @@ struct FRegisterRotator
 };
 
 static FRegisterRotator RegisterRotator;
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif
