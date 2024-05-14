@@ -336,5 +336,5 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *GCHandleContent
 	);
 
-	FGeneratorCore::SaveStringToFile(FGeneratorCore::GetFileName(InScriptStruct), Content);
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InScriptStruct), Content);
 }

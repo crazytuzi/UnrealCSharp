@@ -19,7 +19,8 @@
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Misc/ScopedSlowTask.h"
 #include "Dynamic/FDynamicGenerator.h"
-#include "ToolBar/UnrealCSharpToolBar.h"
+#include "ToolBar/UnrealCSharpPlayToolBar.h"
+#include "ToolBar/UnrealCSharpBlueprintToolBar.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 
@@ -33,10 +34,12 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	FUnrealCSharpEditorCommands::Register();
 
-	UnrealCSharpToolBar = MakeShared<FUnrealCSharpToolBar>();
+	UnrealCSharpPlayToolBar = MakeShared<FUnrealCSharpPlayToolBar>();
 
-	UToolMenus::RegisterStartupCallback(
-		FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FUnrealCSharpEditorModule::RegisterMenus));
+	UnrealCSharpBlueprintToolBar = MakeShared<FUnrealCSharpBlueprintToolBar>();
+
+	OnPostEngineInitDelegateHandle = FCoreDelegates::OnPostEngineInit.AddRaw(
+		this, &FUnrealCSharpEditorModule::OnPostEngineInit);
 
 	CodeAnalysisConsoleCommand = MakeUnique<FAutoConsoleCommand>(
 		TEXT("UnrealCSharp.Editor.CodeAnalysis"), TEXT(""),
@@ -83,13 +86,26 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
 
-	UToolMenus::UnRegisterStartupCallback(this);
-
 	UToolMenus::UnregisterOwner(this);
 
 	FUnrealCSharpEditorStyle::Shutdown();
 
 	FUnrealCSharpEditorCommands::Unregister();
+
+	if (OnPostEngineInitDelegateHandle.IsValid())
+	{
+		FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitDelegateHandle);
+	}
+
+	if (UnrealCSharpBlueprintToolBar.IsValid())
+	{
+		UnrealCSharpBlueprintToolBar->Deinitialize();
+	}
+
+	if (UnrealCSharpPlayToolBar.IsValid())
+	{
+		UnrealCSharpPlayToolBar->Deinitialize();
+	}
 }
 
 void FUnrealCSharpEditorModule::PluginButtonClicked() const
@@ -97,14 +113,24 @@ void FUnrealCSharpEditorModule::PluginButtonClicked() const
 	Generator();
 }
 
+void FUnrealCSharpEditorModule::OnPostEngineInit()
+{
+	RegisterMenus();
+}
+
 void FUnrealCSharpEditorModule::RegisterMenus()
 {
 	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
 	FToolMenuOwnerScoped OwnerScoped(this);
 
-	if (UnrealCSharpToolBar.IsValid())
+	if (UnrealCSharpPlayToolBar.IsValid())
 	{
-		UnrealCSharpToolBar->Initialize();
+		UnrealCSharpPlayToolBar->Initialize();
+	}
+
+	if (UnrealCSharpBlueprintToolBar.IsValid())
+	{
+		UnrealCSharpBlueprintToolBar->Initialize();
 	}
 }
 

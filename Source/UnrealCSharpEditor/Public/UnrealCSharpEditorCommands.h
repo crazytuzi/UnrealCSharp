@@ -22,9 +22,13 @@ public:
 	virtual void RegisterCommands() override;
 
 public:
-	TSharedPtr<FUICommandInfo> PluginAction;
+	TSharedPtr<FUICommandInfo> GeneratorCode;
 
 	TSharedPtr<FUICommandInfo> OpenEditorSettings;
 
 	TSharedPtr<FUICommandInfo> OpenRuntimeSettings;
+
+	TSharedPtr<FUICommandInfo> OpenFile;
+
+	TSharedPtr<FUICommandInfo> OverrideBlueprint;
 };

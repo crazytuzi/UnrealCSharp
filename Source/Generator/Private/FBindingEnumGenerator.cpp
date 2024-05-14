@@ -58,5 +58,5 @@ void FBindingEnumGenerator::Generator(const FBindingEnum* InEnum)
 
 	const auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
 
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

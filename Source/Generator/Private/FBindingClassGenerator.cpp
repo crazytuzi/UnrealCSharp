@@ -544,7 +544,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + TEXT(".cs");
 
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
 
 FString FBindingClassGenerator::GetFunctionDefaultParam(const FTypeInfo* InTypeInfo, const FString& InDefaultArgument)
@@ -746,5 +746,5 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 	const auto FileName = FPaths::Combine(DirectoryName,
 	                                      BINDING_COMBINE_CLASS_IMPLEMENTATION(FileBaseName)) + TEXT(".cs");
 
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

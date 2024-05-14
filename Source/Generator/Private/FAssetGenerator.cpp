@@ -162,5 +162,5 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	const auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
 
-	FGeneratorCore::SaveStringToFile(FileName, Content);
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

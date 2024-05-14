@@ -38,8 +38,6 @@ public:
 	template <typename T>
 	static FString GetFileName(const T* InField);
 
-	static bool SaveStringToFile(const FString& FileName, const FString& String);
-
 	static bool IsSkip(const UField* InField);
 
 	static bool IsSupported(FProperty* Property);

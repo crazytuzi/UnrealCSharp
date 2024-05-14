@@ -86,7 +86,11 @@ public:
 
 	static FString GetCodeAnalysisPath();
 
+	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
+
 	static TMap<FString, TArray<FString>> LoadFileToArray(const FString& InFileName);
+
+	static TMap<FString, FString> LoadFileToString(const FString& InFileName);
 
 	static TArray<FString> GetChangedDirectories();
 
