@@ -4,7 +4,6 @@
 #include "FEnumGenerator.h"
 #include "Binding/TypeInfo/TName.inl"
 #include "Binding/TypeInfo/TNameSpace.inl"
-#include "Misc/FileHelper.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/PropertyMacro.h"
@@ -630,23 +629,6 @@ FString FGeneratorCore::GetModuleRelativePath(const FString& InModuleRelativePat
 	return InModuleRelativePath.Replace(TEXT("Public/"), TEXT("")).Replace(TEXT("Private/"), TEXT(""));
 }
 
-bool FGeneratorCore::SaveStringToFile(const FString& FileName, const FString& String)
-{
-	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-
-	const auto DirectoryName = FPaths::GetPath(FileName);
-
-	if (!PlatformFile.DirectoryExists(*DirectoryName))
-	{
-		PlatformFile.CreateDirectoryTree(*DirectoryName);
-	}
-
-	const auto FileManager = &IFileManager::Get();
-
-	return FFileHelper::SaveStringToFile(String, *FileName, FFileHelper::EEncodingOptions::ForceUTF8, FileManager,
-	                                     FILEWRITE_None);
-}
-
 bool FGeneratorCore::IsSkip(const UField* InField)
 {
 	return bIsSkipGenerateEngineModules && FUnrealCSharpFunctionLibrary::IsEngineType(InField);
@@ -959,7 +941,7 @@ void FGeneratorCore::BeginGenerator()
 		"%s/%s.json"
 	),
 		*FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
-		*OVERRIDE
+		*OVERRIDE_FUNCTION
 	));
 }
 

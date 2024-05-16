@@ -501,6 +501,23 @@ FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
 	return FPaths::Combine(FPaths::ProjectIntermediateDir(), CODE_ANALYSIS);
 }
 
+bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
+{
+	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	const auto DirectoryName = FPaths::GetPath(InFileName);
+
+	if (!PlatformFile.DirectoryExists(*DirectoryName))
+	{
+		PlatformFile.CreateDirectoryTree(*DirectoryName);
+	}
+
+	const auto FileManager = &IFileManager::Get();
+
+	return FFileHelper::SaveStringToFile(InString, *InFileName, FFileHelper::EEncodingOptions::ForceUTF8, FileManager,
+	                                     FILEWRITE_None);
+}
+
 TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(const FString& InFileName)
 {
 	TMap<FString, TArray<FString>> Result;
@@ -530,6 +547,30 @@ TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(con
 				}
 
 				Result.Add(Value.Key, Array);
+			}
+		}
+	}
+
+	return Result;
+}
+
+TMap<FString, FString> FUnrealCSharpFunctionLibrary::LoadFileToString(const FString& InFileName)
+{
+	TMap<FString, FString> Result;
+
+	if (auto& FileManager = IFileManager::Get(); FileManager.FileExists(*InFileName))
+	{
+		if (FString ResultString; FFileHelper::LoadFileToString(ResultString, *InFileName))
+		{
+			TSharedPtr<FJsonObject> JsonObject;
+
+			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(ResultString);
+
+			FJsonSerializer::Deserialize(JsonReader, JsonObject);
+
+			for (const auto& Value : JsonObject->Values)
+			{
+				Result.Add(Value.Key, Value.Value->AsString());
 			}
 		}
 	}

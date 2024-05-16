@@ -18,13 +18,20 @@ public:
 	void PluginButtonClicked() const;
 
 private:
+	void OnPostEngineInit();
+
+private:
 	void RegisterMenus();
 
 public:
 	static void Generator();
 
 private:
-	TSharedPtr<class FUnrealCSharpToolBar> UnrealCSharpToolBar;
+	TSharedPtr<class FUnrealCSharpPlayToolBar> UnrealCSharpPlayToolBar;
+
+	TSharedPtr<class FUnrealCSharpBlueprintToolBar> UnrealCSharpBlueprintToolBar;
+
+	FDelegateHandle OnPostEngineInitDelegateHandle;
 
 	TUniquePtr<FAutoConsoleCommand> CodeAnalysisConsoleCommand;
 

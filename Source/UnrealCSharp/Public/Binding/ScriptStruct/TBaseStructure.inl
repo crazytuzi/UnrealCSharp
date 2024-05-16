@@ -8,7 +8,11 @@ static UScriptStruct* StaticGetBaseStructureInternal(const FName& Name)
 	static auto CoreUObjectPkg = FindObjectChecked<UPackage>(nullptr, TEXT("/Script/CoreUObject"));
 
 	const auto Result = static_cast<UScriptStruct*>(StaticFindObjectFast(
+#if UE_STATIC_FIND_OBJECT_FAST_ANY_PACKAGE
 		UScriptStruct::StaticClass(), CoreUObjectPkg, Name, false, false, RF_NoFlags, EInternalObjectFlags::None));
+#else
+		UScriptStruct::StaticClass(), CoreUObjectPkg, Name, false, RF_NoFlags, EInternalObjectFlags::None));
+#endif
 
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 	if (Result == nullptr)

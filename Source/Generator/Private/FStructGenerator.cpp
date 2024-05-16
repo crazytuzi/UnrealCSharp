@@ -4,6 +4,7 @@
 #include "Binding/Class/FBindingClass.h"
 #include "Engine/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
+#include "Animation/AnimBlueprintGeneratedClass.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
@@ -25,6 +26,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	}
 
 	if (FDynamicStructGenerator::IsDynamicStruct(InScriptStruct))
+	{
+		return;
+	}
+
+	if (Cast<UAnimBlueprintGeneratedClass>(InScriptStruct->GetOwnerClass()))
 	{
 		return;
 	}
@@ -330,5 +336,5 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *GCHandleContent
 	);
 
-	FGeneratorCore::SaveStringToFile(FGeneratorCore::GetFileName(InScriptStruct), Content);
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InScriptStruct), Content);
 }

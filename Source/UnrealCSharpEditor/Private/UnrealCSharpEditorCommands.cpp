@@ -6,13 +6,19 @@
 
 void FUnrealCSharpEditorCommands::RegisterCommands()
 {
-	UI_COMMAND(PluginAction, "UnrealCSharpEditor", "Execute UnrealCSharpEditor action",
-	           EUserInterfaceActionType::Button, FInputGesture());
-
-	UI_COMMAND(OpenEditorSettings, "Open Editor Settings", "Open UnrealCSharpEditor Settings action",
+	UI_COMMAND(GeneratorCode, "Generator Code", "Generator Code Action",
 	           EUserInterfaceActionType::Button, FInputChord());
 
-	UI_COMMAND(OpenRuntimeSettings, "Open Runtime Settings", "Open UnrealCSharpRuntime Settings action",
+	UI_COMMAND(OpenEditorSettings, "Open Editor Settings", "Open UnrealCSharpEditor Settings Action",
+	           EUserInterfaceActionType::Button, FInputChord());
+
+	UI_COMMAND(OpenRuntimeSettings, "Open Runtime Settings", "Open UnrealCSharpRuntime Settings Action",
+	           EUserInterfaceActionType::Button, FInputChord());
+
+	UI_COMMAND(OpenFile, "Open File", "Open File Action",
+	           EUserInterfaceActionType::Button, FInputChord());
+
+	UI_COMMAND(OverrideBlueprint, "Override Blueprint", "Override Blueprint Action",
 	           EUserInterfaceActionType::Button, FInputChord());
 }
 

@@ -2,6 +2,12 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
+#ifdef _MSC_VER
+#pragma warning (push)
+
+#pragma warning (disable: 5103)
+#endif
+
 struct FRegisterInt32Interval
 {
 	FRegisterInt32Interval()
@@ -23,3 +29,7 @@ struct FRegisterInt32Interval
 };
 
 static FRegisterInt32Interval RegisterInt32Interval;
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif

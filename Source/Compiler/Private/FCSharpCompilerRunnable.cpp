@@ -6,7 +6,12 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "UEVersion.h"
+#if UE_APP_STYLE_GET_BRUSH
+#include "Styling/AppStyle.h"
+#else
 #include "EditorStyleSet.h"
+#endif
 
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
@@ -235,7 +240,11 @@ void FCSharpCompilerRunnable::Compile()
 
 			NotificationInfo->bUseSuccessFailIcons = true;
 
+#if UE_APP_STYLE_GET_BRUSH
+			NotificationInfo->Image = FAppStyle::GetBrush(CompileStatusGood);
+#else
 			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusGood);
+#endif
 		}
 		else
 		{
@@ -243,7 +252,11 @@ void FCSharpCompilerRunnable::Compile()
 
 			NotificationInfo->bUseSuccessFailIcons = true;
 
+#if UE_APP_STYLE_GET_BRUSH
+			NotificationInfo->Image = FAppStyle::GetBrush(CompileStatusError);
+#else
 			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusError);
+#endif
 
 			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *Result);
 		}

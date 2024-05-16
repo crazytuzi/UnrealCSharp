@@ -388,7 +388,15 @@ UBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorBlueprintGeneratedCla
 #if WITH_EDITOR
 void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 {
+#if UE_REPLACE_INSTANCES_OF_CLASS_F_REPLACE_INSTANCES_OF_CLASS_PARAMETERS
+	FReplaceInstancesOfClassParameters ReplaceInstancesOfClassParameters;
+
+	ReplaceInstancesOfClassParameters.OriginalCDO = InOldClass->ClassDefaultObject;
+
+	FBlueprintCompileReinstancer::ReplaceInstancesOfClass(InOldClass, InNewClass, ReplaceInstancesOfClassParameters);
+#else
 	FBlueprintCompileReinstancer::ReplaceInstancesOfClass(InOldClass, InNewClass, InOldClass->ClassDefaultObject);
+#endif
 
 	TArray<UBlueprintGeneratedClass*> BlueprintGeneratedClasses;
 

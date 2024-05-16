@@ -32,7 +32,9 @@ namespace CodeAnalysis
                 ["DynamicInterface"] = new List<string>()
             };
 
-            _override = new Dictionary<string, List<string>>();
+            _overrideFunction = new Dictionary<string, List<string>>();
+
+            _overrideFile = new Dictionary<string, string>();
         }
 
         private static List<string> GetFiles(string inPathName)
@@ -80,7 +82,7 @@ namespace CodeAnalysis
 
                 var Root = (CompilationUnitSyntax)Tree.GetRoot();
 
-                AnalysisIsOverride(Root);
+                AnalysisOverride(Item, Root);
 
                 AnalysisDynamic(Root);
             }
@@ -88,7 +90,7 @@ namespace CodeAnalysis
             WriteAll();
         }
 
-        private void AnalysisIsOverride(CompilationUnitSyntax inRoot)
+        private void AnalysisOverride(string inFile, CompilationUnitSyntax inRoot)
         {
             foreach (var RootMember in inRoot.Members)
             {
@@ -117,6 +119,8 @@ namespace CodeAnalysis
 
                             if (IsOverride)
                             {
+                                _overrideFile.Add($"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}", inFile);
+
                                 foreach (var MemberDeclaration in ClassDeclaration.Members)
                                 {
                                     if (MemberDeclaration is MethodDeclarationSyntax MethodDeclaration)
@@ -146,7 +150,8 @@ namespace CodeAnalysis
 
                             if (Functions.Count > 0)
                             {
-                                _override.Add($"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}", Functions);
+                                _overrideFunction.Add($"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}",
+                                    Functions);
                             }
                         }
                     }
@@ -213,8 +218,15 @@ namespace CodeAnalysis
 
         private void WriteAll()
         {
-            File.WriteAllText(Path.Combine(_outputPathName, "Override.json"),
-                JsonSerializer.Serialize(_override,
+            File.WriteAllText(Path.Combine(_outputPathName, "OverrideFunction.json"),
+                JsonSerializer.Serialize(_overrideFunction,
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                    }));
+
+            File.WriteAllText(Path.Combine(_outputPathName, "OverrideFile.json"),
+                JsonSerializer.Serialize(_overrideFile,
                     new JsonSerializerOptions
                     {
                         WriteIndented = true,
@@ -232,7 +244,9 @@ namespace CodeAnalysis
 
         private readonly string _outputPathName;
 
-        private readonly Dictionary<string, List<string>> _override;
+        private readonly Dictionary<string, List<string>> _overrideFunction;
+
+        private readonly Dictionary<string, string> _overrideFile;
 
         private readonly Dictionary<string, List<string>> _dynamic;
     }

@@ -12,7 +12,9 @@
 
 #define CODE_ANALYSIS FString(TEXT("CodeAnalysis"))
 
-#define OVERRIDE FString(TEXT("Override"))
+#define OVERRIDE_FUNCTION FString(TEXT("OverrideFunction"))
+
+#define OVERRIDE_FILE FString(TEXT("OverrideFile"))
 
 #define DYNAMIC FString(TEXT("Dynamic"))
 

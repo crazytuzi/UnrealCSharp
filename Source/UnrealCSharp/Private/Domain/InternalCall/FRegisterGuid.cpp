@@ -4,6 +4,12 @@
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
 
+#ifdef _MSC_VER
+#pragma warning (push)
+
+#pragma warning (disable: 5103)
+#endif
+
 BINDING_ENUM(EGuidFormats)
 
 struct FRegisterGuidFormats
@@ -68,3 +74,7 @@ struct FRegisterGuid
 };
 
 static FRegisterGuid RegisterGuid;
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif
