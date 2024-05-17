@@ -3,7 +3,7 @@
 
 void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 {
-	if (WeakObjectProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*Dest = NewWeakRef(Src);
 	}
@@ -11,29 +11,29 @@ void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FWeakObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (WeakObjectProperty != nullptr)
+	if (Property != nullptr)
 	{
 		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(
 			SrcGarbageCollectionHandle);
 
-		WeakObjectProperty->InitializeValue(Dest);
+		Property->InitializeValue(Dest);
 
-		WeakObjectProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
+		Property->SetObjectPropertyValue(Dest, SrcMulti->Get());
 	}
 }
 
 bool FWeakObjectPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	if (WeakObjectProperty != nullptr)
+	if (Property != nullptr)
 	{
-		const auto ObjectA = WeakObjectProperty->GetObjectPropertyValue(A);
+		const auto ObjectA = Property->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(
 			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
 
-		return WeakObjectProperty->StaticIdentical(ObjectA, ObjectB, PortFlags);
+		return Property->StaticIdentical(ObjectA, ObjectB, PortFlags);
 	}
 
 	return false;

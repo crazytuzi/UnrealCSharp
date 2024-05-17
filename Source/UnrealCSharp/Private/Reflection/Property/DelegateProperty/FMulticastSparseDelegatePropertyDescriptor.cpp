@@ -2,7 +2,7 @@
 
 const FMulticastScriptDelegate* FMulticastSparseDelegatePropertyDescriptor::GetMulticastDelegate(void* InAddress) const
 {
-	auto MulticastDelegate = MulticastSparseDelegateProperty->GetMulticastDelegate(InAddress);
+	auto MulticastDelegate = Property->GetMulticastDelegate(InAddress);
 
 	if (MulticastDelegate == nullptr)
 	{
@@ -14,9 +14,9 @@ const FMulticastScriptDelegate* FMulticastSparseDelegatePropertyDescriptor::GetM
 
 		MulticastScriptDelegate.Add(ScriptDelegate);
 
-		MulticastSparseDelegateProperty->SetMulticastDelegate(InAddress, MulticastScriptDelegate);
+		Property->SetMulticastDelegate(InAddress, MulticastScriptDelegate);
 
-		MulticastDelegate = MulticastSparseDelegateProperty->GetMulticastDelegate(InAddress);
+		MulticastDelegate = Property->GetMulticastDelegate(InAddress);
 	}
 
 	return MulticastDelegate;

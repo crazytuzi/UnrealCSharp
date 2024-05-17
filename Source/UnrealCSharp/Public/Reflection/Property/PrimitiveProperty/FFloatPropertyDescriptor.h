@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPrimitivePropertyDescriptor.h"
+#include "Reflection/Property/TPrimitivePropertyDescriptor.inl"
 
-class FFloatPropertyDescriptor final : public FPrimitivePropertyDescriptor
+class FFloatPropertyDescriptor final : public TPrimitivePropertyDescriptor<FFloatProperty>
 {
 public:
-	using FPrimitivePropertyDescriptor::FPrimitivePropertyDescriptor;
+	using TPrimitivePropertyDescriptor::TPrimitivePropertyDescriptor;
 };

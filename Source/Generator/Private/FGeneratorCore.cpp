@@ -638,7 +638,7 @@ bool FGeneratorCore::IsSupported(FProperty* Property)
 {
 	if (Property == nullptr) return false;
 
-	if (bIsGenerateAllModules) return true;
+	if (bIsGenerateAllModules && Property->IsNative()) return true;
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
 	{
@@ -748,7 +748,7 @@ bool FGeneratorCore::IsSupported(FProperty* Property)
 
 bool FGeneratorCore::IsSupported(const UClass* InClass)
 {
-	if (bIsGenerateAllModules) return true;
+	if (bIsGenerateAllModules && InClass->IsNative()) return true;
 
 	if (const auto FoundSupported = SupportedMap.Find(InClass))
 	{
@@ -789,7 +789,7 @@ bool FGeneratorCore::IsSupported(const UClass* InClass)
 
 bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 {
-	if (bIsGenerateAllModules) return true;
+	if (bIsGenerateAllModules && InFunction->IsNative()) return true;
 
 	if (const auto FoundSupported = SupportedMap.Find(InFunction))
 	{
@@ -814,7 +814,7 @@ bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 
 bool FGeneratorCore::IsSupported(const UStruct* InStruct)
 {
-	if (bIsGenerateAllModules) return true;
+	if (bIsGenerateAllModules && InStruct->IsNative()) return true;
 
 	if (const auto FoundSupported = SupportedMap.Find(InStruct))
 	{
@@ -845,7 +845,7 @@ bool FGeneratorCore::IsSupported(const UStruct* InStruct)
 
 bool FGeneratorCore::IsSupported(const UEnum* InEnum)
 {
-	if (bIsGenerateAllModules) return true;
+	if (bIsGenerateAllModules && InEnum->IsNative()) return true;
 
 	if (const auto FoundSupported = SupportedMap.Find(InEnum))
 	{

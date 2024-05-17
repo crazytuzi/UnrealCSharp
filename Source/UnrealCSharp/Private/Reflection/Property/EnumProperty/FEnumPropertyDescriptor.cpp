@@ -8,17 +8,17 @@ void FEnumPropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FEnumPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	if (EnumProperty != nullptr)
+	if (Property != nullptr)
 	{
-		EnumProperty->GetUnderlyingProperty()->CopySingleValue(Dest, Src);
+		Property->GetUnderlyingProperty()->CopySingleValue(Dest, Src);
 	}
 }
 
 void FEnumPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (EnumProperty != nullptr)
+	if (Property != nullptr)
 	{
-		EnumProperty->GetUnderlyingProperty()->CopySingleValue(Dest, Src);
+		Property->GetUnderlyingProperty()->CopySingleValue(Dest, Src);
 	}
 }
 

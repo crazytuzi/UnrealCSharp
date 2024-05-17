@@ -6,7 +6,4 @@ class FMulticastInlineDelegatePropertyDescriptor final : public FMulticastDelega
 {
 public:
 	using FMulticastDelegatePropertyDescriptor::FMulticastDelegatePropertyDescriptor;
-
-protected:
-	virtual const FMulticastScriptDelegate* GetMulticastDelegate(void* InAddress) const override;
 };

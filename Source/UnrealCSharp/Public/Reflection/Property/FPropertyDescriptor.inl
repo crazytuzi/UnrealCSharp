@@ -1,65 +1,90 @@
 #pragma once
 
-FProperty* FPropertyDescriptor::GetProperty() const
-{
-	return Property;
-}
-
-void FPropertyDescriptor::DestroyProperty()
-{
-	if (Property != nullptr)
-	{
-		delete Property;
-
-		Property = nullptr;
-	}
-}
-
 int32 FPropertyDescriptor::GetElementSize() const
 {
-	return Property != nullptr ? Property->ElementSize : 0;
+	if (const auto Property = GetProperty())
+	{
+		return Property->ElementSize;
+	}
+
+	return 0;
 }
 
 EPropertyFlags FPropertyDescriptor::GetPropertyFlags() const
 {
-	return Property != nullptr ? Property->PropertyFlags : EPropertyFlags::CPF_None;
+	if (const auto Property = GetProperty())
+	{
+		return Property->PropertyFlags;
+	}
+
+	return EPropertyFlags::CPF_None;
 }
 
 template <typename ValueType>
 auto FPropertyDescriptor::ContainerPtrToValuePtr(void* ContainerPtr, const int32 ArrayIndex) const
 {
-	return Property != nullptr ? Property->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex) : nullptr;
+	if (const auto Property = GetProperty())
+	{
+		return Property->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex);
+	}
+
+	return decltype(std::declval<FProperty*>()->ContainerPtrToValuePtr<ValueType>(ContainerPtr, ArrayIndex)){};
 }
 
 FString FPropertyDescriptor::GetName() const
 {
-	return Property != nullptr ? Property->GetName() : FString();
+	if (const auto Property = GetProperty())
+	{
+		return Property->GetName();
+	}
+
+	return {};
 }
 
 void FPropertyDescriptor::InitializeValue_InContainer(void* Dest) const
 {
-	if (Property != nullptr)
+	if (const auto Property = GetProperty())
 	{
-		Property->InitializeValue_InContainer(Dest);
+		return Property->InitializeValue_InContainer(Dest);
 	}
 }
 
 int32 FPropertyDescriptor::GetSize() const
 {
-	return Property != nullptr ? Property->GetSize() : 0;
+	if (const auto Property = GetProperty())
+	{
+		return Property->GetSize();
+	}
+
+	return 0;
 }
 
 int32 FPropertyDescriptor::GetMinAlignment() const
 {
-	return Property != nullptr ? Property->GetMinAlignment() : 0;
+	if (const auto Property = GetProperty())
+	{
+		return Property->GetMinAlignment();
+	}
+
+	return 0;
 }
 
 uint32 FPropertyDescriptor::GetValueTypeHash(const void* Src) const
 {
-	return Property != nullptr ? Property->GetValueTypeHash(Src) : 0u;
+	if (const auto Property = GetProperty())
+	{
+		return Property->GetValueTypeHash(Src);
+	}
+
+	return 0;
 }
 
 bool FPropertyDescriptor::SameType(const FPropertyDescriptor* Other) const
 {
-	return Property != nullptr && Other != nullptr ? Property->SameType(Other->Property) : false;
+	if (const auto Property = GetProperty(); Property != nullptr && Other != nullptr)
+	{
+		return Property->SameType(Other->GetProperty());
+	}
+
+	return false;
 }

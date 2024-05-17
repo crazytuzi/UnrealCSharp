@@ -3,7 +3,7 @@
 
 void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest) const
 {
-	if (SoftClassProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*Dest = NewWeakRef(Src);
 	}
@@ -11,29 +11,29 @@ void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FSoftClassPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (SoftClassProperty != nullptr)
+	if (Property != nullptr)
 	{
 		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
 			SrcGarbageCollectionHandle);
 
-		SoftClassProperty->InitializeValue(Dest);
+		Property->InitializeValue(Dest);
 
-		SoftClassProperty->SetObjectPropertyValue(Dest, SrcMulti->Get());
+		Property->SetObjectPropertyValue(Dest, SrcMulti->Get());
 	}
 }
 
 bool FSoftClassPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	if (SoftClassProperty != nullptr)
+	if (Property != nullptr)
 	{
-		const auto ClassA = SoftClassProperty->GetObjectPropertyValue(A);
+		const auto ClassA = Property->GetObjectPropertyValue(A);
 
 		const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
 			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
 
-		return SoftClassProperty->StaticIdentical(ClassA, ClassB, PortFlags);
+		return Property->StaticIdentical(ClassA, ClassB, PortFlags);
 	}
 
 	return false;

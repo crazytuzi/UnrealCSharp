@@ -4,7 +4,7 @@
 
 void FSetPropertyDescriptor::Get(void* Src, void** Dest) const
 {
-	if (SetProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*Dest = NewWeakRef(Src);
 	}
@@ -12,7 +12,7 @@ void FSetPropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FSetPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	if (SetProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*static_cast<void**>(Dest) = NewRef(Src);
 	}
@@ -20,16 +20,16 @@ void FSetPropertyDescriptor::Get(void* Src, void* Dest) const
 
 void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (SetProperty != nullptr)
+	if (Property != nullptr)
 	{
 		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 			SrcGarbageCollectionHandle);
 
-		SetProperty->InitializeValue(Dest);
+		Property->InitializeValue(Dest);
 
-		SetProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
+		Property->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
 	}
 }
 
@@ -41,10 +41,10 @@ MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const
 	{
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		const auto SetHelper = new FSetHelper(SetProperty->ElementProp, InAddress);
+		const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress);
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-			InAddress, SetProperty);
+			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, SetHelper,
 		                                                           Object);
@@ -57,7 +57,7 @@ MonoObject* FSetPropertyDescriptor::NewWeakRef(void* InAddress) const
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	const auto SetHelper = new FSetHelper(SetProperty->ElementProp, InAddress);
+	const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress);
 
 	FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
 
