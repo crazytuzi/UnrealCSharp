@@ -239,7 +239,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FunctionContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UClass StaticClass()\n"
 		"\t\t{\n"
-		"\t\t\treturn StaticClassSingleton ??= UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
+		"\t\t\treturn StaticClassSingleton \?\?= UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
 		"\t\t}\n\n"
 		"\t\tprivate static UClass StaticClassSingleton { get; set; }\n"
 	),

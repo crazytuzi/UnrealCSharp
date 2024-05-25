@@ -203,7 +203,7 @@ struct TIsNotUEnum<Class> \
 
 #define BINDING_FUNCTION_BUILDER_INVOKE(Function) TFunctionPointer<decltype(&TFunctionBuilder<decltype(Function), Function>::Invoke)>(&TFunctionBuilder<decltype(Function), Function>::Invoke).Value.Pointer
 
-#define BINDING_FUNCTION_BUILDER_INFO(Function, ...) {[](){ return TFunctionBuilder<decltype(Function), Function>::Info(##__VA_ARGS__); }}
+#define BINDING_FUNCTION_BUILDER_INFO(Function, ...) {[](){ return TFunctionBuilder<decltype(Function), Function>::Info(__VA_ARGS__); }}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_FUNCTION(Function, ...) BINDING_FUNCTION_BUILDER_INVOKE(Function), BINDING_FUNCTION_BUILDER_INFO(Function, ##__VA_ARGS__)
@@ -213,7 +213,7 @@ struct TIsNotUEnum<Class> \
 
 #define BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function) TFunctionPointer<decltype(&TFunctionBuilder<Signature, Function>::Invoke)>(&TFunctionBuilder<Signature, Function>::Invoke).Value.Pointer
 
-#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ...) {[](){ return TFunctionBuilder<Signature, Function>::Info(##__VA_ARGS__); }}
+#define BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ...) {[](){ return TFunctionBuilder<Signature, Function>::Info(__VA_ARGS__); }}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_OVERLOAD(Signature, Function, ...) BINDING_OVERLOAD_BUILDER_INVOKE(Signature, Function), BINDING_OVERLOAD_BUILDER_INFO(Signature, Function, ##__VA_ARGS__)
@@ -222,7 +222,7 @@ struct TIsNotUEnum<Class> \
 #endif
 
 #if WITH_FUNCTION_INFO
-#define BINDING_OVERLOADS(...) TOverloadBuilder<void*, TFunction<FFunctionInfo*()>>::Get(##__VA_ARGS__)
+#define BINDING_OVERLOADS(...) TOverloadBuilder<void*, TFunction<FFunctionInfo*()>>::Get(__VA_ARGS__)
 #else
 #define BINDING_OVERLOADS(...) TOverloadBuilder<void*>::Get(##__VA_ARGS__)
 #endif
@@ -251,7 +251,7 @@ struct TIsNotUEnum<Class> \
 
 #define BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index) TFunctionPointer<decltype(&TSubscriptBuilder<T, Result, Index>::Set)>(&TSubscriptBuilder<T, Result, Index>::Set).Value.Pointer
 
-#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ...) {[](){ return TSubscriptBuilder<T, Result, Index>::Info(##__VA_ARGS__); }}
+#define BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ...) {[](){ return TSubscriptBuilder<T, Result, Index>::Info(__VA_ARGS__); }}
 
 #if WITH_FUNCTION_INFO
 #define BINDING_SUBSCRIPT(T, Result, Index, ...) BINDING_SUBSCRIPT_BUILDER_GET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_SET(T, Result, Index), BINDING_SUBSCRIPT_BUILDER_INFO(T, Result, Index, ##__VA_ARGS__)

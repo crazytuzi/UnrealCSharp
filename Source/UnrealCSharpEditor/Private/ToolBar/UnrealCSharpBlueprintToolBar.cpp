@@ -20,11 +20,11 @@ void FUnrealCSharpBlueprintToolBar::Initialize()
 
 	BlueprintEditorModule.GetMenuExtensibilityManager()->GetExtenderDelegates().Add(
 		FAssetEditorExtender::CreateLambda(
-			[&](const TSharedRef<FUICommandList> CommandList, const TArray<UObject*> ContextSensitiveObjects)
+			[&](const TSharedRef<FUICommandList> InCommandList, const TArray<UObject*> InContextSensitiveObjects)
 			{
-				return GenerateBlueprintExtender(ContextSensitiveObjects.IsEmpty()
+				return GenerateBlueprintExtender(InContextSensitiveObjects.IsEmpty()
 					                                 ? nullptr
-					                                 : Cast<UBlueprint>(ContextSensitiveObjects[0]));
+					                                 : Cast<UBlueprint>(InContextSensitiveObjects[0]));
 			}));
 
 	SetCodeAnalysisOverrideFilesMap();

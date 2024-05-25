@@ -139,7 +139,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	auto StaticStructContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UScriptStruct StaticStruct()\n"
 		"\t\t{\n"
-		"\t\t\treturn StaticStructSingleton ??= UStructImplementation.UStruct_StaticStructImplementation(\"%s\");\n"
+		"\t\t\treturn StaticStructSingleton \?\?= UStructImplementation.UStruct_StaticStructImplementation(\"%s\");\n"
 		"\t\t}\n\n"
 		"\t\tprivate static UScriptStruct StaticStructSingleton { get; set; }\n"
 	),
@@ -148,8 +148,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	);
 
 	IdenticalContent = FString::Printf(TEXT(
-		"\t\tpublic static bool operator ==(%s A, %s B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A?.%s??nint.Zero, B?.%s??nint.Zero);\n\n"
-		"\t\tpublic static bool operator !=(%s A, %s B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A?.%s??nint.Zero, B?.%s??nint.Zero);\n\n"
+		"\t\tpublic static bool operator ==(%s A, %s B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A?.%s\?\?nint.Zero, B?.%s\?\?nint.Zero);\n\n"
+		"\t\tpublic static bool operator !=(%s A, %s B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A?.%s\?\?nint.Zero, B?.%s\?\?nint.Zero);\n\n"
 		"\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
 		"\t\tpublic override int GetHashCode() => (int)%s;\n"
 	),

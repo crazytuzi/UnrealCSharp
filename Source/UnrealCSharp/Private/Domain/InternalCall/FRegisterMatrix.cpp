@@ -3,12 +3,6 @@
 #include "Macro/NamespaceMacro.h"
 #include "FRegisterForceInit.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterMatrix
 {
 	static FMatrix MultipliesImplementation(const FMatrix& In, const FMatrix::FReal Other)
@@ -105,7 +99,3 @@ struct FRegisterMatrix
 };
 
 static FRegisterMatrix RegisterMatrix;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

@@ -3,12 +3,6 @@
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterAssetBundleData
 {
 	FRegisterAssetBundleData()
@@ -43,7 +37,3 @@ struct FRegisterAssetBundleData
 };
 
 static FRegisterAssetBundleData RegisterAssetBundleData;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

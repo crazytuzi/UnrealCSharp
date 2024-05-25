@@ -3,12 +3,6 @@
 #include "Macro/NamespaceMacro.h"
 #include "FRegisterForceInit.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterPlane
 {
 	static FPlane::FReal BitOrImplementation(const FPlane& In, const FPlane& V)
@@ -73,7 +67,3 @@ struct FRegisterPlane
 };
 
 static FRegisterPlane RegisterPlane;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

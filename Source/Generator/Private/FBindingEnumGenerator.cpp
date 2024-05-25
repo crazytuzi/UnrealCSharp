@@ -1,5 +1,4 @@
 #include "FBindingEnumGenerator.h"
-#include "FGeneratorCore.h"
 #include "Binding/FBinding.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
