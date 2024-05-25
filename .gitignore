@@ -73,7 +73,6 @@ DerivedDataCache/*
 .idea/
 bin/
 obj/
-Script/CodeAnalysis/*
 !Script/*/*.sln
 !Script/*/*.csproj
 !Script/*/*.cs

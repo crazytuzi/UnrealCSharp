@@ -8,6 +8,11 @@ void FSolutionGenerator::Generator()
 	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginPath() / TEMPLATE;
 
 	CopyCSProj(
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath(),
+		                FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectName() + PROJECT_SUFFIX),
+		TemplatePath / FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectName() + PROJECT_SUFFIX);
+
+	CopyCSProj(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetUEPath(),
 		                FUnrealCSharpFunctionLibrary::GetUEProjectName() + PROJECT_SUFFIX),
 		TemplatePath / FUnrealCSharpFunctionLibrary::GetUEProjectName() + PROJECT_SUFFIX);
@@ -88,6 +93,15 @@ void FSolutionGenerator::CopyCSProj(const FString& Dest, const FString& Src)
 		);
 
 		InResult = InResult.Replace(TEXT("<DefineConstants>$(DefineConstants);</DefineConstants>"), *DefineConstants);
+
+		InResult = InResult.Replace(TEXT("<TargetFramework></TargetFramework>"),
+		                            *FString::Printf(TEXT(
+			                            "<TargetFramework>net%d.%d</TargetFramework>"
+		                            ),
+		                                             DOTNET_MAJOR_VERSION,
+		                                             DOTNET_MINOR_VERSION
+		                            )
+		);
 	});
 }
 

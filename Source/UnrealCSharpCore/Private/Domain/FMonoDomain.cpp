@@ -16,6 +16,7 @@
 #include "Binding/FBinding.h"
 #include "Setting/UnrealCSharpSetting.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "DotnetVersion.h"
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
@@ -53,6 +54,10 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 		mono_dllmap_insert(NULL, "System.IO.Compression.Native", NULL, "__Internal", NULL);
 
 		mono_dllmap_insert(NULL, "System.Security.Cryptography.Native.Apple", NULL, "__Internal", NULL);
+
+#if DOTNET8
+		mono_dllmap_insert(NULL, "System.Globalization.Native", NULL, "__Internal", NULL);
+#endif
 
 		setenv("DOTNET_SYSTEM_GLOBALIZATION_INVARIANT", "1", TRUE);
 #else
@@ -691,8 +696,9 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 
 #if WITH_EDITOR
 	auto Path = FString::Printf(TEXT(
-		"%s/Source/ThirdParty/Mono/lib/%s/net7.0"),
+		"%s/Source/ThirdParty/Mono/lib/%s/%s/net"),
 	                            *FUnrealCSharpFunctionLibrary::GetPluginPath(),
+	                            MONO_CONFIGURATION,
 #if PLATFORM_WINDOWS
 	                            TEXT("Win64")
 #elif PLATFORM_MAC_X86
@@ -701,20 +707,24 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 	);
 #else
 	auto Path = FString::Printf(TEXT(
-		"%s/Binaries/%s/Mono/lib/%s/net7.0"),
+		"%s/Binaries/%s/Mono/lib/%s/%s/net"),
 	                            *FPaths::ProjectDir(),
 #if PLATFORM_WINDOWS
-								TEXT("Win64"),
-								TEXT("Win64"));
+	                            TEXT("Win64"),
+	                            MONO_CONFIGURATION,
+	                            TEXT("Win64"));
 #elif PLATFORM_ANDROID
 	                            TEXT("Android"),
+	                            MONO_CONFIGURATION,
 	                            TEXT("Android"));
 #elif PLATFORM_IOS
-								TEXT("IOS"),
-								TEXT("IOS"));
+	                            TEXT("IOS"),
+	                            MONO_CONFIGURATION,
+	                            TEXT("IOS"));
 #elif PLATFORM_LINUX
 	                            TEXT("Linux"),
-	                            TEXT("Linux"));
+	                            MONO_CONFIGURATION,
+	                            TEXT("Linux_x86_64"));
 #endif
 #endif
 

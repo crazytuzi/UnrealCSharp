@@ -500,6 +500,16 @@ FString FUnrealCSharpFunctionLibrary::GetScriptPath()
 	return FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), SCRIPT));
 }
 
+FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectName()
+{
+	return CODE_ANALYSIS;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath()
+{
+	return FPaths::Combine(GetBasePath(), CODE_ANALYSIS);
+}
+
 FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
 {
 	return FPaths::Combine(FPaths::ProjectIntermediateDir(), CODE_ANALYSIS);
