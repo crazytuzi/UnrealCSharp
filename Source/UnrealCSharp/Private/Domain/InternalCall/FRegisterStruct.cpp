@@ -7,20 +7,20 @@ struct FRegisterStruct
 {
 	static MonoObject* StaticStructImplementation(MonoString* InStructName)
 	{
-		const auto StructName = UTF8_TO_TCHAR(
+		const auto StructName = StringCast<TCHAR>(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
 
-		const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName);
+		const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName.Get());
 
 		return FCSharpEnvironment::GetEnvironment().Bind(InStruct);
 	}
 
 	static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InStructName)
 	{
-		const auto StructName = UTF8_TO_TCHAR(
+		const auto StructName = StringCast<TCHAR>(
 			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
 
-		FCSharpEnvironment::GetEnvironment().Bind(InMonoObject, StructName);
+		FCSharpEnvironment::GetEnvironment().Bind(InMonoObject, StructName.Get());
 	}
 
 	static bool IdenticalImplementation(const FGarbageCollectionHandle InScriptStruct,

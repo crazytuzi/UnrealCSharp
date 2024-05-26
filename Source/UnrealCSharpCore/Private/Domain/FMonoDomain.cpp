@@ -75,9 +75,13 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 				                                    UnrealCSharpSetting->GetPort()
 				);
 
+				const auto& Option1 = StringCast<ANSICHAR>(TEXT("--soft-breakpoints"));
+
+				const auto& Option2 = StringCast<ANSICHAR>(*Config);
+
 				char* Options[] = {
-					TCHAR_TO_ANSI(TEXT("--soft-breakpoints")),
-					TCHAR_TO_ANSI(*Config)
+					(ANSICHAR*)Option1.Get(),
+					(ANSICHAR*)Option2.Get()
 				};
 
 				mono_jit_parse_options(sizeof(Options) / sizeof(char*), Options);

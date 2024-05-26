@@ -74,9 +74,14 @@ void FCodeAnalysis::Analysis()
 {
 	const auto Program = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath(),
 	                                     FString::Printf(TEXT(
-		                                     "%s.exe"
+		                                     "%s%s"
 	                                     ),
-	                                                     *CODE_ANALYSIS
+	                                                     *CODE_ANALYSIS,
+#if PLATFORM_WINDOWS
+	                                                     TEXT(".exe")
+#else
+	                                                     TEXT("")
+#endif
 	                                     ));
 
 	const auto CompileParam = FString::Printf(TEXT(
