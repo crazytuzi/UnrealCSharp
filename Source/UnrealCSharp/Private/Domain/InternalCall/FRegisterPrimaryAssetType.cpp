@@ -2,12 +2,6 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterPrimaryAssetType
 {
 	FRegisterPrimaryAssetType()
@@ -23,7 +17,3 @@ struct FRegisterPrimaryAssetType
 };
 
 static FRegisterPrimaryAssetType RegisterPrimaryAssetType;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

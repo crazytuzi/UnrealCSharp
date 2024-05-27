@@ -3,12 +3,6 @@
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterSoftObjectPath
 {
 	FRegisterSoftObjectPath()
@@ -70,7 +64,3 @@ struct FRegisterSoftObjectPath
 };
 
 static FRegisterSoftObjectPath RegisterSoftObjectPath;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

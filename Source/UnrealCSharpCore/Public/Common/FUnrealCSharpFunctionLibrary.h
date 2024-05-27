@@ -84,6 +84,10 @@ public:
 
 	static FString GetScriptPath();
 
+	static FString GetCodeAnalysisProjectName();
+
+	static FString GetCodeAnalysisCSProjPath();
+
 	static FString GetCodeAnalysisPath();
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);

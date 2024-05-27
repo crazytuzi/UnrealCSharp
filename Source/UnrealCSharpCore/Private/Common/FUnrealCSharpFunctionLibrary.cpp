@@ -99,23 +99,27 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 	}
 
 	return Encode(FString::Printf(TEXT(
-		"%s%s"
-	),
+		              "%s%s"
+	              ),
 	                              InStruct->IsNative() &&
 	                              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
 		                              ? InStruct->GetPrefixCPP()
 		                              : TEXT(""),
-	                              *InStruct->GetName()));
+	                              *InStruct->GetName()),
+	              InStruct->IsNative() &&
+	              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
+	);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullInterface(const UStruct* InStruct)
 {
 	return Encode(FString::Printf(TEXT(
-			"I%s"
-		),
+		              "I%s"
+	              ),
 	                              InStruct->IsInBlueprint()
 		                              ? *GetFullClass(InStruct)
-		                              : *GetFullClass(InStruct).RightChop(1))
+		                              : *GetFullClass(InStruct).RightChop(1)),
+	              InStruct->IsInBlueprint()
 	);
 }
 
@@ -164,7 +168,7 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UEnum* InEnum)
 		return TEXT("");
 	}
 
-	return InEnum->GetName();
+	return Encode(InEnum->GetName(), InEnum->IsNative());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InEnum)
@@ -494,6 +498,16 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 FString FUnrealCSharpFunctionLibrary::GetScriptPath()
 {
 	return FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), SCRIPT));
+}
+
+FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectName()
+{
+	return CODE_ANALYSIS;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath()
+{
+	return FPaths::Combine(GetBasePath(), CODE_ANALYSIS);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()

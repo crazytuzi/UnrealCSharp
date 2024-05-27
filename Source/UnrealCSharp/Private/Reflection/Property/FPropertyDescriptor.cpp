@@ -182,11 +182,6 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 	return nullptr;
 }
 
-FPropertyDescriptor::FPropertyDescriptor(FProperty* InProperty):
-	Property(InProperty)
-{
-}
-
 void FPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 }
@@ -200,14 +195,28 @@ void FPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 }
 
+FProperty* FPropertyDescriptor::GetProperty() const
+{
+	return nullptr;
+}
+
+void FPropertyDescriptor::DestroyProperty()
+{
+}
+
 bool FPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	return Property != nullptr ? Property->Identical(A, B, PortFlags) : false;
+	if (const auto Property = GetProperty())
+	{
+		return Property->Identical(A, B, PortFlags);
+	}
+
+	return false;
 }
 
 void FPropertyDescriptor::DestroyValue(void* Dest) const
 {
-	if (Property != nullptr)
+	if (const auto Property = GetProperty())
 	{
 		Property->DestroyValue(Dest);
 	}

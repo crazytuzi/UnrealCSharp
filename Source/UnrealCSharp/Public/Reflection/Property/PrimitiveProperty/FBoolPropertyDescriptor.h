@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPrimitivePropertyDescriptor.h"
+#include "Reflection/Property/TPrimitivePropertyDescriptor.inl"
 
-class FBoolPropertyDescriptor final : public FPrimitivePropertyDescriptor
+class FBoolPropertyDescriptor final : public TPrimitivePropertyDescriptor<FBoolProperty>
 {
 public:
-	using FPrimitivePropertyDescriptor::FPrimitivePropertyDescriptor;
+	using TPrimitivePropertyDescriptor::TPrimitivePropertyDescriptor;
 
 	virtual void Set(void* Src, void* Dest) const override;
 };

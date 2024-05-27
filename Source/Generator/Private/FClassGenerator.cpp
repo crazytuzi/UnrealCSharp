@@ -239,7 +239,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	FunctionContent = FString::Printf(TEXT(
 		"\t\tpublic%s static UClass StaticClass()\n"
 		"\t\t{\n"
-		"\t\t\treturn StaticClassSingleton ??= UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
+		"\t\t\treturn StaticClassSingleton \?\?= UObjectImplementation.UObject_StaticClassImplementation(\"%s\");\n"
 		"\t\t}\n\n"
 		"\t\tprivate static UClass StaticClassSingleton { get; set; }\n"
 	),
@@ -291,6 +291,13 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 	     FunctionIterator)
 	{
+		if (!FunctionIterator->HasAnyFunctionFlags(EFunctionFlags::FUNC_Public |
+			EFunctionFlags::FUNC_Protected |
+			EFunctionFlags::FUNC_Private))
+		{
+			continue;
+		}
+
 		const auto& FunctionName = FunctionIterator->GetName();
 
 		if (FunctionNameSet.Contains(FunctionName))

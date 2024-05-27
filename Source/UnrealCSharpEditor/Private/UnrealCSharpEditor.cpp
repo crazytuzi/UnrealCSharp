@@ -151,6 +151,10 @@ void FUnrealCSharpEditorModule::Generator()
 
 	SlowTask.MakeDialog();
 
+	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Solution Generator"));
+
+	FSolutionGenerator::Generator();
+
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Code Analysis"));
 
 	FCodeAnalysis::CodeAnalysis();
@@ -183,10 +187,6 @@ void FUnrealCSharpEditorModule::Generator()
 	{
 		FInternationalization::Get().SetCurrentCulture(CurrentCultureName);
 	}
-
-	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Solution Generator"));
-
-	FSolutionGenerator::Generator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "BindingClass Generator"));
 

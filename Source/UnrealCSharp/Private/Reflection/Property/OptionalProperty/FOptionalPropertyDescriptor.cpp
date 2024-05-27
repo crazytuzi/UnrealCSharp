@@ -6,7 +6,7 @@
 
 void FOptionalPropertyDescriptor::Get(void* Src, void** Dest) const
 {
-	if (OptionalProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*Dest = NewWeakRef(Src);
 	}
@@ -14,16 +14,16 @@ void FOptionalPropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FOptionalPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (OptionalProperty != nullptr)
+	if (Property != nullptr)
 	{
 		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(
 			SrcGarbageCollectionHandle);
 
-		OptionalProperty->InitializeValue(Dest);
+		Property->InitializeValue(Dest);
 
-		OptionalProperty->CopyCompleteValue(Dest, SrcOptional->GetData());
+		Property->CopyCompleteValue(Dest, SrcOptional->GetData());
 	}
 }
 
@@ -31,7 +31,7 @@ MonoObject* FOptionalPropertyDescriptor::NewWeakRef(void* InAddress) const
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	const auto OptionalHelper = new FOptionalHelper(OptionalProperty, InAddress);
+	const auto OptionalHelper = new FOptionalHelper(Property, InAddress);
 
 	FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, Object);
 

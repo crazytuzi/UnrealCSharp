@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Reflection/Property/FCompoundPropertyDescriptor.h"
+#include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 #include "UEVersion.h"
 
 #if UE_F_OPTIONAL_PROPERTY
-class FOptionalPropertyDescriptor final : public FCompoundPropertyDescriptor
+class FOptionalPropertyDescriptor final : public TCompoundPropertyDescriptor<FOptionalProperty>
 {
 public:
-	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
+	using TCompoundPropertyDescriptor::TCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

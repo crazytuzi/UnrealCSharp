@@ -4,12 +4,6 @@
 #include "Macro/NamespaceMacro.h"
 #include "UEVersion.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 BINDING_ENUM(EDayOfWeek)
 
 BINDING_ENUM(EMonthOfYear)
@@ -149,7 +143,3 @@ struct FRegisterDateTime
 };
 
 static FRegisterDateTime RegisterDateTime;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

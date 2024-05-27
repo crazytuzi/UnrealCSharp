@@ -3,7 +3,7 @@
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 {
-	if (InterfaceProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*Dest = NewWeakRef(Src);
 	}
@@ -11,14 +11,14 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (InterfaceProperty != nullptr)
+	if (Property != nullptr)
 	{
 		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 			SrcGarbageCollectionHandle);
 
-		InterfaceProperty->InitializeValue(Dest);
+		Property->InitializeValue(Dest);
 
 		const auto Interface = static_cast<FScriptInterface*>(Dest);
 
@@ -26,20 +26,20 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 
 		Interface->SetObject(Object);
 
-		Interface->SetInterface(Object ? Object->GetInterfaceAddress(InterfaceProperty->InterfaceClass) : nullptr);
+		Interface->SetInterface(Object ? Object->GetInterfaceAddress(Property->InterfaceClass) : nullptr);
 	}
 }
 
 bool FInterfacePropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	if (InterfaceProperty != nullptr)
+	if (Property != nullptr)
 	{
 		const auto InterfaceA = static_cast<FScriptInterface*>(const_cast<void*>(A));
 
 		const auto InterfaceB = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
 
-		return InterfaceProperty->Identical(InterfaceA, &InterfaceB, PortFlags);
+		return Property->Identical(InterfaceA, &InterfaceB, PortFlags);
 	}
 
 	return false;

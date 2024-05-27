@@ -2,8 +2,8 @@
 
 void FBoolPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (BoolProperty != nullptr)
+	if (Property != nullptr)
 	{
-		BoolProperty->SetPropertyValue(Dest, *static_cast<bool*>(Src));
+		Property->SetPropertyValue(Dest, *static_cast<bool*>(Src));
 	}
 }

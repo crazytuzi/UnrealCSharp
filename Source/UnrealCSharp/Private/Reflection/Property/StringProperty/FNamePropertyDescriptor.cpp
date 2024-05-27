@@ -1,14 +1,9 @@
 ﻿#include "Reflection/Property/StringProperty/FNamePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FNamePropertyDescriptor::FNamePropertyDescriptor(FProperty* InProperty):
-	FCompoundPropertyDescriptor(InProperty)
-{
-}
-
 void FNamePropertyDescriptor::Get(void* Src, void** Dest) const
 {
-	if (NameProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*Dest = NewWeakRef(Src);
 	}
@@ -16,25 +11,25 @@ void FNamePropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (NameProperty != nullptr)
+	if (Property != nullptr)
 	{
 		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
 		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FName>(
 			SrcGarbageCollectionHandle))
 		{
-			NameProperty->InitializeValue(Dest);
+			Property->InitializeValue(Dest);
 
-			NameProperty->SetPropertyValue(Dest, *SrcValue);
+			Property->SetPropertyValue(Dest, *SrcValue);
 		}
 	}
 }
 
 bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	if (NameProperty != nullptr)
+	if (Property != nullptr)
 	{
-		const auto NameA = NameProperty->GetPropertyValue(A);
+		const auto NameA = Property->GetPropertyValue(A);
 
 		const auto NameB = FCSharpEnvironment::GetEnvironment().GetString<FName>(
 			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));

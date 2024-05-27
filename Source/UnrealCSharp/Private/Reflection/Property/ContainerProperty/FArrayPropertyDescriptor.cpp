@@ -4,7 +4,7 @@
 
 void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 {
-	if (ArrayProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*Dest = NewWeakRef(Src);
 	}
@@ -12,7 +12,7 @@ void FArrayPropertyDescriptor::Get(void* Src, void** Dest) const
 
 void FArrayPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	if (ArrayProperty != nullptr)
+	if (Property != nullptr)
 	{
 		*static_cast<void**>(Dest) = NewRef(Src);
 	}
@@ -20,16 +20,16 @@ void FArrayPropertyDescriptor::Get(void* Src, void* Dest) const
 
 void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (ArrayProperty != nullptr)
+	if (Property != nullptr)
 	{
 		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			SrcGarbageCollectionHandle);
 
-		ArrayProperty->InitializeValue(Dest);
+		Property->InitializeValue(Dest);
 
-		ArrayProperty->CopyCompleteValue(Dest, SrcContainer->GetScriptArray());
+		Property->CopyCompleteValue(Dest, SrcContainer->GetScriptArray());
 	}
 }
 
@@ -41,10 +41,10 @@ MonoObject* FArrayPropertyDescriptor::NewRef(void* InAddress) const
 	{
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, InAddress);
+		const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress);
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-			InAddress, ArrayProperty);
+			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(OwnerGarbageCollectionHandle, InAddress, ArrayHelper,
 		                                                           Object);
@@ -57,7 +57,7 @@ MonoObject* FArrayPropertyDescriptor::NewWeakRef(void* InAddress) const
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	const auto ArrayHelper = new FArrayHelper(ArrayProperty->Inner, InAddress);
+	const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress);
 
 	FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Object);
 

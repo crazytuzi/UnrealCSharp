@@ -2,12 +2,6 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterInt32Range
 {
 	FRegisterInt32Range()
@@ -64,7 +58,3 @@ struct FRegisterInt32Range
 };
 
 static FRegisterInt32Range RegisterInt32Range;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

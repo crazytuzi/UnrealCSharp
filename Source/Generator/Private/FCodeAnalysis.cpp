@@ -13,7 +13,7 @@ void FCodeAnalysis::Compile()
 {
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-	const auto CodeAnalysisPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetPluginPath(), SCRIPT, CODE_ANALYSIS);
+	const auto CodeAnalysisPath = FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath();
 
 	const auto CompileParam = FString::Printf(TEXT(
 		"build \"%s/%s.csproj\" --nologo -c Debug"
@@ -72,11 +72,16 @@ void FCodeAnalysis::Compile()
 
 void FCodeAnalysis::Analysis()
 {
-	const auto Program = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetPluginPath(), SCRIPT, CODE_ANALYSIS,
+	const auto Program = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath(),
 	                                     FString::Printf(TEXT(
-		                                     "%s.exe"
+		                                     "%s%s"
 	                                     ),
-	                                                     *CODE_ANALYSIS
+	                                                     *CODE_ANALYSIS,
+#if PLATFORM_WINDOWS
+	                                                     TEXT(".exe")
+#else
+	                                                     TEXT("")
+#endif
 	                                     ));
 
 	const auto CompileParam = FString::Printf(TEXT(

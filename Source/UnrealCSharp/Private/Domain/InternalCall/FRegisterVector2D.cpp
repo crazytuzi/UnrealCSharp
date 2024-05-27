@@ -4,12 +4,6 @@
 #include "FRegisterForceInit.h"
 #include "UEVersion.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterVector2D
 {
 	static FVector2D MultipliesImplementation(const FVector2D& In, const FVector2D::FReal Scalar)
@@ -158,7 +152,3 @@ struct FRegisterVector2D
 };
 
 static FRegisterVector2D RegisterVector2D;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

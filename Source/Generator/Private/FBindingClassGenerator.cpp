@@ -1,5 +1,4 @@
 #include "FBindingClassGenerator.h"
-#include "FGeneratorCore.h"
 #include "Binding/FBinding.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BindingMacro.h"

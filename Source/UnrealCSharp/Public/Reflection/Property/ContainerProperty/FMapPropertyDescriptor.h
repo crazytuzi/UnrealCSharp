@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "FContainerPropertyDescriptor.h"
+#include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 
-class FMapPropertyDescriptor final : public FContainerPropertyDescriptor
+class FMapPropertyDescriptor final : public TCompoundPropertyDescriptor<FMapProperty>
 {
 public:
-	using FContainerPropertyDescriptor::FContainerPropertyDescriptor;
+	using TCompoundPropertyDescriptor::TCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

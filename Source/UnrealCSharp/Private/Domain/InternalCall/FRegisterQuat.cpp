@@ -3,12 +3,6 @@
 #include "Macro/NamespaceMacro.h"
 #include "FRegisterForceInit.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterQuat
 {
 	static FVector MultipliesImplementation(const FQuat& In, const FVector& Scalar)
@@ -158,7 +152,3 @@ struct FRegisterQuat
 };
 
 static FRegisterQuat RegisterQuat;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif

@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FCompoundPropertyDescriptor.h"
+#include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 
-class FSoftClassPropertyDescriptor final : public FCompoundPropertyDescriptor
+class FSoftClassPropertyDescriptor final : public TCompoundPropertyDescriptor<FSoftClassProperty>
 {
 public:
-	using FCompoundPropertyDescriptor::FCompoundPropertyDescriptor;
+	using TCompoundPropertyDescriptor::TCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

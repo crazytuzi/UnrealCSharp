@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "Reflection/Property/FPrimitivePropertyDescriptor.h"
+#include "Reflection/Property/TPrimitivePropertyDescriptor.inl"
 
-class FEnumPropertyDescriptor final : public FPrimitivePropertyDescriptor
+class FEnumPropertyDescriptor final : public TPrimitivePropertyDescriptor<FEnumProperty>
 {
 public:
-	using FPrimitivePropertyDescriptor::FPrimitivePropertyDescriptor;
+	using TPrimitivePropertyDescriptor::TPrimitivePropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest) const override;

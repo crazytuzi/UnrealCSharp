@@ -2,12 +2,6 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
-#ifdef _MSC_VER
-#pragma warning (push)
-
-#pragma warning (disable: 5103)
-#endif
-
 struct FRegisterFloatRangeBound
 {
 	FRegisterFloatRangeBound()
@@ -41,7 +35,3 @@ struct FRegisterFloatRangeBound
 };
 
 static FRegisterFloatRangeBound RegisterFloatRangeBound;
-
-#ifdef _MSC_VER
-#pragma warning (pop)
-#endif
