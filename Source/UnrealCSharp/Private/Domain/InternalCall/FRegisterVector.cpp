@@ -175,12 +175,12 @@ struct FRegisterVector
 			.Function("Normalize", BINDING_FUNCTION(&FVector::Normalize,
 			                                        TArray<FString>{"Tolerance"}, SMALL_NUMBER))
 			.Function("GetUnsafeNormal", BINDING_FUNCTION(&FVector::GetUnsafeNormal))
-			// @TODO
 			.Function("GetSafeNormal", BINDING_FUNCTION(&FVector::GetSafeNormal,
-			                                            TArray<FString>{"Tolerance", "ResultIfZero"}))
-			// @TODO
+			                                            TArray<FString>{"Tolerance", "ResultIfZero"},
+			                                            FVector::ZeroVector))
 			.Function("GetSafeNormal2D", BINDING_FUNCTION(&FVector::GetSafeNormal2D,
-			                                              TArray<FString>{"Tolerance", "ResultIfZero"}))
+			                                              TArray<FString>{"Tolerance", "ResultIfZero"},
+			                                              FVector::ZeroVector))
 			.Function("ToDirectionAndLength",
 			          BINDING_OVERLOAD(void(FVector::*)(FVector&, double&)const, &FVector::ToDirectionAndLength,
 			                           TArray<FString>{"OutDir", "OutLength"}))

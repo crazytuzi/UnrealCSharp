@@ -221,6 +221,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 		TArray<FString> FunctionParamName;
 
+		FString FunctionDefaultParamBody;
+
 		const auto& DefaultArguments = Function.GetDefaultArguments();
 
 		if (!Function.GetParamNames().IsEmpty())
@@ -242,7 +244,26 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 				if (Params.Num() - Index <= DefaultArguments.Num())
 				{
-					DefaultParam = GetFunctionDefaultParam(Params[Index], DefaultArguments[DefaultArgumentIndex]);
+					if (Params[Index]->IsPrimitive())
+					{
+						DefaultParam = FString::Printf(TEXT(
+							" = %s"),
+						                               *DefaultArguments[DefaultArgumentIndex]
+						);
+					}
+					else
+					{
+						DefaultParam = TEXT(" = null");
+
+						FunctionDefaultParamBody += FString::Printf(TEXT(
+							"%s\t\t\t%s ??= %s;\n"),
+						                                            FunctionDefaultParamBody.IsEmpty()
+							                                            ? TEXT("")
+							                                            : TEXT("\n"),
+						                                            *FunctionParamName[Index],
+						                                            *DefaultArguments[DefaultArgumentIndex]
+						);
+					}
 
 					DefaultArgumentIndex++;
 				}
@@ -408,6 +429,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		}
 
 		auto FunctionImplementationBody = FString::Printf(TEXT(
+			"%s"
+			"%s"
 			"\t\t\t%s"
 			"%s"
 			"%s"
@@ -415,6 +438,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			"%s"
 			"%s"
 		),
+		                                                  *FunctionDefaultParamBody,
+		                                                  FunctionDefaultParamBody.IsEmpty() ? TEXT("") : TEXT("\n"),
 		                                                  Function.GetReturn() != nullptr && !FunctionRefParamIndex.
 		                                                  IsEmpty()
 			                                                  ? TEXT("var __ReturnValue = ")
@@ -544,18 +569,6 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + TEXT(".cs");
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
-}
-
-FString FBindingClassGenerator::GetFunctionDefaultParam(const FTypeInfo* InTypeInfo, const FString& InDefaultArgument)
-{
-	if (InTypeInfo->IsPrimitive())
-	{
-		return FString::Printf(TEXT(" = %s"), *InDefaultArgument);
-	}
-	else
-	{
-		return FString::Printf(TEXT(" = null"));
-	}
 }
 
 void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClass)
