@@ -2,7 +2,6 @@
 #if UE_F_OPTIONAL_PROPERTY
 #include "Environment/FCSharpEnvironment.h"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
-#include "UObject/PropertyOptional.h"
 
 void FOptionalPropertyDescriptor::Get(void* Src, void** Dest) const
 {

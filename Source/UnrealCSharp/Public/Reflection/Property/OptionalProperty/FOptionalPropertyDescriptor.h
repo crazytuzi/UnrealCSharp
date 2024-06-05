@@ -2,6 +2,9 @@
 
 #include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 #include "UEVersion.h"
+#if UE_F_OPTIONAL_PROPERTY
+#include "UObject/PropertyOptional.h"
+#endif
 
 #if UE_F_OPTIONAL_PROPERTY
 class FOptionalPropertyDescriptor final : public TCompoundPropertyDescriptor<FOptionalProperty>
