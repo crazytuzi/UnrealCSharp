@@ -15,7 +15,7 @@ struct FBindClass
 	TSubclassOf<UObject> Class;
 
 	UPROPERTY(EditAnywhere)
-	bool bNeedMonoClass;
+	bool bNeedMonoClass = true;
 };
 
 /**

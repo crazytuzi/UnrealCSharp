@@ -8,17 +8,18 @@ struct TDefaultArgument
 template <typename T>
 struct TDefaultArgumentBuilder
 {
-	static FString GetImplementation(const bool bIsFirst)
+	template <auto Prefix>
+	static FString GetImplementation()
 	{
 		return {};
 	}
 
-	template <typename DefaultArgument, typename... Args>
-	static FString GetImplementation(const bool bIsFirst, DefaultArgument InDefaultArgument, Args&&... InParams)
+	template <auto Prefix, typename DefaultArgument, typename... Args>
+	static FString GetImplementation(DefaultArgument InDefaultArgument, Args&&... InParams)
 	{
-		return (bIsFirst ? TEXT("") : TEXT(" ,")) +
+		return Prefix +
 			TDefaultArgument<DefaultArgument, DefaultArgument>::Get(InDefaultArgument) +
-			GetImplementation(false, InParams...);
+			GetImplementation<Comma>(InParams...);
 	}
 
 	template <typename... Args>
@@ -27,9 +28,13 @@ struct TDefaultArgumentBuilder
 		return FString::Printf(TEXT(
 			"new %s(%s)"),
 		                       *TName<T, T>::Get(),
-		                       *GetImplementation(true, InDefaultArguments...)
+		                       *GetImplementation<Space>(InDefaultArguments...)
 		);
 	}
+
+	static constexpr char Space[] = "";
+
+	static constexpr char Comma[] = " ,";
 };
 
 template <typename T>
