@@ -142,7 +142,7 @@ struct FRegisterArray
 					                         FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
 
-		return 0;
+		return INDEX_NONE;
 	}
 
 	static int32 FindLastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
@@ -158,7 +158,7 @@ struct FRegisterArray
 						                             InValue)));
 		}
 
-		return 0;
+		return INDEX_NONE;
 	}
 
 	static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,

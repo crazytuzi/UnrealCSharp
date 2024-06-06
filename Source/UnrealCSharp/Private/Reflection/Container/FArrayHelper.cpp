@@ -82,7 +82,7 @@ bool FArrayHelper::Identical(const FArrayHelper* InA, const FArrayHelper* InB)
 
 		const auto ItemB = ScriptArrayHelperB.GetRawPtr(Index);
 
-		if (!InnerPropertyDescriptor->Identical(ItemA, ItemB))
+		if (!InnerPropertyDescriptor->GetProperty()->Identical(ItemA, ItemB))
 		{
 			return false;
 		}
@@ -178,7 +178,7 @@ int32 FArrayHelper::FindLast(const void* InValue) const
 		}
 	}
 
-	return 0;
+	return INDEX_NONE;
 }
 
 bool FArrayHelper::Contains(const void* InValue) const
@@ -243,22 +243,27 @@ void FArrayHelper::Reset(const int32 InNewSize) const
 {
 	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	ScriptArrayHelper.Resize(InNewSize);
+	if (InNewSize <= ScriptArray->GetSlack() + ScriptArray->Num())
+	{
+		ScriptArrayHelper.RemoveValues(0, ScriptArray->Num());
+	}
+	else
+	{
+		ScriptArrayHelper.EmptyValues(InNewSize);
+	}
 }
 
 void FArrayHelper::Empty(const int32 InSlack) const
 {
 	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	// @TODO
-	ScriptArrayHelper.Resize(InSlack);
+	ScriptArrayHelper.EmptyValues(InSlack);
 }
 
 void FArrayHelper::SetNum(const int32 InNewNum, const bool bAllowShrinking) const
 {
 	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
 
-	// @TODO
 	ScriptArrayHelper.Resize(InNewNum);
 
 	if (bAllowShrinking)
