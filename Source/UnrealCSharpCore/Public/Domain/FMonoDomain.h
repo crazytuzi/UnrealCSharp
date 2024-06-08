@@ -90,6 +90,8 @@ public:
 
 	static MonoType* Signature_Get_Return_Type(MonoMethodSignature* InMonoMethodSignature);
 
+	static mono_bool Signature_Is_Instance(MonoMethodSignature* InMonoMethodSignature);
+
 	static MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType);
 
 	static MonoClass* Type_Get_Class(MonoType* InMonoType);

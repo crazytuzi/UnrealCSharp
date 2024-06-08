@@ -986,6 +986,11 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* In
 
 				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
 
+				if (!!!FMonoDomain::Signature_Is_Instance(Signature))
+				{
+					Function->FunctionFlags |= FUNC_Static;
+				}
+
 				Function->MinAlignment = 1;
 
 				if (const auto ReturnParamType = FMonoDomain::Signature_Get_Return_Type(Signature))

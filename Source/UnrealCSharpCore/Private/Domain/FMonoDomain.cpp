@@ -338,6 +338,11 @@ MonoType* FMonoDomain::Signature_Get_Return_Type(MonoMethodSignature* InMonoMeth
 	return InMonoMethodSignature != nullptr ? mono_signature_get_return_type(InMonoMethodSignature) : nullptr;
 }
 
+mono_bool FMonoDomain::Signature_Is_Instance(MonoMethodSignature* InMonoMethodSignature)
+{
+	return InMonoMethodSignature != nullptr ? mono_signature_is_instance(InMonoMethodSignature) : false;
+}
+
 MonoType* FMonoDomain::Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType)
 {
 	return InMonoReflectionType != nullptr ? mono_reflection_type_get_type(InMonoReflectionType) : nullptr;

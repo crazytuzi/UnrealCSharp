@@ -240,6 +240,11 @@ MonoType* FDomain::Signature_Get_Return_Type(MonoMethodSignature* InMonoMethodSi
 	return FMonoDomain::Signature_Get_Return_Type(InMonoMethodSignature);
 }
 
+mono_bool FDomain::Signature_Is_Instance(MonoMethodSignature* InMonoMethodSignature) const
+{
+	return FMonoDomain::Signature_Is_Instance(InMonoMethodSignature);
+}
+
 MonoType* FDomain::Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType) const
 {
 	return FMonoDomain::Reflection_Type_Get_Type(InMonoReflectionType);
