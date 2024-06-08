@@ -5,14 +5,14 @@
 #include "Template/TIsTSoftObjectPtr.inl"
 #include "Template/TIsTSoftClassPtr.inl"
 #include "Template/TIsTScriptInterface.inl"
-#include "TValue.inl"
+#include "TValueWrapper.inl"
 #include "TValueMapping.inl"
 
 class FMultiRegistry
 {
 public:
 	template <typename T, template<typename...> class IsType>
-	struct TMultiAddress : TValue<T>
+	struct TMultiAddress : TValueWrapper<T>
 	{
 		template <typename U>
 		struct TIsType
@@ -21,7 +21,7 @@ public:
 		};
 
 		TMultiAddress(T InValue, const bool InNeedFree):
-			TValue<T>(InValue),
+			TValueWrapper<T>(InValue),
 			bNeedFree(InNeedFree)
 		{
 		}

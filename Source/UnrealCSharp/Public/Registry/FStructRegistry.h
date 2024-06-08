@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "TValue.inl"
+#include "TValueWrapper.inl"
 #include "TValueMapping.inl"
 #include "mono/metadata/object-forward.h"
 
-struct FStructAddressBase : TValue<TWeakObjectPtr<UScriptStruct>>
+struct FStructAddressBase : TValueWrapper<TWeakObjectPtr<UScriptStruct>>
 {
 	FStructAddressBase(UScriptStruct* InScriptStruct, void* InAddress):
-		TValue(InScriptStruct),
+		TValueWrapper(InScriptStruct),
 		Address(InAddress)
 	{
 	}
