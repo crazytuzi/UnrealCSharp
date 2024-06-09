@@ -15,12 +15,9 @@ namespace Script.CoreUObject
         public static implicit operator FString(string InValue) => new(InValue);
 
         public static bool operator ==(FString A, FString B) =>
-            FStringImplementation.FString_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+            Utils.EqualsTo(A, B, FStringImplementation.FString_IdenticalImplementation);
 
-        public static bool operator !=(FString A, FString B) =>
-            !FStringImplementation.FString_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static bool operator !=(FString A, FString B) => !(A == B);
 
         public override bool Equals(object Other) => this == Other as FString;
 

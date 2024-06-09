@@ -18,12 +18,9 @@ namespace Script.CoreUObject
         public static implicit operator TScriptInterface<T>(T InObject) => new(InObject);
 
         public static bool operator ==(TScriptInterface<T> A, TScriptInterface<T> B) =>
-            TScriptInterfaceImplementation.TScriptInterface_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+            Utils.EqualsTo(A, B, TScriptInterfaceImplementation.TScriptInterface_IdenticalImplementation);
 
-        public static bool operator !=(TScriptInterface<T> A, TScriptInterface<T> B) =>
-            !TScriptInterfaceImplementation.TScriptInterface_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static bool operator !=(TScriptInterface<T> A, TScriptInterface<T> B) => !(A == B);
 
         public override bool Equals(object Other) => this == Other as TScriptInterface<T>;
 

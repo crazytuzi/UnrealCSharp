@@ -6,6 +6,19 @@
 
 struct FRegisterObject
 {
+	static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
+	{
+		if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetObject(InA))
+		{
+			if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetObject(InB))
+			{
+				return FoundA == FoundB;
+			}
+		}
+
+		return false;
+	}
+
 	static MonoObject* StaticClassImplementation(MonoString* InClassName)
 	{
 		const auto ClassName = StringCast<TCHAR>(
@@ -73,6 +86,7 @@ struct FRegisterObject
 	FRegisterObject()
 	{
 		TBindingClassBuilder<UObject>(NAMESPACE_LIBRARY)
+			.Function("Identical", IdenticalImplementation)
 			.Function("StaticClass", StaticClassImplementation)
 			.Function("GetClass", GetClassImplementation)
 			.Function("GetName", GetNameImplementation)

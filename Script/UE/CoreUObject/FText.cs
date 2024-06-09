@@ -15,12 +15,9 @@ namespace Script.CoreUObject
         public static implicit operator FText(string InValue) => new(InValue);
 
         public static bool operator ==(FText A, FText B) =>
-            FTextImplementation.FText_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+            Utils.EqualsTo(A, B, FTextImplementation.FText_IdenticalImplementation);
 
-        public static bool operator !=(FText A, FText B) =>
-            !FTextImplementation.FText_IdenticalImplementation(
-                A?.GarbageCollectionHandle ?? nint.Zero, B?.GarbageCollectionHandle ?? nint.Zero);
+        public static bool operator !=(FText A, FText B) => !(A == B);
 
         public override bool Equals(object Other) => this == Other as FText;
 
