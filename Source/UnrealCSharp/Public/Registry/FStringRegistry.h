@@ -1,16 +1,16 @@
 #pragma once
 
-#include "TValue.inl"
+#include "TValueWrapper.inl"
 #include "TValueMapping.inl"
 
 class FStringRegistry
 {
 public:
 	template <typename T>
-	struct TStringAddress : TValue<T>
+	struct TStringAddress : TValueWrapper<T>
 	{
 		TStringAddress(T InValue, const bool InNeedFree):
-			TValue<T>(InValue),
+			TValueWrapper<T>(InValue),
 			bNeedFree(InNeedFree)
 		{
 		}

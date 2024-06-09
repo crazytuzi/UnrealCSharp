@@ -104,6 +104,8 @@ public:
 
 	MonoType* Signature_Get_Return_Type(MonoMethodSignature* InMonoMethodSignature) const;
 
+	mono_bool Signature_Is_Instance(MonoMethodSignature* InMonoMethodSignature) const;
+
 	MonoType* Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType) const;
 
 	MonoClass* Type_Get_Class(MonoType* InMonoType) const;

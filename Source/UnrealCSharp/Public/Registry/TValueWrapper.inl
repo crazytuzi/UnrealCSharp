@@ -1,11 +1,11 @@
 #pragma once
 
 template <typename T>
-struct TValue
+struct TValueWrapper
 {
 	typedef T Type;
 
-	explicit TValue(Type InValue):
+	explicit TValueWrapper(const Type& InValue):
 		Value(InValue)
 	{
 	}

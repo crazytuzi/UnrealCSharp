@@ -3,7 +3,6 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
-#include "Macro/NamespaceMacro.h"
 #include "FRegisterObjectFlags.h"
 
 BINDING_ENUM(FActorSpawnParameters::ESpawnActorNameMode)
@@ -27,9 +26,74 @@ static FRegisterSpawnActorNameMode RegisterSpawnActorNameMode;
 
 struct FRegisterActorSpawnParameters
 {
+	static bool GetbNoFailImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+	{
+		if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+			FActorSpawnParameters>(InGarbageCollectionHandle))
+		{
+			return FoundActorSpawnParameters->bNoFail;
+		}
+
+		return false;
+	}
+
+	static void SetbNoFailImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                     const bool InValue)
+	{
+		if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+			FActorSpawnParameters>(InGarbageCollectionHandle))
+		{
+			FoundActorSpawnParameters->bNoFail = InValue;
+		}
+	}
+
+	static bool GetbDeferConstructionImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+	{
+		if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+			FActorSpawnParameters>(InGarbageCollectionHandle))
+		{
+			return FoundActorSpawnParameters->bDeferConstruction;
+		}
+
+		return false;
+	}
+
+	static void SetbDeferConstructionImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+	                                                const bool InValue)
+	{
+		if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+			FActorSpawnParameters>(InGarbageCollectionHandle))
+		{
+			FoundActorSpawnParameters->bDeferConstruction = InValue;
+		}
+	}
+
+	static bool GetbAllowDuringConstructionScriptImplementation(
+		const FGarbageCollectionHandle InGarbageCollectionHandle)
+	{
+		if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+			FActorSpawnParameters>(InGarbageCollectionHandle))
+		{
+			return FoundActorSpawnParameters->bAllowDuringConstructionScript;
+		}
+
+		return false;
+	}
+
+	static void SetbAllowDuringConstructionScriptImplementation(
+		const FGarbageCollectionHandle InGarbageCollectionHandle,
+		const bool InValue)
+	{
+		if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+			FActorSpawnParameters>(InGarbageCollectionHandle))
+		{
+			FoundActorSpawnParameters->bAllowDuringConstructionScript = InValue;
+		}
+	}
+
 	FRegisterActorSpawnParameters()
 	{
-		TBindingClassBuilder<FActorSpawnParameters, true>(NAMESPACE_BINDING)
+		TBindingClassBuilder<FActorSpawnParameters, true>(NAMESPACE_LIBRARY)
 			.Property("Name", BINDING_PROPERTY(&FActorSpawnParameters::Name))
 			.Property("Template", BINDING_PROPERTY(&FActorSpawnParameters::Template))
 			.Property("Owner", BINDING_PROPERTY(&FActorSpawnParameters::Owner))
@@ -38,12 +102,14 @@ struct FRegisterActorSpawnParameters
 			.Property("OverrideParentComponent", BINDING_PROPERTY(&FActorSpawnParameters::OverrideParentComponent))
 			.Property("SpawnCollisionHandlingOverride",
 			          BINDING_PROPERTY(&FActorSpawnParameters::SpawnCollisionHandlingOverride))
-			// @TODO
-			// bNoFail
-			// bDeferConstruction
-			// bAllowDuringConstructionScript
 			.Property("NameMode", BINDING_PROPERTY(&FActorSpawnParameters::NameMode))
-			.Property("ObjectFlags", BINDING_PROPERTY(&FActorSpawnParameters::ObjectFlags));
+			.Property("ObjectFlags", BINDING_PROPERTY(&FActorSpawnParameters::ObjectFlags))
+			.Function("GetbNoFail", GetbNoFailImplementation)
+			.Function("SetbNoFail", SetbNoFailImplementation)
+			.Function("GetbDeferConstruction", GetbDeferConstructionImplementation)
+			.Function("SetbDeferConstruction", SetbDeferConstructionImplementation)
+			.Function("GetbAllowDuringConstructionScript", GetbAllowDuringConstructionScriptImplementation)
+			.Function("SetbAllowDuringConstructionScript", SetbAllowDuringConstructionScriptImplementation);
 	}
 };
 
