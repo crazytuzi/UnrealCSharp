@@ -701,8 +701,6 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 {
 	const auto AssemblyName = mono_assembly_name_get_name(InAssemblyName);
 
-	TArray<uint8> Data;
-
 #if WITH_EDITOR
 	auto Path = FString::Printf(TEXT(
 		"%s/Source/ThirdParty/Mono/lib/%s/%s/net"),
@@ -843,7 +841,9 @@ void FMonoDomain::DeinitializeAssemblyLoadContext()
 
 	const auto UnloadMethod = Class_Get_Method_From_Name(AssemblyLoadContextClass, TEXT("Unload"), 0);
 
-	Runtime_Invoke(UnloadMethod, AssemblyLoadContextObject, nullptr);
+	MonoObject* Exception = nullptr;
+
+	Runtime_Invoke(UnloadMethod, AssemblyLoadContextObject, nullptr, &Exception);
 
 	GCHandle_Free_V2(AssemblyLoadContextGCHandle);
 
