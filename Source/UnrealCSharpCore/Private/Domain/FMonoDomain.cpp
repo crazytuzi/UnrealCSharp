@@ -4,6 +4,7 @@
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/MonoMacro.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -699,7 +700,14 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Params(MonoClass* InMonoClass, co
 MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath,
                                                void* InUserData)
 {
-	const auto AssemblyName = mono_assembly_name_get_name(InAssemblyName);
+	auto AssemblyName = mono_assembly_name_get_name(InAssemblyName);
+
+#if WITH_EDITOR
+	if (AssemblyName == ASSEMBLY_CORE_LIB_RESOURCE_NAME)
+	{
+		AssemblyName = StringCast<ANSICHAR>(*ASSEMBLY_CORE_LIB_NAME).Get();
+	}
+#endif
 
 #if WITH_EDITOR
 	auto Path = FString::Printf(TEXT(

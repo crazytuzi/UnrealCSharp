@@ -54,6 +54,21 @@ struct FRegisterVector
 		return In * Scale;
 	}
 
+	static FVector MultipliesImplementation(const int32 Scale, const FVector& In)
+	{
+		return Scale * In;
+	}
+
+	static FVector MultipliesImplementation(const float Scale, const FVector& In)
+	{
+		return Scale * In;
+	}
+
+	static FVector MultipliesImplementation(const double Scale, const FVector& In)
+	{
+		return Scale * In;
+	}
+
 	static FVector DividesImplementation(const FVector& In, const int32 Scale)
 	{
 		return In / Scale;
@@ -109,6 +124,12 @@ struct FRegisterVector
 			          BINDING_OVERLOAD(FVector(*)(const FVector&, const float), &MultipliesImplementation))
 			.Function("operator *", FUNCTION_MULTIPLIES,
 			          BINDING_OVERLOAD(FVector(*)(const FVector&, const double), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector(*)(const int32, const FVector&), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector(*)(const float, const FVector&), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector(*)(const double, const FVector&), &MultipliesImplementation))
 			.Function("operator /", FUNCTION_DIVIDES,
 			          BINDING_OVERLOAD(FVector(*)(const FVector&, const int32), &DividesImplementation))
 			.Function("operator /", FUNCTION_DIVIDES,
@@ -177,10 +198,10 @@ struct FRegisterVector
 			.Function("GetUnsafeNormal", BINDING_FUNCTION(&FVector::GetUnsafeNormal))
 			.Function("GetSafeNormal", BINDING_FUNCTION(&FVector::GetSafeNormal,
 			                                            TArray<FString>{"Tolerance", "ResultIfZero"},
-			                                            FVector::ZeroVector))
+			                                            SMALL_NUMBER, FVector::ZeroVector))
 			.Function("GetSafeNormal2D", BINDING_FUNCTION(&FVector::GetSafeNormal2D,
 			                                              TArray<FString>{"Tolerance", "ResultIfZero"},
-			                                              FVector::ZeroVector))
+			                                              SMALL_NUMBER, FVector::ZeroVector))
 			.Function("ToDirectionAndLength",
 			          BINDING_OVERLOAD(void(FVector::*)(FVector&, double&)const, &FVector::ToDirectionAndLength,
 			                           TArray<FString>{"OutDir", "OutLength"}))

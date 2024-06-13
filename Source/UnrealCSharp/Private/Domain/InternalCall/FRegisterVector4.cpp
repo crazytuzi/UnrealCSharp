@@ -20,6 +20,21 @@ struct FRegisterVector4
 		return In * Scale;
 	}
 
+	static FVector4 MultipliesImplementation(const int32 Scale, const FVector4& In)
+	{
+		return Scale * In;
+	}
+
+	static FVector4 MultipliesImplementation(const float Scale, const FVector4& In)
+	{
+		return Scale * In;
+	}
+
+	static FVector4 MultipliesImplementation(const double Scale, const FVector4& In)
+	{
+		return Scale * In;
+	}
+
 	static FVector4 DividesImplementation(const FVector4& In, const int32 Scale)
 	{
 		return In / Scale;
@@ -64,6 +79,12 @@ struct FRegisterVector4
 			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const float), &MultipliesImplementation))
 			.Function("operator *", FUNCTION_MULTIPLIES,
 			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const double), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector4(*)(const int32, const FVector4&), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector4(*)(const float, const FVector4&), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector4(*)(const double, const FVector4&), &MultipliesImplementation))
 			.Function("operator /", FUNCTION_DIVIDES,
 			          BINDING_OVERLOAD(FVector4(*)(const FVector4&, const int32), &DividesImplementation))
 			.Function("operator /", FUNCTION_DIVIDES,

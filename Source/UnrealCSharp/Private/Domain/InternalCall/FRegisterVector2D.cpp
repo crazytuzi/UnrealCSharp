@@ -11,6 +11,21 @@ struct FRegisterVector2D
 		return In * Scalar;
 	}
 
+	static FVector2D MultipliesImplementation(const int32 Scale, const FVector2D& In)
+	{
+		return Scale * In;
+	}
+
+	static FVector2D MultipliesImplementation(const float Scale, const FVector2D& In)
+	{
+		return Scale * In;
+	}
+
+	static FVector2D MultipliesImplementation(const double Scale, const FVector2D& In)
+	{
+		return Scale * In;
+	}
+
 	static FVector2D DividesImplementation(const FVector2D& In, const FVector2D::FReal Scalar)
 	{
 		return In / Scalar;
@@ -69,7 +84,15 @@ struct FRegisterVector2D
 			.UnaryMinus()
 			.Subscript(BINDING_SUBSCRIPT(FVector2D, FVector2D::FReal, int32,
 			                             TArray<FString>{"Index"}))
-			.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector2D(*)(const FVector2D&, const FVector2D::FReal),
+			                           &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector2D(*)(const int32, const FVector2D&), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector2D(*)(const float, const FVector2D&), &MultipliesImplementation))
+			.Function("operator *", FUNCTION_MULTIPLIES,
+			          BINDING_OVERLOAD(FVector2D(*)(const double, const FVector2D&), &MultipliesImplementation))
 			.Function("operator /", FUNCTION_DIVIDES, BINDING_FUNCTION(&DividesImplementation))
 			.Function("operator +", FUNCTION_PLUS, BINDING_FUNCTION(&PlusImplementation))
 			.Function("operator -", FUNCTION_MINUS, BINDING_FUNCTION(&MinusImplementation))
