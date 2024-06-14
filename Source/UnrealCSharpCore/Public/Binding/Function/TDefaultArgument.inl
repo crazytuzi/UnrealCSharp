@@ -1,5 +1,65 @@
 ﻿#pragma once
 
+#include <iomanip>
+#include <sstream>
+
+inline FString SanitizeFloat(const double InFloat, const int32 InMinFractionalDigits = 1)
+{
+	std::stringstream StringStream;
+
+	StringStream << std::fixed << std::setprecision(std::numeric_limits<float>::max_digits10) << InFloat;
+
+	FString TempString = StringStream.str().c_str();
+
+	int32 TrimIndex = INDEX_NONE;
+
+	int32 DecimalSeparatorIndex = INDEX_NONE;
+
+	for (auto CharIndex = TempString.Len() - 1; CharIndex >= 0; --CharIndex)
+	{
+		const auto Char = TempString[CharIndex];
+
+		if (Char == TEXT('.'))
+		{
+			DecimalSeparatorIndex = CharIndex;
+
+			TrimIndex = FMath::Max(TrimIndex, DecimalSeparatorIndex);
+
+			break;
+		}
+
+		if (TrimIndex == INDEX_NONE && Char != TEXT('0'))
+		{
+			TrimIndex = CharIndex + 1;
+		}
+	}
+
+	TempString.RemoveAt(TrimIndex, TempString.Len() - TrimIndex, false);
+
+	if (InMinFractionalDigits > 0)
+	{
+		if (TrimIndex == DecimalSeparatorIndex)
+		{
+			TempString.AppendChar(TEXT('.'));
+		}
+
+		const auto NumFractionalDigits = TempString.Len() - DecimalSeparatorIndex - 1;
+
+		if (const auto FractionalDigitsToPad = InMinFractionalDigits - NumFractionalDigits;
+			FractionalDigitsToPad > 0)
+		{
+			TempString.Reserve(TempString.Len() + FractionalDigitsToPad);
+
+			for (auto Cx = 0; Cx < FractionalDigitsToPad; ++Cx)
+			{
+				TempString.AppendChar(TEXT('0'));
+			}
+		}
+	}
+
+	return TempString;
+}
+
 template <typename T, typename Enable = void>
 struct TDefaultArgument
 {
@@ -123,7 +183,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, floa
 {
 	static FString Get(const float InValue)
 	{
-		return FString::Printf(TEXT("%sf"), *FString::SanitizeFloat(InValue));
+		return FString::Printf(TEXT("%sf"), *SanitizeFloat(InValue));
 	}
 };
 
@@ -171,7 +231,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, doub
 {
 	static FString Get(const double InValue)
 	{
-		return FString::SanitizeFloat(InValue);
+		return SanitizeFloat(InValue);
 	}
 };
 

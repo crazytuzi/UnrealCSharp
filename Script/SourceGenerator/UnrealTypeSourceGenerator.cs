@@ -104,13 +104,13 @@ namespace SourceGenerator
                     if (type.Value.HasOperatorEqualTo == false)
                     {
                         source +=
-                            $"\t\tpublic static bool operator ==({type.Value.Name} A, {type.Value.Name} B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
+                            $"\t\tpublic static bool operator ==({type.Value.Name} A, {type.Value.Name} B) => Utils.EqualsTo(A, B, UStructImplementation.UStruct_IdenticalImplementation);\n";
                     }
 
                     if (type.Value.HasOperatorNotEqualTo == false)
                     {
                         source +=
-                            $"\t\tpublic static bool operator !=({type.Value.Name} A, {type.Value.Name} B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A?.GarbageCollectionHandle??nint.Zero, B?.GarbageCollectionHandle??nint.Zero);\n";
+                            $"\t\tpublic static bool operator !=({type.Value.Name} A, {type.Value.Name} B) => !(A == B);\n";
                     }
 
                     source += "\t}\n";

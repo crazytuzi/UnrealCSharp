@@ -148,21 +148,15 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	);
 
 	IdenticalContent = FString::Printf(TEXT(
-		"\t\tpublic static bool operator ==(%s A, %s B) => UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A?.%s\?\?nint.Zero, B?.%s\?\?nint.Zero);\n\n"
-		"\t\tpublic static bool operator !=(%s A, %s B) => !UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A?.%s\?\?nint.Zero, B?.%s\?\?nint.Zero);\n\n"
+		"\t\tpublic static bool operator ==(%s A, %s B) => Utils.EqualsTo(A, B, UStructImplementation.UStruct_IdenticalImplementation);\n\n"
+		"\t\tpublic static bool operator !=(%s A, %s B) => !(A == B);\n\n"
 		"\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
 		"\t\tpublic override int GetHashCode() => (int)%s;\n"
 	),
 	                                   *ClassContent,
 	                                   *ClassContent,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *ClassContent,
 	                                   *ClassContent,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *ClassContent,
 	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);

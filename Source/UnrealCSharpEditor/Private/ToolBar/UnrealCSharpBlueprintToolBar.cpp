@@ -68,16 +68,32 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 			if (Blueprint.IsValid())
 			{
 				const auto Content = FString::Printf(TEXT(
-					"using Script.CoreUObject;\n\n"
+					"using Script.CoreUObject;\n"
+					"using Script.Engine;\n\n"
 					"namespace %s\n"
 					"{\n"
 					"\t[Override]\n"
 					"\tpublic partial class %s\n"
 					"\t{\n"
+					"\t\tprivate %s()\n"
+					"\t\t{\n"
+					"\t\t}\n\n"
+					"\t\t[Override]\n"
+					"\t\tpublic override void ReceiveBeginPlay()\n"
+					"\t\t{\n"
+					"\t\t\tbase.ReceiveBeginPlay();\n"
+					"\t\t}\n\n"
+					"\t\t[Override]\n"
+					"\t\tpublic override void ReceiveEndPlay(EEndPlayReason EndPlayReason)\n"
+					"\t\t{\n"
+					"\t\t\tbase.ReceiveEndPlay(EndPlayReason);\n"
+					"\t\t}\n"
 					"\t}\n"
 					"}"
 				),
 				                                     *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+					                                     Blueprint->GeneratedClass),
+				                                     *FUnrealCSharpFunctionLibrary::GetFullClass(
 					                                     Blueprint->GeneratedClass),
 				                                     *FUnrealCSharpFunctionLibrary::GetFullClass(
 					                                     Blueprint->GeneratedClass));

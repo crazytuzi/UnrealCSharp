@@ -11,7 +11,7 @@ namespace Script.CoreUObject
         private static bool IsOverrideType(Type InType) => InType.IsDefined(typeof(OverrideAttribute), true);
 
         private static bool IsOverrideMethod(MethodInfo InMethodInfo) =>
-            InMethodInfo.IsDefined(typeof(OverrideAttribute), true);
+            InMethodInfo.IsDefined(typeof(OverrideAttribute), false);
 
         public static string GetPathName(Type InType) => InType.GetCustomAttribute<PathNameAttribute>(true)?.PathName;
 
@@ -68,6 +68,38 @@ namespace Script.CoreUObject
             }
 
             return Types.ToArray();
+        }
+
+        private static bool EqualsTo<T>(T A, T B, Func<bool> IdenticalImplementation)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) || IdenticalImplementation();
+        }
+
+        public static bool EqualsTo<T>(T A, T B, Func<nint, nint, bool> IdenticalImplementation)
+            where T : IGarbageCollectionHandle
+        {
+            return EqualsTo(A, B, () => A.GarbageCollectionHandle == B.GarbageCollectionHandle ||
+                                        IdenticalImplementation(A.GarbageCollectionHandle,
+                                            B.GarbageCollectionHandle));
+        }
+
+        public static bool EqualsTo<T>(T A, T B, Func<nint, nint, nint, bool> IdenticalImplementation)
+            where T : IStaticStruct, IGarbageCollectionHandle
+        {
+            return EqualsTo(A, B, () => A.GarbageCollectionHandle == B.GarbageCollectionHandle ||
+                                        IdenticalImplementation(T.StaticStruct().GarbageCollectionHandle,
+                                            A.GarbageCollectionHandle,
+                                            B.GarbageCollectionHandle));
         }
     }
 }
