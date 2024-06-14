@@ -162,52 +162,52 @@ bool FCSharpFunctionDescriptor::CallCSharp(FFrame& InStack, RESULT_DECL)
 		ARRAY_SET(CSharpParams, MonoObject*, Index, static_cast<MonoObject*>(Object));
 	}
 
-	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InStack.Object))
-	{
-		const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
-			Method, FoundMonoObject, CSharpParams);
+	const auto FoundMonoObject = OriginalFunctionFlags & FUNC_Static
+		                             ? nullptr
+		                             : FCSharpEnvironment::GetEnvironment().GetObject(InStack.Object);
 
-		if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
+	if (const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
+			Method, FoundMonoObject, CSharpParams);
+		ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
+	{
+		if (ReturnPropertyDescriptor->IsPrimitiveProperty())
 		{
-			if (ReturnPropertyDescriptor->IsPrimitiveProperty())
+			if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
+				Object_Unbox(ReturnValue))
 			{
-				if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					Object_Unbox(ReturnValue))
-				{
-					ReturnPropertyDescriptor->Set(UnBoxResultValue, RESULT_PARAM);
-				}
-			}
-			else
-			{
-				ReturnPropertyDescriptor->Set(
-					FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(ReturnValue),
-					RESULT_PARAM);
+				ReturnPropertyDescriptor->Set(UnBoxResultValue, RESULT_PARAM);
 			}
 		}
-
-		for (const auto& Index : OutPropertyIndexes)
+		else
 		{
-			if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
-			{
-				OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
+			ReturnPropertyDescriptor->Set(
+				FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(ReturnValue),
+				RESULT_PARAM);
+		}
+	}
 
-				if (OutParams != nullptr)
+	for (const auto& Index : OutPropertyIndexes)
+	{
+		if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
+		{
+			OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
+
+			if (OutParams != nullptr)
+			{
+				if (OutPropertyDescriptor->IsPrimitiveProperty())
 				{
-					if (OutPropertyDescriptor->IsPrimitiveProperty())
+					if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
+						Object_Unbox(ARRAY_GET(CSharpParams, MonoObject*, Index)))
 					{
-						if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-							Object_Unbox(ARRAY_GET(CSharpParams, MonoObject*, Index)))
-						{
-							OutPropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
-						}
+						OutPropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
 					}
-					else
-					{
-						OutPropertyDescriptor->Set(
-							FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-								ARRAY_GET(CSharpParams, MonoObject*, Index)),
-							OutParams->PropAddr);
-					}
+				}
+				else
+				{
+					OutPropertyDescriptor->Set(
+						FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+							ARRAY_GET(CSharpParams, MonoObject*, Index)),
+						OutParams->PropAddr);
 				}
 			}
 		}
