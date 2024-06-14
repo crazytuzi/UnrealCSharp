@@ -9,6 +9,68 @@ void FCodeAnalysis::CodeAnalysis()
 	Analysis();
 }
 
+void FCodeAnalysis::Analysis(const FString& InFile)
+{
+	const auto Program = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath(),
+	                                     FString::Printf(TEXT(
+		                                     "%s%s"
+	                                     ),
+	                                                     *CODE_ANALYSIS,
+#if PLATFORM_WINDOWS
+	                                                     TEXT(".exe")
+#else
+	                                                     TEXT("")
+#endif
+	                                     ));
+
+	const auto CompileParam = FString::Printf(TEXT(
+		"true \"%s\" \"%s\""
+	),
+	                                          *InFile,
+	                                          *FPaths::ConvertRelativePathToFull(
+		                                          FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath())
+	);
+
+	void* ReadPipe = nullptr;
+
+	void* WritePipe = nullptr;
+
+	auto OutProcessID = 0u;
+
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+
+	auto ProcessHandle = FPlatformProcess::CreateProc(
+		*Program,
+		*CompileParam,
+		false,
+		true,
+		true,
+		&OutProcessID,
+		1,
+		nullptr,
+		WritePipe,
+		ReadPipe);
+
+	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	{
+		FPlatformProcess::Sleep(0.01f);
+	}
+
+	auto ReturnCode = 0;
+
+	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	{
+		if (ReturnCode == 0)
+		{
+			// @TODO
+		}
+		else
+		{
+			// @TODO
+		}
+	}
+}
+
 void FCodeAnalysis::Compile()
 {
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
@@ -85,7 +147,7 @@ void FCodeAnalysis::Analysis()
 	                                     ));
 
 	const auto CompileParam = FString::Printf(TEXT(
-		"\"%s\" \"%s\""
+		"false \"%s\" \"%s\""
 	),
 	                                          *FPaths::ConvertRelativePathToFull(
 		                                          FUnrealCSharpFunctionLibrary::GetGamePath()),

@@ -18,6 +18,9 @@ void FUnrealCSharpEditorCommands::RegisterCommands()
 	UI_COMMAND(OpenFile, "Open File", "Open File Action",
 	           EUserInterfaceActionType::Button, FInputChord());
 
+	UI_COMMAND(CodeAnalysis, "Code Analysis", "Code Analysis Action",
+	           EUserInterfaceActionType::Button, FInputChord());
+
 	UI_COMMAND(OverrideBlueprint, "Override Blueprint", "Override Blueprint Action",
 	           EUserInterfaceActionType::Button, FInputChord());
 }

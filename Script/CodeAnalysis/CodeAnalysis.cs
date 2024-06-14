@@ -9,32 +9,91 @@ namespace CodeAnalysis
     {
         static void Main(string[] args)
         {
-            var InputPathName = args[0];
-
-            var OutputPathName = args[1];
-
-            var Analysis = new CodeAnalysis(InputPathName, OutputPathName);
+            var Analysis = new CodeAnalysis(args);
 
             Analysis.Analysis();
         }
 
-        private CodeAnalysis(string inInputPathName, string inOutputPathName)
+        private CodeAnalysis(string[] args)
         {
-            _inputPathName = inInputPathName;
+            _bIsSingle = bool.Parse(args[0]);
 
-            _outputPathName = inOutputPathName;
-
-            _dynamic = new Dictionary<string, List<string>>
+            if (_bIsSingle)
             {
-                ["DynamicClass"] = new List<string>(),
-                ["DynamicStruct"] = new List<string>(),
-                ["DynamicEnum"] = new List<string>(),
-                ["DynamicInterface"] = new List<string>()
-            };
+                _inputFileName = args[1];
 
-            _overrideFunction = new Dictionary<string, List<string>>();
+                _inputPathName = "";
 
-            _overrideFile = new Dictionary<string, string>();
+                _outputPathName = args[2];
+
+                if (File.Exists(Path.Combine(_outputPathName, DynamicFileName)))
+                {
+                    _dynamic = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(
+                        File.ReadAllText(Path.Combine(_outputPathName, DynamicFileName)));
+                }
+                else
+                {
+                    _dynamic = new Dictionary<string, List<string>>
+                    {
+                        ["DynamicClass"] = new List<string>(),
+                        ["DynamicStruct"] = new List<string>(),
+                        ["DynamicEnum"] = new List<string>(),
+                        ["DynamicInterface"] = new List<string>()
+                    };
+                }
+
+                if (File.Exists(Path.Combine(_outputPathName, OverrideFunctionFileName)))
+                {
+                    _overrideFunction = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(
+                        File.ReadAllText(Path.Combine(_outputPathName, OverrideFunctionFileName)));
+                }
+                else
+                {
+                    _overrideFunction = new Dictionary<string, List<string>>();
+                }
+
+                if (File.Exists(Path.Combine(_outputPathName, OverrideFileFileName)))
+                {
+                    _overrideFile = JsonSerializer.Deserialize<Dictionary<string, string>>(
+                        File.ReadAllText(Path.Combine(_outputPathName, OverrideFileFileName)));
+                }
+                else
+                {
+                    _overrideFile = new Dictionary<string, string>();
+                }
+
+                if (_overrideFunction != null && _overrideFile != null)
+                {
+                    var Pair = _overrideFile.FirstOrDefault(pair => pair.Value == _inputFileName);
+
+                    if (Pair.Key != null)
+                    {
+                        _overrideFunction.Remove(Pair.Key);
+
+                        _overrideFile.Remove(Pair.Key);
+                    }
+                }
+            }
+            else
+            {
+                _inputFileName = "";
+
+                _inputPathName = args[1];
+
+                _outputPathName = args[2];
+
+                _dynamic = new Dictionary<string, List<string>>
+                {
+                    ["DynamicClass"] = new List<string>(),
+                    ["DynamicStruct"] = new List<string>(),
+                    ["DynamicEnum"] = new List<string>(),
+                    ["DynamicInterface"] = new List<string>()
+                };
+
+                _overrideFunction = new Dictionary<string, List<string>>();
+
+                _overrideFile = new Dictionary<string, string>();
+            }
         }
 
         private static List<string> GetFiles(string inPathName)
@@ -74,20 +133,32 @@ namespace CodeAnalysis
                 File.Delete(Item);
             }
 
-            var Files = GetFiles(_inputPathName);
-
-            foreach (var Item in Files)
+            if (_bIsSingle)
             {
-                var Tree = CSharpSyntaxTree.ParseText(File.ReadAllText(Item, Encoding.UTF8));
+                AnalysisSingle(_inputFileName);
+            }
+            else
+            {
+                var Files = GetFiles(_inputPathName);
 
-                var Root = (CompilationUnitSyntax)Tree.GetRoot();
-
-                AnalysisOverride(Item, Root);
-
-                AnalysisDynamic(Root);
+                foreach (var Item in Files)
+                {
+                    AnalysisSingle(Item);
+                }
             }
 
             WriteAll();
+        }
+
+        private void AnalysisSingle(string inFile)
+        {
+            var Tree = CSharpSyntaxTree.ParseText(File.ReadAllText(inFile, Encoding.UTF8));
+
+            var Root = (CompilationUnitSyntax)Tree.GetRoot();
+
+            AnalysisOverride(inFile, Root);
+
+            AnalysisDynamic(Root);
         }
 
         private void AnalysisOverride(string inFile, CompilationUnitSyntax inRoot)
@@ -119,7 +190,11 @@ namespace CodeAnalysis
 
                             if (IsOverride)
                             {
-                                _overrideFile.Add($"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}", inFile);
+                                if (_overrideFile != null)
+                                {
+                                    _overrideFile[$"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}"] =
+                                        inFile;
+                                }
 
                                 foreach (var MemberDeclaration in ClassDeclaration.Members)
                                 {
@@ -150,8 +225,11 @@ namespace CodeAnalysis
 
                             if (Functions.Count > 0)
                             {
-                                _overrideFunction.Add($"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}",
-                                    Functions);
+                                if (_overrideFunction != null)
+                                {
+                                    _overrideFunction[$"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}"] =
+                                        Functions;
+                                }
                             }
                         }
                     }
@@ -175,21 +253,21 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UClass"))
                                     {
-                                        _dynamic["DynamicClass"].Add(ClassDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicClass"].Add(ClassDeclaration.Identifier.ToString());
 
                                         return;
                                     }
 
                                     if (Attribute.ToString().Equals("UStruct"))
                                     {
-                                        _dynamic["DynamicStruct"].Add(ClassDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicStruct"].Add(ClassDeclaration.Identifier.ToString());
 
                                         return;
                                     }
 
                                     if (Attribute.ToString().Equals("UInterface"))
                                     {
-                                        _dynamic["DynamicInterface"].Add(ClassDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicInterface"].Add(ClassDeclaration.Identifier.ToString());
 
                                         return;
                                     }
@@ -204,7 +282,7 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UEnum"))
                                     {
-                                        _dynamic["DynamicEnum"].Add(EnumDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicEnum"].Add(EnumDeclaration.Identifier.ToString());
 
                                         return;
                                     }
@@ -218,36 +296,46 @@ namespace CodeAnalysis
 
         private void WriteAll()
         {
-            File.WriteAllText(Path.Combine(_outputPathName, "OverrideFunction.json"),
+            File.WriteAllText(Path.Combine(_outputPathName, DynamicFileName),
+                JsonSerializer.Serialize(_dynamic,
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true,
+                    }));
+
+            File.WriteAllText(Path.Combine(_outputPathName, OverrideFunctionFileName),
                 JsonSerializer.Serialize(_overrideFunction,
                     new JsonSerializerOptions
                     {
                         WriteIndented = true,
                     }));
 
-            File.WriteAllText(Path.Combine(_outputPathName, "OverrideFile.json"),
+            File.WriteAllText(Path.Combine(_outputPathName, OverrideFileFileName),
                 JsonSerializer.Serialize(_overrideFile,
-                    new JsonSerializerOptions
-                    {
-                        WriteIndented = true,
-                    }));
-
-            File.WriteAllText(Path.Combine(_outputPathName, "Dynamic.json"),
-                JsonSerializer.Serialize(_dynamic,
                     new JsonSerializerOptions
                     {
                         WriteIndented = true,
                     }));
         }
 
+        private readonly bool _bIsSingle;
+
+        private readonly string _inputFileName;
+
         private readonly string _inputPathName;
 
         private readonly string _outputPathName;
 
-        private readonly Dictionary<string, List<string>> _overrideFunction;
+        private readonly Dictionary<string, List<string>>? _overrideFunction;
 
-        private readonly Dictionary<string, string> _overrideFile;
+        private readonly Dictionary<string, string>? _overrideFile;
 
-        private readonly Dictionary<string, List<string>> _dynamic;
+        private readonly Dictionary<string, List<string>>? _dynamic;
+
+        private const string DynamicFileName = "Dynamic.json";
+
+        private const string OverrideFunctionFileName = "OverrideFunction.json";
+
+        private const string OverrideFileFileName = "OverrideFile.json";
     }
 }

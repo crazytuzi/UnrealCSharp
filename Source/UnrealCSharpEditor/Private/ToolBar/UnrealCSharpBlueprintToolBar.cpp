@@ -1,6 +1,7 @@
 #include "ToolBar/UnrealCSharpBlueprintToolBar.h"
 #include "BlueprintEditorModule.h"
 #include "SourceCodeNavigation.h"
+#include "FCodeAnalysis.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
@@ -57,6 +58,19 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 				if (IFileManager::Get().FileExists(*OverrideFile))
 				{
 					FSourceCodeNavigation::OpenSourceFile(OverrideFile);
+				}
+			}
+		}), FCanExecuteAction());
+
+	CommandList->MapAction(
+		FUnrealCSharpEditorCommands::Get().CodeAnalysis,
+		FExecuteAction::CreateLambda([this]
+		{
+			if (const auto OverrideFile = GetOverrideFile(); !OverrideFile.IsEmpty())
+			{
+				if (IFileManager::Get().FileExists(*OverrideFile))
+				{
+					FCodeAnalysis::Analysis(OverrideFile);
 				}
 			}
 		}), FCanExecuteAction());
@@ -138,6 +152,9 @@ TSharedRef<FExtender> FUnrealCSharpBlueprintToolBar::GenerateBlueprintExtender(U
 					{
 						MenuBuilder.AddMenuEntry(Commands.OpenFile, NAME_None,
 						                         LOCTEXT("OpenFile", "Open File"));
+
+						MenuBuilder.AddMenuEntry(Commands.CodeAnalysis, NAME_None,
+						                         LOCTEXT("CodeAnalysis", "Code Analysis"));
 					}
 					else
 					{

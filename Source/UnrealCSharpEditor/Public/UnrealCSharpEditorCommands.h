@@ -30,5 +30,7 @@ public:
 
 	TSharedPtr<FUICommandInfo> OpenFile;
 
+	TSharedPtr<FUICommandInfo> CodeAnalysis;
+
 	TSharedPtr<FUICommandInfo> OverrideBlueprint;
 };
