@@ -64,7 +64,7 @@ void FCSharpFunctionDescriptor::Deinitialize()
 	OriginalFunction = nullptr;
 }
 
-bool FCSharpFunctionDescriptor::CallCSharp(FFrame& InStack, RESULT_DECL)
+bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, RESULT_DECL)
 {
 	void* Params = InStack.Locals;
 
@@ -164,7 +164,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(FFrame& InStack, RESULT_DECL)
 
 	const auto FoundMonoObject = OriginalFunctionFlags & FUNC_Static
 		                             ? nullptr
-		                             : FCSharpEnvironment::GetEnvironment().GetObject(InStack.Object);
+		                             : FCSharpEnvironment::GetEnvironment().GetObject(InContext);
 
 	if (const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
 			Method, FoundMonoObject, CSharpParams);

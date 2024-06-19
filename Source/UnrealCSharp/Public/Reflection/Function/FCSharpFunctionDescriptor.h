@@ -17,7 +17,7 @@ public:
 	virtual void Deinitialize() override;
 
 public:
-	bool CallCSharp(FFrame& InStack, RESULT_DECL);
+	bool CallCSharp(UObject* InContext, FFrame& InStack, RESULT_DECL);
 
 private:
 	static FOutParmRec* FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty);
