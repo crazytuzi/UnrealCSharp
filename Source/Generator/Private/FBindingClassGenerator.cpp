@@ -256,7 +256,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 						DefaultParam = TEXT(" = null");
 
 						FunctionDefaultParamBody += FString::Printf(TEXT(
-							"%s\t\t\t%s ??= %s;\n"),
+							"%s\t\t\t%s \?\?= %s;\n"),
 						                                            FunctionDefaultParamBody.IsEmpty()
 							                                            ? TEXT("")
 							                                            : TEXT("\n"),
