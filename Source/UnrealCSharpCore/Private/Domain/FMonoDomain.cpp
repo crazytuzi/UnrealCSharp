@@ -718,6 +718,8 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 	                            TEXT("Win64")
 #elif PLATFORM_MAC_X86
 	                            TEXT("macOS_x86_64")
+#elif PLATFORM_MAC_ARM64
+	                            TEXT("macOS_arm64")
 #endif
 	);
 #else
@@ -740,6 +742,14 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 	                            TEXT("Linux"),
 	                            MONO_CONFIGURATION,
 	                            TEXT("Linux_x86_64"));
+#elif PLATFORM_MAC_X86
+                                    TEXT("macOS_x86_64"),
+                                    MONO_CONFIGURATION,
+                                    TEXT("macOS_x86_64"));
+#elif PLATFORM_MAC_ARM64
+                                    TEXT("macOS_arm64"),
+                                    MONO_CONFIGURATION,
+                                    TEXT("macOS_arm64"));
 #endif
 #endif
 
@@ -759,13 +769,13 @@ void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile
 
 	FFileHelper::LoadFileToArray(Data, *InFile);
 
-	auto ImageOpenStatus = MonoImageOpenStatus::MONO_IMAGE_OK;
+	auto ImageOpenStatus = MONO_IMAGE_OK;
 
 	const auto Image = mono_image_open_from_data_with_name((char*)Data.GetData(), Data.Num(),
 	                                                       true, &ImageOpenStatus,
 	                                                       false, InAssemblyName);
 
-	if (ImageOpenStatus != MonoImageOpenStatus::MONO_IMAGE_OK)
+	if (ImageOpenStatus != MONO_IMAGE_OK)
 	{
 		// @TODO
 		return;
@@ -773,7 +783,7 @@ void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile
 
 	const auto Assembly = mono_assembly_load_from_full(Image, InAssemblyName, &ImageOpenStatus, false);
 
-	if (ImageOpenStatus != MonoImageOpenStatus::MONO_IMAGE_OK)
+	if (ImageOpenStatus != MONO_IMAGE_OK)
 	{
 		// @TODO
 		return;
