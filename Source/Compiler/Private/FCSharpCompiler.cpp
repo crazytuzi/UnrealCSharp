@@ -6,15 +6,19 @@ FCSharpCompiler::FCSharpCompiler():
 {
 	Runnable = new FCSharpCompilerRunnable();
 
-	FRunnableThread::Create(Runnable, TEXT("CSharpCompiler"));
+	Thread = FRunnableThread::Create(Runnable, TEXT("CSharpCompiler"));
 }
 
 FCSharpCompiler::~FCSharpCompiler()
 {
-	if (Runnable != nullptr)
+	if (Thread != nullptr)
 	{
-		delete Runnable;
+		Thread->Kill(true);
 
+		delete Thread;
+		Thread = nullptr;
+
+		delete Runnable;
 		Runnable = nullptr;
 	}
 }

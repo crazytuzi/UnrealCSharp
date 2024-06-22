@@ -55,4 +55,6 @@ private:
 	bool bIsCompiling;
 
 	bool bIsGenerating;
+
+	bool bIsStop;
 };
