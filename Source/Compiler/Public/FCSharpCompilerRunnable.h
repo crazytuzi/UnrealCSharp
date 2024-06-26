@@ -56,5 +56,5 @@ private:
 
 	bool bIsGenerating;
 
-	bool bIsStop;
+	bool bIsStopped;
 };

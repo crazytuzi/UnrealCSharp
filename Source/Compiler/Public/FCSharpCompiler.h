@@ -25,5 +25,6 @@ public:
 
 private:
 	class FCSharpCompilerRunnable* Runnable;
+
 	FRunnableThread* Thread;
 };

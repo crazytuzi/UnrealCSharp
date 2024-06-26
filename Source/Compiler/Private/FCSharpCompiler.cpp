@@ -16,9 +16,11 @@ FCSharpCompiler::~FCSharpCompiler()
 		Thread->Kill(true);
 
 		delete Thread;
+
 		Thread = nullptr;
 
 		delete Runnable;
+
 		Runnable = nullptr;
 	}
 }
