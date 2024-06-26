@@ -395,7 +395,7 @@ namespace SourceCodeGeneratorUbtPlugin
 			{
 				builder.Append(", ");
 				
-				builder.Append(GetFunctionParam(classObj, function));
+				builder.Append(GetFunctionParam(function));
 			}
 
 			if (!function.FunctionFlags.HasAnyFlags(EFunctionFlags.Static))
@@ -405,7 +405,7 @@ namespace SourceCodeGeneratorUbtPlugin
 
 			if (function.HasParameters)
 			{
-				builder.Append(GetFunctionDefaultParam(classObj, function));
+				builder.Append(GetFunctionDefaultParam(function));
 			}
 			
 			builder.Append("))\r\n");
@@ -416,7 +416,7 @@ namespace SourceCodeGeneratorUbtPlugin
 			builder.Append($"\t\t\t.Property(\"{property.SourceName}\", BINDING_PROPERTY(&{classObj.SourceName}::{property.SourceName}))\r\n");
 		}
 
-		private static string GetPropertySignature(UhtProperty? property)
+		private static string GetParamPropertySignature(UhtProperty? property)
 		{
 			if (property == null)
 			{
@@ -427,28 +427,25 @@ namespace SourceCodeGeneratorUbtPlugin
 			
 			var caps = property.PropertyCaps;
 
-			var isParameter = true;
-			bool isInterfaceProp = property is UhtInterfaceProperty;
+			var isInterfaceProp = property is UhtInterfaceProperty;
 
-			bool passCppArgsByRef = caps.HasAnyFlags(UhtPropertyCaps.PassCppArgsByRef);
-			bool isConstParam = isParameter && (property.PropertyFlags.HasAnyFlags(EPropertyFlags.ConstParm) || (isInterfaceProp && !property.PropertyFlags.HasAnyFlags(EPropertyFlags.OutParm)));
-			bool isConstArgsByRef = isParameter && property.ArrayDimensions == null && passCppArgsByRef && !property.PropertyFlags.HasAnyFlags(EPropertyFlags.ConstParm | EPropertyFlags.OutParm);
-			bool isOnConstClass = false;
+			var passCppArgsByRef = caps.HasAnyFlags(UhtPropertyCaps.PassCppArgsByRef);
+			
+			var isConstParam = property.PropertyFlags.HasAnyFlags(EPropertyFlags.ConstParm) || (isInterfaceProp && !property.PropertyFlags.HasAnyFlags(EPropertyFlags.OutParm));
+			
+			var isConstArgsByRef = property.ArrayDimensions == null && passCppArgsByRef && !property.PropertyFlags.HasAnyFlags(EPropertyFlags.ConstParm | EPropertyFlags.OutParm);
+			
+			var isOnConstClass = false;
+			
 			if (property is UhtObjectProperty objectProperty)
 			{
-				isOnConstClass = objectProperty.Class.ClassFlags.HasAnyFlags(EClassFlags.Const);
-
-				if (!isOnConstClass)
-				{
-					if(objectProperty.MetaData.TryGetValue(UhtNames.NativeConst, out var value))
-					{
-						isOnConstClass = true;
-					}
-				}
+				isOnConstClass = objectProperty.Class.ClassFlags.HasAnyFlags(EClassFlags.Const) || 
+				                 objectProperty.MetaData.TryGetValue(UhtNames.NativeConst, out _);
 			}
-			bool shouldHaveRef = property.PropertyFlags.HasAnyFlags(EPropertyFlags.OutParm | EPropertyFlags.ReferenceParm);
+			
+			var shouldHaveRef = property.PropertyFlags.HasAnyFlags(EPropertyFlags.OutParm | EPropertyFlags.ReferenceParm);
 
-			bool constAtTheBeginning = isOnConstClass || isConstArgsByRef || (isConstParam && !shouldHaveRef);
+			var constAtTheBeginning = isOnConstClass || isConstArgsByRef || (isConstParam && !shouldHaveRef);
 			
 			if (constAtTheBeginning)
 			{
@@ -471,7 +468,6 @@ namespace SourceCodeGeneratorUbtPlugin
 			}
 			else if (property is UhtInterfaceProperty interfaceProperty)
 			{
-				// if (interfaceProperty.InterfaceClass.ClassFlags.HasAnyFlags(EClassFlags.Interface))
 				if (interfaceProperty.InterfaceClass == interfaceProperty.Session.IInterface)
 				{
 					builder.Append("FScriptInterface");
@@ -481,40 +477,21 @@ namespace SourceCodeGeneratorUbtPlugin
 					property.AppendText(builder, UhtPropertyTextType.ExportMember);
 				}
 			}
-			// else if (property is UhtInterfaceProperty interfaceProperty)
-			// {
-			// 	builder.Append(interfaceProperty.InterfaceClass.SourceName);
-			// }
-			
-			// else if (property is UhtObjectProperty objectProperty13)
-			// {
-			// 	// if (objectProperty13.Class.ClassFlags.HasAnyFlags(EClassFlags.Const))
-			// 	// {
-			// 	// 	builder.Append("const ");
-			// 	// }
-			// 	if (property.RefQualifier == UhtPropertyRefQualifier.ConstRef)
-			// 	{
-			// 		builder.Append("const ");
-			// 	}
-			// 	
-			// 	builder.Append(objectProperty13.Class.SourceName).Append("*");
-			// }
 			else
 			{
 				property.AppendText(builder, UhtPropertyTextType.ExportMember);
 			}
 
-			bool fromConstClass = false;
-			if (property.Outer != null)
+			var fromConstClass = false;
+
+			if (property.Outer is UhtClass outerClass)
 			{
-				if (property.Outer is UhtClass outerClass)
-				{
-					fromConstClass = outerClass.ClassFlags.HasAnyFlags(EClassFlags.Const);
-				}
+				fromConstClass = outerClass.ClassFlags.HasAnyFlags(EClassFlags.Const);
 			}
 
-			bool constAtTheEnd = fromConstClass || (isConstParam && shouldHaveRef);
-			if (!constAtTheBeginning && constAtTheEnd)
+			var constAtTheEnd = fromConstClass || (isConstParam && shouldHaveRef);
+			
+			if (constAtTheEnd)
 			{
 				if (property is UhtArrayProperty or UhtInterfaceProperty or UhtSoftObjectProperty)
 				{
@@ -530,7 +507,8 @@ namespace SourceCodeGeneratorUbtPlugin
 			}
 
 			shouldHaveRef = passCppArgsByRef; 
-			if (shouldHaveRef || isParameter && 
+			
+			if (shouldHaveRef || 
 			    property.ArrayDimensions == null && 
 			    (passCppArgsByRef || property.PropertyFlags.HasAnyFlags(EPropertyFlags.OutParm | EPropertyFlags.ReferenceParm)))
 			{
@@ -559,15 +537,6 @@ namespace SourceCodeGeneratorUbtPlugin
 			
 			var builder = new StringBuilder();
 			
-			bool isOnConstClass = false;
-			
-			if (property is UhtObjectProperty objectProperty)
-			{
-				isOnConstClass = objectProperty.Class.ClassFlags.HasAnyFlags(EClassFlags.Const);
-			}
-			
-			// property.PropertyFlags.HasAnyFlags(EPropertyFlags.ConstParm)
-			
 			if(property.PropertyFlags.HasAnyFlags(EPropertyFlags.ConstParm) || property.RefQualifier == UhtPropertyRefQualifier.ConstRef)
 			{
 				builder.Append("const ");
@@ -592,10 +561,9 @@ namespace SourceCodeGeneratorUbtPlugin
 
 		private static string GetFunctionSignature(UhtClass classObj, UhtFunction function)
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			
 			builder.Append(GetReturnPropertySignature(function.ReturnProperty));
-			// builder.Append(GetPropertySignature(function.ReturnProperty));
 
 			if (function.FunctionFlags.HasAnyFlags(EFunctionFlags.Static))
 			{
@@ -603,10 +571,10 @@ namespace SourceCodeGeneratorUbtPlugin
 			}
 			else
 			{
-				builder.AppendFormat("({0}::*)", classObj.SourceName);
+				builder.Append($"({classObj.SourceName}::*)");
 			}
 
-			builder.Append("(");
+			builder.Append('(');
 
 			foreach (var child in function.Children)
 			{
@@ -614,19 +582,19 @@ namespace SourceCodeGeneratorUbtPlugin
 				{
 					if (!property.PropertyFlags.HasAnyFlags(EPropertyFlags.ReturnParm))
 					{
-						builder.Append(GetPropertySignature(property));
+						builder.Append(GetParamPropertySignature(property));
 
-						builder.Append(",");
+						builder.Append(", ");
 					}
 				}
 			}
 
 			if (function.HasParameters)
 			{
-				builder.Remove(builder.Length - 1, 1);
+				builder.Remove(builder.Length - 2, 2);
 			}
 
-			builder.Append(")");
+			builder.Append(')');
 
 			if (function.FunctionFlags.HasAnyFlags(EFunctionFlags.Const))
 			{
@@ -636,9 +604,9 @@ namespace SourceCodeGeneratorUbtPlugin
 			return builder.ToString();
 		}
 
-		private static string GetFunctionParam(UhtClass classObj, UhtFunction function)
+		private static string GetFunctionParam(UhtFunction function)
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			
 			builder.Append("TArray<FString>{");
 
@@ -648,27 +616,21 @@ namespace SourceCodeGeneratorUbtPlugin
 				{
 					if (!property.PropertyFlags.HasAnyFlags(EPropertyFlags.ReturnParm))
 					{
-						builder.Append("\"");
-
-						builder.Append(property.SourceName);
-
-						builder.Append("\"");
-
-						builder.Append(",");
+						builder.Append($"\"{property.SourceName}\", ");
 					}
 				}
 			}
 
-			builder.Remove(builder.Length - 1, 1);
+			builder.Remove(builder.Length - 2, 2);
 
-			builder.Append("}");
+			builder.Append('}');
 
 			return builder.ToString();
 		}
 
-		private static string GetFunctionDefaultParam(UhtClass classObj, UhtFunction function)
+		private static string GetFunctionDefaultParam(UhtFunction function)
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 
 			foreach (var child in function.Children)
 			{
@@ -678,9 +640,9 @@ namespace SourceCodeGeneratorUbtPlugin
 					{
 						if (property.DefaultValueTokens != null)
 						{
-							builder.Append(",");
+							builder.Append(", ");
 
-							StringBuilder DefaultValue = new StringBuilder();
+							var DefaultValue = new StringBuilder();
 
 							foreach (var ValueToken in property.DefaultValueTokens)
 							{
