@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System;
 using EpicGames.Core;
 using EpicGames.UHT.Types;
 using EpicGames.UHT.Utils;
@@ -9,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EpicGames.UHT.Tables;
-using UnrealBuildBase;
 using UnrealBuildTool;
 
 namespace SourceCodeGeneratorUbtPlugin
@@ -71,11 +71,32 @@ namespace SourceCodeGeneratorUbtPlugin
                 GetPlugins(Path.GetFullPath(Path.Combine(Session.EngineDirectory, "Plugins/")), HeaderPath);
             }
 
-            DirectoryReference configDirectory =
-                DirectoryReference.Combine(Unreal.EngineDirectory, "Programs/UnrealBuildTool");
-            ConfigHierarchy ini = ConfigCache.ReadHierarchy(ConfigHierarchyType.Engine, configDirectory,
-                BuildHostPlatform.Current.Platform);
-            ini.GetArray("Plugins", "ScriptSupportedModules", out var supportedScriptModules);
+            var SettingFilePath = Path.Combine(new string(Session.ProjectDirectory),
+                "Config",
+                "DefaultUnrealCSharpEditorSetting.ini");
+
+            var ExportModule = new List<string>();
+
+            if (File.Exists(SettingFilePath))
+            {
+                var SettingConfigFile = new ConfigFile(new FileReference(SettingFilePath));
+
+                if (SettingConfigFile.TryGetSection("/Script/UnrealCSharpCore.UnrealCSharpEditorSetting",
+                        out var ScriptConfigSection))
+                {
+                    var SettingConfigHierarchySection = new ConfigHierarchySection(
+                        new List<ConfigFileSection> { ScriptConfigSection });
+
+                    if (SettingConfigHierarchySection.TryGetValues("ExportModule",
+                            out var Values))
+                    {
+                        foreach (var value in Values)
+                        {
+                            ExportModule.Add(value);
+                        }
+                    }
+                }
+            }
 
             List<UhtClass> classes = new();
 
@@ -89,10 +110,11 @@ namespace SourceCodeGeneratorUbtPlugin
                     continue;
                 }
 
-                // if (supportedScriptModules != null && !supportedScriptModules.Any(x => String.Compare(x, package.Module.Name, StringComparison.OrdinalIgnoreCase) == 0))
-                // {
-                // 	continue;
-                // }
+                if (ExportModule.All(module =>
+                        string.Compare(module, package.Module.Name, StringComparison.OrdinalIgnoreCase) != 0))
+                {
+                    continue;
+                }
 
                 QueueClassExports(package, package, classes, tasks);
             }
