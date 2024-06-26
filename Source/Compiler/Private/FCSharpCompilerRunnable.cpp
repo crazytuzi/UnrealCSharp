@@ -16,7 +16,8 @@
 FCSharpCompilerRunnable::FCSharpCompilerRunnable():
 	Event(nullptr),
 	bIsCompiling(false),
-	bIsGenerating(false)
+	bIsGenerating(false),
+	bIsStop(false)
 {
 	OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
 		this, &FCSharpCompilerRunnable::OnBeginGenerator);
@@ -49,6 +50,10 @@ uint32 FCSharpCompilerRunnable::Run()
 {
 	while (true)
 	{
+		if (bIsStop)
+		{
+			return 0;
+		}
 		if (!bIsGenerating)
 		{
 			if (!Tasks.IsEmpty())
@@ -82,8 +87,12 @@ uint32 FCSharpCompilerRunnable::Run()
 
 void FCSharpCompilerRunnable::Stop()
 {
+	bIsStop = true;
+	
 	if (Event != nullptr)
 	{
+		Event->Trigger();
+
 		FPlatformProcess::ReturnSynchEventToPool(Event);
 
 		Event = nullptr;
