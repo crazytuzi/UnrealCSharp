@@ -255,14 +255,17 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 					{
 						DefaultParam = TEXT(" = null");
 
-						FunctionDefaultParamBody += FString::Printf(TEXT(
+						if(!DefaultArguments[DefaultArgumentIndex].IsEmpty())
+						{
+							FunctionDefaultParamBody += FString::Printf(TEXT(
 							"%s\t\t\t%s ??= %s;\n"),
-						                                            FunctionDefaultParamBody.IsEmpty()
-							                                            ? TEXT("")
-							                                            : TEXT("\n"),
-						                                            *FunctionParamName[Index],
-						                                            *DefaultArguments[DefaultArgumentIndex]
+																	FunctionDefaultParamBody.IsEmpty()
+																		? TEXT("")
+																		: TEXT("\n"),
+																	*FunctionParamName[Index],
+																	*DefaultArguments[DefaultArgumentIndex]
 						);
+						}
 					}
 
 					DefaultArgumentIndex++;

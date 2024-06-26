@@ -62,3 +62,48 @@ struct TBaseStructure<FBox>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FBox));
 	}
 };
+
+template <>
+struct TBaseStructure<FBoxSphereBounds>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FBoxSphereBounds));
+	}
+};
+
+template <>
+struct TBaseStructure<FExpressionOutput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FExpressionOutput));
+	}
+};
+
+template <>
+struct TBaseStructure<FExpressionInput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FExpressionInput));
+	}
+};
+
+template <>
+struct TBaseStructure<FVector3f>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FVector3f));
+	}
+};
+
+template <>
+struct TBaseStructure<FVector4f>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FVector4f));
+	}
+};

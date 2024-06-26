@@ -66,6 +66,15 @@ struct TDefaultArgument
 };
 
 template <typename T>
+struct TEmptyDefaultArgument
+{
+	static FString Get(const T& InValue)
+	{
+		return TEXT("");
+	}
+};
+
+template <typename T>
 struct TDefaultArgumentBuilder
 {
 	template <auto Prefix>
@@ -188,6 +197,19 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, floa
 };
 
 template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
+                                            !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>
 {
 	static FString Get(const FName& InValue)
@@ -198,6 +220,24 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FNam
 		                       *InValue.ToString()
 		);
 	}
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsIInterface<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
 };
 
 template <typename T>
@@ -224,6 +264,24 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FTex
 		                       *InValue.ToString()
 		);
 	}
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
 };
 
 template <typename T>
@@ -333,6 +391,61 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FBox
 		return TDefaultArgumentBuilder<T>::Get(InValue.Min, InValue.Max);
 	}
 };
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>>
+{
+	static FString Get(const T& InValue)
+	{
+		return FString::Printf(TEXT(
+			"%s.%s"
+		),
+		                       *StaticEnum<std::decay_t<T>>()->GetName(),
+		                       *StaticEnum<std::decay_t<T>>()->GetNameStringByValue(static_cast<int64>(InValue))
+		);
+	}
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value, T>>
+{
+	static FString Get(const T& InValue)
+	{
+		return FString::Printf(TEXT(
+			"%s.%s"
+		),
+		                       *StaticEnum<typename std::decay_t<T>::EnumType>()->GetName(),
+		                       *StaticEnum<typename std::decay_t<T>::EnumType>()->
+		                       GetNameStringByValue(static_cast<int64>(InValue))
+		);
+	}
+};
+
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+
+#if UE_F_OPTIONAL_PROPERTY
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>> :
+	TEmptyDefaultArgument<T>
+{
+};
+#endif
 
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>

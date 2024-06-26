@@ -111,13 +111,13 @@ public class UnrealCSharpCore : ModuleRules
 			Directory.CreateDirectory(Intermediate);
 		}
 
-		var ProjectPlugins = new HashSet<string>();
+		var ProjectPlugins = new Dictionary<string,string>();
 
 		GetModules(Path.GetFullPath(Path.Combine(ProjectPath, "Plugins/")), ProjectPlugins);
 
 		GetPlugins(Path.GetFullPath(Path.Combine(ProjectPath, "Plugins/")), ProjectPlugins);
 
-		var EngineModules = new HashSet<string>();
+		var EngineModules = new Dictionary<string,string>();
 
 		GetModules(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Developer/")), EngineModules);
 
@@ -127,7 +127,7 @@ public class UnrealCSharpCore : ModuleRules
 
 		GetModules(Path.GetFullPath(Path.Combine(EngineDirectory, "Source/Runtime/")), EngineModules);
 
-		var EnginePlugins = new HashSet<string>();
+		var EnginePlugins = new Dictionary<string,string>();
 
 		GetModules(Path.GetFullPath(Path.Combine(EngineDirectory, "Plugins/")), EnginePlugins);
 
@@ -137,18 +137,46 @@ public class UnrealCSharpCore : ModuleRules
 
 		Writer.WriteObjectStart();
 
-		Writer.WriteStringArrayField("ProjectModules", Target.ExtraModuleNames);
+		Writer.WriteObjectStart("ProjectModules");
+		
+		foreach (var Item in Target.ExtraModuleNames)
+		{
+			Writer.WriteValue(Item, Path.Join(Target.ProjectFile.Directory.FullName, "Source", Item));
+		}
+		
+		Writer.WriteObjectEnd();
+		
+		Writer.WriteObjectStart("ProjectPlugins");
 
-		Writer.WriteStringArrayField("ProjectPlugins", ProjectPlugins);
+		foreach (var Item in ProjectPlugins)
+		{
+			Writer.WriteValue(Item.Key, Item.Value);
+		}
+		
+		Writer.WriteObjectEnd();
+		
+		Writer.WriteObjectStart("EngineModules");
 
-		Writer.WriteStringArrayField("EngineModules", EngineModules);
+		foreach (var Item in EngineModules)
+		{
+			Writer.WriteValue(Item.Key, Item.Value);
+		}
+		
+		Writer.WriteObjectEnd();
+		
+		Writer.WriteObjectStart("EnginePlugins");
 
-		Writer.WriteStringArrayField("EnginePlugins", EnginePlugins);
+		foreach (var Item in EnginePlugins)
+		{
+			Writer.WriteValue(Item.Key, Item.Value);
+		}
+		
+		Writer.WriteObjectEnd();
 
 		Writer.WriteObjectEnd();
 	}
 
-	private void GetPlugins(string InPathName, HashSet<string> Plugins)
+	private void GetPlugins(string InPathName, Dictionary<string,string> Plugins)
 	{
 		var Suffix = "*.uplugin";
 
@@ -156,19 +184,19 @@ public class UnrealCSharpCore : ModuleRules
 
 		foreach (var Item in DirectoryInfo.GetFiles(Suffix))
 		{
-			Plugins.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length + 1));
+			Plugins[Item.Name.Remove(Item.Name.Length - Suffix.Length + 1)] = Item.DirectoryName;
 		}
 
 		foreach (var Directories in DirectoryInfo.GetDirectories())
 		{
 			foreach (var Item in Directories.GetFiles(Suffix, SearchOption.AllDirectories))
 			{
-				Plugins.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length + 1));
+				Plugins[Item.Name.Remove(Item.Name.Length - Suffix.Length + 1)] = Item.DirectoryName;
 			}
 		}
 	}
 
-	private void GetModules(string InPathName, HashSet<string> Modules)
+	private void GetModules(string InPathName, Dictionary<string,string> Modules)
 	{
 		var Suffix = "*.Build.cs";
 
@@ -176,14 +204,14 @@ public class UnrealCSharpCore : ModuleRules
 
 		foreach (var Item in DirectoryInfo.GetFiles(Suffix))
 		{
-			Modules.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length + 1));
+			Modules[Item.Name.Remove(Item.Name.Length - Suffix.Length + 1)] = Item.DirectoryName;
 		}
 
 		foreach (var Directories in DirectoryInfo.GetDirectories())
 		{
 			foreach (var Item in Directories.GetFiles(Suffix, SearchOption.AllDirectories))
 			{
-				Modules.Add(Item.Name.Remove(Item.Name.Length - Suffix.Length + 1));
+				Modules[Item.Name.Remove(Item.Name.Length - Suffix.Length + 1)] = Item.DirectoryName;
 			}
 		}
 	}

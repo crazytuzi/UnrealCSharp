@@ -366,7 +366,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
 
 	static T Set(const FGarbageCollectionHandle InValue)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType*>(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType>(InValue);
 	}
 };
 
