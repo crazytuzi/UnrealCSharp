@@ -27,6 +27,16 @@ namespace SourceCodeGeneratorUbtPlugin
 
 		private UhtSession Session => Factory.Session;
 		
+		private List<UhtClass> ExportClasses = new();
+
+		private HashSet<string> Project = new ();
+		
+		private Dictionary<string,string> HeaderPath = new();
+
+		private const string BindingSuffix = ".binding.inl";
+		
+		private const string HeaderSuffix = ".header.inl";
+		
 		public SourceCodeGenerator(IUhtExportFactory factory)
 		{
 			Factory = factory;
@@ -754,16 +764,5 @@ namespace SourceCodeGeneratorUbtPlugin
 				}
 			}
 		}
-
-		private List<UhtClass> ExportClasses = new();
-
-		private HashSet<string> Project = new ();
-		
-		private Dictionary<string,string> HeaderPath = new();
-
-		private const string BindingSuffix = ".binding.inl";
-		
-		private const string HeaderSuffix = ".header.inl";
-		
 	}
 }

@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="UnrealHeaderToolProgram.ubtplugin.csproj.props" Condition="Exists('UnrealHeaderToolProgram.ubtplugin.csproj.props')" />
+  <Import Project="SourceCodeGenerator.ubtplugin.csproj.props" Condition="Exists('SourceCodeGenerator.ubtplugin.csproj.props')" />
   <Import Project="$(EngineDir)\Source\Programs\Shared\UnrealEngine.csproj.props" />
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -9,9 +9,9 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <Configurations>Debug;Release;Development</Configurations>
-    <RootNamespace>UnrealHeaderToolProgram</RootNamespace>
-    <AssemblyName>UnrealHeaderToolProgram</AssemblyName>
-    <OutputPath>..\..\..\..\Binaries\DotNET\UnrealBuildTool\Plugins\UnrealHeaderToolProgram\</OutputPath>
+    <RootNamespace>SourceCodeGenerator</RootNamespace>
+    <AssemblyName>SourceCodeGenerator</AssemblyName>
+    <OutputPath>..\..\..\..\Binaries\DotNET\UnrealBuildTool\Plugins\SourceCodeGenerator\</OutputPath>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>
     <Nullable>enable</Nullable>
