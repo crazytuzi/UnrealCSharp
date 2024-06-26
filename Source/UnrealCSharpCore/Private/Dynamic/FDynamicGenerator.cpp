@@ -91,10 +91,7 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 
 	for (const auto& Data : FileChangeData)
 	{
-		if (FPaths::GetExtension(Data.Filename) == TEXT("cs"))
-		{
-			FileChange.AddUnique(FPaths::GetBaseFilename(Data.Filename));
-		}
+		FileChange.AddUnique(FPaths::GetBaseFilename(Data.Filename));
 	}
 
 	for (const auto& File : FileChange)
