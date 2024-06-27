@@ -8,6 +8,6 @@ DEFINE_FUNCTION(UCSharpFunction::execCallCSharp)
 		FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(
 			Stack.CurrentNativeFunction->GetOwnerClass(), Stack.CurrentNativeFunction->GetName())))
 	{
-		FunctionDescriptor->CallCSharp(Stack, RESULT_PARAM);
+		FunctionDescriptor->CallCSharp(Context, Stack, RESULT_PARAM);
 	}
 }

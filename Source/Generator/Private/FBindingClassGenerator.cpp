@@ -322,11 +322,19 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		                                           Function.IsDestructor() == true ? TEXT("") : TEXT(" "),
 		                                           *FunctionStatic,
 		                                           FunctionStatic.IsEmpty() == true ? TEXT("") : TEXT(" "),
-		                                           Function.GetFunctionInteract() == EFunctionInteract::None
-			                                           ? TEXT("")
-			                                           : Function.GetFunctionInteract() == EFunctionInteract::New
-			                                           ? TEXT("new ")
-			                                           : TEXT("override"),
+		                                           [Function]()
+		                                           {
+			                                           static auto FunctionInteract =
+				                                           TMap<EFunctionInteract, const TCHAR*>
+				                                           {
+					                                           {EFunctionInteract::None, TEXT("")},
+					                                           {EFunctionInteract::New, TEXT("new ")},
+					                                           {EFunctionInteract::Virtual, TEXT("virtual ")},
+					                                           {EFunctionInteract::Override, TEXT("override ")},
+				                                           };
+
+			                                           return FunctionInteract[Function.GetFunctionInteract()];
+		                                           }(),
 		                                           (Function.IsConstructor() == true || Function.IsDestructor() == true)
 			                                           ? TEXT("")
 			                                           : *FunctionReturnType,

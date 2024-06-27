@@ -201,9 +201,12 @@ void FEditorListener::OnWindowActivatedEvent()
 {
 	if (!FileChanges.IsEmpty())
 	{
-		FCSharpCompiler::Get().Compile(FileChanges);
+		if (!bIsPIEPlaying && !bIsGenerating)
+		{
+			FCSharpCompiler::Get().Compile(FileChanges);
 
-		FileChanges.Reset();
+			FileChanges.Reset();
+		}
 	}
 }
 
@@ -217,27 +220,39 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 			{
 				static auto IgnoreDirectories = TArray<FString>
 				{
-					TEXT("/Proxy/"),
-					TEXT("/obj/")
+					TEXT("Proxy"),
+					TEXT("obj")
 				};
 
 				for (const auto& FileChange : InFileChanges)
 				{
-					auto bIsIgnored = false;
-
-					for (const auto& IgnoreDirectory : IgnoreDirectories)
+					if (FPaths::GetExtension(FileChange.Filename) == TEXT("cs"))
 					{
-						if (FileChange.Filename.Contains(IgnoreDirectory))
+						auto bIsIgnored = false;
+
+						for (const auto& ChangedDirectory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
 						{
-							bIsIgnored = true;
+							for (const auto& IgnoreDirectory : IgnoreDirectories)
+							{
+								if (FPaths::IsUnderDirectory(FileChange.Filename,
+								                             FPaths::Combine(ChangedDirectory, IgnoreDirectory)))
+								{
+									bIsIgnored = true;
 
-							break;
+									break;
+								}
+							}
+
+							if (bIsIgnored)
+							{
+								break;
+							}
 						}
-					}
 
-					if (!bIsIgnored)
-					{
-						FileChanges.Add(FileChange);
+						if (!bIsIgnored)
+						{
+							FileChanges.Add(FileChange);
+						}
 					}
 				}
 			}
