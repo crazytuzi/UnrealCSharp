@@ -3,7 +3,7 @@
 #include "Domain/FDomain.h"
 #include "Reflection/Class/FClassDescriptor.h"
 
-class FCSharpBind
+class UNREALCSHARP_API FCSharpBind
 {
 public:
 	FCSharpBind();
