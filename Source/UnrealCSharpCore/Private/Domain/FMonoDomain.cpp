@@ -769,13 +769,13 @@ void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile
 
 	FFileHelper::LoadFileToArray(Data, *InFile);
 
-	auto ImageOpenStatus = MONO_IMAGE_OK;
+	auto ImageOpenStatus = MonoImageOpenStatus::MONO_IMAGE_OK;
 
 	const auto Image = mono_image_open_from_data_with_name((char*)Data.GetData(), Data.Num(),
 	                                                       true, &ImageOpenStatus,
 	                                                       false, InAssemblyName);
 
-	if (ImageOpenStatus != MONO_IMAGE_OK)
+	if (ImageOpenStatus != MonoImageOpenStatus::MONO_IMAGE_OK)
 	{
 		// @TODO
 		return;
@@ -783,7 +783,7 @@ void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile
 
 	const auto Assembly = mono_assembly_load_from_full(Image, InAssemblyName, &ImageOpenStatus, false);
 
-	if (ImageOpenStatus != MONO_IMAGE_OK)
+	if (ImageOpenStatus != MonoImageOpenStatus::MONO_IMAGE_OK)
 	{
 		// @TODO
 		return;
