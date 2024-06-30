@@ -101,6 +101,7 @@ void FCSharpCompilerRunnable::Exit()
 	if (Event != nullptr)
 	{
 		FPlatformProcess::ReturnSynchEventToPool(Event);
+
 		Event = nullptr;
 	}
 }
