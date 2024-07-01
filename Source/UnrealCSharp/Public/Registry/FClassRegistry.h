@@ -2,7 +2,7 @@
 
 #include "Reflection/Class/FClassDescriptor.h"
 
-class FClassRegistry
+class UNREALCSHARP_API FClassRegistry
 {
 public:
 	FClassRegistry();

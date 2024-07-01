@@ -93,15 +93,17 @@ void FCSharpCompilerRunnable::Stop()
 	if (Event != nullptr)
 	{
 		Event->Trigger();
-
-		FPlatformProcess::ReturnSynchEventToPool(Event);
-
-		Event = nullptr;
 	}
 }
 
 void FCSharpCompilerRunnable::Exit()
 {
+	if (Event != nullptr)
+	{
+		FPlatformProcess::ReturnSynchEventToPool(Event);
+
+		Event = nullptr;
+	}
 }
 
 void FCSharpCompilerRunnable::EnqueueTask()
