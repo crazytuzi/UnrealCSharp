@@ -20,7 +20,8 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bEnableAssetChanged(true),
 	bEnableDirectoryChanged(true),
 	bIsSkipGenerateEngineModules(false),
-	bIsGenerateAllModules(true)
+	bIsGenerateAllModules(true),
+	bEnableExport(false)
 #else
 	Super(ObjectInitializer)
 #endif

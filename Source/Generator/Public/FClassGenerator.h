@@ -32,11 +32,4 @@ private:
 	static FString GeneratorBlueprintFunctionDefaultParam(const UFunction* InFunction, FProperty* InProperty);
 
 	static FString GeneratorFunctionDefaultParam(FProperty* InProperty, const FString& InMetaData);
-
-	static TArray<FString> GetOverrideFunctions(const FString& InNameSpace, const FString& InClass);
-
-private:
-	friend class FGeneratorCore;
-
-	static TMap<FString, TArray<FString>> OverrideFunctionsMap;
 };

@@ -10,8 +10,6 @@
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicInterfaceGenerator.h"
 
-TMap<FString, TArray<FString>> FClassGenerator::OverrideFunctionsMap;
-
 void FClassGenerator::Generator()
 {
 	for (TObjectIterator<UClass> ClassIterator; ClassIterator; ++ClassIterator)
@@ -70,7 +68,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto ClassContent = FUnrealCSharpFunctionLibrary::GetFullClass(InClass);
 
-	const auto& OverrideFunctions = GetOverrideFunctions(NameSpaceContent, ClassContent);
+	const auto& OverrideFunctions = FGeneratorCore::GetOverrideFunctions(NameSpaceContent, ClassContent);
 
 	const auto& BindingFunctions = FBindingClass::GetFunctionNames(ClassContent);
 
@@ -1342,16 +1340,4 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 	}
 
 	return TEXT("");
-}
-
-TArray<FString> FClassGenerator::GetOverrideFunctions(const FString& InNameSpace, const FString& InClass)
-{
-	const auto FoundFunctions = OverrideFunctionsMap.Find(FString::Printf(TEXT(
-		"%s.%s"
-	),
-	                                                                      *InNameSpace,
-	                                                                      *InClass
-	));
-
-	return FoundFunctions != nullptr ? *FoundFunctions : TArray<FString>{};
 }
