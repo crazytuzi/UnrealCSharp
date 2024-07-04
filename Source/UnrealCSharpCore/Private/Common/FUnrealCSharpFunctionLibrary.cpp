@@ -378,7 +378,7 @@ FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData)
 
 FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData, const FString& InAssetName)
 {
-	auto ModuleName = InAssetData.PackagePath.ToString();
+	auto ModuleName = InAssetData.PackagePath.ToString().Replace(TEXT("Game"), FApp::GetProjectName());
 
 	auto DirectoryName = FPaths::Combine(GetGenerationPath(ModuleName), ModuleName);
 
