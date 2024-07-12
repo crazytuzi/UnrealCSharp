@@ -38,6 +38,8 @@ public:
 	template <typename T>
 	static FString GetFileName(const T* InField);
 
+	static TArray<FString> GetOverrideFunctions(const FString& InNameSpace, const FString& InClass);
+
 	static bool IsSkip(const UField* InField);
 
 	static bool IsSupported(FProperty* Property);
@@ -61,6 +63,8 @@ public:
 	static GENERATOR_API void EndGenerator();
 
 private:
+	static TMap<FString, TArray<FString>> OverrideFunctionsMap;
+
 	static bool bIsSkipGenerateEngineModules;
 
 	static bool bIsGenerateAllModules;

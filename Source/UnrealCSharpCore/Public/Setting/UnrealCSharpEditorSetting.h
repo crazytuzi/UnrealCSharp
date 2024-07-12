@@ -84,7 +84,11 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	TArray<TSubclassOf<UObject>> SupportedAssetClass;
 
-	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (GetOptions = "GetModuleList"))
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableExport;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator,
+		meta = (GetOptions = "GetModuleList", EditCondition = "bEnableExport"))
 	TArray<FString> ExportModule;
 #endif
 };

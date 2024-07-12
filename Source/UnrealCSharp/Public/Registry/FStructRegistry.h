@@ -19,7 +19,7 @@ static bool operator==(const FStructAddressBase& A, const FStructAddressBase& B)
 
 static uint32 GetTypeHash(const FStructAddressBase& InStructAddressBase);
 
-class FStructRegistry
+class UNREALCSHARP_API FStructRegistry
 {
 private:
 	struct FStructAddress : FStructAddressBase

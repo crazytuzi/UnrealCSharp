@@ -1,5 +1,4 @@
 ﻿#include "FGeneratorCore.h"
-#include "FClassGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Binding/TypeInfo/TName.inl"
@@ -12,6 +11,8 @@
 #if UE_F_OPTIONAL_PROPERTY
 #include "UObject/PropertyOptional.h"
 #endif
+
+TMap<FString, TArray<FString>> FGeneratorCore::OverrideFunctionsMap;
 
 bool FGeneratorCore::bIsSkipGenerateEngineModules;
 
@@ -629,6 +630,18 @@ FString FGeneratorCore::GetModuleRelativePath(const FString& InModuleRelativePat
 	return InModuleRelativePath.Replace(TEXT("Public/"), TEXT("")).Replace(TEXT("Private/"), TEXT(""));
 }
 
+TArray<FString> FGeneratorCore::GetOverrideFunctions(const FString& InNameSpace, const FString& InClass)
+{
+	const auto FoundFunctions = OverrideFunctionsMap.Find(FString::Printf(TEXT(
+		"%s.%s"
+	),
+	                                                                      *InNameSpace,
+	                                                                      *InClass
+	));
+
+	return FoundFunctions != nullptr ? *FoundFunctions : TArray<FString>{};
+}
+
 bool FGeneratorCore::IsSkip(const UField* InField)
 {
 	return bIsSkipGenerateEngineModules && FUnrealCSharpFunctionLibrary::IsEngineType(InField);
@@ -937,7 +950,7 @@ void FGeneratorCore::BeginGenerator()
 		}
 	}
 
-	FClassGenerator::OverrideFunctionsMap = FUnrealCSharpFunctionLibrary::LoadFileToArray(FString::Printf(TEXT(
+	OverrideFunctionsMap = FUnrealCSharpFunctionLibrary::LoadFileToArray(FString::Printf(TEXT(
 		"%s/%s.json"
 	),
 		*FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),

@@ -718,6 +718,8 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 	                            TEXT("Win64")
 #elif PLATFORM_MAC_X86
 	                            TEXT("macOS_x86_64")
+#elif PLATFORM_MAC_ARM64
+	                            TEXT("macOS_arm64")
 #endif
 	);
 #else
@@ -740,6 +742,14 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 	                            TEXT("Linux"),
 	                            MONO_CONFIGURATION,
 	                            TEXT("Linux_x86_64"));
+#elif PLATFORM_MAC_X86
+                                    TEXT("macOS_x86_64"),
+                                    MONO_CONFIGURATION,
+                                    TEXT("macOS_x86_64"));
+#elif PLATFORM_MAC_ARM64
+                                    TEXT("macOS_arm64"),
+                                    MONO_CONFIGURATION,
+                                    TEXT("macOS_arm64"));
 #endif
 #endif
 

@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using System;
+using System.Collections.Concurrent;
 using EpicGames.Core;
 using EpicGames.UHT.Types;
 using EpicGames.UHT.Utils;
@@ -21,14 +22,37 @@ namespace SourceCodeGeneratorUbtPlugin
             Options = UhtExporterOptions.Default, ModuleName = "UnrealCSharp")]
         private static void SourceCodeGeneratorExporter(IUhtExportFactory factory)
         {
-            new SourceCodeGenerator(factory).Generate();
+            var SettingFilePath = Path.Combine(new string(factory.Session.ProjectDirectory),
+                "Config",
+                "DefaultUnrealCSharpEditorSetting.ini");
+
+            if (File.Exists(SettingFilePath))
+            {
+                var SettingConfigFile = new ConfigFile(new FileReference(SettingFilePath));
+
+                if (SettingConfigFile.TryGetSection("/Script/UnrealCSharpCore.UnrealCSharpEditorSetting",
+                        out var SettingConfigSection))
+                {
+                    var SettingConfigHierarchySection = new ConfigHierarchySection(
+                        new List<ConfigFileSection> { SettingConfigSection });
+
+                    if (SettingConfigHierarchySection.TryGetValue("bEnableExport",
+                            out var Value))
+                    {
+                        if (bool.Parse(Value.ToLower()))
+                        {
+                            new SourceCodeGenerator(factory).Generate();
+                        }
+                    }
+                }
+            }
         }
 
         private readonly IUhtExportFactory Factory;
 
         private UhtSession Session => Factory.Session;
 
-        private List<UhtClass> ExportClasses = new();
+        private ConcurrentQueue<UhtClass> ExportClasses = new();
 
         private HashSet<string> Project = new();
 
@@ -82,10 +106,10 @@ namespace SourceCodeGeneratorUbtPlugin
                 var SettingConfigFile = new ConfigFile(new FileReference(SettingFilePath));
 
                 if (SettingConfigFile.TryGetSection("/Script/UnrealCSharpCore.UnrealCSharpEditorSetting",
-                        out var ScriptConfigSection))
+                        out var SettingConfigSection))
                 {
                     var SettingConfigHierarchySection = new ConfigHierarchySection(
-                        new List<ConfigFileSection> { ScriptConfigSection });
+                        new List<ConfigFileSection> { SettingConfigSection });
 
                     if (SettingConfigHierarchySection.TryGetValues("ExportModule",
                             out var Values))
@@ -97,8 +121,6 @@ namespace SourceCodeGeneratorUbtPlugin
                     }
                 }
             }
-
-            List<UhtClass> classes = new();
 
             List<Task?> tasks = new();
 
@@ -116,7 +138,7 @@ namespace SourceCodeGeneratorUbtPlugin
                     continue;
                 }
 
-                QueueClassExports(package, package, classes, tasks);
+                QueueClassExports(package, tasks);
             }
 
             var waitTasks = tasks.Where(Task => Task != null).Cast<Task>().ToArray();
@@ -132,25 +154,21 @@ namespace SourceCodeGeneratorUbtPlugin
         /// <summary>
         /// Collect the classes to be exported for the given package and type
         /// </summary>
-        /// <param name="package">Package being exported</param>
         /// <param name="type">Type to test for exporting</param>
-        /// <param name="classes">Collection of exported classes</param>
         /// <param name="tasks">Collection of queued tasks</param>
-        private void QueueClassExports(UhtPackage package, UhtType type, List<UhtClass> classes, List<Task?> tasks)
+        private void QueueClassExports(UhtType type, List<Task?> tasks)
         {
             if (type is UhtClass classObj)
             {
                 if (CanExportClass(classObj))
                 {
-                    classes.Add(classObj);
-
                     tasks.Add(Factory.CreateTask(_ => { ExportClass(classObj); }));
                 }
             }
 
             foreach (var child in type.Children)
             {
-                QueueClassExports(package, child, classes, tasks);
+                QueueClassExports(child, tasks);
             }
         }
 
@@ -178,6 +196,16 @@ namespace SourceCodeGeneratorUbtPlugin
             }
 
             if (!function.FunctionFlags.HasAnyFlags(EFunctionFlags.Public))
+            {
+                return false;
+            }
+
+            if (function.Deprecated)
+            {
+                return false;
+            }
+
+            if (function.FunctionFlags.HasAnyFlags(EFunctionFlags.EditorOnly))
             {
                 return false;
             }
@@ -225,13 +253,17 @@ namespace SourceCodeGeneratorUbtPlugin
         /// <returns>True if the property should be exported</returns>
         protected virtual bool CanExportProperty(UhtProperty property)
         {
-            return property.PropertyFlags.HasAnyFlags(EPropertyFlags.NativeAccessSpecifierPublic) &&
+            return !property.Deprecated &&
+                   !property.PropertyFlags.HasAnyFlags(EPropertyFlags.EditorOnly) &&
+                   property.PropertyFlags.HasAnyFlags(EPropertyFlags.NativeAccessSpecifierPublic) &&
                    IsPropertyTypeSupported(property);
         }
 
         private static bool IsClassTypeSupported(UhtClass classObj)
         {
-            return classObj.ClassFlags.HasAnyFlags(EClassFlags.RequiredAPI | EClassFlags.MinimalAPI);
+            return !classObj.Deprecated &&
+                   (classObj == classObj.Session.UObject ||
+                    classObj.ClassFlags.HasAnyFlags(EClassFlags.RequiredAPI | EClassFlags.MinimalAPI));
         }
 
         private static bool IsPropertyTypeSupported(UhtProperty property)
@@ -257,7 +289,15 @@ namespace SourceCodeGeneratorUbtPlugin
                 }
             }
 
-            if (property is UhtDelegateProperty or UhtMulticastDelegateProperty)
+            if (property is UhtInterfaceProperty interfaceProperty)
+            {
+                if (interfaceProperty.InterfaceClass == interfaceProperty.Session.IInterface)
+                {
+                    return false;
+                }
+            }
+
+            if (property is UhtDelegateProperty or UhtMulticastDelegateProperty or UhtFieldPathProperty)
             {
                 return false;
             }
@@ -282,39 +322,51 @@ namespace SourceCodeGeneratorUbtPlugin
             {
                 var fileName = Factory.MakePath(classObj.EngineName, BindingSuffix);
 
-                Factory.CommitOutput(fileName, borrower.StringBuilder);
+                SaveIfChanged(fileName, borrower.StringBuilder);
 
-                ExportClasses.Add(classObj);
+                ExportClasses.Enqueue(classObj);
             }
         }
 
         private void Finish()
         {
-            var packages = new Dictionary<UhtPackage, BorrowStringBuilder>();
+            var packages = new Dictionary<UhtPackage, List<string>>();
 
-            foreach (var Class in ExportClasses)
+            foreach (var ExportClass in ExportClasses)
             {
-                if (!packages.ContainsKey(Class.Package))
+                if (!packages.ContainsKey(ExportClass.Package))
                 {
-                    packages.Add(Class.Package, new BorrowStringBuilder(StringBuilderCache.Big));
-
-                    packages[Class.Package].StringBuilder.Append("#pragma once\r\n\r\n");
+                    packages.Add(ExportClass.Package, new List<string>());
                 }
 
-                packages[Class.Package].StringBuilder.Append(GenerateInclude($"{Class.EngineName}{BindingSuffix}"));
+                packages[ExportClass.Package].Add(ExportClass.EngineName);
             }
 
             foreach (var package in packages)
             {
+                package.Value.Sort();
+
+                var borrow = new BorrowStringBuilder(StringBuilderCache.Big);
+
+                var builder = borrow.StringBuilder;
+
+                builder.Append("#pragma once\r\n\r\n");
+
+                foreach (var value in package.Value)
+                {
+                    builder.Append(GenerateInclude($"{value}{BindingSuffix}"));
+                }
+
                 var fileName = Factory.MakePath(package.Key, HeaderSuffix);
 
-                Factory.CommitOutput(fileName, package.Value.StringBuilder);
+                SaveIfChanged(fileName, builder);
             }
         }
 
         private bool ExportClass(StringBuilder builder, UhtClass classObj)
         {
-            builder.Append("#pragma once\r\n\r\n");
+            builder.Append("#pragma once\r\n\r\n" +
+                           "PRAGMA_DISABLE_DEPRECATION_WARNINGS\r\n\r\n");
 
             var DependencyClasses = new HashSet<UhtClass> { classObj };
 
@@ -337,36 +389,7 @@ namespace SourceCodeGeneratorUbtPlugin
             {
                 if (child is UhtProperty property && CanExportProperty(property))
                 {
-                    if (property is UhtClassProperty classProperty)
-                    {
-                        if (classProperty.MetaClass != null)
-                        {
-                            DependencyClasses.Add(classProperty.MetaClass);
-                        }
-                    }
-                    else if (property is UhtObjectPtrProperty objectPtrProperty)
-                    {
-                        DependencyClasses.Add(objectPtrProperty.Class);
-                    }
-                    else if (property is UhtObjectProperty objectProperty)
-                    {
-                        DependencyClasses.Add(objectProperty.Class);
-                    }
-                    else if (property is UhtSoftClassProperty softClassProperty)
-                    {
-                        if (softClassProperty.MetaClass != null)
-                        {
-                            DependencyClasses.Add(softClassProperty.MetaClass);
-                        }
-                    }
-                    else if (property is UhtSoftObjectProperty softObjectProperty)
-                    {
-                        DependencyClasses.Add(softObjectProperty.Class);
-                    }
-                    else if (property is UhtArrayProperty { ValueProperty: UhtObjectProperty valueProperty })
-                    {
-                        DependencyClasses.Add(valueProperty.Class);
-                    }
+                    GetDependencyClasses(property, DependencyClasses);
 
                     ExportProperty(bodyBuilder, classObj, property);
 
@@ -384,14 +407,7 @@ namespace SourceCodeGeneratorUbtPlugin
                     {
                         if (child is UhtProperty property)
                         {
-                            if (property is UhtObjectProperty objectProperty)
-                            {
-                                DependencyClasses.Add(objectProperty.Class);
-                            }
-                            else if (property is UhtArrayProperty { ValueProperty: UhtObjectProperty ValueProperty })
-                            {
-                                DependencyClasses.Add(ValueProperty.Class);
-                            }
+                            GetDependencyClasses(property, DependencyClasses);
                         }
                     }
 
@@ -414,13 +430,49 @@ namespace SourceCodeGeneratorUbtPlugin
                                      "\t}}\r\n" +
                                      "}};\r\n" +
                                      "\r\n" +
-                                     "static FRegister{0} Register{1};",
+                                     "static FRegister{0} Register{1};\r\n\r\n",
                 classObj.EngineName,
                 classObj.EngineName);
 
             builder.Append(bodyBuilder);
 
+            builder.Append("PRAGMA_ENABLE_DEPRECATION_WARNINGS\r\n");
+
             return bExportProperty || bExportFunction;
+        }
+
+        private static void GetDependencyClasses(UhtProperty property, HashSet<UhtClass> DependencyClasses)
+        {
+            if (property is UhtClassProperty classProperty)
+            {
+                if (classProperty.MetaClass != null)
+                {
+                    DependencyClasses.Add(classProperty.MetaClass);
+                }
+            }
+            else if (property is UhtObjectPtrProperty objectPtrProperty)
+            {
+                DependencyClasses.Add(objectPtrProperty.Class);
+            }
+            else if (property is UhtObjectProperty objectProperty)
+            {
+                DependencyClasses.Add(objectProperty.Class);
+            }
+            else if (property is UhtSoftClassProperty softClassProperty)
+            {
+                if (softClassProperty.MetaClass != null)
+                {
+                    DependencyClasses.Add(softClassProperty.MetaClass);
+                }
+            }
+            else if (property is UhtSoftObjectProperty softObjectProperty)
+            {
+                DependencyClasses.Add(softObjectProperty.Class);
+            }
+            else if (property is UhtArrayProperty { ValueProperty: UhtObjectProperty valueProperty })
+            {
+                DependencyClasses.Add(valueProperty.Class);
+            }
         }
 
         private static void ExportFunction(StringBuilder builder, UhtClass classObj, UhtFunction function)
@@ -505,17 +557,6 @@ namespace SourceCodeGeneratorUbtPlugin
             if (property is UhtEnumProperty enumProperty)
             {
                 builder.Append(enumProperty.Enum.CppType);
-            }
-            else if (property is UhtInterfaceProperty interfaceProperty)
-            {
-                if (interfaceProperty.InterfaceClass == interfaceProperty.Session.IInterface)
-                {
-                    builder.Append("FScriptInterface");
-                }
-                else
-                {
-                    property.AppendText(builder, UhtPropertyTextType.ExportMember);
-                }
             }
             else
             {
@@ -721,6 +762,16 @@ namespace SourceCodeGeneratorUbtPlugin
         private string GetInclude(UhtClass classObj)
         {
             return GenerateInclude(GetHeaderFile(classObj));
+        }
+
+        private void SaveIfChanged(string file, StringBuilder builder)
+        {
+            if (File.Exists(file) && File.ReadAllText(file) == builder.ToString())
+            {
+                return;
+            }
+
+            Factory.CommitOutput(file, builder);
         }
 
         private void GetPlugins(string InPathName, Dictionary<string, string> Plugins)

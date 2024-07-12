@@ -131,6 +131,24 @@ void FEditorListener::OnCancelPIEEnded()
 
 void FEditorListener::OnBeginGenerator()
 {
+	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	auto BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameProxyPath(),
+	                                   FUnrealCSharpFunctionLibrary::GetBindingPath());
+
+	if (PlatformFile.DirectoryExists(*BindingPath))
+	{
+		PlatformFile.DeleteDirectoryRecursively(*BindingPath);
+	}
+
+	BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetUEProxyPath(),
+	                              FUnrealCSharpFunctionLibrary::GetBindingPath());
+
+	if (PlatformFile.DirectoryExists(*BindingPath))
+	{
+		PlatformFile.DeleteDirectoryRecursively(*BindingPath);
+	}
+
 	bIsGenerating = true;
 
 	FileChanges.Reset();
@@ -226,30 +244,33 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 
 				for (const auto& FileChange : InFileChanges)
 				{
-					auto bIsIgnored = false;
-
-					for (const auto& ChangedDirectory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
+					if (FPaths::GetExtension(FileChange.Filename) == TEXT("cs"))
 					{
-						for (const auto& IgnoreDirectory : IgnoreDirectories)
-						{
-							if (FPaths::IsUnderDirectory(FileChange.Filename,
-							                             FPaths::Combine(ChangedDirectory, IgnoreDirectory)))
-							{
-								bIsIgnored = true;
+						auto bIsIgnored = false;
 
+						for (const auto& ChangedDirectory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
+						{
+							for (const auto& IgnoreDirectory : IgnoreDirectories)
+							{
+								if (FPaths::IsUnderDirectory(FileChange.Filename,
+								                             FPaths::Combine(ChangedDirectory, IgnoreDirectory)))
+								{
+									bIsIgnored = true;
+
+									break;
+								}
+							}
+
+							if (bIsIgnored)
+							{
 								break;
 							}
 						}
 
-						if (bIsIgnored)
+						if (!bIsIgnored)
 						{
-							break;
+							FileChanges.Add(FileChange);
 						}
-					}
-
-					if (!bIsIgnored)
-					{
-						FileChanges.Add(FileChange);
 					}
 				}
 			}

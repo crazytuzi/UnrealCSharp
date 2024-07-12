@@ -73,20 +73,20 @@ struct TBaseStructure<FBoxSphereBounds>
 };
 
 template <>
-struct TBaseStructure<FExpressionOutput>
-{
-	static UScriptStruct* Get()
-	{
-		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FExpressionOutput));
-	}
-};
-
-template <>
 struct TBaseStructure<FExpressionInput>
 {
 	static UScriptStruct* Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FExpressionInput));
+	}
+};
+
+template <>
+struct TBaseStructure<FExpressionOutput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FExpressionOutput));
 	}
 };
 
