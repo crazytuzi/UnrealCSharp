@@ -198,7 +198,7 @@ void FUnrealCSharpEditorModule::Generator()
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Garbage Collect"));
 
-	CollectGarbage(RF_NoFlags, true);
+	CollectGarbage(RF_Standalone, true);
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Compiler"));
 
