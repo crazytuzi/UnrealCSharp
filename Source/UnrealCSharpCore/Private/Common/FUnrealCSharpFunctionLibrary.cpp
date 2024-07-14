@@ -37,16 +37,9 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	return GetModuleName(InField, [](FString&)
+	return GetModuleName(InField, [InField](FString& InModuleName)
 	{
-	});
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const UClass* InClass)
-{
-	return GetModuleName(InClass, [InClass](FString& InModuleName)
-	{
-		if (!InClass->IsNative())
+		if (!InField->IsNative())
 		{
 			if (auto Index = 0; InModuleName.FindLastChar(TEXT('/'), Index))
 			{
@@ -481,7 +474,10 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 
 	const auto& ProjectModuleList = GetProjectModuleList();
 
-	if (ProjectModuleList.Contains(Splits[0]) || (Splits[0] == TEXT("Script") && ProjectModuleList.Contains(Splits[1])))
+	if (ProjectModuleList.Contains(Splits[0]) ||
+		Splits[0] == TEXT("Game") ||
+		(Splits[0] == TEXT("Script") &&
+			ProjectModuleList.Contains(Splits[1])))
 	{
 		static auto GameProxyPath = GetGameProxyPath();
 
@@ -698,8 +694,6 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 			TSharedPtr<FJsonObject> JsonObj;
 
 			FJsonSerializer::Deserialize(JsonReader, JsonObj);
-
-			ProjectModuleList.Add(TEXT("Game"));
 
 			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectModules"), OutObject))
 			{

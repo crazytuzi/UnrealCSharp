@@ -302,8 +302,6 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 		ModuleArray.AddUnique(EngineModule);
 	}
 
-	ModuleArray.Remove(TEXT("Game"));
-
 	return ModuleArray;
 }
 #endif

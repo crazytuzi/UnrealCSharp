@@ -12,8 +12,6 @@ public:
 public:
 	static FString GetModuleName(const UField* InField);
 
-	static FString GetModuleName(const UClass* InClass);
-
 	static FString GetModuleName(const UField* InField, const TFunction<void(FString& InModuleName)>& InGetModuleName);
 
 	static FString GetModuleName(const FString& InModuleName);
