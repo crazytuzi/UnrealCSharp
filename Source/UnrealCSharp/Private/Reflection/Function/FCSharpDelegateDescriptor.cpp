@@ -105,7 +105,9 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 			else
 			{
 				PropertyDescriptor->Set(
-					ARRAY_GET(InValue, MonoObject*, ParamIndex++),
+					*static_cast<FGarbageCollectionHandle*>(
+						FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
+							ARRAY_GET(InValue, MonoObject*, ParamIndex++))),
 					PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 			}
 		}
@@ -188,7 +190,9 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 			else
 			{
 				PropertyDescriptor->Set(
-					ARRAY_GET(InValue, MonoObject*, ParamIndex++),
+					*static_cast<FGarbageCollectionHandle*>(
+						FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
+							ARRAY_GET(InValue, MonoObject*, ParamIndex++))),
 					PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 			}
 		}
