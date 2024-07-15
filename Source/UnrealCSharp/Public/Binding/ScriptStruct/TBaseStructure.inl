@@ -73,6 +73,15 @@ struct TBaseStructure<FBoxSphereBounds>
 };
 
 template <>
+struct TBaseStructure<FIntVector>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FIntVector));
+	}
+};
+
+template <>
 struct TBaseStructure<FExpressionInput>
 {
 	static UScriptStruct* Get()
@@ -105,5 +114,131 @@ struct TBaseStructure<FVector4f>
 	static UScriptStruct* Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FVector4f));
+	}
+};
+
+template <>
+struct TBaseStructure<FFrameRate>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FFrameRate));
+	}
+};
+
+template <>
+struct TBaseStructure<FDirectoryPath>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FDirectoryPath));
+	}
+};
+
+template <>
+struct TBaseStructure<FInterpCurveVector>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveVector));
+	}
+};
+
+template <>
+struct TBaseStructure<FInterpCurveQuat>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveQuat));
+	}
+};
+
+template <>
+struct TBaseStructure<FInterpCurveFloat>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveFloat));
+	}
+};
+
+template <>
+struct TBaseStructure<FInterpCurveVector2D>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveVector2D));
+	}
+};
+
+template <>
+struct TBaseStructure<FInterpCurveTwoVectors>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveTwoVectors));
+	}
+};
+
+template <>
+struct TBaseStructure<FInterpCurveLinearColor>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveLinearColor));
+	}
+};
+
+template <>
+struct TBaseStructure<FMaterialAttributesInput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FMaterialAttributesInput));
+	}
+};
+
+template <>
+struct TBaseStructure<FColorMaterialInput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FColorMaterialInput));
+	}
+};
+
+template <>
+struct TBaseStructure<FScalarMaterialInput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FScalarMaterialInput));
+	}
+};
+
+template <>
+struct TBaseStructure<FVectorMaterialInput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FVectorMaterialInput));
+	}
+};
+
+template <>
+struct TBaseStructure<FShadingModelMaterialInput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FShadingModelMaterialInput));
+	}
+};
+
+template <>
+struct TBaseStructure<FStrataMaterialInput>
+{
+	static UScriptStruct* Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FStrataMaterialInput));
 	}
 };

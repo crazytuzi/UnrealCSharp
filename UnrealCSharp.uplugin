@@ -47,7 +47,7 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "SourceCodeGeneratorUbtPlugin",
+			"Name": "SourceCodeGenerator",
 			"Type": "Program",
 			"LoadingPhase": "PostConfigInit"
 		}

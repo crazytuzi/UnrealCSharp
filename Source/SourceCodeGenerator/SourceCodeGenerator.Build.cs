@@ -4,9 +4,9 @@ using System.IO;
 
 namespace UnrealBuildTool.Rules
 {
-	public class SourceCodeGeneratorUbtPlugin : ModuleRules
+	public class SourceCodeGenerator : ModuleRules
 	{
-		public SourceCodeGeneratorUbtPlugin(ReadOnlyTargetRules Target) : base(Target)
+		public SourceCodeGenerator(ReadOnlyTargetRules Target) : base(Target)
 		{
 #if UE_5_2_OR_LATER
         IWYUSupport = IWYUSupport.None;
@@ -25,7 +25,7 @@ namespace UnrealBuildTool.Rules
 
 			PrivateIncludePaths.AddRange(
 				new string[] {
-					"SourceCodeGeneratorUbtPlugin/Private",
+					"SourceCodeGenerator/Private",
 					//"UnrealCSharp/UnrealCSharpCore/Public/Setting"
 				}
 			);
