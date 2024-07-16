@@ -26,7 +26,6 @@ namespace UnrealBuildTool.Rules
 			PrivateIncludePaths.AddRange(
 				new string[] {
 					"SourceCodeGenerator/Private",
-					//"UnrealCSharp/UnrealCSharpCore/Public/Setting"
 				}
 			);
 

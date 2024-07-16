@@ -1,5 +1,4 @@
-﻿#include <iostream>
-
+﻿
 #include "CoreUObject.h"
 #include "Features/IModularFeatures.h"
 #include "Modules/ModuleManager.h"
@@ -30,127 +29,126 @@ static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FP
 
 	if (Param->IsA<FObjectProperty>()
 		|| Param->IsA<FObjectPtrProperty>()
-		|| Param->IsA<FClassPtrProperty>()
-	)
+		|| Param->IsA<FClassPtrProperty>())
 	{
 		OutString = TEXT("nullptr");
-		return true;
 	}
-
-	FString InMetaData;
-
-	if (const FString* CppDefaultValue = MetaMap->Find(CppKey))
+	else
 	{
-		if (!CppDefaultValue->IsEmpty())
+		FString InMetaData;
+
+		if (const FString* CppDefaultValue = MetaMap->Find(CppKey))
 		{
-			InMetaData = *CppDefaultValue;
-		}
-	}
-
-	if (const auto StructProperty = CastField<FStructProperty>(Param))
-	{
-		if (StructProperty->Struct == TBaseStructure<FVector>::Get())
-		{
-			TArray<FString> Value;
-
-			InMetaData.ParseIntoArray(Value, TEXT(","));
-
-			if (Value.Num() == 3)
+			if (!CppDefaultValue->IsEmpty())
 			{
-				OutString = FString::Printf(TEXT(
-					"FVector(%lf, %lf, %lf)"
-				),
-											TCString<TCHAR>::Atod(*Value[0]),
-											TCString<TCHAR>::Atod(*Value[1]),
-											TCString<TCHAR>::Atod(*Value[2])
-				);
-			}
-		}
-		else if (StructProperty->Struct == TBaseStructure<FVector2D>::Get())
-		{
-			FVector2D Value;
-
-			if (Value.InitFromString(InMetaData))
-			{
-				OutString = FString::Printf(TEXT(
-					"FVector2D(%lf, %lf)"
-				),
-											Value.X,
-											Value.Y
-				);
-			}
-		}
-		else if (StructProperty->Struct == TBaseStructure<FRotator>::Get())
-		{
-			TArray<FString> Value;
-
-			InMetaData.ParseIntoArray(Value, TEXT(","));
-
-			if (Value.Num() == 3)
-			{
-				OutString = FString::Printf(TEXT(
-					"FRotator(%lf, %lf, %lf)"
-				),
-				                            TCString<TCHAR>::Atod(*Value[0]),
-				                            TCString<TCHAR>::Atod(*Value[1]),
-				                            TCString<TCHAR>::Atod(*Value[2])
-				);
-			}
-		}
-		else if (StructProperty->Struct == TBaseStructure<FLinearColor>::Get())
-		{
-			FLinearColor Value;
-
-			if (Value.InitFromString(InMetaData))
-			{
-				OutString = FString::Printf(TEXT(
-					"FLinearColor(%ff, %ff, %ff, %ff)"
-				),
-				                            Value.R,
-				                            Value.G,
-				                            Value.B,
-				                            Value.A
-				);
+				InMetaData = *CppDefaultValue;
 			}
 		}
 
-		if (OutString.IsEmpty())
+		if (const auto StructProperty = CastField<FStructProperty>(Param))
 		{
+			if (StructProperty->Struct == TBaseStructure<FVector>::Get())
+			{
+				TArray<FString> Value;
+
+				InMetaData.ParseIntoArray(Value, TEXT(","));
+
+				if (Value.Num() == 3)
+				{
+					OutString = FString::Printf(TEXT(
+						"FVector(%lf, %lf, %lf)"
+					),
+												TCString<TCHAR>::Atod(*Value[0]),
+												TCString<TCHAR>::Atod(*Value[1]),
+												TCString<TCHAR>::Atod(*Value[2])
+					);
+				}
+			}
+			else if (StructProperty->Struct == TBaseStructure<FVector2D>::Get())
+			{
+				FVector2D Value;
+
+				if (Value.InitFromString(InMetaData))
+				{
+					OutString = FString::Printf(TEXT(
+						"FVector2D(%lf, %lf)"
+					),
+												Value.X,
+												Value.Y
+					);
+				}
+			}
+			else if (StructProperty->Struct == TBaseStructure<FRotator>::Get())
+			{
+				TArray<FString> Value;
+
+				InMetaData.ParseIntoArray(Value, TEXT(","));
+
+				if (Value.Num() == 3)
+				{
+					OutString = FString::Printf(TEXT(
+						"FRotator(%lf, %lf, %lf)"
+					),
+					                            TCString<TCHAR>::Atod(*Value[0]),
+					                            TCString<TCHAR>::Atod(*Value[1]),
+					                            TCString<TCHAR>::Atod(*Value[2])
+					);
+				}
+			}
+			else if (StructProperty->Struct == TBaseStructure<FLinearColor>::Get())
+			{
+				FLinearColor Value;
+
+				if (Value.InitFromString(InMetaData))
+				{
+					OutString = FString::Printf(TEXT(
+						"FLinearColor(%ff, %ff, %ff, %ff)"
+					),
+					                            Value.R,
+					                            Value.G,
+					                            Value.B,
+					                            Value.A
+					);
+				}
+			}
+
+			if (OutString.IsEmpty())
+			{
+				OutString = FString::Printf(TEXT(
+					"%s%s()"
+				),
+											StructProperty->Struct->GetPrefixCPP(),
+											*StructProperty->Struct->GetName()
+				);
+			}
+		}
+		else if (Param->IsA<FStrProperty>()) 
+		{
+			OutString = FString::Printf(TEXT("FString(\"%s\")"), *InMetaData);
+		}
+		else if (Param->IsA<FNameProperty>())
+		{
+			OutString = FString::Printf(TEXT("TEXT(\"%s\")"), *InMetaData);
+		}
+		else if (Param->IsA<FTextProperty>())
+		{
+			static auto InvText = FString(TEXT("INVTEXT"));
+
+			if (InMetaData.Contains(InvText))
+			{
+				InMetaData = InMetaData.Mid(InvText.Len() + 2, InMetaData.Len() - InvText.Len() - 4);
+			}
+
 			OutString = FString::Printf(TEXT(
-				"%s%s()"
+				"INVTEXT(\"%s\")"
 			),
-										StructProperty->Struct->GetPrefixCPP(),
-										*StructProperty->Struct->GetName()
+			                            *InMetaData
 			);
 		}
-	}
-	else if (Param->IsA<FStrProperty>()) 
-	{
-		OutString = FString::Printf(TEXT("FString(\"%s\")"), *InMetaData);
-	}
-	else if (Param->IsA<FNameProperty>())
-	{
-		OutString = FString::Printf(TEXT("TEXT(\"%s\")"), *InMetaData);
-	}
-	else if (Param->IsA<FTextProperty>())
-	{
-		static auto InvText = FString(TEXT("INVTEXT"));
-
-		if (InMetaData.Contains(InvText))
+		else if (!InMetaData.IsEmpty())
 		{
-			InMetaData = InMetaData.Mid(InvText.Len() + 2, InMetaData.Len() - InvText.Len() - 4);
+			OutString = InMetaData;
 		}
-
-		OutString = FString::Printf(TEXT(
-			"INVTEXT(\"%s\")"
-		),
-		                            *InMetaData
-		);
-	}
-
-	if (OutString.IsEmpty() && !InMetaData.IsEmpty())
-	{
-		OutString = InMetaData;
 	}
 
 	return !OutString.IsEmpty();

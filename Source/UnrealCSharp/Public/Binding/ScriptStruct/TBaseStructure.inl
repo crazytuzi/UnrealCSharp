@@ -72,6 +72,7 @@ struct TBaseStructure<FBoxSphereBounds>
 	}
 };
 
+#if UE_T_BASE_STRUCTURE_F_INT_VECTOR
 template <>
 struct TBaseStructure<FIntVector>
 {
@@ -80,6 +81,7 @@ struct TBaseStructure<FIntVector>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FIntVector));
 	}
 };
+#endif
 
 template <>
 struct TBaseStructure<FExpressionInput>
