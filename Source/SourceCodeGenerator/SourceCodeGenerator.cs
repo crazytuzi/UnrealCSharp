@@ -714,6 +714,11 @@ namespace SourceCodeGeneratorUbtPlugin
 
         private static string GetFunctionDefaultValue(UhtFunction function)
         {
+            if (!function.FunctionFlags.HasAnyFlags(EFunctionFlags.BlueprintCallable))
+            {
+                return new string("");
+            }
+
             var builder = new StringBuilder();
 
             foreach (var child in function.Children)
