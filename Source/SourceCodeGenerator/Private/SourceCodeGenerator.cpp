@@ -1,5 +1,6 @@
 ﻿#include "SourceCodeGenerator.h"
 #include "Features/IModularFeatures.h"
+#include "Misc/FileHelper.h"
 
 #define LOCTEXT_NAMESPACE "FSourceCodeGeneratorModule"
 
@@ -117,9 +118,9 @@ void FSourceCodeGeneratorModule::ExportFunction(FBigStringBuilder& StringBuilder
 
 	bool bHasParameters = false;
 
-	for (TFieldIterator<FProperty> It(Function); It; ++It)
+	for (TFieldIterator<FProperty> Property(Function); Property; ++Property)
 	{
-		if (It->HasAnyPropertyFlags(CPF_Parm) && !It->HasAnyPropertyFlags(CPF_ReturnParm))
+		if (Property->HasAnyPropertyFlags(CPF_Parm) && !Property->HasAnyPropertyFlags(CPF_ReturnParm))
 		{
 			bHasParameters = true;
 			
@@ -129,7 +130,10 @@ void FSourceCodeGeneratorModule::ExportFunction(FBigStringBuilder& StringBuilder
 
 	if (bHasParameters)
 	{
-		StringBuilder.Append(FString::Printf(TEXT(", %s"), *GetFunctionParamName(Function)));
+		StringBuilder.Appendf(TEXT(
+			", %s"
+		),
+		                      *GetFunctionParamName(Function));
 	}
 
 	if (!Function->HasAnyFunctionFlags(FUNC_Static))
@@ -142,7 +146,7 @@ void FSourceCodeGeneratorModule::ExportFunction(FBigStringBuilder& StringBuilder
 		StringBuilder.Append(GetFunctionDefaultValue(Function));
 	}
 
-	StringBuilder.Append("))\r\n");
+	StringBuilder.Append(TEXT("))\r\n"));
 }
 
 void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& SourceHeaderFilename,
@@ -200,7 +204,7 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 			StringBuilder.Append(GetInclude(DependencyClass));
 		}
 
-		StringBuilder.Append("\r\n");
+		StringBuilder.Append(TEXT("\r\n"));
 
 		BodyBuilder.RemoveSuffix(2);
 
@@ -215,46 +219,54 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 		                                   *Class->GetName()
 		);
 
-		ModuleHeaderPath.FindOrAdd(
-			FPaths::GetCleanFilename(Class->GetPackage()->GetName())).Add(*Class->GetName() + BindingSuffix);
-
 		StringBuilder.Append(BodyBuilder);
 
-		StringBuilder.Append(
-			"PRAGMA_ENABLE_DEPRECATION_WARNINGS\r\n");
+		StringBuilder.Append(TEXT("PRAGMA_ENABLE_DEPRECATION_WARNINGS\r\n"));
 
-		const FString FilePath = FString::Printf(
-			TEXT("%s"), *FPaths::Combine(OutputDir, *Class->GetName() + BindingSuffix));
+		const auto FilePath = FPaths::Combine(OutputDir, *Class->GetName() + BindingSuffix);
 
 		SaveIfChanged(*FilePath, StringBuilder.ToString());
+
+		ExportClasses.Add(Class);
 	}
 }
 
 void FSourceCodeGeneratorModule::FinishExport()
 {
-	for (const auto& HeaderIt : ModuleHeaderPath)
+	TMap<UPackage*, TArray<FString>> Packages;
+
+	for(auto ExportClass : ExportClasses)
 	{
-		FString FileContent;
-
-		const FString FilePath = FString::Printf(
-			TEXT("%s"), *FPaths::Combine(OutputDir, *HeaderIt.Key + HeaderSuffix));
-
-		for (const auto& BindingName : HeaderIt.Value)
+		if(!Packages.Contains(ExportClass->GetPackage()))
 		{
-			FileContent.Append(FString::Printf(TEXT(
-				"#include \"%s\"\n"
-			),
-			                                   *BindingName
-			));
+			Packages[ExportClass->GetPackage()] = {};
 		}
 
-		SaveIfChanged(*FilePath, FileContent);
+		Packages[ExportClass->GetPackage()].Add(*ExportClass->GetName());
+	}
+
+	for (auto Package : Packages)
+	{
+		Package.Value.Sort();
+		
+		FBigStringBuilder StringBuilder;
+
+		StringBuilder.Append(TEXT("#pragma once\r\n\r\n"));
+
+		for (auto Value : Package.Value)
+		{
+			StringBuilder.Append(GenerateInclude(*Value + BindingSuffix));
+		}
+
+		const auto FilePath = FPaths::Combine(OutputDir, *Package.Key->GetName() + HeaderSuffix);
+
+		SaveIfChanged(FilePath, StringBuilder.ToString());
 	}
 }
 
 FString FSourceCodeGeneratorModule::GetGeneratorName() const
 {
-	return TEXT("UnrealCSharp Script Generator");
+	return TEXT("UnrealCSharp Source Code Generator");
 }
 
 bool FSourceCodeGeneratorModule::CanExportClass(const UClass* Class)
@@ -265,9 +277,9 @@ bool FSourceCodeGeneratorModule::CanExportClass(const UClass* Class)
 
 bool FSourceCodeGeneratorModule::CanExportFunction(const UFunction* Function)
 {
-	if (Function->GetOwnerClass() != nullptr)
+	if (auto OwnerClass = Function->GetOwnerClass())
 	{
-		if (!Function->GetOwnerClass()->HasAnyClassFlags(CLASS_RequiredAPI) &&
+		if (!OwnerClass->HasAnyClassFlags(CLASS_RequiredAPI) &&
 			!Function->HasAnyFunctionFlags(FUNC_RequiredAPI))
 		{
 			return false;
@@ -302,9 +314,9 @@ bool FSourceCodeGeneratorModule::CanExportFunction(const UFunction* Function)
 		}
 	}
 
-	for (TFieldIterator<FProperty> It(Function); It; ++It)
+	for (TFieldIterator<FProperty> Property(Function); Property; ++Property)
 	{
-		if (!IsPropertyTypeSupported(*It))
+		if (!IsPropertyTypeSupported(*Property))
 		{
 			return false;
 		}
@@ -329,12 +341,12 @@ bool FSourceCodeGeneratorModule::IsClassTypeSupported(const UClass* Class)
 
 bool FSourceCodeGeneratorModule::IsPropertyTypeSupported(const FProperty* Property)
 {
-	if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
+	if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
 	{
 		return IsPropertyTypeSupported(ArrayProperty->Inner);
 	}
 
-	if (const FObjectProperty* ObjectProperty = CastField<FObjectProperty>(Property))
+	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
 	{
 		if (!IsClassTypeSupported(ObjectProperty->PropertyClass))
 		{
@@ -342,7 +354,7 @@ bool FSourceCodeGeneratorModule::IsPropertyTypeSupported(const FProperty* Proper
 		}
 	}
 
-	if (const FObjectPtrProperty* ObjectPtrProperty = CastField<FObjectPtrProperty>(Property))
+	if (const auto ObjectPtrProperty = CastField<FObjectPtrProperty>(Property))
 	{
 		if (!IsClassTypeSupported(ObjectPtrProperty->PropertyClass))
 		{
@@ -391,9 +403,9 @@ bool FSourceCodeGeneratorModule::IsPropertyTypeSupported(const FProperty* Proper
 		}
 	}
 
-	bool bIsBitField = false;
+	auto bIsBitField = false;
 
-	if (const FBoolProperty* BoolProperty = CastField<FBoolProperty>(Property))
+	if (const auto BoolProperty = CastField<FBoolProperty>(Property))
 	{
 		if (!BoolProperty->IsNativeBool())
 		{
@@ -411,34 +423,34 @@ FString FSourceCodeGeneratorModule::GetReturnPropertySignature(const FProperty* 
 		return TEXT("void");
 	}
 
-	FString StringBuilder;
+	FString String;
 
-	bool bShouldConst = false;
+	auto bIsConst = false;
 
 	if (Property->HasAnyPropertyFlags(CPF_ConstParm) || Property->HasMetaData(FName("NativeConst")))
 	{
-		StringBuilder.Append(TEXT("const "));
+		String.Append(TEXT("const "));
 
-		bShouldConst = true;
+		bIsConst = true;
 	}
 
-	GetPropertySignature(Property, StringBuilder);
+	GetPropertySignature(Property, String);
 
 	if (Property->IsA<FStrProperty>())
 	{
-		if (bShouldConst &&
+		if (bIsConst &&
 			!Property->HasAnyPropertyFlags(CPF_ConstParm))
 		{
-			StringBuilder.Append(TEXT("&"));
+			String.Append(TEXT("&"));
 		}
 	}
 	else if (Property->HasAnyPropertyFlags(CPF_ReferenceParm) &&
 		Property->HasAnyPropertyFlags(CPF_ConstParm))
 	{
-		StringBuilder.Append(TEXT("&"));
+		String.Append(TEXT("&"));
 	}
 
-	return StringBuilder;
+	return String;
 }
 
 FString FSourceCodeGeneratorModule::GetParamPropertySignature(const FProperty* Property)
@@ -448,110 +460,110 @@ FString FSourceCodeGeneratorModule::GetParamPropertySignature(const FProperty* P
 		return TEXT("void");
 	}
 
-	FString SignatureContent;
+	FString String;
 
-	bool bShouldConst = false;
+	auto bIsConst = false;
 
 	if (Property->HasAnyPropertyFlags(CPF_ConstParm) || Property->HasMetaData(FName("NativeConst")))
 	{
-		SignatureContent.Append(TEXT("const "));
+		String.Append(TEXT("const "));
 
-		bShouldConst = true;
+		bIsConst = true;
 	}
 
-	GetPropertySignature(Property, SignatureContent);
+	GetPropertySignature(Property, String);
 
 	if (Property->IsA<FStrProperty>())
 	{
-		if (bShouldConst &&
+		if (bIsConst &&
 			!Property->HasAnyPropertyFlags(CPF_ConstParm) ||
 			Property->HasAnyPropertyFlags(CPF_OutParm))
 		{
-			SignatureContent.Append(TEXT("&"));
+			String.Append(TEXT("&"));
 		}
 	}
 	else if (Property->HasAnyPropertyFlags(CPF_OutParm) ||
 		Property->HasAnyPropertyFlags(CPF_ReferenceParm))
 	{
-		SignatureContent.Append(TEXT("&"));
+		String.Append(TEXT("&"));
 	}
 
-	return SignatureContent;
+	return String;
 }
 
 FString FSourceCodeGeneratorModule::GetFunctionSignature(const UClass* Class, const UFunction* Function)
 {
-	FString FunctionContent;
+	FString String;
 
-	FunctionContent.Append(GetReturnPropertySignature(Function->GetReturnProperty()));
+	String.Append(GetReturnPropertySignature(Function->GetReturnProperty()));
 
 	if (Function->HasAnyFunctionFlags(FUNC_Static))
 	{
-		FunctionContent.Append(TEXT("(*)"));
+		String.Append(TEXT("(*)"));
 	}
 	else
 	{
-		FunctionContent.Append(FString::Printf(TEXT(
+		String.Appendf(TEXT(
 			"(%s::*)"
 		),
 		                                       *(Class->GetPrefixCPP() + Class->GetName())
-		));
+		);
 	}
 
-	FunctionContent.Append("(");
+	String.Append("(");
 
-	bool bIsHasParameter = false;
+	bool bHasParameters = false;
 
-	for (TFieldIterator<FProperty> PropIt(Function); PropIt; ++PropIt)
+	for (TFieldIterator<FProperty> Property(Function); Property; ++Property)
 	{
-		if (!PropIt->HasAnyPropertyFlags(CPF_ReturnParm))
+		if (!Property->HasAnyPropertyFlags(CPF_ReturnParm))
 		{
-			FunctionContent.Append(GetParamPropertySignature(*PropIt));
+			String.Append(GetParamPropertySignature(*Property));
 
-			FunctionContent.Append(TEXT(", "));
+			String.Append(TEXT(", "));
 
-			bIsHasParameter = true;
+			bHasParameters = true;
 		}
 	}
 
-	if (bIsHasParameter)
+	if (bHasParameters)
 	{
-		FunctionContent = FunctionContent.Left(FunctionContent.Len() - 2);
+		String = String.Left(String.Len() - 2);
 	}
 
-	FunctionContent.Append(TEXT(")"));
+	String.Append(TEXT(")"));
 
 	if (Function->HasAnyFunctionFlags(FUNC_Const))
 	{
-		FunctionContent.Append(TEXT("const"));
+		String.Append(TEXT("const"));
 	}
 
-	return FunctionContent;
+	return String;
 }
 
 FString FSourceCodeGeneratorModule::GetFunctionParamName(const UFunction* Function)
 {
 	FSmallStringBuilder Builder;
 
-	Builder.Append("TArray<FString>{");
+	Builder.Append(TEXT("TArray<FString>{"));
 
-	bool bShouldRemove = false;
+	auto bIsConst = false;
 
-	for (TFieldIterator<FProperty> It(Function); It; ++It)
+	for (TFieldIterator<FProperty> Property(Function); Property; ++Property)
 	{
-		if (!It->HasAnyPropertyFlags(CPF_ReturnParm))
+		if (!Property->HasAnyPropertyFlags(CPF_ReturnParm))
 		{
-			Builder.Append(FString::Printf(TEXT(
+			Builder.Appendf(TEXT(
 				"\"%s\", "
 			),
-			                               *It->GetName()
-			));
+			                               *Property->GetName()
+			);
 
-			bShouldRemove = true;
+			bIsConst = true;
 		}
 	}
 
-	if (bShouldRemove)
+	if (bIsConst)
 	{
 		Builder.RemoveSuffix(2);
 	}
@@ -695,7 +707,7 @@ void FSourceCodeGeneratorModule::SaveIfChanged(const FString& FileName, const FS
 			return;
 		}
 
-		FFileHelper::SaveStringToFile(builder, *FileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+		FFileHelper::SaveStringToFile(String, *FileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
 	}
 }
 

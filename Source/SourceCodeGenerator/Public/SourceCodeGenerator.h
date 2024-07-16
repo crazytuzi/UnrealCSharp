@@ -93,7 +93,7 @@ private:
 
 	TMap<FString, FString> HeaderPath;
 
-	TMap<FString, TArray<FString>> ModuleHeaderPath;
+	TArray<UClass*> ExportClasses;
 
 	const FString BindingSuffix = FString(TEXT(".binding.inl"));
 
