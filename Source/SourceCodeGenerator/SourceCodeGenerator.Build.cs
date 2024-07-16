@@ -1,6 +1,4 @@
-﻿
-using UnrealBuildTool;
-using System.IO;
+﻿using UnrealBuildTool;
 
 namespace UnrealBuildTool.Rules
 {
