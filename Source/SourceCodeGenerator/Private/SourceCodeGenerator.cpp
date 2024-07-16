@@ -8,14 +8,14 @@
 
 #define LOCTEXT_NAMESPACE "FSourceCodeGeneratorModule"
 
-#define STRING_BUILDER_BUFFER_SIZE 256 * 1024
+#define STRING_BUILDER_BUFFER_SIZE_BIG 256 * 1024
+
+#define STRING_BUILDER_BUFFER_SIZE_SMALL 1 * 1024
 
 static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FProperty* Param, FString& OutString)
 {
 	if (MetaMap == nullptr || Param == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("\t\t\t\t\t UnrealCSharpGenCodeError : FindDefaultValueString : MetaMap == nullptr || Param == nullptr\n"));
-		
 		return false;
 	}
 
@@ -28,9 +28,9 @@ static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FP
 		return false;
 	}
 
-	if (Param->IsA(FObjectProperty::StaticClass())
-		|| Param->IsA(FObjectPtrProperty::StaticClass())
-		|| Param->IsA(FClassPtrProperty::StaticClass())
+	if (Param->IsA<FObjectProperty>()
+		|| Param->IsA<FObjectPtrProperty>()
+		|| Param->IsA<FClassPtrProperty>()
 	)
 	{
 		OutString = TEXT("nullptr");
@@ -49,7 +49,38 @@ static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FP
 
 	if (const auto StructProperty = CastField<FStructProperty>(Param))
 	{
-		if (StructProperty->Struct == TBaseStructure<FRotator>::Get())
+		if (StructProperty->Struct == TBaseStructure<FVector>::Get())
+		{
+			TArray<FString> Value;
+
+			InMetaData.ParseIntoArray(Value, TEXT(","));
+
+			if (Value.Num() == 3)
+			{
+				OutString = FString::Printf(TEXT(
+					"FVector(%lf, %lf, %lf)"
+				),
+											TCString<TCHAR>::Atod(*Value[0]),
+											TCString<TCHAR>::Atod(*Value[1]),
+											TCString<TCHAR>::Atod(*Value[2])
+				);
+			}
+		}
+		else if (StructProperty->Struct == TBaseStructure<FVector2D>::Get())
+		{
+			FVector2D Value;
+
+			if (Value.InitFromString(InMetaData))
+			{
+				OutString = FString::Printf(TEXT(
+					"FVector2D(%lf, %lf)"
+				),
+											Value.X,
+											Value.Y
+				);
+			}
+		}
+		else if (StructProperty->Struct == TBaseStructure<FRotator>::Get())
 		{
 			TArray<FString> Value;
 
@@ -64,12 +95,9 @@ static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FP
 				                            TCString<TCHAR>::Atod(*Value[1]),
 				                            TCString<TCHAR>::Atod(*Value[2])
 				);
-
-				return true;
 			}
 		}
-
-		if (StructProperty->Struct == TBaseStructure<FLinearColor>::Get())
+		else if (StructProperty->Struct == TBaseStructure<FLinearColor>::Get())
 		{
 			FLinearColor Value;
 
@@ -83,71 +111,28 @@ static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FP
 				                            Value.B,
 				                            Value.A
 				);
-
-				return true;
 			}
 		}
 
-		if (StructProperty->Struct == TBaseStructure<FVector>::Get())
+		if (OutString.IsEmpty())
 		{
-			TArray<FString> Value;
-
-			InMetaData.ParseIntoArray(Value, TEXT(","));
-
-			if (Value.Num() == 3)
-			{
-				OutString = FString::Printf(TEXT(
-					"FVector(%lf, %lf, %lf)"
-				),
-				                            TCString<TCHAR>::Atod(*Value[0]),
-				                            TCString<TCHAR>::Atod(*Value[1]),
-				                            TCString<TCHAR>::Atod(*Value[2])
-				);
-
-				return true;
-			}
+			OutString = FString::Printf(TEXT(
+				"%s%s()"
+			),
+										StructProperty->Struct->GetPrefixCPP(),
+										*StructProperty->Struct->GetName()
+			);
 		}
-
-		if (StructProperty->Struct == TBaseStructure<FVector2D>::Get())
-		{
-			FVector2D Value;
-
-			if (Value.InitFromString(InMetaData))
-			{
-				OutString = FString::Printf(TEXT(
-					"FVector2D(%lf, %lf)"
-				),
-				                            Value.X,
-				                            Value.Y
-				);
-
-				return true;
-			}
-		}
-
-		OutString = FString::Printf(TEXT(
-			"%s%s()"
-		),
-		                            StructProperty->Struct->GetPrefixCPP(),
-		                            *StructProperty->Struct->GetName()
-		);
-
-		return true;
 	}
-
-	if (Param->IsA(FStrProperty::StaticClass())) // FString
+	else if (Param->IsA<FStrProperty>()) 
 	{
 		OutString = FString::Printf(TEXT("FString(\"%s\")"), *InMetaData);
-		return true;
 	}
-
-	if (Param->IsA(FNameProperty::StaticClass()))
+	else if (Param->IsA<FNameProperty>())
 	{
 		OutString = FString::Printf(TEXT("TEXT(\"%s\")"), *InMetaData);
-		return true;
 	}
-
-	if (Param->IsA(FTextProperty::StaticClass()))
+	else if (Param->IsA<FTextProperty>())
 	{
 		static auto InvText = FString(TEXT("INVTEXT"));
 
@@ -161,7 +146,6 @@ static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FP
 		),
 		                            *InMetaData
 		);
-		return true;
 	}
 
 	if (OutString.IsEmpty() && !InMetaData.IsEmpty())
@@ -169,7 +153,7 @@ static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FP
 		OutString = InMetaData;
 	}
 
-	return true;
+	return !OutString.IsEmpty();
 }
 
 class FSourceCodeGeneratorModule : public IScriptGeneratorPluginInterface
@@ -262,13 +246,9 @@ public:
 		{
 			GConfig->GetArray(*ConfigSection, TEXT("+ExportModule"), ExportModules, ConfigFilePath);
 		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("\t\t\t\t\t UnrealCSharpGenCodeError : Config file not found\n"));
-		}
 	}
 
-	static void ExportProperty(TStringBuilder<STRING_BUILDER_BUFFER_SIZE>& StringBuilder, const UClass* Class,
+	static void ExportProperty(TStringBuilder<STRING_BUILDER_BUFFER_SIZE_BIG>& StringBuilder, const UClass* Class,
 	                           const FProperty* Property)
 	{
 		StringBuilder.Append(FString::Printf(
@@ -276,7 +256,7 @@ public:
 			*(Class->GetPrefixCPP() + Class->GetName()), *Property->GetNameCPP()));
 	}
 
-	static void ExportFunction(TStringBuilder<STRING_BUILDER_BUFFER_SIZE>& StringBuilder, const UClass* Class,
+	static void ExportFunction(TStringBuilder<STRING_BUILDER_BUFFER_SIZE_BIG>& StringBuilder, const UClass* Class,
 	                           const UFunction* Function)
 	{
 		StringBuilder.Append(
@@ -321,9 +301,9 @@ public:
 		{
 			TSet<UClass*> DependencyClasses = TSet({Class});
 
-			TStringBuilder<STRING_BUILDER_BUFFER_SIZE> StringBuilder;
+			TStringBuilder<STRING_BUILDER_BUFFER_SIZE_BIG> StringBuilder;
 
-			TStringBuilder<STRING_BUILDER_BUFFER_SIZE> BodyBuilder;
+			TStringBuilder<STRING_BUILDER_BUFFER_SIZE_BIG> BodyBuilder;
 
 			StringBuilder.Append(
 				"#pragma once\r\n\r\n"
@@ -466,7 +446,7 @@ protected:
 
 		if (const auto ReturnProperty = Function->GetReturnProperty())
 		{
-			if (ReturnProperty->IsA(FMapProperty::StaticClass()))
+			if (ReturnProperty->IsA<FMapProperty>())
 			{
 				return false;
 			}
@@ -529,27 +509,27 @@ private:
 			}
 		}
 
-		if (Property->IsA(FEnumProperty::StaticClass()))
+		if (Property->IsA<FEnumProperty>())
 		{
 			return false;
 		}
 
-		if (Property->IsA(FByteProperty::StaticClass()))
+		if (Property->IsA<FByteProperty>())
 		{
 			return false;
 		}
 
-		if (Property->IsA(FDelegateProperty::StaticClass()))
+		if (Property->IsA<FDelegateProperty>())
 		{
 			return false;
 		}
 
-		if (Property->IsA(FMulticastDelegateProperty::StaticClass()))
+		if (Property->IsA<FMulticastDelegateProperty>())
 		{
 			return false;
 		}
 
-		if (Property->IsA(FFieldPathProperty::StaticClass()))
+		if (Property->IsA<FFieldPathProperty>())
 		{
 			return false;
 		}
@@ -593,9 +573,9 @@ private:
 			bShouldConst = true;
 		}
 
-		GetPropertySignature_Internal(Property, StringBuilder);
+		GetPropertySignature(Property, StringBuilder);
 
-		if (Property->IsA(FStrProperty::StaticClass())) // FString
+		if (Property->IsA<FStrProperty>())
 		{
 			if (bShouldConst &&
 				!Property->HasAnyPropertyFlags(CPF_ConstParm))
@@ -619,57 +599,57 @@ private:
 			return TEXT("void");
 		}
 
-		FString StringBuilder;
+		FString SignatureContent;
 
 		bool bShouldConst = false;
 
 		if (Property->HasAnyPropertyFlags(CPF_ConstParm) || Property->HasMetaData(FName("NativeConst")))
 		{
-			StringBuilder.Append(TEXT("const "));
+			SignatureContent.Append(TEXT("const "));
 
 			bShouldConst = true;
 		}
 
-		GetPropertySignature_Internal(Property, StringBuilder);
+		GetPropertySignature(Property, SignatureContent);
 
-		if (Property->IsA(FStrProperty::StaticClass())) // FString
+		if (Property->IsA<FStrProperty>())
 		{
 			if (bShouldConst &&
 				!Property->HasAnyPropertyFlags(CPF_ConstParm) ||
 				Property->HasAnyPropertyFlags(CPF_OutParm))
 			{
-				StringBuilder.Append(TEXT("&"));
+				SignatureContent.Append(TEXT("&"));
 			}
 		}
 		else if (Property->HasAnyPropertyFlags(CPF_OutParm) ||
 			Property->HasAnyPropertyFlags(CPF_ReferenceParm))
 		{
-			StringBuilder.Append(TEXT("&"));
+			SignatureContent.Append(TEXT("&"));
 		}
 
-		return StringBuilder;
+		return SignatureContent;
 	}
 
 	static FString GetFunctionSignature(const UClass* Class, const UFunction* Function)
 	{
-		FString SignatureBuilder;
+		FString FunctionContent;
 
-		SignatureBuilder.Append(GetReturnPropertySignature(Function->GetReturnProperty()));
+		FunctionContent.Append(GetReturnPropertySignature(Function->GetReturnProperty()));
 
 		if (Function->HasAnyFunctionFlags(FUNC_Static))
 		{
-			SignatureBuilder.Append(TEXT("(*)"));
+			FunctionContent.Append(TEXT("(*)"));
 		}
 		else
 		{
-			SignatureBuilder.Append(FString::Printf(TEXT(
+			FunctionContent.Append(FString::Printf(TEXT(
 				"(%s::*)"
 			),
 			                                        *(Class->GetPrefixCPP() + Class->GetName())
 			));
 		}
 
-		SignatureBuilder.Append("(");
+		FunctionContent.Append("(");
 
 		bool bIsHasParameter = false;
 
@@ -677,9 +657,9 @@ private:
 		{
 			if (!PropIt->HasAnyPropertyFlags(CPF_ReturnParm))
 			{
-				SignatureBuilder.Append(GetParamPropertySignature(*PropIt));
+				FunctionContent.Append(GetParamPropertySignature(*PropIt));
 
-				SignatureBuilder.Append(TEXT(", "));
+				FunctionContent.Append(TEXT(", "));
 
 				bIsHasParameter = true;
 			}
@@ -687,22 +667,22 @@ private:
 
 		if (bIsHasParameter)
 		{
-			SignatureBuilder = SignatureBuilder.Left(SignatureBuilder.Len() - 2);
+			FunctionContent = FunctionContent.Left(FunctionContent.Len() - 2);
 		}
 
-		SignatureBuilder.Append(TEXT(")"));
+		FunctionContent.Append(TEXT(")"));
 
 		if (Function->HasAnyFunctionFlags(FUNC_Const))
 		{
-			SignatureBuilder.Append(TEXT("const"));
+			FunctionContent.Append(TEXT("const"));
 		}
 
-		return SignatureBuilder;
+		return FunctionContent;
 	}
 
 	static FString GetFunctionParamName(const UFunction* Function)
 	{
-		FString Builder;
+		TStringBuilder<STRING_BUILDER_BUFFER_SIZE_SMALL> Builder;
 
 		Builder.Append("TArray<FString>{");
 
@@ -724,12 +704,12 @@ private:
 
 		if (bShouldRemove)
 		{
-			Builder = Builder.Left(Builder.Len() - 2);
+			Builder.RemoveSuffix(2);
 		}
 
 		Builder.Append(TEXT("}"));
 
-		return Builder;
+		return Builder.ToString();
 	}
 
 	static FString GetFunctionDefaultValue(const UFunction* Function)
@@ -739,7 +719,7 @@ private:
 			return FString();
 		}
 
-		FString Builder;
+		TStringBuilder<STRING_BUILDER_BUFFER_SIZE_SMALL> Builder;
 
 		const TMap<FName, FString>* MetaMap = UMetaData::GetMapForObject(Function);
 
@@ -757,21 +737,6 @@ private:
 					{
 						Builder.Append("nullptr");
 					}
-					// @TODO Enum
-					else if (const auto EnumProperty = CastField<FEnumProperty>(*It))
-					{
-						Builder.Append(FString::Printf(TEXT(
-							"%s::%s"
-						),
-						                               *EnumProperty->GetEnum()->CppType,
-						                               *ValueStr
-						));
-					}
-					// @TODO Byte
-					else if (const auto ByteProperty = CastField<FByteProperty>(*It))
-					{
-						Builder.Append(ValueStr);
-					}
 					else
 					{
 						Builder.Append(ValueStr);
@@ -780,10 +745,10 @@ private:
 			}
 		}
 
-		return Builder;
+		return Builder.ToString();
 	}
 
-	static void GetPropertySignature_Internal(const FProperty* Property, FString& OutString)
+	static void GetPropertySignature(const FProperty* Property, FString& OutString)
 	{
 		if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
 		{
@@ -817,16 +782,6 @@ private:
 			),
 											 *InterfaceProperty->InterfaceClass->GetName()
 			));
-		}
-		// @TODO Support Byte
-		else if (const auto ByteProperty = CastField<FByteProperty>(Property))
-		{
-			OutString.Append(Property->GetCPPType());
-		}
-		// @TODO Support Enum
-		else if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-		{
-			OutString.Append(EnumProperty->GetEnum()->CppType);
 		}
 		else
 		{
