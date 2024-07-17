@@ -236,6 +236,7 @@ struct TBaseStructure<FShadingModelMaterialInput>
 	}
 };
 
+#if UE_T_BASE_STRUCTURE_F_STRATA_MATERIAL_INPUT
 template <>
 struct TBaseStructure<FStrataMaterialInput>
 {
@@ -244,3 +245,4 @@ struct TBaseStructure<FStrataMaterialInput>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FStrataMaterialInput));
 	}
 };
+#endif
