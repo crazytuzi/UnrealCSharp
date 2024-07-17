@@ -85,7 +85,7 @@ private:
 	static void GetModules(const FString& InPathName, TSet<FString>& Modules);
 
 private:
-	FString OutputDir;
+	FString OutputPath;
 
 	TArray<FString> ExportModules;
 

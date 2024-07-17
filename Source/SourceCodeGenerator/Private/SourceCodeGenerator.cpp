@@ -50,7 +50,7 @@ bool FSourceCodeGeneratorModule::ShouldExportClassesForModule(const FString& Mod
 void FSourceCodeGeneratorModule::Initialize(const FString& RootLocalPath, const FString& RootBuildPath,
                                             const FString& OutputDirectory, const FString& IncludeBase)
 {
-	OutputDir = FPaths::Combine(OutputDirectory, TEXT("UHT/"));
+	OutputPath = OutputDirectory;
 
 	const auto ProjectPath = FPaths::ConvertRelativePathToFull(FPaths::GetPath(FPaths::GetProjectFilePath()));
 
@@ -166,9 +166,9 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 
 		StringBuilder.Append(TEXT("PRAGMA_ENABLE_DEPRECATION_WARNINGS\r\n"));
 
-		const auto FilePath = FPaths::Combine(OutputDir, *Class->GetName() + BindingSuffix);
+		const auto FilePath = FPaths::Combine(OutputPath, *Class->GetName() + BindingSuffix);
 
-		SaveIfChanged(*FilePath, StringBuilder.ToString());
+		SaveIfChanged(FilePath, StringBuilder.ToString());
 
 		ExportClasses.Add(Class);
 	}
@@ -177,13 +177,10 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 void FSourceCodeGeneratorModule::FinishExport()
 {
 	TMap<UPackage*, TArray<FString>> Packages;
-	
+
 	for (const auto ExportClass : ExportClasses)
 	{
-		if (ExportClass->GetPackage() != nullptr)
-		{
-			Packages.FindOrAdd(ExportClass->GetPackage()).Add(*ExportClass->GetName());
-		}
+		Packages.FindOrAdd(ExportClass->GetPackage()).Add(*ExportClass->GetName());
 	}
 
 	for (auto Package : Packages)
@@ -199,9 +196,10 @@ void FSourceCodeGeneratorModule::FinishExport()
 			StringBuilder.Append(GenerateInclude(*Value + BindingSuffix));
 		}
 
-		const auto FilePath = FPaths::Combine(OutputDir, *FPaths::GetCleanFilename(Package.Key->GetName()) + HeaderSuffix);
+		const auto FilePath = FPaths::Combine(
+			OutputPath, *FPaths::GetCleanFilename(Package.Key->GetName()) + HeaderSuffix);
 
-		SaveIfChanged(*FilePath, StringBuilder.ToString());
+		SaveIfChanged(FilePath, StringBuilder.ToString());
 	}
 }
 
@@ -859,10 +857,7 @@ void FSourceCodeGeneratorModule::SaveIfChanged(const FString& FileName, const FS
 		}
 	}
 
-	if (FPaths::ValidatePath(*FileName))
-	{
-		FFileHelper::SaveStringToFile(String, *FileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
-	}
+	FFileHelper::SaveStringToFile(String, *FileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
 }
 
 FString FSourceCodeGeneratorModule::GetHeaderFile(UClass* Class)

@@ -192,7 +192,7 @@ namespace SourceCodeGeneratorUbtPlugin
         {
             if (function.Outer is UhtClass classObj)
             {
-                if (!classObj.ClassFlags.HasAnyFlags(EClassFlags.RequiredAPI) && 
+                if (!classObj.ClassFlags.HasAnyFlags(EClassFlags.RequiredAPI) &&
                     !function.FunctionExportFlags.HasAnyFlags(UhtFunctionExportFlags.RequiredAPI))
                 {
                     return false;
@@ -202,7 +202,7 @@ namespace SourceCodeGeneratorUbtPlugin
             {
                 return false;
             }
-            
+
             if (function.FunctionType != UhtFunctionType.Function)
             {
                 return false;
@@ -714,7 +714,7 @@ namespace SourceCodeGeneratorUbtPlugin
         {
             if (!function.FunctionFlags.HasAnyFlags(EFunctionFlags.BlueprintCallable))
             {
-                return new string("");
+                return "";
             }
 
             var builder = new StringBuilder();
