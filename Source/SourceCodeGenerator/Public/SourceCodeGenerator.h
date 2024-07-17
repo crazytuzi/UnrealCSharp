@@ -13,7 +13,7 @@ private:
 	typedef TStringBuilder<LargeInitialBufferSizes> FBigStringBuilder;
 
 	typedef TStringBuilder<SmallInitialBufferSizes> FSmallStringBuilder;
-	
+
 public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
@@ -33,7 +33,7 @@ public:
 	                        const FString& OutputDirectory, const FString& IncludeBase) override;
 
 	virtual void ExportClass(UClass* Class, const FString& SourceHeaderFilename,
-		const FString& GeneratedHeaderFilename, bool bHasChanged) override;
+	                         const FString& GeneratedHeaderFilename, bool bHasChanged) override;
 
 	virtual void FinishExport() override;
 
@@ -46,9 +46,9 @@ private:
 
 	static bool CanExportProperty(const FProperty* Property);
 
-	static void ExportProperty(FBigStringBuilder& StringBuilder, const UClass* Class, const FProperty* Property);
-
 	static void ExportFunction(FBigStringBuilder& StringBuilder, const UClass* Class, const UFunction* Function);
+
+	static void ExportProperty(FBigStringBuilder& StringBuilder, const UClass* Class, const FProperty* Property);
 
 	static bool IsClassTypeSupported(const UClass* Class);
 
@@ -64,25 +64,25 @@ private:
 
 	static FString GetFunctionDefaultValue(const UFunction* Function);
 
-	static void GetPropertySignature(const FProperty* Property, FString& OutString);
+	static bool FindDefaultValue(const TMap<FName, FString>* MetaMap, const FProperty* Param, FString& String);
+
+	static void GetPropertySignature(const FProperty* Property, FString& String);
 
 	static void GetDependencyClasses(const FProperty* Property, TSet<UClass*>& DependencyClasses);
 
 	static void SaveIfChanged(const FString& FileName, const FString& String);
 
-	FString GetHeaderFile(UClass* InClass);
+	FString GetHeaderFile(UClass* Class);
 
 	static FString GenerateInclude(const FString& FileName);
 
-	FString GetInclude(UClass* InClass);
+	FString GetInclude(UClass* Class);
 
 	static void GetPlugins(const FString& InPathName, TMap<FString, FString>& Plugins);
 
 	static void GetModules(const FString& InPathName, TMap<FString, FString>& Modules);
 
 	static void GetModules(const FString& InPathName, TSet<FString>& Modules);
-
-	static bool FindDefaultValue(const TMap<FName, FString>* MetaMap, const FProperty* Param, FString& OutString);
 
 private:
 	FString OutputDir;
