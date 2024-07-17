@@ -82,7 +82,7 @@ private:
 
 	static void GetModules(const FString& InPathName, TSet<FString>& Modules);
 
-	static bool FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FProperty* Param, FString& OutString);
+	static bool FindDefaultValue(const TMap<FName, FString>* MetaMap, const FProperty* Param, FString& OutString);
 
 private:
 	FString OutputDir;

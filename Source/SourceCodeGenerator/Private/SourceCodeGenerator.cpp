@@ -345,6 +345,17 @@ bool FSourceCodeGeneratorModule::IsPropertyTypeSupported(const FProperty* Proper
 	{
 		return IsPropertyTypeSupported(ArrayProperty->Inner);
 	}
+	
+	if (const auto SetProperty = CastField<FSetProperty>(Property))
+	{
+		return IsPropertyTypeSupported(SetProperty->ElementProp);
+	}
+
+	if (const auto MapProperty = CastField<FMapProperty>(Property))
+	{
+		return IsPropertyTypeSupported(MapProperty->KeyProp) &&
+			IsPropertyTypeSupported(MapProperty->ValueProp);
+	}
 
 	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
 	{
@@ -510,7 +521,7 @@ FString FSourceCodeGeneratorModule::GetFunctionSignature(const UClass* Class, co
 		);
 	}
 
-	String.Append("(");
+	String.Append(TEXT("("));
 
 	bool bHasParameters = false;
 
@@ -528,7 +539,7 @@ FString FSourceCodeGeneratorModule::GetFunctionSignature(const UClass* Class, co
 
 	if (bHasParameters)
 	{
-		String = String.Left(String.Len() - 2);
+		String.LeftInline(String.Len() - 2);
 	}
 
 	String.Append(TEXT(")"));
@@ -582,25 +593,23 @@ FString FSourceCodeGeneratorModule::GetFunctionDefaultValue(const UFunction* Fun
 
 	FSmallStringBuilder Builder;
 
-	const TMap<FName, FString>* MetaMap = UMetaData::GetMapForObject(Function);
+	const auto MetaDataMap = UMetaData::GetMapForObject(Function);
 
-	for (TFieldIterator<FProperty> It(Function); It; ++It)
+	for (TFieldIterator<FProperty> Property(Function); Property; ++Property)
 	{
-		if (It->HasAnyPropertyFlags(CPF_Parm) && !It->HasAnyPropertyFlags(CPF_ReturnParm))
+		if (Property->HasAnyPropertyFlags(CPF_Parm) && !Property->HasAnyPropertyFlags(CPF_ReturnParm))
 		{
-			FString ValueStr;
-
-			if (FindDefaultValueString(MetaMap, *It, ValueStr))
+			if (FString Value;FindDefaultValue(MetaDataMap, *Property, Value))
 			{
-				Builder.Append(", ");
+				Builder.Append(TEXT(", "));
 
-				if (ValueStr == "NULL")
+				if (Value == TEXT("NULL"))
 				{
-					Builder.Append("nullptr");
+					Builder.Append(TEXT("nullptr"));
 				}
 				else
 				{
-					Builder.Append(ValueStr);
+					Builder.Append(Value);
 				}
 			}
 		}
@@ -613,36 +622,37 @@ void FSourceCodeGeneratorModule::GetPropertySignature(const FProperty* Property,
 {
 	if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
 	{
-		OutString.Append(FString::Printf(TEXT(
+		OutString.Appendf(TEXT(
 			"TArray<%s>"
 		),
 		                                 *ArrayProperty->Inner->GetCPPType()
-		));
+		);
 	}
 	else if (const auto SetProperty = CastField<FSetProperty>(Property))
 	{
-		OutString.Append(FString::Printf(TEXT(
+		OutString.Appendf(TEXT(
 			"TSet<%s>"
 		),
 		                                 *SetProperty->ElementProp->GetCPPType()
-		));
+		);
 	}
 	else if (const auto MapProperty = CastField<FMapProperty>(Property))
 	{
-		OutString.Append(FString::Printf(TEXT(
+		OutString.Appendf(TEXT(
 			"TMap<%s, %s>"
 		),
 		                                 *MapProperty->KeyProp->GetCPPType(),
 		                                 *MapProperty->ValueProp->GetCPPType()
-		));
+		);
 	}
 	else if (const auto InterfaceProperty = CastField<FInterfaceProperty>(Property))
 	{
-		OutString.Append(FString::Printf(TEXT(
-			"TScriptInterface<I%s>"
+		OutString.Appendf(TEXT(
+			"TScriptInterface<%s%s>"
 		),
+		InterfaceProperty->InterfaceClass->GetPrefixCPP(),
 		                                 *InterfaceProperty->InterfaceClass->GetName()
-		));
+		);
 	}
 	else
 	{
@@ -700,9 +710,7 @@ void FSourceCodeGeneratorModule::SaveIfChanged(const FString& FileName, const FS
 {
 	if (FPaths::FileExists(FileName))
 	{
-		FString FileContent;
-
-		if (FFileHelper::LoadFileToString(FileContent, *FileName) && FileContent == String)
+		if (FString Result;FFileHelper::LoadFileToString(Result, *FileName) && Result == String)
 		{
 			return;
 		}
@@ -714,7 +722,7 @@ void FSourceCodeGeneratorModule::SaveIfChanged(const FString& FileName, const FS
 FString FSourceCodeGeneratorModule::GetHeaderFile(UClass* InClass)
 {
 	return FPaths::Combine(HeaderPath.FindRef(FPaths::GetCleanFilename(InClass->GetPackage()->GetName())),
-	                       InClass->GetMetaData("ModuleRelativePath"));
+	                       InClass->GetMetaData(TEXT("ModuleRelativePath")));
 }
 
 FString FSourceCodeGeneratorModule::GenerateInclude(const FString& FileName)
@@ -733,72 +741,66 @@ FString FSourceCodeGeneratorModule::GetInclude(UClass* InClass)
 
 void FSourceCodeGeneratorModule::GetPlugins(const FString& InPathName, TMap<FString, FString>& Plugins)
 {
-	const FString Suffix = FString(TEXT("*.uplugin"));
+	const auto Suffix = FString(TEXT("*.uplugin"));
 
-	IFileManager& MyFileManager = IFileManager::Get();
-
-	if (MyFileManager.DirectoryExists(*InPathName))
+	if (auto& FileManager = IFileManager::Get();FileManager.DirectoryExists(*InPathName))
 	{
 		TArray<FString> FileNames;
 
-		MyFileManager.FindFilesRecursive(FileNames, *InPathName, *Suffix, true, false);
+		FileManager.FindFilesRecursive(FileNames, *InPathName, *Suffix, true, false);
 
-		for (auto& PluginName : FileNames)
+		for (const auto& FileName : FileNames)
 		{
 			Plugins.Add(
-				FPaths::GetCleanFilename(PluginName).Left(
-					FPaths::GetCleanFilename(PluginName).Len() - Suffix.Len() + 1),
-				FPaths::ConvertRelativePathToFull(FPaths::GetPath(PluginName)));
+				FPaths::GetCleanFilename(FileName).Left(
+					FPaths::GetCleanFilename(FileName).Len() - Suffix.Len() + 1),
+				FPaths::ConvertRelativePathToFull(FPaths::GetPath(FileName)));
 		}
 	}
 }
 
 void FSourceCodeGeneratorModule::GetModules(const FString& InPathName, TMap<FString, FString>& Modules)
 {
-	const FString Suffix = FString(TEXT("*.Build.cs"));
+	const auto Suffix = FString(TEXT("*.Build.cs"));
 
-	IFileManager& MyFileManager = IFileManager::Get();
-
-	if (MyFileManager.DirectoryExists(*InPathName))
+	if (auto& FileManager = IFileManager::Get();FileManager.DirectoryExists(*InPathName))
 	{
 		TArray<FString> FileNames;
 
-		MyFileManager.FindFilesRecursive(FileNames, *InPathName, *Suffix, true, false);
+		FileManager.FindFilesRecursive(FileNames, *InPathName, *Suffix, true, false);
 
-		for (auto& PluginName : FileNames)
+		for (const auto& FileName : FileNames)
 		{
 			Modules.Add(
-				FPaths::GetCleanFilename(PluginName).Left(
-					FPaths::GetCleanFilename(PluginName).Len() - Suffix.Len() + 1),
-				FPaths::ConvertRelativePathToFull(FPaths::GetPath(PluginName)));
+				FPaths::GetCleanFilename(FileName).Left(
+					FPaths::GetCleanFilename(FileName).Len() - Suffix.Len() + 1),
+				FPaths::ConvertRelativePathToFull(FPaths::GetPath(FileName)));
 		}
 	}
 }
 
 void FSourceCodeGeneratorModule::GetModules(const FString& InPathName, TSet<FString>& Modules)
 {
-	const FString Suffix = FString(TEXT("*.Build.cs"));
+	const auto Suffix = FString(TEXT("*.Build.cs"));
 
-	IFileManager& MyFileManager = IFileManager::Get();
-
-	if (MyFileManager.DirectoryExists(*InPathName))
+	if (auto& FileManager = IFileManager::Get();FileManager.DirectoryExists(*InPathName))
 	{
 		TArray<FString> FileNames;
 
-		MyFileManager.FindFilesRecursive(FileNames, *InPathName, *Suffix, true, false);
+		FileManager.FindFilesRecursive(FileNames, *InPathName, *Suffix, true, false);
 
-		for (auto& PluginName : FileNames)
+		for (const auto& FileName : FileNames)
 		{
 			Modules.Add(
-				FPaths::GetCleanFilename(PluginName).Left(
-					FPaths::GetCleanFilename(PluginName).Len() - Suffix.Len() + 1));
+				FPaths::GetCleanFilename(FileName).Left(
+					FPaths::GetCleanFilename(FileName).Len() - Suffix.Len() + 1));
 		}
 	}
 }
 
-bool FSourceCodeGeneratorModule::FindDefaultValueString(const TMap<FName, FString>* MetaMap, const FProperty* Param, FString& OutString)
+bool FSourceCodeGeneratorModule::FindDefaultValue(const TMap<FName, FString>* MetaDataMap, const FProperty* Param, FString& OutString)
 {
-	if (MetaMap == nullptr || Param == nullptr)
+	if (MetaDataMap == nullptr || Param == nullptr)
 	{
 		return false;
 	}
@@ -807,26 +809,26 @@ bool FSourceCodeGeneratorModule::FindDefaultValueString(const TMap<FName, FStrin
 
 	const FName CppKey(*(FString(TEXT("CPP_Default_")) + ParamName.ToString()));
 
-	if (!MetaMap->Contains(CppKey))
+	if (!MetaDataMap->Contains(CppKey))
 	{
 		return false;
 	}
 
 	if (Param->IsA<FObjectProperty>()
-		|| Param->IsA<FObjectPtrProperty>()
-		|| Param->IsA<FClassPtrProperty>())
+		|| Param->IsA<FClassPtrProperty>()
+		|| Param->IsA<FObjectPtrProperty>())
 	{
 		OutString = TEXT("nullptr");
 	}
 	else
 	{
-		FString InMetaData;
+		FString MetaData;
 
-		if (const FString* CppDefaultValue = MetaMap->Find(CppKey))
+		if (const auto CppDefaultValue = MetaDataMap->Find(CppKey))
 		{
 			if (!CppDefaultValue->IsEmpty())
 			{
-				InMetaData = *CppDefaultValue;
+				MetaData = *CppDefaultValue;
 			}
 		}
 
@@ -836,7 +838,7 @@ bool FSourceCodeGeneratorModule::FindDefaultValueString(const TMap<FName, FStrin
 			{
 				TArray<FString> Value;
 
-				InMetaData.ParseIntoArray(Value, TEXT(","));
+				MetaData.ParseIntoArray(Value, TEXT(","));
 
 				if (Value.Num() == 3)
 				{
@@ -851,9 +853,7 @@ bool FSourceCodeGeneratorModule::FindDefaultValueString(const TMap<FName, FStrin
 			}
 			else if (StructProperty->Struct == TBaseStructure<FVector2D>::Get())
 			{
-				FVector2D Value;
-
-				if (Value.InitFromString(InMetaData))
+				if (FVector2D Value;Value.InitFromString(MetaData))
 				{
 					OutString = FString::Printf(TEXT(
 						"FVector2D(%lf, %lf)"
@@ -867,7 +867,7 @@ bool FSourceCodeGeneratorModule::FindDefaultValueString(const TMap<FName, FStrin
 			{
 				TArray<FString> Value;
 
-				InMetaData.ParseIntoArray(Value, TEXT(","));
+				MetaData.ParseIntoArray(Value, TEXT(","));
 
 				if (Value.Num() == 3)
 				{
@@ -882,9 +882,7 @@ bool FSourceCodeGeneratorModule::FindDefaultValueString(const TMap<FName, FStrin
 			}
 			else if (StructProperty->Struct == TBaseStructure<FLinearColor>::Get())
 			{
-				FLinearColor Value;
-
-				if (Value.InitFromString(InMetaData))
+				if (FLinearColor Value;Value.InitFromString(MetaData))
 				{
 					OutString = FString::Printf(TEXT(
 						"FLinearColor(%ff, %ff, %ff, %ff)"
@@ -909,30 +907,36 @@ bool FSourceCodeGeneratorModule::FindDefaultValueString(const TMap<FName, FStrin
 		}
 		else if (Param->IsA<FStrProperty>())
 		{
-			OutString = FString::Printf(TEXT("FString(\"%s\")"), *InMetaData);
+			OutString = FString::Printf(TEXT(
+				"FString(\"%s\")"
+				),
+				*MetaData);
 		}
 		else if (Param->IsA<FNameProperty>())
 		{
-			OutString = FString::Printf(TEXT("TEXT(\"%s\")"), *InMetaData);
+			OutString = FString::Printf(TEXT(
+				"TEXT(\"%s\")"
+				),
+				*MetaData);
 		}
 		else if (Param->IsA<FTextProperty>())
 		{
 			static auto InvText = FString(TEXT("INVTEXT"));
 
-			if (InMetaData.Contains(InvText))
+			if (MetaData.Contains(InvText))
 			{
-				InMetaData = InMetaData.Mid(InvText.Len() + 2, InMetaData.Len() - InvText.Len() - 4);
+				MetaData.MidInline(InvText.Len() + 2, MetaData.Len() - InvText.Len() - 4);
 			}
 
 			OutString = FString::Printf(TEXT(
 				"INVTEXT(\"%s\")"
 			),
-			                            *InMetaData
+			                            *MetaData
 			);
 		}
-		else if (!InMetaData.IsEmpty())
+		else
 		{
-			OutString = InMetaData;
+			OutString = MetaData;
 		}
 	}
 
