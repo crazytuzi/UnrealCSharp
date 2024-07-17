@@ -177,15 +177,13 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 void FSourceCodeGeneratorModule::FinishExport()
 {
 	TMap<UPackage*, TArray<FString>> Packages;
-
-	for (auto ExportClass : ExportClasses)
+	
+	for (const auto ExportClass : ExportClasses)
 	{
-		if (!Packages.Contains(ExportClass->GetPackage()))
+		if (ExportClass->GetPackage() != nullptr)
 		{
-			Packages[ExportClass->GetPackage()] = {};
+			Packages.FindOrAdd(ExportClass->GetPackage()).Add(*ExportClass->GetName());
 		}
-
-		Packages[ExportClass->GetPackage()].Add(*ExportClass->GetName());
 	}
 
 	for (auto Package : Packages)
@@ -201,9 +199,9 @@ void FSourceCodeGeneratorModule::FinishExport()
 			StringBuilder.Append(GenerateInclude(*Value + BindingSuffix));
 		}
 
-		const auto FilePath = FPaths::Combine(OutputDir, *Package.Key->GetName() + HeaderSuffix);
+		const auto FilePath = FPaths::Combine(OutputDir, *FPaths::GetCleanFilename(Package.Key->GetName()) + HeaderSuffix);
 
-		SaveIfChanged(FilePath, StringBuilder.ToString());
+		SaveIfChanged(*FilePath, StringBuilder.ToString());
 	}
 }
 
@@ -220,7 +218,7 @@ bool FSourceCodeGeneratorModule::CanExportClass(const UClass* Class)
 
 bool FSourceCodeGeneratorModule::CanExportFunction(const UFunction* Function)
 {
-	if (auto OwnerClass = Function->GetOwnerClass())
+	if (const auto OwnerClass = Function->GetOwnerClass())
 	{
 		if (!OwnerClass->HasAnyClassFlags(CLASS_RequiredAPI) &&
 			!Function->HasAnyFunctionFlags(FUNC_RequiredAPI))
@@ -794,9 +792,8 @@ void FSourceCodeGeneratorModule::GetPropertySignature(const FProperty* Property,
 	else if (const auto InterfaceProperty = CastField<FInterfaceProperty>(Property))
 	{
 		String.Appendf(TEXT(
-			"TScriptInterface<%s%s>"
+			"TScriptInterface<I%s>"
 		),
-		               InterfaceProperty->InterfaceClass->GetPrefixCPP(),
 		               *InterfaceProperty->InterfaceClass->GetName()
 		);
 	}
@@ -860,7 +857,10 @@ void FSourceCodeGeneratorModule::SaveIfChanged(const FString& FileName, const FS
 		{
 			return;
 		}
+	}
 
+	if (FPaths::ValidatePath(*FileName))
+	{
 		FFileHelper::SaveStringToFile(String, *FileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
 	}
 }
