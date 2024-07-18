@@ -337,7 +337,7 @@ namespace SourceCodeGeneratorUbtPlugin
                     packages.Add(ExportClass.Package, new List<string>());
                 }
 
-                packages[ExportClass.Package].Add(ExportClass.EngineName);
+                packages[ExportClass.Package].AddUnique(ExportClass.EngineName);
             }
 
             foreach (var package in packages)
@@ -372,11 +372,13 @@ namespace SourceCodeGeneratorUbtPlugin
 
             var bodyBuilder = bodyBorrower.StringBuilder;
 
-            bodyBuilder.AppendFormat("struct FRegister{0}\r\n" +
+            bodyBuilder.AppendFormat("namespace\r\n" +
                                      "{{\r\n" +
-                                     "\tFRegister{1}()\r\n" +
+                                     "\tstruct FRegister{0}\r\n" +
                                      "\t{{\r\n" +
-                                     "\t\tTBindingClassBuilder<{2}>(NAMESPACE_BINDING)\r\n",
+                                     "\t\tFRegister{1}()\r\n" +
+                                     "\t\t{{\r\n" +
+                                     "\t\t\tTBindingClassBuilder<{2}>(NAMESPACE_BINDING)\r\n",
                 classObj.EngineName,
                 classObj.EngineName,
                 classObj.SourceName);
@@ -425,10 +427,11 @@ namespace SourceCodeGeneratorUbtPlugin
             bodyBuilder.Remove(bodyBuilder.Length - 2, 2);
 
             bodyBuilder.AppendFormat(";\r\n" +
-                                     "\t}}\r\n" +
-                                     "}};\r\n" +
+                                     "\t\t}}\r\n" +
+                                     "\t}};\r\n" +
                                      "\r\n" +
-                                     "static FRegister{0} Register{1};\r\n\r\n",
+                                     "\tFRegister{0} Register{1};\r\n" +
+                                     "}}\r\n\r\n",
                 classObj.EngineName,
                 classObj.EngineName);
 
@@ -476,7 +479,7 @@ namespace SourceCodeGeneratorUbtPlugin
         private static void ExportFunction(StringBuilder builder, UhtClass classObj, UhtFunction function)
         {
             builder.Append(
-                $"\t\t\t.Function(\"{function.SourceName}\", BINDING_OVERLOAD({GetFunctionSignature(classObj, function)}, &{classObj.SourceName}::{function.SourceName}");
+                $"\t\t\t\t.Function(\"{function.SourceName}\", BINDING_OVERLOAD({GetFunctionSignature(classObj, function)}, &{classObj.SourceName}::{function.SourceName}");
 
             if (function.HasParameters)
             {
@@ -499,7 +502,7 @@ namespace SourceCodeGeneratorUbtPlugin
         private static void ExportProperty(StringBuilder builder, UhtClass classObj, UhtProperty property)
         {
             builder.Append(
-                $"\t\t\t.Property(\"{property.SourceName}\", BINDING_PROPERTY(&{classObj.SourceName}::{property.SourceName}))\r\n");
+                $"\t\t\t\t.Property(\"{property.SourceName}\", BINDING_PROPERTY(&{classObj.SourceName}::{property.SourceName}))\r\n");
         }
 
         private static string GetParamPropertySignature(UhtProperty? property)

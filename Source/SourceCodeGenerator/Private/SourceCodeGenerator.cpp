@@ -108,11 +108,13 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 			"PRAGMA_DISABLE_DEPRECATION_WARNINGS\r\n\r\n"));
 
 		BodyBuilder.Appendf(TEXT(
-			"struct FRegister%s\r\n"
+			"namespace\r\n"
 			"{\r\n"
-			"\tFRegister%s()\r\n"
+			"\tstruct FRegister%s\r\n"
 			"\t{\r\n"
-			"\t\tTBindingClassBuilder<%s>(NAMESPACE_BINDING)\r\n"
+			"\t\tFRegister%s()\r\n"
+			"\t\t{\r\n"
+			"\t\t\tTBindingClassBuilder<%s>(NAMESPACE_BINDING)\r\n"
 		),
 		                    *Class->GetName(),
 		                    *Class->GetName(),
@@ -153,10 +155,11 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 
 		BodyBuilder.Appendf(TEXT(
 			";\r\n"
-			"\t}\r\n"
-			"};\r\n"
+			"\t\t}\r\n"
+			"\t};\r\n"
 			"\r\n"
-			"static FRegister%s Register%s;\r\n\r\n"
+			"\tFRegister%s Register%s;\r\n"
+			"}\r\n\r\n"
 		),
 		                    *Class->GetName(),
 		                    *Class->GetName()
@@ -170,7 +173,7 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 
 		SaveIfChanged(FilePath, StringBuilder.ToString());
 
-		ExportClasses.Add(Class);
+		ExportClasses.AddUnique(Class);
 	}
 }
 
@@ -276,7 +279,7 @@ void FSourceCodeGeneratorModule::ExportFunction(FBigStringBuilder& StringBuilder
                                                 const UFunction* Function)
 {
 	StringBuilder.Appendf(TEXT(
-		"\t\t\t.Function(\"%s\", BINDING_OVERLOAD(%s, &%s::%s"
+		"\t\t\t\t.Function(\"%s\", BINDING_OVERLOAD(%s, &%s::%s"
 	),
 	                      *Function->GetName(),
 	                      *GetFunctionSignature(Class, Function),
@@ -321,7 +324,7 @@ void FSourceCodeGeneratorModule::ExportProperty(FBigStringBuilder& StringBuilder
                                                 const FProperty* Property)
 {
 	StringBuilder.Appendf(TEXT(
-		"\t\t\t.Property(\"%s\", BINDING_PROPERTY(&%s::%s))\r\n"
+		"\t\t\t\t.Property(\"%s\", BINDING_PROPERTY(&%s::%s))\r\n"
 	),
 	                      *Property->GetNameCPP(),
 	                      *(Class->GetPrefixCPP() + Class->GetName()),
