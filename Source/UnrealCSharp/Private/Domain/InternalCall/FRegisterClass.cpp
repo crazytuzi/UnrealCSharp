@@ -4,21 +4,26 @@
 #include "Macro/BindingMacro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
-struct FRegisterClass
+namespace
 {
-	FRegisterClass()
+	struct FRegisterClass
 	{
-		TBindingClassBuilder<UClass>(NAMESPACE_LIBRARY,
-		                             {
-			                             []()
+		FRegisterClass()
+		{
+			TBindingClassBuilder<UClass>(NAMESPACE_LIBRARY,
 			                             {
-				                             return FUnrealCSharpFunctionLibrary::GetFullClass(UClass::StaticClass());
-			                             }
-		                             })
-			.Property("ClassDefaultObject", BINDING_READONLY_PROPERTY(&UClass::ClassDefaultObject))
-			.Function("GetDefaultObject", BINDING_OVERLOAD(UObject*(UClass::*)(bool)const, &UClass::GetDefaultObject,
-			                                               TArray<FString>{"bCreateIfNeeded"}, true));
-	}
-};
+				                             []()
+				                             {
+					                             return FUnrealCSharpFunctionLibrary::GetFullClass(
+						                             UClass::StaticClass());
+				                             }
+			                             })
+				.Property("ClassDefaultObject", BINDING_READONLY_PROPERTY(&UClass::ClassDefaultObject))
+				.Function("GetDefaultObject", BINDING_OVERLOAD(UObject*(UClass::*)(bool)const,
+				                                               &UClass::GetDefaultObject,
+				                                               TArray<FString>{"bCreateIfNeeded"}, true));
+		}
+	};
 
-static FRegisterClass RegisterClass;
+	FRegisterClass RegisterClass;
+}

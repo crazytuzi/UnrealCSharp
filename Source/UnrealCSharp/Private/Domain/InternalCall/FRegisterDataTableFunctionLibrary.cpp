@@ -4,49 +4,52 @@
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "CoreMacro/NamespaceMacro.h"
 
-struct FRegisterDataTableFunctionLibrary
+namespace
 {
-	static bool GetDataTableRowFromNameImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-	                                                  const FGarbageCollectionHandle RowName, MonoObject** OutRow)
+	struct FRegisterDataTableFunctionLibrary
 	{
-		if (const auto InRowName = FCSharpEnvironment::GetEnvironment().GetString<FName>(RowName))
+		static bool GetDataTableRowFromNameImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                                  const FGarbageCollectionHandle RowName, MonoObject** OutRow)
 		{
-			if (InRowName->IsNone())
+			if (const auto InRowName = FCSharpEnvironment::GetEnvironment().GetString<FName>(RowName))
 			{
-				return false;
-			}
-
-			if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<
-				UDataTable>(InGarbageCollectionHandle))
-			{
-				FCSharpEnvironment::GetEnvironment().Bind(DataTable->RowStruct.Get(), false);
-
-				if (const auto ClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
-					DataTable->RowStruct.Get()))
+				if (InRowName->IsNone())
 				{
-					*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->
-					                                               Object_Init(ClassDescriptor->GetMonoClass());
+					return false;
+				}
 
-					const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
+				if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<
+					UDataTable>(InGarbageCollectionHandle))
+				{
+					FCSharpEnvironment::GetEnvironment().Bind(DataTable->RowStruct.Get(), false);
 
-					const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct(
-						FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(*OutRow));
+					if (const auto ClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
+						DataTable->RowStruct.Get()))
+					{
+						*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->
+						                                               Object_Init(ClassDescriptor->GetMonoClass());
 
-					DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
+						const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
 
-					return true;
+						const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct(
+							FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(*OutRow));
+
+						DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
+
+						return true;
+					}
 				}
 			}
+
+			return false;
 		}
 
-		return false;
-	}
+		FRegisterDataTableFunctionLibrary()
+		{
+			TBindingClassBuilder<UDataTableFunctionLibrary>(NAMESPACE_LIBRARY)
+				.Function("GetDataTableRowFromName", GetDataTableRowFromNameImplementation);
+		}
+	};
 
-	FRegisterDataTableFunctionLibrary()
-	{
-		TBindingClassBuilder<UDataTableFunctionLibrary>(NAMESPACE_LIBRARY)
-			.Function("GetDataTableRowFromName", GetDataTableRowFromNameImplementation);
-	}
-};
-
-static FRegisterDataTableFunctionLibrary RegisterDataTableFunctionLibrary;
+	FRegisterDataTableFunctionLibrary RegisterDataTableFunctionLibrary;
+}

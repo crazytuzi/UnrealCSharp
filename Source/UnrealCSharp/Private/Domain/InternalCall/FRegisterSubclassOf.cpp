@@ -3,55 +3,58 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
-struct FRegisterSubclassOf
+namespace
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InClass)
+	struct FRegisterSubclassOf
 	{
-		const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
-
-		const auto SubclassOf = new TSubclassOf<UObject>(FoundClass);
-
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(InMonoObject, SubclassOf);
-	}
-
-	static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
-	{
-		if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InA))
+		static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InClass)
 		{
-			if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InB))
-			{
-				return *FoundA == *FoundB;
-			}
+			const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
+
+			const auto SubclassOf = new TSubclassOf<UObject>(FoundClass);
+
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(InMonoObject, SubclassOf);
 		}
 
-		return false;
-	}
-
-	static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
 		{
-			(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<
-				UObject>>(InGarbageCollectionHandle);
-		});
-	}
+			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InA))
+			{
+				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InB))
+				{
+					return *FoundA == *FoundB;
+				}
+			}
 
-	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-			InGarbageCollectionHandle);
+			return false;
+		}
 
-		return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
-	}
+		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+			{
+				(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSubclassOf<
+					UObject>>(InGarbageCollectionHandle);
+			});
+		}
 
-	FRegisterSubclassOf()
-	{
-		FClassBuilder(TEXT("TSubclassOf"), NAMESPACE_LIBRARY, true)
-			.Function("Register", RegisterImplementation)
-			.Function("Identical", IdenticalImplementation)
-			.Function("UnRegister", UnRegisterImplementation)
-			.Function("Get", GetImplementation);
-	}
-};
+		static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
+				InGarbageCollectionHandle);
 
-static FRegisterSubclassOf RegisterSubclassOf;
+			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+		}
+
+		FRegisterSubclassOf()
+		{
+			FClassBuilder(TEXT("TSubclassOf"), NAMESPACE_LIBRARY, true)
+				.Function("Register", RegisterImplementation)
+				.Function("Identical", IdenticalImplementation)
+				.Function("UnRegister", UnRegisterImplementation)
+				.Function("Get", GetImplementation);
+		}
+	};
+
+	FRegisterSubclassOf RegisterSubclassOf;
+}

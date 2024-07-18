@@ -3,55 +3,59 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
-struct FRegisterWeakObjectPtr
+namespace
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InObject)
+	struct FRegisterWeakObjectPtr
 	{
-		const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
-
-		const auto WeakObjectPtr = new TWeakObjectPtr<UObject>(FoundObject);
-
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(InMonoObject, WeakObjectPtr);
-	}
-
-	static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
-	{
-		if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(InA))
+		static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InObject)
 		{
-			if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(InB))
-			{
-				return *FoundA == *FoundB;
-			}
+			const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
+
+			const auto WeakObjectPtr = new TWeakObjectPtr<UObject>(FoundObject);
+
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(
+				InMonoObject, WeakObjectPtr);
 		}
 
-		return false;
-	}
-
-	static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
 		{
-			(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(
-				InGarbageCollectionHandle);
-		});
-	}
+			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(InA))
+			{
+				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(InB))
+				{
+					return *FoundA == *FoundB;
+				}
+			}
 
-	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<
-			UObject>>(InGarbageCollectionHandle);
+			return false;
+		}
 
-		return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
-	}
+		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+			{
+				(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TWeakObjectPtr<UObject>>(
+					InGarbageCollectionHandle);
+			});
+		}
 
-	FRegisterWeakObjectPtr()
-	{
-		FClassBuilder(TEXT("TWeakObjectPtr"), NAMESPACE_LIBRARY, true)
-			.Function("Register", RegisterImplementation)
-			.Function("Identical", IdenticalImplementation)
-			.Function("UnRegister", UnRegisterImplementation)
-			.Function("Get", GetImplementation);
-	}
-};
+		static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			const auto Multi = FCSharpEnvironment::GetEnvironment()
+				.GetMulti<TWeakObjectPtr<UObject>>(InGarbageCollectionHandle);
 
-static FRegisterWeakObjectPtr RegisterWeakObjectPtr;
+			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+		}
+
+		FRegisterWeakObjectPtr()
+		{
+			FClassBuilder(TEXT("TWeakObjectPtr"), NAMESPACE_LIBRARY, true)
+				.Function("Register", RegisterImplementation)
+				.Function("Identical", IdenticalImplementation)
+				.Function("UnRegister", UnRegisterImplementation)
+				.Function("Get", GetImplementation);
+		}
+	};
+
+	FRegisterWeakObjectPtr RegisterWeakObjectPtr;
+}
