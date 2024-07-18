@@ -27,7 +27,7 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "Generator",
+			"Name": "ScriptCodeGenerator",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		},

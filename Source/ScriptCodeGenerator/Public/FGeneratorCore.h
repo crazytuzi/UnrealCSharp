@@ -56,11 +56,11 @@ public:
 
 	static const TArray<FName>& GetSupportedAssetPath();
 
-	static GENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
+	static SCRIPTCODEGENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
 
-	static GENERATOR_API void BeginGenerator();
+	static SCRIPTCODEGENERATOR_API void BeginGenerator();
 
-	static GENERATOR_API void EndGenerator();
+	static SCRIPTCODEGENERATOR_API void EndGenerator();
 
 private:
 	static TMap<FString, TArray<FString>> OverrideFunctionsMap;

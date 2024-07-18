@@ -43,7 +43,7 @@ public class UnrealCSharpEditor : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"Generator",
+				"ScriptCodeGenerator",
 				"Compiler",
 				"MainFrame",
 				"UnrealCSharpCore",
