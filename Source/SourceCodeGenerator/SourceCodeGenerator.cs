@@ -190,6 +190,19 @@ namespace SourceCodeGeneratorUbtPlugin
         /// <returns>True if the function should be exported</returns>
         protected virtual bool CanExportFunction(UhtFunction function)
         {
+            if (function.Outer is UhtClass classObj)
+            {
+                if (!classObj.ClassFlags.HasAnyFlags(EClassFlags.RequiredAPI) &&
+                    !function.FunctionExportFlags.HasAnyFlags(UhtFunctionExportFlags.RequiredAPI))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
             if (function.FunctionType != UhtFunctionType.Function)
             {
                 return false;
@@ -218,21 +231,6 @@ namespace SourceCodeGeneratorUbtPlugin
             if (function is { HasReturnProperty: true, ReturnProperty: UhtMapProperty })
             {
                 return false;
-            }
-
-            if (!function.FunctionExportFlags.HasAnyFlags(UhtFunctionExportFlags.RequiredAPI))
-            {
-                if (function.Outer is UhtClass classObj)
-                {
-                    if (!Project.Contains(classObj.Package.ShortName))
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
             }
 
             foreach (var child in function.Children)
@@ -714,6 +712,11 @@ namespace SourceCodeGeneratorUbtPlugin
 
         private static string GetFunctionDefaultValue(UhtFunction function)
         {
+            if (!function.FunctionFlags.HasAnyFlags(EFunctionFlags.BlueprintCallable))
+            {
+                return "";
+            }
+
             var builder = new StringBuilder();
 
             foreach (var child in function.Children)

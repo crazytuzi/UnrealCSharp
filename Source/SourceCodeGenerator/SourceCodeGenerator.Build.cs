@@ -1,6 +1,4 @@
-﻿
-using UnrealBuildTool;
-using System.IO;
+﻿using UnrealBuildTool;
 
 namespace UnrealBuildTool.Rules
 {
@@ -9,7 +7,7 @@ namespace UnrealBuildTool.Rules
 		public SourceCodeGenerator(ReadOnlyTargetRules Target) : base(Target)
 		{
 #if UE_5_2_OR_LATER
-        IWYUSupport = IWYUSupport.None;
+			IWYUSupport = IWYUSupport.None;
 #else
 			bEnforceIWYU = false;
 #endif
@@ -17,14 +15,16 @@ namespace UnrealBuildTool.Rules
 			PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
 			PublicIncludePaths.AddRange(
-				new string[] {
+				new string[]
+				{
 					"Programs/UnrealHeaderTool/Public",
 				}
 			);
 
 
 			PrivateIncludePaths.AddRange(
-				new string[] {
+				new string[]
+				{
 					"SourceCodeGenerator/Private",
 				}
 			);
