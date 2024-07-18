@@ -108,7 +108,7 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 			"PRAGMA_DISABLE_DEPRECATION_WARNINGS\r\n\r\n"));
 
 		BodyBuilder.Appendf(TEXT(
-			"namespace\t\n"
+			"namespace\r\n"
 			"{\r\n"
 			"\tstruct FRegister%s\r\n"
 			"\t{\r\n"
@@ -158,7 +158,7 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 			"\t\t}\r\n"
 			"\t};\r\n"
 			"\r\n"
-			"\tstatic FRegister%s Register%s;\r\n"
+			"\tFRegister%s Register%s;\r\n"
 			"}\r\n\r\n"
 		),
 		                    *Class->GetName(),

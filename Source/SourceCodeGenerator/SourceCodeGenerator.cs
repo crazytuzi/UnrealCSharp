@@ -375,7 +375,7 @@ namespace SourceCodeGeneratorUbtPlugin
 
             var bodyBuilder = bodyBorrower.StringBuilder;
 
-            bodyBuilder.AppendFormat("namespace\t\n" +
+            bodyBuilder.AppendFormat("namespace\r\n" +
                                      "{{\r\n" +
                                      "\tstruct FRegister{0}\r\n" +
                                      "\t{{\r\n" +
@@ -433,7 +433,7 @@ namespace SourceCodeGeneratorUbtPlugin
                                      "\t\t}}\r\n" +
                                      "\t}};\r\n" +
                                      "\r\n" +
-                                     "\tstatic FRegister{0} Register{1};\r\n" +
+                                     "\tFRegister{0} Register{1};\r\n" +
                                      "}}\r\n\r\n",
                 classObj.EngineName,
                 classObj.EngineName);
