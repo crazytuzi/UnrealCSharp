@@ -337,10 +337,7 @@ namespace SourceCodeGeneratorUbtPlugin
                     packages.Add(ExportClass.Package, new List<string>());
                 }
 
-                if (!packages[ExportClass.Package].Contains(ExportClass.EngineName))
-                {
-                    packages[ExportClass.Package].Add(ExportClass.EngineName);
-                }
+                packages[ExportClass.Package].AddUnique(ExportClass.EngineName);
             }
 
             foreach (var package in packages)
