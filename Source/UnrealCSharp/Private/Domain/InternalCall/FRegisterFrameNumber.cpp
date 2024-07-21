@@ -2,36 +2,39 @@
 #include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
 
-struct FRegisterFrameNumber
+namespace
 {
-	static FFrameNumber MultipliesImplementation(const FFrameNumber& In, const float Scalar)
+	struct FRegisterFrameNumber
 	{
-		return In * Scalar;
-	}
+		static FFrameNumber MultipliesImplementation(const FFrameNumber& In, const float Scalar)
+		{
+			return In * Scalar;
+		}
 
-	static FFrameNumber DividesImplementation(const FFrameNumber& In, const float Scalar)
-	{
-		return In / Scalar;
-	}
+		static FFrameNumber DividesImplementation(const FFrameNumber& In, const float Scalar)
+		{
+			return In / Scalar;
+		}
 
-	FRegisterFrameNumber()
-	{
-		TBindingClassBuilder<FFrameNumber>(NAMESPACE_BINDING)
-			.Constructor(BINDING_CONSTRUCTOR(FFrameNumber, int32),
-			             TArray<FString>{"InValue"})
-			.PreIncrement()
-			.PreDecrement()
-			.Less()
-			.Greater()
-			.LessEqual()
-			.GreaterEqual()
-			.Plus()
-			.Minus()
-			.Modulus()
-			.UnaryMinus()
-			.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
-			.Function("operator /", FUNCTION_DIVIDES, BINDING_FUNCTION(&DividesImplementation));
-	}
-};
+		FRegisterFrameNumber()
+		{
+			TBindingClassBuilder<FFrameNumber>(NAMESPACE_BINDING)
+				.Constructor(BINDING_CONSTRUCTOR(FFrameNumber, int32),
+				             TArray<FString>{"InValue"})
+				.PreIncrement()
+				.PreDecrement()
+				.Less()
+				.Greater()
+				.LessEqual()
+				.GreaterEqual()
+				.Plus()
+				.Minus()
+				.Modulus()
+				.UnaryMinus()
+				.Function("operator *", FUNCTION_MULTIPLIES, BINDING_FUNCTION(&MultipliesImplementation))
+				.Function("operator /", FUNCTION_DIVIDES, BINDING_FUNCTION(&DividesImplementation));
+		}
+	};
 
-static FRegisterFrameNumber RegisterFrameNumber;
+	FRegisterFrameNumber RegisterFrameNumber;
+}

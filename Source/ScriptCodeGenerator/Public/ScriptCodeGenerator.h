@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FGeneratorModule : public IModuleInterface
+class FScriptCodeGeneratorModule : public IModuleInterface
 {
 public:
 

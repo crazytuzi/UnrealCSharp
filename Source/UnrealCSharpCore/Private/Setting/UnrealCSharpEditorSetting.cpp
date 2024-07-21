@@ -20,7 +20,8 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bEnableAssetChanged(true),
 	bEnableDirectoryChanged(true),
 	bIsSkipGenerateEngineModules(false),
-	bIsGenerateAllModules(true)
+	bIsGenerateAllModules(true),
+	bEnableExport(false)
 #else
 	Super(ObjectInitializer)
 #endif
@@ -300,8 +301,6 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 	{
 		ModuleArray.AddUnique(EngineModule);
 	}
-
-	ModuleArray.Remove(TEXT("Game"));
 
 	return ModuleArray;
 }

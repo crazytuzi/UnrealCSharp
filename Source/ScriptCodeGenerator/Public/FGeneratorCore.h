@@ -38,6 +38,8 @@ public:
 	template <typename T>
 	static FString GetFileName(const T* InField);
 
+	static TArray<FString> GetOverrideFunctions(const FString& InNameSpace, const FString& InClass);
+
 	static bool IsSkip(const UField* InField);
 
 	static bool IsSupported(FProperty* Property);
@@ -54,13 +56,15 @@ public:
 
 	static const TArray<FName>& GetSupportedAssetPath();
 
-	static GENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
+	static SCRIPTCODEGENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
 
-	static GENERATOR_API void BeginGenerator();
+	static SCRIPTCODEGENERATOR_API void BeginGenerator();
 
-	static GENERATOR_API void EndGenerator();
+	static SCRIPTCODEGENERATOR_API void EndGenerator();
 
 private:
+	static TMap<FString, TArray<FString>> OverrideFunctionsMap;
+
 	static bool bIsSkipGenerateEngineModules;
 
 	static bool bIsGenerateAllModules;

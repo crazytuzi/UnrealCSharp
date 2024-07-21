@@ -3,64 +3,67 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
-struct FRegisterSoftClassPtr
+namespace
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InClass)
+	struct FRegisterSoftClassPtr
 	{
-		const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
-
-		const auto SoftClassPtr = new TSoftClassPtr<UObject>(FoundClass);
-
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(InMonoObject, SoftClassPtr);
-	}
-
-	static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
-	{
-		if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InA))
+		static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InClass)
 		{
-			if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InB))
-			{
-				return *FoundA == *FoundB;
-			}
+			const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
+
+			const auto SoftClassPtr = new TSoftClassPtr<UObject>(FoundClass);
+
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(InMonoObject, SoftClassPtr);
 		}
 
-		return false;
-	}
-
-	static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
 		{
-			(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(
+			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InA))
+			{
+				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(InB))
+				{
+					return *FoundA == *FoundB;
+				}
+			}
+
+			return false;
+		}
+
+		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+			{
+				(void)FCSharpEnvironment::GetEnvironment().RemoveMultiReference<TSoftClassPtr<UObject>>(
+					InGarbageCollectionHandle);
+			});
+		}
+
+		static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
 				InGarbageCollectionHandle);
-		});
-	}
 
-	static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
-			InGarbageCollectionHandle);
+			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+		}
 
-		return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
-	}
+		static MonoObject* LoadSynchronousImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
+				InGarbageCollectionHandle);
 
-	static MonoObject* LoadSynchronousImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
-			InGarbageCollectionHandle);
+			return FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous());
+		}
 
-		return FCSharpEnvironment::GetEnvironment().Bind(Multi->LoadSynchronous());
-	}
+		FRegisterSoftClassPtr()
+		{
+			FClassBuilder(TEXT("TSoftClassPtr"), NAMESPACE_LIBRARY, true)
+				.Function("Register", RegisterImplementation)
+				.Function("Identical", IdenticalImplementation)
+				.Function("UnRegister", UnRegisterImplementation)
+				.Function("Get", GetImplementation)
+				.Function("LoadSynchronous", LoadSynchronousImplementation);
+		}
+	};
 
-	FRegisterSoftClassPtr()
-	{
-		FClassBuilder(TEXT("TSoftClassPtr"), NAMESPACE_LIBRARY, true)
-			.Function("Register", RegisterImplementation)
-			.Function("Identical", IdenticalImplementation)
-			.Function("UnRegister", UnRegisterImplementation)
-			.Function("Get", GetImplementation)
-			.Function("LoadSynchronous", LoadSynchronousImplementation);
-	}
-};
-
-static FRegisterSoftClassPtr RegisterSoftClassPtr;
+	FRegisterSoftClassPtr RegisterSoftClassPtr;
+}

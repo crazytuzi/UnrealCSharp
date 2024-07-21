@@ -48,6 +48,8 @@ public:
 public:
 	MonoObject* Bind(UObject* Object) const;
 
+	MonoObject* Bind(const UObject* Object) const;
+
 	MonoObject* Bind(UClass* Class) const;
 
 	bool Bind(UObject* Object, bool bNeedMonoClass) const;

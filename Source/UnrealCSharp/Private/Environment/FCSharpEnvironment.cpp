@@ -352,6 +352,11 @@ MonoObject* FCSharpEnvironment::Bind(UObject* Object) const
 	return FCSharpBind::Bind(Domain, Object);
 }
 
+MonoObject* FCSharpEnvironment::Bind(const UObject* Object) const
+{
+	return Bind(const_cast<UObject*>(Object));
+}
+
 MonoObject* FCSharpEnvironment::Bind(UClass* Class) const
 {
 	return FCSharpBind::Bind(Domain, Class);

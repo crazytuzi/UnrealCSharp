@@ -156,11 +156,5 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 		                                     InAssetData, FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass))
 	);
 
-	auto ModuleName = InAssetData.PackagePath.ToString();
-
-	auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGenerationPath(ModuleName), ModuleName);
-
-	const auto FileName = FPaths::Combine(DirectoryName, ClassName) + TEXT(".cs");
-
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FUnrealCSharpFunctionLibrary::GetFileName(InAssetData), Content);
 }

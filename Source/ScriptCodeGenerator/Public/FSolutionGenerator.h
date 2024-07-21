@@ -5,7 +5,7 @@
 class FSolutionGenerator
 {
 public:
-	static GENERATOR_API void Generator();
+	static SCRIPTCODEGENERATOR_API void Generator();
 
 private:
 	static void CopyTemplate(const FString& Dest, const FString& Src);

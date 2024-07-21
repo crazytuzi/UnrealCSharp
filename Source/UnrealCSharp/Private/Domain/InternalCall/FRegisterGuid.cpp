@@ -6,65 +6,68 @@
 
 BINDING_ENUM(EGuidFormats)
 
-struct FRegisterGuidFormats
+namespace
 {
-	FRegisterGuidFormats()
+	struct FRegisterGuidFormats
 	{
-		TBindingEnumBuilder<EGuidFormats, true>()
-			.Enumerator("Digits", EGuidFormats::Digits)
-			.Enumerator("DigitsWithHyphens", EGuidFormats::DigitsWithHyphens)
-			.Enumerator("DigitsWithHyphensLower", EGuidFormats::DigitsWithHyphensLower)
-			.Enumerator("DigitsWithHyphensInBraces", EGuidFormats::DigitsWithHyphensInBraces)
-			.Enumerator("DigitsWithHyphensInParentheses", EGuidFormats::DigitsWithHyphensInParentheses)
-			.Enumerator("HexValuesInBraces", EGuidFormats::HexValuesInBraces)
-			.Enumerator("UniqueObjectGuid", EGuidFormats::UniqueObjectGuid)
-			.Enumerator("Short", EGuidFormats::Short)
-			.Enumerator("Base36Encoded", EGuidFormats::Base36Encoded);
-	}
-};
+		FRegisterGuidFormats()
+		{
+			TBindingEnumBuilder<EGuidFormats, true>()
+				.Enumerator("Digits", EGuidFormats::Digits)
+				.Enumerator("DigitsWithHyphens", EGuidFormats::DigitsWithHyphens)
+				.Enumerator("DigitsWithHyphensLower", EGuidFormats::DigitsWithHyphensLower)
+				.Enumerator("DigitsWithHyphensInBraces", EGuidFormats::DigitsWithHyphensInBraces)
+				.Enumerator("DigitsWithHyphensInParentheses", EGuidFormats::DigitsWithHyphensInParentheses)
+				.Enumerator("HexValuesInBraces", EGuidFormats::HexValuesInBraces)
+				.Enumerator("UniqueObjectGuid", EGuidFormats::UniqueObjectGuid)
+				.Enumerator("Short", EGuidFormats::Short)
+				.Enumerator("Base36Encoded", EGuidFormats::Base36Encoded);
+		}
+	};
 
-static FRegisterGuidFormats RegisterGuidFormats;
+	FRegisterGuidFormats RegisterGuidFormats;
 
-struct FRegisterGuid
-{
-	static bool GreaterThanImplementation(const FGuid& X, const FGuid& Y)
+	struct FRegisterGuid
 	{
-		return	((X.A < Y.A) ? true : ((X.A > Y.A) ? false :
-				((X.B < Y.B) ? true : ((X.B > Y.B) ? false :
-				((X.C < Y.C) ? true : ((X.C > Y.C) ? false :
-				((X.D < Y.D) ? true : ((X.D > Y.D) ? false : false))))))));
-	}
+		static bool GreaterThanImplementation(const FGuid& X, const FGuid& Y)
+		{
+			return	((X.A < Y.A) ? true : ((X.A > Y.A) ? false :
+					((X.B < Y.B) ? true : ((X.B > Y.B) ? false :
+					((X.C < Y.C) ? true : ((X.C > Y.C) ? false :
+					((X.D < Y.D) ? true : ((X.D > Y.D) ? false : false))))))));
+		}
 
-	static FString LexToStringImplementation(const FGuid& Value)
-	{
-		return LexToString(Value);
-	}
+		static FString LexToStringImplementation(const FGuid& Value)
+		{
+			return LexToString(Value);
+		}
 
-	FRegisterGuid()
-	{
-		TBindingClassBuilder<FGuid>(NAMESPACE_BINDING)
-			.Constructor(BINDING_CONSTRUCTOR(FGuid, uint32, uint32, uint32, uint32),
-			             TArray<FString>{"InA", "InB", "InC", "InD"})
-			.Constructor(BINDING_CONSTRUCTOR(FGuid, const FString&),
-			             TArray<FString>{"InGuidStr"})
-			.Less()
-			.Subscript(BINDING_SUBSCRIPT(FGuid, uint32, int32,
-			                             TArray<FString>{"Index"}))
-			.Function("operator >", FUNCTION_GREATER, BINDING_FUNCTION(&GreaterThanImplementation))
-			.Function("LexToString", BINDING_FUNCTION(&LexToStringImplementation,
-			                                          TArray<FString>{"Value"}))
-			.Function("Invalidate", BINDING_FUNCTION(&FGuid::Invalidate))
-			.Function("IsValid", BINDING_FUNCTION(&FGuid::IsValid))
+		FRegisterGuid()
+		{
+			TBindingClassBuilder<FGuid>(NAMESPACE_BINDING)
+				.Constructor(BINDING_CONSTRUCTOR(FGuid, uint32, uint32, uint32, uint32),
+				             TArray<FString>{"InA", "InB", "InC", "InD"})
+				.Constructor(BINDING_CONSTRUCTOR(FGuid, const FString&),
+				             TArray<FString>{"InGuidStr"})
+				.Less()
+				.Subscript(BINDING_SUBSCRIPT(FGuid, uint32, int32,
+				                             TArray<FString>{"Index"}))
+				.Function("operator >", FUNCTION_GREATER, BINDING_FUNCTION(&GreaterThanImplementation))
+				.Function("LexToString", BINDING_FUNCTION(&LexToStringImplementation,
+				                                          TArray<FString>{"Value"}))
+				.Function("Invalidate", BINDING_FUNCTION(&FGuid::Invalidate))
+				.Function("IsValid", BINDING_FUNCTION(&FGuid::IsValid))
 #if UE_GUID_TO_STRING
-			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString,
-			                                       EFunctionInteract::New))
+				.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString,
+				                                       EFunctionInteract::New))
 #endif
-			.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString,
-			                                       TArray<FString>{"Format"}))
-			.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
-			.Function("Parse", BINDING_FUNCTION(&FGuid::Parse))
-			.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact));
-	}
-};
+				.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString,
+				                                       TArray<FString>{"Format"}))
+				.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
+				.Function("Parse", BINDING_FUNCTION(&FGuid::Parse))
+				.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact));
+		}
+	};
 
-static FRegisterGuid RegisterGuid;
+	FRegisterGuid RegisterGuid;
+}

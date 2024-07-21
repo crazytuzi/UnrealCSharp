@@ -35,6 +35,7 @@
 *.sdf
 *.VC.db
 *.VC.opendb
+*.props
 
 !/Template/*
 

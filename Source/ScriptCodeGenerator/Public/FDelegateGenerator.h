@@ -5,7 +5,7 @@
 class FDelegateGenerator
 {
 public:
-	static GENERATOR_API void Generator(FProperty* InProperty);
+	static SCRIPTCODEGENERATOR_API void Generator(FProperty* InProperty);
 
 private:
 	friend class FGeneratorCore;

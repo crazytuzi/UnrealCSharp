@@ -5,7 +5,7 @@
 class FBindingClassGenerator
 {
 public:
-	static GENERATOR_API void Generator();
+	static SCRIPTCODEGENERATOR_API void Generator();
 
 private:
 	static void Generator(const FBindingClass* InClass);

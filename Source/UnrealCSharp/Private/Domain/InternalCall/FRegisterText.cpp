@@ -3,52 +3,55 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
-struct FRegisterText
+namespace
 {
-	static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
+	struct FRegisterText
 	{
-		const auto Text = new FText(FText::FromString(UTF8_TO_TCHAR(
-			FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue))));
-
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FText>(InMonoObject, Text);
-	}
-
-	static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
-	{
-		if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetString<FText>(InA))
+		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
 		{
-			if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetString<FText>(InB))
-			{
-				return FoundA->EqualTo(*FoundB);
-			}
+			const auto Text = new FText(FText::FromString(UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue))));
+
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FText>(InMonoObject, Text);
 		}
 
-		return false;
-	}
-
-	static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
 		{
-			(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FText>(InGarbageCollectionHandle);
-		});
-	}
+			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetString<FText>(InA))
+			{
+				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetString<FText>(InB))
+				{
+					return FoundA->EqualTo(*FoundB);
+				}
+			}
 
-	static MonoString* ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		const auto Text = FCSharpEnvironment::GetEnvironment().GetString<FText>(InGarbageCollectionHandle);
+			return false;
+		}
 
-		return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*Text->ToString()));
-	}
+		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
+			{
+				(void)FCSharpEnvironment::GetEnvironment().RemoveStringReference<FText>(InGarbageCollectionHandle);
+			});
+		}
 
-	FRegisterText()
-	{
-		FClassBuilder(TEXT("FText"), NAMESPACE_LIBRARY, true)
-			.Function("Register", RegisterImplementation)
-			.Function("Identical", IdenticalImplementation)
-			.Function("UnRegister", UnRegisterImplementation)
-			.Function("ToString", ToStringImplementation);
-	}
-};
+		static MonoString* ToStringImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			const auto Text = FCSharpEnvironment::GetEnvironment().GetString<FText>(InGarbageCollectionHandle);
 
-static FRegisterText RegisterText;
+			return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*Text->ToString()));
+		}
+
+		FRegisterText()
+		{
+			FClassBuilder(TEXT("FText"), NAMESPACE_LIBRARY, true)
+				.Function("Register", RegisterImplementation)
+				.Function("Identical", IdenticalImplementation)
+				.Function("UnRegister", UnRegisterImplementation)
+				.Function("ToString", ToStringImplementation);
+		}
+	};
+
+	FRegisterText RegisterText;
+}

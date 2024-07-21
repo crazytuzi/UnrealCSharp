@@ -37,16 +37,9 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	return GetModuleName(InField, [](FString&)
+	return GetModuleName(InField, [InField](FString& InModuleName)
 	{
-	});
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const UClass* InClass)
-{
-	return GetModuleName(InClass, [InClass](FString& InModuleName)
-	{
-		if (!InClass->IsNative())
+		if (!InField->IsNative())
 		{
 			if (auto Index = 0; InModuleName.FindLastChar(TEXT('/'), Index))
 			{
@@ -378,7 +371,7 @@ FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData)
 
 FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData, const FString& InAssetName)
 {
-	auto ModuleName = InAssetData.PackagePath.ToString();
+	auto ModuleName = InAssetData.PackagePath.ToString().Replace(TEXT("Game"), FApp::GetProjectName());
 
 	auto DirectoryName = FPaths::Combine(GetGenerationPath(ModuleName), ModuleName);
 
@@ -481,7 +474,10 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 
 	const auto& ProjectModuleList = GetProjectModuleList();
 
-	if (ProjectModuleList.Contains(Splits[0]) || (Splits[0] == TEXT("Script") && ProjectModuleList.Contains(Splits[1])))
+	if (ProjectModuleList.Contains(Splits[0]) ||
+		Splits[0] == TEXT("Game") ||
+		(Splits[0] == TEXT("Script") &&
+			ProjectModuleList.Contains(Splits[1])))
 	{
 		static auto GameProxyPath = GetGameProxyPath();
 
@@ -648,15 +644,13 @@ FString FUnrealCSharpFunctionLibrary::Encode(const UFunction* InFunction)
 
 const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 {
-	static TArray<FString> GameModuleList;
+	static TArray<FString> EngineModuleList;
 
-	if (GameModuleList.IsEmpty())
+	if (EngineModuleList.IsEmpty())
 	{
 		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 
-		FString JsonStr;
-
-		if (FFileHelper::LoadFileToString(JsonStr, *FilePath))
+		if (FString JsonStr; FFileHelper::LoadFileToString(JsonStr, *FilePath))
 		{
 			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
 
@@ -664,26 +658,36 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 
 			FJsonSerializer::Deserialize(JsonReader, JsonObj);
 
-			JsonObj->TryGetStringArrayField(TEXT("EngineModules"), GameModuleList);
+			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("EngineModules"), OutObject))
+			{
+				for (auto Value : OutObject->Get()->Values)
+				{
+					EngineModuleList.AddUnique(Value.Key);
+				}
+			}
 
-			JsonObj->TryGetStringArrayField(TEXT("EnginePlugins"), GameModuleList);
+			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("EnginePlugins"), OutObject))
+			{
+				for (auto Value : OutObject->Get()->Values)
+				{
+					EngineModuleList.AddUnique(Value.Key);
+				}
+			}
 		}
 	}
 
-	return GameModuleList;
+	return EngineModuleList;
 }
 
 const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 {
-	static TArray<FString> GameModuleList;
+	static TArray<FString> ProjectModuleList;
 
-	if (GameModuleList.IsEmpty())
+	if (ProjectModuleList.IsEmpty())
 	{
 		static auto FilePath = FPaths::Combine(FPaths::ProjectIntermediateDir(), TEXT("UnrealCSharp_Modules.json"));
 
-		FString JsonStr;
-
-		if (FFileHelper::LoadFileToString(JsonStr, *FilePath))
+		if (FString JsonStr; FFileHelper::LoadFileToString(JsonStr, *FilePath))
 		{
 			const auto& JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonStr);
 
@@ -691,15 +695,25 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 
 			FJsonSerializer::Deserialize(JsonReader, JsonObj);
 
-			GameModuleList.Add(TEXT("Game"));
+			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectModules"), OutObject))
+			{
+				for (auto Value : OutObject->Get()->Values)
+				{
+					ProjectModuleList.AddUnique(Value.Key);
+				}
+			}
 
-			JsonObj->TryGetStringArrayField(TEXT("ProjectModules"), GameModuleList);
-
-			JsonObj->TryGetStringArrayField(TEXT("ProjectPlugins"), GameModuleList);
+			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectPlugins"), OutObject))
+			{
+				for (auto Value : OutObject->Get()->Values)
+				{
+					ProjectModuleList.AddUnique(Value.Key);
+				}
+			}
 		}
 	}
 
-	return GameModuleList;
+	return ProjectModuleList;
 }
 
 #if WITH_EDITOR

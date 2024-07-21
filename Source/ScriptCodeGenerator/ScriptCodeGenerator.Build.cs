@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class Generator : ModuleRules
+public class ScriptCodeGenerator : ModuleRules
 {
-	public Generator(ReadOnlyTargetRules Target) : base(Target)
+	public ScriptCodeGenerator(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
