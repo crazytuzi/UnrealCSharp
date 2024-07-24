@@ -9,6 +9,6 @@
     <DefineConstants>$(DefineConstants);</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\Plugins\UnrealCSharp\Script\UE\**"></Compile>
+    <Compile Include="..\..\Plugins\UnrealCSharp\Script\UE\**" Exclude="..\..\Plugins\UnrealCSharp\Script\UE\**\*.DS_Store"></Compile>
   </ItemGroup>
 </Project>
