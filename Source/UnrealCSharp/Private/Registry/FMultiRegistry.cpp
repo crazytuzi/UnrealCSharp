@@ -16,15 +16,15 @@ void FMultiRegistry::Initialize()
 
 void FMultiRegistry::Deinitialize()
 {
-	for (auto& Pair : SubclassOfGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : SubclassOfGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 
@@ -32,15 +32,15 @@ void FMultiRegistry::Deinitialize()
 
 	SubclassOfAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : WeakObjectPtrGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : WeakObjectPtrGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 
@@ -48,15 +48,15 @@ void FMultiRegistry::Deinitialize()
 
 	WeakObjectPtrAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : LazyObjectPtrGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : LazyObjectPtrGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 
@@ -64,15 +64,15 @@ void FMultiRegistry::Deinitialize()
 
 	LazyObjectPtrAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : SoftObjectPtrGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : SoftObjectPtrGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 
@@ -80,15 +80,15 @@ void FMultiRegistry::Deinitialize()
 
 	SoftObjectPtrAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : ScriptInterfaceGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : ScriptInterfaceGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 
@@ -96,15 +96,15 @@ void FMultiRegistry::Deinitialize()
 
 	ScriptInterfaceAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : SoftClassPtrGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : SoftClassPtrGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 

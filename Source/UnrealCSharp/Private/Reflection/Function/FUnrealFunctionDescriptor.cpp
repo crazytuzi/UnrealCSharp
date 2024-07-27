@@ -66,7 +66,7 @@
 			{ \
 				MonoObject* Value = nullptr; \
 				OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), \
-				                           reinterpret_cast<void**>(&Value)); \
+				                           reinterpret_cast<void**>(&Value), true); \
 				ARRAY_SET(MonoObjectArray, MonoObject*, Index, Value); \
 			} \
 		} \
@@ -78,7 +78,7 @@
 	if (ReturnPropertyDescriptor != nullptr) \
 	{ \
 		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), \
-		                              reinterpret_cast<void**>(&ReturnValue)); \
+		                              reinterpret_cast<void**>(&ReturnValue), true); \
 	} \
 	if (Params != nullptr) \
 	{ \

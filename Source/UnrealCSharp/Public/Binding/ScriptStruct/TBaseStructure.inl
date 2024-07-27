@@ -29,7 +29,7 @@ static UScriptStruct* StaticGetBaseStructureInternal(const FName& Name)
 template <>
 struct TBaseStructure<FIntPoint>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FIntPoint));
 	}
@@ -39,7 +39,7 @@ struct TBaseStructure<FIntPoint>
 template <>
 struct TBaseStructure<FTimespan>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FTimespan));
 	}
@@ -48,7 +48,7 @@ struct TBaseStructure<FTimespan>
 template <>
 struct TBaseStructure<FAssetBundleEntry>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FAssetBundleEntry));
 	}
@@ -57,7 +57,7 @@ struct TBaseStructure<FAssetBundleEntry>
 template <>
 struct TBaseStructure<FBox>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FBox));
 	}
@@ -66,7 +66,7 @@ struct TBaseStructure<FBox>
 template <>
 struct TBaseStructure<FBoxSphereBounds>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FBoxSphereBounds));
 	}
@@ -76,7 +76,7 @@ struct TBaseStructure<FBoxSphereBounds>
 template <>
 struct TBaseStructure<FIntVector>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FIntVector));
 	}
@@ -86,7 +86,7 @@ struct TBaseStructure<FIntVector>
 template <>
 struct TBaseStructure<FExpressionInput>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FExpressionInput));
 	}
@@ -95,7 +95,7 @@ struct TBaseStructure<FExpressionInput>
 template <>
 struct TBaseStructure<FExpressionOutput>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FExpressionOutput));
 	}
@@ -104,7 +104,7 @@ struct TBaseStructure<FExpressionOutput>
 template <>
 struct TBaseStructure<FVector3f>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FVector3f));
 	}
@@ -113,7 +113,7 @@ struct TBaseStructure<FVector3f>
 template <>
 struct TBaseStructure<FVector4f>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FVector4f));
 	}
@@ -122,7 +122,7 @@ struct TBaseStructure<FVector4f>
 template <>
 struct TBaseStructure<FFrameRate>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FFrameRate));
 	}
@@ -131,7 +131,7 @@ struct TBaseStructure<FFrameRate>
 template <>
 struct TBaseStructure<FDirectoryPath>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FDirectoryPath));
 	}
@@ -140,7 +140,7 @@ struct TBaseStructure<FDirectoryPath>
 template <>
 struct TBaseStructure<FInterpCurveVector>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveVector));
 	}
@@ -149,7 +149,7 @@ struct TBaseStructure<FInterpCurveVector>
 template <>
 struct TBaseStructure<FInterpCurveQuat>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveQuat));
 	}
@@ -158,7 +158,7 @@ struct TBaseStructure<FInterpCurveQuat>
 template <>
 struct TBaseStructure<FInterpCurveFloat>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveFloat));
 	}
@@ -167,7 +167,7 @@ struct TBaseStructure<FInterpCurveFloat>
 template <>
 struct TBaseStructure<FInterpCurveVector2D>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveVector2D));
 	}
@@ -176,7 +176,7 @@ struct TBaseStructure<FInterpCurveVector2D>
 template <>
 struct TBaseStructure<FInterpCurveTwoVectors>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveTwoVectors));
 	}
@@ -185,7 +185,7 @@ struct TBaseStructure<FInterpCurveTwoVectors>
 template <>
 struct TBaseStructure<FInterpCurveLinearColor>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveLinearColor));
 	}
@@ -194,7 +194,7 @@ struct TBaseStructure<FInterpCurveLinearColor>
 template <>
 struct TBaseStructure<FMaterialAttributesInput>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FMaterialAttributesInput));
 	}
@@ -203,7 +203,7 @@ struct TBaseStructure<FMaterialAttributesInput>
 template <>
 struct TBaseStructure<FColorMaterialInput>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FColorMaterialInput));
 	}
@@ -212,7 +212,7 @@ struct TBaseStructure<FColorMaterialInput>
 template <>
 struct TBaseStructure<FScalarMaterialInput>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FScalarMaterialInput));
 	}
@@ -221,7 +221,7 @@ struct TBaseStructure<FScalarMaterialInput>
 template <>
 struct TBaseStructure<FVectorMaterialInput>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FVectorMaterialInput));
 	}
@@ -230,7 +230,7 @@ struct TBaseStructure<FVectorMaterialInput>
 template <>
 struct TBaseStructure<FShadingModelMaterialInput>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FShadingModelMaterialInput));
 	}
@@ -240,7 +240,7 @@ struct TBaseStructure<FShadingModelMaterialInput>
 template <>
 struct TBaseStructure<FStrataMaterialInput>
 {
-	static UScriptStruct* Get()
+	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FStrataMaterialInput));
 	}

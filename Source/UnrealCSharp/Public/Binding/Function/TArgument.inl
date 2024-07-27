@@ -7,7 +7,7 @@ struct TArgument
 {
 };
 
-template <typename T, bool bIsPrimitive = TIsPrimitive<T>::Value>
+template <typename T, auto IsPrimitive = TIsPrimitive<T>::Value>
 struct TBaseArgument
 {
 };
@@ -32,17 +32,18 @@ struct TBaseArgument<T, true>
 	{
 	}
 
-	Type& Get()
+	auto Get() -> Type&
 	{
 		return Value;
 	}
 
-	MonoObject* Set()
+	auto Set()
 	{
-		return TPropertyValue<Type, Type>::Get(const_cast<std::decay_t<T>*>(&Value));
+		return TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
+			const_cast<std::decay_t<T>*>(&Value));
 	}
 
-	constexpr bool IsRef() const
+	constexpr auto IsRef() const
 	{
 		return TTypeInfo<T>::Get()->IsRef();
 	}
@@ -68,17 +69,18 @@ struct TBaseArgument<T, false>
 	{
 	}
 
-	Type& Get()
+	auto Get() -> Type&
 	{
 		return Value;
 	}
 
-	MonoObject* Set()
+	auto Set()
 	{
-		return TPropertyValue<Type, Type>::Get(const_cast<std::decay_t<T>*>(&Value));
+		return TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
+			const_cast<std::decay_t<T>*>(&Value));
 	}
 
-	constexpr bool IsRef() const
+	constexpr auto IsRef() const
 	{
 		return TTypeInfo<T>::Get()->IsRef();
 	}
@@ -100,22 +102,6 @@ struct TCompoundArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_refe
 	TBaseArgument<T>
 {
 	using TBaseArgument<T>::TBaseArgument;
-
-	using Super = TBaseArgument<T>;
-
-	using Type = typename Super::Type;
-
-	MonoObject* Set()
-	{
-		if constexpr (TTypeInfo<T>::IsReference())
-		{
-			return Super::Set();
-		}
-		else
-		{
-			return TPropertyValue<Type, Type>::Get(const_cast<std::decay_t<T>*>(new Type(Super::Value)));
-		}
-	}
 };
 
 template <typename T>
@@ -125,7 +111,7 @@ struct TCompoundArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_refer
 {
 	using TBaseArgument<std::decay_t<T>>::TBaseArgument;
 
-	constexpr bool IsRef() const
+	constexpr auto IsRef() const
 	{
 		return TTypeInfo<T>::Get()->IsRef();
 	}
@@ -137,7 +123,7 @@ struct TStringArgument :
 {
 	using TCompoundArgument<std::decay_t<T>, std::decay_t<T>>::TCompoundArgument;
 
-	constexpr bool IsRef() const
+	constexpr auto IsRef() const
 	{
 		return TTypeInfo<T>::Get()->IsRef();
 	}
@@ -149,7 +135,7 @@ struct TContainerArgument :
 {
 	using TCompoundArgument<std::decay_t<T>, std::decay_t<T>>::TCompoundArgument;
 
-	constexpr bool IsRef() const
+	constexpr auto IsRef() const
 	{
 		return TTypeInfo<T>::Get()->IsRef();
 	}
@@ -262,7 +248,7 @@ struct TArgument<T,
 {
 	using TBaseArgument<std::decay_t<T>>::TBaseArgument;
 
-	constexpr bool IsRef() const
+	constexpr auto IsRef() const
 	{
 		return TTypeInfo<T>::Get()->IsRef();
 	}
@@ -365,7 +351,7 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::d
 {
 	using TMultiArgument<std::decay_t<T>>::TMultiArgument;
 
-	constexpr bool IsRef() const
+	constexpr auto IsRef() const
 	{
 		return TTypeInfo<T>::Get()->IsRef();
 	}
@@ -399,3 +385,17 @@ struct TArgument<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value, T
 {
 	using TMultiArgument<T>::TMultiArgument;
 };
+
+#if UE_F_OPTIONAL_PROPERTY
+template <typename T>
+struct TArgument<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>> :
+	TCompoundArgument<std::decay_t<T>, std::decay_t<T>>
+{
+	using TCompoundArgument<std::decay_t<T>, std::decay_t<T>>::TCompoundArgument;
+
+	constexpr auto IsRef() const
+	{
+		return TTypeInfo<T>::Get()->IsRef();
+	}
+};
+#endif

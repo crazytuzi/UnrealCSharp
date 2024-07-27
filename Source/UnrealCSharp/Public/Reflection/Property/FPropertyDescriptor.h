@@ -13,7 +13,7 @@ public:
 	virtual ~FPropertyDescriptor() = default;
 
 public:
-	virtual void Get(void* Src, void** Dest) const;
+	virtual void Get(void* Src, void** Dest, bool bIsCopy) const;
 
 	virtual void Get(void* Src, void* Dest) const;
 

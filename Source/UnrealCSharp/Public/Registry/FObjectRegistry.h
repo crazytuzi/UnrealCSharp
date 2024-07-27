@@ -36,7 +36,8 @@ public:
 	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject);
 
 public:
-	bool AddReference(UObject* InObject, MonoObject* InMonoObject);
+	template <auto IsWeak>
+	auto AddReference(UObject* InObject, MonoObject* InMonoObject);
 
 	bool RemoveReference(const UObject* InObject);
 
@@ -47,3 +48,5 @@ private:
 
 	FObjectMapping::FAddress2GarbageCollectionHandle Object2GarbageCollectionHandleMap;
 };
+
+#include "FObjectRegistry.inl"

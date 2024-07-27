@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-template <typename T, int32 Size>
-static constexpr int TGetArrayLength(T (&)[Size])
+template <typename T, auto Size>
+static constexpr auto TGetArrayLength(T (&)[Size])
 {
 	return Size;
 }
 
 template <typename T>
-static constexpr int TGetArrayLength(T)
+static constexpr auto TGetArrayLength(T)
 {
 	return 1;
 }

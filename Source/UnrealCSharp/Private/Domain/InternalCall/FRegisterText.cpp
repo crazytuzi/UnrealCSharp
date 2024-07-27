@@ -12,7 +12,7 @@ namespace
 			const auto Text = new FText(FText::FromString(UTF8_TO_TCHAR(
 				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue))));
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FText>(InMonoObject, Text);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true>(InMonoObject, Text);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)

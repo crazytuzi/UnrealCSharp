@@ -70,7 +70,7 @@ void UMulticastDelegateHandler::Deinitialize()
 	{
 		if (DelegateGarbageCollectionHandle.IsValid())
 		{
-			FGarbageCollectionHandle::Free(DelegateGarbageCollectionHandle);
+			FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
 		}
 	}
 
@@ -251,7 +251,7 @@ void UMulticastDelegateHandler::Clear()
 	{
 		if (DelegateGarbageCollectionHandle.IsValid())
 		{
-			FGarbageCollectionHandle::Free(DelegateGarbageCollectionHandle);
+			FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
 		}
 	}
 

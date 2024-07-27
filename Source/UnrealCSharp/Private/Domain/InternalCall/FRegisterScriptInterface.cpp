@@ -13,7 +13,7 @@ namespace
 
 			const auto ScriptInterface = new TScriptInterface<IInterface>(FoundObject);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true>(
 				InMonoObject, ScriptInterface);
 		}
 
@@ -46,7 +46,7 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 				InGarbageCollectionHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->GetObject());
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(Multi->GetObject());
 		}
 
 		FRegisterScriptInterface()

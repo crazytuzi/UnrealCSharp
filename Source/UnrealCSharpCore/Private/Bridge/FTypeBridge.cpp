@@ -83,8 +83,8 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
 		FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass())))
 	{
-		if (InMonoClass == FoundMonoClass || FMonoDomain::Class_Is_Subclass_Of(
-			InMonoClass, FoundMonoClass, false))
+		if (InMonoClass == FoundMonoClass ||
+			FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
 			return EPropertyTypeExtent::ObjectReference;
 		}
@@ -760,9 +760,7 @@ MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoArray* I
 FProperty* FTypeBridge::Factory(MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
                                 const FName& InName, const EObjectFlags InObjectFlags)
 {
-	const auto PropertyType = GetPropertyType(InReflectionType);
-
-	switch (PropertyType)
+	switch (const auto PropertyType = GetPropertyType(InReflectionType); PropertyType)
 	{
 	case EPropertyTypeExtent::Byte: return new FByteProperty(InOwner, InName, InObjectFlags);
 

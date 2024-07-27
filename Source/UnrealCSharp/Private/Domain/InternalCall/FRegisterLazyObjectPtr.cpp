@@ -13,7 +13,7 @@ namespace
 
 			const auto LazyObjectPtr = new TLazyObjectPtr<UObject>(FoundObject);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, true>(
 				InMonoObject, LazyObjectPtr);
 		}
 
@@ -44,7 +44,7 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TLazyObjectPtr<
 				UObject>>(InGarbageCollectionHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(Multi->Get());
 		}
 
 		FRegisterLazyObjectPtr()

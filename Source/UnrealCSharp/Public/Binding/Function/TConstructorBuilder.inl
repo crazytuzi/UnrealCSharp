@@ -7,7 +7,7 @@ template <typename Class, typename... Args>
 struct TConstructorBuilder :
 	TFunctionInfoBuilder<TConstructorBuilder<Class, Args...>, EFunctionType::Constructor, void, Args...>
 {
-	static void Invoke(BINDING_CONSTRUCTOR_PLACEHOLDER_SIGNATURE)
+	static auto Invoke(BINDING_CONSTRUCTOR_PLACEHOLDER_SIGNATURE)
 	{
 		if constexpr (sizeof...(Args) == 0)
 		{

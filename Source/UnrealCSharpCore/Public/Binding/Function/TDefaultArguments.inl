@@ -5,20 +5,20 @@
 template <typename... Args>
 struct TDefaultArguments
 {
-	template <int SkipCount, int Position, int ArgumentsCount, typename... Arguments>
+	template <auto SkipCount, auto Position, auto ArgumentsCount, typename... Arguments>
 	struct TDefaultArgumentsBuilder;
 
-	template <int SkipCount, int Position, int ArgumentsCount, typename Argument, typename... Arguments>
+	template <auto SkipCount, auto Position, auto ArgumentsCount, typename Argument, typename... Arguments>
 	struct TDefaultArgumentsBuilder<SkipCount, Position, ArgumentsCount, Argument, Arguments...> :
 		TDefaultArgumentsBuilder<SkipCount - 1, Position + 1, ArgumentsCount, Arguments...>
 	{
 	};
 
-	template <int Position, int ArgumentsCount, typename Argument, typename... Arguments>
+	template <auto Position, auto ArgumentsCount, typename Argument, typename... Arguments>
 	struct TDefaultArgumentsBuilder<0, Position, ArgumentsCount, Argument, Arguments...>
 	{
 		template <class DefaultArgument, class... DefaultArguments>
-		static void Set(TArray<FString>& OutValue,
+		static auto Set(TArray<FString>& OutValue,
 		                DefaultArgument InDefaultArgument,
 		                DefaultArguments&&... InDefaultArguments)
 		{
@@ -32,16 +32,16 @@ struct TDefaultArguments
 		}
 	};
 
-	template <int Position, int ArgumentsCount>
+	template <auto Position, auto ArgumentsCount>
 	struct TDefaultArgumentsBuilder<0, Position, ArgumentsCount>
 	{
-		static void Set(TArray<FString>& OutValue)
+		static auto Set(TArray<FString>& OutValue)
 		{
 		}
 	};
 
 	template <typename... DefaultArguments>
-	static TArray<FString> Get(DefaultArguments&&... InDefaultArguments)
+	static auto Get(DefaultArguments&&... InDefaultArguments)
 	{
 		TArray<FString> Value;
 

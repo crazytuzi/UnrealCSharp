@@ -9,39 +9,39 @@
 template <typename T, bool bIsStatic = false>
 struct TTypeInfo final : FTypeInfo
 {
-	constexpr static bool IsReference()
+	constexpr static auto IsReference()
 	{
 		return std::is_reference_v<T>;
 	}
 
-	virtual FString GetName() const override
+	virtual auto GetName() const -> FString override
 	{
 		return TName<T, T>::Get();
 	}
 
-	virtual const TArray<FString>& GetNameSpace() const override
+	virtual auto GetNameSpace() const -> const TArray<FString>& override
 	{
 		static auto Instance = TNameSpace<T, T>::Get();
 
 		return Instance;
 	}
 
-	virtual bool IsRef() const override
+	virtual auto IsRef() const -> bool override
 	{
 		return TIsRef<T>::Value;
 	}
 
-	virtual bool IsStatic() const override
+	virtual auto IsStatic() const -> bool override
 	{
 		return bIsStatic;
 	}
 
-	virtual bool IsPrimitive() const override
+	virtual auto IsPrimitive() const -> bool override
 	{
 		return TIsPrimitive<T>::Value;
 	}
 
-	static FTypeInfo* Get()
+	static auto Get() -> FTypeInfo*
 	{
 		static TTypeInfo Instance;
 
@@ -52,34 +52,34 @@ struct TTypeInfo final : FTypeInfo
 template <>
 struct TTypeInfo<void> final : FTypeInfo
 {
-	virtual FString GetName() const override
+	virtual auto GetName() const -> FString override
 	{
-		return {};
+		return FString{};
 	}
 
-	virtual const TArray<FString>& GetNameSpace() const override
+	virtual auto GetNameSpace() const -> const TArray<FString>& override
 	{
 		static TArray<FString> Instance;
 
 		return Instance;
 	}
 
-	virtual bool IsRef() const override
+	virtual auto IsRef() const -> bool override
 	{
 		return false;
 	}
 
-	virtual bool IsStatic() const override
+	virtual auto IsStatic() const -> bool override
 	{
 		return false;
 	}
 
-	virtual bool IsPrimitive() const override
+	virtual auto IsPrimitive() const -> bool override
 	{
 		return false;
 	}
 
-	static FTypeInfo* Get()
+	static auto Get() -> FTypeInfo*
 	{
 		return nullptr;
 	}

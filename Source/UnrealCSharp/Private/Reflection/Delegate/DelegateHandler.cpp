@@ -35,7 +35,7 @@ void UDelegateHandler::Deinitialize()
 {
 	if (DelegateGarbageCollectionHandle.IsValid())
 	{
-		FGarbageCollectionHandle::Free(DelegateGarbageCollectionHandle);
+		FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
 	}
 
 	if (ScriptDelegate != nullptr)
@@ -85,7 +85,7 @@ void UDelegateHandler::UnBind()
 
 	if (DelegateGarbageCollectionHandle.IsValid())
 	{
-		FGarbageCollectionHandle::Free(DelegateGarbageCollectionHandle);
+		FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
 	}
 }
 
@@ -98,7 +98,7 @@ void UDelegateHandler::Clear()
 
 	if (DelegateGarbageCollectionHandle.IsValid())
 	{
-		FGarbageCollectionHandle::Free(DelegateGarbageCollectionHandle);
+		FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
 	}
 }
 

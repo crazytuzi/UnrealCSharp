@@ -38,9 +38,8 @@ void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelay
 {
 	if (const auto AssetDataClass = InAssetData.GetClass())
 	{
-		const auto& AssetDataClassName = AssetDataClass->GetFName();
-
-		if (FGeneratorCore::GetSupportedAssetClassName().Contains(AssetDataClassName))
+		if (const auto& AssetDataClassName = AssetDataClass->GetFName();
+			FGeneratorCore::GetSupportedAssetClassName().Contains(AssetDataClassName))
 		{
 			if (AssetDataClassName == UBlueprint::StaticClass()->GetFName() ||
 				AssetDataClassName == UWidgetBlueprint::StaticClass()->GetFName())
@@ -111,7 +110,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 		return;
 	}
 
-	auto ClassName = FUnrealCSharpFunctionLibrary::GetAssetName(InAssetData, InAssetData.AssetName.ToString());
+	const auto ClassName = FUnrealCSharpFunctionLibrary::GetAssetName(InAssetData, InAssetData.AssetName.ToString());
 
 	FString UsingNameSpaceContent;
 

@@ -15,8 +15,8 @@ struct TConstructorHelper
 template <typename... Args>
 struct TConstructorHelper<std::tuple<Args...>>
 {
-	template <typename Class, size_t... Index>
-	static void Call(std::index_sequence<Index...>, BINDING_CONSTRUCTOR_SIGNATURE)
+	template <typename Class, auto... Index>
+	static auto Call(std::index_sequence<Index...>, BINDING_CONSTRUCTOR_SIGNATURE)
 	{
 		std::tuple<TArgument<Args, Args>...> Argument(Array_Get(InValue, Index)...);
 
@@ -28,13 +28,14 @@ struct TConstructorHelper<std::tuple<Args...>>
 
 		if constexpr (TIsScriptStruct<Class>::Value)
 		{
-			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<Class>::Get(), false);
+			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<Class>::Get());
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<Class>::Get(), Value, InMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+				TBaseStructure<Class>::Get(), Value, InMonoObject);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddBindingReference(InMonoObject, Value);
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<Class, true>(InMonoObject, Value);
 		}
 	}
 };

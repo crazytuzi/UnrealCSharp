@@ -1,6 +1,6 @@
 ﻿#include "Reflection/Property/FieldPathProperty/FFieldPathPropertyDescriptor.h"
 
-void FFieldPathPropertyDescriptor::Get(void* Src, void** Dest) const
+void FFieldPathPropertyDescriptor::Get(void* Src, void** Dest, bool bIsCopy) const
 {
 	// @TODO
 }

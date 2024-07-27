@@ -1,7 +1,7 @@
 ﻿#include "Reflection/Property/EnumProperty/FEnumPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-void FEnumPropertyDescriptor::Get(void* Src, void** Dest) const
+void FEnumPropertyDescriptor::Get(void* Src, void** Dest, bool bIsCopy) const
 {
 	*Dest = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(Class, Src));
 }

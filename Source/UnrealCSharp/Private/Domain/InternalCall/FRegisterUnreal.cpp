@@ -62,7 +62,7 @@ namespace
 			                                       ObjectTemplate,
 			                                       bCopyTransientsFromClassDefaults);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Object);
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(Object);
 		}
 
 		static MonoObject* DuplicateObjectImplementation(const FGarbageCollectionHandle SourceObject,
@@ -79,7 +79,7 @@ namespace
 			                                             ObjectOuter,
 			                                             *ObjectName);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Object);
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(Object);
 		}
 
 		static MonoObject* LoadObjectImplementation(const FGarbageCollectionHandle Outer,
@@ -103,7 +103,7 @@ namespace
 			                                        ObjectSandbox
 			);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Object);
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(Object);
 		}
 
 		static MonoObject* LoadClassImplementation(const FGarbageCollectionHandle Outer,
@@ -127,7 +127,7 @@ namespace
 			                                      ObjectSandbox
 			);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Class);
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(Class);
 		}
 
 		static MonoObject* CreateWidgetImplementation(const FGarbageCollectionHandle InOwningObject,
@@ -160,12 +160,12 @@ namespace
 				UserWidget = CreateWidget(Cast<UWorld>(OwningObject), Class);
 			}
 
-			return FCSharpEnvironment::GetEnvironment().Bind(UserWidget);
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(UserWidget);
 		}
 
 		static MonoObject* GWorldImplementation()
 		{
-			return FCSharpEnvironment::GetEnvironment().Bind(GWorld);
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(GWorld);
 		}
 
 		FRegisterUnreal()

@@ -3,11 +3,11 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
 
-void FOptionalPropertyDescriptor::Get(void* Src, void** Dest) const
+void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
 {
 	if (Property != nullptr)
 	{
-		*Dest = NewWeakRef(Src);
+		*Dest = NewWeakRef(Src, bIsCopy);
 	}
 }
 
@@ -26,14 +26,29 @@ void FOptionalPropertyDescriptor::Set(void* Src, void* Dest) const
 	}
 }
 
-MonoObject* FOptionalPropertyDescriptor::NewWeakRef(void* InAddress) const
+MonoObject* FOptionalPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	if (bIsCopy)
+	{
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	const auto OptionalHelper = new FOptionalHelper(Property, InAddress);
+		const auto OptionalHelper = new FOptionalHelper(Property, CopyValue(InAddress),
+		                                                true, false);
 
-	FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, Object);
+		FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, Object);
 
-	return Object;
+		return Object;
+	}
+	else
+	{
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+		const auto OptionalHelper = new FOptionalHelper(Property, InAddress,
+		                                                false, false);
+
+		FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, Object);
+
+		return Object;
+	}
 }
 #endif

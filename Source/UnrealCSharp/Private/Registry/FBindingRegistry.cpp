@@ -16,15 +16,15 @@ void FBindingRegistry::Initialize()
 
 void FBindingRegistry::Deinitialize()
 {
-	for (auto& Pair : GarbageCollectionHandle2BindingAddress.Get())
+	for (auto& [Key, Value] : GarbageCollectionHandle2BindingAddress.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			delete Pair.Value.AddressWrapper;
+			delete Value.AddressWrapper;
 
-			Pair.Value.AddressWrapper = nullptr;
+			Value.AddressWrapper = nullptr;
 		}
 	}
 
@@ -44,7 +44,14 @@ bool FBindingRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbage
 {
 	if (const auto FoundValue = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle))
 	{
-		BindingAddress2GarbageCollectionHandle.Remove(FoundValue->AddressWrapper->GetValue());
+		if (const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find(
+			FoundValue->AddressWrapper->Value))
+		{
+			if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+			{
+				BindingAddress2GarbageCollectionHandle.Remove(FoundValue->AddressWrapper->Value);
+			}
+		}
 
 		if (FoundValue->bNeedFree)
 		{

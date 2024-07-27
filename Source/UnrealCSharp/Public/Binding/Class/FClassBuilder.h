@@ -21,21 +21,21 @@ public:
 	                       const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {});
 
 	template <typename T>
-	FClassBuilder& Function(const FString& InName,
-	                        T InMethod
+	auto Function(const FString& InName,
+	              T InMethod
 #if WITH_FUNCTION_INFO
-	                        , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction = {}
+	              , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction = {}
 #endif
-	);
+	) -> FClassBuilder&;
 
 	template <typename T, typename U>
-	FClassBuilder& Property(const FString& InName,
-	                        T InGetMethod,
-	                        U InSetMethod
+	auto Property(const FString& InName,
+	              T InGetMethod,
+	              U InSetMethod
 #if WITH_PROPERTY_INFO
-	                        , const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {}
+	              , const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {}
 #endif
-	);
+	) -> FClassBuilder&;
 
 	FClassBuilder& Function(const FString& InName,
 #if WITH_FUNCTION_INFO
@@ -55,10 +55,7 @@ public:
 
 protected:
 	template <typename T>
-	void Function(const FString& InImplementationName, const TFunctionPointer<T>& InMethod)
-	{
-		ClassRegister->BindingMethod(InImplementationName, InMethod.Value.Pointer);
-	}
+	auto Function(const FString& InImplementationName, const TFunctionPointer<T>& InMethod);
 
 private:
 	FString GetFunctionImplementationName(const FString& InName, const FString& InImplementationName) const;
@@ -70,49 +67,4 @@ private:
 	TArray<FString> Functions;
 };
 
-template <typename T>
-FClassBuilder& FClassBuilder::Function(const FString& InName,
-                                       T InMethod
-#if WITH_FUNCTION_INFO
-                                       , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction
-#endif
-)
-{
-	auto FunctionPointer = TFunctionPointer<decltype(InMethod)>(InMethod);
-
-	return Function(InName,
-	                InName,
-	                FunctionPointer.Value.Pointer
-#if WITH_FUNCTION_INFO
-	                , InFunctionInfoFunction
-#endif
-	);
-}
-
-template <typename T, typename U>
-FClassBuilder& FClassBuilder::Property(const FString& InName,
-                                       T InGetMethod,
-                                       U InSetMethod
-#if WITH_PROPERTY_INFO
-                                       , const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction
-#endif
-)
-{
-	auto GetFunctionPointer = TFunctionPointer<decltype(InGetMethod)>(InGetMethod);
-
-	auto SetFunctionPointer = TFunctionPointer<decltype(InSetMethod)>(InSetMethod);
-
-#if WITH_PROPERTY_INFO
-	if (InTypeInfoFunction.IsSet())
-	{
-		ClassRegister->BindingProperty(InName,
-		                               GetFunctionPointer.Value.Pointer,
-		                               SetFunctionPointer.Value.Pointer,
-		                               InTypeInfoFunction
-		);
-	}
-#endif
-
-	return Function(BINDING_PROPERTY_GET + InName, GetFunctionPointer.Value.Pointer).
-		Function(BINDING_PROPERTY_SET + InName, SetFunctionPointer.Value.Pointer);
-}
+#include "FClassBuilder.inl"

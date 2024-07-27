@@ -27,6 +27,12 @@ void FClassDescriptor::Deinitialize()
 	if (const auto Class = Cast<UClass>(Struct))
 	{
 		Class->ClearFunctionMapsCaches();
+
+		FDomain::StaticClassSingleton_Reset(BindMonoClass);
+	}
+	else if (Cast<UScriptStruct>(Struct))
+	{
+		FDomain::StaticStructSingleton_Reset(BindMonoClass);
 	}
 
 	for (const auto& FunctionHash : FunctionHashSet)

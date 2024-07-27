@@ -68,9 +68,9 @@ struct TDefaultArgument
 template <typename T>
 struct TEmptyDefaultArgument
 {
-	static FString Get(const T& InValue)
+	static auto Get(const T& InValue)
 	{
-		return TEXT("");
+		return FString{};
 	}
 };
 
@@ -78,13 +78,13 @@ template <typename T>
 struct TDefaultArgumentBuilder
 {
 	template <auto Prefix>
-	static FString GetImplementation()
+	static auto GetImplementation()
 	{
-		return {};
+		return FString{};
 	}
 
 	template <auto Prefix, typename DefaultArgument, typename... Args>
-	static FString GetImplementation(DefaultArgument InDefaultArgument, Args&&... InParams)
+	static auto GetImplementation(DefaultArgument InDefaultArgument, Args&&... InParams)
 	{
 		return Prefix +
 			TDefaultArgument<DefaultArgument, DefaultArgument>::Get(InDefaultArgument) +
@@ -92,7 +92,7 @@ struct TDefaultArgumentBuilder
 	}
 
 	template <typename... Args>
-	static FString Get(Args&&... InDefaultArguments)
+	static auto Get(Args&&... InDefaultArguments)
 	{
 		return FString::Printf(TEXT(
 			"new %s(%s)"),
@@ -109,7 +109,7 @@ struct TDefaultArgumentBuilder
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>>
 {
-	static FString Get(const uint8 InValue)
+	static auto Get(const uint8 InValue)
 	{
 		return FString::Printf(TEXT("%d"), InValue);
 	}
@@ -118,7 +118,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>>
 {
-	static FString Get(const uint16 InValue)
+	static auto Get(const uint16 InValue)
 	{
 		return FString::Printf(TEXT("%d"), InValue);
 	}
@@ -127,7 +127,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>>
 {
-	static FString Get(const uint32 InValue)
+	static auto Get(const uint32 InValue)
 	{
 		return FString::Printf(TEXT("%d"), InValue);
 	}
@@ -136,7 +136,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>>
 {
-	static FString Get(const uint64 InValue)
+	static auto Get(const uint64 InValue)
 	{
 		return FString::Printf(TEXT("%lld"), InValue);
 	}
@@ -145,7 +145,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>>
 {
-	static FString Get(const int8 InValue)
+	static auto Get(const int8 InValue)
 	{
 		return FString::Printf(TEXT("%d"), InValue);
 	}
@@ -154,7 +154,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>>
 {
-	static FString Get(const int16 InValue)
+	static auto Get(const int16 InValue)
 	{
 		return FString::Printf(TEXT("%d"), InValue);
 	}
@@ -163,7 +163,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int1
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>>
 {
-	static FString Get(const int32 InValue)
+	static auto Get(const int32 InValue)
 	{
 		return FString::Printf(TEXT("%d"), InValue);
 	}
@@ -172,7 +172,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int3
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>>
 {
-	static FString Get(const int64 InValue)
+	static auto Get(const int64 InValue)
 	{
 		return FString::Printf(TEXT("%lld"), InValue);
 	}
@@ -181,7 +181,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int6
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>>
 {
-	static FString Get(const bool InValue)
+	static auto Get(const bool InValue)
 	{
 		return InValue ? TEXT("true") : TEXT("false");
 	}
@@ -190,7 +190,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>>
 {
-	static FString Get(const float InValue)
+	static auto Get(const float InValue)
 	{
 		return FString::Printf(TEXT("%sf"), *SanitizeFloat(InValue));
 	}
@@ -212,7 +212,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Valu
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>
 {
-	static FString Get(const FName& InValue)
+	static auto Get(const FName& InValue)
 	{
 		return FString::Printf(TEXT(
 			"new %s(\"%s\")"),
@@ -243,7 +243,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, 
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, T>>
 {
-	static FString Get(const FString& InValue)
+	static auto Get(const FString& InValue)
 	{
 		return FString::Printf(TEXT(
 			"new %s(\"%s\")"),
@@ -256,7 +256,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FStr
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>>
 {
-	static FString Get(const FText& InValue)
+	static auto Get(const FText& InValue)
 	{
 		return FString::Printf(TEXT(
 			"new %s(\"%s\")"),
@@ -287,7 +287,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>>
 {
-	static FString Get(const double InValue)
+	static auto Get(const double InValue)
 	{
 		return SanitizeFloat(InValue);
 	}
@@ -296,7 +296,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, doub
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FRotator>, T>>
 {
-	static FString Get(const FRotator& InValue)
+	static auto Get(const FRotator& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.Pitch, InValue.Yaw, InValue.Roll);
 	}
@@ -305,7 +305,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FRot
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FQuat>, T>>
 {
-	static FString Get(const FQuat& InValue)
+	static auto Get(const FQuat& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.X, InValue.Y, InValue.Z, InValue.W);
 	}
@@ -314,7 +314,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FQua
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FVector>, T>>
 {
-	static FString Get(const FVector& InValue)
+	static auto Get(const FVector& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.X, InValue.Y, InValue.Z);
 	}
@@ -323,7 +323,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FVec
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FTransform>, T>>
 {
-	static FString Get(const FTransform& InValue)
+	static auto Get(const FTransform& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.GetRotation(), InValue.GetTranslation(), InValue.GetScale3D());
 	}
@@ -332,7 +332,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FTra
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FLinearColor>, T>>
 {
-	static FString Get(const FLinearColor& InValue)
+	static auto Get(const FLinearColor& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.R, InValue.G, InValue.B, InValue.A);
 	}
@@ -341,7 +341,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FLin
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FColor>, T>>
 {
-	static FString Get(const FColor& InValue)
+	static auto Get(const FColor& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.R, InValue.G, InValue.B, InValue.A);
 	}
@@ -350,7 +350,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FCol
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FPlane>, T>>
 {
-	static FString Get(const FPlane& InValue)
+	static auto Get(const FPlane& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.X, InValue.Y, InValue.Z, InValue.W);
 	}
@@ -359,7 +359,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FPla
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FVector2D>, T>>
 {
-	static FString Get(const FVector2D& InValue)
+	static auto Get(const FVector2D& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.X, InValue.Y);
 	}
@@ -368,7 +368,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FVec
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FVector4>, T>>
 {
-	static FString Get(const FVector4& InValue)
+	static auto Get(const FVector4& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.X, InValue.Y, InValue.Z, InValue.W);
 	}
@@ -377,7 +377,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FVec
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FGuid>, T>>
 {
-	static FString Get(const FGuid& InValue)
+	static auto Get(const FGuid& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.A, InValue.B, InValue.C, InValue.D);
 	}
@@ -386,7 +386,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FGui
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FBox2D>, T>>
 {
-	static FString Get(const FBox2D& InValue)
+	static auto Get(const FBox2D& InValue)
 	{
 		return TDefaultArgumentBuilder<T>::Get(InValue.Min, InValue.Max);
 	}
@@ -407,7 +407,7 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>>
 {
-	static FString Get(const T& InValue)
+	static auto Get(const T& InValue)
 	{
 		return FString::Printf(TEXT(
 			"%s.%s"
@@ -421,7 +421,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value, T>>
 {
-	static FString Get(const T& InValue)
+	static auto Get(const T& InValue)
 	{
 		return FString::Printf(TEXT(
 			"%s.%s"
@@ -450,44 +450,44 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
-	static FString Get(const TMap<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-	                              typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>& InValue)
+	static auto Get(const TMap<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+	                           typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>& InValue)
 	{
-		auto Value = FString::Printf(TEXT(
+		auto Value0 = FString::Printf(TEXT(
 			"new %s{"),
-		                             *TName<T, T>::Get()
+		                              *TName<T, T>::Get()
 		);
 
 		auto bIsFirst = true;
 
-		for (const auto& Iterator : InValue)
+		for (const auto& [Key, Value] : InValue)
 		{
-			Value += FString::Printf(TEXT(
+			Value0 += FString::Printf(TEXT(
 				"%s{%s, %s}"),
-			                         bIsFirst ? TEXT("") : TEXT(" ,"),
-			                         *TDefaultArgument<
-				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
-			                         ::Get(Iterator.Key),
-			                         *TDefaultArgument<
-				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
-				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>
-			                         ::Get(Iterator.Value)
+			                          bIsFirst ? TEXT("") : TEXT(" ,"),
+			                          *TDefaultArgument<
+				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+			                          ::Get(Key),
+			                          *TDefaultArgument<
+				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
+				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>
+			                          ::Get(Value)
 			);
 
 			bIsFirst = false;
 		}
 
-		Value += TEXT("}");
+		Value0 += TEXT("}");
 
-		return Value;
+		return Value0;
 	}
 };
 
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 {
-	static FString Get(const TSet<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>& InValue)
+	static auto Get(const TSet<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>& InValue)
 	{
 		auto Value = FString::Printf(TEXT(
 			"new %s{"),
@@ -519,7 +519,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
-	static FString Get(const TArray<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>& InValue)
+	static auto Get(const TArray<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>& InValue)
 	{
 		auto Value = FString::Printf(TEXT(
 			"new %s{"),

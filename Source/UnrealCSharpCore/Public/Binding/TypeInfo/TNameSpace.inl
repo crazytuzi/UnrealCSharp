@@ -26,7 +26,7 @@ struct TNameSpace
 template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::Type>
 struct TGenericNameSpace
 {
-	static TArray<FString> Get()
+	static auto Get()
 	{
 		return TArrayBuilder<FString>()
 		       .Append(TNameSpace<Type, Type>::Get())
@@ -99,18 +99,22 @@ template <typename T>
 struct TNameSpace<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
                                       !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
-	static TArray<FString> Get()
+	static auto Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::remove_pointer_t<std::decay_t<T>>::StaticClass())};
+		return TArray<FString>{
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::remove_pointer_t<std::decay_t<T>>::StaticClass())
+		};
 	}
 };
 
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 {
-	static TArray<FString> Get()
+	static auto Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::ElementType::StaticClass())};
+		return TArray<FString>{
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::ElementType::StaticClass())
+		};
 	}
 };
 
@@ -123,9 +127,11 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<TIsIInterface<std::decay_t<T>>::Value, T>>
 {
-	static TArray<FString> Get()
+	static auto Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::UClassType::StaticClass())};
+		return TArray<FString>{
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::UClassType::StaticClass())
+		};
 	}
 };
 
@@ -138,9 +144,11 @@ struct TNameSpace<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Valu
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 {
-	static TArray<FString> Get()
+	static auto Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::StaticStruct())};
+		return TArray<FString>{
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(std::decay_t<T>::StaticStruct())
+		};
 	}
 };
 
@@ -183,7 +191,7 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
-	static TArray<FString> Get()
+	static auto Get()
 	{
 		return TArrayBuilder<FString>()
 		       .Append(TNameSpace<
@@ -226,9 +234,11 @@ struct TNameSpace<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>> fin
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>>
 {
-	static TArray<FString> Get()
+	static auto Get()
 	{
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(StaticEnum<std::decay_t<T>>())};
+		return TArray<FString>{
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(StaticEnum<std::decay_t<T>>())
+		};
 	}
 };
 

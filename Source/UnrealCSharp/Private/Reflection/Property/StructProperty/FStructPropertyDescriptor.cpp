@@ -4,14 +4,14 @@
 FStructPropertyDescriptor::FStructPropertyDescriptor(FStructProperty* InProperty):
 	TCompoundPropertyDescriptor(InProperty)
 {
-	FCSharpEnvironment::GetEnvironment().Bind(InProperty->Struct, false);
+	FCSharpEnvironment::GetEnvironment().Bind<false>(InProperty->Struct);
 }
 
-void FStructPropertyDescriptor::Get(void* Src, void** Dest) const
+void FStructPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
 {
 	if (Property != nullptr)
 	{
-		*Dest = NewWeakRef(Src);
+		*Dest = NewWeakRef(Src, bIsCopy);
 	}
 }
 
@@ -69,11 +69,22 @@ MonoObject* FStructPropertyDescriptor::NewRef(void* InAddress) const
 	return Object;
 }
 
-MonoObject* FStructPropertyDescriptor::NewWeakRef(const void* InAddress) const
+MonoObject* FStructPropertyDescriptor::NewWeakRef(const void* InAddress, const bool bIsCopy) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	if (bIsCopy)
+	{
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference(Property->Struct, InAddress, Object, false);
+		FCSharpEnvironment::GetEnvironment().AddStructReference<true>(Property->Struct, CopyValue(InAddress), Object);
 
-	return Object;
+		return Object;
+	}
+	else
+	{
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+		FCSharpEnvironment::GetEnvironment().AddStructReference<false>(Property->Struct, InAddress, Object);
+
+		return Object;
+	}
 }

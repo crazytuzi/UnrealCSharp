@@ -8,7 +8,7 @@ public:
 	using TCompoundPropertyDescriptor::TCompoundPropertyDescriptor;
 
 public:
-	virtual void Get(void* Src, void** Dest) const override;
+	virtual void Get(void* Src, void** Dest, bool bIsCopy) const override;
 
 	virtual void Get(void* Src, void* Dest) const override;
 
@@ -17,5 +17,5 @@ public:
 private:
 	MonoObject* NewRef(void* InAddress) const;
 
-	MonoObject* NewWeakRef(void* InAddress) const;
+	MonoObject* NewWeakRef(void* InAddress, bool bIsCopy) const;
 };

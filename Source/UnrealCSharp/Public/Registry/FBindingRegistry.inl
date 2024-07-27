@@ -8,15 +8,15 @@ auto FBindingRegistry::GetBinding(const FGarbageCollectionHandle& InGarbageColle
 {
 	const auto FoundValue = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle);
 
-	return FoundValue != nullptr ? static_cast<T*>(FoundValue->AddressWrapper->GetValue()) : nullptr;
+	return FoundValue != nullptr ? static_cast<T*>(FoundValue->AddressWrapper->Value) : nullptr;
 }
 
-template <typename T>
-auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject, bool bNeedFree)
+template <typename T, auto IsNeedFree>
+auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-	if (bNeedFree == false)
+	if constexpr (!IsNeedFree)
 	{
 		BindingAddress2GarbageCollectionHandle.Add(static_cast<void*>(const_cast<T*>(InObject)),
 		                                           GarbageCollectionHandle);
@@ -25,7 +25,7 @@ auto FBindingRegistry::AddReference(const T* InObject, MonoObject* InMonoObject,
 	auto BindingAddressWrapper = new TBindingAddressWrapper(InObject);
 
 	GarbageCollectionHandle2BindingAddress.Add(GarbageCollectionHandle,
-	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, bNeedFree));
+	                                           FBindingValueMapping::ValueType(BindingAddressWrapper, IsNeedFree));
 
 	return true;
 }

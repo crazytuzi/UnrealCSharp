@@ -5,7 +5,8 @@
 class UNREALCSHARP_API FArrayHelper
 {
 public:
-	explicit FArrayHelper(FProperty* InProperty, void* InData = nullptr, bool InbNeedFree = false);
+	explicit FArrayHelper(FProperty* InProperty, void* InData,
+	                      bool InbNeedFreeData, bool InbNeedFreeProperty);
 
 	~FArrayHelper();
 
@@ -81,5 +82,7 @@ private:
 
 	FScriptArray* ScriptArray;
 
-	bool bNeedFree;
+	bool bNeedFreeData;
+
+	bool bNeedFreeProperty;
 };

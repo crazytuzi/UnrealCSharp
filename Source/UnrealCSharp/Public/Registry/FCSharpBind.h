@@ -16,13 +16,17 @@ public:
 	void Deinitialize();
 
 public:
-	static MonoObject* Bind(FDomain* InDomain, UObject* InObject);
+	template <auto IsNeedMonoClass>
+	static auto Bind(FDomain* InDomain, UStruct* InStruct);
 
-	static MonoObject* Bind(FDomain* InDomain, UClass* InClass);
+	template <auto IsWeak>
+	static auto Bind(FDomain* InDomain, UObject* InObject);
 
-	static bool Bind(FDomain* InDomain, UObject* InObject, bool bNeedMonoClass);
+	template <auto IsWeak>
+	static auto Bind(FDomain* InDomain, UClass* InClass);
 
-	static bool Bind(FDomain* InDomain, UStruct* InStruct, bool bNeedMonoClass);
+	template <auto IsWeak, auto IsNeedMonoClass>
+	static auto Bind(FDomain* InDomain, UObject* InObject);
 
 	template <typename T>
 	static auto Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
@@ -36,18 +40,17 @@ public:
 	template <typename T>
 	static auto Bind(MonoObject* InMonoObject);
 
-	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, const FString& InName,
-	                 UFunction* InFunction);
+	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
 	static bool BindClassDefaultObject(FDomain* InDomain, UObject* InObject);
 
 private:
-	static bool BindImplementation(FDomain* InDomain, UObject* InObject, bool bNeedMonoClass);
+	template <auto IsWeak, auto IsNeedMonoClass>
+	static auto BindImplementation(FDomain* InDomain, UObject* InObject) -> MonoObject*;
 
 	static bool BindImplementation(FDomain* InDomain, UStruct* InStruct);
 
-	static bool BindImplementation(FClassDescriptor* InClassDescriptor, UClass* InClass, const FString& InName,
-	                               UFunction* InFunction);
+	static bool BindImplementation(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
 	template <typename T>
 	static auto BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);

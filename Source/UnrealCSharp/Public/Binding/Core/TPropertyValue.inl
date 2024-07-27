@@ -39,13 +39,20 @@ struct TScriptStructPropertyValue
 template <typename T>
 struct TPrimitivePropertyValue
 {
-	static MonoObject* Get(std::decay_t<T>* InMember)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 			TPropertyClass<T, T>::Get(), InMember);
 	}
 
-	static T Set(MonoObject* InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
+			TPropertyClass<T, T>::Get(), InMember);
+	}
+
+	static auto Set(MonoObject* InValue)
 	{
 		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
 	}
@@ -54,26 +61,45 @@ struct TPrimitivePropertyValue
 template <typename T>
 struct TStringPropertyValue
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
-		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetStringObject<std::decay_t<T>>(InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>>(SrcMonoObject, InMember,
-				!InGarbageCollectionHandle.IsValid() && !TTypeInfo<T>::IsReference() && bNeedFree);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false>(
+				SrcMonoObject, InMember);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false>(
+				SrcMonoObject, InMember);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, true>(
+				SrcMonoObject, new std::decay_t<T>(*InMember));
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		return std::decay_t<T>(*FCSharpEnvironment::GetEnvironment().GetString<std::decay_t<T>>(InValue));
 	}
@@ -82,9 +108,7 @@ struct TStringPropertyValue
 template <typename T>
 struct TMultiPropertyValue
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<std::decay_t<T>>(InMember);
 
@@ -94,15 +118,35 @@ struct TMultiPropertyValue
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>>(
-				SrcMonoObject, InMember,
-				!InGarbageCollectionHandle.IsValid() && !TTypeInfo<T>::IsReference() && bNeedFree);
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false>(
+				SrcMonoObject, InMember);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static T Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false>(
+				SrcMonoObject, InMember);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, true>(
+				SrcMonoObject, new std::decay_t<T>(*InMember));
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue) -> T
 	{
 		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetMulti<std::decay_t<T>>(InValue);
 	}
@@ -111,9 +155,7 @@ struct TMultiPropertyValue
 template <typename T>
 struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
 
@@ -123,23 +165,35 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddBindingReference(
-					InGarbageCollectionHandle, SrcMonoObject, InMember);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddBindingReference(
-					SrcMonoObject, InMember,
-					!TTypeInfo<T>::IsReference() && bNeedFree);
-			}
+			FCSharpEnvironment::GetEnvironment().AddBindingReference(
+				InGarbageCollectionHandle, SrcMonoObject, InMember);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static T Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false>(
+				SrcMonoObject, InMember);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, true>(
+				SrcMonoObject, new std::decay_t<T>(*InMember));
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue) -> T
 	{
 		return *FCSharpEnvironment::GetEnvironment().GetBinding<std::decay_t<T>>(InValue);
 	}
@@ -148,9 +202,7 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 template <typename T>
 struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetBinding(*InMember);
 
@@ -160,22 +212,35 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddBindingReference(
-					InGarbageCollectionHandle, SrcMonoObject, *InMember);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddBindingReference(
-					SrcMonoObject, *InMember, false);
-			}
+			FCSharpEnvironment::GetEnvironment().AddBindingReference(
+				InGarbageCollectionHandle, SrcMonoObject, *InMember);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false>(
+				SrcMonoObject, InMember);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, true>(
+				SrcMonoObject, new std::decay_t<T>(*InMember));
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue) -> std::decay_t<T>
 	{
 		return FCSharpEnvironment::GetEnvironment().GetBinding<
 			std::remove_pointer_t<std::remove_reference_t<T>>>(InValue);
@@ -185,9 +250,7 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 template <typename T>
 struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
 			TBaseStructure<std::decay_t<T>>::Get(), InMember);
@@ -198,28 +261,39 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<std::decay_t<T>>::Get(), false);
+			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<std::decay_t<T>>::Get());
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(InGarbageCollectionHandle,
-				                                                        TBaseStructure<std::decay_t<T>>::Get(),
-				                                                        InMember,
-				                                                        SrcMonoObject);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<std::decay_t<T>>::Get(),
-				                                                        InMember,
-				                                                        SrcMonoObject,
-				                                                        bNeedFree);
-			}
+			FCSharpEnvironment::GetEnvironment().AddStructReference(
+				InGarbageCollectionHandle, TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static T Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<std::decay_t<T>>::Get());
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
+				TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcMonoObject);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+				TBaseStructure<std::decay_t<T>>::Get(), new std::decay_t<T>(*InMember), SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue) -> T
 	{
 		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
 	}
@@ -228,46 +302,55 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 template <typename T>
 struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
 			TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), *InMember);
 
 		if (SrcMonoObject == nullptr)
 		{
-			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().Bind(TBaseStructure<
-				                                          std::decay_t<std::remove_pointer_t<T>>>::Get(), false);
+			FCSharpEnvironment::GetEnvironment().Bind<false>(
+				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get());
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(InGarbageCollectionHandle,
-				                                                        TBaseStructure<
-					                                                        std::decay_t<std::remove_pointer_t<
-						                                                        T>>>::Get(),
-				                                                        *InMember,
-				                                                        SrcMonoObject);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(TBaseStructure<
-					                                                        std::decay_t<std::remove_pointer_t<
-						                                                        T>>>::Get(),
-				                                                        *InMember,
-				                                                        SrcMonoObject,
-				                                                        false);
-			}
+			FCSharpEnvironment::GetEnvironment().AddStructReference(
+				InGarbageCollectionHandle, TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(),
+				*InMember, SrcMonoObject, false);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().Bind<false>(
+			TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get());
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
+				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), InMember,
+				SrcMonoObject);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), new std::decay_t<T>(*InMember),
+				SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		return (std::decay_t<T>)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
 	}
@@ -344,13 +427,20 @@ struct TPropertyValue<T,
                       std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
                                        !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind(
+		return FCSharpEnvironment::GetEnvironment().Bind<false>(
 			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember));
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		return FCSharpEnvironment::GetEnvironment().Bind<true>(
+			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember));
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetObject<std::remove_pointer_t<std::decay_t<T>>>(InValue);
 	}
@@ -359,12 +449,18 @@ struct TPropertyValue<T,
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
 {
-	static MonoObject* Get(T* InMember)
+	static auto Get(T* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
+		return FCSharpEnvironment::GetEnvironment().Bind<false>(*InMember);
 	}
 
-	static T Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(T* InMember)
+	{
+		return FCSharpEnvironment::GetEnvironment().Bind<true>(*InMember);
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType>(InValue);
 	}
@@ -385,9 +481,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(std::decay_t<T>::StaticStruct(), InMember);
 
@@ -397,25 +491,39 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().Bind(std::decay_t<T>::StaticStruct(), false);
+			FCSharpEnvironment::GetEnvironment().Bind<false>(std::decay_t<T>::StaticStruct());
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(
-					InGarbageCollectionHandle, std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddStructReference(
-					std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject,
-					!TTypeInfo<T>::IsReference() && bNeedFree);
-			}
+			FCSharpEnvironment::GetEnvironment().AddStructReference(
+				InGarbageCollectionHandle, std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static T Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().Bind<false>(std::decay_t<T>::StaticStruct());
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
+				std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+				std::decay_t<T>::StaticStruct(), new std::decay_t<T>(*InMember), SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue) -> T
 	{
 		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
 	}
@@ -460,9 +568,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InMember);
 
@@ -492,8 +598,6 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 			const auto FoundValuePropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundValuePropertyMonoType);
 
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
 			const auto KeyProperty = FTypeBridge::Factory(FoundKeyPropertyReflectionType, nullptr, "",
 			                                              EObjectFlags::RF_Transient);
 
@@ -504,24 +608,78 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 
 			ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty, InMember,
-			                                      !InGarbageCollectionHandle.IsValid());
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(
-					InGarbageCollectionHandle, InMember, MapHelper, SrcMonoObject);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, SrcMonoObject);
-			}
+			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty,
+			                                      InMember, false, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				InGarbageCollectionHandle, InMember, MapHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		const auto FoundKeyPropertyMonoClass = TPropertyClass<
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+			::Get();
+
+		const auto FoundKeyPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+			FoundKeyPropertyMonoClass);
+
+		const auto FoundKeyPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+			Type_Get_Object(FoundKeyPropertyMonoType);
+
+		const auto FoundValuePropertyMonoClass = TPropertyClass<
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>
+			::Get();
+
+		const auto FoundValuePropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+			Class_Get_Type(FoundValuePropertyMonoClass);
+
+		const auto FoundValuePropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+			Type_Get_Object(FoundValuePropertyMonoType);
+
+		const auto KeyProperty = FTypeBridge::Factory(FoundKeyPropertyReflectionType, nullptr, "",
+		                                              EObjectFlags::RF_Transient);
+
+		KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+		const auto ValueProperty = FTypeBridge::Factory(FoundValuePropertyReflectionType, nullptr, "",
+		                                                EObjectFlags::RF_Transient);
+
+		ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		if constexpr (IsReference)
+		{
+			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty,
+			                                      InMember, false, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				MapHelper, SrcMonoObject);
+		}
+		else
+		{
+			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty,
+			                                      new std::decay_t<T>(*InMember), true, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				MapHelper, SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		std::decay_t<T> Value;
 
@@ -545,9 +703,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InMember);
 
@@ -566,30 +722,64 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundPropertyMonoType);
 
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
 			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
 			                                           EObjectFlags::RF_Transient);
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			const auto SetHelper = new FSetHelper(Property, InMember, !InGarbageCollectionHandle.IsValid());
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(
-					InGarbageCollectionHandle, InMember, SetHelper, SrcMonoObject);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, SrcMonoObject);
-			}
+			const auto SetHelper = new FSetHelper(Property, InMember, false, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				InGarbageCollectionHandle, InMember, SetHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		const auto FoundPropertyMonoClass = TPropertyClass<
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+			::Get();
+
+		const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+			FoundPropertyMonoClass);
+
+		const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+			Type_Get_Object(FoundPropertyMonoType);
+
+		const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+		                                           EObjectFlags::RF_Transient);
+
+		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		if constexpr (IsReference)
+		{
+			const auto SetHelper = new FSetHelper(Property, InMember, false, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				SetHelper, SrcMonoObject);
+		}
+		else
+		{
+			const auto SetHelper = new FSetHelper(Property, new std::decay_t<T>(*InMember), true, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				SetHelper, SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		std::decay_t<T> Value;
 
@@ -618,7 +808,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
@@ -626,13 +816,28 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<s
 
 		auto SubclassOf = new TSubclassOf<UObject>(*InMember);
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(
-			SrcMonoObject, SubclassOf, true);
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true>(
+			SrcMonoObject, SubclassOf);
 
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		auto SubclassOf = new TSubclassOf<UObject>(*InMember);
+
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true>(
+			SrcMonoObject, SubclassOf);
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InValue)->Get();
 	}
@@ -642,9 +847,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<s
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FArrayHelper>(InMember);
 
@@ -663,30 +866,62 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundPropertyMonoType);
 
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
 			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
 			                                           EObjectFlags::RF_Transient);
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			const auto ArrayHelper = new FArrayHelper(Property, InMember, !InGarbageCollectionHandle.IsValid());
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(
-					InGarbageCollectionHandle, InMember, ArrayHelper, SrcMonoObject);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, SrcMonoObject);
-			}
+			const auto ArrayHelper = new FArrayHelper(Property, InMember, false, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(
+				InGarbageCollectionHandle, InMember, ArrayHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		const auto FoundPropertyMonoClass = TPropertyClass<
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+			::Get();
+
+		const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+			FoundPropertyMonoClass);
+
+		const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+			Type_Get_Object(FoundPropertyMonoType);
+
+		const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+		                                           EObjectFlags::RF_Transient);
+
+		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		if constexpr (IsReference)
+		{
+			const auto ArrayHelper = new FArrayHelper(Property, InMember, false, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, SrcMonoObject);
+		}
+		else
+		{
+			const auto ArrayHelper = new FArrayHelper(Property, new std::decay_t<T>(*InMember), true, true);
+
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InValue);
 
@@ -701,7 +936,14 @@ template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>> :
 	TPrimitivePropertyValue<T>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	{
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
+			TPropertyClass<T, T>::Get(), InMember);
+	}
+
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 			TPropertyClass<T, T>::Get(), InMember);
@@ -712,7 +954,14 @@ template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value, T>> :
 	TPrimitivePropertyValue<T>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	{
+		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
+			TPropertyClass<T, T>::Get(), InMember);
+	}
+
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
 	{
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 			TPropertyClass<T, T>::Get(), InMember);
@@ -729,9 +978,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Val
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>>
 {
-	static MonoObject* Get(std::decay_t<T>* InMember,
-	                       const FGarbageCollectionHandle& InGarbageCollectionHandle = FGarbageCollectionHandle::Zero(),
-	                       bool bNeedFree = true)
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetOptionalObject<FOptionalHelper>(InMember);
 
@@ -750,8 +997,6 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundPropertyMonoType);
 
-			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
 			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 
 			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
@@ -761,24 +1006,66 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 
 			OptionalProperty->SetValueProperty(Property);
 
-			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, InMember,
-			                                                !InGarbageCollectionHandle.IsValid());
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			if (InGarbageCollectionHandle.IsValid())
-			{
-				FCSharpEnvironment::GetEnvironment().AddOptionalReference(
-					InMember, OptionalHelper, SrcMonoObject);
-			}
-			else
-			{
-				FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, SrcMonoObject);
-			}
+			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, InMember,
+			                                                false, true);
+
+			FCSharpEnvironment::GetEnvironment().AddOptionalReference(
+				InMember, OptionalHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
 	}
 
-	static std::decay_t<T> Set(const FGarbageCollectionHandle InValue)
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		const auto FoundPropertyMonoClass = TPropertyClass<
+				typename TTemplateTypeTraits<std::decay_t<T>>::Type,
+				typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+			::Get();
+
+		const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
+			FoundPropertyMonoClass);
+
+		const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
+			Type_Get_Object(FoundPropertyMonoType);
+
+		const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
+
+		const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+		                                           EObjectFlags::RF_Transient);
+
+		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
+
+		OptionalProperty->SetValueProperty(Property);
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		if constexpr (IsReference)
+		{
+			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, InMember,
+			                                                false, true);
+
+			FCSharpEnvironment::GetEnvironment().AddOptionalReference(
+				InMember, OptionalHelper, SrcMonoObject);
+		}
+		else
+		{
+			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, new std::decay_t<T>(*InMember),
+			                                                true, true);
+
+			FCSharpEnvironment::GetEnvironment().AddOptionalReference(
+				OptionalHelper, SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue)
 	{
 		const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(InValue);
 

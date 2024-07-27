@@ -40,7 +40,7 @@ static MonoObject* Get##StructType##PropertyType##PropertyImplementation(const F
 	{ \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddPropertyDescriptor(InPropertyHash)) \
 		{ \
-			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), &Value); \
+			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress), reinterpret_cast<void**>(&Value), false); \
 		} \
 	} \
 	return Value; \

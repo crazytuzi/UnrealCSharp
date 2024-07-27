@@ -1,16 +1,17 @@
 ﻿#include "Registry/FReferenceRegistry.h"
+#include "CoreMacro/Macro.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reference/FReference.h"
 
 FReferenceRegistry::~FReferenceRegistry()
 {
-	for (const auto& Pair : ReferenceRelationship.Get())
+	for (const auto& [PLACEHOLDER, Value] : ReferenceRelationship.Get())
 	{
-		for (const auto& Reference : Pair.Value)
+		for (const auto& Reference : Value)
 		{
 			auto GarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(*Reference);
 
-			FGarbageCollectionHandle::Free(GarbageCollectionHandle);
+			FGarbageCollectionHandle::Free<true>(GarbageCollectionHandle);
 
 			delete Reference;
 		}

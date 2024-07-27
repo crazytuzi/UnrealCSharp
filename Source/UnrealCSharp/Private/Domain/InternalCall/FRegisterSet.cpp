@@ -134,7 +134,7 @@ namespace
 			{
 				const auto Value = SetHelper->GetEnumerator(InIndex);
 
-				SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
+				SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue), false);
 			}
 
 			return ReturnValue;

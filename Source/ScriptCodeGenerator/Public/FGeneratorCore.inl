@@ -3,7 +3,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 template <typename T>
-FString FGeneratorCore::GetFileName(const T* InField)
+auto FGeneratorCore::GetFileName(const T* InField)
 {
 	if constexpr (std::is_same_v<T, FDelegateProperty> || std::is_same_v<T, FMulticastDelegateProperty>)
 	{

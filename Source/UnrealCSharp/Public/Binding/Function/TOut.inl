@@ -10,8 +10,8 @@ struct TOut
 	{
 	}
 
-	template <size_t Index>
-	TOut& Initialize()
+	template <auto Index>
+	auto Initialize() -> TOut&
 	{
 		if (Count > 0)
 		{
@@ -23,8 +23,8 @@ struct TOut
 		return *this;
 	}
 
-	template <size_t Index, typename T, typename... Args>
-	TOut& Initialize()
+	template <auto Index, typename T, typename... Args>
+	auto Initialize() -> TOut&
 	{
 		if (std::get<Index>(Argument).IsRef())
 		{
@@ -34,13 +34,13 @@ struct TOut
 		return Initialize<Index + 1, Args...>();
 	}
 
-	template <size_t Index>
-	static void Get()
+	template <auto Index>
+	static auto Get()
 	{
 	}
 
-	template <size_t Index, typename T, typename... Args>
-	void Get()
+	template <auto Index, typename T, typename... Args>
+	auto Get()
 	{
 		if (std::get<Index>(Argument).IsRef())
 		{

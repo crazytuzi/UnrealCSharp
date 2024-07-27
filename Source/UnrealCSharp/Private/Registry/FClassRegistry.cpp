@@ -27,46 +27,46 @@ void FClassRegistry::Deinitialize()
 {
 	FDynamicClassGenerator::ClassConstructorSet.Remove(&FClassRegistry::ClassConstructor);
 
-	for (const auto& ClassConstructorPair : ClassConstructorMap)
+	for (const auto& [Key, Value] : ClassConstructorMap)
 	{
-		if (ClassConstructorPair.Key.IsValid())
+		if (Key.IsValid())
 		{
-			if (ClassConstructorPair.Key->ClassConstructor == &FClassRegistry::ClassConstructor)
+			if (Key->ClassConstructor == &FClassRegistry::ClassConstructor)
 			{
-				ClassConstructorPair.Key->ClassConstructor = ClassConstructorPair.Value;
+				Key->ClassConstructor = Value;
 			}
 		}
 	}
 
 	ClassConstructorMap.Empty();
 
-	for (auto& ClassDescriptorPair : ClassDescriptorMap)
+	for (auto& [Key, Value] : ClassDescriptorMap)
 	{
-		delete ClassDescriptorPair.Value;
+		delete Value;
 
-		ClassDescriptorPair.Value = nullptr;
+		Value = nullptr;
 	}
 
 	ClassDescriptorMap.Empty();
 
 	PropertyHashMap.Empty();
 
-	for (auto& PropertyDescriptorPair : PropertyDescriptorMap)
+	for (auto& [Key, Value] : PropertyDescriptorMap)
 	{
-		delete PropertyDescriptorPair.Value;
+		delete Value;
 
-		PropertyDescriptorPair.Value = nullptr;
+		Value = nullptr;
 	}
 
 	PropertyDescriptorMap.Empty();
 
 	FunctionHashMap.Empty();
 
-	for (auto& FunctionDescriptorPair : FunctionDescriptorMap)
+	for (auto& [Key, Value] : FunctionDescriptorMap)
 	{
-		delete FunctionDescriptorPair.Value;
+		delete Value;
 
-		FunctionDescriptorPair.Value = nullptr;
+		Value = nullptr;
 	}
 
 	FunctionDescriptorMap.Empty();
@@ -86,16 +86,14 @@ FClassDescriptor* FClassRegistry::GetClassDescriptor(const FName& InClassName) c
 	return InClass != nullptr ? GetClassDescriptor(InClass) : nullptr;
 }
 
-FClassDescriptor* FClassRegistry::AddClassDescriptor(const FDomain* InDomain, UStruct* InStruct)
+FClassDescriptor* FClassRegistry::AddClassDescriptor(UStruct* InStruct)
 {
-	const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct);
-
-	if (FoundClassDescriptor != nullptr)
+	if (const auto FoundClassDescriptor = ClassDescriptorMap.Find(InStruct))
 	{
 		return *FoundClassDescriptor;
 	}
 
-	const auto FoundMonoClass = InDomain->Class_From_Name(
+	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
 		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
 		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct));
 
@@ -127,9 +125,12 @@ void FClassRegistry::RemoveClassDescriptor(const UStruct* InStruct)
 	{
 		if (const auto Class = Cast<UClass>(const_cast<UStruct*>(InStruct)))
 		{
-			Class->ClassConstructor = ClassConstructorMap[Class];
+			if (const auto FoundClassConstructor = ClassConstructorMap.Find(Class))
+			{
+				Class->ClassConstructor = *FoundClassConstructor;
 
-			ClassConstructorMap.Remove(Class);
+				ClassConstructorMap.Remove(Class);
+			}
 		}
 
 		delete *FoundClassDescriptor;

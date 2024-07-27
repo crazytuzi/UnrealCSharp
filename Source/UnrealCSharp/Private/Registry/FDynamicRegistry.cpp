@@ -76,7 +76,7 @@ void FDynamicRegistry::RegisterDynamic() const
 
 			if (const auto DynamicClass = FDynamicClassGenerator::GetDynamicClass(Class))
 			{
-				FCSharpEnvironment::GetEnvironment().Bind(DynamicClass, true);
+				FCSharpEnvironment::GetEnvironment().Bind<true>(DynamicClass);
 			}
 		}
 	}

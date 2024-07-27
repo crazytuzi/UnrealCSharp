@@ -13,7 +13,8 @@ namespace
 
 			const auto SubclassOf = new TSubclassOf<UObject>(FoundClass);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>>(InMonoObject, SubclassOf);
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true>(
+				InMonoObject, SubclassOf);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
@@ -43,7 +44,7 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
 				InGarbageCollectionHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
+			return FCSharpEnvironment::GetEnvironment().Bind<true>(Multi->Get());
 		}
 
 		FRegisterSubclassOf()

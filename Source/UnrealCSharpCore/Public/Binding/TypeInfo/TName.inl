@@ -24,7 +24,7 @@ struct TName
 template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::Type>
 struct TGenericName
 {
-	static FString Get()
+	static auto Get()
 	{
 		return FString::Printf(TEXT(
 			"%s<%s>"
@@ -38,90 +38,90 @@ struct TGenericName
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("byte");
+		return FString(TEXT("byte"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("ushort");
+		return FString(TEXT("ushort"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("uint");
+		return FString(TEXT("uint"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("ulong");
+		return FString(TEXT("ulong"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("sbyte");
+		return FString(TEXT("sbyte"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("short");
+		return FString(TEXT("short"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("int");
+		return FString(TEXT("int"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("long");
+		return FString(TEXT("long"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("bool");
+		return FString(TEXT("bool"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("float");
+		return FString(TEXT("float"));
 	}
 };
 
@@ -129,7 +129,7 @@ template <typename T>
 struct TName<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
                                  !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return FUnrealCSharpFunctionLibrary::GetFullClass(std::remove_pointer_t<std::decay_t<T>>::StaticClass());
 	}
@@ -138,7 +138,7 @@ struct TName<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_
 template <typename T>
 struct TName<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return FUnrealCSharpFunctionLibrary::GetFullClass(std::decay_t<T>::ElementType::StaticClass());
 	}
@@ -147,7 +147,7 @@ struct TName<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return CLASS_F_NAME;
 	}
@@ -156,7 +156,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>
 template <typename T>
 struct TName<T, std::enable_if_t<TIsIInterface<std::decay_t<T>>::Value, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return FUnrealCSharpFunctionLibrary::GetFullInterface(std::decay_t<T>::UClassType::StaticClass());
 	}
@@ -171,7 +171,7 @@ struct TName<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value, T>
 template <typename T>
 struct TName<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return FUnrealCSharpFunctionLibrary::GetFullClass(std::decay_t<T>::StaticStruct());
 	}
@@ -180,7 +180,7 @@ struct TName<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return CLASS_F_STRING;
 	}
@@ -189,7 +189,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, T>>
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return CLASS_F_TEXT;
 	}
@@ -216,16 +216,16 @@ struct TName<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value, T>> 
 template <typename T>
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
-		return TEXT("double");
+		return FString(TEXT("double"));
 	}
 };
 
 template <typename T>
 struct TName<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return FString::Printf(TEXT(
 			"%s<%s, %s>"
@@ -270,7 +270,7 @@ struct TName<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>> :
 template <typename T>
 struct TName<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>>
 {
-	static FString Get()
+	static auto Get()
 	{
 		return FUnrealCSharpFunctionLibrary::GetFullClass(StaticEnum<std::decay_t<T>>());
 	}

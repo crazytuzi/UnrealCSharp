@@ -19,8 +19,8 @@ struct TFunctionHelper
 template <typename Result, typename... Args>
 struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 {
-	template <typename Function, size_t... Index>
-	static MonoObject* Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
+	template <typename Function, auto... Index>
+	static auto Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
 		MonoObject* ReturnValue{};
 
@@ -44,8 +44,8 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 		return ReturnValue;
 	}
 
-	template <typename Class, typename Function, size_t... Index>
-	static MonoObject* Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
+	template <typename Class, typename Function, auto... Index>
+	static auto Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
 		MonoObject* ReturnValue{};
 

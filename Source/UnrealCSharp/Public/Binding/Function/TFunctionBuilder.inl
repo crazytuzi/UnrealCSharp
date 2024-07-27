@@ -14,7 +14,7 @@ struct TFunctionBuilder<void (*)(Args...), Function> :
 	TFunctionInfoBuilder<TFunctionBuilder<void (*)(Args...), Function>,
 	                     EFunctionType::Static, void, Args...>
 {
-	static void Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
+	static auto Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
 		if constexpr (sizeof...(Args) == 0)
 		{
@@ -39,7 +39,7 @@ struct TFunctionBuilder<Result (*)(Args...), Function> :
 	TFunctionInfoBuilder<TFunctionBuilder<Result (*)(Args...), Function>,
 	                     EFunctionType::Static, Result, Args...>
 {
-	static MonoObject* Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
+	static auto Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
 		if constexpr (sizeof...(Args) == 0)
 		{
@@ -64,7 +64,7 @@ struct TFunctionBuilder<void (Class::*)(Args...), Function> :
 	TFunctionInfoBuilder<TFunctionBuilder<void (Class::*)(Args...), Function>,
 	                     EFunctionType::Member, void, Args...>
 {
-	static void Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
+	static auto Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
 		if constexpr (sizeof...(Args) == 0)
 		{
@@ -89,7 +89,7 @@ struct TFunctionBuilder<Result (Class::*)(Args...), Function> :
 	TFunctionInfoBuilder<TFunctionBuilder<Result (Class::*)(Args...), Function>,
 	                     EFunctionType::Member, Result, Args...>
 {
-	static MonoObject* Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
+	static auto Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
 		if constexpr (sizeof...(Args) == 0)
 		{
@@ -114,7 +114,7 @@ struct TFunctionBuilder<void (Class::*)(Args...) const, Function> :
 	TFunctionInfoBuilder<TFunctionBuilder<void (Class::*)(Args...) const, Function>,
 	                     EFunctionType::Member, void, Args...>
 {
-	static void Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
+	static auto Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
 		if constexpr (sizeof...(Args) == 0)
 		{
@@ -139,7 +139,7 @@ struct TFunctionBuilder<Result (Class::*)(Args...) const, Function> :
 	TFunctionInfoBuilder<TFunctionBuilder<Result (Class::*)(Args...) const, Function>,
 	                     EFunctionType::Member, Result, Args...>
 {
-	static MonoObject* Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
+	static auto Invoke(BINDING_FUNCTION_PLACEHOLDER_SIGNATURE)
 	{
 		if constexpr (sizeof...(Args) == 0)
 		{

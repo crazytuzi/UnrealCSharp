@@ -103,7 +103,7 @@ namespace
 						                   ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
 						                   : static_cast<void*>(
 							                   FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue))),
-					reinterpret_cast<void**>(&ReturnValue));
+					reinterpret_cast<void**>(&ReturnValue), false);
 			}
 
 			return ReturnValue;
@@ -122,7 +122,7 @@ namespace
 						                ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
 						                : static_cast<void*>(
 							                FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey))),
-					reinterpret_cast<void**>(&ReturnValue));
+					reinterpret_cast<void**>(&ReturnValue), false);
 			}
 
 			return ReturnValue;
@@ -157,7 +157,7 @@ namespace
 						               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
 						               : static_cast<void*>(
 							               FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey))),
-					reinterpret_cast<void**>(&ReturnValue));
+					reinterpret_cast<void**>(&ReturnValue), false);
 			}
 
 			return ReturnValue;
@@ -213,7 +213,7 @@ namespace
 			{
 				const auto Key = MapHelper->GetEnumeratorKey(InIndex);
 
-				MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(&ReturnValue));
+				MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(&ReturnValue), false);
 			}
 
 			return ReturnValue;
@@ -229,7 +229,7 @@ namespace
 			{
 				const auto Value = MapHelper->GetEnumeratorValue(InIndex);
 
-				MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
+				MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue), false);
 			}
 
 			return ReturnValue;

@@ -45,7 +45,7 @@ private:
 	static void EndGenerator(UClass* InClass);
 
 	template <typename T>
-	static void GeneratorClass(const FString& InName, T InClass, UClass* InParentClass,
+	static auto GeneratorClass(const FString& InName, T InClass, UClass* InParentClass,
 	                           const TFunction<void(UClass*)>& InProcessGenerator)
 	{
 		DynamicClassMap.Add(InName, InClass);

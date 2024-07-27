@@ -4,7 +4,7 @@
 #include "Bridge/FTypeBridge.h"
 #include "mono/metadata/details/object-types.h"
 
-template <typename T, bool bIsPrimitiveProperty>
+template <typename T, auto IsPrimitive>
 class TPropertyDescriptor : public FPropertyDescriptor
 {
 public:
@@ -15,12 +15,12 @@ public:
 	}
 
 public:
-	virtual T* GetProperty() const override
+	virtual auto GetProperty() const -> T* override
 	{
 		return Property;
 	}
 
-	virtual void DestroyProperty() override
+	virtual auto DestroyProperty() -> void override
 	{
 		if (Property != nullptr)
 		{
@@ -31,9 +31,9 @@ public:
 	}
 
 public:
-	virtual bool IsPrimitiveProperty() const override
+	virtual auto IsPrimitiveProperty() const -> bool override
 	{
-		return bIsPrimitiveProperty;
+		return IsPrimitive;
 	}
 
 protected:

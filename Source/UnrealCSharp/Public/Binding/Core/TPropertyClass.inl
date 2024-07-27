@@ -27,7 +27,7 @@ struct TPropertyClass
 template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::Type>
 struct TMultiPropertyClass
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
@@ -41,7 +41,7 @@ struct TMultiPropertyClass
 template <typename T>
 struct TBindingPropertyClass
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -50,7 +50,7 @@ struct TBindingPropertyClass
 template <typename T>
 struct TScriptStructPropertyClass
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -59,7 +59,7 @@ struct TScriptStructPropertyClass
 template <typename T>
 struct TBindingEnumPropertyClass
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -68,7 +68,7 @@ struct TBindingEnumPropertyClass
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_Byte_Class();
 	}
@@ -77,7 +77,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_UInt16_Class();
 	}
@@ -86,7 +86,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_UInt32_Class();
 	}
@@ -95,7 +95,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_UInt64_Class();
 	}
@@ -104,7 +104,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_SByte_Class();
 	}
@@ -113,7 +113,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>,
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_Int16_Class();
 	}
@@ -122,7 +122,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_Int32_Class();
 	}
@@ -131,7 +131,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_Int64_Class();
 	}
@@ -140,7 +140,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_Boolean_Class();
 	}
@@ -149,7 +149,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>,
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_Single_Class();
 	}
@@ -159,7 +159,7 @@ template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
                                           !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -168,7 +168,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -177,7 +177,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value,
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -186,7 +186,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsIInterface<std::decay_t<T>>::Value, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -201,7 +201,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -210,7 +210,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -219,7 +219,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FStrin
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -246,7 +246,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Va
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Get_Double_Class();
 	}
@@ -255,7 +255,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
@@ -292,7 +292,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
@@ -331,7 +331,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<s
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
@@ -357,7 +357,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TIsNotUEnum<std::decay_t<T>>::Value, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
 	}
@@ -379,7 +379,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Val
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>>
 {
-	static MonoClass* Get()
+	static auto Get()
 	{
 		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());

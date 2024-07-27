@@ -36,7 +36,7 @@ public:
 	static FString GetModuleRelativePath(const FString& InModuleRelativePath);
 
 	template <typename T>
-	static FString GetFileName(const T* InField);
+	static auto GetFileName(const T* InField);
 
 	static TArray<FString> GetOverrideFunctions(const FString& InNameSpace, const FString& InClass);
 
