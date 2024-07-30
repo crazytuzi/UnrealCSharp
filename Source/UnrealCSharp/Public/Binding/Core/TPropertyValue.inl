@@ -429,14 +429,14 @@ struct TPropertyValue<T,
 {
 	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind<false>(
+		return FCSharpEnvironment::GetEnvironment().Bind(
 			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember));
 	}
 
 	template <auto IsReference>
 	static auto Get(std::decay_t<T>* InMember)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind<true>(
+		return FCSharpEnvironment::GetEnvironment().Bind(
 			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember));
 	}
 
@@ -451,13 +451,13 @@ struct TPropertyValue<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>
 {
 	static auto Get(T* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind<false>(*InMember);
+		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
 	}
 
 	template <auto IsReference>
 	static auto Get(T* InMember)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind<true>(*InMember);
+		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
 	}
 
 	static auto Set(const FGarbageCollectionHandle InValue)

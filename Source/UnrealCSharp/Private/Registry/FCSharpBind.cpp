@@ -38,6 +38,23 @@ void FCSharpBind::Deinitialize()
 	}
 }
 
+MonoObject* FCSharpBind::Bind(FDomain* InDomain, UObject* InObject)
+{
+	if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+	{
+		return FoundMonoObject;
+	}
+
+	return Bind<false>(InDomain, InObject);
+}
+
+MonoObject* FCSharpBind::Bind(FDomain* InDomain, UClass* InClass)
+{
+	Bind<false>(InDomain, InClass);
+
+	return Bind(InDomain, static_cast<UObject*>(InClass));
+}
+
 bool FCSharpBind::Bind(FDomain* InDomain, MonoObject* InMonoObject, const FName& InStructName)
 {
 	return BindImplementation(InDomain, InMonoObject, InStructName);
@@ -66,7 +83,7 @@ bool FCSharpBind::BindClassDefaultObject(FDomain* InDomain, UObject* InObject)
 			{
 				if (InObject->IsA(Class))
 				{
-					return bNeedMonoClass ? false : !!Bind<false, false>(InDomain, InObject);
+					return bNeedMonoClass ? false : !!Bind<false>(InDomain, InObject);
 				}
 			}
 		}

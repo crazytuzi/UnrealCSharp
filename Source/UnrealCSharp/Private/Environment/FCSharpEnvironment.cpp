@@ -238,7 +238,7 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 
 		if (IsInGameThread())
 		{
-			Bind<false, true>(InObject);
+			Bind<true>(InObject);
 		}
 		else
 		{
@@ -337,7 +337,7 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 		}
 		else
 		{
-			Bind<false, true>(PendingBindObject);
+			Bind<true>(PendingBindObject);
 		}
 
 		if (const auto FoundMonoObject = GetObject(PendingBindObject))
@@ -345,6 +345,21 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 			FDomain::Object_Constructor(FoundMonoObject);
 		}
 	}
+}
+
+MonoObject* FCSharpEnvironment::Bind(UObject* Object) const
+{
+	return FCSharpBind::Bind(Domain, Object);
+}
+
+MonoObject* FCSharpEnvironment::Bind(const UObject* Object) const
+{
+	return Bind(const_cast<UObject*>(Object));
+}
+
+MonoObject* FCSharpEnvironment::Bind(UClass* Class) const
+{
+	return FCSharpBind::Bind(Domain, Class);
 }
 
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
@@ -448,6 +463,11 @@ void FCSharpEnvironment::RemovePropertyDescriptor(const uint32 InPropertyHash) c
 	{
 		ClassRegistry->RemovePropertyDescriptor(InPropertyHash);
 	}
+}
+
+bool FCSharpEnvironment::AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const
+{
+	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InObject, InMonoObject) : false;
 }
 
 MonoObject* FCSharpEnvironment::GetObject(const UObject* InObject) const

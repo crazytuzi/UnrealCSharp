@@ -44,7 +44,7 @@ namespace
 			const auto Multi = FCSharpEnvironment::GetEnvironment()
 				.GetMulti<TWeakObjectPtr<UObject>>(InGarbageCollectionHandle);
 
-			return FCSharpEnvironment::GetEnvironment().Bind<true>(Multi->Get());
+			return FCSharpEnvironment::GetEnvironment().Bind(Multi->Get());
 		}
 
 		FRegisterWeakObjectPtr()

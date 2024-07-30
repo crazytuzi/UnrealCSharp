@@ -14,28 +14,10 @@ auto FCSharpEnvironment::Bind(UStruct* InStruct) const
 	return FCSharpBind::Bind<IsNeedMonoClass>(Domain, InStruct);
 }
 
-template <auto IsWeak>
+template <auto IsNeedMonoClass>
 auto FCSharpEnvironment::Bind(UObject* Object) const
 {
-	return FCSharpBind::Bind<IsWeak>(Domain, Object);
-}
-
-template <auto IsWeak>
-auto FCSharpEnvironment::Bind(const UObject* Object) const
-{
-	return Bind<IsWeak>(const_cast<UObject*>(Object));
-}
-
-template <auto IsWeak>
-auto FCSharpEnvironment::Bind(UClass* Class) const
-{
-	return FCSharpBind::Bind<IsWeak>(Domain, Class);
-}
-
-template <auto IsWeak, auto IsNeedMonoClass>
-auto FCSharpEnvironment::Bind(UObject* Object) const
-{
-	return FCSharpBind::Bind<IsWeak, IsNeedMonoClass>(Domain, Object);
+	return FCSharpBind::Bind<IsNeedMonoClass>(Domain, Object);
 }
 
 template <typename T>
@@ -74,12 +56,6 @@ template <typename T, typename U>
 auto FCSharpEnvironment::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return TGetAddress<T, U>()(this, InGarbageCollectionHandle);
-}
-
-template <auto IsWeak>
-auto FCSharpEnvironment::AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const
-{
-	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference<IsWeak>(InObject, InMonoObject) : false;
 }
 
 template <>

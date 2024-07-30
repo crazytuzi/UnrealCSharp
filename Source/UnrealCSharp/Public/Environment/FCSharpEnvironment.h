@@ -49,16 +49,13 @@ public:
 	template <auto IsNeedMonoClass>
 	auto Bind(UStruct* InStruct) const;
 
-	template <auto IsWeak>
-	auto Bind(UObject* Object) const;
+	MonoObject* Bind(UObject* Object) const;
 
-	template <auto IsWeak>
-	auto Bind(const UObject* Object) const;
+	MonoObject* Bind(const UObject* Object) const;
 
-	template <auto IsWeak>
-	auto Bind(UClass* Class) const;
+	MonoObject* Bind(UClass* Class) const;
 
-	template <auto IsWeak, auto IsNeedMonoClass>
+	template <auto IsNeedMonoClass>
 	auto Bind(UObject* Object) const;
 
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
@@ -101,8 +98,7 @@ public:
 	template <typename T, typename U>
 	auto GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	template <auto IsWeak>
-	auto AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const;
+	bool AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const;
 
 	MonoObject* GetObject(const UObject* InObject) const;
 

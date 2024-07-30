@@ -7,14 +7,7 @@ void FObjectPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) 
 	{
 		const auto SrcObject = Property->GetObjectPropertyValue(Src);
 
-		if(bIsCopy)
-		{
-			*Dest = FCSharpEnvironment::GetEnvironment().Bind<true>(SrcObject);
-		}
-		else
-		{
-			*Dest = FCSharpEnvironment::GetEnvironment().Bind<false>(SrcObject);
-		}
+		*Dest = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
 	}
 }
 

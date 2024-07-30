@@ -26,32 +26,10 @@ auto FCSharpBind::Bind(FDomain* InDomain, UStruct* InStruct)
 	return BindImplementation(InDomain, InStruct);
 }
 
-template <auto IsWeak>
+template <auto IsNeedMonoClass>
 auto FCSharpBind::Bind(FDomain* InDomain, UObject* InObject)
 {
-	if constexpr (!IsWeak)
-	{
-		if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
-		{
-			return FoundMonoObject;
-		}
-	}
-
-	return Bind<IsWeak, false>(InDomain, InObject);
-}
-
-template <auto IsWeak>
-auto FCSharpBind::Bind(FDomain* InDomain, UClass* InClass)
-{
-	Bind<false>(InDomain, static_cast<UStruct*>(InClass));
-
-	return Bind<IsWeak>(InDomain, static_cast<UObject*>(InClass));
-}
-
-template <auto IsWeak, auto IsNeedMonoClass>
-auto FCSharpBind::Bind(FDomain* InDomain, UObject* InObject)
-{
-	return BindImplementation<IsWeak, IsNeedMonoClass>(InDomain, InObject);
+	return BindImplementation<IsNeedMonoClass>(InDomain, InObject);
 }
 
 template <typename T>
@@ -73,7 +51,7 @@ auto FCSharpBind::Bind(MonoObject* InMonoObject)
 	return BindImplementation<T>(InMonoObject);
 }
 
-template <auto IsWeak, auto IsNeedMonoClass>
+template <auto IsNeedMonoClass>
 auto FCSharpBind::BindImplementation(FDomain* InDomain, UObject* InObject) -> MonoObject*
 {
 	if (InDomain == nullptr || InObject == nullptr)
@@ -109,7 +87,7 @@ auto FCSharpBind::BindImplementation(FDomain* InDomain, UObject* InObject) -> Mo
 
 	const auto NewMonoObject = InDomain->Object_New(FoundMonoClass);
 
-	FCSharpEnvironment::GetEnvironment().AddObjectReference<IsWeak>(InObject, NewMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddObjectReference(InObject, NewMonoObject);
 
 	return NewMonoObject;
 }
