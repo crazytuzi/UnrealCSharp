@@ -491,6 +491,26 @@ void FDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InParamCo
 	FMonoDomain::Object_Constructor(InMonoObject, InParamCount, InParams);
 }
 
+void FDomain::StaticClassSingleton_Reset(MonoClass* InMonoClass)
+{
+	void* InParams[] = {nullptr};
+
+	if (const auto FoundProperty = Class_Get_Property_From_Name(InMonoClass, STATIC_CLASS_SINGLETON))
+	{
+		Property_Set_Value(FoundProperty, nullptr, InParams, nullptr);
+	}
+}
+
+void FDomain::StaticStructSingleton_Reset(MonoClass* InMonoClass)
+{
+	void* InParams[] = {nullptr};
+
+	if (const auto FoundProperty = Class_Get_Property_From_Name(InMonoClass, STATIC_STRUCT_SINGLETON))
+	{
+		Property_Set_Value(FoundProperty, nullptr, InParams, nullptr);
+	}
+}
+
 MonoMethod* FDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
                                                        const int32 InParamCount)
 {

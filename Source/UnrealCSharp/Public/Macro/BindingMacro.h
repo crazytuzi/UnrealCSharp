@@ -29,7 +29,7 @@
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static FString Get() \
+	static auto Get() \
 	{ \
 		return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); \
 	} \
@@ -37,7 +37,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static TArray<FString> Get() \
+	static auto Get() \
 	{ \
 		return FBinding::Get().Register().IsEngineClass(TName<T, T>::Get()) \
 			? TArray<FString>{static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))} \
@@ -81,14 +81,14 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static FString Get() { return BINDING_STR(Class); } \
+	static auto Get() -> FString { return BINDING_STR(Class); } \
 }; \
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static TArray<FString> Get() \
+	static auto Get() \
 	{ \
-		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(TBaseStructure<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>>::Get())}; \
+		return TArray<FString>{FUnrealCSharpFunctionLibrary::GetClassNameSpace(TBaseStructure<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>>::Get())}; \
 	} \
 }; \
 template <typename T> \
@@ -133,12 +133,12 @@ struct TIsScriptStruct<Class> \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 { \
-	static FString Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
+	static auto Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
 }; \
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 { \
-	static TArray<FString> Get() \
+	static auto Get() \
 	{ \
 		return FBinding::Get().Register().IsEngineEnum(TName<T, T>::Get()) \
 			? TArray<FString>{static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))} \
@@ -260,7 +260,7 @@ struct TIsNotUEnum<Class> \
 #endif
 
 #define OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
-TClassBuilder& Name() \
+auto Name() -> TClassBuilder& \
 { \
 	Function(FunctionName, ImplementationName, BINDING_FUNCTION(&Name##Implementation)); \
 	return *this; \
@@ -279,7 +279,7 @@ static auto Name##Implementation(const T& In) \
 public: \
 OPERATOR_BUILDER(Name, FunctionName, ImplementationName) \
 private: \
-static T& Name##Implementation(T& In) \
+static auto Name##Implementation(T& In) -> T& \
 { \
 	return Operator In; \
 }

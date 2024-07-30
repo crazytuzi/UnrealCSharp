@@ -13,7 +13,7 @@ namespace
 
 			const auto LazyObjectPtr = new TLazyObjectPtr<UObject>(FoundObject);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, true>(
 				InMonoObject, LazyObjectPtr);
 		}
 

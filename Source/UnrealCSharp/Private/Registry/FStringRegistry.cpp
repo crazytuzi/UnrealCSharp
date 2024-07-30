@@ -16,15 +16,15 @@ void FStringRegistry::Initialize()
 
 void FStringRegistry::Deinitialize()
 {
-	for (auto& Pair : NameGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : NameGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 
@@ -32,15 +32,15 @@ void FStringRegistry::Deinitialize()
 
 	NameAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : StringGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : StringGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 
@@ -48,15 +48,15 @@ void FStringRegistry::Deinitialize()
 
 	StringAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : TextGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : TextGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 
-		if (Pair.Value.bNeedFree)
+		if (Value.bNeedFree)
 		{
-			FMemory::Free(Pair.Value.Value);
+			FMemory::Free(Value.Value);
 
-			Pair.Value.Value = nullptr;
+			Value.Value = nullptr;
 		}
 	}
 

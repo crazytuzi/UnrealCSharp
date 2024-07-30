@@ -23,7 +23,7 @@ namespace
 
 			OptionalProperty->SetValueProperty(ValueProperty);
 
-			const auto OptionalHelper = new FOptionalHelper(OptionalProperty);
+			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, InMonoObject);
 		}
@@ -40,7 +40,7 @@ namespace
 
 			OptionalProperty->SetValueProperty(ValueProperty);
 
-			const auto OptionalHelper = new FOptionalHelper(OptionalProperty);
+			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, InMonoObject);
 

@@ -294,7 +294,7 @@ MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, 
 void FMonoDomain::Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
                                      MonoObject** InExc)
 {
-	if (InMonoProperty != nullptr && InMonoObject != nullptr)
+	if (InMonoProperty != nullptr)
 	{
 		mono_property_set_value(InMonoProperty, InMonoObject, InParams, InExc);
 	}

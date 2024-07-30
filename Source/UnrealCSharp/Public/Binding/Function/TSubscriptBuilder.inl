@@ -7,16 +7,16 @@ template <typename Class, typename Result, typename Index>
 struct TSubscriptBuilder :
 	TFunctionInfoBuilder<TSubscriptBuilder<Class, Result, Index>, EFunctionType::Member, Result, Index>
 {
-	static void Invoke()
+	static auto Invoke()
 	{
 	}
 
-	static void Get(BINDING_SUBSCRIPT_SIGNATURE)
+	static auto Get(BINDING_SUBSCRIPT_SIGNATURE)
 	{
 		TSubscriptHelper<Result, Index>::template Get<Class>(BINDING_SUBSCRIPT_PARAM);
 	}
 
-	static void Set(BINDING_SUBSCRIPT_SIGNATURE)
+	static auto Set(BINDING_SUBSCRIPT_SIGNATURE)
 	{
 		TSubscriptHelper<Result, Index>::template Set<Class>(BINDING_SUBSCRIPT_PARAM);
 	}

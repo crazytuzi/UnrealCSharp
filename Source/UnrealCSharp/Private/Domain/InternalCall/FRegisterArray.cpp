@@ -114,7 +114,7 @@ namespace
 			{
 				const auto Value = ArrayHelper->Get(InIndex);
 
-				ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue));
+				ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue), false);
 			}
 
 			return ReturnValue;

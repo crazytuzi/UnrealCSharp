@@ -1,11 +1,11 @@
 ﻿#include "Reflection/Property/StringProperty/FTextPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-void FTextPropertyDescriptor::Get(void* Src, void** Dest) const
+void FTextPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
 {
 	if (Property != nullptr)
 	{
-		*Dest = NewWeakRef(Src);
+		*Dest = NewWeakRef(Src, bIsCopy);
 	}
 }
 
@@ -40,16 +40,27 @@ bool FTextPropertyDescriptor::Identical(const void* A, const void* B, uint32 Por
 	return false;
 }
 
-MonoObject* FTextPropertyDescriptor::NewWeakRef(void* InAddress) const
+MonoObject* FTextPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetStringObject<FText>(InAddress);
-
-	if (Object == nullptr)
+	if (bIsCopy)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FText>(Object, InAddress, false);
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true>(Object, CopyValue(InAddress));
+
+		return Object;
 	}
+	else
+	{
+		auto Object = FCSharpEnvironment::GetEnvironment().GetStringObject<FText>(InAddress);
 
-	return Object;
+		if (Object == nullptr)
+		{
+			Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, false>(Object, InAddress);
+		}
+
+		return Object;
+	}
 }

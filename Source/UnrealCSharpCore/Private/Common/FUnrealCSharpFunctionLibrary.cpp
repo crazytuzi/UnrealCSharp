@@ -19,9 +19,7 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
 	{
-		const auto& DotNetPath = UnrealCSharpEditorSetting->GetDotNetPath();
-
-		if (!DotNetPath.IsEmpty())
+		if (const auto& DotNetPath = UnrealCSharpEditorSetting->GetDotNetPath(); !DotNetPath.IsEmpty())
 		{
 			return DotNetPath;
 		}
@@ -131,9 +129,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 	}
 	else
 	{
-		auto Index = 0;
-
-		if (ModuleName.FindLastChar(TEXT('/'), Index))
+		if (auto Index = 0; ModuleName.FindLastChar(TEXT('/'), Index))
 		{
 			ModuleName = ModuleName.Left(Index);
 		}
@@ -472,9 +468,8 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 
 	InScriptPath.ParseIntoArray(Splits, TEXT("/"));
 
-	const auto& ProjectModuleList = GetProjectModuleList();
-
-	if (ProjectModuleList.Contains(Splits[0]) ||
+	if (const auto& ProjectModuleList = GetProjectModuleList();
+		ProjectModuleList.Contains(Splits[0]) ||
 		Splits[0] == TEXT("Game") ||
 		(Splits[0] == TEXT("Script") &&
 			ProjectModuleList.Contains(Splits[1])))
@@ -515,9 +510,8 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 {
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
-	const auto DirectoryName = FPaths::GetPath(InFileName);
-
-	if (!PlatformFile.DirectoryExists(*DirectoryName))
+	if (const auto DirectoryName = FPaths::GetPath(InFileName);
+		!PlatformFile.DirectoryExists(*DirectoryName))
 	{
 		PlatformFile.CreateDirectoryTree(*DirectoryName);
 	}
@@ -542,11 +536,11 @@ TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(con
 
 			FJsonSerializer::Deserialize(JsonReader, JsonObject);
 
-			for (const auto& Value : JsonObject->Values)
+			for (const auto& [Key, Value] : JsonObject->Values)
 			{
 				TArray<FString> Array;
 
-				const auto& JsonValueArray = Value.Value->AsArray();
+				const auto& JsonValueArray = Value->AsArray();
 
 				for (auto Index = 0; Index < JsonValueArray.Num(); Index++)
 				{
@@ -556,7 +550,7 @@ TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(con
 					}
 				}
 
-				Result.Add(Value.Key, Array);
+				Result.Add(Key, Array);
 			}
 		}
 	}
@@ -578,9 +572,9 @@ TMap<FString, FString> FUnrealCSharpFunctionLibrary::LoadFileToString(const FStr
 
 			FJsonSerializer::Deserialize(JsonReader, JsonObject);
 
-			for (const auto& Value : JsonObject->Values)
+			for (const auto& [Key, Value] : JsonObject->Values)
 			{
-				Result.Add(Value.Key, Value.Value->AsString());
+				Result.Add(Key, Value->AsString());
 			}
 		}
 	}
@@ -660,17 +654,17 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 
 			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("EngineModules"), OutObject))
 			{
-				for (auto Value : OutObject->Get()->Values)
+				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
 				{
-					EngineModuleList.AddUnique(Value.Key);
+					EngineModuleList.AddUnique(Key);
 				}
 			}
 
 			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("EnginePlugins"), OutObject))
 			{
-				for (auto Value : OutObject->Get()->Values)
+				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
 				{
-					EngineModuleList.AddUnique(Value.Key);
+					EngineModuleList.AddUnique(Key);
 				}
 			}
 		}
@@ -697,17 +691,17 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 
 			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectModules"), OutObject))
 			{
-				for (auto Value : OutObject->Get()->Values)
+				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
 				{
-					ProjectModuleList.AddUnique(Value.Key);
+					ProjectModuleList.AddUnique(Key);
 				}
 			}
 
 			if (const TSharedPtr<FJsonObject>* OutObject; JsonObj->TryGetObjectField(TEXT("ProjectPlugins"), OutObject))
 			{
-				for (auto Value : OutObject->Get()->Values)
+				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
 				{
-					ProjectModuleList.AddUnique(Value.Key);
+					ProjectModuleList.AddUnique(Key);
 				}
 			}
 		}

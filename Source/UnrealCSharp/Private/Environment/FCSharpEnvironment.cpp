@@ -238,7 +238,7 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 
 		if (IsInGameThread())
 		{
-			Bind(InObject, true);
+			Bind<true>(InObject);
 		}
 		else
 		{
@@ -253,9 +253,9 @@ void FCSharpEnvironment::NotifyUObjectDeleted(const UObjectBase* Object, int32 I
 {
 	if (const auto InObject = static_cast<UObject*>(const_cast<UObjectBase*>(Object)))
 	{
-		if (const auto InClass = Cast<UClass>(InObject))
+		if (const auto InStruct = Cast<UStruct>(InObject))
 		{
-			RemoveClassDescriptor(InClass);
+			RemoveClassDescriptor(InStruct);
 		}
 		else
 		{
@@ -323,9 +323,9 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 	{
 		FScopeLock Lock(&CriticalSection);
 
-		for (auto i = 0; i < RemovedIndexes.Num(); ++i)
+		for (const auto RemovedIndex : RemovedIndexes)
 		{
-			AsyncLoadingObjectArray.RemoveAt(RemovedIndexes[i]);
+			AsyncLoadingObjectArray.RemoveAt(RemovedIndex);
 		}
 	}
 
@@ -337,7 +337,7 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 		}
 		else
 		{
-			Bind(PendingBindObject, true);
+			Bind<true>(PendingBindObject);
 		}
 
 		if (const auto FoundMonoObject = GetObject(PendingBindObject))
@@ -362,16 +362,6 @@ MonoObject* FCSharpEnvironment::Bind(UClass* Class) const
 	return FCSharpBind::Bind(Domain, Class);
 }
 
-bool FCSharpEnvironment::Bind(UObject* Object, const bool bNeedMonoClass) const
-{
-	return FCSharpBind::Bind(Domain, Object, bNeedMonoClass);
-}
-
-bool FCSharpEnvironment::Bind(UStruct* InStruct, const bool bNeedMonoClass) const
-{
-	return FCSharpBind::Bind(Domain, InStruct, bNeedMonoClass);
-}
-
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
 {
 	return FCSharpBind::Bind(Domain, InMonoObject, InStructName);
@@ -387,9 +377,9 @@ FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const FName& InClassNam
 	return ClassRegistry != nullptr ? ClassRegistry->GetClassDescriptor(InClassName) : nullptr;
 }
 
-FClassDescriptor* FCSharpEnvironment::AddClassDescriptor(const FDomain* InDomain, UStruct* InStruct) const
+FClassDescriptor* FCSharpEnvironment::AddClassDescriptor(UStruct* InStruct) const
 {
-	return ClassRegistry != nullptr ? ClassRegistry->AddClassDescriptor(InDomain, InStruct) : nullptr;
+	return ClassRegistry != nullptr ? ClassRegistry->AddClassDescriptor(InStruct) : nullptr;
 }
 
 void FCSharpEnvironment::RemoveClassDescriptor(const UStruct* InStruct) const
@@ -493,14 +483,6 @@ bool FCSharpEnvironment::RemoveObjectReference(const UObject* InObject) const
 bool FCSharpEnvironment::RemoveObjectReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return ObjectRegistry != nullptr ? ObjectRegistry->RemoveReference(InGarbageCollectionHandle) : false;
-}
-
-bool FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, const void* InStruct,
-                                            MonoObject* InMonoObject, const bool bNeedFree) const
-{
-	return StructRegistry != nullptr
-		       ? StructRegistry->AddReference(InScriptStruct, InStruct, InMonoObject, bNeedFree)
-		       : false;
 }
 
 bool FCSharpEnvironment::AddStructReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct,

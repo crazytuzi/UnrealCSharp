@@ -1,4 +1,5 @@
 ﻿#include "Registry/FObjectRegistry.h"
+#include "CoreMacro/Macro.h"
 #include "Environment/FCSharpEnvironment.h"
 
 FObjectRegistry::FObjectRegistry()
@@ -17,9 +18,9 @@ void FObjectRegistry::Initialize()
 
 void FObjectRegistry::Deinitialize()
 {
-	for (auto& Pair : GarbageCollectionHandle2Object.Get())
+	for (auto& [Key, PLACEHOLDER] : GarbageCollectionHandle2Object.Get())
 	{
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 	}
 
 	GarbageCollectionHandle2Object.Empty();
@@ -84,7 +85,7 @@ bool FObjectRegistry::RemoveReference(const UObject* InObject)
 
 		GarbageCollectionHandle2Object.Remove(*FoundGarbageCollectionHandle);
 
-		FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle, false);
+		FGarbageCollectionHandle::Free<false>(*FoundGarbageCollectionHandle);
 
 		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
 
@@ -100,14 +101,17 @@ bool FObjectRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageC
 	{
 		if (const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(*FoundValue))
 		{
-			FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle, false);
+			if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+			{
+				FGarbageCollectionHandle::Free<false>(*FoundGarbageCollectionHandle);
 
-			(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
+				(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
+
+				Object2GarbageCollectionHandleMap.Remove(*FoundValue);
+			}
 		}
 
 		GarbageCollectionHandle2Object.Remove(InGarbageCollectionHandle);
-
-		Object2GarbageCollectionHandleMap.Remove(*FoundValue);
 
 		return true;
 	}

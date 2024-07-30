@@ -39,9 +39,7 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 
 	if (!InField->IsNative())
 	{
-		auto Index = 0;
-
-		if (ModuleName.FindLastChar(TEXT('/'), Index))
+		if (auto Index = 0; ModuleName.FindLastChar(TEXT('/'), Index))
 		{
 			ModuleName = ModuleName.Left(Index);
 		}
@@ -257,7 +255,7 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 
 TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 {
-	if (Property == nullptr) return {""};
+	if (Property == nullptr) return {TEXT("")};
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
 	{

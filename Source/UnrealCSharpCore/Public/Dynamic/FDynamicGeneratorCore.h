@@ -42,7 +42,7 @@ public:
 	static void SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 	template <typename T>
-	static void IteratorObject(
+	static auto IteratorObject(
 		const TFunction<bool(const TObjectIterator<T>&)>& InPredicate,
 		const TUniqueFunction<void(const TObjectIterator<T>&)>& InFunction)
 	{

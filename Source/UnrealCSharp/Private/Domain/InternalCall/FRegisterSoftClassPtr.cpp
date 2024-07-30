@@ -13,7 +13,8 @@ namespace
 
 			const auto SoftClassPtr = new TSoftClassPtr<UObject>(FoundClass);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>>(InMonoObject, SoftClassPtr);
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, true>(
+				InMonoObject, SoftClassPtr);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)

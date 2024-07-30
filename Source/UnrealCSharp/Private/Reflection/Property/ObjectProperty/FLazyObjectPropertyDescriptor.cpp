@@ -1,11 +1,11 @@
 ﻿#include "Reflection/Property/ObjectProperty/FLazyObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest) const
+void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
 {
 	if (Property != nullptr)
 	{
-		*Dest = NewWeakRef(Src);
+		*Dest = NewWeakRef(Src, bIsCopy);
 	}
 }
 
@@ -39,16 +39,29 @@ bool FLazyObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 	return false;
 }
 
-MonoObject* FLazyObjectPropertyDescriptor::NewWeakRef(void* InAddress) const
+MonoObject* FLazyObjectPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TLazyObjectPtr<UObject>>(InAddress);
-
-	if (Object == nullptr)
+	if (bIsCopy)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>>(Object, InAddress, false);
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, true>(
+			Object, CopyValue(InAddress));
+
+		return Object;
 	}
+	else
+	{
+		auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TLazyObjectPtr<UObject>>(InAddress);
 
-	return Object;
+		if (Object == nullptr)
+		{
+			Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false>(
+				Object, InAddress);
+		}
+
+		return Object;
+	}
 }

@@ -37,14 +37,18 @@ FClassBuilder& FClassBuilder::Function(const FString& InName,
 #endif
 )
 {
-	for (auto i = 0; i < InMethod.Num(); ++i)
+#if WITH_FUNCTION_INFO
+	for (const auto& [Key, Value] : InMethod)
+#else
+	for (const auto& Elem : InMethod)
+#endif
 	{
 		Function(InName,
 #if WITH_FUNCTION_INFO
-		         InMethod[i].Key,
-		         InMethod[i].Value
+		         Key,
+		         Value
 #else
-		         InMethod[i]
+				 Elem
 #endif
 		);
 	}

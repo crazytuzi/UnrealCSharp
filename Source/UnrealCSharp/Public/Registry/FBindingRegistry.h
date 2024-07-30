@@ -7,36 +7,30 @@ class UNREALCSHARP_API FBindingRegistry
 private:
 	struct FBindingAddressWrapper
 	{
+		explicit FBindingAddressWrapper(void* InValue):
+			Value(InValue)
+		{
+		}
+
 		virtual ~FBindingAddressWrapper()
 		{
 		}
 
-		virtual void* GetValue()
-		{
-			return nullptr;
-		}
+		void* Value;
 	};
 
 	template <typename T>
 	struct TBindingAddressWrapper final : FBindingAddressWrapper
 	{
 		explicit TBindingAddressWrapper(T* InValue):
-			Value(InValue)
+			FBindingAddressWrapper((decltype(Value))InValue)
 		{
 		}
 
 		virtual ~TBindingAddressWrapper() override
 		{
-			delete Value;
+			delete static_cast<T*>(Value);
 		}
-
-		virtual void* GetValue() override
-		{
-			return (void*)Value;
-		}
-
-	private:
-		T* Value;
 	};
 
 	struct FBindingAddress
@@ -81,8 +75,8 @@ public:
 	MonoObject* GetObject(const FBindingValueMapping::FAddressType InAddress);
 
 public:
-	template <typename T>
-	auto AddReference(const T* InObject, MonoObject* InMonoObject, bool bNeedFree = true);
+	template <typename T, auto IsNeedFree>
+	auto AddReference(const T* InObject, MonoObject* InMonoObject);
 
 	template <typename T>
 	auto AddReference(const FGarbageCollectionHandle& InOwner, const T* InObject, MonoObject* InMonoObject);

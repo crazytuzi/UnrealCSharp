@@ -21,7 +21,7 @@ namespace
 				if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<
 					UDataTable>(InGarbageCollectionHandle))
 				{
-					FCSharpEnvironment::GetEnvironment().Bind(DataTable->RowStruct.Get(), false);
+					FCSharpEnvironment::GetEnvironment().Bind<false>(DataTable->RowStruct.Get());
 
 					if (const auto ClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
 						DataTable->RowStruct.Get()))

@@ -7,7 +7,8 @@
 class UNREALCSHARP_API FOptionalHelper
 {
 public:
-	explicit FOptionalHelper(FOptionalProperty* InOptionalProperty, void* InData = nullptr, bool InbNeedFree = false);
+	explicit FOptionalHelper(FOptionalProperty* InOptionalProperty, void* InData,
+	                         bool InbNeedFreeData, bool InbNeedFreeProperty);
 
 	~FOptionalHelper();
 
@@ -38,6 +39,8 @@ private:
 
 	void* Data;
 
-	bool bNeedFree;
+	bool bNeedFreeData;
+
+	bool bNeedFreeProperty;
 };
 #endif

@@ -19,7 +19,7 @@ public:
 
 	FClassDescriptor* GetClassDescriptor(const FName& InClassName) const;
 
-	FClassDescriptor* AddClassDescriptor(const class FDomain* InDomain, UStruct* InStruct);
+	FClassDescriptor* AddClassDescriptor(UStruct* InStruct);
 
 	static void AddClassConstructor(UClass* InClass);
 

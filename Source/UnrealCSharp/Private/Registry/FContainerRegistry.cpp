@@ -16,48 +16,48 @@ void FContainerRegistry::Initialize()
 
 void FContainerRegistry::Deinitialize()
 {
-	for (auto& Pair : ArrayGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : ArrayGarbageCollectionHandle2Helper.Get())
 	{
-		if (Pair.Value != nullptr)
+		if (Value != nullptr)
 		{
-			delete Pair.Value;
+			delete Value;
 
-			Pair.Value = nullptr;
+			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 	}
 
 	ArrayGarbageCollectionHandle2Helper.Empty();
 
 	ArrayAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : MapGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : MapGarbageCollectionHandle2Helper.Get())
 	{
-		if (Pair.Value != nullptr)
+		if (Value != nullptr)
 		{
-			delete Pair.Value;
+			delete Value;
 
-			Pair.Value = nullptr;
+			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 	}
 
 	MapGarbageCollectionHandle2Helper.Empty();
 
 	MapAddress2GarbageCollectionHandle.Empty();
 
-	for (auto& Pair : SetGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : SetGarbageCollectionHandle2Helper.Get())
 	{
-		if (Pair.Value != nullptr)
+		if (Value != nullptr)
 		{
-			delete Pair.Value;
+			delete Value;
 
-			Pair.Value = nullptr;
+			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free(Pair.Key);
+		FGarbageCollectionHandle::Free<true>(Key);
 	}
 
 	SetGarbageCollectionHandle2Helper.Empty();

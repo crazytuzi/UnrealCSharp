@@ -10,7 +10,7 @@ template <typename Result, typename Index>
 struct TSubscriptHelper
 {
 	template <typename Class>
-	static MonoObject* Get(BINDING_SUBSCRIPT_SIGNATURE)
+	static auto Get(BINDING_SUBSCRIPT_SIGNATURE) -> MonoObject*
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
@@ -24,7 +24,7 @@ struct TSubscriptHelper
 	}
 
 	template <typename Class>
-	static void Set(BINDING_SUBSCRIPT_SIGNATURE)
+	static auto Set(BINDING_SUBSCRIPT_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))

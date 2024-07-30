@@ -46,15 +46,17 @@ public:
 	void OnAsyncLoadingFlushUpdate();
 
 public:
+	template <auto IsNeedMonoClass>
+	auto Bind(UStruct* InStruct) const;
+
 	MonoObject* Bind(UObject* Object) const;
 
 	MonoObject* Bind(const UObject* Object) const;
 
 	MonoObject* Bind(UClass* Class) const;
 
-	bool Bind(UObject* Object, bool bNeedMonoClass) const;
-
-	bool Bind(UStruct* InStruct, bool bNeedMonoClass) const;
+	template <auto IsNeedMonoClass>
+	auto Bind(UObject* Object) const;
 
 	bool Bind(MonoObject* InMonoObject, const FName& InStructName) const;
 
@@ -63,7 +65,7 @@ public:
 
 	FClassDescriptor* GetClassDescriptor(const FName& InClassName) const;
 
-	FClassDescriptor* AddClassDescriptor(const FDomain* InDomain, UStruct* InStruct) const;
+	FClassDescriptor* AddClassDescriptor(UStruct* InStruct) const;
 
 	void RemoveClassDescriptor(const UStruct* InStruct) const;
 
@@ -91,7 +93,7 @@ public:
 
 public:
 	template <typename T>
-	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct) const;
+	auto GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct) const -> void*;
 
 	template <typename T, typename U>
 	auto GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -107,8 +109,8 @@ public:
 
 	bool RemoveObjectReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	bool AddStructReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject,
-	                        bool bNeedFree = true) const;
+	template <auto IsNeedFree>
+	auto AddStructReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject) const;
 
 	bool AddStructReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct,
 	                        const void* InStruct, MonoObject* InMonoObject) const;
@@ -167,16 +169,16 @@ private:
 	class TGetAddress<UObject, T>
 	{
 	public:
-		T* operator()(const FCSharpEnvironment* InEnvironment,
-		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+		auto operator()(const FCSharpEnvironment* InEnvironment,
+		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const -> T*;
 	};
 
 	template <typename T>
 	class TGetAddress<UScriptStruct, T>
 	{
 	public:
-		T* operator()(const FCSharpEnvironment* InEnvironment,
-		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+		auto operator()(const FCSharpEnvironment* InEnvironment,
+		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const -> T*;
 	};
 
 public:
@@ -186,8 +188,8 @@ public:
 	template <typename T>
 	auto GetMultiObject(void* InAddress) const;
 
-	template <typename T>
-	auto AddMultiReference(MonoObject* InMonoObject, void* InValue, bool bNeedFree = true) const;
+	template <typename T, auto IsNeedFree>
+	auto AddMultiReference(MonoObject* InMonoObject, void* InValue) const;
 
 	template <typename T>
 	auto RemoveMultiReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -199,8 +201,8 @@ public:
 	template <typename T>
 	auto GetStringObject(void* InAddress) const;
 
-	template <typename T>
-	auto AddStringReference(MonoObject* InMonoObject, void* InValue, bool bNeedFree = true) const;
+	template <typename T, auto IsNeedFree>
+	auto AddStringReference(MonoObject* InMonoObject, void* InValue) const;
 
 	template <typename T>
 	auto RemoveStringReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -211,8 +213,8 @@ public:
 	template <typename T>
 	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	template <typename T>
-	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject, bool bNeedFree = true) const;
+	template <typename T, auto IsNeedFree>
+	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject) const;
 
 	template <typename T>
 	auto AddBindingReference(const FGarbageCollectionHandle& InOwner, MonoObject* InMonoObject,
@@ -231,7 +233,7 @@ public:
 	auto AddOptionalReference(T* InValue, MonoObject* InMonoObject) const;
 
 	template <typename T>
-	auto AddOptionalReference(void* InAddress, T* InValue, MonoObject* InMonoObject, bool bNeedFree = true) const;
+	auto AddOptionalReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
 
 	bool RemoveOptionalReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 #endif
@@ -246,8 +248,8 @@ public:
 	class TGetObject<T, std::enable_if_t<TIsUObject<T>::Value, T>>
 	{
 	public:
-		T* operator()(const FCSharpEnvironment& InEnvironment,
-		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+		auto operator()(const FCSharpEnvironment& InEnvironment,
+		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
 			return InEnvironment.GetObject<T>(InGarbageCollectionHandle);
 		}
@@ -257,8 +259,8 @@ public:
 	class TGetObject<T, std::enable_if_t<TIsUStruct<T>::Value, T>>
 	{
 	public:
-		T* operator()(const FCSharpEnvironment& InEnvironment,
-		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+		auto operator()(const FCSharpEnvironment& InEnvironment,
+		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
 			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
 		}
@@ -268,8 +270,8 @@ public:
 	class TGetObject<T, std::enable_if_t<TIsScriptStruct<T>::Value, T>>
 	{
 	public:
-		T* operator()(const FCSharpEnvironment& InEnvironment,
-		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+		auto operator()(const FCSharpEnvironment& InEnvironment,
+		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
 			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
 		}
@@ -282,8 +284,8 @@ public:
 	                                     T>>
 	{
 	public:
-		T* operator()(const FCSharpEnvironment& InEnvironment,
-		              const FGarbageCollectionHandle& InGarbageCollectionHandle) const
+		auto operator()(const FCSharpEnvironment& InEnvironment,
+		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
 			return InEnvironment.GetBinding<T>(InGarbageCollectionHandle);
 		}

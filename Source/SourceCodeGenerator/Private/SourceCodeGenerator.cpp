@@ -186,21 +186,21 @@ void FSourceCodeGeneratorModule::FinishExport()
 		Packages.FindOrAdd(ExportClass->GetPackage()).Add(*ExportClass->GetName());
 	}
 
-	for (auto Package : Packages)
+	for (auto& [Key, Value] : Packages)
 	{
-		Package.Value.Sort();
+		Value.Sort();
 
 		FBigStringBuilder StringBuilder;
 
 		StringBuilder.Append(TEXT("#pragma once\r\n\r\n"));
 
-		for (auto Value : Package.Value)
+		for (const auto& Name : Value)
 		{
-			StringBuilder.Append(GenerateInclude(*Value + BindingSuffix));
+			StringBuilder.Append(GenerateInclude(*Name + BindingSuffix));
 		}
 
 		const auto FilePath = FPaths::Combine(
-			OutputPath, *FPaths::GetCleanFilename(Package.Key->GetName()) + HeaderSuffix);
+			OutputPath, *FPaths::GetCleanFilename(Key->GetName()) + HeaderSuffix);
 
 		SaveIfChanged(FilePath, StringBuilder.ToString());
 	}

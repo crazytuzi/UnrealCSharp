@@ -23,3 +23,5 @@
 #define FODY_WEAVER_XML FString(TEXT("FodyWeavers.xml"))
 
 #define CODE_FODY_WEAVER_ADDIN FString(TEXT("Weavers"))
+
+#define PLACEHOLDER _

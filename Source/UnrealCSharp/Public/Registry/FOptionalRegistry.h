@@ -37,7 +37,7 @@ public:
 
 	bool AddReference(const FOptionalHelperValueMapping::FAddressType& InAddress,
 	                  const FOptionalHelperValueMapping::ValueType& InValue,
-	                  MonoObject* InMonoObject, bool bNeedFree = true);
+	                  MonoObject* InMonoObject);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 

@@ -16,15 +16,16 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 		Address2GarbageCollectionHandle
 	>
 {
-	static typename FContainerValueMapping::ValueType GetContainer(
-		Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto GetContainer(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+		-> typename FContainerValueMapping::ValueType
 	{
 		const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle);
 
 		return FoundValue != nullptr ? *FoundValue : nullptr;
 	}
 
-	static MonoObject* GetObject(Class* InRegistry, const typename FContainerValueMapping::FAddressType InAddress)
+	static auto GetObject(Class* InRegistry, const typename FContainerValueMapping::FAddressType InAddress)
+		-> MonoObject*
 	{
 		const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(InAddress);
 
@@ -33,7 +34,7 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 			       : nullptr;
 	}
 
-	static bool AddReference(Class* InRegistry, typename FContainerValueMapping::ValueType InValue,
+	static auto AddReference(Class* InRegistry, typename FContainerValueMapping::ValueType InValue,
 	                         MonoObject* InMonoObject)
 	{
 		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
@@ -43,7 +44,7 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 		return true;
 	}
 
-	static bool AddReference(Class* InRegistry, const FGarbageCollectionHandle& InOwner,
+	static auto AddReference(Class* InRegistry, const FGarbageCollectionHandle& InOwner,
 	                         const typename FContainerValueMapping::FAddressType InAddress,
 	                         typename FContainerValueMapping::ValueType InValue, MonoObject* InMonoObject)
 	{
@@ -59,14 +60,17 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 				GarbageCollectionHandle));
 	}
 
-	static bool RemoveReference(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto RemoveReference(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		if (const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle))
 		{
-			if (const auto FoundAddress = (InRegistry->*Address2GarbageCollectionHandle).FindKey(
-				InGarbageCollectionHandle))
+			if (const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(
+				*FoundValue))
 			{
-				(InRegistry->*Address2GarbageCollectionHandle).Remove(*FoundAddress);
+				if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+				{
+					(InRegistry->*Address2GarbageCollectionHandle).Remove(*FoundValue);
+				}
 			}
 
 			delete *FoundValue;

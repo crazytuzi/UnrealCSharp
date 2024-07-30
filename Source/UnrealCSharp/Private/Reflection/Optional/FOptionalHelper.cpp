@@ -2,24 +2,22 @@
 #if UE_F_OPTIONAL_PROPERTY
 #include "UObject/PropertyOptional.h"
 
-FOptionalHelper::FOptionalHelper(FOptionalProperty* InOptionalProperty, void* InData, const bool InbNeedFree):
+FOptionalHelper::FOptionalHelper(FOptionalProperty* InOptionalProperty, void* InData,
+                                 const bool InbNeedFreeData, const bool InbNeedFreeProperty):
 	OptionalProperty(InOptionalProperty),
 	ValuePropertyDescriptor(nullptr),
 	Data(nullptr),
-	bNeedFree(false)
+	bNeedFreeData(InbNeedFreeData),
+	bNeedFreeProperty(InbNeedFreeProperty)
 {
 	ValuePropertyDescriptor = FPropertyDescriptor::Factory(InOptionalProperty->GetValueProperty());
 
 	if (InData != nullptr)
 	{
-		bNeedFree = InbNeedFree;
-
 		Data = InData;
 	}
 	else
 	{
-		bNeedFree = true;
-
 		Data = FMemory::Malloc(ValuePropertyDescriptor->GetSize(), ValuePropertyDescriptor->GetMinAlignment());
 
 		InOptionalProperty->InitializeValueInternal(Data);
@@ -37,25 +35,22 @@ void FOptionalHelper::Initialize()
 
 void FOptionalHelper::Deinitialize()
 {
-	if (bNeedFree && Data != nullptr)
+	if (bNeedFreeData && Data != nullptr)
 	{
 		FMemory::Free(Data);
 
 		Data = nullptr;
+	}
 
-		if (ValuePropertyDescriptor != nullptr)
-		{
-			delete ValuePropertyDescriptor;
+	if (bNeedFreeProperty && ValuePropertyDescriptor != nullptr && OptionalProperty != nullptr)
+	{
+		delete ValuePropertyDescriptor;
 
-			ValuePropertyDescriptor = nullptr;
-		}
+		ValuePropertyDescriptor = nullptr;
 
-		if (OptionalProperty != nullptr)
-		{
-			delete OptionalProperty;
+		delete OptionalProperty;
 
-			OptionalProperty = nullptr;
-		}
+		OptionalProperty = nullptr;
 	}
 }
 

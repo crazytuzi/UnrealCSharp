@@ -1,6 +1,7 @@
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Bridge/FTypeBridge.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
@@ -93,9 +94,9 @@ void FDynamicClassGenerator::OnPrePIEEnded()
 	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(
 		[](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)
 		{
-			for (const auto& DynamicClass : DynamicClassMap)
+			for (const auto& [PLACEHOLDER, Value] : DynamicClassMap)
 			{
-				if (InBlueprintGeneratedClass->IsChildOf(DynamicClass.Value))
+				if (InBlueprintGeneratedClass->IsChildOf(Value))
 				{
 					return true;
 				}

@@ -1,11 +1,11 @@
 ﻿#include "Reflection/Property/ObjectProperty/FWeakObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest) const
+void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
 {
 	if (Property != nullptr)
 	{
-		*Dest = NewWeakRef(Src);
+		*Dest = NewWeakRef(Src, bIsCopy);
 	}
 }
 
@@ -39,16 +39,29 @@ bool FWeakObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 	return false;
 }
 
-MonoObject* FWeakObjectPropertyDescriptor::NewWeakRef(void* InAddress) const
+MonoObject* FWeakObjectPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TWeakObjectPtr<UObject>>(InAddress);
-
-	if (Object == nullptr)
+	if (bIsCopy)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>>(Object, InAddress, false);
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>, true>(
+			Object, CopyValue(InAddress));
+
+		return Object;
 	}
+	else
+	{
+		auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TWeakObjectPtr<UObject>>(InAddress);
 
-	return Object;
+		if (Object == nullptr)
+		{
+			Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>, false>(
+				Object, InAddress);
+		}
+
+		return Object;
+	}
 }

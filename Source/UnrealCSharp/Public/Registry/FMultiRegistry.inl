@@ -14,9 +14,8 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 		Address2GarbageCollectionHandle
 	>
 {
-	static typename FMultiValueMapping::ValueType::Type GetMulti(Class* InRegistry,
-	                                                             const FGarbageCollectionHandle&
-	                                                             InGarbageCollectionHandle)
+	static auto GetMulti(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+		-> typename FMultiValueMapping::ValueType::Type
 	{
 		const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle);
 
@@ -25,7 +24,8 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 			       : nullptr;
 	}
 
-	static MonoObject* GetObject(Class* InRegistry, typename FMultiValueMapping::FAddressType InAddress)
+	static auto GetObject(Class* InRegistry, typename FMultiValueMapping::FAddressType InAddress)
+		-> MonoObject*
 	{
 		const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(InAddress);
 
@@ -34,13 +34,13 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 			       : nullptr;
 	}
 
-	static bool AddReference(Class* InRegistry, MonoObject* InMonoObject,
-	                         typename FMultiValueMapping::FAddressType InAddress,
-	                         bool bNeedFree = true)
+	template <auto IsNeedFree>
+	static auto AddReference(Class* InRegistry, MonoObject* InMonoObject,
+	                         typename FMultiValueMapping::FAddressType InAddress)
 	{
 		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-		if (bNeedFree == false)
+		if constexpr (!IsNeedFree)
 		{
 			(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
 		}
@@ -48,24 +48,29 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle,
 		                                                 typename FMultiValueMapping::ValueType(
 			                                                 static_cast<typename FMultiValueMapping::ValueType::Type>(
-				                                                 InAddress), bNeedFree));
+				                                                 InAddress), IsNeedFree));
 
 		return true;
 	}
 
-	static bool RemoveReference(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto RemoveReference(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		if (const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle))
 		{
+			if (const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(
+				FoundValue->Value))
+			{
+				if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+				{
+					(InRegistry->*Address2GarbageCollectionHandle).Remove(FoundValue->Value);
+				}
+			}
+
 			if (FoundValue->bNeedFree)
 			{
 				FMemory::Free(FoundValue->Value);
 
 				FoundValue->Value = nullptr;
-			}
-			else
-			{
-				(InRegistry->*Address2GarbageCollectionHandle).Remove(FoundValue->Value);
 			}
 
 			(InRegistry->*GarbageCollectionHandle2Value).Remove(InGarbageCollectionHandle);

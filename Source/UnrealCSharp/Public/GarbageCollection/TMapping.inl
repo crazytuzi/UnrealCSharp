@@ -9,43 +9,43 @@ public:
 	typedef InValueType ValueType;
 
 public:
-	ValueType& operator[](const KeyType& InKey)
+	auto operator[](const KeyType& InKey) -> ValueType&
 	{
 		return Map[InKey];
 	}
 
-	const ValueType& operator[](const KeyType& InKey) const
+	auto operator[](const KeyType& InKey) const -> const ValueType&
 	{
 		return Map[InKey];
 	}
 
-	void Empty()
+	auto Empty()
 	{
 		Map.Empty();
 	}
 
-	void Add(const KeyType& InKey, const ValueType& InValue)
+	auto Add(const KeyType& InKey, const ValueType& InValue)
 	{
 		Map.Add(InKey, InValue);
 	}
 
-	int32 Remove(const KeyType& InKey)
+	auto Remove(const KeyType& InKey)
 	{
 		return Map.Remove(InKey);
 	}
 
-	ValueType* Find(const KeyType& InKey)
+	auto Find(const KeyType& InKey)
 	{
 		return Map.Find(InKey);
 	}
 
-	bool Contains(const KeyType& InKey) const
+	auto Contains(const KeyType& InKey) const
 	{
 		return Map.Contains(InKey);
 	}
 
 public:
-	TMap<KeyType, ValueType>& Get()
+	auto Get() -> TMap<KeyType, ValueType>&
 	{
 		return Map;
 	}

@@ -2,7 +2,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
 
-void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest) const
+void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest, bool bIsCopy) const
 {
 	if (Property != nullptr)
 	{

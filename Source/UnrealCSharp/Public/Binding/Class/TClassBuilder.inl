@@ -30,11 +30,11 @@ public:
 	}
 
 public:
-	TClassBuilder& Constructor(const void* InMethod,
+	auto Constructor(const void* InMethod,
 #if WITH_FUNCTION_INFO
-	                           const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction = {},
+	                 const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction = {},
 #endif
-	                           const TArray<FString>& InParamNames = {})
+	                 const TArray<FString>& InParamNames = {}) -> TClassBuilder&
 	{
 #if WITH_FUNCTION_INFO
 		InFunctionInfoFunction.GetValue()()->SetParamNames(InParamNames);
@@ -49,11 +49,11 @@ public:
 		return *this;
 	}
 
-	TClassBuilder& Destructor(const void* InMethod
+	auto Destructor(const void* InMethod
 #if WITH_FUNCTION_INFO
-	                          , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction = {}
+	                , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction = {}
 #endif
-	)
+	) -> TClassBuilder&
 	{
 		Function(FString::Printf(TEXT(
 			         "~%s"
@@ -70,12 +70,12 @@ public:
 		return *this;
 	}
 
-	TClassBuilder& Subscript(const void* InGetMethod,
-	                         const void* InSetMethod
+	auto Subscript(const void* InGetMethod,
+	               const void* InSetMethod
 #if WITH_FUNCTION_INFO
-	                         , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction
+	               , const TOptional<TFunction<FFunctionInfo*()>>& InFunctionInfoFunction
 #endif
-	)
+	) -> TClassBuilder&
 	{
 #if WITH_FUNCTION_INFO
 		if (InFunctionInfoFunction.IsSet())

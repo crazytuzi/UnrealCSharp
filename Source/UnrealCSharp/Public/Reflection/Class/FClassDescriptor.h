@@ -16,7 +16,7 @@ public:
 	void Deinitialize();
 
 public:
-	MonoClass* GetMonoClass() const;
+	UNREALCSHARP_API MonoClass* GetMonoClass() const;
 
 public:
 	FFunctionDescriptor* AddFunctionDescriptor(const FString& InFunctionName);

@@ -63,11 +63,11 @@ public:
 	FGarbageCollectionHandle GetGarbageCollectionHandle(UScriptStruct* InScriptStruct, const void* InStruct);
 
 public:
-	bool AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject,
-	                  bool bNeedFree = true);
+	template <auto IsNeedFree>
+	auto AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject);
 
-	bool AddReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct, const void* InStruct,
-	                  MonoObject* InMonoObject);
+	bool AddReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct,
+	                  const void* InStruct, MonoObject* InMonoObject);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 

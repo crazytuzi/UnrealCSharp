@@ -28,22 +28,22 @@ public:
 		return FDomain::GCHandle_Get_Target_V2(Handle);
 	}
 
-	bool operator==(const TGarbageCollectionHandle& Other) const
+	auto operator==(const TGarbageCollectionHandle& Other) const
 	{
 		return Handle == Other.Handle;
 	}
 
-	bool operator!=(const TGarbageCollectionHandle& Other) const
+	auto operator!=(const TGarbageCollectionHandle& Other) const
 	{
 		return !(*this == Other);
 	}
 
-	bool IsValid() const
+	auto IsValid() const
 	{
 		return Handle != T();
 	}
 
-	static const TGarbageCollectionHandle& Zero()
+	static auto Zero() -> const TGarbageCollectionHandle&
 	{
 		static TGarbageCollectionHandle GarbageCollectionHandle;
 
@@ -51,34 +51,35 @@ public:
 	}
 
 public:
-	static TGarbageCollectionHandle NewRef(MonoObject* InMonoObject, const mono_bool bPinned)
+	static auto NewRef(MonoObject* InMonoObject, const mono_bool bPinned)
 	{
 		return FDomain::GCHandle_New_V2(InMonoObject, bPinned);
 	}
 
-	static TGarbageCollectionHandle NewWeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
+	static auto NewWeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
 	{
 		return FDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
 	}
 
-	static void Free(TGarbageCollectionHandle& InGarbageCollectionHandle, const bool bReset = true)
+	template <auto IsReset>
+	static auto Free(TGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		FDomain::GCHandle_Free_V2(InGarbageCollectionHandle);
 
-		if (bReset)
+		if constexpr (IsReset)
 		{
 			InGarbageCollectionHandle = T();
 		}
 	}
 
-	static TGarbageCollectionHandle MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject,
-	                                                                   MonoProperty* InMonoProperty)
+	static auto MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject,
+	                                               MonoProperty* InMonoProperty) -> TGarbageCollectionHandle
 	{
 		return *static_cast<T*>(FMonoDomain::Object_Unbox(
 			FMonoDomain::Property_Get_Value(InMonoProperty, InMonoObject, nullptr, nullptr)));
 	}
 
-	static TGarbageCollectionHandle MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject)
+	static auto MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject)
 	{
 		const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
 			FMonoDomain::Object_Get_Class(InMonoObject), PROPERTY_GARBAGE_COLLECTION_HANDLE);

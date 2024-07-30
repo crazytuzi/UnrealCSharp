@@ -98,9 +98,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	if (SuperClass != nullptr)
 	{
-		auto SuperClassNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass);
-
-		if (NameSpaceContent != SuperClassNameSpace)
+		if (auto SuperClassNameSpace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(SuperClass);
+			NameSpaceContent != SuperClassNameSpace)
 		{
 			UsingNameSpaces.Add(SuperClassNameSpace);
 		}
@@ -289,9 +288,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 	     FunctionIterator)
 	{
-		if (!FunctionIterator->HasAnyFunctionFlags(EFunctionFlags::FUNC_Public |
-			EFunctionFlags::FUNC_Protected |
-			EFunctionFlags::FUNC_Private))
+		if (!FunctionIterator->HasAnyFunctionFlags(FUNC_AccessSpecifiers))
 		{
 			continue;
 		}

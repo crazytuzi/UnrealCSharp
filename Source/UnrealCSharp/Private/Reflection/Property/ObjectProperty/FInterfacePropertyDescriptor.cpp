@@ -1,11 +1,11 @@
 ﻿#include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-void FInterfacePropertyDescriptor::Get(void* Src, void** Dest) const
+void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
 {
 	if (Property != nullptr)
 	{
-		*Dest = NewWeakRef(Src);
+		*Dest = NewWeakRef(Src, bIsCopy);
 	}
 }
 
@@ -45,17 +45,29 @@ bool FInterfacePropertyDescriptor::Identical(const void* A, const void* B, const
 	return false;
 }
 
-MonoObject* FInterfacePropertyDescriptor::NewWeakRef(void* InAddress) const
+MonoObject* FInterfacePropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(InAddress);
-
-	if (Object == nullptr)
+	if (bIsCopy)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>>(
-			Object, InAddress, false);
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true>(
+			Object, CopyValue(InAddress));
+
+		return Object;
 	}
+	else
+	{
+		auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(InAddress);
 
-	return Object;
+		if (Object == nullptr)
+		{
+			Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false>(
+				Object, InAddress);
+		}
+
+		return Object;
+	}
 }

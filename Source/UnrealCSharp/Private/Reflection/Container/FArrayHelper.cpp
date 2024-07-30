@@ -1,23 +1,21 @@
 ﻿#include "Reflection/Container/FArrayHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 
-FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData, const bool InbNeedFree):
+FArrayHelper::FArrayHelper(FProperty* InProperty, void* InData,
+                           const bool InbNeedFreeData, const bool InbNeedFreeProperty):
 	InnerPropertyDescriptor(nullptr),
 	ScriptArray(nullptr),
-	bNeedFree(false)
+	bNeedFreeData(InbNeedFreeData),
+	bNeedFreeProperty(InbNeedFreeProperty)
 {
 	InnerPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
 
 	if (InData != nullptr)
 	{
-		bNeedFree = InbNeedFree;
-
 		ScriptArray = static_cast<FScriptArray*>(InData);
 	}
 	else
 	{
-		bNeedFree = true;
-
 		ScriptArray = new FScriptArray();
 	}
 }
@@ -33,19 +31,16 @@ void FArrayHelper::Initialize()
 
 void FArrayHelper::Deinitialize()
 {
-	if (bNeedFree && ScriptArray != nullptr)
+	if (bNeedFreeData && ScriptArray != nullptr)
 	{
 		delete ScriptArray;
 
 		ScriptArray = nullptr;
 	}
 
-	if (InnerPropertyDescriptor != nullptr)
+	if (bNeedFreeProperty && InnerPropertyDescriptor != nullptr)
 	{
-		if (bNeedFree)
-		{
-			InnerPropertyDescriptor->DestroyProperty();
-		}
+		InnerPropertyDescriptor->DestroyProperty();
 
 		delete InnerPropertyDescriptor;
 
@@ -127,9 +122,7 @@ int32 FArrayHelper::Max() const
 
 void* FArrayHelper::Get(const int32 Index) const
 {
-	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
-
-	if (ScriptArrayHelper.IsValidIndex(Index))
+	if (auto ScriptArrayHelper = CreateHelperFormInnerProperty(); ScriptArrayHelper.IsValidIndex(Index))
 	{
 		return ScriptArrayHelper.GetRawPtr(Index);
 	}
@@ -139,9 +132,7 @@ void* FArrayHelper::Get(const int32 Index) const
 
 void FArrayHelper::Set(const int32 Index, void* InValue) const
 {
-	auto ScriptArrayHelper = CreateHelperFormInnerProperty();
-
-	if (ScriptArrayHelper.IsValidIndex(Index))
+	if (auto ScriptArrayHelper = CreateHelperFormInnerProperty(); ScriptArrayHelper.IsValidIndex(Index))
 	{
 		InnerPropertyDescriptor->Set(InValue, ScriptArrayHelper.GetRawPtr(Index));
 	}
@@ -153,9 +144,8 @@ int32 FArrayHelper::Find(const void* InValue) const
 
 	for (auto Index = 0; Index < Num(); ++Index)
 	{
-		const auto Item = ScriptArrayHelper.GetRawPtr(Index);
-
-		if (InnerPropertyDescriptor->Identical(Item, InValue))
+		if (const auto Item = ScriptArrayHelper.GetRawPtr(Index);
+			InnerPropertyDescriptor->Identical(Item, InValue))
 		{
 			return Index;
 		}
@@ -170,9 +160,8 @@ int32 FArrayHelper::FindLast(const void* InValue) const
 
 	for (auto Index = Num() - 1; Index >= 0; --Index)
 	{
-		const auto Item = ScriptArrayHelper.GetRawPtr(Index);
-
-		if (InnerPropertyDescriptor->Identical(Item, InValue))
+		if (const auto Item = ScriptArrayHelper.GetRawPtr(Index);
+			InnerPropertyDescriptor->Identical(Item, InValue))
 		{
 			return Index;
 		}
@@ -187,9 +176,8 @@ bool FArrayHelper::Contains(const void* InValue) const
 
 	for (auto Index = 0; Index < Num(); ++Index)
 	{
-		const auto Item = ScriptArrayHelper.GetRawPtr(Index);
-
-		if (InnerPropertyDescriptor->Identical(Item, InValue))
+		if (const auto Item = ScriptArrayHelper.GetRawPtr(Index);
+			InnerPropertyDescriptor->Identical(Item, InValue))
 		{
 			return true;
 		}
@@ -301,9 +289,8 @@ int32 FArrayHelper::RemoveSingle(const void* InValue) const
 
 	for (auto Index = 0; Index < Num(); ++Index)
 	{
-		const auto Item = ScriptArrayHelper.GetRawPtr(Index);
-
-		if (InnerPropertyDescriptor->Identical(Item, InValue))
+		if (const auto Item = ScriptArrayHelper.GetRawPtr(Index);
+			InnerPropertyDescriptor->Identical(Item, InValue))
 		{
 			RemoveAt(Index, 1, true);
 

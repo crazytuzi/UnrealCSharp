@@ -5,7 +5,7 @@
 #include "Template/TIsScriptStruct.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
-template <typename T, bool bIsEngineClass>
+template <typename T, auto IsEngineClass>
 struct TIsEngineClass
 {
 	static bool Get()
@@ -24,7 +24,7 @@ struct TIsEngineClass
 		}
 		else
 		{
-			return bIsEngineClass;
+			return IsEngineClass;
 		}
 	}
 };

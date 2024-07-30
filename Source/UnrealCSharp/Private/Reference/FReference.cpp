@@ -7,7 +7,7 @@ FReference::FReference(const FGarbageCollectionHandle& InGarbageCollectionHandle
 
 FReference::~FReference()
 {
-	FGarbageCollectionHandle::Free(GarbageCollectionHandle);
+	FGarbageCollectionHandle::Free<true>(GarbageCollectionHandle);
 }
 
 FReference::operator FGarbageCollectionHandle() const

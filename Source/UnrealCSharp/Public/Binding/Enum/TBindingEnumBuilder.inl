@@ -23,7 +23,7 @@ public:
 
 public:
 	template <typename Type>
-	TBindingEnumBuilder& Enumerator(const FString& InKey, const Type InValue)
+	auto Enumerator(const FString& InKey, const Type InValue) -> TBindingEnumBuilder&
 	{
 		EnumRegister->BindingEnumerator(InKey, static_cast<std::underlying_type_t<Type>>(InValue));
 

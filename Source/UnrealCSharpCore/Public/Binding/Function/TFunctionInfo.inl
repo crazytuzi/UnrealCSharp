@@ -5,7 +5,7 @@
 #include "TDefaultArguments.inl"
 #include "Binding/TypeInfo/TTypeInfo.inl"
 
-template <auto, EFunctionType FunctionType, typename Result, typename... Args>
+template <auto, auto FunctionType, typename Result, typename... Args>
 struct TFunctionInfo final : FFunctionInfo
 {
 	TFunctionInfo():
@@ -41,52 +41,52 @@ struct TFunctionInfo final : FFunctionInfo
 	{
 	}
 
-	virtual bool IsConstructor() const override
+	virtual auto IsConstructor() const -> bool override
 	{
 		return FunctionType == EFunctionType::Constructor;
 	}
 
-	virtual bool IsDestructor() const override
+	virtual auto IsDestructor() const -> bool override
 	{
 		return FunctionType == EFunctionType::Destructor;
 	}
 
-	virtual bool IsStatic() const override
+	virtual auto IsStatic() const -> bool override
 	{
 		return FunctionType == EFunctionType::Static;
 	}
 
-	virtual FTypeInfo* GetReturn() const override
+	virtual auto GetReturn() const -> FTypeInfo* override
 	{
 		return Return;
 	}
 
-	virtual const TArray<FTypeInfo*>& GetParams() const override
+	virtual auto GetParams() const -> const TArray<FTypeInfo*>& override
 	{
 		return Argument;
 	}
 
-	virtual const TArray<FString>& GetParamNames() const override
+	virtual auto GetParamNames() const -> const TArray<FString>& override
 	{
 		return ParamNames;
 	}
 
-	virtual void SetParamNames(const TArray<FString>& InParamNames) override
+	virtual auto SetParamNames(const TArray<FString>& InParamNames) -> void override
 	{
 		ParamNames = InParamNames;
 	}
 
-	virtual const TArray<FString>& GetDefaultArguments() const override
+	virtual auto GetDefaultArguments() const -> const TArray<FString>& override
 	{
 		return DefaultArguments;
 	}
 
-	virtual EFunctionInteract GetFunctionInteract() const override
+	virtual auto GetFunctionInteract() const -> EFunctionInteract override
 	{
 		return FunctionInteract;
 	}
 
-	static FFunctionInfo* Get()
+	static auto Get() -> FFunctionInfo*
 	{
 		static TFunctionInfo Instance;
 
@@ -94,8 +94,7 @@ struct TFunctionInfo final : FFunctionInfo
 	}
 
 	template <typename... DefaultArguments>
-	static FFunctionInfo* Get(const TArray<FString>& InParamNames,
-	                          DefaultArguments&&... InDefaultArguments)
+	static auto Get(const TArray<FString>& InParamNames, DefaultArguments&&... InDefaultArguments) -> FFunctionInfo*
 	{
 		static TFunctionInfo Instance(InParamNames,
 		                              TDefaultArguments<Args...>::Get(
@@ -104,7 +103,7 @@ struct TFunctionInfo final : FFunctionInfo
 		return &Instance;
 	}
 
-	static FFunctionInfo* Get(const EFunctionInteract InFunctionInteract)
+	static auto Get(const EFunctionInteract InFunctionInteract) -> FFunctionInfo*
 	{
 		static TFunctionInfo Instance(InFunctionInteract);
 
@@ -112,8 +111,8 @@ struct TFunctionInfo final : FFunctionInfo
 	}
 
 	template <typename... DefaultArguments>
-	static FFunctionInfo* Get(const TArray<FString>& InParamNames, const EFunctionInteract InFunctionInteract,
-	                          DefaultArguments&&... InDefaultArguments)
+	static auto Get(const TArray<FString>& InParamNames, const EFunctionInteract InFunctionInteract,
+	                DefaultArguments&&... InDefaultArguments) -> FFunctionInfo*
 	{
 		static TFunctionInfo Instance(InParamNames,
 		                              InFunctionInteract,
