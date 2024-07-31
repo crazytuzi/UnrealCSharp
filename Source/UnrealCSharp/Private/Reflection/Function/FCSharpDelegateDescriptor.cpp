@@ -55,7 +55,8 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 		}
 		else
 		{
-			ReturnPropertyDescriptor->Set(ReturnValue, static_cast<uint8*>(InParams) + Function->ReturnValueOffset);
+			ReturnPropertyDescriptor->Set(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(ReturnValue),
+			                              static_cast<uint8*>(InParams) + Function->ReturnValueOffset);
 		}
 	}
 
