@@ -209,6 +209,8 @@ public:
 
 	MonoType* Property_Get_Type(MonoProperty* InMonoProperty) const;
 
+	MonoMethod* Delegate_Get_Method(MonoObject* InDelegate) const;
+
 	static void* Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod);
 
 	SynchronizationContextTickType SynchronizationContextTick;

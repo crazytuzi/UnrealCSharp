@@ -12,7 +12,7 @@ public:
 	explicit FCSharpDelegateDescriptor(UFunction* InFunction);
 
 public:
-	bool CallDelegate(MonoObject* InDelegate, void* InParams);
+	bool CallDelegate(const UObject* InObject, MonoMethod* InMethod, void* InParams);
 
 	MonoObject* ProcessDelegate(const FScriptDelegate* InScriptDelegate, MonoObject** OutValue,
 	                            MonoArray* InValue);

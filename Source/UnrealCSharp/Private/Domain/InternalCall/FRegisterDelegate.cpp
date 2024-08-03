@@ -24,12 +24,16 @@ namespace
 		}
 
 		static void BindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                               MonoObject* InDelegate)
+		                               const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InGarbageCollectionHandle))
 			{
-				DelegateHelper->Bind(InDelegate);
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					DelegateHelper->Bind(FoundObject, FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                     Delegate_Get_Method(InDelegate));
+				}
 			}
 		}
 

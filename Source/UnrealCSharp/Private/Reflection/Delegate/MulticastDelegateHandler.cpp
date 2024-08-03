@@ -1,25 +1,17 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Reflection/Delegate/MulticastDelegateHandler.h"
+﻿#include "Reflection/Delegate/MulticastDelegateHandler.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Template/TGetArrayLength.inl"
 
 void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 {
-	if (Function != nullptr && Function->GetName() == "CSharpCallBack")
+	if (Function != nullptr && Function->GetName() == FUNCTION_CSHARP_CALLBACK)
 	{
 		if (DelegateDescriptor != nullptr)
 		{
-			for (const auto& DelegateGarbageCollectionHandle : DelegateGarbageCollectionHandles)
+			for (const auto& [Key, Value] : DelegateWrappers)
 			{
-				if (const auto Delegate = static_cast<MonoObject*>(DelegateGarbageCollectionHandle))
-				{
-					DelegateDescriptor->CallDelegate(Delegate, Parms);
-				}
+				DelegateDescriptor->CallDelegate(Key.Get(), Value, Parms);
 			}
 		}
 	}
@@ -66,15 +58,7 @@ void UMulticastDelegateHandler::Deinitialize()
 		DelegateDescriptor = nullptr;
 	}
 
-	for (auto& DelegateGarbageCollectionHandle : DelegateGarbageCollectionHandles)
-	{
-		if (DelegateGarbageCollectionHandle.IsValid())
-		{
-			FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
-		}
-	}
-
-	DelegateGarbageCollectionHandles.Empty();
+	DelegateWrappers.Empty();
 
 	ScriptDelegate.Unbind();
 }
@@ -84,41 +68,12 @@ bool UMulticastDelegateHandler::IsBound() const
 	return MulticastScriptDelegate != nullptr ? MulticastScriptDelegate->IsBound() : false;
 }
 
-bool UMulticastDelegateHandler::Contains(MonoObject* InMulticastDelegate) const
+bool UMulticastDelegateHandler::Contains(UObject* InObject, MonoMethod* InMonoMethod) const
 {
-	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
-	{
-		void* Params[2];
-
-		if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Method_From_Name(
-			FoundMonoClass, FUNCTION_UTILS_MULTICAST_DELEGATE_GET_TARGET, TGetArrayLength(Params)))
-		{
-			for (const auto& DelegateGarbageCollectionHandle : DelegateGarbageCollectionHandles)
-			{
-				if (const auto Delegate = static_cast<MonoObject*>(DelegateGarbageCollectionHandle))
-				{
-					Params[0] = Delegate;
-
-					Params[1] = InMulticastDelegate;
-
-					const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
-						FoundMonoMethod, nullptr, Params);
-
-					if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						ResultMonoObject)))
-					{
-						return true;
-					}
-				}
-			}
-		}
-	}
-
-	return false;
+	return DelegateWrappers.Contains(FDelegateWrapper{InObject, InMonoMethod});
 }
 
-void UMulticastDelegateHandler::Add(MonoObject* InMulticastDelegate)
+void UMulticastDelegateHandler::Add(UObject* InObject, MonoMethod* InMonoMethod)
 {
 	if (MulticastScriptDelegate != nullptr)
 	{
@@ -126,16 +81,16 @@ void UMulticastDelegateHandler::Add(MonoObject* InMulticastDelegate)
 		{
 			ScriptDelegate.Unbind();
 
-			ScriptDelegate.BindUFunction(this, "CSharpCallBack");
+			ScriptDelegate.BindUFunction(this, *FUNCTION_CSHARP_CALLBACK);
 
 			MulticastScriptDelegate->Add(ScriptDelegate);
 		}
 	}
 
-	DelegateGarbageCollectionHandles.Emplace(FGarbageCollectionHandle::NewRef(InMulticastDelegate, true));
+	DelegateWrappers.Add({InObject, InMonoMethod});
 }
 
-void UMulticastDelegateHandler::AddUnique(MonoObject* InMulticastDelegate)
+void UMulticastDelegateHandler::AddUnique(UObject* InObject, MonoMethod* InMonoMethod)
 {
 	if (MulticastScriptDelegate != nullptr)
 	{
@@ -143,52 +98,20 @@ void UMulticastDelegateHandler::AddUnique(MonoObject* InMulticastDelegate)
 		{
 			ScriptDelegate.Unbind();
 
-			ScriptDelegate.BindUFunction(this, "CSharpCallBack");
+			ScriptDelegate.BindUFunction(this, *FUNCTION_CSHARP_CALLBACK);
 
 			MulticastScriptDelegate->Add(ScriptDelegate);
 		}
 	}
 
-	if (!Contains(InMulticastDelegate))
-	{
-		DelegateGarbageCollectionHandles.Emplace(FGarbageCollectionHandle::NewRef(InMulticastDelegate, true));
-	}
+	DelegateWrappers.AddUnique({InObject, InMonoMethod});
 }
 
-void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
+void UMulticastDelegateHandler::Remove(UObject* InObject, MonoMethod* InMonoMethod)
 {
-	if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
-	{
-		void* Params[2];
+	DelegateWrappers.Remove({InObject, InMonoMethod});
 
-		if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Method_From_Name(
-			FoundMonoClass, FUNCTION_UTILS_MULTICAST_DELEGATE_EQUALS, TGetArrayLength(Params)))
-		{
-			for (const auto& DelegateGarbageCollectionHandle : DelegateGarbageCollectionHandles)
-			{
-				if (const auto Delegate = static_cast<MonoObject*>(DelegateGarbageCollectionHandle))
-				{
-					Params[0] = Delegate;
-
-					Params[1] = InMulticastDelegate;
-
-					const auto ResultMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
-						FoundMonoMethod, nullptr, Params);
-
-					if (*static_cast<bool*>(FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						ResultMonoObject)))
-					{
-						DelegateGarbageCollectionHandles.Remove(Delegate);
-
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	if (DelegateGarbageCollectionHandles.IsEmpty())
+	if (DelegateWrappers.IsEmpty())
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -199,37 +122,14 @@ void UMulticastDelegateHandler::Remove(MonoObject* InMulticastDelegate)
 	}
 }
 
-void UMulticastDelegateHandler::RemoveAll(MonoObject* InObject)
+void UMulticastDelegateHandler::RemoveAll(UObject* InObject)
 {
-	DelegateGarbageCollectionHandles.RemoveAll([InObject](FGarbageCollectionHandle Element)
+	DelegateWrappers.RemoveAll([InObject](const FDelegateWrapper& Element)
 	{
-		if (!Element.IsValid())
-		{
-			return true;
-		}
-
-		const auto FoundMonoObject = static_cast<MonoObject*>(Element);
-
-		if (const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
-		{
-			auto Params = static_cast<void*>(FoundMonoObject);
-
-			if (const auto FoundMonoMethod = FCSharpEnvironment::GetEnvironment().GetDomain()->
-				Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_MULTICAST_DELEGATE_GET_TARGET,
-				                           TGetArrayLength(Params)))
-			{
-				const auto TargetMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke(
-					FoundMonoMethod, nullptr, &Params);
-
-				return TargetMonoObject == InObject;
-			}
-		}
-
-		return false;
+		return Element.Object == InObject;
 	});
 
-	if (DelegateGarbageCollectionHandles.IsEmpty())
+	if (DelegateWrappers.IsEmpty())
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -247,15 +147,7 @@ void UMulticastDelegateHandler::Clear()
 		MulticastScriptDelegate->Clear();
 	}
 
-	for (auto& DelegateGarbageCollectionHandle : DelegateGarbageCollectionHandles)
-	{
-		if (DelegateGarbageCollectionHandle.IsValid())
-		{
-			FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
-		}
-	}
-
-	DelegateGarbageCollectionHandles.Empty();
+	DelegateWrappers.Empty();
 
 	ScriptDelegate.Unbind();
 }
@@ -288,5 +180,5 @@ FName UMulticastDelegateHandler::GetFunctionName() const
 
 UFunction* UMulticastDelegateHandler::GetCallBack() const
 {
-	return FindFunction(TEXT("CSharpCallBack"));
+	return FindFunction(*FUNCTION_CSHARP_CALLBACK);
 }

@@ -1,6 +1,7 @@
 ﻿#include "Domain/FMonoDomain.h"
 #include "Log/FMonoLog.h"
 #include "CoreMacro/ClassMacro.h"
+#include "CoreMacro/PropertyMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/Macro.h"
@@ -691,6 +692,23 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Params(MonoClass* InMonoClass, co
 		if (bIsSame == true)
 		{
 			return Method;
+		}
+	}
+
+	return nullptr;
+}
+
+MonoMethod* FMonoDomain::Delegate_Get_Method(MonoObject* InDelegate)
+{
+	if (const auto Class = Object_Get_Class(InDelegate))
+	{
+		if (const auto Property = Class_Get_Property_From_Name(Class, PROPERTY_METHOD))
+		{
+			if (const auto ReflectionMethod = (MonoReflectionMethod*)Property_Get_Value(
+				Property, InDelegate, nullptr, nullptr))
+			{
+				return ReflectionMethod->method;
+			}
 		}
 	}
 

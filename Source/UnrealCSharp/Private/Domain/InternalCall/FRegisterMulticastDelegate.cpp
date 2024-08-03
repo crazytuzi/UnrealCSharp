@@ -35,53 +35,77 @@ namespace
 		}
 
 		static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   MonoObject* InDelegate)
+		                                   const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->Contains(InDelegate);
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					return MulticastDelegateHelper->Contains(FoundObject,
+					                                         FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                                         Delegate_Get_Method(InDelegate));
+				}
 			}
 
 			return false;
 		}
 
-		static void AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InDelegate)
+		static void AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                              const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->Add(InDelegate);
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					MulticastDelegateHelper->Add(FoundObject,
+					                             FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                             Delegate_Get_Method(InDelegate));
+				}
 			}
 		}
 
 		static void AddUniqueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                    MonoObject* InDelegate)
+		                                    const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->AddUnique(InDelegate);
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					MulticastDelegateHelper->AddUnique(FoundObject,
+					                                   FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                                   Delegate_Get_Method(InDelegate));
+				}
 			}
 		}
 
 		static void RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                 MonoObject* InDelegate)
+		                                 const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->Remove(InDelegate);
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					MulticastDelegateHelper->Remove(FoundObject,
+					                                FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                                Delegate_Get_Method(InDelegate));
+				}
 			}
 		}
 
 		static void RemoveAllImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                    MonoObject* InObject)
+		                                    const FGarbageCollectionHandle InObject)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->RemoveAll(InObject);
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					MulticastDelegateHelper->RemoveAll(FoundObject);
+				}
 			}
 		}
 
@@ -90,7 +114,7 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->Clear();
+				MulticastDelegateHelper->Clear();
 			}
 		}
 

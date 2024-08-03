@@ -5,11 +5,10 @@ namespace Script.CoreUObject
 {
     public class FDelegate<T> : FDelegateBase where T : Delegate
     {
-        public void Bind(UObject _, T InDelegate) =>
-            FDelegateImplementation.FDelegate_BindImplementation(GarbageCollectionHandle, InDelegate);
-
-        public void Bind(T InDelegate) =>
-            FDelegateImplementation.FDelegate_BindImplementation(GarbageCollectionHandle, InDelegate);
+        public void Bind(T InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(
+            GarbageCollectionHandle,
+            (InDelegate.Target as UObject)?.GarbageCollectionHandle ?? nint.Zero,
+            InDelegate);
 
         public bool IsBound() => FDelegateImplementation.FDelegate_IsBoundImplementation(GarbageCollectionHandle);
 

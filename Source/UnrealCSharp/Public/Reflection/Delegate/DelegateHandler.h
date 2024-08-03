@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "FDelegateWrapper.h"
 #include "Reflection/Function/FCSharpDelegateDescriptor.h"
-#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "DelegateHandler.generated.h"
 
 /**
@@ -28,13 +28,13 @@ public:
 	void Deinitialize();
 
 public:
-	void Bind(MonoObject* InDelegate);
+	void Bind(UObject* InObject, MonoMethod* InMonoMethod);
 
 	bool IsBound() const;
 
-	void UnBind();
+	void UnBind() const;
 
-	void Clear();
+	void Clear() const;
 
 	MonoObject* Execute(MonoObject** OutValue, MonoArray* InValue) const;
 
@@ -51,5 +51,5 @@ private:
 
 	FCSharpDelegateDescriptor* DelegateDescriptor;
 
-	FGarbageCollectionHandle DelegateGarbageCollectionHandle;
+	FDelegateWrapper DelegateWrapper;
 };
