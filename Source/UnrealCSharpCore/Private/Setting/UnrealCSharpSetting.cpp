@@ -1,9 +1,20 @@
 #include "Setting/UnrealCSharpSetting.h"
+#include "CoreMacro/Macro.h"
 #if WITH_EDITOR
 #include "ISettingsModule.h"
 #endif
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpSettings"
+
+UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer),
+	  PublishDirectory(DEFAULT_PUBLISH_DIRECTORY),
+	  UEName(DEFAULT_UE_NAME),
+	  GameName(DEFAULT_GAME_NAME),
+	  bEnableDebug(false),
+	  Port(0)
+{
+}
 
 #if WITH_EDITOR
 void UUnrealCSharpSetting::RegisterSettings()
@@ -31,6 +42,21 @@ void UUnrealCSharpSetting::UnregisterSettings()
 	}
 }
 #endif
+
+const FGameContentDirectoryPath& UUnrealCSharpSetting::GetPublishDirectory() const
+{
+	return PublishDirectory;
+}
+
+const FString& UUnrealCSharpSetting::GetUEName() const
+{
+	return UEName;
+}
+
+const FString& UUnrealCSharpSetting::GetGameName() const
+{
+	return GameName;
+}
 
 const TArray<FBindClass>& UUnrealCSharpSetting::GetBindClass() const
 {

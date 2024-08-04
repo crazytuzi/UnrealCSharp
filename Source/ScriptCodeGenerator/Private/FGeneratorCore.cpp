@@ -5,6 +5,7 @@
 #include "Binding/TypeInfo/TNameSpace.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "UEVersion.h"
@@ -385,9 +386,12 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	}
 
 	if (CastField<FFieldPathProperty>(Property))
+	{
 		return {
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), TEXT("Script.Reflection.Property")
+			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
+			COMBINE_NAMESPACE(COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(TEXT("Reflection"))), FString(TEXT("Property")))
 		};
+	}
 
 #if UE_F_OPTIONAL_PROPERTY
 	if (const auto OptionalProperty = CastField<FOptionalProperty>(Property))
@@ -911,7 +915,7 @@ void FGeneratorCore::BeginGenerator()
 		{
 			SupportedModule.Add(FString::Printf(TEXT(
 				"%s.%s"),
-			                                    *SCRIPT,
+			                                    *NAMESPACE_ROOT,
 			                                    *Module
 			));
 		}
@@ -929,14 +933,14 @@ void FGeneratorCore::BeginGenerator()
 				FString::Printf(TEXT(
 					"%s.%s"
 				),
-				                *SCRIPT,
+				                *NAMESPACE_ROOT,
 				                *AssetPath
 
 				),
 				FString::Printf(TEXT(
 					"%s.%s."
 				),
-				                *SCRIPT,
+				                *NAMESPACE_ROOT,
 				                *AssetPath
 				)
 			});

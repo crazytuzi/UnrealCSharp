@@ -1,6 +1,7 @@
 #include "FBindingClassGenerator.h"
 #include "Binding/FBinding.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 #include "CoreMacro/BindingMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "FGeneratorCore.h"
@@ -589,11 +590,11 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent[0].Replace(TEXT("."), TEXT("/"))),
-		FUnrealCSharpFunctionLibrary::GetBindingPath());
+		FUnrealCSharpFunctionLibrary::GetBindingDirectory());
 
 	auto FileBaseName = InClass->IsReflectionClass() ? ClassContent.RightChop(1) : ClassContent;
 
-	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + TEXT(".cs");
+	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + CSHARP_SUFFIX;
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
@@ -793,12 +794,12 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent[0].Replace(TEXT("."), TEXT("/"))),
-		FUnrealCSharpFunctionLibrary::GetBindingPath());
+		FUnrealCSharpFunctionLibrary::GetBindingDirectory());
 
 	auto FileBaseName = InClass->IsReflectionClass() ? ClassContent.RightChop(1) : ClassContent;
 
 	const auto FileName = FPaths::Combine(DirectoryName,
-	                                      BINDING_COMBINE_CLASS_IMPLEMENTATION(FileBaseName)) + TEXT(".cs");
+	                                      BINDING_COMBINE_CLASS_IMPLEMENTATION(FileBaseName)) + CSHARP_SUFFIX;
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

@@ -1,5 +1,6 @@
 ﻿#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
@@ -8,6 +9,7 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+#include "Setting/UnrealCSharpSetting.h"
 #if WITH_EDITOR
 #include "WidgetBlueprint.h"
 #include "Animation/AnimBlueprint.h"
@@ -37,7 +39,11 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
 	return GetModuleName(InField, [InField](FString& InModuleName)
 	{
-		if (!InField->IsNative())
+		if (InField->IsNative())
+		{
+			InModuleName.RightChopInline(1);
+		}
+		else
 		{
 			if (auto Index = 0; InModuleName.FindLastChar(TEXT('/'), Index))
 			{
@@ -146,7 +152,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 	return FString::Printf(TEXT(
 		"%s.%s"
 	),
-	                       TEXT("Script"),
+	                       *NAMESPACE_SCRIPT,
 	                       *ModuleName);
 }
 
@@ -185,7 +191,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InEnum)
 	return FString::Printf(TEXT(
 		"%s%s"
 	),
-	                       TEXT("Script"),
+	                       *NAMESPACE_SCRIPT,
 	                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
 }
 
@@ -243,7 +249,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FDelegateProperty*
 		return FString::Printf(TEXT(
 			"%s%s"
 		),
-		                       TEXT("Script"),
+		                       *NAMESPACE_SCRIPT,
 		                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
 	}
 
@@ -311,7 +317,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 		return FString::Printf(TEXT(
 			"%s%s"
 		),
-		                       TEXT("Script"),
+		                       *NAMESPACE_SCRIPT,
 		                       *ModuleName.Replace(TEXT("/"), TEXT(".")));
 	}
 
@@ -371,7 +377,7 @@ FString FUnrealCSharpFunctionLibrary::GetFileName(const FAssetData& InAssetData,
 
 	auto DirectoryName = FPaths::Combine(GetGenerationPath(ModuleName), ModuleName);
 
-	return FPaths::Combine(DirectoryName, GetAssetName(InAssetData, InAssetName) + TEXT(".cs"));
+	return FPaths::Combine(DirectoryName, GetAssetName(InAssetData, InAssetName) + CSHARP_SUFFIX);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetOldFileName(const FAssetData& InAssetData, const FString& InOldObjectPath)
@@ -380,49 +386,61 @@ FString FUnrealCSharpFunctionLibrary::GetOldFileName(const FAssetData& InAssetDa
 }
 #endif
 
-FString FUnrealCSharpFunctionLibrary::GetBaseName()
+FString FUnrealCSharpFunctionLibrary::GetUEName()
 {
-	return TEXT("Script");
+	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+
+	return UnrealCSharpSetting->IsValidLowLevelFast()
+		       ? UnrealCSharpSetting->GetUEName()
+		       : DEFAULT_UE_NAME;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetBasePath()
+#if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetUEDirectory()
 {
-	return FPaths::Combine(FPaths::ProjectDir(), GetBaseName());
+	return GetFullScriptDirectory() / GetUEName();
 }
 
-FString FUnrealCSharpFunctionLibrary::GetUEProjectName()
+FString FUnrealCSharpFunctionLibrary::GetUEProxyDirectory()
 {
-	return TEXT("UE");
+	return GetUEDirectory() / PROXY_NAME;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetUEPath()
+FString FUnrealCSharpFunctionLibrary::GetUEProjectPath()
 {
-	return FPaths::Combine(GetBasePath(), GetUEProjectName());
+	return GetUEDirectory() / GetUEName() + PROJECT_SUFFIX;
+}
+#endif
+
+FString FUnrealCSharpFunctionLibrary::GetGameName()
+{
+	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+
+	return UnrealCSharpSetting->IsValidLowLevelFast()
+		       ? UnrealCSharpSetting->GetGameName()
+		       : DEFAULT_GAME_NAME;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetUEProxyPath()
+#if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetGameDirectory()
 {
-	return FPaths::Combine(GetUEPath(), TEXT("Proxy"));
+	return GetFullScriptDirectory() / GetGameName();
 }
 
-FString FUnrealCSharpFunctionLibrary::GetGameProjectName()
+FString FUnrealCSharpFunctionLibrary::GetGameProxyDirectory()
 {
-	return TEXT("Game");
+	return GetGameDirectory() / PROXY_NAME;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetGamePath()
+FString FUnrealCSharpFunctionLibrary::GetGameProjectPath()
 {
-	return FPaths::Combine(GetBasePath(), GetGameProjectName());
+	return GetGameDirectory() / GetGameName() + PROJECT_SUFFIX;
 }
+#endif
 
-FString FUnrealCSharpFunctionLibrary::GetGameProxyPath()
+FString FUnrealCSharpFunctionLibrary::GetBindingDirectory()
 {
-	return FPaths::Combine(GetGamePath(), TEXT("Proxy"));
-}
-
-FString FUnrealCSharpFunctionLibrary::GetBindingPath()
-{
-	return TEXT("Binding");
+	return BINDING_NAME;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetPluginBaseDir()
@@ -430,23 +448,34 @@ FString FUnrealCSharpFunctionLibrary::GetPluginBaseDir()
 	return IPluginManager::Get().FindPlugin(PLUGIN_NAME)->GetBaseDir();
 }
 
-FString FUnrealCSharpFunctionLibrary::GetPluginPath()
+FString FUnrealCSharpFunctionLibrary::GetPluginDirectory()
 {
 	return FPaths::ConvertRelativePathToFull(GetPluginBaseDir());
 }
 
-FString FUnrealCSharpFunctionLibrary::GetUEScriptPath()
+FString FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory()
 {
-	return FPaths::Combine(GetPluginPath(), SCRIPT, GetUEProjectName());
+	return GetPluginDirectory() / PLUGIN_SCRIPT_PATH;
 }
 
 bool FUnrealCSharpFunctionLibrary::IsEngineType(const UField* InField)
 {
-	static auto UEProxyPath = GetUEProxyPath();
+	const auto ModuleName = GetModuleName(InField);
 
-	return GetGenerationPath(InField) == UEProxyPath;
+	if (const auto Module = FModuleManager::Get().GetModule(*ModuleName))
+	{
+		return Module->IsGameModule();
+	}
+
+	if (const auto Plugin = IPluginManager::Get().FindPlugin(ModuleName))
+	{
+		return Plugin->GetType() == EPluginType::Project;
+	}
+
+	return false;
 }
 
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const UField* InField)
 {
 	if (InField == nullptr || InField->GetPackage() == nullptr)
@@ -471,40 +500,86 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 	if (const auto& ProjectModuleList = GetProjectModuleList();
 		ProjectModuleList.Contains(Splits[0]) ||
 		Splits[0] == TEXT("Game") ||
-		(Splits[0] == TEXT("Script") &&
+		(Splits[0] == NAMESPACE_SCRIPT &&
 			ProjectModuleList.Contains(Splits[1])))
 	{
-		static auto GameProxyPath = GetGameProxyPath();
+		static auto GameProxyPath = GetGameProxyDirectory();
 
 		return GameProxyPath;
 	}
 	else
 	{
-		static auto UEProxyPath = GetUEProxyPath();
+		static auto UEProxyPath = GetUEProxyDirectory();
 
 		return UEProxyPath;
 	}
 }
+#endif
 
-FString FUnrealCSharpFunctionLibrary::GetScriptPath()
+FString FUnrealCSharpFunctionLibrary::GetPublishDirectory()
 {
-	return FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectContentDir(), SCRIPT));
+	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+
+	return UnrealCSharpSetting->IsValidLowLevelFast()
+		       ? UnrealCSharpSetting->GetPublishDirectory().Path
+		       : DEFAULT_PUBLISH_DIRECTORY;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectName()
+FString FUnrealCSharpFunctionLibrary::GetFullPublishDirectory()
 {
-	return CODE_ANALYSIS;
+	return FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / GetPublishDirectory());
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFullUEPublishPath()
+{
+	return GetFullPublishDirectory() / GetUEName() + DLL_SUFFIX;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
+{
+	return GetFullPublishDirectory() / GetGameName() + DLL_SUFFIX;
+}
+
+#if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetScriptDirectory()
+{
+	const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
+
+	return UnrealCSharpEditorSetting->IsValidLowLevelFast()
+		       ? UnrealCSharpEditorSetting->GetScriptDirectory().Path
+		       : DEFAULT_SCRIPT_DIRECTORY;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetFullScriptDirectory()
+{
+	return FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / GetScriptDirectory());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath()
 {
-	return FPaths::Combine(GetBasePath(), CODE_ANALYSIS);
+	return GetFullScriptDirectory() / CODE_ANALYSIS_NAME;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectPath()
+{
+	return GetCodeAnalysisCSProjPath() / CODE_ANALYSIS_NAME + PROJECT_SUFFIX;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()
 {
-	return FPaths::Combine(FPaths::ProjectIntermediateDir(), CODE_ANALYSIS);
+	return FPaths::ProjectIntermediateDir() / CODE_ANALYSIS_NAME;
 }
+
+FString FUnrealCSharpFunctionLibrary::GetSourceGeneratorPath()
+{
+	return GetFullScriptDirectory() / SOURCE_GENERATOR_NAME;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
+{
+	return GetFullScriptDirectory() / WEAVERS_NAME;
+}
+#endif
 
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
@@ -582,14 +657,16 @@ TMap<FString, FString> FUnrealCSharpFunctionLibrary::LoadFileToString(const FStr
 	return Result;
 }
 
+#if WITH_EDITOR
 TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
-	static auto UEScriptPath = GetUEScriptPath();
+	static auto UEDirectory = GetPluginScriptDirectory() / DEFAULT_UE_NAME;
 
-	static auto GamePath = GetGamePath();
+	static auto GameDirectory = GetGameDirectory();
 
-	return {UEScriptPath, GamePath};
+	return {UEDirectory, GameDirectory};
 }
+#endif
 
 FString FUnrealCSharpFunctionLibrary::Encode(const FString& InName, const bool bIsNative, const bool bEncodeWideString)
 {

@@ -43,9 +43,11 @@ public class UnrealCSharpEditor : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"MainFrame",
+				"DesktopPlatform",
+				"EditorStyle",
 				"ScriptCodeGenerator",
 				"Compiler",
-				"MainFrame",
 				"UnrealCSharpCore",
 				"CrossVersion"
 				// ... add private dependencies that you statically link with here ...	

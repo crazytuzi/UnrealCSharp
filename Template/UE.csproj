@@ -4,9 +4,9 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>Script</RootNamespace>
-    <OutputPath>..\..\Content\Script</OutputPath>
+    <OutputPath></OutputPath>
     <DebugType>Embedded</DebugType>
-    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <DefineConstants></DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Plugins\UnrealCSharp\Script\UE\**" Exclude="..\..\Plugins\UnrealCSharp\Script\UE\**\*.DS_Store"></Compile>

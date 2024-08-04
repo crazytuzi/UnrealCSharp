@@ -21,6 +21,8 @@
 #include "Dynamic/FDynamicGenerator.h"
 #include "ToolBar/UnrealCSharpPlayToolBar.h"
 #include "ToolBar/UnrealCSharpBlueprintToolBar.h"
+#include "DetailCustomization/GameContentDirectoryPathCustomization.h"
+#include "DetailCustomization/ProjectDirectoryPathCustomization.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 
@@ -33,6 +35,18 @@ void FUnrealCSharpEditorModule::StartupModule()
 	FUnrealCSharpEditorStyle::ReloadTextures();
 
 	FUnrealCSharpEditorCommands::Register();
+
+	auto& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+
+	PropertyEditorModule.RegisterCustomPropertyTypeLayout("GameContentDirectoryPath",
+	                                                      FOnGetPropertyTypeCustomizationInstance::CreateStatic(
+		                                                      &FGameContentDirectoryPathCustomization::MakeInstance));
+
+	PropertyEditorModule.RegisterCustomPropertyTypeLayout("ProjectDirectoryPath",
+	                                                      FOnGetPropertyTypeCustomizationInstance::CreateStatic(
+		                                                      &FProjectDirectoryPathCustomization::MakeInstance));
+
+	PropertyEditorModule.NotifyCustomizationModuleChanged();
 
 	UnrealCSharpPlayToolBar = MakeShared<FUnrealCSharpPlayToolBar>();
 
@@ -91,6 +105,17 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 	FUnrealCSharpEditorStyle::Shutdown();
 
 	FUnrealCSharpEditorCommands::Unregister();
+
+	if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
+	{
+		auto& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+
+		PropertyEditorModule.UnregisterCustomPropertyTypeLayout("GameContentDirectoryPath");
+
+		PropertyEditorModule.UnregisterCustomPropertyTypeLayout("ProjectDirectoryPath");
+
+		PropertyEditorModule.NotifyCustomizationModuleChanged();
+	}
 
 	if (OnPostEngineInitDelegateHandle.IsValid())
 	{

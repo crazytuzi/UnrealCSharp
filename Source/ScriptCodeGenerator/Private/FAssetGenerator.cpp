@@ -117,7 +117,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 	const auto NameSpaceContent = FString::Printf(TEXT(
 		"%s%s"
 	),
-	                                              TEXT("Script"),
+	                                              *NAMESPACE_ROOT,
 	                                              *InAssetData.PackagePath.ToString().Replace(TEXT("/"), TEXT(".")));
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
