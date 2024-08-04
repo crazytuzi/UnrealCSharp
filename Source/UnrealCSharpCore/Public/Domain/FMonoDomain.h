@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "FMonoObjectTypes.h"
 #include "FMonoDomainInitializeParams.h"
 #include "mono/metadata/appdomain.h"
 
@@ -191,6 +192,8 @@ public:
 
 	static MonoMethod* Class_Get_Method_From_Params(MonoClass* InMonoClass, const FString& InMethodName,
 	                                                const TArray<MonoType*>& InParams);
+
+	static MonoMethod* Delegate_Get_Method(MonoObject* InDelegate);
 
 public:
 	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath, void* InUserData);

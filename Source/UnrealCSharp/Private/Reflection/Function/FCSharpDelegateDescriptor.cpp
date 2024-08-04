@@ -8,41 +8,26 @@ FCSharpDelegateDescriptor::FCSharpDelegateDescriptor(UFunction* InFunction):
 {
 }
 
-bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InParams)
+bool FCSharpDelegateDescriptor::CallDelegate(const UObject* InObject, MonoMethod* InMethod, void* InParams)
 {
-	TArray<void*> CSharpParams;
-
-	CSharpParams.Reserve(PropertyDescriptors.Num());
+	const auto CSharpParams = FCSharpEnvironment::GetEnvironment().GetDomain()->Array_New(
+		FCSharpEnvironment::GetEnvironment().GetDomain()->Get_Object_Class(), PropertyDescriptors.Num());
 
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
-		if (PropertyDescriptors[Index]->IsPrimitiveProperty())
+		if (const auto PropertyDescriptor = PropertyDescriptors[Index])
 		{
-			if (OutPropertyIndexes.Contains(Index))
-			{
-				CSharpParams.Add(static_cast<uint8*>(InParams) + PropertyDescriptors[Index]->GetSize());
-			}
-			else
-			{
-				CSharpParams.Add(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams));
+			void* Object = nullptr;
 
-				PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
-				                                CSharpParams[Index]);
-			}
-		}
-		else
-		{
-			CSharpParams.AddZeroed();
+			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(InParams), &Object, false);
 
-			PropertyDescriptors[Index]->Get(PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(InParams),
-			                                &CSharpParams[Index]);
+			ARRAY_SET(CSharpParams, MonoObject*, Index, static_cast<MonoObject*>(Object));
 		}
 	}
 
-	const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Delegate_Invoke(
-		InDelegate, CSharpParams.GetData());
-
-	if (ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
+	if (const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
+			InMethod, FCSharpEnvironment::GetEnvironment().GetObject(InObject), CSharpParams);
+		ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 	{
 		if (ReturnPropertyDescriptor->IsPrimitiveProperty())
 		{
@@ -50,12 +35,13 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 				ReturnValue))
 			{
 				ReturnPropertyDescriptor->Set(UnBoxResultValue,
-				                              static_cast<uint8*>(InParams) + Function->ReturnValueOffset);
+				                              ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(InParams));
 			}
 		}
 		else
 		{
-			ReturnPropertyDescriptor->Set(ReturnValue, static_cast<uint8*>(InParams) + Function->ReturnValueOffset);
+			ReturnPropertyDescriptor->Set(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(ReturnValue),
+			                              ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(InParams));
 		}
 	}
 
@@ -65,16 +51,25 @@ bool FCSharpDelegateDescriptor::CallDelegate(MonoObject* InDelegate, void* InPar
 		{
 			if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
 			{
-				if (!OutPropertyDescriptor->IsPrimitiveProperty())
+				if (OutPropertyDescriptor->IsPrimitiveProperty())
 				{
-					OutPropertyDescriptor->Set(CSharpParams[Index],
-					                           static_cast<uint8*>(InParams) + OutPropertyDescriptor->GetSize());
+					if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
+						Object_Unbox(ARRAY_GET(CSharpParams, MonoObject*, Index)))
+					{
+						OutPropertyDescriptor->Set(UnBoxResultValue,
+						                           OutPropertyDescriptor->ContainerPtrToValuePtr<void>(InParams));
+					}
+				}
+				else
+				{
+					OutPropertyDescriptor->Set(
+						FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+							ARRAY_GET(CSharpParams, MonoObject*, Index)),
+						OutPropertyDescriptor->ContainerPtrToValuePtr<void>(InParams));
 				}
 			}
 		}
 	}
-
-	CSharpParams.Empty();
 
 	return true;
 }
@@ -92,24 +87,21 @@ MonoObject* FCSharpDelegateDescriptor::ProcessDelegate(const FScriptDelegate* In
 
 		PropertyDescriptor->InitializeValue_InContainer(Params);
 
-		if (!OutPropertyIndexes.Contains(Index))
+		if (PropertyDescriptor->IsPrimitiveProperty())
 		{
-			if (PropertyDescriptor->IsPrimitiveProperty())
+			if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
+				ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
 			{
-				if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-					ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
-				{
-					PropertyDescriptor->Set(UnBoxValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
-				}
+				PropertyDescriptor->Set(UnBoxValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 			}
-			else
-			{
-				PropertyDescriptor->Set(
-					*static_cast<FGarbageCollectionHandle*>(
-						FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-							ARRAY_GET(InValue, MonoObject*, ParamIndex++))),
-					PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
-			}
+		}
+		else
+		{
+			PropertyDescriptor->Set(
+				*static_cast<FGarbageCollectionHandle*>(
+					FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
+						ARRAY_GET(InValue, MonoObject*, ParamIndex++))),
+				PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 		}
 	}
 
@@ -177,24 +169,21 @@ MonoObject* FCSharpDelegateDescriptor::ProcessMulticastDelegate(
 
 		PropertyDescriptor->InitializeValue_InContainer(Params);
 
-		if (!OutPropertyIndexes.Contains(Index))
+		if (PropertyDescriptor->IsPrimitiveProperty())
 		{
-			if (PropertyDescriptor->IsPrimitiveProperty())
+			if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
+				ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
 			{
-				if (const auto UnBoxValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-					ARRAY_GET(InValue, MonoObject*, ParamIndex++)))
-				{
-					PropertyDescriptor->Set(UnBoxValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
-				}
+				PropertyDescriptor->Set(UnBoxValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 			}
-			else
-			{
-				PropertyDescriptor->Set(
-					*static_cast<FGarbageCollectionHandle*>(
-						FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-							ARRAY_GET(InValue, MonoObject*, ParamIndex++))),
-					PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
-			}
+		}
+		else
+		{
+			PropertyDescriptor->Set(
+				*static_cast<FGarbageCollectionHandle*>(
+					FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
+						ARRAY_GET(InValue, MonoObject*, ParamIndex++))),
+				PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 		}
 	}
 

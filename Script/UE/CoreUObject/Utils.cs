@@ -29,10 +29,6 @@ namespace Script.CoreUObject
                     ? InType.GetGenericTypeDefinition()
                     : InType;
 
-        private static object MulticastDelegate_GetTarget(Delegate InDelegate) => InDelegate.Target;
-
-        private static bool MulticastDelegate_Equals(Delegate A, Delegate B) => A == B;
-
         private static void SetOut() => Console.SetOut(Log.Log.Create());
 
         private static string GetTraceback()

@@ -1,15 +1,13 @@
 ﻿#include "Reflection/Delegate/DelegateHandler.h"
+#include "Macro/FunctionMacro.h"
 
 void UDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 {
-	if (Function != nullptr && Function->GetName() == TEXT("CSharpCallBack"))
+	if (Function != nullptr && Function->GetName() == FUNCTION_CSHARP_CALLBACK)
 	{
 		if (DelegateDescriptor != nullptr)
 		{
-			if (const auto Delegate = static_cast<MonoObject*>(DelegateGarbageCollectionHandle))
-			{
-				DelegateDescriptor->CallDelegate(Delegate, Parms);
-			}
+			DelegateDescriptor->CallDelegate(DelegateWrapper.Object.Get(), DelegateWrapper.Method, Parms);
 		}
 	}
 	else
@@ -33,11 +31,6 @@ void UDelegateHandler::Initialize(FScriptDelegate* InScriptDelegate, UFunction* 
 
 void UDelegateHandler::Deinitialize()
 {
-	if (DelegateGarbageCollectionHandle.IsValid())
-	{
-		FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
-	}
-
 	if (ScriptDelegate != nullptr)
 	{
 		if (bNeedFree)
@@ -58,17 +51,17 @@ void UDelegateHandler::Deinitialize()
 	}
 }
 
-void UDelegateHandler::Bind(MonoObject* InDelegate)
+void UDelegateHandler::Bind(UObject* InObject, MonoMethod* InMonoMethod)
 {
 	if (ScriptDelegate != nullptr)
 	{
 		if (!ScriptDelegate->IsBound())
 		{
-			ScriptDelegate->BindUFunction(this, TEXT("CSharpCallBack"));
+			ScriptDelegate->BindUFunction(this, *FUNCTION_CSHARP_CALLBACK);
 		}
 	}
 
-	DelegateGarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InDelegate, true);
+	DelegateWrapper = {InObject, InMonoMethod};
 }
 
 bool UDelegateHandler::IsBound() const
@@ -76,29 +69,19 @@ bool UDelegateHandler::IsBound() const
 	return ScriptDelegate != nullptr ? ScriptDelegate->IsBound() : false;
 }
 
-void UDelegateHandler::UnBind()
+void UDelegateHandler::UnBind() const
 {
 	if (ScriptDelegate != nullptr)
 	{
 		ScriptDelegate->Unbind();
 	}
-
-	if (DelegateGarbageCollectionHandle.IsValid())
-	{
-		FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
-	}
 }
 
-void UDelegateHandler::Clear()
+void UDelegateHandler::Clear() const
 {
 	if (ScriptDelegate != nullptr)
 	{
 		ScriptDelegate->Clear();
-	}
-
-	if (DelegateGarbageCollectionHandle.IsValid())
-	{
-		FGarbageCollectionHandle::Free<true>(DelegateGarbageCollectionHandle);
 	}
 }
 
@@ -130,5 +113,5 @@ FName UDelegateHandler::GetFunctionName() const
 
 UFunction* UDelegateHandler::GetCallBack() const
 {
-	return FindFunction(TEXT("CSharpCallBack"));
+	return FindFunction(*FUNCTION_CSHARP_CALLBACK);
 }

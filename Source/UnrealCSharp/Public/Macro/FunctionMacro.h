@@ -1,12 +1,10 @@
 ﻿#pragma once
 
+#define FUNCTION_CSHARP_CALLBACK FString(TEXT("CSharpCallBack"))
+
 #define FUNCTION_UTILS_IS_OVERRIDE_TYPE FString(TEXT("IsOverrideType"))
 
 #define FUNCTION_UTILS_IS_OVERRIDE_METHOD FString(TEXT("IsOverrideMethod"))
-
-#define FUNCTION_UTILS_MULTICAST_DELEGATE_GET_TARGET FString(TEXT("MulticastDelegate_GetTarget"))
-
-#define FUNCTION_UTILS_MULTICAST_DELEGATE_EQUALS FString(TEXT("MulticastDelegate_Equals"))
 
 #define FUNCTION_UTILS_GET_TRACEBACK FString(TEXT("GetTraceback"))
 

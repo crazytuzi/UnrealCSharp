@@ -20,15 +20,15 @@ public:
 public:
 	bool IsBound() const;
 
-	bool Contains(MonoObject* InMulticastDelegate) const;
+	bool Contains(UObject* InObject, MonoMethod* InMonoMethod) const;
 
-	void Add(MonoObject* InMulticastDelegate) const;
+	void Add(UObject* InObject, MonoMethod* InMonoMethod) const;
 
-	void AddUnique(MonoObject* InMulticastDelegate) const;
+	void AddUnique(UObject* InObject, MonoMethod* InMonoMethod) const;
 
-	void Remove(MonoObject* InMulticastDelegate) const;
+	void Remove(UObject* InObject, MonoMethod* InMonoMethod) const;
 
-	void RemoveAll(MonoObject* InObject) const;
+	void RemoveAll(UObject* InObject) const;
 
 	void Clear() const;
 

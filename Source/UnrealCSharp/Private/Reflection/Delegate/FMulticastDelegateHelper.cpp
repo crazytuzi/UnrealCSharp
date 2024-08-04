@@ -45,36 +45,36 @@ bool FMulticastDelegateHelper::IsBound() const
 	return MulticastDelegateHandler != nullptr ? MulticastDelegateHandler->IsBound() : false;
 }
 
-bool FMulticastDelegateHelper::Contains(MonoObject* InMulticastDelegate) const
+bool FMulticastDelegateHelper::Contains(UObject* InObject, MonoMethod* InMonoMethod) const
 {
-	return MulticastDelegateHandler != nullptr ? MulticastDelegateHandler->Contains(InMulticastDelegate) : false;
+	return MulticastDelegateHandler != nullptr ? MulticastDelegateHandler->Contains(InObject, InMonoMethod) : false;
 }
 
-void FMulticastDelegateHelper::Add(MonoObject* InMulticastDelegate) const
-{
-	if (MulticastDelegateHandler != nullptr)
-	{
-		MulticastDelegateHandler->Add(InMulticastDelegate);
-	}
-}
-
-void FMulticastDelegateHelper::AddUnique(MonoObject* InMulticastDelegate) const
+void FMulticastDelegateHelper::Add(UObject* InObject, MonoMethod* InMonoMethod) const
 {
 	if (MulticastDelegateHandler != nullptr)
 	{
-		MulticastDelegateHandler->AddUnique(InMulticastDelegate);
+		MulticastDelegateHandler->Add(InObject, InMonoMethod);
 	}
 }
 
-void FMulticastDelegateHelper::Remove(MonoObject* InMulticastDelegate) const
+void FMulticastDelegateHelper::AddUnique(UObject* InObject, MonoMethod* InMonoMethod) const
 {
 	if (MulticastDelegateHandler != nullptr)
 	{
-		MulticastDelegateHandler->Remove(InMulticastDelegate);
+		MulticastDelegateHandler->AddUnique(InObject, InMonoMethod);
 	}
 }
 
-void FMulticastDelegateHelper::RemoveAll(MonoObject* InObject) const
+void FMulticastDelegateHelper::Remove(UObject* InObject, MonoMethod* InMonoMethod) const
+{
+	if (MulticastDelegateHandler != nullptr)
+	{
+		MulticastDelegateHandler->Remove(InObject, InMonoMethod);
+	}
+}
+
+void FMulticastDelegateHelper::RemoveAll(UObject* InObject) const
 {
 	if (MulticastDelegateHandler != nullptr)
 	{

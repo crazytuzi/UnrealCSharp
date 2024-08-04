@@ -13,7 +13,8 @@ namespace Script.Library
         public static extern void FDelegate_UnRegisterImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_BindImplementation<T>(nint InMonoObject, T InDelegate) where T : Delegate;
+        public static extern void FDelegate_BindImplementation<T>(nint InMonoObject, nint InObject, T InDelegate)
+            where T : Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool FDelegate_IsBoundImplementation(nint InMonoObject);

@@ -8,37 +8,33 @@ namespace Script.CoreUObject
         public bool IsBound() =>
             FMulticastDelegateImplementation.FMulticastDelegate_IsBoundImplementation(GarbageCollectionHandle);
 
-        public bool Contains(UObject _, T InDelegate) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(GarbageCollectionHandle,
-                InDelegate);
-
         public bool Contains(T InDelegate) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(GarbageCollectionHandle,
+            FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(
+                GarbageCollectionHandle,
+                (InDelegate.Target as UObject)?.GarbageCollectionHandle ?? nint.Zero,
                 InDelegate);
-
-        public void Add(UObject _, T InDelegate) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(GarbageCollectionHandle, InDelegate);
 
         public void Add(T InDelegate) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(GarbageCollectionHandle, InDelegate);
-
-        public void AddUnique(UObject _, T InDelegate) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(GarbageCollectionHandle,
+            FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(
+                GarbageCollectionHandle,
+                (InDelegate.Target as UObject)?.GarbageCollectionHandle ?? nint.Zero,
                 InDelegate);
 
         public void AddUnique(T InDelegate) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(GarbageCollectionHandle,
+            FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(
+                GarbageCollectionHandle,
+                (InDelegate.Target as UObject)?.GarbageCollectionHandle ?? nint.Zero,
                 InDelegate);
 
-        public void Remove(UObject _, T InDelegate) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(GarbageCollectionHandle, InDelegate);
-
         public void Remove(T InDelegate) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(GarbageCollectionHandle, InDelegate);
+            FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(
+                GarbageCollectionHandle,
+                (InDelegate.Target as UObject)?.GarbageCollectionHandle ?? nint.Zero,
+                InDelegate);
 
         public void RemoveAll(UObject InObject) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_RemoveAllImplementation(GarbageCollectionHandle,
-                InObject);
+            FMulticastDelegateImplementation.FMulticastDelegate_RemoveAllImplementation(
+                GarbageCollectionHandle, InObject.GarbageCollectionHandle);
 
         public void Clear() =>
             FMulticastDelegateImplementation.FMulticastDelegate_ClearImplementation(GarbageCollectionHandle);

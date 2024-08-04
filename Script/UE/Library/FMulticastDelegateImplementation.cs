@@ -16,23 +16,23 @@ namespace Script.Library
         public static extern bool FMulticastDelegate_IsBoundImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FMulticastDelegate_ContainsImplementation<T>(nint InMonoObject, T InMulticastDelegate)
-            where T : Delegate;
+        public static extern bool FMulticastDelegate_ContainsImplementation<T>(nint InMonoObject, nint InObject,
+            T InMulticastDelegate) where T : Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_AddImplementation<T>(nint InMonoObject, T InMulticastDelegate)
-            where T : Delegate;
+        public static extern void FMulticastDelegate_AddImplementation<T>(nint InMonoObject, nint InObject,
+            T InMulticastDelegate) where T : Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_AddUniqueImplementation<T>(nint InMonoObject, T InMulticastDelegate)
-            where T : Delegate;
+        public static extern void FMulticastDelegate_AddUniqueImplementation<T>(nint InMonoObject, nint InObject,
+            T InMulticastDelegate) where T : Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_RemoveImplementation<T>(nint InMonoObject, T InMulticastDelegate)
-            where T : Delegate;
+        public static extern void FMulticastDelegate_RemoveImplementation<T>(nint InMonoObject, nint InObject,
+            T InMulticastDelegate) where T : Delegate;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_RemoveAllImplementation(nint InMonoObject, UObject InObject);
+        public static extern void FMulticastDelegate_RemoveAllImplementation(nint InMonoObject, nint InObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FMulticastDelegate_ClearImplementation(nint InMonoObject);

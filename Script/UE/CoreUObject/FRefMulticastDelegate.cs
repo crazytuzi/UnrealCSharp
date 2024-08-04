@@ -8,8 +8,8 @@ namespace Script.CoreUObject
             FMulticastDelegateImplementation.FMulticastDelegate_IsBoundImplementation(GarbageCollectionHandle);
 
         public void RemoveAll(UObject InObject) =>
-            FMulticastDelegateImplementation.FMulticastDelegate_RemoveAllImplementation(GarbageCollectionHandle,
-                InObject);
+            FMulticastDelegateImplementation.FMulticastDelegate_RemoveAllImplementation(
+                GarbageCollectionHandle, InObject.GarbageCollectionHandle);
 
         public void Clear() =>
             FMulticastDelegateImplementation.FMulticastDelegate_ClearImplementation(GarbageCollectionHandle);

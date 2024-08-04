@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "FDelegateWrapper.h"
 #include "Reflection/Function/FCSharpDelegateDescriptor.h"
-#include "GarbageCollection/FGarbageCollectionHandle.h"
 #include "MulticastDelegateHandler.generated.h"
 
 /**
@@ -30,15 +30,15 @@ public:
 public:
 	bool IsBound() const;
 
-	bool Contains(MonoObject* InMulticastDelegate) const;
+	bool Contains(UObject* InObject, MonoMethod* InMonoMethod) const;
 
-	void Add(MonoObject* InMulticastDelegate);
+	void Add(UObject* InObject, MonoMethod* InMonoMethod);
 
-	void AddUnique(MonoObject* InMulticastDelegate);
+	void AddUnique(UObject* InObject, MonoMethod* InMonoMethod);
 
-	void Remove(MonoObject* InMulticastDelegate);
+	void Remove(UObject* InObject, MonoMethod* InMonoMethod);
 
-	void RemoveAll(MonoObject* InObject);
+	void RemoveAll(UObject* InObject);
 
 	void Clear();
 
@@ -59,5 +59,5 @@ private:
 
 	FScriptDelegate ScriptDelegate;
 
-	TArray<FGarbageCollectionHandle> DelegateGarbageCollectionHandles;
+	TArray<FDelegateWrapper> DelegateWrappers;
 };

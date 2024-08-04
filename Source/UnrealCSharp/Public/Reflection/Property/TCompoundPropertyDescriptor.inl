@@ -17,6 +17,7 @@ public:
 
 	virtual auto Get(void* Src, void* Dest) const -> void override
 	{
+		Get(Src, static_cast<void**>(Dest), false);
 	}
 
 	auto CopyValue(const void* InAddress) const

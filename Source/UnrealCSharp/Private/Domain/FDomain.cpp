@@ -495,7 +495,7 @@ void FDomain::StaticClassSingleton_Reset(MonoClass* InMonoClass)
 {
 	void* InParams[] = {nullptr};
 
-	if (const auto FoundProperty = Class_Get_Property_From_Name(InMonoClass, STATIC_CLASS_SINGLETON))
+	if (const auto FoundProperty = Class_Get_Property_From_Name(InMonoClass, PROPERTY_STATIC_CLASS_SINGLETON))
 	{
 		Property_Set_Value(FoundProperty, nullptr, InParams, nullptr);
 	}
@@ -505,7 +505,7 @@ void FDomain::StaticStructSingleton_Reset(MonoClass* InMonoClass)
 {
 	void* InParams[] = {nullptr};
 
-	if (const auto FoundProperty = Class_Get_Property_From_Name(InMonoClass, STATIC_STRUCT_SINGLETON))
+	if (const auto FoundProperty = Class_Get_Property_From_Name(InMonoClass, PROPERTY_STATIC_STRUCT_SINGLETON))
 	{
 		Property_Set_Value(FoundProperty, nullptr, InParams, nullptr);
 	}
@@ -525,6 +525,11 @@ MonoClassField* FDomain::Self_Class_Get_Field_From_Name(MonoClass* InMonoClass, 
 MonoType* FDomain::Property_Get_Type(MonoProperty* InMonoProperty) const
 {
 	return FMonoDomain::Property_Get_Type(InMonoProperty);
+}
+
+MonoMethod* FDomain::Delegate_Get_Method(MonoObject* InDelegate) const
+{
+	return FMonoDomain::Delegate_Get_Method(InDelegate);
 }
 
 void* FDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
