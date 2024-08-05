@@ -167,21 +167,24 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
 	{
-		if (UnrealCSharpEditorSetting->EnableCompiled())
+		if (UnrealCSharpEditorSetting->IsValidLowLevelFast())
 		{
-			bIsCompiling = true;
+			if (UnrealCSharpEditorSetting->EnableCompiled())
+			{
+				bIsCompiling = true;
 
-			Compile();
+				Compile();
 
-			const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
-				InFunction,
-				TStatId(),
-				nullptr,
-				ENamedThreads::GameThread);
+				const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
+					InFunction,
+					TStatId(),
+					nullptr,
+					ENamedThreads::GameThread);
 
-			FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
+				FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
 
-			bIsCompiling = false;
+				bIsCompiling = false;
+			}
 		}
 	}
 }

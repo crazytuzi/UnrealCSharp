@@ -28,6 +28,10 @@ public:
 	static void SetFunctionFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 #if WITH_EDITOR
+	static void SetMetaData(FField* InField, const FString& InAttribute, const FString& InValue);
+
+	static void SetMetaData(UField* InField, const FString& InAttribute, const FString& InValue);
+
 	static void SetMetaData(MonoClass* InMonoClass, const FString& InAttribute,
 	                        const TFunction<void(MonoCustomAttrInfo*)>& InSetMetaData);
 

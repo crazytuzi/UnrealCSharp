@@ -45,7 +45,6 @@ TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
 
 TArray<FString> FDynamicGeneratorCore::StructMetaDataAttrs =
 {
-	CLASS_BLUEPRINT_TYPE_ATTRIBUTE,
 	CLASS_HAS_NATIVE_BREAK_ATTRIBUTE,
 	CLASS_HAS_NATIVE_MAKE_ATTRIBUTE,
 	CLASS_HIDDEN_BY_DEFAULT_ATTRIBUTE,
@@ -54,18 +53,12 @@ TArray<FString> FDynamicGeneratorCore::StructMetaDataAttrs =
 
 TArray<FString> FDynamicGeneratorCore::EnumMetaDataAttrs =
 {
-	CLASS_BLUEPRINT_TYPE_ATTRIBUTE,
 	CLASS_BITFLAGS_ATTRIBUTE,
 	CLASS_USE_ENUM_VALUES_AS_MASK_VALUES_IN_EDITOR
 };
 
 TArray<FString> FDynamicGeneratorCore::InterfaceMetaDataAttrs =
 {
-	CLASS_MINIMAL_API_ATTRIBUTE,
-	CLASS_BLUEPRINT_TYPE_ATTRIBUTE,
-	CLASS_BLUEPRINTABLE_ATTRIBUTE,
-	CLASS_NOT_BLUEPRINTABLE_ATTRIBUTE,
-	CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE,
 	CLASS_CONVERSION_ROOT_ATTRIBUTE,
 	CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE
 };
@@ -772,10 +765,20 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 #endif
 }
 
+void FDynamicGeneratorCore::SetMetaData(FField* InField, const FString& InAttribute, const FString& InValue)
+{
+	InField->SetMetaData(*InAttribute.LeftChop(9), *InValue);
+}
+
+void FDynamicGeneratorCore::SetMetaData(UField* InField, const FString& InAttribute, const FString& InValue)
+{
+	InField->SetMetaData(*InAttribute.LeftChop(9), *InValue);
+}
+
 #if WITH_EDITOR
 template <typename T>
 static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
-                             MonoCustomAttrInfo* InMonoCustomAttrInfo)
+                             MonoCustomAttrInfo* InMonoCustomAttrInfo, const TFunction<void()>& InSetMetaData)
 {
 	for (const auto& MetaDataAttr : InMetaDataAttrs)
 	{
@@ -790,11 +793,13 @@ static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
 
 			const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
 
-			InField->SetMetaData(*MetaDataAttr.LeftChop(9),
-			                     *FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(
-				                     FMonoDomain::Object_To_String(Value, nullptr)))));
+			FDynamicGeneratorCore::SetMetaData(InField, MetaDataAttr,
+			                                   FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(
+				                                   FMonoDomain::Object_To_String(Value,nullptr)))));
 		}
 	}
+
+	InSetMetaData();
 }
 
 void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, const FString& InAttribute,
@@ -826,7 +831,25 @@ void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UClass* InClass,
 		                             InClass->IsChildOf(UInterface::StaticClass())
 			                             ? InterfaceMetaDataAttrs
 			                             : ClassMetaDataAttrs,
-		                             InMonoCustomAttrInfo);
+		                             InMonoCustomAttrInfo, [InClass, InMonoCustomAttrInfo]()
+		                             {
+			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_MINIMAL_API_ATTRIBUTE))
+			                             {
+				                             SetMetaData(InClass, CLASS_MINIMAL_API_ATTRIBUTE, TEXT("true"));
+			                             }
+
+			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+			                             {
+				                             SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+			                             }
+
+			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINTABLE_ATTRIBUTE))
+			                             {
+				                             SetMetaData(InClass, CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE, TEXT("true"));
+
+				                             SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+			                             }
+		                             });
 	            });
 }
 
@@ -841,7 +864,14 @@ void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UScriptStruct* I
 	SetMetaData(InMonoClass, InAttribute,
 	            [InScriptStruct](MonoCustomAttrInfo* InMonoCustomAttrInfo)
 	            {
-		            SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo);
+		            SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo,
+		                             [InScriptStruct, InMonoCustomAttrInfo]()
+		                             {
+			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+			                             {
+				                             SetMetaData(InScriptStruct, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+			                             }
+		                             });
 	            });
 }
 
@@ -855,18 +885,29 @@ void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UEnum* InEnum, c
 	SetMetaData(InMonoClass, InAttribute,
 	            [InEnum](MonoCustomAttrInfo* InMonoCustomAttrInfo)
 	            {
-		            SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo);
+		            SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo,
+		                             [InEnum, InMonoCustomAttrInfo]()
+		                             {
+			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+			                             {
+				                             SetMetaData(InEnum, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+			                             }
+		                             });
 	            });
 }
 
 void FDynamicGeneratorCore::SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
-	SetFieldMetaData(InProperty, PropertyMetaDataAttrs, InMonoCustomAttrInfo);
+	SetFieldMetaData(InProperty, PropertyMetaDataAttrs, InMonoCustomAttrInfo, []()
+	{
+	});
 }
 
 void FDynamicGeneratorCore::SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
-	SetFieldMetaData(InFunction, FunctionMetaDataAttrs, InMonoCustomAttrInfo);
+	SetFieldMetaData(InFunction, FunctionMetaDataAttrs, InMonoCustomAttrInfo, []()
+	{
+	});
 }
 #endif
 
