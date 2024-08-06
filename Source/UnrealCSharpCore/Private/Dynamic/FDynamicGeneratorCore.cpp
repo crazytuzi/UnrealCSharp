@@ -765,6 +765,7 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 #endif
 }
 
+#if WITH_EDITOR
 void FDynamicGeneratorCore::SetMetaData(FField* InField, const FString& InAttribute, const FString& InValue)
 {
 	InField->SetMetaData(*InAttribute.LeftChop(9), *InValue);
@@ -775,7 +776,6 @@ void FDynamicGeneratorCore::SetMetaData(UField* InField, const FString& InAttrib
 	InField->SetMetaData(*InAttribute.LeftChop(9), *InValue);
 }
 
-#if WITH_EDITOR
 template <typename T>
 static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
                              MonoCustomAttrInfo* InMonoCustomAttrInfo, const TFunction<void()>& InSetMetaData)
