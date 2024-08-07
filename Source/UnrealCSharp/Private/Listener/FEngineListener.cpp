@@ -34,7 +34,6 @@ FEngineListener::~FEngineListener()
 	{
 		FEditorDelegates::CancelPIE.Remove(OnCancelPIEDelegateHandle);
 	}
-
 #else
 	if (OnPostEngineInitHandle.IsValid())
 	{

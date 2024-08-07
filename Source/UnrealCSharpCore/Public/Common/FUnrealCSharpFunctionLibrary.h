@@ -110,6 +110,8 @@ public:
 	static FString GetWeaversPath();
 #endif
 
+	static class UAssemblyLoader* GetAssemblyLoader();
+
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
 
 	static TMap<FString, TArray<FString>> LoadFileToArray(const FString& InFileName);

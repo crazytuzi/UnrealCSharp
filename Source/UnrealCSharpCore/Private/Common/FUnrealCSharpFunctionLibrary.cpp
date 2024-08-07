@@ -3,6 +3,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
+#include "Domain/AssemblyLoader.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Interfaces/IPluginManager.h"
@@ -580,6 +581,15 @@ FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
 	return GetFullScriptDirectory() / WEAVERS_NAME;
 }
 #endif
+
+UAssemblyLoader* FUnrealCSharpFunctionLibrary::GetAssemblyLoader()
+{
+	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+
+	return UnrealCSharpSetting->IsValidLowLevelFast()
+		       ? UnrealCSharpSetting->GetAssemblyLoader().GetDefaultObject()
+		       : nullptr;
+}
 
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
