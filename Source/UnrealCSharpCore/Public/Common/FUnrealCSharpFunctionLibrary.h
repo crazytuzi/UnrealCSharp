@@ -68,6 +68,8 @@ public:
 	static FString GetGameProxyDirectory();
 
 	static FString GetGameProjectPath();
+
+	static FString GetGameProjectPropsPath();
 #endif
 
 	static FString GetBindingDirectory();

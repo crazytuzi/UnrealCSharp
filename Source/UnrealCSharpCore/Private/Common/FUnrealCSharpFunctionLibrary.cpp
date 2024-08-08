@@ -437,6 +437,11 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPath()
 {
 	return GetGameDirectory() / GetGameName() + PROJECT_SUFFIX;
 }
+
+FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
+{
+	return GetGameDirectory() / GetGameName() + PROJECT_PROPS_SUFFIX;
+}
 #endif
 
 FString FUnrealCSharpFunctionLibrary::GetBindingDirectory()
