@@ -251,7 +251,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		SuperClassContent = TEXT("FRefDelegate");
 
 		BindFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic void Bind(Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, (InDelegate.Target as UObject)?.%s ?? nint.Zero, InDelegate);\n"
+			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, InObject.%s, InDelegate);\n"
 		),
 		                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE
@@ -604,28 +604,28 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		SuperClassContent = TEXT("FRefMulticastDelegate");
 
 		ContainsFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic bool Contains(Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, (InDelegate.Target as UObject)?.%s ?? nint.Zero, InDelegate);\n"
+			"\t\tpublic bool Contains(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, InObject.%s, InDelegate);\n"
 		),
 		                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
 		AddFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic void Add(Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, (InDelegate.Target as UObject)?.%s ?? nint.Zero, InDelegate);\n"
+			"\t\tpublic void Add(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, InObject.%s, InDelegate);\n"
 		),
 		                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
 		AddUniqueFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic void AddUnique(Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, (InDelegate.Target as UObject)?.%s ?? nint.Zero, InDelegate);\n"
+			"\t\tpublic void AddUnique(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, InObject.%s, InDelegate);\n"
 		),
 		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
 		RemoveFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic void Remove(Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, (InDelegate.Target as UObject)?.%s ?? nint.Zero, InDelegate);\n"
+			"\t\tpublic void Remove(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, InObject.%s, InDelegate);\n"
 		),
 		                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE

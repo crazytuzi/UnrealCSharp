@@ -29,8 +29,11 @@ namespace
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InGarbageCollectionHandle))
 			{
-				DelegateHelper->Bind(FCSharpEnvironment::GetEnvironment().GetObject(InObject),
-				                     FCSharpEnvironment::GetEnvironment().GetDomain()->Delegate_Get_Method(InDelegate));
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					DelegateHelper->Bind(FoundObject, FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                     Delegate_Get_Method(InDelegate));
+				}
 			}
 		}
 

@@ -40,9 +40,12 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->Contains(FCSharpEnvironment::GetEnvironment().GetObject(InObject),
-				                                         FCSharpEnvironment::GetEnvironment().GetDomain()->
-				                                         Delegate_Get_Method(InDelegate));
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					return MulticastDelegateHelper->Contains(FoundObject,
+					                                         FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                                         Delegate_Get_Method(InDelegate));
+				}
 			}
 
 			return false;
@@ -54,9 +57,12 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Add(FCSharpEnvironment::GetEnvironment().GetObject(InObject),
-				                             FCSharpEnvironment::GetEnvironment().GetDomain()->
-				                             Delegate_Get_Method(InDelegate));
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					MulticastDelegateHelper->Add(FoundObject,
+					                             FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                             Delegate_Get_Method(InDelegate));
+				}
 			}
 		}
 
@@ -66,9 +72,12 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->AddUnique(FCSharpEnvironment::GetEnvironment().GetObject(InObject),
-				                                   FCSharpEnvironment::GetEnvironment().GetDomain()->
-				                                   Delegate_Get_Method(InDelegate));
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					MulticastDelegateHelper->AddUnique(FoundObject,
+					                                   FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                                   Delegate_Get_Method(InDelegate));
+				}
 			}
 		}
 
@@ -78,9 +87,12 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Remove(FCSharpEnvironment::GetEnvironment().GetObject(InObject),
-				                                FCSharpEnvironment::GetEnvironment().GetDomain()->
-				                                Delegate_Get_Method(InDelegate));
+				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+				{
+					MulticastDelegateHelper->Remove(FoundObject,
+					                                FCSharpEnvironment::GetEnvironment().GetDomain()->
+					                                Delegate_Get_Method(InDelegate));
+				}
 			}
 		}
 

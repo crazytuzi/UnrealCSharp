@@ -25,12 +25,8 @@ bool FCSharpDelegateDescriptor::CallDelegate(const UObject* InObject, MonoMethod
 		}
 	}
 
-	const auto FoundMonoObject = InObject != nullptr
-		                             ? FCSharpEnvironment::GetEnvironment().GetObject(InObject)
-		                             : (MonoObject*)InMethod;
-
 	if (const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
-			InMethod, FoundMonoObject, CSharpParams);
+			InMethod, FCSharpEnvironment::GetEnvironment().GetObject(InObject), CSharpParams);
 		ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 	{
 		if (ReturnPropertyDescriptor->IsPrimitiveProperty())
