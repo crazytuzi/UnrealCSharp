@@ -5,6 +5,7 @@
 #include "UnrealCSharpEditorCommands.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/NamespaceMacro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 
 #define LOCTEXT_NAMESPACE "UnrealCSharpBlueprintToolBar"
@@ -82,8 +83,8 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 			if (Blueprint.IsValid())
 			{
 				const auto Content = FString::Printf(TEXT(
-					"using Script.CoreUObject;\n"
-					"using Script.Engine;\n\n"
+					"using %s;\n"
+					"using %s;\n\n"
 					"namespace %s\n"
 					"{\n"
 					"\t[Override]\n"
@@ -105,6 +106,8 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 					"\t}\n"
 					"}"
 				),
+				                                     *COMBINE_NAMESPACE(NAMESPACE_SCRIPT, FString(TEXT("CoreUObject"))),
+				                                     *COMBINE_NAMESPACE(NAMESPACE_SCRIPT, FString(TEXT("Engine"))),
 				                                     *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
 					                                     Blueprint->GeneratedClass),
 				                                     *FUnrealCSharpFunctionLibrary::GetFullClass(
@@ -233,9 +236,9 @@ FString FUnrealCSharpBlueprintToolBar::GetFileName() const
 	{
 		auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(Blueprint->GeneratedClass);
 
-		auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGamePath(), ModuleName);
+		auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameDirectory(), ModuleName);
 
-		return FPaths::Combine(DirectoryName, Blueprint->GeneratedClass->GetName()) + TEXT(".cs");
+		return FPaths::Combine(DirectoryName, Blueprint->GeneratedClass->GetName()) + CSHARP_SUFFIX;
 	}
 
 	return {};

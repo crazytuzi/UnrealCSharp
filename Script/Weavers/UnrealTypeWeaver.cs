@@ -83,9 +83,7 @@ namespace Weavers
 
         public override IEnumerable<string> GetAssembliesForScanning()
         {
-            yield return "UE";
-
-            yield return "Game";
+            yield return "";
         }
 
         private void ProcessStructRegister(TypeDefinition Type)
@@ -942,9 +940,9 @@ namespace Weavers
         {
             var definition = ModuleDefinition;
 
-            if (definition.Name != "UE.dll")
+            if (definition.Name != "")
             {
-                definition = ModuleDefinition.ReadModule("../../Content/Script/UE.dll");
+                definition = ModuleDefinition.ReadModule("");
             }
 
             _pathAttributeType = definition.GetType("Script.CoreUObject.PathNameAttribute");

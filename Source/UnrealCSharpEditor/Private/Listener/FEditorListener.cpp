@@ -7,6 +7,7 @@
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "CoreMacro/Macro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
@@ -133,16 +134,16 @@ void FEditorListener::OnBeginGenerator()
 {
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
-	auto BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameProxyPath(),
-	                                   FUnrealCSharpFunctionLibrary::GetBindingPath());
+	auto BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(),
+	                                   FUnrealCSharpFunctionLibrary::GetBindingDirectory());
 
 	if (PlatformFile.DirectoryExists(*BindingPath))
 	{
 		PlatformFile.DeleteDirectoryRecursively(*BindingPath);
 	}
 
-	BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetUEProxyPath(),
-	                              FUnrealCSharpFunctionLibrary::GetBindingPath());
+	BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(),
+	                              FUnrealCSharpFunctionLibrary::GetBindingDirectory());
 
 	if (PlatformFile.DirectoryExists(*BindingPath))
 	{
@@ -238,7 +239,7 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 			{
 				static auto IgnoreDirectories = TArray<FString>
 				{
-					TEXT("Proxy"),
+					PROXY_NAME,
 					TEXT("obj")
 				};
 

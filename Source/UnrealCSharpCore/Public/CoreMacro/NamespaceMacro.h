@@ -4,6 +4,8 @@
 
 #define NAMESPACE_ROOT FString(TEXT("Script"))
 
+#define NAMESPACE_SCRIPT FString(TEXT("Script"))
+
 #define NAMESPACE_SYSTEM FString(TEXT("System"))
 
 #define NAMESPACE_LIBRARY FString(TEXT("Library"))

@@ -730,7 +730,7 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 #if WITH_EDITOR
 	auto Path = FString::Printf(TEXT(
 		"%s/Source/ThirdParty/Mono/lib/%s/%s/net"),
-	                            *FUnrealCSharpFunctionLibrary::GetPluginPath(),
+	                            *FUnrealCSharpFunctionLibrary::GetPluginDirectory(),
 	                            MONO_CONFIGURATION,
 #if PLATFORM_WINDOWS
 	                            TEXT("Win64")

@@ -1,6 +1,5 @@
 ﻿#include "Dynamic/FDynamicGenerator.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "CoreMacro/Macro.h"
 #include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicEnumGenerator.h"
 #include "Dynamic/FDynamicStructGenerator.h"
@@ -23,10 +22,8 @@ void FDynamicGenerator::Generator()
 		FMonoDomain::Initialize({
 			"",
 			{
-				FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
-				DLL_SUFFIX,
-				FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
-				DLL_SUFFIX
+				FUnrealCSharpFunctionLibrary::GetFullUEPublishPath(),
+				FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
 			}
 		});
 	}
@@ -80,10 +77,8 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 	FMonoDomain::Initialize({
 		"",
 		{
-			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
-			DLL_SUFFIX,
-			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
-			DLL_SUFFIX
+			FUnrealCSharpFunctionLibrary::GetFullUEPublishPath(),
+			FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
 		}
 	});
 

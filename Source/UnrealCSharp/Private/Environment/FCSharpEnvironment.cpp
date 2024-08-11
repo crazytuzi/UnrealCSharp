@@ -3,7 +3,6 @@
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FBindingRegistry.h"
 #include "Registry/FCSharpBind.h"
-#include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
@@ -47,10 +46,8 @@ void FCSharpEnvironment::Initialize()
 	Domain = new FDomain({
 		"",
 		{
-			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetUEProjectName() +
-			DLL_SUFFIX,
-			FUnrealCSharpFunctionLibrary::GetScriptPath() / FUnrealCSharpFunctionLibrary::GetGameProjectName() +
-			DLL_SUFFIX
+			FUnrealCSharpFunctionLibrary::GetFullUEPublishPath(),
+			FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
 		}
 	});
 

@@ -15,7 +15,7 @@ void FCodeAnalysis::Analysis(const FString& InFile)
 	                                     FString::Printf(TEXT(
 		                                     "%s%s"
 	                                     ),
-	                                                     *CODE_ANALYSIS,
+	                                                     *CODE_ANALYSIS_NAME,
 #if PLATFORM_WINDOWS
 	                                                     TEXT(".exe")
 #else
@@ -75,13 +75,10 @@ void FCodeAnalysis::Compile()
 {
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-	const auto CodeAnalysisPath = FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath();
-
 	const auto CompileParam = FString::Printf(TEXT(
-		"build \"%s/%s.csproj\" --nologo -c Debug"
+		"build \"%s\" --nologo -c Debug"
 	),
-	                                          *CodeAnalysisPath,
-	                                          *CODE_ANALYSIS
+	                                          *FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectPath()
 	);
 
 	void* ReadPipe = nullptr;
@@ -138,7 +135,7 @@ void FCodeAnalysis::Analysis()
 	                                     FString::Printf(TEXT(
 		                                     "%s%s"
 	                                     ),
-	                                                     *CODE_ANALYSIS,
+	                                                     *CODE_ANALYSIS_NAME,
 #if PLATFORM_WINDOWS
 	                                                     TEXT(".exe")
 #else
@@ -150,7 +147,7 @@ void FCodeAnalysis::Analysis()
 		"false \"%s\" \"%s\""
 	),
 	                                          *FPaths::ConvertRelativePathToFull(
-		                                          FUnrealCSharpFunctionLibrary::GetGamePath()),
+		                                          FUnrealCSharpFunctionLibrary::GetGameDirectory()),
 	                                          *FPaths::ConvertRelativePathToFull(
 		                                          FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath())
 	);

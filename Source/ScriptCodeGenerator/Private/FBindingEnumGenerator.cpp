@@ -1,6 +1,7 @@
 #include "FBindingEnumGenerator.h"
 #include "Binding/FBinding.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 
 void FBindingEnumGenerator::Generator()
 {
@@ -53,9 +54,9 @@ void FBindingEnumGenerator::Generator(const FBindingEnum* InEnum)
 
 	auto DirectoryName = FPaths::Combine(
 		FUnrealCSharpFunctionLibrary::GetGenerationPath(TEXT("/") + NameSpaceContent[0].Replace(TEXT("."), TEXT("/"))),
-		FUnrealCSharpFunctionLibrary::GetBindingPath());
+		FUnrealCSharpFunctionLibrary::GetBindingDirectory());
 
-	const auto FileName = FPaths::Combine(DirectoryName, ClassContent) + TEXT(".cs");
+	const auto FileName = FPaths::Combine(DirectoryName, ClassContent) + CSHARP_SUFFIX;
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

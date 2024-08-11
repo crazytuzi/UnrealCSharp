@@ -4,14 +4,14 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>Script</RootNamespace>
-    <OutputPath>..\..\Content\Script</OutputPath>
+    <OutputPath></OutputPath>
     <DebugType>Embedded</DebugType>
-    <DefineConstants>$(DefineConstants);</DefineConstants>
+    <DefineConstants></DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UE\UE.csproj" /> 
-    <ProjectReference Include="..\..\Plugins\UnrealCSharp\Script\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
-    <ProjectReference Include="..\..\Plugins\UnrealCSharp\Script\Weavers\Weavers.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="" /> 
+    <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    <ProjectReference Include="..\Weavers\Weavers.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>	
   <ItemGroup>
     <PackageReference Include="Fody" Version="6.8.0">
@@ -19,6 +19,6 @@
     <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <None Remove="FodyWeavers.xml" />
-    <WeaverFiles Include="$(ProjectDir)..\..\Plugins\UnrealCSharp\Script\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
+    <WeaverFiles Include="$(ProjectDir)..\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
   </ItemGroup>
 </Project>

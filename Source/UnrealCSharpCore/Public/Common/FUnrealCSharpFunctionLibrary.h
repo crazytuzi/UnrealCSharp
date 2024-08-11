@@ -50,43 +50,65 @@ public:
 	static FString GetOldFileName(const FAssetData& InAssetData, const FString& InOldObjectPath);
 #endif
 
-	static FString GetBaseName();
+	static FString GetUEName();
 
-	static FString GetBasePath();
+#if WITH_EDITOR
+	static FString GetUEDirectory();
 
-	static FString GetUEProjectName();
+	static FString GetUEProxyDirectory();
 
-	static FString GetUEPath();
+	static FString GetUEProjectPath();
+#endif
 
-	static FString GetUEProxyPath();
+	static FString GetGameName();
 
-	static FString GetGameProjectName();
+#if WITH_EDITOR
+	static FString GetGameDirectory();
 
-	static FString GetGamePath();
+	static FString GetGameProxyDirectory();
 
-	static FString GetGameProxyPath();
+	static FString GetGameProjectPath();
+#endif
 
-	static FString GetBindingPath();
+	static FString GetBindingDirectory();
 
 	static FString GetPluginBaseDir();
 
-	static FString GetPluginPath();
+	static FString GetPluginDirectory();
 
-	static FString GetUEScriptPath();
+	static FString GetPluginScriptDirectory();
 
 	static bool IsEngineType(const UField* InField);
 
+#if WITH_EDITOR
 	static FString GetGenerationPath(const UField* InField);
 
 	static FString GetGenerationPath(const FString& InScriptPath);
+#endif
 
-	static FString GetScriptPath();
+	static FString GetPublishDirectory();
 
-	static FString GetCodeAnalysisProjectName();
+	static FString GetFullPublishDirectory();
+
+	static FString GetFullUEPublishPath();
+
+	static FString GetFullGamePublishPath();
+
+#if WITH_EDITOR
+	static FString GetScriptDirectory();
+
+	static FString GetFullScriptDirectory();
 
 	static FString GetCodeAnalysisCSProjPath();
 
+	static FString GetCodeAnalysisProjectPath();
+
 	static FString GetCodeAnalysisPath();
+
+	static FString GetSourceGeneratorPath();
+
+	static FString GetWeaversPath();
+#endif
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
 
@@ -94,7 +116,9 @@ public:
 
 	static TMap<FString, FString> LoadFileToString(const FString& InFileName);
 
+#if WITH_EDITOR
 	static TArray<FString> GetChangedDirectories();
+#endif
 
 	static FString Encode(const FString& InName, bool bIsNative = true, bool bEncodeWideString = false);
 

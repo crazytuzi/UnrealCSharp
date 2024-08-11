@@ -167,21 +167,24 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
 	{
-		if (UnrealCSharpEditorSetting->EnableCompiled())
+		if (UnrealCSharpEditorSetting->IsValidLowLevelFast())
 		{
-			bIsCompiling = true;
+			if (UnrealCSharpEditorSetting->EnableCompiled())
+			{
+				bIsCompiling = true;
 
-			Compile();
+				Compile();
 
-			const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
-				InFunction,
-				TStatId(),
-				nullptr,
-				ENamedThreads::GameThread);
+				const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
+					InFunction,
+					TStatId(),
+					nullptr,
+					ENamedThreads::GameThread);
 
-			FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
+				FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
 
-			bIsCompiling = false;
+				bIsCompiling = false;
+			}
 		}
 	}
 }
@@ -190,17 +193,11 @@ void FCSharpCompilerRunnable::Compile()
 {
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
-	const auto OutDirectory = FString::Printf(TEXT(
-		"%sScript"
-	),
-	                                          *FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir())
-	);
-
 	const auto CompileParam = FString::Printf(TEXT(
-		"publish \"%sScript/Game/Game.csproj\" --nologo -c Debug -o \"%s\""
+		"publish \"%s\" --nologo -c Debug -o \"%s\""
 	),
-	                                          *FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()),
-	                                          *OutDirectory
+	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath(),
+	                                          *FUnrealCSharpFunctionLibrary::GetFullPublishDirectory()
 	);
 
 	void* ReadPipe = nullptr;

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 
 template <typename T>
 auto FGeneratorCore::GetFileName(const T* InField)
@@ -49,7 +50,7 @@ auto FGeneratorCore::GetFileName(const T* InField)
 			FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InField)),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InField));
 
-		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
+		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + CSHARP_SUFFIX;
 	}
 	else
 	{
@@ -62,6 +63,6 @@ auto FGeneratorCore::GetFileName(const T* InField)
 			FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InField)),
 			InField->GetName());
 
-		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + TEXT(".cs");
+		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + CSHARP_SUFFIX;
 	}
 }

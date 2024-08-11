@@ -5,6 +5,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "UEVersion.h"
 #if WITH_EDITOR
+#include "CoreMacro/Macro.h"
 #include "Engine/Blueprint.h"
 #include "WidgetBlueprint.h"
 #include "Engine/UserDefinedEnum.h"
@@ -16,6 +17,7 @@
 UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer& ObjectInitializer):
 #if WITH_EDITOR
 	Super(ObjectInitializer),
+	ScriptDirectory(DEFAULT_SCRIPT_DIRECTORY),
 	bEnableCompiled(true),
 	bEnableAssetChanged(true),
 	bEnableDirectoryChanged(true),
@@ -242,6 +244,11 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 #elif PLATFORM_MAC
 	return {TEXT("/usr/local/share/dotnet/dotnet")};
 #endif
+}
+
+const FProjectDirectoryPath& UUnrealCSharpEditorSetting::GetScriptDirectory() const
+{
+	return ScriptDirectory;
 }
 
 bool UUnrealCSharpEditorSetting::EnableCompiled() const
