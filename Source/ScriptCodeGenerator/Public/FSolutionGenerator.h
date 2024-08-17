@@ -15,6 +15,8 @@ private:
 
 	static void ReplacePluginBaseDir(FString& OutResult);
 
+	static void ReplaceImport(FString& OutResult);
+
 	static void ReplaceDefineConstants(FString& OutResult);
 
 	static void ReplaceOutputPath(FString& OutResult);

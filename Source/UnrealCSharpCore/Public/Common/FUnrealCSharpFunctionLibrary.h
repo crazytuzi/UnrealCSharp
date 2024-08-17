@@ -68,6 +68,8 @@ public:
 	static FString GetGameProxyDirectory();
 
 	static FString GetGameProjectPath();
+
+	static FString GetGameProjectPropsPath();
 #endif
 
 	static FString GetBindingDirectory();
@@ -109,6 +111,8 @@ public:
 
 	static FString GetWeaversPath();
 #endif
+
+	static class UAssemblyLoader* GetAssemblyLoader();
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
 

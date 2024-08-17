@@ -68,11 +68,16 @@ void FSolutionGenerator::Generator()
 		TemplatePath / DEFAULT_GAME_NAME + PROJECT_SUFFIX,
 		TArray<TFunction<void(FString& OutResult)>>
 		{
+			&FSolutionGenerator::ReplaceImport,
 			&FSolutionGenerator::ReplaceDefineConstants,
 			&FSolutionGenerator::ReplaceOutputPath,
 			&FSolutionGenerator::ReplaceTargetFramework,
 			&FSolutionGenerator::ReplaceProjectReference
 		});
+
+	CopyTemplate(
+		FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath(),
+		TemplatePath / DEFAULT_GAME_NAME + PROJECT_PROPS_SUFFIX);
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(),
@@ -118,6 +123,19 @@ void FSolutionGenerator::ReplacePluginBaseDir(FString& OutResult)
 	PluginBaseDir.FindLastChar('/', Index);
 
 	OutResult = OutResult.Replace(*PLUGIN_NAME, *PluginBaseDir.Right(PluginBaseDir.Len() - Index - 1));
+}
+
+void FSolutionGenerator::ReplaceImport(FString& OutResult)
+{
+	OutResult = OutResult.Replace(TEXT("<Import Project=\"\" Condition=\"Exists(\'\')\" />"),
+	                              *FString::Printf(TEXT(
+		                              "<Import Project=\"%s%s\" Condition=\"Exists(\'%s%s\')\" />"
+	                              ),
+	                                               *FUnrealCSharpFunctionLibrary::GetGameName(),
+	                                               *PROJECT_PROPS_SUFFIX,
+	                                               *FUnrealCSharpFunctionLibrary::GetGameName(),
+	                                               *PROJECT_PROPS_SUFFIX
+	                              ));
 }
 
 void FSolutionGenerator::ReplaceDefineConstants(FString& OutResult)
