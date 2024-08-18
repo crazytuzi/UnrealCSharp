@@ -13,7 +13,7 @@ void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
 			SrcGarbageCollectionHandle);
@@ -37,7 +37,7 @@ bool FInterfacePropertyDescriptor::Identical(const void* A, const void* B, const
 		const auto InterfaceA = static_cast<FScriptInterface*>(const_cast<void*>(A));
 
 		const auto InterfaceB = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
-			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
+			*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
 
 		return Property->Identical(InterfaceA, &InterfaceB, PortFlags);
 	}
@@ -52,7 +52,7 @@ MonoObject* FInterfacePropertyDescriptor::NewWeakRef(void* InAddress, const bool
 		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true>(
-			Object, CopyValue(InAddress));
+			Object, InAddress);
 
 		return Object;
 	}

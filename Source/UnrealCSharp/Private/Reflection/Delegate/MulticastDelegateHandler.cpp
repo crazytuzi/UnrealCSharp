@@ -152,22 +152,6 @@ void UMulticastDelegateHandler::Clear()
 	ScriptDelegate.Unbind();
 }
 
-MonoObject* UMulticastDelegateHandler::Broadcast(MonoObject** OutValue, MonoArray* InValue) const
-{
-	if (MulticastScriptDelegate != nullptr)
-	{
-		if (MulticastScriptDelegate->IsBound())
-		{
-			if (DelegateDescriptor != nullptr)
-			{
-				return DelegateDescriptor->ProcessMulticastDelegate(MulticastScriptDelegate, OutValue, InValue);
-			}
-		}
-	}
-
-	return nullptr;
-}
-
 UObject* UMulticastDelegateHandler::GetUObject() const
 {
 	return const_cast<UObject*>(ScriptDelegate.GetUObject());

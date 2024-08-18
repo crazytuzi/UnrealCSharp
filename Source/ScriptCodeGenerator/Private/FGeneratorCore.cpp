@@ -405,8 +405,45 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	return {TEXT("")};
 }
 
-FString FGeneratorCore::GetGetPrimitiveAccessorType(FProperty* Property)
+FString FGeneratorCore::GetBufferCast(FProperty* Property)
 {
+	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
+	{
+		return GetBufferCast(EnumProperty->GetUnderlyingProperty());
+	}
+
+	if (CastField<FByteProperty>(Property)) return TEXT("byte");
+
+	if (CastField<FUInt16Property>(Property)) return TEXT("ushort");
+
+	if (CastField<FUInt32Property>(Property)) return TEXT("uint");
+
+	if (CastField<FUInt64Property>(Property)) return TEXT("ulong");
+
+	if (CastField<FInt8Property>(Property)) return TEXT("sbyte");
+
+	if (CastField<FInt16Property>(Property)) return TEXT("short");
+
+	if (CastField<FIntProperty>(Property)) return TEXT("int");
+
+	if (CastField<FInt64Property>(Property)) return TEXT("long");
+
+	if (CastField<FBoolProperty>(Property)) return TEXT("bool");
+
+	if (CastField<FFloatProperty>(Property)) return TEXT("float");
+
+	if (CastField<FDoubleProperty>(Property)) return TEXT("double");
+
+	return TEXT("nint");
+}
+
+FString FGeneratorCore::GetTypeImplementation(FProperty* Property)
+{
+	if (Property == nullptr)
+	{
+		return TEXT("Generic");
+	}
+
 	if (CastField<FByteProperty>(Property))
 	{
 		return TEXT("Byte");
@@ -414,7 +451,7 @@ FString FGeneratorCore::GetGetPrimitiveAccessorType(FProperty* Property)
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
 	{
-		return *GetGetPrimitiveAccessorType(EnumProperty->GetUnderlyingProperty());
+		return GetTypeImplementation(EnumProperty->GetUnderlyingProperty());
 	}
 
 	if (CastField<FUInt16Property>(Property)) return TEXT("UInt16");
@@ -437,7 +474,7 @@ FString FGeneratorCore::GetGetPrimitiveAccessorType(FProperty* Property)
 
 	if (CastField<FDoubleProperty>(Property)) return TEXT("Double");
 
-	return TEXT("");
+	return TEXT("Generic");
 }
 
 FString FGeneratorCore::GetGetAccessorReturnParamName(FProperty* Property)
@@ -531,7 +568,7 @@ FString FGeneratorCore::GetOutParamString(FProperty* Property, const uint32 Inde
 	                       Index,
 	                       !IsPrimitiveProperty(Property)
 		                       ? *FString::Printf(TEXT(
-			                       "as %s"
+			                       " as %s"
 		                       ),
 		                                          *GetPropertyType(Property))
 		                       : TEXT("")
@@ -590,13 +627,14 @@ FString FGeneratorCore::GetReturnParamType(FProperty* Property)
 	return GetPropertyType(Property);
 }
 
-int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput,
-                                       const bool bHasOutput, const bool bIsNative)
+int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput, const bool bHasOutput,
+                                       const bool bIsNative, const bool bIsNet)
 {
 	return static_cast<int32>(bHasReturn) |
 		static_cast<int32>(bHasInput) << 1 |
 		static_cast<int32>(bHasOutput) << 2 |
-		static_cast<int32>(bIsNative) << 3;
+		static_cast<int32>(bIsNative) << 3 |
+		static_cast<int32>(bIsNet) << 4;
 }
 
 FString FGeneratorCore::GetModuleRelativePath(const UField* InField)

@@ -63,3 +63,80 @@
 #define FUNCTION_GREATER FString(TEXT("Greater"))
 
 #define FUNCTION_GREATER_EQUAL FString(TEXT("GreaterEqual"))
+
+#define INITIALIZE_VALUE(Params) \
+	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index) \
+	{ \
+		const auto& PropertyDescriptor = PropertyDescriptors[Index]; \
+		PropertyDescriptor->InitializeValue_InContainer(Params);
+
+#define IN_VALUE(InBuffer, Params) \
+		PropertyDescriptor->Set(InBuffer + BufferOffsets[Index], PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
+
+#define REFERENCE_IN_VALUE(InBuffer, Params) \
+		if (ReferencePropertyIndexes.Contains(Index) || !OutPropertyIndexes.Contains(Index)) \
+		{ \
+			IN_VALUE(InBuffer, Params) \
+		}
+
+#define IN_END() \
+	}
+
+#define PROCESS_SCRIPT_IN(InBuffer, Params) \
+	INITIALIZE_VALUE(Params) \
+	IN_VALUE(InBuffer, Params) \
+	IN_END()
+
+#define PROCESS_SCRIPT_REFERENCE_IN(InBuffer, Params) \
+	INITIALIZE_VALUE(Params) \
+	REFERENCE_IN_VALUE(InBuffer, Params) \
+	IN_END()
+
+#define NATIVE_OUT_VALUE(OutParams, Params) \
+		CA_SUPPRESS(6263) \
+		const auto Out = (FOutParmRec*)FMemory_Alloca(sizeof(FOutParmRec)); \
+		Out->Property = PropertyDescriptor->GetProperty(); \
+		Out->PropAddr = (uint8*)PropertyDescriptor->ContainerPtrToValuePtr<void>(Params); \
+		if (*LastOut) \
+		{ \
+			(*LastOut)->NextOutParm = Out; \
+			LastOut = &(*LastOut)->NextOutParm; \
+		} \
+		else \
+		{ \
+			*LastOut = Out; \
+		}
+
+#define PROCESS_NATIVE_REFERENCE_IN(InBuffer, OutParams, Params) \
+	auto LastOut = OutParams; \
+	INITIALIZE_VALUE(Params) \
+	IN_VALUE(InBuffer, Params) \
+	NATIVE_OUT_VALUE(OutParams, Params) \
+	IN_END()
+
+#define PROCESS_OUT(OutValue, Params) \
+	const auto MonoObjectArray = FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(), OutPropertyIndexes.Num()); \
+	for (auto Index = 0; Index < OutPropertyIndexes.Num(); ++Index) \
+	{ \
+		if (const auto OutPropertyDescriptor = PropertyDescriptors[OutPropertyIndexes[Index]]) \
+		{ \
+			MonoObject* Value = nullptr; \
+			OutPropertyDescriptor->Get(OutPropertyDescriptor->CopyValue(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
+			                           reinterpret_cast<void**>(&Value), true); \
+			ARRAY_SET(MonoObjectArray, MonoObject*, Index, Value); \
+		} \
+	} \
+	*OutValue = (MonoObject*)MonoObjectArray;
+
+#define PROCESS_COMPOUND_RETURN(Params) \
+	MonoObject* ReturnValue{}; \
+	ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->CopyValue(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
+	                              reinterpret_cast<void**>(&ReturnValue), true); \
+	BufferAllocator->Free(Params); \
+	return ReturnValue;
+
+#define PROCESS_PRIMITIVE_RETURN(Params, Type) \
+	Type ReturnValue{}; \
+	ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), &ReturnValue); \
+	BufferAllocator->Free(Params); \
+	return ReturnValue;

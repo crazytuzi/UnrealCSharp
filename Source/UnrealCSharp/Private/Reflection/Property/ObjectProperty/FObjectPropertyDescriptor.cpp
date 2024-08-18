@@ -15,7 +15,7 @@ void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		const auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(
 			SrcGarbageCollectionHandle);
@@ -33,7 +33,7 @@ bool FObjectPropertyDescriptor::Identical(const void* A, const void* B, const ui
 		const auto ObjectA = Property->GetObjectPropertyValue(A);
 
 		const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetObject(
-			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
+			*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
 
 		return Property->StaticIdentical(ObjectA, ObjectB, PortFlags);
 	}

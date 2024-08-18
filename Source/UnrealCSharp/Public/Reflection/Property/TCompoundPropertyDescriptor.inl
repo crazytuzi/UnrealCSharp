@@ -20,7 +20,7 @@ public:
 		Get(Src, static_cast<void**>(Dest), false);
 	}
 
-	auto CopyValue(const void* InAddress) const
+	virtual auto CopyValue(const void* InAddress) const -> void* override
 	{
 		const auto Value = static_cast<void*>(static_cast<uint8*>(FMemory::Malloc(Super::Property->ElementSize)));
 

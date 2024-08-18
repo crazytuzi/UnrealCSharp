@@ -22,7 +22,7 @@ void FArrayPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 			SrcGarbageCollectionHandle);
@@ -56,26 +56,12 @@ MonoObject* FArrayPropertyDescriptor::NewRef(void* InAddress) const
 
 MonoObject* FArrayPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	if (bIsCopy)
-	{
-		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		const auto ArrayHelper = new FArrayHelper(Property->Inner, CopyValue(InAddress),
-		                                          true, false);
+	const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
+	                                          bIsCopy, false);
 
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Object);
 
-		return Object;
-	}
-	else
-	{
-		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
-
-		const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
-		                                          false, false);
-
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Object);
-
-		return Object;
-	}
+	return Object;
 }

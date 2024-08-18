@@ -36,7 +36,116 @@ public:
 
 	void Clear() const;
 
-	MonoObject* Execute(MonoObject** OutValue, MonoArray* InValue) const;
+	template <typename T>
+	void Execute0() const
+	{
+		if (ScriptDelegate != nullptr)
+		{
+			if (ScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					DelegateDescriptor->Execute0<T>(ScriptDelegate);
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	auto Execute1() const -> T
+	{
+		if (ScriptDelegate != nullptr)
+		{
+			if (ScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					return DelegateDescriptor->Execute1<T>(ScriptDelegate);
+				}
+			}
+		}
+
+		return {};
+	}
+
+	template <typename T>
+	void Execute2(uint8* InBuffer) const
+	{
+		if (ScriptDelegate != nullptr)
+		{
+			if (ScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					DelegateDescriptor->Execute2<T>(ScriptDelegate, InBuffer);
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	auto Execute3(uint8* InBuffer) const -> T
+	{
+		if (ScriptDelegate != nullptr)
+		{
+			if (ScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					return DelegateDescriptor->Execute3<T>(ScriptDelegate, InBuffer);
+				}
+			}
+		}
+
+		return {};
+	}
+
+	template <typename T>
+	void Execute4(MonoObject** OutValue) const
+	{
+		if (ScriptDelegate != nullptr)
+		{
+			if (ScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					DelegateDescriptor->Execute4<T>(ScriptDelegate, OutValue);
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	void Execute6(MonoObject** OutValue, uint8* InBuffer) const
+	{
+		if (ScriptDelegate != nullptr)
+		{
+			if (ScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					DelegateDescriptor->Execute6<T>(ScriptDelegate, OutValue, InBuffer);
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	auto Execute7(MonoObject** OutValue, uint8* InBuffer) const -> T
+	{
+		if (ScriptDelegate != nullptr)
+		{
+			if (ScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					return DelegateDescriptor->Execute7<T>(ScriptDelegate, OutValue, InBuffer);
+				}
+			}
+		}
+
+		return {};
+	}
 
 	UObject* GetUObject() const;
 

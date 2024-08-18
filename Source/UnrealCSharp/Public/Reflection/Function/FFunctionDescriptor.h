@@ -22,6 +22,8 @@ public:
 protected:
 	TWeakObjectPtr<UFunction> Function;
 
+	TArray<uint32> BufferOffsets;
+
 	TArray<FPropertyDescriptor*> PropertyDescriptors;
 
 	FPropertyDescriptor* ReturnPropertyDescriptor;

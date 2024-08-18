@@ -617,7 +617,6 @@ namespace Weavers
                 .Where(Method => Method.CustomAttributes.Any(Attribute =>
                     Attribute.AttributeType.FullName == _serverAttributeType.FullName ||
                     Attribute.AttributeType.FullName == _clientAttributeType.FullName ||
-                    Attribute.AttributeType.FullName == _serverAttributeType.FullName ||
                     Attribute.AttributeType.FullName == _netMulticastAttributeAttributeType.FullName))
                 .ToList();
 
@@ -629,6 +628,85 @@ namespace Weavers
             }
         }
 
+        private static Instruction GetTypeStind(TypeReference Type)
+        {
+            switch (Type.MetadataType)
+            {
+                case MetadataType.Boolean:
+                    return Instruction.Create(OpCodes.Stind_I1);
+                case MetadataType.Byte:
+                    return Instruction.Create(OpCodes.Stind_I1);
+                case MetadataType.Int16:
+                    return Instruction.Create(OpCodes.Stind_I2);
+                case MetadataType.Int32:
+                    return Instruction.Create(OpCodes.Stind_I4);
+                case MetadataType.Int64:
+                    return Instruction.Create(OpCodes.Stind_I8);
+                case MetadataType.SByte:
+                    return Instruction.Create(OpCodes.Stind_I1);
+                case MetadataType.UInt16:
+                    return Instruction.Create(OpCodes.Stind_I2);
+                case MetadataType.UInt32:
+                    return Instruction.Create(OpCodes.Stind_I4);
+                case MetadataType.UInt64:
+                    return Instruction.Create(OpCodes.Stind_I8);
+                case MetadataType.Single:
+                    return Instruction.Create(OpCodes.Stind_R4);
+                case MetadataType.Double:
+                    return Instruction.Create(OpCodes.Stind_R8);
+                default:
+                {
+                    if (Type.Resolve().IsEnum)
+                    {
+                        return GetTypeStind(Type.Resolve().GetEnumUnderlyingType());
+                    }
+
+                    break;
+                }
+            }
+
+            return Instruction.Create(OpCodes.Stind_I);
+        }
+
+        private static sbyte GetTypeSize(TypeReference Type)
+        {
+            switch (Type.MetadataType)
+            {
+                case MetadataType.Boolean:
+                case MetadataType.Byte:
+                    return sizeof(bool);
+                case MetadataType.Int16:
+                    return sizeof(short);
+                case MetadataType.Int32:
+                    return sizeof(int);
+                case MetadataType.Int64:
+                    return sizeof(long);
+                case MetadataType.SByte:
+                    return sizeof(sbyte);
+                case MetadataType.UInt16:
+                    return sizeof(ushort);
+                case MetadataType.UInt32:
+                    return sizeof(uint);
+                case MetadataType.UInt64:
+                    return sizeof(ulong);
+                case MetadataType.Single:
+                    return sizeof(float);
+                case MetadataType.Double:
+                    return sizeof(double);
+                default:
+                {
+                    if (Type.Resolve().IsEnum)
+                    {
+                        return GetTypeSize(Type.Resolve().GetEnumUnderlyingType());
+                    }
+
+                    break;
+                }
+            }
+
+            return (sbyte)IntPtr.Size;
+        }
+
         private void ModifyRpcMethod(TypeDefinition Type, MethodDefinition Method)
         {
             var hashField = new FieldDefinition("__" + Method.Name, FieldAttributes.Private | FieldAttributes.Static,
@@ -637,6 +715,87 @@ namespace Weavers
             Type.Fields.Add(hashField);
 
             Method.Body.GetILProcessor().Clear();
+
+            if (Method.Parameters.Count > 0)
+            {
+                sbyte BufferSize = 0;
+
+                foreach (var param in Method.Parameters)
+                {
+                    BufferSize += GetTypeSize(param.ParameterType);
+                }
+
+                Method.Body.Variables.Add(new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
+
+                Method.Body.InitLocals = true;
+
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Nop));
+
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Nop));
+
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Conv_U));
+
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Localloc));
+
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Stloc_0));
+
+                BufferSize = 0;
+
+                foreach (var param in Method.Parameters)
+                {
+                    Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                    if (BufferSize != 0)
+                    {
+                        Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+
+                        Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Add));
+                    }
+
+                    BufferSize += GetTypeSize(param.ParameterType);
+
+                    Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_S, param));
+
+                    var paramGetGarbageCollectionHandleMethod = GetGarbageCollectionHandle(param.ParameterType);
+
+                    if (paramGetGarbageCollectionHandleMethod != null)
+                    {
+                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
+                            .First(Field => Field.Name == "Zero");
+
+                        var i3 = Instruction.Create(OpCodes.Ldarg_S, param);
+
+                        var i0 = Instruction.Create(OpCodes.Brtrue_S, i3);
+
+                        var i1 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+
+                        var i5 = GetTypeStind(param.ParameterType);
+
+                        var i2 = Instruction.Create(OpCodes.Br_S, i5);
+
+                        var i4 = Instruction.Create(OpCodes.Call,
+                            ModuleDefinition.ImportReference(paramGetGarbageCollectionHandleMethod));
+
+                        Method.Body.GetILProcessor().Append(i0);
+
+                        Method.Body.GetILProcessor().Append(i1);
+
+                        Method.Body.GetILProcessor().Append(i2);
+
+                        Method.Body.GetILProcessor().Append(i3);
+
+                        Method.Body.GetILProcessor().Append(i4);
+
+                        Method.Body.GetILProcessor().Append(i5);
+                    }
+                    else
+                    {
+                        Method.Body.GetILProcessor().Append(GetTypeStind(param.ParameterType));
+                    }
+                }
+            }
 
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Nop));
 
@@ -650,85 +809,15 @@ namespace Weavers
 
             if (Method.Parameters.Count > 0)
             {
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4, Method.Parameters.Count));
-
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Newarr,
-                    ModuleDefinition.ImportReference(ModuleDefinition.TypeSystem.Object)));
-
-                var i = 0;
-
-                foreach (var param in Method.Parameters)
-                {
-                    Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Dup));
-
-                    Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldc_I4, i));
-
-                    Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_S, param));
-
-                    if (param.ParameterType.IsValueType)
-                    {
-                        Method.Body.GetILProcessor().Append(param.ParameterType.Resolve().IsEnum
-                            ? Instruction.Create(OpCodes.Box,
-                                ModuleDefinition.ImportReference(param.ParameterType.Resolve()
-                                    .GetEnumUnderlyingType()))
-                            : Instruction.Create(OpCodes.Box,
-                                ModuleDefinition.ImportReference(param.ParameterType)));
-                    }
-                    else
-                    {
-                        var paramGetGarbageCollectionHandleMethod = GetGarbageCollectionHandle(param.ParameterType);
-
-                        if (paramGetGarbageCollectionHandleMethod != null)
-                        {
-                            var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
-                                .First(Field => Field.Name == "Zero");
-
-                            var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
-
-                            var il4 = Instruction.Create(OpCodes.Ldarg_S, param);
-
-                            var il5 = Instruction.Create(OpCodes.Call,
-                                ModuleDefinition.ImportReference(paramGetGarbageCollectionHandleMethod));
-
-                            var il6 = Instruction.Create(OpCodes.Box, ModuleDefinition.TypeSystem.IntPtr);
-
-                            var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
-
-                            var il3 = Instruction.Create(OpCodes.Br_S, il6);
-
-                            Method.Body.GetILProcessor().Append(il1);
-
-                            Method.Body.GetILProcessor().Append(il2);
-
-                            Method.Body.GetILProcessor().Append(il3);
-
-                            Method.Body.GetILProcessor().Append(il4);
-
-                            Method.Body.GetILProcessor().Append(il5);
-
-                            Method.Body.GetILProcessor().Append(il6);
-                        }
-                    }
-
-                    Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Stelem_Ref));
-
-                    i++;
-                }
-
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call,
-                    ModuleDefinition.ImportReference(_functionReflection2Implementation)));
+                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldloc_0));
             }
-            else
-            {
-                Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call,
-                    ModuleDefinition.ImportReference(_functionReflection0Implementation)));
-            }
+
+            Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call,
+                ModuleDefinition.ImportReference(Method.Parameters.Count > 0
+                    ? _functionReflection2Implementation
+                    : _functionReflection0Implementation)));
 
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ret));
-
-            Method.Body.InitLocals = false;
-
-            Method.Body.Variables.Clear();
 
             Method.Body.ExceptionHandlers.Clear();
         }
@@ -964,10 +1053,10 @@ namespace Weavers
             _overrideAttributeType = definition.GetType("Script.CoreUObject.OverrideAttribute");
 
             _functionReflection0Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "FFunction_Reflection0Implementation");
+                .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall24Implementation");
 
             _functionReflection2Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
-                .FirstOrDefault(Method => Method.Name == "FFunction_Reflection2Implementation");
+                .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall26Implementation");
 
             _getGarbageCollectionHandle = definition.GetType("Script.CoreUObject.UObject").Methods
                 .FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle");

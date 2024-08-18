@@ -47,13 +47,13 @@ static MonoObject* Get##StructType##PropertyType##PropertyImplementation(const F
 }
 
 #define SET_COMPOUND_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType) \
-static void Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, MonoObject* InValue) \
+static void Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, const FGarbageCollectionHandle InValue) \
 { \
 	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType, void*>(InGarbageCollectionHandle)) \
 	{ \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddPropertyDescriptor(InPropertyHash)) \
 		{ \
-			PropertyDescriptor->Set(InValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress)); \
+			PropertyDescriptor->Set(const_cast<FGarbageCollectionHandle*>(&InValue), PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress)); \
 		} \
 	} \
 }

@@ -64,28 +64,34 @@ namespace SourceGenerator
 
                 if (type.Value.DynamicType == EDynamicType.UStruct)
                 {
+                    var interfaceBody = type.Value.HasBase || type.Value.HasGarbageCollectionHandle
+                        ? ": IStaticStruct"
+                        : ": IStaticStruct, IGarbageCollectionHandle";
+
                     var source = "";
 
                     type.Value.Using.ForEach(Str => source += Str);
 
                     source +=
                         $"namespace {type.Value.NameSpace}\n" +
-                        $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}: IStaticStruct, IGarbageCollectionHandle\n" +
+                        $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}{interfaceBody}\n" +
                         "\t{\n";
 
                     if (type.Value.HasStaticStruct == false)
                     {
+                        var newBody = type.Value.HasBase ? " new" : "";
+
                         var fullPath = GetPathName(type.Value.Name);
 
                         source +=
-                            "\t\tpublic static UScriptStruct StaticStruct()\n" +
+                            $"\t\tpublic{newBody} static UScriptStruct StaticStruct()\n" +
                             "\t\t{\n" +
                             $"\t\t\treturn StaticStructSingleton ??= UStructImplementation.UStruct_StaticStructImplementation(\"{fullPath}\");\n" +
                             "\t\t}\n" +
                             "\t\tprivate static UScriptStruct StaticStructSingleton { get; set; }\n";
                     }
 
-                    if (type.Value.HasGarbageCollectionHandle == false)
+                    if (type.Value.HasGarbageCollectionHandle == false && type.Value.HasBase == false)
                     {
                         source += "\t\tpublic nint GarbageCollectionHandle { get; set; }\n";
                     }
@@ -186,6 +192,8 @@ namespace SourceGenerator
             var bIsUStruct = attributeUStruct != null;
 
             var bIsUInterface = attributeUInterface != null;
+
+            var bHasBase = Syntax.BaseList != null;
 
             if (Syntax.Modifiers.ToArray().Any(Modifier => Modifier.Text == "partial") == false)
             {
@@ -362,6 +370,8 @@ namespace SourceGenerator
 
             type.Using = MergeUsing(usingList, type.Using);
 
+            type.HasBase = bHasBase;
+
             type.HasStaticStruct |= bHasStaticStruct;
 
             type.HasStaticClass |= bHasStaticClass;
@@ -464,6 +474,8 @@ namespace SourceGenerator
         public string NameSpace { get; set; }
 
         public string Modifiers { get; set; }
+
+        public bool HasBase { get; set; }
 
         public bool HasGarbageCollectionHandle { get; set; }
 

@@ -118,62 +118,44 @@ namespace
 			}
 		}
 
-		static MonoObject* BroadcastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                           MonoObject** OutValue, MonoArray* InValue)
+		static void GenericBroadcast0Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->Broadcast(OutValue, InValue);
+				return MulticastDelegateHelper->Broadcast0<MonoObject*>();
 			}
-
-			return nullptr;
 		}
 
-		static void Broadcast0Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		static void GenericBroadcast2Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                            uint8* InBuffer)
 		{
-			BroadcastImplementation(InGarbageCollectionHandle, nullptr, nullptr);
+			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
+				FMulticastDelegateHelper>(InGarbageCollectionHandle))
+			{
+				MulticastDelegateHelper->Broadcast2<MonoObject*>(InBuffer);
+			}
 		}
 
-		static MonoObject* Broadcast1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-		{
-			return BroadcastImplementation(InGarbageCollectionHandle, nullptr, nullptr);
-		}
-
-		static void Broadcast2Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     MonoArray* InValue)
-		{
-			BroadcastImplementation(InGarbageCollectionHandle, nullptr, InValue);
-		}
-
-		static MonoObject* Broadcast3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            MonoArray* InValue)
-		{
-			return BroadcastImplementation(InGarbageCollectionHandle, nullptr, InValue);
-		}
-
-		static void Broadcast4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     MonoObject** OutValue)
-		{
-			BroadcastImplementation(InGarbageCollectionHandle, OutValue, nullptr);
-		}
-
-		static MonoObject* Broadcast5Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		static void GenericBroadcast4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 		                                            MonoObject** OutValue)
 		{
-			return BroadcastImplementation(InGarbageCollectionHandle, OutValue, nullptr);
+			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
+				FMulticastDelegateHelper>(InGarbageCollectionHandle))
+			{
+				MulticastDelegateHelper->Broadcast4<MonoObject*>(OutValue);
+			}
 		}
 
-		static void Broadcast6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     MonoObject** OutValue, MonoArray* InValue)
+		static void GenericBroadcast6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                            MonoObject** OutValue,
+		                                            uint8* InBuffer)
 		{
-			BroadcastImplementation(InGarbageCollectionHandle, OutValue, InValue);
-		}
-
-		static MonoObject* Broadcast7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            MonoObject** OutValue, MonoArray* InValue)
-		{
-			return BroadcastImplementation(InGarbageCollectionHandle, OutValue, InValue);
+			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
+				FMulticastDelegateHelper>(InGarbageCollectionHandle))
+			{
+				MulticastDelegateHelper->Broadcast6<MonoObject*>(OutValue, InBuffer);
+			}
 		}
 
 		FRegisterMulticastDelegate()
@@ -189,14 +171,10 @@ namespace
 				.Function("Remove", RemoveImplementation)
 				.Function("RemoveAll", RemoveAllImplementation)
 				.Function("Clear", ClearImplementation)
-				.Function("Broadcast0", Broadcast0Implementation)
-				.Function("Broadcast1", Broadcast1Implementation)
-				.Function("Broadcast2", Broadcast2Implementation)
-				.Function("Broadcast3", Broadcast3Implementation)
-				.Function("Broadcast4", Broadcast4Implementation)
-				.Function("Broadcast5", Broadcast5Implementation)
-				.Function("Broadcast6", Broadcast6Implementation)
-				.Function("Broadcast7", Broadcast7Implementation);
+				.Function("GenericBroadcast0", GenericBroadcast0Implementation)
+				.Function("GenericBroadcast2", GenericBroadcast2Implementation)
+				.Function("GenericBroadcast4", GenericBroadcast4Implementation)
+				.Function("GenericBroadcast6", GenericBroadcast6Implementation);
 		}
 	};
 

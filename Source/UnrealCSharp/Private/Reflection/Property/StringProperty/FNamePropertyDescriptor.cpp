@@ -13,7 +13,7 @@ void FNamePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FName>(
 			SrcGarbageCollectionHandle))
@@ -32,7 +32,7 @@ bool FNamePropertyDescriptor::Identical(const void* A, const void* B, const uint
 		const auto NameA = Property->GetPropertyValue(A);
 
 		const auto NameB = FCSharpEnvironment::GetEnvironment().GetString<FName>(
-			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
+			*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
 
 		return NameA == *NameB;
 	}
@@ -46,7 +46,7 @@ MonoObject* FNamePropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsC
 	{
 		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true>(Object, CopyValue(InAddress));
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true>(Object, InAddress);
 
 		return Object;
 	}

@@ -9,7 +9,9 @@ public:
 
 	static TSet<FString> GetPropertyTypeNameSpace(FProperty* Property);
 
-	static FString GetGetPrimitiveAccessorType(FProperty* Property);
+	static FString GetBufferCast(FProperty* Property);
+
+	static FString GetTypeImplementation(FProperty* Property);
 
 	static FString GetGetAccessorReturnParamName(FProperty* Property);
 
@@ -23,7 +25,7 @@ public:
 
 	static FString GetReturnParamType(FProperty* Property);
 
-	static int32 GetFunctionIndex(bool bHasReturn, bool bHasInput, bool bHasOutput, bool bIsNative = false);
+	static int32 GetFunctionIndex(bool bHasReturn, bool bHasInput, bool bHasOutput, bool bIsNative, bool bIsNet);
 
 	static FString GetModuleRelativePath(const UField* InField);
 
