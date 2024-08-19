@@ -2,11 +2,11 @@
 
 FBindingEnumRegister::FBindingEnumRegister(const TFunction<FString()>& InEnumFunction,
                                            const FString& InUnderlyingType,
-                                           const bool InIsEngineEnum,
+                                           const bool InIsProjectEnum,
                                            const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
 	EnumFunction(InEnumFunction),
 	UnderlyingType(InUnderlyingType),
-	bIsEngineEnum(InIsEngineEnum),
+	bIsProjectEnum(InIsProjectEnum),
 	TypeInfoRegister(InTypeInfoFunction)
 {
 }
@@ -15,7 +15,7 @@ FBindingEnumRegister::operator FBindingEnum*() const
 {
 	return new FBindingEnum(EnumFunction(),
 	                        UnderlyingType,
-	                        bIsEngineEnum,
+	                        bIsProjectEnum,
 	                        FBindingTypeInfo(TypeInfoRegister),
 	                        Enumerators
 	);

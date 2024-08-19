@@ -684,7 +684,7 @@ TArray<FString> FGeneratorCore::GetOverrideFunctions(const FString& InNameSpace,
 
 bool FGeneratorCore::IsSkip(const UField* InField)
 {
-	return bIsSkipGenerateEngineModules && FUnrealCSharpFunctionLibrary::IsEngineType(InField);
+	return bIsSkipGenerateEngineModules && !FUnrealCSharpFunctionLibrary::IsGameField(InField);
 }
 
 bool FGeneratorCore::IsSupported(FProperty* Property)

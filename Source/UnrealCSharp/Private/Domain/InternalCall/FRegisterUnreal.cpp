@@ -14,7 +14,7 @@ namespace
 	{
 		FRegisterLoadFlags()
 		{
-			TBindingEnumBuilder<ELoadFlags, true>()
+			TBindingEnumBuilder<ELoadFlags, false>()
 				.Enumerator("LOAD_None", ELoadFlags::LOAD_None)
 				.Enumerator("LOAD_Async", ELoadFlags::LOAD_Async)
 				.Enumerator("LOAD_NoWarn", ELoadFlags::LOAD_NoWarn)

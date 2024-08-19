@@ -4,7 +4,7 @@
 FBindingClass::FBindingClass(const FString& InBaseClass,
                              const FString& InClass,
                              const FString& InImplementationNameSpace,
-                             const bool InIsEngineClass,
+                             const bool InIsProjectClass,
                              const bool InIsReflectionClass,
                              const FBindingTypeInfo& InTypeInfo,
                              const FBindingSubscript& InSubscript,
@@ -14,7 +14,7 @@ FBindingClass::FBindingClass(const FString& InBaseClass,
 	BaseClass(InBaseClass),
 	Class(InClass),
 	ImplementationNameSpace(InImplementationNameSpace),
-	bIsEngineClass(InIsEngineClass),
+	bIsProjectClass(InIsProjectClass),
 	bIsReflectionClass(InIsReflectionClass),
 	TypeInfo(InTypeInfo),
 	Subscript(InSubscript),
@@ -75,9 +75,9 @@ const FString& FBindingClass::GetImplementationNameSpace() const
 	return ImplementationNameSpace;
 }
 
-bool FBindingClass::IsEngineClass() const
+bool FBindingClass::IsProjectClass() const
 {
-	return bIsEngineClass;
+	return bIsProjectClass;
 }
 
 bool FBindingClass::IsReflectionClass() const

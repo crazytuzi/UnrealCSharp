@@ -12,7 +12,7 @@ public:
 	FBindingClass(const FString& InBaseClass,
 	              const FString& InClass,
 	              const FString& InImplementationNameSpace,
-	              const bool InIsEngineClass,
+	              const bool InIsProjectClass,
 	              const bool InIsReflectionClass,
 	              const FBindingTypeInfo& InTypeInfo,
 	              const FBindingSubscript& InSubscript,
@@ -31,7 +31,7 @@ public:
 
 	const FString& GetImplementationNameSpace() const;
 
-	bool IsEngineClass() const;
+	bool IsProjectClass() const;
 
 	bool IsReflectionClass() const;
 
@@ -54,7 +54,7 @@ private:
 
 	FString ImplementationNameSpace;
 
-	bool bIsEngineClass;
+	bool bIsProjectClass;
 
 	bool bIsReflectionClass;
 

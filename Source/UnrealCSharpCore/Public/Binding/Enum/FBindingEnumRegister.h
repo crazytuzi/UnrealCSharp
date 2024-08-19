@@ -8,7 +8,7 @@ class UNREALCSHARPCORE_API FBindingEnumRegister
 public:
 	FBindingEnumRegister(const TFunction<FString()>& InEnumFunction,
 	                     const FString& InUnderlyingType,
-	                     bool InIsEngineEnum,
+	                     bool InIsProjectEnum,
 	                     const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction);
 
 	explicit operator FBindingEnum*() const;
@@ -21,7 +21,7 @@ private:
 
 	FString UnderlyingType;
 
-	bool bIsEngineEnum;
+	bool bIsProjectEnum;
 
 	FBindingTypeInfoRegister TypeInfoRegister;
 

@@ -11,7 +11,7 @@ class UNREALCSHARPCORE_API FBindingClassRegister
 public:
 	FBindingClassRegister(const TFunction<FString()>& InClassFunction,
 	                      const FString& InImplementationNameSpace,
-	                      const TFunction<bool()>& InIsEngineClassFunction,
+	                      const TFunction<bool()>& InIsProjectClassFunction,
 	                      bool InIsReflectionClass,
 	                      const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {});
 
@@ -41,7 +41,7 @@ public:
 
 	void Inheritance(const TFunction<FString()>& InBaseClassFunction,
 	                 const FString& InImplementationNameSpace,
-	                 const TFunction<bool()>& InIsEngineClassFunction,
+	                 const TFunction<bool()>& InIsProjectClassFunction,
 	                 bool InIsReflectionClass,
 	                 const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {});
 
@@ -52,7 +52,7 @@ private:
 
 	FString ImplementationNameSpace;
 
-	TFunction<bool()> IsEngineClassFunction;
+	TFunction<bool()> IsProjectClassFunction;
 
 	bool bIsReflectionClass;
 

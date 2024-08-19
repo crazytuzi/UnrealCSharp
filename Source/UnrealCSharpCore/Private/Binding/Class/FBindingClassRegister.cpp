@@ -6,12 +6,12 @@
 
 FBindingClassRegister::FBindingClassRegister(const TFunction<FString()>& InClassFunction,
                                              const FString& InImplementationNameSpace,
-                                             const TFunction<bool()>& InIsEngineClassFunction,
+                                             const TFunction<bool()>& InIsProjectClassFunction,
                                              const bool InIsReflectionClass,
                                              const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
 	ClassFunction(InClassFunction),
 	ImplementationNameSpace(COMBINE_NAMESPACE(NAMESPACE_ROOT, InImplementationNameSpace)),
-	IsEngineClassFunction(InIsEngineClassFunction),
+	IsProjectClassFunction(InIsProjectClassFunction),
 	bIsReflectionClass(InIsReflectionClass),
 	TypeInfoRegister{InTypeInfoFunction}
 {
@@ -47,7 +47,7 @@ FBindingClassRegister::operator FBindingClass*() const
 	return new FBindingClass(BaseClassFunction.IsSet() ? BaseClassFunction.GetValue()() : FString(),
 	                         ClassFunction(),
 	                         ImplementationNameSpace,
-	                         IsEngineClassFunction(),
+	                         IsProjectClassFunction(),
 	                         bIsReflectionClass,
 	                         FBindingTypeInfo(TypeInfoRegister),
 	                         FBindingSubscript(SubscriptRegister),
@@ -128,7 +128,7 @@ void FBindingClassRegister::BindingMethod(const FString& InImplementationName, c
 
 void FBindingClassRegister::Inheritance(const TFunction<FString()>& InBaseClassFunction,
                                         const FString& InImplementationNameSpace,
-                                        const TFunction<bool()>& InIsEngineClassFunction,
+                                        const TFunction<bool()>& InIsProjectClassFunction,
                                         const bool InIsReflectionClass,
                                         const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
 {
@@ -136,7 +136,7 @@ void FBindingClassRegister::Inheritance(const TFunction<FString()>& InBaseClassF
 
 	FBinding::Get().Register(InBaseClassFunction,
 	                         InImplementationNameSpace,
-	                         InIsEngineClassFunction,
+	                         InIsProjectClassFunction,
 	                         InIsReflectionClass,
 	                         InTypeInfoFunction);
 }

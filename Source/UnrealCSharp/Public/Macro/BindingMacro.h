@@ -39,9 +39,9 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_po
 { \
 	static auto Get() \
 	{ \
-		return FBinding::Get().Register().IsEngineClass(TName<T, T>::Get()) \
-			? TArray<FString>{static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))} \
-			: TArray<FString>{COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
+		return FBinding::Get().Register().IsProjectClass(TName<T, T>::Get()) \
+			? TArray<FString>{COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))} \
+			: TArray<FString>{static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))}; \
 	} \
 }; \
 template <typename T> \
@@ -140,9 +140,9 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>
 { \
 	static auto Get() \
 	{ \
-		return FBinding::Get().Register().IsEngineEnum(TName<T, T>::Get()) \
-			? TArray<FString>{static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))} \
-			: TArray<FString>{COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))}; \
+		return FBinding::Get().Register().IsProjectEnum(TName<T, T>::Get()) \
+			? TArray<FString>{COMBINE_NAMESPACE(NAMESPACE_ROOT, FString(FApp::GetProjectName()))} \
+			: TArray<FString>{static_cast<FName>(GLongCoreUObjectPackageName).ToString().RightChop(1).Replace(TEXT("/"), TEXT("."))}; \
 	} \
 }; \
 template <typename T> \

@@ -9,7 +9,7 @@ struct FRegisterObjectFlags
 {
 	FRegisterObjectFlags()
 	{
-		TBindingEnumBuilder<EObjectFlags, true>()
+		TBindingEnumBuilder<EObjectFlags, false>()
 			.Enumerator("RF_NoFlags", EObjectFlags::RF_NoFlags)
 			.Enumerator("RF_Public", EObjectFlags::RF_Public)
 			.Enumerator("RF_Standalone", EObjectFlags::RF_Standalone)

@@ -80,7 +80,7 @@ public:
 
 	static FString GetPluginScriptDirectory();
 
-	static bool IsEngineType(const UField* InField);
+	static bool IsGameField(const UField* InField);
 
 #if WITH_EDITOR
 	static FString GetGenerationPath(const UField* InField);

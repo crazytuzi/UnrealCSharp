@@ -7,7 +7,7 @@ class UNREALCSHARPCORE_API FBindingEnum
 public:
 	FBindingEnum(const FString& InEnum,
 	             const FString& InUnderlyingType,
-	             bool InIsEngineEnum,
+	             bool InIsProjectEnum,
 	             const FBindingTypeInfo& InTypeInfo,
 	             const TMap<FString, int64>& InEnumerators);
 
@@ -16,7 +16,7 @@ public:
 
 	const FString& GetUnderlyingType() const;
 
-	bool IsEngineEnum() const;
+	bool IsProjectEnum() const;
 
 	const FBindingTypeInfo& GetTypeInfo() const;
 
@@ -27,7 +27,7 @@ private:
 
 	FString UnderlyingType;
 
-	bool bIsEngineEnum;
+	bool bIsProjectEnum;
 
 	FBindingTypeInfo TypeInfo;
 

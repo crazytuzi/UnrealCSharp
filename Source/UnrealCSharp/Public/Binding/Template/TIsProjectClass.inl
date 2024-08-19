@@ -5,26 +5,26 @@
 #include "Template/TIsScriptStruct.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
-template <typename T, auto IsEngineClass>
-struct TIsEngineClass
+template <typename T, auto IsProjectClass>
+struct TIsProjectClass
 {
-	static bool Get()
+	static auto Get()
 	{
 		if constexpr (TIsUObject<T>::Value)
 		{
-			return FUnrealCSharpFunctionLibrary::IsEngineType(T::StaticClass());
+			return FUnrealCSharpFunctionLibrary::IsGameField(T::StaticClass());
 		}
 		else if constexpr (TIsUStruct<T>::Value)
 		{
-			return FUnrealCSharpFunctionLibrary::IsEngineType(T::StaticStruct());
+			return FUnrealCSharpFunctionLibrary::IsGameField(T::StaticStruct());
 		}
 		else if constexpr (TIsScriptStruct<T>::Value)
 		{
-			return FUnrealCSharpFunctionLibrary::IsEngineType(TBaseStructure<T>::Get());
+			return FUnrealCSharpFunctionLibrary::IsGameField(TBaseStructure<T>::Get());
 		}
 		else
 		{
-			return IsEngineClass;
+			return IsProjectClass;
 		}
 	}
 };
