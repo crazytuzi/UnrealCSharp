@@ -592,7 +592,7 @@ UAssemblyLoader* FUnrealCSharpFunctionLibrary::GetAssemblyLoader()
 	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
 
 	return UnrealCSharpSetting->IsValidLowLevelFast()
-		       ? UnrealCSharpSetting->GetAssemblyLoader().GetDefaultObject()
+		       ? UnrealCSharpSetting->GetAssemblyLoader()
 		       : nullptr;
 }
 

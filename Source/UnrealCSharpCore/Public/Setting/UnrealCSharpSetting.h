@@ -55,7 +55,7 @@ public:
 
 	const FString& GetGameName() const;
 
-	const TSubclassOf<UAssemblyLoader>& GetAssemblyLoader() const;
+	UAssemblyLoader* GetAssemblyLoader() const;
 
 	const TArray<FBindClass>& GetBindClass() const;
 

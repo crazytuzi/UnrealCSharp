@@ -59,9 +59,12 @@ const FString& UUnrealCSharpSetting::GetGameName() const
 	return GameName;
 }
 
-const TSubclassOf<UAssemblyLoader>& UUnrealCSharpSetting::GetAssemblyLoader() const
+UAssemblyLoader* UUnrealCSharpSetting::GetAssemblyLoader() const
 {
-	return AssemblyLoader;
+	return Cast<UAssemblyLoader>((AssemblyLoader->IsValidLowLevelFast()
+		                              ? AssemblyLoader
+		                              : UAssemblyLoader::StaticClass())
+		.GetDefaultObject());
 }
 
 const TArray<FBindClass>& UUnrealCSharpSetting::GetBindClass() const
