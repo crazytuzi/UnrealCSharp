@@ -163,10 +163,7 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>>>
 };
 
 template <typename T>
-struct TReturnValue<T,
-                    std::enable_if_t<
-	                    std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
-	                    !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>>> :
+struct TReturnValue<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>>>> :
 	TPrimitiveReturnValue<T>
 {
 	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
@@ -258,13 +255,6 @@ struct TReturnValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value>> :
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value>> :
-	TMultiReturnValue<T>
-{
-	using TMultiReturnValue<T>::TMultiReturnValue;
-};
-
-template <typename T>
-struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>>> :
 	TMultiReturnValue<T>
 {
 	using TMultiReturnValue<T>::TMultiReturnValue;

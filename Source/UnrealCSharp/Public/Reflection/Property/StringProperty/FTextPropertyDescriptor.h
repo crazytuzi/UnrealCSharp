@@ -5,7 +5,7 @@
 class FTextPropertyDescriptor final : public TCompoundPropertyDescriptor<FTextProperty>
 {
 public:
-	using TCompoundPropertyDescriptor::TCompoundPropertyDescriptor;;
+	using TCompoundPropertyDescriptor::TCompoundPropertyDescriptor;
 
 public:
 	virtual void Get(void* Src, void** Dest, bool bIsCopy) const override;

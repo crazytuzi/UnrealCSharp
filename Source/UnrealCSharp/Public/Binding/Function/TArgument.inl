@@ -97,16 +97,14 @@ struct TPrimitiveArgument :
 };
 
 template <typename T>
-struct TCompoundArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>> || std::is_same_v<
-	                                             std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
+struct TCompoundArgument<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>> :
 	TBaseArgument<T>
 {
 	using TBaseArgument<T>::TBaseArgument;
 };
 
 template <typename T>
-struct TCompoundArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>> && !std::is_same_v<
-	                                             std::remove_pointer_t<std::remove_reference_t<T>>, UClass>, T>> :
+struct TCompoundArgument<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>> :
 	TBaseArgument<std::decay_t<T>>
 {
 	using TBaseArgument<std::decay_t<T>>::TBaseArgument;
@@ -240,10 +238,7 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>>
 };
 
 template <typename T>
-struct TArgument<T,
-                 std::enable_if_t<
-	                 std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
-	                 !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>> :
+struct TArgument<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>>, T>> :
 	TBaseArgument<std::decay_t<T>>
 {
 	using TBaseArgument<std::decay_t<T>>::TBaseArgument;
@@ -343,18 +338,6 @@ struct TArgument<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>>
 	TMultiArgument<T>
 {
 	using TMultiArgument<T>::TMultiArgument;
-};
-
-template <typename T>
-struct TArgument<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>> :
-	TMultiArgument<std::decay_t<T>>
-{
-	using TMultiArgument<std::decay_t<T>>::TMultiArgument;
-
-	constexpr auto IsRef() const
-	{
-		return TTypeInfo<T>::Get()->IsRef();
-	}
 };
 
 template <typename T>

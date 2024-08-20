@@ -156,8 +156,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
-                                          !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
+struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>>, T>>
 {
 	static auto Get()
 	{
@@ -318,13 +317,6 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>> :
 	TMultiPropertyClass<T>
-{
-};
-
-
-template <typename T>
-struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>> :
-	TPropertyClass<TSubclassOf<UObject>, TSubclassOf<UObject>>
 {
 };
 

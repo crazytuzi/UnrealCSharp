@@ -72,7 +72,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 
 	if (InStack.Node != InStack.CurrentNativeFunction)
 	{
-		Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;;
+		Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
 		if (Params != nullptr)
 		{

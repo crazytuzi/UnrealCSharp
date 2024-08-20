@@ -1,8 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 
-class FClassPropertyDescriptor final : public TCompoundPropertyDescriptor<FClassProperty>
+class FSubclassOfPropertyDescriptor final : public TCompoundPropertyDescriptor<FClassProperty>
 {
 public:
 	using TCompoundPropertyDescriptor::TCompoundPropertyDescriptor;
@@ -14,4 +14,7 @@ public:
 
 public:
 	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const override;
+
+private:
+	MonoObject* NewWeakRef(void* InAddress, bool bIsCopy) const;
 };

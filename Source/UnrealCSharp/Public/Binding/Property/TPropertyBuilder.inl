@@ -253,9 +253,7 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
-                        std::enable_if_t<
-	                        std::is_base_of_v<UObject, std::remove_pointer_t<Result>> &&
-	                        !std::is_same_v<std::remove_pointer_t<Result>, UClass>>> :
+                        std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<Result>>>> :
 	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
@@ -335,13 +333,6 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSet<Result
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSubclassOf<Result>::Value>> :
 	TMultiPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member,
-                        std::enable_if_t<std::is_same_v<std::remove_pointer_t<Result>, UClass>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
 {
 };
 
@@ -451,9 +442,7 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::de
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member,
-                        std::enable_if_t<
-	                        std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<Result>>> &&
-	                        !std::is_same_v<std::remove_pointer_t<std::decay_t<Result>>, UClass>>> :
+                        std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<Result>>>>> :
 	TPropertyInfoBuilder<void, Result, Member>
 {
 };
@@ -533,13 +522,6 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSet<std::decay_t<R
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSubclassOf<std::decay_t<Result>>::Value>> :
 	TMultiPropertyBuilder<void, Result, Member>
-{
-};
-
-template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member,
-                        std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<Result>>, UClass>>> :
-	TPropertyInfoBuilder<void, Result, Member>
 {
 };
 

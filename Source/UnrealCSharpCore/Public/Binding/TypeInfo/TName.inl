@@ -126,8 +126,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>, T>>
 };
 
 template <typename T>
-struct TName<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
-                                 !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
+struct TName<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>>, T>>
 {
 	static auto Get()
 	{
@@ -252,12 +251,6 @@ struct TName<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>> :
 template <typename T>
 struct TName<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>> :
 	TGenericName<T>
-{
-};
-
-template <typename T>
-struct TName<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>> :
-	TName<TSubclassOf<UObject>, TSubclassOf<UObject>>
 {
 };
 

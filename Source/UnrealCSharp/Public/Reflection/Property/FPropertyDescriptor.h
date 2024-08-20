@@ -5,8 +5,6 @@
 class FPropertyDescriptor
 {
 public:
-	static EPropertyTypeExtent GetPropertyType(const FProperty* Property);
-
 	static FPropertyDescriptor* Factory(FProperty* InProperty);
 
 public:

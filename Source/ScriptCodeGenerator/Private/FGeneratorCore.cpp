@@ -74,7 +74,7 @@ FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 
 FString FGeneratorCore::GetPropertyType(FProperty* Property)
 {
-	if (Property == nullptr) return "";
+	if (Property == nullptr) return TEXT("");
 
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
 	{
@@ -108,11 +108,18 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 
 	if (const auto ClassProperty = CastField<FClassProperty>(Property))
 	{
-		return FString::Printf(TEXT(
-			"TSubclassOf<%s>"
-		),
-		                       *FUnrealCSharpFunctionLibrary::GetFullClass(ClassProperty->MetaClass)
-		);
+		if (ClassProperty->HasAnyPropertyFlags(CPF_UObjectWrapper))
+		{
+			return FString::Printf(TEXT(
+				"TSubclassOf<%s>"
+			),
+			                       *FUnrealCSharpFunctionLibrary::GetFullClass(ClassProperty->MetaClass)
+			);
+		}
+		else
+		{
+			return TName<UClass*, UClass*>::Get();
+		}
 	}
 
 	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))

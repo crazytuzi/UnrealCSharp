@@ -35,6 +35,7 @@ enum class UNREALCSHARPCORE_API EPropertyTypeExtent
 	Set = CPT_Set,
 	FieldPath = CPT_FieldPath,
 	ClassReference = CPT_MAX + 1,
+	SubclassOfReference,
 	Array,
 	Enum,
 	SoftClassReference,
