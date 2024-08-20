@@ -42,7 +42,65 @@ public:
 
 	void Clear();
 
-	MonoObject* Broadcast(MonoObject** OutValue, MonoArray* InValue) const;
+	template <typename T>
+	void Broadcast0() const
+	{
+		if (MulticastScriptDelegate != nullptr)
+		{
+			if (MulticastScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					DelegateDescriptor->Broadcast0<T>(MulticastScriptDelegate);
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	void Broadcast2(uint8* InBuffer) const
+	{
+		if (MulticastScriptDelegate != nullptr)
+		{
+			if (MulticastScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					DelegateDescriptor->Broadcast2<T>(MulticastScriptDelegate, InBuffer);
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	void Broadcast4(MonoObject** OutValue) const
+	{
+		if (MulticastScriptDelegate != nullptr)
+		{
+			if (MulticastScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					DelegateDescriptor->Broadcast4<T>(MulticastScriptDelegate, OutValue);
+				}
+			}
+		}
+	}
+
+	template <typename T>
+	void Broadcast6(MonoObject** OutValue, uint8* InBuffer) const
+	{
+		if (MulticastScriptDelegate != nullptr)
+		{
+			if (MulticastScriptDelegate->IsBound())
+			{
+				if (DelegateDescriptor != nullptr)
+				{
+					DelegateDescriptor->Broadcast6<T>(MulticastScriptDelegate, OutValue, InBuffer);
+				}
+			}
+		}
+	}
 
 	UObject* GetUObject() const;
 

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "FClassBuilder.h"
-#include "Binding/Template/TIsEngineClass.inl"
+#include "Binding/Template/TIsProjectClass.inl"
 #include "Binding/TypeInfo/TTypeInfo.inl"
 #include "CoreMacro/BindingMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Template/TIsReflectionClass.inl"
 
-template <typename T, bool bIsEngineClass>
+template <typename T, bool bIsProjectClass>
 class TClassBuilder : public FClassBuilder
 {
 public:
@@ -20,7 +20,7 @@ public:
 			              }
 		              },
 		              InImplementationNameSpace,
-		              {[]() { return TIsEngineClass<T, bIsEngineClass>::Get(); }},
+		              {[]() { return TIsProjectClass<T, bIsProjectClass>::Get(); }},
 		              TIsReflectionClass<T>::Value
 #if WITH_TYPE_INFO
 		              , {[]() { return TTypeInfo<T>::Get(); }}

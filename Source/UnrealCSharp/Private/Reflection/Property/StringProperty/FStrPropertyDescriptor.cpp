@@ -13,7 +13,7 @@ void FStrPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FString>(
 			SrcGarbageCollectionHandle))
@@ -32,7 +32,7 @@ bool FStrPropertyDescriptor::Identical(const void* A, const void* B, const uint3
 		const auto StringA = Property->GetPropertyValue(A);
 
 		const auto StringB = FCSharpEnvironment::GetEnvironment().GetString<FString>(
-			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
+			*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
 
 		return StringA == *StringB;
 	}
@@ -46,7 +46,7 @@ MonoObject* FStrPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCo
 	{
 		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true>(Object, CopyValue(InAddress));
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true>(Object, InAddress);
 
 		return Object;
 	}

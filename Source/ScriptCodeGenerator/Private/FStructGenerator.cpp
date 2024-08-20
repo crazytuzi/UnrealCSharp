@@ -234,10 +234,10 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			                                   *FUnrealCSharpFunctionLibrary::Encode(
 				                                   VariableFriendlyPropertyName, PropertyIterator->IsNative()),
 			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
+			                                   *FGeneratorCore::GetTypeImplementation(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetGetPrimitiveAccessorType(*PropertyIterator),
+			                                   *FGeneratorCore::GetTypeImplementation(*PropertyIterator),
 			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 			                                   *DummyPropertyName,
 			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)

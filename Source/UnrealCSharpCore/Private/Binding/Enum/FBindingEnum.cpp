@@ -2,12 +2,12 @@
 
 FBindingEnum::FBindingEnum(const FString& InEnum,
                            const FString& InUnderlyingType,
-                           const bool InIsEngineEnum,
+                           const bool InIsProjectEnum,
                            const FBindingTypeInfo& InTypeInfo,
                            const TMap<FString, int64>& InEnumerators):
 	Enum(InEnum),
 	UnderlyingType(InUnderlyingType),
-	bIsEngineEnum(InIsEngineEnum),
+	bIsProjectEnum(InIsProjectEnum),
 	TypeInfo(InTypeInfo),
 	Enumerators(InEnumerators)
 {
@@ -23,9 +23,9 @@ const FString& FBindingEnum::GetUnderlyingType() const
 	return UnderlyingType;
 }
 
-bool FBindingEnum::IsEngineEnum() const
+bool FBindingEnum::IsProjectEnum() const
 {
-	return bIsEngineEnum;
+	return bIsProjectEnum;
 }
 
 const FBindingTypeInfo& FBindingEnum::GetTypeInfo() const

@@ -32,7 +32,41 @@ public:
 
 	void Clear() const;
 
-	MonoObject* Broadcast(MonoObject** OutValue, MonoArray* InValue) const;
+	template <typename T>
+	void Broadcast0() const
+	{
+		if (MulticastDelegateHandler != nullptr)
+		{
+			MulticastDelegateHandler->Broadcast0<T>();
+		}
+	}
+
+	template <typename T>
+	void Broadcast2(uint8* InBuffer) const
+	{
+		if (MulticastDelegateHandler != nullptr)
+		{
+			MulticastDelegateHandler->Broadcast2<T>(InBuffer);
+		}
+	}
+
+	template <typename T>
+	void Broadcast4(MonoObject** OutValue) const
+	{
+		if (MulticastDelegateHandler != nullptr)
+		{
+			MulticastDelegateHandler->Broadcast4<T>(OutValue);
+		}
+	}
+
+	template <typename T>
+	void Broadcast6(MonoObject** OutValue, uint8* InBuffer) const
+	{
+		if (MulticastDelegateHandler != nullptr)
+		{
+			MulticastDelegateHandler->Broadcast6<T>(OutValue, InBuffer);
+		}
+	}
 
 	UObject* GetUObject() const;
 

@@ -73,9 +73,9 @@ public:
 	}
 
 	static auto MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject,
-	                                               MonoProperty* InMonoProperty) -> TGarbageCollectionHandle
+	                                               MonoProperty* InMonoProperty) -> T*
 	{
-		return *static_cast<T*>(FMonoDomain::Object_Unbox(
+		return static_cast<T*>(FMonoDomain::Object_Unbox(
 			FMonoDomain::Property_Get_Value(InMonoProperty, InMonoObject, nullptr, nullptr)));
 	}
 
@@ -86,7 +86,7 @@ public:
 
 		return FoundProperty != nullptr
 			       ? MonoObject2GarbageCollectionHandle(InMonoObject, FoundProperty)
-			       : TGarbageCollectionHandle{};
+			       : nullptr;
 	}
 
 private:

@@ -14,7 +14,7 @@ namespace
 	{
 		FRegisterDayOfWeek()
 		{
-			TBindingEnumBuilder<EDayOfWeek, true>()
+			TBindingEnumBuilder<EDayOfWeek, false>()
 				.Enumerator("Monday", EDayOfWeek::Monday)
 				.Enumerator("Tuesday", EDayOfWeek::Tuesday)
 				.Enumerator("Wednesday", EDayOfWeek::Wednesday)
@@ -31,7 +31,7 @@ namespace
 	{
 		FRegisterMonthOfYear()
 		{
-			TBindingEnumBuilder<EMonthOfYear, true>()
+			TBindingEnumBuilder<EMonthOfYear, false>()
 				.Enumerator("January", EMonthOfYear::January)
 				.Enumerator("February", EMonthOfYear::February)
 				.Enumerator("March", EMonthOfYear::March)

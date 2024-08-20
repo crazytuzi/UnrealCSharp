@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Domain/AssemblyLoader.h"
 #include "UnrealCSharpSetting.generated.h"
 
 USTRUCT()
@@ -54,6 +55,8 @@ public:
 
 	const FString& GetGameName() const;
 
+	UAssemblyLoader* GetAssemblyLoader() const;
+
 	const TArray<FBindClass>& GetBindClass() const;
 
 	bool IsEnableDebug() const;
@@ -71,6 +74,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Publish, meta = (DisplayName = "Game Name"))
 	FString GameName;
+
+	UPROPERTY(Config, EditAnywhere, Category = Domain)
+	TSubclassOf<UAssemblyLoader> AssemblyLoader;
 
 	UPROPERTY(Config, EditAnywhere, Category = Bind)
 	TArray<FBindClass> BindClass;

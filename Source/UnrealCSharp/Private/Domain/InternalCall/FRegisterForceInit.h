@@ -9,7 +9,7 @@ struct FRegisterForceInit
 {
 	FRegisterForceInit()
 	{
-		TBindingEnumBuilder<EForceInit, true>()
+		TBindingEnumBuilder<EForceInit, false>()
 			.Enumerator("ForceInit", EForceInit::ForceInit)
 			.Enumerator("ForceInitToZero", EForceInit::ForceInitToZero);
 	}

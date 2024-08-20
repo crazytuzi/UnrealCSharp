@@ -85,22 +85,6 @@ void UDelegateHandler::Clear() const
 	}
 }
 
-MonoObject* UDelegateHandler::Execute(MonoObject** OutValue, MonoArray* InValue) const
-{
-	if (ScriptDelegate != nullptr)
-	{
-		if (ScriptDelegate->IsBound())
-		{
-			if (DelegateDescriptor != nullptr)
-			{
-				return DelegateDescriptor->ProcessDelegate(ScriptDelegate, OutValue, InValue);
-			}
-		}
-	}
-
-	return nullptr;
-}
-
 UObject* UDelegateHandler::GetUObject() const
 {
 	return ScriptDelegate != nullptr ? ScriptDelegate->GetUObject() : nullptr;

@@ -4,7 +4,7 @@ using Script.CoreUObject;
 
 namespace Script.Library
 {
-    public static class FMulticastDelegateImplementation
+    public static unsafe class FMulticastDelegateImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FMulticastDelegate_RegisterImplementation(FDelegateBase InMonoObject);
@@ -38,32 +38,18 @@ namespace Script.Library
         public static extern void FMulticastDelegate_ClearImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_Broadcast0Implementation(nint InMonoObject);
+        public static extern void FMulticastDelegate_GenericBroadcast0Implementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object FMulticastDelegate_Broadcast1Implementation(nint InMonoObject);
+        public static extern void FMulticastDelegate_GenericBroadcast2Implementation(nint InMonoObject,
+            byte* InBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_Broadcast2Implementation(nint InMonoObject,
-            params object[] InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object FMulticastDelegate_Broadcast3Implementation(nint InMonoObject,
-            params object[] InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_Broadcast4Implementation(nint InMonoObject, out object[] OutValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object FMulticastDelegate_Broadcast5Implementation(nint InMonoObject,
+        public static extern void FMulticastDelegate_GenericBroadcast4Implementation(nint InMonoObject,
             out object[] OutValue);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_Broadcast6Implementation(nint InMonoObject, out object[] OutValue,
-            params object[] InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object FMulticastDelegate_Broadcast7Implementation(nint InMonoObject, out object[] OutValue,
-            params object[] InValue);
+        public static extern void FMulticastDelegate_GenericBroadcast6Implementation(nint InMonoObject,
+            out object[] OutValue, byte* InBuffer);
     }
 }

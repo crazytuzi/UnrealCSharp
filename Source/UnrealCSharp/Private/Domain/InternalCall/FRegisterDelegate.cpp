@@ -5,6 +5,32 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
+#define EXECUTE_IMPLEMENTATION(PropertyType, Type) \
+		static Type PropertyType##Execute1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle) \
+		{ \
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InGarbageCollectionHandle)) \
+			{ \
+				return DelegateHelper->Execute1<Type>(); \
+			} \
+			return {}; \
+		} \
+		static Type PropertyType##Execute3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle, uint8* InBuffer) \
+		{ \
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InGarbageCollectionHandle)) \
+			{ \
+				return DelegateHelper->Execute3<Type>(InBuffer); \
+			} \
+			return {}; \
+		} \
+		static Type PropertyType##Execute7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue, uint8* InBuffer) \
+		{ \
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InGarbageCollectionHandle)) \
+			{ \
+				return DelegateHelper->Execute7<Type>(OutValue, InBuffer); \
+			} \
+			return {}; \
+		}
+
 namespace
 {
 	struct FRegisterDelegate
@@ -66,62 +92,68 @@ namespace
 			}
 		}
 
-		static MonoObject* ExecuteImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                         MonoObject** OutValue, MonoArray* InValue)
+		EXECUTE_IMPLEMENTATION(Byte, uint8)
+
+		EXECUTE_IMPLEMENTATION(UInt16, uint16)
+
+		EXECUTE_IMPLEMENTATION(UInt32, uint32)
+
+		EXECUTE_IMPLEMENTATION(UInt64, uint64)
+
+		EXECUTE_IMPLEMENTATION(SByte, int8)
+
+		EXECUTE_IMPLEMENTATION(Int16, int16)
+
+		EXECUTE_IMPLEMENTATION(Int32, int)
+
+		EXECUTE_IMPLEMENTATION(Int64, int64)
+
+		EXECUTE_IMPLEMENTATION(Boolean, bool)
+
+		EXECUTE_IMPLEMENTATION(Single, float)
+
+		static void GenericExecute0Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InGarbageCollectionHandle))
 			{
-				return DelegateHelper->Execute(OutValue, InValue);
+				return DelegateHelper->Execute0<MonoObject*>();
 			}
-
-			return nullptr;
 		}
 
-		static void Execute0Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		static void GenericExecute2Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                          uint8* InBuffer)
 		{
-			ExecuteImplementation(InGarbageCollectionHandle, nullptr, nullptr);
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute2<MonoObject*>(InBuffer);
+			}
 		}
 
-		static MonoObject* Execute1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
-		{
-			return ExecuteImplementation(InGarbageCollectionHandle, nullptr, nullptr);
-		}
-
-		static void Execute2Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoArray* InValue)
-		{
-			ExecuteImplementation(InGarbageCollectionHandle, nullptr, InValue);
-		}
-
-		static MonoObject* Execute3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                          MonoArray* InValue)
-		{
-			return ExecuteImplementation(InGarbageCollectionHandle, nullptr, InValue);
-		}
-
-		static void Execute4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   MonoObject** OutValue)
-		{
-			ExecuteImplementation(InGarbageCollectionHandle, OutValue, nullptr);
-		}
-
-		static MonoObject* Execute5Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		static void GenericExecute4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 		                                          MonoObject** OutValue)
 		{
-			return ExecuteImplementation(InGarbageCollectionHandle, OutValue, nullptr);
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute4<MonoObject*>(OutValue);
+			}
 		}
 
-		static void Execute6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   MonoObject** OutValue, MonoArray* InValue)
+		static void GenericExecute6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                          MonoObject** OutValue, uint8* InBuffer)
 		{
-			ExecuteImplementation(InGarbageCollectionHandle, OutValue, InValue);
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute6<MonoObject*>(OutValue, InBuffer);
+			}
 		}
 
-		static MonoObject* Execute7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                          MonoObject** OutValue, MonoArray* InValue)
-		{
-			return ExecuteImplementation(InGarbageCollectionHandle, OutValue, InValue);
-		}
+		EXECUTE_IMPLEMENTATION(Generic, MonoObject*)
+
+		EXECUTE_IMPLEMENTATION(Double, double)
 
 		FRegisterDelegate()
 		{
@@ -132,14 +164,46 @@ namespace
 				.Function("IsBound", IsBoundImplementation)
 				.Function("UnBind", UnBindImplementation)
 				.Function("Clear", ClearImplementation)
-				.Function("Execute0", Execute0Implementation)
-				.Function("Execute1", Execute1Implementation)
-				.Function("Execute2", Execute2Implementation)
-				.Function("Execute3", Execute3Implementation)
-				.Function("Execute4", Execute4Implementation)
-				.Function("Execute5", Execute5Implementation)
-				.Function("Execute6", Execute6Implementation)
-				.Function("Execute7", Execute7Implementation);
+				.Function("ByteExecute1", ByteExecute1Implementation)
+				.Function("ByteExecute3", ByteExecute3Implementation)
+				.Function("ByteExecute7", ByteExecute7Implementation)
+				.Function("UInt16Execute1", UInt16Execute1Implementation)
+				.Function("UInt16Execute3", UInt16Execute3Implementation)
+				.Function("UInt16Execute7", UInt16Execute7Implementation)
+				.Function("UInt32Execute1", UInt32Execute1Implementation)
+				.Function("UInt32Execute3", UInt32Execute3Implementation)
+				.Function("UInt32Execute7", UInt32Execute7Implementation)
+				.Function("UInt64Execute1", UInt64Execute1Implementation)
+				.Function("UInt64Execute3", UInt64Execute3Implementation)
+				.Function("UInt64Execute7", UInt64Execute7Implementation)
+				.Function("SByteExecute1", SByteExecute1Implementation)
+				.Function("SByteExecute3", SByteExecute3Implementation)
+				.Function("SByteExecute7", SByteExecute7Implementation)
+				.Function("Int16Execute1", Int16Execute1Implementation)
+				.Function("Int16Execute3", Int16Execute3Implementation)
+				.Function("Int16Execute7", Int16Execute7Implementation)
+				.Function("Int32Execute1", Int32Execute1Implementation)
+				.Function("Int32Execute3", Int32Execute3Implementation)
+				.Function("Int32Execute7", Int32Execute7Implementation)
+				.Function("Int64Execute1", Int64Execute1Implementation)
+				.Function("Int64Execute3", Int64Execute3Implementation)
+				.Function("Int64Execute7", Int64Execute7Implementation)
+				.Function("BooleanExecute1", BooleanExecute1Implementation)
+				.Function("BooleanExecute3", BooleanExecute3Implementation)
+				.Function("BooleanExecute7", BooleanExecute7Implementation)
+				.Function("SingleExecute1", SingleExecute1Implementation)
+				.Function("SingleExecute3", SingleExecute3Implementation)
+				.Function("SingleExecute7", SingleExecute7Implementation)
+				.Function("GenericExecute0", GenericExecute0Implementation)
+				.Function("GenericExecute1", GenericExecute1Implementation)
+				.Function("GenericExecute2", GenericExecute2Implementation)
+				.Function("GenericExecute3", GenericExecute3Implementation)
+				.Function("GenericExecute4", GenericExecute4Implementation)
+				.Function("GenericExecute6", GenericExecute6Implementation)
+				.Function("GenericExecute7", GenericExecute7Implementation)
+				.Function("DoubleExecute1", DoubleExecute1Implementation)
+				.Function("DoubleExecute3", DoubleExecute3Implementation)
+				.Function("DoubleExecute7", DoubleExecute7Implementation);
 		}
 	};
 

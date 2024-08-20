@@ -35,6 +35,11 @@ public:
 		}
 	}
 
+	virtual auto CopyValue(const void* InAddress) const -> void* override
+	{
+		return const_cast<void*>(InAddress);
+	}
+
 	virtual auto DestroyProperty() -> void override
 	{
 		if (Super::Property != nullptr)

@@ -5,12 +5,12 @@
 
 FClassBuilder::FClassBuilder(const TFunction<FString()>& InClassFunction,
                              const FString& InImplementationNameSpace,
-                             const TFunction<bool()>& InIsEngineClassFunction,
+                             const TFunction<bool()>& InIsProjectClassFunction,
                              const bool InIsReflectionClass,
                              const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
 	ClassRegister(FBinding::Get().Register(InClassFunction,
 	                                       InImplementationNameSpace,
-	                                       InIsEngineClassFunction,
+	                                       InIsProjectClassFunction,
 	                                       InIsReflectionClass,
 	                                       InTypeInfoFunction))
 {
@@ -18,12 +18,12 @@ FClassBuilder::FClassBuilder(const TFunction<FString()>& InClassFunction,
 
 FClassBuilder::FClassBuilder(const FString& InClass,
                              const FString& InImplementationNameSpace,
-                             const bool InIsEngineClass,
+                             const bool InIsProjectClass,
                              const bool InIsReflectionClass,
                              const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction):
 	FClassBuilder([InClass]() { return InClass; },
 	              InImplementationNameSpace,
-	              [InIsEngineClass]() { return InIsEngineClass; },
+	              [InIsProjectClass]() { return InIsProjectClass; },
 	              InIsReflectionClass,
 	              InTypeInfoFunction)
 {

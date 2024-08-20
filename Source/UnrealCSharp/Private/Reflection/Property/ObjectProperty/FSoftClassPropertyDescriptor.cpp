@@ -13,7 +13,7 @@ void FSoftClassPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
 			SrcGarbageCollectionHandle);
@@ -31,7 +31,7 @@ bool FSoftClassPropertyDescriptor::Identical(const void* A, const void* B, const
 		const auto ClassA = Property->GetObjectPropertyValue(A);
 
 		const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSoftClassPtr<UObject>>(
-			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)))->Get();
+			*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)))->Get();
 
 		return Property->StaticIdentical(ClassA, ClassB, PortFlags);
 	}
@@ -46,7 +46,7 @@ MonoObject* FSoftClassPropertyDescriptor::NewWeakRef(void* InAddress, const bool
 		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, true>(
-			Object, CopyValue(InAddress));
+			Object, InAddress);
 
 		return Object;
 	}

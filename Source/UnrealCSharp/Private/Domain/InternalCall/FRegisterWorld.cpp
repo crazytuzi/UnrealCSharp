@@ -15,7 +15,7 @@ namespace
 	{
 		FRegisterSpawnActorNameMode()
 		{
-			TBindingEnumBuilder<FActorSpawnParameters::ESpawnActorNameMode, true>()
+			TBindingEnumBuilder<FActorSpawnParameters::ESpawnActorNameMode, false>()
 				.Enumerator("Required_Fatal", FActorSpawnParameters::ESpawnActorNameMode::Required_Fatal)
 				.Enumerator("Required_ErrorAndReturnNull",
 				            FActorSpawnParameters::ESpawnActorNameMode::Required_ErrorAndReturnNull)
@@ -95,7 +95,7 @@ namespace
 
 		FRegisterActorSpawnParameters()
 		{
-			TBindingClassBuilder<FActorSpawnParameters, true>(NAMESPACE_LIBRARY)
+			TBindingClassBuilder<FActorSpawnParameters, false>(NAMESPACE_LIBRARY)
 				.Property("Name", BINDING_PROPERTY(&FActorSpawnParameters::Name))
 				.Property("Template", BINDING_PROPERTY(&FActorSpawnParameters::Template))
 				.Property("Owner", BINDING_PROPERTY(&FActorSpawnParameters::Owner))

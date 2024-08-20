@@ -3,6 +3,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Misc/FileHelper.h"
 #include "Common/NameEncode.h"
+#include "Domain/AssemblyLoader.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Interfaces/IPluginManager.h"
@@ -436,6 +437,11 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPath()
 {
 	return GetGameDirectory() / GetGameName() + PROJECT_SUFFIX;
 }
+
+FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
+{
+	return GetGameDirectory() / GetGameName() + PROJECT_PROPS_SUFFIX;
+}
 #endif
 
 FString FUnrealCSharpFunctionLibrary::GetBindingDirectory()
@@ -458,7 +464,7 @@ FString FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory()
 	return GetPluginDirectory() / PLUGIN_SCRIPT_PATH;
 }
 
-bool FUnrealCSharpFunctionLibrary::IsEngineType(const UField* InField)
+bool FUnrealCSharpFunctionLibrary::IsGameField(const UField* InField)
 {
 	const auto ModuleName = GetModuleName(InField);
 
@@ -580,6 +586,15 @@ FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
 	return GetFullScriptDirectory() / WEAVERS_NAME;
 }
 #endif
+
+UAssemblyLoader* FUnrealCSharpFunctionLibrary::GetAssemblyLoader()
+{
+	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+
+	return UnrealCSharpSetting->IsValidLowLevelFast()
+		       ? UnrealCSharpSetting->GetAssemblyLoader()
+		       : nullptr;
+}
 
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {

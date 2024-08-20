@@ -75,8 +75,7 @@ namespace
 			{
 				SetHelper->Add(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
 					               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-					               : static_cast<void*>(
-						               FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
+					               : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 		}
 
@@ -88,9 +87,7 @@ namespace
 			{
 				return SetHelper->Remove(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
 					                         ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-					                         : static_cast<void*>(
-						                         FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-							                         InValue)));
+					                         : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 
 			return 0;
@@ -104,9 +101,7 @@ namespace
 			{
 				return SetHelper->Contains(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
 					                           ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-					                           : static_cast<void*>(
-						                           FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-							                           InValue)));
+					                           : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
 			}
 
 			return false;

@@ -22,6 +22,8 @@ public:
 public:
 	virtual FProperty* GetProperty() const;
 
+	virtual void* CopyValue(const void* InAddress) const;
+
 	virtual void DestroyProperty();
 
 public:

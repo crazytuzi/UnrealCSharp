@@ -43,6 +43,12 @@ void FFunctionDescriptor::Initialize()
 				continue;
 			}
 
+			BufferOffsets.Add(BufferOffsets.IsEmpty()
+				                  ? 0
+				                  : BufferOffsets.Last() + (PropertyDescriptor->IsPrimitiveProperty()
+					                                            ? PropertyDescriptor->GetElementSize()
+					                                            : sizeof(void*)));
+
 			const auto Index = PropertyDescriptors.Add(PropertyDescriptor);
 
 			if (Property->HasAnyPropertyFlags(CPF_OutParm) && !Property->HasAnyPropertyFlags(CPF_ConstParm))

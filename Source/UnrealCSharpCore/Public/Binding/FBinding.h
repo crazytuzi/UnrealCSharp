@@ -17,22 +17,22 @@ public:
 
 	FBindingClassRegister*& Register(const TFunction<FString()>& InClassFunction,
 	                                 const FString& InImplementationNameSpace,
-	                                 const TFunction<bool()>& InIsEngineClassFunction,
+	                                 const TFunction<bool()>& InIsProjectClassFunction,
 	                                 bool InIsReflectionClass,
 	                                 const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction);
 
 	FBindingEnumRegister*& Register(const TFunction<FString()>& InEnumFunction,
 	                                const FString& InUnderlyingType,
-	                                bool InIsEngineEnum,
+	                                bool InIsProjectEnum,
 	                                const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {});
 
 	const TArray<FBindingClass*>& GetClasses() const;
 
 	const TArray<FBindingEnum*>& GetEnums() const;
 
-	bool IsEngineClass(const FString& InClass) const;
+	bool IsProjectClass(const FString& InClass) const;
 
-	bool IsEngineEnum(const FString& InEnum) const;
+	bool IsProjectEnum(const FString& InEnum) const;
 
 private:
 	bool bIsRegister;

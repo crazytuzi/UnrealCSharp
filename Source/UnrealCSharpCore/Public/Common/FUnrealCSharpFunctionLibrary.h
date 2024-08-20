@@ -68,6 +68,8 @@ public:
 	static FString GetGameProxyDirectory();
 
 	static FString GetGameProjectPath();
+
+	static FString GetGameProjectPropsPath();
 #endif
 
 	static FString GetBindingDirectory();
@@ -78,7 +80,7 @@ public:
 
 	static FString GetPluginScriptDirectory();
 
-	static bool IsEngineType(const UField* InField);
+	static bool IsGameField(const UField* InField);
 
 #if WITH_EDITOR
 	static FString GetGenerationPath(const UField* InField);
@@ -109,6 +111,8 @@ public:
 
 	static FString GetWeaversPath();
 #endif
+
+	static class UAssemblyLoader* GetAssemblyLoader();
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
 

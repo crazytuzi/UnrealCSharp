@@ -22,7 +22,7 @@ void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		const auto SrcMulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 			FMulticastDelegateHelper>(SrcGarbageCollectionHandle);

@@ -199,6 +199,11 @@ FProperty* FPropertyDescriptor::GetProperty() const
 	return nullptr;
 }
 
+void* FPropertyDescriptor::CopyValue(const void* InAddress) const
+{
+	return nullptr;
+}
+
 void FPropertyDescriptor::DestroyProperty()
 {
 }

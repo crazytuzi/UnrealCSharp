@@ -12,7 +12,7 @@ namespace
 	{
 		FRegisterGuidFormats()
 		{
-			TBindingEnumBuilder<EGuidFormats, true>()
+			TBindingEnumBuilder<EGuidFormats, false>()
 				.Enumerator("Digits", EGuidFormats::Digits)
 				.Enumerator("DigitsWithHyphens", EGuidFormats::DigitsWithHyphens)
 				.Enumerator("DigitsWithHyphensLower", EGuidFormats::DigitsWithHyphensLower)

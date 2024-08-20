@@ -32,7 +32,7 @@ namespace
 						const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
 
 						const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct(
-							FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(*OutRow));
+							*FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(*OutRow));
 
 						DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
 

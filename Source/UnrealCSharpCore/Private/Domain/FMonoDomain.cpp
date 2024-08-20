@@ -4,8 +4,6 @@
 #include "CoreMacro/PropertyMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/Macro.h"
-#include "CoreMacro/MonoMacro.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -715,83 +713,35 @@ MonoMethod* FMonoDomain::Delegate_Get_Method(MonoObject* InDelegate)
 	return nullptr;
 }
 
-MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath,
+MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** OutAssemblyPath,
                                                void* InUserData)
 {
-	auto AssemblyName = mono_assembly_name_get_name(InAssemblyName);
+	const auto& AssemblyName = FString(mono_assembly_name_get_name(InAssemblyName));
 
-#if WITH_EDITOR
-	if (AssemblyName == ASSEMBLY_CORE_LIB_RESOURCE_NAME)
+	if (const auto AssemblyLoader = FUnrealCSharpFunctionLibrary::GetAssemblyLoader())
 	{
-		AssemblyName = StringCast<ANSICHAR>(*ASSEMBLY_CORE_LIB_NAME).Get();
+		if (const auto Data = AssemblyLoader->Load(AssemblyName);
+			!Data.IsEmpty())
+		{
+			MonoAssembly* Assembly = nullptr;
+
+			LoadAssembly(AssemblyName, Data, nullptr, &Assembly);
+
+			return Assembly;
+		}
 	}
-#endif
 
-#if WITH_EDITOR
-	auto Path = FString::Printf(TEXT(
-		"%s/Source/ThirdParty/Mono/lib/%s/%s/net"),
-	                            *FUnrealCSharpFunctionLibrary::GetPluginDirectory(),
-	                            MONO_CONFIGURATION,
-#if PLATFORM_WINDOWS
-	                            TEXT("Win64")
-#elif PLATFORM_MAC_X86
-	                            TEXT("macOS_x86_64")
-#elif PLATFORM_MAC_ARM64
-	                            TEXT("macOS_arm64")
-#endif
-	);
-#else
-	auto Path = FString::Printf(TEXT(
-		"%s/Binaries/%s/Mono/lib/%s/%s/net"),
-	                            *FPaths::ProjectDir(),
-#if PLATFORM_WINDOWS
-	                            TEXT("Win64"),
-	                            MONO_CONFIGURATION,
-	                            TEXT("Win64"));
-#elif PLATFORM_ANDROID
-	                            TEXT("Android"),
-	                            MONO_CONFIGURATION,
-	                            TEXT("Android"));
-#elif PLATFORM_IOS
-	                            TEXT("IOS"),
-	                            MONO_CONFIGURATION,
-	                            TEXT("IOS"));
-#elif PLATFORM_LINUX
-	                            TEXT("Linux"),
-	                            MONO_CONFIGURATION,
-	                            TEXT("Linux_x86_64"));
-#elif PLATFORM_MAC_X86
-                                    TEXT("macOS_x86_64"),
-                                    MONO_CONFIGURATION,
-                                    TEXT("macOS_x86_64"));
-#elif PLATFORM_MAC_ARM64
-                                    TEXT("macOS_arm64"),
-                                    MONO_CONFIGURATION,
-                                    TEXT("macOS_arm64"));
-#endif
-#endif
-
-	const auto File = FPaths::Combine(Path, AssemblyName) + DLL_SUFFIX;
-
-	MonoAssembly* Assembly;
-
-	LoadAssembly(AssemblyName, File, nullptr, &Assembly);
-
-	return Assembly;
+	return nullptr;
 }
 
-void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile,
-                               MonoImage** OutImage, MonoAssembly** OutAssembly)
+void FMonoDomain::LoadAssembly(const FString& InAssemblyName, const TArray<uint8>& InData, MonoImage** OutImage,
+                               MonoAssembly** OutAssembly)
 {
-	TArray<uint8> Data;
-
-	FFileHelper::LoadFileToArray(Data, *InFile);
-
 	auto ImageOpenStatus = MonoImageOpenStatus::MONO_IMAGE_OK;
 
-	const auto Image = mono_image_open_from_data_with_name((char*)Data.GetData(), Data.Num(),
+	const auto Image = mono_image_open_from_data_with_name((char*)InData.GetData(), InData.Num(),
 	                                                       true, &ImageOpenStatus,
-	                                                       false, InAssemblyName);
+	                                                       false, TCHAR_TO_UTF8(*InAssemblyName));
 
 	if (ImageOpenStatus != MonoImageOpenStatus::MONO_IMAGE_OK)
 	{
@@ -799,7 +749,7 @@ void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile
 		return;
 	}
 
-	const auto Assembly = mono_assembly_load_from_full(Image, InAssemblyName, &ImageOpenStatus, false);
+	const auto Assembly = mono_assembly_load_from_full(Image, TCHAR_TO_UTF8(*InAssemblyName), &ImageOpenStatus, false);
 
 	if (ImageOpenStatus != MonoImageOpenStatus::MONO_IMAGE_OK)
 	{
@@ -816,6 +766,16 @@ void FMonoDomain::LoadAssembly(const char* InAssemblyName, const FString& InFile
 	{
 		*OutAssembly = Assembly;
 	}
+}
+
+void FMonoDomain::LoadAssembly(const FString& InAssemblyName, const FString& InFile,
+                               MonoImage** OutImage, MonoAssembly** OutAssembly)
+{
+	TArray<uint8> Data;
+
+	FFileHelper::LoadFileToArray(Data, *InFile);
+
+	LoadAssembly(InAssemblyName, Data, OutImage, OutAssembly);
 }
 
 void FMonoDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
@@ -969,7 +929,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 
 		MonoAssembly* Assembly = nullptr;
 
-		LoadAssembly(TCHAR_TO_UTF8(*FPaths::GetBaseFilename(AssemblyPath)), AssemblyPath, &Image, &Assembly);
+		LoadAssembly(FPaths::GetBaseFilename(AssemblyPath), AssemblyPath, &Image, &Assembly);
 
 		if (Image != nullptr)
 		{

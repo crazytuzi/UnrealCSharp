@@ -22,7 +22,7 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 			SrcGarbageCollectionHandle);
@@ -56,26 +56,12 @@ MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const
 
 MonoObject* FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	if (bIsCopy)
-	{
-		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		const auto SetHelper = new FSetHelper(Property->ElementProp, CopyValue(InAddress),
-		                                      true, false);
+	const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
+	                                      bIsCopy, false);
 
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
 
-		return Object;
-	}
-	else
-	{
-		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
-
-		const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
-		                                      false, false);
-
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
-
-		return Object;
-	}
+	return Object;
 }

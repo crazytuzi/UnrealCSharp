@@ -32,6 +32,8 @@
 
 #define PROJECT_SUFFIX FString(TEXT(".csproj"))
 
+#define PROJECT_PROPS_SUFFIX FString(TEXT(".csproj.props"))
+
 #define SOLUTION_SUFFIX FString(TEXT(".sln"))
 
 #define DLL_SUFFIX FString(TEXT(".dll"))

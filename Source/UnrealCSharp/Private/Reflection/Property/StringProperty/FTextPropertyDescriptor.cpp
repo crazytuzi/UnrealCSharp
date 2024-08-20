@@ -13,7 +13,7 @@ void FTextPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	if (Property != nullptr)
 	{
-		const auto SrcGarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(Src);
+		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
 		if (const auto SrcValue = FCSharpEnvironment::GetEnvironment().GetString<FText>(
 			SrcGarbageCollectionHandle))
@@ -32,7 +32,7 @@ bool FTextPropertyDescriptor::Identical(const void* A, const void* B, uint32 Por
 		const auto TextA = Property->GetPropertyValue(A);
 
 		const auto TextB = FCSharpEnvironment::GetEnvironment().GetString<FText>(
-			static_cast<FGarbageCollectionHandle>(const_cast<void*>(B)));
+			*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
 
 		return TextA.EqualTo(*TextB);
 	}
@@ -46,7 +46,7 @@ MonoObject* FTextPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsC
 	{
 		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true>(Object, CopyValue(InAddress));
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true>(Object, InAddress);
 
 		return Object;
 	}

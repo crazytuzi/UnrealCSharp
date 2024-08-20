@@ -196,9 +196,13 @@ public:
 	static MonoMethod* Delegate_Get_Method(MonoObject* InDelegate);
 
 public:
-	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** InAssemblyPath, void* InUserData);
+	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** OutAssemblyPath,
+	                                         void* InUserData);
 
-	static void LoadAssembly(const char* InAssemblyName, const FString& InFile,
+	static void LoadAssembly(const FString& InAssemblyName, const TArray<uint8>& InData,
+	                         MonoImage** OutImage, MonoAssembly** OutAssembly);
+
+	static void LoadAssembly(const FString& InAssemblyName, const FString& InFile,
 	                         MonoImage** OutImage, MonoAssembly** OutAssembly);
 
 	static void InitializeAssembly(const TArray<FString>& InAssemblies);

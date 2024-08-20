@@ -37,7 +37,7 @@ FBinding& FBinding::Register()
 
 FBindingClassRegister*& FBinding::Register(const TFunction<FString()>& InClassFunction,
                                            const FString& InImplementationNameSpace,
-                                           const TFunction<bool()>& InIsEngineClassFunction,
+                                           const TFunction<bool()>& InIsProjectClassFunction,
                                            const bool InIsReflectionClass,
                                            const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
 {
@@ -59,19 +59,19 @@ FBindingClassRegister*& FBinding::Register(const TFunction<FString()>& InClassFu
 
 	return ClassRegisters.Add_GetRef(new FBindingClassRegister(InClassFunction,
 	                                                           InImplementationNameSpace,
-	                                                           InIsEngineClassFunction,
+	                                                           InIsProjectClassFunction,
 	                                                           InIsReflectionClass,
 	                                                           InTypeInfoFunction));
 }
 
 FBindingEnumRegister*& FBinding::Register(const TFunction<FString()>& InEnumFunction,
                                           const FString& InUnderlyingType,
-                                          const bool InIsEngineEnum,
+                                          const bool InIsProjectEnum,
                                           const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
 {
 	return EnumRegisters.Add_GetRef(new FBindingEnumRegister(InEnumFunction,
 	                                                         InUnderlyingType,
-	                                                         InIsEngineEnum,
+	                                                         InIsProjectEnum,
 	                                                         InTypeInfoFunction));
 }
 
@@ -85,26 +85,26 @@ const TArray<FBindingEnum*>& FBinding::GetEnums() const
 	return Enums;
 }
 
-bool FBinding::IsEngineClass(const FString& InClass) const
+bool FBinding::IsProjectClass(const FString& InClass) const
 {
 	for (auto& Class : Classes)
 	{
 		if (InClass == Class->GetClass())
 		{
-			return Class->IsEngineClass();
+			return Class->IsProjectClass();
 		}
 	}
 
 	return false;
 }
 
-bool FBinding::IsEngineEnum(const FString& InEnum) const
+bool FBinding::IsProjectEnum(const FString& InEnum) const
 {
 	for (auto& Enum : Enums)
 	{
 		if (InEnum == Enum->GetEnum())
 		{
-			return Enum->IsEngineEnum();
+			return Enum->IsProjectEnum();
 		}
 	}
 

@@ -11,6 +11,7 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	  PublishDirectory(DEFAULT_PUBLISH_DIRECTORY),
 	  UEName(DEFAULT_UE_NAME),
 	  GameName(DEFAULT_GAME_NAME),
+	  AssemblyLoader(UAssemblyLoader::StaticClass()),
 	  bEnableDebug(false),
 	  Port(0)
 {
@@ -56,6 +57,14 @@ const FString& UUnrealCSharpSetting::GetUEName() const
 const FString& UUnrealCSharpSetting::GetGameName() const
 {
 	return GameName;
+}
+
+UAssemblyLoader* UUnrealCSharpSetting::GetAssemblyLoader() const
+{
+	return Cast<UAssemblyLoader>((AssemblyLoader->IsValidLowLevelFast()
+		                              ? AssemblyLoader.Get()
+		                              : UAssemblyLoader::StaticClass())
+		->GetDefaultObject());
 }
 
 const TArray<FBindClass>& UUnrealCSharpSetting::GetBindClass() const

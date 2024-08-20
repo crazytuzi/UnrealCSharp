@@ -10,13 +10,13 @@ class UNREALCSHARP_API FClassBuilder
 public:
 	explicit FClassBuilder(const TFunction<FString()>& InClassFunction,
 	                       const FString& InImplementationNameSpace,
-	                       const TFunction<bool()>& InIsEngineClassFunction,
+	                       const TFunction<bool()>& InIsProjectClassFunction,
 	                       bool InIsReflectionClass,
 	                       const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {});
 
 	explicit FClassBuilder(const FString& InClass,
 	                       const FString& InImplementationNameSpace,
-	                       bool InIsEngineClass = false,
+	                       bool InIsProjectClass = false,
 	                       bool InIsReflectionClass = false,
 	                       const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {});
 
