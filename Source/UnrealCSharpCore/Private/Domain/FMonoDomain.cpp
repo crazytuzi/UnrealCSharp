@@ -4,6 +4,7 @@
 #include "CoreMacro/PropertyMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/MonoMacro.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -716,7 +717,14 @@ MonoMethod* FMonoDomain::Delegate_Get_Method(MonoObject* InDelegate)
 MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** OutAssemblyPath,
                                                void* InUserData)
 {
-	const auto& AssemblyName = FString(mono_assembly_name_get_name(InAssemblyName));
+	auto AssemblyName = FString(mono_assembly_name_get_name(InAssemblyName));
+
+#if WITH_EDITOR
+	if (AssemblyName == ASSEMBLY_CORE_LIB_RESOURCE_NAME)
+	{
+		AssemblyName = ASSEMBLY_CORE_LIB_NAME;
+	}
+#endif
 
 	if (const auto AssemblyLoader = FUnrealCSharpFunctionLibrary::GetAssemblyLoader())
 	{
