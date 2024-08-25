@@ -32,39 +32,39 @@ public:
 
 	void Clear() const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Broadcast0() const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast0<T>();
+			MulticastDelegateHandler->Broadcast0<ReturnType>();
 		}
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Broadcast2(uint8* InBuffer) const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast2<T>(InBuffer);
+			MulticastDelegateHandler->Broadcast2<ReturnType>(InBuffer);
 		}
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Broadcast4(MonoObject** OutValue) const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast4<T>(OutValue);
+			MulticastDelegateHandler->Broadcast4<ReturnType>(OutValue);
 		}
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Broadcast6(MonoObject** OutValue, uint8* InBuffer) const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast6<T>(OutValue, InBuffer);
+			MulticastDelegateHandler->Broadcast6<ReturnType>(OutValue, InBuffer);
 		}
 	}
 

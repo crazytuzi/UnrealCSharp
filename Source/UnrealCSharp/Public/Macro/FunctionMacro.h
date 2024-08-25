@@ -128,15 +128,15 @@
 	} \
 	*OutValue = (MonoObject*)MonoObjectArray;
 
-#define PROCESS_COMPOUND_RETURN(Params) \
-	MonoObject* ReturnValue{}; \
-	ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->CopyValue(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
-	                              reinterpret_cast<void**>(&ReturnValue), true); \
-	BufferAllocator->Free(Params); \
-	return ReturnValue;
-
-#define PROCESS_PRIMITIVE_RETURN(Params, Type) \
-	Type ReturnValue{}; \
-	ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), &ReturnValue); \
-	BufferAllocator->Free(Params); \
-	return ReturnValue;
+#define PROCESS_RETURN(ReturnBuffer, Params) \
+	if constexpr (ReturnType == EFunctionReturnType::Primitive) \
+	{ \
+		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), ReturnBuffer); \
+	} \
+	else if constexpr (ReturnType == EFunctionReturnType::Compound) \
+	{ \
+		ReturnPropertyDescriptor->Get( \
+			ReturnPropertyDescriptor->CopyValue(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
+			reinterpret_cast<void**>(ReturnBuffer), true); \
+	} \
+	BufferAllocator->Free(Params);

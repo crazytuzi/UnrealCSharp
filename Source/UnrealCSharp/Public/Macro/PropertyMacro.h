@@ -21,13 +21,13 @@ static Type Get##StructType##PropertyType##PropertyImplementation(const FGarbage
 }
 
 #define SET_PRIMITIVE_PROPERTY_IMPLEMENTATION(StructType, TemplateType, PropertyType, Type) \
-static void Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, Type InValue) \
+static void Set##StructType##PropertyType##PropertyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, const uint32 InPropertyHash, const Type InValue) \
 { \
 	if (const auto FoundAddress = FCSharpEnvironment::GetEnvironment().GetAddress<TemplateType, void*>(InGarbageCollectionHandle)) \
 	{ \
 		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddPropertyDescriptor(InPropertyHash)) \
 		{ \
-			PropertyDescriptor->Set(&InValue, PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress)); \
+			PropertyDescriptor->Set(const_cast<Type*>(&InValue), PropertyDescriptor->ContainerPtrToValuePtr<void>(FoundAddress)); \
 		} \
 	} \
 }

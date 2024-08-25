@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FFunctionDescriptor.h"
+#include "Common/EFunctionReturnType.h"
 #include "mono/metadata/object.h"
 
 class FUnrealFunctionDescriptor final : public FFunctionDescriptor
@@ -12,49 +13,49 @@ public:
 	explicit FUnrealFunctionDescriptor(UFunction* InFunction);
 
 public:
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call0(UObject* InObject) const;
 
-	template <typename T>
-	auto Call1(UObject* InObject) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call1(UObject* InObject, uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call2(UObject* InObject, uint8* InBuffer) const;
 
-	template <typename T>
-	auto Call3(UObject* InObject, uint8* InBuffer) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call3(UObject* InObject, uint8* InBuffer, uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call4(UObject* InObject, MonoObject** OutValue) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call6(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const;
 
-	template <typename T>
-	auto Call7(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call7(UObject* InObject, MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call8(UObject* InObject) const;
 
-	template <typename T>
-	auto Call9(UObject* InObject) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call9(UObject* InObject, uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call10(UObject* InObject, uint8* InBuffer) const;
 
-	template <typename T>
-	auto Call11(UObject* InObject, uint8* InBuffer) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call11(UObject* InObject, uint8* InBuffer, uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call14(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const;
 
-	template <typename T>
-	auto Call15(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call15(UObject* InObject, MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call24(UObject* InObject) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call26(UObject* InObject, uint8* InBuffer) const;
 };
 

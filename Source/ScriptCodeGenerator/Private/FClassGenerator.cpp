@@ -576,9 +576,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		FString BufferBody;
+		FString InBufferBody;
 
-		auto bHasBuffer = false;
+		auto bHasInBuffer = false;
 
 		if (!FunctionParams.IsEmpty())
 		{
@@ -588,18 +588,18 @@ void FClassGenerator::Generator(const UClass* InClass)
 			{
 				if (FunctionOutParamIndex.Contains(Index) == false)
 				{
-					bHasBuffer = true;
+					bHasInBuffer = true;
 
-					BufferBody += FString::Printf(TEXT(
-						"\t\t\t\t*(%s*)(__Buffer%s) = %s;\n\n"
+					InBufferBody += FString::Printf(TEXT(
+						"\t\t\t\t*(%s*)(__InBuffer%s) = %s;\n\n"
 					),
-					                              *FGeneratorCore::GetBufferCast(FunctionParams[Index]),
-					                              BufferSize == 0
-						                              ? TEXT("")
-						                              : *FString::Printf(TEXT(
-							                              " + %d"),
-						                                                 BufferSize),
-					                              *FGeneratorCore::GetParamName(FunctionParams[Index])
+					                                *FGeneratorCore::GetBufferCast(FunctionParams[Index]),
+					                                BufferSize == 0
+						                                ? TEXT("")
+						                                : *FString::Printf(TEXT(
+							                                " + %d"),
+						                                                   BufferSize),
+					                                *FGeneratorCore::GetParamName(FunctionParams[Index])
 					);
 
 					if (FGeneratorCore::IsPrimitiveProperty(FunctionParams[Index]))
@@ -613,19 +613,40 @@ void FClassGenerator::Generator(const UClass* InClass)
 				}
 			}
 
-			BufferBody = FString::Printf(TEXT(
-				"\t\t\t\tvar __Buffer = stackalloc byte[%d];\n\n"
+			InBufferBody = FString::Printf(TEXT(
+				"\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n\n"
 				"%s"
 			),
-			                             BufferSize,
-			                             *BufferBody
+			                               BufferSize,
+			                               *InBufferBody
+			);
+		}
+
+		FString ReturnBufferBody;
+
+		auto bHasReturnBuffer = false;
+
+		if (FunctionReturnParam != nullptr)
+		{
+			bHasReturnBuffer = true;
+
+			ReturnBufferBody = FString::Printf(TEXT(
+				"\t\t\t\tvar __ReturnBuffer = stackalloc byte[%llu];\n\n"
+			),
+			                                   FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
+				                                   ? FunctionReturnParam->ElementSize
+				                                   : sizeof(void*)
 			);
 		}
 
 		auto FunctionCallBody = FString::Printf(TEXT(
-			"FFunctionImplementation.FFunction_%sCall%dImplementation(%s, %s%s%s)"
+			"FFunctionImplementation.FFunction_%sCall%dImplementation(%s, %s%s%s%s);\n"
 		),
-		                                        *FGeneratorCore::GetTypeImplementation(FunctionReturnParam),
+		                                        FunctionReturnParam != nullptr
+			                                        ? FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
+				                                          ? TEXT("Primitive")
+				                                          : TEXT("Compound")
+			                                        : TEXT("Generic"),
 		                                        FGeneratorCore::GetFunctionIndex(FunctionReturnParam != nullptr,
 			                                        FunctionParams.Num() - FunctionOutParamIndex.Num() != 0,
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
@@ -641,7 +662,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                        FunctionRefParamIndex.IsEmpty() && FunctionOutParamIndex.IsEmpty()
 			                                        ? TEXT("")
 			                                        : TEXT(", out var __OutValue"),
-		                                        bHasBuffer ? TEXT(", __Buffer") : TEXT("")
+		                                        bHasInBuffer ? TEXT(", __InBuffer") : TEXT(""),
+		                                        bHasReturnBuffer ? TEXT(", __ReturnBuffer") : TEXT("")
 		);
 
 		TArray<FString> FunctionOutParams;
@@ -676,34 +698,9 @@ void FClassGenerator::Generator(const UClass* InClass)
 		if (FunctionReturnParam != nullptr)
 		{
 			FunctionReturnParamBody = FString::Printf(TEXT(
-				"return %s;"
+				"return *(%s*)__ReturnBuffer;"
 			),
-			                                          FunctionRefParamIndex.IsEmpty()
-				                                          ? FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
-					                                            ? *FString::Printf(TEXT(
-						                                            "%s%s"
-					                                            ),
-						                                            *FGeneratorCore::GetGetAccessorReturnParamName(
-							                                            FunctionReturnParam),
-						                                            *FunctionCallBody)
-					                                            : *FString::Printf(TEXT(
-						                                            "%s as %s"
-					                                            ),
-						                                            *FunctionCallBody,
-						                                            *FGeneratorCore::GetPropertyType(
-							                                            FunctionReturnParam))
-				                                          : FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
-				                                          ? *FString::Printf(TEXT(
-					                                          "%s__ReturnValue"
-				                                          ),
-				                                                             *FGeneratorCore::GetGetAccessorReturnParamName(
-					                                                             FunctionReturnParam))
-				                                          : *FString::Printf(TEXT(
-					                                          "__ReturnValue as %s"
-				                                          ),
-				                                                             *FGeneratorCore::GetPropertyType(
-					                                                             FunctionReturnParam))
-
+			                                          *FunctionReturnType
 			);
 		}
 
@@ -730,40 +727,26 @@ void FClassGenerator::Generator(const UClass* InClass)
 		auto FunctionImplementationBody = FString::Printf(TEXT(
 			"%s"
 			"%s"
+			"%s"
 			"\t\t\t\t%s"
-			"%s"
-			"%s"
 			"%s"
 			"%s"
 			"%s"
 		),
 		                                                  *FunctionDefaultParamBody,
-		                                                  *BufferBody,
-		                                                  FunctionReturnParam != nullptr && !FunctionRefParamIndex.
-		                                                  IsEmpty()
-			                                                  ? TEXT("var __ReturnValue = ")
-			                                                  : TEXT(""),
-		                                                  FunctionReturnParam == nullptr || !FunctionRefParamIndex.
-		                                                  IsEmpty()
-			                                                  ? *FunctionCallBody
-			                                                  : TEXT(""),
-		                                                  FunctionReturnParam == nullptr || !FunctionRefParamIndex.
-		                                                  IsEmpty()
-			                                                  ? TEXT(";\n")
-			                                                  : TEXT(""),
+		                                                  *InBufferBody,
+		                                                  *ReturnBufferBody,
+		                                                  *FunctionCallBody,
 		                                                  *FunctionOutParamBody,
-		                                                  !FunctionOutParamBody.IsEmpty() && !FunctionReturnParamBody.
-		                                                  IsEmpty()
+		                                                  !FunctionOutParamBody.IsEmpty() ||
+		                                                  !FunctionReturnParamBody.IsEmpty()
 			                                                  ? TEXT("\n")
 			                                                  : TEXT(""),
 		                                                  FunctionReturnParamBody.IsEmpty()
 			                                                  ? TEXT("")
 			                                                  : *FString::Printf(TEXT(
-				                                                  "%s%s\n"
+				                                                  "\t\t\t\t%s\n"
 			                                                  ),
-				                                                  !FunctionRefParamIndex.IsEmpty()
-					                                                  ? TEXT("\t\t\t")
-					                                                  : TEXT(""),
 				                                                  *FunctionReturnParamBody));
 
 		FunctionContent += FString::Printf(TEXT(

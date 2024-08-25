@@ -5,32 +5,6 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
-#define EXECUTE_IMPLEMENTATION(PropertyType, Type) \
-		static Type PropertyType##Execute1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle) \
-		{ \
-			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InGarbageCollectionHandle)) \
-			{ \
-				return DelegateHelper->Execute1<Type>(); \
-			} \
-			return {}; \
-		} \
-		static Type PropertyType##Execute3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle, uint8* InBuffer) \
-		{ \
-			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InGarbageCollectionHandle)) \
-			{ \
-				return DelegateHelper->Execute3<Type>(InBuffer); \
-			} \
-			return {}; \
-		} \
-		static Type PropertyType##Execute7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue, uint8* InBuffer) \
-		{ \
-			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(InGarbageCollectionHandle)) \
-			{ \
-				return DelegateHelper->Execute7<Type>(OutValue, InBuffer); \
-			} \
-			return {}; \
-		}
-
 namespace
 {
 	struct FRegisterDelegate
@@ -92,32 +66,32 @@ namespace
 			}
 		}
 
-		EXECUTE_IMPLEMENTATION(Byte, uint8)
-
-		EXECUTE_IMPLEMENTATION(UInt16, uint16)
-
-		EXECUTE_IMPLEMENTATION(UInt32, uint32)
-
-		EXECUTE_IMPLEMENTATION(UInt64, uint64)
-
-		EXECUTE_IMPLEMENTATION(SByte, int8)
-
-		EXECUTE_IMPLEMENTATION(Int16, int16)
-
-		EXECUTE_IMPLEMENTATION(Int32, int)
-
-		EXECUTE_IMPLEMENTATION(Int64, int64)
-
-		EXECUTE_IMPLEMENTATION(Boolean, bool)
-
-		EXECUTE_IMPLEMENTATION(Single, float)
-
 		static void GenericExecute0Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InGarbageCollectionHandle))
 			{
-				return DelegateHelper->Execute0<MonoObject*>();
+				DelegateHelper->Execute0<>();
+			}
+		}
+
+		static void PrimitiveExecute1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                            uint8* ReturnBuffer)
+		{
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute1<EFunctionReturnType::Primitive>(ReturnBuffer);
+			}
+		}
+
+		static void CompoundExecute1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                           uint8* ReturnBuffer)
+		{
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute1<EFunctionReturnType::Compound>(ReturnBuffer);
 			}
 		}
 
@@ -127,7 +101,27 @@ namespace
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute2<MonoObject*>(InBuffer);
+				DelegateHelper->Execute2<>(InBuffer);
+			}
+		}
+
+		static void PrimitiveExecute3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                            uint8* InBuffer, uint8* ReturnBuffer)
+		{
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute3<EFunctionReturnType::Primitive>(InBuffer, ReturnBuffer);
+			}
+		}
+
+		static void CompoundExecute3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                           uint8* InBuffer, uint8* ReturnBuffer)
+		{
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute3<EFunctionReturnType::Compound>(InBuffer, ReturnBuffer);
 			}
 		}
 
@@ -137,7 +131,7 @@ namespace
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute4<MonoObject*>(OutValue);
+				DelegateHelper->Execute4<>(OutValue);
 			}
 		}
 
@@ -147,13 +141,29 @@ namespace
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute6<MonoObject*>(OutValue, InBuffer);
+				DelegateHelper->Execute6<>(OutValue, InBuffer);
 			}
 		}
 
-		EXECUTE_IMPLEMENTATION(Generic, MonoObject*)
+		static void PrimitiveExecute7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                            MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer)
+		{
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute7<EFunctionReturnType::Primitive>(OutValue, InBuffer, ReturnBuffer);
+			}
+		}
 
-		EXECUTE_IMPLEMENTATION(Double, double)
+		static void CompoundExecute7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                           MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer)
+		{
+			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
+				InGarbageCollectionHandle))
+			{
+				DelegateHelper->Execute7<EFunctionReturnType::Compound>(OutValue, InBuffer, ReturnBuffer);
+			}
+		}
 
 		FRegisterDelegate()
 		{
@@ -164,46 +174,16 @@ namespace
 				.Function("IsBound", IsBoundImplementation)
 				.Function("UnBind", UnBindImplementation)
 				.Function("Clear", ClearImplementation)
-				.Function("ByteExecute1", ByteExecute1Implementation)
-				.Function("ByteExecute3", ByteExecute3Implementation)
-				.Function("ByteExecute7", ByteExecute7Implementation)
-				.Function("UInt16Execute1", UInt16Execute1Implementation)
-				.Function("UInt16Execute3", UInt16Execute3Implementation)
-				.Function("UInt16Execute7", UInt16Execute7Implementation)
-				.Function("UInt32Execute1", UInt32Execute1Implementation)
-				.Function("UInt32Execute3", UInt32Execute3Implementation)
-				.Function("UInt32Execute7", UInt32Execute7Implementation)
-				.Function("UInt64Execute1", UInt64Execute1Implementation)
-				.Function("UInt64Execute3", UInt64Execute3Implementation)
-				.Function("UInt64Execute7", UInt64Execute7Implementation)
-				.Function("SByteExecute1", SByteExecute1Implementation)
-				.Function("SByteExecute3", SByteExecute3Implementation)
-				.Function("SByteExecute7", SByteExecute7Implementation)
-				.Function("Int16Execute1", Int16Execute1Implementation)
-				.Function("Int16Execute3", Int16Execute3Implementation)
-				.Function("Int16Execute7", Int16Execute7Implementation)
-				.Function("Int32Execute1", Int32Execute1Implementation)
-				.Function("Int32Execute3", Int32Execute3Implementation)
-				.Function("Int32Execute7", Int32Execute7Implementation)
-				.Function("Int64Execute1", Int64Execute1Implementation)
-				.Function("Int64Execute3", Int64Execute3Implementation)
-				.Function("Int64Execute7", Int64Execute7Implementation)
-				.Function("BooleanExecute1", BooleanExecute1Implementation)
-				.Function("BooleanExecute3", BooleanExecute3Implementation)
-				.Function("BooleanExecute7", BooleanExecute7Implementation)
-				.Function("SingleExecute1", SingleExecute1Implementation)
-				.Function("SingleExecute3", SingleExecute3Implementation)
-				.Function("SingleExecute7", SingleExecute7Implementation)
 				.Function("GenericExecute0", GenericExecute0Implementation)
-				.Function("GenericExecute1", GenericExecute1Implementation)
+				.Function("PrimitiveExecute1", PrimitiveExecute1Implementation)
+				.Function("CompoundExecute1", CompoundExecute1Implementation)
 				.Function("GenericExecute2", GenericExecute2Implementation)
-				.Function("GenericExecute3", GenericExecute3Implementation)
+				.Function("PrimitiveExecute3", PrimitiveExecute3Implementation)
+				.Function("CompoundExecute3", CompoundExecute3Implementation)
 				.Function("GenericExecute4", GenericExecute4Implementation)
 				.Function("GenericExecute6", GenericExecute6Implementation)
-				.Function("GenericExecute7", GenericExecute7Implementation)
-				.Function("DoubleExecute1", DoubleExecute1Implementation)
-				.Function("DoubleExecute3", DoubleExecute3Implementation)
-				.Function("DoubleExecute7", DoubleExecute7Implementation);
+				.Function("PrimitiveExecute7", PrimitiveExecute7Implementation)
+				.Function("CompoundExecute7", CompoundExecute7Implementation);
 		}
 	};
 

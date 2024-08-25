@@ -446,11 +446,6 @@ FString FGeneratorCore::GetBufferCast(FProperty* Property)
 
 FString FGeneratorCore::GetTypeImplementation(FProperty* Property)
 {
-	if (Property == nullptr)
-	{
-		return TEXT("Generic");
-	}
-
 	if (CastField<FByteProperty>(Property))
 	{
 		return TEXT("Byte");
@@ -481,7 +476,7 @@ FString FGeneratorCore::GetTypeImplementation(FProperty* Property)
 
 	if (CastField<FDoubleProperty>(Property)) return TEXT("Double");
 
-	return TEXT("Generic");
+	return TEXT("");
 }
 
 FString FGeneratorCore::GetGetAccessorReturnParamName(FProperty* Property)

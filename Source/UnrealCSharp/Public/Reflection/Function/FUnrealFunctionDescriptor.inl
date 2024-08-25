@@ -4,102 +4,82 @@
 #include "Domain/FMonoDomain.h"
 #include "Macro/FunctionMacro.h"
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call0(UObject* InObject) const
 {
 	InObject->UObject::ProcessEvent(Function.Get(), nullptr);
 }
 
-template <typename T>
-auto FUnrealFunctionDescriptor::Call1(UObject* InObject) const
+template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call1(UObject* InObject, uint8* ReturnBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
 	InObject->UObject::ProcessEvent(Function.Get(), Params);
 
-	if constexpr (std::is_same_v<T, MonoObject*>)
-	{
-		PROCESS_COMPOUND_RETURN(Params);
-	}
-	else
-	{
-		PROCESS_PRIMITIVE_RETURN(Params, T)
-	}
+	PROCESS_RETURN(ReturnBuffer, Params)
 }
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call2(UObject* InObject, uint8* InBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
-	PROCESS_SCRIPT_IN(InBuffer, Params);
+	PROCESS_SCRIPT_IN(InBuffer, Params)
 
 	InObject->UObject::ProcessEvent(Function.Get(), Params);
 }
 
-template <typename T>
-auto FUnrealFunctionDescriptor::Call3(UObject* InObject, uint8* InBuffer) const
+template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call3(UObject* InObject, uint8* InBuffer, uint8* ReturnBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
-	PROCESS_SCRIPT_IN(InBuffer, Params);
+	PROCESS_SCRIPT_IN(InBuffer, Params)
 
 	InObject->UObject::ProcessEvent(Function.Get(), Params);
 
-	if constexpr (std::is_same_v<T, MonoObject*>)
-	{
-		PROCESS_COMPOUND_RETURN(Params);
-	}
-	else
-	{
-		PROCESS_PRIMITIVE_RETURN(Params, T)
-	}
+	PROCESS_RETURN(ReturnBuffer, Params)
 }
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call4(UObject* InObject, MonoObject** OutValue) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
 	InObject->UObject::ProcessEvent(Function.Get(), Params);
 
-	PROCESS_OUT(OutValue, Params);
+	PROCESS_OUT(OutValue, Params)
 }
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call6(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
-	PROCESS_SCRIPT_REFERENCE_IN(InBuffer, Params);
+	PROCESS_SCRIPT_REFERENCE_IN(InBuffer, Params)
 
 	InObject->UObject::ProcessEvent(Function.Get(), Params);
 
-	PROCESS_OUT(OutValue, Params);
+	PROCESS_OUT(OutValue, Params)
 }
 
-template <typename T>
-auto FUnrealFunctionDescriptor::Call7(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const
+template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call7(UObject* InObject, MonoObject** OutValue, uint8* InBuffer,
+                                      uint8* ReturnBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
-	PROCESS_SCRIPT_REFERENCE_IN(InBuffer, Params);
+	PROCESS_SCRIPT_REFERENCE_IN(InBuffer, Params)
 
 	InObject->UObject::ProcessEvent(Function.Get(), Params);
 
 	PROCESS_OUT(OutValue, Params);
 
-	if constexpr (std::is_same_v<T, MonoObject*>)
-	{
-		PROCESS_COMPOUND_RETURN(Params);
-	}
-	else
-	{
-		PROCESS_PRIMITIVE_RETURN(Params, T)
-	}
+	PROCESS_RETURN(ReturnBuffer, Params)
 }
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call8(UObject* InObject) const
 {
 	FFrame Stack(InObject, Function.Get(), nullptr, nullptr, Function->ChildProperties);
@@ -107,8 +87,8 @@ void FUnrealFunctionDescriptor::Call8(UObject* InObject) const
 	Function->Invoke(InObject, Stack, nullptr);
 }
 
-template <typename T>
-auto FUnrealFunctionDescriptor::Call9(UObject* InObject) const
+template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call9(UObject* InObject, uint8* ReturnBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -116,87 +96,67 @@ auto FUnrealFunctionDescriptor::Call9(UObject* InObject) const
 
 	Function->Invoke(InObject, Stack, ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 
-	if constexpr (std::is_same_v<T, MonoObject*>)
-	{
-		PROCESS_COMPOUND_RETURN(Params);
-	}
-	else
-	{
-		PROCESS_PRIMITIVE_RETURN(Params, T)
-	}
+	PROCESS_RETURN(ReturnBuffer, Params)
 }
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call10(UObject* InObject, uint8* InBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
 	FFrame Stack(InObject, Function.Get(), Params, nullptr, Function->ChildProperties);
 
-	PROCESS_NATIVE_REFERENCE_IN(InBuffer, &Stack.OutParms, Params);
+	PROCESS_NATIVE_REFERENCE_IN(InBuffer, &Stack.OutParms, Params)
 
 	Function->Invoke(InObject, Stack, nullptr);
 }
 
-template <typename T>
-auto FUnrealFunctionDescriptor::Call11(UObject* InObject, uint8* InBuffer) const
+template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call11(UObject* InObject, uint8* InBuffer, uint8* ReturnBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
 	FFrame Stack(InObject, Function.Get(), Params, nullptr, Function->ChildProperties);
 
-	PROCESS_NATIVE_REFERENCE_IN(InBuffer, &Stack.OutParms, Params);
+	PROCESS_NATIVE_REFERENCE_IN(InBuffer, &Stack.OutParms, Params)
 
 	Function->Invoke(InObject, Stack, ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 
-	if constexpr (std::is_same_v<T, MonoObject*>)
-	{
-		PROCESS_COMPOUND_RETURN(Params);
-	}
-	else
-	{
-		PROCESS_PRIMITIVE_RETURN(Params, T)
-	}
+	PROCESS_RETURN(ReturnBuffer, Params)
 }
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call14(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
 	FFrame Stack(InObject, Function.Get(), Params, nullptr, Function->ChildProperties);
 
-	PROCESS_NATIVE_REFERENCE_IN(InBuffer, &Stack.OutParms, Params);
+	PROCESS_NATIVE_REFERENCE_IN(InBuffer, &Stack.OutParms, Params)
 
 	Function->Invoke(InObject, Stack, nullptr);
 
-	PROCESS_OUT(OutValue, Params);
+	PROCESS_OUT(OutValue, Params)
 }
 
-template <typename T>
-auto FUnrealFunctionDescriptor::Call15(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const
+template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call15(UObject* InObject, MonoObject** OutValue, uint8* InBuffer,
+                                       uint8* ReturnBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
 	FFrame Stack(InObject, Function.Get(), Params, nullptr, Function->ChildProperties);
 
-	PROCESS_NATIVE_REFERENCE_IN(InBuffer, &Stack.OutParms, Params);
+	PROCESS_NATIVE_REFERENCE_IN(InBuffer, &Stack.OutParms, Params)
 
 	Function->Invoke(InObject, Stack, ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
 
-	PROCESS_OUT(OutValue, Params);
+	PROCESS_OUT(OutValue, Params)
 
-	if constexpr (std::is_same_v<T, MonoObject*>)
-	{
-		PROCESS_COMPOUND_RETURN(Params);
-	}
-	else
-	{
-		PROCESS_PRIMITIVE_RETURN(Params, T)
-	}
+	PROCESS_RETURN(ReturnBuffer, Params)
 }
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call24(UObject* InObject) const
 {
 	const auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);
@@ -215,7 +175,7 @@ void FUnrealFunctionDescriptor::Call24(UObject* InObject) const
 	}
 }
 
-template <typename T>
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call26(UObject* InObject, uint8* InBuffer) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;

@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "Bridge/EPropertyTypeExtent.h"
-
 class FPropertyDescriptor
 {
 public:

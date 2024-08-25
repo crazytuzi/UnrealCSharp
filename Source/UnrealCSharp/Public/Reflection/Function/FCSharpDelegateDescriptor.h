@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "FFunctionDescriptor.h"
+#include "Common/EFunctionReturnType.h"
 #include "mono/metadata/object.h"
 
 class FCSharpDelegateDescriptor final : public FFunctionDescriptor
@@ -14,37 +15,38 @@ public:
 public:
 	bool CallDelegate(const UObject* InObject, MonoMethod* InMethod, void* InParams);
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute0(const FScriptDelegate* InScriptDelegate) const;
 
-	template <typename T>
-	auto Execute1(const FScriptDelegate* InScriptDelegate) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute1(const FScriptDelegate* InScriptDelegate, uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute2(const FScriptDelegate* InScriptDelegate, uint8* InBuffer) const;
 
-	template <typename T>
-	auto Execute3(const FScriptDelegate* InScriptDelegate, uint8* InBuffer) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute3(const FScriptDelegate* InScriptDelegate, uint8* InBuffer, uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute4(const FScriptDelegate* InScriptDelegate, MonoObject** OutValue) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute6(const FScriptDelegate* InScriptDelegate, MonoObject** OutValue, uint8* InBuffer) const;
 
-	template <typename T>
-	auto Execute7(const FScriptDelegate* InScriptDelegate, MonoObject** OutValue, uint8* InBuffer) const;
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute7(const FScriptDelegate* InScriptDelegate, MonoObject** OutValue, uint8* InBuffer,
+	              uint8* ReturnBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Broadcast0(const FMulticastScriptDelegate* InMulticastScriptDelegate) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Broadcast2(const FMulticastScriptDelegate* InMulticastScriptDelegate, uint8* InBuffer) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Broadcast4(const FMulticastScriptDelegate* InMulticastScriptDelegate, MonoObject** OutValue) const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Broadcast6(const FMulticastScriptDelegate* InMulticastScriptDelegate, MonoObject** OutValue,
 	                uint8* InBuffer) const;
 };
