@@ -18,5 +18,5 @@ namespace
 		}
 	};
 
-	FRegisterPrimaryAssetType RegisterPrimaryAssetType;
+	[[maybe_unused]] FRegisterPrimaryAssetType RegisterPrimaryAssetType;
 }

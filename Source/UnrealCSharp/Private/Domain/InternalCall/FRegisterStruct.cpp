@@ -62,5 +62,5 @@ namespace
 		}
 	};
 
-	FRegisterStruct RegisterStruct;
+	[[maybe_unused]] FRegisterStruct RegisterStruct;
 }

@@ -48,5 +48,5 @@ namespace
 		}
 	};
 
-	FRegisterRandomStream RegisterRandomStream;
+	[[maybe_unused]] FRegisterRandomStream RegisterRandomStream;
 }

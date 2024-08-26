@@ -69,5 +69,5 @@ namespace
 		}
 	};
 
-	FRegisterPlane RegisterPlane;
+	[[maybe_unused]] FRegisterPlane RegisterPlane;
 }

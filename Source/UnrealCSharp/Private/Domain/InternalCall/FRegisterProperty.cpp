@@ -68,7 +68,7 @@ namespace
 
 		FRegisterProperty()
 		{
-			FClassBuilder(TEXT("FProperty"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("FProperty"), NAMESPACE_LIBRARY)
 				.Function("GetObjectProperty", GetObjectPropertyImplementation)
 				.Function("SetObjectProperty", SetObjectPropertyImplementation)
 				.Function("GetStructProperty", GetStructPropertyImplementation)
@@ -76,5 +76,5 @@ namespace
 		}
 	};
 
-	FRegisterProperty RegisterProperty;
+	[[maybe_unused]] FRegisterProperty RegisterProperty;
 }

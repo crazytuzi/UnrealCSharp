@@ -24,5 +24,5 @@ namespace
 		}
 	};
 
-	FRegisterInt32Interval RegisterInt32Interval;
+	[[maybe_unused]] FRegisterInt32Interval RegisterInt32Interval;
 }

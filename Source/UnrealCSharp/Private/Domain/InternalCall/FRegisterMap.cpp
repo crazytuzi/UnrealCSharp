@@ -181,7 +181,7 @@ namespace
 
 		FRegisterMap()
 		{
-			FClassBuilder(TEXT("TMap"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TMap"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Empty", EmptyImplementation)
@@ -201,5 +201,5 @@ namespace
 		}
 	};
 
-	FRegisterMap RegisterMap;
+	[[maybe_unused]] FRegisterMap RegisterMap;
 }

@@ -24,7 +24,7 @@ namespace
 		}
 	};
 
-	FRegisterSpawnActorNameMode RegisterSpawnActorNameMode;
+	[[maybe_unused]] FRegisterSpawnActorNameMode RegisterSpawnActorNameMode;
 
 	struct FRegisterActorSpawnParameters
 	{
@@ -115,7 +115,7 @@ namespace
 		}
 	};
 
-	FRegisterActorSpawnParameters RegisterActorSpawnParameters;
+	[[maybe_unused]] FRegisterActorSpawnParameters RegisterActorSpawnParameters;
 
 	struct FRegisterWorld
 	{
@@ -154,5 +154,5 @@ namespace
 		}
 	};
 
-	FRegisterWorld RegisterWorld;
+	[[maybe_unused]] FRegisterWorld RegisterWorld;
 }

@@ -128,5 +128,5 @@ namespace
 		}
 	};
 
-	FRegisterVector4 RegisterVector4;
+	[[maybe_unused]] FRegisterVector4 RegisterVector4;
 }

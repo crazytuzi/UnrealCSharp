@@ -51,7 +51,7 @@ namespace
 
 		FRegisterScriptInterface()
 		{
-			FClassBuilder(TEXT("TScriptInterface"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TScriptInterface"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -59,5 +59,5 @@ namespace
 		}
 	};
 
-	FRegisterScriptInterface RegisterScriptInterface;
+	[[maybe_unused]] FRegisterScriptInterface RegisterScriptInterface;
 }

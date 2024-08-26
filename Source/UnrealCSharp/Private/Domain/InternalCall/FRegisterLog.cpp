@@ -22,10 +22,10 @@ namespace
 
 		FRegisterLog()
 		{
-			FClassBuilder(TEXT("Log"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("Log"), NAMESPACE_LIBRARY)
 				.Function("Log", LogImplementation);
 		}
 	};
 
-	FRegisterLog RegisterLog;
+	[[maybe_unused]] FRegisterLog RegisterLog;
 }

@@ -47,5 +47,5 @@ namespace
 		}
 	};
 
-	FRegisterFrameTime RegisterFrameTime;
+	[[maybe_unused]] FRegisterFrameTime RegisterFrameTime;
 }

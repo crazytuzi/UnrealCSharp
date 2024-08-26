@@ -66,5 +66,5 @@ namespace
 		}
 	};
 
-	FRegisterSoftObjectPath RegisterSoftObjectPath;
+	[[maybe_unused]] FRegisterSoftObjectPath RegisterSoftObjectPath;
 }

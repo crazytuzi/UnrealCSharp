@@ -36,5 +36,5 @@ namespace
 		}
 	};
 
-	FRegisterFloatRangeBound RegisterFloatRangeBound;
+	[[maybe_unused]] FRegisterFloatRangeBound RegisterFloatRangeBound;
 }

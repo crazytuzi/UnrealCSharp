@@ -86,5 +86,5 @@ namespace
 		}
 	};
 
-	FRegisterLinearColor RegisterLinearColor;
+	[[maybe_unused]] FRegisterLinearColor RegisterLinearColor;
 }

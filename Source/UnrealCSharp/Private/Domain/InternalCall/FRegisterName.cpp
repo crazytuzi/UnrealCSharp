@@ -56,7 +56,7 @@ namespace
 
 		FRegisterName()
 		{
-			FClassBuilder(TEXT("FName"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("FName"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -65,5 +65,5 @@ namespace
 		}
 	};
 
-	FRegisterName RegisterName;
+	[[maybe_unused]] FRegisterName RegisterName;
 }

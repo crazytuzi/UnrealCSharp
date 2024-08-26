@@ -127,7 +127,7 @@ namespace
 
 		FRegisterSet()
 		{
-			FClassBuilder(TEXT("TSet"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TSet"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Empty", EmptyImplementation)
@@ -142,5 +142,5 @@ namespace
 		}
 	};
 
-	FRegisterSet RegisterSet;
+	[[maybe_unused]] FRegisterSet RegisterSet;
 }

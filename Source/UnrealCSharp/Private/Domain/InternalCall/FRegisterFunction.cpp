@@ -290,7 +290,7 @@ namespace
 
 		FRegisterFunction()
 		{
-			FClassBuilder(TEXT("FFunction"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("FFunction"), NAMESPACE_LIBRARY)
 				.Function("GenericCall0", GenericCall0Implementation)
 				.Function("PrimitiveCall1", PrimitiveCall1Implementation)
 				.Function("CompoundCall1", CompoundCall1Implementation)
@@ -315,5 +315,5 @@ namespace
 		}
 	};
 
-	FRegisterFunction RegisterFunction;
+	[[maybe_unused]] FRegisterFunction RegisterFunction;
 }

@@ -159,7 +159,7 @@ namespace
 
 		FRegisterMulticastDelegate()
 		{
-			FClassBuilder(TEXT("FMulticastDelegate"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("FMulticastDelegate"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Contains", ContainsImplementation)
@@ -177,5 +177,5 @@ namespace
 		}
 	};
 
-	FRegisterMulticastDelegate RegisterMulticastDelegate;
+	[[maybe_unused]] FRegisterMulticastDelegate RegisterMulticastDelegate;
 }

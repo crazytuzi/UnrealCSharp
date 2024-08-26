@@ -49,7 +49,7 @@ namespace
 
 		FRegisterWeakObjectPtr()
 		{
-			FClassBuilder(TEXT("TWeakObjectPtr"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TWeakObjectPtr"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -57,5 +57,5 @@ namespace
 		}
 	};
 
-	FRegisterWeakObjectPtr RegisterWeakObjectPtr;
+	[[maybe_unused]] FRegisterWeakObjectPtr RegisterWeakObjectPtr;
 }

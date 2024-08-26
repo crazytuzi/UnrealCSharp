@@ -167,7 +167,7 @@ namespace
 
 		FRegisterDelegate()
 		{
-			FClassBuilder(TEXT("FDelegate"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("FDelegate"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Bind", BindImplementation)
@@ -187,5 +187,5 @@ namespace
 		}
 	};
 
-	FRegisterDelegate RegisterDelegate;
+	[[maybe_unused]] FRegisterDelegate RegisterDelegate;
 }

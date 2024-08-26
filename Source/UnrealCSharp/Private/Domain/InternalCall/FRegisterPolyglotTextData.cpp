@@ -46,5 +46,5 @@ namespace
 		}
 	};
 
-	FRegisterPolyglotTextData RegisterPolyglotTextData;
+	[[maybe_unused]] FRegisterPolyglotTextData RegisterPolyglotTextData;
 }

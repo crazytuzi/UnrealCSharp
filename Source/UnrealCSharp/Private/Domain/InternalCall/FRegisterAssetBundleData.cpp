@@ -38,5 +38,5 @@ namespace
 		}
 	};
 
-	FRegisterAssetBundleData RegisterAssetBundleData;
+	[[maybe_unused]] FRegisterAssetBundleData RegisterAssetBundleData;
 }

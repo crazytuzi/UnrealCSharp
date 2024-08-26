@@ -17,5 +17,5 @@ namespace
 		}
 	};
 
-	FRegisterAssetBundleEntry RegisterAssetBundleEntry;
+	[[maybe_unused]] FRegisterAssetBundleEntry RegisterAssetBundleEntry;
 }

@@ -98,5 +98,5 @@ namespace
 		}
 	};
 
-	FRegisterObject RegisterObject;
+	[[maybe_unused]] FRegisterObject RegisterObject;
 }

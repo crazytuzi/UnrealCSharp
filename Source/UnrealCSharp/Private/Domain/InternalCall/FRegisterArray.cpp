@@ -321,7 +321,7 @@ namespace
 
 		FRegisterArray()
 		{
-			FClassBuilder(TEXT("TArray"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TArray"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -354,5 +354,5 @@ namespace
 		}
 	};
 
-	FRegisterArray RegisterArray;
+	[[maybe_unused]] FRegisterArray RegisterArray;
 }

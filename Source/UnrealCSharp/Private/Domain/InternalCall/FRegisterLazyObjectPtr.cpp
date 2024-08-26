@@ -49,7 +49,7 @@ namespace
 
 		FRegisterLazyObjectPtr()
 		{
-			FClassBuilder(TEXT("TLazyObjectPtr"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TLazyObjectPtr"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -57,5 +57,5 @@ namespace
 		}
 	};
 
-	FRegisterLazyObjectPtr RegisterLazyObjectPtr;
+	[[maybe_unused]] FRegisterLazyObjectPtr RegisterLazyObjectPtr;
 }

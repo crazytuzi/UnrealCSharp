@@ -430,7 +430,7 @@ namespace SourceCodeGeneratorUbtPlugin
                                      "\t\t}}\r\n" +
                                      "\t}};\r\n" +
                                      "\r\n" +
-                                     "\tFRegister{0} Register{1};\r\n" +
+                                     "\t[[maybe_unused]] FRegister{0} Register{1};\r\n" +
                                      "}}\r\n\r\n",
                 classObj.EngineName,
                 classObj.EngineName);

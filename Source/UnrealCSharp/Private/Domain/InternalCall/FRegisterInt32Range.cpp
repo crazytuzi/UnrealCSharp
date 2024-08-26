@@ -59,5 +59,5 @@ namespace
 		}
 	};
 
-	FRegisterInt32Range RegisterInt32Range;
+	[[maybe_unused]] FRegisterInt32Range RegisterInt32Range;
 }

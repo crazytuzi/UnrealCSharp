@@ -42,4 +42,4 @@ struct FRegisterObjectFlags
 	}
 };
 
-static FRegisterObjectFlags RegisterObjectFlags;
+[[maybe_unused]] static FRegisterObjectFlags RegisterObjectFlags;

@@ -133,6 +133,6 @@ namespace
 		}
 	};
 
-	FRegisterOptional RegisterOptional;
+	[[maybe_unused]] FRegisterOptional RegisterOptional;
 }
 #endif

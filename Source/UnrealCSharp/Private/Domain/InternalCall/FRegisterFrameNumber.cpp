@@ -36,5 +36,5 @@ namespace
 		}
 	};
 
-	FRegisterFrameNumber RegisterFrameNumber;
+	[[maybe_unused]] FRegisterFrameNumber RegisterFrameNumber;
 }

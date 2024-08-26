@@ -57,7 +57,7 @@ namespace
 
 		FRegisterSoftObjectPtr()
 		{
-			FClassBuilder(TEXT("TSoftObjectPtr"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TSoftObjectPtr"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -66,5 +66,5 @@ namespace
 		}
 	};
 
-	FRegisterSoftObjectPtr RegisterSoftObjectPtr;
+	[[maybe_unused]] FRegisterSoftObjectPtr RegisterSoftObjectPtr;
 }

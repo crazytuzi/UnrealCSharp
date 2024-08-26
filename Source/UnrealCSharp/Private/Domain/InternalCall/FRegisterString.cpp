@@ -45,7 +45,7 @@ namespace
 
 		FRegisterString()
 		{
-			FClassBuilder(TEXT("FString"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("FString"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -53,5 +53,5 @@ namespace
 		}
 	};
 
-	FRegisterString RegisterString;
+	[[maybe_unused]] FRegisterString RegisterString;
 }
