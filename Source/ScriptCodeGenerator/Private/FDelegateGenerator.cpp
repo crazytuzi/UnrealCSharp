@@ -204,11 +204,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	auto ExecuteFunctionCallBody = FString::Printf(TEXT(
 		"FDelegateImplementation.FDelegate_%sExecute%dImplementation(%s%s%s%s);\n"
 	),
-	                                               DelegateReturnParam != nullptr
-		                                               ? FGeneratorCore::IsPrimitiveProperty(DelegateReturnParam)
-			                                                 ? TEXT("Primitive")
-			                                                 : TEXT("Compound")
-		                                               : TEXT("Generic"),
+	                                               *FGeneratorCore::GetFunctionPrefix(DelegateReturnParam),
 	                                               FGeneratorCore::GetFunctionIndex(DelegateReturnParam != nullptr,
 		                                               !DelegateParams.IsEmpty(),
 		                                               !DelegateRefParamIndex.IsEmpty(),
@@ -569,8 +565,9 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	}
 
 	auto BroadcastFunctionCallBody = FString::Printf(TEXT(
-		"FMulticastDelegateImplementation.FMulticastDelegate_GenericBroadcast%dImplementation(%s%s%s);"
+		"FMulticastDelegateImplementation.FMulticastDelegate_%sBroadcast%dImplementation(%s%s%s);"
 	),
+	                                                 *FGeneratorCore::GetFunctionPrefix(nullptr),
 	                                                 FGeneratorCore::GetFunctionIndex(false,
 		                                                 !DelegateParams.IsEmpty(),
 		                                                 !DelegateRefParamIndex.IsEmpty(),

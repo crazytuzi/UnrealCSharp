@@ -175,50 +175,47 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
-		if (FGeneratorCore::IsPrimitiveProperty(*PropertyIterator))
-		{
-			PropertyContent += FString::Printf(TEXT(
-				"\t\t%s %s %s\n"
-				"\t\t{\n"
-				"\t\t\tget => %sFPropertyImplementation.FProperty_GetObject%sPropertyImplementation(%s, %s);\n"
-				"\n"
-				"\t\t\tset => FPropertyImplementation.FProperty_SetObject%sPropertyImplementation(%s, %s, %s);\n"
-				"\t\t}\n"
-			),
-			                                   *PropertyAccessSpecifiers,
-			                                   *PropertyType,
-			                                   *EncodePropertyName,
-			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-			                                   *FGeneratorCore::GetTypeImplementation(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetTypeImplementation(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
-			);
-		}
-		else
-		{
-			PropertyContent += FString::Printf(TEXT(
-				"\t\t%s %s %s\n"
-				"\t\t{\n"
-				"\t\t\tget => FPropertyImplementation.FProperty_GetObjectCompoundPropertyImplementation(%s, %s) as %s;\n"
-				"\n"
-				"\t\t\tset => FPropertyImplementation.FProperty_SetObjectCompoundPropertyImplementation(%s, %s, %s);\n"
-				"\t\t}\n"
-			),
-			                                   *PropertyAccessSpecifiers,
-			                                   *PropertyType,
-			                                   *EncodePropertyName,
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetPropertyType(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
-			);
-		}
+		PropertyContent += FString::Printf(TEXT(
+			"\t\t%s %s %s\n"
+			"\t\t{\n"
+			"\t\t\tget\n"
+			"\t\t\t{\n"
+			"\t\t\t\tunsafe\n"
+			"\t\t\t\t{\n"
+			"\t\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_GetObjectPropertyImplementation(%s, %s, __ReturnBuffer);\n"
+			"\n"
+			"\t\t\t\t\treturn *(%s*)__ReturnBuffer;\n"
+			"\t\t\t\t}\n"
+			"\t\t\t}\n"
+			"\n"
+			"\t\t\tset\n"
+			"\t\t\t{\n"
+			"\t\t\t\tunsafe\n"
+			"\t\t\t\t{\n"
+			"\t\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\t*(%s*)__InBuffer = %s;\n"
+			"\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_SetObjectPropertyImplementation(%s, %s, __InBuffer);\n"
+			"\t\t\t\t}\n"
+			"\t\t\t}\n"
+			"\t\t}\n"
+		),
+		                                   *PropertyAccessSpecifiers,
+		                                   *PropertyType,
+		                                   *EncodePropertyName,
+		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
+		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                   *DummyPropertyName,
+		                                   *PropertyType,
+		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
+		                                   *FGeneratorCore::GetBufferCast(*PropertyIterator),
+		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator),
+		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                   *DummyPropertyName
+		);
 
 		PropertyNameContent += FString::Printf(TEXT(
 			"%s\t\tprivate static uint %s = 0;\n"
@@ -661,11 +658,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		auto FunctionCallBody = FString::Printf(TEXT(
 			"FFunctionImplementation.FFunction_%sCall%dImplementation(%s, %s%s%s%s);\n"
 		),
-		                                        FunctionReturnParam != nullptr
-			                                        ? FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
-				                                          ? TEXT("Primitive")
-				                                          : TEXT("Compound")
-			                                        : TEXT("Generic"),
+		                                        *FGeneratorCore::GetFunctionPrefix(FunctionReturnParam),
 		                                        FGeneratorCore::GetFunctionIndex(FunctionReturnParam != nullptr,
 			                                        FunctionParams.Num() - FunctionOutParamIndex.Num() != 0,
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.

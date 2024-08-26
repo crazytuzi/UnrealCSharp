@@ -596,6 +596,15 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 	}
 }
 
+FString FGeneratorCore::GetFunctionPrefix(FProperty* Property)
+{
+	return Property != nullptr
+		       ? IsPrimitiveProperty(Property)
+			         ? TEXT("Primitive")
+			         : TEXT("Compound")
+		       : TEXT("Generic");
+}
+
 int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput, const bool bHasOutput,
                                        const bool bIsNative, const bool bIsNet)
 {
