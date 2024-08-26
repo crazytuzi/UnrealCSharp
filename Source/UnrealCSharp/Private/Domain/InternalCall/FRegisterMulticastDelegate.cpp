@@ -123,7 +123,7 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				return MulticastDelegateHelper->Broadcast0<MonoObject*>();
+				return MulticastDelegateHelper->Broadcast0<>();
 			}
 		}
 
@@ -133,7 +133,7 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Broadcast2<MonoObject*>(InBuffer);
+				MulticastDelegateHelper->Broadcast2<>(InBuffer);
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Broadcast4<MonoObject*>(OutValue);
+				MulticastDelegateHelper->Broadcast4<>(OutValue);
 			}
 		}
 
@@ -154,7 +154,7 @@ namespace
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Broadcast6<MonoObject*>(OutValue, InBuffer);
+				MulticastDelegateHelper->Broadcast6<>(OutValue, InBuffer);
 			}
 		}
 

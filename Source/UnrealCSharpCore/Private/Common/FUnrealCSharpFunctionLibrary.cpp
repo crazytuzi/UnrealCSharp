@@ -171,7 +171,7 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InEnum)
 {
 	if (InEnum == nullptr)
 	{
-		return "";
+		return TEXT("");
 	}
 
 	FString ModuleName = InEnum->GetOuter() ? InEnum->GetOuter()->GetName() : TEXT("");

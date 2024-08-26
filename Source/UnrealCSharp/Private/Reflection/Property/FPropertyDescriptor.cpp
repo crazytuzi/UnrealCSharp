@@ -12,6 +12,7 @@
 #include "Reflection/Property/PrimitiveProperty/FFloatPropertyDescriptor.h"
 #include "Reflection/Property/ObjectProperty/FObjectPropertyDescriptor.h"
 #include "Reflection/Property/ObjectProperty/FClassPropertyDescriptor.h"
+#include "Reflection/Property/ObjectProperty/FSubclassOfPropertyDescriptor.h"
 #include "Reflection/Property/StringProperty/FNamePropertyDescriptor.h"
 #include "Reflection/Property/DelegateProperty/FDelegatePropertyDescriptor.h"
 #include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
@@ -37,80 +38,6 @@
 #include "Reflection/Property/OptionalProperty/FOptionalPropertyDescriptor.h"
 #endif
 
-EPropertyTypeExtent FPropertyDescriptor::GetPropertyType(const FProperty* Property)
-{
-	if (Property != nullptr)
-	{
-		GET_PROPERTY_TYPE(FByteProperty, EPropertyTypeExtent::Byte)
-
-		GET_PROPERTY_TYPE(FUInt16Property, EPropertyTypeExtent::UInt16)
-
-		GET_PROPERTY_TYPE(FUInt32Property, EPropertyTypeExtent::UInt32)
-
-		GET_PROPERTY_TYPE(FUInt64Property, EPropertyTypeExtent::UInt64)
-
-		GET_PROPERTY_TYPE(FInt8Property, EPropertyTypeExtent::Int8)
-
-		GET_PROPERTY_TYPE(FInt16Property, EPropertyTypeExtent::Int16)
-
-		GET_PROPERTY_TYPE(FIntProperty, EPropertyTypeExtent::Int)
-
-		GET_PROPERTY_TYPE(FInt64Property, EPropertyTypeExtent::Int64)
-
-		GET_PROPERTY_TYPE(FBoolProperty, EPropertyTypeExtent::Bool)
-
-		GET_PROPERTY_TYPE(FFloatProperty, EPropertyTypeExtent::Float)
-
-		GET_PROPERTY_TYPE(FClassProperty, EPropertyTypeExtent::ClassReference)
-
-		GET_PROPERTY_TYPE(FObjectProperty, EPropertyTypeExtent::ObjectReference)
-
-		GET_PROPERTY_TYPE(FNameProperty, EPropertyTypeExtent::Name)
-
-		GET_PROPERTY_TYPE(FDelegateProperty, EPropertyTypeExtent::Delegate)
-
-		GET_PROPERTY_TYPE(FInterfaceProperty, EPropertyTypeExtent::Interface)
-
-		GET_PROPERTY_TYPE(FStructProperty, EPropertyTypeExtent::Struct)
-
-		GET_PROPERTY_TYPE(FArrayProperty, EPropertyTypeExtent::Array)
-
-		GET_PROPERTY_TYPE(FEnumProperty, EPropertyTypeExtent::Enum)
-
-		GET_PROPERTY_TYPE(FStrProperty, EPropertyTypeExtent::String)
-
-		GET_PROPERTY_TYPE(FTextProperty, EPropertyTypeExtent::Text)
-
-		GET_PROPERTY_TYPE(FMulticastInlineDelegateProperty, EPropertyTypeExtent::MulticastInlineDelegate)
-
-		GET_PROPERTY_TYPE(FMulticastSparseDelegateProperty, EPropertyTypeExtent::MulticastSparseDelegate)
-
-		GET_PROPERTY_TYPE(FMulticastDelegateProperty, EPropertyTypeExtent::MulticastDelegate)
-
-		GET_PROPERTY_TYPE(FWeakObjectProperty, EPropertyTypeExtent::WeakObjectReference)
-
-		GET_PROPERTY_TYPE(FLazyObjectProperty, EPropertyTypeExtent::LazyObjectReference)
-
-		GET_PROPERTY_TYPE(FSoftClassProperty, EPropertyTypeExtent::SoftClassReference)
-
-		GET_PROPERTY_TYPE(FSoftObjectProperty, EPropertyTypeExtent::SoftObjectReference)
-
-		GET_PROPERTY_TYPE(FDoubleProperty, EPropertyTypeExtent::Double)
-
-		GET_PROPERTY_TYPE(FMapProperty, EPropertyTypeExtent::Map)
-
-		GET_PROPERTY_TYPE(FSetProperty, EPropertyTypeExtent::Set)
-
-		GET_PROPERTY_TYPE(FFieldPathProperty, EPropertyTypeExtent::FieldPath)
-
-#if UE_F_OPTIONAL_PROPERTY
-		GET_PROPERTY_TYPE(FOptionalProperty, EPropertyTypeExtent::Optional)
-#endif
-	}
-
-	return EPropertyTypeExtent::None;
-}
-
 FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 {
 	NEW_PROPERTY_DESCRIPTOR(FByteProperty)
@@ -133,7 +60,17 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FFloatProperty)
 
-	NEW_PROPERTY_DESCRIPTOR(FClassProperty)
+	if (const auto Property = CastField<FClassProperty>(InProperty))
+	{
+		if (Property->HasAnyPropertyFlags(CPF_UObjectWrapper))
+		{
+			return new FSubclassOfPropertyDescriptor(Property);
+		}
+		else
+		{
+			return new FClassPropertyDescriptor(Property);
+		}
+	}
 
 	NEW_PROPERTY_DESCRIPTOR(FObjectProperty)
 

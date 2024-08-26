@@ -46,4 +46,7 @@
       <HintPath>$(EngineDir)\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="SourceCodeGenerator.Build.cs" />
+  </ItemGroup>
 </Project>

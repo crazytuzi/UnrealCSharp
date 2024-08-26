@@ -213,8 +213,7 @@ FString FSourceCodeGeneratorModule::GetGeneratorName() const
 
 bool FSourceCodeGeneratorModule::CanExportClass(const UClass* Class)
 {
-	return !Class->HasAnyClassFlags(CLASS_Interface) &&
-		IsClassTypeSupported(Class);
+	return IsClassTypeSupported(Class);
 }
 
 bool FSourceCodeGeneratorModule::CanExportFunction(const UFunction* Function)
@@ -335,6 +334,7 @@ bool FSourceCodeGeneratorModule::IsClassTypeSupported(const UClass* Class)
 {
 	return !Class->HasAnyClassFlags(CLASS_Deprecated) &&
 	(Class == UObject::StaticClass() ||
+		Class == UClass::StaticClass() ||
 		Class->HasAnyClassFlags(CLASS_RequiredAPI | CLASS_MinimalAPI));
 }
 

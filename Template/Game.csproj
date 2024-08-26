@@ -9,6 +9,12 @@
     <DebugType>Embedded</DebugType>
     <DefineConstants></DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <NoWarn>1701;1702;8500</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <NoWarn>1701;1702;8500</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="" /> 
     <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
@@ -20,6 +26,7 @@
     <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <None Remove="FodyWeavers.xml" />
+    <None Remove="*.csproj.props" />
     <WeaverFiles Include="$(ProjectDir)..\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
   </ItemGroup>
 </Project>

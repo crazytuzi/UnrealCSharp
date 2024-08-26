@@ -36,7 +36,7 @@ public:
 
 	void Clear() const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute0() const
 	{
 		if (ScriptDelegate != nullptr)
@@ -45,14 +45,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute0<T>(ScriptDelegate);
+					DelegateDescriptor->Execute0<ReturnType>(ScriptDelegate);
 				}
 			}
 		}
 	}
 
-	template <typename T>
-	auto Execute1() const -> T
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute1(uint8* ReturnBuffer) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -60,15 +60,13 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					return DelegateDescriptor->Execute1<T>(ScriptDelegate);
+					DelegateDescriptor->Execute1<ReturnType>(ScriptDelegate, ReturnBuffer);
 				}
 			}
 		}
-
-		return {};
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute2(uint8* InBuffer) const
 	{
 		if (ScriptDelegate != nullptr)
@@ -77,14 +75,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute2<T>(ScriptDelegate, InBuffer);
+					DelegateDescriptor->Execute2<ReturnType>(ScriptDelegate, InBuffer);
 				}
 			}
 		}
 	}
 
-	template <typename T>
-	auto Execute3(uint8* InBuffer) const -> T
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute3(uint8* InBuffer, uint8* ReturnBuffer) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -92,15 +90,13 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					return DelegateDescriptor->Execute3<T>(ScriptDelegate, InBuffer);
+					DelegateDescriptor->Execute3<ReturnType>(ScriptDelegate, InBuffer, ReturnBuffer);
 				}
 			}
 		}
-
-		return {};
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute4(MonoObject** OutValue) const
 	{
 		if (ScriptDelegate != nullptr)
@@ -109,13 +105,13 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute4<T>(ScriptDelegate, OutValue);
+					DelegateDescriptor->Execute4<ReturnType>(ScriptDelegate, OutValue);
 				}
 			}
 		}
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute6(MonoObject** OutValue, uint8* InBuffer) const
 	{
 		if (ScriptDelegate != nullptr)
@@ -124,14 +120,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute6<T>(ScriptDelegate, OutValue, InBuffer);
+					DelegateDescriptor->Execute6<ReturnType>(ScriptDelegate, OutValue, InBuffer);
 				}
 			}
 		}
 	}
 
-	template <typename T>
-	auto Execute7(MonoObject** OutValue, uint8* InBuffer) const -> T
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute7(MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -139,12 +135,10 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					return DelegateDescriptor->Execute7<T>(ScriptDelegate, OutValue, InBuffer);
+					DelegateDescriptor->Execute7<ReturnType>(ScriptDelegate, OutValue, InBuffer, ReturnBuffer);
 				}
 			}
 		}
-
-		return {};
 	}
 
 	UObject* GetUObject() const;

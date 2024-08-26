@@ -29,73 +29,67 @@ public:
 
 	void Clear() const;
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute0() const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute0<T>();
+			DelegateHandler->Execute0<ReturnType>();
 		}
 	}
 
-	template <typename T>
-	auto Execute1() const -> T
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute1(uint8* ReturnBuffer) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			return DelegateHandler->Execute1<T>();
+			DelegateHandler->Execute1<ReturnType>(ReturnBuffer);
 		}
-
-		return {};
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute2(uint8* InBuffer) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute2<T>(InBuffer);
+			DelegateHandler->Execute2<ReturnType>(InBuffer);
 		}
 	}
 
-	template <typename T>
-	auto Execute3(uint8* InBuffer) const -> T
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute3(uint8* InBuffer, uint8* ReturnBuffer) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			return DelegateHandler->Execute3<T>(InBuffer);
+			DelegateHandler->Execute3<ReturnType>(InBuffer, ReturnBuffer);
 		}
-
-		return {};
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute4(MonoObject** OutValue) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute4<T>(OutValue);
+			DelegateHandler->Execute4<ReturnType>(OutValue);
 		}
 	}
 
-	template <typename T>
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute6(MonoObject** OutValue, uint8* InBuffer) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute6<T>(OutValue, InBuffer);
+			DelegateHandler->Execute6<ReturnType>(OutValue, InBuffer);
 		}
 	}
 
-	template <typename T>
-	auto Execute7(MonoObject** OutValue, uint8* InBuffer) const -> T
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Execute7(MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			return DelegateHandler->Execute7<T>(OutValue, InBuffer);
+			DelegateHandler->Execute7<ReturnType>(OutValue, InBuffer, ReturnBuffer);
 		}
-
-		return {};
 	}
 
 	UObject* GetUObject() const;

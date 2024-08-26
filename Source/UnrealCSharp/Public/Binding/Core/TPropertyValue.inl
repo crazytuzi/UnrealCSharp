@@ -423,9 +423,7 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>
 };
 
 template <typename T>
-struct TPropertyValue<T,
-                      std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>> &&
-                                       !std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
+struct TPropertyValue<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>>, T>>
 {
 	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
@@ -804,45 +802,6 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value
 	TMultiPropertyValue<T>
 {
 };
-
-template <typename T>
-struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::remove_pointer_t<std::decay_t<T>>, UClass>, T>>
-{
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
-	{
-		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-		auto SubclassOf = new TSubclassOf<UObject>(*InMember);
-
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true>(
-			SrcMonoObject, SubclassOf);
-
-		return SrcMonoObject;
-	}
-
-	template <auto IsReference>
-	static auto Get(std::decay_t<T>* InMember)
-	{
-		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
-
-		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
-
-		auto SubclassOf = new TSubclassOf<UObject>(*InMember);
-
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true>(
-			SrcMonoObject, SubclassOf);
-
-		return SrcMonoObject;
-	}
-
-	static auto Set(const FGarbageCollectionHandle InValue)
-	{
-		return FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(InValue)->Get();
-	}
-};
-
 
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>

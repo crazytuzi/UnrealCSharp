@@ -179,8 +179,7 @@ namespace SourceCodeGeneratorUbtPlugin
         /// <returns>True if the class should be exported, false if not</returns>
         protected virtual bool CanExportClass(UhtClass classObj)
         {
-            return !classObj.ClassFlags.HasAnyFlags(EClassFlags.Interface) &&
-                   IsClassTypeSupported(classObj);
+            return IsClassTypeSupported(classObj);
         }
 
         /// <summary>
@@ -261,6 +260,7 @@ namespace SourceCodeGeneratorUbtPlugin
         {
             return !classObj.Deprecated &&
                    (classObj == classObj.Session.UObject ||
+                    classObj == classObj.Session.UClass ||
                     classObj.ClassFlags.HasAnyFlags(EClassFlags.RequiredAPI | EClassFlags.MinimalAPI));
         }
 

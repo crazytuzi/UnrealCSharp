@@ -71,11 +71,21 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 	}
 
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()),
+		FUnrealCSharpFunctionLibrary::GetFullClass(UClass::StaticClass())))
+	{
+		if (InMonoClass == FoundMonoClass)
+		{
+			return EPropertyTypeExtent::ClassReference;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SUB_CLASS_OF))
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			return EPropertyTypeExtent::ClassReference;
+			return EPropertyTypeExtent::SubclassOfReference;
 		}
 	}
 
@@ -787,6 +797,11 @@ FProperty* FTypeBridge::Factory(MonoReflectionType* InReflectionType, const FFie
 			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
 		}
 
+	case EPropertyTypeExtent::SubclassOfReference:
+		{
+			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+		}
+
 	case EPropertyTypeExtent::ObjectReference:
 		{
 			return ManagedFactory(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
@@ -864,9 +879,22 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 		{
 			const auto PathName = GetGenericPathName(InReflectionType);
 
+			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
+
+			ClassProperty->MetaClass = UObject::StaticClass();
+
+			return ClassProperty;
+		}
+
+	case EPropertyTypeExtent::SubclassOfReference:
+		{
+			const auto PathName = GetGenericPathName(InReflectionType);
+
 			const auto InClass = LoadObject<UClass>(nullptr, *FString(PathName));
 
 			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
+
+			ClassProperty->SetPropertyFlags(CPF_UObjectWrapper);
 
 			ClassProperty->MetaClass = InClass;
 
