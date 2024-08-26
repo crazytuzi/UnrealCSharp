@@ -3,7 +3,7 @@ using Script.CoreUObject;
 
 namespace Script.Library
 {
-    public static class TSetImplementation
+    public static unsafe class TSetImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TSet_RegisterImplementation<T>(TSet<T> InSet);
@@ -24,18 +24,18 @@ namespace Script.Library
         public static extern int TSet_GetMaxIndexImplementation(nint InSet);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSet_AddImplementation(nint InSet, object InValue);
+        public static extern void TSet_AddImplementation(nint InSet, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TSet_RemoveImplementation(nint InSet, object InValue);
+        public static extern int TSet_RemoveImplementation(nint InSet, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TSet_ContainsImplementation(nint InSet, object InValue);
+        public static extern bool TSet_ContainsImplementation(nint InSet, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool TSet_IsValidIndexImplementation(nint InSet, int InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object TSet_GetEnumeratorImplementation(nint InSet, int Index);
+        public static extern void TSet_GetEnumeratorImplementation(nint InSet, int Index, byte* ReturnBuffer);
     }
 }

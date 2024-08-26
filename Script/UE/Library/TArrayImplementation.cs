@@ -3,7 +3,7 @@ using Script.CoreUObject;
 
 namespace Script.Library
 {
-    public static class TArrayImplementation
+    public static unsafe class TArrayImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TArray_RegisterImplementation<T>(TArray<T> InArray);
@@ -33,19 +33,19 @@ namespace Script.Library
         public static extern int TArray_MaxImplementation(nint InArray);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object TArray_GetImplementation(nint InArray, int InIndex);
+        public static extern void TArray_GetImplementation(nint InArray, int InIndex, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_SetImplementation(nint InArray, int InIndex, object InValue);
+        public static extern void TArray_SetImplementation(nint InArray, int InIndex, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_FindImplementation(nint InArray, object InValue);
+        public static extern int TArray_FindImplementation(nint InArray, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_FindLastImplementation(nint InArray, object InValue);
+        public static extern int TArray_FindLastImplementation(nint InArray, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TArray_ContainsImplementation(nint InArray, object InValue);
+        public static extern bool TArray_ContainsImplementation(nint InArray, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int TArray_AddUninitializedImplementation(nint InArray, int InCount);
@@ -70,19 +70,19 @@ namespace Script.Library
         public static extern void TArray_SetNumImplementation(nint InArray, int InNewNum, bool bAllowShrinking);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_AddImplementation(nint InArray, object InValue);
+        public static extern int TArray_AddImplementation(nint InArray, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int TArray_AddZeroedImplementation(nint InArray, int InCount);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_AddUniqueImplementation(nint InArray, object InValue);
+        public static extern int TArray_AddUniqueImplementation(nint InArray, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_RemoveSingleImplementation(nint InArray, object InValue);
+        public static extern int TArray_RemoveSingleImplementation(nint InArray, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_RemoveImplementation(nint InArray, object InValue);
+        public static extern int TArray_RemoveImplementation(nint InArray, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TArray_SwapMemoryImplementation(nint InArray, int InFirstIndexToSwap,

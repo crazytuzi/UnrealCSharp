@@ -55,18 +55,121 @@ namespace Script.CoreUObject
 
         public T this[int InIndex]
         {
-            get => (T)TArrayImplementation.TArray_GetImplementation(GarbageCollectionHandle, InIndex);
+            get
+            {
+                unsafe
+                {
+                    if (typeof(T).IsValueType)
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(T)];
 
-            set => TArrayImplementation.TArray_SetImplementation(GarbageCollectionHandle, InIndex, value);
+                        TArrayImplementation.TArray_GetImplementation(GarbageCollectionHandle, InIndex, ValueBuffer);
+
+                        return *(T*)ValueBuffer;
+                    }
+                    else
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                        TArrayImplementation.TArray_GetImplementation(GarbageCollectionHandle, InIndex, ValueBuffer);
+
+                        return *(T*)ValueBuffer;
+                    }
+                }
+            }
+
+            set
+            {
+                unsafe
+                {
+                    if (typeof(T).IsValueType)
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                        *(T*)ValueBuffer = value;
+
+                        TArrayImplementation.TArray_SetImplementation(GarbageCollectionHandle, InIndex, ValueBuffer);
+                    }
+                    else
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)ValueBuffer = (value as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        TArrayImplementation.TArray_SetImplementation(GarbageCollectionHandle, InIndex, ValueBuffer);
+                    }
+                }
+            }
         }
 
-        public int Find(T InValue) => TArrayImplementation.TArray_FindImplementation(GarbageCollectionHandle, InValue);
+        public int Find(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
 
-        public int FindLast(T InValue) =>
-            TArrayImplementation.TArray_FindLastImplementation(GarbageCollectionHandle, InValue);
+                    *(T*)ValueBuffer = InValue;
 
-        public bool Contains(T InValue) =>
-            TArrayImplementation.TArray_ContainsImplementation(GarbageCollectionHandle, InValue);
+                    return TArrayImplementation.TArray_FindImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TArrayImplementation.TArray_FindImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
+
+        public int FindLast(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                    *(T*)ValueBuffer = InValue;
+
+                    return TArrayImplementation.TArray_FindLastImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TArrayImplementation.TArray_FindLastImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
+
+        public bool Contains(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                    *(T*)ValueBuffer = InValue;
+
+                    return TArrayImplementation.TArray_ContainsImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TArrayImplementation.TArray_ContainsImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
 
         public int AddUninitialized(int InCount = 1) =>
             TArrayImplementation.TArray_AddUninitializedImplementation(GarbageCollectionHandle, InCount);
@@ -90,19 +193,100 @@ namespace Script.CoreUObject
         public void SetNum(int InNewNum, bool bAllowShrinking = true) =>
             TArrayImplementation.TArray_SetNumImplementation(GarbageCollectionHandle, InNewNum, bAllowShrinking);
 
-        public int Add(T InValue) => TArrayImplementation.TArray_AddImplementation(GarbageCollectionHandle, InValue);
+        public int Add(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                    *(T*)ValueBuffer = InValue;
+
+                    return TArrayImplementation.TArray_AddImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TArrayImplementation.TArray_AddImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
 
         public int AddZeroed(int InCount = 1) =>
             TArrayImplementation.TArray_AddZeroedImplementation(GarbageCollectionHandle, InCount);
 
-        public int AddUnique(T InValue) =>
-            TArrayImplementation.TArray_AddUniqueImplementation(GarbageCollectionHandle, InValue);
+        public int AddUnique(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
 
-        public int RemoveSingle(T InValue) =>
-            TArrayImplementation.TArray_RemoveSingleImplementation(GarbageCollectionHandle, InValue);
+                    *(T*)ValueBuffer = InValue;
 
-        public int Remove(T InValue) =>
-            TArrayImplementation.TArray_RemoveImplementation(GarbageCollectionHandle, InValue);
+                    return TArrayImplementation.TArray_AddUniqueImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TArrayImplementation.TArray_AddUniqueImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
+
+        public int RemoveSingle(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                    *(T*)ValueBuffer = InValue;
+
+                    return TArrayImplementation.TArray_RemoveSingleImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TArrayImplementation.TArray_RemoveSingleImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
+
+        public int Remove(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                    *(T*)ValueBuffer = InValue;
+
+                    return TArrayImplementation.TArray_RemoveImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TArrayImplementation.TArray_RemoveImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
 
         public void SwapMemory(int InFirstIndexToSwap, int InSecondIndexToSwap) =>
             TArrayImplementation.TArray_SwapMemoryImplementation(GarbageCollectionHandle, InFirstIndexToSwap,
