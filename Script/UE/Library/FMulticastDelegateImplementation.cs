@@ -46,10 +46,10 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FMulticastDelegate_GenericBroadcast4Implementation(nint InMonoObject,
-            out object[] OutValue);
+            byte* OutBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FMulticastDelegate_GenericBroadcast6Implementation(nint InMonoObject,
-            out object[] OutValue, byte* InBuffer);
+            byte* InBuffer, byte* OutBuffer);
     }
 }

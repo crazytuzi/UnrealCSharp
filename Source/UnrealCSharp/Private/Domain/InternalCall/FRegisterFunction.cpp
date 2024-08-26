@@ -86,33 +86,33 @@ namespace
 		}
 
 		static void GenericCall4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                       const uint32 InFunctionHash, MonoObject** OutValue)
+		                                       const uint32 InFunctionHash, uint8* OutBuffer)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
 				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
 					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
 				{
-					FunctionDescriptor->Call4<>(FoundObject, OutValue);
+					FunctionDescriptor->Call4<>(FoundObject, OutBuffer);
 				}
 			}
 		}
 
 		static void GenericCall6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                       const uint32 InFunctionHash, MonoObject** OutValue, uint8* InBuffer)
+		                                       const uint32 InFunctionHash, uint8* InBuffer, uint8* OutBuffer)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
 				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
 					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
 				{
-					FunctionDescriptor->Call6<>(FoundObject, OutValue, InBuffer);
+					FunctionDescriptor->Call6<>(FoundObject, InBuffer, OutBuffer);
 				}
 			}
 		}
 
 		static void PrimitiveCall7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                         const uint32 InFunctionHash, MonoObject** OutValue, uint8* InBuffer,
+		                                         const uint32 InFunctionHash, uint8* InBuffer, uint8* OutBuffer,
 		                                         uint8* ReturnBuffer)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
@@ -121,13 +121,13 @@ namespace
 					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
 				{
 					FunctionDescriptor->Call7<EFunctionReturnType::Primitive>(
-						FoundObject, OutValue, InBuffer, ReturnBuffer);
+						FoundObject, InBuffer, OutBuffer, ReturnBuffer);
 				}
 			}
 		}
 
 		static void CompoundCall7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                        const uint32 InFunctionHash, MonoObject** OutValue, uint8* InBuffer,
+		                                        const uint32 InFunctionHash, uint8* InBuffer, uint8* OutBuffer,
 		                                        uint8* ReturnBuffer)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
@@ -136,7 +136,7 @@ namespace
 					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
 				{
 					FunctionDescriptor->Call7<EFunctionReturnType::Compound>(
-						FoundObject, OutValue, InBuffer, ReturnBuffer);
+						FoundObject, InBuffer, OutBuffer, ReturnBuffer);
 				}
 			}
 		}
@@ -220,20 +220,20 @@ namespace
 		}
 
 		static void GenericCall14Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                        const uint32 InFunctionHash, MonoObject** OutValue, uint8* InBuffer)
+		                                        const uint32 InFunctionHash, uint8* InBuffer, uint8* OutBuffer)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
 				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
 					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
 				{
-					FunctionDescriptor->Call14<>(FoundObject, OutValue, InBuffer);
+					FunctionDescriptor->Call14<>(FoundObject, InBuffer, OutBuffer);
 				}
 			}
 		}
 
 		static void PrimitiveCall15Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                          const uint32 InFunctionHash, MonoObject** OutValue, uint8* InBuffer,
+		                                          const uint32 InFunctionHash, uint8* InBuffer, uint8* OutBuffer,
 		                                          uint8* ReturnBuffer)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
@@ -242,13 +242,13 @@ namespace
 					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
 				{
 					FunctionDescriptor->Call15<EFunctionReturnType::Primitive>(
-						FoundObject, OutValue, InBuffer, ReturnBuffer);
+						FoundObject, InBuffer, OutBuffer, ReturnBuffer);
 				}
 			}
 		}
 
 		static void CompoundCall15Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                         const uint32 InFunctionHash, MonoObject** OutValue, uint8* InBuffer,
+		                                         const uint32 InFunctionHash, uint8* InBuffer, uint8* OutBuffer,
 		                                         uint8* ReturnBuffer)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
@@ -257,7 +257,7 @@ namespace
 					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
 				{
 					FunctionDescriptor->Call15<EFunctionReturnType::Compound>(
-						FoundObject, OutValue, InBuffer, ReturnBuffer);
+						FoundObject, InBuffer, OutBuffer, ReturnBuffer);
 				}
 			}
 		}

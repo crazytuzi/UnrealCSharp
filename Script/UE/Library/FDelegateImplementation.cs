@@ -50,18 +50,18 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FDelegate_GenericExecute4Implementation(nint InMonoObject,
-            out object[] OutValue);
+            byte* OutBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FDelegate_GenericExecute6Implementation(nint InMonoObject,
-            out object[] OutValue, byte* InBuffer);
+            byte* InBuffer, byte* OutBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FDelegate_PrimitiveExecute7Implementation(nint InMonoObject,
-            out object[] OutValue, byte* InBuffer, byte* ReturnBuffer);
+            byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FDelegate_CompoundExecute7Implementation(nint InMonoObject,
-            out object[] OutValue, byte* InBuffer, byte* ReturnBuffer);
+            byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
     }
 }

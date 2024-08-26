@@ -11,6 +11,8 @@ public:
 
 	static FString GetBufferCast(FProperty* Property);
 
+	static int32 GetBufferSize(FProperty* Property);
+
 	static FString GetTypeImplementation(FProperty* Property);
 
 	static FString GetGetAccessorReturnParamName(FProperty* Property);
@@ -19,11 +21,7 @@ public:
 
 	static bool IsPrimitiveProperty(FProperty* Property);
 
-	static FString GetOutParamString(FProperty* Property, uint32 Index);
-
 	static FString GetParamName(FProperty* Property);
-
-	static FString GetReturnParamType(FProperty* Property);
 
 	static int32 GetFunctionIndex(bool bHasReturn, bool bHasInput, bool bHasOutput, bool bIsNative, bool bIsNet);
 

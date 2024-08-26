@@ -138,8 +138,6 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 		for (auto Index = 0; Index < DelegateParams.Num(); ++Index)
 		{
-			bHasInBuffer = true;
-
 			InBufferBody += FString::Printf(TEXT(
 				"\t\t\t\t*(%s*)(__InBuffer%s) = %s;\n\n"
 			),
@@ -152,14 +150,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 			                                *FGeneratorCore::GetParamName(DelegateParams[Index])
 			);
 
-			if (FGeneratorCore::IsPrimitiveProperty(DelegateParams[Index]))
-			{
-				BufferSize += DelegateParams[Index]->ElementSize;
-			}
-			else
-			{
-				BufferSize += sizeof(void*);
-			}
+			BufferSize += FGeneratorCore::GetBufferSize(DelegateParams[Index]);
 		}
 
 		InBufferBody = FString::Printf(TEXT(
@@ -169,6 +160,30 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		                               BufferSize,
 		                               *InBufferBody
 		);
+
+		bHasInBuffer = BufferSize != 0;
+	}
+
+	FString OutBufferBody;
+
+	auto bHasOutBuffer = false;
+
+	if (!DelegateRefParamIndex.IsEmpty())
+	{
+		auto BufferSize = 0;
+
+		for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
+		{
+			BufferSize += FGeneratorCore::GetBufferSize(DelegateParams[DelegateRefParamIndex[Index]]);
+		}
+
+		OutBufferBody = FString::Printf(TEXT(
+			"\t\t\t\tvar __OutBuffer = stackalloc byte[%d];\n\n"
+		),
+		                                BufferSize
+		);
+
+		bHasOutBuffer = BufferSize != 0;
 	}
 
 	FString ReturnBufferBody;
@@ -180,11 +195,9 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		bHasReturnBuffer = true;
 
 		ReturnBufferBody = FString::Printf(TEXT(
-			"\t\t\t\tvar __ReturnBuffer = stackalloc byte[%llu];\n\n"
+			"\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n\n"
 		),
-		                                   FGeneratorCore::IsPrimitiveProperty(DelegateReturnParam)
-			                                   ? DelegateReturnParam->ElementSize
-			                                   : sizeof(void*)
+		                                   FGeneratorCore::GetBufferSize(DelegateReturnParam)
 		);
 	}
 
@@ -202,25 +215,10 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		                                               false,
 		                                               false),
 	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                               DelegateRefParamIndex.IsEmpty()
-		                                               ? TEXT("")
-		                                               : TEXT(", out var __OutValue"),
 	                                               bHasInBuffer ? TEXT(", __InBuffer") : TEXT(""),
+	                                               bHasOutBuffer ? TEXT(", __OutBuffer") : TEXT(""),
 	                                               bHasReturnBuffer ? TEXT(", __ReturnBuffer") : TEXT("")
 	);
-
-	TArray<FString> ExecuteFunctionOutParams;
-
-	for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
-	{
-		ExecuteFunctionOutParams.Emplace(FString::Printf(TEXT(
-			"%s = %s;"
-		),
-		                                                 *FUnrealCSharpFunctionLibrary::Encode(
-			                                                 DelegateParams[DelegateRefParamIndex[Index]]),
-		                                                 *FGeneratorCore::GetOutParamString(
-			                                                 DelegateParams[DelegateRefParamIndex[Index]], Index)));
-	}
 
 	FString ExecuteFunctionReturnParamBody;
 
@@ -235,15 +233,32 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	FString ExecuteFunctionOutParamBody;
 
-	for (auto ExecuteFunctionOutParam : ExecuteFunctionOutParams)
+	if (bHasOutBuffer)
 	{
-		ExecuteFunctionOutParamBody += FString::Printf(TEXT(
-			"\n\t\t\t\t%s\n"
-		),
-		                                               *ExecuteFunctionOutParam);
+		auto BufferSize = 0;
+
+		for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
+		{
+			ExecuteFunctionOutParamBody += FString::Printf(TEXT(
+				"\n\t\t\t\t%s = *(%s*)(__OutBuffer%s);\n"
+			),
+			                                               *FUnrealCSharpFunctionLibrary::Encode(
+				                                               DelegateParams[DelegateRefParamIndex[Index]]),
+			                                               *FGeneratorCore::GetPropertyType(
+				                                               DelegateParams[DelegateRefParamIndex[Index]]),
+			                                               BufferSize == 0
+				                                               ? TEXT("")
+				                                               : *FString::Printf(TEXT(
+					                                               " + %d"),
+					                                               BufferSize)
+			);
+
+			BufferSize += FGeneratorCore::GetBufferSize(DelegateParams[DelegateRefParamIndex[Index]]);
+		}
 	}
 
 	auto ExecuteFunctionImplementationBody = FString::Printf(TEXT(
+		"%s"
 		"%s"
 		"%s"
 		"\t\t\t\t%s"
@@ -252,6 +267,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		"%s"
 	),
 	                                                         *InBufferBody,
+	                                                         *OutBufferBody,
 	                                                         *ReturnBufferBody,
 	                                                         *ExecuteFunctionCallBody,
 	                                                         *ExecuteFunctionOutParamBody,
@@ -494,9 +510,9 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                                                    *DelegateDeclarationBody
 	);
 
-	FString BufferBody;
+	FString InBufferBody;
 
-	auto bHasBuffer = false;
+	auto bHasInBuffer = false;
 
 	if (!DelegateParams.IsEmpty())
 	{
@@ -504,37 +520,52 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 		for (auto Index = 0; Index < DelegateParams.Num(); ++Index)
 		{
-			bHasBuffer = true;
-
-			BufferBody += FString::Printf(TEXT(
+			InBufferBody += FString::Printf(TEXT(
 				"\t\t\t\t*(%s*)(__InBuffer%s) = %s;\n\n"
 			),
-			                              *FGeneratorCore::GetBufferCast(DelegateParams[Index]),
-			                              BufferSize == 0
-				                              ? TEXT("")
-				                              : *FString::Printf(TEXT(
-					                              " + %d"),
-				                                                 BufferSize),
-			                              *FGeneratorCore::GetParamName(DelegateParams[Index])
+			                                *FGeneratorCore::GetBufferCast(DelegateParams[Index]),
+			                                BufferSize == 0
+				                                ? TEXT("")
+				                                : *FString::Printf(TEXT(
+					                                " + %d"),
+				                                                   BufferSize),
+			                                *FGeneratorCore::GetParamName(DelegateParams[Index])
 			);
 
-			if (FGeneratorCore::IsPrimitiveProperty(DelegateParams[Index]))
-			{
-				BufferSize += DelegateParams[Index]->ElementSize;
-			}
-			else
-			{
-				BufferSize += sizeof(void*);
-			}
+			BufferSize += FGeneratorCore::GetBufferSize(DelegateParams[Index]);
 		}
 
-		BufferBody = FString::Printf(TEXT(
+		InBufferBody = FString::Printf(TEXT(
 			"\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n\n"
 			"%s"
 		),
-		                             BufferSize,
-		                             *BufferBody
+		                               BufferSize,
+		                               *InBufferBody
 		);
+
+		bHasInBuffer = BufferSize != 0;
+	}
+
+	FString OutBufferBody;
+
+	auto bHasOutBuffer = false;
+
+	if (!DelegateRefParamIndex.IsEmpty())
+	{
+		auto BufferSize = 0;
+
+		for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
+		{
+			BufferSize += FGeneratorCore::GetBufferSize(DelegateParams[DelegateRefParamIndex[Index]]);
+		}
+
+		OutBufferBody = FString::Printf(TEXT(
+			"\t\t\t\tvar __OutBuffer = stackalloc byte[%d];\n\n"
+		),
+		                                BufferSize
+		);
+
+		bHasOutBuffer = BufferSize != 0;
 	}
 
 	auto BroadcastFunctionCallBody = FString::Printf(TEXT(
@@ -546,41 +577,45 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		                                                 false,
 		                                                 false),
 	                                                 *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                                 DelegateRefParamIndex.IsEmpty()
-		                                                 ? TEXT("")
-		                                                 : TEXT(", out var __OutValue"),
-	                                                 bHasBuffer ? TEXT(", __InBuffer") : TEXT("")
+	                                                 bHasInBuffer ? TEXT(", __InBuffer") : TEXT(""),
+	                                                 bHasOutBuffer ? TEXT(", __OutBuffer") : TEXT("")
 	);
-
-	TArray<FString> BroadcastFunctionOutParams;
-
-	for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
-	{
-		BroadcastFunctionOutParams.Emplace(FString::Printf(TEXT(
-			"%s = %s;"
-		),
-		                                                   *FUnrealCSharpFunctionLibrary::Encode(
-			                                                   DelegateParams[DelegateRefParamIndex[Index]]),
-		                                                   *FGeneratorCore::GetOutParamString(
-			                                                   DelegateParams[DelegateRefParamIndex[Index]], Index)));
-	}
 
 	FString BroadcastFunctionOutParamBody;
 
-	for (auto BroadcastFunctionOutParam : BroadcastFunctionOutParams)
+	if (bHasOutBuffer)
 	{
-		BroadcastFunctionOutParamBody += FString::Printf(TEXT(
-			"\n\t\t\t\t%s\n"),
-		                                                 *BroadcastFunctionOutParam);
+		auto BufferSize = 0;
+
+		for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
+		{
+			BroadcastFunctionOutParamBody += FString::Printf(TEXT(
+				"\n\t\t\t\t%s = *(%s*)(__OutBuffer%s);\n"
+			),
+			                                                 *FUnrealCSharpFunctionLibrary::Encode(
+				                                                 DelegateParams[DelegateRefParamIndex[Index]]),
+			                                                 *FGeneratorCore::GetPropertyType(
+				                                                 DelegateParams[DelegateRefParamIndex[Index]]),
+			                                                 BufferSize == 0
+				                                                 ? TEXT("")
+				                                                 : *FString::Printf(TEXT(
+					                                                 " + %d"),
+					                                                 BufferSize)
+			);
+
+			BufferSize += FGeneratorCore::GetBufferSize(DelegateParams[DelegateRefParamIndex[Index]]);
+		}
 	}
 
 	auto BroadcastFunctionImplementationBody = FString::Printf(TEXT(
+		"%s"
 		"%s"
 		"\t\t\t\t%s\n"
 		"%s"
 		"%s"
 	),
-	                                                           *BufferBody,
+	                                                           *InBufferBody,
+	                                                           *OutBufferBody,
 	                                                           *BroadcastFunctionCallBody,
 	                                                           *BroadcastFunctionOutParamBody,
 	                                                           !BroadcastFunctionOutParamBody.IsEmpty()

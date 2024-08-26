@@ -444,6 +444,11 @@ FString FGeneratorCore::GetBufferCast(FProperty* Property)
 	return TEXT("nint");
 }
 
+int32 FGeneratorCore::GetBufferSize(FProperty* Property)
+{
+	return IsPrimitiveProperty(Property) ? Property->ElementSize : sizeof(void*);
+}
+
 FString FGeneratorCore::GetTypeImplementation(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property))
@@ -554,29 +559,6 @@ bool FGeneratorCore::IsPrimitiveProperty(FProperty* Property)
 	return false;
 }
 
-FString FGeneratorCore::GetOutParamString(FProperty* Property, const uint32 Index)
-{
-	if (Property == nullptr) return TEXT("");
-
-	return FString::Printf(TEXT(
-		"%s__OutValue[%d]%s"
-	),
-	                       IsPrimitiveProperty(Property)
-		                       ? *FString::Printf(TEXT(
-			                       "(%s)"
-		                       ),
-		                                          *GetPropertyType(Property))
-		                       : TEXT(""),
-	                       Index,
-	                       !IsPrimitiveProperty(Property)
-		                       ? *FString::Printf(TEXT(
-			                       " as %s"
-		                       ),
-		                                          *GetPropertyType(Property))
-		                       : TEXT("")
-	);
-}
-
 FString FGeneratorCore::GetParamName(FProperty* Property)
 {
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
@@ -612,21 +594,6 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 	}
-}
-
-FString FGeneratorCore::GetReturnParamType(FProperty* Property)
-{
-	if (CastField<FByteProperty>(Property))
-	{
-		return TName<uint8, uint8>::Get();
-	}
-
-	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-	{
-		return GetPropertyType(EnumProperty->GetUnderlyingProperty());
-	}
-
-	return GetPropertyType(Property);
 }
 
 int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput, const bool bHasOutput,
