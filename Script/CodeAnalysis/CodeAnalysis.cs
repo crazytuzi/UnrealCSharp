@@ -20,11 +20,11 @@ namespace CodeAnalysis
 
             if (_bIsSingle)
             {
-                _inputFileName = args[1];
+                _outputPathName = args[1];
 
-                _inputPathName = "";
+                _inputFileName = args[2];
 
-                _outputPathName = args[2];
+                _inputPathNames = new List<string>();
 
                 if (File.Exists(Path.Combine(_outputPathName, DynamicFileName)))
                 {
@@ -76,11 +76,16 @@ namespace CodeAnalysis
             }
             else
             {
+                _outputPathName = args[1];
+
                 _inputFileName = "";
 
-                _inputPathName = args[1];
+                _inputPathNames = new List<string>();
 
-                _outputPathName = args[2];
+                for (var i = 2; i < args.Length; i++)
+                {
+                    _inputPathNames.Add(args[i]);
+                }
 
                 _dynamic = new Dictionary<string, List<string>>
                 {
@@ -139,11 +144,14 @@ namespace CodeAnalysis
             }
             else
             {
-                var Files = GetFiles(_inputPathName);
-
-                foreach (var Item in Files)
+                foreach (var PathName in _inputPathNames)
                 {
-                    AnalysisSingle(Item);
+                    var Files = GetFiles(PathName);
+
+                    foreach (var Item in Files)
+                    {
+                        AnalysisSingle(Item);
+                    }
                 }
             }
 
@@ -320,11 +328,11 @@ namespace CodeAnalysis
 
         private readonly bool _bIsSingle;
 
+        private readonly string _outputPathName;
+
         private readonly string _inputFileName;
 
-        private readonly string _inputPathName;
-
-        private readonly string _outputPathName;
+        private readonly List<string> _inputPathNames;
 
         private readonly Dictionary<string, List<string>>? _overrideFunction;
 

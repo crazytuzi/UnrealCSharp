@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "Domain/AssemblyLoader.h"
 #include "UnrealCSharpSetting.generated.h"
 
@@ -19,6 +18,18 @@ struct FGameContentDirectoryPath : public FDirectoryPath
 	{
 		Path = InPath;
 	}
+};
+
+USTRUCT()
+struct FCustomProject
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FString Name;
+
+	UPROPERTY(EditAnywhere)
+	FString GUID;
 };
 
 USTRUCT()
@@ -55,6 +66,8 @@ public:
 
 	const FString& GetGameName() const;
 
+	const TArray<FCustomProject>& GetCustomProjects() const;
+
 	UAssemblyLoader* GetAssemblyLoader() const;
 
 	const TArray<FBindClass>& GetBindClass() const;
@@ -74,6 +87,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Publish, meta = (DisplayName = "Game Name"))
 	FString GameName;
+
+	UPROPERTY(Config, EditAnywhere, Category = Publish)
+	TArray<FCustomProject> CustomProjects;
 
 	UPROPERTY(Config, EditAnywhere, Category = Domain)
 	TSubclassOf<UAssemblyLoader> AssemblyLoader;

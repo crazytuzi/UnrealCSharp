@@ -2,6 +2,7 @@
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Misc/FileHelper.h"
+#include "Containers/ArrayBuilder.h"
 #include "Common/NameEncode.h"
 #include "Domain/AssemblyLoader.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
@@ -20,7 +21,8 @@
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
+		UnrealCSharpEditorSetting->IsValidLowLevelFast())
 	{
 		if (const auto& DotNetPath = UnrealCSharpEditorSetting->GetDotNetPath(); !DotNetPath.IsEmpty())
 		{
@@ -444,6 +446,24 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
 }
 #endif
 
+#if WITH_EDITOR
+TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
+{
+	TArray<FString> CustomProjectsDirectory;
+
+	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+		UnrealCSharpSetting->IsValidLowLevelFast())
+	{
+		for (const auto& [Name, PLACEHOLDER] : UnrealCSharpSetting->GetCustomProjects())
+		{
+			CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
+		}
+	}
+
+	return CustomProjectsDirectory;
+}
+#endif
+
 FString FUnrealCSharpFunctionLibrary::GetBindingDirectory()
 {
 	return BINDING_NAME;
@@ -544,6 +564,31 @@ FString FUnrealCSharpFunctionLibrary::GetFullUEPublishPath()
 FString FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
 {
 	return GetFullPublishDirectory() / GetGameName() + DLL_SUFFIX;
+}
+
+TArray<FString> FUnrealCSharpFunctionLibrary::GetFullCustomProjectsPublishPath()
+{
+	TArray<FString> FullCustomProjectsPublishPath;
+
+	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+		UnrealCSharpSetting->IsValidLowLevelFast())
+	{
+		for (const auto& [Name, PLACEHOLDER] : UnrealCSharpSetting->GetCustomProjects())
+		{
+			FullCustomProjectsPublishPath.Add(GetFullPublishDirectory() / Name + DLL_SUFFIX);
+		}
+	}
+
+	return FullCustomProjectsPublishPath;
+}
+
+TArray<FString> FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
+{
+	return TArrayBuilder<FString>().
+	       Add(GetFullUEPublishPath()).
+	       Add(GetFullGamePublishPath()).
+	       Append(GetFullCustomProjectsPublishPath()).
+	       Build();
 }
 
 #if WITH_EDITOR
@@ -675,11 +720,11 @@ TMap<FString, FString> FUnrealCSharpFunctionLibrary::LoadFileToString(const FStr
 #if WITH_EDITOR
 TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
-	static auto UEDirectory = GetPluginScriptDirectory() / DEFAULT_UE_NAME;
-
-	static auto GameDirectory = GetGameDirectory();
-
-	return {UEDirectory, GameDirectory};
+	return TArrayBuilder<FString>().
+	       Add(GetPluginScriptDirectory() / DEFAULT_UE_NAME).
+	       Add(GetGameDirectory()).
+	       Append(GetCustomProjectsDirectory()).
+	       Build();
 }
 #endif
 

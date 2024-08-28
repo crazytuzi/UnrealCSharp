@@ -21,10 +21,7 @@ void FDynamicGenerator::Generator()
 	{
 		FMonoDomain::Initialize({
 			"",
-			{
-				FUnrealCSharpFunctionLibrary::GetFullUEPublishPath(),
-				FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
-			}
+			FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 		});
 	}
 
@@ -76,10 +73,7 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 
 	FMonoDomain::Initialize({
 		"",
-		{
-			FUnrealCSharpFunctionLibrary::GetFullUEPublishPath(),
-			FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
-		}
+		FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 	});
 
 	TArray<FString> FileChange;

@@ -77,7 +77,8 @@ bool FCSharpBind::BindClassDefaultObject(FDomain* InDomain, UObject* InObject)
 	}
 	else
 	{
-		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
+		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+			UnrealCSharpSetting->IsValidLowLevelFast())
 		{
 			for (const auto& [Class, bNeedMonoClass] : UnrealCSharpSetting->GetBindClass())
 			{

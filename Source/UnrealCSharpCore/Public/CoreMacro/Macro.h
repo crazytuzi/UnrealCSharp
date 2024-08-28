@@ -30,6 +30,12 @@
 
 #define BINDING_NAME FString(TEXT("Binding"))
 
+#define CSHARP_GUID FString(TEXT("9A19103F-16F7-4668-BE54-9A1E7A4F7556"))
+
+#define PROJECT_PLACEHOLDER FString(TEXT("ProjectPlaceholder"))
+
+#define SOLUTION_CONFIGURATION_PLATFORMS_PLACEHOLDER FString(TEXT("SolutionConfigurationPlatformsPlaceholder"))
+
 #define PROJECT_SUFFIX FString(TEXT(".csproj"))
 
 #define PROJECT_PROPS_SUFFIX FString(TEXT(".csproj.props"))

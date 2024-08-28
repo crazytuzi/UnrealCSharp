@@ -231,7 +231,8 @@ void FEditorListener::OnWindowActivatedEvent()
 
 void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges)
 {
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
+		UnrealCSharpEditorSetting->IsValidLowLevelFast())
 	{
 		if (UnrealCSharpEditorSetting->EnableDirectoryChanged())
 		{
@@ -281,7 +282,8 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 
 void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator) const
 {
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
+		UnrealCSharpEditorSetting->IsValidLowLevelFast())
 	{
 		if (UnrealCSharpEditorSetting->EnableAssetChanged())
 		{
