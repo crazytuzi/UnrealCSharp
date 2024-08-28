@@ -1,6 +1,5 @@
 ﻿#include "Dynamic/FDynamicGenerator.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Domain/FMonoDomain.h"
+#include "Domain/FMonoDomainScope.h"
 #include "Dynamic/FDynamicEnumGenerator.h"
 #include "Dynamic/FDynamicStructGenerator.h"
 #include "Dynamic/FDynamicInterfaceGenerator.h"
@@ -17,15 +16,7 @@ void FDynamicGenerator::Generator()
 	bIsFullGenerator = true;
 #endif
 
-	if (!FMonoDomain::bLoadSucceed)
-	{
-		FMonoDomain::Initialize({
-			"",
-			FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
-		});
-	}
-
-	if (FMonoDomain::bLoadSucceed)
+	FMonoDomainScope([]()
 	{
 		FDynamicEnumGenerator::Generator();
 
@@ -34,9 +25,7 @@ void FDynamicGenerator::Generator()
 		FDynamicInterfaceGenerator::Generator();
 
 		FDynamicClassGenerator::Generator();
-
-		FMonoDomain::Deinitialize();
-	}
+	});
 
 #if WITH_EDITOR
 	bIsFullGenerator = false;
@@ -66,47 +55,35 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 
 void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)
 {
-	if (FMonoDomain::bLoadSucceed)
+	FMonoDomainScope([FileChangeData]()
 	{
-		FMonoDomain::Deinitialize();
-	}
+		TArray<FString> FileChange;
 
-	FMonoDomain::Initialize({
-		"",
-		FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
+		for (const auto& Data : FileChangeData)
+		{
+			FileChange.AddUnique(FPaths::GetBaseFilename(Data.Filename));
+		}
+
+		for (const auto& File : FileChange)
+		{
+			if (auto Class = FDynamicClassGenerator::GetMonoClass(File))
+			{
+				FDynamicClassGenerator::Generator(Class);
+			}
+			else if (Class = FDynamicStructGenerator::GetMonoClass(File); Class != nullptr)
+			{
+				FDynamicStructGenerator::Generator(Class);
+			}
+			else if (Class = FDynamicEnumGenerator::GetMonoClass(File); Class != nullptr)
+			{
+				FDynamicEnumGenerator::Generator(Class);
+			}
+			else if (Class = FDynamicInterfaceGenerator::GetMonoClass(File); Class != nullptr)
+			{
+				FDynamicInterfaceGenerator::Generator(Class);
+			}
+		}
 	});
-
-	TArray<FString> FileChange;
-
-	for (const auto& Data : FileChangeData)
-	{
-		FileChange.AddUnique(FPaths::GetBaseFilename(Data.Filename));
-	}
-
-	for (const auto& File : FileChange)
-	{
-		if (auto Class = FDynamicClassGenerator::GetMonoClass(File))
-		{
-			FDynamicClassGenerator::Generator(Class);
-		}
-		else if (Class = FDynamicStructGenerator::GetMonoClass(File); Class != nullptr)
-		{
-			FDynamicStructGenerator::Generator(Class);
-		}
-		else if (Class = FDynamicEnumGenerator::GetMonoClass(File); Class != nullptr)
-		{
-			FDynamicEnumGenerator::Generator(Class);
-		}
-		else if (Class = FDynamicInterfaceGenerator::GetMonoClass(File); Class != nullptr)
-		{
-			FDynamicInterfaceGenerator::Generator(Class);
-		}
-	}
-
-	if (FMonoDomain::bLoadSucceed)
-	{
-		FMonoDomain::Deinitialize();
-	}
 }
 
 void FDynamicGenerator::OnPrePIEEnded()
