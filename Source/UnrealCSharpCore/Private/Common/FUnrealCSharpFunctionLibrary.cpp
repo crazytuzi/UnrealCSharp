@@ -454,7 +454,7 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
 	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
 		UnrealCSharpSetting->IsValidLowLevelFast())
 	{
-		for (const auto& [Name, PLACEHOLDER] : UnrealCSharpSetting->GetCustomProjects())
+		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects())
 		{
 			CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
 		}
@@ -573,7 +573,7 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetFullCustomProjectsPublishPath()
 	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
 		UnrealCSharpSetting->IsValidLowLevelFast())
 	{
-		for (const auto& [Name, PLACEHOLDER] : UnrealCSharpSetting->GetCustomProjects())
+		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects())
 		{
 			FullCustomProjectsPublishPath.Add(GetFullPublishDirectory() / Name + DLL_SUFFIX);
 		}
