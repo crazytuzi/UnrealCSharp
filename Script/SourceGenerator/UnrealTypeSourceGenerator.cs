@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -19,7 +20,7 @@ namespace SourceGenerator
 
         public static readonly DiagnosticDescriptor ErrorFileNameNotMatch = new DiagnosticDescriptor(
             "UC_ERROR_02",
-            "The file name and class name do not match", "The file where class \"{0}\" is located must be \"{1}\"",
+            "The file name and class name do not match", "The file where {0} \"{1}\" is located must be \"{2}\"",
             "UnrealCSharp",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
@@ -31,6 +32,12 @@ namespace SourceGenerator
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
+        public static readonly DiagnosticDescriptor ErrorNamespace = new DiagnosticDescriptor(
+            "UC_ERROR_04",
+            "The namespace of dynamic class/struct/interface/enum must be \"Script.CoreUObject\"", "The namespace of dynamic {0} must be \"Script.CoreUObject\"",
+            "UnrealCSharp",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
 
         private static string GetPathName(string Name)
         {
@@ -43,12 +50,38 @@ namespace SourceGenerator
             {
                 return;
             }
-
             foreach (var error in unrealTypeReceiver.Errors)
             {
                 Context.ReportDiagnostic(error);
             }
-
+            foreach (var @interface in unrealTypeReceiver.Interfaces)
+            {
+                var source = "";
+                @interface.Usings.Add("using Script.Library;");
+                @interface.Usings.ForEach(Str => source += Str);
+                source += "\nnamespace Script.CoreUObject;";
+                source += $"\n[{string.Join(",", @interface.Attributes)}]";
+                source += $"\npublic partial class U{@interface.Name.Substring(1)} : UInterface ";
+                source += "\n{}";
+                unrealTypeReceiver.Types.Add(@interface.Name, new TypeInfo
+                {
+                    Name = $"U{@interface.Name.Substring(1)}",
+                    DynamicType = EDynamicType.UInterface,
+                    BaseType = "UInterface",
+                    NameSpace = "Script.CoreUObject",
+                    Modifiers = "public partial",
+                    Usings = @interface.Usings,
+                    HasBase = true,
+                    HasEqualsMethod = false,
+                    HasGarbageCollectionHandle = false,
+                    HasHashCodeMethod = false,
+                    HasOperatorEqualTo = false,
+                    HasOperatorNotEqualTo = false,
+                    HasStaticClass = false,
+                    HasStaticStruct = false,
+                });
+                Context.AddSource(@interface.Name + ".gen.cs", source);
+            }
             foreach (var type in unrealTypeReceiver.Types)
             {
                 if (type.Value.DynamicType == EDynamicType.Other)
@@ -85,7 +118,7 @@ namespace SourceGenerator
 
                     var source = "";
 
-                    type.Value.Using.ForEach(Str => source += Str);
+                    type.Value.Usings.ForEach(Str => source += Str);
 
                     source +=
                         $"namespace {type.Value.NameSpace}\n" +
@@ -145,7 +178,7 @@ namespace SourceGenerator
                 {
                     var source = "";
 
-                    type.Value.Using.ForEach(Str => source += Str);
+                    type.Value.Usings.ForEach(Str => source += Str);
 
                     source += $"namespace {type.Value.NameSpace}\n" +
                               $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}: IStaticClass\n" +
@@ -184,14 +217,99 @@ namespace SourceGenerator
 
         public readonly List<Diagnostic> Errors = new List<Diagnostic>();
 
-        
+        public readonly List<InterfaceInfo> Interfaces = new List<InterfaceInfo>();
         public void OnVisitSyntaxNode(SyntaxNode Node)
         {
             if (Node is ClassDeclarationSyntax classDeclarationSyntax)
             {
                 ProcessClass(classDeclarationSyntax);
             }
+            else if (Node is EnumDeclarationSyntax enumDeclarationSyntax)
+            {
+                var name = enumDeclarationSyntax.Identifier.ToString();
+                var filePath = enumDeclarationSyntax.GetLocation().SourceTree.FilePath;
+                if (enumDeclarationSyntax.Parent is BaseNamespaceDeclarationSyntax namespaceDeclarationSyntax == false)
+                    return;
+                if (GetAttributeFromClass(enumDeclarationSyntax, "UEnum") == null)
+                    return;
+                if (name.StartsWith("E") == false)
+                {
+                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeName, 
+                        Location.Create(enumDeclarationSyntax.Identifier.SyntaxTree, enumDeclarationSyntax.Identifier.Span), 
+                        $"The name of UEnum {name} must start with \"E\""));
+
+                }
+                else
+                {
+                    var currectFileName = name + ".cs";
+                    currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
+                    if (Path.GetFileName(filePath) != currectFileName)
+                    {
+                        Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch, 
+                            Location.Create(enumDeclarationSyntax.Identifier.SyntaxTree, enumDeclarationSyntax.Identifier.Span), "enum", name, currectFileName));
+                    }
+                }
+                var @namespace = namespaceDeclarationSyntax.GetFullNamespace();
+                if (@namespace != "Script.CoreUObject")
+                {
+                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorNamespace, Location.Create(enumDeclarationSyntax.Identifier.SyntaxTree, enumDeclarationSyntax.Identifier.Span), name));
+                }
+            }
+            else if (Node is InterfaceDeclarationSyntax interfaceDeclarationSyntax)
+            {
+                var name = interfaceDeclarationSyntax.Identifier.ToString();
+                var filePath = interfaceDeclarationSyntax.GetLocation().SourceTree.FilePath;
+                if (interfaceDeclarationSyntax.Parent is BaseNamespaceDeclarationSyntax namespaceDeclarationSyntax == false)
+                    return;
+                if (GetAttributeFromClass(interfaceDeclarationSyntax, "UInterface") == null)
+                    return;
+                var @namespace = namespaceDeclarationSyntax.GetFullNamespace();
+                bool hasError = false;
+                if (@namespace != "Script.CoreUObject")
+                {
+                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorNamespace, Location.Create(interfaceDeclarationSyntax.Identifier.SyntaxTree, interfaceDeclarationSyntax.Identifier.Span), name));
+                    hasError = true;
+                }
+                if (name.StartsWith("I") == false)
+                {
+                    hasError = true;
+                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeName,
+                        Location.Create(interfaceDeclarationSyntax.Identifier.SyntaxTree, interfaceDeclarationSyntax.Identifier.Span),
+                        $"The name of UInterface {name} must start with \"I\""));
+                }
+                else 
+                {  
+                    var currectFileName = name + ".cs";
+                    currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
+                    if (Path.GetFileName(filePath) != currectFileName)
+                    {
+                        hasError = true;
+                        Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch,
+                            Location.Create(interfaceDeclarationSyntax.Identifier.SyntaxTree, interfaceDeclarationSyntax.Identifier.Span), "interface", name, currectFileName));
+                    }
+                }
+                if (hasError == false)
+                {
+                    List<string> attributes = new List<string>();
+                    foreach (var list in interfaceDeclarationSyntax.AttributeLists)
+                    {
+                        foreach (var attribute in list.Attributes)
+                        {
+                            var text = attribute.ToFullString();
+                            attributes.Add(text);
+                        }
+                    }
+                    Interfaces.Add(new InterfaceInfo
+                    {
+                        Name = name,
+                        Attributes = attributes,
+                        Usings = interfaceDeclarationSyntax.GetUsingList()
+                    });
+                }
+            }
         }
+
+
 
         private void ProcessClass(ClassDeclarationSyntax Syntax)
         {
@@ -268,22 +386,33 @@ namespace SourceGenerator
                 }
             }
 
+            if (bIsUInterface)
+            {
+                if (name.StartsWith("U") == false)
+                {
+                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeName,
+                    Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span),
+                    $"The name of UInterface {name} must start with \"U\""));
+                    isNameCorrect = false;
+                }
+            }
+
             if (isNameCorrect)
             {
-                if (bIsUClass || bIsUStruct)
+                if (bIsUClass || bIsUStruct || bIsUInterface)
                 {
                     var currectFileName = name + ".cs";
                     if (bIsUClass && name.EndsWith("_C") == false)
                     {
                         currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
                     }
-                    if (bIsUStruct)
+                    if (bIsUStruct || bIsUInterface)
                     {
                         currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
                     }
                     if (Path.GetFileName(filePath) != currectFileName)
                     {
-                        Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch, Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span), name, currectFileName));
+                        Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch, Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span),"class", name, currectFileName));
                     }
                 }
             }
@@ -322,12 +451,17 @@ namespace SourceGenerator
                 return;
             }
 
-            if (Syntax.Parent is BaseNamespaceDeclarationSyntax syntax == false)
+            if (Syntax.Parent is BaseNamespaceDeclarationSyntax namespaceDeclarationSyntax == false)
             {
                 return;
             }
 
-            var nameSpace = syntax.GetFullNamespace();
+            var nameSpace = namespaceDeclarationSyntax.GetFullNamespace();
+
+            if (nameSpace != "Script.CoreUObject" && bIsUClass && bIsUStruct && bIsUInterface)
+            {
+                Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorNamespace, Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span), name));
+            }
 
             var usingList = Syntax.GetUsingList();
 
@@ -433,7 +567,7 @@ namespace SourceGenerator
 
                 type.DynamicType = EDynamicType.Other;
 
-                type.Using = new List<string>
+                type.Usings = new List<string>
                 {
                     "using Script.Library;\n",
                     "using Script.UnrealCSharpCore;\n",
@@ -457,7 +591,7 @@ namespace SourceGenerator
                 }
             }
 
-            type.Using = MergeUsing(usingList, type.Using);
+            type.Usings = MergeUsing(usingList, type.Usings);
 
             type.HasBase = bHasBase;
 
@@ -476,7 +610,7 @@ namespace SourceGenerator
             type.HasOperatorNotEqualTo |= bHasOperatorNotEqualTo;
         }
 
-        private static AttributeSyntax GetAttributeFromClass(ClassDeclarationSyntax Syntax, string Name)
+        private static AttributeSyntax GetAttributeFromClass(BaseTypeDeclarationSyntax Syntax, string Name)
         {
             foreach (var attributeList in Syntax.AttributeLists)
             {
@@ -551,12 +685,20 @@ namespace SourceGenerator
         UInterface,
         Other
     }
+    public class InterfaceInfo
+    {
+        public string Name { get; set; }
+
+        public List<string> Attributes { get; set; }
+
+        public List<string> Usings { get; set; }
+    }
 
     public class TypeInfo
     {
         public EDynamicType DynamicType { get; set; }
 
-        public List<string> Using { get; set; }
+        public List<string> Usings { get; set; }
 
         public string Name { get; set; }
 
