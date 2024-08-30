@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,12 +10,27 @@ namespace SourceGenerator
     [Generator]
     public class UnrealTypeSourceGenerator : ISourceGenerator
     {
-        private static readonly DiagnosticDescriptor ErrorDynamicClass = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor ErrorDynamicClass = new DiagnosticDescriptor(
             "UC_ERROR_01",
-            "Dynamic Class Must be partial", "{0} \"{1}\" must be a partial class",
+            "UClass or UStruct must be a partial class", "{0} \"{1}\" must be a partial class",
             "UnrealCSharp",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor ErrorFileNameNotMatch = new DiagnosticDescriptor(
+            "UC_ERROR_02",
+            "The file name and class name do not match", "The file where class \"{0}\" is located must be \"{1}\"",
+            "UnrealCSharp",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor ErrorTypeName = new DiagnosticDescriptor(
+            "UC_ERROR_03",
+            "The name of dynamic class is error", "{0}",
+            "UnrealCSharp",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
 
         private static string GetPathName(string Name)
         {
@@ -30,8 +46,7 @@ namespace SourceGenerator
 
             foreach (var error in unrealTypeReceiver.Errors)
             {
-                Context.ReportDiagnostic(Diagnostic.Create(ErrorDynamicClass, error.ErrorLocation,
-                    error.UnrealDynamicType.ToString().Replace("EType.", ""), error.Name));
+                Context.ReportDiagnostic(error);
             }
 
             foreach (var type in unrealTypeReceiver.Types)
@@ -167,8 +182,9 @@ namespace SourceGenerator
     {
         public readonly Dictionary<string, TypeInfo> Types = new Dictionary<string, TypeInfo>();
 
-        public readonly List<ErrorInfo> Errors = new List<ErrorInfo>();
+        public readonly List<Diagnostic> Errors = new List<Diagnostic>();
 
+        
         public void OnVisitSyntaxNode(SyntaxNode Node)
         {
             if (Node is ClassDeclarationSyntax classDeclarationSyntax)
@@ -195,6 +211,83 @@ namespace SourceGenerator
 
             var bHasBase = Syntax.BaseList != null;
 
+            var filePath = Syntax.GetLocation().SourceTree.FilePath;
+
+            var isNameCorrect = true;
+
+            if (bHasBase)
+            {
+                var baseType = Syntax.BaseList.Types.FirstOrDefault();
+                if (baseType != null)
+                {
+                    if (bIsUClass)
+                    {
+                        if (baseType.Type.GetText().ToString().StartsWith("_C"))
+                        {
+                            if (name.EndsWith("_C") == false)
+                            {
+                                Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeName,
+                                    Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span),
+                                    $"The name of UClass {name} must end with \"_C\""));
+                                isNameCorrect = false;
+                            }
+                        }
+                        else if (baseType.Type.GetText().ToString().StartsWith("A"))
+                        {
+                            if (name.EndsWith("_C") == false && name.StartsWith("A") == false)
+                            {
+
+                                Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeName,
+                                Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span),
+                                $"The name of UClass {name} must end with \"_C\" or start with \"A\""));
+                                isNameCorrect = false;
+                            }
+
+                        }
+                        else if (baseType.Type.GetText().ToString().StartsWith("U"))
+                        {
+                            if (name.StartsWith("U") == false)
+                            {
+                                Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeName,
+                                Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span),
+                                $"The name of UClass {name} must end with \"_C\" or start with \"U\""));
+                                isNameCorrect = false;
+                            }
+                        }
+                    }
+                }
+            }
+            if (bIsUStruct)
+            {
+                if (name.StartsWith("F") == false)
+                {
+                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeName,
+                    Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span),
+                    $"The name of UStruct {name} must start with \"F\""));
+                    isNameCorrect = false;
+                }
+            }
+
+            if (isNameCorrect)
+            {
+                if (bIsUClass || bIsUStruct)
+                {
+                    var currectFileName = name + ".cs";
+                    if (bIsUClass && name.EndsWith("_C") == false)
+                    {
+                        currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
+                    }
+                    if (bIsUStruct)
+                    {
+                        currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
+                    }
+                    if (Path.GetFileName(filePath) != currectFileName)
+                    {
+                        Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch, Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span), name, currectFileName));
+                    }
+                }
+            }
+            
             if (Syntax.Modifiers.ToArray().Any(Modifier => Modifier.Text == "partial") == false)
             {
                 if (bIsUClass || bIsUStruct || bIsUInterface)
@@ -221,13 +314,9 @@ namespace SourceGenerator
 
                         dynamicType = EDynamicType.UInterface;
                     }
+                    
+                    Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorDynamicClass, Location.Create(errorAttribute.SyntaxTree, errorAttribute.Span),dynamicType.ToString().Replace("EType.", ""), name));
 
-                    Errors.Add(new ErrorInfo
-                    {
-                        Name = name,
-                        UnrealDynamicType = dynamicType,
-                        ErrorLocation = Location.Create(errorAttribute.SyntaxTree, errorAttribute.Span)
-                    });
                 }
 
                 return;
@@ -490,6 +579,8 @@ namespace SourceGenerator
         public bool HasEqualsMethod { get; set; }
 
         public bool HasHashCodeMethod { get; set; }
+
+        public string BaseType { get; set; }
     }
 
     public static class CodeAnalysisHelper
