@@ -149,4 +149,10 @@ public:
 
 	static bool IsDynamicReInstanceField(const UField* InField);
 #endif
+
+	template< class T > 
+	T* GetMutableDefaultSafe()
+	{
+		return Cast<T>(T::StaticClass()->GetDefaultObject(false));
+	}
 };

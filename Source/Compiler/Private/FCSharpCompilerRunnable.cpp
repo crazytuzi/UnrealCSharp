@@ -165,8 +165,8 @@ void FCSharpCompilerRunnable::ImmediatelyDoWork()
 
 void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
 {
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
-		UnrealCSharpEditorSetting->IsValidLowLevelFast())
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
 	{
 		if (UnrealCSharpEditorSetting->EnableCompiled())
 		{

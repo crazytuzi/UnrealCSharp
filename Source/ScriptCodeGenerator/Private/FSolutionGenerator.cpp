@@ -271,8 +271,7 @@ void FSolutionGenerator::ReplaceProjectPlaceholder(FString& OutResult)
 {
 	FString Projects;
 
-	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
-		UnrealCSharpSetting->IsValidLowLevelFast())
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
 		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{
@@ -302,8 +301,7 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 {
 	FString SolutionConfigurationPlatforms;
 
-	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
-		UnrealCSharpSetting->IsValidLowLevelFast())
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
 		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{
