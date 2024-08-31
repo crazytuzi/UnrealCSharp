@@ -153,8 +153,6 @@ public:
 	template <class T>
 	static T* GetMutableDefaultSafe()
 	{
-		return T::StaticClass()->IsValidLowLevelFast()
-			       ? Cast<T>(T::StaticClass()->GetDefaultObject(false))
-			       : nullptr;
+		return !GExitPurge ? GetMutableDefault<T>() : nullptr;
 	}
 };
