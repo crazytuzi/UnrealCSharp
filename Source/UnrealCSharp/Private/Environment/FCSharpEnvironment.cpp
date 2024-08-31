@@ -8,9 +8,24 @@
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
 
-void SignalHandler(int32)
+void SignalHandler(int32 Signal)
 {
-	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
+	UE_LOG(LogUnrealCSharp, Error, TEXT("Signal %d occurred"), Signal);
+#if !UE_BUILD_SHIPPING
+	if (FPlatformMisc::IsDebuggerPresent())
+	{
+		UE_DEBUG_BREAK();
+	}
+	else
+#endif
+	{
+		FDebug::DumpStackTraceToLog(ELogVerbosity::Type::Error);
+	}
+
+	UE_LOG(LogUnrealCSharp, Error, TEXT("=== PrintScriptCallstack(): ==="));
+	PrintScriptCallstack();
+
+	UE_LOG(LogUnrealCSharp, Error, TEXT("=== CSharpTrackback: ===\n%s"),
 	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
 		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
