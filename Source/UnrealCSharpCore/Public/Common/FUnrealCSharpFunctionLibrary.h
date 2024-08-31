@@ -150,9 +150,11 @@ public:
 	static bool IsDynamicReInstanceField(const UField* InField);
 #endif
 
-	template< class T > 
-	T* GetMutableDefaultSafe()
+	template <class T>
+	static T* GetMutableDefaultSafe()
 	{
-		return Cast<T>(T::StaticClass()->GetDefaultObject(false));
+		return T::StaticClass()->IsValidLowLevelFast()
+			       ? Cast<T>(T::StaticClass()->GetDefaultObject(false))
+			       : nullptr;
 	}
 };
