@@ -65,8 +65,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 		mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
 #endif
 
-		if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
-			UnrealCSharpSetting->IsValidLowLevelFast())
+		if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+			UUnrealCSharpSetting>())
 		{
 			if (UnrealCSharpSetting->IsEnableDebug())
 			{

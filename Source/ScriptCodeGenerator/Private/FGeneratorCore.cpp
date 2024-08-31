@@ -921,8 +921,8 @@ const TArray<FName>& FGeneratorCore::GetSupportedAssetClassName()
 
 void FGeneratorCore::BeginGenerator()
 {
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
-		UnrealCSharpEditorSetting->IsValidLowLevelFast())
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
 	{
 		bIsSkipGenerateEngineModules = UnrealCSharpEditorSetting->IsSkipGenerateEngineModules();
 

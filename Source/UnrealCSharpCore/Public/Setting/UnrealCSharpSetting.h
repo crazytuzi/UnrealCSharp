@@ -18,6 +18,11 @@ struct FGameContentDirectoryPath : public FDirectoryPath
 	{
 		Path = InPath;
 	}
+
+	operator FString() const
+	{
+		return Path;
+	}
 };
 
 USTRUCT()
