@@ -242,7 +242,6 @@ namespace SourceGenerator
                 else
                 {
                     var currectFileName = name + ".cs";
-                    currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
                     if (Path.GetFileName(filePath) != currectFileName)
                     {
                         Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorFileNameNotMatch, 
@@ -280,7 +279,6 @@ namespace SourceGenerator
                 else 
                 {  
                     var currectFileName = name + ".cs";
-                    currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
                     if (Path.GetFileName(filePath) != currectFileName)
                     {
                         hasError = true;
@@ -438,8 +436,7 @@ namespace SourceGenerator
             }
 
             var nameSpace = namespaceDeclarationSyntax.GetFullNamespace();
-
-            if (nameSpace != "Script.CoreUObject" && bIsUClass && bIsUStruct && bIsUInterface)
+            if (nameSpace != "Script.CoreUObject" && (bIsUClass || bIsUStruct || bIsUInterface))
             {
                 Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorNamespace, Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span), name));
                 hasError = true;
