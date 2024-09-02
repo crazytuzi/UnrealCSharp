@@ -59,5 +59,5 @@ namespace
 		}
 	};
 
-	FRegisterBox2D RegisterBox2D;
+	[[maybe_unused]] FRegisterBox2D RegisterBox2D;
 }

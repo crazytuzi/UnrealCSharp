@@ -68,40 +68,34 @@ namespace
 		}
 
 		static void AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              MonoObject* InValue)
+		                              uint8* InValueBuffer)
 		{
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 				InGarbageCollectionHandle))
 			{
-				SetHelper->Add(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
-					               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-					               : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
+				SetHelper->Add(InValueBuffer);
 			}
 		}
 
 		static int32 RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                  MonoObject* InValue)
+		                                  const uint8* InValueBuffer)
 		{
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 				InGarbageCollectionHandle))
 			{
-				return SetHelper->Remove(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
-					                         ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-					                         : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
+				return SetHelper->Remove(InValueBuffer);
 			}
 
 			return 0;
 		}
 
 		static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   MonoObject* InValue)
+		                                   const uint8* InValueBuffer)
 		{
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 				InGarbageCollectionHandle))
 			{
-				return SetHelper->Contains(SetHelper->GetElementPropertyDescriptor()->IsPrimitiveProperty()
-					                           ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-					                           : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
+				return SetHelper->Contains(InValueBuffer);
 			}
 
 			return false;
@@ -119,25 +113,21 @@ namespace
 			return false;
 		}
 
-		static MonoObject* GetEnumeratorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                               const int32 InIndex)
+		static void GetEnumeratorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                        const int32 InIndex, uint8* ReturnBuffer)
 		{
-			MonoObject* ReturnValue{};
-
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 				InGarbageCollectionHandle))
 			{
 				const auto Value = SetHelper->GetEnumerator(InIndex);
 
-				SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue), false);
+				SetHelper->GetElementPropertyDescriptor()->Get(Value, ReturnBuffer);
 			}
-
-			return ReturnValue;
 		}
 
 		FRegisterSet()
 		{
-			FClassBuilder(TEXT("TSet"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TSet"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Empty", EmptyImplementation)
@@ -152,5 +142,5 @@ namespace
 		}
 	};
 
-	FRegisterSet RegisterSet;
+	[[maybe_unused]] FRegisterSet RegisterSet;
 }

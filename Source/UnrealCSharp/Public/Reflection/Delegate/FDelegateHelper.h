@@ -66,29 +66,29 @@ public:
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute4(MonoObject** OutValue) const
+	void Execute4(uint8* OutBuffer) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute4<ReturnType>(OutValue);
+			DelegateHandler->Execute4<ReturnType>(OutBuffer);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute6(MonoObject** OutValue, uint8* InBuffer) const
+	void Execute6(uint8* InBuffer, uint8* OutBuffer) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute6<ReturnType>(OutValue, InBuffer);
+			DelegateHandler->Execute6<ReturnType>(InBuffer, OutBuffer);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute7(MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer) const
+	void Execute7(uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute7<ReturnType>(OutValue, InBuffer, ReturnBuffer);
+			DelegateHandler->Execute7<ReturnType>(InBuffer, OutBuffer, ReturnBuffer);
 		}
 	}
 

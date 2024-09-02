@@ -36,7 +36,7 @@ namespace
 		}
 	};
 
-	FRegisterLoadFlags RegisterLoadFlags;
+	[[maybe_unused]] FRegisterLoadFlags RegisterLoadFlags;
 
 	struct FRegisterUnreal
 	{
@@ -170,7 +170,7 @@ namespace
 
 		FRegisterUnreal()
 		{
-			FClassBuilder(TEXT("Unreal"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("Unreal"), NAMESPACE_LIBRARY)
 				.Function("NewObject", NewObjectImplementation)
 				.Function("DuplicateObject", DuplicateObjectImplementation)
 				.Function("LoadObject", LoadObjectImplementation)
@@ -180,5 +180,5 @@ namespace
 		}
 	};
 
-	FRegisterUnreal RegisterUnreal;
+	[[maybe_unused]] FRegisterUnreal RegisterUnreal;
 }

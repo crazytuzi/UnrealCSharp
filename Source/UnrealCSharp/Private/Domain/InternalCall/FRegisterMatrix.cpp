@@ -100,5 +100,5 @@ namespace
 		}
 	};
 
-	FRegisterMatrix RegisterMatrix;
+	[[maybe_unused]] FRegisterMatrix RegisterMatrix;
 }

@@ -104,79 +104,59 @@ namespace
 			return 0;
 		}
 
-		static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     const int32 InIndex)
+		static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                              const int32 InIndex, uint8* ReturnBuffer)
 		{
-			MonoObject* ReturnValue{};
-
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
 				const auto Value = ArrayHelper->Get(InIndex);
 
-				ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue), false);
+				ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, ReturnBuffer);
 			}
-
-			return ReturnValue;
 		}
 
 		static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              const int32 InIndex, MonoObject* InValue)
+		                              const int32 InIndex, uint8* InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
-				ArrayHelper->Set(InIndex, ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
-					                          ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						                          InValue)
-					                          : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-						                          InValue));
+				ArrayHelper->Set(InIndex, InValueBuffer);
 			}
 		}
 
 		static int32 FindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                MonoObject* InValue)
+		                                const uint8* InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
-				return ArrayHelper->Find(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
-					                         ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						                         InValue)
-					                         : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-						                         InValue));
+				return ArrayHelper->Find(InValueBuffer);
 			}
 
 			return INDEX_NONE;
 		}
 
 		static int32 FindLastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                    MonoObject* InValue)
+		                                    const uint8* InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
-				return ArrayHelper->FindLast(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
-					                             ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						                             InValue)
-					                             : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-						                             InValue));
+				return ArrayHelper->FindLast(InValueBuffer);
 			}
 
 			return INDEX_NONE;
 		}
 
 		static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   MonoObject* InValue)
+		                                   const uint8* InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
-				return ArrayHelper->Contains(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
-					                             ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						                             InValue)
-					                             : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-						                             InValue));
+				return ArrayHelper->Contains(InValueBuffer);
 			}
 
 			return false;
@@ -255,16 +235,12 @@ namespace
 		}
 
 		static int32 AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                               MonoObject* InValue)
+		                               uint8* InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
-				return ArrayHelper->Add(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
-					                        ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						                        InValue)
-					                        : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-						                        InValue));
+				return ArrayHelper->Add(InValueBuffer);
 			}
 
 			return 0;
@@ -283,48 +259,36 @@ namespace
 		}
 
 		static int32 AddUniqueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     MonoObject* InValue)
+		                                     uint8* InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
-				return ArrayHelper->AddUnique(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
-					                              ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						                              InValue)
-					                              : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-						                              InValue));
+				return ArrayHelper->AddUnique(InValueBuffer);
 			}
 
 			return 0;
 		}
 
 		static int32 RemoveSingleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                        MonoObject* InValue)
+		                                        const uint8* InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
-				return ArrayHelper->RemoveSingle(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
-					                                 ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						                                 InValue)
-					                                 : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-						                                 InValue));
+				return ArrayHelper->RemoveSingle(InValueBuffer);
 			}
 
 			return 0;
 		}
 
 		static int32 RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                  MonoObject* InValue)
+		                                  const uint8* InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InGarbageCollectionHandle))
 			{
-				return ArrayHelper->Remove(ArrayHelper->GetInnerPropertyDescriptor()->IsPrimitiveProperty()
-					                           ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-						                           InValue)
-					                           : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-						                           InValue));
+				return ArrayHelper->Remove(InValueBuffer);
 			}
 
 			return 0;
@@ -357,7 +321,7 @@ namespace
 
 		FRegisterArray()
 		{
-			FClassBuilder(TEXT("TArray"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TArray"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -390,5 +354,5 @@ namespace
 		}
 	};
 
-	FRegisterArray RegisterArray;
+	[[maybe_unused]] FRegisterArray RegisterArray;
 }

@@ -24,5 +24,5 @@ namespace
 		}
 	};
 
-	FRegisterFloatInterval RegisterFloatInterval;
+	[[maybe_unused]] FRegisterFloatInterval RegisterFloatInterval;
 }

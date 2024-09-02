@@ -3,7 +3,7 @@ using Script.CoreUObject;
 
 namespace Script.Library
 {
-    public static class TMapImplementation
+    public static unsafe class TMapImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TMap_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap);
@@ -21,25 +21,25 @@ namespace Script.Library
         public static extern bool TMap_IsEmptyImplementation(nint InMap);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_AddImplementation(nint InMap, object InKey, object InValue);
+        public static extern void TMap_AddImplementation(nint InMap, byte* InKeyBuffer, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TMap_RemoveImplementation(nint InMap, object InKey);
+        public static extern int TMap_RemoveImplementation(nint InMap, byte* InKeyBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object TMap_FindKeyImplementation(nint InMap, object InValue);
+        public static extern void TMap_FindKeyImplementation(nint InMap, byte* InValueBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object TMap_FindImplementation(nint InMap, object InKey);
+        public static extern void TMap_FindImplementation(nint InMap, byte* InKeyBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TMap_ContainsImplementation(nint InMap, object InKey);
+        public static extern bool TMap_ContainsImplementation(nint InMap, byte* InKeyBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object TMap_GetImplementation(nint InMap, object InKey);
+        public static extern void TMap_GetImplementation(nint InMap, byte* InKeyBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_SetImplementation(nint InMap, object InKey, object InValue);
+        public static extern void TMap_SetImplementation(nint InMap, byte* InKeyBuffer, byte* InValueBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int TMap_GetMaxIndexImplementation(nint InMap);
@@ -48,9 +48,9 @@ namespace Script.Library
         public static extern bool TMap_IsValidIndexImplementation(nint InMap, int InIndex);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object TMap_GetEnumeratorKeyImplementation(nint InMap, int InIndex);
+        public static extern void TMap_GetEnumeratorKeyImplementation(nint InMap, int InIndex, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern object TMap_GetEnumeratorValueImplementation(nint InMap, int InIndex);
+        public static extern void TMap_GetEnumeratorValueImplementation(nint InMap, int InIndex, byte* ReturnBuffer);
     }
 }

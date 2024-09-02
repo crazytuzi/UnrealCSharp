@@ -179,5 +179,5 @@ namespace
 		}
 	};
 
-	FRegisterVector2D RegisterVector2D;
+	[[maybe_unused]] FRegisterVector2D RegisterVector2D;
 }

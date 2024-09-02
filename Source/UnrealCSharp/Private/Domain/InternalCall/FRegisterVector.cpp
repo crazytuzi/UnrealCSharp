@@ -341,5 +341,5 @@ namespace
 		}
 	};
 
-	FRegisterVector RegisterVector;
+	[[maybe_unused]] FRegisterVector RegisterVector;
 }

@@ -143,14 +143,23 @@ void FCodeAnalysis::Analysis()
 #endif
 	                                     ));
 
-	const auto CompileParam = FString::Printf(TEXT(
+	auto CompileParam = FString::Printf(TEXT(
 		"false \"%s\" \"%s\""
 	),
-	                                          *FPaths::ConvertRelativePathToFull(
-		                                          FUnrealCSharpFunctionLibrary::GetGameDirectory()),
-	                                          *FPaths::ConvertRelativePathToFull(
-		                                          FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath())
+	                                    *FPaths::ConvertRelativePathToFull(
+		                                    FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()),
+	                                    *FPaths::ConvertRelativePathToFull(
+		                                    FUnrealCSharpFunctionLibrary::GetGameDirectory())
 	);
+
+	for (const auto& CustomProjectsDirectory : FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory())
+	{
+		CompileParam += FString::Printf(TEXT(
+			" \"%s\""
+		),
+		                                *CustomProjectsDirectory
+		);
+	}
 
 	void* ReadPipe = nullptr;
 

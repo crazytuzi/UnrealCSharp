@@ -444,6 +444,11 @@ FString FGeneratorCore::GetBufferCast(FProperty* Property)
 	return TEXT("nint");
 }
 
+int32 FGeneratorCore::GetBufferSize(FProperty* Property)
+{
+	return IsPrimitiveProperty(Property) ? Property->ElementSize : sizeof(void*);
+}
+
 FString FGeneratorCore::GetTypeImplementation(FProperty* Property)
 {
 	if (CastField<FByteProperty>(Property))
@@ -554,29 +559,6 @@ bool FGeneratorCore::IsPrimitiveProperty(FProperty* Property)
 	return false;
 }
 
-FString FGeneratorCore::GetOutParamString(FProperty* Property, const uint32 Index)
-{
-	if (Property == nullptr) return TEXT("");
-
-	return FString::Printf(TEXT(
-		"%s__OutValue[%d]%s"
-	),
-	                       IsPrimitiveProperty(Property)
-		                       ? *FString::Printf(TEXT(
-			                       "(%s)"
-		                       ),
-		                                          *GetPropertyType(Property))
-		                       : TEXT(""),
-	                       Index,
-	                       !IsPrimitiveProperty(Property)
-		                       ? *FString::Printf(TEXT(
-			                       " as %s"
-		                       ),
-		                                          *GetPropertyType(Property))
-		                       : TEXT("")
-	);
-}
-
 FString FGeneratorCore::GetParamName(FProperty* Property)
 {
 	if (const auto ByteProperty = CastField<FByteProperty>(Property))
@@ -614,19 +596,13 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 	}
 }
 
-FString FGeneratorCore::GetReturnParamType(FProperty* Property)
+FString FGeneratorCore::GetFunctionPrefix(FProperty* Property)
 {
-	if (CastField<FByteProperty>(Property))
-	{
-		return TName<uint8, uint8>::Get();
-	}
-
-	if (const auto EnumProperty = CastField<FEnumProperty>(Property))
-	{
-		return GetPropertyType(EnumProperty->GetUnderlyingProperty());
-	}
-
-	return GetPropertyType(Property);
+	return Property != nullptr
+		       ? IsPrimitiveProperty(Property)
+			         ? TEXT("Primitive")
+			         : TEXT("Compound")
+		       : TEXT("Generic");
 }
 
 int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInput, const bool bHasOutput,
@@ -945,7 +921,8 @@ const TArray<FName>& FGeneratorCore::GetSupportedAssetClassName()
 
 void FGeneratorCore::BeginGenerator()
 {
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
 	{
 		bIsSkipGenerateEngineModules = UnrealCSharpEditorSetting->IsSkipGenerateEngineModules();
 

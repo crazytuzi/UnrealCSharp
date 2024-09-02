@@ -25,7 +25,7 @@ namespace
 		}
 	};
 
-	FRegisterGuidFormats RegisterGuidFormats;
+	[[maybe_unused]] FRegisterGuidFormats RegisterGuidFormats;
 
 	struct FRegisterGuid
 	{
@@ -69,5 +69,5 @@ namespace
 		}
 	};
 
-	FRegisterGuid RegisterGuid;
+	[[maybe_unused]] FRegisterGuid RegisterGuid;
 }

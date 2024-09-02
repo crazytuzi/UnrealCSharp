@@ -2,6 +2,7 @@
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Misc/FileHelper.h"
+#include "Containers/ArrayBuilder.h"
 #include "Common/NameEncode.h"
 #include "Domain/AssemblyLoader.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
@@ -20,7 +21,7 @@
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefaultSafe<UUnrealCSharpEditorSetting>())
 	{
 		if (const auto& DotNetPath = UnrealCSharpEditorSetting->GetDotNetPath(); !DotNetPath.IsEmpty())
 		{
@@ -389,11 +390,12 @@ FString FUnrealCSharpFunctionLibrary::GetOldFileName(const FAssetData& InAssetDa
 
 FString FUnrealCSharpFunctionLibrary::GetUEName()
 {
-	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->GetUEName();
+	}
 
-	return UnrealCSharpSetting->IsValidLowLevelFast()
-		       ? UnrealCSharpSetting->GetUEName()
-		       : DEFAULT_UE_NAME;
+	return DEFAULT_UE_NAME;
 }
 
 #if WITH_EDITOR
@@ -415,11 +417,12 @@ FString FUnrealCSharpFunctionLibrary::GetUEProjectPath()
 
 FString FUnrealCSharpFunctionLibrary::GetGameName()
 {
-	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->GetGameName();
+	}
 
-	return UnrealCSharpSetting->IsValidLowLevelFast()
-		       ? UnrealCSharpSetting->GetGameName()
-		       : DEFAULT_GAME_NAME;
+	return DEFAULT_GAME_NAME;
 }
 
 #if WITH_EDITOR
@@ -441,6 +444,23 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPath()
 FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
 {
 	return GetGameDirectory() / GetGameName() + PROJECT_PROPS_SUFFIX;
+}
+#endif
+
+#if WITH_EDITOR
+TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
+{
+	TArray<FString> CustomProjectsDirectory;
+
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects())
+		{
+			CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
+		}
+	}
+
+	return CustomProjectsDirectory;
 }
 #endif
 
@@ -524,11 +544,12 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 
 FString FUnrealCSharpFunctionLibrary::GetPublishDirectory()
 {
-	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->GetPublishDirectory();
+	}
 
-	return UnrealCSharpSetting->IsValidLowLevelFast()
-		       ? UnrealCSharpSetting->GetPublishDirectory().Path
-		       : DEFAULT_PUBLISH_DIRECTORY;
+	return DEFAULT_PUBLISH_DIRECTORY;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullPublishDirectory()
@@ -546,14 +567,39 @@ FString FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
 	return GetFullPublishDirectory() / GetGameName() + DLL_SUFFIX;
 }
 
+TArray<FString> FUnrealCSharpFunctionLibrary::GetFullCustomProjectsPublishPath()
+{
+	TArray<FString> FullCustomProjectsPublishPath;
+
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects())
+		{
+			FullCustomProjectsPublishPath.Add(GetFullPublishDirectory() / Name + DLL_SUFFIX);
+		}
+	}
+
+	return FullCustomProjectsPublishPath;
+}
+
+TArray<FString> FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
+{
+	return TArrayBuilder<FString>().
+	       Add(GetFullUEPublishPath()).
+	       Add(GetFullGamePublishPath()).
+	       Append(GetFullCustomProjectsPublishPath()).
+	       Build();
+}
+
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetScriptDirectory()
 {
-	const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>();
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefaultSafe<UUnrealCSharpEditorSetting>())
+	{
+		return UnrealCSharpEditorSetting->GetScriptDirectory();
+	}
 
-	return UnrealCSharpEditorSetting->IsValidLowLevelFast()
-		       ? UnrealCSharpEditorSetting->GetScriptDirectory().Path
-		       : DEFAULT_SCRIPT_DIRECTORY;
+	return DEFAULT_SCRIPT_DIRECTORY;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullScriptDirectory()
@@ -589,11 +635,12 @@ FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
 
 UAssemblyLoader* FUnrealCSharpFunctionLibrary::GetAssemblyLoader()
 {
-	const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->GetAssemblyLoader();
+	}
 
-	return UnrealCSharpSetting->IsValidLowLevelFast()
-		       ? UnrealCSharpSetting->GetAssemblyLoader()
-		       : nullptr;
+	return nullptr;
 }
 
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
@@ -675,11 +722,11 @@ TMap<FString, FString> FUnrealCSharpFunctionLibrary::LoadFileToString(const FStr
 #if WITH_EDITOR
 TArray<FString> FUnrealCSharpFunctionLibrary::GetChangedDirectories()
 {
-	static auto UEDirectory = GetPluginScriptDirectory() / DEFAULT_UE_NAME;
-
-	static auto GameDirectory = GetGameDirectory();
-
-	return {UEDirectory, GameDirectory};
+	return TArrayBuilder<FString>().
+	       Add(GetPluginScriptDirectory() / DEFAULT_UE_NAME).
+	       Add(GetGameDirectory()).
+	       Append(GetCustomProjectsDirectory()).
+	       Build();
 }
 #endif
 

@@ -179,5 +179,5 @@ namespace
 		}
 	};
 
-	FRegisterTransform RegisterTransform;
+	[[maybe_unused]] FRegisterTransform RegisterTransform;
 }

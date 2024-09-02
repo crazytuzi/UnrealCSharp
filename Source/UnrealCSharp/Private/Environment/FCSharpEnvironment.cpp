@@ -45,10 +45,7 @@ void FCSharpEnvironment::Initialize()
 {
 	Domain = new FDomain({
 		"",
-		{
-			FUnrealCSharpFunctionLibrary::GetFullUEPublishPath(),
-			FUnrealCSharpFunctionLibrary::GetFullGamePublishPath()
-		}
+		FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 	});
 
 	DynamicRegistry = new FDynamicRegistry();

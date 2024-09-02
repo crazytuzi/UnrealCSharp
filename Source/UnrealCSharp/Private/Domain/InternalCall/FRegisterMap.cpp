@@ -59,114 +59,76 @@ namespace
 		}
 
 		static void AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              MonoObject* InKey, MonoObject* InValue)
+		                              uint8* InKeyBuffer, uint8* InValueBuffer)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				MapHelper->Add(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
-					               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
-					               : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey),
-				               MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
-					               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-					               : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
+				MapHelper->Add(InKeyBuffer, InValueBuffer);
 			}
 		}
 
 		static int32 RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                  MonoObject* InKey)
+		                                  const uint8* InKeyBuffer)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				return MapHelper->Remove(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
-					                         ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
-					                         : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey));
+				return MapHelper->Remove(InKeyBuffer);
 			}
 
 			return 0;
 		}
 
-		static MonoObject* FindKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                         MonoObject* InValue)
+		static void FindKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                  const uint8* InValueBuffer, uint8* ReturnBuffer)
 		{
-			MonoObject* ReturnValue{};
-
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				MapHelper->GetKeyPropertyDescriptor()->Get(
-					MapHelper->FindKey(MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
-						                   ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-						                   : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)),
-					reinterpret_cast<void**>(&ReturnValue), false);
+				MapHelper->GetKeyPropertyDescriptor()->Get(MapHelper->FindKey(InValueBuffer), ReturnBuffer);
 			}
-
-			return ReturnValue;
 		}
 
-		static MonoObject* FindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                      MonoObject* InKey)
+		static void FindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                               const uint8* InKeyBuffer, uint8* ReturnBuffer)
 		{
-			MonoObject* ReturnValue{};
-
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				MapHelper->GetValuePropertyDescriptor()->Get(
-					MapHelper->Find(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
-						                ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
-						                : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey)),
-					reinterpret_cast<void**>(&ReturnValue), false);
+				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Find(InKeyBuffer), ReturnBuffer);
 			}
-
-			return ReturnValue;
 		}
 
 		static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   MonoObject* InKey)
+		                                   const uint8* InKeyBuffer)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				return MapHelper->Contains(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
-					                           ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
-					                           : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey));
+				return MapHelper->Contains(InKeyBuffer);
 			}
 
 			return false;
 		}
 
-		static MonoObject* GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     MonoObject* InKey)
+		static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                              const uint8* InKeyBuffer, uint8* ReturnBuffer)
 		{
-			MonoObject* ReturnValue{};
-
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				MapHelper->GetValuePropertyDescriptor()->Get(
-					MapHelper->Get(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
-						               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
-						               : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey)),
-					reinterpret_cast<void**>(&ReturnValue), false);
+				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Get(InKeyBuffer), ReturnBuffer);
 			}
-
-			return ReturnValue;
 		}
 
-		static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InKey,
-		                              MonoObject* InValue)
+		static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                              uint8* InKeyBuffer, uint8* InValueBuffer)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				MapHelper->Set(MapHelper->GetKeyPropertyDescriptor()->IsPrimitiveProperty()
-					               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InKey)
-					               : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InKey),
-				               MapHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
-					               ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-					               : FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue));
+				MapHelper->Set(InKeyBuffer, InValueBuffer);
 			}
 		}
 
@@ -193,41 +155,33 @@ namespace
 			return false;
 		}
 
-		static MonoObject* GetEnumeratorKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                                  const int32 InIndex)
+		static void GetEnumeratorKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                           const int32 InIndex, uint8* ReturnBuffer)
 		{
-			MonoObject* ReturnValue{};
-
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
 				const auto Key = MapHelper->GetEnumeratorKey(InIndex);
 
-				MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(&ReturnValue), false);
+				MapHelper->GetKeyPropertyDescriptor()->Get(Key, ReturnBuffer);
 			}
-
-			return ReturnValue;
 		}
 
-		static MonoObject* GetEnumeratorValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                                    const int32 InIndex)
+		static void GetEnumeratorValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                             const int32 InIndex, uint8* ReturnBuffer)
 		{
-			MonoObject* ReturnValue{};
-
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
 				const auto Value = MapHelper->GetEnumeratorValue(InIndex);
 
-				MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(&ReturnValue), false);
+				MapHelper->GetValuePropertyDescriptor()->Get(Value, ReturnBuffer);
 			}
-
-			return ReturnValue;
 		}
 
 		FRegisterMap()
 		{
-			FClassBuilder(TEXT("TMap"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TMap"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Empty", EmptyImplementation)
@@ -247,5 +201,5 @@ namespace
 		}
 	};
 
-	FRegisterMap RegisterMap;
+	[[maybe_unused]] FRegisterMap RegisterMap;
 }

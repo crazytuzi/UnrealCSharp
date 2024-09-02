@@ -78,5 +78,5 @@ namespace
 		}
 	};
 
-	FRegisterTimespan RegisterTimespan;
+	[[maybe_unused]] FRegisterTimespan RegisterTimespan;
 }

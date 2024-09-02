@@ -66,5 +66,5 @@ namespace
 		}
 	};
 
-	FRegisterColor RegisterColor;
+	[[maybe_unused]] FRegisterColor RegisterColor;
 }

@@ -36,5 +36,5 @@ namespace
 		}
 	};
 
-	FRegisterInt32RangeBound RegisterInt32RangeBound;
+	[[maybe_unused]] FRegisterInt32RangeBound RegisterInt32RangeBound;
 }

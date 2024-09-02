@@ -10,18 +10,6 @@ namespace Weavers
 {
     public class UnrealTypeWeaver : BaseModuleWeaver
     {
-        private readonly Dictionary<string, MethodDefinition> _objectSetMethodMap =
-            new Dictionary<string, MethodDefinition>();
-
-        private readonly Dictionary<string, MethodDefinition> _objectGetMethodMap =
-            new Dictionary<string, MethodDefinition>();
-
-        private readonly Dictionary<string, MethodDefinition> _structSetMethodMap =
-            new Dictionary<string, MethodDefinition>();
-
-        private readonly Dictionary<string, MethodDefinition> _structGetMethodMap =
-            new Dictionary<string, MethodDefinition>();
-
         private readonly List<TypeDefinition> _classTypes = new List<TypeDefinition>();
 
         private readonly List<TypeDefinition> _structTypes = new List<TypeDefinition>();
@@ -30,13 +18,21 @@ namespace Weavers
 
         private readonly List<TypeDefinition> _interfaceTypes = new List<TypeDefinition>();
 
+        private MethodDefinition _getObjectPropertyImplementation;
+
+        private MethodDefinition _setObjectPropertyImplementation;
+
+        private MethodDefinition _getStructPropertyImplementation;
+
+        private MethodDefinition _setStructPropertyImplementation;
+
         private MethodDefinition _structRegisterImplementation;
 
         private MethodDefinition _structUnRegisterImplementation;
 
-        private MethodDefinition _functionReflection0Implementation;
+        private MethodDefinition _genericCall24Implementation;
 
-        private MethodDefinition _functionReflection2Implementation;
+        private MethodDefinition _genericCall26Implementation;
 
         private MethodDefinition _getGarbageCollectionHandle;
 
@@ -300,139 +296,143 @@ namespace Weavers
             // 修改setter
             if (Property.SetMethod != null)
             {
-                var propertyType = Property.PropertyType;
-
-                MethodDefinition propertySetMethod;
-
                 var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType);
 
-                if (getParamGarbageCollectionHandle != null)
+                var field = Type.Fields.FirstOrDefault(Field =>
+                    Field.Name == "__" + Property.Name &&
+                    Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+
+                if (field == null)
                 {
-                    _objectSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod);
+                    field = new FieldDefinition("__" + Property.Name,
+                        FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
+
+                    Type.Fields.Add(field);
                 }
-                else
+
+                var BufferSize = GetTypeSize(Property.PropertyType);
+
+                Property.SetMethod.Body.Variables.Add(
+                    new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
+
+                Property.SetMethod.Body.InitLocals = true;
+
+                var ilProcessor = Property.SetMethod.Body.GetILProcessor();
+
+                ilProcessor.Clear();
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Localloc));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Stloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+
+                if (!Property.PropertyType.IsValueType)
                 {
-                    propertySetMethod = GetPropertyAccessor(Property, _objectSetMethodMap);
-                }
-
-                if (propertySetMethod != null)
-                {
-                    var field = Type.Fields.FirstOrDefault(Field =>
-                        Field.Name == "__" + Property.Name &&
-                        Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
-
-                    if (field == null)
-                    {
-                        field = new FieldDefinition("__" + Property.Name,
-                            FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-
-                        Type.Fields.Add(field);
-                    }
-
-                    var ilProcessor = Property.SetMethod.Body.GetILProcessor();
-
-                    ilProcessor.Clear();
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-
-                    if (getParamGarbageCollectionHandle != null)
-                    {
-                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
-                            .First(Field => Field.Name == "Zero");
-
-                        var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
-
-                        var il4 = Instruction.Create(OpCodes.Ldarg_1);
-
-                        var il5 = Instruction.Create(OpCodes.Call,
-                            ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
-
-                        var il6 = Instruction.Create(OpCodes.Nop);
-
-                        var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
-
-                        var il3 = Instruction.Create(OpCodes.Br_S, il6);
-
-                        ilProcessor.Append(il1);
-
-                        ilProcessor.Append(il2);
-
-                        ilProcessor.Append(il3);
-
-                        ilProcessor.Append(il4);
-
-                        ilProcessor.Append(il5);
-
-                        ilProcessor.Append(il6);
-                    }
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(propertySetMethod)));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Nop));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ret));
+                        ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
                 }
-                else
-                {
-                    throw new WeavingException("Not found set function of type " + propertyType.FullName);
-                }
+
+                ilProcessor.Append(GetTypeStind(Property.PropertyType));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(field)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(_setObjectPropertyImplementation)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ret));
             }
 
             if (Property.GetMethod != null)
             {
-                var propertyType = Property.PropertyType;
+                var field = Type.Fields.FirstOrDefault(Field =>
+                    Field.Name == "__" + Property.Name &&
+                    Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
 
-                // 先找一下int, uint这些 函数的类型跟 property能直接对上的
-                var propertyGetMethod = GetPropertyAccessor(Property, _objectGetMethodMap);
-
-                if (propertyGetMethod != null)
+                if (field == null)
                 {
-                    var field = Type.Fields.FirstOrDefault(Field =>
-                        Field.Name == "__" + Property.Name &&
-                        Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+                    field = new FieldDefinition("__" + Property.Name,
+                        FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
 
-                    if (field == null)
-                    {
-                        field = new FieldDefinition("__" + Property.Name,
-                            FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-
-                        Type.Fields.Add(field);
-                    }
-
-                    var ilProcessor = Property.GetMethod.Body.GetILProcessor();
-
-                    ilProcessor.Clear();
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(propertyGetMethod)));
-
-                    if (propertyType.IsValueType == false)
-                    {
-                        ilProcessor.Append(Instruction.Create(OpCodes.Isinst,
-                            ModuleDefinition.ImportReference(propertyType)));
-                    }
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ret));
+                    Type.Fields.Add(field);
                 }
-                else
-                {
-                    throw new WeavingException("Not found get function of type " + propertyType.FullName);
-                }
+
+                var BufferSize = GetTypeSize(Property.PropertyType);
+
+                Property.GetMethod.Body.Variables.Add(
+                    new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
+
+                Property.GetMethod.Body.Variables.Add(
+                    new VariableDefinition(ModuleDefinition.ImportReference(Property.PropertyType)));
+
+                Property.GetMethod.Body.InitLocals = true;
+
+                var ilProcessor = Property.GetMethod.Body.GetILProcessor();
+
+                ilProcessor.Clear();
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Localloc));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Stloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(field)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(_getObjectPropertyImplementation)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                ilProcessor.Append(GetTypeLdind(Property.PropertyType));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Stloc_1));
+
+                var i1 = Instruction.Create(OpCodes.Ldloc_1);
+
+                var i0 = Instruction.Create(OpCodes.Br_S, i1);
+
+                ilProcessor.Append(i0);
+
+                ilProcessor.Append(i1);
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ret));
             }
         }
 
@@ -473,139 +473,143 @@ namespace Weavers
             // 修改setter
             if (Property.SetMethod != null)
             {
-                var propertyType = Property.PropertyType;
-
-                MethodDefinition propertySetMethod;
-
                 var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType);
 
-                if (getParamGarbageCollectionHandle != null)
+                var field = Type.Fields.FirstOrDefault(Field =>
+                    Field.Name == "__" + Property.Name &&
+                    Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+
+                if (field == null)
                 {
-                    _structSetMethodMap.TryGetValue(ModuleDefinition.TypeSystem.IntPtr.FullName, out propertySetMethod);
+                    field = new FieldDefinition("__" + Property.Name,
+                        FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
+
+                    Type.Fields.Add(field);
                 }
-                else
+
+                var BufferSize = GetTypeSize(Property.PropertyType);
+
+                Property.SetMethod.Body.Variables.Add(
+                    new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
+
+                Property.SetMethod.Body.InitLocals = true;
+
+                var ilProcessor = Property.SetMethod.Body.GetILProcessor();
+
+                ilProcessor.Clear();
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Localloc));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Stloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
+
+                if (!Property.PropertyType.IsValueType)
                 {
-                    propertySetMethod = GetPropertyAccessor(Property, _structSetMethodMap);
-                }
-
-                if (propertySetMethod != null)
-                {
-                    var field = Type.Fields.FirstOrDefault(Field =>
-                        Field.Name == "__" + Property.Name &&
-                        Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
-
-                    if (field == null)
-                    {
-                        field = new FieldDefinition("__" + Property.Name,
-                            FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-
-                        Type.Fields.Add(field);
-                    }
-
-                    var ilProcessor = Property.SetMethod.Body.GetILProcessor();
-
-                    ilProcessor.Clear();
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-
                     ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
-
-                    if (getParamGarbageCollectionHandle != null)
-                    {
-                        var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
-                            .First(Field => Field.Name == "Zero");
-
-                        var il2 = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
-
-                        var il4 = Instruction.Create(OpCodes.Ldarg_1);
-
-                        var il5 = Instruction.Create(OpCodes.Call,
-                            ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
-
-                        var il6 = Instruction.Create(OpCodes.Nop);
-
-                        var il1 = Instruction.Create(OpCodes.Brtrue_S, il4);
-
-                        var il3 = Instruction.Create(OpCodes.Br_S, il6);
-
-                        ilProcessor.Append(il1);
-
-                        ilProcessor.Append(il2);
-
-                        ilProcessor.Append(il3);
-
-                        ilProcessor.Append(il4);
-
-                        ilProcessor.Append(il5);
-
-                        ilProcessor.Append(il6);
-                    }
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(propertySetMethod)));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Nop));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ret));
+                        ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
                 }
-                else
-                {
-                    throw new WeavingException("Not found set function of type " + propertyType.FullName);
-                }
+
+                ilProcessor.Append(GetTypeStind(Property.PropertyType));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(field)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(_setStructPropertyImplementation)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ret));
             }
 
             if (Property.GetMethod != null)
             {
-                var propertyType = Property.PropertyType;
+                var field = Type.Fields.FirstOrDefault(Field =>
+                    Field.Name == "__" + Property.Name &&
+                    Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
 
-                // 先找一下int, uint这些 函数的类型跟 property能直接对上的
-                var propertyGetMethod = GetPropertyAccessor(Property, _structGetMethodMap);
-
-                if (propertyGetMethod != null)
+                if (field == null)
                 {
-                    var field = Type.Fields.FirstOrDefault(Field =>
-                        Field.Name == "__" + Property.Name &&
-                        Field.FieldType.FullName == ModuleDefinition.TypeSystem.UInt32.FullName);
+                    field = new FieldDefinition("__" + Property.Name,
+                        FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
 
-                    if (field == null)
-                    {
-                        field = new FieldDefinition("__" + Property.Name,
-                            FieldAttributes.Private | FieldAttributes.Static, ModuleDefinition.TypeSystem.UInt32);
-
-                        Type.Fields.Add(field);
-                    }
-
-                    var ilProcessor = Property.GetMethod.Body.GetILProcessor();
-
-                    ilProcessor.Clear();
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, field));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(propertyGetMethod)));
-
-                    if (propertyType.IsValueType == false)
-                    {
-                        ilProcessor.Append(Instruction.Create(OpCodes.Isinst,
-                            ModuleDefinition.ImportReference(propertyType)));
-                    }
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Ret));
+                    Type.Fields.Add(field);
                 }
-                else
-                {
-                    throw new WeavingException("Not found get function of type " + propertyType.FullName);
-                }
+
+                var BufferSize = GetTypeSize(Property.PropertyType);
+
+                Property.GetMethod.Body.Variables.Add(
+                    new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
+
+                Property.GetMethod.Body.Variables.Add(
+                    new VariableDefinition(ModuleDefinition.ImportReference(Property.PropertyType)));
+
+                Property.GetMethod.Body.InitLocals = true;
+
+                var ilProcessor = Property.GetMethod.Body.GetILProcessor();
+
+                ilProcessor.Clear();
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldc_I4_S, BufferSize));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Conv_U));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Localloc));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Stloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(field)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                    ModuleDefinition.ImportReference(_getStructPropertyImplementation)));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Nop));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
+
+                ilProcessor.Append(GetTypeLdind(Property.PropertyType));
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Stloc_1));
+
+                var i1 = Instruction.Create(OpCodes.Ldloc_1);
+
+                var i0 = Instruction.Create(OpCodes.Br_S, i1);
+
+                ilProcessor.Append(i0);
+
+                ilProcessor.Append(i1);
+
+                ilProcessor.Append(Instruction.Create(OpCodes.Ret));
             }
         }
 
@@ -666,6 +670,46 @@ namespace Weavers
             }
 
             return Instruction.Create(OpCodes.Stind_I);
+        }
+
+        private static Instruction GetTypeLdind(TypeReference Type)
+        {
+            switch (Type.MetadataType)
+            {
+                case MetadataType.Boolean:
+                    return Instruction.Create(OpCodes.Ldind_U1);
+                case MetadataType.Byte:
+                    return Instruction.Create(OpCodes.Ldind_I1);
+                case MetadataType.Int16:
+                    return Instruction.Create(OpCodes.Ldind_I2);
+                case MetadataType.Int32:
+                    return Instruction.Create(OpCodes.Ldind_I4);
+                case MetadataType.Int64:
+                    return Instruction.Create(OpCodes.Ldind_I8);
+                case MetadataType.SByte:
+                    return Instruction.Create(OpCodes.Ldind_U1);
+                case MetadataType.UInt16:
+                    return Instruction.Create(OpCodes.Ldind_U2);
+                case MetadataType.UInt32:
+                    return Instruction.Create(OpCodes.Ldind_U4);
+                case MetadataType.UInt64:
+                    return Instruction.Create(OpCodes.Ldind_I8);
+                case MetadataType.Single:
+                    return Instruction.Create(OpCodes.Ldind_R4);
+                case MetadataType.Double:
+                    return Instruction.Create(OpCodes.Ldind_R8);
+                default:
+                {
+                    if (Type.Resolve().IsEnum)
+                    {
+                        return GetTypeLdind(Type.Resolve().GetEnumUnderlyingType());
+                    }
+
+                    break;
+                }
+            }
+
+            return Instruction.Create(OpCodes.Ldind_Ref);
         }
 
         private static sbyte GetTypeSize(TypeReference Type)
@@ -814,8 +858,8 @@ namespace Weavers
 
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call,
                 ModuleDefinition.ImportReference(Method.Parameters.Count > 0
-                    ? _functionReflection2Implementation
-                    : _functionReflection0Implementation)));
+                    ? _genericCall26Implementation
+                    : _genericCall24Implementation)));
 
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ret));
 
@@ -870,36 +914,6 @@ namespace Weavers
             }
 
             return newMethod;
-        }
-
-        private MethodDefinition GetPropertyAccessor(PropertyReference Property,
-            IReadOnlyDictionary<string, MethodDefinition> MethodMap)
-        {
-            var type = Property.PropertyType.Resolve();
-
-            if (MethodMap.TryGetValue(Property.PropertyType.FullName, out var propertyGetMethod))
-            {
-                return propertyGetMethod;
-            }
-
-            // 然后找一下enum
-            if (type.IsEnum)
-            {
-                if (MethodMap.TryGetValue(type.GetEnumUnderlyingType().FullName, out propertyGetMethod) == false)
-                {
-                    throw new WeavingException("Not found accessor Property Method: named " + Property.Name +
-                                               " property type is " +
-                                               type.Resolve().GetEnumUnderlyingType().Resolve().FullName +
-                                               " of type " + "type " + type.FullName);
-                }
-            }
-
-            if (GetGarbageCollectionHandle(type.Resolve()) != null)
-            {
-                propertyGetMethod = MethodMap[ModuleDefinition.TypeSystem.Object.FullName];
-            }
-
-            return propertyGetMethod;
         }
 
         private MethodReference GetGarbageCollectionHandle(TypeDefinition Type)
@@ -974,57 +988,6 @@ namespace Weavers
             }
         }
 
-        private void SearchAllPropertyAccessors(ModuleDefinition Definition)
-        {
-            var propertyImplementationClass = Definition.GetType("Script.Library.FPropertyImplementation");
-
-            foreach (var method in propertyImplementationClass.Methods)
-            {
-                if (method.IsStatic == false)
-                {
-                    continue;
-                }
-
-                // Get函数
-                if (method.ReturnType.FullName != ModuleDefinition.TypeSystem.Void.FullName &&
-                    method.Name.IndexOf("FProperty_Get", StringComparison.Ordinal) >= 0 &&
-                    method.Name.IndexOf("PropertyImplementation", StringComparison.Ordinal) > 0)
-                {
-                    var propertyType = method.ReturnType;
-
-                    if (method.Name.IndexOf("FProperty_GetObject", StringComparison.Ordinal) >= 0)
-                    {
-                        // UObject
-                        _objectGetMethodMap.Add(propertyType.FullName, method);
-                    }
-                    else if (method.Name.IndexOf("FProperty_GetStruct", StringComparison.Ordinal) >= 0)
-                    {
-                        // UStruct
-                        _structGetMethodMap.Add(propertyType.FullName, method);
-                    }
-                }
-                // Set函数
-                else if (method.ReturnType.FullName == ModuleDefinition.TypeSystem.Void.FullName &&
-                         method.Name.IndexOf("FProperty_Set", StringComparison.Ordinal) >= 0 &&
-                         method.Name.IndexOf("PropertyImplementation", StringComparison.Ordinal) > 0 &&
-                         method.Parameters.Count == 3)
-                {
-                    var propertyType = method.Parameters[2].ParameterType;
-
-                    if (method.Name.IndexOf("FProperty_SetObject", StringComparison.Ordinal) >= 0)
-                    {
-                        // UObject
-                        _objectSetMethodMap.Add(propertyType.FullName, method);
-                    }
-                    else if (method.Name.IndexOf("FProperty_SetStruct", StringComparison.Ordinal) >= 0)
-                    {
-                        // UStruct
-                        _structSetMethodMap.Add(propertyType.FullName, method);
-                    }
-                }
-            }
-        }
-
         private void GetAllMeta()
         {
             var definition = ModuleDefinition;
@@ -1052,16 +1015,30 @@ namespace Weavers
 
             _overrideAttributeType = definition.GetType("Script.CoreUObject.OverrideAttribute");
 
-            _functionReflection0Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
+            _getObjectPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
+                .Methods
+                .FirstOrDefault(Method => Method.Name == "FProperty_GetObjectPropertyImplementation");
+
+            _setObjectPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
+                .Methods
+                .FirstOrDefault(Method => Method.Name == "FProperty_SetObjectPropertyImplementation");
+
+            _getStructPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
+                .Methods
+                .FirstOrDefault(Method => Method.Name == "FProperty_GetStructPropertyImplementation");
+
+            _setStructPropertyImplementation = definition.GetType("Script.Library.FPropertyImplementation")
+                .Methods
+                .FirstOrDefault(Method => Method.Name == "FProperty_SetStructPropertyImplementation");
+
+            _genericCall24Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
                 .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall24Implementation");
 
-            _functionReflection2Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
+            _genericCall26Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
                 .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall26Implementation");
 
             _getGarbageCollectionHandle = definition.GetType("Script.CoreUObject.UObject").Methods
                 .FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle");
-
-            SearchAllPropertyAccessors(definition);
         }
     }
 

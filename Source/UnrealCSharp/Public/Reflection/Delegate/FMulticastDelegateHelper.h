@@ -51,20 +51,20 @@ public:
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast4(MonoObject** OutValue) const
+	void Broadcast4(uint8* OutBuffer) const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast4<ReturnType>(OutValue);
+			MulticastDelegateHandler->Broadcast4<ReturnType>(OutBuffer);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast6(MonoObject** OutValue, uint8* InBuffer) const
+	void Broadcast6(uint8* InBuffer, uint8* OutBuffer) const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast6<ReturnType>(OutValue, InBuffer);
+			MulticastDelegateHandler->Broadcast6<ReturnType>(InBuffer, OutBuffer);
 		}
 	}
 

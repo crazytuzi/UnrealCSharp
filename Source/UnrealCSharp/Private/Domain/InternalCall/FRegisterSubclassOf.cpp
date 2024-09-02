@@ -49,7 +49,7 @@ namespace
 
 		FRegisterSubclassOf()
 		{
-			FClassBuilder(TEXT("TSubclassOf"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("TSubclassOf"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
@@ -57,5 +57,5 @@ namespace
 		}
 	};
 
-	FRegisterSubclassOf RegisterSubclassOf;
+	[[maybe_unused]] FRegisterSubclassOf RegisterSubclassOf;
 }

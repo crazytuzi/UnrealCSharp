@@ -15,6 +15,11 @@ struct FProjectDirectoryPath : public FDirectoryPath
 	{
 		Path = InPath;
 	}
+
+	operator FString() const
+	{
+		return Path;
+	}
 };
 
 UCLASS(config = UnrealCSharpEditorSetting, defaultconfig, meta = (DisplayName = "UnrealCSharpEditorSetting"))

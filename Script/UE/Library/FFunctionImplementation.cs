@@ -29,27 +29,27 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_GenericCall4Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue);
+            byte* OutBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_PrimitiveCall15Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue, byte* ReturnBuffer);
+            byte* OutBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_CompoundCall15Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue, byte* ReturnBuffer);
+            byte* OutBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_GenericCall6Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue, byte* InBuffer);
+            byte* InBuffer, byte* OutBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_PrimitiveCall7Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue, byte* InBuffer, byte* ReturnBuffer);
+            byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_CompoundCall7Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue, byte* InBuffer, byte* ReturnBuffer);
+            byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_GenericCall8Implementation(nint InMonoObject, uint InFunctionHash);
@@ -76,15 +76,15 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_GenericCall14Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue, byte* InBuffer);
+            byte* InBuffer, byte* OutBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_PrimitiveCall15Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue, byte* InBuffer, byte* ReturnBuffer);
+            byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_CompoundCall15Implementation(nint InMonoObject, uint InFunctionHash,
-            out object[] OutValue, byte* InBuffer, byte* ReturnBuffer);
+            byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_GenericCall24Implementation(nint InMonoObject, uint InFunctionHash);

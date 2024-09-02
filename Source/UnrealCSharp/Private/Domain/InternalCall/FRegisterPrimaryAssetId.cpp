@@ -28,5 +28,5 @@ namespace
 		}
 	};
 
-	FRegisterPrimaryAssetId RegisterPrimaryAssetId;
+	[[maybe_unused]] FRegisterPrimaryAssetId RegisterPrimaryAssetId;
 }

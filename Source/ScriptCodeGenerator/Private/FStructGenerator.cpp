@@ -219,52 +219,48 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 				UserDefinedStruct, *PropertyIterator);
 		}
 
-		if (FGeneratorCore::IsPrimitiveProperty(*PropertyIterator))
-		{
-			PropertyContent += FString::Printf(TEXT(
-				"\t\t%s %s %s\n"
-				"\t\t{\n"
-				"\t\t\tget => %sFPropertyImplementation.FProperty_GetStruct%sPropertyImplementation(%s, %s);\n"
-				"\n"
-				"\t\t\tset => FPropertyImplementation.FProperty_SetStruct%sPropertyImplementation(%s, %s, %s);\n"
-				"\t\t}\n"
-			),
-			                                   *PropertyAccessSpecifiers,
-			                                   *PropertyType,
-			                                   *FUnrealCSharpFunctionLibrary::Encode(
-				                                   VariableFriendlyPropertyName, PropertyIterator->IsNative()),
-			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-			                                   *FGeneratorCore::GetTypeImplementation(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetTypeImplementation(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
-			);
-		}
-		else
-		{
-			PropertyContent += FString::Printf(TEXT(
-				"\t\t%s %s %s\n"
-				"\t\t{\n"
-				"\t\t\tget => FPropertyImplementation.FProperty_GetStructCompoundPropertyImplementation(%s, %s) as %s;\n"
-				"\n"
-				"\t\t\tset => FPropertyImplementation.FProperty_SetStructCompoundPropertyImplementation(%s, %s, %s);\n"
-				"\t\t}\n"
-			),
-			                                   *PropertyAccessSpecifiers,
-			                                   *PropertyType,
-			                                   *FUnrealCSharpFunctionLibrary::Encode(
-				                                   VariableFriendlyPropertyName, PropertyIterator->IsNative()),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetPropertyType(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
-			);
-		}
+		PropertyContent += FString::Printf(TEXT(
+			"\t\t%s %s %s\n"
+			"\t\t{\n"
+			"\t\t\tget\n"
+			"\t\t\t{\n"
+			"\t\t\t\tunsafe\n"
+			"\t\t\t\t{\n"
+			"\t\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_GetStructPropertyImplementation(%s, %s, __ReturnBuffer);\n"
+			"\n"
+			"\t\t\t\t\treturn *(%s*)__ReturnBuffer;\n"
+			"\t\t\t\t}\n"
+			"\t\t\t}\n"
+			"\n"
+			"\t\t\tset\n"
+			"\t\t\t{\n"
+			"\t\t\t\tunsafe\n"
+			"\t\t\t\t{\n"
+			"\t\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\t*(%s*)__InBuffer = %s;\n"
+			"\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_SetStructPropertyImplementation(%s, %s, __InBuffer);\n"
+			"\t\t\t\t}\n"
+			"\t\t\t}\n"
+			"\t\t}\n"
+		),
+		                                   *PropertyAccessSpecifiers,
+		                                   *PropertyType,
+		                                   *FUnrealCSharpFunctionLibrary::Encode(
+			                                   VariableFriendlyPropertyName, PropertyIterator->IsNative()),
+		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
+		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                   *DummyPropertyName,
+		                                   *PropertyType,
+		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
+		                                   *FGeneratorCore::GetBufferCast(*PropertyIterator),
+		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator),
+		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                   *DummyPropertyName
+		);
 
 		PropertyNameContent += FString::Printf(TEXT(
 			"%s\t\tprivate static uint %s = 0;\n"

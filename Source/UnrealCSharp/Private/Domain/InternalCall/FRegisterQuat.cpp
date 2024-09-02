@@ -156,5 +156,5 @@ namespace
 		}
 	};
 
-	FRegisterQuat RegisterQuat;
+	[[maybe_unused]] FRegisterQuat RegisterQuat;
 }

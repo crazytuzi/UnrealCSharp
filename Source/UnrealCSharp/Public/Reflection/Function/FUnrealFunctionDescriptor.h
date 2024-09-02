@@ -2,7 +2,6 @@
 
 #include "FFunctionDescriptor.h"
 #include "Common/EFunctionReturnType.h"
-#include "mono/metadata/object.h"
 
 class FUnrealFunctionDescriptor final : public FFunctionDescriptor
 {
@@ -26,13 +25,13 @@ public:
 	void Call3(UObject* InObject, uint8* InBuffer, uint8* ReturnBuffer) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Call4(UObject* InObject, MonoObject** OutValue) const;
+	void Call4(UObject* InObject, uint8* OutBuffer) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Call6(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const;
+	void Call6(UObject* InObject, uint8* InBuffer, uint8* OutBuffer) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Call7(UObject* InObject, MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer) const;
+	void Call7(UObject* InObject, uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call8(UObject* InObject) const;
@@ -47,10 +46,10 @@ public:
 	void Call11(UObject* InObject, uint8* InBuffer, uint8* ReturnBuffer) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Call14(UObject* InObject, MonoObject** OutValue, uint8* InBuffer) const;
+	void Call14(UObject* InObject, uint8* InBuffer, uint8* OutBuffer) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Call15(UObject* InObject, MonoObject** OutValue, uint8* InBuffer, uint8* ReturnBuffer) const;
+	void Call15(UObject* InObject, uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call24(UObject* InObject) const;

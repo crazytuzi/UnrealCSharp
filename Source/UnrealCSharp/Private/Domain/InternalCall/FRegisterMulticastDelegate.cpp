@@ -138,29 +138,28 @@ namespace
 		}
 
 		static void GenericBroadcast4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            MonoObject** OutValue)
+		                                            uint8* OutBuffer)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Broadcast4<>(OutValue);
+				MulticastDelegateHelper->Broadcast4<>(OutBuffer);
 			}
 		}
 
 		static void GenericBroadcast6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            MonoObject** OutValue,
-		                                            uint8* InBuffer)
+		                                            uint8* InBuffer, uint8* OutBuffer)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Broadcast6<>(OutValue, InBuffer);
+				MulticastDelegateHelper->Broadcast6<>(InBuffer, OutBuffer);
 			}
 		}
 
 		FRegisterMulticastDelegate()
 		{
-			FClassBuilder(TEXT("FMulticastDelegate"), NAMESPACE_LIBRARY, true)
+			FClassBuilder(TEXT("FMulticastDelegate"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
 				.Function("Contains", ContainsImplementation)
@@ -178,5 +177,5 @@ namespace
 		}
 	};
 
-	FRegisterMulticastDelegate RegisterMulticastDelegate;
+	[[maybe_unused]] FRegisterMulticastDelegate RegisterMulticastDelegate;
 }

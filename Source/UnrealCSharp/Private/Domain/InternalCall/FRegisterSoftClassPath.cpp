@@ -21,5 +21,5 @@ namespace
 		}
 	};
 
-	FRegisterSoftClassPath RegisterSoftClassPath;
+	[[maybe_unused]] FRegisterSoftClassPath RegisterSoftClassPath;
 }

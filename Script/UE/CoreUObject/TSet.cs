@@ -41,18 +41,105 @@ namespace Script.CoreUObject
 
         public int GetMaxIndex() => TSetImplementation.TSet_GetMaxIndexImplementation(GarbageCollectionHandle);
 
-        public void Add(T InValue) => TSetImplementation.TSet_AddImplementation(GarbageCollectionHandle, InValue);
+        public void Add(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
 
-        public int Remove(T InValue) => TSetImplementation.TSet_RemoveImplementation(GarbageCollectionHandle, InValue);
+                    *(T*)ValueBuffer = InValue;
 
-        public bool Contains(T InValue) =>
-            TSetImplementation.TSet_ContainsImplementation(GarbageCollectionHandle, InValue);
+                    TSetImplementation.TSet_AddImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    TSetImplementation.TSet_AddImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
+
+        public int Remove(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                    *(T*)ValueBuffer = InValue;
+
+                    return TSetImplementation.TSet_RemoveImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TSetImplementation.TSet_RemoveImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
+
+        public bool Contains(T InValue)
+        {
+            unsafe
+            {
+                if (typeof(T).IsValueType)
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                    *(T*)ValueBuffer = InValue;
+
+                    return TSetImplementation.TSet_ContainsImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+                else
+                {
+                    var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TSetImplementation.TSet_ContainsImplementation(GarbageCollectionHandle, ValueBuffer);
+                }
+            }
+        }
 
         private bool IsValidIndex(int InIndex) =>
             TSetImplementation.TSet_IsValidIndexImplementation(GarbageCollectionHandle, InIndex);
 
-        private T this[int InIndex] =>
-            (T)TSetImplementation.TSet_GetEnumeratorImplementation(GarbageCollectionHandle, InIndex);
+        private T this[int InIndex]
+        {
+            get
+            {
+                unsafe
+                {
+                    if (typeof(T).IsValueType)
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(T)];
+
+                        TSetImplementation.TSet_GetEnumeratorImplementation(GarbageCollectionHandle, InIndex,
+                            ValueBuffer);
+
+                        return *(T*)ValueBuffer;
+                    }
+                    else
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                        TSetImplementation.TSet_GetEnumeratorImplementation(GarbageCollectionHandle, InIndex,
+                            ValueBuffer);
+
+                        return *(T*)ValueBuffer;
+                    }
+                }
+            }
+        }
 
         public nint GarbageCollectionHandle { get; set; }
     }

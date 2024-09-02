@@ -16,6 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGenerator", "SourceGe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weavers", "Weavers\Weavers.csproj", "{DB42848F-4C21-4581-99BA-C92CB37D4024}"
 EndProject
+ProjectPlaceholder
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +39,7 @@ Global
 		{DB42848F-4C21-4581-99BA-C92CB37D4024}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB42848F-4C21-4581-99BA-C92CB37D4024}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB42848F-4C21-4581-99BA-C92CB37D4024}.Release|Any CPU.Build.0 = Release|Any CPU
+		{SolutionConfigurationPlatformsPlaceholder}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

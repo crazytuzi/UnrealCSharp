@@ -59,5 +59,5 @@ namespace
 		}
 	};
 
-	FRegisterFloatRange RegisterFloatRange;
+	[[maybe_unused]] FRegisterFloatRange RegisterFloatRange;
 }

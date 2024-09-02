@@ -15,4 +15,4 @@ struct FRegisterForceInit
 	}
 };
 
-static FRegisterForceInit RegisterForceInit;
+[[maybe_unused]] static FRegisterForceInit RegisterForceInit;

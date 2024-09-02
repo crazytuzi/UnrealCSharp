@@ -5,6 +5,7 @@
 #include "Engine/UserDefinedEnum.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
 #include "Binding/Class/FBindingClass.h"
+#include "Containers/ArrayBuilder.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
@@ -174,50 +175,47 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		UsingNameSpaces.Append(FGeneratorCore::GetPropertyTypeNameSpace(*PropertyIterator));
 
-		if (FGeneratorCore::IsPrimitiveProperty(*PropertyIterator))
-		{
-			PropertyContent += FString::Printf(TEXT(
-				"\t\t%s %s %s\n"
-				"\t\t{\n"
-				"\t\t\tget => %sFPropertyImplementation.FProperty_GetObject%sPropertyImplementation(%s, %s);\n"
-				"\n"
-				"\t\t\tset => FPropertyImplementation.FProperty_SetObject%sPropertyImplementation(%s, %s, %s);\n"
-				"\t\t}\n"
-			),
-			                                   *PropertyAccessSpecifiers,
-			                                   *PropertyType,
-			                                   *EncodePropertyName,
-			                                   *FGeneratorCore::GetGetAccessorReturnParamName(*PropertyIterator),
-			                                   *FGeneratorCore::GetTypeImplementation(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetTypeImplementation(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
-			);
-		}
-		else
-		{
-			PropertyContent += FString::Printf(TEXT(
-				"\t\t%s %s %s\n"
-				"\t\t{\n"
-				"\t\t\tget => FPropertyImplementation.FProperty_GetObjectCompoundPropertyImplementation(%s, %s) as %s;\n"
-				"\n"
-				"\t\t\tset => FPropertyImplementation.FProperty_SetObjectCompoundPropertyImplementation(%s, %s, %s);\n"
-				"\t\t}\n"
-			),
-			                                   *PropertyAccessSpecifiers,
-			                                   *PropertyType,
-			                                   *EncodePropertyName,
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetPropertyType(*PropertyIterator),
-			                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                   *DummyPropertyName,
-			                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator)
-			);
-		}
+		PropertyContent += FString::Printf(TEXT(
+			"\t\t%s %s %s\n"
+			"\t\t{\n"
+			"\t\t\tget\n"
+			"\t\t\t{\n"
+			"\t\t\t\tunsafe\n"
+			"\t\t\t\t{\n"
+			"\t\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_GetObjectPropertyImplementation(%s, %s, __ReturnBuffer);\n"
+			"\n"
+			"\t\t\t\t\treturn *(%s*)__ReturnBuffer;\n"
+			"\t\t\t\t}\n"
+			"\t\t\t}\n"
+			"\n"
+			"\t\t\tset\n"
+			"\t\t\t{\n"
+			"\t\t\t\tunsafe\n"
+			"\t\t\t\t{\n"
+			"\t\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\t*(%s*)__InBuffer = %s;\n"
+			"\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_SetObjectPropertyImplementation(%s, %s, __InBuffer);\n"
+			"\t\t\t\t}\n"
+			"\t\t\t}\n"
+			"\t\t}\n"
+		),
+		                                   *PropertyAccessSpecifiers,
+		                                   *PropertyType,
+		                                   *EncodePropertyName,
+		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
+		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                   *DummyPropertyName,
+		                                   *PropertyType,
+		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
+		                                   *FGeneratorCore::GetBufferCast(*PropertyIterator),
+		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator),
+		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+		                                   *DummyPropertyName
+		);
 
 		PropertyNameContent += FString::Printf(TEXT(
 			"%s\t\tprivate static uint %s = 0;\n"
@@ -588,8 +586,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 			{
 				if (FunctionOutParamIndex.Contains(Index) == false)
 				{
-					bHasInBuffer = true;
-
 					InBufferBody += FString::Printf(TEXT(
 						"\t\t\t\t*(%s*)(__InBuffer%s) = %s;\n\n"
 					),
@@ -602,14 +598,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 					                                *FGeneratorCore::GetParamName(FunctionParams[Index])
 					);
 
-					if (FGeneratorCore::IsPrimitiveProperty(FunctionParams[Index]))
-					{
-						BufferSize += FunctionParams[Index]->ElementSize;
-					}
-					else
-					{
-						BufferSize += sizeof(void*);
-					}
+					BufferSize += FGeneratorCore::GetBufferSize(FunctionParams[Index]);
 				}
 			}
 
@@ -620,6 +609,35 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                               BufferSize,
 			                               *InBufferBody
 			);
+
+			bHasInBuffer = BufferSize != 0;
+		}
+
+		FString OutBufferBody;
+
+		auto bHasOutBuffer = false;
+
+		if (!FunctionOutParamIndex.IsEmpty() || !FunctionRefParamIndex.IsEmpty())
+		{
+			auto BufferSize = 0;
+
+			for (auto Index = 0; Index < FunctionOutParamIndex.Num(); ++Index)
+			{
+				BufferSize += FGeneratorCore::GetBufferSize(FunctionParams[FunctionOutParamIndex[Index]]);
+			}
+
+			for (auto Index = 0; Index < FunctionRefParamIndex.Num(); ++Index)
+			{
+				BufferSize += FGeneratorCore::GetBufferSize(FunctionParams[FunctionRefParamIndex[Index]]);
+			}
+
+			OutBufferBody = FString::Printf(TEXT(
+				"\t\t\t\tvar __OutBuffer = stackalloc byte[%d];\n\n"
+			),
+			                                BufferSize
+			);
+
+			bHasOutBuffer = BufferSize != 0;
 		}
 
 		FString ReturnBufferBody;
@@ -631,22 +649,16 @@ void FClassGenerator::Generator(const UClass* InClass)
 			bHasReturnBuffer = true;
 
 			ReturnBufferBody = FString::Printf(TEXT(
-				"\t\t\t\tvar __ReturnBuffer = stackalloc byte[%llu];\n\n"
+				"\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n\n"
 			),
-			                                   FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
-				                                   ? FunctionReturnParam->ElementSize
-				                                   : sizeof(void*)
+			                                   FGeneratorCore::GetBufferSize(FunctionReturnParam)
 			);
 		}
 
 		auto FunctionCallBody = FString::Printf(TEXT(
 			"FFunctionImplementation.FFunction_%sCall%dImplementation(%s, %s%s%s%s);\n"
 		),
-		                                        FunctionReturnParam != nullptr
-			                                        ? FGeneratorCore::IsPrimitiveProperty(FunctionReturnParam)
-				                                          ? TEXT("Primitive")
-				                                          : TEXT("Compound")
-			                                        : TEXT("Generic"),
+		                                        *FGeneratorCore::GetFunctionPrefix(FunctionReturnParam),
 		                                        FGeneratorCore::GetFunctionIndex(FunctionReturnParam != nullptr,
 			                                        FunctionParams.Num() - FunctionOutParamIndex.Num() != 0,
 			                                        !FunctionRefParamIndex.IsEmpty() || !FunctionOutParamIndex.
@@ -659,39 +671,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 				                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE)
 			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                        *DummyFunctionName,
-		                                        FunctionRefParamIndex.IsEmpty() && FunctionOutParamIndex.IsEmpty()
-			                                        ? TEXT("")
-			                                        : TEXT(", out var __OutValue"),
 		                                        bHasInBuffer ? TEXT(", __InBuffer") : TEXT(""),
+		                                        bHasOutBuffer ? TEXT(", __OutBuffer") : TEXT(""),
 		                                        bHasReturnBuffer ? TEXT(", __ReturnBuffer") : TEXT("")
 		);
-
-		TArray<FString> FunctionOutParams;
-
-		for (auto Index = 0; Index < FunctionOutParamIndex.Num(); ++Index)
-		{
-			FunctionOutParams.Emplace(FString::Printf(TEXT(
-				"%s = %s;"
-			),
-			                                          *FUnrealCSharpFunctionLibrary::Encode(
-				                                          FunctionParams[FunctionOutParamIndex[Index]]),
-			                                          *FGeneratorCore::GetOutParamString(
-				                                          FunctionParams[FunctionOutParamIndex[Index]],
-				                                          FunctionOutParamIndexMapping[Index])));
-		}
-
-		for (auto Index = 0; Index < FunctionRefParamIndex.Num(); ++Index)
-		{
-			FunctionOutParams.Emplace(FString::Printf(TEXT(
-				"%s = %s;"
-			),
-			                                          *FUnrealCSharpFunctionLibrary::Encode(
-				                                          FunctionParams[FunctionRefParamIndex[Index]]),
-			                                          *FGeneratorCore::GetOutParamString(
-				                                          FunctionParams[FunctionRefParamIndex[Index]],
-				                                          FunctionOutParamIndexMapping[FunctionParams.Num() - 1 -
-					                                          Index])));
-		}
 
 		FString FunctionReturnParamBody;
 
@@ -716,15 +699,37 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FString FunctionOutParamBody;
 
-		for (auto FunctionOutParam : FunctionOutParams)
+		if (bHasOutBuffer)
 		{
-			FunctionOutParamBody += FString::Printf(TEXT(
-				"\n\t\t\t\t%s\n"
-			),
-			                                        *FunctionOutParam);
+			auto FunctionOutBufferIndex = TArrayBuilder<int32>().Append(FunctionOutParamIndex).Append(
+				FunctionRefParamIndex).Build();
+
+			FunctionOutBufferIndex.Sort();
+
+			auto BufferSize = 0;
+
+			for (auto Index = 0; Index < FunctionOutBufferIndex.Num(); ++Index)
+			{
+				FunctionOutParamBody += FString::Printf(TEXT(
+					"\n\t\t\t\t%s = *(%s*)(__OutBuffer%s);\n"
+				),
+				                                        *FUnrealCSharpFunctionLibrary::Encode(
+					                                        FunctionParams[FunctionOutBufferIndex[Index]]),
+				                                        *FGeneratorCore::GetPropertyType(
+					                                        FunctionParams[FunctionOutBufferIndex[Index]]),
+				                                        BufferSize == 0
+					                                        ? TEXT("")
+					                                        : *FString::Printf(TEXT(
+						                                        " + %d"),
+					                                                           BufferSize)
+				);
+
+				BufferSize += FGeneratorCore::GetBufferSize(FunctionParams[FunctionOutBufferIndex[Index]]);
+			}
 		}
 
 		auto FunctionImplementationBody = FString::Printf(TEXT(
+			"%s"
 			"%s"
 			"%s"
 			"%s"
@@ -735,6 +740,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		),
 		                                                  *FunctionDefaultParamBody,
 		                                                  *InBufferBody,
+		                                                  *OutBufferBody,
 		                                                  *ReturnBufferBody,
 		                                                  *FunctionCallBody,
 		                                                  *FunctionOutParamBody,

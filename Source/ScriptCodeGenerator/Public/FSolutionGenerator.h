@@ -30,4 +30,8 @@ private:
 	static void ReplaceDefinition(FString& OutResult);
 
 	static void ReplaceProject(FString& OutResult);
+
+	static void ReplaceProjectPlaceholder(FString& OutResult);
+
+	static void ReplaceSolutionConfigurationPlatformsPlaceholder(FString& OutResult);
 };

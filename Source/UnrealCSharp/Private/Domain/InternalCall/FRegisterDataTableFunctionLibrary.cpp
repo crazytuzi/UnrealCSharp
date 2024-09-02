@@ -51,5 +51,5 @@ namespace
 		}
 	};
 
-	FRegisterDataTableFunctionLibrary RegisterDataTableFunctionLibrary;
+	[[maybe_unused]] FRegisterDataTableFunctionLibrary RegisterDataTableFunctionLibrary;
 }

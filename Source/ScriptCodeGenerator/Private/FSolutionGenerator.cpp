@@ -2,6 +2,7 @@
 #include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
+#include "Setting/UnrealCSharpSetting.h"
 
 void FSolutionGenerator::Generator()
 {
@@ -85,7 +86,9 @@ void FSolutionGenerator::Generator()
 		TemplatePath / SOLUTION_NAME + SOLUTION_SUFFIX,
 		TArray<TFunction<void(FString& OutResult)>>
 		{
-			&FSolutionGenerator::ReplaceProject
+			&FSolutionGenerator::ReplaceProject,
+			&FSolutionGenerator::ReplaceProjectPlaceholder,
+			&FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder
 		});
 }
 
@@ -262,4 +265,65 @@ void FSolutionGenerator::ReplaceProject(FString& OutResult)
 		                 *FUnrealCSharpFunctionLibrary::GetGameName(),
 		                 *PROJECT_SUFFIX
 		));
+}
+
+void FSolutionGenerator::ReplaceProjectPlaceholder(FString& OutResult)
+{
+	FString Projects;
+
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
+		{
+			Projects += FString::Printf(TEXT(
+				"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\n"
+				"EndProject\n"
+			),
+			                            *CSHARP_GUID,
+			                            *CustomProject.Name,
+			                            *CustomProject.Name,
+			                            *CustomProject.Name,
+			                            *PROJECT_SUFFIX,
+			                            *CustomProject.GUID()
+			);
+		}
+	}
+
+	OutResult = OutResult.Replace(*FString::Printf(TEXT(
+		                              "%s"
+		                              "\r\n"),
+	                                               *PROJECT_PLACEHOLDER
+	                              ),
+	                              *Projects);
+}
+
+void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FString& OutResult)
+{
+	FString SolutionConfigurationPlatforms;
+
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
+		{
+			SolutionConfigurationPlatforms += FString::Printf(TEXT(
+				"\t\t{%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n"
+				"\t\t{%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\n"
+				"\t\t{%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\n"
+				"\t\t{%s}.Release|Any CPU.Build.0 = Release|Any CPU\n"
+			),
+			                                                  *CustomProject.GUID(),
+			                                                  *CustomProject.GUID(),
+			                                                  *CustomProject.GUID(),
+			                                                  *CustomProject.GUID()
+			);
+		}
+	}
+
+	OutResult = OutResult.Replace(*FString::Printf(TEXT(
+		                              "\t\t{%s}.Release|Any CPU.Build.0 = Release|Any CPU"
+		                              "\r\n"
+	                              ),
+	                                               *SOLUTION_CONFIGURATION_PLATFORMS_PLACEHOLDER
+	                              ),
+	                              *SolutionConfigurationPlatforms);
 }

@@ -59,6 +59,11 @@ const FString& UUnrealCSharpSetting::GetGameName() const
 	return GameName;
 }
 
+const TArray<FCustomProject>& UUnrealCSharpSetting::GetCustomProjects() const
+{
+	return CustomProjects;
+}
+
 UAssemblyLoader* UUnrealCSharpSetting::GetAssemblyLoader() const
 {
 	return Cast<UAssemblyLoader>((AssemblyLoader->IsValidLowLevelFast()

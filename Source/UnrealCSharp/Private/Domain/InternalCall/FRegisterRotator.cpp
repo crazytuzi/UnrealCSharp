@@ -95,5 +95,5 @@ namespace
 		}
 	};
 
-	FRegisterRotator RegisterRotator;
+	[[maybe_unused]] FRegisterRotator RegisterRotator;
 }

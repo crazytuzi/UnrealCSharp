@@ -25,7 +25,7 @@ namespace
 		}
 	};
 
-	FRegisterDayOfWeek RegisterDayOfWeek;
+	[[maybe_unused]] FRegisterDayOfWeek RegisterDayOfWeek;
 
 	struct FRegisterMonthOfYear
 	{
@@ -47,7 +47,7 @@ namespace
 		}
 	};
 
-	FRegisterMonthOfYear RegisterMonthOfYear;
+	[[maybe_unused]] FRegisterMonthOfYear RegisterMonthOfYear;
 
 	struct FRegisterDateTime
 	{
@@ -145,5 +145,5 @@ namespace
 		}
 	};
 
-	FRegisterDateTime RegisterDateTime;
+	[[maybe_unused]] FRegisterDateTime RegisterDateTime;
 }

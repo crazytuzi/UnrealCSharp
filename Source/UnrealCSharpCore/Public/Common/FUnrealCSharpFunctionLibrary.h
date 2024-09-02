@@ -72,6 +72,10 @@ public:
 	static FString GetGameProjectPropsPath();
 #endif
 
+#if WITH_EDITOR
+	static TArray<FString> GetCustomProjectsDirectory();
+#endif
+
 	static FString GetBindingDirectory();
 
 	static FString GetPluginBaseDir();
@@ -95,6 +99,10 @@ public:
 	static FString GetFullUEPublishPath();
 
 	static FString GetFullGamePublishPath();
+
+	static TArray<FString> GetFullCustomProjectsPublishPath();
+
+	static TArray<FString> GetFullAssemblyPublishPath();
 
 #if WITH_EDITOR
 	static FString GetScriptDirectory();
@@ -141,4 +149,10 @@ public:
 
 	static bool IsDynamicReInstanceField(const UField* InField);
 #endif
+
+	template <typename T>
+	static T* GetMutableDefaultSafe()
+	{
+		return !GExitPurge ? GetMutableDefault<T>() : nullptr;
+	}
 };

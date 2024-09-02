@@ -73,7 +73,7 @@ public:
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast4(MonoObject** OutValue) const
+	void Broadcast4(uint8* OutBuffer) const
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -81,14 +81,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Broadcast4<ReturnType>(MulticastScriptDelegate, OutValue);
+					DelegateDescriptor->Broadcast4<ReturnType>(MulticastScriptDelegate, OutBuffer);
 				}
 			}
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast6(MonoObject** OutValue, uint8* InBuffer) const
+	void Broadcast6(uint8* InBuffer, uint8* OutBuffer) const
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -96,7 +96,7 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Broadcast6<ReturnType>(MulticastScriptDelegate, OutValue, InBuffer);
+					DelegateDescriptor->Broadcast6<ReturnType>(MulticastScriptDelegate, InBuffer, OutBuffer);
 				}
 			}
 		}

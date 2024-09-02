@@ -158,7 +158,7 @@ void FSourceCodeGeneratorModule::ExportClass(UClass* Class, const FString& Sourc
 			"\t\t}\r\n"
 			"\t};\r\n"
 			"\r\n"
-			"\tFRegister%s Register%s;\r\n"
+			"\t[[maybe_unused]] FRegister%s Register%s;\r\n"
 			"}\r\n\r\n"
 		),
 		                    *Class->GetName(),

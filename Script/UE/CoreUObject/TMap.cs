@@ -33,25 +33,362 @@ namespace Script.CoreUObject
 
         public bool IsEmpty() => TMapImplementation.TMap_IsEmptyImplementation(GarbageCollectionHandle);
 
-        public void Add(TKey InKey, TValue InValue) =>
-            TMapImplementation.TMap_AddImplementation(GarbageCollectionHandle, InKey, InValue);
+        public void Add(TKey InKey, TValue InValue)
+        {
+            unsafe
+            {
+                if (typeof(TKey).IsValueType)
+                {
+                    if (typeof(TValue).IsValueType)
+                    {
+                        var KeyBuffer = stackalloc byte[sizeof(TKey)];
 
-        public int Remove(TKey InKey) => TMapImplementation.TMap_RemoveImplementation(GarbageCollectionHandle, InKey);
+                        *(TKey*)KeyBuffer = InKey;
 
-        public TKey FindKey(TValue InValue) =>
-            (TKey)TMapImplementation.TMap_FindKeyImplementation(GarbageCollectionHandle, InValue);
+                        var ValueBuffer = stackalloc byte[sizeof(TValue)];
 
-        public TValue Find(TKey InKey) =>
-            (TValue)TMapImplementation.TMap_FindImplementation(GarbageCollectionHandle, InKey);
+                        *(TValue*)ValueBuffer = InValue;
 
-        public bool Contains(TKey InKey) =>
-            TMapImplementation.TMap_ContainsImplementation(GarbageCollectionHandle, InKey);
+                        TMapImplementation.TMap_AddImplementation(GarbageCollectionHandle, KeyBuffer, ValueBuffer);
+                    }
+                    else
+                    {
+                        var KeyBuffer = stackalloc byte[sizeof(TKey)];
+
+                        *(TKey*)KeyBuffer = InKey;
+
+                        var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        TMapImplementation.TMap_AddImplementation(GarbageCollectionHandle, KeyBuffer, ValueBuffer);
+                    }
+                }
+                else
+                {
+                    if (typeof(TValue).IsValueType)
+                    {
+                        var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        var ValueBuffer = stackalloc byte[sizeof(TValue)];
+
+                        *(TValue*)ValueBuffer = InValue;
+
+                        TMapImplementation.TMap_AddImplementation(GarbageCollectionHandle, KeyBuffer, ValueBuffer);
+                    }
+                    else
+                    {
+                        var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        TMapImplementation.TMap_AddImplementation(GarbageCollectionHandle, KeyBuffer, ValueBuffer);
+                    }
+                }
+            }
+        }
+
+        public int Remove(TKey InKey)
+        {
+            unsafe
+            {
+                if (typeof(TKey).IsValueType)
+                {
+                    var KeyBuffer = stackalloc byte[sizeof(TKey)];
+
+                    *(TKey*)KeyBuffer = InKey;
+
+                    return TMapImplementation.TMap_RemoveImplementation(GarbageCollectionHandle, KeyBuffer);
+                }
+                else
+                {
+                    var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TMapImplementation.TMap_RemoveImplementation(GarbageCollectionHandle, KeyBuffer);
+                }
+            }
+        }
+
+        public TKey FindKey(TValue InValue)
+        {
+            unsafe
+            {
+                if (typeof(TValue).IsValueType)
+                {
+                    if (typeof(TKey).IsValueType)
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(TValue)];
+
+                        *(TValue*)ValueBuffer = InValue;
+
+                        var ReturnBuffer = stackalloc byte[sizeof(TKey)];
+
+                        TMapImplementation.TMap_FindKeyImplementation(GarbageCollectionHandle, ValueBuffer,
+                            ReturnBuffer);
+
+                        return *(TKey*)ReturnBuffer;
+                    }
+                    else
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(TValue)];
+
+                        *(TValue*)ValueBuffer = InValue;
+
+                        var ReturnBuffer = stackalloc byte[sizeof(nint)];
+
+                        TMapImplementation.TMap_FindKeyImplementation(GarbageCollectionHandle, ValueBuffer,
+                            ReturnBuffer);
+
+                        return *(TKey*)ReturnBuffer;
+                    }
+                }
+                else
+                {
+                    if (typeof(TKey).IsValueType)
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        var ReturnBuffer = stackalloc byte[sizeof(TKey)];
+
+                        TMapImplementation.TMap_FindKeyImplementation(GarbageCollectionHandle, ValueBuffer,
+                            ReturnBuffer);
+
+                        return *(TKey*)ReturnBuffer;
+                    }
+                    else
+                    {
+                        var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        var ReturnBuffer = stackalloc byte[sizeof(nint)];
+
+                        TMapImplementation.TMap_FindKeyImplementation(GarbageCollectionHandle, ValueBuffer,
+                            ReturnBuffer);
+
+                        return *(TKey*)ReturnBuffer;
+                    }
+                }
+            }
+        }
+
+        public TValue Find(TKey InKey)
+        {
+            unsafe
+            {
+                if (typeof(TKey).IsValueType)
+                {
+                    if (typeof(TValue).IsValueType)
+                    {
+                        var KeyBuffer = stackalloc byte[sizeof(TKey)];
+
+                        *(TKey*)KeyBuffer = InKey;
+
+                        var ReturnBuffer = stackalloc byte[sizeof(TValue)];
+
+                        TMapImplementation.TMap_FindImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
+
+                        return *(TValue*)ReturnBuffer;
+                    }
+                    else
+                    {
+                        var KeyBuffer = stackalloc byte[sizeof(TKey)];
+
+                        *(TKey*)KeyBuffer = InKey;
+
+                        var ReturnBuffer = stackalloc byte[sizeof(nint)];
+
+                        TMapImplementation.TMap_FindImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
+
+                        return *(TValue*)ReturnBuffer;
+                    }
+                }
+                else
+                {
+                    if (typeof(TValue).IsValueType)
+                    {
+                        var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        var ReturnBuffer = stackalloc byte[sizeof(TValue)];
+
+                        TMapImplementation.TMap_FindImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
+
+                        return *(TValue*)ReturnBuffer;
+                    }
+                    else
+                    {
+                        var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                        *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                        var ReturnBuffer = stackalloc byte[sizeof(nint)];
+
+                        TMapImplementation.TMap_FindImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
+
+                        return *(TValue*)ReturnBuffer;
+                    }
+                }
+            }
+        }
+
+        public bool Contains(TKey InKey)
+        {
+            unsafe
+            {
+                if (typeof(TKey).IsValueType)
+                {
+                    var KeyBuffer = stackalloc byte[sizeof(TKey)];
+
+                    *(TKey*)KeyBuffer = InKey;
+
+                    return TMapImplementation.TMap_ContainsImplementation(GarbageCollectionHandle, KeyBuffer);
+                }
+                else
+                {
+                    var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                    *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                    return TMapImplementation.TMap_ContainsImplementation(GarbageCollectionHandle, KeyBuffer);
+                }
+            }
+        }
 
         public TValue this[TKey InKey]
         {
-            get => (TValue)TMapImplementation.TMap_GetImplementation(GarbageCollectionHandle, InKey);
+            get
+            {
+                unsafe
+                {
+                    if (typeof(TKey).IsValueType)
+                    {
+                        if (typeof(TValue).IsValueType)
+                        {
+                            var KeyBuffer = stackalloc byte[sizeof(TKey)];
 
-            set => TMapImplementation.TMap_SetImplementation(GarbageCollectionHandle, InKey, value);
+                            *(TKey*)KeyBuffer = InKey;
+
+                            var ReturnBuffer = stackalloc byte[sizeof(TValue)];
+
+                            TMapImplementation.TMap_GetImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
+
+                            return *(TValue*)ReturnBuffer;
+                        }
+                        else
+                        {
+                            var KeyBuffer = stackalloc byte[sizeof(TKey)];
+
+                            *(TKey*)KeyBuffer = InKey;
+
+                            var ReturnBuffer = stackalloc byte[sizeof(nint)];
+
+                            TMapImplementation.TMap_GetImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
+
+                            return *(TValue*)ReturnBuffer;
+                        }
+                    }
+                    else
+                    {
+                        if (typeof(TValue).IsValueType)
+                        {
+                            var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                            *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                            var ReturnBuffer = stackalloc byte[sizeof(TValue)];
+
+                            TMapImplementation.TMap_GetImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
+
+                            return *(TValue*)ReturnBuffer;
+                        }
+                        else
+                        {
+                            var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                            *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                            var ReturnBuffer = stackalloc byte[sizeof(nint)];
+
+                            TMapImplementation.TMap_GetImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
+
+                            return *(TValue*)ReturnBuffer;
+                        }
+                    }
+                }
+            }
+
+            set
+            {
+                unsafe
+                {
+                    if (typeof(TKey).IsValueType)
+                    {
+                        if (typeof(TValue).IsValueType)
+                        {
+                            var KeyBuffer = stackalloc byte[sizeof(TKey)];
+
+                            *(TKey*)KeyBuffer = InKey;
+
+                            var ValueBuffer = stackalloc byte[sizeof(TValue)];
+
+                            *(TValue*)ValueBuffer = value;
+
+                            TMapImplementation.TMap_SetImplementation(GarbageCollectionHandle, KeyBuffer, ValueBuffer);
+                        }
+                        else
+                        {
+                            var KeyBuffer = stackalloc byte[sizeof(TKey)];
+
+                            *(TKey*)KeyBuffer = InKey;
+
+                            var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                            *(nint*)ValueBuffer = (value as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                            TMapImplementation.TMap_SetImplementation(GarbageCollectionHandle, KeyBuffer, ValueBuffer);
+                        }
+                    }
+                    else
+                    {
+                        if (typeof(TValue).IsValueType)
+                        {
+                            var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                            *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                            var ValueBuffer = stackalloc byte[sizeof(TValue)];
+
+                            *(TValue*)ValueBuffer = value;
+
+                            TMapImplementation.TMap_SetImplementation(GarbageCollectionHandle, KeyBuffer, ValueBuffer);
+                        }
+                        else
+                        {
+                            var KeyBuffer = stackalloc byte[sizeof(nint)];
+
+                            *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                            var ValueBuffer = stackalloc byte[sizeof(nint)];
+
+                            *(nint*)ValueBuffer = (value as IGarbageCollectionHandle)!.GarbageCollectionHandle;
+
+                            TMapImplementation.TMap_SetImplementation(GarbageCollectionHandle, KeyBuffer, ValueBuffer);
+                        }
+                    }
+                }
+            }
         }
 
         private int GetMaxIndex() => TMapImplementation.TMap_GetMaxIndexImplementation(GarbageCollectionHandle);
@@ -59,11 +396,55 @@ namespace Script.CoreUObject
         private bool IsValidIndex(int InIndex) =>
             TMapImplementation.TMap_IsValidIndexImplementation(GarbageCollectionHandle, InIndex);
 
-        private TKey GetEnumeratorKey(int InIndex) =>
-            (TKey)TMapImplementation.TMap_GetEnumeratorKeyImplementation(GarbageCollectionHandle, InIndex);
+        private TKey GetEnumeratorKey(int InIndex)
+        {
+            unsafe
+            {
+                if (typeof(TKey).IsValueType)
+                {
+                    var ReturnBuffer = stackalloc byte[sizeof(TKey)];
 
-        private TValue GetEnumeratorValue(int InIndex) =>
-            (TValue)TMapImplementation.TMap_GetEnumeratorValueImplementation(GarbageCollectionHandle, InIndex);
+                    TMapImplementation.TMap_GetEnumeratorKeyImplementation(GarbageCollectionHandle, InIndex,
+                        ReturnBuffer);
+
+                    return *(TKey*)ReturnBuffer;
+                }
+                else
+                {
+                    var ReturnBuffer = stackalloc byte[sizeof(nint)];
+
+                    TMapImplementation.TMap_GetEnumeratorKeyImplementation(GarbageCollectionHandle, InIndex,
+                        ReturnBuffer);
+
+                    return *(TKey*)ReturnBuffer;
+                }
+            }
+        }
+
+        private TValue GetEnumeratorValue(int InIndex)
+        {
+            unsafe
+            {
+                if (typeof(TValue).IsValueType)
+                {
+                    var ReturnBuffer = stackalloc byte[sizeof(TValue)];
+
+                    TMapImplementation.TMap_GetEnumeratorValueImplementation(GarbageCollectionHandle, InIndex,
+                        ReturnBuffer);
+
+                    return *(TValue*)ReturnBuffer;
+                }
+                else
+                {
+                    var ReturnBuffer = stackalloc byte[sizeof(nint)];
+
+                    TMapImplementation.TMap_GetEnumeratorValueImplementation(GarbageCollectionHandle, InIndex,
+                        ReturnBuffer);
+
+                    return *(TValue*)ReturnBuffer;
+                }
+            }
+        }
 
         public nint GarbageCollectionHandle { get; set; }
     }

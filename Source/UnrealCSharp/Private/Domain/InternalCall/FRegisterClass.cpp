@@ -25,5 +25,5 @@ namespace
 		}
 	};
 
-	FRegisterClass RegisterClass;
+	[[maybe_unused]] FRegisterClass RegisterClass;
 }

@@ -165,26 +165,24 @@ void FCSharpCompilerRunnable::ImmediatelyDoWork()
 
 void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
 {
-	if (const auto UnrealCSharpEditorSetting = GetMutableDefault<UUnrealCSharpEditorSetting>())
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
 	{
-		if (UnrealCSharpEditorSetting->IsValidLowLevelFast())
+		if (UnrealCSharpEditorSetting->EnableCompiled())
 		{
-			if (UnrealCSharpEditorSetting->EnableCompiled())
-			{
-				bIsCompiling = true;
+			bIsCompiling = true;
 
-				Compile();
+			Compile();
 
-				const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
-					InFunction,
-					TStatId(),
-					nullptr,
-					ENamedThreads::GameThread);
+			const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
+				InFunction,
+				TStatId(),
+				nullptr,
+				ENamedThreads::GameThread);
 
-				FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
+			FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
 
-				bIsCompiling = false;
-			}
+			bIsCompiling = false;
 		}
 	}
 }
@@ -235,13 +233,13 @@ void FCSharpCompilerRunnable::Compile()
 
 	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
 	{
-		static const FName CompileStatusUnknown("Blueprint.CompileStatus.Overlay.Unknown");
+		[[maybe_unused]] static const FName CompileStatusUnknown("Blueprint.CompileStatus.Overlay.Unknown");
 
 		static const FName CompileStatusError("Blueprint.CompileStatus.Overlay.Error");
 
 		static const FName CompileStatusGood("Blueprint.CompileStatus.Overlay.Good");
 
-		static const FName CompileStatusWarning("Blueprint.CompileStatus.Overlay.Warning");
+		[[maybe_unused]] static const FName CompileStatusWarning("Blueprint.CompileStatus.Overlay.Warning");
 
 		if (ReturnCode == 0)
 		{

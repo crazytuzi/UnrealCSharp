@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "Domain/AssemblyLoader.h"
 #include "UnrealCSharpSetting.generated.h"
 
@@ -18,6 +17,36 @@ struct FGameContentDirectoryPath : public FDirectoryPath
 		FDirectoryPath()
 	{
 		Path = InPath;
+	}
+
+	operator FString() const
+	{
+		return Path;
+	}
+};
+
+USTRUCT()
+struct FCustomProject
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	FString Name;
+
+	FString GUID() const
+	{
+		const auto Hex = FString::Printf(TEXT("%X"), GetTypeHash(Name));
+
+		return FString::Printf(TEXT(
+			"%s-%s-%s-%s-%s%s"
+		),
+		                       *Hex,
+		                       *Hex.Mid(0, 4),
+		                       *Hex.Mid(4, 4),
+		                       *Hex.Mid(0, 4),
+		                       *Hex.Mid(4, 4),
+		                       *Hex
+		);
 	}
 };
 
@@ -55,6 +84,8 @@ public:
 
 	const FString& GetGameName() const;
 
+	const TArray<FCustomProject>& GetCustomProjects() const;
+
 	UAssemblyLoader* GetAssemblyLoader() const;
 
 	const TArray<FBindClass>& GetBindClass() const;
@@ -74,6 +105,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Publish, meta = (DisplayName = "Game Name"))
 	FString GameName;
+
+	UPROPERTY(Config, EditAnywhere, Category = Publish)
+	TArray<FCustomProject> CustomProjects;
 
 	UPROPERTY(Config, EditAnywhere, Category = Domain)
 	TSubclassOf<UAssemblyLoader> AssemblyLoader;
