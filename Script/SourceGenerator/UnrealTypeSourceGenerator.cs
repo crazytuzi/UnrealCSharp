@@ -365,7 +365,7 @@ namespace SourceGenerator
                         }
                         else if (baseTypeName.StartsWith("U"))
                         {
-                            if (name.StartsWith("U") == false)
+                            if (name.EndsWith("_C") == false && name.StartsWith("U") == false)
                             {
                                 Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorTypeName,
                                 Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span),
@@ -440,7 +440,7 @@ namespace SourceGenerator
 
             var nameSpace = namespaceDeclarationSyntax.GetFullNamespace();
 
-            if (nameSpace != "Script.CoreUObject" && bIsUClass && bIsUStruct && bIsUInterface)
+            if (nameSpace != "Script.CoreUObject" &&(bIsUClass || bIsUStruct || bIsUInterface))
             {
                 Errors.Add(Diagnostic.Create(UnrealTypeSourceGenerator.ErrorNamespace, Location.Create(Syntax.Identifier.SyntaxTree, Syntax.Identifier.Span), name));
                 hasError = true;
