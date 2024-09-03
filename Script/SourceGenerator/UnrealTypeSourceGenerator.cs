@@ -64,10 +64,13 @@ namespace SourceGenerator
                 var source = "";
                 @interface.Usings.Add("using Script.Library;");
                 @interface.Usings.ForEach(Str => source += Str);
-                source += "\nnamespace Script.CoreUObject;";
-                source += $"\n[{string.Join(", ", @interface.Attributes)}]";
-                source += $"\npublic partial class U{@interface.Name.Substring(1)} : UInterface ";
-                source += "\n{}";
+                source += "\nnamespace Script.CoreUObject";
+                source += "\n{";
+                source += $"\n\t[{string.Join(", ", @interface.Attributes)}]";
+                source += $"\n\tpublic partial class U{@interface.Name.Substring(1)} : UInterface ";
+                source += "\n\t{";
+                source += "\n\t}";
+                source += "\n}";
                 unrealTypeReceiver.Types.Add(@interface.Name, new TypeInfo
                 {
                     Name = $"U{@interface.Name.Substring(1)}",
@@ -126,7 +129,7 @@ namespace SourceGenerator
                     type.Value.Usings.ForEach(Str => source += Str);
 
                     source +=
-                        $"namespace {type.Value.NameSpace}\n" +
+                        $"\nnamespace {type.Value.NameSpace}\n" +
                         $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}{interfaceBody}\n" +
                         "\t{\n";
 
@@ -185,7 +188,7 @@ namespace SourceGenerator
 
                     type.Value.Usings.ForEach(Str => source += Str);
 
-                    source += $"namespace {type.Value.NameSpace}\n" +
+                    source += $"\nnamespace {type.Value.NameSpace}\n" +
                               $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}: IStaticClass\n" +
                               "\t{\n";
 
