@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -11,6 +10,7 @@ namespace SourceGenerator
     [Generator]
     public class UnrealTypeSourceGenerator : ISourceGenerator
     {
+       
         public static readonly DiagnosticDescriptor ErrorDynamicClass = new DiagnosticDescriptor(
             "UC_ERROR_01",
             "UClass or UStruct must be a partial class", "{0} \"{1}\" must be a partial class",
@@ -46,6 +46,11 @@ namespace SourceGenerator
 
         public void Execute(GeneratorExecutionContext Context)
         {
+            var mainSyntaxTree = Context.Compilation.SyntaxTrees
+                          .First(x => x.HasCompilationUnitRoot);
+
+            var directory = Path.GetDirectoryName(mainSyntaxTree.FilePath);
+
             if (!(Context.SyntaxReceiver is UnrealTypeReceiver unrealTypeReceiver))
             {
                 return;
@@ -60,7 +65,7 @@ namespace SourceGenerator
                 @interface.Usings.Add("using Script.Library;");
                 @interface.Usings.ForEach(Str => source += Str);
                 source += "\nnamespace Script.CoreUObject;";
-                source += $"\n[{string.Join(",", @interface.Attributes)}]";
+                source += $"\n[{string.Join(", ", @interface.Attributes)}]";
                 source += $"\npublic partial class U{@interface.Name.Substring(1)} : UInterface ";
                 source += "\n{}";
                 unrealTypeReceiver.Types.Add(@interface.Name, new TypeInfo
@@ -213,6 +218,16 @@ namespace SourceGenerator
 
     public class UnrealTypeReceiver : ISyntaxReceiver
     {
+        private string[] UInterfaceAttributes =
+        {
+            "UInterface",
+            "MinimalAPI",
+            "BlueprintType",
+            "Blueprintable",
+            "ConversionRoot",
+            "CannotImplementInterfaceInBlueprint"
+        };
+
         public readonly Dictionary<string, TypeInfo> Types = new Dictionary<string, TypeInfo>();
 
         public readonly List<Diagnostic> Errors = new List<Diagnostic>();
@@ -279,6 +294,7 @@ namespace SourceGenerator
                 else 
                 {  
                     var currectFileName = name + ".cs";
+                    currectFileName = currectFileName.Substring(1, currectFileName.Length - 1);
                     if (Path.GetFileName(filePath) != currectFileName)
                     {
                         hasError = true;
@@ -293,8 +309,11 @@ namespace SourceGenerator
                     {
                         foreach (var attribute in list.Attributes)
                         {
-                            var text = attribute.ToFullString();
-                            attributes.Add(text);
+                            var text = attribute.ToFullString().Trim();
+                            if (UInterfaceAttributes.Any(attributeText => text.IndexOf(attributeText) >= 0))
+                            {
+                                attributes.Add(text);
+                            }
                         }
                     }
                     Interfaces.Add(new InterfaceInfo
@@ -308,7 +327,7 @@ namespace SourceGenerator
         }
 
 
-
+        
         private void ProcessClass(ClassDeclarationSyntax Syntax)
         {
             var name = Syntax.Identifier.ToString();
