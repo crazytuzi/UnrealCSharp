@@ -313,7 +313,7 @@ namespace SourceGenerator
 
         private void ProcessClass(ClassDeclarationSyntax Syntax)
         {
-            var name = Syntax.Identifier.ToString();
+            var name = Syntax.Identifier.ToString().Trim();
 
             var attributeUClass = GetAttributeFromClass(Syntax, "UClass");
 
@@ -338,9 +338,10 @@ namespace SourceGenerator
                 var baseType = Syntax.BaseList.Types.FirstOrDefault();
                 if (baseType != null)
                 {
+                    var baseTypeName = baseType.Type.GetText().ToString().Trim();
                     if (bIsUClass)
                     {
-                        if (baseType.Type.GetText().ToString().StartsWith("_C"))
+                        if (baseTypeName.EndsWith("_C"))
                         {
                             if (name.EndsWith("_C") == false)
                             {
@@ -350,7 +351,7 @@ namespace SourceGenerator
                                 hasError = true;
                             }
                         }
-                        else if (baseType.Type.GetText().ToString().StartsWith("A"))
+                        else if (baseTypeName.StartsWith("A"))
                         {
                             if (name.EndsWith("_C") == false && name.StartsWith("A") == false)
                             {
@@ -362,7 +363,7 @@ namespace SourceGenerator
                             }
 
                         }
-                        else if (baseType.Type.GetText().ToString().StartsWith("U"))
+                        else if (baseTypeName.StartsWith("U"))
                         {
                             if (name.StartsWith("U") == false)
                             {
