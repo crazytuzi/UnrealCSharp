@@ -18,6 +18,11 @@ struct FGameContentDirectoryPath : public FDirectoryPath
 	{
 		Path = InPath;
 	}
+
+	operator FString() const
+	{
+		return Path;
+	}
 };
 
 USTRUCT()
@@ -28,8 +33,21 @@ struct FCustomProject
 	UPROPERTY(EditAnywhere)
 	FString Name;
 
-	UPROPERTY(EditAnywhere)
-	FString GUID;
+	FString GUID() const
+	{
+		const auto Hex = FString::Printf(TEXT("%X"), GetTypeHash(Name));
+
+		return FString::Printf(TEXT(
+			"%s-%s-%s-%s-%s%s"
+		),
+		                       *Hex,
+		                       *Hex.Mid(0, 4),
+		                       *Hex.Mid(4, 4),
+		                       *Hex.Mid(0, 4),
+		                       *Hex.Mid(4, 4),
+		                       *Hex
+		);
+	}
 };
 
 USTRUCT()

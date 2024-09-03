@@ -149,4 +149,10 @@ public:
 
 	static bool IsDynamicReInstanceField(const UField* InField);
 #endif
+
+	template <typename T>
+	static T* GetMutableDefaultSafe()
+	{
+		return !GExitPurge ? GetMutableDefault<T>() : nullptr;
+	}
 };

@@ -271,21 +271,20 @@ void FSolutionGenerator::ReplaceProjectPlaceholder(FString& OutResult)
 {
 	FString Projects;
 
-	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
-		UnrealCSharpSetting->IsValidLowLevelFast())
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
-		for (const auto& [Name, GUID] : UnrealCSharpSetting->GetCustomProjects())
+		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{
 			Projects += FString::Printf(TEXT(
 				"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\n"
 				"EndProject\n"
 			),
 			                            *CSHARP_GUID,
-			                            *Name,
-			                            *Name,
-			                            *Name,
+			                            *CustomProject.Name,
+			                            *CustomProject.Name,
+			                            *CustomProject.Name,
 			                            *PROJECT_SUFFIX,
-			                            *GUID
+			                            *CustomProject.GUID()
 			);
 		}
 	}
@@ -302,10 +301,9 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 {
 	FString SolutionConfigurationPlatforms;
 
-	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>();
-		UnrealCSharpSetting->IsValidLowLevelFast())
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
-		for (const auto& [PLACEHOLDER, GUID] : UnrealCSharpSetting->GetCustomProjects())
+		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{
 			SolutionConfigurationPlatforms += FString::Printf(TEXT(
 				"\t\t{%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n"
@@ -313,10 +311,10 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 				"\t\t{%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\n"
 				"\t\t{%s}.Release|Any CPU.Build.0 = Release|Any CPU\n"
 			),
-			                                                  *GUID,
-			                                                  *GUID,
-			                                                  *GUID,
-			                                                  *GUID
+			                                                  *CustomProject.GUID(),
+			                                                  *CustomProject.GUID(),
+			                                                  *CustomProject.GUID(),
+			                                                  *CustomProject.GUID()
 			);
 		}
 	}
