@@ -715,6 +715,38 @@ MonoMethod* FMonoDomain::Delegate_Get_Method(MonoObject* InDelegate)
 	return nullptr;
 }
 
+mono_bool FMonoDomain::Type_Is_Class(MonoType* InMonoType)
+{
+	if (const auto FoundMonoClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
+	{
+		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_IS_CLASS, 1))
+		{
+			void* InParams[1] = {Type_Get_Object(InMonoType)};
+
+			return *static_cast<bool*>(Object_Unbox(Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr)));
+		}
+	}
+
+	return false;
+}
+
+mono_bool FMonoDomain::Type_Is_Enum(MonoType* InMonoType)
+{
+	if (const auto FoundMonoClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
+	{
+		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_IS_ENUM, 1))
+		{
+			void* InParams[1] = {Type_Get_Object(InMonoType)};
+
+			return *static_cast<bool*>(Object_Unbox(Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr)));
+		}
+	}
+
+	return false;
+}
+
 MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** OutAssemblyPath,
                                                void* InUserData)
 {
@@ -1020,47 +1052,4 @@ void FMonoDomain::RegisterBinding()
 			mono_add_internal_call(TCHAR_TO_ANSI(*Method.GetMethod()), Method.GetFunction());
 		}
 	}
-}
-
-
-mono_bool FMonoDomain::Type_Is_Class(MonoType* InMonoType)
-{
-	if (const auto FoundMonoClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
-	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_ASSEMBLY_UTIL_IS_CLASS, 1))
-		{
-			void* InParams[1] = { 
-				mono_type_get_object(Domain, InMonoType)
-			};
-
-			auto object = Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr);
-
-			bool bRet = *static_cast<bool*>(mono_object_unbox(object));
-
-			return bRet;
-		}
-	}
-	return false;
-}
-
-mono_bool FMonoDomain::Type_Is_Enum(MonoType* InMonoType)
-{
-	if (const auto FoundMonoClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
-	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_ASSEMBLY_UTIL_IS_ENUM, 1))
-		{
-			void* InParams[1] = {
-				mono_type_get_object(Domain, InMonoType)
-			};
-
-			auto object = Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr);
-
-			bool bRet = *static_cast<bool*>(mono_object_unbox(object));
-
-			return bRet;
-		}
-	}
-	return false;
 }

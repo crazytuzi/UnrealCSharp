@@ -97,7 +97,7 @@ namespace Script.CoreUObject
                                             A.GarbageCollectionHandle,
                                             B.GarbageCollectionHandle));
         }
-        
+
         public static bool IsClass(Type InType)
         {
             return InType.IsClass;

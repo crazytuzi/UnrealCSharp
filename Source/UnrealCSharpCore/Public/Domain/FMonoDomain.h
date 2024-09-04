@@ -180,9 +180,6 @@ public:
 
 	static void* Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod);
 
-	static mono_bool Type_Is_Class(MonoType* InMonoType);
-
-	static mono_bool Type_Is_Enum(MonoType* InMonoType);
 public:
 	static void Object_Constructor(MonoObject* InMonoObject, int32 InParamCount = 0, void** InParams = nullptr);
 
@@ -197,6 +194,10 @@ public:
 	                                                const TArray<MonoType*>& InParams);
 
 	static MonoMethod* Delegate_Get_Method(MonoObject* InDelegate);
+
+	static mono_bool Type_Is_Class(MonoType* InMonoType);
+
+	static mono_bool Type_Is_Enum(MonoType* InMonoType);
 
 public:
 	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** OutAssemblyPath,

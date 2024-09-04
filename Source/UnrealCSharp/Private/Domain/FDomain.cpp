@@ -486,6 +486,11 @@ void FDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
 	return FMonoDomain::GCHandle_Free_V2(InGCHandle);
 }
 
+void* FDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
+{
+	return FMonoDomain::Method_Get_Unmanaged_Thunk(InMonoMethod);
+}
+
 void FDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InParamCount, void** InParams)
 {
 	FMonoDomain::Object_Constructor(InMonoObject, InParamCount, InParams);
@@ -532,9 +537,14 @@ MonoMethod* FDomain::Delegate_Get_Method(MonoObject* InDelegate) const
 	return FMonoDomain::Delegate_Get_Method(InDelegate);
 }
 
-void* FDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
+mono_bool FDomain::Type_Is_Class(MonoType* InMonoType)
 {
-	return FMonoDomain::Method_Get_Unmanaged_Thunk(InMonoMethod);
+	return FMonoDomain::Type_Is_Class(InMonoType);
+}
+
+mono_bool FDomain::Type_Is_Enum(MonoType* InMonoType)
+{
+	return FMonoDomain::Type_Is_Enum(InMonoType);
 }
 
 void FDomain::InitializeSynchronizationContext()

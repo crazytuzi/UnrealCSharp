@@ -196,6 +196,8 @@ public:
 
 	static void GCHandle_Free_V2(MonoGCHandle InGCHandle);
 
+	static void* Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod);
+
 	static void Object_Constructor(MonoObject* InMonoObject, int32 InParamCount = 0, void** InParams = nullptr);
 
 	static void StaticClassSingleton_Reset(MonoClass* InMonoClass);
@@ -211,7 +213,9 @@ public:
 
 	MonoMethod* Delegate_Get_Method(MonoObject* InDelegate) const;
 
-	static void* Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod);
+	static mono_bool Type_Is_Class(MonoType* InMonoType);
+
+	static mono_bool Type_Is_Enum(MonoType* InMonoType);
 
 	SynchronizationContextTickType SynchronizationContextTick;
 

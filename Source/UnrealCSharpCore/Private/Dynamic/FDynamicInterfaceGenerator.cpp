@@ -58,13 +58,12 @@ void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
 	{
 		return;
 	}
-	auto MonoType = FMonoDomain::Class_Get_Type(InMonoClass);
 
-	if (FMonoDomain::Type_Is_Class(MonoType) == false)
+	if (!FMonoDomain::Type_Is_Class(FMonoDomain::Class_Get_Type(InMonoClass)))
 	{
 		return;
 	}
-		
+
 	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
