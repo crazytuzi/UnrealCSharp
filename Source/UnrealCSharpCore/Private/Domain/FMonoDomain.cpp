@@ -1021,3 +1021,46 @@ void FMonoDomain::RegisterBinding()
 		}
 	}
 }
+
+
+mono_bool FMonoDomain::Type_Is_Class(MonoType* InMonoType)
+{
+	if (const auto FoundMonoClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
+	{
+		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_ASSEMBLY_UTIL_IS_CLASS, 1))
+		{
+			void* InParams[1] = { 
+				mono_type_get_object(Domain, InMonoType)
+			};
+
+			auto object = Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr);
+
+			bool bRet = *static_cast<bool*>(mono_object_unbox(object));
+
+			return bRet;
+		}
+	}
+	return false;
+}
+
+mono_bool FMonoDomain::Type_Is_Enum(MonoType* InMonoType)
+{
+	if (const auto FoundMonoClass = Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
+	{
+		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_ASSEMBLY_UTIL_IS_ENUM, 1))
+		{
+			void* InParams[1] = {
+				mono_type_get_object(Domain, InMonoType)
+			};
+
+			auto object = Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr);
+
+			bool bRet = *static_cast<bool*>(mono_object_unbox(object));
+
+			return bRet;
+		}
+	}
+	return false;
+}
