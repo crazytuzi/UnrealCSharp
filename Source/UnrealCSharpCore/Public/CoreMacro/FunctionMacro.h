@@ -14,6 +14,10 @@
 
 #define FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE FString(TEXT("MakeGenericTypeInstance"))
 
+#define FUNCTION_UTILS_IS_CLASS FString(TEXT("IsClass"))
+
+#define FUNCTION_UTILS_IS_ENUM FString(TEXT("IsEnum"))
+
 #define FUNCTION_STATIC_STRUCT FString(TEXT("StaticStruct"))
 
 #define FUNCTION_ASSEMBLY_UTIL_INITIALIZE FString(TEXT("Initialize"))

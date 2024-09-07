@@ -195,6 +195,10 @@ public:
 
 	static MonoMethod* Delegate_Get_Method(MonoObject* InDelegate);
 
+	static mono_bool Type_Is_Class(MonoType* InMonoType);
+
+	static mono_bool Type_Is_Enum(MonoType* InMonoType);
+
 public:
 	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** OutAssemblyPath,
 	                                         void* InUserData);

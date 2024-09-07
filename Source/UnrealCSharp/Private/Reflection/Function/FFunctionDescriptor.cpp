@@ -45,9 +45,10 @@ void FFunctionDescriptor::Initialize()
 
 			InBufferOffsets.Add(InBufferOffsets.IsEmpty()
 				                    ? 0
-				                    : InBufferOffsets.Last() + (PropertyDescriptor->IsPrimitiveProperty()
-					                                                ? PropertyDescriptor->GetElementSize()
-					                                                : sizeof(void*)));
+				                    : InBufferOffsets.Last() +
+				                    (PropertyDescriptors.Last()->IsPrimitiveProperty()
+					                     ? PropertyDescriptors.Last()->GetElementSize()
+					                     : sizeof(void*)));
 
 			const auto Index = PropertyDescriptors.Add(PropertyDescriptor);
 
@@ -60,9 +61,10 @@ void FFunctionDescriptor::Initialize()
 
 				OutBufferOffsets.Add(OutBufferOffsets.IsEmpty()
 					                     ? 0
-					                     : OutBufferOffsets.Last() + (PropertyDescriptor->IsPrimitiveProperty()
-						                                                  ? PropertyDescriptor->GetElementSize()
-						                                                  : sizeof(void*)));
+					                     : OutBufferOffsets.Last() +
+					                     (PropertyDescriptors[OutPropertyIndexes.Last()]->IsPrimitiveProperty()
+						                      ? PropertyDescriptors[OutPropertyIndexes.Last()]->GetElementSize()
+						                      : sizeof(void*)));
 
 				OutPropertyIndexes.Emplace(Index);
 			}

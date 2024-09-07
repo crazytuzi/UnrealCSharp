@@ -97,5 +97,15 @@ namespace Script.CoreUObject
                                             A.GarbageCollectionHandle,
                                             B.GarbageCollectionHandle));
         }
+
+        public static bool IsClass(Type InType)
+        {
+            return InType.IsClass;
+        }
+
+        public static bool IsEnum(Type InType)
+        {
+            return InType.IsEnum;
+        }
     }
 }

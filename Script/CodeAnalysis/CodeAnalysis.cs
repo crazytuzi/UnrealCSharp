@@ -272,10 +272,18 @@ namespace CodeAnalysis
 
                                         return;
                                     }
-
+                                }
+                            }
+                        }
+                        else if (NameSpaceMember is InterfaceDeclarationSyntax InterfaceDeclaration)
+                        {
+                            foreach (var AttributeList in InterfaceDeclaration.AttributeLists)
+                            {
+                                foreach (var Attribute in AttributeList.Attributes)
+                                {
                                     if (Attribute.ToString().Equals("UInterface"))
                                     {
-                                        _dynamic?["DynamicInterface"].Add(ClassDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicInterface"].Add(InterfaceDeclaration.Identifier.ToString());
 
                                         return;
                                     }
