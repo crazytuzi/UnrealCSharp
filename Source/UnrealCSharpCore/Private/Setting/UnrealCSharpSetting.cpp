@@ -11,6 +11,9 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	  PublishDirectory(DEFAULT_PUBLISH_DIRECTORY),
 	  UEName(DEFAULT_UE_NAME),
 	  GameName(DEFAULT_GAME_NAME),
+	  bEnableCallOverrideFunction(true),
+	  OverrideFunctionNamePrefix(DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX),
+	  OverrideFunctionNameSuffix(DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX),
 	  AssemblyLoader(UAssemblyLoader::StaticClass()),
 	  bEnableDebug(false),
 	  Port(0)
@@ -62,6 +65,21 @@ const FString& UUnrealCSharpSetting::GetGameName() const
 const TArray<FCustomProject>& UUnrealCSharpSetting::GetCustomProjects() const
 {
 	return CustomProjects;
+}
+
+bool UUnrealCSharpSetting::EnableCallOverrideFunction() const
+{
+	return bEnableCallOverrideFunction;
+}
+
+const FString& UUnrealCSharpSetting::GetOverrideFunctionNamePrefix() const
+{
+	return OverrideFunctionNamePrefix;
+}
+
+const FString& UUnrealCSharpSetting::GetOverrideFunctionNameSuffix() const
+{
+	return OverrideFunctionNameSuffix;
 }
 
 UAssemblyLoader* UUnrealCSharpSetting::GetAssemblyLoader() const

@@ -86,6 +86,12 @@ public:
 
 	const TArray<FCustomProject>& GetCustomProjects() const;
 
+	bool EnableCallOverrideFunction() const;
+
+	const FString& GetOverrideFunctionNamePrefix() const;
+
+	const FString& GetOverrideFunctionNameSuffix() const;
+
 	UAssemblyLoader* GetAssemblyLoader() const;
 
 	const TArray<FBindClass>& GetBindClass() const;
@@ -108,6 +114,15 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Publish)
 	TArray<FCustomProject> CustomProjects;
+
+	UPROPERTY(Config, EditAnywhere, Category = Override)
+	bool bEnableCallOverrideFunction;
+
+	UPROPERTY(Config, EditAnywhere, Category = Override, meta = (EditCondition = "bEnableCallOverrideFunction"))
+	FString OverrideFunctionNamePrefix;
+
+	UPROPERTY(Config, EditAnywhere, Category = Override, meta = (EditCondition = "bEnableCallOverrideFunction"))
+	FString OverrideFunctionNameSuffix;
 
 	UPROPERTY(Config, EditAnywhere, Category = Domain)
 	TSubclassOf<UAssemblyLoader> AssemblyLoader;

@@ -76,6 +76,16 @@ public:
 	static TArray<FString> GetCustomProjectsDirectory();
 #endif
 
+	static bool EnableCallOverrideFunction();
+
+	static FString GetOverrideFunctionNamePrefix();
+
+	static FString GetOverrideFunctionNameSuffix();
+
+	static FString GetOverrideFunctionName(const FString& InFunctionName);
+
+	static FString GetOverrideFunctionName(const FName& InFunctionName);
+
 	static FString GetBindingDirectory();
 
 	static FString GetPluginBaseDir();

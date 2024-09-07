@@ -246,7 +246,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()));
 
-	TArray<UFunction*> Functions;
+	TArray<TPair<FString, UFunction*>> Functions;
 
 	for (const auto InInterface : InClass->Interfaces)
 	{
@@ -278,7 +278,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 			FunctionNameSet.Add(FunctionName);
 
-			Functions.Add(*FunctionIterator);
+			Functions.Emplace(FunctionName, *FunctionIterator);
 		}
 	}
 
@@ -303,11 +303,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 			continue;
 		}
 
-		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(*FunctionIterator)))
-		{
-			continue;
-		}
-
 		if (BindingFunctions.Contains(FunctionName))
 		{
 			continue;
@@ -324,22 +319,46 @@ void FClassGenerator::Generator(const UClass* InClass)
 		{
 			if (const auto& Function = SuperClass->FindFunctionByName(*FunctionName))
 			{
-				Functions.Add(Function);
+				Functions.Emplace(FunctionName, Function);
 			}
 			else
 			{
-				Functions.Add(*FunctionIterator);
+				if (const auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(FunctionName);
+					OverrideFunctions.Contains(EncodeFunctionName))
+				{
+					if (FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction())
+					{
+						Functions.Emplace(FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(FunctionName),
+						                  *FunctionIterator);
+					}
+				}
+				else
+				{
+					Functions.Emplace(FunctionName, *FunctionIterator);
+				}
 			}
 		}
 		else
 		{
-			Functions.Add(*FunctionIterator);
+			if (const auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(FunctionName);
+				OverrideFunctions.Contains(EncodeFunctionName))
+			{
+				if (FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction())
+				{
+					Functions.Emplace(FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(FunctionName),
+					                  *FunctionIterator);
+				}
+			}
+			else
+			{
+				Functions.Emplace(FunctionName, *FunctionIterator);
+			}
 		}
 	}
 
 	FunctionNameSet.Empty();
 
-	for (const auto Function : Functions)
+	for (const auto& [Name, Function] : Functions)
 	{
 		if (bHasFunction == true)
 		{
@@ -368,9 +387,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FString FunctionPolymorphism = TEXT("virtual");
 
-		const auto& FunctionName = Function->GetName();
-
-		auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(Function);
+		auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(Name);
 
 		if (bIsInterface == true)
 		{
@@ -397,7 +414,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 					TEXT("GetType")
 				};
 
-				if (DefaultImplementations.Contains(FunctionName))
+				if (DefaultImplementations.Contains(Name))
 				{
 					FunctionPolymorphism = TEXT("new");
 				}
@@ -780,7 +797,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			);
 		}
 
-		FunctionNameSet.Add(FunctionName);
+		FunctionNameSet.Add(Name);
 	}
 
 	if (bIsInterface == true)
