@@ -231,7 +231,6 @@ namespace SourceGenerator
     {
         private readonly string[] _interfaceAttributes =
         {
-            "UInterface",
             "MinimalAPI",
             "BlueprintType",
             "Blueprintable",
