@@ -24,6 +24,8 @@ private:
 	void RegisterMenus();
 
 public:
+	static void UpdatePackagingSettings();
+
 	static void Generator();
 
 private:
