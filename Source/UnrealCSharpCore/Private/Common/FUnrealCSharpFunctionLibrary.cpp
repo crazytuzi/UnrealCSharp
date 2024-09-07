@@ -685,6 +685,18 @@ FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
 }
 #endif
 
+#if WITH_EDITOR
+bool FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment()
+{
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefaultSafe<UUnrealCSharpEditorSetting>())
+	{
+		return UnrealCSharpEditorSetting->IsGenerateFunctionComment();
+	}
+
+	return false;
+}
+#endif
+
 UAssemblyLoader* FUnrealCSharpFunctionLibrary::GetAssemblyLoader()
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())

@@ -130,6 +130,10 @@ public:
 	static FString GetWeaversPath();
 #endif
 
+#if WITH_EDITOR
+	static bool IsGenerateFunctionComment();
+#endif
+
 	static class UAssemblyLoader* GetAssemblyLoader();
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);

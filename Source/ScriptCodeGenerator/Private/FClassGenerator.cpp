@@ -1,4 +1,5 @@
 ﻿#include "FClassGenerator.h"
+#include "FDoxygenConverter.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -462,34 +463,15 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionReturnType = FGeneratorCore::GetPropertyType(FunctionReturnParam);
 		}
 
-		auto FunctionComment = Function->GetMetaData(TEXT("Comment"));
+		FString FunctionComment;
 
-		if (!FunctionComment.IsEmpty())
+		if (FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment())
 		{
-			FunctionComment = FString::Printf(TEXT(
-				"\t\t%s"
-			),
-			                                  *FunctionComment
-			);
+			auto Comment = Function->GetMetaData(TEXT("Comment"));
 
-			FunctionComment = FunctionComment.Replace(TEXT("\n"), TEXT("\n\t\t"));
-
-			FunctionComment = FunctionComment.Replace(TEXT("\n\t\t\t"), TEXT("\n\t\t"));
-
-			if (FunctionComment.EndsWith(TEXT("\t")))
+			if (!Comment.IsEmpty())
 			{
-				FunctionComment.RemoveAt(FunctionComment.Len() - 2, 2);
-			}
-			else if (FunctionComment.EndsWith(TEXT("\t\t")))
-			{
-				FunctionComment.RemoveAt(FunctionComment.Len() - 4, 4);
-			}
-
-			if (!FunctionComment.EndsWith(TEXT("\n")))
-			{
-				FunctionComment = FString::Printf(TEXT(
-					"%s\n"
-				), *FunctionComment);
+				FunctionComment = FDoxygenConverter(TEXT("\t\t"))(Comment);
 			}
 		}
 
