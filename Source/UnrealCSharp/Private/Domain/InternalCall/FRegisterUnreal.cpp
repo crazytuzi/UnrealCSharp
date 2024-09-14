@@ -55,7 +55,7 @@ namespace
 
 			const auto ObjectTemplate = FCSharpEnvironment::GetEnvironment().GetObject(Template);
 
-			const auto Object = NewObject<UObject>(ObjectOuter,
+			const auto Object = NewObject<UObject>(ObjectOuter ? ObjectOuter: GetTransientPackage(),
 			                                       ObjectClass,
 			                                       *ObjectName,
 			                                       Flags,
