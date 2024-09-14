@@ -129,11 +129,11 @@ struct TIsScriptStruct<Class> \
 	enum { Value = true }; \
 };
 
-#define BINDING_ENUM(Class) \
+#define BINDING_ENUM_WITH_NAME(Class, Name)\
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 { \
-	static auto Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
+	static auto Get() { return Name; } \
 }; \
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
@@ -182,6 +182,8 @@ struct TIsNotUEnum<Class> \
 { \
 	enum { Value = true }; \
 };
+
+#define BINDING_ENUM(Class) BINDING_ENUM_WITH_NAME(Class,  BINDING_REMOVE_NAMESPACE_CLASS_STR(Class))
 
 #define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set
 
