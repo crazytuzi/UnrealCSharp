@@ -8,13 +8,17 @@
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
 
-void SignalHandler(int32)
+TMap<int32, struct sigaction> SignalDefaultAction;
+
+void SignalHandler(int32 Signal)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
 	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
 		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
+
+	sigaction(Signal, &SignalDefaultAction[Signal], nullptr);
 }
 
 FCSharpEnvironment FCSharpEnvironment::Environment;
@@ -98,7 +102,11 @@ void FCSharpEnvironment::Initialize()
 
 	for (const auto SignalType : SignalTypes)
 	{
-		signal(SignalType, SignalHandler);
+		struct sigaction Action;
+		FMemory::Memzero(&Action, sizeof(struct sigaction));
+		Action.sa_handler = SignalHandler;
+		sigemptyset(&Action.sa_mask);
+		sigaction(SignalType, &Action, &SignalDefaultAction.FindOrAdd(SignalType));
 	}
 
 	FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Broadcast();
