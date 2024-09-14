@@ -8,7 +8,9 @@
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
 
+#if !PLATFORM_WINDOWS
 TMap<int32, struct sigaction> SignalDefaultAction;
+#endif
 
 void SignalHandler(int32 Signal)
 {
@@ -17,8 +19,11 @@ void SignalHandler(int32 Signal)
 		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
-
+#if PLATFORM_WINDOWS
+	signal(Signal,SIG_DFL);
+#else
 	sigaction(Signal, &SignalDefaultAction[Signal], nullptr);
+#endif
 }
 
 FCSharpEnvironment FCSharpEnvironment::Environment;
@@ -102,11 +107,15 @@ void FCSharpEnvironment::Initialize()
 
 	for (const auto SignalType : SignalTypes)
 	{
+#if PLATFORM_WINDOWS
+		signal(SignalType, SignalHandler);
+#else
 		struct sigaction Action;
 		FMemory::Memzero(&Action, sizeof(struct sigaction));
 		Action.sa_handler = SignalHandler;
 		sigemptyset(&Action.sa_mask);
 		sigaction(SignalType, &Action, &SignalDefaultAction.FindOrAdd(SignalType));
+#endif
 	}
 
 	FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Broadcast();
