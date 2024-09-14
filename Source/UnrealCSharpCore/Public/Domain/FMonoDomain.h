@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "FMonoObjectTypes.h"
 #include "FMonoDomainInitializeParams.h"
@@ -25,6 +25,8 @@ public:
 
 	static mono_bool Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* InSuperMonoClass,
 	                                      mono_bool bCheckInterfaces);
+
+	static mono_bool Class_Is_ValueType(MonoClass* InMonoClass);
 
 	static MonoClass* Class_Get_Parent(MonoClass* InMonoClass);
 

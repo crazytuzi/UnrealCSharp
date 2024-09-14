@@ -166,6 +166,11 @@ mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* I
 		       : false;
 }
 
+mono_bool FMonoDomain::Class_Is_ValueType(MonoClass* InMonoClass)
+{
+	return mono_class_is_valuetype(InMonoClass);
+}
+
 MonoClass* FMonoDomain::Class_Get_Parent(MonoClass* InMonoClass)
 {
 	return InMonoClass != nullptr ? mono_class_get_parent(InMonoClass) : nullptr;
