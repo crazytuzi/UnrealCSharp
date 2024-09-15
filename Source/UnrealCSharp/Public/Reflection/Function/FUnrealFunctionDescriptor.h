@@ -52,6 +52,12 @@ public:
 	void Call15(UObject* InObject, uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call16(UObject* InObject) const;
+
+	template <auto ReturnType = EFunctionReturnType::Void>
+	void Call18(UObject* InObject, uint8* InBuffer) const;
+
+	template <auto ReturnType = EFunctionReturnType::Void>
 	void Call24(UObject* InObject) const;
 
 	template <auto ReturnType = EFunctionReturnType::Void>
