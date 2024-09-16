@@ -114,7 +114,14 @@ void FCSharpEnvironment::Initialize()
 		FMemory::Memzero(&Action, sizeof(struct sigaction));
 		Action.sa_handler = SignalHandler;
 		sigemptyset(&Action.sa_mask);
-		sigaction(SignalType, &Action, &SignalDefaultAction.FindOrAdd(SignalType));
+		if (!SignalDefaultAction.Contains(SignalType))
+		{
+			sigaction(SignalType, &Action, &SignalDefaultAction.Add(SignalType));
+		}
+		else
+		{
+			sigaction(SignalType, &Action, nullptr);
+		}
 #endif
 	}
 
