@@ -43,7 +43,8 @@ public class ScriptCodeGenerator : ModuleRules
 				"UnrealEd", 
 				"UnrealCSharpCore",
 				"CrossVersion",
-				"Json"
+				"Json",
+				"Projects"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
