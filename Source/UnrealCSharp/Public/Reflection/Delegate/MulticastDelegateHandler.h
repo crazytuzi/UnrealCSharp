@@ -30,13 +30,13 @@ public:
 public:
 	bool IsBound() const;
 
-	bool Contains(UObject* InObject, MonoMethod* InMonoMethod) const;
+	bool Contains(UObject* InObject, MonoObject* InMonoDelegate) const;
 
-	void Add(UObject* InObject, MonoMethod* InMonoMethod);
+	void Add(UObject* InObject, MonoObject* InMonoDelegate);
 
-	void AddUnique(UObject* InObject, MonoMethod* InMonoMethod);
+	void AddUnique(UObject* InObject, MonoObject* InMonoDelegate);
 
-	void Remove(UObject* InObject, MonoMethod* InMonoMethod);
+	void Remove(UObject* InObject, MonoObject* InMonoDelegate);
 
 	void RemoveAll(UObject* InObject);
 

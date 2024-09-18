@@ -13,7 +13,7 @@ public:
 	explicit FCSharpDelegateDescriptor(UFunction* InFunction);
 
 public:
-	bool CallDelegate(const UObject* InObject, MonoMethod* InMethod, void* InParams);
+	bool CallDelegate(const UObject* InObject, MonoObject* InDelegate, void* InParams);
 
 	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute0(const FScriptDelegate* InScriptDelegate) const;
