@@ -12,6 +12,8 @@
 
 #define DEFAULT_GAME_NAME FString(TEXT("Game"))
 
+#define DEFAULT_CUSTOM_PROJECT_NAME FString(TEXT("CustomProject"))
+
 #define CODE_ANALYSIS_NAME FString(TEXT("CodeAnalysis"))
 
 #define SOURCE_GENERATOR_NAME FString(TEXT("SourceGenerator"))
