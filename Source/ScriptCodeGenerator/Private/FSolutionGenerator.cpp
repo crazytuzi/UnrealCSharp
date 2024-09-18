@@ -106,7 +106,7 @@ void FSolutionGenerator::Generator()
 			}
 			else
 			{
-				FNotificationInfo Info(FText::FromString(TEXT("Can`t find ")));
+				FNotificationInfo Info(FText::FromString(FString(TEXT("Can`t find the custom project : ")) + CustomProject.Name));
 				Info.FadeInDuration = 2.0f;
 				Info.ExpireDuration = 2.0f;
 				Info.FadeOutDuration = 2.0f;
