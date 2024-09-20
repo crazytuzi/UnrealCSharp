@@ -529,10 +529,21 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>()) 
 	{
-		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects()) {
-			if (Name == Splits[0] || (Splits[0] == NAMESPACE_SCRIPT && Name == Splits[1])) 
+		for (const auto& [PluginName] : UnrealCSharpSetting->GetCustomProjects())
+		{
+			if (PluginName == Splits[0] || (Splits[0] == NAMESPACE_SCRIPT && PluginName == Splits[1]))
 			{
-				return GetFullScriptDirectory() / Name	/ PROXY_NAME;
+				return GetFullScriptDirectory() / PluginName / PROXY_NAME;
+			}
+			if (TSharedPtr<IPlugin> CustomProjectPlugin = IPluginManager::Get().FindPlugin(PluginName))
+			{
+				for (const auto& ModuleDescriptor : CustomProjectPlugin->GetDescriptor().Modules)
+				{
+					if (ModuleDescriptor.Name == Splits[0] || (Splits[0] == NAMESPACE_SCRIPT && ModuleDescriptor.Name == Splits[1]))
+					{
+						return GetFullScriptDirectory() / PluginName / PROXY_NAME;
+					}
+				}
 			}
 		}
 	}
