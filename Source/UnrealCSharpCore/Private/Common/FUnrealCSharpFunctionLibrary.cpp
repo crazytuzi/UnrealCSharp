@@ -71,10 +71,10 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InModuleName)
 {
 	auto ModuleName = InModuleName;
 
-	if (constexpr char ReplaceProjectModuleName[] = "/Game";
+	if (constexpr char ReplaceProjectModuleName[] = "/Game/";
 		ModuleName.StartsWith(ReplaceProjectModuleName))
 	{
-		constexpr auto ReplaceProjectModuleNameLength = sizeof(ReplaceProjectModuleName) - 1;
+		constexpr auto ReplaceProjectModuleNameLength = sizeof(ReplaceProjectModuleName) - 2;
 
 		const auto Size_ModuleName = ModuleName.Len();
 
