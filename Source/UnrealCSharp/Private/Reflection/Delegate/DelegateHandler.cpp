@@ -49,6 +49,11 @@ void UDelegateHandler::Deinitialize()
 
 		DelegateDescriptor = nullptr;
 	}
+
+	if (DelegateWrapper.GCHandle.IsValid())
+	{
+		FGarbageCollectionHandle::Free<false>(DelegateWrapper.GCHandle);
+	}
 }
 
 void UDelegateHandler::Bind(UObject* InObject, MonoObject* InMonoDelegate)
@@ -61,7 +66,7 @@ void UDelegateHandler::Bind(UObject* InObject, MonoObject* InMonoDelegate)
 		}
 	}
 
-	DelegateWrapper = {InObject, InMonoDelegate };
+	DelegateWrapper = {InObject, InMonoDelegate, FGarbageCollectionHandle::NewRef(InMonoDelegate, true) };
 }
 
 bool UDelegateHandler::IsBound() const

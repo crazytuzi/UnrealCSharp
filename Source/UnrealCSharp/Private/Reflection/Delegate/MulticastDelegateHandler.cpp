@@ -9,7 +9,7 @@ void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 	{
 		if (DelegateDescriptor != nullptr)
 		{
-			for (const auto& [Key, Value] : DelegateWrappers)
+			for (const auto& [Key, Value, GC] : DelegateWrappers)
 			{
 				DelegateDescriptor->CallDelegate(Key.Get(), Value, Parms);
 			}
@@ -58,6 +58,10 @@ void UMulticastDelegateHandler::Deinitialize()
 		DelegateDescriptor = nullptr;
 	}
 
+	for (auto& Delegate : DelegateWrappers) 
+	{
+		FGarbageCollectionHandle::Free<false>(Delegate.GCHandle);
+	}
 	DelegateWrappers.Empty();
 
 	ScriptDelegate.Unbind();
@@ -86,8 +90,8 @@ void UMulticastDelegateHandler::Add(UObject* InObject, MonoObject* InMonoDelegat
 			MulticastScriptDelegate->Add(ScriptDelegate);
 		}
 	}
-
-	DelegateWrappers.Add({InObject, InMonoDelegate});
+;
+	DelegateWrappers.Add({InObject, InMonoDelegate, FGarbageCollectionHandle::NewRef(InMonoDelegate, true) });
 }
 
 void UMulticastDelegateHandler::AddUnique(UObject* InObject, MonoObject* InMonoDelegate)
@@ -103,8 +107,7 @@ void UMulticastDelegateHandler::AddUnique(UObject* InObject, MonoObject* InMonoD
 			MulticastScriptDelegate->Add(ScriptDelegate);
 		}
 	}
-
-	DelegateWrappers.AddUnique({InObject, InMonoDelegate});
+	DelegateWrappers.AddUnique({InObject, InMonoDelegate, FGarbageCollectionHandle::NewRef(InMonoDelegate, true) });
 }
 
 void UMulticastDelegateHandler::Remove(UObject* InObject, MonoObject* InMonoDelegate)
