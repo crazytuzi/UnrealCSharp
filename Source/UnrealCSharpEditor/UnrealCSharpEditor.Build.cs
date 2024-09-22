@@ -46,6 +46,7 @@ public class UnrealCSharpEditor : ModuleRules
 				"MainFrame",
 				"DesktopPlatform",
 				"EditorStyle",
+				"DeveloperToolSettings",
 				"ScriptCodeGenerator",
 				"Compiler",
 				"UnrealCSharpCore",

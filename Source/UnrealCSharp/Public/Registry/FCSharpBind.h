@@ -38,7 +38,7 @@ public:
 	template <typename T>
 	static auto Bind(MonoObject* InMonoObject);
 
-	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
+	static bool Bind(FDomain* InDomain, FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
 	static bool BindClassDefaultObject(FDomain* InDomain, UObject* InObject);
 
@@ -48,7 +48,8 @@ private:
 
 	static bool BindImplementation(FDomain* InDomain, UStruct* InStruct);
 
-	static bool BindImplementation(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
+	static bool BindImplementation(FDomain* InDomain, FClassDescriptor* InClassDescriptor,
+	                               UClass* InClass, UFunction* InFunction);
 
 	template <typename T>
 	static auto BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);

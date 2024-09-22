@@ -464,6 +464,58 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
 }
 #endif
 
+bool FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction()
+{
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->EnableCallOverrideFunction();
+	}
+
+	return false;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetOverrideFunctionNamePrefix()
+{
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->GetOverrideFunctionNamePrefix();
+	}
+
+	return DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetOverrideFunctionNameSuffix()
+{
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->GetOverrideFunctionNameSuffix();
+	}
+
+	return DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(const FString& InFunctionName)
+{
+	return FString::Printf(TEXT(
+		"%s%s%s"
+	),
+	                       *GetOverrideFunctionNamePrefix(),
+	                       *InFunctionName,
+	                       *GetOverrideFunctionNameSuffix()
+	);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(const FName& InFunctionName)
+{
+	return FString::Printf(TEXT(
+		"%s%s%s"
+	),
+	                       *GetOverrideFunctionNamePrefix(),
+	                       *InFunctionName.ToString(),
+	                       *GetOverrideFunctionNameSuffix()
+	);
+}
+
 FString FUnrealCSharpFunctionLibrary::GetBindingDirectory()
 {
 	return BINDING_NAME;
@@ -630,6 +682,18 @@ FString FUnrealCSharpFunctionLibrary::GetSourceGeneratorPath()
 FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
 {
 	return GetFullScriptDirectory() / WEAVERS_NAME;
+}
+#endif
+
+#if WITH_EDITOR
+bool FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment()
+{
+	if (const auto UnrealCSharpEditorSetting = GetMutableDefaultSafe<UUnrealCSharpEditorSetting>())
+	{
+		return UnrealCSharpEditorSetting->IsGenerateFunctionComment();
+	}
+
+	return false;
 }
 #endif
 

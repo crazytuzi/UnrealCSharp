@@ -62,6 +62,8 @@ public:
 
 	const TArray<TSubclassOf<UObject>>& GetSupportedAssetClass() const;
 
+	bool IsGenerateFunctionComment() const;
+
 	UFUNCTION()
 	TArray<FString> GetModuleList();
 #endif
@@ -98,6 +100,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	TArray<TSubclassOf<UObject>> SupportedAssetClass;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bIsGenerateFunctionComment;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bEnableExport;

@@ -12,6 +12,10 @@
 
 #define DEFAULT_GAME_NAME FString(TEXT("Game"))
 
+#define DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX FString(TEXT(""))
+
+#define DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX FString(TEXT("_Override"))
+
 #define CODE_ANALYSIS_NAME FString(TEXT("CodeAnalysis"))
 
 #define SOURCE_GENERATOR_NAME FString(TEXT("SourceGenerator"))
