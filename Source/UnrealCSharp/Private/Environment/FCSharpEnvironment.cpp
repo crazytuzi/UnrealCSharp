@@ -8,7 +8,7 @@
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
 
-#if !PLATFORM_WINDOWS
+#if PLATFORM_MAC
 TMap<int32, struct sigaction> SignalDefaultAction;
 #endif
 
@@ -19,9 +19,7 @@ void SignalHandler(int32 Signal)
 		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
-#if PLATFORM_WINDOWS
-	signal(Signal,SIG_DFL);
-#else
+#if PLATFORM_MAC
 	sigaction(Signal, &SignalDefaultAction[Signal], nullptr);
 #endif
 }
@@ -107,9 +105,7 @@ void FCSharpEnvironment::Initialize()
 
 	for (const auto SignalType : SignalTypes)
 	{
-#if PLATFORM_WINDOWS
-		signal(SignalType, SignalHandler);
-#else
+#if PLATFORM_MAC
 		struct sigaction Action;
 		FMemory::Memzero(&Action, sizeof(struct sigaction));
 		Action.sa_handler = SignalHandler;
@@ -122,6 +118,8 @@ void FCSharpEnvironment::Initialize()
 		{
 			sigaction(SignalType, &Action, nullptr);
 		}
+#else
+		signal(SignalType, SignalHandler);
 #endif
 	}
 
