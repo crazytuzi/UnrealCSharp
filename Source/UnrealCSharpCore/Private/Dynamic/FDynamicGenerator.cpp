@@ -25,6 +25,8 @@ void FDynamicGenerator::Generator()
 		FDynamicInterfaceGenerator::Generator();
 
 		FDynamicClassGenerator::Generator();
+
+		FDynamicGeneratorCore::Generator();
 	});
 
 #if WITH_EDITOR

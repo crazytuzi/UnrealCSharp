@@ -1,6 +1,7 @@
 #include "Dynamic/FDynamicStructGenerator.h"
 #include "Bridge/FTypeBridge.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicClassGenerator.h"
@@ -22,7 +23,35 @@ void FDynamicStructGenerator::Generator()
 	FDynamicGeneratorCore::Generator(CLASS_U_STRUCT_ATTRIBUTE,
 	                                 [](MonoClass* InMonoClass)
 	                                 {
-		                                 Generator(InMonoClass);
+		                                 if (InMonoClass == nullptr)
+		                                 {
+			                                 return;
+		                                 }
+
+		                                 const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+		                                 auto Node = FDynamicDependencyGraph::FNode(ClassName, [InMonoClass]()
+		                                 {
+			                                 Generator(InMonoClass);
+		                                 });
+
+		                                 if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
+		                                 {
+			                                 if (FDynamicGeneratorCore::ClassHasAttr(
+				                                 ParentMonoClass, CLASS_U_STRUCT_ATTRIBUTE))
+			                                 {
+				                                 const auto ParentClassName = FString(
+					                                 FMonoDomain::Class_Get_Name(ParentMonoClass));
+
+				                                 Node.Dependency(FDynamicDependencyGraph::FDependency{
+					                                 ParentClassName, false
+				                                 });
+			                                 }
+		                                 }
+
+		                                 FDynamicGeneratorCore::GeneratorProperty(InMonoClass, Node);
+
+		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
 }
 
@@ -48,7 +77,7 @@ bool FDynamicStructGenerator::IsDynamicStruct(MonoClass* InMonoClass)
 
 MonoClass* FDynamicStructGenerator::GetMonoClass(const FString& InName)
 {
-	static auto F = TBaseStructure<FVector>::Get()->GetPrefixCPP();
+	static auto F = STRUCT_PREFIX;
 
 	return FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), F + InName);
 }
@@ -121,6 +150,8 @@ void FDynamicStructGenerator::Generator(MonoClass* InMonoClass)
 		ScriptStruct->Guid = FGuid::NewGuid();
 	}
 #endif
+
+	FDynamicGeneratorCore::Completed(ClassName);
 }
 
 bool FDynamicStructGenerator::IsDynamicStruct(const UScriptStruct* InScriptStruct)

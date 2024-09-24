@@ -1,5 +1,6 @@
 #pragma once
 
+#include "FDynamicDependencyGraph.h"
 #include "mono/metadata/details/reflection-types.h"
 
 class FDynamicGeneratorCore
@@ -16,6 +17,24 @@ public:
 
 	static const FString& DynamicReInstanceBaseName();
 #endif
+
+	static void AddNode(const FDynamicDependencyGraph::FNode& InNode);
+
+	static bool IsCompleted(const FString& InName);
+
+	static void Completed(const FString& InName);
+
+	static void OnCompleted(const FString& InName, const TFunction<void()>& InOnCompleted);
+
+	static void Generator();
+
+	static void GeneratorField(MonoReflectionType* InMonoReflectionType, FDynamicDependencyGraph::FNode& OutNode);
+
+	static void GeneratorProperty(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);
+
+	static void GeneratorFunction(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);
+
+	static bool ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName);
 
 	static void Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator);
 

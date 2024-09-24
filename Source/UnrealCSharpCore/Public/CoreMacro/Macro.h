@@ -64,4 +64,12 @@
 
 #define DYNAMIC FString(TEXT("Dynamic"))
 
+#define ACTOR_PREFIX AActor::StaticClass()->GetPrefixCPP()
+
+#define OBJECT_PREFIX UObject::StaticClass()->GetPrefixCPP()
+
+#define INTERFACE_PREFIX UInterface::StaticClass()->GetPrefixCPP()
+
+#define STRUCT_PREFIX TBaseStructure<FVector>::Get()->GetPrefixCPP()
+
 #define PLACEHOLDER _

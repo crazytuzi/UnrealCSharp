@@ -1,4 +1,5 @@
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "Dynamic/FDynamicDependencyGraph.h"
 #include "Bridge/FTypeBridge.h"
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/MonoMacro.h"
@@ -251,6 +252,244 @@ const FString& FDynamicGeneratorCore::DynamicReInstanceBaseName()
 	return DynamicReInstance;
 }
 #endif
+
+void FDynamicGeneratorCore::AddNode(const FDynamicDependencyGraph::FNode& InNode)
+{
+	FDynamicDependencyGraph::Get().AddNode(InNode);
+}
+
+bool FDynamicGeneratorCore::IsCompleted(const FString& InName)
+{
+	return FDynamicDependencyGraph::Get().IsCompleted(InName);
+}
+
+void FDynamicGeneratorCore::Completed(const FString& InName)
+{
+	FDynamicDependencyGraph::Get().Completed(InName);
+}
+
+void FDynamicGeneratorCore::OnCompleted(const FString& InName, const TFunction<void()>& InOnCompleted)
+{
+	FDynamicDependencyGraph::Get().OnCompleted(InName, InOnCompleted);
+}
+
+void FDynamicGeneratorCore::Generator()
+{
+	FDynamicDependencyGraph::Get().Generator();
+}
+
+void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionType,
+                                           FDynamicDependencyGraph::FNode& OutNode)
+{
+	const auto InMonoType = FMonoDomain::Reflection_Type_Get_Type(
+		FTypeBridge::GetType(InMonoReflectionType));
+
+	const auto InMonoClass = FMonoDomain::Type_Get_Class(InMonoType);
+
+	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SUB_CLASS_OF))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+
+			return;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
+		FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass())))
+	{
+		if (InMonoClass == FoundMonoClass ||
+			FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			if (ClassHasAttr(InMonoClass, CLASS_U_CLASS_ATTRIBUTE))
+			{
+				OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, true});
+			}
+
+			return;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SCRIPT_INTERFACE))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+
+			return;
+		}
+	}
+
+	if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FMonoDomain::Get_Enum_Class(), false))
+	{
+		if (ClassHasAttr(InMonoClass, CLASS_U_ENUM_ATTRIBUTE))
+		{
+			OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
+		}
+
+		return;
+	}
+
+	if (FMonoDomain::Class_Get_Method_From_Name(
+		InMonoClass, FUNCTION_STATIC_STRUCT, 0))
+	{
+		if (ClassHasAttr(InMonoClass, CLASS_U_STRUCT_ATTRIBUTE))
+		{
+			OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
+		}
+
+		return;
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_WEAK_OBJECT_PTR))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+
+			return;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_LAZY_OBJECT_PTR))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+
+			return;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_CLASS_PTR))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+
+			return;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_OBJECT_PTR))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+
+			return;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_MAP))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType, 1), OutNode);
+
+			return;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SET))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+
+			return;
+		}
+	}
+
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_ARRAY))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+		}
+	}
+}
+
+void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode)
+{
+	if (InMonoClass == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_PROPERTY_ATTRIBUTE);
+
+	void* Iterator = nullptr;
+
+	while (const auto Property = FMonoDomain::Class_Get_Properties(InMonoClass, &Iterator))
+	{
+		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Property(InMonoClass, Property))
+		{
+			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			{
+				const auto PropertyType = FMonoDomain::Property_Get_Type(Property);
+
+				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
+
+				GeneratorField(ReflectionType, OutNode);
+			}
+		}
+	}
+}
+
+void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode)
+{
+	if (InMonoClass == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_FUNCTION_ATTRIBUTE);
+
+	void* MethodIterator = nullptr;
+
+	while (const auto Method = FMonoDomain::Class_Get_Methods(InMonoClass, &MethodIterator))
+	{
+		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Method(Method))
+		{
+			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			{
+				const auto Signature = FMonoDomain::Method_Signature(Method);
+
+				void* ParamIterator = nullptr;
+
+				while (const auto Param = FMonoDomain::Signature_Get_Params(Signature, &ParamIterator))
+				{
+					const auto ReflectionType = FMonoDomain::Type_Get_Object(Param);
+
+					GeneratorField(ReflectionType, OutNode);
+				}
+			}
+		}
+	}
+}
+
+bool FDynamicGeneratorCore::ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName)
+{
+	return AttrsHasAttr(FMonoDomain::Custom_Attrs_From_Class(InMonoClass), InAttributeName);
+}
 
 void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator)
 {
@@ -959,8 +1198,8 @@ void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* In
 
 				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
 
-				const auto CppProperty = FTypeBridge::Factory(ReflectionType, InField, PropertyName,
-				                                              EObjectFlags::RF_Public);
+				const auto CppProperty = FTypeBridge::Factory<true>(ReflectionType, InField, PropertyName,
+				                                                    EObjectFlags::RF_Public);
 
 				SetPropertyFlags(CppProperty, Attrs);
 
@@ -1038,8 +1277,8 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* In
 				{
 					const auto ReturnParamReflectionType = FMonoDomain::Type_Get_Object(ReturnParamType);
 
-					if (const auto Property = FTypeBridge::Factory(ReturnParamReflectionType, Function, "",
-					                                               RF_Public | RF_Transient))
+					if (const auto Property = FTypeBridge::Factory<true>(ReturnParamReflectionType, Function, "",
+					                                                     RF_Public | RF_Transient))
 					{
 						Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
 
@@ -1051,10 +1290,10 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* In
 
 				for (auto Index = ParamDescriptors.Num() - 1; Index >= 0; --Index)
 				{
-					const auto Property = FTypeBridge::Factory(ParamDescriptors[Index].ReflectionType,
-					                                           Function,
-					                                           ParamDescriptors[Index].Name,
-					                                           RF_Public | RF_Transient);
+					const auto Property = FTypeBridge::Factory<true>(ParamDescriptors[Index].ReflectionType,
+					                                                 Function,
+					                                                 ParamDescriptors[Index].Name,
+					                                                 RF_Public | RF_Transient);
 
 					Property->SetPropertyFlags(CPF_Parm);
 
