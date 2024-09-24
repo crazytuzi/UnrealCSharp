@@ -87,6 +87,13 @@ namespace Script.Library
             byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FFunction_GenericCall16Implementation(nint InMonoObject, uint InFunctionHash);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FFunction_GenericCall18Implementation(nint InMonoObject, uint InFunctionHash,
+            byte* InBuffer);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FFunction_GenericCall24Implementation(nint InMonoObject, uint InFunctionHash);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
