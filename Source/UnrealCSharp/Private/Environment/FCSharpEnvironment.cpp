@@ -9,7 +9,7 @@
 #include <signal.h>
 
 #if PLATFORM_MAC
-TMap<int32, struct sigaction> SignalDefaultAction;
+TMap<int32, struct sigaction> SignalActions;
 #endif
 
 void SignalHandler(int32 Signal)
@@ -21,9 +21,8 @@ void SignalHandler(int32 Signal)
 	GLog->Flush();
 
 #if PLATFORM_MAC
-	sigaction(Signal, &SignalDefaultAction[Signal], nullptr);
+	sigaction(Signal, &SignalActions[Signal], nullptr);
 #endif
-
 }
 
 FCSharpEnvironment FCSharpEnvironment::Environment;
@@ -108,17 +107,21 @@ void FCSharpEnvironment::Initialize()
 	for (const auto SignalType : SignalTypes)
 	{
 #if PLATFORM_MAC
-		struct sigaction Action;
-		FMemory::Memzero(&Action, sizeof(struct sigaction));
-		Action.sa_handler = SignalHandler;
-		sigemptyset(&Action.sa_mask);
-		if (!SignalDefaultAction.Contains(SignalType))
+		struct sigaction SigAction;
+
+		FMemory::Memzero(&SigAction, sizeof(struct sigaction));
+
+		SigAction.sa_handler = SignalHandler;
+
+		sigemptyset(&SigAction.sa_mask);
+
+		if (!SignalActions.Contains(SignalType))
 		{
-			sigaction(SignalType, &Action, &SignalDefaultAction.Add(SignalType));
+			sigaction(SignalType, &SigAction, &SignalActions.Add(SignalType));
 		}
 		else
 		{
-			sigaction(SignalType, &Action, nullptr);
+			sigaction(SignalType, &SigAction, nullptr);
 		}
 #else
 		signal(SignalType, SignalHandler);
