@@ -19,9 +19,11 @@ void SignalHandler(int32 Signal)
 		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
+
 #if PLATFORM_MAC
 	sigaction(Signal, &SignalDefaultAction[Signal], nullptr);
 #endif
+
 }
 
 FCSharpEnvironment FCSharpEnvironment::Environment;
