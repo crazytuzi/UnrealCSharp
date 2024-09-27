@@ -157,7 +157,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 
 		void* Object = nullptr;
 
-		PropertyDescriptors[Index]->Get(PropertyAddress, &Object, false);
+		PropertyDescriptors[Index]->Get<std::false_type>(PropertyAddress, &Object);
 
 		ARRAY_SET(CSharpParams, MonoObject*, Index, static_cast<MonoObject*>(Object));
 	}

@@ -9,7 +9,14 @@ public:
 	virtual ~FPropertyDescriptor() = default;
 
 public:
-	virtual void Get(void* Src, void** Dest, bool bIsCopy) const;
+	template <typename BoolConstant>
+	auto Get(void* Src, void** Dest) const;
+
+	virtual void Get(void* Src, void** Dest) const;
+
+	virtual void Get(void* Src, void** Dest, std::true_type) const;
+
+	virtual void Get(void* Src, void** Dest, std::false_type) const;
 
 	virtual void Get(void* Src, void* Dest) const;
 

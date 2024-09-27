@@ -2,42 +2,38 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
 
-void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest, bool bIsCopy) const
+void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	if (Property != nullptr)
-	{
-		*Dest = NewWeakRef(Src);
-	}
+	*Dest = NewWeakRef(Src);
+}
+
+void FMulticastDelegatePropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+{
+	*Dest = NewWeakRef(Src);
 }
 
 void FMulticastDelegatePropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	if (Property != nullptr)
-	{
-		*static_cast<void**>(Dest) = NewRef(Src);
-	}
+	*static_cast<void**>(Dest) = NewRef(Src);
 }
 
 void FMulticastDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (Property != nullptr)
-	{
-		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
-		const auto SrcMulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
-			FMulticastDelegateHelper>(SrcGarbageCollectionHandle);
+	const auto SrcMulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
+		FMulticastDelegateHelper>(SrcGarbageCollectionHandle);
 
-		Property->InitializeValue(Dest);
+	Property->InitializeValue(Dest);
 
-		const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest));
+	const auto MulticastScriptDelegate = const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(Dest));
 
-		FScriptDelegate ScriptDelegate;
+	FScriptDelegate ScriptDelegate;
 
-		ScriptDelegate.BindUFunction(SrcMulticastDelegateHelper->GetUObject(),
-		                             SrcMulticastDelegateHelper->GetFunctionName());
+	ScriptDelegate.BindUFunction(SrcMulticastDelegateHelper->GetUObject(),
+	                             SrcMulticastDelegateHelper->GetFunctionName());
 
-		MulticastScriptDelegate->Add(ScriptDelegate);
-	}
+	MulticastScriptDelegate->Add(ScriptDelegate);
 }
 
 const FMulticastScriptDelegate* FMulticastDelegatePropertyDescriptor::GetMulticastDelegate(void* InAddress) const

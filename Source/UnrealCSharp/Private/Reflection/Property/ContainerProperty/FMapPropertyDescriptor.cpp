@@ -2,35 +2,31 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FMapHelper.h"
 
-void FMapPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
+void FMapPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	if (Property != nullptr)
-	{
-		*Dest = NewWeakRef(Src, bIsCopy);
-	}
+	*Dest = NewWeakRef(Src, true);
+}
+
+void FMapPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+{
+	*Dest = NewWeakRef(Src, false);
 }
 
 void FMapPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	if (Property != nullptr)
-	{
-		*static_cast<void**>(Dest) = NewRef(Src);
-	}
+	*static_cast<void**>(Dest) = NewRef(Src);
 }
 
 void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (Property != nullptr)
-	{
-		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-			SrcGarbageCollectionHandle);
+	const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
+		SrcGarbageCollectionHandle);
 
-		Property->InitializeValue(Dest);
+	Property->InitializeValue(Dest);
 
-		Property->CopyCompleteValue(Dest, SrcContainer->GetScriptMap());
-	}
+	Property->CopyCompleteValue(Dest, SrcContainer->GetScriptMap());
 }
 
 MonoObject* FMapPropertyDescriptor::NewRef(void* InAddress) const
