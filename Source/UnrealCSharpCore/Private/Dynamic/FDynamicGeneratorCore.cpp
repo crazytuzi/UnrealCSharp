@@ -505,28 +505,40 @@ void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunctio
 	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
 
-	void* InParams[2] = {
-		AttributeMonoReflectionType,
-		FMonoDomain::GCHandle_Get_Target_V2(FMonoDomain::AssemblyGCHandles[1])
-	};
+	auto bIsUEAssemblyGCHandle = true;
 
-	const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
-		UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
-
-	const auto Types = reinterpret_cast<MonoArray*>(FMonoDomain::Runtime_Invoke(
-		GetTypesWithAttributeMethod, nullptr, InParams));
-
-	const auto Length = FMonoDomain::Array_Length(Types);
-
-	for (auto Index = 0; Index < Length; ++Index)
+	for (const auto& AssemblyGCHandle : FMonoDomain::AssemblyGCHandles)
 	{
-		const auto ReflectionType = ARRAY_GET(Types, MonoReflectionType*, Index);
+		if (bIsUEAssemblyGCHandle)
+		{
+			bIsUEAssemblyGCHandle = false;
+		}
+		else
+		{
+			void* InParams[2] = {
+				AttributeMonoReflectionType,
+				FMonoDomain::GCHandle_Get_Target_V2(AssemblyGCHandle)
+			};
 
-		const auto Type = FMonoDomain::Reflection_Type_Get_Type(ReflectionType);
+			const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
+				UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
 
-		const auto Class = FMonoDomain::Type_Get_Class(Type);
+			const auto Types = reinterpret_cast<MonoArray*>(FMonoDomain::Runtime_Invoke(
+				GetTypesWithAttributeMethod, nullptr, InParams));
 
-		InGenerator(Class);
+			const auto Length = FMonoDomain::Array_Length(Types);
+
+			for (auto Index = 0; Index < Length; ++Index)
+			{
+				const auto ReflectionType = ARRAY_GET(Types, MonoReflectionType*, Index);
+
+				const auto Type = FMonoDomain::Reflection_Type_Get_Type(ReflectionType);
+
+				const auto Class = FMonoDomain::Type_Get_Class(Type);
+
+				InGenerator(Class);
+			}
+		}
 	}
 }
 
