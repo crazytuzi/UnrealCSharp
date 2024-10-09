@@ -149,7 +149,10 @@ void FCSharpCompilerRunnable::DoWork()
 {
 	Compile([&]()
 	{
-		FDynamicGenerator::Generator(FileChanges);
+		if (!GExitPurge)
+		{
+			FDynamicGenerator::Generator(FileChanges);
+		}
 
 		FileChanges.Empty();
 	});
