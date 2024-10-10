@@ -95,7 +95,7 @@ auto FCSharpBind::BindImplementation(FDomain* InDomain, UObject* InObject) -> Mo
 template <typename T>
 auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 {
-	const auto Property = FTypeBridge::Factory(InReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+	const auto Property = FTypeBridge::Factory<>(InReflectionType, nullptr, "", EObjectFlags::RF_Transient);
 
 	Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
@@ -110,12 +110,12 @@ template <typename T>
 auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
                                      MonoReflectionType* InValueReflectionType)
 {
-	const auto KeyProperty = FTypeBridge::Factory(InKeyReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+	const auto KeyProperty = FTypeBridge::Factory<>(InKeyReflectionType, nullptr, "", EObjectFlags::RF_Transient);
 
 	KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
 	const auto ValueProperty =
-		FTypeBridge::Factory(InValueReflectionType, nullptr, "", EObjectFlags::RF_Transient);
+		FTypeBridge::Factory<>(InValueReflectionType, nullptr, "", EObjectFlags::RF_Transient);
 
 	ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 

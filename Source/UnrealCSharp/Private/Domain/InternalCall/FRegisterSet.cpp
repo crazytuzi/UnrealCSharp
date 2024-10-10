@@ -121,7 +121,7 @@ namespace
 			{
 				const auto Value = SetHelper->GetEnumerator(InIndex);
 
-				SetHelper->GetElementPropertyDescriptor()->Get(Value, ReturnBuffer);
+				SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(ReturnBuffer));
 			}
 		}
 

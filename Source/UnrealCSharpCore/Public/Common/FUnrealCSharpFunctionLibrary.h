@@ -161,6 +161,8 @@ public:
 
 	static bool IsSpecialStruct(const UScriptStruct* InScriptStruct);
 
+	static bool IsSpecialEnum(const UEnum* InEnum);
+
 	static bool IsDynamicReInstanceField(const UField* InField);
 #endif
 

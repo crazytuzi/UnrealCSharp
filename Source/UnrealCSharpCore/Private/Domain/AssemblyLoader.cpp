@@ -43,7 +43,7 @@ TArray<uint8> UAssemblyLoader::Load(const FString& InAssemblyName)
 	                                  MONO_CONFIGURATION,
 	                                  TEXT("macOS_x86_64"));
 #elif PLATFORM_MAC_ARM64
-	                                  TEXT("macOS_arm64"),
+	                                  TEXT("Mac"),
 	                                  MONO_CONFIGURATION,
 	                                  TEXT("macOS_arm64"));
 #endif

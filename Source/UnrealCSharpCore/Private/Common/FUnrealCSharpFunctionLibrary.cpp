@@ -920,7 +920,9 @@ bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
 	{
 		if (const auto ClassName = InClass->GetName();
 			ClassName.StartsWith(TEXT("SKEL_")) || ClassName.StartsWith(TEXT("PLACEHOLDER-CLASS")) ||
-			ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")))
+			ClassName.StartsWith(TEXT("REINST_")) || ClassName.StartsWith(TEXT("TRASHCLASS_")) ||
+			ClassName.StartsWith(TEXT("LIVECODING_"))
+		)
 		{
 			return true;
 		}
@@ -931,9 +933,32 @@ bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
 
 bool FUnrealCSharpFunctionLibrary::IsSpecialStruct(const UScriptStruct* InScriptStruct)
 {
-	return InScriptStruct != nullptr
-		       ? InScriptStruct->GetName().StartsWith(TEXT("STRUCT_REINST_"))
-		       : false;
+	if (InScriptStruct != nullptr)
+	{
+		if (const auto StructName = InScriptStruct->GetName();
+			StructName.StartsWith(TEXT("STRUCT_REINST_")) || StructName.StartsWith(TEXT("LIVECODING_"))
+		)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsSpecialEnum(const UEnum* InEnum)
+{
+	if (InEnum != nullptr)
+	{
+		if (const auto EnumName = InEnum->GetName();
+			EnumName.StartsWith(TEXT("LIVECODING_"))
+		)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool FUnrealCSharpFunctionLibrary::IsDynamicReInstanceField(const UField* InField)

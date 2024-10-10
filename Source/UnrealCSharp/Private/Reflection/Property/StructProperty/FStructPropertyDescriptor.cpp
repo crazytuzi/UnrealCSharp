@@ -7,12 +7,22 @@ FStructPropertyDescriptor::FStructPropertyDescriptor(FStructProperty* InProperty
 	FCSharpEnvironment::GetEnvironment().Bind<false>(InProperty->Struct);
 }
 
-void FStructPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
+void FStructPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	if (Property != nullptr)
-	{
-		*Dest = NewWeakRef(Src, bIsCopy);
-	}
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(Property->Struct, Src, Object);
+
+	*Dest = Object;
+}
+
+void FStructPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+{
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+	FCSharpEnvironment::GetEnvironment().AddStructReference<false>(Property->Struct, Src, Object);
+
+	*Dest = Object;
 }
 
 void FStructPropertyDescriptor::Get(void* Src, void* Dest) const
@@ -22,33 +32,25 @@ void FStructPropertyDescriptor::Get(void* Src, void* Dest) const
 
 void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (Property != nullptr)
+	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+
+	if (const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(
+		SrcGarbageCollectionHandle))
 	{
-		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+		Property->InitializeValue(Dest);
 
-		if (const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(
-			SrcGarbageCollectionHandle))
-		{
-			Property->InitializeValue(Dest);
-
-			Property->CopySingleValue(Dest, SrcStruct);
-		}
+		Property->CopySingleValue(Dest, SrcStruct);
 	}
 }
 
 bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
-	if (Property != nullptr)
-	{
-		const auto StructA = Property->ContainerPtrToValuePtr<void>(A);
+	const auto StructA = Property->ContainerPtrToValuePtr<void>(A);
 
-		const auto StructB = FCSharpEnvironment::GetEnvironment().GetStruct(
-			*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
+	const auto StructB = FCSharpEnvironment::GetEnvironment().GetStruct(
+		*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
 
-		return Property->Identical(StructA, StructB, PortFlags);
-	}
-
-	return false;
+	return Property->Identical(StructA, StructB, PortFlags);
 }
 
 MonoObject* FStructPropertyDescriptor::NewRef(void* InAddress) const
@@ -67,24 +69,4 @@ MonoObject* FStructPropertyDescriptor::NewRef(void* InAddress) const
 	}
 
 	return Object;
-}
-
-MonoObject* FStructPropertyDescriptor::NewWeakRef(const void* InAddress, const bool bIsCopy) const
-{
-	if (bIsCopy)
-	{
-		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
-
-		FCSharpEnvironment::GetEnvironment().AddStructReference<true>(Property->Struct, InAddress, Object);
-
-		return Object;
-	}
-	else
-	{
-		const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
-
-		FCSharpEnvironment::GetEnvironment().AddStructReference<false>(Property->Struct, InAddress, Object);
-
-		return Object;
-	}
 }

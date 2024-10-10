@@ -2,35 +2,31 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
 
-void FSetPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
+void FSetPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	if (Property != nullptr)
-	{
-		*Dest = NewWeakRef(Src, bIsCopy);
-	}
+	*Dest = NewWeakRef(Src, true);
+}
+
+void FSetPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+{
+	*Dest = NewWeakRef(Src, false);
 }
 
 void FSetPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	if (Property != nullptr)
-	{
-		*static_cast<void**>(Dest) = NewRef(Src);
-	}
+	*static_cast<void**>(Dest) = NewRef(Src);
 }
 
 void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (Property != nullptr)
-	{
-		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-			SrcGarbageCollectionHandle);
+	const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
+		SrcGarbageCollectionHandle);
 
-		Property->InitializeValue(Dest);
+	Property->InitializeValue(Dest);
 
-		Property->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
-	}
+	Property->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
 }
 
 MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const

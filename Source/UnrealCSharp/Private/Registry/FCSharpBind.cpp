@@ -1,5 +1,4 @@
 ﻿#include "Registry/FCSharpBind.h"
-#include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "Macro/FunctionMacro.h"
@@ -223,10 +222,10 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 				}
 			}
 
-			for (const auto& [PLACEHOLDER, Value] : Functions)
+			for (const auto& [Key, Value] : Functions)
 			{
 				if (const auto FoundMonoMethod = InDomain->Class_Get_Method_From_Name(
-					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(Value),
+					FoundMonoClass, FUnrealCSharpFunctionLibrary::Encode(Key),
 					Value->ReturnValueOffset != MAX_uint16
 						? Value->NumParms - 1
 						: Value->NumParms))

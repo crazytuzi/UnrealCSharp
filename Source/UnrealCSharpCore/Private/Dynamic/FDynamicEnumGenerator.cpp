@@ -20,7 +20,25 @@ void FDynamicEnumGenerator::Generator()
 	FDynamicGeneratorCore::Generator(CLASS_U_ENUM_ATTRIBUTE,
 	                                 [](MonoClass* InMonoClass)
 	                                 {
-		                                 Generator(InMonoClass);
+		                                 if (InMonoClass == nullptr)
+		                                 {
+			                                 return;
+		                                 }
+
+		                                 if (!FMonoDomain::Type_Is_Enum(FMonoDomain::Class_Get_Type(InMonoClass)))
+		                                 {
+			                                 return;
+		                                 }
+
+		                                 const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+		                                 const auto Node = FDynamicDependencyGraph::FNode(
+			                                 ClassName, [InMonoClass]()
+			                                 {
+				                                 Generator(InMonoClass);
+			                                 });
+
+		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
 }
 
@@ -98,6 +116,8 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
 		ReInstance(Enum);
 	}
 #endif
+
+	FDynamicGeneratorCore::Completed(ClassName);
 }
 
 bool FDynamicEnumGenerator::IsDynamicEnum(const UEnum* InEnum)

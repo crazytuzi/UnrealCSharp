@@ -1,5 +1,11 @@
 #pragma once
 
+template <typename BoolConstant>
+auto FPropertyDescriptor::Get(void* Src, void** Dest) const
+{
+	Get(Src, Dest, BoolConstant());
+}
+
 int32 FPropertyDescriptor::GetElementSize() const
 {
 	if (const auto Property = GetProperty())

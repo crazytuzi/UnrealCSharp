@@ -1,6 +1,7 @@
 #include "Dynamic/FDynamicInterfaceGenerator.h"
 #include "Bridge/FTypeBridge.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
@@ -20,7 +21,40 @@ void FDynamicInterfaceGenerator::Generator()
 	FDynamicGeneratorCore::Generator(CLASS_U_INTERFACE_ATTRIBUTE,
 	                                 [](MonoClass* InMonoClass)
 	                                 {
-		                                 Generator(InMonoClass);
+		                                 if (InMonoClass == nullptr)
+		                                 {
+			                                 return;
+		                                 }
+
+		                                 if (!FMonoDomain::Type_Is_Class(FMonoDomain::Class_Get_Type(InMonoClass)))
+		                                 {
+			                                 return;
+		                                 }
+
+		                                 const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+		                                 auto Node = FDynamicDependencyGraph::FNode(ClassName, [InMonoClass]()
+		                                 {
+			                                 Generator(InMonoClass);
+		                                 });
+
+		                                 if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
+		                                 {
+			                                 if (FDynamicGeneratorCore::ClassHasAttr(
+				                                 ParentMonoClass, CLASS_U_INTERFACE_ATTRIBUTE))
+			                                 {
+				                                 const auto ParentClassName = FString(
+					                                 FMonoDomain::Class_Get_Name(ParentMonoClass));
+
+				                                 Node.Dependency(FDynamicDependencyGraph::FDependency{
+					                                 ParentClassName, false
+				                                 });
+			                                 }
+		                                 }
+
+		                                 FDynamicGeneratorCore::GeneratorFunction(InMonoClass, Node);
+
+		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
 }
 
@@ -46,7 +80,7 @@ bool FDynamicInterfaceGenerator::IsDynamicInterface(MonoClass* InMonoClass)
 
 MonoClass* FDynamicInterfaceGenerator::GetMonoClass(const FString& InName)
 {
-	static auto U = UInterface::StaticClass()->GetPrefixCPP();
+	static auto U = INTERFACE_PREFIX;
 
 	return FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), U + InName);
 }
@@ -115,6 +149,8 @@ void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
 		ReInstance(Class);
 	}
 #endif
+
+	FDynamicGeneratorCore::Completed(ClassName);
 }
 
 bool FDynamicInterfaceGenerator::IsDynamicInterface(const UClass* InClass)

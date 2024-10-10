@@ -11,13 +11,22 @@ public:
 	using Super = TPropertyDescriptor<T, false>;
 
 public:
-	virtual auto Get(void* Src, void** Dest, bool bIsCopy) const -> void override
+	virtual auto Get(void* Src, void** Dest) const -> void override
+	{
+		Super::template Get<std::false_type>(Src, Dest);
+	}
+
+	virtual auto Get(void* Src, void** Dest, std::true_type) const -> void override
+	{
+	}
+
+	virtual auto Get(void* Src, void** Dest, std::false_type) const -> void override
 	{
 	}
 
 	virtual auto Get(void* Src, void* Dest) const -> void override
 	{
-		Get(Src, static_cast<void**>(Dest), false);
+		Super::template Get<std::false_type>(Src, static_cast<void**>(Dest));
 	}
 
 	virtual auto CopyValue(const void* InAddress) const -> void* override

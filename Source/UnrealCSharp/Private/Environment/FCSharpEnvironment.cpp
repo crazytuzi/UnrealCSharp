@@ -8,13 +8,21 @@
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
 
-void SignalHandler(int32)
+#if PLATFORM_MAC
+TMap<int32, struct sigaction> SignalActions;
+#endif
+
+void SignalHandler(int32 Signal)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
 	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
 		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
+
+#if PLATFORM_MAC
+	sigaction(Signal, &SignalActions[Signal], nullptr);
+#endif
 }
 
 FCSharpEnvironment FCSharpEnvironment::Environment;
@@ -98,7 +106,26 @@ void FCSharpEnvironment::Initialize()
 
 	for (const auto SignalType : SignalTypes)
 	{
+#if PLATFORM_MAC
+		struct sigaction SigAction;
+
+		FMemory::Memzero(&SigAction, sizeof(struct sigaction));
+
+		SigAction.sa_handler = SignalHandler;
+
+		sigemptyset(&SigAction.sa_mask);
+
+		if (!SignalActions.Contains(SignalType))
+		{
+			sigaction(SignalType, &SigAction, &SignalActions.Add(SignalType));
+		}
+		else
+		{
+			sigaction(SignalType, &SigAction, nullptr);
+		}
+#else
 		signal(SignalType, SignalHandler);
+#endif
 	}
 
 	FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Broadcast();

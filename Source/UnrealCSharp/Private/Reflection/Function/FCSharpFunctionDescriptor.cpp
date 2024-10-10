@@ -10,7 +10,15 @@ FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction):
 	OriginalNativeFuncPtr(nullptr),
 	Method(FCSharpEnvironment::GetEnvironment().GetDomain()->Parent_Class_Get_Method_From_Name(
 		FCSharpEnvironment::GetEnvironment().GetClassDescriptor(InFunction->GetOwnerClass())->GetMonoClass(),
-		TCHAR_TO_UTF8(*FUnrealCSharpFunctionLibrary::Encode(InFunction)),
+		TCHAR_TO_UTF8(
+			InFunction->HasAnyFunctionFlags(FUNC_Net)
+			? *FString::Printf(TEXT(
+					"%s_Implementation"
+				),
+				*FUnrealCSharpFunctionLibrary::Encode(InFunction))
+
+			: *FUnrealCSharpFunctionLibrary::Encode(InFunction)
+		),
 		PropertyDescriptors.Num()))
 {
 }
@@ -157,7 +165,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 
 		void* Object = nullptr;
 
-		PropertyDescriptors[Index]->Get(PropertyAddress, &Object, false);
+		PropertyDescriptors[Index]->Get<std::false_type>(PropertyAddress, &Object);
 
 		ARRAY_SET(CSharpParams, MonoObject*, Index, static_cast<MonoObject*>(Object));
 	}

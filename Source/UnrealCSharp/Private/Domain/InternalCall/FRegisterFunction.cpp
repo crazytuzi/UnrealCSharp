@@ -262,6 +262,32 @@ namespace
 			}
 		}
 
+		static void GenericCall16Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                        const uint32 InFunctionHash)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
+					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				{
+					FunctionDescriptor->Call16<>(FoundObject);
+				}
+			}
+		}
+
+		static void GenericCall18Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                        const uint32 InFunctionHash, uint8* InBuffer)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
+					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				{
+					FunctionDescriptor->Call18<>(FoundObject, InBuffer);
+				}
+			}
+		}
+
 		static void GenericCall24Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
 		                                        const uint32 InFunctionHash)
 		{
@@ -310,6 +336,8 @@ namespace
 				.Function("GenericCall14", GenericCall14Implementation)
 				.Function("PrimitiveCall15", PrimitiveCall15Implementation)
 				.Function("CompoundCall15", CompoundCall15Implementation)
+				.Function("GenericCall16", GenericCall16Implementation)
+				.Function("GenericCall18", GenericCall18Implementation)
 				.Function("GenericCall24", GenericCall24Implementation)
 				.Function("GenericCall26", GenericCall26Implementation);
 		}
