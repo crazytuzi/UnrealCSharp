@@ -14,7 +14,10 @@ void FStructGenerator::Generator()
 {
 	for (TObjectIterator<UScriptStruct> ScriptStructIterator; ScriptStructIterator; ++ScriptStructIterator)
 	{
-		Generator(*ScriptStructIterator);
+		if (!Cast<UUserDefinedStruct>(*ScriptStructIterator))
+		{
+			Generator(*ScriptStructIterator);
+		}
 	}
 }
 

@@ -11,7 +11,10 @@ void FEnumGenerator::Generator()
 {
 	for (TObjectIterator<UEnum> EnumIterator; EnumIterator; ++EnumIterator)
 	{
-		Generator(*EnumIterator);
+		if (!Cast<UUserDefinedEnum>(*EnumIterator))
+		{
+			Generator(*EnumIterator);
+		}
 	}
 
 	GeneratorCollisionChannel();

@@ -10,87 +10,103 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "UEVersion.h"
+#include "Setting/UnrealCSharpEditorSetting.h"
 
 TArray<UUserDefinedEnum*> FAssetGenerator::UserDefinedEnums;
 
 void FAssetGenerator::Generator()
 {
-	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
-
-	TArray<FAssetData> OutAssetData;
-
-	AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetSupportedAssetPath(), OutAssetData, true);
-
-	for (const auto& AssetData : OutAssetData)
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
 	{
-		Generator(AssetData, true);
-	}
+		if (UnrealCSharpEditorSetting->IsGenerateAsset())
+		{
+			const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(
+				TEXT("AssetRegistry"));
 
-	for (const auto& UserDefinedEnum : UserDefinedEnums)
-	{
-		FEnumGenerator::Generator(UserDefinedEnum);
-	}
+			TArray<FAssetData> OutAssetData;
 
-	UserDefinedEnums.Empty();
+			AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetSupportedAssetPath(), OutAssetData, true);
+
+			for (const auto& AssetData : OutAssetData)
+			{
+				Generator(AssetData, true);
+			}
+
+			for (const auto& UserDefinedEnum : UserDefinedEnums)
+			{
+				FEnumGenerator::Generator(UserDefinedEnum);
+			}
+
+			UserDefinedEnums.Empty();
+		}
+	}
 }
 
 void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelayedGeneratorUserDefinedEnum)
 {
-	if (const auto AssetDataClass = InAssetData.GetClass())
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
 	{
-		if (const auto& AssetDataClassName = AssetDataClass->GetFName();
-			FGeneratorCore::GetSupportedAssetClassName().Contains(AssetDataClassName))
+		if (UnrealCSharpEditorSetting->IsGenerateAsset())
 		{
-			if (AssetDataClassName == UBlueprint::StaticClass()->GetFName() ||
-				AssetDataClassName == UWidgetBlueprint::StaticClass()->GetFName())
+			if (const auto AssetDataClass = InAssetData.GetClass())
 			{
-				if (const auto Blueprint = LoadObject<
-#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
-					UBlueprint>(nullptr, *InAssetData.GetObjectPathString()))
-#else
-					UBlueprint>(nullptr, *InAssetData.ObjectPath.ToString()))
-#endif
+				if (const auto& AssetDataClassName = AssetDataClass->GetFName();
+					FGeneratorCore::GetSupportedAssetClassName().Contains(AssetDataClassName))
 				{
-					if (const auto Class = Cast<UClass>(Blueprint->GeneratedClass))
+					if (AssetDataClassName == UBlueprint::StaticClass()->GetFName() ||
+						AssetDataClassName == UWidgetBlueprint::StaticClass()->GetFName())
 					{
-						FClassGenerator::Generator(Class);
+						if (const auto Blueprint = LoadObject<
+#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+							UBlueprint>(nullptr, *InAssetData.GetObjectPathString()))
+#else
+							UBlueprint>(nullptr, *InAssetData.ObjectPath.ToString()))
+#endif
+						{
+							if (const auto Class = Cast<UClass>(Blueprint->GeneratedClass))
+							{
+								FClassGenerator::Generator(Class);
+							}
+						}
 					}
-				}
-			}
-			else if (AssetDataClassName == UUserDefinedStruct::StaticClass()->GetFName())
-			{
-				if (const auto UserDefinedStruct = LoadObject<
-#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
-					UUserDefinedStruct>(nullptr, *InAssetData.GetObjectPathString()))
-#else
-					UUserDefinedStruct>(nullptr, *InAssetData.ObjectPath.ToString()))
-#endif
-				{
-					FStructGenerator::Generator(UserDefinedStruct);
-				}
-			}
-			else if (AssetDataClassName == UUserDefinedEnum::StaticClass()->GetFName())
-			{
-				if (const auto UserDefinedEnum = LoadObject<
-#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
-					UUserDefinedEnum>(nullptr, *InAssetData.GetObjectPathString()))
-#else
-					UUserDefinedEnum>(nullptr, *InAssetData.ObjectPath.ToString()))
-#endif
-				{
-					if (bDelayedGeneratorUserDefinedEnum)
+					else if (AssetDataClassName == UUserDefinedStruct::StaticClass()->GetFName())
 					{
-						UserDefinedEnums.Emplace(UserDefinedEnum);
+						if (const auto UserDefinedStruct = LoadObject<
+#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+							UUserDefinedStruct>(nullptr, *InAssetData.GetObjectPathString()))
+#else
+							UUserDefinedStruct>(nullptr, *InAssetData.ObjectPath.ToString()))
+#endif
+						{
+							FStructGenerator::Generator(UserDefinedStruct);
+						}
+					}
+					else if (AssetDataClassName == UUserDefinedEnum::StaticClass()->GetFName())
+					{
+						if (const auto UserDefinedEnum = LoadObject<
+#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+							UUserDefinedEnum>(nullptr, *InAssetData.GetObjectPathString()))
+#else
+							UUserDefinedEnum>(nullptr, *InAssetData.ObjectPath.ToString()))
+#endif
+						{
+							if (bDelayedGeneratorUserDefinedEnum)
+							{
+								UserDefinedEnums.Emplace(UserDefinedEnum);
+							}
+							else
+							{
+								FEnumGenerator::Generator(UserDefinedEnum);
+							}
+						}
 					}
 					else
 					{
-						FEnumGenerator::Generator(UserDefinedEnum);
+						GeneratorAsset(InAssetData);
 					}
 				}
-			}
-			else
-			{
-				GeneratorAsset(InAssetData);
 			}
 		}
 	}
