@@ -23,6 +23,7 @@ TMap<FString, TArray<FString>> FDynamicGeneratorCore::DynamicMap;
 
 TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
 {
+	CLASS_HIDE_CATEGORIES_ATTRIBUTE,
 	CLASS_BLUEPRINT_SPAWNABLE_COMPONENT_ATTRIBUTE,
 	CLASS_CHILD_CAN_TICK_ATTRIBUTE,
 	CLASS_CHILD_CANNOT_TICK_ATTRIBUTE,
@@ -1037,18 +1038,8 @@ static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
 	{
 		if (FDynamicGeneratorCore::AttrsHasAttr(InMonoCustomAttrInfo, MetaDataAttr))
 		{
-			const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), MetaDataAttr);
-
-			const auto FoundMonoObject = FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, FoundMonoClass);
-
-			const auto FoundMonoProperty = FMonoDomain::Class_Get_Property_From_Name(FoundMonoClass, TEXT("Value"));
-
-			const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
-
 			FDynamicGeneratorCore::SetMetaData(InField, MetaDataAttr,
-			                                   FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(
-				                                   FMonoDomain::Object_To_String(Value,nullptr)))));
+			                                   FDynamicGeneratorCore::AttrGetValue(InMonoCustomAttrInfo, MetaDataAttr));
 		}
 	}
 
@@ -1086,6 +1077,13 @@ void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UClass* InClass,
 			                             : ClassMetaDataAttrs,
 		                             InMonoCustomAttrInfo, [InClass, InMonoCustomAttrInfo]()
 		                             {
+			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLASS_GROUP_ATTRIBUTE))
+			                             {
+				                             SetMetaData(InClass, FString(TEXT("ClassGroupNamesAttribute")),
+				                                         *AttrGetValue(InMonoCustomAttrInfo,
+				                                                       *CLASS_CLASS_GROUP_ATTRIBUTE));
+			                             }
+
 			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_MINIMAL_API_ATTRIBUTE))
 			                             {
 				                             SetMetaData(InClass, CLASS_MINIMAL_API_ATTRIBUTE, TEXT("true"));
@@ -1185,6 +1183,20 @@ MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* InMonoCustom
 	}
 
 	return nullptr;
+}
+
+FString FDynamicGeneratorCore::AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName)
+{
+	const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttributeName);
+
+	const auto FoundMonoObject = FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, FoundMonoClass);
+
+	const auto FoundMonoProperty = FMonoDomain::Class_Get_Property_From_Name(FoundMonoClass, TEXT("Value"));
+
+	const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
+
+	return FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(FMonoDomain::Object_To_String(Value,nullptr))));
 }
 
 void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* InField,
