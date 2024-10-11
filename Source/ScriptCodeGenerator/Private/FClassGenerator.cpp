@@ -16,7 +16,10 @@ void FClassGenerator::Generator()
 {
 	for (TObjectIterator<UClass> ClassIterator; ClassIterator; ++ClassIterator)
 	{
-		Generator(*ClassIterator);
+		if (!Cast<UBlueprintGeneratedClass>(*ClassIterator))
+		{
+			Generator(*ClassIterator);
+		}
 	}
 }
 
