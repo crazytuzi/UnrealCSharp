@@ -126,9 +126,9 @@
 			} \
 			else \
 			{ \
-				OutPropertyDescriptor->Get( \
+				OutPropertyDescriptor->Get<std::true_type>( \
 					OutPropertyDescriptor->CopyValue(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
-					reinterpret_cast<void**>(OutBuffer + OutBufferOffsets[Index]), true); \
+					reinterpret_cast<void**>(OutBuffer + OutBufferOffsets[Index])); \
 			} \
 		} \
 	}
@@ -140,8 +140,8 @@
 	} \
 	else if constexpr (ReturnType == EFunctionReturnType::Compound) \
 	{ \
-		ReturnPropertyDescriptor->Get( \
+		ReturnPropertyDescriptor->Get<std::true_type>( \
 			ReturnPropertyDescriptor->CopyValue(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
-			reinterpret_cast<void**>(ReturnBuffer), true); \
+			reinterpret_cast<void**>(ReturnBuffer)); \
 	} \
 	BufferAllocator->Free(Params);

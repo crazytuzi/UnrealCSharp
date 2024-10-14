@@ -76,6 +76,16 @@ public:
 	static TArray<FString> GetCustomProjectsDirectory();
 #endif
 
+	static bool EnableCallOverrideFunction();
+
+	static FString GetOverrideFunctionNamePrefix();
+
+	static FString GetOverrideFunctionNameSuffix();
+
+	static FString GetOverrideFunctionName(const FString& InFunctionName);
+
+	static FString GetOverrideFunctionName(const FName& InFunctionName);
+
 	static FString GetBindingDirectory();
 
 	static FString GetPluginBaseDir();
@@ -120,6 +130,10 @@ public:
 	static FString GetWeaversPath();
 #endif
 
+#if WITH_EDITOR
+	static bool IsGenerateFunctionComment();
+#endif
+
 	static class UAssemblyLoader* GetAssemblyLoader();
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
@@ -146,6 +160,8 @@ public:
 	static bool IsSpecialClass(const UClass* InClass);
 
 	static bool IsSpecialStruct(const UScriptStruct* InScriptStruct);
+
+	static bool IsSpecialEnum(const UEnum* InEnum);
 
 	static bool IsDynamicReInstanceField(const UField* InField);
 #endif

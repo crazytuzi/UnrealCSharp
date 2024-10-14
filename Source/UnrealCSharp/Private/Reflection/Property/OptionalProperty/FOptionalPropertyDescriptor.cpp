@@ -3,27 +3,26 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "GarbageCollection/FGarbageCollectionHandle.h"
 
-void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, const bool bIsCopy) const
+void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	if (Property != nullptr)
-	{
-		*Dest = NewWeakRef(Src, bIsCopy);
-	}
+	*Dest = NewWeakRef(Src, true);
+}
+
+void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+{
+	*Dest = NewWeakRef(Src, false);
 }
 
 void FOptionalPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	if (Property != nullptr)
-	{
-		const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
-		const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(
-			SrcGarbageCollectionHandle);
+	const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(
+		SrcGarbageCollectionHandle);
 
-		Property->InitializeValue(Dest);
+	Property->InitializeValue(Dest);
 
-		Property->CopyCompleteValue(Dest, SrcOptional->GetData());
-	}
+	Property->CopyCompleteValue(Dest, SrcOptional->GetData());
 }
 
 MonoObject* FOptionalPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const

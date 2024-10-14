@@ -12,9 +12,9 @@
 #include "FBindingEnumGenerator.h"
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
-#include "Misc/MessageDialog.h"
 #include "ToolMenus.h"
 #include "Internationalization/Culture.h"
+#include "Settings/ProjectPackagingSettings.h"
 #include "FCodeAnalysis.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Misc/ScopedSlowTask.h"
@@ -89,6 +89,8 @@ void FUnrealCSharpEditorModule::StartupModule()
 				Generator();
 			}));
 
+	UpdatePackagingSettings();
+
 	if (IsRunningCookCommandlet())
 	{
 		Generator();
@@ -156,6 +158,34 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 	if (UnrealCSharpBlueprintToolBar.IsValid())
 	{
 		UnrealCSharpBlueprintToolBar->Initialize();
+	}
+}
+
+void FUnrealCSharpEditorModule::UpdatePackagingSettings()
+{
+	const auto PublishDirectory = FUnrealCSharpFunctionLibrary::GetPublishDirectory();
+
+	if (const auto ProjectPackagingSettings = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UProjectPackagingSettings>())
+	{
+		bool bIsExisted{};
+
+		for (const auto& [Path] : ProjectPackagingSettings->DirectoriesToAlwaysStageAsUFS)
+		{
+			if (Path == PublishDirectory)
+			{
+				bIsExisted = true;
+
+				break;
+			}
+		}
+
+		if (!bIsExisted)
+		{
+			ProjectPackagingSettings->DirectoriesToAlwaysStageAsUFS.Add({PublishDirectory});
+
+			ProjectPackagingSettings->TryUpdateDefaultConfigFile();
+		}
 	}
 }
 

@@ -18,8 +18,10 @@ bool FCSharpDelegateDescriptor::CallDelegate(const UObject* InObject, MonoObject
 		{
 			void* Object = nullptr;
 
-			PropertyDescriptor->Get(PropertyDescriptor->ContainerPtrToValuePtr<void>(InParams), &Object, false);
-			CSharpParams[Index] = Object;
+			PropertyDescriptor->Get<std::false_type>(PropertyDescriptor->ContainerPtrToValuePtr<void>(InParams),
+			                                         &Object);
+
+			ARRAY_SET(CSharpParams, MonoObject*, Index, static_cast<MonoObject*>(Object));
 		}
 	}
 

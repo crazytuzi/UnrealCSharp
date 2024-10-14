@@ -119,7 +119,15 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 	return nullptr;
 }
 
-void FPropertyDescriptor::Get(void* Src, void** Dest, bool bIsCopy) const
+void FPropertyDescriptor::Get(void* Src, void** Dest) const
+{
+}
+
+void FPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
+{
+}
+
+void FPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
 }
 

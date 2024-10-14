@@ -86,7 +86,8 @@ namespace
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				MapHelper->GetKeyPropertyDescriptor()->Get(MapHelper->FindKey(InValueBuffer), ReturnBuffer);
+				MapHelper->GetKeyPropertyDescriptor()->Get(MapHelper->FindKey(InValueBuffer),
+				                                           reinterpret_cast<void**>(ReturnBuffer));
 			}
 		}
 
@@ -96,7 +97,8 @@ namespace
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Find(InKeyBuffer), ReturnBuffer);
+				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Find(InKeyBuffer),
+				                                             reinterpret_cast<void**>(ReturnBuffer));
 			}
 		}
 
@@ -118,7 +120,8 @@ namespace
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InGarbageCollectionHandle))
 			{
-				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Get(InKeyBuffer), ReturnBuffer);
+				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Get(InKeyBuffer),
+				                                             reinterpret_cast<void**>(ReturnBuffer));
 			}
 		}
 
@@ -163,7 +166,7 @@ namespace
 			{
 				const auto Key = MapHelper->GetEnumeratorKey(InIndex);
 
-				MapHelper->GetKeyPropertyDescriptor()->Get(Key, ReturnBuffer);
+				MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(ReturnBuffer));
 			}
 		}
 
@@ -175,7 +178,7 @@ namespace
 			{
 				const auto Value = MapHelper->GetEnumeratorValue(InIndex);
 
-				MapHelper->GetValuePropertyDescriptor()->Get(Value, ReturnBuffer);
+				MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(ReturnBuffer));
 			}
 		}
 

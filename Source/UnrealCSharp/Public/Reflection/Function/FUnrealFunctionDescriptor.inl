@@ -155,6 +155,53 @@ void FUnrealFunctionDescriptor::Call15(UObject* InObject, uint8* InBuffer, uint8
 }
 
 template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call16(UObject* InObject) const
+{
+	const auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);
+
+	const bool bIsRemote = FunctionCallspace & FunctionCallspace::Remote;
+
+	const bool bIsLocal = FunctionCallspace & FunctionCallspace::Local;
+
+	if (bIsLocal)
+	{
+		InObject->UObject::ProcessEvent(Function.Get(), nullptr);
+	}
+	else if (bIsRemote)
+	{
+		InObject->CallRemoteFunction(Function.Get(), nullptr, nullptr, nullptr);
+	}
+}
+
+template <auto ReturnType>
+void FUnrealFunctionDescriptor::Call18(UObject* InObject, uint8* InBuffer) const
+{
+	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
+
+	PROCESS_SCRIPT_IN()
+
+	const auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);
+
+	const bool bIsRemote = FunctionCallspace & FunctionCallspace::Remote;
+
+	const bool bIsLocal = FunctionCallspace & FunctionCallspace::Local;
+
+	if (bIsLocal)
+	{
+		InObject->UObject::ProcessEvent(Function.Get(), Params);
+	}
+	else if (bIsRemote)
+	{
+		InObject->CallRemoteFunction(Function.Get(), Params, nullptr, nullptr);
+	}
+
+	if (Params != nullptr)
+	{
+		BufferAllocator->Free(Params);
+	}
+}
+
+template <auto ReturnType>
 void FUnrealFunctionDescriptor::Call24(UObject* InObject) const
 {
 	const auto FunctionCallspace = InObject->GetFunctionCallspace(Function.Get(), nullptr);

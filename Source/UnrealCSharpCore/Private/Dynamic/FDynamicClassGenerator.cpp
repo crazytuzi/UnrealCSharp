@@ -30,7 +30,42 @@ void FDynamicClassGenerator::Generator()
 	FDynamicGeneratorCore::Generator(CLASS_U_CLASS_ATTRIBUTE,
 	                                 [](MonoClass* InMonoClass)
 	                                 {
-		                                 Generator(InMonoClass);
+		                                 if (InMonoClass == nullptr)
+		                                 {
+			                                 return;
+		                                 }
+
+		                                 if (!FMonoDomain::Type_Is_Class(FMonoDomain::Class_Get_Type(InMonoClass)))
+		                                 {
+			                                 return;
+		                                 }
+
+		                                 const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+		                                 auto Node = FDynamicDependencyGraph::FNode(ClassName, [InMonoClass]()
+		                                 {
+			                                 Generator(InMonoClass);
+		                                 });
+
+		                                 if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
+		                                 {
+			                                 if (FDynamicGeneratorCore::ClassHasAttr(
+				                                 ParentMonoClass, CLASS_U_CLASS_ATTRIBUTE))
+			                                 {
+				                                 const auto ParentClassName = FString(
+					                                 FMonoDomain::Class_Get_Name(ParentMonoClass));
+
+				                                 Node.Dependency(FDynamicDependencyGraph::FDependency{
+					                                 ParentClassName, false
+				                                 });
+			                                 }
+		                                 }
+
+		                                 FDynamicGeneratorCore::GeneratorProperty(InMonoClass, Node);
+
+		                                 FDynamicGeneratorCore::GeneratorFunction(InMonoClass, Node);
+
+		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
 }
 
@@ -67,9 +102,9 @@ bool FDynamicClassGenerator::IsDynamicClass(MonoClass* InMonoClass)
 
 MonoClass* FDynamicClassGenerator::GetMonoClass(const FString& InName)
 {
-	static auto A = AActor::StaticClass()->GetPrefixCPP();
+	static auto A = ACTOR_PREFIX;
 
-	static auto U = UObject::StaticClass()->GetPrefixCPP();
+	static auto U = OBJECT_PREFIX;
 
 	if (IsDynamicBlueprintGeneratedClass(InName))
 	{
@@ -199,6 +234,8 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 		ReInstance(OldClass, Class);
 	}
 #endif
+
+	FDynamicGeneratorCore::Completed(ClassName);
 }
 
 bool FDynamicClassGenerator::IsDynamicClass(const UClass* InClass)

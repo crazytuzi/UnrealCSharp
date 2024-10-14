@@ -34,6 +34,11 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		return;
 	}
 
+	if (FUnrealCSharpFunctionLibrary::IsSpecialEnum(InEnum))
+	{
+		return;
+	}
+
 	const auto UserDefinedEnum = Cast<UUserDefinedEnum>(InEnum);
 
 	FString UsingNameSpaceContent;

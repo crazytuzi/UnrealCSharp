@@ -14,6 +14,10 @@
 
 #define DEFAULT_CUSTOM_PROJECT_NAME FString(TEXT("CustomProject"))
 
+#define DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX FString(TEXT(""))
+
+#define DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX FString(TEXT("_Override"))
+
 #define CODE_ANALYSIS_NAME FString(TEXT("CodeAnalysis"))
 
 #define SOURCE_GENERATOR_NAME FString(TEXT("SourceGenerator"))
@@ -61,5 +65,13 @@
 #define OVERRIDE_FILE FString(TEXT("OverrideFile"))
 
 #define DYNAMIC FString(TEXT("Dynamic"))
+
+#define ACTOR_PREFIX AActor::StaticClass()->GetPrefixCPP()
+
+#define OBJECT_PREFIX UObject::StaticClass()->GetPrefixCPP()
+
+#define INTERFACE_PREFIX UInterface::StaticClass()->GetPrefixCPP()
+
+#define STRUCT_PREFIX TBaseStructure<FVector>::Get()->GetPrefixCPP()
 
 #define PLACEHOLDER _

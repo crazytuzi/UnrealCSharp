@@ -23,6 +23,7 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bEnableDirectoryChanged(true),
 	bIsSkipGenerateEngineModules(false),
 	bIsGenerateAllModules(true),
+	bIsGenerateFunctionComment(true),
 	bEnableExport(false)
 #else
 	Super(ObjectInitializer)
@@ -289,6 +290,11 @@ const TArray<FString>& UUnrealCSharpEditorSetting::GetSupportedAssetPath() const
 const TArray<TSubclassOf<UObject>>& UUnrealCSharpEditorSetting::GetSupportedAssetClass() const
 {
 	return SupportedAssetClass;
+}
+
+bool UUnrealCSharpEditorSetting::IsGenerateFunctionComment() const
+{
+	return bIsGenerateFunctionComment;
 }
 
 TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()

@@ -1,4 +1,5 @@
 ﻿#include "FClassGenerator.h"
+#include "FDoxygenConverter.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -246,7 +247,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UClass::StaticClass()));
 
-	TArray<UFunction*> Functions;
+	TArray<TPair<FString, UFunction*>> Functions;
 
 	for (const auto InInterface : InClass->Interfaces)
 	{
@@ -278,7 +279,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 			FunctionNameSet.Add(FunctionName);
 
-			Functions.Add(*FunctionIterator);
+			Functions.Emplace(FunctionName, *FunctionIterator);
 		}
 	}
 
@@ -286,7 +287,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 	                                                EFieldIteratorFlags::ExcludeDeprecated); FunctionIterator; ++
 	     FunctionIterator)
 	{
-		if (!FunctionIterator->HasAnyFunctionFlags(FUNC_AccessSpecifiers))
+		if (!FunctionIterator->HasAnyFunctionFlags(FUNC_AccessSpecifiers | FUNC_BlueprintEvent))
 		{
 			continue;
 		}
@@ -299,11 +300,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		if (FunctionIterator->HasAnyFunctionFlags(FUNC_Delegate))
-		{
-			continue;
-		}
-
-		if (OverrideFunctions.Contains(FUnrealCSharpFunctionLibrary::Encode(*FunctionIterator)))
 		{
 			continue;
 		}
@@ -324,22 +320,46 @@ void FClassGenerator::Generator(const UClass* InClass)
 		{
 			if (const auto& Function = SuperClass->FindFunctionByName(*FunctionName))
 			{
-				Functions.Add(Function);
+				Functions.Emplace(FunctionName, Function);
 			}
 			else
 			{
-				Functions.Add(*FunctionIterator);
+				if (const auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(FunctionName);
+					OverrideFunctions.Contains(EncodeFunctionName))
+				{
+					if (FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction())
+					{
+						Functions.Emplace(FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(FunctionName),
+						                  *FunctionIterator);
+					}
+				}
+				else
+				{
+					Functions.Emplace(FunctionName, *FunctionIterator);
+				}
 			}
 		}
 		else
 		{
-			Functions.Add(*FunctionIterator);
+			if (const auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(FunctionName);
+				OverrideFunctions.Contains(EncodeFunctionName))
+			{
+				if (FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction())
+				{
+					Functions.Emplace(FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(FunctionName),
+					                  *FunctionIterator);
+				}
+			}
+			else
+			{
+				Functions.Emplace(FunctionName, *FunctionIterator);
+			}
 		}
 	}
 
 	FunctionNameSet.Empty();
 
-	for (const auto Function : Functions)
+	for (const auto& [Name, Function] : Functions)
 	{
 		if (bHasFunction == true)
 		{
@@ -368,9 +388,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		FString FunctionPolymorphism = TEXT("virtual");
 
-		const auto& FunctionName = Function->GetName();
-
-		auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(Function);
+		auto EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(Name);
 
 		if (bIsInterface == true)
 		{
@@ -397,7 +415,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 					TEXT("GetType")
 				};
 
-				if (DefaultImplementations.Contains(FunctionName))
+				if (DefaultImplementations.Contains(Name))
 				{
 					FunctionPolymorphism = TEXT("new");
 				}
@@ -445,34 +463,15 @@ void FClassGenerator::Generator(const UClass* InClass)
 			FunctionReturnType = FGeneratorCore::GetPropertyType(FunctionReturnParam);
 		}
 
-		auto FunctionComment = Function->GetMetaData(TEXT("Comment"));
+		FString FunctionComment;
 
-		if (!FunctionComment.IsEmpty())
+		if (FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment())
 		{
-			FunctionComment = FString::Printf(TEXT(
-				"\t\t%s"
-			),
-			                                  *FunctionComment
-			);
+			auto Comment = Function->GetMetaData(TEXT("Comment"));
 
-			FunctionComment = FunctionComment.Replace(TEXT("\n"), TEXT("\n\t\t"));
-
-			FunctionComment = FunctionComment.Replace(TEXT("\n\t\t\t"), TEXT("\n\t\t"));
-
-			if (FunctionComment.EndsWith(TEXT("\t")))
+			if (!Comment.IsEmpty())
 			{
-				FunctionComment.RemoveAt(FunctionComment.Len() - 2, 2);
-			}
-			else if (FunctionComment.EndsWith(TEXT("\t\t")))
-			{
-				FunctionComment.RemoveAt(FunctionComment.Len() - 4, 4);
-			}
-
-			if (!FunctionComment.EndsWith(TEXT("\n")))
-			{
-				FunctionComment = FString::Printf(TEXT(
-					"%s\n"
-				), *FunctionComment);
+				FunctionComment = FDoxygenConverter(TEXT("\t\t"))(Comment);
 			}
 		}
 
@@ -780,7 +779,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			);
 		}
 
-		FunctionNameSet.Add(FunctionName);
+		FunctionNameSet.Add(Name);
 	}
 
 	if (bIsInterface == true)

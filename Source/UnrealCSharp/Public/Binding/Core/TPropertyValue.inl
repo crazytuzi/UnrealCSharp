@@ -596,13 +596,13 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 			const auto FoundValuePropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundValuePropertyMonoType);
 
-			const auto KeyProperty = FTypeBridge::Factory(FoundKeyPropertyReflectionType, nullptr, "",
-			                                              EObjectFlags::RF_Transient);
+			const auto KeyProperty = FTypeBridge::Factory<>(FoundKeyPropertyReflectionType, nullptr, "",
+			                                                EObjectFlags::RF_Transient);
 
 			KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			const auto ValueProperty = FTypeBridge::Factory(FoundValuePropertyReflectionType, nullptr, "",
-			                                                EObjectFlags::RF_Transient);
+			const auto ValueProperty = FTypeBridge::Factory<>(FoundValuePropertyReflectionType, nullptr, "",
+			                                                  EObjectFlags::RF_Transient);
 
 			ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
@@ -645,13 +645,13 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 		const auto FoundValuePropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 			Type_Get_Object(FoundValuePropertyMonoType);
 
-		const auto KeyProperty = FTypeBridge::Factory(FoundKeyPropertyReflectionType, nullptr, "",
-		                                              EObjectFlags::RF_Transient);
+		const auto KeyProperty = FTypeBridge::Factory<>(FoundKeyPropertyReflectionType, nullptr, "",
+		                                                EObjectFlags::RF_Transient);
 
 		KeyProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-		const auto ValueProperty = FTypeBridge::Factory(FoundValuePropertyReflectionType, nullptr, "",
-		                                                EObjectFlags::RF_Transient);
+		const auto ValueProperty = FTypeBridge::Factory<>(FoundValuePropertyReflectionType, nullptr, "",
+		                                                  EObjectFlags::RF_Transient);
 
 		ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
@@ -720,8 +720,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundPropertyMonoType);
 
-			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
-			                                           EObjectFlags::RF_Transient);
+			const auto Property = FTypeBridge::Factory<>(FoundPropertyReflectionType, nullptr, "",
+			                                             EObjectFlags::RF_Transient);
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
@@ -752,8 +752,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 		const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 			Type_Get_Object(FoundPropertyMonoType);
 
-		const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
-		                                           EObjectFlags::RF_Transient);
+		const auto Property = FTypeBridge::Factory<>(FoundPropertyReflectionType, nullptr, "",
+		                                             EObjectFlags::RF_Transient);
 
 		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
@@ -825,8 +825,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 			const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 				Type_Get_Object(FoundPropertyMonoType);
 
-			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
-			                                           EObjectFlags::RF_Transient);
+			const auto Property = FTypeBridge::Factory<>(FoundPropertyReflectionType, nullptr, "",
+			                                             EObjectFlags::RF_Transient);
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
@@ -857,8 +857,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 		const auto FoundPropertyReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->
 			Type_Get_Object(FoundPropertyMonoType);
 
-		const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
-		                                           EObjectFlags::RF_Transient);
+		const auto Property = FTypeBridge::Factory<>(FoundPropertyReflectionType, nullptr, "",
+		                                             EObjectFlags::RF_Transient);
 
 		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
@@ -958,7 +958,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 
 			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 
-			const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+			const auto Property = FTypeBridge::Factory<>(FoundPropertyReflectionType, nullptr, "",
 			                                           EObjectFlags::RF_Transient);
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
@@ -995,7 +995,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 
 		const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 
-		const auto Property = FTypeBridge::Factory(FoundPropertyReflectionType, nullptr, "",
+		const auto Property = FTypeBridge::Factory<>(FoundPropertyReflectionType, nullptr, "",
 		                                           EObjectFlags::RF_Transient);
 
 		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
