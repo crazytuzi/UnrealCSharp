@@ -5,7 +5,7 @@
 #include "Macro/BindingMacro.h"
 #include "FRegisterObjectFlags.h"
 
-BINDING_ENUM(FActorSpawnParameters::ESpawnActorNameMode)
+BINDING_ENUM(FActorSpawnParameters::ESpawnActorNameMode, false)
 
 BINDING_CLASS(FActorSpawnParameters)
 

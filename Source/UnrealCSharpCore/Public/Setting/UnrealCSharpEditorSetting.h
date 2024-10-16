@@ -58,6 +58,8 @@ public:
 
 	const TArray<FString>& GetSupportedModule() const;
 
+	bool IsGenerateAsset() const;
+
 	const TArray<FString>& GetSupportedAssetPath() const;
 
 	const TArray<TSubclassOf<UObject>>& GetSupportedAssetClass() const;
@@ -95,10 +97,14 @@ private:
 		meta = (GetOptions = "GetModuleList", EditCondition = "!bIsGenerateAllModules"))
 	TArray<FString> SupportedModule;
 
-	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (GetOptions = "GetModuleList"))
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bIsGenerateAsset;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator,
+		meta = (GetOptions = "GetModuleList", EditCondition = "bIsGenerateAsset"))
 	TArray<FString> SupportedAssetPath;
 
-	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bIsGenerateAsset"))
 	TArray<TSubclassOf<UObject>> SupportedAssetClass;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)

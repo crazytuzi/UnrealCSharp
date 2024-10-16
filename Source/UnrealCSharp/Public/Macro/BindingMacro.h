@@ -18,20 +18,52 @@
 #include "Template/TIsScriptStruct.inl"
 #include "Template/TIsNotUEnum.inl"
 
+template <typename... Args>
+auto constexpr TSizeof_Args(Args... InArgs)
+{
+	return sizeof...(InArgs);
+}
+
+template <auto Index, typename... Args>
+auto TGet_Args(Args&&... InArgs)
+{
+	return std::get<Index>(std::forward_as_tuple(std::forward<Args>(InArgs)...));
+}
+
+template <auto Index, typename... Args>
+auto TGet_Args()
+{
+	return false;
+}
+
 #define BINDING_STR(Str) #Str
 
-#define BINDING_REMOVE_NAMESPACE_CLASS_STR(Class) FString(TEXT(BINDING_STR(Class))).RightChop( \
-	FString(TEXT(BINDING_STR(Class))).Find(TEXT(":"), ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1)
+#define BINDING_STRING(Str) FString(TEXT(BINDING_STR(Str)))
 
-#define BINDING_REMOVE_PREFIX_CLASS_STR(Class) FString(TEXT(BINDING_STR(Class))).RightChop(1)
+#define BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) BINDING_STRING(Class).Left( \
+	BINDING_STRING(Class).Find(TEXT("::")) - 1)
 
-#define BINDING_CLASS(Class) \
+#define BINDING_REMOVE_RIGHT_NAMESPACE_CLASS_STR(Class) BINDING_STRING(Class).Right( \
+	BINDING_STRING(Class).Len() - BINDING_STRING(Class).Find(TEXT("::")) - 2)
+
+#define BINDING_REMOVE_PREFIX_CLASS_STR(Class) BINDING_STRING(Class).RightChop(1)
+
+#define BINDING_CLASS(Class, ...) \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static auto Get() \
+	static auto Get()\
 	{ \
-		return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); \
+		if constexpr (!TSizeof_Args(__VA_ARGS__)) \
+		{ \
+			return BINDING_STRING(Class); \
+		} \
+		else \
+		{ \
+			return TGet_Args<0>(__VA_ARGS__) \
+				? BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) \
+				: BINDING_REMOVE_RIGHT_NAMESPACE_CLASS_STR(Class); \
+		} \
 	} \
 }; \
 template <typename T> \
@@ -81,7 +113,7 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static auto Get() -> FString { return BINDING_STR(Class); } \
+	static auto Get() { return BINDING_STRING(Class); } \
 }; \
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
@@ -129,11 +161,23 @@ struct TIsScriptStruct<Class> \
 	enum { Value = true }; \
 };
 
-#define BINDING_ENUM(Class) \
+#define BINDING_ENUM(Class, ...) \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 { \
-	static auto Get() { return BINDING_REMOVE_NAMESPACE_CLASS_STR(Class); } \
+	static auto Get() \
+	{ \
+		if constexpr (!TSizeof_Args(__VA_ARGS__)) \
+		{ \
+			return BINDING_STRING(Class); \
+		} \
+		else \
+		{ \
+			return TGet_Args<0>(__VA_ARGS__) \
+			     ? BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) \
+			     : BINDING_REMOVE_RIGHT_NAMESPACE_CLASS_STR(Class); \
+		} \
+	} \
 }; \
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
