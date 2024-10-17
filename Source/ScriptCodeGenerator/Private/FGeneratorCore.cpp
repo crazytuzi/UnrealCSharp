@@ -632,14 +632,16 @@ FString FGeneratorCore::GetModuleRelativePath(const UEnum* InEnum)
 FString FGeneratorCore::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
 {
 	return InDelegateProperty != nullptr
-		       ? GetModuleRelativePath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))
+		       ? GetModuleRelativePath(
+			       InDelegateProperty->SignatureFunction->GetMetaData(TEXT("ModuleRelativePath")))
 		       : FString();
 }
 
 FString FGeneratorCore::GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty)
 {
 	return InMulticastDelegateProperty != nullptr
-		       ? GetModuleRelativePath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))
+		       ? GetModuleRelativePath(
+			       InMulticastDelegateProperty->SignatureFunction->GetMetaData(TEXT("ModuleRelativePath")))
 		       : FString();
 }
 
