@@ -1,4 +1,5 @@
 ﻿#include "Dynamic/FDynamicGenerator.h"
+#include "CoreMacro/Macro.h"
 #include "Domain/FMonoDomainScope.h"
 #include "Dynamic/FDynamicEnumGenerator.h"
 #include "Dynamic/FDynamicStructGenerator.h"
@@ -8,6 +9,8 @@
 
 #if WITH_EDITOR
 bool FDynamicGenerator::bIsFullGenerator{};
+
+TMap<FString, FString> FDynamicGenerator::CodeAnalysisDynamicFilesMap{};
 #endif
 
 void FDynamicGenerator::Generator()
@@ -53,6 +56,33 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 	{
 		CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS, true);
 	}
+}
+
+void FDynamicGenerator::SetCodeAnalysisDynamicFilesMap()
+{
+	CodeAnalysisDynamicFilesMap = FUnrealCSharpFunctionLibrary::LoadFileToString(FString::Printf(TEXT(
+		"%s/%s.json"
+	),
+		*FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath(),
+		*DYNAMIC_FILE
+	));
+}
+
+FString FDynamicGenerator::GetDynamicFile(const UStruct* InStruct)
+{
+	return GetDynamicFile(FUnrealCSharpFunctionLibrary::GetFullClass(InStruct));
+}
+
+FString FDynamicGenerator::GetDynamicFile(const UEnum* InEnum)
+{
+	return GetDynamicFile(FUnrealCSharpFunctionLibrary::GetFullClass(InEnum));
+}
+
+FString FDynamicGenerator::GetDynamicFile(const FString& InName)
+{
+	const auto FoundDynamicFile = CodeAnalysisDynamicFilesMap.Find(InName);
+
+	return FoundDynamicFile != nullptr ? *FoundDynamicFile : FString{};
 }
 
 void FDynamicGenerator::Generator(const TArray<FFileChangeData>& FileChangeData)

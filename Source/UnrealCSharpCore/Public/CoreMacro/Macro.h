@@ -64,6 +64,8 @@
 
 #define DYNAMIC FString(TEXT("Dynamic"))
 
+#define DYNAMIC_FILE FString(TEXT("DynamicFile"))
+
 #define ACTOR_PREFIX AActor::StaticClass()->GetPrefixCPP()
 
 #define OBJECT_PREFIX UObject::StaticClass()->GetPrefixCPP()
