@@ -7,6 +7,7 @@
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
+#include "Dynamic/FDynamicGenerator.h"
 
 #define LOCTEXT_NAMESPACE "UnrealCSharpBlueprintToolBar"
 
@@ -31,6 +32,8 @@ void FUnrealCSharpBlueprintToolBar::Initialize()
 
 	SetCodeAnalysisOverrideFilesMap();
 
+	FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
+
 	OnEndGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnEndGenerator.AddRaw(
 		this, &FUnrealCSharpBlueprintToolBar::OnEndGenerator);
 }
@@ -46,6 +49,8 @@ void FUnrealCSharpBlueprintToolBar::Deinitialize()
 void FUnrealCSharpBlueprintToolBar::OnEndGenerator()
 {
 	SetCodeAnalysisOverrideFilesMap();
+
+	FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
 }
 
 void FUnrealCSharpBlueprintToolBar::BuildAction()
