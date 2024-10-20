@@ -1,11 +1,12 @@
 #include "ToolBar/UnrealCSharpBlueprintToolBar.h"
 #include "BlueprintEditorModule.h"
 #include "SourceCodeNavigation.h"
+#include "Blueprint/UserWidget.h"
+#include "Misc/FileHelper.h"
 #include "FCodeAnalysis.h"
 #include "UnrealCSharpEditorCommands.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
-#include "CoreMacro/NamespaceMacro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 
 #define LOCTEXT_NAMESPACE "UnrealCSharpBlueprintToolBar"
@@ -82,51 +83,59 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 		{
 			if (Blueprint.IsValid())
 			{
-				const auto Content = FString::Printf(TEXT(
-					"using %s;\n"
-					"using %s;\n\n"
-					"namespace %s\n"
-					"{\n"
-					"\t[Override]\n"
-					"\tpublic partial class %s\n"
-					"\t{\n"
-					"\t\tprivate %s()\n"
-					"\t\t{\n"
-					"\t\t}\n\n"
-					"\t\t[Override]\n"
-					"\t\tpublic override void ReceiveBeginPlay()\n"
-					"\t\t{\n"
-					"\t\t\tbase.ReceiveBeginPlay();\n"
-					"\t\t}\n\n"
-					"\t\t[Override]\n"
-					"\t\tpublic override void ReceiveEndPlay(EEndPlayReason EndPlayReason)\n"
-					"\t\t{\n"
-					"\t\t\tbase.ReceiveEndPlay(EndPlayReason);\n"
-					"\t\t}\n"
-					"\t}\n"
-					"}"
-				),
-				                                     *COMBINE_NAMESPACE(NAMESPACE_SCRIPT, FString(TEXT("CoreUObject"))),
-				                                     *COMBINE_NAMESPACE(NAMESPACE_SCRIPT, FString(TEXT("Engine"))),
-				                                     *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-					                                     Blueprint->GeneratedClass),
-				                                     *FUnrealCSharpFunctionLibrary::GetFullClass(
-					                                     Blueprint->GeneratedClass),
-				                                     *FUnrealCSharpFunctionLibrary::GetFullClass(
-					                                     Blueprint->GeneratedClass));
-
-				if (const auto FileName = GetFileName(); FUnrealCSharpFunctionLibrary::SaveStringToFile(
-					FileName, Content))
+				static TArray<UClass*> TemplateClasses =
 				{
-					const auto Class = FString::Printf(TEXT(
-						"%s.%s"
-					),
-					                                   *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
-						                                   Blueprint->GeneratedClass),
-					                                   *FUnrealCSharpFunctionLibrary::GetFullClass(
-						                                   Blueprint->GeneratedClass));
+					AActor::StaticClass(),
+					UActorComponent::StaticClass(),
+					UUserWidget::StaticClass(),
+					UObject::StaticClass()
+				};
 
-					DynamicOverrideFilesMap.Add(Class, FileName);
+				for (const auto TemplateClass : TemplateClasses)
+				{
+					if (Blueprint->GeneratedClass->IsChildOf(TemplateClass))
+					{
+						const auto Template = FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
+							/ TemplateClass->GetName() + CSHARP_SUFFIX;
+
+						FString Content;
+
+						FFileHelper::LoadFileToString(Content, *Template);
+
+						Content.ReplaceInline(*FString::Printf(TEXT(
+							                      "namespace %s"
+						                      ),
+						                                       *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+							                                       TemplateClass)
+						                      ),
+						                      *FString::Printf(TEXT(
+							                      "namespace %s"
+						                      ),
+						                                       *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+							                                       Blueprint->GeneratedClass))
+						);
+
+						Content.ReplaceInline(*FUnrealCSharpFunctionLibrary::GetFullClass(
+							                      TemplateClass),
+						                      *FUnrealCSharpFunctionLibrary::GetFullClass(
+							                      Blueprint->GeneratedClass));
+
+						if (const auto FileName = GetFileName();
+							FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
+						{
+							const auto Class = FString::Printf(TEXT(
+								"%s.%s"
+							),
+							                                   *FUnrealCSharpFunctionLibrary::GetClassNameSpace(
+								                                   Blueprint->GeneratedClass),
+							                                   *FUnrealCSharpFunctionLibrary::GetFullClass(
+								                                   Blueprint->GeneratedClass));
+
+							DynamicOverrideFilesMap.Add(Class, FileName);
+						}
+
+						break;
+					}
 				}
 			}
 		}), FCanExecuteAction());

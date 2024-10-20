@@ -50,7 +50,8 @@ public class UnrealCSharpEditor : ModuleRules
 				"ScriptCodeGenerator",
 				"Compiler",
 				"UnrealCSharpCore",
-				"CrossVersion"
+				"CrossVersion",
+				"UMG"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

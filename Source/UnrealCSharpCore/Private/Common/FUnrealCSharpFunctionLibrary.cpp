@@ -536,6 +536,13 @@ FString FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory()
 	return GetPluginDirectory() / PLUGIN_SCRIPT_PATH;
 }
 
+#if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
+{
+	return GetPluginDirectory() / PLUGIN_TEMPLATE_PATH;
+}
+#endif
+
 bool FUnrealCSharpFunctionLibrary::IsGameField(const UField* InField)
 {
 	const auto ModuleName = GetModuleName(InField);
