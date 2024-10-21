@@ -216,9 +216,10 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FDelegateProperty* InDe
 	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
 
 	return Encode(FString::Printf(TEXT(
-		"F%s"
-	),
-	                              *DelegateName));
+		              "F%s"
+	              ),
+	                              *DelegateName),
+	              InDelegateProperty->IsNative());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FDelegateProperty* InDelegateProperty)
@@ -277,9 +278,10 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FMulticastDelegatePrope
 	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
 
 	return Encode(FString::Printf(TEXT(
-		"F%s"
-	),
-	                              *DelegateName));
+		              "F%s"
+	              ),
+	                              *DelegateName),
+	              InMulticastDelegateProperty->IsNative());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegateProperty* InMulticastDelegateProperty)
@@ -341,7 +343,7 @@ FString FUnrealCSharpFunctionLibrary::GetAssetName(const FAssetData& InAssetData
 	return FString::Printf(TEXT(
 		"%s%s"
 	),
-	                       *Encode(InAssetName),
+	                       *Encode(InAssetName, false),
 	                       *GetSuffixName(InAssetData)
 	);
 }
