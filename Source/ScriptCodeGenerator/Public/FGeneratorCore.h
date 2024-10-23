@@ -60,6 +60,8 @@ public:
 
 	static SCRIPTCODEGENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
 
+	static SCRIPTCODEGENERATOR_API bool IsSupportedAssetClass(UClass* InClass);
+
 	static SCRIPTCODEGENERATOR_API void BeginGenerator();
 
 	static SCRIPTCODEGENERATOR_API void EndGenerator();

@@ -299,6 +299,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 		const auto& FunctionName = FunctionIterator->GetName();
 
+		if (FunctionName.EndsWith("_CSharp"))
+		{
+			continue;
+		}
+
 		const auto& EncodeFunctionName = FUnrealCSharpFunctionLibrary::Encode(*FunctionIterator);
 
 		if (FunctionNameSet.Contains(FunctionName))

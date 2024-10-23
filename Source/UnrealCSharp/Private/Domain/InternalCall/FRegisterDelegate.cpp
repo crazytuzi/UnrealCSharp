@@ -31,8 +31,7 @@ namespace
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					DelegateHelper->Bind(FoundObject, FCSharpEnvironment::GetEnvironment().GetDomain()->
-					                     Delegate_Get_Method(InDelegate));
+					DelegateHelper->Bind(FoundObject, InDelegate);
 				}
 			}
 		}

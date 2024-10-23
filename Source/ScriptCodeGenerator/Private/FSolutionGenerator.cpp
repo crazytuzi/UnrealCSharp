@@ -3,6 +3,9 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
 #include "Setting/UnrealCSharpSetting.h"
+#include "Interfaces/IPluginManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
+#include "Framework/Notifications/NotificationManager.h"
 
 void FSolutionGenerator::Generator()
 {
@@ -75,6 +78,42 @@ void FSolutionGenerator::Generator()
 			&FSolutionGenerator::ReplaceTargetFramework,
 			&FSolutionGenerator::ReplaceProjectReference
 		});
+
+	if (const auto UnrealCSharpSetting = GetMutableDefault<UUnrealCSharpSetting>())
+	{
+		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
+		{
+			TSharedPtr<IPlugin> CustomProjectPlugin = IPluginManager::Get().FindPlugin(CustomProject.Name);
+			if (CustomProjectPlugin)
+			{
+				FString	ScriptDirectory = CustomProjectPlugin->GetBaseDir() / SOLUTION_NAME;
+				FString ProjectPath = FUnrealCSharpFunctionLibrary::GetFullScriptDirectory() / CustomProject.Name / CustomProject.Name + PROJECT_SUFFIX;
+				FString RelativeIncludeDirectory = ScriptDirectory;
+				FPaths::MakePathRelativeTo(RelativeIncludeDirectory, *ProjectPath);
+
+				CopyTemplate(
+					FUnrealCSharpFunctionLibrary::GetFullScriptDirectory() / CustomProject.Name / CustomProject.Name + PROJECT_SUFFIX,
+					TemplatePath / DEFAULT_CUSTOM_PROJECT_NAME + PROJECT_SUFFIX,
+					TArray<TFunction<void(FString & OutResult)>>
+				{
+						[RelativeIncludeDirectory](FString& OutResult) {
+							OutResult = OutResult.Replace(TEXT("IncludeDirectory"), *RelativeIncludeDirectory);
+						},
+						& FSolutionGenerator::ReplaceDefineConstants,
+						& FSolutionGenerator::ReplaceOutputPath,
+						& FSolutionGenerator::ReplaceTargetFramework
+				});
+			}
+			else
+			{
+				FNotificationInfo Info(FText::FromString(FString(TEXT("Can`t find the custom project : ")) + CustomProject.Name));
+				Info.FadeInDuration = 2.0f;
+				Info.ExpireDuration = 2.0f;
+				Info.FadeOutDuration = 2.0f;
+				FSlateNotificationManager::Get().AddNotification(Info);
+			}
+		}
+	}
 
 	CopyTemplate(
 		FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath(),
@@ -196,15 +235,26 @@ void FSolutionGenerator::ReplaceTargetFramework(FString& OutResult)
 
 void FSolutionGenerator::ReplaceProjectReference(FString& OutResult)
 {
-	OutResult = OutResult.Replace(TEXT("<ProjectReference Include=\"\" />"),
-	                              *FString::Printf(TEXT(
-		                              "<ProjectReference Include=\"..\\%s\\%s%s\" />"
-	                              ),
-	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
-	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
-	                                               *PROJECT_SUFFIX
+	FString UEProjectReference = FString::Printf(TEXT("<ProjectReference Include=\"..\\%s\\%s%s\" />"),
+		*FUnrealCSharpFunctionLibrary::GetUEName(),
+		*FUnrealCSharpFunctionLibrary::GetUEName(),
+		*PROJECT_SUFFIX
+	);
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
+		{
+			FString CustomProjectReference = FString::Printf(TEXT("\n\t<ProjectReference Include=\"..\\%s\\%s%s\" />"),
+				*CustomProject.Name,
+				*CustomProject.Name,
+				*PROJECT_SUFFIX
+			);
 
-	                              ));
+			UEProjectReference += CustomProjectReference;
+		}
+	}
+
+	OutResult = OutResult.Replace(TEXT("<ProjectReference Include=\"\" />"), *UEProjectReference);
 }
 
 void FSolutionGenerator::ReplaceYield(FString& OutResult)

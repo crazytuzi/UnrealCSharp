@@ -919,6 +919,34 @@ const TArray<FName>& FGeneratorCore::GetSupportedAssetClassName()
 	return SupportedAssetClassName;
 }
 
+SCRIPTCODEGENERATOR_API bool FGeneratorCore::IsSupportedAssetClass(UClass* InClass)
+{
+	if(InClass == nullptr)
+	{
+		return false;
+	}
+	else if (SupportedAssetClassName.Contains(InClass->GetFName())) 
+	{
+			return true;
+	}
+	else {
+		UClass* SuperClass = InClass;
+		while (true)
+		{
+			SuperClass = SuperClass->GetSuperClass();
+			if (SuperClass == nullptr) 
+			{
+				break;
+			}
+			else if (SupportedAssetClassName.Contains(SuperClass->GetFName()))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 void FGeneratorCore::BeginGenerator()
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
@@ -951,14 +979,14 @@ void FGeneratorCore::BeginGenerator()
 					"%s.%s"
 				),
 				                *NAMESPACE_ROOT,
-				                *AssetPath
+				                *AssetPath.Replace(TEXT("/"),TEXT("."))
 
 				),
 				FString::Printf(TEXT(
 					"%s.%s."
 				),
 				                *NAMESPACE_ROOT,
-				                *AssetPath
+				                *AssetPath.Replace(TEXT("/"),TEXT("."))
 				)
 			});
 		}

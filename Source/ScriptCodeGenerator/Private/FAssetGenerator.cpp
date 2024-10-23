@@ -11,6 +11,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "UEVersion.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+#include "Engine/LevelScriptActor.h"
 
 TArray<UUserDefinedEnum*> FAssetGenerator::UserDefinedEnums;
 
@@ -26,7 +27,7 @@ void FAssetGenerator::Generator()
 
 			TArray<FAssetData> OutAssetData;
 
-			AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetSupportedAssetPath(), OutAssetData, true);
+			AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetSupportedAssetPath(), OutAssetData, true, false);
 
 			for (const auto& AssetData : OutAssetData)
 			{
@@ -52,11 +53,10 @@ void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelay
 		{
 			if (const auto AssetDataClass = InAssetData.GetClass())
 			{
-				if (const auto& AssetDataClassName = AssetDataClass->GetFName();
-					FGeneratorCore::GetSupportedAssetClassName().Contains(AssetDataClassName))
+				if (FGeneratorCore::IsSupportedAssetClass(AssetDataClass))
 				{
-					if (AssetDataClassName == UBlueprint::StaticClass()->GetFName() ||
-						AssetDataClassName == UWidgetBlueprint::StaticClass()->GetFName())
+					if (AssetDataClass->IsChildOf(UBlueprint::StaticClass()) ||
+						AssetDataClass->IsChildOf(UWidgetBlueprint::StaticClass()))
 					{
 						if (const auto Blueprint = LoadObject<
 #if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
@@ -71,7 +71,7 @@ void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelay
 							}
 						}
 					}
-					else if (AssetDataClassName == UUserDefinedStruct::StaticClass()->GetFName())
+					else if (AssetDataClass->IsChildOf(UUserDefinedStruct::StaticClass()))
 					{
 						if (const auto UserDefinedStruct = LoadObject<
 #if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
@@ -83,7 +83,7 @@ void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelay
 							FStructGenerator::Generator(UserDefinedStruct);
 						}
 					}
-					else if (AssetDataClassName == UUserDefinedEnum::StaticClass()->GetFName())
+					else if (AssetDataClass->IsChildOf(UUserDefinedEnum::StaticClass()))
 					{
 						if (const auto UserDefinedEnum = LoadObject<
 #if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
@@ -100,6 +100,19 @@ void FAssetGenerator::Generator(const FAssetData& InAssetData, const bool bDelay
 							{
 								FEnumGenerator::Generator(UserDefinedEnum);
 							}
+						}
+					}
+					else if (AssetDataClass->IsChildOf(UWorld::StaticClass()))
+					{
+						FString LevelScriptPath = FString::Printf(TEXT("%s.%s_C"), *InAssetData.PackageName.ToString(), *InAssetData.AssetName.ToString());
+						if (const auto LevelScriptClass = LoadObject<
+#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+							UBlueprintGeneratedClass>(nullptr, *LevelScriptPath))
+#else
+							UBlueprintGeneratedClass> (nullptr, *LevelScriptPath))
+#endif
+						{
+							FClassGenerator::Generator(LevelScriptClass);
 						}
 					}
 					else
