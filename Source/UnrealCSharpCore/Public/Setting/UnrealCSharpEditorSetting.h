@@ -101,7 +101,7 @@ private:
 	bool bIsGenerateAsset;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator,
-		meta = (GetOptions = "GetModuleList", EditCondition = "bIsGenerateAsset"))
+		meta = (EditCondition = "bIsGenerateAsset"))
 	TArray<FString> SupportedAssetPath;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bIsGenerateAsset"))
