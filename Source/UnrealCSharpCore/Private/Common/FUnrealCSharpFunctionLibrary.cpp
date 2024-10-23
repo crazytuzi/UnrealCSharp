@@ -71,10 +71,10 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InModuleName)
 {
 	auto ModuleName = InModuleName;
 
-	if (constexpr char ReplaceProjectModuleName[] = "/Game";
+	if (constexpr char ReplaceProjectModuleName[] = "/Game/";
 		ModuleName.StartsWith(ReplaceProjectModuleName))
 	{
-		constexpr auto ReplaceProjectModuleNameLength = sizeof(ReplaceProjectModuleName) - 1;
+		constexpr auto ReplaceProjectModuleNameLength = sizeof(ReplaceProjectModuleName) - 2;
 
 		const auto Size_ModuleName = ModuleName.Len();
 
@@ -456,7 +456,11 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
 	{
 		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects())
 		{
-			CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
+			if(TSharedPtr<IPlugin> CustomProjectPlugin = IPluginManager::Get().FindPlugin(Name))
+			{
+				CustomProjectsDirectory.Add(CustomProjectPlugin->GetBaseDir()/ SOLUTION_NAME);
+				CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
+			}
 		}
 	}
 
@@ -575,6 +579,27 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 
 	InScriptPath.ParseIntoArray(Splits, TEXT("/"));
 
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>()) 
+	{
+		for (const auto& [PluginName] : UnrealCSharpSetting->GetCustomProjects())
+		{
+			if (PluginName == Splits[0] || (Splits[0] == NAMESPACE_SCRIPT && PluginName == Splits[1]))
+			{
+				return GetFullScriptDirectory() / PluginName / PROXY_NAME;
+			}
+			if (TSharedPtr<IPlugin> CustomProjectPlugin = IPluginManager::Get().FindPlugin(PluginName))
+			{
+				for (const auto& ModuleDescriptor : CustomProjectPlugin->GetDescriptor().Modules)
+				{
+					if (ModuleDescriptor.Name == Splits[0] || (Splits[0] == NAMESPACE_SCRIPT && ModuleDescriptor.Name == Splits[1]))
+					{
+						return GetFullScriptDirectory() / PluginName / PROXY_NAME;
+					}
+				}
+			}
+		}
+	}
+
 	if (const auto& ProjectModuleList = GetProjectModuleList();
 		ProjectModuleList.Contains(Splits[0]) ||
 		Splits[0] == TEXT("Game") ||
@@ -582,7 +607,6 @@ FString FUnrealCSharpFunctionLibrary::GetGenerationPath(const FString& InScriptP
 			ProjectModuleList.Contains(Splits[1])))
 	{
 		static auto GameProxyPath = GetGameProxyDirectory();
-
 		return GameProxyPath;
 	}
 	else
