@@ -12,6 +12,8 @@
 
 #define DEFAULT_GAME_NAME FString(TEXT("Game"))
 
+#define DEFAULT_CUSTOM_PROJECT_NAME FString(TEXT("CustomProject"))
+
 #define DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX FString(TEXT(""))
 
 #define DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX FString(TEXT("_Override"))

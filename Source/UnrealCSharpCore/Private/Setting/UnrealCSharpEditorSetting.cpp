@@ -53,11 +53,12 @@ void UUnrealCSharpEditorSetting::RegisterSettings()
 
 		static TSet<FString> DefaultSupportedAssetPaths =
 		{
-			FApp::GetProjectName()
+			//FApp::GetProjectName()
 		};
 
 		static TSet<TSubclassOf<UObject>> DefaultSupportedAssetClasses =
 		{
+			UWorld::StaticClass(),
 			UBlueprint::StaticClass(),
 			UUserDefinedStruct::StaticClass(),
 			UUserDefinedEnum::StaticClass(),

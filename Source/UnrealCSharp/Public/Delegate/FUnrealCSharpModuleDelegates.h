@@ -9,9 +9,9 @@ public:
 
 	DECLARE_MULTICAST_DELEGATE(FOnCSharpEnvironmentInitialize);
 
-	static FOnUnrealCSharpModuleActive OnUnrealCSharpModuleActive;
+	static UNREALCSHARP_API FOnUnrealCSharpModuleActive OnUnrealCSharpModuleActive;
 
-	static FOnUnrealCSharpModuleInActive OnUnrealCSharpModuleInActive;
+	static UNREALCSHARP_API FOnUnrealCSharpModuleInActive OnUnrealCSharpModuleInActive;
 
-	static FOnCSharpEnvironmentInitialize OnCSharpEnvironmentInitialize;
+	static UNREALCSHARP_API FOnCSharpEnvironmentInitialize OnCSharpEnvironmentInitialize;
 };

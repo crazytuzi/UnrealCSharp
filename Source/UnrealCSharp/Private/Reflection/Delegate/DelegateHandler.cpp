@@ -7,7 +7,7 @@ void UDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 	{
 		if (DelegateDescriptor != nullptr)
 		{
-			DelegateDescriptor->CallDelegate(DelegateWrapper.Object.Get(), DelegateWrapper.Method, Parms);
+			DelegateDescriptor->CallDelegate(DelegateWrapper.Object.Get(), DelegateWrapper.Delegate, Parms);
 		}
 	}
 	else
@@ -49,9 +49,14 @@ void UDelegateHandler::Deinitialize()
 
 		DelegateDescriptor = nullptr;
 	}
+
+	if (DelegateWrapper.GCHandle.IsValid())
+	{
+		FGarbageCollectionHandle::Free<false>(DelegateWrapper.GCHandle);
+	}
 }
 
-void UDelegateHandler::Bind(UObject* InObject, MonoMethod* InMonoMethod)
+void UDelegateHandler::Bind(UObject* InObject, MonoObject* InMonoDelegate)
 {
 	if (ScriptDelegate != nullptr)
 	{
@@ -61,7 +66,7 @@ void UDelegateHandler::Bind(UObject* InObject, MonoMethod* InMonoMethod)
 		}
 	}
 
-	DelegateWrapper = {InObject, InMonoMethod};
+	DelegateWrapper = {InObject, InMonoDelegate, FGarbageCollectionHandle::NewRef(InMonoDelegate, true) };
 }
 
 bool UDelegateHandler::IsBound() const

@@ -21,7 +21,7 @@ public:
 	void Deinitialize();
 
 public:
-	void Bind(UObject* InObject, MonoMethod* InMonoMethod) const;
+	void Bind(UObject* InObject, MonoObject* InMonoDelegate) const;
 
 	bool IsBound() const;
 
