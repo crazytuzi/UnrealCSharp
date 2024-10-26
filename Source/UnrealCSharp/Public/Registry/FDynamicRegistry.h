@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-class FDynamicRegistry
+class UNREALCSHARP_API FDynamicRegistry
 {
 public:
 	FDynamicRegistry();

@@ -296,6 +296,12 @@ public:
 
 	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
 
+public:
+	template <typename T>
+	auto GetRegistry();
+
+	class FCSharpBind* GetBind() const;
+
 private:
 	static FCSharpEnvironment Environment;
 
