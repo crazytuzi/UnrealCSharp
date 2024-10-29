@@ -5,7 +5,7 @@
 class UNREALCSHARP_API FDomain final : public FTickableGameObject
 {
 private:
-	typedef void (*SynchronizationContextTickType)(float, MonoException**);
+	typedef void (*SynchronizationContextTickType)(float, MonoObject**);
 
 public:
 	explicit FDomain(const FMonoDomainInitializeParams& InParams);
