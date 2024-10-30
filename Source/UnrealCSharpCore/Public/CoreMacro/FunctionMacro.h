@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#define FUNCTION_CLASS_CONSTRUCTOR FString(".cctor")
+
 #define FUNCTION_OBJECT_CONSTRUCTOR FString(".ctor")
 
 #define FUNCTION_UTILS_SET_OUT FString(TEXT("SetOut"))
