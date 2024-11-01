@@ -6,9 +6,9 @@
 
 void FSolutionGenerator::Generator()
 {
-	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginDirectory() / PLUGIN_TEMPLATE_PATH;
+	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory();
 
-	const auto ScriptPath = FUnrealCSharpFunctionLibrary::GetPluginDirectory() / PLUGIN_SCRIPT_PATH;
+	const auto ScriptPath = FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory();
 
 	CopyTemplate(
 		FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectPath(),

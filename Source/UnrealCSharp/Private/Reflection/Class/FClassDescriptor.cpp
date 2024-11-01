@@ -20,6 +20,8 @@ void FClassDescriptor::Initialize()
 	{
 		Class->ClearFunctionMapsCaches();
 	}
+
+	FMonoDomain::Class_Constructor(BindMonoClass);
 }
 
 void FClassDescriptor::Deinitialize()

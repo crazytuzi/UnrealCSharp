@@ -337,13 +337,40 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
 
-                if (!Property.PropertyType.IsValueType)
+                if (getParamGarbageCollectionHandle != null)
                 {
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
-                }
+                    var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
+                        .First(Field => Field.Name == "Zero");
 
-                ilProcessor.Append(GetTypeStind(Property.PropertyType));
+                    var ib = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+
+                    var i12 = Instruction.Create(OpCodes.Ldarg_1);
+
+                    var i13 = Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+
+                    var i18 = GetTypeStind(Property.PropertyType);
+
+                    var i9 = Instruction.Create(OpCodes.Brtrue_S, i12);
+
+                    var i10 = Instruction.Create(OpCodes.Br_S, i18);
+
+                    ilProcessor.Append(i9);
+
+                    ilProcessor.Append(ib);
+
+                    ilProcessor.Append(i10);
+
+                    ilProcessor.Append(i12);
+
+                    ilProcessor.Append(i13);
+
+                    ilProcessor.Append(i18);
+                }
+                else
+                {
+                    ilProcessor.Append(GetTypeStind(Property.PropertyType));
+                }
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 
@@ -514,13 +541,40 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
 
-                if (!Property.PropertyType.IsValueType)
+                if (getParamGarbageCollectionHandle != null)
                 {
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(getParamGarbageCollectionHandle)));
-                }
+                    var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
+                        .First(Field => Field.Name == "Zero");
 
-                ilProcessor.Append(GetTypeStind(Property.PropertyType));
+                    var ib = Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(zeroField));
+
+                    var i12 = Instruction.Create(OpCodes.Ldarg_1);
+
+                    var i13 = Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+
+                    var i18 = GetTypeStind(Property.PropertyType);
+
+                    var i9 = Instruction.Create(OpCodes.Brtrue_S, i12);
+
+                    var i10 = Instruction.Create(OpCodes.Br_S, i18);
+
+                    ilProcessor.Append(i9);
+
+                    ilProcessor.Append(ib);
+
+                    ilProcessor.Append(i10);
+
+                    ilProcessor.Append(i12);
+
+                    ilProcessor.Append(i13);
+
+                    ilProcessor.Append(i18);
+                }
+                else
+                {
+                    ilProcessor.Append(GetTypeStind(Property.PropertyType));
+                }
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 

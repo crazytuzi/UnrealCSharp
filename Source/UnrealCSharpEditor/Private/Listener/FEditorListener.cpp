@@ -134,6 +134,25 @@ void FEditorListener::OnBeginGenerator()
 {
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
+	{
+		if (UnrealCSharpEditorSetting->EnableDeleteProxyDirectory())
+		{
+			if (const auto UEProxyDirectory = FUnrealCSharpFunctionLibrary::GetUEProxyDirectory();
+				PlatformFile.DirectoryExists(*UEProxyDirectory))
+			{
+				PlatformFile.DeleteDirectoryRecursively(*UEProxyDirectory);
+			}
+
+			if (const auto GameProxyDirectory = FUnrealCSharpFunctionLibrary::GetGameProxyDirectory();
+				PlatformFile.DirectoryExists(*GameProxyDirectory))
+			{
+				PlatformFile.DeleteDirectoryRecursively(*GameProxyDirectory);
+			}
+		}
+	}
+
 	auto BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(),
 	                                   FUnrealCSharpFunctionLibrary::GetBindingDirectory());
 

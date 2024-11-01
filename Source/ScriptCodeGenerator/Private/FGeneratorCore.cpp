@@ -538,7 +538,7 @@ FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 	else
 	{
 		return FString::Printf(TEXT(
-			"value.%s"),
+			"value?.%s ?? nint.Zero"),
 		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 	}
@@ -632,14 +632,16 @@ FString FGeneratorCore::GetModuleRelativePath(const UEnum* InEnum)
 FString FGeneratorCore::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
 {
 	return InDelegateProperty != nullptr
-		       ? GetModuleRelativePath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))
+		       ? GetModuleRelativePath(
+			       InDelegateProperty->SignatureFunction->GetMetaData(TEXT("ModuleRelativePath")))
 		       : FString();
 }
 
 FString FGeneratorCore::GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty)
 {
 	return InMulticastDelegateProperty != nullptr
-		       ? GetModuleRelativePath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))
+		       ? GetModuleRelativePath(
+			       InMulticastDelegateProperty->SignatureFunction->GetMetaData(TEXT("ModuleRelativePath")))
 		       : FString();
 }
 
