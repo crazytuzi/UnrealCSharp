@@ -248,7 +248,7 @@ void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 I
 {
 	if (const auto InObject = static_cast<UObject*>(const_cast<UObjectBase*>(Object)))
 	{
-		if (InObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject | EObjectFlags::RF_ArchetypeObject))
+		if (InObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject))
 		{
 			FScopeLock Lock(&CriticalSection);
 
@@ -352,7 +352,7 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 
 	for (const auto& PendingBindObject : PendingBindObjects)
 	{
-		if (PendingBindObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject | EObjectFlags::RF_ArchetypeObject))
+		if (PendingBindObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject))
 		{
 			FCSharpBind::BindClassDefaultObject(Domain, PendingBindObject);
 		}
