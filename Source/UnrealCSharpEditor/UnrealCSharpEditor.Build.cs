@@ -26,7 +26,8 @@ public class UnrealCSharpEditor : ModuleRules
 			new string[]
 			{
 				"Core", 
-				"DirectoryWatcher"
+				"DirectoryWatcher", 
+				"CollectionManager"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -50,7 +51,9 @@ public class UnrealCSharpEditor : ModuleRules
 				"ScriptCodeGenerator",
 				"Compiler",
 				"UnrealCSharpCore",
-				"CrossVersion"
+				"CrossVersion", 
+				"ContentBrowserData",
+				"ContentBrowserClassDataSource",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

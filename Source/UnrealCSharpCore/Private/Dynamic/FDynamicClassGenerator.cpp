@@ -15,6 +15,7 @@
 #include "Dynamic/FDynamicGenerator.h"
 #endif
 #include "UEVersion.h"
+#include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 
 TSet<UClass::ClassConstructorType> FDynamicClassGenerator::ClassConstructorSet
 {
@@ -233,6 +234,10 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 	{
 		ReInstance(OldClass, Class);
 	}
+#endif
+
+#if WITH_EDITOR
+	FUnrealCSharpCoreModuleDelegates::OnClassHierarchyUpdated.Broadcast();
 #endif
 
 	FDynamicGeneratorCore::Completed(ClassName);

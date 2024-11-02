@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ContentBrowser/UnrealCSharpScriptClassDataSource.h"
 #include "Listener/FEditorListener.h"
 #include "Modules/ModuleManager.h"
 
@@ -22,6 +23,10 @@ private:
 
 private:
 	void RegisterMenus();
+
+	void RegisterDataSource();
+
+	void UnregisterDataSource();
 
 public:
 	static void UpdatePackagingSettings();
@@ -44,4 +49,6 @@ private:
 	TUniquePtr<FAutoConsoleCommand> GeneratorConsoleCommand;
 
 	FEditorListener EditorListener;
+
+	TStrongObjectPtr<UUnrealCSharpScriptClassDataSource> ScriptClassDataSource;
 };

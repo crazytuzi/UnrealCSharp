@@ -35,6 +35,11 @@ public:
 
 	static UNREALCSHARPCORE_API UClass* GetDynamicClass(MonoClass* InMonoClass);
 
+	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses()
+	{
+		return DynamicClassSet;
+	}
+
 private:
 	static void BeginGenerator(UClass* InClass, UClass* InParentClass);
 

@@ -36,6 +36,8 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	FUnrealCSharpEditorCommands::Register();
 
+	RegisterDataSource();
+
 	auto& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 
 	PropertyEditorModule.RegisterCustomPropertyTypeLayout("GameContentDirectoryPath",
@@ -108,6 +110,8 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 
 	FUnrealCSharpEditorCommands::Unregister();
 
+	UnregisterDataSource();
+
 	if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
 	{
 		auto& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
@@ -159,6 +163,22 @@ void FUnrealCSharpEditorModule::RegisterMenus()
 	{
 		UnrealCSharpBlueprintToolBar->Initialize();
 	}
+}
+
+void FUnrealCSharpEditorModule::RegisterDataSource()
+{
+	GetMutableDefault<UContentBrowserDataSubsystem>()->ActivateDataSource(FName(TEXT("ScriptData")));
+	
+	const auto NewDataSource = NewObject<UUnrealCSharpScriptClassDataSource>(GetTransientPackage(),"ScriptData");
+	
+	ScriptClassDataSource.Reset(NewDataSource);
+	
+	ScriptClassDataSource->Initialize();
+}
+
+void FUnrealCSharpEditorModule::UnregisterDataSource()
+{
+	ScriptClassDataSource.Reset();
 }
 
 void FUnrealCSharpEditorModule::UpdatePackagingSettings()
