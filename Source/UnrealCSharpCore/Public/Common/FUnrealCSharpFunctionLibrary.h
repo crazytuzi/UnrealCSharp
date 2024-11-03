@@ -94,6 +94,10 @@ public:
 
 	static FString GetPluginScriptDirectory();
 
+#if WITH_EDITOR
+	static FString GetPluginTemplateDirectory();
+#endif
+
 	static bool IsGameField(const UField* InField);
 
 #if WITH_EDITOR

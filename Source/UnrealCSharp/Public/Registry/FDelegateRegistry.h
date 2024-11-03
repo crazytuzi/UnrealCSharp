@@ -4,7 +4,7 @@
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
 
-class FDelegateRegistry
+class UNREALCSHARP_API FDelegateRegistry
 {
 public:
 	template <typename Address, typename Value>

@@ -42,5 +42,8 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern UWorld Unreal_GWorldImplementation();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern UPackage Unreal_GetTransientPackageImplementation();
     }
 }

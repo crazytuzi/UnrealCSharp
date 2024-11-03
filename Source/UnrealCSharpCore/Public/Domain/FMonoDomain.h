@@ -181,6 +181,8 @@ public:
 	static void* Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod);
 
 public:
+	static void Class_Constructor(MonoClass* InMonoClass);
+
 	static void Object_Constructor(MonoObject* InMonoObject, int32 InParamCount = 0, void** InParams = nullptr);
 
 	static MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,

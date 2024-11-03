@@ -538,7 +538,7 @@ FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 	else
 	{
 		return FString::Printf(TEXT(
-			"value.%s"),
+			"value?.%s ?? nint.Zero"),
 		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 	}

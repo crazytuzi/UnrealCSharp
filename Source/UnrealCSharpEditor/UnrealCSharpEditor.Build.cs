@@ -54,6 +54,7 @@ public class UnrealCSharpEditor : ModuleRules
 				"CrossVersion", 
 				"ContentBrowserData",
 				"ContentBrowserClassDataSource",
+				"UMG"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

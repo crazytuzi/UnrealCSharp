@@ -168,6 +168,11 @@ namespace
 			return FCSharpEnvironment::GetEnvironment().Bind(GWorld);
 		}
 
+		static MonoObject* GetTransientPackageImplementation()
+		{
+			return FCSharpEnvironment::GetEnvironment().Bind(GetTransientPackage());
+		}
+
 		FRegisterUnreal()
 		{
 			FClassBuilder(TEXT("Unreal"), NAMESPACE_LIBRARY)
@@ -176,7 +181,8 @@ namespace
 				.Function("LoadObject", LoadObjectImplementation)
 				.Function("LoadClass", LoadClassImplementation)
 				.Function("CreateWidget", CreateWidgetImplementation)
-				.Function("GWorld", GWorldImplementation);
+				.Function("GWorld", GWorldImplementation)
+				.Function("GetTransientPackage", GetTransientPackageImplementation);
 		}
 	};
 
