@@ -81,9 +81,6 @@ public:
 	                              const FName InAttributeKey,
 	                              FContentBrowserItemDataAttributeValue& OutAttributeValue) override;
 
-	virtual bool GetItemAttributes(const FContentBrowserItemData& InItem, const bool InIncludeMetaData,
-	                               FContentBrowserItemDataAttributeValues& OutAttributeValues) override;
-
 	virtual bool AppendItemReference(const FContentBrowserItemData& InItem, FString& InOutStr) override;
 
 	virtual bool TryGetCollectionId(const FContentBrowserItemData& InItem, FSoftObjectPath& OutCollectionId) override;

@@ -2,7 +2,6 @@
 
 #include "AssetToolsModule.h"
 #include "CollectionManagerModule.h"
-#include "ContentBrowserClassDataCore.h"
 #include "ContentBrowserDataUtils.h"
 #include "ContentBrowserItemPath.h"
 #include "ProjectDescriptor.h"
@@ -549,20 +548,30 @@ bool UUnrealCSharpScriptClassDataSource::GetItemAttribute(const FContentBrowserI
                                                           const bool InIncludeMetaData, const FName InAttributeKey,
                                                           FContentBrowserItemDataAttributeValue& OutAttributeValue)
 {
-	return ContentBrowserClassData::GetItemAttribute(GetClassTypeActions().Get(), this, InItem, InIncludeMetaData,
-	                                                 InAttributeKey, OutAttributeValue);
-}
+	if (const auto ClassPayload = GetClassFileItemPayload(InItem))
+	{
 
-bool UUnrealCSharpScriptClassDataSource::GetItemAttributes(const FContentBrowserItemData& InItem,
-                                                           const bool InIncludeMetaData,
-                                                           FContentBrowserItemDataAttributeValues& OutAttributeValues)
-{
-	return ContentBrowserClassData::GetItemAttributes(this, InItem, InIncludeMetaData, OutAttributeValues);
+		return ClassPayload->GetClassFileItemAttribute(GetClassTypeActions().Get(), InIncludeMetaData, InAttributeKey, OutAttributeValue);
+	}
+
+	return false;
 }
 
 bool UUnrealCSharpScriptClassDataSource::AppendItemReference(const FContentBrowserItemData& InItem, FString& InOutStr)
 {
-	return ContentBrowserClassData::AppendItemReference(this, InItem, InOutStr);
+	if (const auto ClassPayload = GetClassFileItemPayload(InItem))
+	{
+		if (InOutStr.Len() > 0)
+		{
+			InOutStr += LINE_TERMINATOR;
+		}
+		
+		InOutStr += ClassPayload->GetAssetData().GetExportTextName();
+		
+		return true;
+	}
+
+	return false;
 }
 
 bool UUnrealCSharpScriptClassDataSource::TryGetCollectionId(const FContentBrowserItemData& InItem,
@@ -574,6 +583,7 @@ bool UUnrealCSharpScriptClassDataSource::TryGetCollectionId(const FContentBrowse
 
 		return true;
 	}
+
 	return false;
 }
 
@@ -586,6 +596,7 @@ bool UUnrealCSharpScriptClassDataSource::Legacy_TryGetPackagePath(const FContent
 
 		return true;
 	}
+
 	return false;
 }
 
@@ -598,6 +609,7 @@ bool UUnrealCSharpScriptClassDataSource::Legacy_TryGetAssetData(const FContentBr
 
 		return true;
 	}
+
 	return false;
 }
 
@@ -622,6 +634,7 @@ UUnrealCSharpScriptClassDataSource::GetClassFileItemPayload(const FContentBrowse
 	{
 		return StaticCastSharedPtr<const FUnrealCSharpScriptClassFileItemDataPayload>(InItem.GetPayload());
 	}
+
 	return nullptr;
 }
 
@@ -632,6 +645,7 @@ UUnrealCSharpScriptClassDataSource::GetClassFolderItemDataPayload(const FContent
 	{
 		return StaticCastSharedPtr<const FUnrealCSharpScriptClassFolderItemDataPayload>(InItem.GetPayload());
 	}
+
 	return nullptr;
 }
 

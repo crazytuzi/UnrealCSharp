@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "ContentBrowserItemData.h"
+#include "IAssetTypeActions.h"
 #include "AssetRegistry/AssetData.h"
 
 class FAssetThumbnail;
@@ -18,19 +19,17 @@ public:
 		return InternalPath;
 	}
 
-	//const FString& GetFilename() const;
-
 private:
 	FName InternalPath;
-
-	mutable bool bHasCachedFilename = false;
-	mutable FString CachedFilename;
+	
 };
 
 class UNREALCSHARPEDITOR_API FUnrealCSharpScriptClassFileItemDataPayload : public IContentBrowserItemDataPayload
 {
 public:
 	FUnrealCSharpScriptClassFileItemDataPayload(const FName InInternalPath, UClass* InClass);
+
+	static bool GetClassFileItemAttribute(IAssetTypeActions* InClassTypeActions, const bool InIncludeMetaData, const FName InAttributeKey, FContentBrowserItemDataAttributeValue& OutAttributeValue);
 
 	FName GetInternalPath() const
 	{
@@ -46,9 +45,7 @@ public:
 	{
 		return AssetData;
 	}
-
-	//const FString& GetFilename() const;
-
+	
 	void UpdateThumbnail(FAssetThumbnail& InThumbnail) const;
 
 private:
@@ -57,7 +54,5 @@ private:
 	TWeakObjectPtr<UClass> Class;
 
 	FAssetData AssetData;
-
-	mutable bool bHasCachedFilename = false;
-	mutable FString CachedFilename;
+	
 };
