@@ -66,6 +66,10 @@
 
 #define DYNAMIC_FILE FString(TEXT("DynamicFile"))
 
+#define SCRIPT_CLASS_ROOT_INTERNAL_PATH "/Classes_Script"
+
+#define SCRIPT_CLASS_ROOT_VIRTUAL_PATH "/All" SCRIPT_CLASS_ROOT_INTERNAL_PATH
+
 #define ACTOR_PREFIX AActor::StaticClass()->GetPrefixCPP()
 
 #define OBJECT_PREFIX UObject::StaticClass()->GetPrefixCPP()

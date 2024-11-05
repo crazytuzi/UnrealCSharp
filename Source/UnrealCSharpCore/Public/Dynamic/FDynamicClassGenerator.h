@@ -21,6 +21,8 @@ public:
 	static MonoClass* GetMonoClass(const FString& InName);
 
 	static void OnPrePIEEnded();
+
+	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses();
 #endif
 
 	static void Generator(MonoClass* InMonoClass);
@@ -34,11 +36,6 @@ public:
 	static bool IsDynamicBlueprintGeneratedSubClass(const UBlueprintGeneratedClass* InClass);
 
 	static UNREALCSHARPCORE_API UClass* GetDynamicClass(MonoClass* InMonoClass);
-
-	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses()
-	{
-		return DynamicClassSet;
-	}
 
 private:
 	static void BeginGenerator(UClass* InClass, UClass* InParentClass);

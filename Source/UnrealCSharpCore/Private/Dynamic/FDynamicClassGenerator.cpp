@@ -145,6 +145,11 @@ void FDynamicClassGenerator::OnPrePIEEnded()
 			InBlueprintGeneratedClass->ClassConstructor = &FDynamicClassGenerator::ClassConstructor;
 		});
 }
+
+const TSet<UClass*>& FDynamicClassGenerator::GetDynamicClasses()
+{
+	return DynamicClassSet;
+}
 #endif
 
 void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
@@ -237,7 +242,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 #endif
 
 #if WITH_EDITOR
-	FUnrealCSharpCoreModuleDelegates::OnClassHierarchyUpdated.Broadcast();
+	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Broadcast();
 #endif
 
 	FDynamicGeneratorCore::Completed(ClassName);

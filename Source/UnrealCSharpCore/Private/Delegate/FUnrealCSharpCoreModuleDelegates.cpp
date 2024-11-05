@@ -4,4 +4,4 @@ FUnrealCSharpCoreModuleDelegates::FOnBeginGenerator FUnrealCSharpCoreModuleDeleg
 
 FUnrealCSharpCoreModuleDelegates::FOnEndGenerator FUnrealCSharpCoreModuleDelegates::OnEndGenerator;
 
-FUnrealCSharpCoreModuleDelegates::FOnClassHierarchyUpdated FUnrealCSharpCoreModuleDelegates::OnClassHierarchyUpdated;
+FUnrealCSharpCoreModuleDelegates::FOnDynamicClassUpdated FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated;

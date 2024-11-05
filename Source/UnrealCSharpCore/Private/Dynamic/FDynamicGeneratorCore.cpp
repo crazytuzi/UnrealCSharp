@@ -14,7 +14,6 @@
 #include "CoreMacro/MetaDataAttributeMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
@@ -225,10 +224,6 @@ void FDynamicGeneratorCore::BeginCodeAnalysisGenerator()
 void FDynamicGeneratorCore::EndCodeAnalysisGenerator()
 {
 	DynamicMap.Empty();
-
-#if WITH_EDITOR
-	FUnrealCSharpCoreModuleDelegates::OnClassHierarchyUpdated.Broadcast();
-#endif
 }
 
 void FDynamicGeneratorCore::CodeAnalysisGenerator(const FString& InName,

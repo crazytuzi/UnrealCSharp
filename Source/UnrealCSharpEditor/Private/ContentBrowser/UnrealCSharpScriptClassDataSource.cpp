@@ -9,6 +9,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "CoreMacro/Macro.h"
 #include "Interfaces/IProjectManager.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(UnrealCSharpScriptClassDataSource)
@@ -19,7 +20,7 @@ void UUnrealCSharpScriptClassDataSource::Initialize(const bool InAutoRegister)
 {
 	Super::Initialize(InAutoRegister);
 
-	FUnrealCSharpCoreModuleDelegates::OnClassHierarchyUpdated.AddUObject(
+	OnDynamicClassUpdatedHandle = FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.AddUObject(
 		this, &UUnrealCSharpScriptClassDataSource::OnScriptClassHierarchyUpdated);
 
 	CollectionManager = &FCollectionManagerModule::GetModule().Get();
@@ -29,13 +30,15 @@ void UUnrealCSharpScriptClassDataSource::Initialize(const bool InAutoRegister)
 
 void UUnrealCSharpScriptClassDataSource::Shutdown()
 {
-	Super::Shutdown();
-
 	CollectionManager = nullptr;
 
 	ScriptClassHierarchy.Reset();
 
 	ClassTypeActions.Reset();
+
+	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Remove(OnDynamicClassUpdatedHandle);
+
+	Super::Shutdown();
 }
 
 TSharedPtr<IAssetTypeActions> UUnrealCSharpScriptClassDataSource::GetClassTypeActions()
@@ -53,7 +56,7 @@ TSharedPtr<IAssetTypeActions> UUnrealCSharpScriptClassDataSource::GetClassTypeAc
 	return ClassTypeActions;
 }
 
-bool UUnrealCSharpScriptClassDataSource::RootClassPathPassesFilter(const FName InRootClassPath)
+bool UUnrealCSharpScriptClassDataSource::RootClassPathPassesFilter(const FName& InRootClassPath)
 {
 	return InRootClassPath.ToString().StartsWith(SCRIPT_CLASS_ROOT_INTERNAL_PATH);
 }
@@ -74,10 +77,18 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 
 	const auto CollectionFilter = InFilter.ExtraFilters.FindFilter<FContentBrowserDataCollectionFilter>();
 
-	const auto ClassPermissionList = ClassFilter && ClassFilter->ClassPermissionList && ClassFilter->
-	                                 ClassPermissionList->HasFiltering()
-		                                 ? ClassFilter->ClassPermissionList.Get()
-		                                 : nullptr;
+	const FPathPermissionList* ClassPermissionList = nullptr;
+
+	if (ClassFilter)
+	{
+		if (ClassFilter->ClassPermissionList)
+		{
+			if (ClassFilter->ClassPermissionList->HasFiltering())
+			{
+				ClassPermissionList = ClassFilter->ClassPermissionList.Get();
+			}
+		}
+	}
 
 	const bool bIncludeFolders =
 		EnumHasAnyFlags(InFilter.ItemTypeFilter, EContentBrowserItemTypeFilter::IncludeFolders);
@@ -206,7 +217,7 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 						return true;
 					}, true);
 
-				if (InternalPaths.Num() == 0)
+				if (InternalPaths.IsEmpty())
 				{
 					return;
 				}
@@ -221,7 +232,7 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 		}
 	}
 
-	if (InternalPaths.Num() == 0 || !ScriptClassHierarchy.IsValid())
+	if (InternalPaths.IsEmpty() || !ScriptClassHierarchy.IsValid())
 	{
 		return;
 	}
@@ -233,13 +244,13 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 
 		if (ConvertedPathType == EContentBrowserPathType::Virtual)
 		{
-			for (const FName InternalPath : InternalPaths)
+			for (const FName& InternalPath : InternalPaths)
 			{
 				ScriptClassDataFilter.ValidFolders.Add(InternalPath);
 			}
 		}
 
-		for (const FName ChildClassFolder : ChildClassFolders)
+		for (const FName& ChildClassFolder : ChildClassFolders)
 		{
 			ScriptClassDataFilter.ValidFolders.Add(ChildClassFolder);
 		}
@@ -247,8 +258,8 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 
 	if (bIncludeFiles)
 	{
-		if (const auto ChildClassObjects = ScriptClassHierarchy->GetMatchingClasses(
-			ConvertedPath, InFilter.bRecursivePaths); ChildClassObjects.Num() > 0)
+		if (const auto& ChildClassObjects = ScriptClassHierarchy->GetMatchingClasses(
+			ConvertedPath, InFilter.bRecursivePaths); !ChildClassObjects.IsEmpty())
 		{
 			TSet<FTopLevelAssetPath> ClassPathsToInclude;
 
@@ -257,7 +268,7 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 				TArray<FTopLevelAssetPath> ClassPathsForCollections;
 				if (GetClassPathsForCollections(CollectionFilter->SelectedCollections,
 				                                CollectionFilter->bIncludeChildCollections,
-				                                ClassPathsForCollections) && ClassPathsForCollections.Num() == 0)
+				                                ClassPathsForCollections) && ClassPathsForCollections.IsEmpty())
 				{
 					return;
 				}
@@ -267,7 +278,7 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 
 			for (UClass* ChildClassObject : ChildClassObjects)
 			{
-				const bool bPassesInclusiveFilter = ClassPathsToInclude.Num() == 0 || ClassPathsToInclude.Contains(
+				const bool bPassesInclusiveFilter = ClassPathsToInclude.IsEmpty() || ClassPathsToInclude.Contains(
 					FTopLevelAssetPath(ChildClassObject));
 
 				const bool bPassesPermissionCheck = !ClassPermissionList || ClassPermissionList->PassesFilter(
@@ -436,8 +447,8 @@ bool UUnrealCSharpScriptClassDataSource::DoesItemPassFilter(const FContentBrowse
 	switch (InItem.GetItemType())
 	{
 	case EContentBrowserItemFlags::Type_Folder:
-		if (EnumHasAnyFlags(InFilter.ItemTypeFilter, EContentBrowserItemTypeFilter::IncludeFolders) && ClassDataFilter->
-			ValidFolders.Num() > 0)
+		if (EnumHasAnyFlags(InFilter.ItemTypeFilter, EContentBrowserItemTypeFilter::IncludeFolders) && !ClassDataFilter->
+			ValidFolders.IsEmpty())
 		{
 			if (const auto FolderPayload = GetClassFolderItemDataPayload(InItem))
 			{
@@ -447,8 +458,8 @@ bool UUnrealCSharpScriptClassDataSource::DoesItemPassFilter(const FContentBrowse
 		break;
 
 	case EContentBrowserItemFlags::Type_File:
-		if (EnumHasAnyFlags(InFilter.ItemTypeFilter, EContentBrowserItemTypeFilter::IncludeFiles) && ClassDataFilter->
-			ValidClasses.Num() > 0)
+		if (EnumHasAnyFlags(InFilter.ItemTypeFilter, EContentBrowserItemTypeFilter::IncludeFiles) && !ClassDataFilter->
+			ValidClasses.IsEmpty())
 		{
 			if (const auto ClassPayload = GetClassFileItemPayload(InItem))
 			{
@@ -494,7 +505,11 @@ TSet<FName> UUnrealCSharpScriptClassDataSource::GetGameModules()
 
 FString UUnrealCSharpScriptClassDataSource::GetDynamicClassSourcePath(const UClass* InClass)
 {
-	return FDynamicGenerator::GetDynamicFile(InClass).Replace(TEXT("\\"), TEXT("/"));
+	FString DynamicClassFileName = FDynamicGenerator::GetDynamicFile(InClass);
+
+	FPaths::NormalizeFilename(DynamicClassFileName);
+
+	return DynamicClassFileName;
 }
 
 FString UUnrealCSharpScriptClassDataSource::GetDynamicClassVirtualPath(const UClass* InClass)
@@ -561,7 +576,7 @@ bool UUnrealCSharpScriptClassDataSource::AppendItemReference(const FContentBrows
 {
 	if (const auto ClassPayload = GetClassFileItemPayload(InItem))
 	{
-		if (InOutStr.Len() > 0)
+		if (!InOutStr.IsEmpty())
 		{
 			InOutStr += LINE_TERMINATOR;
 		}
@@ -653,7 +668,7 @@ bool UUnrealCSharpScriptClassDataSource::GetClassPathsForCollections(
 	TArrayView<const FCollectionNameType> InCollections, const bool bIncludeChildCollections,
 	TArray<FTopLevelAssetPath>& OutClassPaths) const
 {
-	if (InCollections.Num() > 0)
+	if (!InCollections.IsEmpty())
 	{
 		const ECollectionRecursionFlags::Flags CollectionRecursionMode = bIncludeChildCollections
 			                                                                 ? ECollectionRecursionFlags::SelfAndChildren

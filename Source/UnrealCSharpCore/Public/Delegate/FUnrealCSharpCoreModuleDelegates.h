@@ -7,11 +7,11 @@ public:
 
 	DECLARE_MULTICAST_DELEGATE(FOnEndGenerator);
 
-	DECLARE_MULTICAST_DELEGATE(FOnClassHierarchyUpdated);
+	DECLARE_MULTICAST_DELEGATE(FOnDynamicClassUpdated);
 
 	static FOnBeginGenerator OnBeginGenerator;
 
 	static FOnEndGenerator OnEndGenerator;
 
-	static FOnClassHierarchyUpdated OnClassHierarchyUpdated;
+	static FOnDynamicClassUpdated OnDynamicClassUpdated;
 };

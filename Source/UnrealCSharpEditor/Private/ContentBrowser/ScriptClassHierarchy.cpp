@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "ContentBrowser/ScriptClassHierarchy.h"
-
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "ContentBrowser/UnrealCSharpScriptClassDataSource.h"
+#include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 
 
@@ -194,7 +194,7 @@ void FScriptClassHierarchy::EnumerateLeafNodesInternal(TSharedPtr<FScriptClassHi
                                                        const TFunctionRef<void(TSharedPtr<FScriptClassHierarchyNode>&&)>
                                                        & InCallback)
 {
-	if (InNode->GetChildrenRef().Num() == 0)
+	if (InNode->GetChildrenRef().IsEmpty())
 	{
 		InCallback(MoveTemp(InNode));
 		return;

@@ -5,6 +5,7 @@
 #include "Dynamic/FDynamicStructGenerator.h"
 #include "Dynamic/FDynamicInterfaceGenerator.h"
 #include "Dynamic/FDynamicClassGenerator.h"
+#include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 
 #if WITH_EDITOR
@@ -51,6 +52,8 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 	FDynamicClassGenerator::CodeAnalysisGenerator();
 
 	FDynamicGeneratorCore::EndCodeAnalysisGenerator();
+	
+	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Broadcast();
 
 	if (IsRunningCookCommandlet())
 	{

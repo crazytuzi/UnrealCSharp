@@ -9,10 +9,6 @@
 
 #include "UnrealCSharpScriptClassDataSource.generated.h"
 
-#define SCRIPT_CLASS_ROOT_INTERNAL_PATH "/Classes_Script"
-
-#define SCRIPT_CLASS_ROOT_VIRTUAL_PATH "/All/Classes_Script"
-
 USTRUCT()
 struct UNREALCSHARPEDITOR_API FUnrealCSharpCompiledScriptClassDataFilter
 {
@@ -97,7 +93,7 @@ public:
 protected:
 	TSharedPtr<IAssetTypeActions> GetClassTypeActions();
 
-	static bool RootClassPathPassesFilter(const FName InRootClassPath);
+	static bool RootClassPathPassesFilter(const FName& InRootClassPath);
 
 	virtual void BuildRootPathVirtualTree() override;
 
@@ -119,6 +115,8 @@ private:
 	TSharedPtr<IAssetTypeActions> ClassTypeActions;
 
 	TSharedPtr<FScriptClassHierarchy> ScriptClassHierarchy;
+
+	FDelegateHandle OnDynamicClassUpdatedHandle;
 
 	ICollectionManager* CollectionManager;
 };
