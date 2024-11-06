@@ -6,13 +6,19 @@
 #include "ContentBrowserItemPath.h"
 #include "ProjectDescriptor.h"
 #include "SourceCodeNavigation.h"
+#if UE_NAME_PERMISSION_LIST
+#include "Misc/NamePermissionList.h"
+#endif
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "CoreMacro/Macro.h"
+#include "Dynamic/FDynamicClassGenerator.h"
 #include "Interfaces/IProjectManager.h"
 
+#if UE_INLINE_GENERATED
 #include UE_INLINE_GENERATED_CPP_BY_NAME(UnrealCSharpScriptClassDataSource)
+#endif
 
 #define LOCTEXT_NAMESPACE "UnrealCSharpScriptClassDataSource"
 
@@ -21,6 +27,9 @@ void UUnrealCSharpScriptClassDataSource::Initialize(const bool InAutoRegister)
 	Super::Initialize(InAutoRegister);
 
 	OnDynamicClassUpdatedHandle = FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.AddUObject(
+		this, &UUnrealCSharpScriptClassDataSource::OnScriptClassHierarchyUpdated);
+
+	OnEndGeneratorHandle = FUnrealCSharpCoreModuleDelegates::OnEndGenerator.AddUObject(
 		this, &UUnrealCSharpScriptClassDataSource::OnScriptClassHierarchyUpdated);
 
 	CollectionManager = &FCollectionManagerModule::GetModule().Get();
@@ -36,7 +45,15 @@ void UUnrealCSharpScriptClassDataSource::Shutdown()
 
 	ClassTypeActions.Reset();
 
-	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Remove(OnDynamicClassUpdatedHandle);
+	if (FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.IsBoundToObject(this))
+	{
+		FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Remove(OnDynamicClassUpdatedHandle);
+	}
+
+	if (FUnrealCSharpCoreModuleDelegates::OnEndGenerator.IsBoundToObject(this))
+	{
+		FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Remove(OnEndGeneratorHandle);
+	}
 
 	Super::Shutdown();
 }
@@ -77,7 +94,11 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 
 	const auto CollectionFilter = InFilter.ExtraFilters.FindFilter<FContentBrowserDataCollectionFilter>();
 
+#if UE_NAME_PERMISSION_LIST
+	const FNamePermissionList* ClassPermissionList = nullptr;
+#else
 	const FPathPermissionList* ClassPermissionList = nullptr;
+#endif
 
 	if (ClassFilter)
 	{
@@ -106,6 +127,8 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 	{
 		return;
 	}
+
+	RefreshVirtualPathTreeIfNeeded();
 
 	TSet<FName> InternalPaths;
 
@@ -261,11 +284,20 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 		if (const auto& ChildClassObjects = ScriptClassHierarchy->GetMatchingClasses(
 			ConvertedPath, InFilter.bRecursivePaths); !ChildClassObjects.IsEmpty())
 		{
+#if UE_TOP_LEVEL_ASSET_PATH
 			TSet<FTopLevelAssetPath> ClassPathsToInclude;
+#else
+			TSet<FName> ClassPathsToInclude;
+#endif
 
 			if (CollectionFilter)
 			{
+#if UE_TOP_LEVEL_ASSET_PATH
 				TArray<FTopLevelAssetPath> ClassPathsForCollections;
+#else
+				TArray<FName> ClassPathsForCollections;
+#endif
+
 				if (GetClassPathsForCollections(CollectionFilter->SelectedCollections,
 				                                CollectionFilter->bIncludeChildCollections,
 				                                ClassPathsForCollections) && ClassPathsForCollections.IsEmpty())
@@ -279,10 +311,19 @@ void UUnrealCSharpScriptClassDataSource::CompileFilter(const FName InPath, const
 			for (UClass* ChildClassObject : ChildClassObjects)
 			{
 				const bool bPassesInclusiveFilter = ClassPathsToInclude.IsEmpty() || ClassPathsToInclude.Contains(
+#if UE_TOP_LEVEL_ASSET_PATH
 					FTopLevelAssetPath(ChildClassObject));
-
+#else
+					*ChildClassObject->GetPathName());
+#endif
+				
 				const bool bPassesPermissionCheck = !ClassPermissionList || ClassPermissionList->PassesFilter(
+#if UE_TOP_LEVEL_ASSET_PATH
 					ChildClassObject->GetClassPathName().ToString());
+#else
+					ChildClassObject->GetFName());
+#endif
+					
 
 				if (bPassesInclusiveFilter && bPassesPermissionCheck)
 				{
@@ -314,8 +355,11 @@ FContentBrowserItemData UUnrealCSharpScriptClassDataSource::CreateClassFolderIte
 	}
 
 	return FContentBrowserItemData(this,
-	                               EContentBrowserItemFlags::Type_Folder | EContentBrowserItemFlags::Category_Class |
-	                               EContentBrowserItemFlags::Category_Plugin,
+	                               EContentBrowserItemFlags::Type_Folder | EContentBrowserItemFlags::Category_Class
+#if UE_ITEM_TAG_PLUGIN
+	                               | EContentBrowserItemFlags::Category_Plugin
+#endif
+	                               ,
 	                               VirtualizedPath,
 	                               *FolderItemName,
 	                               MoveTemp(FolderDisplayNameOverride),
@@ -325,8 +369,11 @@ FContentBrowserItemData UUnrealCSharpScriptClassDataSource::CreateClassFolderIte
 FContentBrowserItemData UUnrealCSharpScriptClassDataSource::CreateClassFileItem(UClass* InClass)
 {
 	return FContentBrowserItemData(this,
-	                               EContentBrowserItemFlags::Type_File | EContentBrowserItemFlags::Category_Class |
-	                               EContentBrowserItemFlags::Category_Plugin,
+	                               EContentBrowserItemFlags::Type_File | EContentBrowserItemFlags::Category_Class 
+#if UE_ITEM_TAG_PLUGIN
+								   | EContentBrowserItemFlags::Category_Plugin
+#endif
+								   ,
 	                               *GetDynamicClassVirtualPath(InClass),
 	                               InClass->GetFName(),
 	                               FText(),
@@ -590,12 +637,19 @@ bool UUnrealCSharpScriptClassDataSource::AppendItemReference(const FContentBrows
 }
 
 bool UUnrealCSharpScriptClassDataSource::TryGetCollectionId(const FContentBrowserItemData& InItem,
-                                                            FSoftObjectPath& OutCollectionId)
+#if UE_ITEM_DATA_TRY_GET_COLLECTION_ID_PROPERTY
+															FName& OutCollectionId)
+#else
+															FSoftObjectPath& OutCollectionId)
+#endif
 {
 	if (const auto ClassPayload = GetClassFileItemPayload(InItem))
 	{
+#if UE_OBJECT_PATH
 		OutCollectionId = FSoftObjectPath(ClassPayload->GetAssetData().GetSoftObjectPath());
-
+#else
+		OutCollectionId = ClassPayload->GetAssetData().ObjectPath;
+#endif
 		return true;
 	}
 
@@ -638,7 +692,11 @@ bool UUnrealCSharpScriptClassDataSource::Legacy_TryConvertAssetDataToVirtualPath
 	const bool InUseFolderPaths, FName& OutPath)
 {
 	return TryConvertInternalPathToVirtual(
+#if UE_OBJECT_PATH
 		InUseFolderPaths ? InAssetData.PackagePath : *InAssetData.GetSoftObjectPath().ToString(),
+#else
+		InUseFolderPaths ? InAssetData.PackagePath : InAssetData.ObjectPath,
+#endif
 		OutPath);
 }
 
@@ -666,7 +724,11 @@ UUnrealCSharpScriptClassDataSource::GetClassFolderItemDataPayload(const FContent
 
 bool UUnrealCSharpScriptClassDataSource::GetClassPathsForCollections(
 	TArrayView<const FCollectionNameType> InCollections, const bool bIncludeChildCollections,
-	TArray<FTopLevelAssetPath>& OutClassPaths) const
+#if UE_TOP_LEVEL_ASSET_PATH
+									TArray<FTopLevelAssetPath>& OutClassPaths) const
+#else
+									TArray<FName>& OutClassPaths) const
+#endif
 {
 	if (!InCollections.IsEmpty())
 	{
@@ -691,6 +753,10 @@ void UUnrealCSharpScriptClassDataSource::OnScriptClassHierarchyUpdated()
 	ScriptClassHierarchy.Reset();
 
 	ScriptClassHierarchy = MakeShareable(new FScriptClassHierarchy());
+
+	SetVirtualPathTreeNeedsRebuild();
+
+	NotifyItemDataRefreshed();
 }
 
 bool UUnrealCSharpScriptClassDataSource::ConvertRelativePathToVirtualPath(const FName InNativePath,

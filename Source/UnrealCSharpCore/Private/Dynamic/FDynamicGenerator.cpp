@@ -52,7 +52,7 @@ void FDynamicGenerator::CodeAnalysisGenerator()
 	FDynamicClassGenerator::CodeAnalysisGenerator();
 
 	FDynamicGeneratorCore::EndCodeAnalysisGenerator();
-	
+
 	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Broadcast();
 
 	if (IsRunningCookCommandlet())

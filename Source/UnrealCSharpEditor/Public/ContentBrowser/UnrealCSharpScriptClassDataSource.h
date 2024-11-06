@@ -5,6 +5,7 @@
 #include "UnrealCSharpScriptClassDataPayload.h"
 #include "IAssetTypeActions.h"
 #include "ICollectionManager.h"
+#include "UEVersion.h"
 #include "ScriptClassHierarchy.h"
 
 #include "UnrealCSharpScriptClassDataSource.generated.h"
@@ -79,7 +80,11 @@ public:
 
 	virtual bool AppendItemReference(const FContentBrowserItemData& InItem, FString& InOutStr) override;
 
+#if UE_ITEM_DATA_TRY_GET_COLLECTION_ID_PROPERTY
+	virtual bool TryGetCollectionId(const FContentBrowserItemData& InItem, FName& OutCollectionId) override;
+#else
 	virtual bool TryGetCollectionId(const FContentBrowserItemData& InItem, FSoftObjectPath& OutCollectionId) override;
+#endif
 
 	virtual bool Legacy_TryGetPackagePath(const FContentBrowserItemData& InItem, FName& OutPackagePath) override;
 
@@ -110,13 +115,20 @@ private:
 
 	bool GetClassPathsForCollections(TArrayView<const FCollectionNameType> InCollections,
 	                                 const bool bIncludeChildCollections,
+#if UE_TOP_LEVEL_ASSET_PATH
 	                                 TArray<FTopLevelAssetPath>& OutClassPaths) const;
+#else
+	                                 TArray<FName>& OutClassPaths) const;
+#endif
+	
 
 	TSharedPtr<IAssetTypeActions> ClassTypeActions;
 
 	TSharedPtr<FScriptClassHierarchy> ScriptClassHierarchy;
 
 	FDelegateHandle OnDynamicClassUpdatedHandle;
+
+	FDelegateHandle OnEndGeneratorHandle;
 
 	ICollectionManager* CollectionManager;
 };
