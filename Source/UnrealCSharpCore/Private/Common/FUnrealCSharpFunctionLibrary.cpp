@@ -466,6 +466,26 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
 }
 #endif
 
+#if WITH_EDITOR
+bool FUnrealCSharpFunctionLibrary::IsRootPath(const FString& InPath)
+{
+	if (InPath.StartsWith(GetGameDirectory()))
+	{
+		return true;
+	}
+
+	for (const auto& CustomProjectsDirectory : GetCustomProjectsDirectory())
+	{
+		if (InPath.StartsWith(CustomProjectsDirectory))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+#endif
+
 bool FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction()
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())

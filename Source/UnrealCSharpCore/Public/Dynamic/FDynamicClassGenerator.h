@@ -21,6 +21,8 @@ public:
 	static MonoClass* GetMonoClass(const FString& InName);
 
 	static void OnPrePIEEnded();
+
+	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses();
 #endif
 
 	static void Generator(MonoClass* InMonoClass);

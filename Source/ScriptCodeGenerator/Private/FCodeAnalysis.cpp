@@ -23,12 +23,12 @@ void FCodeAnalysis::Analysis(const FString& InFile)
 #endif
 	                                     ));
 
-	const auto CompileParam = FString::Printf(TEXT(
+	const auto AnalysisParam = FString::Printf(TEXT(
 		"true \"%s\" \"%s\""
 	),
-	                                          *InFile,
-	                                          *FPaths::ConvertRelativePathToFull(
-		                                          FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath())
+	                                           *InFile,
+	                                           *FPaths::ConvertRelativePathToFull(
+		                                           FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath())
 	);
 
 	void* ReadPipe = nullptr;
@@ -41,7 +41,7 @@ void FCodeAnalysis::Analysis(const FString& InFile)
 
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*Program,
-		*CompileParam,
+		*AnalysisParam,
 		false,
 		true,
 		true,
@@ -143,21 +143,21 @@ void FCodeAnalysis::Analysis()
 #endif
 	                                     ));
 
-	auto CompileParam = FString::Printf(TEXT(
+	auto AnalysisParam = FString::Printf(TEXT(
 		"false \"%s\" \"%s\""
 	),
-	                                    *FPaths::ConvertRelativePathToFull(
-		                                    FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()),
-	                                    *FPaths::ConvertRelativePathToFull(
-		                                    FUnrealCSharpFunctionLibrary::GetGameDirectory())
+	                                     *FPaths::ConvertRelativePathToFull(
+		                                     FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()),
+	                                     *FPaths::ConvertRelativePathToFull(
+		                                     FUnrealCSharpFunctionLibrary::GetGameDirectory())
 	);
 
 	for (const auto& CustomProjectsDirectory : FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory())
 	{
-		CompileParam += FString::Printf(TEXT(
+		AnalysisParam += FString::Printf(TEXT(
 			" \"%s\""
 		),
-		                                *CustomProjectsDirectory
+		                                 *CustomProjectsDirectory
 		);
 	}
 
@@ -171,7 +171,7 @@ void FCodeAnalysis::Analysis()
 
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*Program,
-		*CompileParam,
+		*AnalysisParam,
 		false,
 		true,
 		true,

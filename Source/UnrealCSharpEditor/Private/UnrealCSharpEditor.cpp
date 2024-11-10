@@ -19,6 +19,7 @@
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Misc/ScopedSlowTask.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "IContentBrowserDataModule.h"
 #include "ToolBar/UnrealCSharpPlayToolBar.h"
 #include "ToolBar/UnrealCSharpBlueprintToolBar.h"
 #include "DetailCustomization/GameContentDirectoryPathCustomization.h"
@@ -89,7 +90,16 @@ void FUnrealCSharpEditorModule::StartupModule()
 				Generator();
 			}));
 
-	UpdatePackagingSettings();
+	DynamicDataSource.Reset(NewObject<UDynamicDataSource>(GetTransientPackage(), "DynamicData"));
+
+	DynamicDataSource->Initialize();
+
+	TickHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([this](const float DeltaTime)
+	{
+		Tick(DeltaTime);
+
+		return true;
+	}));
 
 	if (IsRunningCookCommandlet())
 	{
@@ -132,6 +142,20 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 	if (UnrealCSharpPlayToolBar.IsValid())
 	{
 		UnrealCSharpPlayToolBar->Deinitialize();
+	}
+
+	DynamicDataSource.Reset();
+
+	FTSTicker::GetCoreTicker().RemoveTicker(TickHandle);
+}
+
+void FUnrealCSharpEditorModule::Tick(const float InDeltaTime)
+{
+	if (!bHasTicked)
+	{
+		bHasTicked = true;
+
+		IContentBrowserDataModule::Get().GetSubsystem()->ActivateDataSource("DynamicData");
 	}
 }
 
