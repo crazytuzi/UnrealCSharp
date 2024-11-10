@@ -76,6 +76,10 @@ public:
 	static TArray<FString> GetCustomProjectsDirectory();
 #endif
 
+#if WITH_EDITOR
+	static bool IsRootPath(const FString& InPath);
+#endif
+
 	static bool EnableCallOverrideFunction();
 
 	static FString GetOverrideFunctionNamePrefix();

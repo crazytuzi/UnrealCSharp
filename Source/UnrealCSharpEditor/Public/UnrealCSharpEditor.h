@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ContentBrowser/DynamicDataSource.h"
 #include "Listener/FEditorListener.h"
 #include "Modules/ModuleManager.h"
 
@@ -13,6 +14,8 @@ public:
 	virtual void StartupModule() override;
 
 	virtual void ShutdownModule() override;
+
+	void Tick(const float InDeltaTime);
 
 	/** This function will be bound to Command. */
 	void PluginButtonClicked() const;
@@ -44,4 +47,10 @@ private:
 	TUniquePtr<FAutoConsoleCommand> GeneratorConsoleCommand;
 
 	FEditorListener EditorListener;
+
+	FTSTicker::FDelegateHandle TickHandle;
+
+	bool bHasTicked = false;
+
+	TStrongObjectPtr<UDynamicDataSource> DynamicDataSource;
 };
