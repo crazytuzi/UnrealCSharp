@@ -35,9 +35,14 @@ void FDomain::Tick(const float DeltaTime)
 {
 	if (SynchronizationContextTick != nullptr)
 	{
-		MonoException* Exception{};
+		MonoObject* Exception{};
 
 		SynchronizationContextTick(DeltaTime, &Exception);
+
+		if (Exception != nullptr)
+		{
+			Unhandled_Exception(Exception);
+		}
 	}
 }
 

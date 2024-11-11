@@ -18,6 +18,7 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 #if WITH_EDITOR
 	Super(ObjectInitializer),
 	ScriptDirectory(DEFAULT_SCRIPT_DIRECTORY),
+	bEnableDeleteProxyDirectory(false),
 	bEnableCompiled(true),
 	bEnableAssetChanged(true),
 	bEnableDirectoryChanged(true),
@@ -252,6 +253,11 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 const FProjectDirectoryPath& UUnrealCSharpEditorSetting::GetScriptDirectory() const
 {
 	return ScriptDirectory;
+}
+
+bool UUnrealCSharpEditorSetting::EnableDeleteProxyDirectory() const
+{
+	return bEnableDeleteProxyDirectory;
 }
 
 bool UUnrealCSharpEditorSetting::EnableCompiled() const

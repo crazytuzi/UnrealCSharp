@@ -76,6 +76,10 @@ public:
 	static TArray<FString> GetCustomProjectsDirectory();
 #endif
 
+#if WITH_EDITOR
+	static bool IsRootPath(const FString& InPath);
+#endif
+
 	static bool EnableCallOverrideFunction();
 
 	static FString GetOverrideFunctionNamePrefix();
@@ -93,6 +97,10 @@ public:
 	static FString GetPluginDirectory();
 
 	static FString GetPluginScriptDirectory();
+
+#if WITH_EDITOR
+	static FString GetPluginTemplateDirectory();
+#endif
 
 	static bool IsGameField(const UField* InField);
 

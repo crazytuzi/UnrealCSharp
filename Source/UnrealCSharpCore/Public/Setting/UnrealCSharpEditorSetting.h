@@ -46,6 +46,8 @@ public:
 
 	const FProjectDirectoryPath& GetScriptDirectory() const;
 
+	bool EnableDeleteProxyDirectory() const;
+
 	bool EnableCompiled() const;
 
 	bool EnableAssetChanged() const;
@@ -77,6 +79,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (RelativePath))
 	FProjectDirectoryPath ScriptDirectory;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableDeleteProxyDirectory;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bEnableCompiled;

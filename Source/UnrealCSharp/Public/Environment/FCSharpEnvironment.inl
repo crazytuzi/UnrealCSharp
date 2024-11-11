@@ -276,6 +276,57 @@ auto FCSharpEnvironment::AddBindingReference(const FGarbageCollectionHandle& InO
 	return BindingRegistry != nullptr ? BindingRegistry->AddReference(InOwner, InObject, InMonoObject) : false;
 }
 
+template <typename T>
+auto FCSharpEnvironment::GetRegistry()
+{
+	if constexpr (std::is_same_v<T, FDynamicRegistry>)
+	{
+		return DynamicRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FClassRegistry>)
+	{
+		return ClassRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FReferenceRegistry>)
+	{
+		return ReferenceRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FObjectRegistry>)
+	{
+		return ObjectRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FStructRegistry>)
+	{
+		return StructRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FContainerRegistry>)
+	{
+		return ContainerRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FDelegateRegistry>)
+	{
+		return DelegateRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FMultiRegistry>)
+	{
+		return MultiRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FStringRegistry>)
+	{
+		return StringRegistry;
+	}
+	else if constexpr (std::is_same_v<T, FBindingRegistry>)
+	{
+		return BindingRegistry;
+	}
+#if UE_F_OPTIONAL_PROPERTY
+	else if constexpr (std::is_same_v<T, FOptionalRegistry>)
+	{
+		return OptionalRegistry;
+	}
+#endif
+}
+
 #if UE_F_OPTIONAL_PROPERTY
 template <typename T>
 auto FCSharpEnvironment::GetOptionalObject(void* InAddress) const

@@ -216,9 +216,10 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FDelegateProperty* InDe
 	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
 
 	return Encode(FString::Printf(TEXT(
-		"F%s"
-	),
-	                              *DelegateName));
+		              "F%s"
+	              ),
+	                              *DelegateName),
+	              InDelegateProperty->IsNative());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FDelegateProperty* InDelegateProperty)
@@ -277,9 +278,10 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FMulticastDelegatePrope
 	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
 
 	return Encode(FString::Printf(TEXT(
-		"F%s"
-	),
-	                              *DelegateName));
+		              "F%s"
+	              ),
+	                              *DelegateName),
+	              InMulticastDelegateProperty->IsNative());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegateProperty* InMulticastDelegateProperty)
@@ -341,7 +343,7 @@ FString FUnrealCSharpFunctionLibrary::GetAssetName(const FAssetData& InAssetData
 	return FString::Printf(TEXT(
 		"%s%s"
 	),
-	                       *Encode(InAssetName),
+	                       *Encode(InAssetName, false),
 	                       *GetSuffixName(InAssetData)
 	);
 }
@@ -468,6 +470,26 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
 }
 #endif
 
+#if WITH_EDITOR
+bool FUnrealCSharpFunctionLibrary::IsRootPath(const FString& InPath)
+{
+	if (InPath.StartsWith(GetGameDirectory()))
+	{
+		return true;
+	}
+
+	for (const auto& CustomProjectsDirectory : GetCustomProjectsDirectory())
+	{
+		if (InPath.StartsWith(CustomProjectsDirectory))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+#endif
+
 bool FUnrealCSharpFunctionLibrary::EnableCallOverrideFunction()
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
@@ -539,6 +561,13 @@ FString FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory()
 {
 	return GetPluginDirectory() / PLUGIN_SCRIPT_PATH;
 }
+
+#if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
+{
+	return GetPluginDirectory() / PLUGIN_TEMPLATE_PATH;
+}
+#endif
 
 bool FUnrealCSharpFunctionLibrary::IsGameField(const UField* InField)
 {

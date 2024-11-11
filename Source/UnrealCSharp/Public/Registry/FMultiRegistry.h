@@ -8,7 +8,7 @@
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
 
-class FMultiRegistry
+class UNREALCSHARP_API FMultiRegistry
 {
 public:
 	template <typename T, template<typename...> class IsType>

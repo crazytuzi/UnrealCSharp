@@ -25,8 +25,10 @@ public class UnrealCSharpEditor : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", 
-				"DirectoryWatcher"
+				"Core",
+				"UnrealEd",
+				"DirectoryWatcher",
+				"CollectionManager"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -37,7 +39,6 @@ public class UnrealCSharpEditor : ModuleRules
 			{
 				"Projects",
 				"InputCore",
-				"UnrealEd",
 				"ToolMenus",
 				"CoreUObject",
 				"Engine",
@@ -47,10 +48,12 @@ public class UnrealCSharpEditor : ModuleRules
 				"DesktopPlatform",
 				"EditorStyle",
 				"DeveloperToolSettings",
+				"ContentBrowserData",
+				"UMG",
 				"ScriptCodeGenerator",
 				"Compiler",
 				"UnrealCSharpCore",
-				"CrossVersion"
+				"CrossVersion" 
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

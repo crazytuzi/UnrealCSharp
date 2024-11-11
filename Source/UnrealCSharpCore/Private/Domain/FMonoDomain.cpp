@@ -602,6 +602,14 @@ void* FMonoDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
 	return mono_method_get_unmanaged_thunk(InMonoMethod);
 }
 
+void FMonoDomain::Class_Constructor(MonoClass* InMonoClass)
+{
+	if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_CLASS_CONSTRUCTOR, 0))
+	{
+		Runtime_Invoke(FoundMethod, InMonoClass, nullptr);
+	}
+}
+
 void FMonoDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InParamCount, void** InParams)
 {
 	if (const auto FoundMonoClass = Object_Get_Class(InMonoObject))

@@ -5,7 +5,7 @@
 #include "Reflection/Container/FMapHelper.h"
 #include "Reflection/Container/FSetHelper.h"
 
-class FContainerRegistry
+class UNREALCSHARP_API FContainerRegistry
 {
 public:
 	template <typename Key, typename Address>

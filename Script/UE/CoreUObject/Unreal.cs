@@ -15,7 +15,7 @@ namespace Script.CoreUObject
             bool bCopyTransientsFromClassDefaults = false
         ) where T : UObject, IStaticClass =>
             UnrealImplementation.Unreal_NewObjectImplementation<T>(
-                Outer?.GarbageCollectionHandle ?? nint.Zero,
+                Outer?.GarbageCollectionHandle ?? GetTransientPackage().GarbageCollectionHandle,
                 Class?.GarbageCollectionHandle ?? T.StaticClass().GarbageCollectionHandle,
                 Name?.GarbageCollectionHandle ?? FName.NAME_None.GarbageCollectionHandle,
                 Flags,
@@ -80,5 +80,7 @@ namespace Script.CoreUObject
         }
 
         public static UWorld GWorld => UnrealImplementation.Unreal_GWorldImplementation();
+
+        public static UPackage GetTransientPackage() => UnrealImplementation.Unreal_GetTransientPackageImplementation();
     }
 }

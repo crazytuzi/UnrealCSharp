@@ -3,7 +3,7 @@
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
 
-class FStringRegistry
+class UNREALCSHARP_API FStringRegistry
 {
 public:
 	template <typename T>

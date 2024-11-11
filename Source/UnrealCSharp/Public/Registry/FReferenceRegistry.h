@@ -2,7 +2,7 @@
 
 #include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
 
-class FReferenceRegistry
+class UNREALCSHARP_API FReferenceRegistry
 {
 public:
 	FReferenceRegistry() = default;
