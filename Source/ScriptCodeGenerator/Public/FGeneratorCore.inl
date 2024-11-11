@@ -29,7 +29,7 @@ auto FGeneratorCore::GetFileName(const T* InField)
 			FUnrealCSharpFunctionLibrary::GetGenerationPath(SignatureFunction), ModuleName);
 
 		auto ModuleRelativeFile = FPaths::Combine(
-			FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField)),
+			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InField));
 
 		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + CSHARP_SUFFIX;

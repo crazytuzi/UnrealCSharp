@@ -184,7 +184,12 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 	return FPaths::Combine(PackageName, ModuleRelativePath);
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const TObjectPtr<UFunction>& InSignatureFunction)
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+#ifdef UE_GET_RELATIVE_MODULE_PATH_T_OBJECT_PTR_FUNCTION_PARAMETERS
+	const TObjectPtr<UFunction>& InSignatureFunction)
+#else
+	const UFunction* InSignatureFunction)
+#endif
 {
 	FString ModuleRelativePath;
 
