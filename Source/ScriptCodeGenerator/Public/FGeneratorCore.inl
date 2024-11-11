@@ -12,42 +12,24 @@ auto FGeneratorCore::GetFileName(const T* InField)
 
 		const auto SignatureFunction = InField->SignatureFunction;
 
+		FString ModuleName;
+
 		if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
 		{
-			if (InField->IsNative())
-			{
-				RelativeModuleName = FString::Printf(TEXT(
-					"%s/%s"
-				),
-				                                     *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
-				                                     *Class->GetName());
-			}
-			else
-			{
-				RelativeModuleName = *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT(""));
-			}
+			ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(
+				Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT(""));
 		}
 
 		if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
 		{
-			RelativeModuleName = Package->GetName().Replace(TEXT("/Script/"), TEXT("/"));
+			ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(Package);
 		}
-
-		if (!InField->IsNative())
-		{
-			if (auto Index = 0; RelativeModuleName.FindLastChar(TEXT('/'), Index))
-			{
-				RelativeModuleName.LeftInline(Index);
-			}
-		}
-
-		auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(RelativeModuleName);
 
 		auto DirectoryName = FPaths::Combine(
-			FUnrealCSharpFunctionLibrary::GetGenerationPath(InField->SignatureFunction), ModuleName);
+			FUnrealCSharpFunctionLibrary::GetGenerationPath(SignatureFunction), ModuleName);
 
 		auto ModuleRelativeFile = FPaths::Combine(
-			FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InField)),
+			FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField)),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InField));
 
 		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + CSHARP_SUFFIX;
@@ -60,7 +42,7 @@ auto FGeneratorCore::GetFileName(const T* InField)
 			FUnrealCSharpFunctionLibrary::GetGenerationPath(InField), ModuleName);
 
 		auto ModuleRelativeFile = FPaths::Combine(
-			FPaths::GetPath(FGeneratorCore::GetModuleRelativePath(InField)),
+			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField),
 			InField->GetName());
 
 		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + CSHARP_SUFFIX;

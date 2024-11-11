@@ -12,9 +12,23 @@ public:
 public:
 	static FString GetModuleName(const UField* InField);
 
-	static FString GetModuleName(const UField* InField, const TFunction<void(FString& InModuleName)>& InGetModuleName);
+	static FString GetModuleName(const UPackage* InPackage);
 
-	static FString GetModuleName(const FString& InModuleName);
+	static FString GetModuleName(const FString& InPackageName);
+
+	static FString GetModulaRelativePathWithoutModuleName(const FString& InModulaRelativePath);
+
+	static FString GetModuleRelativePath(const UField* InField);
+
+	static FString GetModuleRelativePath(const FDelegateProperty* InDelegateProperty);
+
+	static FString GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty);
+
+	static FString GetModuleRelativePath(const TObjectPtr<UFunction>& InSignatureFunction);
+
+	static FString GetModuleRelativePath(const UPackage* InPackage);
+
+	static FString GetModuleRelativePath(const FString& InModuleRelativePath);
 
 	static FString GetFullClass(const UStruct* InStruct);
 
