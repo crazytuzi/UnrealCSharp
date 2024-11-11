@@ -140,51 +140,23 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InFiel
 	return FPaths::Combine(ModuleRelativePathMetaData, PackageName);
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
-	const FDelegateProperty* InDelegateProperty)
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
 {
-	if (InDelegateProperty == nullptr)
-	{
-		return FString();
-	}
-
-	FString PackageName;
-
-	if (const auto SignatureFunction = InDelegateProperty->SignatureFunction; SignatureFunction != nullptr)
-	{
-		PackageName = GetModuleRelativePath(SignatureFunction);
-	}
-
-	const auto ModuleRelativePath = FPaths::Combine(
-		GetModuleRelativePath(FPaths::GetPath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))),
-		GetFullClass(InDelegateProperty));
-
-	return FPaths::Combine(PackageName, ModuleRelativePath);
+	return GetModuleRelativePath(InDelegateProperty->SignatureFunction, InDelegateProperty->IsNative());
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 	const FMulticastDelegateProperty* InMulticastDelegateProperty)
 {
-	if (InMulticastDelegateProperty == nullptr)
-	{
-		return FString();
-	}
-
-	FString PackageName;
-
-	if (const auto SignatureFunction = InMulticastDelegateProperty->SignatureFunction; SignatureFunction != nullptr)
-	{
-		PackageName = GetModuleRelativePath(SignatureFunction);
-	}
-
-	const auto ModuleRelativePath = FPaths::Combine(
-		GetModuleRelativePath(FPaths::GetPath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")))),
-		GetFullClass(InMulticastDelegateProperty));
-
-	return FPaths::Combine(PackageName, ModuleRelativePath);
+	return GetModuleRelativePath(InMulticastDelegateProperty->SignatureFunction, InMulticastDelegateProperty->IsNative());
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const TObjectPtr<UFunction>& InSignatureFunction)
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+#ifdef UE_GET_RELATIVE_MODULE_PATH_T_OBJECT_PTR_FUNCTION_PARAMETERS
+	const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative)
+#else
+	const UFunction* InSignatureFunction, const bool bIsNative)
+#endif
 {
 	FString ModuleRelativePath;
 
@@ -195,12 +167,20 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const TObjectPtr<UFu
 
 	if (const auto Class = Cast<UClass>(InSignatureFunction->GetOuter()))
 	{
-		ModuleRelativePath = GetModulaRelativePathWithoutModuleName(FString::Printf(TEXT(
+		if (bIsNative)
+		{
+			ModuleRelativePath = FString::Printf(TEXT(
 				"%s/%s"
 			),
 				*(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
-				*Class->GetName())
-		);
+				*Class->GetName());
+		}
+		else
+		{
+			ModuleRelativePath = *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT(""));
+		}
+
+		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
 	}
 
 	if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))

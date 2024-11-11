@@ -24,7 +24,11 @@ public:
 
 	static FString GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 
-	static FString GetModuleRelativePath(const TObjectPtr<UFunction>& InSignatureFunction);
+#ifdef UE_GET_RELATIVE_MODULE_PATH_T_OBJECT_PTR_FUNCTION_PARAMETERS
+	static FString GetModuleRelativePath(const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative = true);
+#else
+	static FString GetModuleRelativePath(const UFunction* InSignatureFunction, const bool bIsNative = true);
+#endif
 
 	static FString GetModuleRelativePath(const UPackage* InPackage);
 
