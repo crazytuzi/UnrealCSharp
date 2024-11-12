@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "UEVersion.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 
@@ -17,7 +18,7 @@ auto FGeneratorCore::GetFileName(const T* InField)
 
 		FString ModuleName;
 
-		FString ModuleRelativeName = FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField);
+		FString ModuleRelativeName = FUnrealCSharpFunctionLibrary::GetModuleRelativePath(SignatureFunction, InField->IsNative());
 
 		if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
 		{

@@ -140,17 +140,6 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InFiel
 	return FPaths::Combine(ModuleRelativePathMetaData, PackageName);
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
-{
-	return GetModuleRelativePath(InDelegateProperty->SignatureFunction, InDelegateProperty->IsNative());
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
-	const FMulticastDelegateProperty* InMulticastDelegateProperty)
-{
-	return GetModuleRelativePath(InMulticastDelegateProperty->SignatureFunction, InMulticastDelegateProperty->IsNative());
-}
-
 FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 #ifdef UE_GET_RELATIVE_MODULE_PATH_T_OBJECT_PTR_FUNCTION_PARAMETERS
 	const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative)

@@ -20,10 +20,6 @@ public:
 
 	static FString GetModuleRelativePath(const UField* InField);
 
-	static FString GetModuleRelativePath(const FDelegateProperty* InDelegateProperty);
-
-	static FString GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty);
-
 #ifdef UE_GET_RELATIVE_MODULE_PATH_T_OBJECT_PTR_FUNCTION_PARAMETERS
 	static FString GetModuleRelativePath(const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative = true);
 #else
