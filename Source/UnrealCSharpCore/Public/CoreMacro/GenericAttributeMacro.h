@@ -1,5 +1,7 @@
 #pragma once
 
+#define CLASS_OVERRIDE_ATTRIBUTE FString(TEXT("OverrideAttribute"))
+
 #define CLASS_VISIBLE_INSTANCE_ONLY_ATTRIBUTE FString(TEXT("VisibleInstanceOnlyAttribute"))
 
 #define CLASS_BLUEPRINT_CALLABLE_ATTRIBUTE FString(TEXT("BlueprintCallableAttribute"))

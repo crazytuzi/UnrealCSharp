@@ -9,7 +9,7 @@ public:
 	typedef FFunctionDescriptor Super;
 
 public:
-	explicit FCSharpFunctionDescriptor(UFunction* InFunction);
+	explicit FCSharpFunctionDescriptor(const FString& InMethodName, UFunction* InFunction);
 
 	virtual ~FCSharpFunctionDescriptor() override;
 
