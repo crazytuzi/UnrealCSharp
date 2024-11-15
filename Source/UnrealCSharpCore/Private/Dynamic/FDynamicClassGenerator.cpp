@@ -13,6 +13,7 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetReinstanceUtilities.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #endif
 #include "UEVersion.h"
 
@@ -93,6 +94,8 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 			                                             }
 		                                             }
 	                                             });
+
+	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Broadcast();
 }
 
 bool FDynamicClassGenerator::IsDynamicClass(MonoClass* InMonoClass)
@@ -143,6 +146,11 @@ void FDynamicClassGenerator::OnPrePIEEnded()
 		{
 			InBlueprintGeneratedClass->ClassConstructor = &FDynamicClassGenerator::ClassConstructor;
 		});
+}
+
+const TSet<UClass*>& FDynamicClassGenerator::GetDynamicClasses()
+{
+	return DynamicClassSet;
 }
 #endif
 
@@ -236,6 +244,10 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 #endif
 
 	FDynamicGeneratorCore::Completed(ClassName);
+
+#if WITH_EDITOR
+	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Broadcast();
+#endif
 }
 
 bool FDynamicClassGenerator::IsDynamicClass(const UClass* InClass)

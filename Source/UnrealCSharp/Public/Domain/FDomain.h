@@ -31,7 +31,7 @@ public:
 
 	MonoVTable* Class_VTable(MonoClass* InMonoClass);
 
-	MonoClass* Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName) const;
+	static MonoClass* Class_From_Name(const FString& InNameSpace, const FString& InMonoClassName);
 
 	MonoMethod* Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
 	                                       int32 InParamCount) const;
@@ -49,13 +49,13 @@ public:
 
 	MonoClassField* Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName);
 
-	MonoClassField* Class_Get_Fields(MonoClass* InMonoClass, void** InIterator) const;
+	static MonoClassField* Class_Get_Fields(MonoClass* InMonoClass, void** InIterator);
 
 	MonoProperty* Class_Get_Properties(MonoClass* InMonoClass, void** InIterator) const;
 
 	MonoProperty* Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName) const;
 
-	MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator) const;
+	static MonoMethod* Class_Get_Methods(MonoClass* InMonoClass, void** InIterator);
 
 	MonoClass* Class_Get_Interfaces(MonoClass* InMonoClass, void** InIterator) const;
 
@@ -65,15 +65,15 @@ public:
 
 	MonoCustomAttrInfo* Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty) const;
 
-	MonoCustomAttrInfo* Custom_Attrs_From_Method(MonoMethod* InMonoMethod) const;
+	static MonoCustomAttrInfo* Custom_Attrs_From_Method(MonoMethod* InMonoMethod);
 
-	mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass) const;
+	static mono_bool Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
 
 	MonoObject* Custom_Attrs_Get_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass) const;
 
 	void Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue);
 
-	const char* Field_Get_Name(MonoClassField* InMonoClassField) const;
+	static const char* Field_Get_Name(MonoClassField* InMonoClassField);
 
 	MonoType* Field_Get_Type(MonoClassField* InMonoClassField) const;
 
@@ -92,13 +92,13 @@ public:
 	static MonoObject* Property_Get_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
 	                                      MonoObject** InExc);
 
-	const char* Method_Get_Name(MonoMethod* InMonoMethod) const;
+	static const char* Method_Get_Name(MonoMethod* InMonoMethod);
 
 	void Method_Get_Param_Names(MonoMethod* InMonoMethod, const char** InNames) const;
 
-	MonoMethodSignature* Method_Signature(MonoMethod* InMonoMethod) const;
+	static MonoMethodSignature* Method_Signature(MonoMethod* InMonoMethod);
 
-	uint32_t Signature_Get_Param_Count(MonoMethodSignature* InMonoMethodSignature) const;
+	static uint32_t Signature_Get_Param_Count(MonoMethodSignature* InMonoMethodSignature);
 
 	MonoType* Signature_Get_Params(MonoMethodSignature* InMonoMethodSignature, void** InIterator) const;
 
