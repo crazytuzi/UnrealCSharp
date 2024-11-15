@@ -141,7 +141,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InFiel
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
-#ifdef UE_GET_RELATIVE_MODULE_PATH_T_OBJECT_PTR_FUNCTION_PARAMETERS
+#if UE_GET_MODULE_RELATIVE_PATH_T_OBJECT_PTR
 	const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative)
 #else
 	const UFunction* InSignatureFunction, const bool bIsNative)
