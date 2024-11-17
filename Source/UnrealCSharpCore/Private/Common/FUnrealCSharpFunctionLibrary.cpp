@@ -17,6 +17,7 @@
 #include "Animation/AnimBlueprint.h"
 #include "Animation/AnimInstance.h"
 #endif
+#include "UEVersion.h"
 
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
@@ -330,7 +331,12 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FDelegateProperty* InDe
 
 	auto DelegateName = SignatureFunction->GetName();
 
-	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
+	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(),
+#if UE_F_STRING_LEFT_CHOPIN_LINE_E_ALLOW_SHRINKING
+	                            EAllowShrinking::No);
+#else
+	                            false);
+#endif
 
 	return Encode(FString::Printf(TEXT(
 		              "F%s"
@@ -392,7 +398,12 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FMulticastDelegatePrope
 
 	auto DelegateName = SignatureFunction->GetName();
 
-	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(), false);
+	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(),
+#if UE_F_STRING_LEFT_CHOPIN_LINE_E_ALLOW_SHRINKING
+								EAllowShrinking::No);
+#else
+								false);
+#endif
 
 	return Encode(FString::Printf(TEXT(
 		              "F%s"

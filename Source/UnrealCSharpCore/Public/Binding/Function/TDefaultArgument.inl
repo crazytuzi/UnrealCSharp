@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include "UEVersion.h"
 
 inline FString SanitizeFloat(const double InFloat, const int32 InMinFractionalDigits = 1)
 {
@@ -34,7 +35,12 @@ inline FString SanitizeFloat(const double InFloat, const int32 InMinFractionalDi
 		}
 	}
 
-	TempString.RemoveAt(TrimIndex, TempString.Len() - TrimIndex, false);
+	TempString.RemoveAt(TrimIndex, TempString.Len() - TrimIndex,
+#if UE_F_STRING_REMOVE_AT_E_ALLOW_SHRINKING
+	                    EAllowShrinking::No);
+#else
+	                    false);
+#endif
 
 	if (InMinFractionalDigits > 0)
 	{
