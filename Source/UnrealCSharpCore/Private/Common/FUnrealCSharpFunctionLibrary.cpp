@@ -39,55 +39,185 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	return GetModuleName(InField, [InField](FString& InModuleName)
+	if (InField == nullptr)
 	{
-		if (InField->IsNative())
-		{
-			InModuleName.RightChopInline(1);
-		}
-		else
-		{
-			if (auto Index = 0; InModuleName.FindLastChar(TEXT('/'), Index))
-			{
-				InModuleName.LeftInline(Index);
-			}
-		}
-	});
+		return FString();
+	}
+
+	return GetModuleName(InField->GetPackage());
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField,
-                                                    const TFunction<void(FString& InModuleName)>& InGetModuleName)
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UPackage* InPackage)
 {
-	const auto Package = InField != nullptr ? InField->GetPackage() : nullptr;
+	if (InPackage == nullptr)
+	{
+		return FString();
+	}
 
-	auto ModuleName = Package ? Package->GetName() : TEXT("");
+	const auto PackageName = InPackage->GetName();
 
-	InGetModuleName(ModuleName);
+	if (PackageName.IsEmpty())
+	{
+		return FString();
+	}
 
-	return GetModuleName(ModuleName);
+	return GetModuleName(PackageName);
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InModuleName)
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InPackageName)
 {
-	auto ModuleName = InModuleName;
+	FString ModuleName;
 
-	if (constexpr char ReplaceProjectModuleName[] = "/Game";
-		ModuleName.StartsWith(ReplaceProjectModuleName))
+	if (InPackageName.IsEmpty())
 	{
-		constexpr auto ReplaceProjectModuleNameLength = sizeof(ReplaceProjectModuleName) - 1;
+		return ModuleName;
+	}
 
-		const auto Size_ModuleName = ModuleName.Len();
+	TArray<FString> Splits;
 
-		const auto Const_Index = Size_ModuleName - ReplaceProjectModuleNameLength;
+	InPackageName.ParseIntoArray(Splits, TEXT("/"));
 
-		ModuleName = FApp::GetProjectName() + ModuleName.Right(Const_Index);
+	if (const auto& ProjectModuleList = GetProjectModuleList();
+		ProjectModuleList.Contains(Splits[0]) ||
+		Splits[0] == TEXT("Game") ||
+		(Splits[0] == TEXT("Script") &&
+			ProjectModuleList.Contains(Splits[1])))
+	{
+		ModuleName = FApp::GetProjectName();
 	}
 	else
 	{
-		ModuleName = ModuleName.Replace(TEXT("Script/"), TEXT(""));
+		ModuleName = Splits[1];
 	}
 
 	return ModuleName;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModulaRelativePathWithoutModuleName(const FString& InModulaRelativePath)
+{
+	FString ModuleRelativePath = InModulaRelativePath;
+
+	if (InModulaRelativePath.IsEmpty())
+	{
+		return ModuleRelativePath;
+	}
+
+	TArray<FString> Splits;
+
+	InModulaRelativePath.ParseIntoArray(Splits, TEXT("/"));
+
+	if (const auto& ProjectModuleList = GetProjectModuleList();
+		ProjectModuleList.Contains(Splits[0]) ||
+		Splits[0] == TEXT("Game") ||
+		(Splits[0] == TEXT("Script") &&
+			ProjectModuleList.Contains(Splits[1])))
+	{
+		ModuleRelativePath = InModulaRelativePath.RightChop(Splits[0].Len() + 1);
+	}
+	else if (Splits.Num() > 1 && Splits[0] == TEXT("Script"))
+	{
+		if (const int32 FoundIndex = InModulaRelativePath.Find(Splits[1]); FoundIndex != INDEX_NONE)
+		{
+			ModuleRelativePath = InModulaRelativePath.RightChop(FoundIndex + Splits[1].Len());
+		}
+	}
+
+	return ModuleRelativePath;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InField)
+{
+	if (InField == nullptr)
+	{
+		return FString();
+	}
+
+	auto PackageName = GetModuleRelativePath(InField->GetPackage());
+
+	const auto ModuleRelativePathMetaData = GetModuleRelativePath(
+		FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath"))));
+
+	return FPaths::Combine(ModuleRelativePathMetaData, PackageName);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+#if UE_GET_MODULE_RELATIVE_PATH_T_OBJECT_PTR
+	const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative)
+#else
+	const UFunction* InSignatureFunction, const bool bIsNative)
+#endif
+{
+	FString ModuleRelativePath;
+
+	if (InSignatureFunction == nullptr)
+	{
+		return ModuleRelativePath;
+	}
+
+	if (const auto Class = Cast<UClass>(InSignatureFunction->GetOuter()))
+	{
+		if (bIsNative)
+		{
+			ModuleRelativePath = FString::Printf(TEXT(
+				"%s/%s"
+			),
+				*(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
+				*Class->GetName());
+		}
+		else
+		{
+			ModuleRelativePath = *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT(""));
+		}
+
+		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
+	}
+
+	if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))
+	{
+		ModuleRelativePath = GetModuleRelativePath(Package);
+	}
+
+	return ModuleRelativePath;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UPackage* InPackage)
+{
+	if (InPackage == nullptr)
+	{
+		return FString();
+	}
+
+	const auto PackageName = InPackage->GetName();
+
+	if (PackageName.IsEmpty())
+	{
+		return FString();
+	}
+
+	return GetModulaRelativePathWithoutModuleName(PackageName);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FString& InModuleRelativePath)
+{
+	const FString PublicStr = TEXT("Public");
+
+	const FString PrivateStr = TEXT("Private");
+
+	TArray<FString> SubStrings;
+
+	InModuleRelativePath.ParseIntoArray(SubStrings, TEXT("/"));
+
+	TArray<FString> ResultComponents;
+
+	for (const FString& SubString : SubStrings)
+	{
+		if (SubString != PublicStr && SubString != PrivateStr)
+		{
+			ResultComponents.Add(SubString);
+		}
+	}
+
+	return FString::Join(ResultComponents, TEXT("/"));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
