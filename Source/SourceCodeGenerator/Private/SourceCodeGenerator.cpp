@@ -1,6 +1,8 @@
 ﻿#include "SourceCodeGenerator.h"
 #include "Features/IModularFeatures.h"
 #include "Misc/FileHelper.h"
+#include "UObject/CoreNet.h"
+#include "UObject/Interface.h"
 
 #define LOCTEXT_NAMESPACE "FSourceCodeGeneratorModule"
 
@@ -213,7 +215,8 @@ FString FSourceCodeGeneratorModule::GetGeneratorName() const
 
 bool FSourceCodeGeneratorModule::CanExportClass(const UClass* Class)
 {
-	return IsClassTypeSupported(Class);
+	return !Class->HasAnyClassFlags(CLASS_Interface) &&
+		IsClassTypeSupported(Class);
 }
 
 bool FSourceCodeGeneratorModule::CanExportFunction(const UFunction* Function)
@@ -865,8 +868,22 @@ void FSourceCodeGeneratorModule::SaveIfChanged(const FString& FileName, const FS
 
 FString FSourceCodeGeneratorModule::GetHeaderFile(UClass* Class)
 {
+	FString ModuleRelativePath = Class->GetMetaData(TEXT("ModuleRelativePath"));
+
+	if (ModuleRelativePath.IsEmpty())
+	{
+		if (Class == UInterface::StaticClass())
+		{
+			ModuleRelativePath = TEXT("Public/UObject/Interface.h");
+		}
+		else if (Class == UPackageMap::StaticClass())
+		{
+			ModuleRelativePath = TEXT("Public/UObject/CoreNet.h");
+		}
+	}
+
 	return FPaths::Combine(HeaderPath.FindRef(FPaths::GetCleanFilename(Class->GetPackage()->GetName())),
-	                       Class->GetMetaData(TEXT("ModuleRelativePath")));
+	                       ModuleRelativePath);
 }
 
 FString FSourceCodeGeneratorModule::GenerateInclude(const FString& FileName)
