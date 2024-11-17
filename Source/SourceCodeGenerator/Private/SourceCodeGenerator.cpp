@@ -343,22 +343,6 @@ bool FSourceCodeGeneratorModule::IsClassTypeSupported(const UClass* Class)
 
 bool FSourceCodeGeneratorModule::IsPropertyTypeSupported(const FProperty* Property)
 {
-	if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
-	{
-		return IsPropertyTypeSupported(ArrayProperty->Inner);
-	}
-
-	if (const auto SetProperty = CastField<FSetProperty>(Property))
-	{
-		return IsPropertyTypeSupported(SetProperty->ElementProp);
-	}
-
-	if (const auto MapProperty = CastField<FMapProperty>(Property))
-	{
-		return IsPropertyTypeSupported(MapProperty->KeyProp) &&
-			IsPropertyTypeSupported(MapProperty->ValueProp);
-	}
-
 	if (const auto ObjectProperty = CastField<FObjectProperty>(Property))
 	{
 		if (!IsClassTypeSupported(ObjectProperty->PropertyClass))
@@ -414,6 +398,22 @@ bool FSourceCodeGeneratorModule::IsPropertyTypeSupported(const FProperty* Proper
 		{
 			return false;
 		}
+	}
+
+	if (const auto ArrayProperty = CastField<FArrayProperty>(Property))
+	{
+		return IsPropertyTypeSupported(ArrayProperty->Inner);
+	}
+
+	if (const auto SetProperty = CastField<FSetProperty>(Property))
+	{
+		return IsPropertyTypeSupported(SetProperty->ElementProp);
+	}
+
+	if (const auto MapProperty = CastField<FMapProperty>(Property))
+	{
+		return IsPropertyTypeSupported(MapProperty->KeyProp) &&
+			IsPropertyTypeSupported(MapProperty->ValueProp);
 	}
 
 	auto bIsBitField = false;
@@ -849,6 +849,22 @@ void FSourceCodeGeneratorModule::GetDependencyClasses(const FProperty* Property,
 		if (ArrayProperty->Inner != nullptr)
 		{
 			GetDependencyClasses(ArrayProperty->Inner, DependencyClasses);
+		}
+	}
+	else if (const auto SetProperty = CastField<FSetProperty>(Property))
+	{
+		if (SetProperty->ElementProp != nullptr)
+		{
+			GetDependencyClasses(SetProperty->ElementProp, DependencyClasses);
+		}
+	}
+	else if (const auto MapProperty = CastField<FMapProperty>(Property))
+	{
+		if (MapProperty->KeyProp != nullptr && MapProperty->ValueProp != nullptr)
+		{
+			GetDependencyClasses(MapProperty->KeyProp, DependencyClasses);
+
+			GetDependencyClasses(MapProperty->ValueProp, DependencyClasses);
 		}
 	}
 }
