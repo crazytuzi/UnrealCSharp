@@ -653,7 +653,11 @@ FContentBrowserItemData UDynamicDataSource::CreateFolderItemDataPayload(const FN
 	                               VirtualPath,
 	                               *FolderItemName,
 	                               MoveTemp(DisplayNameOverride),
-	                               MakeShared<FDynamicFolderItemDataPayload>(InFolderPath));
+	                               MakeShared<FDynamicFolderItemDataPayload>(InFolderPath)
+#if UE_F_CONTENT_BROWSER_ITEM_DATA_F_NAME
+	                               , InFolderPath
+#endif
+	);
 }
 
 FContentBrowserItemData UDynamicDataSource::CreateFileItemDataPayload(UClass* InClass)
@@ -668,7 +672,11 @@ FContentBrowserItemData UDynamicDataSource::CreateFileItemDataPayload(UClass* In
 	                               InClass->GetFName(),
 	                               FText(),
 	                               MakeShared<FDynamicFileItemDataPayload>(
-		                               *FDynamicGenerator::GetDynamicNormalizeFile(InClass), InClass));
+		                               *FDynamicGenerator::GetDynamicNormalizeFile(InClass), InClass)
+#if UE_F_CONTENT_BROWSER_ITEM_DATA_F_NAME
+	                               , *FDynamicGenerator::GetDynamicNormalizeFile(InClass)
+#endif
+	);
 }
 
 bool UDynamicDataSource::GetClassPaths(const TArrayView<const FCollectionNameType>& InCollections,
