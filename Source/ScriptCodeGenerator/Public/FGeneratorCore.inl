@@ -18,14 +18,14 @@ auto FGeneratorCore::GetFileName(const T* InField)
 
 		FString ModuleName;
 
-		FString ModuleRelativeName = FUnrealCSharpFunctionLibrary::GetModuleRelativePath(SignatureFunction, InField->IsNative());
+		auto ModuleRelativePath = FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+			SignatureFunction, InField->IsNative());
 
 		if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
 		{
-			ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(ModuleRelativeName);
+			ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(ModuleRelativePath);
 		}
-
-		if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
+		else if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
 		{
 			ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(Package);
 		}
@@ -35,19 +35,18 @@ auto FGeneratorCore::GetFileName(const T* InField)
 
 		if (!InField->IsNative())
 		{
-			if (auto Index = 0; ModuleRelativeName.FindLastChar(TEXT('/'), Index))
+			if (auto Index = 0; ModuleRelativePath.FindLastChar(TEXT('/'), Index))
 			{
-				ModuleRelativeName.LeftInline(Index);
+				ModuleRelativePath.LeftInline(Index);
 			}
 		}
 
-		auto ModuleRelativePathMetaData = FPaths::Combine(
-			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath")))),
+		auto ModuleRelativeFile = FPaths::Combine(
+			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+				FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath")))),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InField));
 
-		ModuleRelativeName = FPaths::Combine(ModuleRelativeName, ModuleRelativePathMetaData);
-		
-		return FPaths::Combine(DirectoryName, ModuleRelativeName) + CSHARP_SUFFIX;
+		return FPaths::Combine(DirectoryName, FPaths::Combine(ModuleRelativePath, ModuleRelativeFile)) + CSHARP_SUFFIX;
 	}
 	else
 	{

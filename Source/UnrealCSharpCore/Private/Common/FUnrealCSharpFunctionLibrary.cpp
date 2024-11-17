@@ -47,84 +47,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 	return GetModuleName(InField->GetPackage());
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const UPackage* InPackage)
-{
-	if (InPackage == nullptr)
-	{
-		return FString();
-	}
-
-	const auto PackageName = InPackage->GetName();
-
-	if (PackageName.IsEmpty())
-	{
-		return FString();
-	}
-
-	return GetModuleName(PackageName);
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InPackageName)
-{
-	FString ModuleName;
-
-	if (InPackageName.IsEmpty())
-	{
-		return ModuleName;
-	}
-
-	TArray<FString> Splits;
-
-	InPackageName.ParseIntoArray(Splits, TEXT("/"));
-
-	if (const auto& ProjectModuleList = GetProjectModuleList();
-		ProjectModuleList.Contains(Splits[0]) ||
-		Splits[0] == TEXT("Game") ||
-		(Splits[0] == TEXT("Script") &&
-			ProjectModuleList.Contains(Splits[1])))
-	{
-		ModuleName = FApp::GetProjectName();
-	}
-	else
-	{
-		ModuleName = Splits[1];
-	}
-
-	return ModuleName;
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModulaRelativePathWithoutModuleName(const FString& InModulaRelativePath)
-{
-	FString ModuleRelativePath = InModulaRelativePath;
-
-	if (InModulaRelativePath.IsEmpty())
-	{
-		return ModuleRelativePath;
-	}
-
-	TArray<FString> Splits;
-
-	InModulaRelativePath.ParseIntoArray(Splits, TEXT("/"));
-
-	if (const auto& ProjectModuleList = GetProjectModuleList();
-		ProjectModuleList.Contains(Splits[0]) ||
-		Splits[0] == TEXT("Game") ||
-		(Splits[0] == TEXT("Script") &&
-			ProjectModuleList.Contains(Splits[1])))
-	{
-		ModuleRelativePath = InModulaRelativePath.RightChop(Splits[0].Len() + 1);
-	}
-	else if (Splits.Num() > 1 && Splits[0] == TEXT("Script"))
-	{
-		if (const int32 FoundIndex = InModulaRelativePath.Find(Splits[1]); FoundIndex != INDEX_NONE)
-		{
-			ModuleRelativePath = InModulaRelativePath.RightChop(FoundIndex + Splits[1].Len());
-		}
-	}
-
-	return ModuleRelativePath;
-}
-
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InField)
 {
 	if (InField == nullptr)
@@ -132,12 +55,103 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InFiel
 		return FString();
 	}
 
-	auto PackageName = GetModuleRelativePath(InField->GetPackage());
+	auto ModuleRelativePath = GetModuleRelativePath(InField->GetPackage());
 
-	const auto ModuleRelativePathMetaData = GetModuleRelativePath(
-		FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath"))));
+	return FPaths::Combine(GetModuleRelativePath(FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath")))),
+	                       ModuleRelativePath);
+}
+#endif
 
-	return FPaths::Combine(ModuleRelativePathMetaData, PackageName);
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const UPackage* InPackage)
+{
+	if (InPackage == nullptr)
+	{
+		return FString();
+	}
+
+	if (const auto Name = InPackage->GetName();
+		!Name.IsEmpty())
+	{
+		return GetModuleName(Name);
+	}
+
+	return FString();
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UPackage* InPackage)
+{
+	if (InPackage == nullptr)
+	{
+		return FString();
+	}
+
+	if (const auto Name = InPackage->GetName();
+		!Name.IsEmpty())
+	{
+		return GetPackageRelativePath(Name);
+	}
+
+	return FString();
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
+{
+	FString ModuleName;
+
+	if (InName.IsEmpty())
+	{
+		return ModuleName;
+	}
+
+	TArray<FString> OutArray;
+
+	InName.ParseIntoArray(OutArray, TEXT("/"));
+
+	if (const auto& ProjectModuleList = GetProjectModuleList();
+		ProjectModuleList.Contains(OutArray[0]) ||
+		OutArray[0] == TEXT("Game") ||
+		(OutArray[0] == TEXT("Script") && ProjectModuleList.Contains(OutArray[1])))
+	{
+		ModuleName = FApp::GetProjectName();
+	}
+	else
+	{
+		ModuleName = OutArray[1];
+	}
+
+	return ModuleName;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetPackageRelativePath(const FString& InRelativePath)
+{
+	auto ModuleRelativePath = InRelativePath;
+
+	if (InRelativePath.IsEmpty())
+	{
+		return ModuleRelativePath;
+	}
+
+	TArray<FString> OutArray;
+
+	InRelativePath.ParseIntoArray(OutArray, TEXT("/"));
+
+	if (const auto& ProjectModuleList = GetProjectModuleList();
+		ProjectModuleList.Contains(OutArray[0]) ||
+		OutArray[0] == TEXT("Game") ||
+		(OutArray[0] == TEXT("Script") && ProjectModuleList.Contains(OutArray[1])))
+	{
+		ModuleRelativePath = InRelativePath.RightChop(OutArray[0].Len() + 1);
+	}
+	else if (OutArray.Num() > 1 && OutArray[0] == TEXT("Script"))
+	{
+		if (const auto Index = InRelativePath.Find(OutArray[1]);
+			Index != INDEX_NONE)
+		{
+			ModuleRelativePath = InRelativePath.RightChop(Index + OutArray[1].Len());
+		}
+	}
+
+	return ModuleRelativePath;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
@@ -161,8 +175,8 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 			ModuleRelativePath = FString::Printf(TEXT(
 				"%s/%s"
 			),
-				*(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
-				*Class->GetName());
+			                                     *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
+			                                     *Class->GetName());
 		}
 		else
 		{
@@ -171,8 +185,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 
 		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
 	}
-
-	if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))
+	else if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))
 	{
 		ModuleRelativePath = GetModuleRelativePath(Package);
 	}
@@ -180,44 +193,18 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 	return ModuleRelativePath;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UPackage* InPackage)
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FString& InRelativePath)
 {
-	if (InPackage == nullptr)
+	TArray<FString> OutArray;
+
+	InRelativePath.ParseIntoArray(OutArray, TEXT("/"));
+
+	OutArray.RemoveAll([](const FString& Element)
 	{
-		return FString();
-	}
+		return Element == TEXT("Public") || Element == TEXT("Private");
+	});
 
-	const auto PackageName = InPackage->GetName();
-
-	if (PackageName.IsEmpty())
-	{
-		return FString();
-	}
-
-	return GetModulaRelativePathWithoutModuleName(PackageName);
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FString& InModuleRelativePath)
-{
-	const FString PublicStr = TEXT("Public");
-
-	const FString PrivateStr = TEXT("Private");
-
-	TArray<FString> SubStrings;
-
-	InModuleRelativePath.ParseIntoArray(SubStrings, TEXT("/"));
-
-	TArray<FString> ResultComponents;
-
-	for (const FString& SubString : SubStrings)
-	{
-		if (SubString != PublicStr && SubString != PrivateStr)
-		{
-			ResultComponents.Add(SubString);
-		}
-	}
-
-	return FString::Join(ResultComponents, TEXT("/"));
+	return FString::Join(OutArray, TEXT("/"));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)

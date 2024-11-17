@@ -252,11 +252,11 @@ FString FUnrealCSharpBlueprintToolBar::GetFileName() const
 
 		auto DirectoryName = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameDirectory(), ModuleName);
 
-		auto ModuleRelativePath = FPaths::Combine(
+		auto ModuleRelativeFile = FPaths::Combine(
 			FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetModuleRelativePath(Blueprint->GeneratedClass)),
 			Blueprint->GeneratedClass->GetName());
 
-		return FPaths::Combine(DirectoryName, ModuleRelativePath) / CSHARP_SUFFIX;
+		return FPaths::Combine(DirectoryName, ModuleRelativeFile) / CSHARP_SUFFIX;
 	}
 
 	return {};
