@@ -267,11 +267,6 @@ namespace SourceCodeGeneratorUbtPlugin
 
         private static bool IsPropertyTypeSupported(UhtProperty property)
         {
-            if (property is UhtArrayProperty arrayProperty)
-            {
-                return IsPropertyTypeSupported(arrayProperty.ValueProperty);
-            }
-
             if (property is UhtObjectProperty objectProperty)
             {
                 if (!IsClassTypeSupported(objectProperty.Class))
@@ -304,6 +299,22 @@ namespace SourceCodeGeneratorUbtPlugin
             if (property is UhtStructProperty { ScriptStruct.HasNoOpConstructor: false })
             {
                 return false;
+            }
+
+            if (property is UhtArrayProperty arrayProperty)
+            {
+                return IsPropertyTypeSupported(arrayProperty.ValueProperty);
+            }
+
+            if (property is UhtSetProperty setProperty)
+            {
+                return IsPropertyTypeSupported(setProperty.ValueProperty);
+            }
+
+            if (property is UhtMapProperty mapProperty)
+            {
+                return IsPropertyTypeSupported(mapProperty.KeyProperty) &&
+                       IsPropertyTypeSupported(mapProperty.ValueProperty);
             }
 
             return property is { IsBitfield: false, IsStaticArray: false };
@@ -471,9 +482,19 @@ namespace SourceCodeGeneratorUbtPlugin
             {
                 DependencyClasses.Add(softObjectProperty.Class);
             }
-            else if (property is UhtArrayProperty { ValueProperty: UhtObjectProperty valueProperty })
+            else if (property is UhtArrayProperty arrayProperty)
             {
-                DependencyClasses.Add(valueProperty.Class);
+                GetDependencyClasses(arrayProperty.ValueProperty, DependencyClasses);
+            }
+            else if (property is UhtSetProperty setProperty)
+            {
+                GetDependencyClasses(setProperty.ValueProperty, DependencyClasses);
+            }
+            else if (property is UhtMapProperty mapProperty)
+            {
+                GetDependencyClasses(mapProperty.KeyProperty, DependencyClasses);
+
+                GetDependencyClasses(mapProperty.ValueProperty, DependencyClasses);
             }
         }
 
@@ -562,7 +583,7 @@ namespace SourceCodeGeneratorUbtPlugin
                 fromConstClass = outerClass.ClassFlags.HasAnyFlags(EClassFlags.Const);
             }
 
-            var constAtTheEnd = fromConstClass || (isConstParam && shouldHaveRef) && !constAtTheBeginning;
+            var constAtTheEnd = (fromConstClass || (isConstParam && shouldHaveRef)) && !constAtTheBeginning;
 
             if (constAtTheEnd)
             {
