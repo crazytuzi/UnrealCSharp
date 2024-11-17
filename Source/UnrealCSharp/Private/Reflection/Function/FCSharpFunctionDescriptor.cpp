@@ -1,25 +1,15 @@
 ﻿#include "Reflection/Function/FCSharpFunctionDescriptor.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/MonoMacro.h"
 
-FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction):
+FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(const FString& InMethodName, UFunction* InFunction):
 	Super(InFunction,
 	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction)),
 	OriginalFunctionFlags(EFunctionFlags::FUNC_None),
 	OriginalNativeFuncPtr(nullptr),
 	Method(FCSharpEnvironment::GetEnvironment().GetDomain()->Parent_Class_Get_Method_From_Name(
 		FCSharpEnvironment::GetEnvironment().GetClassDescriptor(InFunction->GetOwnerClass())->GetMonoClass(),
-		TCHAR_TO_UTF8(
-			InFunction->HasAnyFunctionFlags(FUNC_Net)
-			? *FString::Printf(TEXT(
-					"%s_Implementation"
-				),
-				*FUnrealCSharpFunctionLibrary::Encode(InFunction))
-
-			: *FUnrealCSharpFunctionLibrary::Encode(InFunction)
-		),
-		PropertyDescriptors.Num()))
+		InMethodName, PropertyDescriptors.Num()))
 {
 }
 

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "UEVersion.h"
 
 class UNREALCSHARPCORE_API FUnrealCSharpFunctionLibrary
 {
@@ -12,9 +13,25 @@ public:
 public:
 	static FString GetModuleName(const UField* InField);
 
-	static FString GetModuleName(const UField* InField, const TFunction<void(FString& InModuleName)>& InGetModuleName);
+#if WITH_EDITOR
+	static FString GetModuleRelativePath(const UField* InField);
+#endif
 
-	static FString GetModuleName(const FString& InModuleName);
+	static FString GetModuleName(const UPackage* InPackage);
+
+	static FString GetModuleRelativePath(const UPackage* InPackage);
+
+	static FString GetModuleName(const FString& InName);
+
+	static FString GetPackageRelativePath(const FString& InRelativePath);
+
+#if UE_GET_MODULE_RELATIVE_PATH_T_OBJECT_PTR
+	static FString GetModuleRelativePath(const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative = true);
+#else
+	static FString GetModuleRelativePath(const UFunction* InSignatureFunction, const bool bIsNative = true);
+#endif
+
+	static FString GetModuleRelativePath(const FString& InRelativePath);
 
 	static FString GetFullClass(const UStruct* InStruct);
 

@@ -40,6 +40,9 @@ public:
 
 	static bool Bind(FDomain* InDomain, FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
+	static bool Bind(FDomain* InDomain, FClassDescriptor* InClassDescriptor,
+	                 UClass* InClass, const FString& InMethodName, UFunction* InFunction);
+
 	static bool BindClassDefaultObject(FDomain* InDomain, UObject* InObject);
 
 private:
@@ -49,7 +52,7 @@ private:
 	static bool BindImplementation(FDomain* InDomain, UStruct* InStruct);
 
 	static bool BindImplementation(FDomain* InDomain, FClassDescriptor* InClassDescriptor,
-	                               UClass* InClass, UFunction* InFunction);
+	                               UClass* InClass, const FString& InMethodName, UFunction* InFunction);
 
 	template <typename T>
 	static auto BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
@@ -75,8 +78,6 @@ private:
 
 private:
 	static bool IsOverrideType(const FDomain* InDomain, MonoReflectionType* InMonoReflectionType);
-
-	static bool IsOverrideMethod(const FDomain* InDomain, MonoReflectionMethod* InMonoReflectionMethod);
 
 private:
 	void OnCSharpEnvironmentInitialize();

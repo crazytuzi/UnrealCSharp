@@ -4,8 +4,6 @@
 
 #define FUNCTION_UTILS_IS_OVERRIDE_TYPE FString(TEXT("IsOverrideType"))
 
-#define FUNCTION_UTILS_IS_OVERRIDE_METHOD FString(TEXT("IsOverrideMethod"))
-
 #define FUNCTION_UTILS_GET_TRACEBACK FString(TEXT("GetTraceback"))
 
 #define FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE FString(TEXT("Initialize"))

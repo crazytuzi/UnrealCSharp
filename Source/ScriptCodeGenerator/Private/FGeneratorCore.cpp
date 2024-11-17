@@ -615,41 +615,6 @@ int32 FGeneratorCore::GetFunctionIndex(const bool bHasReturn, const bool bHasInp
 		static_cast<int32>(bIsNet) << 4;
 }
 
-FString FGeneratorCore::GetModuleRelativePath(const UField* InField)
-{
-	return InField != nullptr
-		       ? GetModuleRelativePath(InField->GetMetaData(TEXT("ModuleRelativePath")))
-		       : FString();
-}
-
-FString FGeneratorCore::GetModuleRelativePath(const UEnum* InEnum)
-{
-	return InEnum != nullptr
-		       ? GetModuleRelativePath(InEnum->GetMetaData(TEXT("ModuleRelativePath")))
-		       : FString();
-}
-
-FString FGeneratorCore::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
-{
-	return InDelegateProperty != nullptr
-		       ? GetModuleRelativePath(
-			       InDelegateProperty->SignatureFunction->GetMetaData(TEXT("ModuleRelativePath")))
-		       : FString();
-}
-
-FString FGeneratorCore::GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty)
-{
-	return InMulticastDelegateProperty != nullptr
-		       ? GetModuleRelativePath(
-			       InMulticastDelegateProperty->SignatureFunction->GetMetaData(TEXT("ModuleRelativePath")))
-		       : FString();
-}
-
-FString FGeneratorCore::GetModuleRelativePath(const FString& InModuleRelativePath)
-{
-	return InModuleRelativePath.Replace(TEXT("Public/"), TEXT("")).Replace(TEXT("Private/"), TEXT(""));
-}
-
 TArray<FString> FGeneratorCore::GetOverrideFunctions(const FString& InNameSpace, const FString& InClass)
 {
 	const auto FoundFunctions = OverrideFunctionsMap.Find(FString::Printf(TEXT(
