@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TPropertyDescriptor.inl"
+#include "UEVersion.h"
 
 template <typename T>
 class TCompoundPropertyDescriptor : public TPropertyDescriptor<T, false>
@@ -31,7 +32,13 @@ public:
 
 	virtual auto CopyValue(const void* InAddress) const -> void* override
 	{
-		const auto Value = static_cast<void*>(static_cast<uint8*>(FMemory::Malloc(Super::Property->ElementSize)));
+		const auto Value = static_cast<void*>(static_cast<uint8*>(FMemory::Malloc(
+#if UE_F_PROPERTY_GET_ELEMENT_SIZE
+			Super::Property->GetElementSize()
+#else
+			Super::Property->ElementSize
+#endif
+		)));
 
 		Super::Property->InitializeValue(Value);
 

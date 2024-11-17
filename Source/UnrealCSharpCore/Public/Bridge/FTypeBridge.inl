@@ -2,6 +2,7 @@
 
 #include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "UEVersion.h"
 
 template <auto IsSoftReference>
 FProperty* FTypeBridge::Factory(MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
@@ -209,7 +210,11 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 			const auto StructProperty = new FStructProperty(InOwner, InName, InObjectFlags);
 
+#if UE_F_PROPERTY_SET_ELEMENT_SIZE
+			StructProperty->SetElementSize(InScriptStruct->GetStructureSize());
+#else
 			StructProperty->ElementSize = InScriptStruct->GetStructureSize();
+#endif
 
 			StructProperty->Struct = InScriptStruct;
 
@@ -269,7 +274,11 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 			const auto UnderlyingProperty = Factory(UnderlyingReflectionType, EnumProperty, "",
 			                                        EObjectFlags::RF_NoFlags);
 
+#if UE_F_PROPERTY_GET_ELEMENT_SIZE && UE_F_PROPERTY_SET_ELEMENT_SIZE
+			EnumProperty->SetElementSize(UnderlyingProperty->GetElementSize());
+#else
 			EnumProperty->ElementSize = UnderlyingProperty->ElementSize;
+#endif
 
 			EnumProperty->SetEnum(InEnum);
 
