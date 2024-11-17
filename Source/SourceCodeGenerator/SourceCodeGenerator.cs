@@ -179,7 +179,8 @@ namespace SourceCodeGeneratorUbtPlugin
         /// <returns>True if the class should be exported, false if not</returns>
         protected virtual bool CanExportClass(UhtClass classObj)
         {
-            return IsClassTypeSupported(classObj);
+            return !classObj.ClassFlags.HasAnyFlags(EClassFlags.Interface) &&
+                   IsClassTypeSupported(classObj);
         }
 
         /// <summary>
@@ -542,17 +543,7 @@ namespace SourceCodeGeneratorUbtPlugin
 
             if (constAtTheBeginning)
             {
-                if (property is UhtArrayProperty or UhtInterfaceProperty or UhtSoftObjectProperty)
-                {
-                    if (property.RefQualifier == UhtPropertyRefQualifier.ConstRef)
-                    {
-                        builder.Append("const ");
-                    }
-                }
-                else
-                {
-                    builder.Append("const ");
-                }
+                builder.Append("const ");
             }
 
             if (property is UhtEnumProperty enumProperty)
@@ -571,21 +562,11 @@ namespace SourceCodeGeneratorUbtPlugin
                 fromConstClass = outerClass.ClassFlags.HasAnyFlags(EClassFlags.Const);
             }
 
-            var constAtTheEnd = fromConstClass || (isConstParam && shouldHaveRef);
+            var constAtTheEnd = fromConstClass || (isConstParam && shouldHaveRef) && !constAtTheBeginning;
 
             if (constAtTheEnd)
             {
-                if (property is UhtArrayProperty or UhtInterfaceProperty or UhtSoftObjectProperty)
-                {
-                    if (property.RefQualifier == UhtPropertyRefQualifier.ConstRef)
-                    {
-                        builder.Append(" const");
-                    }
-                }
-                else
-                {
-                    builder.Append(" const");
-                }
+                builder.Append(" const");
             }
 
             shouldHaveRef = passCppArgsByRef;
