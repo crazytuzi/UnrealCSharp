@@ -147,6 +147,8 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
 
+			ClassProperty->PropertyClass = UObject::StaticClass();
+
 			ClassProperty->MetaClass = UObject::StaticClass();
 
 			return ClassProperty;
@@ -163,6 +165,8 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 			SetClass<IsSoftReference>(PathName, [PathName, ClassProperty]()
 			{
 				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+
+				ClassProperty->PropertyClass = InClass;
 
 				ClassProperty->MetaClass = InClass;
 			});
@@ -328,6 +332,8 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 			SetClass<IsSoftReference>(PathName, [PathName, SoftClassProperty]()
 			{
 				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+
+				SoftClassProperty->PropertyClass = InClass;
 
 				SoftClassProperty->MetaClass = InClass;
 			});
