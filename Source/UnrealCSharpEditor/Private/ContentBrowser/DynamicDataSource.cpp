@@ -598,14 +598,14 @@ void UDynamicDataSource::UpdateHierarchy()
 #if UE_U_CONTENT_BROWSER_DATA_SOURCE_NOTIFY_ITEM_DATA_REFRESHED
 	NotifyItemDataRefreshed();
 #else
-	for (const auto& DynamicClass : DynamicHierarchy->GetMatchingClasses(*DYNAMIC_ROOT_INTERNAL_PATH, true))
+	for (const auto& MatchingClass : DynamicHierarchy->GetMatchingClasses(*DYNAMIC_ROOT_INTERNAL_PATH, true))
 	{
-		QueueItemDataUpdate(FContentBrowserItemDataUpdate::MakeItemAddedUpdate(CreateFileItem(DynamicClass)));
+		QueueItemDataUpdate(FContentBrowserItemDataUpdate::MakeItemAddedUpdate(CreateFileItem(MatchingClass)));
 	}
 
-	for (const auto& DynamicClassFolder : DynamicHierarchy->GetMatchingFolders(*DYNAMIC_ROOT_INTERNAL_PATH, true))
+	for (const auto& MatchingFolder : DynamicHierarchy->GetMatchingFolders(*DYNAMIC_ROOT_INTERNAL_PATH, true))
 	{
-		QueueItemDataUpdate(FContentBrowserItemDataUpdate::MakeItemAddedUpdate(CreateFolderItem(DynamicClassFolder)));
+		QueueItemDataUpdate(FContentBrowserItemDataUpdate::MakeItemAddedUpdate(CreateFolderItem(MatchingFolder)));
 	}
 #endif
 }

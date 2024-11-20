@@ -448,11 +448,11 @@ int32 FGeneratorCore::GetBufferSize(FProperty* Property)
 {
 	return IsPrimitiveProperty(Property)
 #if UE_F_PROPERTY_GET_ELEMENT_SIZE
-			   ? Property->GetElementSize()
+		       ? Property->GetElementSize()
 #else
-			   ? Property->ElementSize
+		       ? Property->ElementSize
 #endif
-			   : sizeof(void*);
+		       : sizeof(void*);
 }
 
 FString FGeneratorCore::GetTypeImplementation(FProperty* Property)

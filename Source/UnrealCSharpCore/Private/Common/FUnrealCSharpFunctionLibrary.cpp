@@ -332,7 +332,7 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FDelegateProperty* InDe
 	auto DelegateName = SignatureFunction->GetName();
 
 	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(),
-#if UE_F_STRING_LEFT_CHOPIN_LINE_E_ALLOW_SHRINKING
+#if UE_F_STRING_LEFT_CHOP_IN_LINE_E_ALLOW_SHRINKING
 	                            EAllowShrinking::No
 #else
 	                            false
@@ -400,7 +400,7 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const FMulticastDelegatePrope
 	auto DelegateName = SignatureFunction->GetName();
 
 	DelegateName.LeftChopInline(FString(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX).Len(),
-#if UE_F_STRING_LEFT_CHOPIN_LINE_E_ALLOW_SHRINKING
+#if UE_F_STRING_LEFT_CHOP_IN_LINE_E_ALLOW_SHRINKING
 	                            EAllowShrinking::No
 #else
 	                            false

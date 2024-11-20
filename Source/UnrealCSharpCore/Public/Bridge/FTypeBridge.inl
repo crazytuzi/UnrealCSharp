@@ -274,7 +274,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 			const auto UnderlyingProperty = Factory(UnderlyingReflectionType, EnumProperty, "",
 			                                        EObjectFlags::RF_NoFlags);
 
-#if UE_F_PROPERTY_GET_ELEMENT_SIZE && UE_F_PROPERTY_SET_ELEMENT_SIZE
+#if UE_F_PROPERTY_SET_ELEMENT_SIZE && UE_F_PROPERTY_GET_ELEMENT_SIZE
 			EnumProperty->SetElementSize(UnderlyingProperty->GetElementSize());
 #else
 			EnumProperty->ElementSize = UnderlyingProperty->ElementSize;
