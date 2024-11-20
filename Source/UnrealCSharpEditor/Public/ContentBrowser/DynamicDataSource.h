@@ -94,9 +94,9 @@ private:
 	TSharedPtr<const FDynamicFolderItemDataPayload> GetFolderItemDataPayload(
 		const FContentBrowserItemData& InItemData) const;
 
-	FContentBrowserItemData CreateFolderItemDataPayload(const FName& InFolderPath);
+	FContentBrowserItemData CreateFolderItem(const FName& InFolderPath);
 
-	FContentBrowserItemData CreateFileItemDataPayload(UClass* InClass);
+	FContentBrowserItemData CreateFileItem(UClass* InClass);
 
 	bool GetClassPaths(const TArrayView<const FCollectionNameType>& InCollections,
 	                   const bool bIncludeChildCollections,

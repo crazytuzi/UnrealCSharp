@@ -7,6 +7,7 @@
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
+#include "UEVersion.h"
 
 #if PLATFORM_MAC
 TMap<int32, struct sigaction> SignalActions;
@@ -327,10 +328,21 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 
 			auto Object = ObjectPtr.Get();
 
-			if (Object->HasAnyFlags(RF_NeedPostLoad)
-				|| Object->HasAnyInternalFlags(EInternalObjectFlags::AsyncLoading | EInternalObjectFlags::Async)
-				|| Object->GetClass()->HasAnyInternalFlags(
-					EInternalObjectFlags::AsyncLoading | EInternalObjectFlags::Async))
+			if (Object->HasAnyFlags(RF_NeedPostLoad) ||
+				Object->HasAnyInternalFlags(
+#if UE_E_INTERNAL_OBJECT_FLAGS_ASYNC_LOADING
+					EInternalObjectFlags_AsyncLoading
+#else
+					EInternalObjectFlags::AsyncLoading
+#endif
+					| EInternalObjectFlags::Async) ||
+				Object->GetClass()->HasAnyInternalFlags(
+#if UE_E_INTERNAL_OBJECT_FLAGS_ASYNC_LOADING
+					EInternalObjectFlags_AsyncLoading
+#else
+					EInternalObjectFlags::AsyncLoading
+#endif
+					| EInternalObjectFlags::Async))
 			{
 				continue;
 			}

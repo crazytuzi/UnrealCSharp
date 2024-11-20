@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UEVersion.h"
+
 template <typename BoolConstant>
 auto FPropertyDescriptor::Get(void* Src, void** Dest) const
 {
@@ -10,7 +12,12 @@ int32 FPropertyDescriptor::GetElementSize() const
 {
 	if (const auto Property = GetProperty())
 	{
-		return Property->ElementSize;
+		return
+#if UE_F_PROPERTY_GET_ELEMENT_SIZE
+			Property->GetElementSize();
+#else
+			Property->ElementSize;
+#endif
 	}
 
 	return 0;
