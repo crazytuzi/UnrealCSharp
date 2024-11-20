@@ -443,6 +443,8 @@ UBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorBlueprintGeneratedCla
 #if WITH_EDITOR
 void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 {
+	InOldClass->ClassFlags |= CLASS_NewerVersionExists;
+
 #if UE_REPLACE_INSTANCES_OF_CLASS_F_REPLACE_INSTANCES_OF_CLASS_PARAMETERS
 	FReplaceInstancesOfClassParameters ReplaceInstancesOfClassParameters;
 
