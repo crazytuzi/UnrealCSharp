@@ -1127,3 +1127,31 @@ bool FUnrealCSharpFunctionLibrary::IsDynamicReInstanceField(const UField* InFiel
 		       : false;
 }
 #endif
+
+bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const FName& InFunctionName)
+{
+	if (InClass == nullptr)
+	{
+		return false;
+	}
+
+	auto OwnerClass = InClass;
+
+	auto SuperClass = InClass->GetSuperClass();
+
+	while (SuperClass != nullptr)
+	{
+		if (SuperClass->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
+		{
+			OwnerClass = SuperClass;
+
+			SuperClass = SuperClass->GetSuperClass();
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	return OwnerClass->IsNative();
+}

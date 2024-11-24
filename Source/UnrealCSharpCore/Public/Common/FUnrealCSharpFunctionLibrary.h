@@ -191,6 +191,8 @@ public:
 	static bool IsDynamicReInstanceField(const UField* InField);
 #endif
 
+	static bool IsNativeFunction(const UClass* InClass, const FName& InFunctionName);
+
 	template <typename T>
 	static T* GetMutableDefaultSafe()
 	{
