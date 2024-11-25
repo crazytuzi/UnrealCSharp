@@ -17,7 +17,6 @@
 #include "Animation/AnimBlueprint.h"
 #include "Animation/AnimInstance.h"
 #endif
-#include "UEVersion.h"
 
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
@@ -38,6 +37,7 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 }
 #endif
 
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
 	if (InField == nullptr)
@@ -47,21 +47,6 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 
 	return GetModuleName(InField->GetPackage());
 }
-
-#if WITH_EDITOR
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InField)
-{
-	if (InField == nullptr)
-	{
-		return FString();
-	}
-
-	auto ModuleRelativePath = GetModuleRelativePath(InField->GetPackage());
-
-	return FPaths::Combine(GetModuleRelativePath(FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath")))),
-	                       ModuleRelativePath);
-}
-#endif
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UPackage* InPackage)
 {
@@ -74,22 +59,6 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UPackage* InPackage)
 		!Name.IsEmpty())
 	{
 		return GetModuleName(Name);
-	}
-
-	return FString();
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UPackage* InPackage)
-{
-	if (InPackage == nullptr)
-	{
-		return FString();
-	}
-
-	if (const auto Name = InPackage->GetName();
-		!Name.IsEmpty())
-	{
-		return GetPackageRelativePath(Name);
 	}
 
 	return FString();
@@ -115,7 +84,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
 	{
 		ModuleName = FApp::GetProjectName();
 	}
-	else
+	else if (OutArray.Num() > 1)
 	{
 		ModuleName = OutArray[1];
 	}
@@ -123,39 +92,42 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
 	return ModuleName;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetPackageRelativePath(const FString& InRelativePath)
+FString FUnrealCSharpFunctionLibrary::GetOuterName(const UPackage* InPackage)
 {
-	auto ModuleRelativePath = InRelativePath;
-
-	if (InRelativePath.IsEmpty())
+	if (InPackage == nullptr)
 	{
-		return ModuleRelativePath;
+		return FString();
 	}
 
-	TArray<FString> OutArray;
-
-	InRelativePath.ParseIntoArray(OutArray, TEXT("/"));
-
-	if (const auto& ProjectModuleList = GetProjectModuleList();
-		ProjectModuleList.Contains(OutArray[0]) ||
-		OutArray[0] == TEXT("Game") ||
-		(OutArray[0] == TEXT("Script") && ProjectModuleList.Contains(OutArray[1])))
-	{
-		ModuleRelativePath = InRelativePath.RightChop(OutArray[0].Len() + 1);
-	}
-	else if (OutArray.Num() > 1 && OutArray[0] == TEXT("Script"))
-	{
-		if (const auto Index = InRelativePath.Find(OutArray[1]);
-			Index != INDEX_NONE)
-		{
-			ModuleRelativePath = InRelativePath.RightChop(Index + OutArray[1].Len());
-		}
-	}
-
-	return ModuleRelativePath;
+	return InPackage->GetName();
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+FString FUnrealCSharpFunctionLibrary::GetOuterName(const UClass* InClass)
+{
+	FString OuterName;
+
+	if (InClass == nullptr)
+	{
+		return OuterName;
+	}
+
+	if (InClass->IsNative())
+	{
+		OuterName = FString::Printf(TEXT(
+			"%s/%s"
+		),
+		                            *(InClass->GetOuter() ? InClass->GetOuter()->GetName() : TEXT("")),
+		                            *InClass->GetName());
+	}
+	else
+	{
+		OuterName = *(InClass->GetOuter() ? InClass->GetOuter()->GetName() : TEXT(""));
+	}
+
+	return OuterName;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetOuterName(
 #if UE_GET_MODULE_RELATIVE_PATH_T_OBJECT_PTR
 	const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative)
 #else
@@ -171,34 +143,94 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 
 	if (const auto Class = Cast<UClass>(InSignatureFunction->GetOuter()))
 	{
-		if (bIsNative)
-		{
-			ModuleRelativePath = FString::Printf(TEXT(
-				"%s/%s"
-			),
-			                                     *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT("")),
-			                                     *Class->GetName());
-		}
-		else
-		{
-			ModuleRelativePath = *(Class->GetOuter() ? Class->GetOuter()->GetName() : TEXT(""));
-		}
-
-		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
+		ModuleRelativePath = GetOuterName(Class);
 	}
 	else if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))
 	{
-		ModuleRelativePath = GetModuleRelativePath(Package);
+		ModuleRelativePath = GetOuterName(Package);
 	}
 
 	return ModuleRelativePath;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FString& InRelativePath)
+FString FUnrealCSharpFunctionLibrary::GetOuterRelativePath(const FString& InRelativePath)
 {
+	FString OuterRelativePath;
+
+	if (InRelativePath.IsEmpty())
+	{
+		return OuterRelativePath;
+	}
+
 	TArray<FString> OutArray;
 
 	InRelativePath.ParseIntoArray(OutArray, TEXT("/"));
+
+	if (const auto& ProjectModuleList = GetProjectModuleList();
+		ProjectModuleList.Contains(OutArray[0]) || OutArray[0] == TEXT("Game"))
+	{
+		OuterRelativePath = InRelativePath.RightChop(OutArray[0].Len() + 1);
+	}
+	else if (OutArray.Num() > 1)
+	{
+		if (const auto Index = InRelativePath.Find(OutArray[1]);
+			Index != INDEX_NONE)
+		{
+			OuterRelativePath = InRelativePath.RightChop(Index + OutArray[1].Len());
+		}
+	}
+
+	return OuterRelativePath;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(const UField* InField)
+{
+	FString ModuleRelativePathMetaData;
+
+	if (InField == nullptr)
+	{
+		return ModuleRelativePathMetaData;
+	}
+
+	ModuleRelativePathMetaData = FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath")));
+
+	return GetModuleRelativePathMetaData(ModuleRelativePathMetaData);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(const FDelegateProperty* InDelegateProperty)
+{
+	FString ModuleRelativePathMetaData;
+
+	if (InDelegateProperty == nullptr)
+	{
+		return ModuleRelativePathMetaData;
+	}
+
+	ModuleRelativePathMetaData = FPaths::GetPath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")));
+
+	return GetModuleRelativePathMetaData(ModuleRelativePathMetaData);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(
+	const FMulticastDelegateProperty* InMulticastDelegateProperty)
+{
+	FString ModuleRelativePathMetaData;
+
+	if (InMulticastDelegateProperty == nullptr)
+	{
+		return ModuleRelativePathMetaData;
+	}
+
+	ModuleRelativePathMetaData = FPaths::GetPath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")));
+
+	return GetModuleRelativePathMetaData(ModuleRelativePathMetaData);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(const FString& InMetaData)
+{
+	TArray<FString> OutArray;
+
+	InMetaData.ParseIntoArray(OutArray, TEXT("/"));
 
 	OutArray.RemoveAll([](const FString& Element)
 	{
@@ -207,6 +239,42 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FString& InRel
 
 	return FString::Join(OutArray, TEXT("/"));
 }
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InField)
+{
+	if (InField == nullptr)
+	{
+		return FString();
+	}
+
+	const auto Package = InField->GetPackage();
+
+	if (Package == nullptr)
+	{
+		return FString();
+	}
+
+	auto ModuleRelativePath = FPaths::Combine(GetOuterRelativePath(Package->GetName()),
+	                                          GetModuleRelativePathMetaData(InField));
+
+	if (!InField->IsNative())
+	{
+		GetModuleRelativePath(ModuleRelativePath);
+	}
+
+	return ModuleRelativePath;
+}
+
+void FUnrealCSharpFunctionLibrary::GetModuleRelativePath(FString& InRelativePath)
+{
+	InRelativePath.RemoveFromEnd(TEXT("/"));
+
+	if (auto Index = 0; InRelativePath.FindLastChar(TEXT('/'), Index))
+	{
+		InRelativePath.LeftInline(Index);
+	}
+}
+#endif
 
 FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 {
