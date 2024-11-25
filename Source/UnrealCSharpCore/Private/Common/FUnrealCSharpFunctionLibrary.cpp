@@ -48,6 +48,32 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 	return GetModuleName(InField->GetPackage());
 }
 
+FString FUnrealCSharpFunctionLibrary::GetModuleName(
+#if UE_GET_MODULE_NAME_T_OBJECT_PTR
+	const TObjectPtr<UFunction>& InSignatureFunction)
+#else
+	const UFunction* InSignatureFunction)
+#endif
+{
+	FString ModuleName;
+
+	if (InSignatureFunction == nullptr)
+	{
+		return ModuleName;
+	}
+
+	if (InSignatureFunction->GetOuter()->IsA<UClass>())
+	{
+		ModuleName = GetModuleName(GetOuterName(InSignatureFunction));
+	}
+	else if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))
+	{
+		ModuleName = GetModuleName(Package);
+	}
+
+	return ModuleName;
+}
+
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UPackage* InPackage)
 {
 	if (InPackage == nullptr)
@@ -92,6 +118,127 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
 	return ModuleName;
 }
 
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InField)
+{
+	if (InField == nullptr)
+	{
+		return FString();
+	}
+
+	const auto Package = InField->GetPackage();
+
+	if (Package == nullptr)
+	{
+		return FString();
+	}
+
+	auto ModuleRelativePath = FPaths::Combine(GetOuterRelativePath(Package->GetName()),
+	                                          GetModuleRelativePathMetaData(InField));
+
+	if (!InField->IsNative())
+	{
+		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
+	}
+
+	return ModuleRelativePath;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
+{
+	if (InDelegateProperty == nullptr)
+	{
+		return FString();
+	}
+
+	const auto SignatureFunction = InDelegateProperty->SignatureFunction;
+
+	if (SignatureFunction == nullptr)
+	{
+		return FString();
+	}
+
+	auto ModuleRelativePath = FPaths::Combine(GetOuterRelativePath(SignatureFunction),
+	                                          GetModuleRelativePathMetaData(InDelegateProperty));
+
+	if (!InDelegateProperty->IsNative())
+	{
+		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
+	}
+
+	return ModuleRelativePath;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+	const FMulticastDelegateProperty* InMulticastDelegateProperty)
+{
+	if (InMulticastDelegateProperty == nullptr)
+	{
+		return FString();
+	}
+
+	const auto SignatureFunction = InMulticastDelegateProperty->SignatureFunction;
+
+	if (SignatureFunction == nullptr)
+	{
+		return FString();
+	}
+
+	auto ModuleRelativePath = FPaths::Combine(GetOuterRelativePath(SignatureFunction),
+	                                          GetModuleRelativePathMetaData(InMulticastDelegateProperty));
+
+	if (!InMulticastDelegateProperty->IsNative())
+	{
+		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
+	}
+
+	return ModuleRelativePath;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FString& InRelativePath)
+{
+	auto ModuleRelativePath = InRelativePath;
+
+	if (ModuleRelativePath.IsEmpty())
+	{
+		return ModuleRelativePath;
+	}
+
+	ModuleRelativePath.RemoveFromEnd(TEXT("/"));
+
+	if (auto Index = 0; ModuleRelativePath.FindLastChar(TEXT('/'), Index))
+	{
+		ModuleRelativePath.LeftInline(Index);
+	}
+
+	return ModuleRelativePath;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetOuterName(
+#if UE_GET_OUTER_NAME_T_OBJECT_PTR
+	const TObjectPtr<UFunction>& InSignatureFunction)
+#else
+	const UFunction* InSignatureFunction)
+#endif
+{
+	FString ModuleRelativePath;
+
+	if (InSignatureFunction == nullptr)
+	{
+		return ModuleRelativePath;
+	}
+
+	if (const auto Class = Cast<UClass>(InSignatureFunction->GetOuter()))
+	{
+		ModuleRelativePath = GetOuterName(Class);
+	}
+	else if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))
+	{
+		ModuleRelativePath = GetOuterName(Package);
+	}
+
+	return ModuleRelativePath;
+}
+
 FString FUnrealCSharpFunctionLibrary::GetOuterName(const UPackage* InPackage)
 {
 	if (InPackage == nullptr)
@@ -127,30 +274,19 @@ FString FUnrealCSharpFunctionLibrary::GetOuterName(const UClass* InClass)
 	return OuterName;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetOuterName(
-#if UE_GET_MODULE_RELATIVE_PATH_T_OBJECT_PTR
-	const TObjectPtr<UFunction>& InSignatureFunction, const bool bIsNative)
+FString FUnrealCSharpFunctionLibrary::GetOuterRelativePath(
+#if UE_GET_OUTER_RELATIVE_PATH_T_OBJECT_PTR
+	const TObjectPtr<UFunction>& InSignatureFunction)
 #else
-	const UFunction* InSignatureFunction, const bool bIsNative)
+	const UFunction* InSignatureFunction)
 #endif
 {
-	FString ModuleRelativePath;
-
 	if (InSignatureFunction == nullptr)
 	{
-		return ModuleRelativePath;
+		return FString();
 	}
 
-	if (const auto Class = Cast<UClass>(InSignatureFunction->GetOuter()))
-	{
-		ModuleRelativePath = GetOuterName(Class);
-	}
-	else if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))
-	{
-		ModuleRelativePath = GetOuterName(Package);
-	}
-
-	return ModuleRelativePath;
+	return GetOuterRelativePath(GetOuterName(InSignatureFunction));
 }
 
 FString FUnrealCSharpFunctionLibrary::GetOuterRelativePath(const FString& InRelativePath)
@@ -238,41 +374,6 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(const FStrin
 	});
 
 	return FString::Join(OutArray, TEXT("/"));
-}
-
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InField)
-{
-	if (InField == nullptr)
-	{
-		return FString();
-	}
-
-	const auto Package = InField->GetPackage();
-
-	if (Package == nullptr)
-	{
-		return FString();
-	}
-
-	auto ModuleRelativePath = FPaths::Combine(GetOuterRelativePath(Package->GetName()),
-	                                          GetModuleRelativePathMetaData(InField));
-
-	if (!InField->IsNative())
-	{
-		GetModuleRelativePath(ModuleRelativePath);
-	}
-
-	return ModuleRelativePath;
-}
-
-void FUnrealCSharpFunctionLibrary::GetModuleRelativePath(FString& InRelativePath)
-{
-	InRelativePath.RemoveFromEnd(TEXT("/"));
-
-	if (auto Index = 0; InRelativePath.FindLastChar(TEXT('/'), Index))
-	{
-		InRelativePath.LeftInline(Index);
-	}
 }
 #endif
 
