@@ -16,37 +16,16 @@ auto FGeneratorCore::GetFileName(const T* InField)
 			return FString();
 		}
 
-		FString ModuleName;
-
-		auto ModuleRelativePath = FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
-			SignatureFunction, InField->IsNative());
-
-		if (const auto Class = Cast<UClass>(SignatureFunction->GetOuter()))
-		{
-			ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(ModuleRelativePath);
-		}
-		else if (const auto Package = Cast<UPackage>(SignatureFunction->GetOuter()))
-		{
-			ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(Package);
-		}
+		auto ModuleName = FUnrealCSharpFunctionLibrary::GetModuleName(SignatureFunction);
 
 		auto DirectoryName = FPaths::Combine(
 			FUnrealCSharpFunctionLibrary::GetGenerationPath(SignatureFunction), ModuleName);
 
-		if (!InField->IsNative())
-		{
-			if (auto Index = 0; ModuleRelativePath.FindLastChar(TEXT('/'), Index))
-			{
-				ModuleRelativePath.LeftInline(Index);
-			}
-		}
-
-		auto ModuleRelativeFile = FPaths::Combine(
-			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
-				FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath")))),
+		auto ModuleRelativePath = FPaths::Combine(
+			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InField));
 
-		return FPaths::Combine(DirectoryName, FPaths::Combine(ModuleRelativePath, ModuleRelativeFile)) + CSHARP_SUFFIX;
+		return FPaths::Combine(DirectoryName, ModuleRelativePath) + CSHARP_SUFFIX;
 	}
 	else
 	{
@@ -55,10 +34,10 @@ auto FGeneratorCore::GetFileName(const T* InField)
 		auto DirectoryName = FPaths::Combine(
 			FUnrealCSharpFunctionLibrary::GetGenerationPath(InField), ModuleName);
 
-		auto ModuleRelativeFile = FPaths::Combine(
+		auto ModuleRelativePath = FPaths::Combine(
 			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField),
 			InField->GetName());
 
-		return FPaths::Combine(DirectoryName, ModuleRelativeFile) + CSHARP_SUFFIX;
+		return FPaths::Combine(DirectoryName, ModuleRelativePath) + CSHARP_SUFFIX;
 	}
 }
