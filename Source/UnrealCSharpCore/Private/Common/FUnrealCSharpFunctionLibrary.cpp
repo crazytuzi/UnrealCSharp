@@ -63,7 +63,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InFiel
 	}
 
 	auto ModuleRelativePath = FPaths::Combine(GetOuterRelativePath(Package->GetName()),
-											  GetModuleRelativePathMetaData(InField));
+	                                          GetModuleRelativePathMetaData(InField));
 
 	if (!InField->IsNative())
 	{
@@ -149,7 +149,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
 	{
 		ModuleName = FApp::GetProjectName();
 	}
-	else if (OutArray.Num() > 1)
+	else if (OutArray.IsValidIndex(1))
 	{
 		ModuleName = OutArray[1];
 	}
@@ -157,7 +157,8 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
 	return ModuleName;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FDelegateProperty* InDelegateProperty)
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
+	const FDelegateProperty* InDelegateProperty)
 {
 	if (InDelegateProperty == nullptr)
 	{
@@ -172,7 +173,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FDelegatePrope
 	}
 
 	auto ModuleRelativePath = FPaths::Combine(GetOuterRelativePath(SignatureFunction),
-											  GetModuleRelativePathMetaData(InDelegateProperty));
+	                                          GetModuleRelativePathMetaData(InDelegateProperty));
 
 	if (!InDelegateProperty->IsNative())
 	{
@@ -182,7 +183,8 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FDelegatePrope
 	return ModuleRelativePath;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(const FDelegateProperty* InDelegateProperty)
+FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(
+	const FDelegateProperty* InDelegateProperty)
 {
 	FString ModuleRelativePathMetaData;
 
@@ -212,7 +214,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 	}
 
 	auto ModuleRelativePath = FPaths::Combine(GetOuterRelativePath(SignatureFunction),
-											  GetModuleRelativePathMetaData(InMulticastDelegateProperty));
+	                                          GetModuleRelativePathMetaData(InMulticastDelegateProperty));
 
 	if (!InMulticastDelegateProperty->IsNative())
 	{
@@ -289,7 +291,7 @@ FString FUnrealCSharpFunctionLibrary::GetOuterRelativePath(const FString& InRela
 	{
 		OuterRelativePath = InRelativePath.RightChop(OutArray[0].Len() + 1);
 	}
-	else if (OutArray.Num() > 1)
+	else if (OutArray.IsValidIndex(1))
 	{
 		if (const auto Index = InRelativePath.Find(OutArray[1]);
 			Index != INDEX_NONE)
@@ -351,8 +353,8 @@ FString FUnrealCSharpFunctionLibrary::GetOuterName(const UClass* InClass)
 		OuterName = FString::Printf(TEXT(
 			"%s/%s"
 		),
-									*(InClass->GetOuter() ? InClass->GetOuter()->GetName() : TEXT("")),
-									*InClass->GetName());
+		                            *(InClass->GetOuter() ? InClass->GetOuter()->GetName() : TEXT("")),
+		                            *InClass->GetName());
 	}
 	else
 	{
