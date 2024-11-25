@@ -21,11 +21,11 @@ auto FGeneratorCore::GetFileName(const T* InField)
 		auto DirectoryName = FPaths::Combine(
 			FUnrealCSharpFunctionLibrary::GetGenerationPath(SignatureFunction), ModuleName);
 
-		auto ModuleRelativePath = FPaths::Combine(
-			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InField));
+		auto ModuleRelativePath = FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField);
 
-		return FPaths::Combine(DirectoryName, ModuleRelativePath) + CSHARP_SUFFIX;
+		auto FileName = FUnrealCSharpFunctionLibrary::GetFullClass(InField) + CSHARP_SUFFIX;
+
+		return FPaths::Combine(DirectoryName, ModuleRelativePath, FileName);
 	}
 	else
 	{
@@ -34,10 +34,10 @@ auto FGeneratorCore::GetFileName(const T* InField)
 		auto DirectoryName = FPaths::Combine(
 			FUnrealCSharpFunctionLibrary::GetGenerationPath(InField), ModuleName);
 
-		auto ModuleRelativePath = FPaths::Combine(
-			FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField),
-			InField->GetName());
+		auto ModuleRelativePath = FUnrealCSharpFunctionLibrary::GetModuleRelativePath(InField);
 
-		return FPaths::Combine(DirectoryName, ModuleRelativePath) + CSHARP_SUFFIX;
+		auto FileName = InField->GetName() + CSHARP_SUFFIX;
+
+		return FPaths::Combine(DirectoryName, ModuleRelativePath, FileName);
 	}
 }

@@ -37,17 +37,12 @@ FString FUnrealCSharpFunctionLibrary::GetDotNet()
 }
 #endif
 
-#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UField* InField)
 {
-	if (InField == nullptr)
-	{
-		return FString();
-	}
-
-	return GetModuleName(InField->GetPackage());
+	return InField ? GetModuleName(InField->GetPackage()) : FString();
 }
 
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InField)
 {
 	if (InField == nullptr)
@@ -67,7 +62,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const UField* InFiel
 
 	if (!InField->IsNative())
 	{
-		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
+		ProcessModuleRelativePath(ModuleRelativePath);
 	}
 
 	return ModuleRelativePath;
@@ -84,9 +79,11 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(const UField
 
 	ModuleRelativePathMetaData = FPaths::GetPath(InField->GetMetaData(TEXT("ModuleRelativePath")));
 
-	return GetModuleRelativePathMetaData(ModuleRelativePathMetaData);
+	return ProcessModuleRelativePathMetaData(ModuleRelativePathMetaData);
 }
+#endif
 
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetModuleName(
 #if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
 	const TObjectPtr<UFunction>& InSignatureFunction)
@@ -96,7 +93,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(
 {
 	FString ModuleName;
 
-	if (InSignatureFunction == nullptr)
+	if (InSignatureFunction == nullptr || InSignatureFunction->GetOuter() == nullptr)
 	{
 		return ModuleName;
 	}
@@ -112,6 +109,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(
 
 	return ModuleName;
 }
+#endif
 
 FString FUnrealCSharpFunctionLibrary::GetModuleName(const UPackage* InPackage)
 {
@@ -157,6 +155,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleName(const FString& InName)
 	return ModuleName;
 }
 
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 	const FDelegateProperty* InDelegateProperty)
 {
@@ -177,7 +176,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 
 	if (!InDelegateProperty->IsNative())
 	{
-		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
+		ProcessModuleRelativePath(ModuleRelativePath);
 	}
 
 	return ModuleRelativePath;
@@ -195,7 +194,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(
 
 	ModuleRelativePathMetaData = FPaths::GetPath(InDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")));
 
-	return GetModuleRelativePathMetaData(ModuleRelativePathMetaData);
+	return ProcessModuleRelativePathMetaData(ModuleRelativePathMetaData);
 }
 
 FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
@@ -218,7 +217,7 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(
 
 	if (!InMulticastDelegateProperty->IsNative())
 	{
-		ModuleRelativePath = GetModuleRelativePath(ModuleRelativePath);
+		ProcessModuleRelativePath(ModuleRelativePath);
 	}
 
 	return ModuleRelativePath;
@@ -236,28 +235,24 @@ FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(
 
 	ModuleRelativePathMetaData = FPaths::GetPath(InMulticastDelegateProperty->GetMetaData(TEXT("ModuleRelativePath")));
 
-	return GetModuleRelativePathMetaData(ModuleRelativePathMetaData);
+	return ProcessModuleRelativePathMetaData(ModuleRelativePathMetaData);
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePath(const FString& InRelativePath)
+void FUnrealCSharpFunctionLibrary::ProcessModuleRelativePath(FString& OutModuleRelativePath)
 {
-	auto ModuleRelativePath = InRelativePath;
-
-	if (ModuleRelativePath.IsEmpty())
+	if (!OutModuleRelativePath.IsEmpty())
 	{
-		return ModuleRelativePath;
+		OutModuleRelativePath.RemoveFromEnd(TEXT("/"));
+
+		if (auto Index = 0; OutModuleRelativePath.FindLastChar(TEXT('/'), Index))
+		{
+			OutModuleRelativePath.LeftInline(Index);
+		}
 	}
-
-	ModuleRelativePath.RemoveFromEnd(TEXT("/"));
-
-	if (auto Index = 0; ModuleRelativePath.FindLastChar(TEXT('/'), Index))
-	{
-		ModuleRelativePath.LeftInline(Index);
-	}
-
-	return ModuleRelativePath;
 }
+#endif
 
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetOuterRelativePath(
 #if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
 	const TObjectPtr<UFunction>& InSignatureFunction)
@@ -265,12 +260,7 @@ FString FUnrealCSharpFunctionLibrary::GetOuterRelativePath(
 	const UFunction* InSignatureFunction)
 #endif
 {
-	if (InSignatureFunction == nullptr)
-	{
-		return FString();
-	}
-
-	return GetOuterRelativePath(GetOuterName(InSignatureFunction));
+	return InSignatureFunction ? GetOuterRelativePath(GetOuterName(InSignatureFunction)) : FString();
 }
 
 FString FUnrealCSharpFunctionLibrary::GetOuterRelativePath(const FString& InRelativePath)
@@ -310,33 +300,28 @@ FString FUnrealCSharpFunctionLibrary::GetOuterName(
 	const UFunction* InSignatureFunction)
 #endif
 {
-	FString ModuleRelativePath;
+	FString OuterName;
 
 	if (InSignatureFunction == nullptr)
 	{
-		return ModuleRelativePath;
+		return OuterName;
 	}
 
 	if (const auto Class = Cast<UClass>(InSignatureFunction->GetOuter()))
 	{
-		ModuleRelativePath = GetOuterName(Class);
+		OuterName = GetOuterName(Class);
 	}
 	else if (const auto Package = Cast<UPackage>(InSignatureFunction->GetOuter()))
 	{
-		ModuleRelativePath = GetOuterName(Package);
+		OuterName = GetOuterName(Package);
 	}
 
-	return ModuleRelativePath;
+	return OuterName;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetOuterName(const UPackage* InPackage)
 {
-	if (InPackage == nullptr)
-	{
-		return FString();
-	}
-
-	return InPackage->GetName();
+	return InPackage ? InPackage->GetName() : FString();
 }
 
 FString FUnrealCSharpFunctionLibrary::GetOuterName(const UClass* InClass)
@@ -364,11 +349,11 @@ FString FUnrealCSharpFunctionLibrary::GetOuterName(const UClass* InClass)
 	return OuterName;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetModuleRelativePathMetaData(const FString& InMetaData)
+FString FUnrealCSharpFunctionLibrary::ProcessModuleRelativePathMetaData(const FString& InModuleRelativePathMetaData)
 {
 	TArray<FString> OutArray;
 
-	InMetaData.ParseIntoArray(OutArray, TEXT("/"));
+	InModuleRelativePathMetaData.ParseIntoArray(OutArray, TEXT("/"));
 
 	OutArray.RemoveAll([](const FString& Element)
 	{

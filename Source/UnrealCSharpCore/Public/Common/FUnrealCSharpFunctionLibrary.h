@@ -11,23 +11,27 @@ public:
 #endif
 
 public:
-#if WITH_EDITOR
 	static FString GetModuleName(const UField* InField);
 
+#if WITH_EDITOR
 	static FString GetModuleRelativePath(const UField* InField);
 
 	static FString GetModuleRelativePathMetaData(const UField* InField);
+#endif
 
+#if WITH_EDITOR
 #if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
 	static FString GetModuleName(const TObjectPtr<UFunction>& InSignatureFunction);
 #else
 	static FString GetModuleName(const UFunction* InSignatureFunction);
+#endif
 #endif
 
 	static FString GetModuleName(const UPackage* InPackage);
 
 	static FString GetModuleName(const FString& InName);
 
+#if WITH_EDITOR
 	static FString GetModuleRelativePath(const FDelegateProperty* InDelegateProperty);
 
 	static FString GetModuleRelativePathMetaData(const FDelegateProperty* InDelegateProperty);
@@ -36,8 +40,10 @@ public:
 
 	static FString GetModuleRelativePathMetaData(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 
-	static FString GetModuleRelativePath(const FString& InRelativePath);
+	static void ProcessModuleRelativePath(FString& OutModuleRelativePath);
+#endif
 
+#if WITH_EDITOR
 #if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
 	static FString GetOuterRelativePath(const TObjectPtr<UFunction>& InSignatureFunction);
 #else
@@ -56,7 +62,7 @@ public:
 
 	static FString GetOuterName(const UClass* InClass);
 
-	static FString GetModuleRelativePathMetaData(const FString& InMetaData);
+	static FString ProcessModuleRelativePathMetaData(const FString& InModuleRelativePathMetaData);
 #endif
 
 	static FString GetFullClass(const UStruct* InStruct);
