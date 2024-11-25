@@ -14,7 +14,11 @@ public:
 #if WITH_EDITOR
 	static FString GetModuleName(const UField* InField);
 
-#if UE_GET_MODULE_NAME_T_OBJECT_PTR
+	static FString GetModuleRelativePath(const UField* InField);
+
+	static FString GetModuleRelativePathMetaData(const UField* InField);
+
+#if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
 	static FString GetModuleName(const TObjectPtr<UFunction>& InSignatureFunction);
 #else
 	static FString GetModuleName(const UFunction* InSignatureFunction);
@@ -24,15 +28,25 @@ public:
 
 	static FString GetModuleName(const FString& InName);
 
-	static FString GetModuleRelativePath(const UField* InField);
-
 	static FString GetModuleRelativePath(const FDelegateProperty* InDelegateProperty);
+
+	static FString GetModuleRelativePathMetaData(const FDelegateProperty* InDelegateProperty);
 
 	static FString GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 
+	static FString GetModuleRelativePathMetaData(const FMulticastDelegateProperty* InMulticastDelegateProperty);
+
 	static FString GetModuleRelativePath(const FString& InRelativePath);
 
-#if UE_GET_OUTER_NAME_T_OBJECT_PTR
+#if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
+	static FString GetOuterRelativePath(const TObjectPtr<UFunction>& InSignatureFunction);
+#else
+	static FString GetOuterRelativePath(const UFunction* InSignatureFunction);
+#endif
+
+	static FString GetOuterRelativePath(const FString& InRelativePath);
+
+#if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
 	static FString GetOuterName(const TObjectPtr<UFunction>& InSignatureFunction);
 #else
 	static FString GetOuterName(const UFunction* InSignatureFunction);
@@ -41,20 +55,6 @@ public:
 	static FString GetOuterName(const UPackage* InPackage);
 
 	static FString GetOuterName(const UClass* InClass);
-
-#if UE_GET_OUTER_RELATIVE_PATH_T_OBJECT_PTR
-	static FString GetOuterRelativePath(const TObjectPtr<UFunction>& InSignatureFunction);
-#else
-	static FString GetOuterRelativePath(const UFunction* InSignatureFunction);
-#endif
-
-	static FString GetOuterRelativePath(const FString& InRelativePath);
-
-	static FString GetModuleRelativePathMetaData(const UField* InField);
-
-	static FString GetModuleRelativePathMetaData(const FDelegateProperty* InDelegateProperty);
-
-	static FString GetModuleRelativePathMetaData(const FMulticastDelegateProperty* InMulticastDelegateProperty);
 
 	static FString GetModuleRelativePathMetaData(const FString& InMetaData);
 #endif
