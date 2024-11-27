@@ -1,5 +1,5 @@
 ﻿#include "Reflection/Function/FFunctionDescriptor.h"
-#include "Environment/FCSharpEnvironment.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 
 FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction,
                                          const TSharedPtr<FFunctionParamBufferAllocator>& InBufferAllocator):
@@ -22,7 +22,8 @@ void FFunctionDescriptor::Initialize()
 		return;
 	}
 
-	const auto IsNativeClass = Function->GetOuter()->IsNative();
+	const auto IsNativeFunction =
+		FUnrealCSharpFunctionLibrary::IsNativeFunction(Function->GetOwnerClass(), Function->GetFName());
 
 	PropertyDescriptors.Reserve(Function->ReturnValueOffset != MAX_uint16
 		                            ? (Function->NumParms > 0
@@ -54,7 +55,7 @@ void FFunctionDescriptor::Initialize()
 
 			if (Property->HasAnyPropertyFlags(CPF_OutParm) && !Property->HasAnyPropertyFlags(CPF_ConstParm))
 			{
-				if (IsNativeClass || Property->HasAnyPropertyFlags(CPF_ReferenceParm))
+				if (IsNativeFunction || Property->HasAnyPropertyFlags(CPF_ReferenceParm))
 				{
 					ReferencePropertyIndexes.Emplace(Index);
 				}

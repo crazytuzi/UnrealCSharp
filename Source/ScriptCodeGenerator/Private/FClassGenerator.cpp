@@ -480,7 +480,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->HasAnyPropertyFlags(
 				CPF_ConstParm))
 			{
-				if (Function->GetOwnerClass()->IsNative() ||
+				if (FUnrealCSharpFunctionLibrary::IsNativeFunction(InClass, Function->GetFName()) ||
 					FunctionParams[Index]->HasAnyPropertyFlags(CPF_ReferenceParm))
 				{
 					FunctionOutParamIndexMapping[FunctionParams.Num() - 1 - FunctionRefParamIndex.Num()] =

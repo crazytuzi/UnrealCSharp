@@ -32,7 +32,7 @@ public:
 	void Compile(const TFunction<void()>& InFunction);
 
 private:
-	static void Compile();
+	void Compile();
 
 private:
 	void OnBeginGenerator();
@@ -57,4 +57,6 @@ private:
 	bool bIsGenerating;
 
 	bool bIsStopped;
+
+	TSharedPtr<SNotificationItem> NotificationItem;
 };

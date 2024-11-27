@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "UEVersion.h"
 
 class UNREALCSHARPCORE_API FUnrealCSharpFunctionLibrary
 {
@@ -12,9 +13,57 @@ public:
 public:
 	static FString GetModuleName(const UField* InField);
 
-	static FString GetModuleName(const UField* InField, const TFunction<void(FString& InModuleName)>& InGetModuleName);
+#if WITH_EDITOR
+	static FString GetModuleRelativePath(const UField* InField);
 
-	static FString GetModuleName(const FString& InModuleName);
+	static FString GetModuleRelativePathMetaData(const UField* InField);
+#endif
+
+#if WITH_EDITOR
+#if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
+	static FString GetModuleName(const TObjectPtr<UFunction>& InSignatureFunction);
+#else
+	static FString GetModuleName(const UFunction* InSignatureFunction);
+#endif
+#endif
+
+	static FString GetModuleName(const UPackage* InPackage);
+
+	static FString GetModuleName(const FString& InName);
+
+#if WITH_EDITOR
+	static FString GetModuleRelativePath(const FDelegateProperty* InDelegateProperty);
+
+	static FString GetModuleRelativePathMetaData(const FDelegateProperty* InDelegateProperty);
+
+	static FString GetModuleRelativePath(const FMulticastDelegateProperty* InMulticastDelegateProperty);
+
+	static FString GetModuleRelativePathMetaData(const FMulticastDelegateProperty* InMulticastDelegateProperty);
+
+	static void ProcessModuleRelativePath(FString& OutModuleRelativePath);
+#endif
+
+#if WITH_EDITOR
+#if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
+	static FString GetOuterRelativePath(const TObjectPtr<UFunction>& InSignatureFunction);
+#else
+	static FString GetOuterRelativePath(const UFunction* InSignatureFunction);
+#endif
+
+	static FString GetOuterRelativePath(const FString& InRelativePath);
+
+#if UE_F_DELEGATE_PROPERTY_SIGNATURE_FUNCTION_T_OBJECT_PTR
+	static FString GetOuterName(const TObjectPtr<UFunction>& InSignatureFunction);
+#else
+	static FString GetOuterName(const UFunction* InSignatureFunction);
+#endif
+
+	static FString GetOuterName(const UPackage* InPackage);
+
+	static FString GetOuterName(const UClass* InClass);
+
+	static FString ProcessModuleRelativePathMetaData(const FString& InModuleRelativePathMetaData);
+#endif
 
 	static FString GetFullClass(const UStruct* InStruct);
 
@@ -173,6 +222,8 @@ public:
 
 	static bool IsDynamicReInstanceField(const UField* InField);
 #endif
+
+	static bool IsNativeFunction(const UClass* InClass, const FName& InFunctionName);
 
 	template <typename T>
 	static T* GetMutableDefaultSafe()

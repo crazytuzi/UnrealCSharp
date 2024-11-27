@@ -9,6 +9,7 @@
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Template/TGetArrayLength.inl"
 #include "Setting/UnrealCSharpSetting.h"
+#include "UEVersion.h"
 
 #if !WITH_EDITOR
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
@@ -229,6 +230,9 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 				if (auto Function = *It)
 				{
 					if (Function->HasAnyFunctionFlags(FUNC_BlueprintEvent) &&
+#if UE_DO_NATIVE_IMPL_OPTIMIZATION
+						!Function->HasAnyFunctionFlags(FUNC_Native) &&
+#endif
 						!Function->HasAnyFunctionFlags(FUNC_Final))
 					{
 						if (const auto Name = Function->GetName(); !Functions.Contains(Name))

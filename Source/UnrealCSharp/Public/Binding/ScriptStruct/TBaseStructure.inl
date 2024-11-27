@@ -119,6 +119,7 @@ struct TBaseStructure<FVector4f>
 	}
 };
 
+#if UE_T_BASE_STRUCTURE_F_FRAME_RATE
 template <>
 struct TBaseStructure<FFrameRate>
 {
@@ -127,6 +128,7 @@ struct TBaseStructure<FFrameRate>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FFrameRate));
 	}
 };
+#endif
 
 template <>
 struct TBaseStructure<FDirectoryPath>

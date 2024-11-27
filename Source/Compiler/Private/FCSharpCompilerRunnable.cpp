@@ -192,6 +192,31 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
 
 void FCSharpCompilerRunnable::Compile()
 {
+	AsyncTask(ENamedThreads::GameThread, [this]()
+	{
+		static const FName CompileStatusBackground("Blueprint.CompileStatus.Background");
+
+		FNotificationInfo NotificationInfo(FText::FromString(TEXT("Compilation background")));
+
+		NotificationInfo.bUseSuccessFailIcons = true;
+
+#if UE_APP_STYLE_GET_BRUSH
+		NotificationInfo.Image = FAppStyle::GetBrush(CompileStatusBackground);
+#else
+		NotificationInfo.Image = FEditorStyle::GetBrush(CompileStatusBackground);
+#endif
+
+		NotificationInfo.bFireAndForget = true;
+
+		NotificationInfo.ExpireDuration = 60.f;
+
+		NotificationInfo.FadeOutDuration = 0.5f;
+
+		NotificationInfo.FadeInDuration = 0.5f;
+
+		NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
+	});
+
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
 	const auto CompileParam = FString::Printf(TEXT(
@@ -276,16 +301,26 @@ void FCSharpCompilerRunnable::Compile()
 
 	FPlatformProcess::CloseProc(ProcessHandle);
 
-	if (NotificationInfo != nullptr)
+	AsyncTask(ENamedThreads::GameThread, [this, NotificationInfo]()
 	{
-		NotificationInfo->bFireAndForget = true;
+		if (NotificationItem.IsValid())
+		{
+			NotificationItem->Fadeout();
 
-		NotificationInfo->FadeOutDuration = 2.0f;
+			NotificationItem.Reset();
+		}
 
-		NotificationInfo->FadeInDuration = 0.5f;
+		if (NotificationInfo != nullptr)
+		{
+			NotificationInfo->bFireAndForget = true;
 
-		FSlateNotificationManager::Get().QueueNotification(NotificationInfo);
-	}
+			NotificationInfo->FadeOutDuration = 2.0f;
+
+			NotificationInfo->FadeInDuration = 0.5f;
+
+			FSlateNotificationManager::Get().QueueNotification(NotificationInfo);
+		}
+	});
 }
 
 void FCSharpCompilerRunnable::OnBeginGenerator()

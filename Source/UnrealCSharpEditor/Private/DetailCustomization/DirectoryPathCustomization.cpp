@@ -111,7 +111,13 @@ FReply FDirectoryPathCustomization::OnPickDirectory(const TSharedRef<IPropertyHa
 
 					if (bUseRelativePath)
 					{
-						Directory.RightChopInline(AbsoluteDirectory.Len(), false);
+						Directory.RightChopInline(AbsoluteDirectory.Len(),
+#if UE_F_STRING_LEFT_CHOP_IN_LINE_E_ALLOW_SHRINKING
+						                          EAllowShrinking::No
+#else
+						                          false
+#endif
+						);
 					}
 
 					PropertyHandle->SetValue(Directory);

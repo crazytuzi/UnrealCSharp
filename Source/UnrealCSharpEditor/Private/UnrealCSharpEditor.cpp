@@ -90,6 +90,8 @@ void FUnrealCSharpEditorModule::StartupModule()
 				Generator();
 			}));
 
+	UpdatePackagingSettings();
+
 	DynamicDataSource.Reset(NewObject<UDynamicDataSource>(GetTransientPackage(), "DynamicData"));
 
 	DynamicDataSource->Initialize();

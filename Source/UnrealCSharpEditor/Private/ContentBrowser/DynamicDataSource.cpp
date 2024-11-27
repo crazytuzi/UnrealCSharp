@@ -326,7 +326,7 @@ void UDynamicDataSource::EnumerateItemsMatchingFilter(const FContentBrowserDataC
 	{
 		for (const auto& Folder : ClassDataFilter->Folders)
 		{
-			if (!InCallback(CreateFolderItemDataPayload(Folder)))
+			if (!InCallback(CreateFolderItem(Folder)))
 			{
 				return;
 			}
@@ -337,7 +337,7 @@ void UDynamicDataSource::EnumerateItemsMatchingFilter(const FContentBrowserDataC
 	{
 		for (const auto Class : ClassDataFilter->Classes)
 		{
-			if (!InCallback(CreateFileItemDataPayload(Class)))
+			if (!InCallback(CreateFileItem(Class)))
 			{
 				return;
 			}
@@ -360,7 +360,7 @@ void UDynamicDataSource::EnumerateItemsAtPath(const FName InPath,
 	{
 		if (DynamicHierarchy->FindNode(InternalPath))
 		{
-			InCallback(CreateFolderItemDataPayload(InternalPath));
+			InCallback(CreateFolderItem(InternalPath));
 		}
 	}
 
@@ -370,7 +370,7 @@ void UDynamicDataSource::EnumerateItemsAtPath(const FName InPath,
 		{
 			for (const auto Class : Node->GetClasses())
 			{
-				InCallback(CreateFileItemDataPayload(Class));
+				InCallback(CreateFileItem(Class));
 			}
 		}
 	}
@@ -383,7 +383,7 @@ bool UDynamicDataSource::EnumerateItemsForObjects(const TArrayView<UObject*> InO
 	{
 		if (const auto Class = Cast<UClass>(Object))
 		{
-			if (!InCallback(CreateFileItemDataPayload(Class)))
+			if (!InCallback(CreateFileItem(Class)))
 			{
 				return false;
 			}
@@ -595,7 +595,19 @@ void UDynamicDataSource::UpdateHierarchy()
 
 	SetVirtualPathTreeNeedsRebuild();
 
+#if UE_U_CONTENT_BROWSER_DATA_SOURCE_NOTIFY_ITEM_DATA_REFRESHED
 	NotifyItemDataRefreshed();
+#else
+	for (const auto& MatchingClass : DynamicHierarchy->GetMatchingClasses(*DYNAMIC_ROOT_INTERNAL_PATH, true))
+	{
+		QueueItemDataUpdate(FContentBrowserItemDataUpdate::MakeItemAddedUpdate(CreateFileItem(MatchingClass)));
+	}
+
+	for (const auto& MatchingFolder : DynamicHierarchy->GetMatchingFolders(*DYNAMIC_ROOT_INTERNAL_PATH, true))
+	{
+		QueueItemDataUpdate(FContentBrowserItemDataUpdate::MakeItemAddedUpdate(CreateFolderItem(MatchingFolder)));
+	}
+#endif
 }
 
 bool UDynamicDataSource::IsRootInternalPath(const FName& InPath)
@@ -624,7 +636,7 @@ TSharedPtr<const FDynamicFolderItemDataPayload> UDynamicDataSource::GetFolderIte
 		       : nullptr;
 }
 
-FContentBrowserItemData UDynamicDataSource::CreateFolderItemDataPayload(const FName& InFolderPath)
+FContentBrowserItemData UDynamicDataSource::CreateFolderItem(const FName& InFolderPath)
 {
 	FName VirtualPath;
 
@@ -653,10 +665,14 @@ FContentBrowserItemData UDynamicDataSource::CreateFolderItemDataPayload(const FN
 	                               VirtualPath,
 	                               *FolderItemName,
 	                               MoveTemp(DisplayNameOverride),
-	                               MakeShared<FDynamicFolderItemDataPayload>(InFolderPath));
+	                               MakeShared<FDynamicFolderItemDataPayload>(InFolderPath)
+#if UE_F_CONTENT_BROWSER_ITEM_DATA_F_NAME
+	                               , InFolderPath
+#endif
+	);
 }
 
-FContentBrowserItemData UDynamicDataSource::CreateFileItemDataPayload(UClass* InClass)
+FContentBrowserItemData UDynamicDataSource::CreateFileItem(UClass* InClass)
 {
 	return FContentBrowserItemData(this,
 	                               EContentBrowserItemFlags::Type_File | EContentBrowserItemFlags::Category_Class
@@ -668,7 +684,11 @@ FContentBrowserItemData UDynamicDataSource::CreateFileItemDataPayload(UClass* In
 	                               InClass->GetFName(),
 	                               FText(),
 	                               MakeShared<FDynamicFileItemDataPayload>(
-		                               *FDynamicGenerator::GetDynamicNormalizeFile(InClass), InClass));
+		                               *FDynamicGenerator::GetDynamicNormalizeFile(InClass), InClass)
+#if UE_F_CONTENT_BROWSER_ITEM_DATA_F_NAME
+	                               , *FDynamicGenerator::GetDynamicNormalizeFile(InClass)
+#endif
+	);
 }
 
 bool UDynamicDataSource::GetClassPaths(const TArrayView<const FCollectionNameType>& InCollections,

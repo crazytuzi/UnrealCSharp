@@ -11,7 +11,11 @@ public class UnrealCSharpCore : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
+#if UE_5_5_OR_LATER
+		UndefinedIdentifierWarningLevel = WarningLevel.Off;
+#else
 		bEnableUndefinedIdentifierWarnings = false;
+#endif
 
 		PublicIncludePaths.AddRange(
 			new string[]
