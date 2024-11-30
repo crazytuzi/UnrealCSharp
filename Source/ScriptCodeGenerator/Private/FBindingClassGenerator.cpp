@@ -134,34 +134,64 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		if (bRead)
 		{
 			PropertyGetContent = FString::Printf(TEXT(
-				"\t\t\tget => %s.%s(%s);\n"
+				"\t\t\tget\n"
+				"\t\t\t{\n"
+				"\t\t\t\tunsafe\n"
+				"\t\t\t\t{\n"
+				"\t\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n"
+				"\n"
+				"\t\t\t\t\t%s.%s(%s, __ReturnBuffer);\n"
+				"\n"
+				"\t\t\t\t\treturn *(%s*)__ReturnBuffer;\n"
+				""
+				"\t\t\t\t}\n"
+				"\t\t\t}\n"
 			),
+			                                     Property.GetBufferSize(),
 			                                     *BINDING_COMBINE_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName)),
 			                                     Property.IsStatic()
 				                                     ? TEXT("nint.Zero")
-				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE
+				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+			                                     *Property.GetName()
+
 			);
 		}
 
 		if (bWrite)
 		{
 			PropertySetContent = FString::Printf(TEXT(
-				"\t\t\tset => %s.%s(%s, %s);\n"
+				"\t\t\tset\n"
+				"\t\t\t{\n"
+				"\t\t\t\tunsafe\n"
+				"\t\t\t\t{\n"
+				"\t\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n"
+				"\n"
+				"\t\t\t\t\t*(%s*)__InBuffer = %s;\n"
+				"\n"
+				"\t\t\t\t\t%s.%s(%s, __InBuffer);\n"
+				"\t\t\t\t}\n"
+				"\t\t\t}\n"
 			),
+			                                     Property.GetBufferSize(),
+			                                     Property.IsPrimitive()
+				                                     ? *Property.GetName()
+				                                     : TEXT("nint"),
+			                                     Property.IsPrimitive()
+				                                     ? TEXT("value")
+				                                     : *FString::Printf(TEXT(
+					                                     "value?.%s ?? nint.Zero"),
+				                                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
+				                                     ),
 			                                     *BINDING_COMBINE_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName)),
 			                                     Property.IsStatic()
 				                                     ? TEXT("nint.Zero")
-				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-			                                     Property.IsPrimitive()
-				                                     ? TEXT("value")
-				                                     : *FString::Printf(TEXT(
-					                                     "value.%s"),
-				                                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
-				                                     )
+				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE
+
+
 			);
 		}
 
@@ -681,9 +711,8 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		{
 			GetFunctionContent = FString::Printf(TEXT(
 				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern %s %s(nint InObject);\n"
+				"\t\tpublic static extern void %s(nint InObject, byte* ReturnBuffer);\n"
 			),
-			                                     *Property.GetName(),
 			                                     *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName))
 			);
@@ -693,13 +722,10 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		{
 			SetFunctionContent = FString::Printf(TEXT(
 				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern void %s(nint InObject, %s InValue);\n"
+				"\t\tpublic static extern void %s(nint InObject, byte* InBuffer);\n"
 			),
 			                                     *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
-				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName)),
-			                                     Property.IsPrimitive()
-				                                     ? *Property.GetName()
-				                                     : TEXT("nint")
+				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName))
 			);
 		}
 
@@ -780,7 +806,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
-		"\tpublic static partial class %s\n"
+		"\tpublic static unsafe partial class %s\n"
 		"\t{\n"
 		"%s"
 		"\t}\n"

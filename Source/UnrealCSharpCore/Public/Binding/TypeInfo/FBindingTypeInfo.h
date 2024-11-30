@@ -26,6 +26,11 @@ struct FBindingTypeInfo
 		return TypeInfo != nullptr ? TypeInfo->GetNameSpace() : Instance;
 	}
 
+	int32 GetBufferSize() const
+	{
+		return TypeInfo != nullptr ? TypeInfo->GetBufferSize() : false;
+	}
+
 	bool IsRef() const
 	{
 		return TypeInfo != nullptr ? TypeInfo->IsRef() : false;
