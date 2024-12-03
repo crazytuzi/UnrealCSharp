@@ -735,7 +735,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                                  *ReturnBufferBody,
 		                                                  *FunctionCallBody,
 		                                                  *FunctionOutParamBody,
-		                                                  !FunctionOutParamBody.IsEmpty() ||
 		                                                  !FunctionReturnParamBody.IsEmpty()
 			                                                  ? TEXT("\n")
 			                                                  : TEXT(""),

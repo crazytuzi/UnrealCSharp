@@ -395,8 +395,81 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		                                           *FunctionDeclarationBody
 		);
 
+		FString InBufferBody;
+
+		auto bHasInBuffer = false;
+
+		if (!Params.IsEmpty())
+		{
+			auto BufferSize = 0;
+
+			for (auto Index = 0; Index < Params.Num(); ++Index)
+			{
+				InBufferBody += FString::Printf(TEXT(
+					"\t\t\t\t*(%s*)(__InBuffer%s) = %s;\n\n"
+				),
+				                                *Params[Index]->GetName(),
+				                                BufferSize == 0
+					                                ? TEXT("")
+					                                : *FString::Printf(TEXT(
+						                                " + %d"),
+					                                                   BufferSize),
+				                                *FunctionParamName[Index]
+				);
+
+				BufferSize += Params[Index]->GetBufferSize();
+			}
+
+			InBufferBody = FString::Printf(TEXT(
+				"\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n\n"
+				"%s"
+			),
+			                               BufferSize,
+			                               *InBufferBody
+			);
+
+			bHasInBuffer = BufferSize != 0;
+		}
+
+		FString OutBufferBody;
+
+		auto bHasOutBuffer = false;
+
+		if (!FunctionRefParamIndex.IsEmpty())
+		{
+			auto BufferSize = 0;
+
+			for (auto Index = 0; Index < FunctionRefParamIndex.Num(); ++Index)
+			{
+				BufferSize += Params[FunctionRefParamIndex[Index]]->GetBufferSize();
+			}
+
+			OutBufferBody = FString::Printf(TEXT(
+				"\t\t\t\tvar __OutBuffer = stackalloc byte[%d];\n\n"
+			),
+			                                BufferSize
+			);
+
+			bHasOutBuffer = BufferSize != 0;
+		}
+
+		FString ReturnBufferBody;
+
+		auto bHasReturnBuffer = false;
+
+		if (Function.GetReturn() != nullptr)
+		{
+			bHasReturnBuffer = true;
+
+			ReturnBufferBody = FString::Printf(TEXT(
+				"\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n\n"
+			),
+			                                   Function.GetReturn()->GetBufferSize()
+			);
+		}
+
 		auto FunctionCallBody = FString::Printf(TEXT(
-			"%s.%s(%s%s"
+			"%s.%s(%s%s%s%s);\n"
 		),
 		                                        *BINDING_COMBINE_CLASS_IMPLEMENTATION(ClassContent),
 		                                        *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
@@ -406,135 +479,87 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			                                        : Function.IsConstructor()
 			                                        ? TEXT("this")
 			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                        FunctionRefParamIndex.IsEmpty()
-			                                        ? TEXT("")
-			                                        : TEXT(", out var __OutValue")
+		                                        bHasInBuffer ? TEXT(", __InBuffer") : TEXT(""),
+		                                        bHasOutBuffer ? TEXT(", __OutBuffer") : TEXT(""),
+		                                        bHasReturnBuffer ? TEXT(", __ReturnBuffer") : TEXT("")
 		);
-
-		for (auto Index = 0; Index < Params.Num(); ++Index)
-		{
-			FunctionCallBody += FString::Printf(TEXT(
-				", %s"
-			),
-			                                    Params[Index]->IsPrimitive()
-				                                    ? *FunctionParamName[Index]
-				                                    : *FString::Printf(TEXT(
-					                                    "%s?.%s ?? nint.Zero"),
-				                                                       *FunctionParamName[Index],
-				                                                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
-				                                    ));
-		}
-
-		FunctionCallBody += TEXT(")");
 
 		FString FunctionReturnParamBody;
 
 		if (Function.GetReturn() != nullptr)
 		{
 			FunctionReturnParamBody = FString::Printf(TEXT(
-				"return %s;"
+				"return *(%s*)__ReturnBuffer;"
 			),
-			                                          FunctionRefParamIndex.IsEmpty()
-				                                          ? Function.GetReturn()->IsPrimitive()
-					                                            ? *FString::Printf(TEXT(
-						                                            "(%s)%s"
-					                                            ),
-						                                            *FunctionReturnType,
-						                                            *FunctionCallBody)
-					                                            : *FString::Printf(TEXT(
-						                                            "%s as %s"
-					                                            ),
-						                                            *FunctionCallBody,
-						                                            *FunctionReturnType)
-				                                          : Function.GetReturn()->IsPrimitive()
-				                                          ? *FString::Printf(TEXT(
-					                                          "(%s)__ReturnValue"
-				                                          ),
-				                                                             *FunctionReturnType
-				                                          )
-				                                          : *FString::Printf(TEXT(
-					                                          "__ReturnValue as %s"
-				                                          ),
-				                                                             *FunctionReturnType
-				                                          ));
+			                                          *FunctionReturnType
+			);
 		}
 
-		FString FunctionRefParamBody;
+		FString FunctionOutParamBody;
 
-		for (auto Index = 0; Index < FunctionRefParamIndex.Num(); ++Index)
+		if (bHasOutBuffer)
 		{
-			FunctionRefParamBody += FString::Printf(TEXT(
-				"\n\t\t\t%s = %s__OutValue[%d]%s;\n"
-			),
-			                                        *FunctionParamName[FunctionRefParamIndex[Index]],
-			                                        Params[FunctionRefParamIndex[Index]]->IsPrimitive()
-				                                        ? *FString::Printf(TEXT(
-					                                        "(%s)"
-				                                        ),
-				                                                           *Params[FunctionRefParamIndex[Index]]->
-				                                                           GetName()
-				                                        )
-				                                        : TEXT(""),
-			                                        Index,
-			                                        !Params[FunctionRefParamIndex[Index]]->IsPrimitive()
-				                                        ? *FString::Printf(TEXT(
-					                                        " as %s"
-				                                        ),
-				                                                           *Params[FunctionRefParamIndex[Index]]->
-				                                                           GetName())
-				                                        : TEXT("")
-			);
+			auto FunctionOutBufferIndex = FunctionRefParamIndex;
+
+			FunctionOutBufferIndex.Sort();
+
+			auto BufferSize = 0;
+
+			for (auto Index = 0; Index < FunctionOutBufferIndex.Num(); ++Index)
+			{
+				FunctionOutParamBody += FString::Printf(TEXT(
+					"\n\t\t\t\t%s = *(%s*)(__OutBuffer%s);\n"
+				),
+				                                        *FunctionParamName[FunctionOutBufferIndex[Index]],
+				                                        *Params[FunctionOutBufferIndex[Index]]->GetName(),
+				                                        BufferSize == 0
+					                                        ? TEXT("")
+					                                        : *FString::Printf(TEXT(
+						                                        " + %d"),
+					                                                           BufferSize)
+				);
+
+				BufferSize += Params[FunctionOutBufferIndex[Index]]->GetBufferSize();
+			}
 		}
 
 		auto FunctionImplementationBody = FString::Printf(TEXT(
 			"%s"
 			"%s"
-			"\t\t\t%s"
 			"%s"
 			"%s"
+			"\t\t\t\t%s"
 			"%s"
 			"%s"
 			"%s"
 		),
 		                                                  *FunctionDefaultParamBody,
-		                                                  FunctionDefaultParamBody.IsEmpty() ? TEXT("") : TEXT("\n"),
-		                                                  Function.GetReturn() != nullptr && !FunctionRefParamIndex.
-		                                                  IsEmpty()
-			                                                  ? TEXT("var __ReturnValue = ")
-			                                                  : TEXT(""),
-		                                                  Function.GetReturn() == nullptr || !FunctionRefParamIndex.
-		                                                  IsEmpty()
-			                                                  ? *FunctionCallBody
-			                                                  : TEXT(""),
-		                                                  Function.GetReturn() == nullptr || !FunctionRefParamIndex.
-		                                                  IsEmpty()
-			                                                  ? TEXT(";\n")
-			                                                  : TEXT(""),
-		                                                  *FunctionRefParamBody,
-		                                                  !FunctionRefParamBody.IsEmpty() && !FunctionReturnParamBody.
-		                                                  IsEmpty()
+		                                                  *InBufferBody,
+		                                                  *OutBufferBody,
+		                                                  *ReturnBufferBody,
+		                                                  *FunctionCallBody,
+		                                                  *FunctionOutParamBody,
+		                                                  !FunctionReturnParamBody.IsEmpty()
 			                                                  ? TEXT("\n")
 			                                                  : TEXT(""),
 		                                                  FunctionReturnParamBody.IsEmpty()
 			                                                  ? TEXT("")
 			                                                  : *FString::Printf(TEXT(
-				                                                  "%s%s\n"
+				                                                  "\t\t\t\t%s\n"
 			                                                  ),
-				                                                  !FunctionRefParamIndex.IsEmpty()
-					                                                  ? TEXT("\t\t\t")
-					                                                  : TEXT(""),
 				                                                  *FunctionReturnParamBody));
 
 		if (Function.IsConstructor())
 		{
 			FunctionImplementationBody = FString::Printf(TEXT(
-				"\t\t\tif (GetType() == typeof(%s))\n"
-				"\t\t\t{\n"
-				"\t%s"
-				"\t\t\t}\n"
+				"\t\t\t\tif (GetType() == typeof(%s))\n"
+				"\t\t\t\t{\n"
+				"%s"
+				"\t\t\t\t}\n"
 			),
 			                                             *ClassContent,
-			                                             *FunctionImplementationBody
+			                                             *FunctionImplementationBody.Replace(
+				                                             TEXT("\t\t\t\t"), TEXT("\t\t\t\t\t"))
 			);
 		}
 
@@ -542,7 +567,10 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			"%s"
 			"\t\t%s\n"
 			"\t\t{\n"
+			"\t\t\tunsafe\n"
+			"\t\t\t{\n"
 			"%s"
+			"\t\t\t}\n"
 			"\t\t}\n"
 		),
 		                                   FunctionContent.IsEmpty() ? TEXT("") : TEXT("\n"),
@@ -773,15 +801,19 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern %s %s(%s InObject%s%s);\n"
+			"\t\tpublic static extern void %s(%s InObject%s%s%s);\n"
 		),
-		                                           Function.GetReturn() != nullptr ? TEXT("object") : TEXT("void"),
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                           ClassContent, Function.GetFunctionImplementationName()),
 		                                           Function.IsConstructor() ? *ClassContent : TEXT("nint"),
-		                                           bHasRef ? TEXT(", out object[] OutValue") : TEXT(""),
 		                                           !Function.GetParams().IsEmpty()
-			                                           ? TEXT(", params object[] InValue")
+			                                           ? TEXT(", byte* InBuffer")
+			                                           : TEXT(""),
+		                                           bHasRef
+			                                           ? TEXT(", byte* OutBuffer")
+			                                           : TEXT(""),
+		                                           Function.GetReturn() != nullptr
+			                                           ? TEXT(", byte* ReturnBuffer")
 			                                           : TEXT("")
 		);
 
