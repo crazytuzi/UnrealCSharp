@@ -46,4 +46,9 @@ public:
 
 		return Value;
 	}
+
+	virtual auto GetBufferSize() const -> int32 override
+	{
+		return sizeof(void*);
+	}
 };

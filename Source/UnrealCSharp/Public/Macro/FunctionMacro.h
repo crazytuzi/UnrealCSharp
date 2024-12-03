@@ -69,7 +69,8 @@
 		PropertyDescriptor->InitializeValue_InContainer(Params);
 
 #define IN_VALUE() \
-		PropertyDescriptor->Set(InBuffer + InBufferOffsets[Index], PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
+		PropertyDescriptor->Set(InBuffer, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params)); \
+		InBuffer += PropertyDescriptor->GetBufferSize();
 
 #define REFERENCE_IN_VALUE() \
 		if (ReferencePropertyIndexes.Contains(Index) || !OutPropertyIndexes.Contains(Index)) \
@@ -120,14 +121,15 @@
 			if (OutPropertyDescriptor->IsPrimitiveProperty()) \
 			{ \
 				OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), \
-										   OutBuffer + OutBufferOffsets[Index]); \
+										   OutBuffer); \
 			} \
 			else \
 			{ \
 				OutPropertyDescriptor->Get<std::true_type>( \
 					OutPropertyDescriptor->CopyValue(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
-					reinterpret_cast<void**>(OutBuffer + OutBufferOffsets[Index])); \
+					reinterpret_cast<void**>(OutBuffer)); \
 			} \
+			OutBuffer += OutPropertyDescriptor->GetBufferSize(); \
 		} \
 	}
 

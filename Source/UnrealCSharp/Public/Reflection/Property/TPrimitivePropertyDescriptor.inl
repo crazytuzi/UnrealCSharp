@@ -2,6 +2,7 @@
 
 #include "TPropertyDescriptor.inl"
 #include "Environment/FCSharpEnvironment.h"
+#include "UEVersion.h"
 
 template <typename T>
 class TPrimitivePropertyDescriptor : public TPropertyDescriptor<T, true>
@@ -52,5 +53,14 @@ public:
 
 			Super::Property = nullptr;
 		}
+	}
+
+	virtual auto GetBufferSize() const -> int32 override
+	{
+#if UE_F_PROPERTY_GET_ELEMENT_SIZE
+		return Super::Property->GetElementSize();
+#else
+		return Super::Property->ElementSize;
+#endif
 	}
 };

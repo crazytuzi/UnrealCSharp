@@ -153,6 +153,11 @@ void FPropertyDescriptor::DestroyProperty()
 {
 }
 
+int32 FPropertyDescriptor::GetBufferSize() const
+{
+	return 0;
+}
+
 bool FPropertyDescriptor::Identical(const void* A, const void* B, const uint32 PortFlags) const
 {
 	if (const auto Property = GetProperty())
