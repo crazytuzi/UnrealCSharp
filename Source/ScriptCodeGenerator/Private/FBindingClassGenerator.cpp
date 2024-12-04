@@ -51,47 +51,86 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		UsingNameSpaces.Append(InClass->GetSubscript().GetParams()[0]->GetNameSpace());
 
 		auto SubscriptGetContent = FString::Printf(TEXT(
-			"\t\t\tget => %s%s.%s(%s, %s)%s;\n"
+			"\t\t\tget\n"
+			"\t\t\t{\n"
+			"\t\t\t\tunsafe\n"
+			"\t\t\t\t{\n"
+			"\t\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\t*(%s*)(__InBuffer) = %s;\n"
+			"\n"
+			"\t\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\t%s.%s(%s, __InBuffer, __ReturnBuffer);\n"
+			"\n"
+			"\t\t\t\t\treturn *(%s*)__ReturnBuffer;\n"
+			"\t\t\t\t}\n"
+			"\t\t\t}\n"
 		),
-		                                           InClass->GetSubscript().GetReturn()->IsPrimitive()
-			                                           ? *FString::Printf(TEXT(
-				                                           "(%s)"
+		                                           InClass->GetSubscript().GetParams()[0]->GetBufferSize(),
+		                                           InClass->GetSubscript().GetParams()[0]->IsPrimitive()
+			                                           ? *InClass->GetSubscript().GetParams()[0]->GetName()
+			                                           : TEXT("nint"),
+		                                           InClass->GetSubscript().GetParams()[0]->IsPrimitive()
+			                                           ? *InClass->GetSubscript().GetParamNames()[0]
+			                                           : *FString::Printf(TEXT(
+				                                           "%s?.%s ?? nint.Zero"),
+			                                                              *InClass->GetSubscript().GetParamNames()[0],
+			                                                              *PROPERTY_GARBAGE_COLLECTION_HANDLE
 			                                           ),
-			                                                              *InClass->GetSubscript().GetReturn()->
-			                                                              GetName()
-			                                           )
-			                                           : TEXT(""),
+		                                           InClass->GetSubscript().GetReturn()->GetBufferSize(),
 		                                           *BINDING_COMBINE_CLASS_IMPLEMENTATION(ClassContent),
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                           ClassContent,
 			                                           InClass->GetSubscript().GetGetImplementationName()),
 		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                           *InClass->GetSubscript().GetParamNames()[0],
-		                                           !InClass->GetSubscript().GetReturn()->IsPrimitive()
-			                                           ? *FString::Printf(TEXT(
-				                                           " as %s"
-			                                           ),
-			                                                              *InClass->GetSubscript().GetReturn()->
-			                                                              GetName())
-			                                           : TEXT("")
+		                                           *InClass->GetSubscript().GetReturn()->GetName()
 
 		);
 
 		auto SubscriptSetContent = FString::Printf(TEXT(
-			"\t\t\tset => %s.%s(%s, %s, %s);\n"
+			"\t\t\tset\n"
+			"\t\t\t{\n"
+			"\t\t\t\tunsafe\n"
+			"\t\t\t\t{\n"
+			"\t\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n"
+			"\n"
+			"\t\t\t\t\t*(%s*)(__InBuffer) = %s;\n"
+			"\n"
+			"\t\t\t\t\t*(%s*)(__InBuffer + %d) = %s;\n"
+			"\n"
+			"\t\t\t\t\t%s.%s(%s, __InBuffer);\n"
+			"\t\t\t\t}\n"
+			"\t\t\t}\n"
 		),
+		                                           InClass->GetSubscript().GetParams()[0]->GetBufferSize() + InClass->
+		                                           GetSubscript().GetReturn()->GetBufferSize(),
+		                                           InClass->GetSubscript().GetParams()[0]->IsPrimitive()
+			                                           ? *InClass->GetSubscript().GetParams()[0]->GetName()
+			                                           : TEXT("nint"),
+		                                           InClass->GetSubscript().GetParams()[0]->IsPrimitive()
+			                                           ? *InClass->GetSubscript().GetParamNames()[0]
+			                                           : *FString::Printf(TEXT(
+				                                           "%s?.%s ?? nint.Zero"),
+			                                                              *InClass->GetSubscript().GetParamNames()[0],
+			                                                              *PROPERTY_GARBAGE_COLLECTION_HANDLE
+			                                           ),
+		                                           InClass->GetSubscript().GetReturn()->IsPrimitive()
+			                                           ? *InClass->GetSubscript().GetReturn()->GetName()
+			                                           : TEXT("nint"),
+		                                           InClass->GetSubscript().GetParams()[0]->GetBufferSize(),
+		                                           InClass->GetSubscript().GetReturn()->IsPrimitive()
+			                                           ? TEXT("value")
+			                                           : *FString::Printf(TEXT(
+				                                           "value?.%s ?? nint.Zero"),
+			                                                              *PROPERTY_GARBAGE_COLLECTION_HANDLE
+			                                           ),
+
 		                                           *BINDING_COMBINE_CLASS_IMPLEMENTATION(ClassContent),
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                           ClassContent,
 			                                           InClass->GetSubscript().GetSetImplementationName()),
-		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                           *InClass->GetSubscript().GetParamNames()[0],
-		                                           InClass->GetSubscript().GetParams()[0]->IsPrimitive()
-			                                           ? TEXT("value")
-			                                           : *FString::Printf(TEXT(
-				                                           "value.%s"),
-			                                                              *PROPERTY_GARBAGE_COLLECTION_HANDLE
-			                                           )
+		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
 		);
 
 		SubscriptContent = FString::Printf(TEXT(
@@ -408,13 +447,21 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 				InBufferBody += FString::Printf(TEXT(
 					"\t\t\t\t*(%s*)(__InBuffer%s) = %s;\n\n"
 				),
-				                                *Params[Index]->GetName(),
+				                                Params[Index]->IsPrimitive()
+					                                ? *Params[Index]->GetName()
+					                                : TEXT("nint"),
 				                                BufferSize == 0
 					                                ? TEXT("")
 					                                : *FString::Printf(TEXT(
 						                                " + %d"),
 					                                                   BufferSize),
-				                                *FunctionParamName[Index]
+				                                Params[Index]->IsPrimitive()
+					                                ? *FunctionParamName[Index]
+					                                : *FString::Printf(TEXT(
+						                                "%s?.%s ?? nint.Zero"),
+					                                                   *FunctionParamName[Index],
+					                                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
+					                                )
 				);
 
 				BufferSize += Params[Index]->GetBufferSize();
@@ -684,7 +731,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern object %s(nint InObject, params object[] InValue);\n"
+			"\t\tpublic static extern void %s(nint InObject, byte* InBuffer, byte* ReturnBuffer);\n"
 		),
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                           ClassContent, InClass->GetSubscript().GetGetImplementationName())
@@ -700,7 +747,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 		FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern void %s(nint InObject, params object[] InValue);\n"
+			"\t\tpublic static extern void %s(nint InObject, byte* InBuffer);\n"
 		),
 		                                      *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                      ClassContent, InClass->GetSubscript().GetSetImplementationName())
