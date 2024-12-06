@@ -519,7 +519,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		}
 
 		auto FunctionCallBody = FString::Printf(TEXT(
-			"%s.%s(%s%s%s%s);\n"
+			"%s.%s(%s, %s, %s, %s);\n"
 		),
 		                                        *BINDING_COMBINE_CLASS_IMPLEMENTATION(ClassContent),
 		                                        *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
@@ -529,9 +529,9 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			                                        : Function.IsConstructor()
 			                                        ? TEXT("this")
 			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                        bHasInBuffer ? TEXT(", __InBuffer") : TEXT(""),
-		                                        bHasOutBuffer ? TEXT(", __OutBuffer") : TEXT(""),
-		                                        bHasReturnBuffer ? TEXT(", __ReturnBuffer") : TEXT("")
+		                                        bHasInBuffer ? TEXT("__InBuffer") : TEXT("null"),
+		                                        bHasOutBuffer ? TEXT("__OutBuffer") : TEXT("null"),
+		                                        bHasReturnBuffer ? TEXT("__ReturnBuffer") : TEXT("null")
 		);
 
 		FString FunctionReturnParamBody;
@@ -850,20 +850,14 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern void %s(%s InObject%s%s%s);\n"
+			"\t\tpublic static extern void %s(%s InObject, %s, %s, %s);\n"
 		),
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                           ClassContent, Function.GetFunctionImplementationName()),
 		                                           Function.IsConstructor() ? *ClassContent : TEXT("nint"),
-		                                           !Function.GetParams().IsEmpty()
-			                                           ? TEXT(", byte* InBuffer")
-			                                           : TEXT(""),
-		                                           bHasRef
-			                                           ? TEXT(", byte* OutBuffer")
-			                                           : TEXT(""),
-		                                           Function.GetReturn() != nullptr
-			                                           ? TEXT(", byte* ReturnBuffer")
-			                                           : TEXT("")
+		                                           TEXT("byte* InBuffer"),
+		                                           TEXT("byte* OutBuffer"),
+		                                           TEXT("byte* ReturnBuffer")
 		);
 
 		FunctionContent += FString::Printf(TEXT(
