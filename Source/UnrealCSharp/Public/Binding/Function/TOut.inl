@@ -3,8 +3,8 @@
 template <typename Type>
 struct TOut
 {
-	explicit TOut(MonoObject** InOutValue, Type& InArgument):
-		OutValue(InOutValue),
+	explicit TOut(uint8* OutBuffer, Type& InArgument):
+		Buffer(OutBuffer),
 		Argument(InArgument),
 		Count(0)
 	{
@@ -13,12 +13,12 @@ struct TOut
 	template <auto Index>
 	auto Initialize() -> TOut&
 	{
-		if (Count > 0)
-		{
-			*OutValue = (MonoObject*)FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(), Count);
-
-			Count = 0;
-		}
+		// if (Count > 0)
+		// {
+		// 	*OutValue = (MonoObject*)FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(), Count);
+		//
+		// 	Count = 0;
+		// }
 
 		return *this;
 	}
@@ -46,14 +46,23 @@ struct TOut
 		{
 			auto Value = std::get<Index>(Argument).Set();
 
-			ARRAY_SET((MonoArray*)*OutValue, MonoObject*, Count++, Value);
+			if constexpr (TIsPrimitive<T>::Value)
+			{
+				*(std::remove_const_t<std::decay_t<T>>*)Buffer = Value;
+			}
+			else
+			{
+				*reinterpret_cast<void**>(Buffer) = Value;
+			}
+
+			Buffer += TTypeInfo<std::decay_t<T>>::Get()->GetBufferSize();
 		}
 
 		Get<Index + 1, Args...>();
 	}
 
 private:
-	MonoObject** OutValue;
+	uint8* Buffer;
 
 	Type& Argument;
 

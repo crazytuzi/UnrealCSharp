@@ -24,11 +24,8 @@ struct TBaseArgument<T, true>
 
 	TBaseArgument() = default;
 
-	explicit TBaseArgument(MonoObject* InMonoObject):
-		Value
-		{
-			*(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InMonoObject)
-		}
+	explicit TBaseArgument(uint8* InBuffer):
+		Value(*(std::decay_t<T>*)InBuffer)
 	{
 	}
 
@@ -39,8 +36,9 @@ struct TBaseArgument<T, true>
 
 	auto Set()
 	{
-		return TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
-			const_cast<std::decay_t<T>*>(&Value));
+		// return TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
+		// 	const_cast<std::decay_t<T>*>(&Value));
+		return Value;
 	}
 
 	constexpr auto IsRef() const
@@ -59,13 +57,8 @@ struct TBaseArgument<T, false>
 
 	TBaseArgument() = default;
 
-	explicit TBaseArgument(MonoObject* InMonoObject):
-		Value
-		{
-			TPropertyValue<Type, Type>::Set(
-				*static_cast<FGarbageCollectionHandle*>(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InMonoObject)))
-		}
+	explicit TBaseArgument(uint8* InBuffer):
+		Value(TPropertyValue<Type, Type>::Set(*(FGarbageCollectionHandle*)InBuffer))
 	{
 	}
 

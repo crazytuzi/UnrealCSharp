@@ -11,13 +11,13 @@ struct TSubscriptBuilder :
 	{
 	}
 
-	static auto Get(BINDING_SUBSCRIPT_SIGNATURE)
+	static auto Get(BINDING_SUBSCRIPT_GET_SIGNATURE)
 	{
-		TSubscriptHelper<Result, Index>::template Get<Class>(BINDING_SUBSCRIPT_PARAM);
+		TSubscriptHelper<Result, Index>::template Get<Class>(BINDING_SUBSCRIPT_GET_PARAM);
 	}
 
-	static auto Set(BINDING_SUBSCRIPT_SIGNATURE)
+	static auto Set(BINDING_SUBSCRIPT_SET_SIGNATURE)
 	{
-		TSubscriptHelper<Result, Index>::template Set<Class>(BINDING_SUBSCRIPT_PARAM);
+		TSubscriptHelper<Result, Index>::template Set<Class>(BINDING_SUBSCRIPT_SET_PARAM);
 	}
 };

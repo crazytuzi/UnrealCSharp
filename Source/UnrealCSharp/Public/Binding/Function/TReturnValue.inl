@@ -7,8 +7,34 @@ struct TReturnValue
 {
 };
 
-template <typename T>
+template <typename T, auto IsPrimitive = TIsPrimitive<T>::Value>
 struct TBaseReturnValue
+{
+};
+
+template <typename T>
+struct TBaseReturnValue<T, true>
+{
+	using Type = T;
+
+	TBaseReturnValue() = default;
+
+	explicit TBaseReturnValue(Type&& InValue):
+		Value(InValue)
+	{
+	}
+
+	auto Get() const
+	{
+		return Value;
+	}
+
+protected:
+	Type Value;
+};
+
+template <typename T>
+struct TBaseReturnValue<T, false>
 {
 	using Type = T;
 
