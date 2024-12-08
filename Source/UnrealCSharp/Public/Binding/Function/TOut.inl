@@ -15,7 +15,7 @@ struct TOut
 	{
 	}
 
-	template <auto Index, typename T, typename... Args>
+	template <auto Index, typename T, typename... Args1>
 	auto Get()
 	{
 		if (std::get<Index>(Argument).IsRef())
@@ -34,7 +34,7 @@ struct TOut
 			Buffer += TTypeInfo<std::decay_t<T>>::Get()->GetBufferSize();
 		}
 
-		Get<Index + 1, Args...>();
+		Get<Index + 1, Args1...>();
 	}
 
 private:

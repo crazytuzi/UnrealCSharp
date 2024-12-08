@@ -1,7 +1,6 @@
 #pragma once
 
 #include "TFunctionHelper.inl"
-#include "THasRef.inl"
 #include "Binding/Function/TFunctionInfoBuilder.inl"
 
 template <typename T, T>
