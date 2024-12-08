@@ -1,7 +1,7 @@
 #pragma once
 
-#include "TBufferSize.inl"
 #include "TArgument.inl"
+#include "TBufferSize.inl"
 #include "TOut.inl"
 #include "TReturnValue.inl"
 #include "Environment/FCSharpEnvironment.h"
@@ -18,7 +18,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 	template <typename Function, auto... Index>
 	static auto Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		std::tuple<TArgument<Args, Args>...> Argument((InBuffer + TTypeInfo<std::decay_t<Args>>::Get()->GetBufferSize())...);
+		std::tuple<TArgument<Args, Args>...> Argument(InBuffer + std::get<Index>(TBufferSize<Args...>()())...);
 
 		if constexpr (std::is_same_v<Result, void>)
 		{
@@ -26,10 +26,6 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 		}
 		else
 		{
-			// ReturnValue = TReturnValue<Result>(std::forward<Result>(
-			// 		InFunction(std::forward<Args>(std::get<Index>(Argument).Get())...)))
-			// 	.Get();
-
 			auto Value = TReturnValue<Result>(std::forward<Result>(
 					InFunction(std::forward<Args>(std::get<Index>(Argument).Get())...)))
 				.Get();
@@ -44,9 +40,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 			}
 		}
 		
-		TOut<std::tuple<TArgument<Args, Args>...>>(OutBuffer, Argument)
-			.template Initialize<0, Args...>()
-			.template Get<0, Args...>();
+		TOut<std::tuple<TArgument<Args, Args>...>, Args...>(OutBuffer, Argument);
 	}
 
 	template <typename Class, typename Function, auto... Index>
@@ -55,8 +49,8 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			std::tuple<TArgument<Args, Args>...> Argument((InBuffer + TTypeInfo<std::decay_t<Args>>::Get()->GetBufferSize())...);
-
+			std::tuple<TArgument<Args, Args>...> Argument(InBuffer + std::get<Index>(TBufferSize<Args...>()())...);
+		
 			if constexpr (std::is_same_v<Result, void>)
 			{
 				(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...);
@@ -66,7 +60,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 				auto Value = TReturnValue<Result>(std::forward<Result>(
 						(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...)))
 					.Get();
-
+		
 				if constexpr (TIsPrimitive<Result>::Value)
 				{
 					*(std::remove_const_t<std::decay_t<Result>>*)ReturnBuffer = Value;
@@ -77,9 +71,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 				}
 			}
 		
-			TOut<std::tuple<TArgument<Args, Args>...>>(OutBuffer, Argument)
-				.template Initialize<0, Args...>()
-				.template Get<0, Args...>();
+			TOut<std::tuple<TArgument<Args, Args>...>, Args...>(OutBuffer, Argument);
 		}
 	}
 };

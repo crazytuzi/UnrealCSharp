@@ -20,9 +20,7 @@ struct TConstructorHelper<std::tuple<Args...>>
 		
 		auto Value = new Class(std::forward<Args>(std::get<Index>(Argument).Get())...);
 		
-		TOut<std::tuple<TArgument<Args, Args>...>>(OutBuffer, Argument)
-			.template Initialize<0, Args...>()
-			.template Get<0, Args...>();
+		TOut<std::tuple<TArgument<Args, Args>...>>(OutBuffer, Argument);
 		
 		if constexpr (TIsScriptStruct<Class>::Value)
 		{

@@ -1,37 +1,13 @@
 #pragma once
 
-template <typename Type>
+template <typename Type, typename... Args0>
 struct TOut
 {
 	explicit TOut(uint8* OutBuffer, Type& InArgument):
 		Buffer(OutBuffer),
-		Argument(InArgument),
-		Count(0)
+		Argument(InArgument)
 	{
-	}
-
-	template <auto Index>
-	auto Initialize() -> TOut&
-	{
-		// if (Count > 0)
-		// {
-		// 	*OutValue = (MonoObject*)FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(), Count);
-		//
-		// 	Count = 0;
-		// }
-
-		return *this;
-	}
-
-	template <auto Index, typename T, typename... Args>
-	auto Initialize() -> TOut&
-	{
-		if (std::get<Index>(Argument).IsRef())
-		{
-			++Count;
-		}
-
-		return Initialize<Index + 1, Args...>();
+		Get<0, Args0...>();
 	}
 
 	template <auto Index>
@@ -65,6 +41,4 @@ private:
 	uint8* Buffer;
 
 	Type& Argument;
-
-	int32 Count;
 };
