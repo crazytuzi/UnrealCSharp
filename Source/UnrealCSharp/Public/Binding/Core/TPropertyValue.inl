@@ -51,11 +51,6 @@ struct TPrimitivePropertyValue
 		return FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(
 			TPropertyClass<T, T>::Get(), InMember);
 	}
-
-	static auto Set(MonoObject* InValue)
-	{
-		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue);
-	}
 };
 
 template <typename T>
