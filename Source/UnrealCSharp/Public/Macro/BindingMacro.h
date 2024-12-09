@@ -104,9 +104,9 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_poi
 }; \
 template <typename T> \
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<T>>, Class>>> : \
-	TBindingReturnValue<T> \
+	TCompoundReturnValue<T> \
 { \
-	using TBindingReturnValue<T>::TBindingReturnValue; \
+	using TCompoundReturnValue<T>::TCompoundReturnValue; \
 };
 
 #define BINDING_SCRIPT_STRUCT(Class) \
@@ -151,9 +151,9 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_poi
 }; \
 template <typename T> \
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<T>>, Class>>> : \
-	TScriptStructReturnValue<T> \
+	TCompoundReturnValue<T> \
 { \
-	using TScriptStructReturnValue<T>::TScriptStructReturnValue; \
+	using TCompoundReturnValue<T>::TCompoundReturnValue; \
 }; \
 template <> \
 struct TIsScriptStruct<Class> \
@@ -217,9 +217,9 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>>
 }; \
 template <typename T> \
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>>> : \
-	TBindingEnumReturnValue<T> \
+	TPrimitiveReturnValue<T> \
 { \
-	using TBindingEnumReturnValue<T>::TBindingEnumReturnValue; \
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue; \
 }; \
 template <> \
 struct TIsNotUEnum<Class> \

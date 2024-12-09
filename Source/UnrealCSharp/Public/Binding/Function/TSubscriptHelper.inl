@@ -13,18 +13,8 @@ struct TSubscriptHelper
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			auto Value = TReturnValue<Result>(std::forward<Result>(
-				FoundObject->operator[](TArgument<Index, Index>(IN_BUFFER).Get())
-			)).Get();
-
-			if constexpr (TIsPrimitive<Result>::Value)
-			{
-				*(std::remove_const_t<std::decay_t<Result>>*)RETURN_BUFFER = Value;
-			}
-			else
-			{
-				*reinterpret_cast<void**>(RETURN_BUFFER) = Value;
-			}
+			TReturnValue<Result>(RETURN_BUFFER, std::forward<Result>(
+				FoundObject->operator[](TArgument<Index, Index>(IN_BUFFER).Get())));
 		}
 	}
 

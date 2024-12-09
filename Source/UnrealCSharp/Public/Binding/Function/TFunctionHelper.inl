@@ -26,18 +26,8 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 		}
 		else
 		{
-			auto Value = TReturnValue<Result>(std::forward<Result>(
-					InFunction(std::forward<Args>(std::get<Index>(Argument).Get())...)))
-				.Get();
-
-			if constexpr (TIsPrimitive<Result>::Value)
-			{
-				*(std::remove_const_t<std::decay_t<Result>>*)RETURN_BUFFER = Value;
-			}
-			else
-			{
-				*reinterpret_cast<void**>(RETURN_BUFFER) = Value;
-			}
+			TReturnValue<Result>(RETURN_BUFFER, std::forward<Result>(
+					InFunction(std::forward<Args>(std::get<Index>(Argument).Get())...)));
 		}
 		
 		TOut<std::tuple<TArgument<Args, Args>...>, Args...>(OUT_BUFFER, Argument);
@@ -57,18 +47,8 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 			}
 			else
 			{
-				auto Value = TReturnValue<Result>(std::forward<Result>(
-						(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...)))
-					.Get();
-		
-				if constexpr (TIsPrimitive<Result>::Value)
-				{
-					*(std::remove_const_t<std::decay_t<Result>>*)RETURN_BUFFER = Value;
-				}
-				else
-				{
-					*reinterpret_cast<void**>(RETURN_BUFFER) = Value;
-				}
+				TReturnValue<Result>(RETURN_BUFFER, std::forward<Result>(
+						(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...)));
 			}
 		
 			TOut<std::tuple<TArgument<Args, Args>...>, Args...>(OUT_BUFFER, Argument);

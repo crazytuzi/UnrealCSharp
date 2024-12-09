@@ -7,115 +7,31 @@ struct TReturnValue
 {
 };
 
-template <typename T, auto IsPrimitive = TIsPrimitive<T>::Value>
-struct TBaseReturnValue
-{
-};
-
 template <typename T>
-struct TBaseReturnValue<T, true>
+struct TPrimitiveReturnValue
 {
 	using Type = T;
 
-	TBaseReturnValue() = default;
+	TPrimitiveReturnValue() = default;
 
-	explicit TBaseReturnValue(Type&& InValue):
-		Value(InValue)
+	explicit TPrimitiveReturnValue(uint8* ReturnBuffer, Type&& InValue)
 	{
+		*(std::remove_const_t<std::decay_t<T>>*)ReturnBuffer = InValue;
 	}
-
-	auto Get() const
-	{
-		return Value;
-	}
-
-protected:
-	Type Value;
 };
 
 template <typename T>
-struct TBaseReturnValue<T, false>
+struct TCompoundReturnValue
 {
 	using Type = T;
 
-	TBaseReturnValue() = default;
+	TCompoundReturnValue() = default;
 
-	explicit TBaseReturnValue(MonoObject* InObject):
-		Object(InObject)
+	explicit TCompoundReturnValue(uint8* ReturnBuffer, Type&& InValue)
 	{
+		*reinterpret_cast<void**>(ReturnBuffer) = TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
+				const_cast<std::decay_t<T>*>(&InValue));
 	}
-
-	explicit TBaseReturnValue(Type&& InValue):
-		Object{
-			TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
-				const_cast<std::decay_t<T>*>(&InValue))
-		}
-	{
-	}
-
-	auto Get() const
-	{
-		return Object;
-	}
-
-protected:
-	MonoObject* Object;
-};
-
-template <typename T>
-struct TPrimitiveReturnValue :
-	TBaseReturnValue<T>
-{
-	using TBaseReturnValue<T>::TBaseReturnValue;
-};
-
-template <typename T>
-struct TCompoundReturnValue :
-	TBaseReturnValue<T>
-{
-	using TBaseReturnValue<T>::TBaseReturnValue;
-};
-
-template <typename T>
-struct TStringReturnValue :
-	TCompoundReturnValue<T>
-{
-	using TCompoundReturnValue<T>::TCompoundReturnValue;
-};
-
-template <typename T>
-struct TContainerReturnValue :
-	TCompoundReturnValue<T>
-{
-	using TCompoundReturnValue<T>::TCompoundReturnValue;
-};
-
-template <typename T>
-struct TMultiReturnValue :
-	TCompoundReturnValue<T>
-{
-	using TCompoundReturnValue<T>::TCompoundReturnValue;
-};
-
-template <typename T>
-struct TBindingReturnValue :
-	TCompoundReturnValue<T>
-{
-	using TCompoundReturnValue<T>::TCompoundReturnValue;
-};
-
-template <typename T>
-struct TScriptStructReturnValue :
-	TCompoundReturnValue<T>
-{
-	using TCompoundReturnValue<T>::TCompoundReturnValue;
-};
-
-template <typename T>
-struct TBindingEnumReturnValue :
-	TPrimitiveReturnValue<T>
-{
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
 };
 
 template <typename T>
@@ -190,30 +106,30 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>>>
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>>>> :
-	TPrimitiveReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value>> :
-	TPrimitiveReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>>> :
-	TStringReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TStringReturnValue<T>::TStringReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value>> :
-	TMultiReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TMultiReturnValue<T>::TMultiReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
@@ -225,37 +141,37 @@ struct TReturnValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value>> :
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>>> :
-	TStringReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TStringReturnValue<T>::TStringReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>>> :
-	TStringReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TStringReturnValue<T>::TStringReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value>> :
-	TMultiReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TMultiReturnValue<T>::TMultiReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<T>>::Value>> :
-	TMultiReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TMultiReturnValue<T>::TMultiReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<T>>::Value>> :
-	TMultiReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TMultiReturnValue<T>::TMultiReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
@@ -267,30 +183,30 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double>>
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value>> :
-	TContainerReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TContainerReturnValue<T>::TContainerReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value>> :
-	TContainerReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TContainerReturnValue<T>::TContainerReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value>> :
-	TMultiReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TMultiReturnValue<T>::TMultiReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value>> :
-	TContainerReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TContainerReturnValue<T>::TContainerReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 template <typename T>
@@ -309,9 +225,9 @@ struct TReturnValue<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value>>
 
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<T>>::Value>> :
-	TMultiReturnValue<T>
+	TCompoundReturnValue<T>
 {
-	using TMultiReturnValue<T>::TMultiReturnValue;
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
 #if UE_F_OPTIONAL_PROPERTY
