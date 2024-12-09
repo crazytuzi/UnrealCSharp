@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "CoreMacro/BufferMacro.h"
 #include "FDelegateWrapper.h"
 #include "Reflection/Function/FCSharpDelegateDescriptor.h"
 #include "MulticastDelegateHandler.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class UNREALCSHARP_API UMulticastDelegateHandler final : public UObject
@@ -17,28 +18,28 @@ class UNREALCSHARP_API UMulticastDelegateHandler final : public UObject
 	GENERATED_BODY()
 
 public:
-	virtual void ProcessEvent(UFunction* Function, void* Parms) override;
+	virtual void ProcessEvent(UFunction *Function, void *Parms) override;
 
 	UFUNCTION()
 	void CSharpCallBack();
 
 public:
-	void Initialize(FMulticastScriptDelegate* InMulticastScriptDelegate, UFunction* InSignatureFunction);
+	void Initialize(FMulticastScriptDelegate *InMulticastScriptDelegate, UFunction *InSignatureFunction);
 
 	void Deinitialize();
 
 public:
 	bool IsBound() const;
 
-	bool Contains(UObject* InObject, MonoMethod* InMonoMethod) const;
+	bool Contains(UObject *InObject, MonoMethod *InMonoMethod) const;
 
-	void Add(UObject* InObject, MonoMethod* InMonoMethod);
+	void Add(UObject *InObject, MonoMethod *InMonoMethod);
 
-	void AddUnique(UObject* InObject, MonoMethod* InMonoMethod);
+	void AddUnique(UObject *InObject, MonoMethod *InMonoMethod);
 
-	void Remove(UObject* InObject, MonoMethod* InMonoMethod);
+	void Remove(UObject *InObject, MonoMethod *InMonoMethod);
 
-	void RemoveAll(UObject* InObject);
+	void RemoveAll(UObject *InObject);
 
 	void Clear();
 
@@ -58,7 +59,7 @@ public:
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast2(uint8* InBuffer) const
+	void Broadcast2(IN_BUFFER_SIGNATURE) const
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -66,14 +67,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Broadcast2<ReturnType>(MulticastScriptDelegate, InBuffer);
+					DelegateDescriptor->Broadcast2<ReturnType>(MulticastScriptDelegate, IN_BUFFER);
 				}
 			}
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast4(uint8* OutBuffer) const
+	void Broadcast4(OUT_BUFFER_SIGNATURE) const
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -81,14 +82,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Broadcast4<ReturnType>(MulticastScriptDelegate, OutBuffer);
+					DelegateDescriptor->Broadcast4<ReturnType>(MulticastScriptDelegate, OUT_BUFFER);
 				}
 			}
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast6(uint8* InBuffer, uint8* OutBuffer) const
+	void Broadcast6(IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const
 	{
 		if (MulticastScriptDelegate != nullptr)
 		{
@@ -96,24 +97,24 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Broadcast6<ReturnType>(MulticastScriptDelegate, InBuffer, OutBuffer);
+					DelegateDescriptor->Broadcast6<ReturnType>(MulticastScriptDelegate, IN_BUFFER, OUT_BUFFER);
 				}
 			}
 		}
 	}
 
-	UObject* GetUObject() const;
+	UObject *GetUObject() const;
 
 	FName GetFunctionName() const;
 
-	UFunction* GetCallBack() const;
+	UFunction *GetCallBack() const;
 
 private:
 	bool bNeedFree;
 
-	FMulticastScriptDelegate* MulticastScriptDelegate;
+	FMulticastScriptDelegate *MulticastScriptDelegate;
 
-	FCSharpDelegateDescriptor* DelegateDescriptor;
+	FCSharpDelegateDescriptor *DelegateDescriptor;
 
 	FScriptDelegate ScriptDelegate;
 

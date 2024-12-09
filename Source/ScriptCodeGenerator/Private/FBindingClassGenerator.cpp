@@ -2,6 +2,7 @@
 #include "Binding/FBinding.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/BindingMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "FGeneratorCore.h"
@@ -733,10 +734,12 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern void %s(nint InObject, byte* InBuffer, byte* ReturnBuffer);\n"
+			"\t\tpublic static extern void %s(nint InObject, byte* %hs, byte* %hs);\n"
 		),
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
-			                                           ClassContent, InClass->GetSubscript().GetGetImplementationName())
+			                                           ClassContent, InClass->GetSubscript().GetGetImplementationName()),
+			                                           STR(IN_BUFFER),
+			                                           STR(RETURN_BUFFER)
 		);
 
 		FunctionContent += FString::Printf(TEXT(
@@ -749,10 +752,11 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 		FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern void %s(nint InObject, byte* InBuffer);\n"
+			"\t\tpublic static extern void %s(nint InObject, byte* %hs);\n"
 		),
 		                                      *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
-			                                      ClassContent, InClass->GetSubscript().GetSetImplementationName())
+			                                      ClassContent, InClass->GetSubscript().GetSetImplementationName()),
+			                                      STR(IN_BUFFER)
 		);
 
 		FunctionContent += FString::Printf(TEXT(
@@ -788,10 +792,11 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		{
 			GetFunctionContent = FString::Printf(TEXT(
 				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern void %s(nint InObject, byte* ReturnBuffer);\n"
+				"\t\tpublic static extern void %s(nint InObject, byte* %hs);\n"
 			),
 			                                     *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
-				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName))
+				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName)),
+				                                     STR(RETURN_BUFFER)
 			);
 		}
 
@@ -799,10 +804,11 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		{
 			SetFunctionContent = FString::Printf(TEXT(
 				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern void %s(nint InObject, byte* InBuffer);\n"
+				"\t\tpublic static extern void %s(nint InObject, byte* %hs);\n"
 			),
 			                                     *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
-				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName))
+				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName)),
+				                                     STR(IN_BUFFER)
 			);
 		}
 
@@ -850,14 +856,14 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 		auto FunctionDeclaration = FString::Printf(TEXT(
 			"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-			"\t\tpublic static extern void %s(%s InObject, %s, %s, %s);\n"
+			"\t\tpublic static extern void %s(%s InObject, byte* %hs, byte* %hs, byte* %hs);\n"
 		),
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                           ClassContent, Function.GetFunctionImplementationName()),
 		                                           Function.IsConstructor() ? *ClassContent : TEXT("nint"),
-		                                           TEXT("byte* InBuffer"),
-		                                           TEXT("byte* OutBuffer"),
-		                                           TEXT("byte* ReturnBuffer")
+		                                           STR(IN_BUFFER),
+		                                           STR(OUT_BUFFER),
+		                                           STR(RETURN_BUFFER)
 		);
 
 		FunctionContent += FString::Printf(TEXT(

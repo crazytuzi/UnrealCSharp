@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "CoreMacro/BufferMacro.h"
 #include "FDelegateBaseHelper.h"
 #include "MulticastDelegateHandler.h"
 
@@ -8,27 +9,27 @@ class FMulticastDelegateHelper final : public FDelegateBaseHelper
 public:
 	FMulticastDelegateHelper();
 
-	FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction);
+	FMulticastDelegateHelper(FMulticastScriptDelegate *InMulticastDelegate, UFunction *InSignatureFunction);
 
 	virtual ~FMulticastDelegateHelper() override;
 
 public:
-	void Initialize(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction);
+	void Initialize(FMulticastScriptDelegate *InMulticastDelegate, UFunction *InSignatureFunction);
 
 	void Deinitialize();
 
 public:
 	bool IsBound() const;
 
-	bool Contains(UObject* InObject, MonoMethod* InMonoMethod) const;
+	bool Contains(UObject *InObject, MonoMethod *InMonoMethod) const;
 
-	void Add(UObject* InObject, MonoMethod* InMonoMethod) const;
+	void Add(UObject *InObject, MonoMethod *InMonoMethod) const;
 
-	void AddUnique(UObject* InObject, MonoMethod* InMonoMethod) const;
+	void AddUnique(UObject *InObject, MonoMethod *InMonoMethod) const;
 
-	void Remove(UObject* InObject, MonoMethod* InMonoMethod) const;
+	void Remove(UObject *InObject, MonoMethod *InMonoMethod) const;
 
-	void RemoveAll(UObject* InObject) const;
+	void RemoveAll(UObject *InObject) const;
 
 	void Clear() const;
 
@@ -42,33 +43,33 @@ public:
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast2(uint8* InBuffer) const
+	void Broadcast2(IN_BUFFER_SIGNATURE) const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast2<ReturnType>(InBuffer);
+			MulticastDelegateHandler->Broadcast2<ReturnType>(IN_BUFFER);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast4(uint8* OutBuffer) const
+	void Broadcast4(OUT_BUFFER_SIGNATURE) const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast4<ReturnType>(OutBuffer);
+			MulticastDelegateHandler->Broadcast4<ReturnType>(OUT_BUFFER);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Broadcast6(uint8* InBuffer, uint8* OutBuffer) const
+	void Broadcast6(IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const
 	{
 		if (MulticastDelegateHandler != nullptr)
 		{
-			MulticastDelegateHandler->Broadcast6<ReturnType>(InBuffer, OutBuffer);
+			MulticastDelegateHandler->Broadcast6<ReturnType>(IN_BUFFER, OUT_BUFFER);
 		}
 	}
 
-	UObject* GetUObject() const;
+	UObject *GetUObject() const;
 
 	FName GetFunctionName() const;
 

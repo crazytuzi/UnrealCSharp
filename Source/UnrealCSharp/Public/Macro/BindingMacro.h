@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/BindingMacro.h"
 #include "Binding/FBinding.h"
 #include "Binding/Function/TFunctionBuilder.inl"
@@ -36,9 +37,7 @@ auto TGet_Args()
 	return false;
 }
 
-#define BINDING_STR(Str) #Str
-
-#define BINDING_STRING(Str) FString(TEXT(BINDING_STR(Str)))
+#define BINDING_STRING(Str) FString(TEXT(STR(Str)))
 
 #define BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) BINDING_STRING(Class).Left( \
 	BINDING_STRING(Class).Find(TEXT("::")) - 1)

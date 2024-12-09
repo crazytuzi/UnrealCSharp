@@ -3,6 +3,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FMapHelper.h"
+#include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
@@ -10,27 +11,25 @@ namespace
 {
 	struct FRegisterMap
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject)
+		static void RegisterImplementation(MonoObject *InMonoObject)
 		{
 			FCSharpBind::Bind<FMapHelper>(InMonoObject,
-			                              FTypeBridge::GetGenericArgument(InMonoObject),
-			                              FTypeBridge::GetGenericArgument(InMonoObject, 1));
+										  FTypeBridge::GetGenericArgument(InMonoObject),
+										  FTypeBridge::GetGenericArgument(InMonoObject, 1));
 		}
 
 		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
-			{
-				(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FMapHelper>(
-					InGarbageCollectionHandle);
-			});
+					  { (void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FMapHelper>(
+							InGarbageCollectionHandle); });
 		}
 
 		static void EmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                const int32 InExpectedNumElements)
+										const int32 InExpectedNumElements)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return MapHelper->Empty(InExpectedNumElements);
 			}
@@ -39,7 +38,7 @@ namespace
 		static int32 NumImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return MapHelper->Num();
 			}
@@ -50,7 +49,7 @@ namespace
 		static bool IsEmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return MapHelper->IsEmpty();
 			}
@@ -59,20 +58,20 @@ namespace
 		}
 
 		static void AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              uint8* InKeyBuffer, uint8* InValueBuffer)
+									  uint8 *InKeyBuffer, uint8 *InValueBuffer)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				MapHelper->Add(InKeyBuffer, InValueBuffer);
 			}
 		}
 
 		static int32 RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                  const uint8* InKeyBuffer)
+										  const uint8 *InKeyBuffer)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return MapHelper->Remove(InKeyBuffer);
 			}
@@ -81,32 +80,32 @@ namespace
 		}
 
 		static void FindKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                  const uint8* InValueBuffer, uint8* ReturnBuffer)
+										  const uint8 *InValueBuffer, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				MapHelper->GetKeyPropertyDescriptor()->Get(MapHelper->FindKey(InValueBuffer),
-				                                           reinterpret_cast<void**>(ReturnBuffer));
+														   reinterpret_cast<void **>(RETURN_BUFFER));
 			}
 		}
 
 		static void FindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                               const uint8* InKeyBuffer, uint8* ReturnBuffer)
+									   const uint8 *InKeyBuffer, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Find(InKeyBuffer),
-				                                             reinterpret_cast<void**>(ReturnBuffer));
+															 reinterpret_cast<void **>(RETURN_BUFFER));
 			}
 		}
 
 		static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   const uint8* InKeyBuffer)
+										   const uint8 *InKeyBuffer)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return MapHelper->Contains(InKeyBuffer);
 			}
@@ -115,21 +114,21 @@ namespace
 		}
 
 		static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              const uint8* InKeyBuffer, uint8* ReturnBuffer)
+									  const uint8 *InKeyBuffer, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				MapHelper->GetValuePropertyDescriptor()->Get(MapHelper->Get(InKeyBuffer),
-				                                             reinterpret_cast<void**>(ReturnBuffer));
+															 reinterpret_cast<void **>(RETURN_BUFFER));
 			}
 		}
 
 		static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              uint8* InKeyBuffer, uint8* InValueBuffer)
+									  uint8 *InKeyBuffer, uint8 *InValueBuffer)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				MapHelper->Set(InKeyBuffer, InValueBuffer);
 			}
@@ -138,7 +137,7 @@ namespace
 		static int32 GetMaxIndexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return MapHelper->GetMaxIndex();
 			}
@@ -147,10 +146,10 @@ namespace
 		}
 
 		static bool IsValidIndexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                       const int32 InIndex)
+											   const int32 InIndex)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return MapHelper->IsValidIndex(InIndex);
 			}
@@ -159,26 +158,26 @@ namespace
 		}
 
 		static void GetEnumeratorKeyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                           const int32 InIndex, uint8* ReturnBuffer)
+												   const int32 InIndex, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				const auto Key = MapHelper->GetEnumeratorKey(InIndex);
 
-				MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void**>(ReturnBuffer));
+				MapHelper->GetKeyPropertyDescriptor()->Get(Key, reinterpret_cast<void **>(RETURN_BUFFER));
 			}
 		}
 
 		static void GetEnumeratorValueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                             const int32 InIndex, uint8* ReturnBuffer)
+													 const int32 InIndex, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				const auto Value = MapHelper->GetEnumeratorValue(InIndex);
 
-				MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void**>(ReturnBuffer));
+				MapHelper->GetValuePropertyDescriptor()->Get(Value, reinterpret_cast<void **>(RETURN_BUFFER));
 			}
 		}
 

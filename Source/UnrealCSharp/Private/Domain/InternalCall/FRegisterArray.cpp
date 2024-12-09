@@ -3,6 +3,7 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Bridge/FTypeBridge.h"
 #include "Reflection/Container/FArrayHelper.h"
+#include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
@@ -10,7 +11,7 @@ namespace
 {
 	struct FRegisterArray
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject)
+		static void RegisterImplementation(MonoObject *InMonoObject)
 		{
 			FCSharpBind::Bind<FArrayHelper>(InMonoObject, FTypeBridge::GetGenericArgument(InMonoObject));
 		}
@@ -31,16 +32,13 @@ namespace
 		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
-			{
-				(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<
-					FArrayHelper>(InGarbageCollectionHandle);
-			});
+					  { (void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FArrayHelper>(InGarbageCollectionHandle); });
 		}
 
 		static int32 GetTypeSizeImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->GetTypeSize();
 			}
@@ -51,7 +49,7 @@ namespace
 		static int32 GetSlackImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->GetSlack();
 			}
@@ -60,10 +58,10 @@ namespace
 		}
 
 		static bool IsValidIndexImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                       const int32 InIndex)
+											   const int32 InIndex)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->IsValidIndex(InIndex);
 			}
@@ -74,7 +72,7 @@ namespace
 		static int32 NumImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->Num();
 			}
@@ -85,7 +83,7 @@ namespace
 		static bool IsEmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->IsEmpty();
 			}
@@ -96,7 +94,7 @@ namespace
 		static int32 MaxImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->Max();
 			}
@@ -105,32 +103,32 @@ namespace
 		}
 
 		static void GetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              const int32 InIndex, uint8* ReturnBuffer)
+									  const int32 InIndex, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				const auto Value = ArrayHelper->Get(InIndex);
 
-				ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(ReturnBuffer));
+				ArrayHelper->GetInnerPropertyDescriptor()->Get(Value, reinterpret_cast<void **>(RETURN_BUFFER));
 			}
 		}
 
 		static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              const int32 InIndex, uint8* InValueBuffer)
+									  const int32 InIndex, uint8 *InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				ArrayHelper->Set(InIndex, InValueBuffer);
 			}
 		}
 
 		static int32 FindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                const uint8* InValueBuffer)
+										const uint8 *InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->Find(InValueBuffer);
 			}
@@ -139,10 +137,10 @@ namespace
 		}
 
 		static int32 FindLastImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                    const uint8* InValueBuffer)
+											const uint8 *InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->FindLast(InValueBuffer);
 			}
@@ -151,10 +149,10 @@ namespace
 		}
 
 		static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   const uint8* InValueBuffer)
+										   const uint8 *InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->Contains(InValueBuffer);
 			}
@@ -163,10 +161,10 @@ namespace
 		}
 
 		static int32 AddUninitializedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            const int32 InCount)
+													const int32 InCount)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->AddUninitialized(InCount);
 			}
@@ -175,70 +173,70 @@ namespace
 		}
 
 		static void InsertZeroedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                       const int32 InIndex, const int32 InCount)
+											   const int32 InIndex, const int32 InCount)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				ArrayHelper->InsertZeroed(InIndex, InCount);
 			}
 		}
 
 		static void InsertDefaultedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                          const int32 InIndex, const int32 InCount)
+												  const int32 InIndex, const int32 InCount)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				ArrayHelper->InsertDefaulted(InIndex, InCount);
 			}
 		}
 
 		static void RemoveAtImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   const int32 InIndex, const int32 InCount, const bool bAllowShrinking)
+										   const int32 InIndex, const int32 InCount, const bool bAllowShrinking)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				ArrayHelper->RemoveAt(InIndex, InCount, bAllowShrinking);
 			}
 		}
 
 		static void ResetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                const int32 InNewSize)
+										const int32 InNewSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->Reset(InNewSize);
 			}
 		}
 
 		static void EmptyImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                const int32 InSlack)
+										const int32 InSlack)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->Empty(InSlack);
 			}
 		}
 
 		static void SetNumImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                 const int32 InNewNum, const bool bAllowShrinking)
+										 const int32 InNewNum, const bool bAllowShrinking)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->SetNum(InNewNum, bAllowShrinking);
 			}
 		}
 
 		static int32 AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                               uint8* InValueBuffer)
+									   uint8 *InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->Add(InValueBuffer);
 			}
@@ -247,10 +245,10 @@ namespace
 		}
 
 		static int32 AddZeroedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     const int32 InCount)
+											 const int32 InCount)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->AddZeroed(InCount);
 			}
@@ -259,10 +257,10 @@ namespace
 		}
 
 		static int32 AddUniqueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     uint8* InValueBuffer)
+											 uint8 *InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->AddUnique(InValueBuffer);
 			}
@@ -271,10 +269,10 @@ namespace
 		}
 
 		static int32 RemoveSingleImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                        const uint8* InValueBuffer)
+												const uint8 *InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->RemoveSingle(InValueBuffer);
 			}
@@ -283,10 +281,10 @@ namespace
 		}
 
 		static int32 RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                  const uint8* InValueBuffer)
+										  const uint8 *InValueBuffer)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return ArrayHelper->Remove(InValueBuffer);
 			}
@@ -295,20 +293,20 @@ namespace
 		}
 
 		static void SwapMemoryImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                     const int32 InFirstIndexToSwap, const int32 InSecondIndexToSwap)
+											 const int32 InFirstIndexToSwap, const int32 InSecondIndexToSwap)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				ArrayHelper->SwapMemory(InFirstIndexToSwap, InSecondIndexToSwap);
 			}
 		}
 
 		static void SwapImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                               const int32 InFirstIndexToSwap, const int32 InSecondIndexToSwap)
+									   const int32 InFirstIndexToSwap, const int32 InSecondIndexToSwap)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				ArrayHelper->Swap(InFirstIndexToSwap, InSecondIndexToSwap);
 			}

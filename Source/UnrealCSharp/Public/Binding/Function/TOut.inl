@@ -1,11 +1,11 @@
 #pragma once
 
+#include "CoreMacro/BufferMacro.h"
 template <typename Type, typename... Args0>
 struct TOut
 {
-	explicit TOut(uint8* OutBuffer, Type& InArgument):
-		Buffer(OutBuffer),
-		Argument(InArgument)
+	explicit TOut(OUT_BUFFER_SIGNATURE, Type &InArgument) : Buffer(OUT_BUFFER),
+															Argument(InArgument)
 	{
 		Get<0, Args0...>();
 	}
@@ -24,11 +24,11 @@ struct TOut
 
 			if constexpr (TIsPrimitive<T>::Value)
 			{
-				*(std::remove_const_t<std::decay_t<T>>*)Buffer = Value;
+				*(std::remove_const_t<std::decay_t<T>> *)Buffer = Value;
 			}
 			else
 			{
-				*reinterpret_cast<void**>(Buffer) = Value;
+				*reinterpret_cast<void **>(Buffer) = Value;
 			}
 
 			Buffer += TTypeInfo<std::decay_t<T>>::Get()->GetBufferSize();
@@ -38,7 +38,7 @@ struct TOut
 	}
 
 private:
-	uint8* Buffer;
+	uint8 *Buffer;
 
-	Type& Argument;
+	Type &Argument;
 };

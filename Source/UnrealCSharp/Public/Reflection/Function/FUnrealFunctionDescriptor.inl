@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMacro/BufferMacro.h"
 #include "Macro/FunctionMacro.h"
 
 template <auto ReturnType>
@@ -9,7 +10,7 @@ void FUnrealFunctionDescriptor::Call0(UObject* InObject) const
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call1(UObject* InObject, uint8* ReturnBuffer) const
+void FUnrealFunctionDescriptor::Call1(UObject* InObject, RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -19,7 +20,7 @@ void FUnrealFunctionDescriptor::Call1(UObject* InObject, uint8* ReturnBuffer) co
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call2(UObject* InObject, uint8* InBuffer) const
+void FUnrealFunctionDescriptor::Call2(UObject* InObject, IN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -29,7 +30,7 @@ void FUnrealFunctionDescriptor::Call2(UObject* InObject, uint8* InBuffer) const
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call3(UObject* InObject, uint8* InBuffer, uint8* ReturnBuffer) const
+void FUnrealFunctionDescriptor::Call3(UObject* InObject, IN_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -41,7 +42,7 @@ void FUnrealFunctionDescriptor::Call3(UObject* InObject, uint8* InBuffer, uint8*
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call4(UObject* InObject, uint8* OutBuffer) const
+void FUnrealFunctionDescriptor::Call4(UObject* InObject, OUT_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -51,7 +52,7 @@ void FUnrealFunctionDescriptor::Call4(UObject* InObject, uint8* OutBuffer) const
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call6(UObject* InObject, uint8* InBuffer, uint8* OutBuffer) const
+void FUnrealFunctionDescriptor::Call6(UObject* InObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -63,8 +64,8 @@ void FUnrealFunctionDescriptor::Call6(UObject* InObject, uint8* InBuffer, uint8*
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call7(UObject* InObject, uint8* InBuffer, uint8* OutBuffer,
-                                      uint8* ReturnBuffer) const
+void FUnrealFunctionDescriptor::Call7(UObject* InObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE,
+                                      RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -86,7 +87,7 @@ void FUnrealFunctionDescriptor::Call8(UObject* InObject) const
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call9(UObject* InObject, uint8* ReturnBuffer) const
+void FUnrealFunctionDescriptor::Call9(UObject* InObject, RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -98,7 +99,7 @@ void FUnrealFunctionDescriptor::Call9(UObject* InObject, uint8* ReturnBuffer) co
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call10(UObject* InObject, uint8* InBuffer) const
+void FUnrealFunctionDescriptor::Call10(UObject* InObject, IN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -110,7 +111,7 @@ void FUnrealFunctionDescriptor::Call10(UObject* InObject, uint8* InBuffer) const
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call11(UObject* InObject, uint8* InBuffer, uint8* ReturnBuffer) const
+void FUnrealFunctionDescriptor::Call11(UObject* InObject, IN_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -124,7 +125,7 @@ void FUnrealFunctionDescriptor::Call11(UObject* InObject, uint8* InBuffer, uint8
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call14(UObject* InObject, uint8* InBuffer, uint8* OutBuffer) const
+void FUnrealFunctionDescriptor::Call14(UObject* InObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -138,8 +139,8 @@ void FUnrealFunctionDescriptor::Call14(UObject* InObject, uint8* InBuffer, uint8
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call15(UObject* InObject, uint8* InBuffer, uint8* OutBuffer,
-                                       uint8* ReturnBuffer) const
+void FUnrealFunctionDescriptor::Call15(UObject* InObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE,
+                                       RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -174,7 +175,7 @@ void FUnrealFunctionDescriptor::Call16(UObject* InObject) const
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call18(UObject* InObject, uint8* InBuffer) const
+void FUnrealFunctionDescriptor::Call18(UObject* InObject, IN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -221,7 +222,7 @@ void FUnrealFunctionDescriptor::Call24(UObject* InObject) const
 }
 
 template <auto ReturnType>
-void FUnrealFunctionDescriptor::Call26(UObject* InObject, uint8* InBuffer) const
+void FUnrealFunctionDescriptor::Call26(UObject* InObject, IN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 

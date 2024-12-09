@@ -2,6 +2,7 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
+#include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
@@ -9,7 +10,7 @@ namespace
 {
 	struct FRegisterDelegate
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject)
+		static void RegisterImplementation(MonoObject *InMonoObject)
 		{
 			FCSharpBind::Bind<FDelegateHelper>(InMonoObject);
 		}
@@ -17,22 +18,19 @@ namespace
 		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			AsyncTask(ENamedThreads::GameThread, [InGarbageCollectionHandle]
-			{
-				(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference<FDelegateHelper>(
-					InGarbageCollectionHandle);
-			});
+					  { (void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference<FDelegateHelper>(
+							InGarbageCollectionHandle); });
 		}
 
 		static void BindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                               const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
+									   const FGarbageCollectionHandle InObject, MonoObject *InDelegate)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					DelegateHelper->Bind(FoundObject, FCSharpEnvironment::GetEnvironment().GetDomain()->
-					                     Delegate_Get_Method(InDelegate));
+					DelegateHelper->Bind(FoundObject, FCSharpEnvironment::GetEnvironment().GetDomain()->Delegate_Get_Method(InDelegate));
 				}
 			}
 		}
@@ -40,7 +38,7 @@ namespace
 		static bool IsBoundImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				return DelegateHelper->IsBound();
 			}
@@ -51,7 +49,7 @@ namespace
 		static void UnBindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				DelegateHelper->UnBind();
 			}
@@ -60,7 +58,7 @@ namespace
 		static void ClearImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				DelegateHelper->Clear();
 			}
@@ -69,99 +67,99 @@ namespace
 		static void GenericExecute0Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
 				DelegateHelper->Execute0<>();
 			}
 		}
 
 		static void PrimitiveExecute1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            uint8* ReturnBuffer)
+													RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute1<EFunctionReturnType::Primitive>(ReturnBuffer);
+				DelegateHelper->Execute1<EFunctionReturnType::Primitive>(RETURN_BUFFER);
 			}
 		}
 
 		static void CompoundExecute1Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                           uint8* ReturnBuffer)
+												   RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute1<EFunctionReturnType::Compound>(ReturnBuffer);
+				DelegateHelper->Execute1<EFunctionReturnType::Compound>(RETURN_BUFFER);
 			}
 		}
 
 		static void GenericExecute2Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                          uint8* InBuffer)
+												  IN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute2<>(InBuffer);
+				DelegateHelper->Execute2<>(IN_BUFFER);
 			}
 		}
 
 		static void PrimitiveExecute3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            uint8* InBuffer, uint8* ReturnBuffer)
+													IN_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute3<EFunctionReturnType::Primitive>(InBuffer, ReturnBuffer);
+				DelegateHelper->Execute3<EFunctionReturnType::Primitive>(IN_BUFFER, RETURN_BUFFER);
 			}
 		}
 
 		static void CompoundExecute3Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                           uint8* InBuffer, uint8* ReturnBuffer)
+												   IN_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute3<EFunctionReturnType::Compound>(InBuffer, ReturnBuffer);
+				DelegateHelper->Execute3<EFunctionReturnType::Compound>(IN_BUFFER, RETURN_BUFFER);
 			}
 		}
 
 		static void GenericExecute4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                          uint8* OutBuffer)
+												  OUT_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute4<>(OutBuffer);
+				DelegateHelper->Execute4<>(OUT_BUFFER);
 			}
 		}
 
 		static void GenericExecute6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                          uint8* InBuffer, uint8* OutBuffer)
+												  IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute6<>(InBuffer, OutBuffer);
+				DelegateHelper->Execute6<>(IN_BUFFER, OUT_BUFFER);
 			}
 		}
 
 		static void PrimitiveExecute7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer)
+													IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute7<EFunctionReturnType::Primitive>(InBuffer, OutBuffer, ReturnBuffer);
+				DelegateHelper->Execute7<EFunctionReturnType::Primitive>(IN_BUFFER, OUT_BUFFER, RETURN_BUFFER);
 			}
 		}
 
 		static void CompoundExecute7Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                           uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer)
+												   IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
-				InGarbageCollectionHandle))
+					InGarbageCollectionHandle))
 			{
-				DelegateHelper->Execute7<EFunctionReturnType::Compound>(InBuffer, OutBuffer, ReturnBuffer);
+				DelegateHelper->Execute7<EFunctionReturnType::Compound>(IN_BUFFER, OUT_BUFFER, RETURN_BUFFER);
 			}
 		}
 
