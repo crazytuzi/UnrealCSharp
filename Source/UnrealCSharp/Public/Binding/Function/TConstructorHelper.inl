@@ -16,11 +16,11 @@ struct TConstructorHelper<std::tuple<Args...>>
 	template <typename Class, auto... Index>
 	static auto Call(std::index_sequence<Index...>, BINDING_CONSTRUCTOR_SIGNATURE)
 	{
-		std::tuple<TArgument<Args, Args>...> Argument(InBuffer + std::get<Index>(TBufferSize<Args...>()())...);
+		std::tuple<TArgument<Args, Args>...> Argument(IN_BUFFER + std::get<Index>(TBufferSize<Args...>()())...);
 		
 		auto Value = new Class(std::forward<Args>(std::get<Index>(Argument).Get())...);
 		
-		TOut<std::tuple<TArgument<Args, Args>...>>(OutBuffer, Argument);
+		TOut<std::tuple<TArgument<Args, Args>...>>(OUT_BUFFER, Argument);
 		
 		if constexpr (TIsScriptStruct<Class>::Value)
 		{

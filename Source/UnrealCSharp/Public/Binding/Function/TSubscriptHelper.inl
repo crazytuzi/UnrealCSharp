@@ -14,16 +14,16 @@ struct TSubscriptHelper
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
 			auto Value = TReturnValue<Result>(std::forward<Result>(
-				FoundObject->operator[](TArgument<Index, Index>(InBuffer).Get())
+				FoundObject->operator[](TArgument<Index, Index>(IN_BUFFER).Get())
 			)).Get();
 
 			if constexpr (TIsPrimitive<Result>::Value)
 			{
-				*(std::remove_const_t<std::decay_t<Result>>*)ReturnBuffer = Value;
+				*(std::remove_const_t<std::decay_t<Result>>*)RETURN_BUFFER = Value;
 			}
 			else
 			{
-				*reinterpret_cast<void**>(ReturnBuffer) = Value;
+				*reinterpret_cast<void**>(RETURN_BUFFER) = Value;
 			}
 		}
 	}
@@ -34,8 +34,8 @@ struct TSubscriptHelper
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			FoundObject->operator[](TArgument<Index, Index>(InBuffer).Get()) =
-				TArgument<Result, Result>(InBuffer + TTypeInfo<std::decay_t<Index>>::Get()->GetBufferSize()).Get();
+			FoundObject->operator[](TArgument<Index, Index>(IN_BUFFER).Get()) =
+				TArgument<Result, Result>(IN_BUFFER + TTypeInfo<std::decay_t<Index>>::Get()->GetBufferSize()).Get();
 		}
 	}
 };

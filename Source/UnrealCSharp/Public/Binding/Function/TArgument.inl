@@ -36,8 +36,6 @@ struct TBaseArgument<T, true>
 
 	auto Set()
 	{
-		// return TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
-		// 	const_cast<std::decay_t<T>*>(&Value));
 		return Value;
 	}
 

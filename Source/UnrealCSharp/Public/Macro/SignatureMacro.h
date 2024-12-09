@@ -1,21 +1,33 @@
 #pragma once
 
-#define BINDING_CONSTRUCTOR_SIGNATURE MonoObject* InMonoObject, uint8* InBuffer, uint8* OutBuffer
+#define IN_BUFFER InBuffer
 
-#define BINDING_CONSTRUCTOR_PARAM InMonoObject, InBuffer, OutBuffer
+#define IN_BUFFER_SIGNATURE uint8* IN_BUFFER
+
+#define OUT_BUFFER OutBuffer
+
+#define OUT_BUFFER_SIGNATURE uint8* OUT_BUFFER
+
+#define RETURN_BUFFER ReturnBuffer
+
+#define RETURN_BUFFER_SIGNATURE uint8* RETURN_BUFFER
+
+#define BINDING_CONSTRUCTOR_SIGNATURE MonoObject* InMonoObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE
+
+#define BINDING_CONSTRUCTOR_PARAM InMonoObject, IN_BUFFER, OUT_BUFFER
 
 #define BINDING_DESTRUCTOR_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle
 
 #define BINDING_DESTRUCTOR_PARAM InGarbageCollectionHandle
 
-#define BINDING_FUNCTION_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer
+#define BINDING_FUNCTION_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE
 
-#define BINDING_FUNCTION_PARAM InGarbageCollectionHandle, InBuffer, OutBuffer, ReturnBuffer
+#define BINDING_FUNCTION_PARAM InGarbageCollectionHandle, IN_BUFFER, OUT_BUFFER, RETURN_BUFFER
 
-#define BINDING_SUBSCRIPT_GET_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, uint8* InBuffer, uint8* ReturnBuffer
+#define BINDING_SUBSCRIPT_GET_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE
 
-#define BINDING_SUBSCRIPT_GET_PARAM InGarbageCollectionHandle, InBuffer, ReturnBuffer
+#define BINDING_SUBSCRIPT_GET_PARAM InGarbageCollectionHandle, IN_BUFFER, RETURN_BUFFER
 
-#define BINDING_SUBSCRIPT_SET_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, uint8* InBuffer
+#define BINDING_SUBSCRIPT_SET_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE
 
-#define BINDING_SUBSCRIPT_SET_PARAM InGarbageCollectionHandle, InBuffer
+#define BINDING_SUBSCRIPT_SET_PARAM InGarbageCollectionHandle, IN_BUFFER
