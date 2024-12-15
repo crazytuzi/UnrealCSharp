@@ -5,8 +5,6 @@
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/SignatureMacro.h"
 
-extern MonoObject* Array_Get(MonoArray* InMonoArray, const size_t InIndex);
-
 template <typename>
 struct TConstructorHelper
 {
@@ -18,13 +16,11 @@ struct TConstructorHelper<std::tuple<Args...>>
 	template <typename Class, auto... Index>
 	static auto Call(std::index_sequence<Index...>, BINDING_CONSTRUCTOR_SIGNATURE)
 	{
-		std::tuple<TArgument<Args, Args>...> Argument(Array_Get(InValue, Index)...);
+		std::tuple<TArgument<Args, Args>...> Argument(IN_BUFFER + std::get<Index>(TBufferOffset<Args...>()())...);
 
 		auto Value = new Class(std::forward<Args>(std::get<Index>(Argument).Get())...);
 
-		TOut<std::tuple<TArgument<Args, Args>...>>(OutValue, Argument)
-			.template Initialize<0, Args...>()
-			.template Get<0, Args...>();
+		TOut<std::tuple<TArgument<Args, Args>...>>(OUT_BUFFER, Argument);
 
 		if constexpr (TIsScriptStruct<Class>::Value)
 		{

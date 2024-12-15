@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "CoreMacro/Macro.h"
 #include "CoreMacro/BindingMacro.h"
 #include "Binding/FBinding.h"
 #include "Binding/Function/TFunctionBuilder.inl"
@@ -36,17 +37,13 @@ auto TGet_Args()
 	return false;
 }
 
-#define BINDING_STR(Str) #Str
+#define BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) F_STRING_STR(Class).Left( \
+	F_STRING_STR(Class).Find(TEXT("::")) - 1)
 
-#define BINDING_STRING(Str) FString(TEXT(BINDING_STR(Str)))
+#define BINDING_REMOVE_RIGHT_NAMESPACE_CLASS_STR(Class) F_STRING_STR(Class).Right( \
+	F_STRING_STR(Class).Len() - F_STRING_STR(Class).Find(TEXT("::")) - 2)
 
-#define BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) BINDING_STRING(Class).Left( \
-	BINDING_STRING(Class).Find(TEXT("::")) - 1)
-
-#define BINDING_REMOVE_RIGHT_NAMESPACE_CLASS_STR(Class) BINDING_STRING(Class).Right( \
-	BINDING_STRING(Class).Len() - BINDING_STRING(Class).Find(TEXT("::")) - 2)
-
-#define BINDING_REMOVE_PREFIX_CLASS_STR(Class) BINDING_STRING(Class).RightChop(1)
+#define BINDING_REMOVE_PREFIX_CLASS_STR(Class) F_STRING_STR(Class).RightChop(1)
 
 #define BINDING_CLASS(Class, ...) \
 template <typename T> \
@@ -56,7 +53,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer
 	{ \
 		if constexpr (!TSizeof_Args(__VA_ARGS__)) \
 		{ \
-			return BINDING_STRING(Class); \
+			return F_STRING_STR(Class); \
 		} \
 		else \
 		{ \
@@ -88,12 +85,12 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remov
 }; \
 template <typename InClass, typename Result, Result InClass::* Member> \
 struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<Result>>, Class>>> : \
-	TBindingPropertyBuilder<InClass, Result, Member> \
+	TCompoundPropertyBuilder<InClass, Result, Member> \
 { \
 }; \
 template <typename Result, Result* Member> \
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<Result>>, Class>>> : \
-	TBindingPropertyBuilder<void, Result, Member> \
+	TCompoundPropertyBuilder<void, Result, Member> \
 { \
 }; \
 template <typename T> \
@@ -104,16 +101,16 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_poi
 }; \
 template <typename T> \
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<T>>, Class>>> : \
-	TBindingReturnValue<T> \
+	TCompoundReturnValue<T> \
 { \
-	using TBindingReturnValue<T>::TBindingReturnValue; \
+	using TCompoundReturnValue<T>::TCompoundReturnValue; \
 };
 
 #define BINDING_SCRIPT_STRUCT(Class) \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
 { \
-	static auto Get() { return BINDING_STRING(Class); } \
+	static auto Get() { return F_STRING_STR(Class); } \
 }; \
 template <typename T> \
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
@@ -135,12 +132,12 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remov
 }; \
 template <typename InClass, typename Result, Result InClass::* Member> \
 struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, Class>>> : \
-	TScriptStructPropertyBuilder<InClass, Result, Member> \
+	TCompoundPropertyBuilder<InClass, Result, Member> \
 { \
 }; \
 template <typename Result, Result* Member> \
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, Class>>> : \
-	TScriptStructPropertyBuilder<void, Result, Member> \
+	TCompoundPropertyBuilder<void, Result, Member> \
 { \
 }; \
 template <typename T> \
@@ -151,9 +148,9 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_poi
 }; \
 template <typename T> \
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<T>>, Class>>> : \
-	TScriptStructReturnValue<T> \
+	TCompoundReturnValue<T> \
 { \
-	using TScriptStructReturnValue<T>::TScriptStructReturnValue; \
+	using TCompoundReturnValue<T>::TCompoundReturnValue; \
 }; \
 template <> \
 struct TIsScriptStruct<Class> \
@@ -169,7 +166,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>> \
 	{ \
 		if constexpr (!TSizeof_Args(__VA_ARGS__)) \
 		{ \
-			return BINDING_STRING(Class); \
+			return F_STRING_STR(Class); \
 		} \
 		else \
 		{ \
@@ -201,12 +198,12 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>
 }; \
 template <typename InClass, typename Result, Result InClass::* Member> \
 struct TPropertyBuilder<Result InClass::*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, Class>>> : \
-	TBindingEnumPropertyBuilder<InClass, Result, Member> \
+	TPrimitivePropertyBuilder<InClass, Result, Member> \
 { \
 }; \
 template <typename Result, Result* Member> \
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, Class>>> : \
-	TBindingEnumPropertyBuilder<void, Result, Member> \
+	TPrimitivePropertyBuilder<void, Result, Member> \
 { \
 }; \
 template <typename T> \
@@ -217,9 +214,9 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>, T>>
 }; \
 template <typename T> \
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, Class>>> : \
-	TBindingEnumReturnValue<T> \
+	TPrimitiveReturnValue<T> \
 { \
-	using TBindingEnumReturnValue<T>::TBindingEnumReturnValue; \
+	using TPrimitiveReturnValue<T>::TPrimitiveReturnValue; \
 }; \
 template <> \
 struct TIsNotUEnum<Class> \

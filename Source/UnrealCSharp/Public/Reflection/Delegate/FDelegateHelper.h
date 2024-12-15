@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "CoreMacro/BufferMacro.h"
 #include "FDelegateBaseHelper.h"
 #include "DelegateHandler.h"
 
@@ -39,56 +40,56 @@ public:
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute1(uint8* ReturnBuffer) const
+	void Execute1(RETURN_BUFFER_SIGNATURE) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute1<ReturnType>(ReturnBuffer);
+			DelegateHandler->Execute1<ReturnType>(RETURN_BUFFER);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute2(uint8* InBuffer) const
+	void Execute2(IN_BUFFER_SIGNATURE) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute2<ReturnType>(InBuffer);
+			DelegateHandler->Execute2<ReturnType>(IN_BUFFER);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute3(uint8* InBuffer, uint8* ReturnBuffer) const
+	void Execute3(IN_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute3<ReturnType>(InBuffer, ReturnBuffer);
+			DelegateHandler->Execute3<ReturnType>(IN_BUFFER, RETURN_BUFFER);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute4(uint8* OutBuffer) const
+	void Execute4(OUT_BUFFER_SIGNATURE) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute4<ReturnType>(OutBuffer);
+			DelegateHandler->Execute4<ReturnType>(OUT_BUFFER);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute6(uint8* InBuffer, uint8* OutBuffer) const
+	void Execute6(IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute6<ReturnType>(InBuffer, OutBuffer);
+			DelegateHandler->Execute6<ReturnType>(IN_BUFFER, OUT_BUFFER);
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute7(uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer) const
+	void Execute7(IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const
 	{
 		if (DelegateHandler != nullptr)
 		{
-			DelegateHandler->Execute7<ReturnType>(InBuffer, OutBuffer, ReturnBuffer);
+			DelegateHandler->Execute7<ReturnType>(IN_BUFFER, OUT_BUFFER, RETURN_BUFFER);
 		}
 	}
 

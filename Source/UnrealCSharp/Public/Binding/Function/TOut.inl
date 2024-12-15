@@ -1,37 +1,16 @@
 #pragma once
 
-template <typename Type>
+#include "CoreMacro/BufferMacro.h"
+#include "TBufferOffset.inl"
+
+template <typename Type, typename... Args0>
 struct TOut
 {
-	explicit TOut(MonoObject** InOutValue, Type& InArgument):
-		OutValue(InOutValue),
-		Argument(InArgument),
-		Count(0)
+	explicit TOut(OUT_BUFFER_SIGNATURE, Type& InArgument) :
+		Buffer(OUT_BUFFER),
+		Argument(InArgument)
 	{
-	}
-
-	template <auto Index>
-	auto Initialize() -> TOut&
-	{
-		if (Count > 0)
-		{
-			*OutValue = (MonoObject*)FMonoDomain::Array_New(FMonoDomain::Get_Object_Class(), Count);
-
-			Count = 0;
-		}
-
-		return *this;
-	}
-
-	template <auto Index, typename T, typename... Args>
-	auto Initialize() -> TOut&
-	{
-		if (std::get<Index>(Argument).IsRef())
-		{
-			++Count;
-		}
-
-		return Initialize<Index + 1, Args...>();
+		Get<0, Args0...>();
 	}
 
 	template <auto Index>
@@ -39,23 +18,28 @@ struct TOut
 	{
 	}
 
-	template <auto Index, typename T, typename... Args>
+	template <auto Index, typename T, typename... Args1>
 	auto Get()
 	{
 		if (std::get<Index>(Argument).IsRef())
 		{
-			auto Value = std::get<Index>(Argument).Set();
+			if constexpr (TIsPrimitive<T>::Value)
+			{
+				*(std::remove_const_t<std::decay_t<T>>*)Buffer = std::get<Index>(Argument).Set();
+			}
+			else
+			{
+				*reinterpret_cast<void**>(Buffer) = std::get<Index>(Argument).Set();
+			}
 
-			ARRAY_SET((MonoArray*)*OutValue, MonoObject*, Count++, Value);
+			Buffer += std::get<Index>(TBufferOffset<Args0...>()());
 		}
 
-		Get<Index + 1, Args...>();
+		Get<Index + 1, Args1...>();
 	}
 
 private:
-	MonoObject** OutValue;
+	uint8* Buffer;
 
 	Type& Argument;
-
-	int32 Count;
 };

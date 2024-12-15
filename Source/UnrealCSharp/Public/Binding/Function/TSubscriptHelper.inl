@@ -1,36 +1,37 @@
 #pragma once
 
+#include "TBufferOffset.inl"
 #include "TArgument.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/SignatureMacro.h"
-
-extern MonoObject* Array_Get(MonoArray* InMonoArray, const size_t InIndex);
 
 template <typename Result, typename Index>
 struct TSubscriptHelper
 {
 	template <typename Class>
-	static auto Get(BINDING_SUBSCRIPT_SIGNATURE) -> MonoObject*
+	static auto Get(BINDING_SUBSCRIPT_GET_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			return TReturnValue<Result>(std::forward<Result>(
-				FoundObject->operator[](TArgument<Index, Index>(Array_Get(InValue, 0)).Get())
-			)).Get();
+			TReturnValue<Result>(RETURN_BUFFER, std::forward<Result>(
+				                     FoundObject->operator[](
+					                     TArgument<Index, Index>(
+						                     IN_BUFFER + std::get<0>(TBufferOffset<Index>()())).Get())));
 		}
-
-		return nullptr;
 	}
 
 	template <typename Class>
-	static auto Set(BINDING_SUBSCRIPT_SIGNATURE)
+	static auto Set(BINDING_SUBSCRIPT_SET_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			FoundObject->operator[](TArgument<Index, Index>(Array_Get(InValue, 0)).Get()) =
-				TArgument<Result, Result>(Array_Get(InValue, 1)).Get();
+			FoundObject->operator[](
+					TArgument<Index, Index>(
+						IN_BUFFER + std::get<0>(TBufferOffset<Index, Result>()())).Get()) =
+				TArgument<Result, Result>(
+					IN_BUFFER + std::get<1>(TBufferOffset<Index, Result>()())).Get();
 		}
 	}
 };

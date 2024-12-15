@@ -2,6 +2,7 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
+#include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Bridge/FTypeBridge.h"
 #include "Async/Async.h"
@@ -68,34 +69,34 @@ namespace
 		}
 
 		static void AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              uint8* InValueBuffer)
+		                              IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 				InGarbageCollectionHandle))
 			{
-				SetHelper->Add(InValueBuffer);
+				SetHelper->Add(IN_VALUE_BUFFER);
 			}
 		}
 
 		static int32 RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                  const uint8* InValueBuffer)
+		                                  const IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 				InGarbageCollectionHandle))
 			{
-				return SetHelper->Remove(InValueBuffer);
+				return SetHelper->Remove(IN_VALUE_BUFFER);
 			}
 
 			return 0;
 		}
 
 		static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   const uint8* InValueBuffer)
+		                                   const IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 				InGarbageCollectionHandle))
 			{
-				return SetHelper->Contains(InValueBuffer);
+				return SetHelper->Contains(IN_VALUE_BUFFER);
 			}
 
 			return false;
@@ -114,14 +115,14 @@ namespace
 		}
 
 		static void GetEnumeratorImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                        const int32 InIndex, uint8* ReturnBuffer)
+		                                        const int32 InIndex, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
 				InGarbageCollectionHandle))
 			{
 				const auto Value = SetHelper->GetEnumerator(InIndex);
 
-				SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(ReturnBuffer));
+				SetHelper->GetElementPropertyDescriptor()->Get(Value, reinterpret_cast<void**>(RETURN_BUFFER));
 			}
 		}
 

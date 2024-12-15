@@ -1,6 +1,7 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
+#include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 #include "Registry/FCSharpBind.h"
@@ -128,32 +129,32 @@ namespace
 		}
 
 		static void GenericBroadcast2Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            uint8* InBuffer)
+		                                            IN_BUFFER_SIGNATURE)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Broadcast2<>(InBuffer);
+				MulticastDelegateHelper->Broadcast2<>(IN_BUFFER);
 			}
 		}
 
 		static void GenericBroadcast4Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            uint8* OutBuffer)
+		                                            OUT_BUFFER_SIGNATURE)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Broadcast4<>(OutBuffer);
+				MulticastDelegateHelper->Broadcast4<>(OUT_BUFFER);
 			}
 		}
 
 		static void GenericBroadcast6Implementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                            uint8* InBuffer, uint8* OutBuffer)
+		                                            IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
-				MulticastDelegateHelper->Broadcast6<>(InBuffer, OutBuffer);
+				MulticastDelegateHelper->Broadcast6<>(IN_BUFFER, OUT_BUFFER);
 			}
 		}
 
