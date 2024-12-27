@@ -36,7 +36,7 @@ namespace Weavers
 
         private MethodDefinition _getGarbageCollectionHandle;
 
-        private TypeDefinition _pathAttributeType;
+        private TypeDefinition _pathNameAttributeType;
 
         private TypeDefinition _ufunctionAttributeType;
 
@@ -44,7 +44,9 @@ namespace Weavers
 
         private TypeDefinition _clientAttributeType;
 
-        private TypeDefinition _netMulticastAttributeAttributeType;
+        private TypeDefinition _netMulticastAttributeType;
+
+        private TypeDefinition _notPlaceableAttributeType;
 
         private TypeDefinition _overrideAttributeType;
 
@@ -235,9 +237,10 @@ namespace Weavers
 
         private void AddPathNameAttributeToUnrealType(TypeDefinition Type)
         {
-            if (Type.CustomAttributes.Any(Attribute => Attribute.AttributeType == _pathAttributeType) == false)
+            if (Type.CustomAttributes.Any(Attribute =>
+                    Attribute.AttributeType.FullName == _pathNameAttributeType.FullName) == false)
             {
-                var constructor = _pathAttributeType.GetConstructors().FirstOrDefault();
+                var constructor = _pathNameAttributeType.GetConstructors().FirstOrDefault();
 
                 var constructorRef = ModuleDefinition.ImportReference(constructor);
 
@@ -249,6 +252,21 @@ namespace Weavers
                     fullPath));
 
                 Type.CustomAttributes.Add(attribute);
+            }
+
+            if (Type.Name.EndsWith("_C"))
+            {
+                if (Type.CustomAttributes.Any(Attribute =>
+                        Attribute.AttributeType.FullName == _notPlaceableAttributeType.FullName) == false)
+                {
+                    var constructor = _notPlaceableAttributeType.GetConstructors().FirstOrDefault();
+
+                    var constructorRef = ModuleDefinition.ImportReference(constructor);
+
+                    var attribute = new CustomAttribute(constructorRef);
+
+                    Type.CustomAttributes.Add(attribute);
+                }
             }
         }
 
@@ -675,7 +693,7 @@ namespace Weavers
                 .Where(Method => Method.CustomAttributes.Any(Attribute =>
                     Attribute.AttributeType.FullName == _serverAttributeType.FullName ||
                     Attribute.AttributeType.FullName == _clientAttributeType.FullName ||
-                    Attribute.AttributeType.FullName == _netMulticastAttributeAttributeType.FullName))
+                    Attribute.AttributeType.FullName == _netMulticastAttributeType.FullName))
                 .ToList();
 
             foreach (var method in rpcMethods)
@@ -1051,7 +1069,7 @@ namespace Weavers
                 definition = ModuleDefinition.ReadModule("");
             }
 
-            _pathAttributeType = definition.GetType("Script.CoreUObject.PathNameAttribute");
+            _pathNameAttributeType = definition.GetType("Script.CoreUObject.PathNameAttribute");
 
             _structRegisterImplementation = definition.GetType("Script.Library.UStructImplementation").Methods
                 .FirstOrDefault(Method => Method.Name == "UStruct_RegisterImplementation");
@@ -1065,7 +1083,9 @@ namespace Weavers
 
             _serverAttributeType = definition.GetType("Script.Dynamic.ServerAttribute");
 
-            _netMulticastAttributeAttributeType = definition.GetType("Script.Dynamic.NetMulticastAttribute");
+            _netMulticastAttributeType = definition.GetType("Script.Dynamic.NetMulticastAttribute");
+
+            _notPlaceableAttributeType = definition.GetType("Script.Dynamic.NotPlaceableAttribute");
 
             _overrideAttributeType = definition.GetType("Script.CoreUObject.OverrideAttribute");
 

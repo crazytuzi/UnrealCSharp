@@ -41,8 +41,6 @@ private:
 
 #if WITH_EDITOR
 	static void ReInstance(UDynamicScriptStruct* InOldScriptStruct, UDynamicScriptStruct* InNewScriptStruct);
-
-	static void GeneratorMetaData(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct);
 #endif
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct);

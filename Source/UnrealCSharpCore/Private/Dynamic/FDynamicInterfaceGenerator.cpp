@@ -179,9 +179,7 @@ void FDynamicInterfaceGenerator::BeginGenerator(UClass* InClass, UClass* InParen
 
 void FDynamicInterfaceGenerator::ProcessGenerator(MonoClass* InMonoClass, UClass* InClass)
 {
-#if WITH_EDITOR
-	GeneratorMetaData(InMonoClass, InClass);
-#endif
+	FDynamicGeneratorCore::SetFlags(InClass, FMonoDomain::Custom_Attrs_From_Class(InMonoClass));
 
 	GeneratorFunction(InMonoClass, InClass);
 }
@@ -316,12 +314,6 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 		}
 	}
 }
-
-void FDynamicInterfaceGenerator::GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass)
-{
-	FDynamicGeneratorCore::SetMetaData(InMonoClass, InClass, CLASS_U_INTERFACE_ATTRIBUTE);
-}
-
 #endif
 
 void FDynamicInterfaceGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)

@@ -36,8 +36,6 @@ private:
 
 #if WITH_EDITOR
 	static void ReInstance(UEnum* InEnum);
-
-	static void GeneratorMetaData(MonoClass* InMonoClass, UEnum* InEnum);
 #endif
 
 	static void GeneratorEnumerator(MonoClass* InMonoClass, UEnum* InEnum);

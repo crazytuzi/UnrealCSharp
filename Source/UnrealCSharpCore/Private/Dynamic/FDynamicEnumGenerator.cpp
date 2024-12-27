@@ -132,9 +132,7 @@ void FDynamicEnumGenerator::BeginGenerator(const UEnum* InEnum)
 
 void FDynamicEnumGenerator::ProcessGenerator(MonoClass* InMonoClass, UEnum* InEnum)
 {
-#if WITH_EDITOR
-	GeneratorMetaData(InMonoClass, InEnum);
-#endif
+	FDynamicGeneratorCore::SetFlags(InEnum, FMonoDomain::Custom_Attrs_From_Class(InMonoClass));
 
 	GeneratorEnumerator(InMonoClass, InEnum);
 }
@@ -258,11 +256,6 @@ void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 			FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
 		}
 	}
-}
-
-void FDynamicEnumGenerator::GeneratorMetaData(MonoClass* InMonoClass, UEnum* InEnum)
-{
-	FDynamicGeneratorCore::SetMetaData(InMonoClass, InEnum, CLASS_U_ENUM_ATTRIBUTE);
 }
 #endif
 

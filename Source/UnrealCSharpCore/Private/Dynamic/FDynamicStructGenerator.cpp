@@ -170,9 +170,7 @@ void FDynamicStructGenerator::BeginGenerator(UDynamicScriptStruct* InScriptStruc
 
 void FDynamicStructGenerator::ProcessGenerator(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct)
 {
-#if WITH_EDITOR
-	GeneratorMetaData(InMonoClass, InScriptStruct);
-#endif
+	FDynamicGeneratorCore::SetFlags(InScriptStruct, FMonoDomain::Custom_Attrs_From_Class(InMonoClass));
 
 	GeneratorProperty(InMonoClass, InScriptStruct);
 }
@@ -385,11 +383,6 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 	InOldScriptStruct->RemoveFromRoot();
 
 	InOldScriptStruct->MarkAsGarbage();
-}
-
-void FDynamicStructGenerator::GeneratorMetaData(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct)
-{
-	FDynamicGeneratorCore::SetMetaData(InMonoClass, InScriptStruct, CLASS_U_STRUCT_ATTRIBUTE);
 }
 #endif
 

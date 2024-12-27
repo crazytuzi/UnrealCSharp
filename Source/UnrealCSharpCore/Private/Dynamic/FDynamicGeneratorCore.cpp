@@ -553,7 +553,7 @@ FString FDynamicGeneratorCore::GetClassNameSpace()
 	return FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass());
 }
 
-void FDynamicGeneratorCore::SetPropertyFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
 	if (InProperty == nullptr || InMonoCustomAttrInfo == nullptr)
 	{
@@ -791,7 +791,7 @@ enum class EDynamicFunctionExportFlags
 	//									= 0x00000100,
 };
 
-void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
 	if (InFunction == nullptr || InMonoCustomAttrInfo == nullptr)
 	{
@@ -1019,6 +1019,68 @@ void FDynamicGeneratorCore::SetFunctionFlags(UFunction* InFunction, MonoCustomAt
 #endif
 }
 
+void FDynamicGeneratorCore::SetFlags(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	if (InClass == nullptr || InMonoCustomAttrInfo == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC),
+		InClass->IsChildOf(UInterface::StaticClass()) ? CLASS_U_INTERFACE_ATTRIBUTE : CLASS_U_CLASS_ATTRIBUTE);
+
+	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
+	{
+#if WITH_EDITOR
+		if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NOT_PLACEABLE_ATTRIBUTE))
+		{
+			InClass->ClassFlags |= CLASS_NotPlaceable;
+		}
+#endif
+
+#if WITH_EDITOR
+		SetMetaData(InClass, InMonoCustomAttrInfo);
+#endif
+	}
+}
+
+void FDynamicGeneratorCore::SetFlags(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	if (InScriptStruct == nullptr || InMonoCustomAttrInfo == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_STRUCT_ATTRIBUTE);
+
+	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
+	{
+#if WITH_EDITOR
+		SetMetaData(InScriptStruct, InMonoCustomAttrInfo);
+#endif
+	}
+}
+
+void FDynamicGeneratorCore::SetFlags(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	if (InEnum == nullptr || InMonoCustomAttrInfo == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_ENUM_ATTRIBUTE);
+
+	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
+	{
+#if WITH_EDITOR
+		SetMetaData(InEnum, InMonoCustomAttrInfo);
+#endif
+	}
+}
+
 #if WITH_EDITOR
 void FDynamicGeneratorCore::SetMetaData(FField* InField, const FString& InAttribute, const FString& InValue)
 {
@@ -1046,107 +1108,6 @@ static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
 	InSetMetaData();
 }
 
-void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, const FString& InAttribute,
-                                        const TFunction<void(MonoCustomAttrInfo*)>& InSetMetaData)
-{
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttribute);
-
-	if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass))
-	{
-		if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
-		{
-			InSetMetaData(Attrs);
-		}
-	}
-}
-
-void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UClass* InClass, const FString& InAttribute)
-{
-	if (InMonoClass == nullptr || InClass == nullptr)
-	{
-		return;
-	}
-
-	SetMetaData(InMonoClass, InAttribute,
-	            [InClass](MonoCustomAttrInfo* InMonoCustomAttrInfo)
-	            {
-		            SetFieldMetaData(InClass,
-		                             InClass->IsChildOf(UInterface::StaticClass())
-			                             ? InterfaceMetaDataAttrs
-			                             : ClassMetaDataAttrs,
-		                             InMonoCustomAttrInfo, [InClass, InMonoCustomAttrInfo]()
-		                             {
-			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLASS_GROUP_ATTRIBUTE))
-			                             {
-				                             SetMetaData(InClass, FString(TEXT("ClassGroupNamesAttribute")),
-				                                         *AttrGetValue(InMonoCustomAttrInfo,
-				                                                       *CLASS_CLASS_GROUP_ATTRIBUTE));
-			                             }
-
-			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_MINIMAL_API_ATTRIBUTE))
-			                             {
-				                             SetMetaData(InClass, CLASS_MINIMAL_API_ATTRIBUTE, TEXT("true"));
-			                             }
-
-			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
-			                             {
-				                             SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
-			                             }
-
-			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINTABLE_ATTRIBUTE))
-			                             {
-				                             SetMetaData(InClass, CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE, TEXT("true"));
-
-				                             SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
-			                             }
-		                             });
-	            });
-}
-
-void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct,
-                                        const FString& InAttribute)
-{
-	if (InMonoClass == nullptr || InScriptStruct == nullptr)
-	{
-		return;
-	}
-
-	SetMetaData(InMonoClass, InAttribute,
-	            [InScriptStruct](MonoCustomAttrInfo* InMonoCustomAttrInfo)
-	            {
-		            SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo,
-		                             [InScriptStruct, InMonoCustomAttrInfo]()
-		                             {
-			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
-			                             {
-				                             SetMetaData(InScriptStruct, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
-			                             }
-		                             });
-	            });
-}
-
-void FDynamicGeneratorCore::SetMetaData(MonoClass* InMonoClass, UEnum* InEnum, const FString& InAttribute)
-{
-	if (InMonoClass == nullptr || InEnum == nullptr)
-	{
-		return;
-	}
-
-	SetMetaData(InMonoClass, InAttribute,
-	            [InEnum](MonoCustomAttrInfo* InMonoCustomAttrInfo)
-	            {
-		            SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo,
-		                             [InEnum, InMonoCustomAttrInfo]()
-		                             {
-			                             if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
-			                             {
-				                             SetMetaData(InEnum, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
-			                             }
-		                             });
-	            });
-}
-
 void FDynamicGeneratorCore::SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
 	SetFieldMetaData(InProperty, PropertyMetaDataAttrs, InMonoCustomAttrInfo, []()
@@ -1159,6 +1120,72 @@ void FDynamicGeneratorCore::SetMetaData(UFunction* InFunction, MonoCustomAttrInf
 	SetFieldMetaData(InFunction, FunctionMetaDataAttrs, InMonoCustomAttrInfo, []()
 	{
 	});
+}
+
+void FDynamicGeneratorCore::SetMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	SetFieldMetaData(InClass, InClass->IsChildOf(UInterface::StaticClass())
+		                          ? InterfaceMetaDataAttrs
+		                          : ClassMetaDataAttrs,
+	                 InMonoCustomAttrInfo, [InClass, InMonoCustomAttrInfo]()
+	                 {
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLASS_GROUP_ATTRIBUTE))
+		                 {
+			                 SetMetaData(InClass, FString(TEXT("ClassGroupNamesAttribute")),
+			                             *AttrGetValue(InMonoCustomAttrInfo,
+			                                           *CLASS_CLASS_GROUP_ATTRIBUTE));
+		                 }
+
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_MINIMAL_API_ATTRIBUTE))
+		                 {
+			                 SetMetaData(InClass, CLASS_MINIMAL_API_ATTRIBUTE, TEXT("true"));
+		                 }
+
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		                 {
+			                 SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+		                 }
+
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINTABLE_ATTRIBUTE))
+		                 {
+			                 SetMetaData(InClass, CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE, TEXT("true"));
+
+			                 SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+		                 }
+	                 });
+}
+
+void FDynamicGeneratorCore::SetMetaData(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	if (InScriptStruct == nullptr || InScriptStruct == nullptr)
+	{
+		return;
+	}
+
+	SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo, [InScriptStruct, InMonoCustomAttrInfo]()
+	{
+		if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		{
+			SetMetaData(InScriptStruct, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+		}
+	});
+}
+
+void FDynamicGeneratorCore::SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+{
+	if (InEnum == nullptr || InMonoCustomAttrInfo == nullptr)
+	{
+		return;
+	}
+
+	SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo,
+	                 [InEnum, InMonoCustomAttrInfo]()
+	                 {
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		                 {
+			                 SetMetaData(InEnum, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+		                 }
+	                 });
 }
 #endif
 
@@ -1227,7 +1254,7 @@ void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* In
 				const auto CppProperty = FTypeBridge::Factory<true>(ReflectionType, InField, PropertyName,
 				                                                    EObjectFlags::RF_Public);
 
-				SetPropertyFlags(CppProperty, Attrs);
+				SetFlags(CppProperty, Attrs);
 
 				InField->AddCppProperty(CppProperty);
 
@@ -1339,7 +1366,7 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* In
 
 				InClass->Children = Function;
 
-				SetFunctionFlags(Function, Attrs);
+				SetFlags(Function, Attrs);
 
 				InClass->AddFunctionToFunctionMap(Function, MethodName);
 
