@@ -66,6 +66,8 @@ void FDynamicClassGenerator::Generator()
 
 		                                 FDynamicGeneratorCore::GeneratorFunction(InMonoClass, Node);
 
+		                                 FDynamicGeneratorCore::GeneratorInterface(InMonoClass, Node);
+
 		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
 }

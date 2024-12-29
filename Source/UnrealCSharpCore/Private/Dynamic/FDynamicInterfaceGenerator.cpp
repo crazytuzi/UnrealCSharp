@@ -318,24 +318,10 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 
 void FDynamicInterfaceGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)
 {
-	FDynamicGeneratorCore::GeneratorFunction(UInterfaceToIInterface(InMonoClass),
+	FDynamicGeneratorCore::GeneratorFunction(FDynamicGeneratorCore::UInterfaceToIInterface(InMonoClass),
 	                                         InClass,
 	                                         [](const UFunction* InFunction)
 	                                         {
 		                                         InFunction->SetInternalFlags(EInternalObjectFlags::Native);
 	                                         });
-}
-
-MonoClass* FDynamicInterfaceGenerator::UInterfaceToIInterface(MonoClass* InMonoClass)
-{
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
-
-	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
-
-	return FMonoDomain::Class_From_Name(NameSpace,
-	                                    FString::Printf(TEXT(
-		                                    "I%s"
-	                                    ),
-	                                                    *ClassName.RightChop(1)
-	                                    ));
 }

@@ -489,6 +489,32 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, FDynamicDe
 	}
 }
 
+void FDynamicGeneratorCore::GeneratorInterface(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode)
+{
+	if (InMonoClass == nullptr)
+	{
+		return;
+	}
+
+	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_INTERFACE_ATTRIBUTE);
+
+	void* Iterator = nullptr;
+
+	while (const auto Interface = FMonoDomain::Class_Get_Interfaces(InMonoClass, &Iterator))
+	{
+		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(Interface))
+		{
+			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			{
+				const auto ClassName = FString(FMonoDomain::Class_Get_Name(IInterfaceToUInterface(Interface)));
+
+				OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
+			}
+		}
+	}
+}
+
 bool FDynamicGeneratorCore::ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName)
 {
 	return AttrsHasAttr(FMonoDomain::Custom_Attrs_From_Class(InMonoClass), InAttributeName);
@@ -1374,4 +1400,32 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* In
 			}
 		}
 	}
+}
+
+MonoClass* FDynamicGeneratorCore::UInterfaceToIInterface(MonoClass* InMonoClass)
+{
+	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
+
+	return FMonoDomain::Class_From_Name(NameSpace,
+	                                    FString::Printf(TEXT(
+		                                    "I%s"
+	                                    ),
+	                                                    *ClassName.RightChop(1)
+	                                    ));
+}
+
+MonoClass* FDynamicGeneratorCore::IInterfaceToUInterface(MonoClass* InMonoClass)
+{
+	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
+
+	return FMonoDomain::Class_From_Name(NameSpace,
+	                                    FString::Printf(TEXT(
+		                                    "U%s"
+	                                    ),
+	                                                    *ClassName.RightChop(1)
+	                                    ));
 }

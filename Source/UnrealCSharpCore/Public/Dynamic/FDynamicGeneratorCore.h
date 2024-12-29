@@ -34,6 +34,8 @@ public:
 
 	static void GeneratorFunction(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);
 
+	static void GeneratorInterface(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);
+
 	static bool ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName);
 
 	static void Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator);
@@ -93,6 +95,10 @@ public:
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass,
 	                              const TFunction<void(const UFunction* InFunction)>& InGenerator);
+
+	static MonoClass* UInterfaceToIInterface(MonoClass* InMonoClass);
+
+	static MonoClass* IInterfaceToUInterface(MonoClass* InMonoClass);
 
 private:
 #if WITH_EDITOR
