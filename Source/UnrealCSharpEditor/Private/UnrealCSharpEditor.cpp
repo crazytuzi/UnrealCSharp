@@ -24,12 +24,20 @@
 #include "ToolBar/UnrealCSharpBlueprintToolBar.h"
 #include "DetailCustomization/GameContentDirectoryPathCustomization.h"
 #include "DetailCustomization/ProjectDirectoryPathCustomization.h"
+#include "Setting/UnrealCSharpEditorSetting.h"
+#include "Setting/UnrealCSharpSetting.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 
 void FUnrealCSharpEditorModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+
+	UUnrealCSharpEditorSetting::RegisterSettings();
+
+	UUnrealCSharpSetting::RegisterSettings();
+
+	FDynamicGenerator::Generator();
 
 	FUnrealCSharpEditorStyle::Initialize();
 
@@ -149,6 +157,10 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 	DynamicDataSource.Reset();
 
 	FTSTicker::GetCoreTicker().RemoveTicker(TickHandle);
+
+	UUnrealCSharpEditorSetting::UnregisterSettings();
+
+	UUnrealCSharpSetting::UnregisterSettings();
 }
 
 void FUnrealCSharpEditorModule::Tick(const float InDeltaTime)

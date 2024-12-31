@@ -16,7 +16,8 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	  OverrideFunctionNameSuffix(DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX),
 	  AssemblyLoader(UAssemblyLoader::StaticClass()),
 	  bEnableDebug(false),
-	  Port(0)
+	  Port(0),
+	  bEnableImmediatelyActive(true)
 {
 }
 
@@ -108,6 +109,11 @@ const FString& UUnrealCSharpSetting::GetHost() const
 int32 UUnrealCSharpSetting::GetPort() const
 {
 	return Port;
+}
+
+bool UUnrealCSharpSetting::IsEnableImmediatelyActive() const
+{
+	return bEnableImmediatelyActive;
 }
 
 #undef LOCTEXT_NAMESPACE

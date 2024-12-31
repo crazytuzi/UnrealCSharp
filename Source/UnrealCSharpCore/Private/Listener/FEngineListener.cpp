@@ -1,5 +1,7 @@
 ﻿#include "Listener/FEngineListener.h"
-#include "UnrealCSharp.h"
+#include "UnrealCSharpCore.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Setting/UnrealCSharpSetting.h"
 
 FEngineListener::FEngineListener()
 {
@@ -9,7 +11,6 @@ FEngineListener::FEngineListener()
 	OnPostPIEStartedDelegateHandle = FEditorDelegates::PostPIEStarted.AddRaw(this, &FEngineListener::OnPostPIEStarted);
 
 	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEngineListener::OnCancelPIE);
-
 #else
 	OnPostEngineInitHandle = FCoreDelegates::OnPostEngineInit.AddRaw(this, &FEngineListener::OnPostEngineInit);
 
@@ -50,7 +51,13 @@ FEngineListener::~FEngineListener()
 #if WITH_EDITOR
 void FEngineListener::OnPreBeginPIE(const bool)
 {
-	FUnrealCSharpModule::Get().SetActive(true);
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		if (UnrealCSharpSetting->IsEnableImmediatelyActive())
+		{
+			FUnrealCSharpCoreModule::Get().SetActive(true);
+		}
+	}
 }
 
 void FEngineListener::OnPostPIEStarted(const bool)
@@ -59,17 +66,22 @@ void FEngineListener::OnPostPIEStarted(const bool)
 
 void FEngineListener::OnCancelPIE()
 {
-	FUnrealCSharpModule::Get().SetActive(false);
+	FUnrealCSharpCoreModule::Get().SetActive(false);
 }
-
 #else
 void FEngineListener::OnPostEngineInit()
 {
-	FUnrealCSharpModule::Get().SetActive(true);
+	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		if (UnrealCSharpSetting->IsEnableImmediatelyActive())
+		{
+			FUnrealCSharpCoreModule::Get().SetActive(true);
+		}
+	}
 }
 
 void FEngineListener::OnPreExit()
 {
-	FUnrealCSharpModule::Get().SetActive(false);
+	FUnrealCSharpCoreModule::Get().SetActive(false);
 }
 #endif

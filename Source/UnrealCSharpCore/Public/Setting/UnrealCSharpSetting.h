@@ -102,6 +102,8 @@ public:
 
 	int32 GetPort() const;
 
+	bool IsEnableImmediatelyActive() const;
+
 private:
 	UPROPERTY(Config, EditAnywhere, Category = Publish, meta = (RelativePath))
 	FGameContentDirectoryPath PublishDirectory;
@@ -138,4 +140,7 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Debug)
 	int32 Port;
+
+	UPROPERTY(Config, EditAnywhere, Category = Module)
+	bool bEnableImmediatelyActive;
 };
