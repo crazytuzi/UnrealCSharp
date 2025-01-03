@@ -20,7 +20,7 @@ void FObjectRegistry::Deinitialize()
 {
 	for (auto& [Key, PLACEHOLDER] : GarbageCollectionHandle2Object.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 	}
 
 	GarbageCollectionHandle2Object.Empty();
@@ -85,33 +85,7 @@ bool FObjectRegistry::RemoveReference(const UObject* InObject)
 
 		GarbageCollectionHandle2Object.Remove(*FoundGarbageCollectionHandle);
 
-		FGarbageCollectionHandle::Free<false>(*FoundGarbageCollectionHandle);
-
-		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
-
-		return true;
-	}
-
-	return false;
-}
-
-bool FObjectRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
-{
-	if (const auto FoundValue = GarbageCollectionHandle2Object.Find(InGarbageCollectionHandle))
-	{
-		if (const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(*FoundValue))
-		{
-			if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
-			{
-				FGarbageCollectionHandle::Free<false>(*FoundGarbageCollectionHandle);
-
-				(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
-
-				Object2GarbageCollectionHandleMap.Remove(*FoundValue);
-			}
-		}
-
-		GarbageCollectionHandle2Object.Remove(InGarbageCollectionHandle);
+		FGarbageCollectionHandle::Free(*FoundGarbageCollectionHandle);
 
 		return true;
 	}

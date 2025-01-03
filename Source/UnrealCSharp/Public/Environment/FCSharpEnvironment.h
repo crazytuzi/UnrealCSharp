@@ -5,7 +5,6 @@
 #include "Registry/FClassRegistry.h"
 #include "Registry/FMultiRegistry.h"
 #include "Registry/FStringRegistry.h"
-#include "Registry/FReferenceRegistry.h"
 #include "Registry/FObjectRegistry.h"
 #include "Registry/FStructRegistry.h"
 #include "Template/TIsUObject.inl"
@@ -92,9 +91,6 @@ public:
 	void RemovePropertyDescriptor(uint32 InPropertyHash) const;
 
 public:
-	template <typename T>
-	auto GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct) const -> void*;
-
 	template <typename T, typename U>
 	auto GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
@@ -107,23 +103,14 @@ public:
 
 	bool RemoveObjectReference(const UObject* InObject) const;
 
-	bool RemoveObjectReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-	template <auto IsNeedFree>
+	template <auto IsNeedFree, auto IsMember>
 	auto AddStructReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject) const;
-
-	bool AddStructReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct,
-	                        const void* InStruct, MonoObject* InMonoObject) const;
 
 	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct) const;
 
 	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	bool RemoveStructReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
-
-	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject) const;
-
-	FGarbageCollectionHandle GetGarbageCollectionHandle(void* InAddress, const FProperty* InProperty) const;
 
 public:
 	template <typename T>
@@ -132,12 +119,8 @@ public:
 	template <typename T>
 	auto GetContainerObject(void* InAddress) const;
 
-	template <typename T>
-	auto AddContainerReference(T* InValue, MonoObject* InMonoObject) const;
-
-	template <typename T>
-	auto AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
-	                           MonoObject* InMonoObject) const;
+	template <typename T, auto IsMember>
+	auto AddContainerReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto RemoveContainerReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -149,12 +132,8 @@ public:
 	template <typename T>
 	auto GetDelegateObject(void* InAddress) const;
 
-	template <typename T>
-	auto AddDelegateReference(T* InValue, MonoObject* InMonoObject) const;
-
-	template <typename T>
-	auto AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
-	                          MonoObject* InMonoObject) const;
+	template <typename T, auto IsMember>
+	auto AddDelegateReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -188,7 +167,7 @@ public:
 	template <typename T>
 	auto GetMultiObject(void* InAddress) const;
 
-	template <typename T, auto IsNeedFree>
+	template <typename T, auto IsNeedFree, auto IsMember>
 	auto AddMultiReference(MonoObject* InMonoObject, void* InValue) const;
 
 	template <typename T>
@@ -201,7 +180,7 @@ public:
 	template <typename T>
 	auto GetStringObject(void* InAddress) const;
 
-	template <typename T, auto IsNeedFree>
+	template <typename T, auto IsNeedFree, auto IsMember>
 	auto AddStringReference(MonoObject* InMonoObject, void* InValue) const;
 
 	template <typename T>
@@ -213,7 +192,7 @@ public:
 	template <typename T>
 	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
-	template <typename T, auto IsNeedFree>
+	template <typename T, auto IsNeedFree, auto IsMember>
 	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject) const;
 
 	template <typename T>
@@ -292,11 +271,6 @@ public:
 	};
 
 public:
-	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference) const;
-
-	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
-
-public:
 	template <typename T>
 	auto GetRegistry();
 
@@ -325,8 +299,6 @@ private:
 	class FCSharpBind* CSharpBind;
 
 	FClassRegistry* ClassRegistry;
-
-	FReferenceRegistry* ReferenceRegistry;
 
 	FObjectRegistry* ObjectRegistry;
 

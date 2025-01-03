@@ -5,7 +5,7 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true>(Object, Src);
+	FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(Object, Src);
 
 	*Dest = Object;
 }
@@ -18,7 +18,7 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 	{
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FText, false>(Object, Src);
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FText, false, true>(Object, Src);
 	}
 
 	*Dest = Object;

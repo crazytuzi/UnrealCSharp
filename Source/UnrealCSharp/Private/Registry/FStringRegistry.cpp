@@ -18,7 +18,7 @@ void FStringRegistry::Deinitialize()
 {
 	for (auto& [Key, Value] : NameGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{
@@ -34,7 +34,7 @@ void FStringRegistry::Deinitialize()
 
 	for (auto& [Key, Value] : StringGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{
@@ -50,7 +50,7 @@ void FStringRegistry::Deinitialize()
 
 	for (auto& [Key, Value] : TextGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{

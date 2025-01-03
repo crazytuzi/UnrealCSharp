@@ -5,7 +5,7 @@ void FSubclassOfPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) 
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true>(
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true, false>(
 		Object, Src);
 
 	*Dest = Object;
@@ -19,7 +19,7 @@ void FSubclassOfPropertyDescriptor::Get(void* Src, void** Dest, std::false_type)
 	{
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, false>(
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, false, true>(
 			Object, Src);
 	}
 

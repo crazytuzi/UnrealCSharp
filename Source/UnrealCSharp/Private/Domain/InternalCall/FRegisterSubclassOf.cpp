@@ -13,7 +13,7 @@ namespace
 
 			const auto SubclassOf = new TSubclassOf<UObject>(FoundClass);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true, false>(
 				InMonoObject, SubclassOf);
 		}
 

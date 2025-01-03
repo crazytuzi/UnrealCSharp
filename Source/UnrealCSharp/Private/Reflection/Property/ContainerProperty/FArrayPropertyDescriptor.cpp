@@ -40,11 +40,8 @@ MonoObject* FArrayPropertyDescriptor::NewRef(void* InAddress) const
 		const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
 		                                          false, false);
 
-		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-			InAddress, Property);
-
-		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerGarbageCollectionHandle, InAddress, ArrayHelper, Object);
+		FCSharpEnvironment::GetEnvironment().AddContainerReference<FArrayHelper, true>(
+			InAddress, ArrayHelper, Object);
 	}
 
 	return Object;
@@ -57,7 +54,7 @@ MonoObject* FArrayPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIs
 	const auto ArrayHelper = new FArrayHelper(Property->Inner, InAddress,
 	                                          bIsCopy, false);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference<FArrayHelper, false>(InAddress, ArrayHelper, Object);
 
 	return Object;
 }

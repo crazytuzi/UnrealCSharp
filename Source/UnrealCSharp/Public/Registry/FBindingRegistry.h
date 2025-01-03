@@ -75,11 +75,8 @@ public:
 	MonoObject* GetObject(const FBindingValueMapping::FAddressType InAddress);
 
 public:
-	template <typename T, auto IsNeedFree>
+	template <typename T, auto IsNeedFree, auto IsMember>
 	auto AddReference(const T* InObject, MonoObject* InMonoObject);
-
-	template <typename T>
-	auto AddReference(const FGarbageCollectionHandle& InOwner, const T* InObject, MonoObject* InMonoObject);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 

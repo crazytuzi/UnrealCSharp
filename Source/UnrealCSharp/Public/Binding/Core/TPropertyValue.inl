@@ -66,7 +66,7 @@ struct TStringPropertyValue
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false>(
+			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, true>(
 				SrcMonoObject, InMember);
 		}
 
@@ -82,12 +82,12 @@ struct TStringPropertyValue
 
 		if constexpr (IsReference)
 		{
-			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false>(
+			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, false>(
 				SrcMonoObject, InMember);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, true>(
+			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, true, false>(
 				SrcMonoObject, new std::decay_t<T>(*InMember));
 		}
 
@@ -113,7 +113,7 @@ struct TMultiPropertyValue
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false, true>(
 				SrcMonoObject, InMember);
 		}
 
@@ -129,12 +129,12 @@ struct TMultiPropertyValue
 
 		if constexpr (IsReference)
 		{
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false, false>(
 				SrcMonoObject, InMember);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, true>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, true, false>(
 				SrcMonoObject, new std::decay_t<T>(*InMember));
 		}
 
@@ -160,8 +160,8 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().AddBindingReference(
-				InGarbageCollectionHandle, SrcMonoObject, InMember);
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false, true>(
+				SrcMonoObject, InMember);
 		}
 
 		return SrcMonoObject;
@@ -176,12 +176,12 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 
 		if constexpr (IsReference)
 		{
-			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false>(
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false, false>(
 				SrcMonoObject, InMember);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, true>(
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, true, false>(
 				SrcMonoObject, new std::decay_t<T>(*InMember));
 		}
 
@@ -207,8 +207,8 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 
 			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().AddBindingReference(
-				InGarbageCollectionHandle, SrcMonoObject, *InMember);
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false, true>(
+				SrcMonoObject, *InMember);
 		}
 
 		return SrcMonoObject;
@@ -223,12 +223,12 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 
 		if constexpr (IsReference)
 		{
-			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false>(
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false, false>(
 				SrcMonoObject, InMember);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, true>(
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, true, false>(
 				SrcMonoObject, new std::decay_t<T>(*InMember));
 		}
 
@@ -258,8 +258,8 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 
 			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<std::decay_t<T>>::Get());
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(
-				InGarbageCollectionHandle, TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false, true>(
+				TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
@@ -276,12 +276,12 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 
 		if constexpr (IsReference)
 		{
-			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false, false>(
 				TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcMonoObject);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true, false>(
 				TBaseStructure<std::decay_t<T>>::Get(), new std::decay_t<T>(*InMember), SrcMonoObject);
 		}
 
@@ -331,13 +331,13 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 
 		if constexpr (IsReference)
 		{
-			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false, false>(
 				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), InMember,
 				SrcMonoObject);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true, false>(
 				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), new std::decay_t<T>(*InMember),
 				SrcMonoObject);
 		}
@@ -486,8 +486,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 
 			FCSharpEnvironment::GetEnvironment().Bind<false>(std::decay_t<T>::StaticStruct());
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference(
-				InGarbageCollectionHandle, std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false, true>(
+				std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
@@ -504,12 +504,12 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 
 		if constexpr (IsReference)
 		{
-			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false, false>(
 				std::decay_t<T>::StaticStruct(), InMember, SrcMonoObject);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true, false>(
 				std::decay_t<T>::StaticStruct(), new std::decay_t<T>(*InMember), SrcMonoObject);
 		}
 
@@ -606,8 +606,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty,
 			                                      InMember, false, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				InGarbageCollectionHandle, InMember, MapHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FMapHelper, true>(
+				InMember, MapHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
@@ -657,16 +657,16 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty,
 			                                      InMember, false, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				MapHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FMapHelper, false>(
+				InMember, MapHelper, SrcMonoObject);
 		}
 		else
 		{
 			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty,
 			                                      new std::decay_t<T>(*InMember), true, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				MapHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FMapHelper, false>(
+				InMember, MapHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
@@ -724,8 +724,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 
 			const auto SetHelper = new FSetHelper(Property, InMember, false, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				InGarbageCollectionHandle, InMember, SetHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FSetHelper, true>(
+				InMember, SetHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
@@ -758,15 +758,15 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 		{
 			const auto SetHelper = new FSetHelper(Property, InMember, false, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				SetHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FSetHelper, false>(
+				InMember, SetHelper, SrcMonoObject);
 		}
 		else
 		{
 			const auto SetHelper = new FSetHelper(Property, new std::decay_t<T>(*InMember), true, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				SetHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FSetHelper, false>(
+				InMember, SetHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
@@ -829,8 +829,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 
 			const auto ArrayHelper = new FArrayHelper(Property, InMember, false, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				InGarbageCollectionHandle, InMember, ArrayHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FArrayHelper, true>(
+				InMember, ArrayHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;
@@ -863,13 +863,15 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 		{
 			const auto ArrayHelper = new FArrayHelper(Property, InMember, false, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FArrayHelper, false>(
+				InMember, ArrayHelper, SrcMonoObject);
 		}
 		else
 		{
 			const auto ArrayHelper = new FArrayHelper(Property, new std::decay_t<T>(*InMember), true, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, SrcMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference<FArrayHelper, false>(
+				InMember, ArrayHelper, SrcMonoObject);
 		}
 
 		return SrcMonoObject;

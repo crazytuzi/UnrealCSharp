@@ -18,7 +18,7 @@ void FBindingRegistry::Deinitialize()
 {
 	for (auto& [Key, Value] : GarbageCollectionHandle2BindingAddress.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{

@@ -61,15 +61,11 @@ public:
 		return FDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
 	}
 
-	template <auto IsReset>
 	static auto Free(TGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
 		FDomain::GCHandle_Free_V2(InGarbageCollectionHandle);
 
-		if constexpr (IsReset)
-		{
-			InGarbageCollectionHandle = T();
-		}
+		InGarbageCollectionHandle = T();
 	}
 
 	static auto MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject,

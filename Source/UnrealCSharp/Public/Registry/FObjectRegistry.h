@@ -40,8 +40,6 @@ public:
 
 	bool RemoveReference(const UObject* InObject);
 
-	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
-
 private:
 	FObjectMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2Object;
 

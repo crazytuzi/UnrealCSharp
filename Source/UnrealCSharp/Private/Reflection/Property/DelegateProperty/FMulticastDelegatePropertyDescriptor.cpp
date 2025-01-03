@@ -53,11 +53,8 @@ MonoObject* FMulticastDelegatePropertyDescriptor::NewRef(void* InAddress) const
 
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
-			InAddress, Property);
-
-		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerGarbageCollectionHandle, InAddress,
-		                                                          MulticastDelegateHelper, Object);
+		FCSharpEnvironment::GetEnvironment().AddDelegateReference<FMulticastDelegateHelper, false>(
+			InAddress, MulticastDelegateHelper, Object);
 	}
 
 	return Object;
@@ -71,7 +68,8 @@ MonoObject* FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress) co
 
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(MulticastDelegateHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference<FMulticastDelegateHelper, false>(
+		InAddress, MulticastDelegateHelper, Object);
 
 	return Object;
 }

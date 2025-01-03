@@ -18,7 +18,7 @@ void FMultiRegistry::Deinitialize()
 {
 	for (auto& [Key, Value] : SubclassOfGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{
@@ -34,7 +34,7 @@ void FMultiRegistry::Deinitialize()
 
 	for (auto& [Key, Value] : WeakObjectPtrGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{
@@ -50,7 +50,7 @@ void FMultiRegistry::Deinitialize()
 
 	for (auto& [Key, Value] : LazyObjectPtrGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{
@@ -66,7 +66,7 @@ void FMultiRegistry::Deinitialize()
 
 	for (auto& [Key, Value] : SoftObjectPtrGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{
@@ -82,7 +82,7 @@ void FMultiRegistry::Deinitialize()
 
 	for (auto& [Key, Value] : ScriptInterfaceGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{
@@ -98,7 +98,7 @@ void FMultiRegistry::Deinitialize()
 
 	for (auto& [Key, Value] : SoftClassPtrGarbageCollectionHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 
 		if (Value.bNeedFree)
 		{

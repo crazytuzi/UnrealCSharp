@@ -58,48 +58,18 @@ auto FCSharpEnvironment::GetAddress(const FGarbageCollectionHandle& InGarbageCol
 	return TGetAddress<T, U>()(this, InGarbageCollectionHandle);
 }
 
-template <>
-inline auto FCSharpEnvironment::GetAddress<UObject>(const FGarbageCollectionHandle& InGarbageCollectionHandle,
-                                                    UStruct*& InStruct) const -> void*
-{
-	if (ObjectRegistry != nullptr)
-	{
-		if (const auto FoundObject = ObjectRegistry->GetAddress(InGarbageCollectionHandle, InStruct))
-		{
-			return FoundObject;
-		}
-	}
-
-	return nullptr;
-}
-
-template <>
-inline void* FCSharpEnvironment::GetAddress<UScriptStruct>(const FGarbageCollectionHandle& InGarbageCollectionHandle,
-                                                           UStruct*& InStruct) const
-{
-	if (StructRegistry != nullptr)
-	{
-		if (const auto FoundStruct = StructRegistry->GetAddress(InGarbageCollectionHandle, InStruct))
-		{
-			return FoundStruct;
-		}
-	}
-
-	return nullptr;
-}
-
 template <typename T>
 auto FCSharpEnvironment::GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return ObjectRegistry != nullptr ? Cast<T>(ObjectRegistry->GetObject(InGarbageCollectionHandle)) : nullptr;
 }
 
-template <auto IsNeedFree>
+template <auto IsNeedFree, auto IsMember>
 auto FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, const void* InStruct,
                                             MonoObject* InMonoObject) const
 {
 	return StructRegistry != nullptr
-		       ? StructRegistry->AddReference<IsNeedFree>(InScriptStruct, InStruct, InMonoObject)
+		       ? StructRegistry->AddReference<IsNeedFree, IsMember>(InScriptStruct, InStruct, InMonoObject)
 		       : false;
 }
 
@@ -119,22 +89,12 @@ auto FCSharpEnvironment::GetContainerObject(void* InAddress) const
 		       : nullptr;
 }
 
-template <typename T>
-auto FCSharpEnvironment::AddContainerReference(T* InValue, MonoObject* InMonoObject) const
+template <typename T, auto IsMember>
+auto FCSharpEnvironment::AddContainerReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const
 {
 	return ContainerRegistry != nullptr
-		       ? FContainerRegistry::TContainerRegistry<T>::AddReference(
-			       ContainerRegistry, InValue, InMonoObject)
-		       : false;
-}
-
-template <typename T>
-auto FCSharpEnvironment::AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
-                                               MonoObject* InMonoObject) const
-{
-	return ContainerRegistry != nullptr
-		       ? FContainerRegistry::TContainerRegistry<T>::AddReference(
-			       ContainerRegistry, InOwner, InAddress, InValue, InMonoObject)
+		       ? FContainerRegistry::TContainerRegistry<T>::AddReference<IsMember>(
+			       ContainerRegistry, InAddress, InValue, InMonoObject)
 		       : false;
 }
 
@@ -163,21 +123,11 @@ auto FCSharpEnvironment::GetDelegateObject(void* InAddress) const
 		       : nullptr;
 }
 
-template <typename T>
-auto FCSharpEnvironment::AddDelegateReference(T* InValue, MonoObject* InMonoObject) const
+template <typename T, auto IsMember>
+auto FCSharpEnvironment::AddDelegateReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const
 {
 	return DelegateRegistry != nullptr
-		       ? FDelegateRegistry::TDelegateRegistry<T>::AddReference(DelegateRegistry, InValue, InMonoObject)
-		       : false;
-}
-
-template <typename T>
-auto FCSharpEnvironment::AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
-                                              MonoObject* InMonoObject) const
-{
-	return DelegateRegistry != nullptr
-		       ? FDelegateRegistry::TDelegateRegistry<T>::AddReference(DelegateRegistry, InOwner, InAddress, InValue,
-		                                                               InMonoObject)
+		       ? FDelegateRegistry::TDelegateRegistry<T>::AddReference<IsMember>(DelegateRegistry, InAddress, InValue, InMonoObject)
 		       : false;
 }
 
@@ -205,11 +155,11 @@ auto FCSharpEnvironment::GetMultiObject(void* InAddress) const
 		       : nullptr;
 }
 
-template <typename T, auto IsNeedFree>
+template <typename T, auto IsNeedFree, auto IsMember>
 auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject, void* InValue) const
 {
 	return MultiRegistry != nullptr
-		       ? FMultiRegistry::TMultiRegistry<T, T>::template AddReference<IsNeedFree>(
+		       ? FMultiRegistry::TMultiRegistry<T, T>::template AddReference<IsNeedFree, IsMember>(
 			       MultiRegistry, InMonoObject, InValue)
 		       : false;
 }
@@ -238,11 +188,11 @@ auto FCSharpEnvironment::GetStringObject(void* InAddress) const
 		       : nullptr;
 }
 
-template <typename T, auto IsNeedFree>
+template <typename T, auto IsNeedFree, auto IsMember>
 auto FCSharpEnvironment::AddStringReference(MonoObject* InMonoObject, void* InValue) const
 {
 	return StringRegistry != nullptr
-		       ? FStringRegistry::TStringRegistry<T>::template AddReference<IsNeedFree>(
+		       ? FStringRegistry::TStringRegistry<T>::template AddReference<IsNeedFree, IsMember>(
 			       StringRegistry, InMonoObject, InValue)
 		       : false;
 }
@@ -263,10 +213,10 @@ auto FCSharpEnvironment::GetBinding(const FGarbageCollectionHandle& InGarbageCol
 		       : nullptr;
 }
 
-template <typename T, auto IsNeedFree>
+template <typename T, auto IsNeedFree, auto IsMember>
 auto FCSharpEnvironment::AddBindingReference(MonoObject* InMonoObject, const T* InObject) const
 {
-	return BindingRegistry != nullptr ? BindingRegistry->AddReference<T, IsNeedFree>(InObject, InMonoObject) : false;
+	return BindingRegistry != nullptr ? BindingRegistry->AddReference<T, IsNeedFree, IsMember>(InObject, InMonoObject) : false;
 }
 
 template <typename T>
@@ -286,10 +236,6 @@ auto FCSharpEnvironment::GetRegistry()
 	else if constexpr (std::is_same_v<T, FClassRegistry>)
 	{
 		return ClassRegistry;
-	}
-	else if constexpr (std::is_same_v<T, FReferenceRegistry>)
-	{
-		return ReferenceRegistry;
 	}
 	else if constexpr (std::is_same_v<T, FObjectRegistry>)
 	{

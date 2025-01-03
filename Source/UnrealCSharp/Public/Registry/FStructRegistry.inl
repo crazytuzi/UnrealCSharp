@@ -10,7 +10,7 @@ uint32 GetTypeHash(const FStructAddressBase& InStructAddressBase)
 	return HashCombineFast(GetTypeHash(InStructAddressBase.Value), GetTypeHash(InStructAddressBase.Address));
 }
 
-template <auto IsNeedFree>
+template <auto IsNeedFree, auto IsMember>
 auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject)
 {
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
@@ -20,6 +20,12 @@ auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* In
 		                                          const_cast<void*>(InStruct),
 		                                          IsNeedFree
 	                                          });
+
+	if constexpr (IsMember)
+	{
+		StructAddress2GarbageCollectionHandle.Add(
+		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), GarbageCollectionHandle);
+	}
 
 	return true;
 }

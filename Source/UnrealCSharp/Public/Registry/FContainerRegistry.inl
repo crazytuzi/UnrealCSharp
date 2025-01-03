@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "Reference/TContainerReference.h"
-
 template <
 	typename Class,
 	typename FContainerValueMapping,
@@ -34,30 +32,20 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 			       : nullptr;
 	}
 
-	static auto AddReference(Class* InRegistry, typename FContainerValueMapping::ValueType InValue,
-	                         MonoObject* InMonoObject)
+	template <auto IsMember>
+	static auto AddReference(Class* InRegistry, const typename FContainerValueMapping::FAddressType InAddress,
+	                         typename FContainerValueMapping::ValueType InValue, MonoObject* InMonoObject)
 	{
 		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
+		if constexpr (IsMember)
+		{
+			(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
+		}
+		
 		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
 
 		return true;
-	}
-
-	static auto AddReference(Class* InRegistry, const FGarbageCollectionHandle& InOwner,
-	                         const typename FContainerValueMapping::FAddressType InAddress,
-	                         typename FContainerValueMapping::ValueType InValue, MonoObject* InMonoObject)
-	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
-
-		(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
-
-		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
-
-		return FCSharpEnvironment::GetEnvironment().AddReference(
-			InOwner,
-			new TContainerReference<std::remove_pointer_t<typename FContainerValueMapping::ValueType>>(
-				GarbageCollectionHandle));
 	}
 
 	static auto RemoveReference(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)

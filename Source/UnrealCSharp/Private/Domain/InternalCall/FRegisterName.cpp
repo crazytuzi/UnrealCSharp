@@ -12,7 +12,7 @@ namespace
 			const auto Name = new FName(UTF8_TO_TCHAR(
 				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue)));
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true>(InMonoObject, Name);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(InMonoObject, Name);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
@@ -49,7 +49,7 @@ namespace
 
 			const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true>(Object, new FName(NAME_None));
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(Object, new FName(NAME_None));
 
 			return Object;
 		}

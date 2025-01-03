@@ -25,7 +25,7 @@ void FDelegateRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 	}
 
 	DelegateGarbageCollectionHandle2Helper.Empty();
@@ -41,7 +41,7 @@ void FDelegateRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 	}
 
 	MulticastDelegateGarbageCollectionHandle2Helper.Empty();

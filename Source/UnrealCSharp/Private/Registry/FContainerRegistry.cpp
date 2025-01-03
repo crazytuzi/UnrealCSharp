@@ -25,7 +25,7 @@ void FContainerRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 	}
 
 	ArrayGarbageCollectionHandle2Helper.Empty();
@@ -41,7 +41,7 @@ void FContainerRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 	}
 
 	MapGarbageCollectionHandle2Helper.Empty();
@@ -57,7 +57,7 @@ void FContainerRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FGarbageCollectionHandle::Free(Key);
 	}
 
 	SetGarbageCollectionHandle2Helper.Empty();

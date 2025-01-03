@@ -26,12 +26,12 @@ struct TConstructorHelper<std::tuple<Args...>>
 		{
 			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<Class>::Get());
 
-			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true, false>(
 				TBaseStructure<Class>::Get(), Value, InMonoObject);
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddBindingReference<Class, true>(InMonoObject, Value);
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<Class, true, false>(InMonoObject, Value);
 		}
 	}
 };
