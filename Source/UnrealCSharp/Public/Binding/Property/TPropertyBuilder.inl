@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMacro/BufferMacro.h"
 #include "Binding/Core/TPropertyValue.inl"
 #include "Binding/Core/TPropertyClass.inl"
 #include "Binding/TypeInfo/TTypeInfo.inl"
@@ -23,172 +24,92 @@ struct TPropertyBuilder
 {
 };
 
-template <typename Class, typename Result, auto Member, typename Enable = void>
-struct TPropertyInfoBuilder
-{
-};
-
-template <typename Class, typename Result, auto Member, typename Enable = void>
+template <typename Class, typename Result, auto Member>
 struct TPrimitivePropertyBuilder
 {
+	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, RETURN_BUFFER_SIGNATURE)
+	{
+		if constexpr (std::is_same_v<Class, void>)
+		{
+			*(std::remove_const_t<Result>*)RETURN_BUFFER = *Member;
+		}
+		else
+		{
+			if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+				FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+			{
+				*(std::remove_const_t<Result>*)RETURN_BUFFER = FoundObject->*Member;
+			}
+		}
+	}
+
+	static auto Set(const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE)
+	{
+		if constexpr (std::is_same_v<Class, void>)
+		{
+			*Member = *(Result*)IN_BUFFER;
+		}
+		else
+		{
+			if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+				FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+			{
+				FoundObject->*Member = *(Result*)IN_BUFFER;
+			}
+		}
+	}
+
+	static auto Info()
+	{
+		return TTypeInfo<Result, std::is_same_v<Class, void>>::Get();
+	}
 };
 
-template <typename Class, typename Result, auto Member, typename Enable = void>
+template <typename Class, typename Result, auto Member>
 struct TCompoundPropertyBuilder
 {
-};
-
-template <typename Class, typename Result, auto Member>
-struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>>
-{
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle) -> MonoObject*
+	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, RETURN_BUFFER_SIGNATURE)
 	{
-		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+		if constexpr (std::is_same_v<Class, void>)
 		{
-			return TPropertyValue<Result, Result>::Get(&(FoundObject->*Member),
-			                                           InGarbageCollectionHandle);
+			*reinterpret_cast<void**>(RETURN_BUFFER) = TPropertyValue<Result, Result>::Get(
+				const_cast<std::remove_const_t<Result>*>(Member),
+				InGarbageCollectionHandle);
 		}
-
-		return nullptr;
+		else
+		{
+			if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+				FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+			{
+				*reinterpret_cast<void**>(RETURN_BUFFER) = TPropertyValue<Result, Result>::Get(
+					&(FoundObject->*Member),
+					InGarbageCollectionHandle);
+			}
+		}
 	}
 
-	static auto Set(const FGarbageCollectionHandle InGarbageCollectionHandle, const FGarbageCollectionHandle InValue)
+	static auto Set(const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE)
 	{
-		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+		if constexpr (std::is_same_v<Class, void>)
 		{
-			FoundObject->*Member = TPropertyValue<Result, Result>::Set(InValue);
+			*const_cast<std::remove_const_t<Result>*>(Member) = TPropertyValue<Result, Result>::Set(
+				*(FGarbageCollectionHandle*)IN_BUFFER);
+		}
+		else
+		{
+			if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
+				FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+			{
+				FoundObject->*Member = TPropertyValue<Result, Result>::Set(
+					*(FGarbageCollectionHandle*)IN_BUFFER);
+			}
 		}
 	}
 
 	static auto Info()
 	{
-		return TTypeInfo<Result>::Get();
+		return TTypeInfo<Result, std::is_same_v<Class, void>>::Get();
 	}
-};
-
-template <typename Class, typename Result, auto Member>
-struct TPropertyInfoBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>>
-{
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
-	{
-		return TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member),
-		                                           InGarbageCollectionHandle);
-	}
-
-	static auto Set(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject* InValue)
-	{
-		*const_cast<std::remove_const_t<Result>*>(Member) = TPropertyValue<Result, Result>::Set(InValue);
-	}
-
-	static auto Info()
-	{
-		return TTypeInfo<Result, true>::Get();
-	}
-};
-
-template <typename Class, typename Result, auto Member>
-struct TPrimitivePropertyBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
-{
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
-		{
-			return FoundObject->*Member;
-		}
-
-		return Result{};
-	}
-
-	static auto Set(const FGarbageCollectionHandle InGarbageCollectionHandle, const Result InValue)
-	{
-		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
-		{
-			FoundObject->*Member = InValue;
-		}
-	}
-};
-
-template <typename Class, typename Result, auto Member>
-struct TPrimitivePropertyBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
-{
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle)
-	{
-		return *Member;
-	}
-
-	static auto Set(const FGarbageCollectionHandle InGarbageCollectionHandle, const Result InValue)
-	{
-		*const_cast<std::remove_const_t<Result>*>(Member) = InValue;
-	}
-};
-
-template <typename Class, typename Result, auto Member>
-struct TCompoundPropertyBuilder<Class, Result, Member, std::enable_if_t<!std::is_same_v<Class, void>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
-{
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue) -> MonoObject*
-	{
-		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
-		{
-			return TPropertyValue<Result, Result>::Get(&(FoundObject->*Member), InGarbageCollectionHandle);
-		}
-
-		return nullptr;
-	}
-};
-
-template <typename Class, typename Result, auto Member>
-struct TCompoundPropertyBuilder<Class, Result, Member, std::enable_if_t<std::is_same_v<Class, void>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
-{
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue)
-	{
-		return TPropertyValue<Result, Result>::Get(const_cast<std::remove_const_t<Result>*>(Member),
-		                                           InGarbageCollectionHandle);
-	}
-};
-
-template <typename Class, typename Result, auto Member>
-struct TStringPropertyBuilder :
-	TCompoundPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, auto Member>
-struct TContainerPropertyBuilder :
-	TCompoundPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, auto Member>
-struct TMultiPropertyBuilder :
-	TCompoundPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, auto Member>
-struct TBindingPropertyBuilder :
-	TCompoundPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, auto Member>
-struct TScriptStructPropertyBuilder :
-	TCompoundPropertyBuilder<Class, Result, Member>
-{
-};
-
-template <typename Class, typename Result, auto Member>
-struct TBindingEnumPropertyBuilder :
-	TPrimitivePropertyBuilder<Class, Result, Member>
-{
 };
 
 template <typename Class, typename Result, Result Class::* Member>
@@ -254,25 +175,25 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member,
                         std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<Result>>>> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTObjectPtr<Result>::Value>> :
-	TPropertyInfoBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FName>>> :
-	TStringPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTScriptInterface<Result>::Value>> :
-	TMultiPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -284,31 +205,31 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsUStruct<Res
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FString>>> :
-	TStringPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FText>>> :
-	TStringPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTWeakObjectPtr<Result>::Value>> :
-	TMultiPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTLazyObjectPtr<Result>::Value>> :
-	TMultiPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSoftObjectPtr<Result>::Value>> :
-	TMultiPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -320,25 +241,25 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTMap<Result>::Value>> :
-	TContainerPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSet<Result>::Value>> :
-	TContainerPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSubclassOf<Result>::Value>> :
-	TMultiPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTArray<Result>::Value>> :
-	TContainerPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -353,22 +274,19 @@ template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTEnumAsByte<Result>::Value>> :
 	TPrimitivePropertyBuilder<Class, Result, Member>
 {
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle)
-		-> std::underlying_type_t<typename Result::EnumType>
+	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, RETURN_BUFFER_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			return FoundObject->*Member;
+			*(std::underlying_type_t<typename Result::EnumType>*)RETURN_BUFFER = FoundObject->*Member;
 		}
-
-		return std::underlying_type_t<typename Result::EnumType>{};
 	}
 };
 
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTSoftClassPtr<Result>::Value>> :
-	TMultiPropertyBuilder<Class, Result, Member>
+	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
 
@@ -443,25 +361,25 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::de
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member,
                         std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<Result>>>>> :
-	TPropertyInfoBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTObjectPtr<std::decay_t<Result>>::Value>> :
-	TPropertyInfoBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FName>>> :
-	TStringPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTScriptInterface<std::decay_t<Result>>::Value>> :
-	TMultiPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
@@ -473,31 +391,31 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsUStruct<std::decay_
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FString>>> :
-	TStringPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FText>>> :
-	TStringPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<Result>>::Value>> :
-	TMultiPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTLazyObjectPtr<std::decay_t<Result>>::Value>> :
-	TMultiPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftObjectPtr<std::decay_t<Result>>::Value>> :
-	TMultiPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
@@ -509,25 +427,25 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::de
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTMap<std::decay_t<Result>>::Value>> :
-	TContainerPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSet<std::decay_t<Result>>::Value>> :
-	TContainerPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSubclassOf<std::decay_t<Result>>::Value>> :
-	TMultiPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTArray<std::decay_t<Result>>::Value>> :
-	TContainerPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 
@@ -542,16 +460,15 @@ template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTEnumAsByte<std::decay_t<Result>>::Value>> :
 	TPrimitivePropertyBuilder<void, Result, Member>
 {
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle)
-		-> std::underlying_type_t<typename Result::EnumType>
+	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, RETURN_BUFFER_SIGNATURE)
 	{
-		return *Member;
+		*(std::underlying_type_t<typename Result::EnumType>*)RETURN_BUFFER = *Member;
 	}
 };
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTSoftClassPtr<std::decay_t<Result>>::Value>> :
-	TMultiPropertyBuilder<void, Result, Member>
+	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
 

@@ -3,11 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Listener/FEngineListener.h"
 #include "Listener/FUObjectListener.h"
 #include "Modules/ModuleManager.h"
 
-class FUnrealCSharpModule final: public IModuleInterface
+class FUnrealCSharpModule final : public IModuleInterface
 {
 public:
 	/** IModuleInterface implementation */
@@ -16,20 +15,14 @@ public:
 	virtual void ShutdownModule() override;
 
 public:
-	static FORCEINLINE FUnrealCSharpModule& Get()
-	{
-		return FModuleManager::LoadModuleChecked<FUnrealCSharpModule>("UnrealCSharp");
-	}
+	void OnUnrealCSharpCoreModuleActive();
 
-public:
-	bool GetActive() const;
-
-	void SetActive(bool InbIsActive);
+	void OnUnrealCSharpCoreModuleInActive();
 
 private:
+	FDelegateHandle OnUnrealCSharpCoreModuleActiveDelegateHandle;
+
+	FDelegateHandle OnUnrealCSharpCoreModuleInActiveDelegateHandle;
+
 	FUObjectListener UObjectListener;
-
-	FEngineListener EngineListener;
-
-	bool bIsActive = false;
 };

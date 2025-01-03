@@ -34,6 +34,8 @@ public:
 
 	static void GeneratorFunction(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);
 
+	static void GeneratorInterface(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);
+
 	static bool ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName);
 
 	static void Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator);
@@ -42,27 +44,30 @@ public:
 
 	static FString GetClassNameSpace();
 
-	static void SetPropertyFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+	static void SetFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
-	static void SetFunctionFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+	static void SetFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetFlags(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetFlags(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetFlags(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 #if WITH_EDITOR
 	static void SetMetaData(FField* InField, const FString& InAttribute, const FString& InValue);
 
 	static void SetMetaData(UField* InField, const FString& InAttribute, const FString& InValue);
 
-	static void SetMetaData(MonoClass* InMonoClass, const FString& InAttribute,
-	                        const TFunction<void(MonoCustomAttrInfo*)>& InSetMetaData);
-
-	static void SetMetaData(MonoClass* InMonoClass, UClass* InClass, const FString& InAttribute);
-
-	static void SetMetaData(MonoClass* InMonoClass, UScriptStruct* InScriptStruct, const FString& InAttribute);
-
-	static void SetMetaData(MonoClass* InMonoClass, UEnum* InEnum, const FString& InAttribute);
-
 	static void SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 	static void SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetMetaData(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo);
+
+	static void SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo);
 
 	template <typename T>
 	static auto IteratorObject(
@@ -90,6 +95,10 @@ public:
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass,
 	                              const TFunction<void(const UFunction* InFunction)>& InGenerator);
+
+	static MonoClass* UInterfaceToIInterface(MonoClass* InMonoClass);
+
+	static MonoClass* IInterfaceToUInterface(MonoClass* InMonoClass);
 
 private:
 #if WITH_EDITOR

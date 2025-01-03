@@ -29,6 +29,8 @@ public:
 
 	virtual void DestroyProperty();
 
+	virtual int32 GetBufferSize() const;
+
 public:
 	FORCEINLINE int32 GetElementSize() const;
 

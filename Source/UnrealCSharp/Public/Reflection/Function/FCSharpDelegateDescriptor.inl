@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMacro/BufferMacro.h"
 #include "Macro/FunctionMacro.h"
 
 template <auto ReturnType>
@@ -9,7 +10,7 @@ void FCSharpDelegateDescriptor::Execute0(const FScriptDelegate* InScriptDelegate
 }
 
 template <auto ReturnType>
-void FCSharpDelegateDescriptor::Execute1(const FScriptDelegate* InScriptDelegate, uint8* ReturnBuffer) const
+void FCSharpDelegateDescriptor::Execute1(const FScriptDelegate* InScriptDelegate, RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -19,7 +20,7 @@ void FCSharpDelegateDescriptor::Execute1(const FScriptDelegate* InScriptDelegate
 }
 
 template <auto ReturnType>
-void FCSharpDelegateDescriptor::Execute2(const FScriptDelegate* InScriptDelegate, uint8* InBuffer) const
+void FCSharpDelegateDescriptor::Execute2(const FScriptDelegate* InScriptDelegate, IN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -29,8 +30,8 @@ void FCSharpDelegateDescriptor::Execute2(const FScriptDelegate* InScriptDelegate
 }
 
 template <auto ReturnType>
-void FCSharpDelegateDescriptor::Execute3(const FScriptDelegate* InScriptDelegate, uint8* InBuffer,
-                                         uint8* ReturnBuffer) const
+void FCSharpDelegateDescriptor::Execute3(const FScriptDelegate* InScriptDelegate, IN_BUFFER_SIGNATURE,
+                                         RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -42,7 +43,7 @@ void FCSharpDelegateDescriptor::Execute3(const FScriptDelegate* InScriptDelegate
 }
 
 template <auto ReturnType>
-void FCSharpDelegateDescriptor::Execute4(const FScriptDelegate* InScriptDelegate, uint8* OutBuffer) const
+void FCSharpDelegateDescriptor::Execute4(const FScriptDelegate* InScriptDelegate, OUT_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -52,8 +53,8 @@ void FCSharpDelegateDescriptor::Execute4(const FScriptDelegate* InScriptDelegate
 }
 
 template <auto ReturnType>
-void FCSharpDelegateDescriptor::Execute6(const FScriptDelegate* InScriptDelegate, uint8* InBuffer,
-                                         uint8* OutBuffer) const
+void FCSharpDelegateDescriptor::Execute6(const FScriptDelegate* InScriptDelegate, IN_BUFFER_SIGNATURE,
+                                         OUT_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -65,8 +66,8 @@ void FCSharpDelegateDescriptor::Execute6(const FScriptDelegate* InScriptDelegate
 }
 
 template <auto ReturnType>
-void FCSharpDelegateDescriptor::Execute7(const FScriptDelegate* InScriptDelegate, uint8* InBuffer,
-                                         uint8* OutBuffer, uint8* ReturnBuffer) const
+void FCSharpDelegateDescriptor::Execute7(const FScriptDelegate* InScriptDelegate, IN_BUFFER_SIGNATURE,
+                                         OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -87,7 +88,7 @@ void FCSharpDelegateDescriptor::Broadcast0(const FMulticastScriptDelegate* InMul
 
 template <auto ReturnType>
 void FCSharpDelegateDescriptor::Broadcast2(const FMulticastScriptDelegate* InMulticastScriptDelegate,
-                                           uint8* InBuffer) const
+                                           IN_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -98,7 +99,7 @@ void FCSharpDelegateDescriptor::Broadcast2(const FMulticastScriptDelegate* InMul
 
 template <auto ReturnType>
 void FCSharpDelegateDescriptor::Broadcast4(const FMulticastScriptDelegate* InMulticastScriptDelegate,
-                                           uint8* OutBuffer) const
+                                           OUT_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
@@ -109,7 +110,7 @@ void FCSharpDelegateDescriptor::Broadcast4(const FMulticastScriptDelegate* InMul
 
 template <auto ReturnType>
 void FCSharpDelegateDescriptor::Broadcast6(const FMulticastScriptDelegate* InMulticastScriptDelegate,
-                                           uint8* InBuffer, uint8* OutBuffer) const
+                                           IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 

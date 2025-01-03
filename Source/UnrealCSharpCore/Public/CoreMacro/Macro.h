@@ -79,3 +79,9 @@
 #define STRUCT_PREFIX TBaseStructure<FVector>::Get()->GetPrefixCPP()
 
 #define PLACEHOLDER _
+
+#define STR(Str) #Str
+
+#define TEXT_STR(Str) TEXT(STR(Str))
+
+#define F_STRING_STR(Str) FString(TEXT_STR(Str))

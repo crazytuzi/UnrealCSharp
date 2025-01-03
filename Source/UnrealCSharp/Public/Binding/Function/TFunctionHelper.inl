@@ -1,15 +1,11 @@
 #pragma once
 
 #include "TArgument.inl"
+#include "TBufferOffset.inl"
 #include "TOut.inl"
 #include "TReturnValue.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/SignatureMacro.h"
-
-inline MonoObject* Array_Get(MonoArray* InMonoArray, const size_t InIndex)
-{
-	return ARRAY_GET(InMonoArray, MonoObject*, InIndex);
-}
 
 template <typename>
 struct TFunctionHelper
@@ -22,9 +18,7 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 	template <typename Function, auto... Index>
 	static auto Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		MonoObject* ReturnValue{};
-
-		std::tuple<TArgument<Args, Args>...> Argument(Array_Get(InValue, Index)...);
+		std::tuple<TArgument<Args, Args>...> Argument(IN_BUFFER + std::get<Index>(TBufferOffset<Args...>()())...);
 
 		if constexpr (std::is_same_v<Result, void>)
 		{
@@ -32,27 +26,21 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 		}
 		else
 		{
-			ReturnValue = TReturnValue<Result>(std::forward<Result>(
-					InFunction(std::forward<Args>(std::get<Index>(Argument).Get())...)))
-				.Get();
+			TReturnValue<Result>(RETURN_BUFFER, std::forward<Result>(InFunction(
+				                     std::forward<Args>(std::get<Index>(Argument).Get())...)));
 		}
 
-		TOut<std::tuple<TArgument<Args, Args>...>>(OutValue, Argument)
-			.template Initialize<0, Args...>()
-			.template Get<0, Args...>();
-
-		return ReturnValue;
+		TOut<std::tuple<TArgument<Args, Args>...>, Args...>(OUT_BUFFER, Argument);
 	}
 
 	template <typename Class, typename Function, auto... Index>
 	static auto Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
-		MonoObject* ReturnValue{};
-
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
 			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
 		{
-			std::tuple<TArgument<Args, Args>...> Argument(Array_Get(InValue, Index)...);
+			std::tuple<TArgument<Args, Args>...> Argument(
+				IN_BUFFER + std::get<Index>(TBufferOffset<Args...>()())...);
 
 			if constexpr (std::is_same_v<Result, void>)
 			{
@@ -60,16 +48,11 @@ struct TFunctionHelper<TPair<Result, std::tuple<Args...>>>
 			}
 			else
 			{
-				ReturnValue = TReturnValue<Result>(std::forward<Result>(
-						(FoundObject->*InFunction)(std::forward<Args>(std::get<Index>(Argument).Get())...)))
-					.Get();
+				TReturnValue<Result>(RETURN_BUFFER, std::forward<Result>((FoundObject->*InFunction)(
+					                     std::forward<Args>(std::get<Index>(Argument).Get())...)));
 			}
 
-			TOut<std::tuple<TArgument<Args, Args>...>>(OutValue, Argument)
-				.template Initialize<0, Args...>()
-				.template Get<0, Args...>();
+			TOut<std::tuple<TArgument<Args, Args>...>, Args...>(OUT_BUFFER, Argument);
 		}
-
-		return ReturnValue;
 	}
 };

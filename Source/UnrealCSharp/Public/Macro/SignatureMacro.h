@@ -1,33 +1,23 @@
 #pragma once
 
-#define BINDING_CONSTRUCTOR_SIGNATURE MonoObject* InMonoObject, MonoObject** OutValue, MonoArray* InValue
+#include "CoreMacro/BufferMacro.h"
 
-#define BINDING_CONSTRUCTOR_PLACEHOLDER_SIGNATURE MonoObject* InMonoObject, void* Value0, void* Value1
+#define BINDING_CONSTRUCTOR_SIGNATURE MonoObject* InMonoObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE
 
-#define BINDING_CONSTRUCTOR_PLACEHOLDER_PARAM0 InMonoObject, nullptr, nullptr
-
-#define BINDING_CONSTRUCTOR_PLACEHOLDER_PARAM1 InMonoObject, static_cast<MonoObject**>(Value0), nullptr
-
-#define BINDING_CONSTRUCTOR_PLACEHOLDER_PARAM2 InMonoObject, nullptr, static_cast<MonoArray*>(Value0)
-
-#define BINDING_CONSTRUCTOR_PLACEHOLDER_PARAM3 InMonoObject, static_cast<MonoObject**>(Value0), static_cast<MonoArray*>(Value1)
+#define BINDING_CONSTRUCTOR_PARAM InMonoObject, IN_BUFFER, OUT_BUFFER
 
 #define BINDING_DESTRUCTOR_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle
 
 #define BINDING_DESTRUCTOR_PARAM InGarbageCollectionHandle
 
-#define BINDING_FUNCTION_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, MonoObject** OutValue, MonoArray* InValue
+#define BINDING_FUNCTION_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE
 
-#define BINDING_FUNCTION_PLACEHOLDER_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, void* Value0, void* Value1
+#define BINDING_FUNCTION_PARAM InGarbageCollectionHandle, IN_BUFFER, OUT_BUFFER, RETURN_BUFFER
 
-#define BINDING_FUNCTION_PLACEHOLDER_PARAM0 InGarbageCollectionHandle, nullptr, nullptr
+#define BINDING_SUBSCRIPT_GET_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE
 
-#define BINDING_FUNCTION_PLACEHOLDER_PARAM1 InGarbageCollectionHandle, static_cast<MonoObject**>(Value0), nullptr
+#define BINDING_SUBSCRIPT_GET_PARAM InGarbageCollectionHandle, IN_BUFFER, RETURN_BUFFER
 
-#define BINDING_FUNCTION_PLACEHOLDER_PARAM2 InGarbageCollectionHandle, nullptr, static_cast<MonoArray*>(Value0)
+#define BINDING_SUBSCRIPT_SET_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE
 
-#define BINDING_FUNCTION_PLACEHOLDER_PARAM3 InGarbageCollectionHandle, static_cast<MonoObject**>(Value0), static_cast<MonoArray*>(Value1)
-
-#define BINDING_SUBSCRIPT_SIGNATURE const FGarbageCollectionHandle InGarbageCollectionHandle, MonoArray* InValue
-
-#define BINDING_SUBSCRIPT_PARAM InGarbageCollectionHandle, InValue
+#define BINDING_SUBSCRIPT_SET_PARAM InGarbageCollectionHandle, IN_BUFFER

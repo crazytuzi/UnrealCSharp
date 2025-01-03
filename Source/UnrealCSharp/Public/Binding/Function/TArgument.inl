@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreMacro/BufferMacro.h"
 #include "Binding/Core/TPropertyValue.inl"
 
 template <typename T, typename Enable = void>
@@ -24,11 +25,8 @@ struct TBaseArgument<T, true>
 
 	TBaseArgument() = default;
 
-	explicit TBaseArgument(MonoObject* InMonoObject):
-		Value
-		{
-			*(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InMonoObject)
-		}
+	explicit TBaseArgument(IN_BUFFER_SIGNATURE) :
+		Value(*(std::decay_t<Type>*)IN_BUFFER)
 	{
 	}
 
@@ -39,17 +37,16 @@ struct TBaseArgument<T, true>
 
 	auto Set()
 	{
-		return TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
-			const_cast<std::decay_t<T>*>(&Value));
+		return Value;
 	}
 
 	constexpr auto IsRef() const
 	{
-		return TTypeInfo<T>::Get()->IsRef();
+		return TTypeInfo<Type>::Get()->IsRef();
 	}
 
 protected:
-	T Value;
+	Type Value;
 };
 
 template <typename T>
@@ -59,13 +56,8 @@ struct TBaseArgument<T, false>
 
 	TBaseArgument() = default;
 
-	explicit TBaseArgument(MonoObject* InMonoObject):
-		Value
-		{
-			TPropertyValue<Type, Type>::Set(
-				*static_cast<FGarbageCollectionHandle*>(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InMonoObject)))
-		}
+	explicit TBaseArgument(IN_BUFFER_SIGNATURE) :
+		Value(TPropertyValue<Type, Type>::Set(*(FGarbageCollectionHandle*)IN_BUFFER))
 	{
 	}
 
@@ -76,17 +68,17 @@ struct TBaseArgument<T, false>
 
 	auto Set()
 	{
-		return TPropertyValue<Type, Type>::template Get<TTypeInfo<T>::IsReference()>(
-			const_cast<std::decay_t<T>*>(&Value));
+		return TPropertyValue<Type, Type>::template Get<TTypeInfo<Type>::IsReference()>(
+			const_cast<std::decay_t<Type>*>(&Value));
 	}
 
 	constexpr auto IsRef() const
 	{
-		return TTypeInfo<T>::Get()->IsRef();
+		return TTypeInfo<Type>::Get()->IsRef();
 	}
 
 protected:
-	T Value;
+	Type Value;
 };
 
 template <typename T>

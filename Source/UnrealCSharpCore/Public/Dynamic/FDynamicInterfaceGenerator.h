@@ -36,13 +36,9 @@ private:
 
 #if WITH_EDITOR
 	static void ReInstance(UClass* InClass);
-
-	static void GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass);
 #endif
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
-
-	static MonoClass* UInterfaceToIInterface(MonoClass* InMonoClass);
 
 private:
 	static TMap<FString, UClass*> DynamicInterfaceMap;

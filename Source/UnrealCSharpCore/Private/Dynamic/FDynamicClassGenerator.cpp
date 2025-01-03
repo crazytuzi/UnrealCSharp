@@ -66,6 +66,8 @@ void FDynamicClassGenerator::Generator()
 
 		                                 FDynamicGeneratorCore::GeneratorFunction(InMonoClass, Node);
 
+		                                 FDynamicGeneratorCore::GeneratorInterface(InMonoClass, Node);
+
 		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
 }
@@ -321,9 +323,7 @@ void FDynamicClassGenerator::BeginGenerator(UBlueprintGeneratedClass* InClass, U
 
 void FDynamicClassGenerator::ProcessGenerator(MonoClass* InMonoClass, UClass* InClass)
 {
-#if WITH_EDITOR
-	GeneratorMetaData(InMonoClass, InClass);
-#endif
+	FDynamicGeneratorCore::SetFlags(InClass, FMonoDomain::Custom_Attrs_From_Class(InMonoClass));
 
 	GeneratorProperty(InMonoClass, InClass);
 
@@ -548,11 +548,6 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 
 		InOldClass->MarkAsGarbage();
 	}
-}
-
-void FDynamicClassGenerator::GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass)
-{
-	FDynamicGeneratorCore::SetMetaData(InMonoClass, InClass, CLASS_U_CLASS_ATTRIBUTE);
 }
 #endif
 

@@ -6,6 +6,7 @@
 #include "Kismet2/StructureEditorUtils.h"
 #include "Animation/AnimBlueprintGeneratedClass.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicStructGenerator.h"
@@ -229,11 +230,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\t\t\t{\n"
 			"\t\t\t\tunsafe\n"
 			"\t\t\t\t{\n"
-			"\t\t\t\t\tvar __ReturnBuffer = stackalloc byte[%d];\n"
+			"\t\t\t\t\tvar %s = stackalloc byte[%d];\n"
 			"\n"
-			"\t\t\t\t\tFPropertyImplementation.FProperty_GetStructPropertyImplementation(%s, %s, __ReturnBuffer);\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_GetStructPropertyImplementation(%s, %s, %s);\n"
 			"\n"
-			"\t\t\t\t\treturn *(%s*)__ReturnBuffer;\n"
+			"\t\t\t\t\treturn *(%s*)%s;\n"
 			"\t\t\t\t}\n"
 			"\t\t\t}\n"
 			"\n"
@@ -241,11 +242,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\t\t\t{\n"
 			"\t\t\t\tunsafe\n"
 			"\t\t\t\t{\n"
-			"\t\t\t\t\tvar __InBuffer = stackalloc byte[%d];\n"
+			"\t\t\t\t\tvar %s = stackalloc byte[%d];\n"
 			"\n"
-			"\t\t\t\t\t*(%s*)__InBuffer = %s;\n"
+			"\t\t\t\t\t*(%s*)%s = %s;\n"
 			"\n"
-			"\t\t\t\t\tFPropertyImplementation.FProperty_SetStructPropertyImplementation(%s, %s, __InBuffer);\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_SetStructPropertyImplementation(%s, %s, %s);\n"
 			"\t\t\t\t}\n"
 			"\t\t\t}\n"
 			"\t\t}\n"
@@ -254,15 +255,21 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		                                   *PropertyType,
 		                                   *FUnrealCSharpFunctionLibrary::Encode(
 			                                   VariableFriendlyPropertyName, PropertyIterator->IsNative()),
+		                                   RETURN_BUFFER_TEXT,
 		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
 		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                   *DummyPropertyName,
+		                                   RETURN_BUFFER_TEXT,
 		                                   *PropertyType,
+		                                   RETURN_BUFFER_TEXT,
+		                                   IN_BUFFER_TEXT,
 		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
 		                                   *FGeneratorCore::GetBufferCast(*PropertyIterator),
+		                                   IN_BUFFER_TEXT,
 		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator),
 		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                   *DummyPropertyName
+		                                   *DummyPropertyName,
+		                                   IN_BUFFER_TEXT
 		);
 
 		PropertyNameContent += FString::Printf(TEXT(

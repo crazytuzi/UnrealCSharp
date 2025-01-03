@@ -14,7 +14,6 @@ private:
 	void OnPostPIEStarted(const bool);
 
 	void OnCancelPIE();
-
 #else
 	void OnPostEngineInit();
 
@@ -28,7 +27,6 @@ private:
 	FDelegateHandle OnPostPIEStartedDelegateHandle;
 
 	FDelegateHandle OnCancelPIEDelegateHandle;
-
 #else
 	FDelegateHandle OnPostEngineInitHandle;
 

@@ -26,6 +26,18 @@ struct TTypeInfo final : FTypeInfo
 		return Instance;
 	}
 
+	virtual auto GetBufferSize() const -> int32 override
+	{
+		if constexpr (TIsPrimitive<T>::Value)
+		{
+			return sizeof(T);
+		}
+		else
+		{
+			return sizeof(void*);
+		}
+	}
+
 	virtual auto IsRef() const -> bool override
 	{
 		return TIsRef<T>::Value;

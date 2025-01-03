@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "CoreMacro/BufferMacro.h"
+
 #define FUNCTION_CSHARP_CALLBACK FString(TEXT("CSharpCallBack"))
 
 #define FUNCTION_UTILS_IS_OVERRIDE_TYPE FString(TEXT("IsOverrideType"))
@@ -69,7 +71,8 @@
 		PropertyDescriptor->InitializeValue_InContainer(Params);
 
 #define IN_VALUE() \
-		PropertyDescriptor->Set(InBuffer + InBufferOffsets[Index], PropertyDescriptor->ContainerPtrToValuePtr<void>(Params));
+		PropertyDescriptor->Set(IN_BUFFER, PropertyDescriptor->ContainerPtrToValuePtr<void>(Params)); \
+		IN_BUFFER += PropertyDescriptor->GetBufferSize();
 
 #define REFERENCE_IN_VALUE() \
 		if (ReferencePropertyIndexes.Contains(Index) || !OutPropertyIndexes.Contains(Index)) \
@@ -120,26 +123,27 @@
 			if (OutPropertyDescriptor->IsPrimitiveProperty()) \
 			{ \
 				OutPropertyDescriptor->Get(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), \
-										   OutBuffer + OutBufferOffsets[Index]); \
+										   OUT_BUFFER); \
 			} \
 			else \
 			{ \
 				OutPropertyDescriptor->Get<std::true_type>( \
 					OutPropertyDescriptor->CopyValue(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
-					reinterpret_cast<void**>(OutBuffer + OutBufferOffsets[Index])); \
+					reinterpret_cast<void**>(OUT_BUFFER)); \
 			} \
+			OUT_BUFFER += OutPropertyDescriptor->GetBufferSize(); \
 		} \
 	}
 
 #define PROCESS_RETURN() \
 	if constexpr (ReturnType == EFunctionReturnType::Primitive) \
 	{ \
-		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), ReturnBuffer); \
+		ReturnPropertyDescriptor->Get(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params), RETURN_BUFFER); \
 	} \
 	else if constexpr (ReturnType == EFunctionReturnType::Compound) \
 	{ \
 		ReturnPropertyDescriptor->Get<std::true_type>( \
 			ReturnPropertyDescriptor->CopyValue(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
-			reinterpret_cast<void**>(ReturnBuffer)); \
+			reinterpret_cast<void**>(RETURN_BUFFER)); \
 	} \
 	BufferAllocator->Free(Params);

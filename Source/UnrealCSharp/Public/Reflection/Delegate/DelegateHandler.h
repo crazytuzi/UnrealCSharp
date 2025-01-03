@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "CoreMacro/BufferMacro.h"
 #include "FDelegateWrapper.h"
 #include "Reflection/Function/FCSharpDelegateDescriptor.h"
 #include "DelegateHandler.generated.h"
@@ -52,7 +53,7 @@ public:
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute1(uint8* ReturnBuffer) const
+	void Execute1(RETURN_BUFFER_SIGNATURE) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -60,14 +61,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute1<ReturnType>(ScriptDelegate, ReturnBuffer);
+					DelegateDescriptor->Execute1<ReturnType>(ScriptDelegate, RETURN_BUFFER);
 				}
 			}
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute2(uint8* InBuffer) const
+	void Execute2(IN_BUFFER_SIGNATURE) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -75,14 +76,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute2<ReturnType>(ScriptDelegate, InBuffer);
+					DelegateDescriptor->Execute2<ReturnType>(ScriptDelegate, IN_BUFFER);
 				}
 			}
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute3(uint8* InBuffer, uint8* ReturnBuffer) const
+	void Execute3(IN_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -90,14 +91,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute3<ReturnType>(ScriptDelegate, InBuffer, ReturnBuffer);
+					DelegateDescriptor->Execute3<ReturnType>(ScriptDelegate, IN_BUFFER, RETURN_BUFFER);
 				}
 			}
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute4(uint8* OutBuffer) const
+	void Execute4(OUT_BUFFER_SIGNATURE) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -105,14 +106,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute4<ReturnType>(ScriptDelegate, OutBuffer);
+					DelegateDescriptor->Execute4<ReturnType>(ScriptDelegate, OUT_BUFFER);
 				}
 			}
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute6(uint8* InBuffer, uint8* OutBuffer) const
+	void Execute6(IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -120,14 +121,14 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute6<ReturnType>(ScriptDelegate, InBuffer, OutBuffer);
+					DelegateDescriptor->Execute6<ReturnType>(ScriptDelegate, IN_BUFFER, OUT_BUFFER);
 				}
 			}
 		}
 	}
 
 	template <auto ReturnType = EFunctionReturnType::Void>
-	void Execute7(uint8* InBuffer, uint8* OutBuffer, uint8* ReturnBuffer) const
+	void Execute7(IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE, RETURN_BUFFER_SIGNATURE) const
 	{
 		if (ScriptDelegate != nullptr)
 		{
@@ -135,7 +136,7 @@ public:
 			{
 				if (DelegateDescriptor != nullptr)
 				{
-					DelegateDescriptor->Execute7<ReturnType>(ScriptDelegate, InBuffer, OutBuffer, ReturnBuffer);
+					DelegateDescriptor->Execute7<ReturnType>(ScriptDelegate, IN_BUFFER, OUT_BUFFER, RETURN_BUFFER);
 				}
 			}
 		}

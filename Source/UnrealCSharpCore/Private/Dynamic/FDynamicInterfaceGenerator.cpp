@@ -179,9 +179,7 @@ void FDynamicInterfaceGenerator::BeginGenerator(UClass* InClass, UClass* InParen
 
 void FDynamicInterfaceGenerator::ProcessGenerator(MonoClass* InMonoClass, UClass* InClass)
 {
-#if WITH_EDITOR
-	GeneratorMetaData(InMonoClass, InClass);
-#endif
+	FDynamicGeneratorCore::SetFlags(InClass, FMonoDomain::Custom_Attrs_From_Class(InMonoClass));
 
 	GeneratorFunction(InMonoClass, InClass);
 }
@@ -316,34 +314,14 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 		}
 	}
 }
-
-void FDynamicInterfaceGenerator::GeneratorMetaData(MonoClass* InMonoClass, UClass* InClass)
-{
-	FDynamicGeneratorCore::SetMetaData(InMonoClass, InClass, CLASS_U_INTERFACE_ATTRIBUTE);
-}
-
 #endif
 
 void FDynamicInterfaceGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)
 {
-	FDynamicGeneratorCore::GeneratorFunction(UInterfaceToIInterface(InMonoClass),
+	FDynamicGeneratorCore::GeneratorFunction(FDynamicGeneratorCore::UInterfaceToIInterface(InMonoClass),
 	                                         InClass,
 	                                         [](const UFunction* InFunction)
 	                                         {
 		                                         InFunction->SetInternalFlags(EInternalObjectFlags::Native);
 	                                         });
-}
-
-MonoClass* FDynamicInterfaceGenerator::UInterfaceToIInterface(MonoClass* InMonoClass)
-{
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
-
-	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
-
-	return FMonoDomain::Class_From_Name(NameSpace,
-	                                    FString::Printf(TEXT(
-		                                    "I%s"
-	                                    ),
-	                                                    *ClassName.RightChop(1)
-	                                    ));
 }
