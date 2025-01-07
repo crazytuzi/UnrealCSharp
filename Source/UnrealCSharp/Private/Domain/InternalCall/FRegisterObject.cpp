@@ -53,7 +53,8 @@ namespace
 
 				const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
-				FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true>(Object, new FString(Name));
+				FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(
+					Object, new FString(Name));
 
 				return Object;
 			}

@@ -5,12 +5,21 @@
 class UNREALCSHARP_API FReference
 {
 public:
-	explicit FReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	explicit FReference(const FGarbageCollectionHandle& InGarbageCollectionHandle):
+		GarbageCollectionHandle(InGarbageCollectionHandle)
+	{
+	}
 
-	virtual ~FReference();
+	virtual ~FReference()
+	{
+		FGarbageCollectionHandle::Free<true>(GarbageCollectionHandle);
+	}
 
 public:
-	explicit operator FGarbageCollectionHandle() const;
+	explicit operator FGarbageCollectionHandle() const
+	{
+		return GarbageCollectionHandle;
+	}
 
 protected:
 	FGarbageCollectionHandle GarbageCollectionHandle;

@@ -50,28 +50,6 @@ MonoObject* FOptionalRegistry::GetObject(const FOptionalHelperValueMapping::FAdd
 		       : nullptr;
 }
 
-bool FOptionalRegistry::AddReference(const FOptionalHelperValueMapping::ValueType& InValue, MonoObject* InMonoObject)
-{
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	OptionalGarbageCollectionHandle2Helper.Add(GarbageCollectionHandle, InValue);
-
-	return true;
-}
-
-bool FOptionalRegistry::AddReference(const FOptionalHelperValueMapping::FAddressType& InAddress,
-                                     const FOptionalHelperValueMapping::ValueType& InValue,
-                                     MonoObject* InMonoObject)
-{
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
-
-	OptionalAddress2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
-
-	OptionalGarbageCollectionHandle2Helper.Add(GarbageCollectionHandle, InValue);
-
-	return true;
-}
-
 bool FOptionalRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
 {
 	if (const auto FoundValue = OptionalGarbageCollectionHandle2Helper.Find(InGarbageCollectionHandle))

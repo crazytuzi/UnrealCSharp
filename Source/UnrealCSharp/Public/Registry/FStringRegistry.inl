@@ -34,13 +34,13 @@ struct FStringRegistry::TStringRegistryImplementation<
 			       : nullptr;
 	}
 
-	template <auto IsNeedFree>
+	template <auto IsNeedFree, auto IsMember>
 	static auto AddReference(Class* InRegistry, MonoObject* InMonoObject,
 	                         typename FStringValueMapping::FAddressType InAddress)
 	{
 		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
 
-		if constexpr (!IsNeedFree)
+		if constexpr (IsMember)
 		{
 			(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
 		}

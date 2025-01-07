@@ -205,11 +205,11 @@ auto FCSharpEnvironment::GetMultiObject(void* InAddress) const
 		       : nullptr;
 }
 
-template <typename T, auto IsNeedFree>
+template <typename T, auto IsNeedFree, auto IsMember>
 auto FCSharpEnvironment::AddMultiReference(MonoObject* InMonoObject, void* InValue) const
 {
 	return MultiRegistry != nullptr
-		       ? FMultiRegistry::TMultiRegistry<T, T>::template AddReference<IsNeedFree>(
+		       ? FMultiRegistry::TMultiRegistry<T, T>::template AddReference<IsNeedFree, IsMember>(
 			       MultiRegistry, InMonoObject, InValue)
 		       : false;
 }
@@ -238,11 +238,11 @@ auto FCSharpEnvironment::GetStringObject(void* InAddress) const
 		       : nullptr;
 }
 
-template <typename T, auto IsNeedFree>
+template <typename T, auto IsNeedFree, auto IsMember>
 auto FCSharpEnvironment::AddStringReference(MonoObject* InMonoObject, void* InValue) const
 {
 	return StringRegistry != nullptr
-		       ? FStringRegistry::TStringRegistry<T>::template AddReference<IsNeedFree>(
+		       ? FStringRegistry::TStringRegistry<T>::template AddReference<IsNeedFree, IsMember>(
 			       StringRegistry, InMonoObject, InValue)
 		       : false;
 }
@@ -336,19 +336,11 @@ auto FCSharpEnvironment::GetOptionalObject(void* InAddress) const
 		       : nullptr;
 }
 
-template <typename T>
-auto FCSharpEnvironment::AddOptionalReference(T* InValue, MonoObject* InMonoObject) const
-{
-	return OptionalRegistry != nullptr
-		       ? OptionalRegistry->AddReference(InValue, InMonoObject)
-		       : false;
-}
-
-template <typename T>
+template <typename T, auto IsMember>
 auto FCSharpEnvironment::AddOptionalReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const
 {
 	return OptionalRegistry != nullptr
-		       ? OptionalRegistry->AddReference(InAddress, InValue, InMonoObject)
+		       ? OptionalRegistry->AddReference<IsMember>(InAddress, InValue, InMonoObject)
 		       : false;
 }
 #endif

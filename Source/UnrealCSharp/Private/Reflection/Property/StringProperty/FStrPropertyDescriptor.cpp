@@ -5,7 +5,7 @@ void FStrPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true>(Object, Src);
+	FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(Object, Src);
 
 	*Dest = Object;
 }
@@ -18,7 +18,7 @@ void FStrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 	{
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FString, false>(Object, Src);
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FString, false, true>(Object, Src);
 	}
 
 	*Dest = Object;

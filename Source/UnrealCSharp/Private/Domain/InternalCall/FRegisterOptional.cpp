@@ -25,7 +25,8 @@ namespace
 
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
-			FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, InMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
+				nullptr, OptionalHelper, InMonoObject);
 		}
 
 		static void Register2Implementation(MonoObject* InMonoObject, MonoObject* InValue)
@@ -42,7 +43,8 @@ namespace
 
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
-			FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, InMonoObject);
+			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
+				nullptr, OptionalHelper, InMonoObject);
 
 			OptionalHelper->Set(OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
 				                    ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)

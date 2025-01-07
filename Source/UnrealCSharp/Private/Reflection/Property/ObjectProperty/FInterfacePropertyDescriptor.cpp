@@ -5,7 +5,7 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, std::true_type) c
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true>(
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
 		Object, Src);
 
 	*Dest = Object;
@@ -19,7 +19,7 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, std::false_type) 
 	{
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false>(
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, true>(
 			Object, Src);
 	}
 
