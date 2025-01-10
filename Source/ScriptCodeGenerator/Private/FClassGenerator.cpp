@@ -1074,18 +1074,21 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	}
 
 	const auto Key = InProperty->GetName();
-
+	
 	const auto MetaData = InFunction->GetMetaData(*Key);
 
 	if (const auto ByteProperty = CastField<FByteProperty>(InProperty))
 	{
 		if (ByteProperty->Enum != nullptr)
 		{
-			if (const auto UserDefinedEnum = Cast<UUserDefinedEnum>(ByteProperty->Enum))
+			auto EnumValueIndex = ByteProperty->Enum->GetIndexByNameString(MetaData);
+			
+			FText DisplayName = ByteProperty->Enum->GetDisplayNameTextByValue(EnumValueIndex);
+
+			if (!DisplayName.IsEmpty())
 			{
 				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
-				                       *UserDefinedEnum->GetDisplayNameTextByIndex(
-					                       UserDefinedEnum->GetIndexByNameString(MetaData)).ToString());
+									   *DisplayName.ToString());
 			}
 			else
 			{
