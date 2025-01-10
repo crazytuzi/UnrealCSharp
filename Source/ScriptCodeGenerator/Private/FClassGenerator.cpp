@@ -487,21 +487,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 			if (FunctionParams[Index]->HasAnyPropertyFlags(CPF_OutParm) && !FunctionParams[Index]->HasAnyPropertyFlags(
 				CPF_ConstParm))
 			{
-				if (FUnrealCSharpFunctionLibrary::IsNativeFunction(InClass, Function->GetFName()) ||
-					FunctionParams[Index]->HasAnyPropertyFlags(CPF_ReferenceParm))
-				{
-					FunctionOutParamIndexMapping[FunctionParams.Num() - 1 - FunctionRefParamIndex.Num()] =
-						FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();
+				FunctionOutParamIndexMapping[FunctionParams.Num() - 1 - FunctionRefParamIndex.Num()] =
+					FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();
 
-					FunctionRefParamIndex.Emplace(Index);
-				}
-				else
-				{
-					FunctionOutParamIndexMapping[FunctionOutParamIndex.Num()] =
-						FunctionRefParamIndex.Num() + FunctionOutParamIndex.Num();
-
-					FunctionOutParamIndex.Emplace(Index);
-				}
+				FunctionRefParamIndex.Emplace(Index);
 			}
 
 			if (bGeneratorFunctionDefaultParam == false)
