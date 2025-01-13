@@ -22,6 +22,8 @@ TSet<UClass::ClassConstructorType> FDynamicClassGenerator::ClassConstructorSet
 	&FDynamicClassGenerator::ClassConstructor
 };
 
+TMap<UClass*, FString> FDynamicClassGenerator::NamespaceMap;
+
 TMap<FString, UClass*> FDynamicClassGenerator::DynamicClassMap;
 
 TSet<UClass*> FDynamicClassGenerator::DynamicClassSet;
@@ -75,8 +77,8 @@ void FDynamicClassGenerator::Generator()
 #if WITH_EDITOR
 void FDynamicClassGenerator::CodeAnalysisGenerator()
 {
-	FDynamicGeneratorCore::CodeAnalysisGenerator(TEXT("DynamicClass"),
-	                                             [](const FString& InName)
+	FDynamicGeneratorCore::CodeAnalysisGenerator(DYNAMIC_CLASS,
+	                                             [](const FString& InNameSpace, const FString& InName)
 	                                             {
 		                                             if (!DynamicClassMap.Contains(InName))
 		                                             {
@@ -84,6 +86,7 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 			                                             {
 				                                             GeneratorBlueprintGeneratedClass(
 					                                             FDynamicGeneratorCore::GetOuter(),
+					                                             InNameSpace,
 					                                             InName,
 					                                             AActor::StaticClass());
 			                                             }
@@ -91,6 +94,7 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 			                                             {
 				                                             GeneratorClass(
 					                                             FDynamicGeneratorCore::GetOuter(),
+					                                             InNameSpace,
 					                                             InName,
 					                                             AActor::StaticClass());
 			                                             }
@@ -103,30 +107,6 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 bool FDynamicClassGenerator::IsDynamicClass(MonoClass* InMonoClass)
 {
 	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_CLASS_ATTRIBUTE);
-}
-
-MonoClass* FDynamicClassGenerator::GetMonoClass(const FString& InName)
-{
-	static auto A = ACTOR_PREFIX;
-
-	static auto U = OBJECT_PREFIX;
-
-	if (IsDynamicBlueprintGeneratedClass(InName))
-	{
-		return FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), InName);
-	}
-
-	if (const auto Class = FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), A + InName))
-	{
-		return Class;
-	}
-
-	if (const auto Class = FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), U + InName))
-	{
-		return Class;
-	}
-
-	return nullptr;
 }
 
 void FDynamicClassGenerator::OnPrePIEEnded()
@@ -169,6 +149,8 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 	}
 
 	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+	const auto ClassNamespace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
@@ -223,7 +205,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 
 	if (IsDynamicBlueprintGeneratedClass(ClassName))
 	{
-		Class = GeneratorBlueprintGeneratedClass(Outer, ClassName, ParentClass,
+		Class = GeneratorBlueprintGeneratedClass(Outer, ClassNamespace, ClassName, ParentClass,
 		                                         [InMonoClass](UClass* InClass)
 		                                         {
 			                                         ProcessGenerator(InMonoClass, InClass);
@@ -231,7 +213,7 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 	}
 	else
 	{
-		Class = GeneratorClass(Outer, ClassName, ParentClass,
+		Class = GeneratorClass(Outer, ClassNamespace, ClassName, ParentClass,
 		                       [InMonoClass](UClass* InClass)
 		                       {
 			                       ProcessGenerator(InMonoClass, InClass);
@@ -287,6 +269,13 @@ UClass* FDynamicClassGenerator::GetDynamicClass(MonoClass* InMonoClass)
 	const auto FoundDynamicClass = DynamicClassMap.Find(ClassName);
 
 	return FoundDynamicClass != nullptr ? *FoundDynamicClass : nullptr;
+}
+
+FString FDynamicClassGenerator::GetNameSpace(const UClass* InClass)
+{
+	const auto FoundNameSpace = NamespaceMap.Find(InClass);
+
+	return FoundNameSpace != nullptr ? *FoundNameSpace : FString{};
 }
 
 void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentClass)
@@ -387,37 +376,40 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 #endif
 }
 
-UClass* FDynamicClassGenerator::GeneratorClass(UPackage* InOuter, const FString& InName, UClass* InParentClass)
+UClass* FDynamicClassGenerator::GeneratorClass(UPackage* InOuter, const FString& InNameSpace,
+                                               const FString& InName, UClass* InParentClass)
 {
-	return GeneratorClass(InOuter, InName, InParentClass,
+	return GeneratorClass(InOuter, InNameSpace, InName, InParentClass,
 	                      [](UClass* InClass)
 	                      {
 	                      });
 }
 
-UClass* FDynamicClassGenerator::GeneratorClass(UPackage* InOuter, const FString& InName, UClass* InParentClass,
+UClass* FDynamicClassGenerator::GeneratorClass(UPackage* InOuter, const FString& InNameSpace,
+                                               const FString& InName, UClass* InParentClass,
                                                const TFunction<void(UClass*)>& InProcessGenerator)
 {
 	const auto Class = NewObject<UClass>(InOuter, *InName.RightChop(1), RF_Public);
 
 	Class->AddToRoot();
 
-	GeneratorClass(InName, Class, InParentClass, InProcessGenerator);
+	GeneratorClass(InNameSpace, InName, Class, InParentClass, InProcessGenerator);
 
 	return Class;
 }
 
-UBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorBlueprintGeneratedClass(UPackage* InOuter,
-	const FString& InName, UClass* InParentClass)
+UBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorBlueprintGeneratedClass(
+	UPackage* InOuter, const FString& InNameSpace, const FString& InName, UClass* InParentClass)
 {
-	return GeneratorBlueprintGeneratedClass(InOuter, InName, InParentClass,
+	return GeneratorBlueprintGeneratedClass(InOuter, InNameSpace, InName, InParentClass,
 	                                        [](UClass* InClass)
 	                                        {
 	                                        });
 }
 
-UBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorBlueprintGeneratedClass(UPackage* InOuter,
-	const FString& InName, UClass* InParentClass, const TFunction<void(UClass*)>& InProcessGenerator)
+UBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorBlueprintGeneratedClass(
+	UPackage* InOuter, const FString& InNameSpace, const FString& InName, UClass* InParentClass,
+	const TFunction<void(UClass*)>& InProcessGenerator)
 {
 	auto Class = NewObject<UBlueprintGeneratedClass>(InOuter, *InName, RF_Public);
 
@@ -435,7 +427,7 @@ UBlueprintGeneratedClass* FDynamicClassGenerator::GeneratorBlueprintGeneratedCla
 	Class->ClassGeneratedBy = Blueprint;
 #endif
 
-	GeneratorClass(InName, Class, InParentClass, InProcessGenerator);
+	GeneratorClass(InNameSpace, InName, Class, InParentClass, InProcessGenerator);
 
 	return Class;
 }

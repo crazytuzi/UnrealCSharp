@@ -30,6 +30,9 @@ FEditorListener::FEditorListener():
 	OnEndGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnEndGenerator.AddRaw(
 		this, &FEditorListener::OnEndGenerator);
 
+	OnCompileDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnCompile.AddRaw(
+		this, &FEditorListener::OnCompile);
+
 	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 
 	AssetRegistryModule.Get().OnFilesLoaded().AddRaw(this, &FEditorListener::OnFilesLoaded);
@@ -75,6 +78,11 @@ FEditorListener::~FEditorListener()
 		auto& MainFrameModule = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
 
 		MainFrameModule.OnMainFrameCreationFinished().Remove(OnMainFrameCreationFinishedDelegateHandle);
+	}
+
+	if (OnCompileDelegateHandle.IsValid())
+	{
+		FUnrealCSharpCoreModuleDelegates::OnCompile.Remove(OnCompileDelegateHandle);
 	}
 
 	if (OnEndGeneratorDelegateHandle.IsValid())
@@ -179,6 +187,29 @@ void FEditorListener::OnEndGenerator()
 	bIsGenerating = false;
 
 	FileChanges.Reset();
+}
+
+void FEditorListener::OnCompile(const TArray<FFileChangeData>& InFileChangeData)
+{
+	if (!InFileChangeData.IsEmpty())
+	{
+		TArray<FString> FileChange;
+
+		for (const auto& Data : InFileChangeData)
+		{
+			FileChange.AddUnique(Data.Filename);
+		}
+
+		for (const auto& File : FileChange)
+		{
+			if (IFileManager::Get().FileExists(*File))
+			{
+				FCodeAnalysis::Analysis(File);
+			}
+		}
+
+		FDynamicGenerator::SetCodeAnalysisDynamicFilesMap();
+	}
 }
 
 void FEditorListener::OnFilesLoaded()

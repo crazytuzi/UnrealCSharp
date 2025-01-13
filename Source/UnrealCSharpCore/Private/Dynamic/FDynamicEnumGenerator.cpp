@@ -1,4 +1,5 @@
 #include "Dynamic/FDynamicEnumGenerator.h"
+#include "CoreMacro/Macro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Template/TGetArrayLength.inl"
@@ -10,6 +11,8 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #endif
 #include "UEVersion.h"
+
+TMap<UEnum*, FString> FDynamicEnumGenerator::NamespaceMap;
 
 TMap<FString, UEnum*> FDynamicEnumGenerator::DynamicEnumMap;
 
@@ -45,12 +48,15 @@ void FDynamicEnumGenerator::Generator()
 #if WITH_EDITOR
 void FDynamicEnumGenerator::CodeAnalysisGenerator()
 {
-	FDynamicGeneratorCore::CodeAnalysisGenerator(TEXT("DynamicEnum"),
-	                                             [](const FString& InName)
+	FDynamicGeneratorCore::CodeAnalysisGenerator(DYNAMIC_ENUM,
+	                                             [](const FString& InNameSpace, const FString& InName)
 	                                             {
 		                                             if (!DynamicEnumMap.Contains(InName))
 		                                             {
-			                                             GeneratorEnum(FDynamicGeneratorCore::GetOuter(), InName);
+			                                             GeneratorEnum(
+				                                             FDynamicGeneratorCore::GetOuter(),
+				                                             InNameSpace,
+				                                             InName);
 		                                             }
 	                                             });
 }
@@ -58,11 +64,6 @@ void FDynamicEnumGenerator::CodeAnalysisGenerator()
 bool FDynamicEnumGenerator::IsDynamicEnum(MonoClass* InMonoClass)
 {
 	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_ENUM_ATTRIBUTE);
-}
-
-MonoClass* FDynamicEnumGenerator::GetMonoClass(const FString& InName)
-{
-	return FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), InName);
 }
 #endif
 
@@ -80,6 +81,8 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
 
 	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
 
+	const auto ClassNamespace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
+
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
 #if WITH_EDITOR
@@ -92,7 +95,7 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
 	{
 		Enum = DynamicEnumMap[ClassName];
 
-		GeneratorEnum(ClassName, Enum, [InMonoClass](UEnum* InEnum)
+		GeneratorEnum(ClassNamespace, ClassName, Enum, [InMonoClass](UEnum* InEnum)
 		{
 			ProcessGenerator(InMonoClass, InEnum);
 		});
@@ -103,7 +106,7 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
 	}
 	else
 	{
-		Enum = GeneratorEnum(Outer, ClassName,
+		Enum = GeneratorEnum(Outer, ClassNamespace, ClassName,
 		                     [InMonoClass](UEnum* InEnum)
 		                     {
 			                     ProcessGenerator(InMonoClass, InEnum);
@@ -123,6 +126,13 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
 bool FDynamicEnumGenerator::IsDynamicEnum(const UEnum* InEnum)
 {
 	return DynamicEnumSet.Contains(InEnum);
+}
+
+FString FDynamicEnumGenerator::GetNameSpace(const UEnum* InEnum)
+{
+	const auto FoundNameSpace = NamespaceMap.Find(InEnum);
+
+	return FoundNameSpace != nullptr ? *FoundNameSpace : FString{};
 }
 
 void FDynamicEnumGenerator::BeginGenerator(const UEnum* InEnum)
@@ -163,9 +173,11 @@ void FDynamicEnumGenerator::EndGenerator(UEnum* InEnum)
 #endif
 }
 
-void FDynamicEnumGenerator::GeneratorEnum(const FString& InName, UEnum* InEnum,
-                                          const TFunction<void(UEnum*)>& InProcessGenerator)
+void FDynamicEnumGenerator::GeneratorEnum(const FString& InNameSpace, const FString& InName,
+                                          UEnum* InEnum, const TFunction<void(UEnum*)>& InProcessGenerator)
 {
+	NamespaceMap.Add(InEnum, InNameSpace);
+
 	DynamicEnumMap.Add(InName, InEnum);
 
 	DynamicEnumSet.Add(InEnum);
@@ -177,22 +189,22 @@ void FDynamicEnumGenerator::GeneratorEnum(const FString& InName, UEnum* InEnum,
 	EndGenerator(InEnum);
 }
 
-UEnum* FDynamicEnumGenerator::GeneratorEnum(UPackage* InOuter, const FString& InName)
+UEnum* FDynamicEnumGenerator::GeneratorEnum(UPackage* InOuter, const FString& InNameSpace, const FString& InName)
 {
-	return GeneratorEnum(InOuter, InName,
+	return GeneratorEnum(InOuter, InNameSpace, InName,
 	                     [](UEnum* InEnum)
 	                     {
 	                     });
 }
 
-UEnum* FDynamicEnumGenerator::GeneratorEnum(UPackage* InOuter, const FString& InName,
-                                            const TFunction<void(UEnum*)>& InProcessGenerator)
+UEnum* FDynamicEnumGenerator::GeneratorEnum(UPackage* InOuter, const FString& InNameSpace,
+                                            const FString& InName, const TFunction<void(UEnum*)>& InProcessGenerator)
 {
 	const auto Enum = NewObject<UEnum>(InOuter, *InName, RF_Public);
 
 	Enum->AddToRoot();
 
-	GeneratorEnum(InName, Enum, InProcessGenerator);
+	GeneratorEnum(InNameSpace, InName, Enum, InProcessGenerator);
 
 	return Enum;
 }

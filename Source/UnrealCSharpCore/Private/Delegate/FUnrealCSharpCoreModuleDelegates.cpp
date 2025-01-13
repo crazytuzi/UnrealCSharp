@@ -11,3 +11,7 @@ FUnrealCSharpCoreModuleDelegates::FOnBeginGenerator FUnrealCSharpCoreModuleDeleg
 FUnrealCSharpCoreModuleDelegates::FOnEndGenerator FUnrealCSharpCoreModuleDelegates::OnEndGenerator;
 
 FUnrealCSharpCoreModuleDelegates::FOnDynamicClassUpdated FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated;
+
+#if WITH_EDITOR
+FUnrealCSharpCoreModuleDelegates::FOnCompile FUnrealCSharpCoreModuleDelegates::OnCompile;
+#endif

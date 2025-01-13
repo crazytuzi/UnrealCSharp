@@ -71,6 +71,10 @@ public:
 
 	static FString GetClassNameSpace(const UStruct* InStruct);
 
+	static FString GetClassNameSpace(const UClass* InClass);
+
+	static FString GetClassNameSpace(const UScriptStruct* InScriptStruct);
+
 	static FString GetFullClass(const UEnum* InEnum);
 
 	static FString GetClassNameSpace(const UEnum* InEnum);

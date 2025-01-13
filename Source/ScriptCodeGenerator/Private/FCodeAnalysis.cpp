@@ -26,9 +26,9 @@ void FCodeAnalysis::Analysis(const FString& InFile)
 	const auto AnalysisParam = FString::Printf(TEXT(
 		"true \"%s\" \"%s\""
 	),
-	                                           *InFile,
 	                                           *FPaths::ConvertRelativePathToFull(
-		                                           FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath())
+		                                           FUnrealCSharpFunctionLibrary::GetCodeAnalysisPath()),
+	                                           *InFile
 	);
 
 	void* ReadPipe = nullptr;

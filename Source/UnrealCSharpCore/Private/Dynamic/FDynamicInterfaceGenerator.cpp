@@ -12,6 +12,8 @@
 #endif
 #include "UEVersion.h"
 
+TMap<UClass*, FString> FDynamicInterfaceGenerator::NamespaceMap;
+
 TMap<FString, UClass*> FDynamicInterfaceGenerator::DynamicInterfaceMap;
 
 TSet<UClass*> FDynamicInterfaceGenerator::DynamicInterfaceSet;
@@ -61,12 +63,13 @@ void FDynamicInterfaceGenerator::Generator()
 #if WITH_EDITOR
 void FDynamicInterfaceGenerator::CodeAnalysisGenerator()
 {
-	FDynamicGeneratorCore::CodeAnalysisGenerator(TEXT("DynamicInterface"),
-	                                             [](const FString& InName)
+	FDynamicGeneratorCore::CodeAnalysisGenerator(DYNAMIC_INTERFACE,
+	                                             [](const FString& InNameSpace, const FString& InName)
 	                                             {
 		                                             if (!DynamicInterfaceMap.Contains(InName))
 		                                             {
 			                                             GeneratorInterface(FDynamicGeneratorCore::GetOuter(),
+			                                                                InNameSpace,
 			                                                                InName,
 			                                                                UInterface::StaticClass());
 		                                             }
@@ -76,13 +79,6 @@ void FDynamicInterfaceGenerator::CodeAnalysisGenerator()
 bool FDynamicInterfaceGenerator::IsDynamicInterface(MonoClass* InMonoClass)
 {
 	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_INTERFACE_ATTRIBUTE);
-}
-
-MonoClass* FDynamicInterfaceGenerator::GetMonoClass(const FString& InName)
-{
-	static auto U = INTERFACE_PREFIX;
-
-	return FMonoDomain::Class_From_Name(FDynamicGeneratorCore::GetClassNameSpace(), U + InName);
 }
 #endif
 
@@ -99,6 +95,8 @@ void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
 	}
 
 	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+
+	const auto ClassNamespace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
@@ -124,7 +122,7 @@ void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
 
 		Class->PurgeClass(true);
 
-		GeneratorInterface(ClassName, Class, ParentClass,
+		GeneratorInterface(ClassNamespace, ClassName, Class, ParentClass,
 		                   [InMonoClass](UClass* InInterface)
 		                   {
 			                   ProcessGenerator(InMonoClass, InInterface);
@@ -136,7 +134,7 @@ void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
 	}
 	else
 	{
-		Class = GeneratorInterface(Outer, ClassName, ParentClass,
+		Class = GeneratorInterface(Outer, ClassNamespace, ClassName, ParentClass,
 		                           [InMonoClass](UClass* InInterface)
 		                           {
 			                           ProcessGenerator(InMonoClass, InInterface);
@@ -156,6 +154,13 @@ void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
 bool FDynamicInterfaceGenerator::IsDynamicInterface(const UClass* InClass)
 {
 	return DynamicInterfaceSet.Contains(InClass);
+}
+
+FString FDynamicInterfaceGenerator::GetNameSpace(const UClass* InClass)
+{
+	const auto FoundNameSpace = NamespaceMap.Find(InClass);
+
+	return FoundNameSpace != nullptr ? *FoundNameSpace : FString{};
 }
 
 void FDynamicInterfaceGenerator::BeginGenerator(UClass* InClass, UClass* InParentClass)
@@ -239,9 +244,12 @@ void FDynamicInterfaceGenerator::EndGenerator(UClass* InClass)
 #endif
 }
 
-void FDynamicInterfaceGenerator::GeneratorInterface(const FString& InName, UClass* InClass, UClass* InParentClass,
+void FDynamicInterfaceGenerator::GeneratorInterface(const FString& InNameSpace, const FString& InName,
+                                                    UClass* InClass, UClass* InParentClass,
                                                     const TFunction<void(UClass*)>& InProcessGenerator)
 {
+	NamespaceMap.Add(InClass, InNameSpace);
+
 	DynamicInterfaceMap.Add(InName, InClass);
 
 	DynamicInterfaceSet.Add(InClass);
@@ -253,22 +261,24 @@ void FDynamicInterfaceGenerator::GeneratorInterface(const FString& InName, UClas
 	EndGenerator(InClass);
 }
 
-UClass* FDynamicInterfaceGenerator::GeneratorInterface(UPackage* InOuter, const FString& InName, UClass* InParentClass)
+UClass* FDynamicInterfaceGenerator::GeneratorInterface(UPackage* InOuter, const FString& InNameSpace,
+                                                       const FString& InName, UClass* InParentClass)
 {
-	return GeneratorInterface(InOuter, InName, InParentClass,
+	return GeneratorInterface(InOuter, InNameSpace, InName, InParentClass,
 	                          [](UClass* InClass)
 	                          {
 	                          });
 }
 
-UClass* FDynamicInterfaceGenerator::GeneratorInterface(UPackage* InOuter, const FString& InName, UClass* InParentClass,
+UClass* FDynamicInterfaceGenerator::GeneratorInterface(UPackage* InOuter, const FString& InNameSpace,
+                                                       const FString& InName, UClass* InParentClass,
                                                        const TFunction<void(UClass*)>& InProcessGenerator)
 {
 	const auto Class = NewObject<UClass>(InOuter, *InName.RightChop(1), RF_Public);
 
 	Class->AddToRoot();
 
-	GeneratorInterface(InName, Class, InParentClass, InProcessGenerator);
+	GeneratorInterface(InNameSpace, InName, Class, InParentClass, InProcessGenerator);
 
 	return Class;
 }

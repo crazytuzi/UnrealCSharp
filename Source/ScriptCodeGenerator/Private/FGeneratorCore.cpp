@@ -816,33 +816,33 @@ bool FGeneratorCore::IsSupported(const UFunction* InFunction)
 	return true;
 }
 
-bool FGeneratorCore::IsSupported(const UStruct* InStruct)
+bool FGeneratorCore::IsSupported(const UScriptStruct* InScriptStruct)
 {
-	if (bIsGenerateAllModules && InStruct->IsNative()) return true;
+	if (bIsGenerateAllModules && InScriptStruct->IsNative()) return true;
 
-	if (const auto FoundSupported = SupportedMap.Find(InStruct))
+	if (const auto FoundSupported = SupportedMap.Find(InScriptStruct))
 	{
 		return *FoundSupported;
 	}
 
-	if (!IsSupportedModule(FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct)))
+	if (!IsSupportedModule(FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct)))
 	{
-		SupportedMap.Add(InStruct, false);
+		SupportedMap.Add(InScriptStruct, false);
 
 		return false;
 	}
 
-	if (const auto SuperStruct = InStruct->GetSuperStruct())
+	if (const auto SuperStruct = Cast<UScriptStruct>(InScriptStruct->GetSuperStruct()))
 	{
 		if (!IsSupported(SuperStruct))
 		{
-			SupportedMap.Add(InStruct, false);
+			SupportedMap.Add(InScriptStruct, false);
 
 			return false;
 		}
 	}
 
-	SupportedMap.Add(InStruct, true);
+	SupportedMap.Add(InScriptStruct, true);
 
 	return true;
 }

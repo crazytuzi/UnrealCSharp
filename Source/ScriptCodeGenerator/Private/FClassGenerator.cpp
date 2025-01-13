@@ -10,8 +10,7 @@
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
-#include "Dynamic/FDynamicClassGenerator.h"
-#include "Dynamic/FDynamicInterfaceGenerator.h"
+#include "Dynamic/FDynamicGenerator.h"
 
 void FClassGenerator::Generator()
 {
@@ -31,12 +30,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		return;
 	}
 
-	if (FDynamicClassGenerator::IsDynamicClass(InClass))
-	{
-		return;
-	}
-
-	if (FDynamicInterfaceGenerator::IsDynamicInterface(InClass))
+	if (FDynamicGenerator::IsDynamicClass(InClass))
 	{
 		return;
 	}

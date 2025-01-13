@@ -66,6 +66,14 @@
 
 #define DYNAMIC_FILE FString(TEXT("DynamicFile"))
 
+#define DYNAMIC_CLASS FString(TEXT("DynamicClass"))
+
+#define DYNAMIC_STRUCT FString(TEXT("DynamicStruct"))
+
+#define DYNAMIC_ENUM FString(TEXT("DynamicEnum"))
+
+#define DYNAMIC_INTERFACE FString(TEXT("DynamicInterface"))
+
 #define DYNAMIC_ROOT_INTERNAL_PATH FString(TEXT("/Classes_Script"))
 
 #define DYNAMIC_ROOT_VIRTUAL_PATH FString(TEXT("/All")) / DYNAMIC_ROOT_INTERNAL_PATH
