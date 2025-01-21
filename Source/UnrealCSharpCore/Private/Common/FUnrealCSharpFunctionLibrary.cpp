@@ -756,16 +756,28 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
 #endif
 
 #if WITH_EDITOR
-TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
+TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsName()
 {
-	TArray<FString> CustomProjectsDirectory;
+	TArray<FString> CustomProjectsName;
 
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
 		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects())
 		{
-			CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
+			CustomProjectsName.Add(Name);
 		}
+	}
+
+	return CustomProjectsName;
+}
+
+TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
+{
+	TArray<FString> CustomProjectsDirectory;
+
+	for (const auto& Name : GetCustomProjectsName())
+	{
+		CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
 	}
 
 	return CustomProjectsDirectory;
@@ -865,6 +877,37 @@ FString FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory()
 }
 
 #if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideFileName(const UClass* InTemplateClass)
+{
+	return GetPluginTemplateOverrideDirectory() /
+		FString::Printf(TEXT(
+			"%s%s"
+		),
+		                *InTemplateClass->GetName(),
+		                *CSHARP_SUFFIX);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(const UClass* InTemplateClass)
+{
+	return GetPluginTemplateDynamicDirectory() /
+		FString::Printf(TEXT(
+			"%s%s%s"
+		),
+		                *DYNAMIC,
+		                *InTemplateClass->GetName(),
+		                *CSHARP_SUFFIX);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideDirectory()
+{
+	return GetPluginTemplateDirectory() / PLUGIN_TEMPLATE_OVERRIDE;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicDirectory()
+{
+	return GetPluginTemplateDirectory() / PLUGIN_TEMPLATE_DYNAMIC;
+}
+
 FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
 {
 	return GetPluginDirectory() / PLUGIN_TEMPLATE_PATH;

@@ -24,6 +24,8 @@ public:
 public:
 	TSharedPtr<FUICommandInfo> GeneratorCode;
 
+	TSharedPtr<FUICommandInfo> OpenNewDynamicClassDialog;
+
 	TSharedPtr<FUICommandInfo> OpenEditorSettings;
 
 	TSharedPtr<FUICommandInfo> OpenRuntimeSettings;

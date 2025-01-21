@@ -126,6 +126,8 @@ public:
 #endif
 
 #if WITH_EDITOR
+	static TArray<FString> GetCustomProjectsName();
+
 	static TArray<FString> GetCustomProjectsDirectory();
 #endif
 
@@ -152,6 +154,14 @@ public:
 	static FString GetPluginScriptDirectory();
 
 #if WITH_EDITOR
+	static FString GetPluginTemplateOverrideFileName(const UClass* InTemplateClass);
+
+	static FString GetPluginTemplateDynamicFileName(const UClass* InTemplateClass);
+
+	static FString GetPluginTemplateOverrideDirectory();
+
+	static FString GetPluginTemplateDynamicDirectory();
+
 	static FString GetPluginTemplateDirectory();
 #endif
 
