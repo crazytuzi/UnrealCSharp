@@ -1311,23 +1311,31 @@ bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const
 		return false;
 	}
 
+	const UFunction* Function{};
+
 	auto OwnerClass = InClass;
 
-	auto SuperClass = InClass->GetSuperClass();
+	auto Class = InClass;
 
-	while (SuperClass != nullptr)
+	while (Class != nullptr)
 	{
-		if (SuperClass->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
+		for (const auto Interface : Class->Interfaces)
 		{
-			OwnerClass = SuperClass;
+			if (Interface.Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
+			{
+				return Interface.Class->IsNative();
+			}
+		}
 
-			SuperClass = SuperClass->GetSuperClass();
-		}
-		else
+		if (const auto Result = Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
 		{
-			break;
+			Function = Result;
+
+			OwnerClass = Class;
 		}
+
+		Class = Class->GetSuperClass();
 	}
 
-	return OwnerClass->IsNative();
+	return Function->IsNative() && OwnerClass->IsNative();
 }
