@@ -756,28 +756,16 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
 #endif
 
 #if WITH_EDITOR
-TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsName()
+TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
 {
-	TArray<FString> CustomProjectsName;
+	TArray<FString> CustomProjectsDirectory;
 
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
 		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects())
 		{
-			CustomProjectsName.Add(Name);
+			CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
 		}
-	}
-
-	return CustomProjectsName;
-}
-
-TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
-{
-	TArray<FString> CustomProjectsDirectory;
-
-	for (const auto& Name : GetCustomProjectsName())
-	{
-		CustomProjectsDirectory.Add(GetFullScriptDirectory() / Name);
 	}
 
 	return CustomProjectsDirectory;
@@ -877,37 +865,6 @@ FString FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory()
 }
 
 #if WITH_EDITOR
-FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideFileName(const UClass* InTemplateClass)
-{
-	return GetPluginTemplateOverrideDirectory() /
-		FString::Printf(TEXT(
-			"%s%s"
-		),
-		                *InTemplateClass->GetName(),
-		                *CSHARP_SUFFIX);
-}
-
-FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(const UClass* InTemplateClass)
-{
-	return GetPluginTemplateDynamicDirectory() /
-		FString::Printf(TEXT(
-			"%s%s%s"
-		),
-		                *DYNAMIC,
-		                *InTemplateClass->GetName(),
-		                *CSHARP_SUFFIX);
-}
-
-FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideDirectory()
-{
-	return GetPluginTemplateDirectory() / PLUGIN_TEMPLATE_OVERRIDE;
-}
-
-FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicDirectory()
-{
-	return GetPluginTemplateDirectory() / PLUGIN_TEMPLATE_DYNAMIC;
-}
-
 FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
 {
 	return GetPluginDirectory() / PLUGIN_TEMPLATE_PATH;
@@ -1354,6 +1311,8 @@ bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const
 		return false;
 	}
 
+	const UFunction* Function{};
+
 	auto OwnerClass = InClass;
 
 	auto Class = InClass;
@@ -1368,24 +1327,15 @@ bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const
 			}
 		}
 
-		if (Class == InClass)
+		if (const auto Result = Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
 		{
-			Class = Class->GetSuperClass();
-		}
-		else
-		{
-			if (Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
-			{
-				OwnerClass = Class;
+			Function = Result;
 
-				Class = Class->GetSuperClass();
-			}
-			else
-			{
-				break;
-			}
+			OwnerClass = Class;
 		}
+
+		Class = Class->GetSuperClass();
 	}
 
-	return OwnerClass->IsNative();
+	return Function->IsNative() && OwnerClass->IsNative();
 }
