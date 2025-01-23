@@ -10,6 +10,7 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Engine/SCS_Node.h"
 #include "Engine/SimpleConstructionScript.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetReinstanceUtilities.h"
 #include "Dynamic/FDynamicGenerator.h"
@@ -224,6 +225,11 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass)
 	if (OldClass != nullptr)
 	{
 		ReInstance(OldClass, Class);
+	}
+
+	if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+	{
+		AssetRegistryModule->Get().OnFilesLoaded().Broadcast();
 	}
 #endif
 
