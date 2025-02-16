@@ -385,7 +385,7 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(DynamicClass),
 			FUnrealCSharpFunctionLibrary::GetFullClass(DynamicClass)))
 		{
-			FDynamicClassGenerator::Generator(FoundMonoClass);
+			FDynamicClassGenerator::Generator(FoundMonoClass, EDynamicClassGeneratorType::ReInstance);
 		}
 	}
 
