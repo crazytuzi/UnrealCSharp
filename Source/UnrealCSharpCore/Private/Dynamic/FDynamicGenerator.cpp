@@ -150,7 +150,7 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& InFileChangeDat
 					{
 					case EDynamicType::Class:
 						{
-							FDynamicClassGenerator::Generator(Class);
+							FDynamicClassGenerator::Generator(Class, EDynamicClassGeneratorType::FileChange);
 						}
 						break;
 					case EDynamicType::Struct:

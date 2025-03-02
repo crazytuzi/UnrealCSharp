@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Template/TFunctionPointer.inl"
+#include "EDynamicClassGeneratorType.h"
 #include "mono/metadata/object.h"
 
 inline uint32 GetTypeHash(const UClass::ClassConstructorType& InClassConstructor)
@@ -23,7 +24,7 @@ public:
 	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses();
 #endif
 
-	static void Generator(MonoClass* InMonoClass);
+	static void Generator(MonoClass* InMonoClass, EDynamicClassGeneratorType InDynamicClassGeneratorType);
 
 	static bool IsDynamicClass(const UClass* InClass);
 
