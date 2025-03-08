@@ -545,7 +545,7 @@ UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass*
 
 	NewFunction->ClearInternalFlags(EInternalObjectFlags::Native);
 
-	if (GShouldVerifyGCAssumptions && GUObjectArray.IsDisregardForGC(InClass))
+	if (InClass->HasAnyInternalFlags(EInternalObjectFlags::RootSet) || GUObjectArray.IsDisregardForGC(InClass))
 	{
 		NewFunction->AddToRoot();
 	}
