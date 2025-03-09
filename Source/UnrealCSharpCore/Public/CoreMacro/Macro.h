@@ -6,6 +6,12 @@
 
 #define PLUGIN_TEMPLATE_PATH FString(TEXT("Template"))
 
+#define PLUGIN_TEMPLATE_OVERRIDE FString(TEXT("Override"))
+
+#define PLUGIN_TEMPLATE_DYNAMIC FString(TEXT("Dynamic"))
+
+#define DYNAMIC_CLASS_DEFAULT_PREFIX FString(TEXT("My"))
+
 #define SOLUTION_NAME FString(TEXT("Script"))
 
 #define DEFAULT_UE_NAME FString(TEXT("UE"))
@@ -39,6 +45,8 @@
 #define PROJECT_PLACEHOLDER FString(TEXT("ProjectPlaceholder"))
 
 #define SOLUTION_CONFIGURATION_PLATFORMS_PLACEHOLDER FString(TEXT("SolutionConfigurationPlatformsPlaceholder"))
+
+#define DYNAMIC_CLASS_TEMPLATE_FILE_NAMESPACE_PLACEHOLDER FString(TEXT("Script.CoreUObject"))
 
 #define PROJECT_SUFFIX FString(TEXT(".csproj"))
 

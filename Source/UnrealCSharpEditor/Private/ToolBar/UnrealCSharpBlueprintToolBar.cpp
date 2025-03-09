@@ -100,8 +100,7 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 				{
 					if (Blueprint->GeneratedClass->IsChildOf(TemplateClass))
 					{
-						const auto Template = FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
-							/ TemplateClass->GetName() + CSHARP_SUFFIX;
+						const auto Template = FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideFileName(TemplateClass);
 
 						FString Content;
 

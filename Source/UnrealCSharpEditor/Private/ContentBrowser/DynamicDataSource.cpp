@@ -9,6 +9,12 @@
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "ContentBrowserDataMenuContexts.h"
+#include "ToolMenuDelegates.h"
+#include "ToolMenus.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "ContentBrowser/DynamicNewClassContextMenu.h"
+#include "NewClass/DynamicNewClassUtils.h"
 
 #ifdef UE_INLINE_GENERATED_CPP_BY_NAME
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DynamicDataSource)
@@ -27,6 +33,19 @@ void UDynamicDataSource::Initialize(const bool InAutoRegister)
 		this, &UDynamicDataSource::OnEndGenerator);
 
 	CollectionManager = &FCollectionManagerModule::GetModule().Get();
+
+	if (UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("ContentBrowser.AddNewContextMenu"))
+	{
+		Menu->AddDynamicSection(*FString::Printf(TEXT("DynamicSection_DataSource_%s"), *GetName()),
+		                        FNewToolMenuDelegate::CreateLambda(
+			                        [WeakThis = TWeakObjectPtr<UDynamicDataSource>(this)](UToolMenu* InMenu)
+			                        {
+				                        if (UDynamicDataSource* This = WeakThis.Get())
+				                        {
+					                        This->PopulateAddNewContextMenu(InMenu);
+				                        }
+			                        }));
+	}
 
 	BuildRootPathVirtualTree();
 }
@@ -575,6 +594,46 @@ void UDynamicDataSource::BuildRootPathVirtualTree()
 	Super::BuildRootPathVirtualTree();
 
 	RootPathAdded(FNameBuilder(*DYNAMIC_ROOT_INTERNAL_PATH));
+}
+
+void UDynamicDataSource::PopulateAddNewContextMenu(UToolMenu* InMenu)
+{
+	const auto ContextObject = InMenu->FindContext<UContentBrowserDataMenuContext_AddNewMenu>();
+
+	TArray<FName> SelectedClassPaths;
+
+	for (const FName& SelectedPath : ContextObject->SelectedPaths)
+	{
+		if (FName InternalPath; TryConvertVirtualPathToInternal(SelectedPath, InternalPath))
+		{
+			SelectedClassPaths.Add(InternalPath);
+		}
+	}
+
+	FDynamicNewClassContextMenu::FOnOpenNewDynamicClassRequested OnOpenNewDynamicClassRequested;
+
+	if (SelectedClassPaths.Num() > 0)
+	{
+		OnOpenNewDynamicClassRequested = FDynamicNewClassContextMenu::FOnOpenNewDynamicClassRequested::CreateStatic(
+			&UDynamicDataSource::OnOpenNewDynamicClassRequested);
+	}
+
+	FDynamicNewClassContextMenu::MakeContextMenu(InMenu, SelectedClassPaths, OnOpenNewDynamicClassRequested);
+}
+
+void UDynamicDataSource::OnOpenNewDynamicClassRequested(const FName& InSelectedPath)
+{
+	FString SelectedFileSystemPath;
+
+	FDynamicHierarchy::TryConvertInternalPathToFileSystemPath(
+		InSelectedPath.ToString(), SelectedFileSystemPath);
+
+	if (SelectedFileSystemPath.EndsWith(FUnrealCSharpFunctionLibrary::GetScriptDirectory()))
+	{
+		SelectedFileSystemPath = FUnrealCSharpFunctionLibrary::GetGameDirectory();
+	}
+
+	FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(SelectedFileSystemPath);
 }
 
 void UDynamicDataSource::OnDynamicClassUpdated()
