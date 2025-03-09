@@ -6,12 +6,12 @@
 #if UE_F_NAME_PERMISSION_LIST
 #include "Misc/NamePermissionList.h"
 #endif
-#include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
-#include "CoreMacro/Macro.h"
-#include "Dynamic/FDynamicGenerator.h"
 #include "ContentBrowserDataMenuContexts.h"
 #include "ToolMenuDelegates.h"
 #include "ToolMenus.h"
+#include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
+#include "CoreMacro/Macro.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "ContentBrowser/DynamicNewClassContextMenu.h"
 #include "NewClass/DynamicNewClassUtils.h"
@@ -34,15 +34,18 @@ void UDynamicDataSource::Initialize(const bool InAutoRegister)
 
 	CollectionManager = &FCollectionManagerModule::GetModule().Get();
 
-	if (UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("ContentBrowser.AddNewContextMenu"))
+	if (const auto Menu = UToolMenus::Get()->ExtendMenu("ContentBrowser.AddNewContextMenu"))
 	{
-		Menu->AddDynamicSection(*FString::Printf(TEXT("DynamicSection_DataSource_%s"), *GetName()),
+		Menu->AddDynamicSection(*FString::Printf(TEXT(
+			                        "DynamicSection_DataSource_%s"),
+		                                         *GetName()
+		                        ),
 		                        FNewToolMenuDelegate::CreateLambda(
 			                        [WeakThis = TWeakObjectPtr<UDynamicDataSource>(this)](UToolMenu* InMenu)
 			                        {
-				                        if (UDynamicDataSource* This = WeakThis.Get())
+				                        if (WeakThis.IsValid())
 				                        {
-					                        This->PopulateAddNewContextMenu(InMenu);
+					                        WeakThis->PopulateAddNewContextMenu(InMenu);
 				                        }
 			                        }));
 	}
@@ -596,13 +599,27 @@ void UDynamicDataSource::BuildRootPathVirtualTree()
 	RootPathAdded(FNameBuilder(*DYNAMIC_ROOT_INTERNAL_PATH));
 }
 
+void UDynamicDataSource::OnNewClassRequested(const FName& InSelectedPath)
+{
+	if (auto SelectedFileSystemPath = FDynamicHierarchy::ConvertInternalPathToFileSystemPath(InSelectedPath.ToString());
+		!SelectedFileSystemPath.IsEmpty())
+	{
+		if (SelectedFileSystemPath.EndsWith(FUnrealCSharpFunctionLibrary::GetScriptDirectory()))
+		{
+			SelectedFileSystemPath = FUnrealCSharpFunctionLibrary::GetGameDirectory();
+		}
+
+		FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(SelectedFileSystemPath);
+	}
+}
+
 void UDynamicDataSource::PopulateAddNewContextMenu(UToolMenu* InMenu)
 {
 	const auto ContextObject = InMenu->FindContext<UContentBrowserDataMenuContext_AddNewMenu>();
 
 	TArray<FName> SelectedClassPaths;
 
-	for (const FName& SelectedPath : ContextObject->SelectedPaths)
+	for (const auto& SelectedPath : ContextObject->SelectedPaths)
 	{
 		if (FName InternalPath; TryConvertVirtualPathToInternal(SelectedPath, InternalPath))
 		{
@@ -612,28 +629,13 @@ void UDynamicDataSource::PopulateAddNewContextMenu(UToolMenu* InMenu)
 
 	FDynamicNewClassContextMenu::FOnOpenNewDynamicClassRequested OnOpenNewDynamicClassRequested;
 
-	if (SelectedClassPaths.Num() > 0)
+	if (!SelectedClassPaths.IsEmpty())
 	{
 		OnOpenNewDynamicClassRequested = FDynamicNewClassContextMenu::FOnOpenNewDynamicClassRequested::CreateStatic(
-			&UDynamicDataSource::OnOpenNewDynamicClassRequested);
+			&UDynamicDataSource::OnNewClassRequested);
 	}
 
 	FDynamicNewClassContextMenu::MakeContextMenu(InMenu, SelectedClassPaths, OnOpenNewDynamicClassRequested);
-}
-
-void UDynamicDataSource::OnOpenNewDynamicClassRequested(const FName& InSelectedPath)
-{
-	FString SelectedFileSystemPath;
-
-	FDynamicHierarchy::TryConvertInternalPathToFileSystemPath(
-		InSelectedPath.ToString(), SelectedFileSystemPath);
-
-	if (SelectedFileSystemPath.EndsWith(FUnrealCSharpFunctionLibrary::GetScriptDirectory()))
-	{
-		SelectedFileSystemPath = FUnrealCSharpFunctionLibrary::GetGameDirectory();
-	}
-
-	FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(SelectedFileSystemPath);
 }
 
 void UDynamicDataSource::OnDynamicClassUpdated()

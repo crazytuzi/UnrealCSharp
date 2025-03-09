@@ -10,7 +10,7 @@
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassUtils"
 
-void FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(const FString& InitialPath)
+void FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(const FString& InInitialPath)
 {
 	const auto WindowTitle = LOCTEXT("AddCodeWindowHeader_DynamicCppClass", "Add Dynamic C# Class");
 
@@ -27,7 +27,7 @@ void FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(const FString& In
 	const auto NewClassDialog =
 		SNew(SDynamicNewClassDialog)
 		.ParentWindow(AddCodeWindow)
-		.InitialPath(InitialPath);
+		.InitialPath(InInitialPath);
 
 	AddCodeWindow->SetContent(NewClassDialog);
 
@@ -38,7 +38,7 @@ void FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(const FString& In
 		return;
 	}
 
-	if (const auto ParentWindow = MainFrameModule->GetParentWindow(); ParentWindow.IsValid())
+	if (const auto ParentWindow = MainFrameModule->GetParentWindow())
 	{
 		FSlateApplication::Get().AddWindowAsNativeChild(AddCodeWindow, ParentWindow.ToSharedRef());
 	}
@@ -48,22 +48,22 @@ void FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(const FString& In
 	}
 }
 
-TArray<FProjectContextInfo> FDynamicNewClassUtils::GetCurrentProjectsInfo()
+TArray<FProjectContent> FDynamicNewClassUtils::GetProjectContent()
 {
 	TArray CustomProjectsName = {FUnrealCSharpFunctionLibrary::GetGameName()};
 
 	CustomProjectsName.Append(FUnrealCSharpFunctionLibrary::GetCustomProjectsName());
 
-	TArray<FProjectContextInfo> CustomProjectsInfo;
+	TArray<FProjectContent> ProjectContents;
 
 	for (const auto& ProjectName : CustomProjectsName)
 	{
-		CustomProjectsInfo.Add(FProjectContextInfo(ProjectName,
-		                                           FUnrealCSharpFunctionLibrary::GetFullScriptDirectory() /
-		                                           ProjectName));
+		ProjectContents.Add(FProjectContent(ProjectName,
+		                                    FUnrealCSharpFunctionLibrary::GetFullScriptDirectory() /
+		                                    ProjectName));
 	}
 
-	return CustomProjectsInfo;
+	return ProjectContents;
 }
 
 void FDynamicNewClassUtils::GetDynamicClassContent(const UClass* InParentClass, const FString& InNewClassName,
@@ -83,160 +83,60 @@ void FDynamicNewClassUtils::GetDynamicClassContent(const UClass* InParentClass, 
 		return;
 	}
 
-	const bool bIsCppParentClass = InParentClass->IsNative() &&
-		!FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(
-			InParentClass);
+	const auto bIsCppParentClass = InParentClass->IsNative() &&
+		!FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InParentClass);
 
-	const FString ParentNamespace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InParentClass);
+	const auto ParentNamespace = FUnrealCSharpFunctionLibrary::GetClassNameSpace(InParentClass);
 
-	const FString ParentClassName = (bIsCppParentClass ? InParentClass->GetPrefixCPP() : TEXT("")) + InParentClass->
-		GetName();
+	const auto ParentClassName = (bIsCppParentClass ? InParentClass->GetPrefixCPP() : TEXT("")) +
+		InParentClass->GetName();
 
-	const FString GeneratedClassName = FString::Printf(TEXT(
+	const auto GeneratedClassName = FString::Printf(TEXT(
 		"%s%s"
 	),
-	                                                   bIsCppParentClass && !InNewClassName.EndsWith(TEXT("_C"))
-		                                                   ? InParentClass->GetPrefixCPP()
-		                                                   : TEXT(""),
-	                                                   *InNewClassName);
+	                                                bIsCppParentClass && !InNewClassName.EndsWith(TEXT("_C"))
+		                                                ? InParentClass->GetPrefixCPP()
+		                                                : TEXT(""),
+	                                                *InNewClassName
+	);
 
-	const auto TemplateFileName = FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(
-		AncestorClass);
+	const auto TemplateFileName = FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(AncestorClass);
 
 	FFileHelper::LoadFileToString(OutContent, *TemplateFileName);
 
-	AddNamespaceIfUnique(OutContent, ParentNamespace);
+	AddNamespace(ParentNamespace, OutContent);
 
 	OutContent.ReplaceInline(*FString::Printf(TEXT(
 		                         ": %s"
 	                         ),
-	                                          *FUnrealCSharpFunctionLibrary::GetFullClass(AncestorClass)),
+	                                          *FUnrealCSharpFunctionLibrary::GetFullClass(AncestorClass)
+	                         ),
 	                         *FString::Printf(TEXT(
 		                         ": %s"
 	                         ),
-	                                          *ParentClassName));
+	                                          *ParentClassName
+	                         )
+	);
 
-	const FString OldClassFullName = FString::Printf(TEXT(
+	const auto OldClassFullName = FString::Printf(TEXT(
 		"%s%s%s"
 	),
-	                                                 AncestorClass->GetPrefixCPP(),
-	                                                 *DYNAMIC_CLASS_DEFAULT_PREFIX,
-	                                                 *AncestorClass->GetName());
+	                                              AncestorClass->GetPrefixCPP(),
+	                                              *DYNAMIC_CLASS_DEFAULT_PREFIX,
+	                                              *AncestorClass->GetName()
+	);
 
 	OutContent.ReplaceInline(*FString::Printf(TEXT(
-		                         "class %s"
+		                         "%s"
 	                         ),
-	                                          *OldClassFullName),
+	                                          *OldClassFullName
+	                         ),
 	                         *FString::Printf(TEXT(
-		                         "class %s"
+		                         "%s"
 	                         ),
-	                                          *GeneratedClassName));
-
-	OutContent.ReplaceInline(*FString::Printf(TEXT(
-		                         "public %s()"
-	                         ),
-	                                          *OldClassFullName),
-	                         *FString::Printf(TEXT(
-		                         "public %s()"
-	                         ),
-	                                          *GeneratedClassName));
-}
-
-UClass* FDynamicNewClassUtils::GetAncestorClass(const UClass* InParentClass)
-{
-	if (!InParentClass)
-	{
-		return nullptr;
-	}
-
-	static TArray TemplateClasses =
-	{
-		AActor::StaticClass(),
-		UActorComponent::StaticClass(),
-		UUserWidget::StaticClass(),
-		UObject::StaticClass()
-	};
-
-	for (const auto& TemplateClass : TemplateClasses)
-	{
-		if (InParentClass->IsChildOf(TemplateClass))
-		{
-			return TemplateClass;
-		}
-	}
-
-	return nullptr;
-}
-
-void FDynamicNewClassUtils::AddNamespaceIfUnique(FString& OutContent, const FString& InNamespace)
-{
-	if (OutContent.IsEmpty() || InNamespace.IsEmpty())
-	{
-		return;
-	}
-
-	TSet<FString> Namespaces;
-
-	TArray<FString> Lines;
-
-	const FString Using = TEXT("using");
-
-	const FString NameSpace = TEXT("namespace");
-
-	OutContent.ParseIntoArrayLines(Lines, false);
-
-	for (const FString& Line : Lines)
-	{
-		if (FString TrimmedLine = Line.TrimStartAndEnd(); TrimmedLine.StartsWith(Using))
-		{
-			FString Path = TrimmedLine
-			               .RightChop(Using.Len())
-			               .LeftChop(1)
-			               .TrimStartAndEnd();
-
-			if (Path != DYNAMIC_CLASS_TEMPLATE_FILE_NAMESPACE_PLACEHOLDER)
-			{
-				Namespaces.Add(Path);
-			}
-		}
-		else if (TrimmedLine.StartsWith(NameSpace))
-		{
-			const FString Path = TrimmedLine
-			                     .RightChop(NameSpace.Len())
-			                     .TrimStartAndEnd();
-
-			Namespaces.Add(Path);
-
-			break;
-		}
-	}
-
-	if (const bool bIsUnique = !Namespaces.Contains(InNamespace); bIsUnique)
-	{
-		OutContent.ReplaceInline(
-			*FString::Printf(TEXT(
-				"%s %s;"
-			),
-			                 *Using,
-			                 *DYNAMIC_CLASS_TEMPLATE_FILE_NAMESPACE_PLACEHOLDER),
-			*FString::Printf(TEXT(
-				"%s %s;"
-			),
-			                 *Using,
-			                 *InNamespace));
-	}
-	else
-	{
-		OutContent.ReplaceInline(
-			*FString::Printf(TEXT(
-				"%s %s;%s"
-			),
-			                 *Using,
-			                 *DYNAMIC_CLASS_TEMPLATE_FILE_NAMESPACE_PLACEHOLDER,
-			                 LINE_TERMINATOR),
-			TEXT("")
-		);
-	}
+	                                          *GeneratedClassName
+	                         )
+	);
 }
 
 FString FDynamicNewClassUtils::GetAssetGeneratedClassName(const FAssetData& InAssetData)
@@ -264,23 +164,29 @@ FString FNewClassInfo::GetClassNameCPP() const
 	switch (ClassType)
 	{
 	case EClassType::UObject:
-		return BaseClass ? BaseClass->GetName() : TEXT("");
-
+		{
+			return BaseClass ? BaseClass->GetName() : TEXT("");
+		}
 	case EClassType::EmptyCpp:
-		return TEXT("");
-
+		{
+			return TEXT("");
+		}
 	case EClassType::SlateWidget:
-		return TEXT("CompoundWidget");
-
+		{
+			return TEXT("CompoundWidget");
+		}
 	case EClassType::SlateWidgetStyle:
-		return TEXT("SlateWidgetStyle");
-
+		{
+			return TEXT("SlateWidgetStyle");
+		}
 	case EClassType::UInterface:
-		return TEXT("Interface");
-
+		{
+			return TEXT("Interface");
+		}
 	default:
 		break;
 	}
+
 	return TEXT("");
 }
 
@@ -289,20 +195,25 @@ FText FNewClassInfo::GetClassName() const
 	switch (ClassType)
 	{
 	case EClassType::UObject:
-		return BaseClass ? BaseClass->GetDisplayNameText() : FText::GetEmpty();
-
+		{
+			return BaseClass ? BaseClass->GetDisplayNameText() : FText::GetEmpty();
+		}
 	case EClassType::EmptyCpp:
-		return LOCTEXT("NoParentClass", "None");
-
+		{
+			return LOCTEXT("NoParentClass", "None");
+		}
 	case EClassType::SlateWidget:
-		return LOCTEXT("SlateWidgetParentClass", "Slate Widget");
-
+		{
+			return LOCTEXT("SlateWidgetParentClass", "Slate Widget");
+		}
 	case EClassType::SlateWidgetStyle:
-		return LOCTEXT("SlateWidgetStyleParentClass", "Slate Widget Style");
-
+		{
+			return LOCTEXT("SlateWidgetStyleParentClass", "Slate Widget Style");
+		}
 	case EClassType::UInterface:
-		return LOCTEXT("UInterfaceParentClass", "Unreal Interface");
-
+		{
+			return LOCTEXT("UInterfaceParentClass", "Unreal Interface");
+		}
 	default:
 		break;
 	}
@@ -318,11 +229,11 @@ FText FNewClassInfo::GetClassDescription(const bool bFullDescription) const
 		{
 			if (BaseClass)
 			{
-				FString ClassDescription = BaseClass->GetToolTipText(!bFullDescription).ToString();
+				auto ClassDescription = BaseClass->GetToolTipText(!bFullDescription).ToString();
 
 				if (!bFullDescription)
 				{
-					if (int32 FullStopIndex = 0; ClassDescription.FindChar('.', FullStopIndex))
+					if (auto FullStopIndex = 0; ClassDescription.FindChar('.', FullStopIndex))
 					{
 						ClassDescription.LeftInline(FullStopIndex + 1,
 #if UE_F_STRING_LEFT_CHOP_IN_LINE_E_ALLOW_SHRINKING
@@ -340,26 +251,130 @@ FText FNewClassInfo::GetClassDescription(const bool bFullDescription) const
 			}
 		}
 		break;
-
 	case EClassType::EmptyCpp:
-		return LOCTEXT("EmptyClassDescription", "An empty C++ class with a default constructor and destructor.");
-
+		{
+			return LOCTEXT("EmptyClassDescription", "An empty C++ class with a default constructor and destructor.");
+		}
 	case EClassType::SlateWidget:
-		return LOCTEXT("SlateWidgetClassDescription", "A custom Slate widget, deriving from SCompoundWidget.");
-
+		{
+			return LOCTEXT("SlateWidgetClassDescription", "A custom Slate widget, deriving from SCompoundWidget.");
+		}
 	case EClassType::SlateWidgetStyle:
-		return LOCTEXT("SlateWidgetStyleClassDescription",
-		               "A custom Slate widget style, deriving from FSlateWidgetStyle, along with its associated UObject wrapper class.");
-
+		{
+			return LOCTEXT("SlateWidgetStyleClassDescription",
+			               "A custom Slate widget style, deriving from FSlateWidgetStyle, along with its associated UObject wrapper class.");
+		}
 	case EClassType::UInterface:
-		return LOCTEXT("UInterfaceClassDescription",
-		               "A UObject Interface class, to be implemented by other UObject-based classes.");
-
+		{
+			return LOCTEXT("UInterfaceClassDescription",
+			               "A UObject Interface class, to be implemented by other UObject-based classes.");
+		}
 	default:
 		break;
 	}
 
 	return FText::GetEmpty();
+}
+
+UClass* FDynamicNewClassUtils::GetAncestorClass(const UClass* InClass)
+{
+	if (!InClass)
+	{
+		return nullptr;
+	}
+
+	static TArray TemplateClasses =
+	{
+		AActor::StaticClass(),
+		UActorComponent::StaticClass(),
+		UUserWidget::StaticClass(),
+		UObject::StaticClass()
+	};
+
+	for (const auto& TemplateClass : TemplateClasses)
+	{
+		if (InClass->IsChildOf(TemplateClass))
+		{
+			return TemplateClass;
+		}
+	}
+
+	return nullptr;
+}
+
+void FDynamicNewClassUtils::AddNamespace(const FString& InNamespace, FString& OutContent)
+{
+	if (OutContent.IsEmpty() || InNamespace.IsEmpty())
+	{
+		return;
+	}
+
+	TSet<FString> Namespaces;
+
+	TArray<FString> Lines;
+
+	const FString Using = TEXT("using");
+
+	const FString NameSpace = TEXT("namespace");
+
+	OutContent.ParseIntoArrayLines(Lines, false);
+
+	for (const auto& Line : Lines)
+	{
+		if (auto TrimmedLine = Line.TrimStartAndEnd(); TrimmedLine.StartsWith(Using))
+		{
+			auto Path = TrimmedLine
+			            .RightChop(Using.Len())
+			            .LeftChop(1)
+			            .TrimStartAndEnd();
+
+			if (Path != DYNAMIC_CLASS_DEFAULT_NAMESPACE)
+			{
+				Namespaces.Add(Path);
+			}
+		}
+		else if (TrimmedLine.StartsWith(NameSpace))
+		{
+			const auto Path = TrimmedLine
+			                  .RightChop(NameSpace.Len())
+			                  .TrimStartAndEnd();
+
+			Namespaces.Add(Path);
+
+			break;
+		}
+	}
+
+	if (!Namespaces.Contains(InNamespace))
+	{
+		OutContent.ReplaceInline(
+			*FString::Printf(TEXT(
+				"%s %s;"
+			),
+			                 *Using,
+			                 *DYNAMIC_CLASS_DEFAULT_NAMESPACE
+			),
+			*FString::Printf(TEXT(
+				"%s %s;"
+			),
+			                 *Using,
+			                 *InNamespace
+			)
+		);
+	}
+	else
+	{
+		OutContent.ReplaceInline(
+			*FString::Printf(TEXT(
+				"%s %s;%s"
+			),
+			                 *Using,
+			                 *DYNAMIC_CLASS_DEFAULT_NAMESPACE,
+			                 LINE_TERMINATOR
+			),
+			TEXT("")
+		);
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

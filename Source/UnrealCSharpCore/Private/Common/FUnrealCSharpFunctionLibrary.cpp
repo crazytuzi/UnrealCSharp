@@ -880,25 +880,9 @@ FString FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory()
 }
 
 #if WITH_EDITOR
-FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideFileName(const UClass* InTemplateClass)
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
 {
-	return GetPluginTemplateOverrideDirectory() /
-		FString::Printf(TEXT(
-			"%s%s"
-		),
-		                *InTemplateClass->GetName(),
-		                *CSHARP_SUFFIX);
-}
-
-FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(const UClass* InTemplateClass)
-{
-	return GetPluginTemplateDynamicDirectory() /
-		FString::Printf(TEXT(
-			"%s%s%s"
-		),
-		                *DYNAMIC,
-		                *InTemplateClass->GetName(),
-		                *CSHARP_SUFFIX);
+	return GetPluginDirectory() / PLUGIN_TEMPLATE_PATH;
 }
 
 FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideDirectory()
@@ -906,14 +890,30 @@ FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideDirectory()
 	return GetPluginTemplateDirectory() / PLUGIN_TEMPLATE_OVERRIDE;
 }
 
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideFileName(const UClass* InClass)
+{
+	return GetPluginTemplateOverrideDirectory() /
+		FString::Printf(TEXT(
+			"%s%s"
+		),
+		                *InClass->GetName(),
+		                *CSHARP_SUFFIX);
+}
+
 FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicDirectory()
 {
 	return GetPluginTemplateDirectory() / PLUGIN_TEMPLATE_DYNAMIC;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(const UClass* InClass)
 {
-	return GetPluginDirectory() / PLUGIN_TEMPLATE_PATH;
+	return GetPluginTemplateDynamicDirectory() /
+		FString::Printf(TEXT(
+			"%s%s%s"
+		),
+		                *DYNAMIC_CLASS_DEFAULT_PREFIX,
+		                *InClass->GetName(),
+		                *CSHARP_SUFFIX);
 }
 #endif
 

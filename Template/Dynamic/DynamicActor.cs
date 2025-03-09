@@ -5,22 +5,22 @@ using Script.CoreUObject;
 namespace Script.CoreUObject
 {
     [UClass]
-    public partial class AMyActor : AActor
+    public partial class ADynamicActor : AActor
     {
-        public AMyActor()
+        public ADynamicActor()
         {
         }
 
         [Override]
-		public override void ReceiveBeginPlay()
-		{
-			base.ReceiveBeginPlay();
-		}
+        public override void ReceiveBeginPlay()
+        {
+            base.ReceiveBeginPlay();
+        }
 
-		[Override]
-		public override void ReceiveEndPlay(EEndPlayReason EndPlayReason)
-		{
-			base.ReceiveEndPlay(EndPlayReason);
-		}
+        [Override]
+        public override void ReceiveEndPlay(EEndPlayReason EndPlayReason)
+        {
+            base.ReceiveEndPlay(EndPlayReason);
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace Script.UMG
     [Override]
     public partial class UUserWidget
     {
-        private UUserWidget()
+        public UUserWidget()
         {
         }
 

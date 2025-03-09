@@ -35,36 +35,30 @@ void SDynamicClassViewer::Construct(const FArguments& InArgs)
 	ChildSlot
 	[
 		SNew(SVerticalBox)
-
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(2)
 		[
 			SAssignNew(SearchBox, SSearchBox)
-
 			.OnTextChanged(this, &SDynamicClassViewer::OnSearchTextChanged)
 			.OnTextCommitted(this, &SDynamicClassViewer::OnSearchTextCommitted)
 		]
-
 		+ SVerticalBox::Slot()
 		.FillHeight(1.0f)
 		[
 			SAssignNew(ListView, SListView<TSharedPtr<FDynamicClassViewerNode>>)
-
 			.ListItemsSource(&FilteredItems)
 			.SelectionMode(ESelectionMode::Single)
 			.OnGenerateRow(this, &SDynamicClassViewer::OnGenerateRow)
 			.OnSelectionChanged(this, &SDynamicClassViewer::OnSelectionChanged)
 			.OnMouseButtonDoubleClick(this, &SDynamicClassViewer::OnNodeDoubleClicked)
 		]
-
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(5)
 		.HAlign(HAlign_Left)
 		[
 			SNew(STextBlock)
-
 			.Text(this, &SDynamicClassViewer::GetItemCountText)
 		]
 	];
@@ -74,37 +68,29 @@ END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 bool SDynamicClassViewer::ValidateClass(const FString& InClassName) const
 {
-	if (!ClassCollector.IsValid())
-	{
-		return false;
-	}
-
-	return ClassCollector->ValidateNode(InClassName);
+	return !ClassCollector.IsValid() ? false : ClassCollector->ValidateNode(InClassName);
 }
 
 TSharedRef<ITableRow> SDynamicClassViewer::OnGenerateRow(
 	TSharedPtr<FDynamicClassViewerNode> Item,
 	const TSharedRef<STableViewBase>& OwnerTable) const
 {
-	FSlateFontInfo FontInfo = FAppStyle::Get().GetFontStyle("PropertyWindow.NormalFont");
+	auto FontInfo = FAppStyle::Get().GetFontStyle("PropertyWindow.NormalFont");
 
 	FontInfo.Size = 10;
 
 	return SNew(STableRow<TSharedPtr<FDynamicClassViewerNode>>, OwnerTable)
-
 		.Padding(FMargin(2.0f))
 		.ShowSelection(true)
 		.SignalSelectionMode(ETableRowSignalSelectionMode::Instantaneous)
 		[
 			SNew(SHorizontalBox)
-
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			.VAlign(VAlign_Center)
 			.Padding(5.0f, 0.0f)
 			[
 				SNew(STextBlock)
-
 				.Text(FText::FromString(Item->AssetClassName))
 				.HighlightText(SearchText)
 				.Font(FontInfo)
@@ -171,7 +157,7 @@ void SDynamicClassViewer::OnSearchTextCommitted(const FText& InSearchText, EText
 
 void SDynamicClassViewer::UpdateFilteredItems()
 {
-	const FString SearchString = SearchText.ToString();
+	const auto SearchString = SearchText.ToString();
 
 	FilteredItems.Empty();
 
@@ -183,8 +169,6 @@ void SDynamicClassViewer::UpdateFilteredItems()
 	{
 		for (const auto& Item : AllItems)
 		{
-			const FTextFilterString FilterString(Item->AssetClassName);
-
 			if (TextFilter->TestTextFilter(FBasicStringFilterExpressionContext(Item->AssetClassName)))
 			{
 				FilteredItems.Add(Item);

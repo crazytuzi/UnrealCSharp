@@ -48,7 +48,7 @@ void FUnrealCSharpPlayToolBar::BuildAction()
 		}), FCanExecuteAction());
 
 	CommandList->MapAction(
-		FUnrealCSharpEditorCommands::Get().OpenNewDynamicClassDialog,
+		FUnrealCSharpEditorCommands::Get().OpenNewDynamicClass,
 		FExecuteAction::CreateLambda([]
 		{
 			FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(
@@ -87,8 +87,8 @@ TSharedRef<SWidget> FUnrealCSharpPlayToolBar::GeneratePlayToolBarMenu()
 	MenuBuilder.AddMenuEntry(Commands.GeneratorCode, NAME_None,
 	                         LOCTEXT("GeneratorCode", "Generator Code"));
 
-	MenuBuilder.AddMenuEntry(Commands.OpenNewDynamicClassDialog, NAME_None,
-	                         LOCTEXT("OpenNewDynamicClassDialog", "Open NewDynamicClassDialog"));
+	MenuBuilder.AddMenuEntry(Commands.OpenNewDynamicClass, NAME_None,
+	                         LOCTEXT("OpenNewDynamicClass", "Open NewDynamicClass"));
 
 	MenuBuilder.AddMenuEntry(Commands.OpenEditorSettings, NAME_None,
 	                         LOCTEXT("OpenEditorSettings", "Open EditorSettings"));

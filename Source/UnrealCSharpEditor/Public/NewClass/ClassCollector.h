@@ -5,34 +5,32 @@
 
 struct FDynamicClassViewerNodeKeyFuncs : BaseKeyFuncs<TSharedPtr<FDynamicClassViewerNode>, FString>
 {
-	using ElementType = TSharedPtr<FDynamicClassViewerNode>;
+	using FElementType = TSharedPtr<FDynamicClassViewerNode>;
 
-	using KeyType = FString;
+	using FKeyType = FString;
 
-	static KeyType GetSetKey(const ElementType& Element)
+	static FKeyType GetSetKey(const FElementType& InElement)
 	{
-		return Element.IsValid() ? Element->AssetClassName : TEXT("");
+		return InElement.IsValid() ? InElement->AssetClassName : TEXT("");
 	}
 
-	static bool Matches(const KeyType& A, const KeyType& B)
+	static bool Matches(const FKeyType& A, const FKeyType& B)
 	{
 		return A == B;
 	}
 
-	static uint32 GetKeyHash(const KeyType& Key)
+	static uint32 GetKeyHash(const FKeyType& InKey)
 	{
-		return GetTypeHash(Key);
+		return GetTypeHash(InKey);
 	}
 };
 
-using NodeSearcher = TSet<TSharedPtr<FDynamicClassViewerNode>, FDynamicClassViewerNodeKeyFuncs>;
-
-class FClassCollector : public TSharedFromThis<FClassCollector>
+class FClassCollector final : public TSharedFromThis<FClassCollector>
 {
 public:
 	FClassCollector();
 
-	virtual ~FClassCollector();
+	~FClassCollector();
 
 	static TArray<TSharedPtr<FDynamicClassViewerNode>>& GetAllNodes();
 
@@ -51,11 +49,11 @@ private:
 
 	static bool IsValidParentClass(const UClass* InClass);
 
-	static void OnReloadComplete(EReloadCompleteReason Reason);
+	static void OnReloadComplete(EReloadCompleteReason InReason);
 
-	static void AssetAdded(const FAssetData& InAssetData);
+	static void OnAssetAdded(const FAssetData& InAssetData);
 
-	static void RemoveAsset(const FAssetData& InAssetData);
+	static void OnAssetRemoved(const FAssetData& InAssetData);
 
 	static void OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath);
 
@@ -64,17 +62,17 @@ private:
 
 	static TSet<TSharedPtr<FDynamicClassViewerNode>, FDynamicClassViewerNodeKeyFuncs> NodesSet;
 
-	static FDelegateHandle OnDynamicClassUpdatedRequestPopulateClassHierarchyDelegateHandle;
+	static FDelegateHandle OnDynamicClassUpdatedDelegateHandle;
 
-	static FDelegateHandle OnEndGeneratorRequestPopulateClassHierarchyDelegateHandle;
+	static FDelegateHandle OnEndGeneratorDelegateHandle;
 
-	static FDelegateHandle OnReloadCompleteRequestPopulateClassHierarchyDelegateHandle;
+	static FDelegateHandle OnReloadCompleteDelegateDelegateHandle;
 
-	static FDelegateHandle OnBlueprintCompiledRequestPopulateClassHierarchyDelegateHandle;
+	static FDelegateHandle OnBlueprintCompiledDelegateHandle;
 
-	static FDelegateHandle OnEndFrameRequestPopulateClassHierarchyDelegateHandle;
+	static FDelegateHandle OnEndFrameDelegateHandle;
 
-	static FDelegateHandle OnFilesLoadedRequestPopulateClassHierarchyDelegateHandle;
+	static FDelegateHandle OnFilesLoadedDelegateHandle;
 
 	static FDelegateHandle OnAssetAddedDelegateHandle;
 

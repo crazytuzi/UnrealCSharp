@@ -2,22 +2,22 @@
 #include "ToolMenus.h"
 #include "UnrealCSharpEditorStyle.h"
 
-#define LOCTEXT_NAMESPACE "ContentBrowserClassDataSource"
+#define LOCTEXT_NAMESPACE "DynamicNewClassContextMenu"
 
 void FDynamicNewClassContextMenu::MakeContextMenu(UToolMenu* InMenu, const TArray<FName>& InSelectedClassPaths,
                                                   const FOnOpenNewDynamicClassRequested&
                                                   InOnOpenNewDynamicClassRequested)
 {
-	if (InSelectedClassPaths.Num() == 0)
+	if (InSelectedClassPaths.IsEmpty())
 	{
 		return;
 	}
 
-	const FName FirstSelectedPath = InSelectedClassPaths[0];
+	const auto FirstSelectedPath = InSelectedClassPaths[0];
 
-	const bool bHasSinglePathSelected = InSelectedClassPaths.Num() == 1;
+	const auto bHasSinglePathSelected = InSelectedClassPaths.Num() == 1;
 
-	auto CanExecuteClassActions = [bHasSinglePathSelected]() -> bool
+	auto CanExecuteClassActions = [bHasSinglePathSelected]()
 	{
 		return bHasSinglePathSelected;
 	};
@@ -27,7 +27,7 @@ void FDynamicNewClassContextMenu::MakeContextMenu(UToolMenu* InMenu, const TArra
 
 	if (InOnOpenNewDynamicClassRequested.IsBound())
 	{
-		const FName ClassCreationPath = FirstSelectedPath;
+		const auto ClassCreationPath = FirstSelectedPath;
 
 		FText NewClassToolTip;
 
@@ -62,7 +62,7 @@ void FDynamicNewClassContextMenu::MakeContextMenu(UToolMenu* InMenu, const TArra
 void FDynamicNewClassContextMenu::ExecuteNewClass(const FName InPath,
                                                   FOnOpenNewDynamicClassRequested InOnOpenNewDynamicClassRequested)
 {
-	InOnOpenNewDynamicClassRequested.ExecuteIfBound(InPath);
+	(void)InOnOpenNewDynamicClassRequested.ExecuteIfBound(InPath);
 }
 
 #undef LOCTEXT_NAMESPACE

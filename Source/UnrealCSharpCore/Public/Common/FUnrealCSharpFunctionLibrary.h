@@ -154,15 +154,15 @@ public:
 	static FString GetPluginScriptDirectory();
 
 #if WITH_EDITOR
-	static FString GetPluginTemplateOverrideFileName(const UClass* InTemplateClass);
-
-	static FString GetPluginTemplateDynamicFileName(const UClass* InTemplateClass);
+	static FString GetPluginTemplateDirectory();
 
 	static FString GetPluginTemplateOverrideDirectory();
 
+	static FString GetPluginTemplateOverrideFileName(const UClass* InClass);
+
 	static FString GetPluginTemplateDynamicDirectory();
 
-	static FString GetPluginTemplateDirectory();
+	static FString GetPluginTemplateDynamicFileName(const UClass* InClass);
 #endif
 
 	static bool IsGameField(const UField* InField);

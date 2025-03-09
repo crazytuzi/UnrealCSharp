@@ -10,7 +10,9 @@
 
 #define PLUGIN_TEMPLATE_DYNAMIC FString(TEXT("Dynamic"))
 
-#define DYNAMIC_CLASS_DEFAULT_PREFIX FString(TEXT("My"))
+#define DYNAMIC_CLASS_DEFAULT_PREFIX FString(TEXT("Dynamic"))
+
+#define DYNAMIC_CLASS_DEFAULT_NAMESPACE UObject::StaticClass()->GetPackage()->GetName().RightChop(1).Replace(TEXT("/"), TEXT("."))
 
 #define SOLUTION_NAME FString(TEXT("Script"))
 
@@ -45,8 +47,6 @@
 #define PROJECT_PLACEHOLDER FString(TEXT("ProjectPlaceholder"))
 
 #define SOLUTION_CONFIGURATION_PLATFORMS_PLACEHOLDER FString(TEXT("SolutionConfigurationPlatformsPlaceholder"))
-
-#define DYNAMIC_CLASS_TEMPLATE_FILE_NAMESPACE_PLACEHOLDER FString(TEXT("Script.CoreUObject"))
 
 #define PROJECT_SUFFIX FString(TEXT(".csproj"))
 

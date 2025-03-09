@@ -5,9 +5,9 @@ using Script.CoreUObject;
 namespace Script.CoreUObject
 {
     [UClass]
-    public partial class UMyUserWidget : UUserWidget
+    public partial class UDynamicUserWidget : UUserWidget
     {
-        public UMyUserWidget()
+        public UDynamicUserWidget()
         {
         }
 

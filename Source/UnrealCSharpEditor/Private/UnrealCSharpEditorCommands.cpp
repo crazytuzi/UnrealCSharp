@@ -9,7 +9,7 @@ void FUnrealCSharpEditorCommands::RegisterCommands()
 	UI_COMMAND(GeneratorCode, "Generator Code", "Generator Code Action",
 	           EUserInterfaceActionType::Button, FInputChord());
 
-	UI_COMMAND(OpenNewDynamicClassDialog, "Open New Dynamic Class Dialog", "Open New UnrealCSharp Dynamic Class Dialog",
+	UI_COMMAND(OpenNewDynamicClass, "Open New Dynamic Class", "Open New UnrealCSharp Dynamic Class",
 	           EUserInterfaceActionType::Button, FInputChord());
 
 	UI_COMMAND(OpenEditorSettings, "Open Editor Settings", "Open UnrealCSharpEditor Settings Action",

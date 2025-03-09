@@ -1,38 +1,21 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-
-struct FProjectContextInfo
-{
-	FProjectContextInfo(const FString& InProjectName, const FString& InProjectSourcePath)
-		: ProjectName(InProjectName)
-		  , ProjectSourcePath(InProjectSourcePath)
-	{
-	}
-
-	FProjectContextInfo(FString&& InProjectName, FString&& InProjectSourcePath)
-		: ProjectName(MoveTemp(InProjectName)),
-		  ProjectSourcePath(MoveTemp(InProjectSourcePath))
-	{
-	}
-
-	FString ProjectName;
-
-	FString ProjectSourcePath;
-};
+#include "ProjectContent.h"
 
 class FDynamicNewClassUtils
 {
 public:
-	static void OpenAddDynamicClassToProjectDialog(const FString& InitialPath);
+	static void OpenAddDynamicClassToProjectDialog(const FString& InInitialPath);
 
-	static TArray<FProjectContextInfo> GetCurrentProjectsInfo();
+	static TArray<FProjectContent> GetProjectContent();
 
 	static void GetDynamicClassContent(const UClass* InParentClass, const FString& InNewClassName, FString& OutContent);
 
-	static UClass* GetAncestorClass(const UClass* InParentClass);
-
-	static void AddNamespaceIfUnique(FString& OutContent, const FString& InNamespace);
-
 	static FString GetAssetGeneratedClassName(const FAssetData& InAssetData);
+
+private:
+	static UClass* GetAncestorClass(const UClass* InClass);
+
+	static void AddNamespace(const FString& InNamespace, FString& OutContent);
 };

@@ -1,5 +1,4 @@
 ﻿#include "NewClass/ClassCollector.h"
-
 #include "WidgetBlueprint.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -10,17 +9,17 @@ TArray<TSharedPtr<FDynamicClassViewerNode>> FClassCollector::AllNodes;
 
 TSet<TSharedPtr<FDynamicClassViewerNode>, FDynamicClassViewerNodeKeyFuncs> FClassCollector::NodesSet;
 
-FDelegateHandle FClassCollector::OnDynamicClassUpdatedRequestPopulateClassHierarchyDelegateHandle;
+FDelegateHandle FClassCollector::OnDynamicClassUpdatedDelegateHandle;
 
-FDelegateHandle FClassCollector::OnEndGeneratorRequestPopulateClassHierarchyDelegateHandle;
+FDelegateHandle FClassCollector::OnEndGeneratorDelegateHandle;
 
-FDelegateHandle FClassCollector::OnReloadCompleteRequestPopulateClassHierarchyDelegateHandle;
+FDelegateHandle FClassCollector::OnReloadCompleteDelegateDelegateHandle;
 
-FDelegateHandle FClassCollector::OnBlueprintCompiledRequestPopulateClassHierarchyDelegateHandle;
+FDelegateHandle FClassCollector::OnBlueprintCompiledDelegateHandle;
 
-FDelegateHandle FClassCollector::OnEndFrameRequestPopulateClassHierarchyDelegateHandle;
+FDelegateHandle FClassCollector::OnEndFrameDelegateHandle;
 
-FDelegateHandle FClassCollector::OnFilesLoadedRequestPopulateClassHierarchyDelegateHandle;
+FDelegateHandle FClassCollector::OnFilesLoadedDelegateHandle;
 
 FDelegateHandle FClassCollector::OnAssetAddedDelegateHandle;
 
@@ -32,85 +31,73 @@ FClassCollector::FClassCollector()
 {
 	PopulateClassHierarchy();
 
-	OnDynamicClassUpdatedRequestPopulateClassHierarchyDelegateHandle =
+	OnDynamicClassUpdatedDelegateHandle =
 		FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.AddStatic(
 			&FClassCollector::RequestPopulateClassHierarchy);
 
-	OnEndGeneratorRequestPopulateClassHierarchyDelegateHandle =
-		FUnrealCSharpCoreModuleDelegates::OnEndGenerator.AddStatic(
-			&FClassCollector::RequestPopulateClassHierarchy);
+	OnEndGeneratorDelegateHandle =
+		FUnrealCSharpCoreModuleDelegates::OnEndGenerator.AddStatic(&FClassCollector::RequestPopulateClassHierarchy);
 
-	OnReloadCompleteRequestPopulateClassHierarchyDelegateHandle =
-		FCoreUObjectDelegates::ReloadCompleteDelegate.AddStatic(
-			&FClassCollector::OnReloadComplete);
+	OnReloadCompleteDelegateDelegateHandle =
+		FCoreUObjectDelegates::ReloadCompleteDelegate.AddStatic(&FClassCollector::OnReloadComplete);
 
 	if (GEditor)
 	{
-		OnBlueprintCompiledRequestPopulateClassHierarchyDelegateHandle =
-			GEditor->OnBlueprintCompiled().AddStatic(
-				&FClassCollector::RequestPopulateClassHierarchy);
+		OnBlueprintCompiledDelegateHandle =
+			GEditor->OnBlueprintCompiled().AddStatic(&FClassCollector::RequestPopulateClassHierarchy);
 	}
 
 	if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
 	{
-		OnFilesLoadedRequestPopulateClassHierarchyDelegateHandle =
-			AssetRegistryModule->Get().OnFilesLoaded().AddStatic(
-				&FClassCollector::RequestPopulateClassHierarchy);
+		OnFilesLoadedDelegateHandle =
+			AssetRegistryModule->Get().OnFilesLoaded().AddStatic(&FClassCollector::RequestPopulateClassHierarchy);
 
 		OnAssetAddedDelegateHandle =
-			AssetRegistryModule->Get().OnAssetAdded().AddStatic(
-				&FClassCollector::AssetAdded);
+			AssetRegistryModule->Get().OnAssetAdded().AddStatic(&FClassCollector::OnAssetAdded);
 
 		OnAssetRemovedDelegateHandle =
-			AssetRegistryModule->Get().OnAssetRemoved().AddStatic(
-				&FClassCollector::RemoveAsset);
+			AssetRegistryModule->Get().OnAssetRemoved().AddStatic(&FClassCollector::OnAssetRemoved);
 
 		OnAssetRenamedDelegateHandle =
-			AssetRegistryModule->Get().OnAssetRenamed().AddStatic(
-				&FClassCollector::OnAssetRenamed);
+			AssetRegistryModule->Get().OnAssetRenamed().AddStatic(&FClassCollector::OnAssetRenamed);
 	}
 }
 
 FClassCollector::~FClassCollector()
 {
-	if (OnDynamicClassUpdatedRequestPopulateClassHierarchyDelegateHandle.IsValid())
+	if (OnDynamicClassUpdatedDelegateHandle.IsValid())
 	{
-		FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Remove(
-			OnDynamicClassUpdatedRequestPopulateClassHierarchyDelegateHandle);
+		FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Remove(OnDynamicClassUpdatedDelegateHandle);
 	}
 
-	if (OnEndGeneratorRequestPopulateClassHierarchyDelegateHandle.IsValid())
+	if (OnEndGeneratorDelegateHandle.IsValid())
 	{
-		FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Remove(
-			OnEndGeneratorRequestPopulateClassHierarchyDelegateHandle);
+		FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Remove(OnEndGeneratorDelegateHandle);
 	}
 
-	if (OnReloadCompleteRequestPopulateClassHierarchyDelegateHandle.IsValid())
+	if (OnReloadCompleteDelegateDelegateHandle.IsValid())
 	{
-		FCoreUObjectDelegates::ReloadCompleteDelegate.Remove(
-			OnReloadCompleteRequestPopulateClassHierarchyDelegateHandle);
+		FCoreUObjectDelegates::ReloadCompleteDelegate.Remove(OnReloadCompleteDelegateDelegateHandle);
 	}
 
 	if (GEditor)
 	{
-		if (OnBlueprintCompiledRequestPopulateClassHierarchyDelegateHandle.IsValid())
+		if (OnBlueprintCompiledDelegateHandle.IsValid())
 		{
-			GEditor->OnBlueprintCompiled().Remove(
-				OnBlueprintCompiledRequestPopulateClassHierarchyDelegateHandle);
+			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
 		}
 	}
 
-	if (OnEndFrameRequestPopulateClassHierarchyDelegateHandle.IsValid())
+	if (OnEndFrameDelegateHandle.IsValid())
 	{
-		FCoreDelegates::OnEndFrame.Remove(
-			OnEndFrameRequestPopulateClassHierarchyDelegateHandle);
+		FCoreDelegates::OnEndFrame.Remove(OnEndFrameDelegateHandle);
 	}
 
 	if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
 	{
-		if (OnFilesLoadedRequestPopulateClassHierarchyDelegateHandle.IsValid())
+		if (OnFilesLoadedDelegateHandle.IsValid())
 		{
-			AssetRegistryModule->Get().OnFilesLoaded().Remove(OnFilesLoadedRequestPopulateClassHierarchyDelegateHandle);
+			AssetRegistryModule->Get().OnFilesLoaded().Remove(OnFilesLoadedDelegateHandle);
 		}
 
 		if (OnAssetAddedDelegateHandle.IsValid())
@@ -142,7 +129,7 @@ bool FClassCollector::ValidateNode(const FString& InClassName)
 
 void FClassCollector::RequestPopulateClassHierarchy()
 {
-	static uint64 LastRequestFrame = 0;
+	static auto LastRequestFrame = 0u;
 
 	if (LastRequestFrame == GFrameNumber)
 	{
@@ -151,8 +138,7 @@ void FClassCollector::RequestPopulateClassHierarchy()
 
 	LastRequestFrame = GFrameNumber;
 
-	OnEndFrameRequestPopulateClassHierarchyDelegateHandle = FCoreDelegates::OnEndFrame.AddStatic(
-		&FClassCollector::PopulateClassHierarchy);
+	OnEndFrameDelegateHandle = FCoreDelegates::OnEndFrame.AddStatic(&FClassCollector::PopulateClassHierarchy);
 }
 
 void FClassCollector::PopulateClassHierarchy()
@@ -165,20 +151,17 @@ void FClassCollector::PopulateClassHierarchy()
 }
 
 void FClassCollector::PopulateClassInMemory()
-
 {
 	TArray<UClass*> ValidClasses;
 
-	for (TObjectIterator<UClass> ObjectIt; ObjectIt; ++ObjectIt)
+	for (TObjectIterator<UClass> Class; Class; ++Class)
 	{
-		auto CurrentClass = *ObjectIt;
-
-		if (!IsValidParentClass(CurrentClass))
+		if (!IsValidParentClass(*Class))
 		{
 			continue;
 		}
 
-		ValidClasses.Add(CurrentClass);
+		ValidClasses.Add(*Class);
 	}
 
 	TArray<UClass*> FilterClasses;
@@ -190,17 +173,16 @@ void FClassCollector::PopulateClassInMemory()
 		{
 			auto SupportedModules = UnrealCSharpEditorSetting->GetSupportedModule();
 
-			if (const int32 Index = SupportedModules.Find(FApp::GetProjectName()); Index != INDEX_NONE)
+			if (const auto Index = SupportedModules.Find(FApp::GetProjectName()); Index != INDEX_NONE)
 			{
 				SupportedModules[Index] = TEXT("Game");
 			}
 
-			for (auto ValidClassIt = ValidClasses.CreateIterator(); ValidClassIt; ++ValidClassIt)
+			for (auto Class = ValidClasses.CreateIterator(); Class; ++Class)
 			{
-				if (const auto CurrentClass = *ValidClassIt; SupportedModules.Contains(
-					FUnrealCSharpFunctionLibrary::GetModuleName(CurrentClass)))
+				if (SupportedModules.Contains(FUnrealCSharpFunctionLibrary::GetModuleName(*Class)))
 				{
-					FilterClasses.Add(CurrentClass);
+					FilterClasses.Add(*Class);
 				}
 			}
 		}
@@ -210,21 +192,18 @@ void FClassCollector::PopulateClassInMemory()
 		}
 	}
 
-	for (auto FilterClassIt = FilterClasses.CreateConstIterator(); FilterClassIt; ++FilterClassIt)
+	for (auto FilterClass = FilterClasses.CreateConstIterator(); FilterClass; ++FilterClass)
 	{
-		const auto CurrentClass = *FilterClassIt;
-
-		TSharedPtr<FDynamicClassViewerNode> NewNode = MakeShared<FDynamicClassViewerNode>(
-			CurrentClass->GetName(),
-			CurrentClass->GetPathName()
+		TSharedPtr<FDynamicClassViewerNode> Node = MakeShared<FDynamicClassViewerNode>(
+			(*FilterClass)->GetName(),
+			(*FilterClass)->GetPathName()
 		);
 
-		NodesSet.Add(NewNode);
+		NodesSet.Add(Node);
 	}
 }
 
 void FClassCollector::PopulateClassByAsset()
-
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -269,9 +248,9 @@ void FClassCollector::PopulateClassByAsset()
 				if (AssetDataClassName == UBlueprint::StaticClass()->GetFName() ||
 					AssetDataClassName == UWidgetBlueprint::StaticClass()->GetFName())
 				{
-					TSharedPtr<FDynamicClassViewerNode> NewNode = MakeShared<FDynamicClassViewerNode>(AssetData);
+					TSharedPtr<FDynamicClassViewerNode> Node = MakeShared<FDynamicClassViewerNode>(AssetData);
 
-					NodesSet.Add(NewNode);
+					NodesSet.Add(Node);
 				}
 			}
 		}
@@ -297,8 +276,9 @@ bool FClassCollector::IsValidParentClass(const UClass* InClass)
 		return false;
 	}
 
-	if (InClass->ClassGeneratedBy != nullptr && InClass != UBlueprintGeneratedClass::StaticClass() && InClass !=
-		UWidgetBlueprint::StaticClass())
+	if (InClass->ClassGeneratedBy != nullptr &&
+		InClass != UBlueprintGeneratedClass::StaticClass() &&
+		InClass != UWidgetBlueprint::StaticClass())
 	{
 		return false;
 	}
@@ -322,12 +302,12 @@ bool FClassCollector::IsValidParentClass(const UClass* InClass)
 	return true;
 }
 
-void FClassCollector::OnReloadComplete(EReloadCompleteReason Reason)
+void FClassCollector::OnReloadComplete(EReloadCompleteReason InReason)
 {
 	RequestPopulateClassHierarchy();
 }
 
-void FClassCollector::AssetAdded(const FAssetData& InAssetData)
+void FClassCollector::OnAssetAdded(const FAssetData& InAssetData)
 {
 	if (const auto NewClassName = FDynamicNewClassUtils::GetAssetGeneratedClassName(InAssetData);
 		ValidateNode(NewClassName))
@@ -340,7 +320,7 @@ void FClassCollector::AssetAdded(const FAssetData& InAssetData)
 	RefreshAllNodes();
 }
 
-void FClassCollector::RemoveAsset(const FAssetData& InAssetData)
+void FClassCollector::OnAssetRemoved(const FAssetData& InAssetData)
 {
 	const auto NewClassName = FDynamicNewClassUtils::GetAssetGeneratedClassName(InAssetData);
 

@@ -10,9 +10,9 @@ struct FDynamicClassViewerNode
 
 	FString ObjectPath;
 
-	explicit FDynamicClassViewerNode(const FString& InAssetName, const FString& InObjectPath = TEXT(""))
-		: AssetClassName(InAssetName)
-		  , ObjectPath(InObjectPath)
+	explicit FDynamicClassViewerNode(const FString& InAssetName, const FString& InObjectPath):
+		AssetClassName(InAssetName),
+		ObjectPath(InObjectPath)
 	{
 	}
 
@@ -20,11 +20,10 @@ struct FDynamicClassViewerNode
 	{
 		AssetClassName = FDynamicNewClassUtils::GetAssetGeneratedClassName(InAssetData);
 
-		ObjectPath =
 #if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
-			InAssetData.GetObjectPathString();
+		ObjectPath = InAssetData.GetObjectPathString();
 #else
-			InAssetData.ObjectPath.ToString();
+		ObjectPath = InAssetData.ObjectPath.ToString();
 #endif
 	}
 
@@ -35,21 +34,16 @@ struct FDynamicClassViewerNode
 			return nullptr;
 		}
 
-		auto FindClass = Cast<UClass>(StaticFindObject(UClass::StaticClass(), nullptr, *ObjectPath));
-
-		if (FindClass != nullptr)
+		if (const auto Class = LoadObject<UClass>(nullptr, *ObjectPath))
 		{
-			return FindClass;
+			return Class;
 		}
 
-		if (const auto Blueprint = LoadObject<
-			UBlueprint>(nullptr, *ObjectPath))
+		if (const auto Blueprint = LoadObject<UBlueprint>(nullptr, *ObjectPath))
 		{
-			if (Blueprint->GeneratedClass)
+			if (Blueprint->GeneratedClass != nullptr)
 			{
-				FindClass = Cast<UClass>(Blueprint->GeneratedClass);
-
-				return FindClass;
+				return Cast<UClass>(Blueprint->GeneratedClass);
 			}
 		}
 
@@ -62,12 +56,12 @@ struct FDynamicClassViewerNode
 	}
 };
 
-DECLARE_DELEGATE_OneParam(FOnDynamicClassNodePicked, TSharedPtr<FDynamicClassViewerNode>);
-
-DECLARE_DELEGATE_OneParam(FOnDynamicClassNodeDoubleClicked, TSharedPtr<FDynamicClassViewerNode>);
-
-class SDynamicClassViewer : public SCompoundWidget
+class SDynamicClassViewer final : public SCompoundWidget
 {
+	DECLARE_DELEGATE_OneParam(FOnDynamicClassNodePicked, TSharedPtr<FDynamicClassViewerNode>);
+
+	DECLARE_DELEGATE_OneParam(FOnDynamicClassNodeDoubleClicked, TSharedPtr<FDynamicClassViewerNode>);
+
 public:
 	SLATE_BEGIN_ARGS(SDynamicClassViewer)
 		{
@@ -88,8 +82,7 @@ private:
 	TSharedRef<ITableRow> OnGenerateRow(TSharedPtr<FDynamicClassViewerNode> Item,
 	                                    const TSharedRef<STableViewBase>& OwnerTable) const;
 
-	void OnSelectionChanged(TSharedPtr<FDynamicClassViewerNode> Item,
-	                        ESelectInfo::Type SelectType);
+	void OnSelectionChanged(TSharedPtr<FDynamicClassViewerNode> Item, ESelectInfo::Type SelectType);
 
 	void OnNodeDoubleClicked(TSharedPtr<FDynamicClassViewerNode> Item);
 
@@ -115,8 +108,6 @@ private:
 	TArray<TSharedPtr<FDynamicClassViewerNode>> FilteredItems;
 
 	FText SearchText;
-
-	int32 TotalItemCount = 0;
 
 	FOnDynamicClassNodePicked OnDynamicClassNodePickedDelegate;
 

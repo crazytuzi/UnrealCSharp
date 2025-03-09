@@ -78,9 +78,9 @@ public:
 	virtual void BuildRootPathVirtualTree() override;
 
 private:
-	void PopulateAddNewContextMenu(UToolMenu* InMenu);
+	static void OnNewClassRequested(const FName& InSelectedPath);
 
-	static void OnOpenNewDynamicClassRequested(const FName& InSelectedPath);
+	void PopulateAddNewContextMenu(UToolMenu* InMenu);
 
 	void OnDynamicClassUpdated();
 

@@ -23,13 +23,13 @@ BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 {
-	const auto& CurrentProjects = FDynamicNewClassUtils::GetCurrentProjectsInfo();
+	const auto& ProjectContent = FDynamicNewClassUtils::GetProjectContent();
 
-	AvailableProjects.Reserve(CurrentProjects.Num());
+	AvailableProjects.Reserve(ProjectContent.Num());
 
-	for (const auto& ProjectInfo : CurrentProjects)
+	for (const auto& Project : ProjectContent)
 	{
-		AvailableProjects.Emplace(MakeShareable(new FProjectContextInfo(ProjectInfo)));
+		AvailableProjects.Emplace(MakeShared<FProjectContent>(Project));
 	}
 
 	if (AvailableProjects.IsEmpty())
@@ -45,17 +45,17 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 
 	for (const auto& AvailableProject : AvailableProjects)
 	{
-		if (AbsoluteInitialPath.StartsWith(AvailableProject->ProjectSourcePath))
+		if (AbsoluteInitialPath.StartsWith(AvailableProject->SourcePath))
 		{
-			SelectedProjectInfo = AvailableProject;
+			SelectedProjectContent = AvailableProject;
 
 			break;
 		}
 	}
 
-	if (!SelectedProjectInfo.IsValid())
+	if (!SelectedProjectContent.IsValid())
 	{
-		SelectedProjectInfo = AvailableProjects.Top();
+		SelectedProjectContent = AvailableProjects.Top();
 	}
 
 	NewClassTypeIndex = 0;
@@ -78,12 +78,11 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 
 	UpdateInputValidity();
 
-	constexpr float EditableTextHeight = 26.0f;
+	constexpr auto EditableTextHeight = 26.0f;
 
 	ChildSlot
 	[
 		SNew(SBorder)
-
 		.Padding(18)
 		.BorderImage(
 #if UE_APP_STYLE_GET_BRUSH
@@ -93,13 +92,10 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 #endif
 		[
 			SNew(SVerticalBox)
-
 			.AddMetaData<FTutorialMetaData>(TEXT("AddCodeMajorAnchor"))
-
 			+ SVerticalBox::Slot()
 			[
 				SAssignNew(MainWizard, SWizard)
-
 				.ShowPageList(false)
 				.CanFinish(this, &SDynamicNewClassDialog::CanFinish)
 				.FinishButtonText(LOCTEXT("FinishButtonText_Dynamic", "Create Dynamic Class"))
@@ -108,53 +104,44 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 				.OnCanceled(this, &SDynamicNewClassDialog::CancelClicked)
 				.OnFinished(this, &SDynamicNewClassDialog::FinishClicked)
 				.InitialPageIndex(0)
-
 				+ SWizard::Page()
 				.CanShow(true)
 				[
 					SNew(SVerticalBox)
-
 					+ SVerticalBox::Slot()
 					.AutoHeight()
 					.Padding(0)
 					[
 						SNew(STextBlock)
-
 						.Font(FAppStyle::Get().GetFontStyle("HeadingExtraSmall"))
 						.Text(LOCTEXT("ParentClassTitle", "Choose Parent Class"))
 						.TransformPolicy(ETextTransformPolicy::ToUpper)
 					]
-
 					+ SVerticalBox::Slot()
 					.AutoHeight()
 					.HAlign(HAlign_Center)
 					[
 						SNew(SSegmentedControl<bool>)
-
-						.Value(this, &SDynamicNewClassDialog::IsAllClassShown)
+						.Value(this, &SDynamicNewClassDialog::IsShowFullClassTree)
 						.OnValueChanged(this, &SDynamicNewClassDialog::OnAllClassVisibilityChanged)
 						+ SSegmentedControl<bool>::Slot(false)
 						.Text(LOCTEXT("CommonClasses", "Common Classes"))
 						+ SSegmentedControl<bool>::Slot(true)
 						.Text(LOCTEXT("AllClasses", "All Classes"))
 					]
-
 					+ SVerticalBox::Slot()
 					.AutoHeight()
 					.Padding(0, 10)
 					[
 						SNew(STextBlock)
-
 						.Text(LOCTEXT("ChooseParentClassDescription_Dynamic",
 						              "This will add a dynamic class file to your game project."))
 					]
-
 					+ SVerticalBox::Slot()
 					.FillHeight(1.f)
 					.Padding(0, 10)
 					[
 						SNew(SBorder)
-
 						.AddMetaData<FTutorialMetaData>(TEXT("AddCodeOptions"))
 						.BorderImage(
 #if UE_APP_STYLE_GET_BRUSH
@@ -164,11 +151,9 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 #endif
 						[
 							SNew(SVerticalBox)
-
 							+ SVerticalBox::Slot()
 							[
 								SAssignNew(ParentClassListView, SListView< TSharedPtr<FNewClassInfo> >)
-
 								.ListItemsSource(&ParentClassItemsSource)
 								.SelectionMode(ESelectionMode::Single)
 								.ClearSelectionOnClick(false)
@@ -177,11 +162,9 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 								.OnSelectionChanged(this, &SDynamicNewClassDialog::OnCommonClassItemSelected)
 								.Visibility(this, &SDynamicNewClassDialog::GetCommonClassVisibility)
 							]
-
 							+ SVerticalBox::Slot()
 							[
 								SNew(SBox)
-
 								.Visibility(this, &SDynamicNewClassDialog::GetAllClassVisibility)
 								[
 									DynamicClassViewer.ToSharedRef()
@@ -189,102 +172,83 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 							]
 						]
 					]
-
 					+ SVerticalBox::Slot()
 					.Padding(30, 2)
 					.AutoHeight()
 					[
 						SNew(SGridPanel)
-
 						.FillColumn(1, 1.0f)
-
 						+ SGridPanel::Slot(0, 0)
 						.VAlign(VAlign_Center)
 						.Padding(2.0f, 2.0f, 10.0f, 2.0f)
 						.HAlign(HAlign_Left)
 						[
 							SNew(STextBlock)
-
 							.Text(LOCTEXT("ParentClassLabel", "Selected Class"))
 						]
-
 						+ SGridPanel::Slot(1, 0)
 						.VAlign(VAlign_Center)
 						.Padding(2.0f)
 						.HAlign(HAlign_Left)
 						[
 							SNew(SHorizontalBox)
-
 							+ SHorizontalBox::Slot()
 							.VAlign(VAlign_Center)
 							.AutoWidth()
 							[
 								SNew(STextBlock)
-
 								.Text(this, &SDynamicNewClassDialog::GetSelectedParentClassName)
 							]
 						]
 					]
 				]
-
 				+ SWizard::Page()
 				.OnEnter(this, &SDynamicNewClassDialog::OnNamePageEntered)
 				[
 					SNew(SVerticalBox)
-
 					+ SVerticalBox::Slot()
 					.AutoHeight()
 					.Padding(0)
 					[
 						SNew(STextBlock)
-
 						.Font(FAppStyle::Get().GetFontStyle("HeadingExtraSmall"))
 						.Text(this, &SDynamicNewClassDialog::GetNameClassTitle)
 						.TransformPolicy(ETextTransformPolicy::ToUpper)
 					]
-
 					+ SVerticalBox::Slot()
 					.FillHeight(1.f)
 					.Padding(0, 10)
 					[
 						SNew(SVerticalBox)
-
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						.Padding(0, 0, 0, 5)
 						[
 							SNew(STextBlock)
-
 							.Text(LOCTEXT("ClassNameDescription",
 							              "Enter a name for your new class. Class names may only contain alphanumeric characters, and may not contain a space."))
 						]
-
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						.Padding(0, 0, 0, 2)
 						[
 							SNew(STextBlock)
-
 							.Text(LOCTEXT("ClassNameDetails_Blueprint",
 							              "When you click the \"Create\" button below, a new dynamic class will be created."))
 						]
-
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						.Padding(0, 5)
 						[
 							SNew(SWarningOrErrorBox)
-
 							.MessageStyle(EMessageStyle::Error)
 							.Visibility(this, &SDynamicNewClassDialog::GetNameErrorLabelVisibility)
 							.Message(this, &SDynamicNewClassDialog::GetNameErrorLabelText)
 						]
-
 						+ SVerticalBox::Slot()
 						.AutoHeight()
 						[
 							SNew(SBorder)
-
 							.BorderImage(
 #if UE_APP_STYLE_GET_BRUSH
 								FAppStyle::GetBrush("DetailsView.CategoryTop"))
@@ -295,96 +259,78 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 							.Padding(FMargin(6.0f, 4.0f, 7.0f, 4.0f))
 							[
 								SNew(SVerticalBox)
-
 								+ SVerticalBox::Slot()
 								.AutoHeight()
 								.Padding(0)
 								[
 									SNew(SGridPanel)
-
 									.FillColumn(1, 1.0f)
-
 									+ SGridPanel::Slot(0, 0)
 									.VAlign(VAlign_Center)
 									.Padding(0, 0, 12, 0)
 									[
 										SNew(STextBlock)
-
 										.Text(LOCTEXT("NewClassType_Label", "Dynamic Class Type"))
 									]
-
 									+ SGridPanel::Slot(1, 0)
 									.VAlign(VAlign_Center)
 									.HAlign(HAlign_Left)
 									.Padding(2.0f)
 									[
 										SNew(SSegmentedControl<int32>)
-
 										.Value_Lambda([this] { return NewClassTypeIndex; })
 										.OnValueChanged(this, &SDynamicNewClassDialog::OnNewClassTypeChanged)
 										.IsEnabled_Lambda([this]
 										{
-											if (!SelectedParentClassInfo.IsValid())
-											{
-												return true;
-											}
-
-											return !SelectedParentClassInfo->AssetClassName.EndsWith(TEXT("_C"));
+											return !SelectedParentClassInfo.IsValid()
+												       ? true
+												       : !SelectedParentClassInfo->AssetClassName.EndsWith(TEXT("_C"));
 										})
 										+ SSegmentedControl<int32>::Slot(0)
 										.Text(LOCTEXT("NewClassType_Cpp", "C++"))
 										+ SSegmentedControl<int32>::Slot(1)
 										.Text(LOCTEXT("NewClassType_BP", "Blueprint"))
 									]
-
 									+ SGridPanel::Slot(1, 0)
 									.VAlign(VAlign_Center)
 									.HAlign(HAlign_Left)
 									.Padding(2.0f)
-
 									+ SGridPanel::Slot(0, 1)
 									.VAlign(VAlign_Center)
 									.Padding(0, 0, 12, 0)
 									[
 										SNew(STextBlock)
-
 										.Text(LOCTEXT("NameLabel", "Name"))
 									]
-
 									+ SGridPanel::Slot(1, 1)
 									.Padding(0.0f, 3.0f)
 									.VAlign(VAlign_Center)
 									[
 										SNew(SBox)
-
 										.HeightOverride(EditableTextHeight)
 										.AddMetaData<FTutorialMetaData>(TEXT("ClassName"))
 										[
 											SNew(SHorizontalBox)
-
 											+ SHorizontalBox::Slot()
 											.FillWidth(.7f)
 											[
 												SAssignNew(ClassNameEditBox, SEditableTextBox)
-
 												.Text(this, &SDynamicNewClassDialog::OnGetClassNameText)
 												.OnTextChanged(this, &SDynamicNewClassDialog::OnClassNameTextChanged)
 												.OnTextCommitted(
 													this, &SDynamicNewClassDialog::OnClassNameTextCommitted)
 											]
-
 											+ SHorizontalBox::Slot()
 											.AutoWidth()
 											.Padding(6.0f, 0.0f, 0.0f, 0.0f)
 											[
-												SAssignNew(AvailableProjectsCombo,
-												           SComboBox<TSharedPtr<FProjectContextInfo>>)
-
+												SAssignNew(AvailableProjectsComboBox,
+												           SComboBox<TSharedPtr<FProjectContent>>)
 												.Visibility(EVisibility::Visible)
 												.ToolTipText(LOCTEXT("ProjectComboToolTip",
 												                     "Choose the target project for your new class"))
 												.OptionsSource(&AvailableProjects)
-												.InitiallySelectedItem(SelectedProjectInfo)
+												.InitiallySelectedItem(SelectedProjectContent)
 												.OnSelectionChanged(
 													this,
 													&SDynamicNewClassDialog::SelectedProjectComboBoxSelectionChanged)
@@ -392,63 +338,52 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 													this, &SDynamicNewClassDialog::MakeWidgetForSelectedModuleCombo)
 												[
 													SNew(STextBlock)
-
 													.Text(this, &SDynamicNewClassDialog::GetSelectedProjectComboText)
 												]
 											]
 										]
 									]
-
 									+ SGridPanel::Slot(0, 2)
 									.VAlign(VAlign_Center)
 									.Padding(0, 0, 12, 0)
 									[
 										SNew(STextBlock)
-
 										.Text(LOCTEXT("PathLabel", "Path"))
 									]
-
 									+ SGridPanel::Slot(1, 2)
 									.Padding(0.0f, 3.0f)
 									.VAlign(VAlign_Center)
 									[
 										SNew(SVerticalBox)
-
 										+ SVerticalBox::Slot()
 										.Padding(0)
 										.AutoHeight()
 										[
 											SNew(SBox)
-
 											.Visibility(EVisibility::Visible)
 											.HeightOverride(EditableTextHeight)
 											.AddMetaData<FTutorialMetaData>(TEXT("Path"))
 											[
 												SNew(SHorizontalBox)
-
 												+ SHorizontalBox::Slot()
 												.FillWidth(1.0f)
 												[
 													SNew(SEditableTextBox)
-
 													.Text(this, &SDynamicNewClassDialog::OnGetClassPathText)
 													.OnTextChanged(
 														this, &SDynamicNewClassDialog::OnClassPathTextChanged)
 												]
-
 												+ SHorizontalBox::Slot()
 												.AutoWidth()
 												.Padding(6.0f, 1.0f, 0.0f, 0.0f)
 												[
 													SNew(SButton)
-
 													.VAlign(VAlign_Center)
 													.ButtonStyle(FAppStyle::Get(), "SimpleButton")
 													.OnClicked(
 														this, &SDynamicNewClassDialog::HandleChooseFolderButtonClicked)
 													[
 														SNew(SImage)
-
 														.Image(FAppStyle::Get().GetBrush("Icons.FolderClosed"))
 														.ColorAndOpacity(FSlateColor::UseForeground())
 													]
@@ -456,55 +391,45 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 											]
 										]
 									]
-
 									+ SGridPanel::Slot(0, 3)
 									.VAlign(VAlign_Center)
 									.Padding(0, 0, 12, 0)
 									[
 										SNew(STextBlock)
-
 										.Visibility(EVisibility::Visible)
 										.Text(LOCTEXT("ParentClassNameLabel", "Parent Class"))
 									]
-
 									+ SGridPanel::Slot(1, 3)
 									.Padding(0.0f, 3.0f)
 									.VAlign(VAlign_Center)
 									[
 										SNew(SBox)
-
 										.Visibility(EVisibility::Visible)
 										.VAlign(VAlign_Center)
 										.HeightOverride(EditableTextHeight)
 										[
 											SNew(STextBlock)
-
 											.Text(this, &SDynamicNewClassDialog::OnGetParentClassNameText)
 										]
 									]
-
 									+ SGridPanel::Slot(0, 4)
 									.VAlign(VAlign_Center)
 									.Padding(0, 0, 12, 0)
 									[
 										SNew(STextBlock)
-
 										.Visibility(EVisibility::Visible)
 										.Text(LOCTEXT("HeaderFileLabel", "Dynamic File Path"))
 									]
-
 									+ SGridPanel::Slot(1, 4)
 									.Padding(0.0f, 3.0f)
 									.VAlign(VAlign_Center)
 									[
 										SNew(SBox)
-
 										.Visibility(EVisibility::Visible)
 										.VAlign(VAlign_Center)
 										.HeightOverride(EditableTextHeight)
 										[
 											SNew(STextBlock)
-
 											.Text(this, &SDynamicNewClassDialog::OnGetDynamicFilePathText)
 										]
 									]
@@ -517,9 +442,9 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 		]
 	];
 
-	if (const auto ParentWindow = InArgs._ParentWindow; ParentWindow.IsValid())
+	if (const auto ParentWindow = InArgs._ParentWindow)
 	{
-		ParentWindow.Get()->SetWidgetToFocusOnActivate(ParentClassListView);
+		ParentWindow->SetWidgetToFocusOnActivate(ParentClassListView);
 	}
 }
 
@@ -543,11 +468,10 @@ TSharedRef<ITableRow> SDynamicNewClassDialog::MakeParentClassListViewWidget(
 
 	const auto ClassBrush = FClassIconFinder::FindThumbnailForClass(Class);
 
-	constexpr int32 ItemHeight = 64;
+	constexpr auto ItemHeight = 64;
 
 	return
 			SNew(STableRow<TSharedPtr<FNewClassInfo>>, OwnerTable)
-
 			.Padding(4)
 			.Style(
 #if UE_APP_STYLE_GET
@@ -560,11 +484,9 @@ TSharedRef<ITableRow> SDynamicNewClassDialog::MakeParentClassListViewWidget(
 			                                              FEditorClassUtils::GetDocumentationExcerpt(Class)))
 			[
 				SNew(SBox)
-
 				.HeightOverride(ItemHeight)
 				[
 					SNew(SHorizontalBox)
-
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					.VAlign(VAlign_Center)
@@ -572,27 +494,22 @@ TSharedRef<ITableRow> SDynamicNewClassDialog::MakeParentClassListViewWidget(
 					.Padding(8)
 					[
 						SNew(SBox)
-
 						.HeightOverride(ItemHeight / 2.0f)
 						.WidthOverride(ItemHeight / 2.0f)
 						[
 							SNew(SImage)
-
 							.Image(ClassBrush)
 						]
 					]
-
 					+ SHorizontalBox::Slot()
 					.FillWidth(1.0f)
 					.VAlign(VAlign_Center)
 					.Padding(4)
 					[
 						SNew(SVerticalBox)
-
 						+ SVerticalBox::Slot()
 						[
 							SNew(STextBlock)
-
 							.TextStyle(FAppStyle::Get(), "DialogButtonText")
 							.Text(ClassName)
 						]
@@ -600,7 +517,6 @@ TSharedRef<ITableRow> SDynamicNewClassDialog::MakeParentClassListViewWidget(
 						+ SVerticalBox::Slot()
 						[
 							SNew(STextBlock)
-
 							.Text(ClassShortDescription)
 							.AutoWrapText(true)
 						]
@@ -670,18 +586,18 @@ void SDynamicNewClassDialog::OnAllClassItemDoubleClicked(TSharedPtr<FDynamicClas
 
 void SDynamicNewClassDialog::MainWizardShowNextPage() const
 {
-	if (constexpr int32 NamePageIdx = 1; MainWizard->CanShowPage(NamePageIdx))
+	if (constexpr auto NamePageIdx = 1; MainWizard->CanShowPage(NamePageIdx))
 	{
 		MainWizard->ShowPage(NamePageIdx);
 	}
 }
 
-bool SDynamicNewClassDialog::IsAllClassShown() const
+bool SDynamicNewClassDialog::IsShowFullClassTree() const
 {
 	return bShowFullClassTree;
 }
 
-void SDynamicNewClassDialog::OnAllClassVisibilityChanged(bool bInShowFullClassTree)
+void SDynamicNewClassDialog::OnAllClassVisibilityChanged(const bool bInShowFullClassTree)
 {
 	bShowFullClassTree = bInShowFullClassTree;
 }
@@ -705,16 +621,14 @@ void SDynamicNewClassDialog::OnNewClassTypeChanged(const int32 NewTypeIndex)
 {
 	NewClassTypeIndex = NewTypeIndex;
 
-	static const FString Suffix = TEXT("_C");
-
-	if (NewClassTypeIndex == 1 && !NewClassName.EndsWith(Suffix))
+	if (NewClassTypeIndex == 1 && !NewClassName.EndsWith(TEXT("_C")))
 	{
-		NewClassName += Suffix;
+		NewClassName += TEXT("_C");
 	}
 
 	if (NewClassTypeIndex == 0)
 	{
-		NewClassName.RemoveFromEnd(Suffix);
+		NewClassName.RemoveFromEnd(TEXT("_C"));
 	}
 
 	UpdateInputValidity();
@@ -722,12 +636,7 @@ void SDynamicNewClassDialog::OnNewClassTypeChanged(const int32 NewTypeIndex)
 
 FText SDynamicNewClassDialog::GetNameErrorLabelText() const
 {
-	if (!bLastInputValidityCheckSuccessful)
-	{
-		return LastInputValidityErrorText;
-	}
-
-	return FText::GetEmpty();
+	return !bLastInputValidityCheckSuccessful ? LastInputValidityErrorText : FText::GetEmpty();
 }
 
 void SDynamicNewClassDialog::OnNamePageEntered()
@@ -737,29 +646,28 @@ void SDynamicNewClassDialog::OnNamePageEntered()
 		return;
 	}
 
-	const FString ParentClassName = SelectedParentClassInfo->AssetClassName;
+	const auto ParentClassName = SelectedParentClassInfo->AssetClassName;
 
 	NewClassTypeIndex = ParentClassName.EndsWith(
 		                    TEXT("_C"))
 		                    ? 1
 		                    : 0;
 
-	const FString PotentialNewClassName = FString::Printf(TEXT(
+	const auto PotentialNewClassName = FString::Printf(TEXT(
 		"%s%s%s"
 	),
-	                                                      *DYNAMIC_CLASS_DEFAULT_PREFIX,
-	                                                      ParentClassName.IsEmpty()
-		                                                      ? TEXT("Class")
-		                                                      : *ParentClassName,
-	                                                      NewClassTypeIndex == 1
-		                                                      ? ParentClassName.EndsWith(TEXT("_C"))
-			                                                        ? TEXT("")
-			                                                        : TEXT("_C")
-		                                                      : TEXT(""));
+	                                                   *DYNAMIC_CLASS_DEFAULT_PREFIX,
+	                                                   ParentClassName.IsEmpty()
+		                                                   ? TEXT("Class")
+		                                                   : *ParentClassName,
+	                                                   NewClassTypeIndex == 1
+		                                                   ? ParentClassName.EndsWith(TEXT("_C"))
+			                                                     ? TEXT("")
+			                                                     : TEXT("_C")
+		                                                   : TEXT("")
+	);
 
 	NewClassName = PotentialNewClassName;
-
-	LastAutoGeneratedClassName = PotentialNewClassName;
 
 	UpdateInputValidity();
 
@@ -768,10 +676,8 @@ void SDynamicNewClassDialog::OnNamePageEntered()
 
 FText SDynamicNewClassDialog::GetNameClassTitle() const
 {
-	static const FString NoneString = TEXT("None");
-
-	if (const FText ParentClassName = GetSelectedParentClassName();
-		!ParentClassName.IsEmpty() && ParentClassName.ToString() != NoneString)
+	if (const auto ParentClassName = GetSelectedParentClassName();
+		!ParentClassName.IsEmpty() && ParentClassName.ToString() != TEXT("None"))
 	{
 		return FText::Format(LOCTEXT("NameClassTitle", "Name Your New {0}"), ParentClassName);
 	}
@@ -813,11 +719,11 @@ void SDynamicNewClassDialog::OnClassPathTextChanged(const FText& NewText)
 
 	for (const auto& AvailableProject : AvailableProjects)
 	{
-		if (NewClassPath.StartsWith(AvailableProject->ProjectSourcePath))
+		if (NewClassPath.StartsWith(AvailableProject->SourcePath))
 		{
-			SelectedProjectInfo = AvailableProject;
+			SelectedProjectContent = AvailableProject;
 
-			AvailableProjectsCombo->SetSelectedItem(SelectedProjectInfo);
+			AvailableProjectsComboBox->SetSelectedItem(SelectedProjectContent);
 
 			break;
 		}
@@ -858,7 +764,7 @@ void SDynamicNewClassDialog::FinishClicked()
 
 	if (CanFinish())
 	{
-		if (const auto ParentClass = SelectedParentClassInfo->GetClass(); ParentClass)
+		if (const auto ParentClass = SelectedParentClassInfo->GetClass())
 		{
 			FString NewClassContent;
 
@@ -875,7 +781,7 @@ void SDynamicNewClassDialog::FinishClicked()
 
 FReply SDynamicNewClassDialog::HandleChooseFolderButtonClicked()
 {
-	if (const auto DesktopPlatform = FDesktopPlatformModule::Get(); DesktopPlatform)
+	if (const auto DesktopPlatform = FDesktopPlatformModule::Get())
 	{
 		const auto ParentWindow = FSlateApplication::Get().FindWidgetWindow(AsShared());
 
@@ -885,9 +791,9 @@ FReply SDynamicNewClassDialog::HandleChooseFolderButtonClicked()
 
 		FString FolderName;
 
-		const FString Title = LOCTEXT("NewClassBrowseTitle", "Choose a dynamic class source location").ToString();
+		const auto Title = LOCTEXT("NewClassBrowseTitle", "Choose a dynamic class source location").ToString();
 
-		const bool bFolderSelected = DesktopPlatform->OpenDirectoryDialog(
+		const auto bFolderSelected = DesktopPlatform->OpenDirectoryDialog(
 			ParentWindowWindowHandle,
 			Title,
 			NewClassPath,
@@ -905,11 +811,11 @@ FReply SDynamicNewClassDialog::HandleChooseFolderButtonClicked()
 
 			for (const auto& AvailableProject : AvailableProjects)
 			{
-				if (NewClassPath.StartsWith(AvailableProject->ProjectSourcePath))
+				if (NewClassPath.StartsWith(AvailableProject->SourcePath))
 				{
-					SelectedProjectInfo = AvailableProject;
+					SelectedProjectContent = AvailableProject;
 
-					AvailableProjectsCombo->SetSelectedItem(SelectedProjectInfo);
+					AvailableProjectsComboBox->SetSelectedItem(SelectedProjectContent);
 
 					break;
 				}
@@ -926,26 +832,26 @@ FText SDynamicNewClassDialog::GetSelectedProjectComboText() const
 {
 	FFormatNamedArguments Args;
 
-	Args.Add(TEXT("ProjectName"), FText::FromString(SelectedProjectInfo->ProjectName));
+	Args.Add(TEXT("ProjectName"), FText::FromString(SelectedProjectContent->Name));
 
 	return FText::Format(LOCTEXT("ModuleComboEntry", "{ProjectName}"), Args);
 }
 
-void SDynamicNewClassDialog::SelectedProjectComboBoxSelectionChanged(TSharedPtr<FProjectContextInfo> Value,
+void SDynamicNewClassDialog::SelectedProjectComboBoxSelectionChanged(TSharedPtr<FProjectContent> Value,
                                                                      ESelectInfo::Type SelectInfo)
 {
-	SelectedProjectInfo = Value;
+	SelectedProjectContent = Value;
 
-	NewClassPath = SelectedProjectInfo->ProjectSourcePath;
+	NewClassPath = SelectedProjectContent->SourcePath;
 
 	UpdateInputValidity();
 }
 
-TSharedRef<SWidget> SDynamicNewClassDialog::MakeWidgetForSelectedModuleCombo(TSharedPtr<FProjectContextInfo> Value)
+TSharedRef<SWidget> SDynamicNewClassDialog::MakeWidgetForSelectedModuleCombo(TSharedPtr<FProjectContent> Value)
 {
 	FFormatNamedArguments Args;
 
-	Args.Add(TEXT("ProjectName"), FText::FromString(Value->ProjectName));
+	Args.Add(TEXT("ProjectName"), FText::FromString(Value->Name));
 
 	return SNew(STextBlock)
 		.Text(FText::Format(LOCTEXT("ModuleComboEntry", "{ProjectName}"), Args));
@@ -953,8 +859,6 @@ TSharedRef<SWidget> SDynamicNewClassDialog::MakeWidgetForSelectedModuleCombo(TSh
 
 void SDynamicNewClassDialog::UpdateInputValidity()
 {
-	bLastInputValidityCheckSuccessful = true;
-
 	bLastInputValidityCheckSuccessful = GameProjectUtils::IsValidClassNameForCreation(
 		NewClassName, LastInputValidityErrorText);
 
@@ -1007,11 +911,11 @@ void SDynamicNewClassDialog::UpdateInputValidity()
 			return;
 		}
 
-		bool bIsStartWithProjectDirectory = false;
+		auto bIsStartWithProjectDirectory = false;
 
 		for (const auto& AvailableProject : AvailableProjects)
 		{
-			if (NewClassPath.StartsWith(AvailableProject->ProjectSourcePath))
+			if (NewClassPath.StartsWith(AvailableProject->SourcePath))
 			{
 				bIsStartWithProjectDirectory = true;
 			}
@@ -1056,16 +960,15 @@ void SDynamicNewClassDialog::SetupDefaultCommonParentClassItems()
 
 	DefaultFeaturedClasses.Add(FNewClassInfo(USceneComponent::StaticClass()));
 
-	for (const auto& Featured : DefaultFeaturedClasses)
+	for (const auto& DefaultFeaturedClass : DefaultFeaturedClasses)
 	{
-		ParentClassItemsSource.Add(MakeShareable(new FNewClassInfo(Featured)));
+		ParentClassItemsSource.Add(MakeShared<FNewClassInfo>(DefaultFeaturedClass));
 	}
 }
 
 void SDynamicNewClassDialog::CloseContainingWindow()
 {
-	if (const auto ContainingWindow = FSlateApplication::Get().FindWidgetWindow(AsShared());
-		ContainingWindow.IsValid())
+	if (const auto ContainingWindow = FSlateApplication::Get().FindWidgetWindow(AsShared()))
 	{
 		ContainingWindow->RequestDestroyWindow();
 	}
@@ -1093,8 +996,8 @@ FReply SDynamicNewClassDialog::OnKeyDown(const FGeometry& MyGeometry, const FKey
 void SDynamicNewClassDialog::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,
                                   const float InDeltaTime)
 {
-	if (!bPreventPeriodicValidityChecksUntilNextChange
-		&& InCurrentTime > LastPeriodicValidityCheckTime + PeriodicValidityCheckFrequency)
+	if (!bPreventPeriodicValidityChecksUntilNextChange &&
+		InCurrentTime > LastPeriodicValidityCheckTime + PeriodicValidityCheckFrequency)
 	{
 		UpdateInputValidity();
 	}
