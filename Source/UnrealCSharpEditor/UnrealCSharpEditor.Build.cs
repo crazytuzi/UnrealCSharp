@@ -50,10 +50,15 @@ public class UnrealCSharpEditor : ModuleRules
 				"DeveloperToolSettings",
 				"ContentBrowserData",
 				"UMG",
+				"GameProjectGeneration",
+				"AppFramework",
+				"ToolWidgets",
+				"ClassViewer",
+				"UMGEditor",
 				"ScriptCodeGenerator",
 				"Compiler",
 				"UnrealCSharpCore",
-				"CrossVersion" 
+				"CrossVersion",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

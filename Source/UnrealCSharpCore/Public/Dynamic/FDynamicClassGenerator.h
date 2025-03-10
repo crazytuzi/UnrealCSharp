@@ -26,9 +26,9 @@ public:
 
 	static void Generator(MonoClass* InMonoClass, EDynamicClassGeneratorType InDynamicClassGeneratorType);
 
-	static bool IsDynamicClass(const UClass* InClass);
+	static UNREALCSHARPCORE_API bool IsDynamicClass(const UClass* InClass);
 
-	static bool IsDynamicBlueprintGeneratedClass(const UField* InField);
+	static UNREALCSHARPCORE_API bool IsDynamicBlueprintGeneratedClass(const UField* InField);
 
 	static bool IsDynamicBlueprintGeneratedClass(const UBlueprintGeneratedClass* InClass);
 

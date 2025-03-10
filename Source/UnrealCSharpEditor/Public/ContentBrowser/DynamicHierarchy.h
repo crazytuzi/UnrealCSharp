@@ -32,6 +32,8 @@ public:
 
 	TArray<UClass*> GetMatchingClasses(const FName& InPath, const bool bRecurse = false) const;
 
+	static FString ConvertInternalPathToFileSystemPath(const FString& InInternalPath);
+
 private:
 	static bool EnumeratePath(const FString& InPath, const TFunctionRef<bool(const FName&)>& InCallback);
 

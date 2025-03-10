@@ -15,9 +15,9 @@ public:
 
 	DECLARE_MULTICAST_DELEGATE(FOnEndGenerator);
 
+#if WITH_EDITOR
 	DECLARE_MULTICAST_DELEGATE(FOnDynamicClassUpdated);
 
-#if WITH_EDITOR
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCompile, const TArray<FFileChangeData>& InFileChangeData);
 #endif
 
@@ -29,9 +29,9 @@ public:
 
 	static FOnEndGenerator OnEndGenerator;
 
+#if WITH_EDITOR
 	static FOnDynamicClassUpdated OnDynamicClassUpdated;
 
-#if WITH_EDITOR
 	static FOnCompile OnCompile;
 #endif
 };

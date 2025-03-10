@@ -127,6 +127,30 @@ TArray<UClass*> FDynamicHierarchy::GetMatchingClasses(const FName& InPath, const
 	return MatchingClasses;
 }
 
+FString FDynamicHierarchy::ConvertInternalPathToFileSystemPath(const FString& InInternalPath)
+{
+	auto FileSystemPath = InInternalPath;
+
+	if (FileSystemPath.IsEmpty() ||
+		!FileSystemPath.StartsWith(TEXT("/")))
+	{
+		return FString();
+	}
+
+	const auto SecondSlashIndex = FileSystemPath.Find(TEXT("/"), ESearchCase::IgnoreCase, ESearchDir::FromStart, 1);
+
+	FileSystemPath = SecondSlashIndex != INDEX_NONE
+		                 ? FileSystemPath.RightChop(SecondSlashIndex)
+		                 : TEXT("");
+
+	if (FileSystemPath.IsEmpty())
+	{
+		return FString();
+	}
+
+	return FUnrealCSharpFunctionLibrary::GetFullScriptDirectory() / FileSystemPath;
+}
+
 bool FDynamicHierarchy::EnumeratePath(const FString& InPath, const TFunctionRef<bool(const FName&)>& InCallback)
 {
 	const auto Path = *InPath;

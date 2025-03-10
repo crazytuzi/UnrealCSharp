@@ -6,6 +6,14 @@
 
 #define PLUGIN_TEMPLATE_PATH FString(TEXT("Template"))
 
+#define PLUGIN_TEMPLATE_OVERRIDE FString(TEXT("Override"))
+
+#define PLUGIN_TEMPLATE_DYNAMIC FString(TEXT("Dynamic"))
+
+#define DYNAMIC_CLASS_DEFAULT_PREFIX FString(TEXT("Dynamic"))
+
+#define DYNAMIC_CLASS_DEFAULT_NAMESPACE UObject::StaticClass()->GetPackage()->GetName().RightChop(1).Replace(TEXT("/"), TEXT("."))
+
 #define SOLUTION_NAME FString(TEXT("Script"))
 
 #define DEFAULT_UE_NAME FString(TEXT("UE"))
