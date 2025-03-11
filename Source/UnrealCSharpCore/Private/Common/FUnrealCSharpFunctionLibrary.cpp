@@ -1365,7 +1365,7 @@ bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const
 
 	while (Class != nullptr)
 	{
-		for (const auto Interface : Class->Interfaces)
+		for (const auto& Interface : Class->Interfaces)
 		{
 			if (Interface.Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
 			{
