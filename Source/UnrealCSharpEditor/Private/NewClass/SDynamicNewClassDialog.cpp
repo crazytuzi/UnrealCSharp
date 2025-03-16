@@ -13,6 +13,7 @@
 #include "ClassIconFinder.h"
 #include "GameProjectUtils.h"
 #include "NewClass/SDynamicClassViewer.h"
+#include "NewClass/DynamicNewClassInfo.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
@@ -153,7 +154,7 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 							SNew(SVerticalBox)
 							+ SVerticalBox::Slot()
 							[
-								SAssignNew(ParentClassListView, SListView< TSharedPtr<FNewClassInfo> >)
+								SAssignNew(ParentClassListView, SListView< TSharedPtr<FDynamicNewClassInfo> >)
 								.ListItemsSource(&ParentClassItemsSource)
 								.SelectionMode(ESelectionMode::Single)
 								.ClearSelectionOnClick(false)
@@ -451,11 +452,11 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 TSharedRef<ITableRow> SDynamicNewClassDialog::MakeParentClassListViewWidget(
-	TSharedPtr<FNewClassInfo> ParentClassItem, const TSharedRef<STableViewBase>& OwnerTable)
+	TSharedPtr<FDynamicNewClassInfo> ParentClassItem, const TSharedRef<STableViewBase>& OwnerTable)
 {
 	if (!ParentClassItem.IsValid() || !ParentClassItem->IsSet())
 	{
-		return SNew(STableRow<TSharedPtr<FNewClassInfo>>, OwnerTable);
+		return SNew(STableRow<TSharedPtr<FDynamicNewClassInfo>>, OwnerTable);
 	}
 
 	const auto ClassName = ParentClassItem->GetClassName();
@@ -471,7 +472,7 @@ TSharedRef<ITableRow> SDynamicNewClassDialog::MakeParentClassListViewWidget(
 	constexpr auto ItemHeight = 64;
 
 	return
-			SNew(STableRow<TSharedPtr<FNewClassInfo>>, OwnerTable)
+			SNew(STableRow<TSharedPtr<FDynamicNewClassInfo>>, OwnerTable)
 			.Padding(4)
 			.Style(
 #if UE_APP_STYLE_GET
@@ -532,7 +533,7 @@ FText SDynamicNewClassDialog::GetSelectedParentClassName() const
 		                         : TEXT("None"));
 }
 
-void SDynamicNewClassDialog::OnCommonClassItemSelected(TSharedPtr<FNewClassInfo> Item, ESelectInfo::Type SelectInfo)
+void SDynamicNewClassDialog::OnCommonClassItemSelected(TSharedPtr<FDynamicNewClassInfo> Item, ESelectInfo::Type SelectInfo)
 {
 	if (!Item.IsValid() || Item->BaseClass == nullptr)
 	{
@@ -545,7 +546,7 @@ void SDynamicNewClassDialog::OnCommonClassItemSelected(TSharedPtr<FNewClassInfo>
 	UpdateInputValidity();
 }
 
-void SDynamicNewClassDialog::OnCommonClassItemDoubleClicked(TSharedPtr<FNewClassInfo> Item)
+void SDynamicNewClassDialog::OnCommonClassItemDoubleClicked(TSharedPtr<FDynamicNewClassInfo> Item)
 {
 	if (!Item.IsValid() || !Item->IsSet())
 	{
@@ -962,7 +963,7 @@ void SDynamicNewClassDialog::SetupDefaultCommonParentClassItems()
 
 	for (const auto& DefaultFeaturedClass : DefaultFeaturedClasses)
 	{
-		ParentClassItemsSource.Add(MakeShared<FNewClassInfo>(DefaultFeaturedClass));
+		ParentClassItemsSource.Add(MakeShared<FDynamicNewClassInfo>(DefaultFeaturedClass));
 	}
 }
 
@@ -985,7 +986,7 @@ FReply SDynamicNewClassDialog::OnKeyDown(const FGeometry& MyGeometry, const FKey
 
 	if (InKeyEvent.GetKey() == EKeys::Enter)
 	{
-		OnCommonClassItemDoubleClicked(TSharedPtr<FNewClassInfo>());
+		OnCommonClassItemDoubleClicked(TSharedPtr<FDynamicNewClassInfo>());
 
 		return FReply::Handled();
 	}

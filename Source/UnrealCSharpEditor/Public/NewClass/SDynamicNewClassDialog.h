@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 
 struct FProjectContent;
-struct FNewClassInfo;
+struct FDynamicNewClassInfo;
 class IClassViewerFilter;
 class SEditableTextBox;
 class SWizard;
@@ -30,14 +30,14 @@ public:
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 
 private:
-	TSharedRef<ITableRow> MakeParentClassListViewWidget(TSharedPtr<FNewClassInfo> ParentClassItem,
+	TSharedRef<ITableRow> MakeParentClassListViewWidget(TSharedPtr<FDynamicNewClassInfo> ParentClassItem,
 	                                                    const TSharedRef<STableViewBase>& OwnerTable);
 
 	FText GetSelectedParentClassName() const;
 
-	void OnCommonClassItemSelected(TSharedPtr<FNewClassInfo> Item, ESelectInfo::Type SelectInfo);
+	void OnCommonClassItemSelected(TSharedPtr<FDynamicNewClassInfo> Item, ESelectInfo::Type SelectInfo);
 
-	void OnCommonClassItemDoubleClicked(TSharedPtr<FNewClassInfo> Item);
+	void OnCommonClassItemDoubleClicked(TSharedPtr<FDynamicNewClassInfo> Item);
 
 	void OnAllClassItemSelected(TSharedPtr<FDynamicClassViewerNode> Item);
 
@@ -103,9 +103,9 @@ private:
 private:
 	TSharedPtr<SWizard> MainWizard;
 
-	TSharedPtr<SListView<TSharedPtr<FNewClassInfo>>> ParentClassListView;
+	TSharedPtr<SListView<TSharedPtr<FDynamicNewClassInfo>>> ParentClassListView;
 
-	TArray<TSharedPtr<FNewClassInfo>> ParentClassItemsSource;
+	TArray<TSharedPtr<FDynamicNewClassInfo>> ParentClassItemsSource;
 
 	TSharedPtr<SDynamicClassViewer> DynamicClassViewer;
 
