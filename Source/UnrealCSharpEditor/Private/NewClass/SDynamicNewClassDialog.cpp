@@ -533,7 +533,8 @@ FText SDynamicNewClassDialog::GetSelectedParentClassName() const
 		                         : TEXT("None"));
 }
 
-void SDynamicNewClassDialog::OnCommonClassItemSelected(TSharedPtr<FDynamicNewClassInfo> Item, ESelectInfo::Type SelectInfo)
+void SDynamicNewClassDialog::OnCommonClassItemSelected(TSharedPtr<FDynamicNewClassInfo> Item,
+                                                       ESelectInfo::Type SelectInfo)
 {
 	if (!Item.IsValid() || Item->BaseClass == nullptr)
 	{
@@ -951,15 +952,15 @@ void SDynamicNewClassDialog::UpdateInputValidity()
 
 void SDynamicNewClassDialog::SetupDefaultCommonParentClassItems()
 {
-	TArray<FNewClassInfo> DefaultFeaturedClasses;
+	TArray<FDynamicNewClassInfo> DefaultFeaturedClasses;
 
-	DefaultFeaturedClasses.Add(FNewClassInfo(FNewClassInfo::EClassType::EmptyCpp));
+	DefaultFeaturedClasses.Add(FDynamicNewClassInfo(FNewClassInfo::EClassType::EmptyCpp));
 
-	DefaultFeaturedClasses.Add(FNewClassInfo(UActorComponent::StaticClass()));
+	DefaultFeaturedClasses.Add(FDynamicNewClassInfo(UActorComponent::StaticClass()));
 
 	DefaultFeaturedClasses.Append(FFeaturedClasses::ActorClasses());
 
-	DefaultFeaturedClasses.Add(FNewClassInfo(USceneComponent::StaticClass()));
+	DefaultFeaturedClasses.Add(FDynamicNewClassInfo(USceneComponent::StaticClass()));
 
 	for (const auto& DefaultFeaturedClass : DefaultFeaturedClasses)
 	{

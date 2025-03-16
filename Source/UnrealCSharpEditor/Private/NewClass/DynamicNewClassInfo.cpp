@@ -2,9 +2,8 @@
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassInfo"
 
-FDynamicNewClassInfo::FDynamicNewClassInfo(const FNewClassInfo& InNewClassInfo)
-	: ClassType(InNewClassInfo.ClassType)
-	  , BaseClass(InNewClassInfo.BaseClass)
+FDynamicNewClassInfo::FDynamicNewClassInfo(const FNewClassInfo& InNewClassInfo):
+	FNewClassInfo(InNewClassInfo)
 {
 }
 
@@ -74,7 +73,7 @@ FText FDynamicNewClassInfo::GetClassDescription(const bool bFullDescription) con
 {
 	switch (ClassType)
 	{
-	case FNewClassInfo::EClassType::UObject:
+	case EClassType::UObject:
 		{
 			if (BaseClass)
 			{
@@ -123,11 +122,6 @@ FText FDynamicNewClassInfo::GetClassDescription(const bool bFullDescription) con
 	}
 
 	return FText::GetEmpty();
-}
-
-bool FDynamicNewClassInfo::IsSet() const
-{
-	return ClassType != FNewClassInfo::EClassType::UObject || BaseClass;
 }
 
 #undef LOCTEXT_NAMESPACE
