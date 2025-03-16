@@ -10,47 +10,47 @@ namespace
 	{
 		static FVector2D MultipliesImplementation(const FVector2D& In, const FVector2D::FReal Scalar)
 		{
-			return In * Scalar;
+			return &In != nullptr ? In * Scalar : decltype(In * Scalar)();
 		}
 
 		static FVector2D MultipliesImplementation(const int32 Scale, const FVector2D& In)
 		{
-			return Scale * In;
+			return &In != nullptr ? Scale * In : decltype(Scale * In)();
 		}
 
 		static FVector2D MultipliesImplementation(const float Scale, const FVector2D& In)
 		{
-			return Scale * In;
+			return &In != nullptr ? Scale * In : decltype(Scale * In)();
 		}
 
 		static FVector2D MultipliesImplementation(const double Scale, const FVector2D& In)
 		{
-			return Scale * In;
+			return &In != nullptr ? Scale * In : decltype(Scale * In)();
 		}
 
 		static FVector2D DividesImplementation(const FVector2D& In, const FVector2D::FReal Scalar)
 		{
-			return In / Scalar;
+			return &In != nullptr ? In / Scalar : decltype(In / Scalar)();
 		}
 
 		static FVector2D PlusImplementation(const FVector2D& In, const FVector2D::FReal A)
 		{
-			return In + A;
+			return &In != nullptr && (&A != nullptr) ? In + A : decltype(In + A)();
 		}
 
 		static FVector2D MinusImplementation(const FVector2D& In, const FVector2D::FReal A)
 		{
-			return In - A;
+			return &In != nullptr && (&A != nullptr) ? In - A : decltype(In - A)();
 		}
 
 		static FVector2D::FReal BitOrImplementation(const FVector2D& In, const FVector2D& V)
 		{
-			return In | V;
+			return &In != nullptr && (&V != nullptr) ? In | V : decltype(In | V)();
 		}
 
 		static FVector2D::FReal BitXorImplementation(const FVector2D& In, const FVector2D& V)
 		{
-			return In ^ V;
+			return &In != nullptr && (&V != nullptr) ? In ^ V : decltype(In ^ V)();
 		}
 
 		FRegisterVector2D()

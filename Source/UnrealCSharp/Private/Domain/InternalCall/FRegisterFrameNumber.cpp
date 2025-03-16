@@ -8,12 +8,12 @@ namespace
 	{
 		static FFrameNumber MultipliesImplementation(const FFrameNumber& In, const float Scalar)
 		{
-			return In * Scalar;
+			return &In != nullptr ? In * Scalar : decltype(In * Scalar)();
 		}
 
 		static FFrameNumber DividesImplementation(const FFrameNumber& In, const float Scalar)
 		{
-			return In / Scalar;
+			return &In != nullptr ? In / Scalar : decltype(In / Scalar)();
 		}
 
 		FRegisterFrameNumber()

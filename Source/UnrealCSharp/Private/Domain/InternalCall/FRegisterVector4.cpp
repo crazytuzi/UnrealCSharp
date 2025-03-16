@@ -9,47 +9,47 @@ namespace
 	{
 		static FVector4 MultipliesImplementation(const FVector4& In, const int32 Scale)
 		{
-			return In * Scale;
+			return &In != nullptr ? In * Scale : decltype(In * Scale)();
 		}
 
 		static FVector4 MultipliesImplementation(const FVector4& In, const float Scale)
 		{
-			return In * Scale;
+			return &In != nullptr ? In * Scale : decltype(In * Scale)();
 		}
 
 		static FVector4 MultipliesImplementation(const FVector4& In, const double Scale)
 		{
-			return In * Scale;
+			return &In != nullptr ? In * Scale : decltype(In * Scale)();
 		}
 
 		static FVector4 MultipliesImplementation(const int32 Scale, const FVector4& In)
 		{
-			return Scale * In;
+			return &In != nullptr ? Scale * In : decltype(Scale * In)();
 		}
 
 		static FVector4 MultipliesImplementation(const float Scale, const FVector4& In)
 		{
-			return Scale * In;
+			return &In != nullptr ? Scale * In : decltype(Scale * In)();
 		}
 
 		static FVector4 MultipliesImplementation(const double Scale, const FVector4& In)
 		{
-			return Scale * In;
+			return &In != nullptr ? Scale * In : decltype(Scale * In)();
 		}
 
 		static FVector4 DividesImplementation(const FVector4& In, const int32 Scale)
 		{
-			return In / Scale;
+			return &In != nullptr ? In / Scale : decltype(In / Scale)();
 		}
 
 		static FVector4 DividesImplementation(const FVector4& In, const float Scale)
 		{
-			return In / Scale;
+			return &In != nullptr ? In / Scale : decltype(In / Scale)();
 		}
 
 		static FVector4 DividesImplementation(const FVector4& In, const double Scale)
 		{
-			return In / Scale;
+			return &In != nullptr ? In / Scale : decltype(In / Scale)();
 		}
 
 		FRegisterVector4()

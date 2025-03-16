@@ -9,32 +9,32 @@ namespace
 	{
 		static FVector MultipliesImplementation(const FQuat& In, const FVector& Scalar)
 		{
-			return In * Scalar;
+			return &In != nullptr && (&Scalar != nullptr) ? In * Scalar : decltype(In * Scalar)();
 		}
 
 		static FQuat MultipliesImplementation(const FQuat& In, const float Scale)
 		{
-			return In * Scale;
+			return &In != nullptr ? In * Scale : decltype(In * Scale)();
 		}
 
 		static FQuat MultipliesImplementation(const FQuat& In, const double Scale)
 		{
-			return In * Scale;
+			return &In != nullptr ? In * Scale : decltype(In * Scale)();
 		}
 
 		static FQuat DividesImplementation(const FQuat& In, const float Scale)
 		{
-			return In / Scale;
+			return &In != nullptr ? In / Scale : decltype(In / Scale)();
 		}
 
 		static FQuat DividesImplementation(const FQuat& In, const double Scale)
 		{
-			return In / Scale;
+			return &In != nullptr ? In / Scale : decltype(In / Scale)();
 		}
 
 		static FQuat::FReal BitOrImplementation(const FQuat& In, const FQuat& Q)
 		{
-			return In | Q;
+			return &In != nullptr && (&Q != nullptr) ? In | Q : decltype(In | Q)();
 		}
 
 		FRegisterQuat()

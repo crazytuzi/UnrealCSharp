@@ -8,12 +8,12 @@ namespace
 	{
 		static FTimespan MultipliesImplementation(const FTimespan& In, const double Scalar)
 		{
-			return In * Scalar;
+			return &In != nullptr ? In * Scalar : decltype(In * Scalar)();
 		}
 
 		static FTimespan DividesImplementation(const FTimespan& In, const double Scalar)
 		{
-			return In / Scalar;
+			return &In != nullptr ? In / Scalar : decltype(In / Scalar)();
 		}
 
 		FRegisterTimespan()
