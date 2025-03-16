@@ -13,6 +13,7 @@
 #include "ClassIconFinder.h"
 #include "GameProjectUtils.h"
 #include "NewClass/SDynamicClassViewer.h"
+#include "NewClass/DynamicNewClassInfo.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
