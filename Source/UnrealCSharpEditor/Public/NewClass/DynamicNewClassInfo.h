@@ -4,9 +4,11 @@
 
 struct FDynamicNewClassInfo : FNewClassInfo
 {
-	using FNewClassInfo::FNewClassInfo;
+	typedef FNewClassInfo Super;
 
-	explicit FDynamicNewClassInfo(const FNewClassInfo& InNewClassInfo);
+	using Super::Super;
+
+	explicit FDynamicNewClassInfo(const Super& InSuper);
 
 	FText GetClassName() const;
 
