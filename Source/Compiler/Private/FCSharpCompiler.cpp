@@ -48,11 +48,11 @@ void FCSharpCompiler::ImmediatelyCompile() const
 	}
 }
 
-void FCSharpCompiler::Compile(const TArray<FFileChangeData>& FileChangeData) const
+void FCSharpCompiler::Compile(const TArray<FFileChangeData>& InFileChangeData) const
 {
 	if (Runnable != nullptr)
 	{
-		Runnable->EnqueueTask(FileChangeData);
+		Runnable->EnqueueTask(InFileChangeData);
 	}
 }
 

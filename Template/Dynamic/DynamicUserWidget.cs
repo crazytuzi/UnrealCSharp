@@ -1,11 +1,13 @@
-﻿using Script.CoreUObject;
+using Script.Dynamic;
+using Script.UMG;
+using Script.CoreUObject;
 
-namespace Script.UMG
+namespace Script.CoreUObject
 {
-    [Override]
-    public partial class UUserWidget
+    [UClass]
+    public partial class UDynamicUserWidget : UUserWidget
     {
-        private UUserWidget()
+        public UDynamicUserWidget()
         {
         }
 

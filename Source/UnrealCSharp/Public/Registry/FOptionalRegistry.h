@@ -33,11 +33,9 @@ public:
 
 	MonoObject* GetObject(const FOptionalHelperValueMapping::FAddressType& InAddress);
 
-	bool AddReference(const FOptionalHelperValueMapping::ValueType& InValue, MonoObject* InMonoObject);
-
-	bool AddReference(const FOptionalHelperValueMapping::FAddressType& InAddress,
-	                  const FOptionalHelperValueMapping::ValueType& InValue,
-	                  MonoObject* InMonoObject);
+	template <auto IsMember>
+	auto AddReference(const FOptionalHelperValueMapping::FAddressType& InAddress,
+	                  const FOptionalHelperValueMapping::ValueType& InValue, MonoObject* InMonoObject);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 
@@ -46,4 +44,6 @@ private:
 
 	FOptionalHelperValueMapping::FAddress2GarbageCollectionHandle OptionalAddress2GarbageCollectionHandle;
 };
+
+#include "FOptionalRegistry.inl"
 #endif

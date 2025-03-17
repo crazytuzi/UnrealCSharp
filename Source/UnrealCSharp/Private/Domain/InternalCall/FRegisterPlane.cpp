@@ -9,22 +9,22 @@ namespace
 	{
 		static FPlane::FReal BitOrImplementation(const FPlane& In, const FPlane& V)
 		{
-			return In | V;
+			return &In != nullptr && (&V != nullptr) ? In | V : decltype(In | V)();
 		}
 
 		static FPlane DividesImplementation(const FPlane& In, const FPlane::FReal Scale)
 		{
-			return In / Scale;
+			return &In != nullptr ? In / Scale : decltype(In / Scale)();
 		}
 
 		static FPlane MultipliesImplementation(const FPlane& In, const FPlane::FReal Scale)
 		{
-			return In * Scale;
+			return &In != nullptr ? In * Scale : decltype(In * Scale)();
 		}
 
 		static FPlane MultipliesImplementation(FPlane& In, const FPlane& V)
 		{
-			return In * V;
+			return &In != nullptr && (&V != nullptr) ? In * V : decltype(In * V)();
 		}
 
 		FRegisterPlane()

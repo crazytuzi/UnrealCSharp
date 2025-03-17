@@ -18,8 +18,5 @@ public:
 	virtual void Get(void* Src, void** Dest, std::false_type) const override;
 
 	virtual void Set(void* Src, void* Dest) const override;
-
-private:
-	MonoObject* NewWeakRef(void* InAddress, bool bIsCopy) const;
 };
 #endif

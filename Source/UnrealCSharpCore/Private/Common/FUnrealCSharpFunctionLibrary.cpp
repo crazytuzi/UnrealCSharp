@@ -6,6 +6,7 @@
 #include "Common/NameEncode.h"
 #include "Domain/AssemblyLoader.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Interfaces/IPluginManager.h"
 #include "Serialization/JsonReader.h"
@@ -432,6 +433,20 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UStruct* InStruct)
 	                       *ModuleName);
 }
 
+FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UClass* InClass)
+{
+	return FDynamicGenerator::IsDynamicClass(InClass)
+		       ? FDynamicGenerator::GetNameSpace(InClass)
+		       : GetClassNameSpace(static_cast<const UStruct*>(InClass));
+}
+
+FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UScriptStruct* InScriptStruct)
+{
+	return FDynamicGenerator::IsDynamicStruct(InScriptStruct)
+		       ? FDynamicGenerator::GetNameSpace(InScriptStruct)
+		       : GetClassNameSpace(static_cast<const UStruct*>(InScriptStruct));
+}
+
 FString FUnrealCSharpFunctionLibrary::GetFullClass(const UEnum* InEnum)
 {
 	if (InEnum == nullptr)
@@ -447,6 +462,11 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const UEnum* InEnum)
 	if (InEnum == nullptr)
 	{
 		return TEXT("");
+	}
+
+	if (FDynamicGenerator::IsDynamicEnum(InEnum))
+	{
+		return FDynamicGenerator::GetNameSpace(InEnum);
 	}
 
 	FString ModuleName = InEnum->GetOuter() ? InEnum->GetOuter()->GetName() : TEXT("");
@@ -736,6 +756,21 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
 #endif
 
 #if WITH_EDITOR
+TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsName()
+{
+	TArray<FString> CustomProjectsName;
+
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		for (const auto& [Name] : UnrealCSharpSetting->GetCustomProjects())
+		{
+			CustomProjectsName.Add(Name);
+		}
+	}
+
+	return CustomProjectsName;
+}
+
 TArray<FString> FUnrealCSharpFunctionLibrary::GetCustomProjectsDirectory()
 {
 	TArray<FString> CustomProjectsDirectory;
@@ -848,6 +883,37 @@ FString FUnrealCSharpFunctionLibrary::GetPluginScriptDirectory()
 FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory()
 {
 	return GetPluginDirectory() / PLUGIN_TEMPLATE_PATH;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideDirectory()
+{
+	return GetPluginTemplateDirectory() / PLUGIN_TEMPLATE_OVERRIDE;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateOverrideFileName(const UClass* InClass)
+{
+	return GetPluginTemplateOverrideDirectory() /
+		FString::Printf(TEXT(
+			"%s%s"
+		),
+		                *InClass->GetName(),
+		                *CSHARP_SUFFIX);
+}
+
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicDirectory()
+{
+	return GetPluginTemplateDirectory() / PLUGIN_TEMPLATE_DYNAMIC;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetPluginTemplateDynamicFileName(const UClass* InClass)
+{
+	return GetPluginTemplateDynamicDirectory() /
+		FString::Printf(TEXT(
+			"%s%s%s"
+		),
+		                *DYNAMIC_CLASS_DEFAULT_PREFIX,
+		                *InClass->GetName(),
+		                *CSHARP_SUFFIX);
 }
 #endif
 
@@ -1291,23 +1357,31 @@ bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const
 		return false;
 	}
 
+	const UFunction* Function{};
+
 	auto OwnerClass = InClass;
 
-	auto SuperClass = InClass->GetSuperClass();
+	auto Class = InClass;
 
-	while (SuperClass != nullptr)
+	while (Class != nullptr)
 	{
-		if (SuperClass->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
+		for (const auto& Interface : Class->Interfaces)
 		{
-			OwnerClass = SuperClass;
+			if (Interface.Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
+			{
+				return Interface.Class->IsNative();
+			}
+		}
 
-			SuperClass = SuperClass->GetSuperClass();
-		}
-		else
+		if (const auto Result = Class->FindFunctionByName(InFunctionName, EIncludeSuperFlag::Type::ExcludeSuper))
 		{
-			break;
+			Function = Result;
+
+			OwnerClass = Class;
 		}
+
+		Class = Class->GetSuperClass();
 	}
 
-	return OwnerClass->IsNative();
+	return Function->IsNative() && OwnerClass->IsNative();
 }

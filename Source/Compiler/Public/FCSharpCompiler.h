@@ -17,7 +17,7 @@ public:
 
 	void ImmediatelyCompile() const;
 
-	void Compile(const TArray<FFileChangeData>& FileChangeData) const;
+	void Compile(const TArray<FFileChangeData>& InFileChangeData) const;
 
 	void Compile(const TFunction<void()>& InFunction) const;
 

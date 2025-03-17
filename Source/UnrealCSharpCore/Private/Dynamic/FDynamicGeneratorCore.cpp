@@ -227,13 +227,16 @@ void FDynamicGeneratorCore::EndCodeAnalysisGenerator()
 }
 
 void FDynamicGeneratorCore::CodeAnalysisGenerator(const FString& InName,
-                                                  const TFunction<void(const FString&)>& InGenerator)
+                                                  const TFunction<void(const FString&, const FString&)>& InGenerator)
 {
 	if (const auto Names = DynamicMap.Find(InName))
 	{
 		for (const auto& Name : *Names)
 		{
-			InGenerator(Name);
+			if (auto Index = 0; Name.FindLastChar(TEXT('.'), Index))
+			{
+				InGenerator(Name.Left(Index), Name.Right(Name.Len() - Index - 1));
+			}
 		}
 	}
 }
@@ -1429,3 +1432,30 @@ MonoClass* FDynamicGeneratorCore::IInterfaceToUInterface(MonoClass* InMonoClass)
 	                                                    *ClassName.RightChop(1)
 	                                    ));
 }
+
+#if WITH_EDITOR
+EDynamicType FDynamicGeneratorCore::GetDynamicType(const FString& InName)
+{
+	if (DynamicMap.Contains(DYNAMIC_CLASS) && DynamicMap[DYNAMIC_CLASS].Contains(InName))
+	{
+		return EDynamicType::Class;
+	}
+
+	if (DynamicMap.Contains(DYNAMIC_STRUCT) && DynamicMap[DYNAMIC_STRUCT].Contains(InName))
+	{
+		return EDynamicType::Struct;
+	}
+
+	if (DynamicMap.Contains(DYNAMIC_ENUM) && DynamicMap[DYNAMIC_ENUM].Contains(InName))
+	{
+		return EDynamicType::Enum;
+	}
+
+	if (DynamicMap.Contains(DYNAMIC_INTERFACE) && DynamicMap[DYNAMIC_INTERFACE].Contains(InName))
+	{
+		return EDynamicType::Interface;
+	}
+
+	return EDynamicType::None;
+}
+#endif

@@ -8,7 +8,7 @@ namespace
 	{
 		static FTransform MultipliesImplementation(const FTransform& In, const FQuat& Other)
 		{
-			return In * Other;
+			return &In != nullptr && (&Other != nullptr) ? In * Other : decltype(In * Other)();
 		}
 
 		FRegisterTransform()

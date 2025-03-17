@@ -188,7 +188,7 @@ public:
 	template <typename T>
 	auto GetMultiObject(void* InAddress) const;
 
-	template <typename T, auto IsNeedFree>
+	template <typename T, auto IsNeedFree, auto IsMember>
 	auto AddMultiReference(MonoObject* InMonoObject, void* InValue) const;
 
 	template <typename T>
@@ -201,7 +201,7 @@ public:
 	template <typename T>
 	auto GetStringObject(void* InAddress) const;
 
-	template <typename T, auto IsNeedFree>
+	template <typename T, auto IsNeedFree, auto IsMember>
 	auto AddStringReference(MonoObject* InMonoObject, void* InValue) const;
 
 	template <typename T>
@@ -229,10 +229,7 @@ public:
 	template <typename T>
 	auto GetOptionalObject(void* InAddress) const;
 
-	template <typename T>
-	auto AddOptionalReference(T* InValue, MonoObject* InMonoObject) const;
-
-	template <typename T>
+	template <typename T, auto IsMember>
 	auto AddOptionalReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
 
 	bool RemoveOptionalReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;

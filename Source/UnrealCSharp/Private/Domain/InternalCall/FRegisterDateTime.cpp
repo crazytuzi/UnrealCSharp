@@ -53,24 +53,24 @@ namespace
 	{
 		static FDateTime PlusImplementation(const FDateTime& In, const FTimespan& Other)
 		{
-			return In + Other;
+			return &In != nullptr && (&Other != nullptr) ? In + Other : decltype(In + Other)();
 		}
 
 #if UE_DATETIME_PLUS
 		static FDateTime& PlusImplementation(FDateTime& In, const FDateTime& Other)
 		{
-			return In + Other;
+			return &In != nullptr && (&Other != nullptr) ? In + Other : In;
 		}
 #endif
 
 		static FTimespan MinusImplementation(const FDateTime& In, const FDateTime& Other)
 		{
-			return In - Other;
+			return &In != nullptr && (&Other != nullptr) ? In - Other : decltype(In - Other)();
 		}
 
 		static FDateTime MinusImplementation(const FDateTime& In, const FTimespan& Other)
 		{
-			return In - Other;
+			return &In != nullptr && (&Other != nullptr) ? In - Other : decltype(In - Other)();
 		}
 
 		FRegisterDateTime()

@@ -13,7 +13,7 @@ namespace
 
 			const auto WeakObjectPtr = new TWeakObjectPtr<UObject>(FoundObject);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>, true>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>, true, false>(
 				InMonoObject, WeakObjectPtr);
 		}
 

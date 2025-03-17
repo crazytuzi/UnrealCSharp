@@ -22,6 +22,8 @@ private:
 
 	void OnEndGenerator();
 
+	void OnCompile(const TArray<FFileChangeData>& InFileChangeData);
+
 	void OnFilesLoaded();
 
 	void OnAssetAdded(const FAssetData& InAssetData) const;
@@ -53,6 +55,8 @@ private:
 	FDelegateHandle OnBeginGeneratorDelegateHandle;
 
 	FDelegateHandle OnEndGeneratorDelegateHandle;
+
+	FDelegateHandle OnCompileDelegateHandle;
 
 	FDelegateHandle OnMainFrameCreationFinishedDelegateHandle;
 

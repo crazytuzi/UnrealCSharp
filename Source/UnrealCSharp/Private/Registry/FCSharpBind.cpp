@@ -173,8 +173,8 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 	if (const auto InClass = Cast<UClass>(InStruct))
 	{
 		if (const auto FoundMonoClass = InDomain->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InClass)))
 		{
 			TMap<FString, UFunction*> Functions;
 
@@ -441,9 +441,22 @@ bool FCSharpBind::CanBind(const FDomain* InDomain, UStruct* InStruct)
 	}
 #endif
 
-	if (const auto FoundMonoClass = InDomain->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
-		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct)))
+	MonoClass* FoundMonoClass{};
+
+	if (const auto InClass = Cast<UClass>(InStruct))
+	{
+		FoundMonoClass = InDomain->Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InClass));
+	}
+	else if (const auto InScriptStruct = Cast<UScriptStruct>(InStruct))
+	{
+		FoundMonoClass = InDomain->Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct));
+	}
+
+	if (FoundMonoClass != nullptr)
 	{
 		if (const auto FoundMonoType = InDomain->Class_Get_Type(FoundMonoClass))
 		{
@@ -532,7 +545,7 @@ UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass*
 
 	NewFunction->ClearInternalFlags(EInternalObjectFlags::Native);
 
-	if (GShouldVerifyGCAssumptions && GUObjectArray.IsDisregardForGC(InClass))
+	if (InClass->HasAnyInternalFlags(EInternalObjectFlags::RootSet) || GUObjectArray.IsDisregardForGC(InClass))
 	{
 		NewFunction->AddToRoot();
 	}

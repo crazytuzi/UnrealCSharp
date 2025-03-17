@@ -93,9 +93,20 @@ FClassDescriptor* FClassRegistry::AddClassDescriptor(UStruct* InStruct)
 		return *FoundClassDescriptor;
 	}
 
-	const auto FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(InStruct),
-		FUnrealCSharpFunctionLibrary::GetFullClass(InStruct));
+	MonoClass* FoundMonoClass{};
+
+	if (const auto InClass = Cast<UClass>(InStruct))
+	{
+		FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InClass));
+	}
+	else if (const auto InScriptStruct = Cast<UScriptStruct>(InStruct))
+	{
+		FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct));
+	}
 
 	if (FoundMonoClass == nullptr)
 	{

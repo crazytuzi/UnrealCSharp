@@ -21,7 +21,7 @@ public:
 public:
 	void EnqueueTask();
 
-	void EnqueueTask(const TArray<FFileChangeData>& FileChangeData);
+	void EnqueueTask(const TArray<FFileChangeData>& InFileChangeData);
 
 	bool IsCompiling() const;
 

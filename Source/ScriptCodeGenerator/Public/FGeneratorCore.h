@@ -40,7 +40,7 @@ public:
 
 	static bool IsSupported(const UFunction* InFunction);
 
-	static bool IsSupported(const UStruct* InStruct);
+	static bool IsSupported(const UScriptStruct* InScriptStruct);
 
 	static bool IsSupported(const UEnum* InEnum);
 

@@ -71,6 +71,10 @@ public:
 
 	static FString GetClassNameSpace(const UStruct* InStruct);
 
+	static FString GetClassNameSpace(const UClass* InClass);
+
+	static FString GetClassNameSpace(const UScriptStruct* InScriptStruct);
+
 	static FString GetFullClass(const UEnum* InEnum);
 
 	static FString GetClassNameSpace(const UEnum* InEnum);
@@ -122,6 +126,8 @@ public:
 #endif
 
 #if WITH_EDITOR
+	static TArray<FString> GetCustomProjectsName();
+
 	static TArray<FString> GetCustomProjectsDirectory();
 #endif
 
@@ -149,6 +155,14 @@ public:
 
 #if WITH_EDITOR
 	static FString GetPluginTemplateDirectory();
+
+	static FString GetPluginTemplateOverrideDirectory();
+
+	static FString GetPluginTemplateOverrideFileName(const UClass* InClass);
+
+	static FString GetPluginTemplateDynamicDirectory();
+
+	static FString GetPluginTemplateDynamicFileName(const UClass* InClass);
 #endif
 
 	static bool IsGameField(const UField* InField);

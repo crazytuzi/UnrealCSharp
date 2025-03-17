@@ -5,7 +5,7 @@ void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) c
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, true>(
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, true, false>(
 		Object, Src);
 
 	*Dest = Object;
@@ -19,7 +19,7 @@ void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) 
 	{
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, false>(
+		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, false, true>(
 			Object, Src);
 	}
 

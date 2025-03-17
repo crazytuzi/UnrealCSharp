@@ -31,15 +31,17 @@ namespace
 	{
 		static bool GreaterThanImplementation(const FGuid& X, const FGuid& Y)
 		{
-			return	((X.A < Y.A) ? true : ((X.A > Y.A) ? false :
-					((X.B < Y.B) ? true : ((X.B > Y.B) ? false :
-					((X.C < Y.C) ? true : ((X.C > Y.C) ? false :
-					((X.D < Y.D) ? true : ((X.D > Y.D) ? false : false))))))));
+			return	(&X != nullptr && (&Y != nullptr))
+					? ((X.A > Y.A) ? true : ((X.A < Y.A) ? false :
+					((X.B > Y.B) ? true : ((X.B < Y.B) ? false :
+					((X.C > Y.C) ? true : ((X.C < Y.C) ? false :
+					((X.D > Y.D) ? true : ((X.D < Y.D) ? false : false))))))))
+					: false;
 		}
 
 		static FString LexToStringImplementation(const FGuid& Value)
 		{
-			return LexToString(Value);
+			return (&Value != nullptr) ? LexToString(Value) : decltype(LexToString(Value))();
 		}
 
 		FRegisterGuid()

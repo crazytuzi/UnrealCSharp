@@ -3,6 +3,8 @@
 #include "ToolMenus.h"
 #include "UnrealCSharpEditor.h"
 #include "UnrealCSharpEditorCommands.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "NewClass/DynamicNewClassUtils.h"
 
 #define LOCTEXT_NAMESPACE "UnrealCSharpPlayToolBar"
 
@@ -46,6 +48,14 @@ void FUnrealCSharpPlayToolBar::BuildAction()
 		}), FCanExecuteAction());
 
 	CommandList->MapAction(
+		FUnrealCSharpEditorCommands::Get().OpenNewDynamicClass,
+		FExecuteAction::CreateLambda([]
+		{
+			FDynamicNewClassUtils::OpenAddDynamicClassToProjectDialog(
+				FUnrealCSharpFunctionLibrary::GetGameDirectory());
+		}), FCanExecuteAction());
+
+	CommandList->MapAction(
 		FUnrealCSharpEditorCommands::Get().OpenEditorSettings,
 		FExecuteAction::CreateLambda([]
 		{
@@ -76,6 +86,9 @@ TSharedRef<SWidget> FUnrealCSharpPlayToolBar::GeneratePlayToolBarMenu()
 
 	MenuBuilder.AddMenuEntry(Commands.GeneratorCode, NAME_None,
 	                         LOCTEXT("GeneratorCode", "Generator Code"));
+
+	MenuBuilder.AddMenuEntry(Commands.OpenNewDynamicClass, NAME_None,
+	                         LOCTEXT("OpenNewDynamicClass", "Open NewDynamicClass"));
 
 	MenuBuilder.AddMenuEntry(Commands.OpenEditorSettings, NAME_None,
 	                         LOCTEXT("OpenEditorSettings", "Open EditorSettings"));

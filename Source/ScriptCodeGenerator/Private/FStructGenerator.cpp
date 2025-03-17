@@ -9,7 +9,7 @@
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
-#include "Dynamic/FDynamicStructGenerator.h"
+#include "Dynamic/FDynamicGenerator.h"
 
 void FStructGenerator::Generator()
 {
@@ -29,7 +29,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		return;
 	}
 
-	if (FDynamicStructGenerator::IsDynamicStruct(InScriptStruct))
+	if (FDynamicGenerator::IsDynamicStruct(InScriptStruct))
 	{
 		return;
 	}
@@ -90,7 +90,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
 	};
 
-	auto SuperStruct = InScriptStruct->GetSuperStruct();
+	auto SuperStruct = Cast<UScriptStruct>(InScriptStruct->GetSuperStruct());
 
 	if (SuperStruct != nullptr)
 	{

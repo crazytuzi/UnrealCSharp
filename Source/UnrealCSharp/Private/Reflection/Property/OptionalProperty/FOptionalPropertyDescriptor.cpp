@@ -5,12 +5,29 @@
 
 void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	*Dest = NewWeakRef(Src, true);
+	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+	const auto OptionalHelper = new FOptionalHelper(Property, Src, true, false);
+
+	FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(Src, OptionalHelper, Object);
+
+	*Dest = Object;
 }
 
 void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
-	*Dest = NewWeakRef(Src, false);
+	auto Object = FCSharpEnvironment::GetEnvironment().GetOptionalObject<FOptionalHelper>(Src);
+
+	if (Object == nullptr)
+	{
+		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+
+		const auto OptionalHelper = new FOptionalHelper(Property, Src, false, false);
+
+		FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, true>(Src, OptionalHelper, Object);
+	}
+
+	*Dest = Object;
 }
 
 void FOptionalPropertyDescriptor::Set(void* Src, void* Dest) const
@@ -23,17 +40,5 @@ void FOptionalPropertyDescriptor::Set(void* Src, void* Dest) const
 	Property->InitializeValue(Dest);
 
 	Property->CopyCompleteValue(Dest, SrcOptional->GetData());
-}
-
-MonoObject* FOptionalPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
-{
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
-
-	const auto OptionalHelper = new FOptionalHelper(Property, InAddress,
-	                                                bIsCopy, false);
-
-	FCSharpEnvironment::GetEnvironment().AddOptionalReference(OptionalHelper, Object);
-
-	return Object;
 }
 #endif

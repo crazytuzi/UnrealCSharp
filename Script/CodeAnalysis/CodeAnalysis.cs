@@ -273,11 +273,15 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UClass"))
                                     {
-                                        _dynamic?["DynamicClass"].Add(ClassDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicClass"]
+                                            .Add($"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}");
 
                                         if (_dynamicFile != null)
                                         {
-                                            _dynamicFile[ClassDeclaration.Identifier.ToString()] = inFile;
+                                            _dynamicFile[
+                                                    $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}"
+                                                ] =
+                                                inFile;
                                         }
 
                                         return;
@@ -285,11 +289,14 @@ namespace CodeAnalysis
 
                                     if (Attribute.ToString().Equals("UStruct"))
                                     {
-                                        _dynamic?["DynamicStruct"].Add(ClassDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicStruct"]
+                                            .Add($"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}");
 
                                         if (_dynamicFile != null)
                                         {
-                                            _dynamicFile[ClassDeclaration.Identifier.ToString()] = inFile;
+                                            _dynamicFile[
+                                                $"{NamespaceDeclaration.Name}.{ClassDeclaration.Identifier}"
+                                            ] = inFile;
                                         }
 
                                         return;
@@ -305,11 +312,15 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UInterface"))
                                     {
-                                        _dynamic?["DynamicInterface"].Add(InterfaceDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicInterface"]
+                                            .Add($"{NamespaceDeclaration.Name}.{InterfaceDeclaration.Identifier}");
 
                                         if (_dynamicFile != null)
                                         {
-                                            _dynamicFile[InterfaceDeclaration.Identifier.ToString()] = inFile;
+                                            _dynamicFile[
+                                                    $"{NamespaceDeclaration.Name}.{InterfaceDeclaration.Identifier}"
+                                                ] =
+                                                inFile;
                                         }
 
                                         return;
@@ -325,11 +336,14 @@ namespace CodeAnalysis
                                 {
                                     if (Attribute.ToString().Equals("UEnum"))
                                     {
-                                        _dynamic?["DynamicEnum"].Add(EnumDeclaration.Identifier.ToString());
+                                        _dynamic?["DynamicEnum"]
+                                            .Add($"{NamespaceDeclaration.Name}.{EnumDeclaration.Identifier}");
 
                                         if (_dynamicFile != null)
                                         {
-                                            _dynamicFile[EnumDeclaration.Identifier.ToString()] = inFile;
+                                            _dynamicFile[
+                                                $"{NamespaceDeclaration.Name}.{EnumDeclaration.Identifier}"
+                                            ] = inFile;
                                         }
 
                                         return;

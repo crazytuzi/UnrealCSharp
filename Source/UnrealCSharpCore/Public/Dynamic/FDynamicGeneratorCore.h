@@ -1,5 +1,8 @@
 #pragma once
 
+#if WITH_EDITOR
+#include "EDynamicType.h"
+#endif
 #include "FDynamicDependencyGraph.h"
 #include "mono/metadata/details/reflection-types.h"
 
@@ -11,7 +14,8 @@ public:
 
 	static void EndCodeAnalysisGenerator();
 
-	static void CodeAnalysisGenerator(const FString& InName, const TFunction<void(const FString&)>& InGenerator);
+	static void CodeAnalysisGenerator(const FString& InName,
+	                                  const TFunction<void(const FString&, const FString&)>& InGenerator);
 
 	static bool IsDynamic(MonoClass* InMonoClass, const FString& InAttribute);
 
@@ -99,6 +103,10 @@ public:
 	static MonoClass* UInterfaceToIInterface(MonoClass* InMonoClass);
 
 	static MonoClass* IInterfaceToUInterface(MonoClass* InMonoClass);
+
+#if WITH_EDITOR
+	static EDynamicType GetDynamicType(const FString& InName);
+#endif
 
 private:
 #if WITH_EDITOR

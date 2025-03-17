@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Template/TFunctionPointer.inl"
+#include "EDynamicClassGeneratorType.h"
 #include "mono/metadata/object.h"
 
 inline uint32 GetTypeHash(const UClass::ClassConstructorType& InClassConstructor)
@@ -18,24 +19,24 @@ public:
 
 	static bool IsDynamicClass(MonoClass* InMonoClass);
 
-	static MonoClass* GetMonoClass(const FString& InName);
-
 	static void OnPrePIEEnded();
 
 	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses();
 #endif
 
-	static void Generator(MonoClass* InMonoClass);
+	static void Generator(MonoClass* InMonoClass, EDynamicClassGeneratorType InDynamicClassGeneratorType);
 
-	static bool UNREALCSHARPCORE_API IsDynamicClass(const UClass* InClass);
+	static UNREALCSHARPCORE_API bool IsDynamicClass(const UClass* InClass);
 
-	static bool IsDynamicBlueprintGeneratedClass(const UField* InField);
+	static UNREALCSHARPCORE_API bool IsDynamicBlueprintGeneratedClass(const UField* InField);
 
 	static bool IsDynamicBlueprintGeneratedClass(const UBlueprintGeneratedClass* InClass);
 
 	static bool IsDynamicBlueprintGeneratedSubClass(const UBlueprintGeneratedClass* InClass);
 
 	static UNREALCSHARPCORE_API UClass* GetDynamicClass(MonoClass* InMonoClass);
+
+	static FString GetNameSpace(const UClass* InClass);
 
 private:
 	static void BeginGenerator(UClass* InClass, UClass* InParentClass);
@@ -47,9 +48,11 @@ private:
 	static void EndGenerator(UClass* InClass);
 
 	template <typename T>
-	static auto GeneratorClass(const FString& InName, T InClass, UClass* InParentClass,
+	static auto GeneratorClass(const FString& InNameSpace, const FString& InName, T InClass, UClass* InParentClass,
 	                           const TFunction<void(UClass*)>& InProcessGenerator)
 	{
+		NamespaceMap.Add(InClass, InNameSpace);
+
 		DynamicClassMap.Add(InName, InClass);
 
 		DynamicClassSet.Add(InClass);
@@ -61,16 +64,17 @@ private:
 		EndGenerator(InClass);
 	}
 
-	static UClass* GeneratorClass(UPackage* InOuter, const FString& InName, UClass* InParentClass);
+	static UClass* GeneratorClass(UPackage* InOuter, const FString& InNameSpace, const FString& InName,
+	                              UClass* InParentClass);
 
-	static UClass* GeneratorClass(UPackage* InOuter, const FString& InName, UClass* InParentClass,
-	                              const TFunction<void(UClass*)>& InProcessGenerator);
-
-	static UBlueprintGeneratedClass* GeneratorBlueprintGeneratedClass(
-		UPackage* InOuter, const FString& InName, UClass* InParentClass);
+	static UClass* GeneratorClass(UPackage* InOuter, const FString& InNameSpace, const FString& InName,
+	                              UClass* InParentClass, const TFunction<void(UClass*)>& InProcessGenerator);
 
 	static UBlueprintGeneratedClass* GeneratorBlueprintGeneratedClass(
-		UPackage* InOuter, const FString& InName, UClass* InParentClass,
+		UPackage* InOuter, const FString& InNameSpace, const FString& InName, UClass* InParentClass);
+
+	static UBlueprintGeneratedClass* GeneratorBlueprintGeneratedClass(
+		UPackage* InOuter, const FString& InNameSpace, const FString& InName, UClass* InParentClass,
 		const TFunction<void(UClass*)>& InProcessGenerator);
 
 #if WITH_EDITOR
@@ -91,6 +95,8 @@ public:
 	static UNREALCSHARPCORE_API TSet<UClass::ClassConstructorType> ClassConstructorSet;
 
 private:
+	static TMap<UClass*, FString> NamespaceMap;
+
 	static TMap<FString, UClass*> DynamicClassMap;
 
 	static TSet<UClass*> DynamicClassSet;

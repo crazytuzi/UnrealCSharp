@@ -13,7 +13,7 @@ namespace
 
 			const auto SoftClassPtr = new TSoftClassPtr<UObject>(FoundClass);
 
-			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, true>(
+			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, true, false>(
 				InMonoObject, SoftClassPtr);
 		}
 
