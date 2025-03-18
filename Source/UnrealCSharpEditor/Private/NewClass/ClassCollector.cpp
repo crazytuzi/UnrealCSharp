@@ -4,6 +4,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+#include "UEVersion.h"
 
 TArray<TSharedPtr<FDynamicClassViewerNode>> FClassCollector::AllNodes;
 
@@ -229,7 +230,7 @@ void FClassCollector::PopulateClassByAsset()
 
 		TArray<FName> SupportedAssetClassNames;
 
-		for (const auto SupportedAssetClass : UnrealCSharpEditorSetting->GetSupportedAssetClass())
+		for (const auto& SupportedAssetClass : UnrealCSharpEditorSetting->GetSupportedAssetClass())
 		{
 			SupportedAssetClassNames.Add(SupportedAssetClass->GetFName());
 		}

@@ -9,6 +9,7 @@
 #include "Widgets/Layout/SGridPanel.h"
 #include "SWarningOrErrorBox.h"
 #include "TutorialMetaData.h"
+#include "AddToProjectConfig.h"
 #include "FeaturedClasses.inl"
 #include "ClassIconFinder.h"
 #include "GameProjectUtils.h"
@@ -17,6 +18,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
+#include "UEVersion.h"
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassDialog"
 

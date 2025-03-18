@@ -357,7 +357,7 @@ void UDynamicDataSource::EnumerateItemsMatchingFilter(const FContentBrowserDataC
 
 	if (EnumHasAnyFlags(InFilter.ItemTypeFilter, EContentBrowserItemTypeFilter::IncludeFiles))
 	{
-		for (const auto Class : ClassDataFilter->Classes)
+		for (const auto& Class : ClassDataFilter->Classes)
 		{
 			if (!InCallback(CreateFileItem(Class)))
 			{

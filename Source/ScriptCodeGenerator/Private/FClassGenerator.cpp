@@ -253,7 +253,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	TArray<TTuple<bool, FString, FString, UFunction*>> Functions;
 
-	for (const auto InInterface : InClass->Interfaces)
+	for (const auto& InInterface : InClass->Interfaces)
 	{
 		if (SuperClass != nullptr && SuperClass->ImplementsInterface(InInterface.Class))
 		{
