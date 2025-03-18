@@ -776,7 +776,7 @@ bool FGeneratorCore::IsSupported(const UClass* InClass)
 		}
 	}
 
-	for (const auto Interface : InClass->Interfaces)
+	for (const auto& Interface : InClass->Interfaces)
 	{
 		if (!IsSupported(Interface.Class))
 		{

@@ -1,6 +1,7 @@
 ﻿#include "NewClass/ClassCollector.h"
 #include "WidgetBlueprint.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "UEVersion.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
@@ -229,7 +230,7 @@ void FClassCollector::PopulateClassByAsset()
 
 		TArray<FName> SupportedAssetClassNames;
 
-		for (const auto SupportedAssetClass : UnrealCSharpEditorSetting->GetSupportedAssetClass())
+		for (const auto& SupportedAssetClass : UnrealCSharpEditorSetting->GetSupportedAssetClass())
 		{
 			SupportedAssetClassNames.Add(SupportedAssetClass->GetFName());
 		}
