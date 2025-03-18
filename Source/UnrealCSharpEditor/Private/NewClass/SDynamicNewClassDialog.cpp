@@ -13,6 +13,7 @@
 #include "FeaturedClasses.inl"
 #include "ClassIconFinder.h"
 #include "GameProjectUtils.h"
+#include "UEVersion.h"
 #include "NewClass/SDynamicClassViewer.h"
 #include "NewClass/DynamicNewClassInfo.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
