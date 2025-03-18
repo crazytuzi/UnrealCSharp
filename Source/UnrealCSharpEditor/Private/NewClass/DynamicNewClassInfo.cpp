@@ -2,9 +2,8 @@
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassInfo"
 
-FDynamicNewClassInfo::FDynamicNewClassInfo(const FNewClassInfo& InNewClassInfo)
-	: ClassType(InNewClassInfo.ClassType)
-	  , BaseClass(InNewClassInfo.BaseClass)
+FDynamicNewClassInfo::FDynamicNewClassInfo(const Super& InSuper):
+	Super(InSuper)
 {
 }
 
@@ -12,23 +11,23 @@ FText FDynamicNewClassInfo::GetClassName() const
 {
 	switch (ClassType)
 	{
-	case FNewClassInfo::EClassType::UObject:
+	case EClassType::UObject:
 		{
 			return BaseClass ? BaseClass->GetDisplayNameText() : FText::GetEmpty();
 		}
-	case FNewClassInfo::EClassType::EmptyCpp:
+	case EClassType::EmptyCpp:
 		{
 			return LOCTEXT("NoParentClass", "None");
 		}
-	case FNewClassInfo::EClassType::SlateWidget:
+	case EClassType::SlateWidget:
 		{
 			return LOCTEXT("SlateWidgetParentClass", "Slate Widget");
 		}
-	case FNewClassInfo::EClassType::SlateWidgetStyle:
+	case EClassType::SlateWidgetStyle:
 		{
 			return LOCTEXT("SlateWidgetStyleParentClass", "Slate Widget Style");
 		}
-	case FNewClassInfo::EClassType::UInterface:
+	case EClassType::UInterface:
 		{
 			return LOCTEXT("UInterfaceParentClass", "Unreal Interface");
 		}
@@ -43,23 +42,23 @@ FString FDynamicNewClassInfo::GetClassNameCPP() const
 {
 	switch (ClassType)
 	{
-	case FNewClassInfo::EClassType::UObject:
+	case EClassType::UObject:
 		{
 			return BaseClass ? BaseClass->GetName() : TEXT("");
 		}
-	case FNewClassInfo::EClassType::EmptyCpp:
+	case EClassType::EmptyCpp:
 		{
 			return TEXT("");
 		}
-	case FNewClassInfo::EClassType::SlateWidget:
+	case EClassType::SlateWidget:
 		{
 			return TEXT("CompoundWidget");
 		}
-	case FNewClassInfo::EClassType::SlateWidgetStyle:
+	case EClassType::SlateWidgetStyle:
 		{
 			return TEXT("SlateWidgetStyle");
 		}
-	case FNewClassInfo::EClassType::UInterface:
+	case EClassType::UInterface:
 		{
 			return TEXT("Interface");
 		}
@@ -74,7 +73,7 @@ FText FDynamicNewClassInfo::GetClassDescription(const bool bFullDescription) con
 {
 	switch (ClassType)
 	{
-	case FNewClassInfo::EClassType::UObject:
+	case EClassType::UObject:
 		{
 			if (BaseClass)
 			{
@@ -100,20 +99,20 @@ FText FDynamicNewClassInfo::GetClassDescription(const bool bFullDescription) con
 			}
 		}
 		break;
-	case FNewClassInfo::EClassType::EmptyCpp:
+	case EClassType::EmptyCpp:
 		{
 			return LOCTEXT("EmptyClassDescription", "An empty C++ class with a default constructor and destructor.");
 		}
-	case FNewClassInfo::EClassType::SlateWidget:
+	case EClassType::SlateWidget:
 		{
 			return LOCTEXT("SlateWidgetClassDescription", "A custom Slate widget, deriving from SCompoundWidget.");
 		}
-	case FNewClassInfo::EClassType::SlateWidgetStyle:
+	case EClassType::SlateWidgetStyle:
 		{
 			return LOCTEXT("SlateWidgetStyleClassDescription",
 			               "A custom Slate widget style, deriving from FSlateWidgetStyle, along with its associated UObject wrapper class.");
 		}
-	case FNewClassInfo::EClassType::UInterface:
+	case EClassType::UInterface:
 		{
 			return LOCTEXT("UInterfaceClassDescription",
 			               "A UObject Interface class, to be implemented by other UObject-based classes.");
@@ -123,11 +122,6 @@ FText FDynamicNewClassInfo::GetClassDescription(const bool bFullDescription) con
 	}
 
 	return FText::GetEmpty();
-}
-
-bool FDynamicNewClassInfo::IsSet() const
-{
-	return ClassType != FNewClassInfo::EClassType::UObject || BaseClass;
 }
 
 #undef LOCTEXT_NAMESPACE

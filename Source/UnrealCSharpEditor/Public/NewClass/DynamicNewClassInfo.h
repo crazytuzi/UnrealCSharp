@@ -2,19 +2,17 @@
 
 #include "AddToProjectConfig.h"
 
-struct FDynamicNewClassInfo
+struct FDynamicNewClassInfo : FNewClassInfo
 {
-	FDynamicNewClassInfo(const FNewClassInfo& InNewClassInfo);
+	typedef FNewClassInfo Super;
+
+	using Super::Super;
+
+	explicit FDynamicNewClassInfo(const Super& InSuper);
 
 	FText GetClassName() const;
 
-	FString GetClassNameCPP() const;
-
 	FText GetClassDescription(const bool bFullDescription = true) const;
 
-	bool IsSet() const;
-
-	FNewClassInfo::EClassType ClassType;
-
-	const UClass* BaseClass;
+	FString GetClassNameCPP() const;
 };
