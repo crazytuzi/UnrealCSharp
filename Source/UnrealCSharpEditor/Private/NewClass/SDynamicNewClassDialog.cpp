@@ -9,6 +9,7 @@
 #include "Widgets/Layout/SGridPanel.h"
 #include "SWarningOrErrorBox.h"
 #include "TutorialMetaData.h"
+#include "AddToProjectConfig.h"
 #include "FeaturedClasses.inl"
 #include "ClassIconFinder.h"
 #include "GameProjectUtils.h"
