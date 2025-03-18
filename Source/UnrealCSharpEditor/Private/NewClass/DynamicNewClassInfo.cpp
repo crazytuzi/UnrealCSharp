@@ -1,4 +1,5 @@
 ﻿#include "NewClass/DynamicNewClassInfo.h"
+#include "UEVersion.h"
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassInfo"
 

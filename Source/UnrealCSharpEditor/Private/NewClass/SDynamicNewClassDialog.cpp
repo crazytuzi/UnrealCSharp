@@ -18,6 +18,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
+#include "UEVersion.h"
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassDialog"
 

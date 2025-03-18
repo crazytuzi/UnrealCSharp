@@ -3,11 +3,11 @@
 #include "CoreMinimal.h"
 
 struct FProjectContent;
-struct FDynamicNewClassInfo;
 class IClassViewerFilter;
 class SEditableTextBox;
 class SWizard;
 class SDynamicClassViewer;
+struct FDynamicNewClassInfo;
 struct FDynamicClassViewerNode;
 
 class SDynamicNewClassDialog final : public SCompoundWidget
