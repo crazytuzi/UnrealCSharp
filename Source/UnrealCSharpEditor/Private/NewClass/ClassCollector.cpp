@@ -1,10 +1,10 @@
 ﻿#include "NewClass/ClassCollector.h"
 #include "WidgetBlueprint.h"
 #include "AssetRegistry/AssetRegistryModule.h"
-#include "UEVersion.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+#include "UEVersion.h"
 
 TArray<TSharedPtr<FDynamicClassViewerNode>> FClassCollector::AllNodes;
 

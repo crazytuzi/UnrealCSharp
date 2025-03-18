@@ -13,12 +13,12 @@
 #include "FeaturedClasses.inl"
 #include "ClassIconFinder.h"
 #include "GameProjectUtils.h"
-#include "UEVersion.h"
 #include "NewClass/SDynamicClassViewer.h"
 #include "NewClass/DynamicNewClassInfo.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
+#include "UEVersion.h"
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassDialog"
 
