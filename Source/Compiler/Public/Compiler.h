@@ -12,4 +12,6 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+	/** Compile When Start PIE */
+	void OnStartPIE(bool bSimulateInEditor);
 };

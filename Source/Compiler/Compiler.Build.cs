@@ -42,7 +42,8 @@ public class Compiler : ModuleRules
 				"Json",
 				"UnrealCSharpCore",
 				"CrossVersion",
-				"EditorStyle"
+				"EditorStyle",
+				"UnrealEd"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
