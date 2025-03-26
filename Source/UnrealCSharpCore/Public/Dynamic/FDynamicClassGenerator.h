@@ -19,7 +19,7 @@ public:
 
 	static bool IsDynamicClass(MonoClass* InMonoClass);
 
-	static void OnPrePIEEnded();
+	static void OnPrePIEEnded(const bool bIsSimulating);
 
 	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses();
 #endif

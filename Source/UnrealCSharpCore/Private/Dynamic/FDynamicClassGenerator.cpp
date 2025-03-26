@@ -110,7 +110,7 @@ bool FDynamicClassGenerator::IsDynamicClass(MonoClass* InMonoClass)
 	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_CLASS_ATTRIBUTE);
 }
 
-void FDynamicClassGenerator::OnPrePIEEnded()
+void FDynamicClassGenerator::OnPrePIEEnded(const bool bIsSimulating)
 {
 	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(
 		[](const TObjectIterator<UBlueprintGeneratedClass>& InBlueprintGeneratedClass)

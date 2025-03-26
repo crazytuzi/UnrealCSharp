@@ -5,13 +5,7 @@
 
 FEngineListener::FEngineListener()
 {
-#if WITH_EDITOR
-	OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddRaw(this, &FEngineListener::OnPreBeginPIE);
-
-	OnPostPIEStartedDelegateHandle = FEditorDelegates::PostPIEStarted.AddRaw(this, &FEngineListener::OnPostPIEStarted);
-
-	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEngineListener::OnCancelPIE);
-#else
+#if !WITH_EDITOR
 	OnPostEngineInitHandle = FCoreDelegates::OnPostEngineInit.AddRaw(this, &FEngineListener::OnPostEngineInit);
 
 	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
@@ -20,22 +14,7 @@ FEngineListener::FEngineListener()
 
 FEngineListener::~FEngineListener()
 {
-#if WITH_EDITOR
-	if (OnPreBeginPIEDelegateHandle.IsValid())
-	{
-		FEditorDelegates::PreBeginPIE.Remove(OnPreBeginPIEDelegateHandle);
-	}
-
-	if (OnPostPIEStartedDelegateHandle.IsValid())
-	{
-		FEditorDelegates::PostPIEStarted.Remove(OnPostPIEStartedDelegateHandle);
-	}
-
-	if (OnCancelPIEDelegateHandle.IsValid())
-	{
-		FEditorDelegates::CancelPIE.Remove(OnCancelPIEDelegateHandle);
-	}
-#else
+#if !WITH_EDITOR
 	if (OnPostEngineInitHandle.IsValid())
 	{
 		FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitHandle);
@@ -58,10 +37,6 @@ void FEngineListener::OnPreBeginPIE(const bool)
 			FUnrealCSharpCoreModule::Get().SetActive(true);
 		}
 	}
-}
-
-void FEngineListener::OnPostPIEStarted(const bool)
-{
 }
 
 void FEngineListener::OnCancelPIE()
