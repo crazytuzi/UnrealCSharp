@@ -1,6 +1,8 @@
 ﻿#include "Listener/FEditorListener.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "DirectoryWatcherModule.h"
+#include "HAL/ThreadHeartBeat.h"
+#include "HAL/ThreadManager.h"
 #include "FAssetGenerator.h"
 #include "FCodeAnalysis.h"
 #include "FCSharpCompiler.h"
@@ -10,6 +12,7 @@
 #include "CoreMacro/Macro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "Listener/FEngineListener.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 
 FEditorListener::FEditorListener():
@@ -22,7 +25,7 @@ FEditorListener::FEditorListener():
 
 	OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddRaw(this, &FEditorListener::OnPrePIEEnded);
 
-	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEditorListener::OnCancelPIEEnded);
+	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEditorListener::OnCancelPIE);
 
 	OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
 		this, &FEditorListener::OnBeginGenerator);
@@ -123,18 +126,35 @@ void FEditorListener::OnPostEngineInit()
 	FDynamicGenerator::CodeAnalysisGenerator();
 }
 
-void FEditorListener::OnPreBeginPIE(const bool)
+void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 {
 	bIsPIEPlaying = true;
+
+	while (FCSharpCompiler::Get().IsCompiling())
+	{
+		FThreadHeartBeat::Get().HeartBeat();
+
+		FPlatformProcess::SleepNoStats(0.0001f);
+
+		FTSTicker::GetCoreTicker().Tick(FApp::GetDeltaTime());
+
+		FThreadManager::Get().Tick();
+
+		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
+	}
+
+	FEngineListener::OnPreBeginPIE(bIsSimulating);
 }
 
-void FEditorListener::OnPrePIEEnded(const bool)
+void FEditorListener::OnPrePIEEnded(const bool bIsSimulating)
 {
-	FDynamicGenerator::OnPrePIEEnded();
+	FDynamicGenerator::OnPrePIEEnded(bIsSimulating);
 }
 
-void FEditorListener::OnCancelPIEEnded()
+void FEditorListener::OnCancelPIE()
 {
+	FEngineListener::OnCancelPIE();
+
 	bIsPIEPlaying = false;
 }
 

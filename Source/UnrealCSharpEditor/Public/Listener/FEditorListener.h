@@ -12,11 +12,11 @@ public:
 private:
 	void OnPostEngineInit();
 
-	void OnPreBeginPIE(const bool);
+	void OnPreBeginPIE(const bool bIsSimulating);
 
-	void OnPrePIEEnded(const bool);
+	void OnPrePIEEnded(const bool bIsSimulating);
 
-	void OnCancelPIEEnded();
+	void OnCancelPIE();
 
 	void OnBeginGenerator();
 

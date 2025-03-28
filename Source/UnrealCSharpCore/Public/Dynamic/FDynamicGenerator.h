@@ -36,7 +36,7 @@ public:
 
 	static void Generator(const TArray<FFileChangeData>& InFileChangeData);
 
-	static void OnPrePIEEnded();
+	static void OnPrePIEEnded(const bool bIsSimulating);
 
 	static bool IsFullGenerator();
 
