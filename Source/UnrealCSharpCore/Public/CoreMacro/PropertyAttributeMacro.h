@@ -57,3 +57,11 @@
 #define CLASS_TEXT_EXPORT_TRANSIENT_ATTRIBUTE FString(TEXT("TextExportTransientAttribute"))
 
 #define CLASS_SKIP_SERIALIZATION_ATTRIBUTE FString(TEXT("SkipSerializationAttribute"))
+
+#define CLASS_DEFAULT_SUB_OBJECT_ATTRIBUTE FString(TEXT("DefaultSubObjectAttribute"))
+
+#define CLASS_ROOT_COMPONENT_ATTRIBUTE FString(TEXT("RootComponentAttribute"))
+
+#define CLASS_ATTACHMENT_PARENT_ATTRIBUTE FString(TEXT("AttachmentParentAttribute"))
+
+#define CLASS_ATTACHMENT_SOCKET_NAME_ATTRIBUTE FString(TEXT("AttachmentSocketNameAttribute"))

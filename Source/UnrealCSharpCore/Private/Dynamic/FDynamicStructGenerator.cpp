@@ -398,7 +398,9 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 void FDynamicStructGenerator::GeneratorProperty(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct)
 {
 	FDynamicGeneratorCore::GeneratorProperty(InMonoClass, InScriptStruct,
-	                                         [](const FProperty* InProperty)
+	                                         [](const MonoProperty* InMonoProperty,
+	                                            const MonoCustomAttrInfo* InMonoCustomAttrInfo,
+	                                            const FProperty* InProperty)
 	                                         {
 	                                         });
 }

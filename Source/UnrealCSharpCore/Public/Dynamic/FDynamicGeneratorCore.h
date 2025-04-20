@@ -95,7 +95,8 @@ public:
 	static FString AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
 
 	static void GeneratorProperty(MonoClass* InMonoClass, UField* InField,
-	                              const TFunction<void(const FProperty* InProperty)>& InGenerator);
+	                              const TFunction<void(const MonoProperty*, MonoCustomAttrInfo*, const FProperty*)>&
+	                              InGenerator);
 
 	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass,
 	                              const TFunction<void(const UFunction* InFunction)>& InGenerator);
