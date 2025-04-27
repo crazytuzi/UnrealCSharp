@@ -36,7 +36,7 @@ private:
 
 	void OnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool);
 
-	void OnWindowActivatedEvent();
+	void OnWindowActivatedEvent(bool bIsActive);
 
 	void OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges);
 
@@ -59,6 +59,8 @@ private:
 	FDelegateHandle OnCompileDelegateHandle;
 
 	FDelegateHandle OnMainFrameCreationFinishedDelegateHandle;
+
+	FDelegateHandle OnWindowActivatedDelegateHandle;
 
 	FDelegateHandle OnDirectoryChangedDelegateHandle;
 

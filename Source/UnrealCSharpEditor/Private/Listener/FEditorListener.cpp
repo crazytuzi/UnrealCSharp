@@ -76,6 +76,10 @@ FEditorListener::~FEditorListener()
 		}
 	}
 
+	if (FSlateApplication::IsInitialized() &&OnWindowActivatedDelegateHandle.IsValid())
+	{
+		FSlateApplication::Get().OnApplicationActivationStateChanged().Remove(OnWindowActivatedDelegateHandle);
+	}
 	if (OnMainFrameCreationFinishedDelegateHandle.IsValid())
 	{
 		auto& MainFrameModule = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
@@ -283,18 +287,22 @@ void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
 
 void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow> InRootWindow, bool)
 {
-	InRootWindow->GetOnWindowActivatedEvent().AddRaw(this, &FEditorListener::OnWindowActivatedEvent);
+	OnWindowActivatedDelegateHandle= FSlateApplication::Get().OnApplicationActivationStateChanged().AddRaw(
+			this, &FEditorListener::OnWindowActivatedEvent);
 }
 
-void FEditorListener::OnWindowActivatedEvent()
+void FEditorListener::OnWindowActivatedEvent(bool bIsActive)
 {
-	if (!FileChanges.IsEmpty())
+	if(bIsActive)
 	{
-		if (!bIsPIEPlaying && !bIsGenerating)
+		if (!FileChanges.IsEmpty())
 		{
-			FCSharpCompiler::Get().Compile(FileChanges);
+			if (!bIsPIEPlaying && !bIsGenerating)
+			{
+				FCSharpCompiler::Get().Compile(FileChanges);
 
-			FileChanges.Reset();
+				FileChanges.Reset();
+			}
 		}
 	}
 }
