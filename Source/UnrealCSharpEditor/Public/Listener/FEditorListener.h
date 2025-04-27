@@ -34,9 +34,9 @@ private:
 
 	void OnAssetUpdated(const FAssetData& InAssetData) const;
 
-	void OnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool);
+	void OnMainFrameCreationFinished(TSharedPtr<SWindow>, bool);
 
-	void OnWindowActivatedEvent(bool bIsActive);
+	void OnApplicationActivationStateChanged(const bool IsActive);
 
 	void OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges);
 
@@ -60,7 +60,7 @@ private:
 
 	FDelegateHandle OnMainFrameCreationFinishedDelegateHandle;
 
-	FDelegateHandle OnWindowActivatedDelegateHandle;
+	FDelegateHandle OnApplicationActivationStateChangedDelegateHandle;
 
 	FDelegateHandle OnDirectoryChangedDelegateHandle;
 

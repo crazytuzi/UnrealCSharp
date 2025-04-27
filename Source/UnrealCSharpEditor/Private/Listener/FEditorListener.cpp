@@ -76,10 +76,12 @@ FEditorListener::~FEditorListener()
 		}
 	}
 
-	if (FSlateApplication::IsInitialized() &&OnWindowActivatedDelegateHandle.IsValid())
+	if (FSlateApplication::IsInitialized() && OnApplicationActivationStateChangedDelegateHandle.IsValid())
 	{
-		FSlateApplication::Get().OnApplicationActivationStateChanged().Remove(OnWindowActivatedDelegateHandle);
+		FSlateApplication::Get().OnApplicationActivationStateChanged().Remove(
+			OnApplicationActivationStateChangedDelegateHandle);
 	}
+
 	if (OnMainFrameCreationFinishedDelegateHandle.IsValid())
 	{
 		auto& MainFrameModule = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
@@ -285,15 +287,15 @@ void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
 	});
 }
 
-void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow> InRootWindow, bool)
+void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow>, bool)
 {
-	OnWindowActivatedDelegateHandle= FSlateApplication::Get().OnApplicationActivationStateChanged().AddRaw(
-			this, &FEditorListener::OnWindowActivatedEvent);
+	OnApplicationActivationStateChangedDelegateHandle = FSlateApplication::Get().OnApplicationActivationStateChanged().
+		AddRaw(this, &FEditorListener::OnApplicationActivationStateChanged);
 }
 
-void FEditorListener::OnWindowActivatedEvent(bool bIsActive)
+void FEditorListener::OnApplicationActivationStateChanged(const bool IsActive)
 {
-	if(bIsActive)
+	if (IsActive)
 	{
 		if (!FileChanges.IsEmpty())
 		{
