@@ -11,6 +11,7 @@
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+#include "CoreMinimal.h"
 
 FEditorListener::FEditorListener():
 	bIsPIEPlaying(false),
@@ -212,6 +213,22 @@ void FEditorListener::OnCompile(const TArray<FFileChangeData>& InFileChangeData)
 	}
 }
 
+
+bool FEditorListener::IsAssetModifyRecently(const FAssetData& InAssetData, int32 ThresholdSeconds) const
+{
+	FString Filename;
+	if (!FPackageName::DoesPackageExist(InAssetData.PackageName.ToString(), &Filename)) return false;
+	
+	FDateTime FileTimeStamp = IFileManager::Get().GetTimeStamp(*Filename);
+	FDateTime Now = FDateTime::UtcNow();
+	FTimespan Delte = Now - FileTimeStamp;
+
+	if (Delte.GetTotalSeconds() <= ThresholdSeconds) return true;
+
+	return false;
+}
+
+
 void FEditorListener::OnFilesLoaded()
 {
 	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
@@ -230,7 +247,7 @@ void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
 	OnAssetChanged([&]
 	{
 		FAssetGenerator::Generator(InAssetData);
-	});
+	}, true);
 }
 
 void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
@@ -239,7 +256,7 @@ void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 	{
 		FPlatformFileManager::Get().Get().GetPlatformFile().DeleteFile(
 			*FUnrealCSharpFunctionLibrary::GetFileName(InAssetData));
-	});
+	}, true);
 }
 
 void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const
@@ -250,7 +267,7 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 			*FUnrealCSharpFunctionLibrary::GetOldFileName(InAssetData, InOldObjectPath));
 
 		FAssetGenerator::Generator(InAssetData);
-	});
+	}, true);
 }
 
 void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
@@ -258,7 +275,7 @@ void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
 	OnAssetChanged([&]
 	{
 		FAssetGenerator::Generator(InAssetData);
-	});
+	}, IsAssetModifyRecently(InAssetData));
 }
 
 void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow> InRootWindow, bool)
@@ -330,7 +347,7 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 	}
 }
 
-void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator) const
+void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator, bool IsNeedCompile) const
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -343,8 +360,8 @@ void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator) const
 
 				InGenerator();
 
-				FCSharpCompiler::Get().Compile();
-
+				if (IsNeedCompile) FCSharpCompiler::Get().Compile();
+				
 				FGeneratorCore::EndGenerator();
 			}
 		}

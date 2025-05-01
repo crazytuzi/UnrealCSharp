@@ -41,7 +41,10 @@ private:
 	void OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges);
 
 private:
-	void OnAssetChanged(const TFunction<void()>& InGenerator) const;
+	void OnAssetChanged(const TFunction<void()>& InGenerator, bool IsNeedCompile) const;
+
+private:
+	bool IsAssetModifyRecently(const FAssetData& InAssetData, int32 ThresholdSeconds = 5) const;
 
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
