@@ -44,6 +44,9 @@ private:
 	void OnAssetChanged(const TFunction<void()>& InGenerator) const;
 
 private:
+	bool IsAssetModifyRecently(const FAssetData& InAssetData, int32 ThresholdSeconds = 5) const;
+
+private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
 
 	FDelegateHandle OnPreBeginPIEDelegateHandle;

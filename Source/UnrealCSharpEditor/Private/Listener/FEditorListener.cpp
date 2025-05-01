@@ -125,6 +125,19 @@ FEditorListener::~FEditorListener()
 	}
 }
 
+bool FEditorListener::IsAssetModifyRecently(const FAssetData& InAssetData, int32 ThresholdSeconds) const
+{
+	FString Filename;
+	if (!FPackageName::DoesPackageExist(InAssetData.PackageName.ToString(), &Filename)) return false;
+
+	FDateTime FileTimeStamp = IFileManager::Get().GetTimeStamp(*Filename);
+	FDateTime Now = FDateTime::UtcNow();
+	FTimespan Delte = Now - FileTimeStamp;
+	if (Delte.GetTotalSeconds() <= ThresholdSeconds) return true;
+
+	return false;
+}
+
 void FEditorListener::OnPostEngineInit()
 {
 	FCodeAnalysis::CodeAnalysis();
@@ -281,6 +294,8 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 
 void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
 {
+	if (!IsAssetModifyRecently(InAssetData)) return;
+
 	OnAssetChanged([&]
 	{
 		FAssetGenerator::Generator(InAssetData);
