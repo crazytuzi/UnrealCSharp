@@ -125,15 +125,26 @@ FEditorListener::~FEditorListener()
 	}
 }
 
-bool FEditorListener::IsAssetModifyRecently(const FAssetData& InAssetData, int32 ThresholdSeconds) const
+bool FEditorListener::IsAssetModifyRecently(const FAssetData& InAssetData) const
 {
-	FString Filename;
-	if (!FPackageName::DoesPackageExist(InAssetData.PackageName.ToString(), &Filename)) return false;
+	FString InFilename;
+	if (!FPackageName::DoesPackageExist(InAssetData.PackageName.ToString(), &InFilename))
+	{
+		return false;
+	}
 
-	FDateTime FileTimeStamp = IFileManager::Get().GetTimeStamp(*Filename);
+	FDateTime FileTimeStamp = IFileManager::Get().GetTimeStamp(*InFilename);
 	FDateTime Now = FDateTime::UtcNow();
-	FTimespan Delte = Now - FileTimeStamp;
-	if (Delte.GetTotalSeconds() <= ThresholdSeconds) return true;
+	FTimespan Delta = Now - FileTimeStamp;
+
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
+	{
+		if (Delta.GetTotalSeconds() <= UnrealCSharpEditorSetting->GetAssetUpdatedThreshold())
+		{
+			return true;
+		}
+	}
 
 	return false;
 }

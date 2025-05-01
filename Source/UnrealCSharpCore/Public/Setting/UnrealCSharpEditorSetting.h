@@ -68,6 +68,8 @@ public:
 
 	bool IsGenerateFunctionComment() const;
 
+	double GetAssetUpdatedThreshold() const;
+
 	UFUNCTION()
 	TArray<FString> GetModuleList();
 #endif
@@ -121,5 +123,9 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = Generator,
 		meta = (GetOptions = "GetModuleList", EditCondition = "bEnableExport"))
 	TArray<FString> ExportModule;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	double AssetUpdatedThreshold;
+
 #endif
 };
