@@ -128,21 +128,19 @@ FEditorListener::~FEditorListener()
 bool FEditorListener::IsAssetModifyRecently(const FAssetData& InAssetData) const
 {
 	FString InFilename;
-	if (!FPackageName::DoesPackageExist(InAssetData.PackageName.ToString(), &InFilename))
-	{
-		return false;
-	}
 
-	FDateTime FileTimeStamp = IFileManager::Get().GetTimeStamp(*InFilename);
-	FDateTime Now = FDateTime::UtcNow();
-	FTimespan Delta = Now - FileTimeStamp;
-
-	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
-		UUnrealCSharpEditorSetting>())
+	if (FPackageName::DoesPackageExist(InAssetData.PackageName.ToString(), &InFilename))
 	{
-		if (Delta.GetTotalSeconds() <= UnrealCSharpEditorSetting->GetAssetUpdatedThreshold())
+		if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+			UUnrealCSharpEditorSetting>())
 		{
-			return true;
+			FDateTime FileTimeStamp = IFileManager::Get().GetTimeStamp(*InFilename);
+			FDateTime Now = FDateTime::UtcNow();
+			FTimespan Delta = Now - FileTimeStamp;
+			if (Delta.GetTotalSeconds() <= UnrealCSharpEditorSetting->GetAssetUpdatedThreshold())
+			{
+				return true;
+			}
 		}
 	}
 

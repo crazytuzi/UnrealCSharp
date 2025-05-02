@@ -43,7 +43,6 @@ private:
 private:
 	void OnAssetChanged(const TFunction<void()>& InGenerator) const;
 
-private:
 	bool IsAssetModifyRecently(const FAssetData& InAssetData) const;
 
 private:

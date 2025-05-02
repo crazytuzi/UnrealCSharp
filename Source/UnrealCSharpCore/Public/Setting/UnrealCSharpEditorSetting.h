@@ -68,10 +68,10 @@ public:
 
 	bool IsGenerateFunctionComment() const;
 
-	double GetAssetUpdatedThreshold() const;
-
 	UFUNCTION()
 	TArray<FString> GetModuleList();
+
+	double GetAssetUpdatedThreshold() const;
 #endif
 
 private:

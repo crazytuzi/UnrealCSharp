@@ -314,11 +314,6 @@ bool UUnrealCSharpEditorSetting::IsGenerateFunctionComment() const
 	return bIsGenerateFunctionComment;
 }
 
-double UUnrealCSharpEditorSetting::GetAssetUpdatedThreshold() const
-{
-	return AssetUpdatedThreshold;
-}
-
 TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 {
 	TArray<FString> ModuleArray;
@@ -338,6 +333,11 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 	}
 
 	return ModuleArray;
+}
+
+double UUnrealCSharpEditorSetting::GetAssetUpdatedThreshold() const
+{
+	return AssetUpdatedThreshold;
 }
 #endif
 
