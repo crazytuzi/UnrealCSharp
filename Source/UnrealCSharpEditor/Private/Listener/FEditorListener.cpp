@@ -303,12 +303,13 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 
 void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
 {
-	if (!IsAssetModifyRecently(InAssetData)) return;
-
-	OnAssetChanged([&]
+	if (IsAssetModifyRecently(InAssetData))
 	{
-		FAssetGenerator::Generator(InAssetData);
-	});
+		OnAssetChanged([&]
+			{
+				FAssetGenerator::Generator(InAssetData);
+			});
+	}
 }
 
 void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow>, bool)

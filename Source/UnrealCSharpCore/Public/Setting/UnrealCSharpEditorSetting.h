@@ -126,6 +126,5 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	double AssetUpdatedThreshold;
-
 #endif
 };
