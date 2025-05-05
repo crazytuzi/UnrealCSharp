@@ -43,7 +43,7 @@ private:
 private:
 	void OnAssetChanged(const TFunction<void()>& InGenerator) const;
 
-	bool IsAssetModifyRecently(const FAssetData& InAssetData) const;
+	static bool IsAssetModifyRecently(const FAssetData& InAssetData);
 
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
