@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#if !WITH_EDITOR
+#include "ModuleDescriptor.h"
+#endif
+
 class UNREALCSHARPCORE_API FEngineListener
 {
 public:
@@ -14,14 +18,16 @@ public:
 	static void OnCancelPIE();
 #else
 private:
-	void OnPostEngineInit();
+	void OnLoadingPhaseComplete(ELoadingPhase::Type LoadingPhase, bool bSuccess);
 
 	void OnPreExit();
 #endif
 
+	static void SetActive(bool InbIsActive);
+
 #if !WITH_EDITOR
 private:
-	FDelegateHandle OnPostEngineInitHandle;
+	FDelegateHandle OnLoadingPhaseCompleteHandle;
 
 	FDelegateHandle OnPreExitHandle;
 #endif
