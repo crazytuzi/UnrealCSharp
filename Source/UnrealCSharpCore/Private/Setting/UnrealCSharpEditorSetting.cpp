@@ -30,8 +30,7 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bIsGenerateAllModules(true),
 	bIsGenerateAsset(true),
 	bIsGenerateFunctionComment(true),
-	bEnableExport(false),
-	AssetUpdatedThreshold(3.0)
+	bEnableExport(false)
 #else
 	Super(ObjectInitializer)
 #endif
@@ -333,11 +332,6 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 	}
 
 	return ModuleArray;
-}
-
-double UUnrealCSharpEditorSetting::GetAssetUpdatedThreshold() const
-{
-	return AssetUpdatedThreshold;
 }
 #endif
 

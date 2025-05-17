@@ -125,25 +125,6 @@ FEditorListener::~FEditorListener()
 	}
 }
 
-bool FEditorListener::IsAssetModifyRecently(const FAssetData& InAssetData)
-{
-	if (FString OutFilename; FPackageName::DoesPackageExist(InAssetData.PackageName.ToString(), &OutFilename))
-	{
-		if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
-			UUnrealCSharpEditorSetting>())
-		{
-			if (const auto FileTimeStamp = IFileManager::Get().GetTimeStamp(*OutFilename);
-				(FDateTime::UtcNow() - FileTimeStamp).GetTotalSeconds() <=
-				UnrealCSharpEditorSetting->GetAssetUpdatedThreshold())
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
 void FEditorListener::OnPostEngineInit()
 {
 	FCodeAnalysis::CodeAnalysis();
@@ -267,7 +248,7 @@ void FEditorListener::OnFilesLoaded()
 
 	AssetRegistryModule.Get().OnAssetRenamed().AddRaw(this, &FEditorListener::OnAssetRenamed);
 
-	AssetRegistryModule.Get().OnAssetUpdated().AddRaw(this, &FEditorListener::OnAssetUpdated);
+	AssetRegistryModule.Get().OnAssetUpdatedOnDisk().AddRaw(this, &FEditorListener::OnAssetUpdatedOnDisk);
 }
 
 void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
@@ -298,15 +279,12 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 	});
 }
 
-void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
+void FEditorListener::OnAssetUpdatedOnDisk(const FAssetData& InAssetData) const
 {
-	if (IsAssetModifyRecently(InAssetData))
+	OnAssetChanged([&]
 	{
-		OnAssetChanged([&]
-		{
-			FAssetGenerator::Generator(InAssetData);
-		});
-	}
+		FAssetGenerator::Generator(InAssetData);
+	});
 }
 
 void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow>, bool)
