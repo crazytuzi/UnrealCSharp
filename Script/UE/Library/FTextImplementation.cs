@@ -16,5 +16,9 @@ namespace Script.Library
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern string FText_ToStringImplementation(nint InText);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern FText FText_CreateFromBufferImplementation(string InBuffer, string InTextNamespace,
+            string InPackageNamespace, bool bRequiresQuotes);
     }
 }

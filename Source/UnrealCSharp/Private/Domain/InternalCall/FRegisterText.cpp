@@ -43,13 +43,48 @@ namespace
 			return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*Text->ToString()));
 		}
 
+		static MonoObject* CreateFromBufferImplementation(MonoString* InBuffer, MonoString* InTextNamespace,
+			MonoString* InPackageNamespace, const bool bRequiresQuotes)
+		{
+			const auto Buffer = InBuffer != nullptr
+									? UTF8_TO_TCHAR(
+										FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+											InBuffer))
+									: nullptr;
+
+			const auto TextNamespace = InTextNamespace != nullptr
+											? UTF8_TO_TCHAR(
+												FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+													InTextNamespace))
+											: nullptr;
+
+			const auto PackageNamespace = InPackageNamespace != nullptr
+												? UTF8_TO_TCHAR(
+													FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+														InPackageNamespace))
+												: nullptr;
+
+			const auto OutText = new FText();
+
+			FTextStringHelper::ReadFromBuffer(Buffer, *OutText, TextNamespace, PackageNamespace, bRequiresQuotes);
+
+			const auto FoundMonoClass = TPropertyClass<FText, FText>::Get();
+
+			const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(Object, OutText);
+
+			return Object;
+		}
+
 		FRegisterText()
 		{
 			FClassBuilder(TEXT("FText"), NAMESPACE_LIBRARY)
 				.Function("Register", RegisterImplementation)
 				.Function("Identical", IdenticalImplementation)
 				.Function("UnRegister", UnRegisterImplementation)
-				.Function("ToString", ToStringImplementation);
+				.Function("ToString", ToStringImplementation)
+				.Function("CreateFromBuffer", CreateFromBufferImplementation);
 		}
 	};
 

@@ -25,6 +25,11 @@ namespace Script.CoreUObject
 
         public override string ToString() => FTextImplementation.FText_ToStringImplementation(GarbageCollectionHandle);
 
+        public static FText CreateFrom(string InBuffer, string InTextNamespace = null, string InPackageNamespace = null,
+            bool bRequiresQuotes = false) =>
+            FTextImplementation.FText_CreateFromBufferImplementation(InBuffer, InTextNamespace, InPackageNamespace,
+                bRequiresQuotes);
+
         public nint GarbageCollectionHandle { get; set; }
     }
 }
