@@ -1366,8 +1366,8 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		return FString::Printf(TEXT(
 			"\t\t\t\t%s \?\?= FText.CreateFrom(\"%s\");\n\n"
 		),
-								*FUnrealCSharpFunctionLibrary::Encode(InProperty),
-								*InMetaData.Replace(TEXT("\""), TEXT("\\\""))
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
+		                       *InMetaData.Replace(TEXT("\""), TEXT("\\\""))
 		);
 	}
 
