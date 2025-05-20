@@ -32,7 +32,7 @@ private:
 
 	void OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const;
 
-	void OnAssetUpdated(const FAssetData& InAssetData) const;
+	void OnAssetUpdatedOnDisk(const FAssetData& InAssetData) const;
 
 	void OnMainFrameCreationFinished(TSharedPtr<SWindow>, bool);
 
@@ -42,8 +42,6 @@ private:
 
 private:
 	void OnAssetChanged(const TFunction<void()>& InGenerator) const;
-
-	static bool IsAssetModifyRecently(const FAssetData& InAssetData);
 
 private:
 	FDelegateHandle OnPostEngineInitDelegateHandle;
