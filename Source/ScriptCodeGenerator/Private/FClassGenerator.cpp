@@ -1078,8 +1078,8 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 			if (const auto UserDefinedEnum = Cast<UUserDefinedEnum>(ByteProperty->Enum))
 			{
 				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
-				                       *UserDefinedEnum->GetDisplayNameTextByIndex(
-					                       UserDefinedEnum->GetIndexByNameString(MetaData)).ToString());
+				                       *FUnrealCSharpFunctionLibrary::Encode(UserDefinedEnum->GetDisplayNameTextByIndex(
+					                       UserDefinedEnum->GetIndexByNameString(MetaData)).ToString()));
 			}
 			else
 			{
