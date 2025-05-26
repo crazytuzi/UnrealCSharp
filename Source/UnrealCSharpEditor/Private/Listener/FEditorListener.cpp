@@ -1,6 +1,8 @@
 ﻿#include "Listener/FEditorListener.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "DirectoryWatcherModule.h"
+#include "HAL/ThreadHeartBeat.h"
+#include "HAL/ThreadManager.h"
 #include "FAssetGenerator.h"
 #include "FCodeAnalysis.h"
 #include "FCSharpCompiler.h"
@@ -10,6 +12,7 @@
 #include "CoreMacro/Macro.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "Listener/FEngineListener.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 
 FEditorListener::FEditorListener():
@@ -22,7 +25,7 @@ FEditorListener::FEditorListener():
 
 	OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddRaw(this, &FEditorListener::OnPrePIEEnded);
 
-	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEditorListener::OnCancelPIEEnded);
+	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEditorListener::OnCancelPIE);
 
 	OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
 		this, &FEditorListener::OnBeginGenerator);
@@ -71,6 +74,12 @@ FEditorListener::~FEditorListener()
 			DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
 				Directory, OnDirectoryChangedDelegateHandle);
 		}
+	}
+
+	if (FSlateApplication::IsInitialized() && OnApplicationActivationStateChangedDelegateHandle.IsValid())
+	{
+		FSlateApplication::Get().OnApplicationActivationStateChanged().Remove(
+			OnApplicationActivationStateChangedDelegateHandle);
 	}
 
 	if (OnMainFrameCreationFinishedDelegateHandle.IsValid())
@@ -123,18 +132,35 @@ void FEditorListener::OnPostEngineInit()
 	FDynamicGenerator::CodeAnalysisGenerator();
 }
 
-void FEditorListener::OnPreBeginPIE(const bool)
+void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 {
 	bIsPIEPlaying = true;
+
+	while (FCSharpCompiler::Get().IsCompiling())
+	{
+		FThreadHeartBeat::Get().HeartBeat();
+
+		FPlatformProcess::SleepNoStats(0.0001f);
+
+		FTSTicker::GetCoreTicker().Tick(FApp::GetDeltaTime());
+
+		FThreadManager::Get().Tick();
+
+		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
+	}
+
+	FEngineListener::OnPreBeginPIE(bIsSimulating);
 }
 
-void FEditorListener::OnPrePIEEnded(const bool)
+void FEditorListener::OnPrePIEEnded(const bool bIsSimulating)
 {
-	FDynamicGenerator::OnPrePIEEnded();
+	FDynamicGenerator::OnPrePIEEnded(bIsSimulating);
 }
 
-void FEditorListener::OnCancelPIEEnded()
+void FEditorListener::OnCancelPIE()
 {
+	FEngineListener::OnCancelPIE();
+
 	bIsPIEPlaying = false;
 }
 
@@ -222,7 +248,7 @@ void FEditorListener::OnFilesLoaded()
 
 	AssetRegistryModule.Get().OnAssetRenamed().AddRaw(this, &FEditorListener::OnAssetRenamed);
 
-	AssetRegistryModule.Get().OnAssetUpdated().AddRaw(this, &FEditorListener::OnAssetUpdated);
+	AssetRegistryModule.Get().OnAssetUpdatedOnDisk().AddRaw(this, &FEditorListener::OnAssetUpdatedOnDisk);
 }
 
 void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
@@ -253,7 +279,7 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 	});
 }
 
-void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
+void FEditorListener::OnAssetUpdatedOnDisk(const FAssetData& InAssetData) const
 {
 	OnAssetChanged([&]
 	{
@@ -261,20 +287,24 @@ void FEditorListener::OnAssetUpdated(const FAssetData& InAssetData) const
 	});
 }
 
-void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow> InRootWindow, bool)
+void FEditorListener::OnMainFrameCreationFinished(const TSharedPtr<SWindow>, bool)
 {
-	InRootWindow->GetOnWindowActivatedEvent().AddRaw(this, &FEditorListener::OnWindowActivatedEvent);
+	OnApplicationActivationStateChangedDelegateHandle = FSlateApplication::Get().OnApplicationActivationStateChanged().
+		AddRaw(this, &FEditorListener::OnApplicationActivationStateChanged);
 }
 
-void FEditorListener::OnWindowActivatedEvent()
+void FEditorListener::OnApplicationActivationStateChanged(const bool IsActive)
 {
-	if (!FileChanges.IsEmpty())
+	if (IsActive)
 	{
-		if (!bIsPIEPlaying && !bIsGenerating)
+		if (!FileChanges.IsEmpty())
 		{
-			FCSharpCompiler::Get().Compile(FileChanges);
+			if (!bIsPIEPlaying && !bIsGenerating)
+			{
+				FCSharpCompiler::Get().Compile(FileChanges);
 
-			FileChanges.Reset();
+				FileChanges.Reset();
+			}
 		}
 	}
 }

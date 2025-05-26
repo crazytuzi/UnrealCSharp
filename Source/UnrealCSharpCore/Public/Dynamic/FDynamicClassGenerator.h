@@ -12,6 +12,18 @@ inline uint32 GetTypeHash(const UClass::ClassConstructorType& InClassConstructor
 class FDynamicClassGenerator
 {
 public:
+	struct FDefaultSubObjectInfo
+	{
+		const FObjectProperty* Property;
+
+		bool bIsRootComponent = false;
+
+		FString Parent;
+
+		FString Socket;
+	};
+
+public:
 	static void Generator();
 
 #if WITH_EDITOR
@@ -19,7 +31,7 @@ public:
 
 	static bool IsDynamicClass(MonoClass* InMonoClass);
 
-	static void OnPrePIEEnded();
+	static void OnPrePIEEnded(const bool bIsSimulating);
 
 	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses();
 #endif
@@ -91,11 +103,23 @@ private:
 
 	static bool IsDynamicBlueprintGeneratedClass(const FString& InName);
 
+	static void NewComponentTemplate(class USCS_Node* InNode, UObject* InOuter, UClass* InClass, const FName& InName);
+
+#if WITH_EDITOR
+	static void RemoveComponentTemplate(const UBlueprintGeneratedClass* InBlueprintGeneratedClass,
+	                                    const USCS_Node* InNode);
+#endif
+
+	static USCS_Node* NewNode(USimpleConstructionScript* InSimpleConstructionScript, UObject* InOuter, UClass* InClass,
+	                          const FName& InName);
+
 public:
 	static UNREALCSHARPCORE_API TSet<UClass::ClassConstructorType> ClassConstructorSet;
 
 private:
 	static TMap<UClass*, FString> NamespaceMap;
+
+	static TMap<UClass*, TArray<FDefaultSubObjectInfo>> DefaultSubObjectInfoMap;
 
 	static TMap<FString, UClass*> DynamicClassMap;
 

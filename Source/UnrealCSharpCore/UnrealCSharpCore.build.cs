@@ -37,6 +37,7 @@ public class UnrealCSharpCore : ModuleRules
 			new string[]
 			{
 				"Core",
+				"Projects",
 				"Mono"
 				// ... add other public dependencies that you statically link with here ...
 			}

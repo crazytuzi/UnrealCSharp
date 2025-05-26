@@ -178,9 +178,9 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& InFileChangeDat
 	}
 }
 
-void FDynamicGenerator::OnPrePIEEnded()
+void FDynamicGenerator::OnPrePIEEnded(const bool bIsSimulating)
 {
-	FDynamicClassGenerator::OnPrePIEEnded();
+	FDynamicClassGenerator::OnPrePIEEnded(bIsSimulating);
 }
 
 bool FDynamicGenerator::IsFullGenerator()

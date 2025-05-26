@@ -1,34 +1,33 @@
 ﻿#pragma once
 
-class FEngineListener
+#if !WITH_EDITOR
+#include "ModuleDescriptor.h"
+#endif
+
+class UNREALCSHARPCORE_API FEngineListener
 {
 public:
 	FEngineListener();
 
 	~FEngineListener();
 
-private:
 #if WITH_EDITOR
-	void OnPreBeginPIE(const bool);
+public:
+	static void OnPreBeginPIE(const bool);
 
-	void OnPostPIEStarted(const bool);
-
-	void OnCancelPIE();
+	static void OnCancelPIE();
 #else
-	void OnPostEngineInit();
+private:
+	void OnLoadingPhaseComplete(ELoadingPhase::Type LoadingPhase, bool bSuccess);
 
 	void OnPreExit();
 #endif
 
+	static void SetActive(bool InbIsActive);
+
+#if !WITH_EDITOR
 private:
-#if WITH_EDITOR
-	FDelegateHandle OnPreBeginPIEDelegateHandle;
-
-	FDelegateHandle OnPostPIEStartedDelegateHandle;
-
-	FDelegateHandle OnCancelPIEDelegateHandle;
-#else
-	FDelegateHandle OnPostEngineInitHandle;
+	FDelegateHandle OnLoadingPhaseCompleteHandle;
 
 	FDelegateHandle OnPreExitHandle;
 #endif

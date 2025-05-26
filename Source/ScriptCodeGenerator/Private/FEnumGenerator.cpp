@@ -196,7 +196,9 @@ void FEnumGenerator::GeneratorCollisionChannel()
 		EnumeratorContent += FString::Printf(TEXT(
 			"\t\t%s = %lld%s\n"
 		),
-		                                     *CollisionProfile->ReturnChannelNameFromContainerIndex(Index).ToString(),
+		                                     *FUnrealCSharpFunctionLibrary::Encode(
+			                                     CollisionProfile->ReturnChannelNameFromContainerIndex(Index).
+			                                                       ToString(), false),
 		                                     EnumeratorValue, Index == InEnum->NumEnums() - 1 ? TEXT("") : TEXT(","));
 	}
 

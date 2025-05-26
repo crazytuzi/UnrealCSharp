@@ -2,9 +2,6 @@
 
 #include "UnrealCSharpCore.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
-#if !WITH_EDITOR
-#include "Dynamic/FDynamicGenerator.h"
-#endif
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpCoreModule"
 
@@ -27,10 +24,6 @@ void FUnrealCSharpCoreModule::SetActive(const bool InbIsActive)
 
 		if (InbIsActive)
 		{
-#if !WITH_EDITOR
-			FDynamicGenerator::Generator();
-#endif
-
 			FUnrealCSharpCoreModuleDelegates::OnUnrealCSharpCoreModuleActive.Broadcast();
 		}
 		else

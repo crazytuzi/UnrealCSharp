@@ -12,11 +12,11 @@ public:
 private:
 	void OnPostEngineInit();
 
-	void OnPreBeginPIE(const bool);
+	void OnPreBeginPIE(const bool bIsSimulating);
 
-	void OnPrePIEEnded(const bool);
+	void OnPrePIEEnded(const bool bIsSimulating);
 
-	void OnCancelPIEEnded();
+	void OnCancelPIE();
 
 	void OnBeginGenerator();
 
@@ -32,11 +32,11 @@ private:
 
 	void OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const;
 
-	void OnAssetUpdated(const FAssetData& InAssetData) const;
+	void OnAssetUpdatedOnDisk(const FAssetData& InAssetData) const;
 
-	void OnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool);
+	void OnMainFrameCreationFinished(TSharedPtr<SWindow>, bool);
 
-	void OnWindowActivatedEvent();
+	void OnApplicationActivationStateChanged(const bool IsActive);
 
 	void OnDirectoryChanged(const TArray<FFileChangeData>& InFileChanges);
 
@@ -59,6 +59,8 @@ private:
 	FDelegateHandle OnCompileDelegateHandle;
 
 	FDelegateHandle OnMainFrameCreationFinishedDelegateHandle;
+
+	FDelegateHandle OnApplicationActivationStateChangedDelegateHandle;
 
 	FDelegateHandle OnDirectoryChangedDelegateHandle;
 
