@@ -62,7 +62,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	{
 		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
 
-		if (EnumeratorValue == InEnum->GetMaxEnumValue())
+		if (InEnum->NumEnums() != 1 && EnumeratorValue == InEnum->GetMaxEnumValue())
 		{
 			break;
 		}
