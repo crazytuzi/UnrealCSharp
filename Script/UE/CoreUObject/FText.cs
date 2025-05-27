@@ -10,7 +10,10 @@ namespace Script.CoreUObject
 
         ~FText() => FTextImplementation.FText_UnRegisterImplementation(GarbageCollectionHandle);
 
-        public FText(string InValue) => FTextImplementation.FText_RegisterImplementation(this, InValue);
+        public FText(string InBuffer, string InTextNamespace = null, string InPackageNamespace = null,
+            bool bRequiresQuotes = false) =>
+            FTextImplementation.FText_RegisterImplementation(this, InBuffer, InTextNamespace, InPackageNamespace,
+                bRequiresQuotes);
 
         public static implicit operator FText(string InValue) => new(InValue);
 

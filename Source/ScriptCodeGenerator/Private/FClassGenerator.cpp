@@ -1363,20 +1363,11 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 
 	if (CastField<FTextProperty>(InProperty))
 	{
-		auto Value = InMetaData;
-
-		static auto InvText = FString(TEXT("INVTEXT"));
-
-		if (Value.Contains(InvText))
-		{
-			Value = Value.Mid(InvText.Len() + 2, Value.Len() - InvText.Len() - 4);
-		}
-
 		return FString::Printf(TEXT(
 			"\t\t\t\t%s \?\?= new FText(\"%s\");\n\n"
 		),
 		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
-		                       *Value
+		                       *InMetaData.Replace(TEXT("\""), TEXT("\\\""))
 		);
 	}
 
