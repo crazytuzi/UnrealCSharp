@@ -7,12 +7,32 @@ namespace
 {
 	struct FRegisterText
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
+		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InBuffer, MonoString* InTextNamespace,
+		                                   MonoString* InPackageNamespace, const bool bRequiresQuotes)
 		{
-			const auto Text = new FText(FText::FromString(UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue))));
+			const auto Buffer = InBuffer != nullptr
+				                    ? UTF8_TO_TCHAR(
+					                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                    InBuffer))
+				                    : nullptr;
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(InMonoObject, Text);
+			const auto TextNamespace = InTextNamespace != nullptr
+				                           ? UTF8_TO_TCHAR(
+					                           FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                           InTextNamespace))
+				                           : nullptr;
+
+			const auto PackageNamespace = InPackageNamespace != nullptr
+				                              ? UTF8_TO_TCHAR(
+					                              FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                              InPackageNamespace))
+				                              : nullptr;
+
+			const auto OutText = new FText();
+
+			FTextStringHelper::ReadFromBuffer(Buffer, *OutText, TextNamespace, PackageNamespace, bRequiresQuotes);
+
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(InMonoObject, OutText);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
