@@ -1078,8 +1078,15 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 			if (const auto UserDefinedEnum = Cast<UUserDefinedEnum>(ByteProperty->Enum))
 			{
 				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
-				                       *FUnrealCSharpFunctionLibrary::Encode(UserDefinedEnum->GetDisplayNameTextByIndex(
-					                       UserDefinedEnum->GetIndexByNameString(MetaData)).ToString()));
+				                       *FUnrealCSharpFunctionLibrary::Encode(MetaData.IsEmpty()
+					                                                             ? *UserDefinedEnum->
+					                                                             GetDisplayNameTextByIndex(
+						                                                             ENUM_DEFAULT_MAX_INDEX).ToString()
+					                                                             : *UserDefinedEnum->
+					                                                             GetDisplayNameTextByIndex(
+						                                                             UserDefinedEnum->
+						                                                             GetIndexByNameString(MetaData)).
+					                                                             ToString(), false));
 			}
 			else
 			{
@@ -1157,7 +1164,8 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	{
 		return FString::Printf(TEXT(" = %s.%s"), *EnumProperty->GetEnum()->GetName(),
 		                       MetaData.IsEmpty()
-			                       ? *EnumProperty->GetEnum()->GetDisplayNameTextByIndex(0).ToString()
+			                       ? *EnumProperty->GetEnum()->GetDisplayNameTextByIndex(ENUM_DEFAULT_MAX_INDEX).
+			                                        ToString()
 			                       : *MetaData);
 	}
 

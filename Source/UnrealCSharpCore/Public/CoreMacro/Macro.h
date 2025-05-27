@@ -101,3 +101,5 @@
 #define TEXT_STR(Str) TEXT(STR(Str))
 
 #define F_STRING_STR(Str) FString(TEXT_STR(Str))
+
+#define ENUM_DEFAULT_MAX_INDEX 0
