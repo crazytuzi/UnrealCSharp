@@ -3,11 +3,14 @@
 #include "Registry/FDelegateRegistry.h"
 #include "Registry/FBindingRegistry.h"
 #include "Registry/FCSharpBind.h"
+#include "CoreMacro/AccessPrivateMacro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Log/UnrealCSharpLog.h"
 #include <signal.h>
 #include "UEVersion.h"
+
+ACCESS_PRIVATE_MEMBER_PROPERTY(UObjectBase, ObjectFlags, EObjectFlags)
 
 #if PLATFORM_MAC
 TMap<int32, struct sigaction> SignalActions;
@@ -283,6 +286,12 @@ void FCSharpEnvironment::NotifyUObjectDeleted(const UObjectBase* Object, int32 I
 		{
 			(void)RemoveObjectReference(InObject);
 		}
+
+		{
+			FScopeLock Lock(&CriticalSection);
+
+			AsyncLoadingObjectArray.Remove(InObject);
+		}
 	}
 }
 
@@ -328,7 +337,8 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 
 			auto Object = ObjectPtr.Get();
 
-			if (Object->HasAnyFlags(RF_NeedPostLoad) ||
+			if (Object->*TAccessPrivate<UObjectBase_ObjectFlags>::Value & ~RF_AllFlags ||
+				Object->HasAnyFlags(RF_NeedPostLoad) ||
 				Object->HasAnyInternalFlags(
 #if UE_E_INTERNAL_OBJECT_FLAGS_ASYNC_LOADING
 					EInternalObjectFlags_AsyncLoading
