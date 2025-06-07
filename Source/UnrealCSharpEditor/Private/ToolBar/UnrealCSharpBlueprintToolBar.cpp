@@ -120,10 +120,18 @@ void FUnrealCSharpBlueprintToolBar::BuildAction()
 							                                       Blueprint->GeneratedClass))
 						);
 
-						Content.ReplaceInline(*FUnrealCSharpFunctionLibrary::GetFullClass(
-							                      TemplateClass),
-						                      *FUnrealCSharpFunctionLibrary::GetFullClass(
-							                      Blueprint->GeneratedClass));
+						Content.ReplaceInline(*FString::Printf(TEXT(
+							                      " %s"
+						                      ),
+						                                       *FUnrealCSharpFunctionLibrary::GetFullClass(
+							                                       TemplateClass)
+						                      ),
+						                      *FString::Printf(TEXT(
+							                      " %s"
+						                      ),
+						                                       *FUnrealCSharpFunctionLibrary::GetFullClass(
+							                                       Blueprint->GeneratedClass))
+						);
 
 						if (const auto FileName = GetFileName();
 							FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content))
