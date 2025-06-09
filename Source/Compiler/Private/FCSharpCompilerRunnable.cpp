@@ -197,6 +197,11 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
 
 void FCSharpCompilerRunnable::Compile()
 {
+	if (!IFileManager::Get().FileExists(*FUnrealCSharpFunctionLibrary::GetGameProjectPath()))
+	{
+		return;
+	}
+
 	AsyncTask(ENamedThreads::GameThread, [this]()
 	{
 		static const FName CompileStatusBackground("Blueprint.CompileStatus.Background");
