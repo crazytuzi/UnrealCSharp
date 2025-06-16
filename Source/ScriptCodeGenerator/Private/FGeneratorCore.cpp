@@ -166,6 +166,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 		return FUnrealCSharpFunctionLibrary::GetFullClass(EnumProperty->GetEnum());
 	}
 
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(Property)) return TName<FUtf8String, FUtf8String>::Get();
+#endif
+	
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(Property)) return TName<FAnsiString, FAnsiString>::Get();
+#endif
+
 	if (CastField<FStrProperty>(Property)) return TName<FString, FString>::Get();
 
 	if (CastField<FTextProperty>(Property)) return TName<FText, FText>::Get();
@@ -335,6 +343,14 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 		return {FUnrealCSharpFunctionLibrary::GetClassNameSpace(EnumProperty->GetEnum())};
 	}
 
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(Property)) return TSet<FString>{TNameSpace<FUtf8String, FUtf8String>::Get()};
+#endif
+
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(Property)) return TSet<FString>{TNameSpace<FAnsiString, FAnsiString>::Get()};
+#endif
+	
 	if (CastField<FStrProperty>(Property)) return TSet<FString>{TNameSpace<FString, FString>::Get()};
 
 	if (CastField<FTextProperty>(Property)) return TSet<FString>{TNameSpace<FText, FText>::Get()};
@@ -703,6 +719,14 @@ bool FGeneratorCore::IsSupported(FProperty* Property)
 	{
 		return IsSupported(EnumProperty->GetEnum());
 	}
+
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(Property)) return true;
+#endif
+
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(Property)) return true;
+#endif
 
 	if (CastField<FStrProperty>(Property)) return true;
 

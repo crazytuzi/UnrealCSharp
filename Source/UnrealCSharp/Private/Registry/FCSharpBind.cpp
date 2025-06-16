@@ -583,9 +583,16 @@ void FCSharpBind::OnCSharpEnvironmentInitialize()
 {
 	for (const auto Class : TObjectRange<UClass>())
 	{
+# if  UE_GET_DEFAULT_UOBJECT
+		if (Class->GetDefaultObject(false))
+		{
+			BindClassDefaultObject(FCSharpEnvironment::GetEnvironment().GetDomain(), Class->GetDefaultObject(false));
+		}
+#else
 		if (Class->ClassDefaultObject)
 		{
 			BindClassDefaultObject(FCSharpEnvironment::GetEnvironment().GetDomain(), Class->ClassDefaultObject);
 		}
+#endif
 	}
 }

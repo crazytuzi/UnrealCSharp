@@ -11,6 +11,9 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "BlueprintActionDatabase.h"
+#include "BlueprintEditorModule.h"
+#include "Toolkits/ToolkitManager.h"
+#include "Editor/Kismet/Internal/Blueprints/BlueprintDependencies.h"
 #endif
 #include "UEVersion.h"
 
@@ -262,6 +265,180 @@ UDynamicScriptStruct* FDynamicStructGenerator::GeneratorStruct(UPackage* InOuter
 }
 
 #if WITH_EDITOR
+static void ChangeMemberVariableType(UBlueprint* Blueprint, const FName VariableName, const FEdGraphPinType& NewPinType)
+{
+	if (VariableName != NAME_None)
+	{
+		const int32 VarIndex = FBlueprintEditorUtils::FindNewVariableIndex(Blueprint, VariableName);
+		if (VarIndex != INDEX_NONE)
+		{
+			const UEdGraphSchema_K2* K2Schema = GetDefault<UEdGraphSchema_K2>();
+			FBPVariableDescription& Variable = Blueprint->NewVariables[VarIndex];
+			
+			// Update the variable type only if it is different
+			if (Variable.VarType != NewPinType)
+			{
+				TArray<UBlueprint*> ChildBPs;
+				// FBlueprintEditorUtils::GetLoadedChildBlueprints(Blueprint, ChildBPs);
+
+				TArray<UK2Node*> AllVariableNodes = (*TAccessPrivate<FBlueprintEditorUtils_GetNodesForVariable>::Value)(VariableName, Blueprint, nullptr);
+				// TArray<UK2Node*> AllVariableNodes = FBlueprintEditorUtils::GetNodesForVariable(VariableName, Blueprint);
+				for(UBlueprint* ChildBP : ChildBPs)
+				{
+					TArray<UK2Node*> VariableNodes = (*TAccessPrivate<FBlueprintEditorUtils_GetNodesForVariable>::Value)(VariableName, ChildBP, nullptr);
+					// TArray<UK2Node*> VariableNodes = FBlueprintEditorUtils::GetNodesForVariable(VariableName, ChildBP);
+					AllVariableNodes.Append(VariableNodes);
+				}
+
+				// TRUE if the user might be breaking variable connections
+				bool bBreakingVariableConnections = false;
+
+				// If there are variable nodes in place, warn the user of the consequences using a suppressible dialog
+				if(AllVariableNodes.Num())
+				{
+					// @TODO !!!         !IsRunningCookCommandlet 打包的时候不要进
+					if(!IsRunningCommandlet())
+					{
+						if(TAccessPrivate<FBlueprintEditorUtils_VerifyUserWantsVariableTypeChanged>::Value(VariableName))
+						{
+							// User has decided to cancel changing the variable member type
+							return;
+						}
+					
+						bBreakingVariableConnections = true;
+					}
+				}
+				
+				Blueprint->Modify();
+
+				/** Only change the variable type if type selection is valid, some unloaded Blueprints will turn out to be bad */
+				bool bChangeVariableType = true;
+
+				if ((NewPinType.PinCategory == UEdGraphSchema_K2::PC_Object) || (NewPinType.PinCategory == UEdGraphSchema_K2::PC_Interface))
+				{
+					// if it's a PC_Object, then it should have an associated UClass object
+					if(NewPinType.PinSubCategoryObject.IsValid())
+					{
+						const UClass* ClassObject = Cast<UClass>(NewPinType.PinSubCategoryObject.Get());
+						check(ClassObject != nullptr);
+
+						if (ClassObject->IsChildOf(AActor::StaticClass()))
+						{
+							// NOTE: Right now the code that stops hard AActor references from being set in unsafe places is tied to this flag
+							Variable.PropertyFlags |= CPF_DisableEditOnTemplate;
+						}
+						else 
+						{
+							// clear the disable-default-value flag that might have been present (if this was an AActor variable before)
+							Variable.PropertyFlags &= ~(CPF_DisableEditOnTemplate);
+						}
+					}
+					else
+					{
+						bChangeVariableType = false;
+
+						// Display a notification to inform the user that the variable type was invalid (likely due to corruption), it should no longer appear in the list.
+						// FNotificationInfo Info( LOCTEXT("InvalidUnloadedBP", "The selected type was invalid once loaded, it has been removed from the list!") );
+						// Info.ExpireDuration = 3.0f;
+						// Info.bUseLargeFont = false;
+						// TSharedPtr<SNotificationItem> Notification = FSlateNotificationManager::Get().AddNotification(Info);
+						// if ( Notification.IsValid() )
+						// {
+						// 	Notification->SetCompletionState( SNotificationItem::CS_Fail );
+						// }
+					}
+				}
+				else 
+				{
+					// clear the disable-default-value flag that might have been present (if this was an AActor variable before)
+					Variable.PropertyFlags &= ~(CPF_DisableEditOnTemplate);
+				}
+
+				if(bChangeVariableType)
+				{
+					const bool bBecameBoolean = Variable.VarType.PinCategory != UEdGraphSchema_K2::PC_Boolean && NewPinType.PinCategory == UEdGraphSchema_K2::PC_Boolean;
+					const bool bBecameNotBoolean = Variable.VarType.PinCategory == UEdGraphSchema_K2::PC_Boolean && NewPinType.PinCategory != UEdGraphSchema_K2::PC_Boolean;
+					if (bBecameBoolean || bBecameNotBoolean)
+					{
+						Variable.FriendlyName = FName::NameToDisplayString(Variable.VarName.ToString(), bBecameBoolean);
+					}
+
+					Variable.VarType = NewPinType;
+
+					if(Variable.VarType.IsSet() || Variable.VarType.IsMap())
+					{
+						// Make sure that the variable is no longer tagged for replication, and warn the user if the variable is no
+						// longer going to be replicated:
+						if(Variable.RepNotifyFunc != NAME_None || Variable.PropertyFlags & CPF_Net || Variable.PropertyFlags & CPF_RepNotify)
+						{
+							// FNotificationInfo Warning( 
+							// 	FText::Format(
+							// 		LOCTEXT("InvalidReplicationSettings", "Maps and sets cannot be replicated - {0} has had its replication settings cleared"),
+							// 		FText::FromName(Variable.VarName) 
+							// 	) 
+							// );
+							// Warning.ExpireDuration = 5.0f;
+							// Warning.bFireAndForget = true;
+							// Warning.Image = FCoreStyle::Get().GetBrush(TEXT("MessageLog.Warning"));
+							// FSlateNotificationManager::Get().AddNotification(Warning);
+
+							Variable.PropertyFlags &= ~CPF_Net;
+							Variable.PropertyFlags &= ~CPF_RepNotify;
+							Variable.RepNotifyFunc = NAME_None;
+							Variable.ReplicationCondition = COND_None;
+						}
+					}
+
+					UClass* ParentClass = nullptr;
+					FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(Blueprint);
+
+					if(bBreakingVariableConnections)
+					{
+						for(UBlueprint* ChildBP : ChildBPs)
+						{
+							// Mark the Blueprint as structurally modified so we can reconstruct the node successfully
+							FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(ChildBP);
+						}
+
+						// Reconstruct all variable nodes that reference the changing variable
+						for(UK2Node* VariableNode : AllVariableNodes)
+						{
+							K2Schema->ReconstructNode(*VariableNode, true);
+						}
+
+						TSharedPtr<IToolkit> FoundAssetEditor = FToolkitManager::Get().FindEditorForAsset(Blueprint);
+						if (FoundAssetEditor.IsValid())
+						{
+							TSharedRef<IBlueprintEditor> BlueprintEditor = StaticCastSharedRef<IBlueprintEditor>(FoundAssetEditor.ToSharedRef());
+
+							UK2Node* FirstVariableNode = nullptr;
+							for (UK2Node* VariableNode : AllVariableNodes)
+							{
+								if (VariableNode->IsA<UK2Node_Variable>())
+								{
+									FirstVariableNode = VariableNode;
+									break;
+								}
+							}
+
+							if (FirstVariableNode)
+							{
+								constexpr bool bSetFindWithinBlueprint = false;
+								constexpr bool bSelectFirstResult = false;
+								constexpr EGetFindReferenceSearchStringFlags Flags = EGetFindReferenceSearchStringFlags::UseSearchSyntax;
+								BlueprintEditor->SummonSearchUI(bSetFindWithinBlueprint, FirstVariableNode->GetFindReferenceSearchString(Flags), bSelectFirstResult);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+#endif
+
+
+#if WITH_EDITOR
 void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct,
                                          UDynamicScriptStruct* InNewScriptStruct)
 {
@@ -359,7 +536,7 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 
 					NewVarType.PinSubCategoryObject = InNewScriptStruct;
 
-					FBlueprintEditorUtils::ChangeMemberVariableType(Blueprint, Variable.VarName, NewVarType);
+					ChangeMemberVariableType(Blueprint, Variable.VarName, NewVarType);
 
 					bIsRefresh = true;
 				}

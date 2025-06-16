@@ -16,6 +16,14 @@
 
 #define CLASS_U_INTERFACE_ATTRIBUTE FString(TEXT("UInterfaceAttribute"))
 
+#if UE_F_UTF8_STR_PROPERTY
+#define CLASS_F_UTF8_STRING FString(TEXT("FUtf8String"))
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+#define CLASS_F_ANSI_STRING FString(TEXT("FAnsiString"))
+#endif
+
 #define CLASS_F_STRING FString(TEXT("FString"))
 
 #define CLASS_F_NAME FString(TEXT("FName"))

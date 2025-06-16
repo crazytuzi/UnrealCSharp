@@ -57,7 +57,8 @@ public class UnrealCSharpCore : ModuleRules
 				new string[]
 				{
 					"BlueprintGraph",
-					"UnrealEd"
+					"UnrealEd", 
+					"EditorFramework"
 					// ... add other public dependencies that you statically link with here ...
 				}
 			);

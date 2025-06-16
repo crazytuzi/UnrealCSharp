@@ -6,6 +6,9 @@
 #if UE_F_NAME_PERMISSION_LIST
 #include "Misc/NamePermissionList.h"
 #endif
+#if UE_F_COLLECTION_REF
+#include "ICollectionContainer.h"
+#endif
 #include "ContentBrowserDataMenuContexts.h"
 #include "ToolMenuDelegates.h"
 #include "ToolMenus.h"
@@ -289,9 +292,14 @@ void UDynamicDataSource::CompileFilter(const FName InPath, const FContentBrowser
 				TArray<FName> ClassPathsForCollections;
 #endif
 
-				if (GetClassPaths(DataCollectionFilter->SelectedCollections,
-				                  DataCollectionFilter->bIncludeChildCollections,
-				                  ClassPathsForCollections) &&
+				if (GetClassPaths(
+#if UE_F_COLLECTION_REF
+					DataCollectionFilter->Collections,
+#else
+					DataCollectionFilter->SelectedCollections,
+#endif
+					DataCollectionFilter->bIncludeChildCollections,
+					ClassPathsForCollections) &&
 					ClassPathsForCollections.IsEmpty())
 				{
 					return;
@@ -752,24 +760,38 @@ FContentBrowserItemData UDynamicDataSource::CreateFileItem(UClass* InClass)
 	);
 }
 
-bool UDynamicDataSource::GetClassPaths(const TArrayView<const FCollectionNameType>& InCollections,
-                                       const bool bIncludeChildCollections,
-#if UE_F_TOP_LEVEL_ASSET_PATH
-                                       TArray<FTopLevelAssetPath>& OutClassPaths) const
+bool UDynamicDataSource::GetClassPaths(
+#if UE_F_COLLECTION_REF
+	const TArrayView<const FCollectionRef>& InCollections,
 #else
-                                       TArray<FName>& OutClassPaths) const
+	const TArrayView<const FCollectionNameType>& InCollections,
 #endif
+
+	const bool bIncludeChildCollections,
+#if UE_F_TOP_LEVEL_ASSET_PATH
+	TArray<FTopLevelAssetPath>& OutClassPaths
+#else
+	TArray<FName>& OutClassPaths
+#endif
+) const
 {
 	if (!InCollections.IsEmpty())
 	{
 		const auto CollectionRecursionFlags = bIncludeChildCollections
 			                                      ? ECollectionRecursionFlags::SelfAndChildren
 			                                      : ECollectionRecursionFlags::Self;
-
+#if UE_F_COLLECTION_REF
+		for (const auto& [Container, Name, Type] : InCollections)
+		{
+			FCollectionManagerModule::GetModule().Get().GetProjectCollectionContainer()->GetClassesInCollection(
+				Name, Type, OutClassPaths, CollectionRecursionFlags);
+		}
+#else
 		for (const auto& [Name, Type] : InCollections)
 		{
 			CollectionManager->GetClassesInCollection(Name, Type, OutClassPaths, CollectionRecursionFlags);
 		}
+#endif
 
 		return true;
 	}

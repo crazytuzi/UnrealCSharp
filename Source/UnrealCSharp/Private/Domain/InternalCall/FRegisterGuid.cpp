@@ -61,13 +61,17 @@ namespace
 				.Function("IsValid", BINDING_FUNCTION(&FGuid::IsValid))
 #if UE_GUID_TO_STRING
 				.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString,
-				                                       EFunctionInteract::New))
+					EFunctionInteract::New))
 #endif
 				.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString,
 				                                       TArray<FString>{"Format"}))
-				.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
+#if UE_GUID_PARSE
 				.Function("Parse", BINDING_FUNCTION(&FGuid::Parse))
-				.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact));
+#endif
+#if UE_GUID_PARSE_EXACT
+				.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact))
+#endif
+				.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid));
 		}
 	};
 
