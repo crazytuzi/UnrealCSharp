@@ -121,5 +121,8 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = Generator,
 		meta = (GetOptions = "GetModuleList", EditCondition = "bEnableExport"))
 	TArray<FString> ExportModule;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bEnableExport"))
+	TArray<FString> ClassBlacklist;
 #endif
 };
