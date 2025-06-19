@@ -70,6 +70,8 @@ public:
 
 	UFUNCTION()
 	TArray<FString> GetModuleList();
+
+	const TArray<FString>& GetClassBlacklist() const;
 #endif
 
 private:

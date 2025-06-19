@@ -333,6 +333,11 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 
 	return ModuleArray;
 }
+
+const TArray<FString>& UUnrealCSharpEditorSetting::GetClassBlacklist() const
+{
+	return ClassBlacklist;
+}
 #endif
 
 #undef LOCTEXT_NAMESPACE
