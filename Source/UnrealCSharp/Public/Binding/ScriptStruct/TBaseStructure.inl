@@ -139,6 +139,7 @@ struct TBaseStructure<FDirectoryPath>
 	}
 };
 
+#if UE_T_BASE_STRUCTURE_F_INTERP_CURVE_VECTOR
 template <>
 struct TBaseStructure<FInterpCurveVector>
 {
@@ -147,7 +148,9 @@ struct TBaseStructure<FInterpCurveVector>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveVector));
 	}
 };
+#endif
 
+#if UE_T_BASE_STRUCTURE_F_INTERP_CURVE_QUAT
 template <>
 struct TBaseStructure<FInterpCurveQuat>
 {
@@ -156,7 +159,9 @@ struct TBaseStructure<FInterpCurveQuat>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveQuat));
 	}
 };
+#endif
 
+#if UE_T_BASE_STRUCTURE_F_INTERP_CURVE_FLOAT
 template <>
 struct TBaseStructure<FInterpCurveFloat>
 {
@@ -165,7 +170,9 @@ struct TBaseStructure<FInterpCurveFloat>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveFloat));
 	}
 };
+#endif
 
+#if UE_T_BASE_STRUCTURE_F_INTERP_CURVE_VECTOR2D
 template <>
 struct TBaseStructure<FInterpCurveVector2D>
 {
@@ -174,7 +181,9 @@ struct TBaseStructure<FInterpCurveVector2D>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveVector2D));
 	}
 };
+#endif
 
+#if UE_T_BASE_STRUCTURE_F_INTERP_CURVE_TWO_VECTORS
 template <>
 struct TBaseStructure<FInterpCurveTwoVectors>
 {
@@ -183,7 +192,9 @@ struct TBaseStructure<FInterpCurveTwoVectors>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveTwoVectors));
 	}
 };
+#endif
 
+#if UE_T_BASE_STRUCTURE_F_INTERP_CURVE_LINEAR_COLOR
 template <>
 struct TBaseStructure<FInterpCurveLinearColor>
 {
@@ -192,6 +203,7 @@ struct TBaseStructure<FInterpCurveLinearColor>
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FInterpCurveLinearColor));
 	}
 };
+#endif
 
 template <>
 struct TBaseStructure<FMaterialAttributesInput>

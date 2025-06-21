@@ -345,15 +345,16 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 
 	InClass->AssembleReferenceTokenStream();
 
-	InClass->ClassDefaultObject = StaticAllocateObject(InClass, InClass->GetOuter(),
-	                                                   *InClass->GetDefaultObjectName().ToString(),
-	                                                   RF_Public | RF_ClassDefaultObject | RF_ArchetypeObject,
-	                                                   EInternalObjectFlags::None,
-	                                                   false);
+	FUnrealCSharpFunctionLibrary::SetClassDefaultObject(InClass);
 
-	(*InClass->ClassConstructor)(FObjectInitializer(InClass->ClassDefaultObject,
-	                                                InClass->GetSuperClass()->GetDefaultObject(),
-	                                                EObjectInitializerOptions::None));
+	(*InClass->ClassConstructor)(FObjectInitializer(
+#if UE_GET_DEFAULT_UOBJECT
+		InClass->GetDefaultObject(false),
+#else
+		InClass->ClassDefaultObject,
+#endif
+		InClass->GetSuperClass()->GetDefaultObject(),
+		EObjectInitializerOptions::None));
 
 	InClass->SetInternalFlags(EInternalObjectFlags::Native);
 
@@ -454,7 +455,12 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 #if UE_REPLACE_INSTANCES_OF_CLASS_F_REPLACE_INSTANCES_OF_CLASS_PARAMETERS
 	FReplaceInstancesOfClassParameters ReplaceInstancesOfClassParameters;
 
-	ReplaceInstancesOfClassParameters.OriginalCDO = InOldClass->ClassDefaultObject;
+	ReplaceInstancesOfClassParameters.OriginalCDO =
+#if UE_GET_DEFAULT_UOBJECT
+		InOldClass->GetDefaultObject(false);
+#else
+		InOldClass->ClassDefaultObject;
+#endif
 
 	FBlueprintCompileReinstancer::ReplaceInstancesOfClass(InOldClass, InNewClass, ReplaceInstancesOfClassParameters);
 #else
@@ -476,7 +482,7 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 			}
 		});
 
-	InOldClass->ClassDefaultObject = nullptr;
+	FUnrealCSharpFunctionLibrary::SetClassDefaultObject(InOldClass, nullptr);
 
 	(void)InOldClass->GetDefaultObject(true);
 

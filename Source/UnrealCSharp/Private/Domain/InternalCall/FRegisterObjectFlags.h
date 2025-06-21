@@ -22,7 +22,9 @@ struct FRegisterObjectFlags
 			.Enumerator("RF_TagGarbageTemp", EObjectFlags::RF_TagGarbageTemp)
 			.Enumerator("RF_NeedInitialization", EObjectFlags::RF_NeedInitialization)
 			.Enumerator("RF_NeedLoad", EObjectFlags::RF_NeedLoad)
+#if UE_E_OBJECT_FLAGS_RF_KEEP_FOR_COOKER
 			.Enumerator("RF_KeepForCooker", EObjectFlags::RF_KeepForCooker)
+#endif
 			.Enumerator("RF_NeedPostLoad", EObjectFlags::RF_NeedPostLoad)
 			.Enumerator("RF_NeedPostLoadSubobjects", EObjectFlags::RF_NeedPostLoadSubobjects)
 			.Enumerator("RF_NewerVersionExists", EObjectFlags::RF_NewerVersionExists)
