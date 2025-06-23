@@ -1385,3 +1385,31 @@ bool FUnrealCSharpFunctionLibrary::IsNativeFunction(const UClass* InClass, const
 
 	return Function->IsNative() && OwnerClass->IsNative();
 }
+
+void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass)
+{
+#if UE_SET_CLASS_DEFAULT_OBJECT
+	InClass->SetDefaultObject(
+		StaticAllocateObject(InClass, InClass->GetOuter(),
+		                     *InClass->GetDefaultObjectName().ToString(),
+		                     RF_Public | RF_ClassDefaultObject | RF_ArchetypeObject,
+		                     EInternalObjectFlags::None,
+		                     false)
+	);
+#else
+	InClass->ClassDefaultObject = StaticAllocateObject(InClass, InClass->GetOuter(),
+		*InClass->GetDefaultObjectName().ToString(),
+		RF_Public | RF_ClassDefaultObject | RF_ArchetypeObject,
+		EInternalObjectFlags::None,
+		false);
+#endif
+}
+
+void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObject* InClassDefaultObject)
+{
+#if UE_SET_CLASS_DEFAULT_OBJECT
+	InClass->SetDefaultObject(InClassDefaultObject);
+#else
+	InClass->ClassDefaultObject = InClassDefaultObject
+#endif
+}

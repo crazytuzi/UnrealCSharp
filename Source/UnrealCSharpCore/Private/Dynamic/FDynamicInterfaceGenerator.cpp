@@ -199,15 +199,16 @@ void FDynamicInterfaceGenerator::EndGenerator(UClass* InClass)
 
 	InClass->AssembleReferenceTokenStream();
 
-	InClass->ClassDefaultObject = StaticAllocateObject(InClass, InClass->GetOuter(),
-	                                                   *InClass->GetDefaultObjectName().ToString(),
-	                                                   RF_Public | RF_ClassDefaultObject | RF_ArchetypeObject,
-	                                                   EInternalObjectFlags::None,
-	                                                   false);
+	FUnrealCSharpFunctionLibrary::SetClassDefaultObject(InClass);
 
-	(*InClass->ClassConstructor)(FObjectInitializer(InClass->ClassDefaultObject,
-	                                                InClass->GetSuperClass()->GetDefaultObject(),
-	                                                EObjectInitializerOptions::None));
+	(*InClass->ClassConstructor)(FObjectInitializer(
+#if UE_GET_DEFAULT_UOBJECT
+		InClass->GetDefaultObject(false),
+#else
+		InClass->ClassDefaultObject,
+#endif
+		InClass->GetSuperClass()->GetDefaultObject(),
+		EObjectInitializerOptions::None));
 
 	InClass->SetInternalFlags(EInternalObjectFlags::Native);
 
