@@ -20,6 +20,12 @@
 #include "Reflection/Property/ContainerProperty/FArrayPropertyDescriptor.h"
 #include "Reflection/Property/EnumProperty/FEnumPropertyDescriptor.h"
 #include "Reflection/Property/StringProperty/FStrPropertyDescriptor.h"
+#if UE_F_UTF8_STR_PROPERTY
+#include "Reflection/Property/StringProperty/FUtf8StrPropertyDescriptor.h"
+#endif
+#if UE_F_ANSI_STR_PROPERTY
+#include "Reflection/Property/StringProperty/FAnsiStrPropertyDescriptor.h"
+#endif
 #include "Reflection/Property/StringProperty/FTextPropertyDescriptor.h"
 #include "Reflection/Property/DelegateProperty/FMulticastDelegatePropertyDescriptor.h"
 #include "Reflection/Property/DelegateProperty/FMulticastInlineDelegatePropertyDescriptor.h"
@@ -87,6 +93,14 @@ FPropertyDescriptor* FPropertyDescriptor::Factory(FProperty* InProperty)
 	NEW_PROPERTY_DESCRIPTOR(FEnumProperty)
 
 	NEW_PROPERTY_DESCRIPTOR(FStrProperty)
+
+#if UE_F_UTF8_STR_PROPERTY
+	NEW_PROPERTY_DESCRIPTOR(FUtf8StrProperty)
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	NEW_PROPERTY_DESCRIPTOR(FAnsiStrProperty)
+#endif
 
 	NEW_PROPERTY_DESCRIPTOR(FTextProperty)
 

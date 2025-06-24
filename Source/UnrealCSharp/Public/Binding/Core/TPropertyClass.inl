@@ -215,6 +215,28 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FStrin
 	}
 };
 
+#if UE_F_UTF8_STR_PROPERTY
+template <typename T>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FUtf8String>, T>>
+{
+	static auto Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <typename T>
+struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FAnsiString>, T>>
+{
+	static auto Get()
+	{
+		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+	}
+};
+#endif
+
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>>
 {

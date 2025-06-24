@@ -276,6 +276,24 @@ struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, T
 	using TStringArgument<T>::TStringArgument;
 };
 
+#if UE_F_UTF8_STR_PROPERTY
+template <typename T>
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FUtf8String>, T>> :
+	TStringArgument<T>
+{
+	using TStringArgument<T>::TStringArgument;
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <typename T>
+struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FAnsiString>, T>> :
+	TStringArgument<T>
+{
+	using TStringArgument<T>::TStringArgument;
+};
+#endif
+
 template <typename T>
 struct TArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>> :
 	TStringArgument<T>

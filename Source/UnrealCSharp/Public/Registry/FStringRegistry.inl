@@ -106,6 +106,34 @@ struct FStringRegistry::TStringRegistry<FString> :
 {
 };
 
+#if UE_F_UTF8_STR_PROPERTY
+template <>
+struct FStringRegistry::TStringRegistry<FUtf8String> :
+	TStringRegistryImplementation<
+		FUtf8StringMapping,
+		decltype(&FStringRegistry::Utf8StringGarbageCollectionHandle2Address),
+		&FStringRegistry::Utf8StringGarbageCollectionHandle2Address,
+		decltype(&FStringRegistry::Utf8StringAddress2GarbageCollectionHandle),
+		&FStringRegistry::Utf8StringAddress2GarbageCollectionHandle
+	>
+{
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <>
+struct FStringRegistry::TStringRegistry<FAnsiString> :
+	TStringRegistryImplementation<
+		FAnsiStringMapping,
+		decltype(&FStringRegistry::AnsiStringGarbageCollectionHandle2Address),
+		&FStringRegistry::AnsiStringGarbageCollectionHandle2Address,
+		decltype(&FStringRegistry::AnsiStringAddress2GarbageCollectionHandle),
+		&FStringRegistry::AnsiStringAddress2GarbageCollectionHandle
+	>
+{
+};
+#endif
+
 template <>
 struct FStringRegistry::TStringRegistry<FText> :
 	TStringRegistryImplementation<

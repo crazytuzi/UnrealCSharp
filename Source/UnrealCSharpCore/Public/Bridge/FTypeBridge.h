@@ -31,6 +31,14 @@ public:
 
 	static MonoClass* GetMonoClass(const FStrProperty*);
 
+#if UE_F_UTF8_STR_PROPERTY
+	static MonoClass* GetMonoClass(const FUtf8StrProperty*);
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	static MonoClass* GetMonoClass(const FAnsiStrProperty*);
+#endif
+
 	static MonoClass* GetMonoClass(const FTextProperty*);
 
 	static MonoClass* GetMonoClass(const FMulticastDelegateProperty* InProperty);

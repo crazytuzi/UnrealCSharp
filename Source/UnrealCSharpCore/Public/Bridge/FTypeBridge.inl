@@ -64,6 +64,14 @@ FProperty* FTypeBridge::Factory(MonoReflectionType* InReflectionType, const FFie
 
 	case EPropertyTypeExtent::String: return new FStrProperty(InOwner, InName, InObjectFlags);
 
+#if UE_F_UTF8_STR_PROPERTY
+	case EPropertyTypeExtent::Utf8String: return new FUtf8StrProperty(InOwner, InName, InObjectFlags);
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	case EPropertyTypeExtent::AnsiString: return new FAnsiStrProperty(InOwner, InName, InObjectFlags);
+#endif
+
 	case EPropertyTypeExtent::Text: return new FTextProperty(InOwner, InName, InObjectFlags);
 
 	case EPropertyTypeExtent::WeakObjectReference:

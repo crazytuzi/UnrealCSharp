@@ -15,6 +15,12 @@ struct TIsRef
 			std::is_same_v<std::decay_t<T>, FName> ||
 			std::is_same_v<std::decay_t<T>, FText> ||
 			std::is_same_v<std::decay_t<T>, FString> ||
+#if UE_F_UTF8_STR_PROPERTY
+			std::is_same_v<std::decay_t<T>, FUtf8String> ||
+#endif
+#if UE_F_ANSI_STR_PROPERTY
+			std::is_same_v<std::decay_t<T>, FAnsiString> ||
+#endif
 			std::is_pointer_v<std::decay_t<T>> ||
 			TIsTArray<std::decay_t<T>>::Value ||
 			TIsTSet<std::decay_t<T>>::Value ||
