@@ -204,6 +204,11 @@ void FCSharpCompilerRunnable::Compile()
 
 	AsyncTask(ENamedThreads::GameThread, [this]()
 	{
+		if (GExitPurge)
+		{
+			return;
+		}
+
 		static const FName CompileStatusBackground("Blueprint.CompileStatus.Background");
 
 		FNotificationInfo NotificationInfo(FText::FromString(TEXT("Compilation background")));
@@ -313,6 +318,11 @@ void FCSharpCompilerRunnable::Compile()
 
 	AsyncTask(ENamedThreads::GameThread, [this, NotificationInfo]()
 	{
+		if (GExitPurge)
+		{
+			return;
+		}
+
 		if (NotificationItem.IsValid())
 		{
 			NotificationItem->Fadeout();
