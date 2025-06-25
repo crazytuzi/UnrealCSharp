@@ -66,8 +66,20 @@ namespace
 				.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString,
 				                                       TArray<FString>{"Format"}))
 				.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
+#if UE_GUID_PARSE_F_STRING_F_GUID
+				.Function("Parse", BINDING_OVERLOAD(bool(*)(const FString&, FGuid&), &FGuid::Parse,
+				                                    TArray<FString>{"GuidString", "OutGuid"}))
+#else
 				.Function("Parse", BINDING_FUNCTION(&FGuid::Parse))
-				.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact));
+#endif
+#if UE_GUID_PARSE_EXACT_F_STRING_E_GUID_FORMATS_F_GUID
+				.Function("ParseExact", BINDING_OVERLOAD(bool(*)(const FString&, EGuidFormats, FGuid& OutGuid),
+				                                         &FGuid::ParseExact,
+				                                         TArray<FString>{"GuidString", "Format", "OutGuid"}))
+#else
+				.Function("ParseExact", BINDING_FUNCTION(&FGuid::ParseExact))
+#endif
+				;
 		}
 	};
 
