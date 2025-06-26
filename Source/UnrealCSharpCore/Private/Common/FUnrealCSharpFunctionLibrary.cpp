@@ -637,9 +637,10 @@ FString FUnrealCSharpFunctionLibrary::GetClassNameSpace(const FMulticastDelegate
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetSuffixName(const FAssetData& InAssetData)
 {
-	return InAssetData.GetClass()->GetFName() == UBlueprint::StaticClass()->GetFName() ||
-	       InAssetData.GetClass()->GetFName() == UWidgetBlueprint::StaticClass()->GetFName() ||
-	       InAssetData.GetClass()->GetFName() == UAnimBlueprint::StaticClass()->GetFName()
+	return InAssetData.GetClass() != nullptr &&
+	       (InAssetData.GetClass()->GetFName() == UBlueprint::StaticClass()->GetFName() ||
+		       InAssetData.GetClass()->GetFName() == UWidgetBlueprint::StaticClass()->GetFName() ||
+		       InAssetData.GetClass()->GetFName() == UAnimBlueprint::StaticClass()->GetFName())
 		       ? TEXT("_C")
 		       : TEXT("");
 }

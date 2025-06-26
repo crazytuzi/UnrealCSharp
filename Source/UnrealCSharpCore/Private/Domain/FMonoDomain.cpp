@@ -760,12 +760,10 @@ MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName,
 {
 	auto AssemblyName = FString(mono_assembly_name_get_name(InAssemblyName));
 
-#if WITH_EDITOR
 	if (AssemblyName == ASSEMBLY_CORE_LIB_RESOURCE_NAME)
 	{
 		AssemblyName = ASSEMBLY_CORE_LIB_NAME;
 	}
-#endif
 
 	if (const auto AssemblyLoader = FUnrealCSharpFunctionLibrary::GetAssemblyLoader())
 	{

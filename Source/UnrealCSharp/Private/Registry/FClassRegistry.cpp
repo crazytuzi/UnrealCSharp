@@ -1,10 +1,11 @@
 ﻿#include "Registry/FClassRegistry.h"
 #include "Domain/FDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/AccessPrivateMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Template/TAccessPrivate.inl"
-#include "Template/TAccessPrivateStub.inl"
+
+ACCESS_PRIVATE_MEMBER_PROPERTY(FObjectInitializer, bIsDeferredInitializer, bool)
 
 TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> FClassRegistry::ClassConstructorMap;
 
@@ -246,14 +247,6 @@ void FClassRegistry::RemovePropertyDescriptor(const uint32 InPropertyHash)
 		PropertyDescriptorMap.Remove(InPropertyHash);
 	}
 }
-
-struct FObjectInitializer_bIsDeferredInitializer
-{
-	typedef bool (FObjectInitializer::*Type);
-};
-
-template struct TAccessPrivateStub<FObjectInitializer_bIsDeferredInitializer,
-                                   &FObjectInitializer::bIsDeferredInitializer>;
 
 void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitializer)
 {

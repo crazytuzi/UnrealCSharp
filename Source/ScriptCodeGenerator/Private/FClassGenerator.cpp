@@ -10,6 +10,7 @@
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
+#include "ScriptCodeGeneratorMacro.h"
 #include "Dynamic/FDynamicGenerator.h"
 
 void FClassGenerator::Generator()
@@ -1078,8 +1079,15 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 			if (const auto UserDefinedEnum = Cast<UUserDefinedEnum>(ByteProperty->Enum))
 			{
 				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
-				                       *UserDefinedEnum->GetDisplayNameTextByIndex(
-					                       UserDefinedEnum->GetIndexByNameString(MetaData)).ToString());
+				*FUnrealCSharpFunctionLibrary::Encode(MetaData.IsEmpty()
+														  ? *UserDefinedEnum->
+														  GetDisplayNameTextByIndex(
+															  ENUM_DEFAULT_MAX_INDEX).ToString()
+														  : *UserDefinedEnum->
+														  GetDisplayNameTextByIndex(
+															  UserDefinedEnum->
+															  GetIndexByNameString(MetaData)).
+														  ToString(), false));
 			}
 			else
 			{
@@ -1157,7 +1165,8 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 	{
 		return FString::Printf(TEXT(" = %s.%s"), *EnumProperty->GetEnum()->GetName(),
 		                       MetaData.IsEmpty()
-			                       ? *EnumProperty->GetEnum()->GetDisplayNameTextByIndex(0).ToString()
+			                       ? *EnumProperty->GetEnum()->GetDisplayNameTextByIndex(ENUM_DEFAULT_MAX_INDEX).
+			                                        ToString()
 			                       : *MetaData);
 	}
 
@@ -1363,20 +1372,11 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 
 	if (CastField<FTextProperty>(InProperty))
 	{
-		auto Value = InMetaData;
-
-		static auto InvText = FString(TEXT("INVTEXT"));
-
-		if (Value.Contains(InvText))
-		{
-			Value = Value.Mid(InvText.Len() + 2, Value.Len() - InvText.Len() - 4);
-		}
-
 		return FString::Printf(TEXT(
 			"\t\t\t\t%s \?\?= new FText(\"%s\");\n\n"
 		),
 		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
-		                       *Value
+		                       *InMetaData.Replace(TEXT("\""), TEXT("\\\""))
 		);
 	}
 

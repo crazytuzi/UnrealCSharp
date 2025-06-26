@@ -1,3 +1,5 @@
+using Script.CoreUObject;
+
 namespace Script.CoreUObject
 {
     [Override]
