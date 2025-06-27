@@ -1,3 +1,4 @@
+#if UE_5_6_OR_LATER
 using Script.Library;
 
 namespace Script.CoreUObject
@@ -30,3 +31,4 @@ namespace Script.CoreUObject
         public nint GarbageCollectionHandle { get; set; }
     }
 }
+#endif

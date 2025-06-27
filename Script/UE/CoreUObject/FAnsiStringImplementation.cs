@@ -1,3 +1,4 @@
+#if UE_5_6_OR_LATER
 using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
@@ -18,3 +19,4 @@ namespace Script.Library
         public static extern string FAnsiString_ToStringImplementation(nint InString);
     }
 }
+#endif
