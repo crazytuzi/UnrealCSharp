@@ -172,7 +172,7 @@ struct TBaseStructure<FInterpCurveFloat>
 };
 #endif
 
-#if UE_T_BASE_STRUCTURE_F_INTERP_CURVE_VECTOR2D
+#if UE_T_BASE_STRUCTURE_F_INTERP_CURVE_VECTOR_2D
 template <>
 struct TBaseStructure<FInterpCurveVector2D>
 {
