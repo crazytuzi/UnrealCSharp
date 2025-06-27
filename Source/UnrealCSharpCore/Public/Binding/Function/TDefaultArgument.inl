@@ -259,6 +259,36 @@ struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FStr
 	}
 };
 
+#if UE_F_UTF8_STR_PROPERTY
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FUtf8String>, T>>
+{
+	static auto Get(const FUtf8String& InValue)
+	{
+		return FString::Printf(TEXT(
+			"new %s(\"%s\")"),
+		                       *TName<T, T>::Get(),
+		                       *InValue
+		);
+	}
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <typename T>
+struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FAnsiString>, T>>
+{
+	static auto Get(const FAnsiString& InValue)
+	{
+		return FString::Printf(TEXT(
+			"new %s(\"%s\")"),
+		                       *TName<T, T>::Get(),
+		                       *InValue
+		);
+	}
+};
+#endif
+
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>>
 {

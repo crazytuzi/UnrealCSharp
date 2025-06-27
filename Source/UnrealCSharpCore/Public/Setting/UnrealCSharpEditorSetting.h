@@ -70,6 +70,8 @@ public:
 
 	UFUNCTION()
 	TArray<FString> GetModuleList();
+
+	const TArray<FString>& GetClassBlacklist() const;
 #endif
 
 private:
@@ -121,5 +123,8 @@ private:
 	UPROPERTY(Config, EditAnywhere, Category = Generator,
 		meta = (GetOptions = "GetModuleList", EditCondition = "bEnableExport"))
 	TArray<FString> ExportModule;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bEnableExport"))
+	TArray<FString> ClassBlacklist;
 #endif
 };

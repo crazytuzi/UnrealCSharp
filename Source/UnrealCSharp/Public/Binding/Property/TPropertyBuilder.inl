@@ -209,6 +209,22 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v
 {
 };
 
+#if UE_F_UTF8_STR_PROPERTY
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FUtf8String>>> :
+	TCompoundPropertyBuilder<Class, Result, Member>
+{
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <typename Class, typename Result, Result Class::* Member>
+struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FAnsiString>>> :
+	TCompoundPropertyBuilder<Class, Result, Member>
+{
+};
+#endif
+
 template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<std::is_same_v<Result, FText>>> :
 	TCompoundPropertyBuilder<Class, Result, Member>
@@ -394,6 +410,22 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::de
 	TCompoundPropertyBuilder<void, Result, Member>
 {
 };
+
+#if UE_F_UTF8_STR_PROPERTY
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FUtf8String>>> :
+	TCompoundPropertyBuilder<void, Result, Member>
+{
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <typename Result, Result* Member>
+struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FAnsiString>>> :
+	TCompoundPropertyBuilder<void, Result, Member>
+{
+};
+#endif
 
 template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<std::is_same_v<std::decay_t<Result>, FText>>> :

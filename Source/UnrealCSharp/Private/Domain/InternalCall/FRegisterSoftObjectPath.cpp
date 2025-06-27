@@ -33,8 +33,10 @@ namespace
 #endif
 				.Function("GetAssetPathString", BINDING_FUNCTION(&FSoftObjectPath::GetAssetPathString))
 				.Function("GetSubPathString", BINDING_FUNCTION(&FSoftObjectPath::GetSubPathString))
+#if UE_SOFT_OBJECT_PATH_SET_SUB_PATH_STRING
 				.Function("SetSubPathString", BINDING_FUNCTION(&FSoftObjectPath::SetSubPathString,
 				                                               TArray<FString>{"InSubPathString"}))
+#endif
 				.Function("GetLongPackageName", BINDING_FUNCTION(&FSoftObjectPath::GetLongPackageName))
 				.Function("GetLongPackageFName", BINDING_FUNCTION(&FSoftObjectPath::GetLongPackageFName))
 				.Function("GetAssetName", BINDING_FUNCTION(&FSoftObjectPath::GetAssetName))
@@ -58,8 +60,14 @@ namespace
 #if UE_SOFT_OBJECT_PATH_INVALIDATE_TAG
 				.Function("InvalidateTag", BINDING_FUNCTION(&FSoftObjectPath::InvalidateTag))
 #endif
+#if UE_SOFT_OBJECT_PATH_GET_OR_CREATE_ID_FOR_OBJECT_U_OBJECT
+				.Function("GetOrCreateIDForObject", BINDING_OVERLOAD(FSoftObjectPath(*)(const UObject*),
+				                                                     &FSoftObjectPath::GetOrCreateIDForObject,
+				                                                     TArray<FString>{"Object"}))
+#else
 				.Function("GetOrCreateIDForObject", BINDING_FUNCTION(&FSoftObjectPath::GetOrCreateIDForObject,
 				                                                     TArray<FString>{"Object"}))
+#endif
 				.Function("AddPIEPackageName", BINDING_FUNCTION(&FSoftObjectPath::AddPIEPackageName,
 				                                                TArray<FString>{"NewPIEPackageName"}))
 				.Function("ClearPIEPackageNames", BINDING_FUNCTION(&FSoftObjectPath::ClearPIEPackageNames));

@@ -239,6 +239,10 @@ public:
 
 	static bool IsNativeFunction(const UClass* InClass, const FName& InFunctionName);
 
+	static void SetClassDefaultObject(UClass* InClass);
+
+	static void SetClassDefaultObject(UClass* InClass, UObject* InClassDefaultObject);
+
 	template <typename T>
 	static T* GetMutableDefaultSafe()
 	{

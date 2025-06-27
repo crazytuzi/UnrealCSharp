@@ -345,13 +345,9 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 
 	InClass->AssembleReferenceTokenStream();
 
-	InClass->ClassDefaultObject = StaticAllocateObject(InClass, InClass->GetOuter(),
-	                                                   *InClass->GetDefaultObjectName().ToString(),
-	                                                   RF_Public | RF_ClassDefaultObject | RF_ArchetypeObject,
-	                                                   EInternalObjectFlags::None,
-	                                                   false);
+	FUnrealCSharpFunctionLibrary::SetClassDefaultObject(InClass);
 
-	(*InClass->ClassConstructor)(FObjectInitializer(InClass->ClassDefaultObject,
+	(*InClass->ClassConstructor)(FObjectInitializer(InClass->GetDefaultObject(false),
 	                                                InClass->GetSuperClass()->GetDefaultObject(),
 	                                                EObjectInitializerOptions::None));
 
@@ -454,7 +450,7 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 #if UE_REPLACE_INSTANCES_OF_CLASS_F_REPLACE_INSTANCES_OF_CLASS_PARAMETERS
 	FReplaceInstancesOfClassParameters ReplaceInstancesOfClassParameters;
 
-	ReplaceInstancesOfClassParameters.OriginalCDO = InOldClass->ClassDefaultObject;
+	ReplaceInstancesOfClassParameters.OriginalCDO = InOldClass->GetDefaultObject(false);
 
 	FBlueprintCompileReinstancer::ReplaceInstancesOfClass(InOldClass, InNewClass, ReplaceInstancesOfClassParameters);
 #else
@@ -476,7 +472,7 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 			}
 		});
 
-	InOldClass->ClassDefaultObject = nullptr;
+	FUnrealCSharpFunctionLibrary::SetClassDefaultObject(InOldClass, nullptr);
 
 	(void)InOldClass->GetDefaultObject(true);
 

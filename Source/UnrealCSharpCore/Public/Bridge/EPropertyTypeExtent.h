@@ -44,4 +44,10 @@ enum class UNREALCSHARPCORE_API EPropertyTypeExtent
 #if UE_F_OPTIONAL_PROPERTY
 	, Optional
 #endif
+#if UE_F_UTF8_STR_PROPERTY
+	, Utf8String
+#endif
+#if UE_F_ANSI_STR_PROPERTY
+	, AnsiString
+#endif
 };

@@ -168,6 +168,14 @@ FString FGeneratorCore::GetPropertyType(FProperty* Property)
 
 	if (CastField<FStrProperty>(Property)) return TName<FString, FString>::Get();
 
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(Property)) return TName<FUtf8String, FUtf8String>::Get();
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(Property)) return TName<FAnsiString, FAnsiString>::Get();
+#endif
+
 	if (CastField<FTextProperty>(Property)) return TName<FText, FText>::Get();
 
 	if (const auto MulticastDelegateProperty = CastField<FMulticastDelegateProperty>(Property))
@@ -336,6 +344,14 @@ TSet<FString> FGeneratorCore::GetPropertyTypeNameSpace(FProperty* Property)
 	}
 
 	if (CastField<FStrProperty>(Property)) return TSet<FString>{TNameSpace<FString, FString>::Get()};
+
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(Property)) return TSet<FString>{TNameSpace<FUtf8String, FUtf8String>::Get()};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(Property)) return TSet<FString>{TNameSpace<FAnsiString, FAnsiString>::Get()};
+#endif
 
 	if (CastField<FTextProperty>(Property)) return TSet<FString>{TNameSpace<FText, FText>::Get()};
 
@@ -705,6 +721,14 @@ bool FGeneratorCore::IsSupported(FProperty* Property)
 	}
 
 	if (CastField<FStrProperty>(Property)) return true;
+
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(Property)) return true;
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(Property)) return true;
+#endif
 
 	if (CastField<FTextProperty>(Property)) return true;
 

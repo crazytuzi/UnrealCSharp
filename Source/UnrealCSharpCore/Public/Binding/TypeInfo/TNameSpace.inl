@@ -157,6 +157,22 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>, 
 {
 };
 
+#if UE_F_UTF8_STR_PROPERTY
+template <typename T>
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FUtf8String>, T>> final :
+	FCommonNameSpace
+{
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <typename T>
+struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FAnsiString>, T>> final :
+	FCommonNameSpace
+{
+};
+#endif
+
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>> final :
 	FCommonNameSpace
