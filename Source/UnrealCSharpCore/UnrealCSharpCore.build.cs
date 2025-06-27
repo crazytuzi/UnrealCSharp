@@ -11,7 +11,9 @@ public class UnrealCSharpCore : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-#if UE_5_5_OR_LATER
+#if UE_5_6_OR_LATER
+		CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
+#elif UE_5_5_OR_LATER
 		UndefinedIdentifierWarningLevel = WarningLevel.Off;
 #else
 		bEnableUndefinedIdentifierWarnings = false;

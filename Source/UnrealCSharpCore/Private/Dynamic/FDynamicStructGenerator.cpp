@@ -321,7 +321,11 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 		{
 			auto DynamicBlueprintExtension = NewObject<UDynamicBlueprintExtension>(Blueprint);
 
+#if UE_U_BLUEPRINT_ADD_EXTENSION
 			Blueprint->AddExtension(DynamicBlueprintExtension);
+#else
+			Blueprint->Extensions.Add(DynamicBlueprintExtension);
+#endif
 
 			DynamicBlueprintExtension->AddToRoot();
 
@@ -379,6 +383,12 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 
 				FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
 			}
+
+#if	UE_U_BLUEPRINT_REMOVE_EXTENSION
+			Blueprint->RemoveExtension(DynamicBlueprintExtension);
+#else
+			Blueprint->Extensions.RemoveSingleSwap(DynamicBlueprintExtension);
+#endif
 
 			DynamicBlueprintExtension->RemoveFromRoot();
 		}
