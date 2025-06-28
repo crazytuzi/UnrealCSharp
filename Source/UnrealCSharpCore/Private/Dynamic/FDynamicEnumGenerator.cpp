@@ -9,6 +9,7 @@
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
+#include "Dynamic/DynamicBlueprintExtension.h"
 #endif
 #include "UEVersion.h"
 
@@ -256,6 +257,14 @@ void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 	{
 		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
+			auto DynamicBlueprintExtension = NewObject<UDynamicBlueprintExtension>(Blueprint);
+
+#if UE_U_BLUEPRINT_ADD_EXTENSION
+			Blueprint->AddExtension(DynamicBlueprintExtension);
+#else
+			Blueprint->Extensions.Add(DynamicBlueprintExtension);
+#endif
+
 			Blueprint->Modify();
 
 			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);
@@ -266,6 +275,12 @@ void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 				EBlueprintCompileOptions::SkipSave;
 
 			FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
+
+#if	UE_U_BLUEPRINT_REMOVE_EXTENSION
+			Blueprint->RemoveExtension(DynamicBlueprintExtension);
+#else
+			Blueprint->Extensions.RemoveSingleSwap(DynamicBlueprintExtension);
+#endif
 		}
 	}
 }

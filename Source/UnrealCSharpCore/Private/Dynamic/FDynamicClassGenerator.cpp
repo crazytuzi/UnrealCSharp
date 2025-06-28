@@ -16,6 +16,7 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetReinstanceUtilities.h"
 #include "Dynamic/FDynamicGenerator.h"
+#include "Dynamic/DynamicBlueprintExtension.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #endif
 #include "UEVersion.h"
@@ -366,13 +367,13 @@ void FDynamicClassGenerator::EndGenerator(UClass* InClass)
 
 #if UE_NOTIFY_REGISTRATION_EVENT
 #if !WITH_EDITOR
-	NotifyRegistrationEvent(*InClass->ClassDefaultObject->GetPackage()->GetName(),
-	                        *InClass->ClassDefaultObject->GetName(),
+	NotifyRegistrationEvent(*InClass->GetDefaultObject(false)->GetPackage()->GetName(),
+	                        *InClass->GetDefaultObject(false)->GetName(),
 	                        ENotifyRegistrationType::NRT_ClassCDO,
 	                        ENotifyRegistrationPhase::NRP_Finished,
 	                        nullptr,
 	                        false,
-	                        InClass->ClassDefaultObject);
+	                        InClass->GetDefaultObject(false));
 
 
 	NotifyRegistrationEvent(*InClass->GetPackage()->GetName(),
@@ -480,6 +481,14 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 	{
 		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
+			auto DynamicBlueprintExtension = NewObject<UDynamicBlueprintExtension>(Blueprint);
+
+#if UE_U_BLUEPRINT_ADD_EXTENSION
+			Blueprint->AddExtension(DynamicBlueprintExtension);
+#else
+			Blueprint->Extensions.Add(DynamicBlueprintExtension);
+#endif
+
 			Blueprint->Modify();
 
 			if (const auto SimpleConstructionScript = Blueprint->SimpleConstructionScript)
@@ -532,6 +541,12 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 				EBlueprintCompileOptions::SkipSave;
 
 			FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
+
+#if	UE_U_BLUEPRINT_REMOVE_EXTENSION
+			Blueprint->RemoveExtension(DynamicBlueprintExtension);
+#else
+			Blueprint->Extensions.RemoveSingleSwap(DynamicBlueprintExtension);
+#endif
 		}
 	}
 
