@@ -11,7 +11,7 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "BlueprintActionDatabase.h"
-#include "Dynamic/DynamicBlueprintExtension.h"
+#include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #endif
 #include "UEVersion.h"
 
@@ -319,15 +319,7 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 	{
 		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
-			auto DynamicBlueprintExtension = NewObject<UDynamicBlueprintExtension>(Blueprint);
-
-#if UE_U_BLUEPRINT_ADD_EXTENSION
-			Blueprint->AddExtension(DynamicBlueprintExtension);
-#else
-			Blueprint->Extensions.Add(DynamicBlueprintExtension);
-#endif
-
-			DynamicBlueprintExtension->AddToRoot();
+			FDynamicBlueprintExtensionScope DynamicBlueprintExtensionScope(Blueprint);
 
 			auto bIsRefresh = false;
 
@@ -383,14 +375,6 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 
 				FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
 			}
-
-#if	UE_U_BLUEPRINT_REMOVE_EXTENSION
-			Blueprint->RemoveExtension(DynamicBlueprintExtension);
-#else
-			Blueprint->Extensions.RemoveSingleSwap(DynamicBlueprintExtension);
-#endif
-
-			DynamicBlueprintExtension->RemoveFromRoot();
 		}
 	}
 

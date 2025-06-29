@@ -9,7 +9,7 @@
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Kismet2/BlueprintEditorUtils.h"
-#include "Dynamic/DynamicBlueprintExtension.h"
+#include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #endif
 #include "UEVersion.h"
 
@@ -174,7 +174,7 @@ void FDynamicInterfaceGenerator::BeginGenerator(UClass* InClass, UClass* InParen
 
 	InClass->SetSuperStruct(InParentClass);
 
-#if UE_CLASS_ADD_REFERENCED_OBJECTS
+#if UE_U_CLASS_ADD_REFERENCED_OBJECTS
 	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
 
@@ -308,13 +308,7 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 	{
 		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
-			auto DynamicBlueprintExtension = NewObject<UDynamicBlueprintExtension>(Blueprint);
-
-#if UE_U_BLUEPRINT_ADD_EXTENSION
-			Blueprint->AddExtension(DynamicBlueprintExtension);
-#else
-			Blueprint->Extensions.Add(DynamicBlueprintExtension);
-#endif
+			FDynamicBlueprintExtensionScope DynamicBlueprintExtensionScope(Blueprint);
 
 			Blueprint->Modify();
 
@@ -326,12 +320,6 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 				EBlueprintCompileOptions::SkipSave;
 
 			FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
-
-#if	UE_U_BLUEPRINT_REMOVE_EXTENSION
-			Blueprint->RemoveExtension(DynamicBlueprintExtension);
-#else
-			Blueprint->Extensions.RemoveSingleSwap(DynamicBlueprintExtension);
-#endif
 		}
 	}
 }

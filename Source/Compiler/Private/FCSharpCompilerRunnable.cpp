@@ -7,7 +7,7 @@
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "UEVersion.h"
-#if UE_APP_STYLE_GET_BRUSH
+#if UE_F_APP_STYLE_GET_BRUSH
 #include "Styling/AppStyle.h"
 #else
 #include "EditorStyleSet.h"
@@ -215,7 +215,7 @@ void FCSharpCompilerRunnable::Compile()
 
 		NotificationInfo.bUseSuccessFailIcons = true;
 
-#if UE_APP_STYLE_GET_BRUSH
+#if UE_F_APP_STYLE_GET_BRUSH
 		NotificationInfo.Image = FAppStyle::GetBrush(CompileStatusBackground);
 #else
 		NotificationInfo.Image = FEditorStyle::GetBrush(CompileStatusBackground);
@@ -290,7 +290,7 @@ void FCSharpCompilerRunnable::Compile()
 
 			NotificationInfo->bUseSuccessFailIcons = true;
 
-#if UE_APP_STYLE_GET_BRUSH
+#if UE_F_APP_STYLE_GET_BRUSH
 			NotificationInfo->Image = FAppStyle::GetBrush(CompileStatusGood);
 #else
 			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusGood);
@@ -302,7 +302,7 @@ void FCSharpCompilerRunnable::Compile()
 
 			NotificationInfo->bUseSuccessFailIcons = true;
 
-#if UE_APP_STYLE_GET_BRUSH
+#if UE_F_APP_STYLE_GET_BRUSH
 			NotificationInfo->Image = FAppStyle::GetBrush(CompileStatusError);
 #else
 			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusError);

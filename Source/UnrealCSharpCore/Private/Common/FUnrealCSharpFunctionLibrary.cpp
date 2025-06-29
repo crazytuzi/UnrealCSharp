@@ -1400,7 +1400,7 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass)
 
 void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObject* InClassDefaultObject)
 {
-#if UE_CLASS_SET_DEFAULT_OBJECT
+#if UE_U_CLASS_SET_DEFAULT_OBJECT
 	InClass->SetDefaultObject(InClassDefaultObject);
 #else
 	InClass->ClassDefaultObject = InClassDefaultObject;

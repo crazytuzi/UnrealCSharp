@@ -15,19 +15,19 @@ namespace
 				          BINDING_OVERLOAD(FAssetBundleEntry*(FAssetBundleData::*)(FName),
 				                           &FAssetBundleData::FindEntry,
 				                           TArray<FString>{"SearchName"}))
-#if UE_ASSET_BUNDLE_DATA_ADD_BUNDLE_ASSET
+#if UE_F_ASSET_BUNDLE_DATA_ADD_BUNDLE_ASSET
 				.Function("AddBundleAsset",
 				          BINDING_OVERLOAD(void(FAssetBundleData::*)(FName, const FSoftObjectPath&),
 				                           &FAssetBundleData::AddBundleAsset,
 				                           TArray<FString>{"BundleName", "AssetPath"}))
 #endif
-#if UE_ASSET_BUNDLE_DATA_ADD_BUNDLE_ASSETS
+#if UE_F_ASSET_BUNDLE_DATA_ADD_BUNDLE_ASSETS
 				.Function("AddBundleAssets",
 				          BINDING_OVERLOAD(void(FAssetBundleData::*)(FName, const TArray<FSoftObjectPath>&),
 				                           &FAssetBundleData::AddBundleAssets,
 				                           TArray<FString>{"BundleName", "AssetPaths"}))
 #endif
-#if UE_ASSET_BUNDLE_DATA_SET_BUNDLE_ASSETS
+#if UE_F_ASSET_BUNDLE_DATA_SET_BUNDLE_ASSETS
 				.Function("SetBundleAssets",
 				          BINDING_OVERLOAD(void(FAssetBundleData::*)(FName, TArray<FSoftObjectPath>&&),
 				                           &FAssetBundleData::SetBundleAssets,

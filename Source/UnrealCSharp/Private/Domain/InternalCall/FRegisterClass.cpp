@@ -19,7 +19,7 @@ namespace
 						                             UClass::StaticClass());
 				                             }
 			                             })
-#if UE_CLASS_CLASS_DEFAULT_OBJECT
+#if UE_U_CLASS_CLASS_DEFAULT_OBJECT
 				.Property("ClassDefaultObject", BINDING_READONLY_PROPERTY(&UClass::ClassDefaultObject))
 #endif
 				.Function("GetDefaultObject", BINDING_OVERLOAD(UObject*(UClass::*)(bool)const,

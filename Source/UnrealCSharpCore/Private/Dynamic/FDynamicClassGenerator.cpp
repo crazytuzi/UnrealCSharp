@@ -16,7 +16,7 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetReinstanceUtilities.h"
 #include "Dynamic/FDynamicGenerator.h"
-#include "Dynamic/DynamicBlueprintExtension.h"
+#include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #endif
 #include "UEVersion.h"
@@ -303,7 +303,7 @@ void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentCla
 
 	InClass->SetSuperStruct(InParentClass);
 
-#if UE_CLASS_ADD_REFERENCED_OBJECTS
+#if UE_U_CLASS_ADD_REFERENCED_OBJECTS
 	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
 
@@ -448,7 +448,7 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 {
 	InOldClass->ClassFlags |= CLASS_NewerVersionExists;
 
-#if UE_REPLACE_INSTANCES_OF_CLASS_F_REPLACE_INSTANCES_OF_CLASS_PARAMETERS
+#if UE_F_REPLACE_INSTANCES_OF_CLASS_F_REPLACE_INSTANCES_OF_CLASS_PARAMETERS
 	FReplaceInstancesOfClassParameters ReplaceInstancesOfClassParameters;
 
 	ReplaceInstancesOfClassParameters.OriginalCDO = InOldClass->GetDefaultObject(false);
@@ -481,13 +481,7 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 	{
 		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
-			auto DynamicBlueprintExtension = NewObject<UDynamicBlueprintExtension>(Blueprint);
-
-#if UE_U_BLUEPRINT_ADD_EXTENSION
-			Blueprint->AddExtension(DynamicBlueprintExtension);
-#else
-			Blueprint->Extensions.Add(DynamicBlueprintExtension);
-#endif
+			FDynamicBlueprintExtensionScope DynamicBlueprintExtensionScope(Blueprint);
 
 			Blueprint->Modify();
 
@@ -541,12 +535,6 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 				EBlueprintCompileOptions::SkipSave;
 
 			FKismetEditorUtilities::CompileBlueprint(Blueprint, BlueprintCompileOptions);
-
-#if	UE_U_BLUEPRINT_REMOVE_EXTENSION
-			Blueprint->RemoveExtension(DynamicBlueprintExtension);
-#else
-			Blueprint->Extensions.RemoveSingleSwap(DynamicBlueprintExtension);
-#endif
 		}
 	}
 

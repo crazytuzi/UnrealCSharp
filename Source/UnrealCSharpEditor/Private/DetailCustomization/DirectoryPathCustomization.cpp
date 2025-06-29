@@ -25,7 +25,7 @@ void FDirectoryPathCustomization::CustomizeHeader(const TSharedRef<IPropertyHand
 		const auto bUseRelativePath = StructPropertyHandle->HasMetaData(TEXT("RelativePath"));
 
 		const TSharedPtr<SWidget> PickerWidget = SAssignNew(BrowseButton, SButton)
-#if UE_APP_STYLE_GET
+#if UE_F_APP_STYLE_GET
 			.ButtonStyle(FAppStyle::Get(), "HoverHintOnly")
 #else
 			.ButtonStyle(FEditorStyle::Get(), "HoverHintOnly")
@@ -38,7 +38,7 @@ void FDirectoryPathCustomization::CustomizeHeader(const TSharedRef<IPropertyHand
 			.IsFocusable(false)
 			[
 				SNew(SImage)
-#if UE_APP_STYLE_GET_BRUSH
+#if UE_F_APP_STYLE_GET_BRUSH
 				.Image(FAppStyle::GetBrush("PropertyWindow.Button_Ellipsis"))
 #else
 				.Image(FEditorStyle::GetBrush("PropertyWindow.Button_Ellipsis"))
