@@ -303,7 +303,7 @@ void FDynamicClassGenerator::BeginGenerator(UClass* InClass, UClass* InParentCla
 
 	InClass->SetSuperStruct(InParentClass);
 
-#if UE_CLASS_ADD_REFERENCED_OBJECTS
+#if UE_U_CLASS_ADD_REFERENCED_OBJECTS
 	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
 
@@ -448,7 +448,7 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 {
 	InOldClass->ClassFlags |= CLASS_NewerVersionExists;
 
-#if UE_REPLACE_INSTANCES_OF_CLASS_F_REPLACE_INSTANCES_OF_CLASS_PARAMETERS
+#if UE_F_REPLACE_INSTANCES_OF_CLASS_F_REPLACE_INSTANCES_OF_CLASS_PARAMETERS
 	FReplaceInstancesOfClassParameters ReplaceInstancesOfClassParameters;
 
 	ReplaceInstancesOfClassParameters.OriginalCDO = InOldClass->GetDefaultObject(false);

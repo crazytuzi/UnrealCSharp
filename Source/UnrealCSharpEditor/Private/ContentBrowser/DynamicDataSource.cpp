@@ -547,7 +547,7 @@ bool UDynamicDataSource::TryGetCollectionId(const FContentBrowserItemData& InIte
 {
 	if (const auto FileItemPayload = GetFileItemDataPayload(InItem))
 	{
-#if UE_ASSET_DATA_GET_SOFT_OBJECT_PATH
+#if UE_F_ASSET_DATA_GET_SOFT_OBJECT_PATH
 		OutCollectionId = FSoftObjectPath(FileItemPayload->GetAssetData().GetSoftObjectPath());
 #else
 		OutCollectionId = FileItemPayload->GetAssetData().ObjectPath;
@@ -592,7 +592,7 @@ bool UDynamicDataSource::Legacy_TryConvertAssetDataToVirtualPath(const FAssetDat
                                                                  const bool InUseFolderPaths, FName& OutPath)
 {
 	return TryConvertInternalPathToVirtual(
-#if UE_ASSET_DATA_GET_SOFT_OBJECT_PATH
+#if UE_F_ASSET_DATA_GET_SOFT_OBJECT_PATH
 		InUseFolderPaths ? InAssetData.PackagePath : *InAssetData.GetSoftObjectPath().ToString(),
 #else
 		InUseFolderPaths ? InAssetData.PackagePath : InAssetData.ObjectPath,

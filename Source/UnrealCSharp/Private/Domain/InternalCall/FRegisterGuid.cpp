@@ -59,20 +59,20 @@ namespace
 				                                          TArray<FString>{"Value"}))
 				.Function("Invalidate", BINDING_FUNCTION(&FGuid::Invalidate))
 				.Function("IsValid", BINDING_FUNCTION(&FGuid::IsValid))
-#if UE_GUID_TO_STRING
+#if UE_F_GUID_TO_STRING
 				.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)()const, &FGuid::ToString,
 				                                       EFunctionInteract::New))
 #endif
 				.Function("ToString", BINDING_OVERLOAD(FString(FGuid::*)(EGuidFormats)const, &FGuid::ToString,
 				                                       TArray<FString>{"Format"}))
 				.Function("NewGuid", BINDING_FUNCTION(&FGuid::NewGuid))
-#if UE_GUID_PARSE_F_STRING_F_GUID
+#if UE_F_GUID_PARSE_F_STRING_F_GUID
 				.Function("Parse", BINDING_OVERLOAD(bool(*)(const FString&, FGuid&), &FGuid::Parse,
 				                                    TArray<FString>{"GuidString", "OutGuid"}))
 #else
 				.Function("Parse", BINDING_FUNCTION(&FGuid::Parse))
 #endif
-#if UE_GUID_PARSE_EXACT_F_STRING_E_GUID_FORMATS_F_GUID
+#if UE_F_GUID_PARSE_EXACT_F_STRING_E_GUID_FORMATS_F_GUID
 				.Function("ParseExact", BINDING_OVERLOAD(bool(*)(const FString&, EGuidFormats, FGuid& OutGuid),
 				                                         &FGuid::ParseExact,
 				                                         TArray<FString>{"GuidString", "Format", "OutGuid"}))

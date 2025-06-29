@@ -174,7 +174,7 @@ void FDynamicInterfaceGenerator::BeginGenerator(UClass* InClass, UClass* InParen
 
 	InClass->SetSuperStruct(InParentClass);
 
-#if UE_CLASS_ADD_REFERENCED_OBJECTS
+#if UE_U_CLASS_ADD_REFERENCED_OBJECTS
 	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
 
