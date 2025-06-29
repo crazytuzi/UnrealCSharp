@@ -2,7 +2,6 @@
 
 #if WITH_EDITOR
 #include "Dynamic/DynamicBlueprintExtension.h"
-#endif
 #include "UEVersion.h"
 
 class FDynamicBlueprintExtensionScope
@@ -47,7 +46,8 @@ public:
 	}
 
 private:
-	UBlueprint* Blueprint = nullptr;
+	UBlueprint* Blueprint{};
 
-	UDynamicBlueprintExtension* DynamicBlueprintExtension = nullptr;
+	UDynamicBlueprintExtension* DynamicBlueprintExtension{};
 };
+#endif
