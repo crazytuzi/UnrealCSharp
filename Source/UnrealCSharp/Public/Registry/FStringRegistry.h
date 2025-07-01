@@ -2,6 +2,7 @@
 
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
+#include "UEVersion.h"
 
 class UNREALCSHARP_API FStringRegistry
 {
@@ -22,6 +23,14 @@ public:
 
 	typedef TStringAddress<FString*> FStringAddress;
 
+#if UE_F_UTF8_STR_PROPERTY
+	typedef TStringAddress<FUtf8String*> FUtf8StringAddress;
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	typedef TStringAddress<FAnsiString*> FAnsiStringAddress;
+#endif
+
 	typedef TStringAddress<FText*> FTextAddress;
 
 	template <typename Address, typename Value>
@@ -35,6 +44,14 @@ public:
 	typedef TStringValueMapping<void*, FNameAddress> FNameMapping;
 
 	typedef TStringValueMapping<void*, FStringAddress> FStringMapping;
+
+#if UE_F_UTF8_STR_PROPERTY
+	typedef TStringValueMapping<void*, FUtf8StringAddress> FUtf8StringMapping;
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	typedef TStringValueMapping<void*, FAnsiStringAddress> FAnsiStringMapping;
+#endif
 
 	typedef TStringValueMapping<void*, FTextAddress> FTextMapping;
 
@@ -66,6 +83,18 @@ private:
 	FStringMapping::FGarbageCollectionHandle2Value StringGarbageCollectionHandle2Address;
 
 	FStringMapping::FAddress2GarbageCollectionHandle StringAddress2GarbageCollectionHandle;
+
+#if UE_F_UTF8_STR_PROPERTY
+	FUtf8StringMapping::FGarbageCollectionHandle2Value Utf8StringGarbageCollectionHandle2Address;
+
+	FUtf8StringMapping::FAddress2GarbageCollectionHandle Utf8StringAddress2GarbageCollectionHandle;
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	FAnsiStringMapping::FGarbageCollectionHandle2Value AnsiStringGarbageCollectionHandle2Address;
+
+	FAnsiStringMapping::FAddress2GarbageCollectionHandle AnsiStringAddress2GarbageCollectionHandle;
+#endif
 
 	FTextMapping::FGarbageCollectionHandle2Value TextGarbageCollectionHandle2Address;
 

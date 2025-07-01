@@ -88,7 +88,7 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 		SNew(SBorder)
 		.Padding(18)
 		.BorderImage(
-#if UE_APP_STYLE_GET_BRUSH
+#if UE_F_APP_STYLE_GET_BRUSH
 			FAppStyle::GetBrush("Docking.Tab.ContentAreaBrush"))
 #else
 			FEditorStyle::GetBrush("Docking.Tab.ContentAreaBrush"))
@@ -147,7 +147,7 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 						SNew(SBorder)
 						.AddMetaData<FTutorialMetaData>(TEXT("AddCodeOptions"))
 						.BorderImage(
-#if UE_APP_STYLE_GET_BRUSH
+#if UE_F_APP_STYLE_GET_BRUSH
 							FAppStyle::GetBrush("ToolPanel.GroupBorder"))
 #else
 							FEditorStyle::GetBrush("ToolPanel.GroupBorder"))
@@ -253,7 +253,7 @@ void SDynamicNewClassDialog::Construct(const FArguments& InArgs)
 						[
 							SNew(SBorder)
 							.BorderImage(
-#if UE_APP_STYLE_GET_BRUSH
+#if UE_F_APP_STYLE_GET_BRUSH
 								FAppStyle::GetBrush("DetailsView.CategoryTop"))
 #else
 								FEditorStyle::GetBrush("DetailsView.CategoryTop"))
@@ -477,7 +477,7 @@ TSharedRef<ITableRow> SDynamicNewClassDialog::MakeParentClassListViewWidget(
 			SNew(STableRow<TSharedPtr<FDynamicNewClassInfo>>, OwnerTable)
 			.Padding(4)
 			.Style(
-#if UE_APP_STYLE_GET
+#if UE_F_APP_STYLE_GET
 				FAppStyle::Get(), "NewClassDialog.ParentClassListView.TableRow")
 #else
 				FEditorStyle::Get(), "NewClassDialog.ParentClassListView.TableRow")

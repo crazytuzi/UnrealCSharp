@@ -238,7 +238,7 @@ void FClassCollector::PopulateClassByAsset()
 		for (const auto& AssetData : AllAssetData)
 		{
 			if (const auto& AssetDataClassName =
-#if UE_ASSET_DATA_GET_ASSET_NAME
+#if UE_F_ASSET_DATA_GET_ASSET_NAME
 					AssetData.AssetClassPath.GetAssetName();
 #else
 					AssetData.AssetClass;

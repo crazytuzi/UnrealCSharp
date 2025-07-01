@@ -34,6 +34,9 @@ public:
 
 	static void GeneratorField(MonoReflectionType* InMonoReflectionType, FDynamicDependencyGraph::FNode& OutNode);
 
+	static void GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoReflectionType* InMonoReflectionType,
+	                           FDynamicDependencyGraph::FNode& OutNode);
+
 	static void GeneratorProperty(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);
 
 	static void GeneratorFunction(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);

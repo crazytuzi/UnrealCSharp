@@ -136,6 +136,28 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(MonoReflectionType* InReflectio
 		}
 	}
 
+#if UE_F_UTF8_STR_PROPERTY
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_UTF8_STRING))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			return EPropertyTypeExtent::Utf8String;
+		}
+	}
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_ANSI_STRING))
+	{
+		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		{
+			return EPropertyTypeExtent::AnsiString;
+		}
+	}
+#endif
+
 	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_TEXT))
 	{
@@ -520,6 +542,22 @@ MonoClass* FTypeBridge::GetMonoClass(const FStrProperty*)
 	return FMonoDomain::Class_From_Name(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_STRING);
 }
+
+#if UE_F_UTF8_STR_PROPERTY
+MonoClass* FTypeBridge::GetMonoClass(const FUtf8StrProperty*)
+{
+	return FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_UTF8_STRING);
+}
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+MonoClass* FTypeBridge::GetMonoClass(const FAnsiStrProperty*)
+{
+	return FMonoDomain::Class_From_Name(
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_F_ANSI_STRING);
+}
+#endif
 
 MonoClass* FTypeBridge::GetMonoClass(const FTextProperty*)
 {

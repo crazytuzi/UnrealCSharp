@@ -528,6 +528,22 @@ struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FStrin
 {
 };
 
+#if UE_F_UTF8_STR_PROPERTY
+template <typename T>
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FUtf8String>, T>> :
+	TStringPropertyValue<T>
+{
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <typename T>
+struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FAnsiString>, T>> :
+	TStringPropertyValue<T>
+{
+};
+#endif
+
 template <typename T>
 struct TPropertyValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>> :
 	TStringPropertyValue<T>

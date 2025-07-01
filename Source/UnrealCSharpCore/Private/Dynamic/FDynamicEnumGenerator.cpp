@@ -9,6 +9,7 @@
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
+#include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #endif
 #include "UEVersion.h"
 
@@ -256,6 +257,8 @@ void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 	{
 		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
+			FDynamicBlueprintExtensionScope DynamicBlueprintExtensionScope(Blueprint);
+
 			Blueprint->Modify();
 
 			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);

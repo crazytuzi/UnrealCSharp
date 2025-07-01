@@ -6,6 +6,9 @@
 #if UE_F_NAME_PERMISSION_LIST
 #include "Misc/NamePermissionList.h"
 #endif
+#if UE_I_COLLECTION_MANAGER_GET_PROJECT_COLLECTION_CONTAINER
+#include "ICollectionContainer.h"
+#endif
 #include "ContentBrowserDataMenuContexts.h"
 #include "ToolMenuDelegates.h"
 #include "ToolMenus.h"
@@ -289,9 +292,14 @@ void UDynamicDataSource::CompileFilter(const FName InPath, const FContentBrowser
 				TArray<FName> ClassPathsForCollections;
 #endif
 
-				if (GetClassPaths(DataCollectionFilter->SelectedCollections,
-				                  DataCollectionFilter->bIncludeChildCollections,
-				                  ClassPathsForCollections) &&
+				if (GetClassPaths(
+#if UE_F_COLLECTION_REF
+						DataCollectionFilter->Collections,
+#else
+						DataCollectionFilter->SelectedCollections,
+#endif
+						DataCollectionFilter->bIncludeChildCollections,
+						ClassPathsForCollections) &&
 					ClassPathsForCollections.IsEmpty())
 				{
 					return;
@@ -539,7 +547,7 @@ bool UDynamicDataSource::TryGetCollectionId(const FContentBrowserItemData& InIte
 {
 	if (const auto FileItemPayload = GetFileItemDataPayload(InItem))
 	{
-#if UE_ASSET_DATA_GET_SOFT_OBJECT_PATH
+#if UE_F_ASSET_DATA_GET_SOFT_OBJECT_PATH
 		OutCollectionId = FSoftObjectPath(FileItemPayload->GetAssetData().GetSoftObjectPath());
 #else
 		OutCollectionId = FileItemPayload->GetAssetData().ObjectPath;
@@ -584,7 +592,7 @@ bool UDynamicDataSource::Legacy_TryConvertAssetDataToVirtualPath(const FAssetDat
                                                                  const bool InUseFolderPaths, FName& OutPath)
 {
 	return TryConvertInternalPathToVirtual(
-#if UE_ASSET_DATA_GET_SOFT_OBJECT_PATH
+#if UE_F_ASSET_DATA_GET_SOFT_OBJECT_PATH
 		InUseFolderPaths ? InAssetData.PackagePath : *InAssetData.GetSoftObjectPath().ToString(),
 #else
 		InUseFolderPaths ? InAssetData.PackagePath : InAssetData.ObjectPath,
@@ -752,13 +760,19 @@ FContentBrowserItemData UDynamicDataSource::CreateFileItem(UClass* InClass)
 	);
 }
 
-bool UDynamicDataSource::GetClassPaths(const TArrayView<const FCollectionNameType>& InCollections,
-                                       const bool bIncludeChildCollections,
-#if UE_F_TOP_LEVEL_ASSET_PATH
-                                       TArray<FTopLevelAssetPath>& OutClassPaths) const
+bool UDynamicDataSource::GetClassPaths(
+#if UE_F_COLLECTION_REF
+	const TArrayView<const FCollectionRef>& InCollections,
 #else
-                                       TArray<FName>& OutClassPaths) const
+	const TArrayView<const FCollectionNameType>& InCollections,
 #endif
+	const bool bIncludeChildCollections,
+#if UE_F_TOP_LEVEL_ASSET_PATH
+	TArray<FTopLevelAssetPath>& OutClassPaths
+#else
+	TArray<FName>& OutClassPaths
+#endif
+) const
 {
 	if (!InCollections.IsEmpty())
 	{
@@ -766,10 +780,18 @@ bool UDynamicDataSource::GetClassPaths(const TArrayView<const FCollectionNameTyp
 			                                      ? ECollectionRecursionFlags::SelfAndChildren
 			                                      : ECollectionRecursionFlags::Self;
 
+#if UE_I_COLLECTION_MANAGER_GET_PROJECT_COLLECTION_CONTAINER
+		for (const auto& [PLACEHOLDER, Name, Type] : InCollections)
+		{
+			CollectionManager->GetProjectCollectionContainer()->GetClassesInCollection(
+				Name, Type, OutClassPaths, CollectionRecursionFlags);
+		}
+#else
 		for (const auto& [Name, Type] : InCollections)
 		{
 			CollectionManager->GetClassesInCollection(Name, Type, OutClassPaths, CollectionRecursionFlags);
 		}
+#endif
 
 		return true;
 	}

@@ -20,7 +20,7 @@ struct FDynamicClassViewerNode
 	{
 		AssetClassName = FDynamicNewClassUtils::GetAssetGeneratedClassName(InAssetData);
 
-#if UE_ASSET_DATA_GET_OBJECT_PATH_STRING
+#if UE_F_ASSET_DATA_GET_OBJECT_PATH_STRING
 		ObjectPath = InAssetData.GetObjectPathString();
 #else
 		ObjectPath = InAssetData.ObjectPath.ToString();

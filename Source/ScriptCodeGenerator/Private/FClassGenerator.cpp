@@ -1036,6 +1036,24 @@ FString FClassGenerator::GetCppFunctionDefaultParam(const UFunction* InFunction,
 		return FString::Printf(TEXT(" = null"));
 	}
 
+#if	UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+#endif
+
+#if	UE_F_ANSI_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+#endif
+
 	if (CastField<FTextProperty>(InProperty))
 	{
 		// @TODO
@@ -1176,6 +1194,24 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 
 		return FString::Printf(TEXT(" = null"));
 	}
+
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(InProperty))
+	{
+		// @TODO
+
+		return FString::Printf(TEXT(" = null"));
+	}
+#endif
 
 	if (CastField<FTextProperty>(InProperty))
 	{
@@ -1369,6 +1405,30 @@ FString FClassGenerator::GeneratorFunctionDefaultParam(FProperty* InProperty, co
 		                       *InMetaData
 		);
 	}
+
+#if UE_F_UTF8_STR_PROPERTY
+	if (CastField<FUtf8StrProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(
+			"\t\t\t\t%s \?\?= new FUtf8String(\"%s\");\n\n"
+		),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
+		                       *InMetaData
+		);
+	}
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+	if (CastField<FAnsiStrProperty>(InProperty))
+	{
+		return FString::Printf(TEXT(
+			"\t\t\t\t%s \?\?= new FAnsiString(\"%s\");\n\n"
+		),
+		                       *FUnrealCSharpFunctionLibrary::Encode(InProperty),
+		                       *InMetaData
+		);
+	}
+#endif
 
 	if (CastField<FTextProperty>(InProperty))
 	{

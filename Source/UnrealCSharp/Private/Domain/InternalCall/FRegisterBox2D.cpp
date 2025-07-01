@@ -31,7 +31,7 @@ namespace
 				                                                            TArray<FString>{"Point"}))
 				.Function("ExpandBy", BINDING_OVERLOAD(FBox2D(FBox2D::*)(const FBox2D::FReal)const, &FBox2D::ExpandBy,
 				                                       TArray<FString>{"W"}))
-#if UE_BOX_2D_EXPAND_BY_VECTOR2
+#if UE_F_BOX_2D_EXPAND_BY_VECTOR2
 				.Function("ExpandBy", BINDING_OVERLOAD(FBox2D(FBox2D::*)(const FVector2D&)const, &FBox2D::ExpandBy,
 				                                       TArray<FString>{"V"}))
 #endif

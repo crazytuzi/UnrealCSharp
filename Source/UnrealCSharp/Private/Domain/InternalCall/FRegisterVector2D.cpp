@@ -71,16 +71,16 @@ namespace
 				.Minus()
 				.Multiplies()
 				.Divides()
-#if UE_VECTOR2_LESS
+#if UE_F_VECTOR2_LESS
 				.Less()
 #endif
-#if UE_VECTOR2_GREATER
+#if UE_F_VECTOR2_GREATER
 				.Greater()
 #endif
-#if UE_VECTOR2_LESS_EQUAL
+#if UE_F_VECTOR2_LESS_EQUAL
 				.LessEqual()
 #endif
-#if UE_VECTOR2_GREATER_EQUAL
+#if UE_F_VECTOR2_GREATER_EQUAL
 				.GreaterEqual()
 #endif
 				.UnaryMinus()
@@ -107,16 +107,16 @@ namespace
 				.Function("One", BINDING_FUNCTION(&FVector2D::One))
 				.Function("UnitX", BINDING_FUNCTION(&FVector2D::UnitX))
 				.Function("UnitY", BINDING_FUNCTION(&FVector2D::UnitY))
-#if UE_VECTOR2_COMPONENT_WISE_ALL_LESS_THAN
+#if UE_F_VECTOR2_COMPONENT_WISE_ALL_LESS_THAN
 				.Function("ComponentwiseAllLessThan", BINDING_FUNCTION(&FVector2D::ComponentwiseAllLessThan))
 #endif
-#if UE_VECTOR2_COMPONENT_WISE_ALL_GREATER_THAN
+#if UE_F_VECTOR2_COMPONENT_WISE_ALL_GREATER_THAN
 				.Function("ComponentwiseAllGreaterThan", BINDING_FUNCTION(&FVector2D::ComponentwiseAllGreaterThan))
 #endif
-#if UE_VECTOR2_COMPONENT_WISE_ALL_LESS_OR_EQUAL
+#if UE_F_VECTOR2_COMPONENT_WISE_ALL_LESS_OR_EQUAL
 				.Function("ComponentwiseAllLessOrEqual", BINDING_FUNCTION(&FVector2D::ComponentwiseAllLessOrEqual))
 #endif
-#if UE_VECTOR2_COMPONENT_WISE_ALL_GREATER_OR_EQUAL
+#if UE_F_VECTOR2_COMPONENT_WISE_ALL_GREATER_OR_EQUAL
 				.Function("ComponentwiseAllGreaterOrEqual", BINDING_FUNCTION(&FVector2D::ComponentwiseAllGreaterOrEqual))
 #endif
 				.Function("Component", BINDING_OVERLOAD(FVector2D::FReal(FVector2D::*)(int32)const,

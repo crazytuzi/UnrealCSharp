@@ -147,6 +147,24 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FString>
 	using TCompoundReturnValue<T>::TCompoundReturnValue;
 };
 
+#if UE_F_UTF8_STR_PROPERTY
+template <typename T>
+struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FUtf8String>>> :
+	TCompoundReturnValue<T>
+{
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
+};
+#endif
+
+#if UE_F_ANSI_STR_PROPERTY
+template <typename T>
+struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FAnsiString>>> :
+	TCompoundReturnValue<T>
+{
+	using TCompoundReturnValue<T>::TCompoundReturnValue;
+};
+#endif
+
 template <typename T>
 struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>>> :
 	TCompoundReturnValue<T>

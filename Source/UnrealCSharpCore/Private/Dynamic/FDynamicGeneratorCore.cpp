@@ -287,6 +287,13 @@ void FDynamicGeneratorCore::Generator()
 void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionType,
                                            FDynamicDependencyGraph::FNode& OutNode)
 {
+	GeneratorField(nullptr, InMonoReflectionType, OutNode);
+}
+
+void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrInfo,
+                                           MonoReflectionType* InMonoReflectionType,
+                                           FDynamicDependencyGraph::FNode& OutNode)
+{
 	const auto InMonoType = FMonoDomain::Reflection_Type_Get_Type(
 		FTypeBridge::GetType(InMonoReflectionType));
 
@@ -299,7 +306,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 
 			return;
 		}
@@ -314,7 +321,11 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 		{
 			if (ClassHasAttr(InMonoClass, CLASS_U_CLASS_ATTRIBUTE))
 			{
-				OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, true});
+				const auto bIsSoftReference =
+					!(AttrsHasAttr(InMonoCustomAttrInfo, CLASS_DEFAULT_SUB_OBJECT_ATTRIBUTE) ||
+						AttrsHasAttr(InMonoCustomAttrInfo, CLASS_ROOT_COMPONENT_ATTRIBUTE));
+
+				OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, bIsSoftReference});
 			}
 
 			return;
@@ -326,7 +337,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 
 			return;
 		}
@@ -358,7 +369,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 
 			return;
 		}
@@ -369,7 +380,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 
 			return;
 		}
@@ -380,7 +391,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 
 			return;
 		}
@@ -391,7 +402,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 
 			return;
 		}
@@ -402,9 +413,9 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType, 1), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType, 1), OutNode);
 
 			return;
 		}
@@ -415,7 +426,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 
 			return;
 		}
@@ -426,7 +437,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionT
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			GeneratorField(FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
+			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
 		}
 	}
 }
@@ -453,7 +464,7 @@ void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, FDynamicDe
 
 				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
 
-				GeneratorField(ReflectionType, OutNode);
+				GeneratorField(Attrs, ReflectionType, OutNode);
 			}
 		}
 	}

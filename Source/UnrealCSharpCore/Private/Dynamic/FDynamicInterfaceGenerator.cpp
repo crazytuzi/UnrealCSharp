@@ -9,6 +9,7 @@
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Kismet2/BlueprintEditorUtils.h"
+#include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #endif
 #include "UEVersion.h"
 
@@ -173,7 +174,7 @@ void FDynamicInterfaceGenerator::BeginGenerator(UClass* InClass, UClass* InParen
 
 	InClass->SetSuperStruct(InParentClass);
 
-#if UE_CLASS_ADD_REFERENCED_OBJECTS
+#if UE_U_CLASS_ADD_REFERENCED_OBJECTS
 	InClass->ClassAddReferencedObjects = InParentClass->ClassAddReferencedObjects;
 #endif
 
@@ -199,13 +200,9 @@ void FDynamicInterfaceGenerator::EndGenerator(UClass* InClass)
 
 	InClass->AssembleReferenceTokenStream();
 
-	InClass->ClassDefaultObject = StaticAllocateObject(InClass, InClass->GetOuter(),
-	                                                   *InClass->GetDefaultObjectName().ToString(),
-	                                                   RF_Public | RF_ClassDefaultObject | RF_ArchetypeObject,
-	                                                   EInternalObjectFlags::None,
-	                                                   false);
+	FUnrealCSharpFunctionLibrary::SetClassDefaultObject(InClass);
 
-	(*InClass->ClassConstructor)(FObjectInitializer(InClass->ClassDefaultObject,
+	(*InClass->ClassConstructor)(FObjectInitializer(InClass->GetDefaultObject(false),
 	                                                InClass->GetSuperClass()->GetDefaultObject(),
 	                                                EObjectInitializerOptions::None));
 
@@ -224,13 +221,13 @@ void FDynamicInterfaceGenerator::EndGenerator(UClass* InClass)
 
 #if UE_NOTIFY_REGISTRATION_EVENT
 #if !WITH_EDITOR
-	NotifyRegistrationEvent(*InClass->ClassDefaultObject->GetPackage()->GetName(),
-							*InClass->ClassDefaultObject->GetName(),
+	NotifyRegistrationEvent(*InClass->GetDefaultObject(false)->GetPackage()->GetName(),
+							*InClass->GetDefaultObject(false)->GetName(),
 							ENotifyRegistrationType::NRT_ClassCDO,
 							ENotifyRegistrationPhase::NRP_Finished,
 							nullptr,
 							false,
-							InClass->ClassDefaultObject);
+							InClass->GetDefaultObject(false));
 
 
 	NotifyRegistrationEvent(*InClass->GetPackage()->GetName(),
@@ -311,6 +308,8 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 	{
 		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
+			FDynamicBlueprintExtensionScope DynamicBlueprintExtensionScope(Blueprint);
+
 			Blueprint->Modify();
 
 			FBlueprintEditorUtils::RefreshAllNodes(Blueprint);

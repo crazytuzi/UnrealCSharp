@@ -10,27 +10,19 @@ namespace
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InBuffer, MonoString* InTextNamespace,
 		                                   MonoString* InPackageNamespace, const bool bRequiresQuotes)
 		{
-			const auto Buffer = InBuffer != nullptr
-				                    ? UTF8_TO_TCHAR(
-					                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
-						                    InBuffer))
-				                    : nullptr;
+			const auto Buffer = StringCast<TCHAR>(
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InBuffer));
 
-			const auto TextNamespace = InTextNamespace != nullptr
-				                           ? UTF8_TO_TCHAR(
-					                           FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
-						                           InTextNamespace))
-				                           : nullptr;
+			const auto TextNamespace = StringCast<TCHAR>(
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InTextNamespace));
 
-			const auto PackageNamespace = InPackageNamespace != nullptr
-				                              ? UTF8_TO_TCHAR(
-					                              FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
-						                              InPackageNamespace))
-				                              : nullptr;
+			const auto PackageNamespace = StringCast<TCHAR>(
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InPackageNamespace));
 
 			const auto OutText = new FText();
 
-			FTextStringHelper::ReadFromBuffer(Buffer, *OutText, TextNamespace, PackageNamespace, bRequiresQuotes);
+			FTextStringHelper::ReadFromBuffer(Buffer.Get(), *OutText, TextNamespace.Get(), PackageNamespace.Get(),
+			                                  bRequiresQuotes);
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(InMonoObject, OutText);
 		}

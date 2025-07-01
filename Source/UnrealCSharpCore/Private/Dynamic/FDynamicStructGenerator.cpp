@@ -11,6 +11,7 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "BlueprintActionDatabase.h"
+#include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #endif
 #include "UEVersion.h"
 
@@ -318,6 +319,8 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 	{
 		if (const auto Blueprint = Cast<UBlueprint>(BlueprintGeneratedClass->ClassGeneratedBy))
 		{
+			FDynamicBlueprintExtensionScope DynamicBlueprintExtensionScope(Blueprint);
+
 			auto bIsRefresh = false;
 
 			TArray<UK2Node*> AllNodes;
@@ -351,15 +354,11 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 				}
 			}
 
-			for (const auto& Variable : Blueprint->NewVariables)
+			for (auto& Variable : Blueprint->NewVariables)
 			{
 				if (Variable.VarType.PinSubCategoryObject == InOldScriptStruct)
 				{
-					auto NewVarType = Variable.VarType;
-
-					NewVarType.PinSubCategoryObject = InNewScriptStruct;
-
-					FBlueprintEditorUtils::ChangeMemberVariableType(Blueprint, Variable.VarName, NewVarType);
+					Variable.VarType.PinSubCategoryObject = InNewScriptStruct;
 
 					bIsRefresh = true;
 				}

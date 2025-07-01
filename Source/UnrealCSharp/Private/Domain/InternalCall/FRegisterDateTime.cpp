@@ -56,7 +56,7 @@ namespace
 			return &In != nullptr && (&Other != nullptr) ? In + Other : decltype(In + Other)();
 		}
 
-#if UE_DATETIME_PLUS
+#if UE_F_DATETIME_PLUS
 		static FDateTime& PlusImplementation(FDateTime& In, const FDateTime& Other)
 		{
 			return &In != nullptr && (&Other != nullptr) ? In + Other : In;
@@ -86,7 +86,7 @@ namespace
 				.LessEqual()
 				.Function("operator +", FUNCTION_PLUS,
 				          BINDING_OVERLOAD(FDateTime(*)(const FDateTime&, const FTimespan&), &PlusImplementation))
-#if UE_DATETIME_PLUS
+#if UE_F_DATETIME_PLUS
 				.Function("operator +", FUNCTION_PLUS,
 				          BINDING_OVERLOAD(FDateTime&(*)(FDateTime&, const FDateTime&), &PlusImplementation))
 #endif
