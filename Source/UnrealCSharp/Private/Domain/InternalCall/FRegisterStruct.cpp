@@ -9,20 +9,30 @@ namespace
 	{
 		static MonoObject* StaticStructImplementation(MonoString* InStructName)
 		{
-			const auto StructName = StringCast<TCHAR>(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
+			const TCHAR* StructName{};
 
-			const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName.Get());
+			if (InStructName != nullptr)
+			{
+				StructName = UTF8_TO_TCHAR(
+					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
+			}
+
+			const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName);
 
 			return FCSharpEnvironment::GetEnvironment().Bind(InStruct);
 		}
 
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InStructName)
 		{
-			const auto StructName = StringCast<TCHAR>(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
+			const TCHAR* StructName{};
 
-			FCSharpEnvironment::GetEnvironment().Bind(InMonoObject, StructName.Get());
+			if (InStructName != nullptr)
+			{
+				StructName = UTF8_TO_TCHAR(
+					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
+			}
+
+			FCSharpEnvironment::GetEnvironment().Bind(InMonoObject, StructName);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InScriptStruct,

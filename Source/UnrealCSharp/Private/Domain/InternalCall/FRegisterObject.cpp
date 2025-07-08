@@ -23,10 +23,15 @@ namespace
 
 		static MonoObject* StaticClassImplementation(MonoString* InClassName)
 		{
-			const auto ClassName = StringCast<TCHAR>(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InClassName));
+			const TCHAR* ClassName{};
 
-			const auto InClass = LoadObject<UClass>(nullptr, ClassName.Get());
+			if (InClassName != nullptr)
+			{
+				ClassName = UTF8_TO_TCHAR(
+					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InClassName));
+			}
+
+			const auto InClass = LoadObject<UClass>(nullptr, ClassName);
 
 			return FCSharpEnvironment::GetEnvironment().Bind(InClass);
 		}
