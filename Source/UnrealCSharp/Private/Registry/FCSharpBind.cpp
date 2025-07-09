@@ -225,7 +225,7 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 
 			for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::IncludeSuper,
 			                                  EFieldIteratorFlags::ExcludeDeprecated,
-			                                  EFieldIteratorFlags::ExcludeInterfaces); It; ++It)
+			                                  EFieldIteratorFlags::IncludeInterfaces); It; ++It)
 			{
 				if (auto Function = *It)
 				{
