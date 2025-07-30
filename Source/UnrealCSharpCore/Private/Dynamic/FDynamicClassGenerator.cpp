@@ -12,7 +12,6 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Engine/SimpleConstructionScript.h"
 #include "Engine/InheritableComponentHandler.h"
-#include "AssetRegistry/AssetRegistryModule.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetReinstanceUtilities.h"
 #include "Dynamic/FDynamicGenerator.h"
