@@ -232,14 +232,6 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass,
 	{
 		ReInstance(OldClass, Class);
 	}
-
-	if (InDynamicClassGeneratorType == EDynamicClassGeneratorType::FileChange)
-	{
-		if (const auto AssetRegistryModule = FModuleManager::GetModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
-		{
-			AssetRegistryModule->Get().OnFilesLoaded().Broadcast();
-		}
-	}
 #endif
 
 	FDynamicGeneratorCore::Completed(ClassName);
