@@ -1,7 +1,10 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/CompilerMacro.h"
 #include "Async/Async.h"
+
+PRAGMA_DISABLE_DANGLING_WARNINGS
 
 namespace
 {
@@ -10,29 +13,23 @@ namespace
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InBuffer, MonoString* InTextNamespace,
 		                                   MonoString* InPackageNamespace, const bool bRequiresQuotes)
 		{
-			const TCHAR* Buffer{};
+			const auto Buffer = InBuffer != nullptr
+				                    ? UTF8_TO_TCHAR(
+					                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                    InBuffer))
+				                    : nullptr;
 
-			if (InBuffer != nullptr)
-			{
-				Buffer = UTF8_TO_TCHAR(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InBuffer));
-			}
+			const auto TextNamespace = InTextNamespace != nullptr
+				                           ? UTF8_TO_TCHAR(
+					                           FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                           InTextNamespace))
+				                           : nullptr;
 
-			const TCHAR* TextNamespace{};
-
-			if (InTextNamespace != nullptr)
-			{
-				TextNamespace = UTF8_TO_TCHAR(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InTextNamespace));
-			}
-
-			const TCHAR* PackageNamespace{};
-
-			if (InPackageNamespace != nullptr)
-			{
-				PackageNamespace = UTF8_TO_TCHAR(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InPackageNamespace));
-			}
+			const auto PackageNamespace = InPackageNamespace != nullptr
+				                              ? UTF8_TO_TCHAR(
+					                              FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                              InPackageNamespace))
+				                              : nullptr;
 
 			const auto OutText = new FText();
 
@@ -81,3 +78,5 @@ namespace
 
 	[[maybe_unused]] FRegisterText RegisterText;
 }
+
+PRAGMA_ENABLE_DANGLING_WARNINGS

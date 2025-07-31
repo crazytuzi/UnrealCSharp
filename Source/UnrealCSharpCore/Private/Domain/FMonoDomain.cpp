@@ -5,6 +5,7 @@
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/MonoMacro.h"
+#include "CoreMacro/CompilerMacro.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -18,6 +19,8 @@
 #include "Setting/UnrealCSharpSetting.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "DotnetVersion.h"
+
+PRAGMA_DISABLE_DANGLING_WARNINGS
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
@@ -77,17 +80,9 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 				                                    UnrealCSharpSetting->GetPort()
 				);
 
-				char* Option1{};
-
-				Option1 = TCHAR_TO_ANSI(TEXT("--soft-breakpoints"));
-
-				char* Option2{};
-
-				Option2 = TCHAR_TO_ANSI(*Config);
-
 				char* Options[] = {
-					Option1,
-					Option2
+					TCHAR_TO_ANSI(TEXT("--soft-breakpoints")),
+					TCHAR_TO_ANSI(*Config)
 				};
 
 				mono_jit_parse_options(sizeof(Options) / sizeof(char*), Options);
@@ -1063,3 +1058,5 @@ void FMonoDomain::RegisterBinding()
 		}
 	}
 }
+
+PRAGMA_ENABLE_DANGLING_WARNINGS

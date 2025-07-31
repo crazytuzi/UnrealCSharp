@@ -1,7 +1,10 @@
 ﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/CompilerMacro.h"
 #include "Async/Async.h"
+
+PRAGMA_DISABLE_DANGLING_WARNINGS
 
 namespace
 {
@@ -9,13 +12,8 @@ namespace
 	{
 		static MonoObject* StaticStructImplementation(MonoString* InStructName)
 		{
-			const TCHAR* StructName{};
-
-			if (InStructName != nullptr)
-			{
-				StructName = UTF8_TO_TCHAR(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
-			}
+			const auto StructName = UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
 
 			const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName);
 
@@ -24,13 +22,8 @@ namespace
 
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InStructName)
 		{
-			const TCHAR* StructName{};
-
-			if (InStructName != nullptr)
-			{
-				StructName = UTF8_TO_TCHAR(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
-			}
+			const auto StructName = UTF8_TO_TCHAR(
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InStructName));
 
 			FCSharpEnvironment::GetEnvironment().Bind(InMonoObject, StructName);
 		}
@@ -74,3 +67,5 @@ namespace
 
 	[[maybe_unused]] FRegisterStruct RegisterStruct;
 }
+
+PRAGMA_ENABLE_DANGLING_WARNINGS

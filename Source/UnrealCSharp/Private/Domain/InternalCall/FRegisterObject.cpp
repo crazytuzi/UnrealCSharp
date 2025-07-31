@@ -2,7 +2,10 @@
 #include "Binding/Core/TPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/CompilerMacro.h"
 #include "Macro/BindingMacro.h"
+
+PRAGMA_DISABLE_DANGLING_WARNINGS
 
 namespace
 {
@@ -23,13 +26,8 @@ namespace
 
 		static MonoObject* StaticClassImplementation(MonoString* InClassName)
 		{
-			const TCHAR* ClassName{};
-
-			if (InClassName != nullptr)
-			{
-				ClassName = UTF8_TO_TCHAR(
-					FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InClassName));
-			}
+			const auto ClassName =
+				UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InClassName));
 
 			const auto InClass = LoadObject<UClass>(nullptr, ClassName);
 
@@ -106,3 +104,5 @@ namespace
 
 	[[maybe_unused]] FRegisterObject RegisterObject;
 }
+
+PRAGMA_ENABLE_DANGLING_WARNINGS
