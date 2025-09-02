@@ -46,16 +46,21 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	Delegate.Add({NameSpaceContent, ClassContent});
 
-	FString SuperClassContent;
-
-	FString BindFunctionContent;
+	FString DelegateDeclarationContent;
 
 	FString ExecuteFunctionContent;
 
-	FString DelegateDeclarationContent;
+	FString BindFunctionContent;
+
+	FString IsBoundFunctionContent;
+
+	FString UnbindFunctionContent;
+
+	FString ClearFunctionContent;
+
+	FString GCHandleContent;
 
 	TSet<FString> UsingNameSpaces{
-		NAMESPACE_SYSTEM,
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
 	};
@@ -73,7 +78,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => FDelegateImplementation.FDelegate_UnRegisterImplementation(%s);\n"
+		"\n\t\t~%s() => FDelegateImplementation.FDelegate_UnRegisterImplementation(%s);\n\n"
 	),
 	                                               *ClassContent,
 	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE
@@ -307,87 +312,50 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		"\t\t\t{\n"
 		"%s"
 		"\t\t\t}\n"
-		"\t\t}\n"
+		"\t\t}\n\n"
 	),
 	                                         *ExecuteFunctionDeclaration,
 	                                         *ExecuteFunctionImplementationBody
 	);
 
-	if (!DelegateRefParamIndex.IsEmpty())
-	{
-		SuperClassContent = TEXT("FRefDelegate");
+	DelegateDeclarationContent = FString::Printf(TEXT(
+		"\t\tpublic delegate %s Delegate(%s);\n\n"
+	),
+	                                             *DelegateReturnType,
+	                                             *DelegateDeclarationBody);
 
-		BindFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, InObject.%s, InDelegate);\n"
-		),
-		                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
+	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 
-		DelegateDeclarationContent = FString::Printf(TEXT(
-			"\t\tpublic delegate %s Delegate(%s);\n"
-		),
-		                                             *DelegateReturnType,
-		                                             *DelegateDeclarationBody);
+	BindFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, InObject.%s, InDelegate);\n\n"
+	),
+	                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
-	}
-	else
-	{
-		if (DelegateReturnParam != nullptr)
-		{
-			SuperClassContent = TEXT("FDelegate<Func<");
-		}
-		else
-		{
-			if (!DelegateParams.IsEmpty())
-			{
-				SuperClassContent = TEXT("FDelegate<Action<");
-			}
-			else
-			{
-				SuperClassContent = TEXT("FDelegate<Action");
-			}
-		}
+	UnbindFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic void Unbind() => FDelegateImplementation.FDelegate_UnBindImplementation(%s);\n\n"
+	),
+	                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		for (auto Index = 0; Index < DelegateParams.Num(); ++Index)
-		{
-			SuperClassContent += FString::Printf(TEXT(
-				"%s%s"
-			),
-			                                     Index != 0 ? TEXT(", ") : TEXT(""),
-			                                     *FGeneratorCore::GetPropertyType(DelegateParams[Index]));
-		}
+	ClearFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic void Clear() => FDelegateImplementation.FDelegate_ClearImplementation(%s);\n\n"
+	),
+	                                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		if (DelegateReturnParam != nullptr)
-		{
-			SuperClassContent += !DelegateParams.IsEmpty()
-				                     ? FString::Printf(TEXT(
-					                     ", %s"
-				                     ),
-				                                       *DelegateReturnType)
-				                     : FString::Printf(TEXT(
-					                     "%s"
-				                     ),
-				                                       *DelegateReturnType);
-		}
+	IsBoundFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic bool IsBound() => FDelegateImplementation.FDelegate_IsBoundImplementation(%s);\n\n"
+	),
+	                                         *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		if (DelegateReturnParam != nullptr)
-		{
-			SuperClassContent += TEXT(">>");
-		}
-		else
-		{
-			if (!DelegateParams.IsEmpty())
-			{
-				SuperClassContent += TEXT(">>");
-			}
-			else
-			{
-				SuperClassContent += TEXT(">");
-			}
-		}
-	}
+	GCHandleContent = FString::Printf(TEXT(
+		"\t\tpublic nint %s { get; set; }\n"
+	),
+	                                  *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
 	UsingNameSpaces.Remove(UsingNameSpaceContent);
 
@@ -405,11 +373,12 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
-		"\tpublic class %s : %s\n"
+		"\tpublic class %s : IGarbageCollectionHandle\n"
 		"\t{\n"
 		"%s"
 		"%s"
-		"\n"
+		"%s"
+		"%s"
 		"%s"
 		"%s"
 		"%s"
@@ -421,14 +390,15 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *ClassContent,
-	                               *SuperClassContent,
+	                               *DelegateDeclarationContent,
 	                               *ConstructorContent,
 	                               *DestructorContent,
-	                               *BindFunctionContent,
-	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *ExecuteFunctionContent,
-	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
-	                               *DelegateDeclarationContent
+	                               *BindFunctionContent,
+	                               *UnbindFunctionContent,
+	                               *ClearFunctionContent,
+	                               *IsBoundFunctionContent,
+	                               *GCHandleContent
 	);
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InDelegateProperty), Content);
@@ -456,7 +426,11 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	Delegate.Add({NameSpaceContent, ClassContent});
 
-	FString SuperClassContent;
+	FString DelegateDeclarationContent;
+
+	FString BroadcastFunctionContent;
+
+	FString IsBoundFunctionContent;
 
 	FString ContainsFunctionContent;
 
@@ -466,12 +440,13 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	FString RemoveFunctionContent;
 
-	FString BroadcastFunctionContent;
+	FString RemoveAllFunctionContent;
 
-	FString DelegateDeclarationContent;
+	FString ClearFunctionContent;
+
+	FString GCHandleContent;
 
 	TSet<FString> UsingNameSpaces{
-		NAMESPACE_SYSTEM,
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
 	};
@@ -487,7 +462,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => FMulticastDelegateImplementation.FMulticastDelegate_UnRegisterImplementation(%s);\n"
+		"\n\t\t~%s() => FMulticastDelegateImplementation.FMulticastDelegate_UnRegisterImplementation(%s);\n\n"
 	),
 	                                               *ClassContent,
 	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE
@@ -663,80 +638,71 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		"\t\t\t{\n"
 		"%s"
 		"\t\t\t}\n"
-		"\t\t}\n"
+		"\t\t}\n\n"
 	),
 	                                           *BroadcastFunctionDeclaration,
 	                                           *BroadcastFunctionImplementationBody
 	);
 
-	if (!DelegateRefParamIndex.IsEmpty())
-	{
-		SuperClassContent = TEXT("FRefMulticastDelegate");
+	DelegateDeclarationContent = FString::Printf(TEXT(
+		"\t\tpublic delegate void Delegate(%s);\n\n"
+	),
+	                                             *DelegateDeclarationBody);
 
-		ContainsFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic bool Contains(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, InObject.%s, InDelegate);\n"
-		),
-		                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
+	IsBoundFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic bool IsBound() => FMulticastDelegateImplementation.FMulticastDelegate_IsBoundImplementation(%s);\n\n"
+	),
+	                                         *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		AddFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic void Add(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, InObject.%s, InDelegate);\n"
-		),
-		                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
+	ContainsFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic bool Contains(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, InObject.%s, InDelegate);\n\n"
+	),
+	                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		AddUniqueFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic void AddUnique(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, InObject.%s, InDelegate);\n"
-		),
-		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
+	AddFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic void Add(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, InObject.%s, InDelegate);\n\n"
+	),
+	                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		RemoveFunctionContent = FString::Printf(TEXT(
-			"\t\tpublic void Remove(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, InObject.%s, InDelegate);\n"
-		),
-		                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-		                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
+	AddUniqueFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic void AddUnique(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, InObject.%s, InDelegate);\n\n"
+	),
+	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		DelegateDeclarationContent = FString::Printf(TEXT(
-			"\t\tpublic delegate void Delegate(%s);\n"
-		),
-		                                             *DelegateDeclarationBody);
+	RemoveFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic void Remove(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, InObject.%s, InDelegate);\n\n"
+	),
+	                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
-	}
-	else
-	{
-		if (!DelegateParams.IsEmpty())
-		{
-			SuperClassContent = TEXT("FMulticastDelegate<Action<");
-		}
-		else
-		{
-			SuperClassContent = TEXT("FMulticastDelegate<Action");
-		}
+	RemoveAllFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic void RemoveAll(UObject InObject) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveAllImplementation(%s, InObject.%s);\n\n"
+	),
+	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		for (auto Index = 0; Index < DelegateParams.Num(); ++Index)
-		{
-			SuperClassContent += FString::Printf(TEXT(
-				"%s%s"
-			),
-			                                     Index != 0 ? TEXT(", ") : TEXT(""),
-			                                     *FGeneratorCore::GetPropertyType(DelegateParams[Index]));
-		}
+	ClearFunctionContent = FString::Printf(TEXT(
+		"\t\tpublic void Clear() => FMulticastDelegateImplementation.FMulticastDelegate_ClearImplementation(%s);\n\n"
+	),
+	                                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
 
-		if (!DelegateParams.IsEmpty())
-		{
-			SuperClassContent += TEXT(">>");
-		}
-		else
-		{
-			SuperClassContent += TEXT(">");
-		}
-	}
+	GCHandleContent = FString::Printf(TEXT(
+		"\t\tpublic nint %s { get; set; }\n"
+	),
+	                                  *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	);
+
+	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 
 	UsingNameSpaces.Remove(NameSpaceContent);
 
@@ -754,11 +720,9 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
-		"\tpublic class %s : %s\n"
+		"\tpublic class %s : IGarbageCollectionHandle\n"
 		"\t{\n"
 		"%s"
-		"%s"
-		"\n"
 		"%s"
 		"%s"
 		"%s"
@@ -776,20 +740,18 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *ClassContent,
-	                               *SuperClassContent,
+	                               *DelegateDeclarationContent,
 	                               *ConstructorContent,
 	                               *DestructorContent,
-	                               *ContainsFunctionContent,
-	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
-	                               *AddFunctionContent,
-	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
-	                               *AddUniqueFunctionContent,
-	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
-	                               *RemoveFunctionContent,
-	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *BroadcastFunctionContent,
-	                               !DelegateRefParamIndex.IsEmpty() ? TEXT("\n") : TEXT(""),
-	                               *DelegateDeclarationContent
+	                               *IsBoundFunctionContent,
+	                               *ContainsFunctionContent,
+	                               *AddFunctionContent,
+	                               *AddUniqueFunctionContent,
+	                               *RemoveFunctionContent,
+	                               *RemoveAllFunctionContent,
+	                               *ClearFunctionContent,
+	                               *GCHandleContent
 	);
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InMulticastDelegateProperty), Content);
