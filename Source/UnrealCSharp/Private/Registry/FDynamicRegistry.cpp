@@ -1,7 +1,6 @@
 ﻿#include "Registry/FDynamicRegistry.h"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/FunctionMacro.h"
-#include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Dynamic/FDynamicClassGenerator.h"
@@ -78,7 +77,7 @@ void FDynamicRegistry::RegisterDynamic() const
 
 				for (auto Index = 0; Index < Length; ++Index)
 				{
-					const auto ReflectionType = ARRAY_GET(Types, MonoReflectionType*, Index);
+					const auto ReflectionType = FDomain::Array_Get<MonoReflectionType*>(Types, Index);
 
 					const auto Type = FMonoDomain::Reflection_Type_Get_Type(ReflectionType);
 

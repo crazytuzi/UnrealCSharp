@@ -2,7 +2,6 @@
 #include "Dynamic/FDynamicDependencyGraph.h"
 #include "Bridge/FTypeBridge.h"
 #include "CoreMacro/Macro.h"
-#include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/ClassAttributeMacro.h"
 #include "CoreMacro/FunctionMacro.h"
@@ -571,7 +570,7 @@ void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunctio
 
 			for (auto Index = 0; Index < Length; ++Index)
 			{
-				const auto ReflectionType = ARRAY_GET(Types, MonoReflectionType*, Index);
+				const auto ReflectionType = FMonoDomain::Array_Get<MonoReflectionType*>(Types, Index);
 
 				const auto Type = FMonoDomain::Reflection_Type_Get_Type(ReflectionType);
 

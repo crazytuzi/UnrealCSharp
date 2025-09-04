@@ -1,8 +1,7 @@
 ﻿#pragma once
 
-#include "Domain/FMonoDomain.h"
+#include "Domain/FDomain.h"
 #include "Bridge/FTypeBridge.h"
-#include "CoreMacro/MonoMacro.h"
 #include "Binding/TypeInfo/TGeneric.inl"
 #include "Binding/TypeInfo/TName.inl"
 #include "Binding/TypeInfo/TNameSpace.inl"
@@ -302,9 +301,9 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 			FMonoDomain::Get_Object_Class(), 2);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundKeyReflectionType);
+		FDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundKeyReflectionType);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 1, FoundValueReflectionType);
+		FDomain::Array_Set(ReflectionTypeMonoArray, 1, FoundValueReflectionType);
 
 		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, ReflectionTypeMonoArray);
 	}
@@ -330,7 +329,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 			FMonoDomain::Get_Object_Class(), 1);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+		FDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
 		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
@@ -362,7 +361,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 			FMonoDomain::Get_Object_Class(), 1);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+		FDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
 		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
@@ -410,7 +409,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 			FMonoDomain::Get_Object_Class(), 1);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+		FDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
 		return FTypeBridge::GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}

@@ -481,6 +481,11 @@ MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
 	return mono_array_new(Domain, InMonoClass, InNum);
 }
 
+char* FMonoDomain::Array_Addr_With_Size(MonoArray* InArray, const int32 InSize, const uint64 InIndex)
+{
+	return InArray != nullptr ? mono_array_addr_with_size(InArray, InSize, InIndex) : nullptr;
+}
+
 uint64 FMonoDomain::Array_Length(MonoArray* InMonoArray)
 {
 	return InMonoArray != nullptr ? mono_array_length(InMonoArray) : 0u;

@@ -147,6 +147,8 @@ public:
 
 	MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum) const;
 
+	char* Array_Addr_With_Size(MonoArray* InArray, int32 InSize, uint64 InIndex);
+
 	uint64 Array_Length(MonoArray* InMonoArray) const;
 
 	MonoClass* Get_Byte_Class() const;
@@ -217,6 +219,15 @@ public:
 
 	static mono_bool Type_Is_Enum(MonoType* InMonoType);
 
+	template <typename T>
+	static auto Array_Addr(MonoArray* InArray, const uint64 InIndex) -> T;
+
+	template <typename T>
+	static auto Array_Get(MonoArray* InArray, const uint64 InIndex) -> T;
+
+	template <typename T>
+	static auto Array_Set(MonoArray* InArray, const uint64 InIndex, T InValue) -> void;
+
 	SynchronizationContextTickType SynchronizationContextTick;
 
 public:
@@ -226,3 +237,5 @@ public:
 
 	MonoString* GetTraceback() const;
 };
+
+#include "FDomain.inl"
