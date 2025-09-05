@@ -89,6 +89,52 @@ namespace
 			return false;
 		}
 
+		static void AddToRootImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				FoundObject->AddToRoot();
+			}
+		}
+
+		static void RemoveFromRootImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				FoundObject->RemoveFromRoot();
+			}
+		}
+
+		static bool IsRootedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				return FoundObject->IsRooted();
+			}
+
+			return false;
+		}
+
+		static bool AddReferenceImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				return FCSharpEnvironment::GetEnvironment().AddReference(FoundObject);
+			}
+
+			return false;
+		}
+
+		static bool RemoveReferenceImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				return FCSharpEnvironment::GetEnvironment().RemoveReference(FoundObject);
+			}
+
+			return false;
+		}
+
 		FRegisterObject()
 		{
 			TBindingClassBuilder<UObject>(NAMESPACE_LIBRARY)
@@ -98,7 +144,12 @@ namespace
 				.Function("GetName", GetNameImplementation)
 				.Function("GetWorld", BINDING_FUNCTION(&UObject::GetWorld))
 				.Function("IsValid", IsValidImplementation)
-				.Function("IsA", IsAImplementation);
+				.Function("IsA", IsAImplementation)
+				.Function("AddToRoot", AddToRootImplementation)
+				.Function("RemoveFromRoot", RemoveFromRootImplementation)
+				.Function("IsRooted", IsRootedImplementation)
+				.Function("AddReference", AddReferenceImplementation)
+				.Function("RemoveReference", RemoveReferenceImplementation);
 		}
 	};
 

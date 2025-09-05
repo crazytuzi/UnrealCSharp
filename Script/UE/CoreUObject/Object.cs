@@ -25,6 +25,18 @@ namespace Script.CoreUObject
             UObjectImplementation.UObject_IsAImplementation(GarbageCollectionHandle,
                 T.StaticClass().GarbageCollectionHandle);
 
+        public void AddToRoot() => UObjectImplementation.UObject_AddToRootImplementation(GarbageCollectionHandle);
+
+        public void RemoveFromRoot() =>
+            UObjectImplementation.UObject_RemoveFromRootImplementation(GarbageCollectionHandle);
+
+        public bool IsRooted() => UObjectImplementation.UObject_IsRootedImplementation(GarbageCollectionHandle);
+
+        public bool AddReference() => UObjectImplementation.UObject_AddReferenceImplementation(GarbageCollectionHandle);
+
+        public bool RemoveReference() =>
+            UObjectImplementation.UObject_RemoveReferenceImplementation(GarbageCollectionHandle);
+
         public nint GarbageCollectionHandle { get; set; }
     }
 }

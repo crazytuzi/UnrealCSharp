@@ -293,6 +293,10 @@ public:
 
 	bool RemoveReference(const FGarbageCollectionHandle& InOwner) const;
 
+	bool AddReference(UObject* InObject) const;
+
+	bool RemoveReference(UObject* InObject) const;
+
 public:
 	template <typename T>
 	auto GetRegistry();

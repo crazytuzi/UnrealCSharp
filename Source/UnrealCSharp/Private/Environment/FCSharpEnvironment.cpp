@@ -609,6 +609,16 @@ bool FCSharpEnvironment::RemoveReference(const FGarbageCollectionHandle& InOwner
 	return ReferenceRegistry != nullptr ? ReferenceRegistry->RemoveReference(InOwner) : false;
 }
 
+bool FCSharpEnvironment::AddReference(UObject* InObject) const
+{
+	return ReferenceRegistry != nullptr ? ReferenceRegistry->AddReference(InObject) : false;
+}
+
+bool FCSharpEnvironment::RemoveReference(UObject* InObject) const
+{
+	return ReferenceRegistry != nullptr ? ReferenceRegistry->RemoveReference(InObject) : false;
+}
+
 FCSharpBind* FCSharpEnvironment::GetBind() const
 {
 	return CSharpBind;
