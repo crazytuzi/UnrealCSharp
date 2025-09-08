@@ -58,7 +58,7 @@ void UUnrealCSharpEditorSetting::RegisterSettings()
 
 		static TSet<FString> DefaultSupportedAssetPaths =
 		{
-			FApp::GetProjectName()
+			TEXT("/Game")
 		};
 
 		static TSet<TSubclassOf<UObject>> DefaultSupportedAssetClasses =
@@ -78,7 +78,22 @@ void UUnrealCSharpEditorSetting::RegisterSettings()
 
 		for (const auto& DefaultSupportedAssetPath : DefaultSupportedAssetPaths)
 		{
-			MutableDefaultUnrealCSharpEditorSetting->SupportedAssetPath.AddUnique(DefaultSupportedAssetPath);
+			auto bIsUnique = true;
+
+			for (const auto& [Path] : MutableDefaultUnrealCSharpEditorSetting->SupportedAssetPath)
+			{
+				if (DefaultSupportedAssetPath == Path)
+				{
+					bIsUnique = false;
+
+					break;
+				}
+			}
+
+			if (bIsUnique)
+			{
+				MutableDefaultUnrealCSharpEditorSetting->SupportedAssetPath.Add({DefaultSupportedAssetPath});
+			}
 		}
 
 		for (const auto& DefaultSupportedAssetClass : DefaultSupportedAssetClasses)
@@ -298,7 +313,7 @@ bool UUnrealCSharpEditorSetting::IsGenerateAsset() const
 	return bIsGenerateAsset;
 }
 
-const TArray<FString>& UUnrealCSharpEditorSetting::GetSupportedAssetPath() const
+const TArray<FDirectoryPath>& UUnrealCSharpEditorSetting::GetSupportedAssetPath() const
 {
 	return SupportedAssetPath;
 }

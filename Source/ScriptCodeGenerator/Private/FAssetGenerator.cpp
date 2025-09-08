@@ -28,9 +28,16 @@ void FAssetGenerator::Generator()
 			const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(
 				TEXT("AssetRegistry"));
 
+			TArray<FName> AssetPaths;
+
+			for (const auto& [Path] : UnrealCSharpEditorSetting->GetSupportedAssetPath())
+			{
+				AssetPaths.Add(*Path);
+			}
+
 			TArray<FAssetData> OutAssetData;
 
-			AssetRegistryModule.Get().GetAssetsByPaths(FGeneratorCore::GetSupportedAssetPath(), OutAssetData, true);
+			AssetRegistryModule.Get().GetAssetsByPaths(AssetPaths, OutAssetData, true);
 
 			for (const auto& AssetData : OutAssetData)
 			{

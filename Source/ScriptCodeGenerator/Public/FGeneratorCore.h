@@ -36,6 +36,8 @@ public:
 
 	static bool IsSupported(FProperty* Property);
 
+	static bool IsSupported(const UPackage* InPackage);
+
 	static bool IsSupported(const UClass* InClass);
 
 	static bool IsSupported(const UFunction* InFunction);
@@ -44,9 +46,7 @@ public:
 
 	static bool IsSupported(const UEnum* InEnum);
 
-	static bool IsSupportedModule(const FString& InModule);
-
-	static const TArray<FName>& GetSupportedAssetPath();
+	static SCRIPTCODEGENERATOR_API bool IsSupported(const FAssetData& InAssetData);
 
 	static SCRIPTCODEGENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
 
@@ -63,9 +63,7 @@ private:
 
 	static TArray<FString> SupportedModule;
 
-	static TArray<FName> SupportedAssetPath;
-
-	static TArray<FString> SupportedAssetPathNameSpace;
+	static TArray<FString> SupportedAssetPath;
 
 	static TMap<TWeakObjectPtr<const UObject>, bool> SupportedMap;
 
