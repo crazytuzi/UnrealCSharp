@@ -8,6 +8,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Template/TGetArrayLength.inl"
+#include "Template/TFieldIteratorExt.inl"
 #include "Setting/UnrealCSharpSetting.h"
 #include "UEVersion.h"
 
@@ -223,9 +224,9 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 
 			Functions.Empty();
 
-			for (TFieldIterator<UFunction> It(InClass, EFieldIteratorFlags::IncludeSuper,
+			for (TFieldIteratorExt<UFunction> It(InClass, EFieldIteratorFlags::IncludeSuper,
 			                                  EFieldIteratorFlags::ExcludeDeprecated,
-			                                  EFieldIteratorFlags::ExcludeInterfaces); It; ++It)
+			                                  EFieldIteratorFlags::IncludeInterfaces); It; ++It)
 			{
 				if (auto Function = *It)
 				{

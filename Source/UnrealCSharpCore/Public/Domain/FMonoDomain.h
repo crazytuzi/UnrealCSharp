@@ -134,6 +134,8 @@ public:
 
 	static MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum);
 
+	static char* Array_Addr_With_Size(MonoArray* InArray, int32 InSize, uint64 InIndex);
+
 	static uint64 Array_Length(MonoArray* InMonoArray);
 
 	static MonoClass* Get_Byte_Class();
@@ -201,6 +203,15 @@ public:
 
 	static mono_bool Type_Is_Enum(MonoType* InMonoType);
 
+	template <typename T>
+	static auto Array_Addr(MonoArray* InArray, const uint64 InIndex) -> T;
+
+	template <typename T>
+	static auto Array_Get(MonoArray* InArray, const uint64 InIndex) -> T;
+
+	template <typename T>
+	static auto Array_Set(MonoArray* InArray, const uint64 InIndex, T InValue) -> void;
+
 public:
 	static MonoAssembly* AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** OutAssemblyPath,
 	                                         void* InUserData);
@@ -245,3 +256,5 @@ public:
 
 	static bool bLoadSucceed;
 };
+
+#include "FMonoDomain.inl"

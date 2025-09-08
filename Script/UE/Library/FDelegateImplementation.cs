@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Script.CoreUObject;
 
 namespace Script.Library
 {
     public static unsafe class FDelegateImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_RegisterImplementation(FDelegateBase InMonoObject);
+        public static extern void FDelegate_RegisterImplementation(object InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FDelegate_UnRegisterImplementation(nint InMonoObject);

@@ -2,7 +2,6 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/FunctionMacro.h"
-#include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Template/TGetArrayLength.inl"
@@ -517,7 +516,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FArrayProperty* InProperty)
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 			FMonoDomain::Get_Object_Class(), 1);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+		FMonoDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
 		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
@@ -671,9 +670,9 @@ MonoClass* FTypeBridge::GetMonoClass(const FMapProperty* InProperty)
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 			FMonoDomain::Get_Object_Class(), 2);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundKeyReflectionType);
+		FMonoDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundKeyReflectionType);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 1, FoundValueReflectionType);
+		FMonoDomain::Array_Set(ReflectionTypeMonoArray, 1, FoundValueReflectionType);
 
 		return GetMonoClass(FoundGenericMonoClass, ReflectionTypeMonoArray);
 	}
@@ -698,7 +697,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FSetProperty* InProperty)
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 			FMonoDomain::Get_Object_Class(), 1);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+		FMonoDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
 		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
@@ -724,7 +723,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FOptionalProperty* InProperty)
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 			FMonoDomain::Get_Object_Class(), 1);
 
-		ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+		FMonoDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
 		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
 	}
@@ -753,7 +752,7 @@ MonoClass* FTypeBridge::GetMonoClass(MonoClass* InGenericMonoClass, MonoClass* I
 	const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
 		FMonoDomain::Get_Object_Class(), 1);
 
-	ARRAY_SET(ReflectionTypeMonoArray, MonoReflectionType*, 0, FoundReflectionType);
+	FMonoDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
 	InParams[1] = ReflectionTypeMonoArray;
 
@@ -811,24 +810,24 @@ MonoReflectionType* FTypeBridge::GetType(MonoReflectionType* InReflectionType)
 
 MonoReflectionType* FTypeBridge::GetGenericArgument(MonoObject* InMonoObject, const int32 InIndex)
 {
-	return ARRAY_GET(
+	return FMonoDomain::Array_Get<MonoReflectionType*>(
 		GetGenericArguments(FMonoDomain::Object_Get_Class(InMonoObject)),
-		MonoReflectionType*, InIndex);
+		InIndex);
 }
 
 MonoReflectionType* FTypeBridge::GetGenericArgument(MonoClass* InMonoClass, const int32 InIndex)
 {
-	return ARRAY_GET(GetGenericArguments(InMonoClass), MonoReflectionType*, InIndex);
+	return FMonoDomain::Array_Get<MonoReflectionType*>(GetGenericArguments(InMonoClass), InIndex);
 }
 
 MonoReflectionType* FTypeBridge::GetGenericArgument(MonoType* InMonoType, const int32 InIndex)
 {
-	return ARRAY_GET(GetGenericArguments(InMonoType), MonoReflectionType*, InIndex);
+	return FMonoDomain::Array_Get<MonoReflectionType*>(GetGenericArguments(InMonoType), InIndex);
 }
 
 MonoReflectionType* FTypeBridge::GetGenericArgument(MonoReflectionType* InReflectionType, const int32 InIndex)
 {
-	return ARRAY_GET(GetGenericArguments(InReflectionType), MonoReflectionType*, InIndex);
+	return FMonoDomain::Array_Get<MonoReflectionType*>(GetGenericArguments(InReflectionType), InIndex);
 }
 
 MonoArray* FTypeBridge::GetGenericArguments(MonoObject* InMonoObject)

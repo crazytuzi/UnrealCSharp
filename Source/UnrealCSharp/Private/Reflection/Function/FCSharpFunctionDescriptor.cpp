@@ -1,6 +1,5 @@
 ﻿#include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "CoreMacro/MonoMacro.h"
 
 FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(const FString& InMethodName, UFunction* InFunction):
 	Super(InFunction,
@@ -157,7 +156,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 
 		PropertyDescriptors[Index]->Get<std::false_type>(PropertyAddress, &Object);
 
-		ARRAY_SET(CSharpParams, MonoObject*, Index, static_cast<MonoObject*>(Object));
+		FDomain::Array_Set(CSharpParams, Index, static_cast<MonoObject*>(Object));
 	}
 
 	const auto FoundMonoObject = OriginalFunctionFlags & FUNC_Static
@@ -195,7 +194,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 				if (OutPropertyDescriptor->IsPrimitiveProperty())
 				{
 					if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-						Object_Unbox(ARRAY_GET(CSharpParams, MonoObject*, Index)))
+						Object_Unbox(FDomain::Array_Get<MonoObject*>(CSharpParams, Index)))
 					{
 						OutPropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
 					}
@@ -204,7 +203,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 				{
 					OutPropertyDescriptor->Set(
 						FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-							ARRAY_GET(CSharpParams, MonoObject*, Index)),
+							FDomain::Array_Get<MonoObject*>(CSharpParams, Index)),
 						OutParams->PropAddr);
 				}
 			}

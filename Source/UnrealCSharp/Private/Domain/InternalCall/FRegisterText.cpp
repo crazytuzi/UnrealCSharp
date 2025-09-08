@@ -1,7 +1,10 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/CompilerMacro.h"
 #include "Async/Async.h"
+
+PRAGMA_DISABLE_DANGLING_WARNINGS
 
 namespace
 {
@@ -10,19 +13,27 @@ namespace
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InBuffer, MonoString* InTextNamespace,
 		                                   MonoString* InPackageNamespace, const bool bRequiresQuotes)
 		{
-			const auto Buffer = StringCast<TCHAR>(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InBuffer));
+			const auto Buffer = InBuffer != nullptr
+				                    ? UTF8_TO_TCHAR(
+					                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                    InBuffer))
+				                    : nullptr;
 
-			const auto TextNamespace = StringCast<TCHAR>(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InTextNamespace));
+			const auto TextNamespace = InTextNamespace != nullptr
+				                           ? UTF8_TO_TCHAR(
+					                           FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                           InTextNamespace))
+				                           : nullptr;
 
-			const auto PackageNamespace = StringCast<TCHAR>(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InPackageNamespace));
+			const auto PackageNamespace = InPackageNamespace != nullptr
+				                              ? UTF8_TO_TCHAR(
+					                              FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+						                              InPackageNamespace))
+				                              : nullptr;
 
 			const auto OutText = new FText();
 
-			FTextStringHelper::ReadFromBuffer(Buffer.Get(), *OutText, TextNamespace.Get(), PackageNamespace.Get(),
-			                                  bRequiresQuotes);
+			FTextStringHelper::ReadFromBuffer(Buffer, *OutText, TextNamespace, PackageNamespace, bRequiresQuotes);
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(InMonoObject, OutText);
 		}
@@ -67,3 +78,5 @@ namespace
 
 	[[maybe_unused]] FRegisterText RegisterText;
 }
+
+PRAGMA_ENABLE_DANGLING_WARNINGS

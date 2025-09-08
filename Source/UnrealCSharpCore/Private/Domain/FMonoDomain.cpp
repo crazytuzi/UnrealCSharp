@@ -5,6 +5,7 @@
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/MonoMacro.h"
+#include "CoreMacro/CompilerMacro.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
 #include "mono/jit/jit.h"
@@ -18,6 +19,8 @@
 #include "Setting/UnrealCSharpSetting.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "DotnetVersion.h"
+
+PRAGMA_DISABLE_DANGLING_WARNINGS
 
 MonoDomain* FMonoDomain::Domain = nullptr;
 
@@ -77,13 +80,9 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 				                                    UnrealCSharpSetting->GetPort()
 				);
 
-				const auto& Option1 = StringCast<ANSICHAR>(TEXT("--soft-breakpoints"));
-
-				const auto& Option2 = StringCast<ANSICHAR>(*Config);
-
 				char* Options[] = {
-					(ANSICHAR*)Option1.Get(),
-					(ANSICHAR*)Option2.Get()
+					TCHAR_TO_ANSI(TEXT("--soft-breakpoints")),
+					TCHAR_TO_ANSI(*Config)
 				};
 
 				mono_jit_parse_options(sizeof(Options) / sizeof(char*), Options);
@@ -480,6 +479,11 @@ char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
 MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
 {
 	return mono_array_new(Domain, InMonoClass, InNum);
+}
+
+char* FMonoDomain::Array_Addr_With_Size(MonoArray* InArray, const int32 InSize, const uint64 InIndex)
+{
+	return InArray != nullptr ? mono_array_addr_with_size(InArray, InSize, InIndex) : nullptr;
 }
 
 uint64 FMonoDomain::Array_Length(MonoArray* InMonoArray)
@@ -1059,3 +1063,5 @@ void FMonoDomain::RegisterBinding()
 		}
 	}
 }
+
+PRAGMA_ENABLE_DANGLING_WARNINGS

@@ -18,6 +18,18 @@ FReferenceRegistry::~FReferenceRegistry()
 	}
 
 	ReferenceRelationship.Empty();
+
+	ObjectArray.Empty();
+}
+
+void FReferenceRegistry::AddReferencedObjects(FReferenceCollector& Collector)
+{
+	Collector.AddReferencedObjects(ObjectArray);
+}
+
+FString FReferenceRegistry::GetReferencerName() const
+{
+	return TEXT("FReferenceRegistry");
 }
 
 bool FReferenceRegistry::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference)
@@ -45,4 +57,28 @@ bool FReferenceRegistry::RemoveReference(const FGarbageCollectionHandle& InOwner
 	}
 
 	return true;
+}
+
+bool FReferenceRegistry::AddReference(UObject* InObject)
+{
+	if (InObject != nullptr)
+	{
+		ObjectArray.AddUnique(InObject);
+
+		return true;
+	}
+
+	return false;
+}
+
+bool FReferenceRegistry::RemoveReference(UObject* InObject)
+{
+	if (InObject != nullptr)
+	{
+		ObjectArray.Remove(InObject);
+
+		return true;
+	}
+
+	return false;
 }

@@ -2,7 +2,10 @@
 #include "Binding/Core/TPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
+#include "CoreMacro/CompilerMacro.h"
 #include "Macro/BindingMacro.h"
+
+PRAGMA_DISABLE_DANGLING_WARNINGS
 
 namespace
 {
@@ -23,10 +26,10 @@ namespace
 
 		static MonoObject* StaticClassImplementation(MonoString* InClassName)
 		{
-			const auto ClassName = StringCast<TCHAR>(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InClassName));
+			const auto ClassName =
+				UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InClassName));
 
-			const auto InClass = LoadObject<UClass>(nullptr, ClassName.Get());
+			const auto InClass = LoadObject<UClass>(nullptr, ClassName);
 
 			return FCSharpEnvironment::GetEnvironment().Bind(InClass);
 		}
@@ -86,6 +89,52 @@ namespace
 			return false;
 		}
 
+		static void AddToRootImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				FoundObject->AddToRoot();
+			}
+		}
+
+		static void RemoveFromRootImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				FoundObject->RemoveFromRoot();
+			}
+		}
+
+		static bool IsRootedImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				return FoundObject->IsRooted();
+			}
+
+			return false;
+		}
+
+		static bool AddReferenceImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				return FCSharpEnvironment::GetEnvironment().AddReference(FoundObject);
+			}
+
+			return false;
+		}
+
+		static bool RemoveReferenceImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
+		{
+			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
+			{
+				return FCSharpEnvironment::GetEnvironment().RemoveReference(FoundObject);
+			}
+
+			return false;
+		}
+
 		FRegisterObject()
 		{
 			TBindingClassBuilder<UObject>(NAMESPACE_LIBRARY)
@@ -95,9 +144,16 @@ namespace
 				.Function("GetName", GetNameImplementation)
 				.Function("GetWorld", BINDING_FUNCTION(&UObject::GetWorld))
 				.Function("IsValid", IsValidImplementation)
-				.Function("IsA", IsAImplementation);
+				.Function("IsA", IsAImplementation)
+				.Function("AddToRoot", AddToRootImplementation)
+				.Function("RemoveFromRoot", RemoveFromRootImplementation)
+				.Function("IsRooted", IsRootedImplementation)
+				.Function("AddReference", AddReferenceImplementation)
+				.Function("RemoveReference", RemoveReferenceImplementation);
 		}
 	};
 
 	[[maybe_unused]] FRegisterObject RegisterObject;
 }
+
+PRAGMA_ENABLE_DANGLING_WARNINGS
