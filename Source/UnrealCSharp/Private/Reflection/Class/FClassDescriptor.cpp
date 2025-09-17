@@ -1,6 +1,5 @@
 ﻿#include "Reflection/Class/FClassDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Reflection/Function/FUnrealFunctionDescriptor.h"
 
 FClassDescriptor::FClassDescriptor(UStruct* InStruct, MonoClass* InBindMonoClass):
 	Struct(InStruct),
@@ -57,47 +56,12 @@ MonoClass* FClassDescriptor::GetMonoClass() const
 	return BindMonoClass;
 }
 
-FFunctionDescriptor* FClassDescriptor::AddFunctionDescriptor(const FString& InFunctionName)
-{
-	if (auto InClass = Cast<UClass>(Struct))
-	{
-		while (InClass != nullptr)
-		{
-			if (const auto FoundFunction = InClass->
-				FindFunctionByName(*InFunctionName, EIncludeSuperFlag::ExcludeSuper))
-			{
-				const auto NewFunctionDescriptor = new FUnrealFunctionDescriptor(FoundFunction);
-
-				FunctionHashSet.Add(GetTypeHash(FoundFunction));
-
-				return NewFunctionDescriptor;
-			}
-
-			for (const auto& Interface : InClass->Interfaces)
-			{
-				if (const auto FoundFunction = Interface.Class->FindFunctionByName(
-					*InFunctionName, EIncludeSuperFlag::IncludeSuper))
-				{
-					const auto NewFunctionDescriptor = new FUnrealFunctionDescriptor(FoundFunction);
-
-					FunctionHashSet.Add(GetTypeHash(FoundFunction));
-
-					return NewFunctionDescriptor;
-				}
-			}
-
-			InClass = InClass->GetSuperClass();
-		}
-	}
-
-	return nullptr;
-}
-
-FFunctionDescriptor* FClassDescriptor::GetOrAddFunctionDescriptor(const FString& InFunctionName)
+FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FString& InFunctionName)
 {
 	for (const auto FunctionHash : FunctionHashSet)
 	{
-		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor(FunctionHash))
+		if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetFunctionDescriptor<
+			FCSharpFunctionDescriptor>(FunctionHash))
 		{
 			if (FunctionDescriptor->GetName() == InFunctionName)
 			{
@@ -106,16 +70,16 @@ FFunctionDescriptor* FClassDescriptor::GetOrAddFunctionDescriptor(const FString&
 		}
 	}
 
-	return AddFunctionDescriptor(InFunctionName);
+	return nullptr;
 }
 
-FPropertyDescriptor* FClassDescriptor::AddPropertyDescriptor(const FString& InPropertyName)
+FPropertyDescriptor* FClassDescriptor::AddPropertyDescriptor(FProperty* InProperty)
 {
-	if (const auto FoundProperty = Struct->FindPropertyByName(*InPropertyName))
+	if (InProperty != nullptr)
 	{
-		const auto NewPropertyDescriptor = FPropertyDescriptor::Factory(FoundProperty);
+		const auto NewPropertyDescriptor = FPropertyDescriptor::Factory(InProperty);
 
-		PropertyHashSet.Add(GetTypeHash(FoundProperty));
+		PropertyHashSet.Add(GetTypeHash(InProperty));
 
 		return NewPropertyDescriptor;
 	}
@@ -126,21 +90,4 @@ FPropertyDescriptor* FClassDescriptor::AddPropertyDescriptor(const FString& InPr
 bool FClassDescriptor::HasFunctionDescriptor(const uint32 InFunctionHash) const
 {
 	return FunctionHashSet.Contains(InFunctionHash);
-}
-
-bool FClassDescriptor::HasPropertyDescriptor(const FString& InPropertyName)
-{
-	for (const auto PropertyHash : PropertyHashSet)
-	{
-		if (const auto PropertyDescriptor = FCSharpEnvironment::GetEnvironment().
-			GetOrAddPropertyDescriptor(PropertyHash))
-		{
-			if (PropertyDescriptor->GetName() == InPropertyName)
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
 }

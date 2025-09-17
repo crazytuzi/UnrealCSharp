@@ -433,42 +433,6 @@ void FCSharpEnvironment::RemoveClassDescriptor(const UStruct* InStruct) const
 	}
 }
 
-FFunctionDescriptor* FCSharpEnvironment::GetOrAddFunctionDescriptor(const UStruct* InStruct,
-                                                                    const FString& InFunctionName) const
-{
-	const auto FoundClassDescriptor = GetClassDescriptor(InStruct);
-
-	return FoundClassDescriptor != nullptr ? FoundClassDescriptor->GetOrAddFunctionDescriptor(InFunctionName) : nullptr;
-}
-
-FFunctionDescriptor* FCSharpEnvironment::GetFunctionDescriptor(const uint32 InFunctionHash) const
-{
-	return ClassRegistry != nullptr ? ClassRegistry->GetFunctionDescriptor(InFunctionHash) : nullptr;
-}
-
-FFunctionDescriptor* FCSharpEnvironment::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) const
-{
-	return ClassRegistry != nullptr ? ClassRegistry->GetOrAddFunctionDescriptor(InFunctionHash) : nullptr;
-}
-
-void FCSharpEnvironment::AddFunctionDescriptor(const uint32 InFunctionHash,
-                                               FFunctionDescriptor* InFunctionDescriptor) const
-{
-	if (ClassRegistry != nullptr)
-	{
-		ClassRegistry->AddFunctionDescriptor(InFunctionHash, InFunctionDescriptor);
-	}
-}
-
-void FCSharpEnvironment::AddFunctionHash(const uint32 InFunctionHash, FClassDescriptor* InClassDescriptor,
-                                         const FString& InFunctionName) const
-{
-	if (ClassRegistry != nullptr)
-	{
-		ClassRegistry->AddFunctionHash(InFunctionHash, InClassDescriptor, InFunctionName);
-	}
-}
-
 void FCSharpEnvironment::RemoveFunctionDescriptor(const uint32 InFunctionHash) const
 {
 	if (ClassRegistry != nullptr)
@@ -482,21 +446,12 @@ FPropertyDescriptor* FCSharpEnvironment::GetOrAddPropertyDescriptor(const uint32
 	return ClassRegistry != nullptr ? ClassRegistry->GetOrAddPropertyDescriptor(InPropertyHash) : nullptr;
 }
 
-void FCSharpEnvironment::AddPropertyDescriptor(const uint32 InPropertyHash,
-                                               FPropertyDescriptor* InPropertyDescriptor) const
-{
-	if (ClassRegistry != nullptr)
-	{
-		ClassRegistry->AddPropertyDescriptor(InPropertyHash, InPropertyDescriptor);
-	}
-}
-
 void FCSharpEnvironment::AddPropertyHash(const uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
-                                         const FString& InPropertyName) const
+                                         FProperty* InProperty) const
 {
 	if (ClassRegistry != nullptr)
 	{
-		ClassRegistry->AddPropertyHash(InPropertyHash, InClassDescriptor, InPropertyName);
+		ClassRegistry->AddPropertyHash(InPropertyHash, InClassDescriptor, InProperty);
 	}
 }
 

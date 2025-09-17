@@ -19,19 +19,16 @@ public:
 	UNREALCSHARP_API MonoClass* GetMonoClass() const;
 
 public:
-	FFunctionDescriptor* AddFunctionDescriptor(const FString& InFunctionName);
+	FFunctionDescriptor* GetFunctionDescriptor(const FString& InFunctionName);
 
-	FFunctionDescriptor* GetOrAddFunctionDescriptor(const FString& InFunctionName);
+	template <typename T, typename... Args>
+	auto AddFunctionDescriptor(UFunction* InFunction, Args&&... InArgs) -> T*;
 
-	FPropertyDescriptor* AddPropertyDescriptor(const FString& InPropertyName);
+	FPropertyDescriptor* AddPropertyDescriptor(FProperty* InProperty);
 
 	bool HasFunctionDescriptor(uint32 InFunctionHash) const;
 
-	bool HasPropertyDescriptor(const FString& InPropertyName);
-
 private:
-	friend class FCSharpBind;
-
 	TWeakObjectPtr<UStruct> Struct;
 
 	MonoClass* BindMonoClass;
@@ -40,3 +37,5 @@ private:
 
 	TSet<uint32> FunctionHashSet;
 };
+
+#include "FClassDescriptor.inl"

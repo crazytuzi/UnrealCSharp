@@ -1,64 +1,15 @@
 ﻿#include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(const FString& InMethodName, UFunction* InFunction):
+FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
+                                                     FCSharpFunctionRegister&& InFunctionRegister):
 	Super(InFunction,
 	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction)),
-	OriginalFunctionFlags(EFunctionFlags::FUNC_None),
-	OriginalNativeFuncPtr(nullptr),
+	FunctionRegister(std::move(InFunctionRegister)),
 	Method(FCSharpEnvironment::GetEnvironment().GetDomain()->Parent_Class_Get_Method_From_Name(
 		FCSharpEnvironment::GetEnvironment().GetClassDescriptor(InFunction->GetOwnerClass())->GetMonoClass(),
-		InMethodName, PropertyDescriptors.Num()))
+		InFunction->GetName(), PropertyDescriptors.Num()))
 {
-}
-
-FCSharpFunctionDescriptor::~FCSharpFunctionDescriptor()
-{
-	FCSharpFunctionDescriptor::Deinitialize();
-}
-
-void FCSharpFunctionDescriptor::Deinitialize()
-{
-	const auto InOriginalFunction = OriginalFunction.Get(true);
-
-	const auto InCallCSharpFunction = Function.Get(true);
-
-	if (InOriginalFunction != nullptr && InCallCSharpFunction != nullptr)
-	{
-		UFunction* FunctionRemove;
-
-		if (InOriginalFunction->GetOuter() == InCallCSharpFunction->GetOuter())
-		{
-			InCallCSharpFunction->FunctionFlags = OriginalFunctionFlags;
-
-			InCallCSharpFunction->SetNativeFunc(OriginalNativeFuncPtr);
-
-			FunctionRemove = InOriginalFunction;
-		}
-		else
-		{
-			FunctionRemove = InCallCSharpFunction;
-		}
-
-		if (FunctionRemove != nullptr)
-		{
-			if (const auto Class = Cast<UClass>(FunctionRemove->GetOuter()))
-			{
-				Class->RemoveFunctionFromFunctionMap(FunctionRemove);
-			}
-
-			if (FunctionRemove->IsRooted())
-			{
-				FunctionRemove->RemoveFromRoot();
-			}
-			else
-			{
-				FunctionRemove->MarkAsGarbage();
-			}
-		}
-	}
-
-	OriginalFunction = nullptr;
 }
 
 bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, RESULT_DECL)
@@ -159,7 +110,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 		FDomain::Array_Set(CSharpParams, Index, static_cast<MonoObject*>(Object));
 	}
 
-	const auto FoundMonoObject = OriginalFunctionFlags & FUNC_Static
+	const auto FoundMonoObject = FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static
 		                             ? nullptr
 		                             : FCSharpEnvironment::GetEnvironment().GetObject(InContext);
 
@@ -226,6 +177,11 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 	}
 
 	return true;
+}
+
+const TWeakObjectPtr<UFunction>& FCSharpFunctionDescriptor::GetOriginalFunction() const
+{
+	return FunctionRegister.GetOriginalFunction();
 }
 
 FOutParmRec* FCSharpFunctionDescriptor::FindOutParmRec(FOutParmRec* OutParam, const FProperty* OutProperty)

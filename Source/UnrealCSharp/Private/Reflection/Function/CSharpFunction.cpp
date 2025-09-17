@@ -4,9 +4,8 @@
 
 DEFINE_FUNCTION(UCSharpFunction::execCallCSharp)
 {
-	if (const auto FunctionDescriptor = static_cast<FCSharpFunctionDescriptor*>(
-		FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(
-			Stack.CurrentNativeFunction->GetOwnerClass(), Stack.CurrentNativeFunction->GetName())))
+	if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+		FCSharpFunctionDescriptor>(GetTypeHash(Stack.CurrentNativeFunction)))
 	{
 		FunctionDescriptor->CallCSharp(Context, Stack, RESULT_PARAM);
 	}

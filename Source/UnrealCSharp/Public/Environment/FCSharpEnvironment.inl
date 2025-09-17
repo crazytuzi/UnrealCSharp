@@ -21,6 +21,27 @@ auto FCSharpEnvironment::Bind(UObject* Object) const
 }
 
 template <typename T>
+auto FCSharpEnvironment::GetFunctionDescriptor(const uint32 InFunctionHash) const -> T*
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetFunctionDescriptor<T>(InFunctionHash) : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) const -> T*
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetOrAddFunctionDescriptor<T>(InFunctionHash) : nullptr;
+}
+
+template <typename T, typename... Args>
+auto FCSharpEnvironment::AddFunctionHash(Args&&... InArgs) const -> void
+{
+	if (ClassRegistry != nullptr)
+	{
+		ClassRegistry->AddFunctionHash<T>(std::forward<Args>(InArgs)...);
+	}
+}
+
+template <typename T>
 auto FCSharpEnvironment::TGetAddress<UObject, T>::operator()(const FCSharpEnvironment* InEnvironment,
                                                              const FGarbageCollectionHandle& InGarbageCollectionHandle)
 const -> T*
