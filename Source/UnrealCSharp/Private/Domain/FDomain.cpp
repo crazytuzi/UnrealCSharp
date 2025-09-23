@@ -220,6 +220,11 @@ const char* FDomain::Method_Get_Name(MonoMethod* InMonoMethod)
 	return FMonoDomain::Method_Get_Name(InMonoMethod);
 }
 
+MonoClass* FDomain::Method_Get_Class(MonoMethod* InMonoMethod)
+{
+	return FMonoDomain::Method_Get_Class(InMonoMethod);
+}
+
 void FDomain::Method_Get_Param_Names(MonoMethod* InMonoMethod, const char** InNames) const
 {
 	FMonoDomain::Method_Get_Param_Names(InMonoMethod, InNames);
