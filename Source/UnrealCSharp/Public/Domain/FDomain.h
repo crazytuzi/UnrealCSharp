@@ -94,6 +94,8 @@ public:
 
 	static const char* Method_Get_Name(MonoMethod* InMonoMethod);
 
+	static MonoClass* Method_Get_Class(MonoMethod* InMonoMethod);
+
 	void Method_Get_Param_Names(MonoMethod* InMonoMethod, const char** InNames) const;
 
 	static MonoMethodSignature* Method_Signature(MonoMethod* InMonoMethod);

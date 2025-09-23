@@ -14,6 +14,9 @@
 #include "mono/metadata/mono-debug.h"
 #include "mono/metadata/class.h"
 #include "mono/metadata/reflection.h"
+#if UE_TRACE_ENABLED
+#include "Domain/FMonoProfiler.h"
+#endif
 #include "Misc/FileHelper.h"
 #include "Binding/FBinding.h"
 #include "Setting/UnrealCSharpSetting.h"
@@ -94,6 +97,8 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 		Domain = mono_jit_init("UnrealCSharp");
 
 		mono_domain_set(Domain, false);
+
+		RegisterProfiler();
 	}
 
 	InitializeAssembly(InParams.Assemblies);
@@ -309,6 +314,11 @@ MonoObject* FMonoDomain::Property_Get_Value(MonoProperty* InMonoProperty, void* 
 const char* FMonoDomain::Method_Get_Name(MonoMethod* InMonoMethod)
 {
 	return InMonoMethod != nullptr ? mono_method_get_name(InMonoMethod) : nullptr;
+}
+
+MonoClass* FMonoDomain::Method_Get_Class(MonoMethod* InMonoMethod)
+{
+	return InMonoMethod != nullptr ? mono_method_get_class(InMonoMethod) : nullptr;
 }
 
 void FMonoDomain::Method_Get_Param_Names(MonoMethod* InMonoMethod, const char** InNames)
@@ -1064,4 +1074,10 @@ void FMonoDomain::RegisterBinding()
 	}
 }
 
+void FMonoDomain::RegisterProfiler()
+{
+#if UE_TRACE_ENABLED
+	FMonoProfiler::Register();
+#endif
+}
 PRAGMA_ENABLE_DANGLING_WARNINGS
