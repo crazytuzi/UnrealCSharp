@@ -231,15 +231,15 @@ struct TIsNotUEnum<Class> \
 #define BINDING_PROPERTY_BUILDER_INFO(Property) {[](){ return TPropertyBuilder<decltype(Property), Property>::Info(); }}
 
 #if WITH_PROPERTY_INFO
-#define BINDING_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), BINDING_PROPERTY_BUILDER_SET(Property), BINDING_PROPERTY_BUILDER_INFO(Property)
+#define BINDING_PROPERTY(Property, ...) BINDING_PROPERTY_BUILDER_GET(Property), BINDING_PROPERTY_BUILDER_SET(Property), BINDING_PROPERTY_BUILDER_INFO(Property), ##__VA_ARGS__
 #else
-#define BINDING_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), BINDING_PROPERTY_BUILDER_SET(Property)
+#define BINDING_PROPERTY(Property, ...) BINDING_PROPERTY_BUILDER_GET(Property), BINDING_PROPERTY_BUILDER_SET(Property)
 #endif
 
 #if WITH_PROPERTY_INFO
-#define BINDING_READONLY_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), nullptr, BINDING_PROPERTY_BUILDER_INFO(Property)
+#define BINDING_READONLY_PROPERTY(Property, ...) BINDING_PROPERTY_BUILDER_GET(Property), nullptr, BINDING_PROPERTY_BUILDER_INFO(Property), ##__VA_ARGS__
 #else
-#define BINDING_READONLY_PROPERTY(Property) BINDING_PROPERTY_BUILDER_GET(Property), nullptr
+#define BINDING_READONLY_PROPERTY(Property, ...) BINDING_PROPERTY_BUILDER_GET(Property), nullptr
 #endif
 
 #define BINDING_FUNCTION_BUILDER_INVOKE(Function) TFunctionPointer<decltype(&TFunctionBuilder<decltype(Function), Function>::Invoke)>(&TFunctionBuilder<decltype(Function), Function>::Invoke).Value.Pointer

@@ -25,6 +25,7 @@ auto FClassBuilder::Property(const FString& InName,
                              U InSetMethod
 #if WITH_PROPERTY_INFO
                              , const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction
+                             , const TOptional<EPropertyInteract>& InPropertyInteract
 #endif
 ) -> FClassBuilder&
 {
@@ -38,7 +39,8 @@ auto FClassBuilder::Property(const FString& InName,
 		ClassRegister->BindingProperty(InName,
 		                               GetFunctionPointer.Value.Pointer,
 		                               SetFunctionPointer.Value.Pointer,
-		                               InTypeInfoFunction
+		                               InTypeInfoFunction,
+		                               InPropertyInteract
 		);
 	}
 #endif

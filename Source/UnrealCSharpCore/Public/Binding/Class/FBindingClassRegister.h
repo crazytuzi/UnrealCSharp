@@ -31,7 +31,8 @@ public:
 	void BindingProperty(const FString& InName,
 	                     const void* InGetMethod,
 	                     const void* InSetMethod,
-	                     const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction);
+	                     const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction,
+	                     const TOptional<EPropertyInteract>& InPropertyInteract);
 
 	void BindingFunction(const FString& InName,
 	                     const FString& InImplementationName,

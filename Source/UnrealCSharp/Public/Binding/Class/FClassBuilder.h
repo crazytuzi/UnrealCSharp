@@ -34,6 +34,7 @@ public:
 	              U InSetMethod
 #if WITH_PROPERTY_INFO
 	              , const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction = {}
+	              , const TOptional<EPropertyInteract>& InPropertyInteract = {}
 #endif
 	) -> FClassBuilder&;
 

@@ -82,7 +82,8 @@ void FBindingClassRegister::BindingSubscript(const FString& InName,
 void FBindingClassRegister::BindingProperty(const FString& InName,
                                             const void* InGetMethod,
                                             const void* InSetMethod,
-                                            const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction)
+                                            const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction,
+                                            const TOptional<EPropertyInteract>& InPropertyInteract)
 {
 	PropertyRegisters.Emplace(
 		InTypeInfoFunction,
@@ -93,7 +94,8 @@ void FBindingClassRegister::BindingProperty(const FString& InName,
 				                    : EBindingPropertyAccess::None)) +
 			static_cast<int32>(InSetMethod != nullptr
 				                   ? EBindingPropertyAccess::OnlyWrite
-				                   : EBindingPropertyAccess::None))
+				                   : EBindingPropertyAccess::None)),
+		InPropertyInteract
 	);
 }
 
