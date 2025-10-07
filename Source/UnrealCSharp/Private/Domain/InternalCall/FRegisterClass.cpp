@@ -9,6 +9,30 @@ namespace
 {
 	struct FRegisterClass
 	{
+		static void RemoveFunctionImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
+		                                         const FGarbageCollectionHandle InName)
+		{
+			if (const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(
+				InGarbageCollectionHandle))
+			{
+				const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InName);
+
+				if (const auto Function = FoundClass->FindFunctionByName(*Name))
+				{
+					if (Function->IsRooted())
+					{
+						Function->RemoveFromRoot();
+					}
+					else
+					{
+						Function->MarkAsGarbage();
+					}
+
+					FoundClass->RemoveFunctionFromFunctionMap(Function);
+				}
+			}
+		}
+
 		FRegisterClass()
 		{
 			TBindingClassBuilder<UClass>(NAMESPACE_LIBRARY,
@@ -24,7 +48,8 @@ namespace
 #endif
 				.Function("GetDefaultObject", BINDING_OVERLOAD(UObject*(UClass::*)(bool)const,
 				                                               &UClass::GetDefaultObject,
-				                                               TArray<FString>{"bCreateIfNeeded"}, true));
+				                                               TArray<FString>{"bCreateIfNeeded"}, true))
+				.Function("RemoveFunction", RemoveFunctionImplementation);
 		}
 	};
 
