@@ -38,7 +38,7 @@ auto TGet_Args()
 }
 
 #define BINDING_REMOVE_LEFT_NAMESPACE_CLASS_STR(Class) F_STRING_STR(Class).Left( \
-	F_STRING_STR(Class).Find(TEXT("::")) - 1)
+	F_STRING_STR(Class).Find(TEXT("::")))
 
 #define BINDING_REMOVE_RIGHT_NAMESPACE_CLASS_STR(Class) F_STRING_STR(Class).Right( \
 	F_STRING_STR(Class).Len() - F_STRING_STR(Class).Find(TEXT("::")) - 2)
