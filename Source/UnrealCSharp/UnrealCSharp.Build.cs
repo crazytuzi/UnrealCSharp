@@ -40,7 +40,9 @@ public class UnrealCSharp : ModuleRules
 				"CoreUObject",
 				"Slate",
 				"SlateCore",
-				"UMG"
+				"UMG",
+				"InputCore",
+				"EnhancedInput"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
