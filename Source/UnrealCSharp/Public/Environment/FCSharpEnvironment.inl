@@ -125,6 +125,12 @@ auto FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, const
 }
 
 template <typename T>
+auto FCSharpEnvironment::GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const -> T*
+{
+	return StructRegistry != nullptr ? static_cast<T*>(StructRegistry->GetStruct(InGarbageCollectionHandle)) : nullptr;
+}
+
+template <typename T>
 auto FCSharpEnvironment::GetContainer(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return ContainerRegistry != nullptr

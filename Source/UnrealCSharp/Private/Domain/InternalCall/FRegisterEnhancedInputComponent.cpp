@@ -155,9 +155,8 @@ namespace
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject<UEnhancedInputComponent>(
 				InGarbageCollectionHandle))
 			{
-				const auto [InputAction, TriggerEvent, FunctionNameToBind] =
-					*static_cast<FBlueprintEnhancedInputActionBinding*>(
-						FCSharpEnvironment::GetEnvironment().GetStruct(InBlueprintEnhancedInputActionBinding));
+				const auto [InputAction, TriggerEvent, FunctionNameToBind] = *FCSharpEnvironment::GetEnvironment().
+					GetStruct<FBlueprintEnhancedInputActionBinding>(InBlueprintEnhancedInputActionBinding);
 
 				const auto ObjectToBindTo = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InObjectToBindTo);
 

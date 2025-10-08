@@ -496,11 +496,6 @@ MonoObject* FCSharpEnvironment::GetObject(UScriptStruct* InScriptStruct, const v
 	return StructRegistry != nullptr ? StructRegistry->GetObject(InScriptStruct, InStruct) : nullptr;
 }
 
-void* FCSharpEnvironment::GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
-{
-	return StructRegistry != nullptr ? StructRegistry->GetStruct(InGarbageCollectionHandle) : nullptr;
-}
-
 bool FCSharpEnvironment::RemoveStructReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 {
 	return StructRegistry != nullptr ? StructRegistry->RemoveReference(InGarbageCollectionHandle) : false;

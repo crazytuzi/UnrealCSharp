@@ -34,7 +34,7 @@ void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
 {
 	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
 
-	if (const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct(
+	if (const auto SrcStruct = FCSharpEnvironment::GetEnvironment().GetStruct<>(
 		SrcGarbageCollectionHandle))
 	{
 		Property->InitializeValue(Dest);
@@ -47,7 +47,7 @@ bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const ui
 {
 	const auto StructA = Property->ContainerPtrToValuePtr<void>(A);
 
-	const auto StructB = FCSharpEnvironment::GetEnvironment().GetStruct(
+	const auto StructB = FCSharpEnvironment::GetEnvironment().GetStruct<>(
 		*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
 
 	return Property->Identical(StructA, StructB, PortFlags);

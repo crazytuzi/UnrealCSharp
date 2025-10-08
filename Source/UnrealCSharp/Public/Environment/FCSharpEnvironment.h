@@ -112,7 +112,8 @@ public:
 
 	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct) const;
 
-	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+	template <typename T = void>
+	auto GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const -> T*;
 
 	bool RemoveStructReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
@@ -254,7 +255,7 @@ public:
 		auto operator()(const FCSharpEnvironment& InEnvironment,
 		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
-			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
+			return InEnvironment.GetStruct<T>(InGarbageCollectionHandle);
 		}
 	};
 
@@ -265,7 +266,7 @@ public:
 		auto operator()(const FCSharpEnvironment& InEnvironment,
 		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
-			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
+			return InEnvironment.GetStruct<T>(InGarbageCollectionHandle);
 		}
 	};
 
