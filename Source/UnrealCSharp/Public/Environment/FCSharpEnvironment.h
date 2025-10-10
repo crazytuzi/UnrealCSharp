@@ -69,25 +69,20 @@ public:
 
 	void RemoveClassDescriptor(const UStruct* InStruct) const;
 
-	FFunctionDescriptor* GetOrAddFunctionDescriptor(const UStruct* InStruct, const FString& InFunctionName) const;
+	template <typename T>
+	auto GetFunctionDescriptor(const uint32 InFunctionHash) const -> T*;
 
-	FFunctionDescriptor* GetFunctionDescriptor(uint32 InFunctionHash) const;
+	template <typename T>
+	auto GetOrAddFunctionDescriptor(const uint32 InFunctionHash) const -> T*;
 
-	FFunctionDescriptor* GetOrAddFunctionDescriptor(uint32 InFunctionHash) const;
-
-	void AddFunctionDescriptor(uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor) const;
-
-	void AddFunctionHash(uint32 InFunctionHash, FClassDescriptor* InClassDescriptor,
-	                     const FString& InFunctionName) const;
+	template <typename T, typename... Args>
+	auto AddFunctionHash(Args&&... InArgs) const -> void;
 
 	void RemoveFunctionDescriptor(uint32 InFunctionHash) const;
 
 	FPropertyDescriptor* GetOrAddPropertyDescriptor(uint32 InPropertyHash) const;
 
-	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor) const;
-
-	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor,
-	                     const FString& InPropertyName) const;
+	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor, FProperty* InProperty) const;
 
 	void RemovePropertyDescriptor(uint32 InPropertyHash) const;
 
@@ -117,7 +112,8 @@ public:
 
 	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct) const;
 
-	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
+	template <typename T = void>
+	auto GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const -> T*;
 
 	bool RemoveStructReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
@@ -259,7 +255,7 @@ public:
 		auto operator()(const FCSharpEnvironment& InEnvironment,
 		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
-			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
+			return InEnvironment.GetStruct<T>(InGarbageCollectionHandle);
 		}
 	};
 
@@ -270,7 +266,7 @@ public:
 		auto operator()(const FCSharpEnvironment& InEnvironment,
 		                const FGarbageCollectionHandle& InGarbageCollectionHandle) const
 		{
-			return static_cast<T*>(InEnvironment.GetStruct(InGarbageCollectionHandle));
+			return InEnvironment.GetStruct<T>(InGarbageCollectionHandle);
 		}
 	};
 

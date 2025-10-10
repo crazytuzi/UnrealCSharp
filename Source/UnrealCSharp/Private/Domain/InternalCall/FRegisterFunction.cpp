@@ -13,8 +13,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call0<>(FoundObject);
 				}
@@ -26,8 +26,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call1<EFunctionReturnType::Primitive>(FoundObject, RETURN_BUFFER);
 				}
@@ -39,8 +39,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call1<EFunctionReturnType::Compound>(FoundObject, RETURN_BUFFER);
 				}
@@ -52,8 +52,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call2<>(FoundObject, IN_BUFFER);
 				}
@@ -66,8 +66,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call3<EFunctionReturnType::Primitive>(FoundObject, IN_BUFFER, RETURN_BUFFER);
 				}
@@ -80,8 +80,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call3<EFunctionReturnType::Compound>(FoundObject, IN_BUFFER, RETURN_BUFFER);
 				}
@@ -93,8 +93,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call4<>(FoundObject, OUT_BUFFER);
 				}
@@ -106,8 +106,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call6<>(FoundObject, IN_BUFFER, OUT_BUFFER);
 				}
@@ -120,8 +120,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call7<EFunctionReturnType::Primitive>(
 						FoundObject, IN_BUFFER, OUT_BUFFER, RETURN_BUFFER);
@@ -135,8 +135,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call7<EFunctionReturnType::Compound>(
 						FoundObject, IN_BUFFER, OUT_BUFFER, RETURN_BUFFER);
@@ -149,8 +149,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call8<>(FoundObject);
 				}
@@ -162,8 +162,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call9<EFunctionReturnType::Primitive>(FoundObject, RETURN_BUFFER);
 				}
@@ -175,8 +175,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call9<EFunctionReturnType::Compound>(FoundObject, RETURN_BUFFER);
 				}
@@ -188,8 +188,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call10<>(FoundObject, IN_BUFFER);
 				}
@@ -202,8 +202,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call11<EFunctionReturnType::Primitive>(FoundObject, IN_BUFFER, RETURN_BUFFER);
 				}
@@ -216,8 +216,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call11<EFunctionReturnType::Compound>(FoundObject, IN_BUFFER, RETURN_BUFFER);
 				}
@@ -229,8 +229,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call14<>(FoundObject, IN_BUFFER, OUT_BUFFER);
 				}
@@ -243,8 +243,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call15<EFunctionReturnType::Primitive>(
 						FoundObject, IN_BUFFER, OUT_BUFFER, RETURN_BUFFER);
@@ -258,8 +258,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call15<EFunctionReturnType::Compound>(
 						FoundObject, IN_BUFFER, OUT_BUFFER, RETURN_BUFFER);
@@ -272,8 +272,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call16<>(FoundObject);
 				}
@@ -285,8 +285,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call18<>(FoundObject, IN_BUFFER);
 				}
@@ -298,8 +298,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call24<>(FoundObject);
 				}
@@ -311,8 +311,8 @@ namespace
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InGarbageCollectionHandle))
 			{
-				if (const auto FunctionDescriptor = static_cast<FUnrealFunctionDescriptor*>(
-					FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor(InFunctionHash)))
+				if (const auto FunctionDescriptor = FCSharpEnvironment::GetEnvironment().GetOrAddFunctionDescriptor<
+					FUnrealFunctionDescriptor>(InFunctionHash))
 				{
 					FunctionDescriptor->Call26<>(FoundObject, IN_BUFFER);
 				}

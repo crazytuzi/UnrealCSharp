@@ -8,20 +8,25 @@ struct FBindingPropertyRegister : FBindingTypeInfoRegister
 {
 	FBindingPropertyRegister(const TOptional<TFunction<FTypeInfo*()>>& InTypeInfoFunction,
 	                         const FString& InName,
-	                         const EBindingPropertyAccess& InAccess):
+	                         const EBindingPropertyAccess& InPropertyAccess,
+	                         const TOptional<EPropertyInteract>& InPropertyInteract):
 		FBindingTypeInfoRegister(InTypeInfoFunction),
 		Name(InName),
-		Access(InAccess)
+		PropertyAccess(InPropertyAccess),
+		PropertyInteract(InPropertyInteract)
 	{
 	}
 
 	explicit operator FBindingProperty() const
 	{
-		return FBindingProperty(operator FBindingTypeInfo(), Name, Access);
+		return FBindingProperty(operator FBindingTypeInfo(), Name, PropertyAccess,
+		                        PropertyInteract.Get(EPropertyInteract::None));
 	}
 
 private:
 	FString Name;
 
-	EBindingPropertyAccess Access;
+	EBindingPropertyAccess PropertyAccess;
+
+	TOptional<EPropertyInteract> PropertyInteract;
 };

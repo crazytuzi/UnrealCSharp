@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Reflection/Class/FClassDescriptor.h"
+#include "Reflection/Function/FCSharpFunctionRegister.h"
 
 class UNREALCSHARP_API FClassRegistry
 {
@@ -25,21 +26,22 @@ public:
 
 	void RemoveClassDescriptor(const UStruct* InStruct);
 
-	FFunctionDescriptor* GetFunctionDescriptor(uint32 InFunctionHash);
+	template <typename T>
+	auto GetFunctionDescriptor(uint32 InFunctionHash) -> T*;
 
-	FFunctionDescriptor* GetOrAddFunctionDescriptor(uint32 InFunctionHash);
+	template <typename T>
+	auto GetOrAddFunctionDescriptor(const uint32 InFunctionHash) -> T*;
 
 	FPropertyDescriptor* GetOrAddPropertyDescriptor(uint32 InPropertyHash);
 
 	void AddFunctionDescriptor(uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor);
 
-	void AddFunctionHash(uint32 InFunctionHash, FClassDescriptor* InClassDescriptor, const FString& InFunctionName);
+	template <typename T, typename... Args>
+	auto AddFunctionHash(uint32 InFunctionHash, Args&&... InArgs) -> void;
 
 	void RemoveFunctionDescriptor(uint32 InFunctionHash);
 
-	void AddPropertyDescriptor(uint32 InPropertyHash, FPropertyDescriptor* InPropertyDescriptor);
-
-	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor, const FString& InPropertyName);
+	void AddPropertyHash(uint32 InPropertyHash, FClassDescriptor* InClassDescriptor, FProperty* InProperty);
 
 	void RemovePropertyDescriptor(uint32 InPropertyHash);
 
@@ -49,13 +51,17 @@ private:
 private:
 	TMap<TWeakObjectPtr<const UStruct>, FClassDescriptor*> ClassDescriptorMap;
 
-	TMap<uint32, TPair<FClassDescriptor*, FString>> PropertyHashMap;
+	TMap<uint32, std::tuple<FClassDescriptor*, FProperty*>> PropertyHashMap;
 
 	TMap<uint32, FPropertyDescriptor*> PropertyDescriptorMap;
 
-	TMap<uint32, TPair<FClassDescriptor*, FString>> FunctionHashMap;
+	TMap<uint32, std::tuple<FClassDescriptor*, UFunction*, FCSharpFunctionRegister>> CSharpFunctionHashMap;
+
+	TMap<uint32, std::tuple<FClassDescriptor*, UFunction*>> UnrealFunctionHashMap;
 
 	TMap<uint32, FFunctionDescriptor*> FunctionDescriptorMap;
 
 	static TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> ClassConstructorMap;
 };
+
+#include "FClassRegistry.inl"

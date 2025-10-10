@@ -62,7 +62,7 @@ public:
 
 	bool IsGenerateAsset() const;
 
-	const TArray<FString>& GetSupportedAssetPath() const;
+	const TArray<FDirectoryPath>& GetSupportedAssetPath() const;
 
 	const TArray<TSubclassOf<UObject>>& GetSupportedAssetClass() const;
 
@@ -108,8 +108,8 @@ private:
 	bool bIsGenerateAsset;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator,
-		meta = (GetOptions = "GetModuleList", EditCondition = "bIsGenerateAsset"))
-	TArray<FString> SupportedAssetPath;
+		meta = (LongPackageName, EditCondition = "bIsGenerateAsset"))
+	TArray<FDirectoryPath> SupportedAssetPath;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bIsGenerateAsset"))
 	TArray<TSubclassOf<UObject>> SupportedAssetClass;

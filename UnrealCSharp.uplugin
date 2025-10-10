@@ -51,5 +51,11 @@
 			"Type": "Program",
 			"LoadingPhase": "PostConfigInit"
 		}
+	],
+    "Plugins": [
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		}
 	]
 }

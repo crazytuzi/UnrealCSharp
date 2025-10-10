@@ -81,6 +81,8 @@ public:
 
 	static const char* Method_Get_Name(MonoMethod* InMonoMethod);
 
+	static MonoClass* Method_Get_Class(MonoMethod* InMonoMethod);
+
 	static void Method_Get_Param_Names(MonoMethod* InMonoMethod, const char** InNames);
 
 	static MonoMethodSignature* Method_Signature(MonoMethod* InMonoMethod);
@@ -242,6 +244,8 @@ private:
 	static void RegisterLog();
 
 	static void RegisterBinding();
+
+	static void RegisterProfiler();
 
 public:
 	static MonoDomain* Domain;

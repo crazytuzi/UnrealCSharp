@@ -21,6 +21,27 @@ auto FCSharpEnvironment::Bind(UObject* Object) const
 }
 
 template <typename T>
+auto FCSharpEnvironment::GetFunctionDescriptor(const uint32 InFunctionHash) const -> T*
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetFunctionDescriptor<T>(InFunctionHash) : nullptr;
+}
+
+template <typename T>
+auto FCSharpEnvironment::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) const -> T*
+{
+	return ClassRegistry != nullptr ? ClassRegistry->GetOrAddFunctionDescriptor<T>(InFunctionHash) : nullptr;
+}
+
+template <typename T, typename... Args>
+auto FCSharpEnvironment::AddFunctionHash(Args&&... InArgs) const -> void
+{
+	if (ClassRegistry != nullptr)
+	{
+		ClassRegistry->AddFunctionHash<T>(std::forward<Args>(InArgs)...);
+	}
+}
+
+template <typename T>
 auto FCSharpEnvironment::TGetAddress<UObject, T>::operator()(const FCSharpEnvironment* InEnvironment,
                                                              const FGarbageCollectionHandle& InGarbageCollectionHandle)
 const -> T*
@@ -101,6 +122,12 @@ auto FCSharpEnvironment::AddStructReference(UScriptStruct* InScriptStruct, const
 	return StructRegistry != nullptr
 		       ? StructRegistry->AddReference<IsNeedFree>(InScriptStruct, InStruct, InMonoObject)
 		       : false;
+}
+
+template <typename T>
+auto FCSharpEnvironment::GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle) const -> T*
+{
+	return StructRegistry != nullptr ? static_cast<T*>(StructRegistry->GetStruct(InGarbageCollectionHandle)) : nullptr;
 }
 
 template <typename T>

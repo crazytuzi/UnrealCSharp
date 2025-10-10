@@ -21,9 +21,7 @@ bool FGeneratorCore::bIsGenerateAllModules;
 
 TArray<FString> FGeneratorCore::SupportedModule;
 
-TArray<FName> FGeneratorCore::SupportedAssetPath;
-
-TArray<FString> FGeneratorCore::SupportedAssetPathNameSpace;
+TArray<FString> FGeneratorCore::SupportedAssetPath;
 
 TMap<TWeakObjectPtr<const UObject>, bool> FGeneratorCore::SupportedMap;
 
@@ -774,6 +772,24 @@ bool FGeneratorCore::IsSupported(FProperty* Property)
 	return false;
 }
 
+bool FGeneratorCore::IsSupported(const UPackage* InPackage)
+{
+	if (InPackage != nullptr)
+	{
+		const auto& PackageName = InPackage->GetName();
+
+		for (const auto& AssetPath : SupportedAssetPath)
+		{
+			if (PackageName.StartsWith(AssetPath))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool FGeneratorCore::IsSupported(const UClass* InClass)
 {
 	if (bIsGenerateAllModules && InClass->IsNative()) return true;
@@ -783,7 +799,7 @@ bool FGeneratorCore::IsSupported(const UClass* InClass)
 		return *FoundSupported;
 	}
 
-	if (!IsSupportedModule(FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass)))
+	if (!IsSupported(InClass->GetPackage()))
 	{
 		SupportedMap.Add(InClass, false);
 
@@ -849,7 +865,7 @@ bool FGeneratorCore::IsSupported(const UScriptStruct* InScriptStruct)
 		return *FoundSupported;
 	}
 
-	if (!IsSupportedModule(FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct)))
+	if (!IsSupported(InScriptStruct->GetPackage()))
 	{
 		SupportedMap.Add(InScriptStruct, false);
 
@@ -880,7 +896,7 @@ bool FGeneratorCore::IsSupported(const UEnum* InEnum)
 		return *FoundSupported;
 	}
 
-	if (!IsSupportedModule(FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum)))
+	if (!IsSupported(InEnum->GetPackage()))
 	{
 		SupportedMap.Add(InEnum, false);
 
@@ -892,23 +908,9 @@ bool FGeneratorCore::IsSupported(const UEnum* InEnum)
 	return true;
 }
 
-bool FGeneratorCore::IsSupportedModule(const FString& InModule)
+bool FGeneratorCore::IsSupported(const FAssetData& InAssetData)
 {
-	for (auto Index = 0; Index < SupportedAssetPathNameSpace.Num(); Index += 2)
-	{
-		if (InModule == SupportedAssetPathNameSpace[Index] ||
-			InModule.StartsWith(SupportedAssetPathNameSpace[Index + 1]))
-		{
-			return true;
-		}
-	}
-
-	return SupportedModule.Contains(InModule);
-}
-
-const TArray<FName>& FGeneratorCore::GetSupportedAssetPath()
-{
-	return SupportedAssetPath;
+	return IsSupported(InAssetData.GetPackage());
 }
 
 const TArray<FName>& FGeneratorCore::GetSupportedAssetClassName()
@@ -934,30 +936,12 @@ void FGeneratorCore::BeginGenerator()
 			));
 		}
 
-		for (auto AssetPath : UnrealCSharpEditorSetting->GetSupportedAssetPath())
+		for (const auto& [Path] : UnrealCSharpEditorSetting->GetSupportedAssetPath())
 		{
-			AssetPath = AssetPath == FApp::GetProjectName() ? TEXT("Game") : AssetPath;
-
 			SupportedAssetPath.Add(*FString::Printf(TEXT(
-				"/%s"),
-			                                        *AssetPath
+				"%s/"),
+			                                        *Path
 			));
-
-			SupportedAssetPathNameSpace.Append({
-				FString::Printf(TEXT(
-					"%s.%s"
-				),
-				                *NAMESPACE_ROOT,
-				                *AssetPath
-
-				),
-				FString::Printf(TEXT(
-					"%s.%s."
-				),
-				                *NAMESPACE_ROOT,
-				                *AssetPath
-				)
-			});
 		}
 
 		for (const auto& AssetClass : UnrealCSharpEditorSetting->GetSupportedAssetClass())
@@ -983,8 +967,6 @@ void FGeneratorCore::EndGenerator()
 	SupportedModule.Empty();
 
 	SupportedAssetPath.Empty();
-
-	SupportedAssetPathNameSpace.Empty();
 
 	SupportedMap.Empty();
 

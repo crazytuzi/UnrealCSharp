@@ -26,5 +26,5 @@ public:
 private:
 	TGarbageCollectionHandleMapping<TSet<class FReference*>> ReferenceRelationship;
 
-	TArray<UObject*> ObjectArray;
+	TArray<TObjectPtr<UObject>> ObjectArray;
 };

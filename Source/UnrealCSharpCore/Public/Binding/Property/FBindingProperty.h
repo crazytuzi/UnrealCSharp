@@ -2,13 +2,16 @@
 
 #include "Binding/TypeInfo/FBindingTypeInfo.h"
 #include "EBindingPropertyAccess.h"
+#include "EPropertyInteract.h"
 
 struct FBindingProperty : FBindingTypeInfo
 {
-	FBindingProperty(const FBindingTypeInfo& InTypeInfo, const FString& InName, const EBindingPropertyAccess& InAccess):
+	FBindingProperty(const FBindingTypeInfo& InTypeInfo, const FString& InName,
+	                 const EBindingPropertyAccess& InPropertyAccess, const EPropertyInteract& InPropertyInteract):
 		FBindingTypeInfo(InTypeInfo),
 		Name(InName),
-		Access(InAccess)
+		PropertyAccess(InPropertyAccess),
+		PropertyInteract(InPropertyInteract)
 	{
 	}
 
@@ -17,13 +20,20 @@ struct FBindingProperty : FBindingTypeInfo
 		return Name;
 	}
 
-	EBindingPropertyAccess GetAccess() const
+	EBindingPropertyAccess GetPropertyAccess() const
 	{
-		return Access;
+		return PropertyAccess;
+	}
+
+	EPropertyInteract GetPropertyInteract() const
+	{
+		return PropertyInteract;
 	}
 
 private:
 	FString Name;
 
-	EBindingPropertyAccess Access;
+	EBindingPropertyAccess PropertyAccess;
+
+	EPropertyInteract PropertyInteract;
 };

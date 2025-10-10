@@ -174,11 +174,11 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 		FString PropertySetContent;
 
-		const auto bRead = (static_cast<int32>(Property.GetAccess()) &
+		const auto bRead = (static_cast<int32>(Property.GetPropertyAccess()) &
 				static_cast<int32>(EBindingPropertyAccess::OnlyRead))
 			== static_cast<int32>(EBindingPropertyAccess::OnlyRead);
 
-		const auto bWrite = (static_cast<int32>(Property.GetAccess()) &
+		const auto bWrite = (static_cast<int32>(Property.GetPropertyAccess()) &
 				static_cast<int32>(EBindingPropertyAccess::OnlyWrite))
 			== static_cast<int32>(EBindingPropertyAccess::OnlyWrite);
 
@@ -253,7 +253,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		{
 			PropertyContent += FString::Printf(TEXT(
 				"%s"
-				"\t\tpublic %s%s %s\n"
+				"\t\tpublic %s%s%s %s\n"
 				"\t\t{\n"
 				"%s"
 				"%s"
@@ -261,6 +261,17 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 				"\t\t}\n"
 			),
 			                                   PropertyContent.IsEmpty() ? TEXT("") : TEXT("\n"),
+			                                   [Property]()
+			                                   {
+				                                   static auto PropertyInteract =
+					                                   TMap<EPropertyInteract, const TCHAR*>
+					                                   {
+						                                   {EPropertyInteract::None, TEXT("")},
+						                                   {EPropertyInteract::New, TEXT("new ")}
+					                                   };
+
+				                                   return PropertyInteract[Property.GetPropertyInteract()];
+			                                   }(),
 			                                   Property.IsStatic() ? TEXT("static ") : TEXT(""),
 			                                   *PropertyType,
 			                                   *PropertyName,
@@ -798,11 +809,11 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 		FString SetFunctionContent;
 
-		const auto bRead = (static_cast<int32>(Property.GetAccess()) &
+		const auto bRead = (static_cast<int32>(Property.GetPropertyAccess()) &
 				static_cast<int32>(EBindingPropertyAccess::OnlyRead))
 			== static_cast<int32>(EBindingPropertyAccess::OnlyRead);
 
-		const auto bWrite = (static_cast<int32>(Property.GetAccess()) &
+		const auto bWrite = (static_cast<int32>(Property.GetPropertyAccess()) &
 				static_cast<int32>(EBindingPropertyAccess::OnlyWrite))
 			== static_cast<int32>(EBindingPropertyAccess::OnlyWrite);
 

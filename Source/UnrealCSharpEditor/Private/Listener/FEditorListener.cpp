@@ -253,7 +253,7 @@ void FEditorListener::OnFilesLoaded()
 
 void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
 {
-	OnAssetChanged([&]
+	OnAssetChanged(InAssetData, [&]
 	{
 		FAssetGenerator::Generator(InAssetData);
 	});
@@ -261,7 +261,7 @@ void FEditorListener::OnAssetAdded(const FAssetData& InAssetData) const
 
 void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 {
-	OnAssetChanged([&]
+	OnAssetChanged(InAssetData, [&]
 	{
 		FPlatformFileManager::Get().Get().GetPlatformFile().DeleteFile(
 			*FUnrealCSharpFunctionLibrary::GetFileName(InAssetData));
@@ -270,7 +270,7 @@ void FEditorListener::OnAssetRemoved(const FAssetData& InAssetData) const
 
 void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FString& InOldObjectPath) const
 {
-	OnAssetChanged([&]
+	OnAssetChanged(InAssetData, [&]
 	{
 		FPlatformFileManager::Get().Get().GetPlatformFile().DeleteFile(
 			*FUnrealCSharpFunctionLibrary::GetOldFileName(InAssetData, InOldObjectPath));
@@ -281,7 +281,7 @@ void FEditorListener::OnAssetRenamed(const FAssetData& InAssetData, const FStrin
 
 void FEditorListener::OnAssetUpdatedOnDisk(const FAssetData& InAssetData) const
 {
-	OnAssetChanged([&]
+	OnAssetChanged(InAssetData, [&]
 	{
 		FAssetGenerator::Generator(InAssetData);
 	});
@@ -360,7 +360,7 @@ void FEditorListener::OnDirectoryChanged(const TArray<FFileChangeData>& InFileCh
 	}
 }
 
-void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator) const
+void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunction<void()>& InGenerator) const
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -371,9 +371,12 @@ void FEditorListener::OnAssetChanged(const TFunction<void()>& InGenerator) const
 			{
 				FGeneratorCore::BeginGenerator();
 
-				InGenerator();
+				if (FGeneratorCore::IsSupported(InAssetData))
+				{
+					InGenerator();
 
-				FCSharpCompiler::Get().Compile();
+					FCSharpCompiler::Get().Compile();
+				}
 
 				FGeneratorCore::EndGenerator();
 			}

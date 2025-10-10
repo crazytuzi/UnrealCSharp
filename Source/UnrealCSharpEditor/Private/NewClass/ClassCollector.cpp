@@ -214,19 +214,14 @@ void FClassCollector::PopulateClassByAsset()
 
 		TArray<FName> AssetPaths;
 
-		for (auto AssetPath : UnrealCSharpEditorSetting->GetSupportedAssetPath())
+		for (const auto& [Path] : UnrealCSharpEditorSetting->GetSupportedAssetPath())
 		{
-			AssetPath = AssetPath == FApp::GetProjectName() ? TEXT("Game") : AssetPath;
-
-			AssetPaths.Add(*FString::Printf(TEXT(
-				"/%s"
-			),
-			                                *AssetPath));
+			AssetPaths.Add(*Path);
 		}
 
-		TArray<FAssetData> AllAssetData;
+		TArray<FAssetData> OutAssetData;
 
-		AssetRegistryModule.Get().GetAssetsByPaths(AssetPaths, AllAssetData, true);
+		AssetRegistryModule.Get().GetAssetsByPaths(AssetPaths, OutAssetData, true);
 
 		TArray<FName> SupportedAssetClassNames;
 
@@ -235,7 +230,7 @@ void FClassCollector::PopulateClassByAsset()
 			SupportedAssetClassNames.Add(SupportedAssetClass->GetFName());
 		}
 
-		for (const auto& AssetData : AllAssetData)
+		for (const auto& AssetData : OutAssetData)
 		{
 			if (const auto& AssetDataClassName =
 #if UE_F_ASSET_DATA_GET_ASSET_NAME

@@ -35,9 +35,9 @@ namespace
 			if (const auto FoundScriptStruct = FCSharpEnvironment::GetEnvironment().GetObject<
 				UScriptStruct>(InScriptStruct))
 			{
-				if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetStruct(InA))
+				if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetStruct<>(InA))
 				{
-					if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetStruct(InB))
+					if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetStruct<>(InB))
 					{
 						return FoundScriptStruct->CompareScriptStruct(FoundA, FoundB, PPF_None);
 					}

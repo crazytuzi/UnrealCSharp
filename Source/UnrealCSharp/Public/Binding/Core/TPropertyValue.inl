@@ -290,7 +290,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 
 	static auto Set(const FGarbageCollectionHandle InValue) -> T
 	{
-		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+		return *FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<T>>(InValue);
 	}
 };
 
@@ -347,7 +347,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 
 	static auto Set(const FGarbageCollectionHandle InValue)
 	{
-		return (std::decay_t<T>)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<std::remove_pointer_t<T>>>(InValue);
 	}
 };
 
@@ -518,7 +518,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 
 	static auto Set(const FGarbageCollectionHandle InValue) -> T
 	{
-		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetStruct(InValue);
+		return *FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<T>>(InValue);
 	}
 };
 
