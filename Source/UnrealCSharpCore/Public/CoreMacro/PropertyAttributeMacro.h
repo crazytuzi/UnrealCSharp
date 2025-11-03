@@ -65,3 +65,5 @@
 #define CLASS_ATTACHMENT_PARENT_ATTRIBUTE FString(TEXT("AttachmentParentAttribute"))
 
 #define CLASS_ATTACHMENT_SOCKET_NAME_ATTRIBUTE FString(TEXT("AttachmentSocketNameAttribute"))
+
+#define CLASS_DEFAULT_VALUE_ATTRIBUTE FString(TEXT("DefaultValueAttribute"))

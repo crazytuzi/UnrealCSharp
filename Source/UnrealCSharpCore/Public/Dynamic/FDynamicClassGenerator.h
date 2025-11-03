@@ -124,4 +124,6 @@ private:
 	static TMap<FString, UClass*> DynamicClassMap;
 
 	static TSet<UClass*> DynamicClassSet;
+
+	static TMap<UClass*, TArray<TTuple<const FProperty*, FString>>> DefaultValueMap;
 };
