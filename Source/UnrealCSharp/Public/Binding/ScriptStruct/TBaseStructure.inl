@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MaterialExpressionIO.h"
 #include "Macro/BindingMacro.h"
 #include "UEVersion.h"
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/BlueprintGeneratedClass.h"
 #include "Template/TFunctionPointer.inl"
 #include "EDynamicClassGeneratorType.h"
 #include "mono/metadata/object.h"

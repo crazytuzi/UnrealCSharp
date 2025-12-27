@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Tickable.h"
 #include "Domain/FMonoDomain.h"
 
 class UNREALCSHARP_API FDomain final : public FTickableGameObject

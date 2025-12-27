@@ -1,4 +1,6 @@
-﻿#include "Binding/Class/TBindingClassBuilder.inl"
+﻿#include "Engine/Level.h"
+#include "GameFramework/Pawn.h"
+#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
