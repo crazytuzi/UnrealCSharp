@@ -402,8 +402,12 @@ namespace
 				.Property("ValveIndex_Right_Trackpad_Down", BINDING_PROPERTY(&EKeys::ValveIndex_Right_Trackpad_Down))
 				.Property("ValveIndex_Right_Trackpad_Left", BINDING_PROPERTY(&EKeys::ValveIndex_Right_Trackpad_Left))
 				.Property("ValveIndex_Right_Trackpad_Right", BINDING_PROPERTY(&EKeys::ValveIndex_Right_Trackpad_Right))
+#if UE_E_KEYS_VIRTUAL_ACCEPT
 				.Property("Virtual_Accept", BINDING_PROPERTY(&EKeys::Virtual_Accept))
+#endif
+#if UE_E_KEYS_VIRTUAL_BACK
 				.Property("Virtual_Back", BINDING_PROPERTY(&EKeys::Virtual_Back))
+#endif
 				.Property("Invalid", BINDING_PROPERTY(&EKeys::Invalid));
 		}
 	};

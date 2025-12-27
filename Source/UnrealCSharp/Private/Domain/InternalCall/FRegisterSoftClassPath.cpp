@@ -1,6 +1,13 @@
 ﻿#include "Binding/Class/TBindingClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
+#include "UEVersion.h"
+#if !UE_U_STRUCT_F_SOFT_CLASS_PATH
+#include "Binding/ScriptStruct/TScriptStruct.inl"
+#endif
+
+#if UE_U_STRUCT_F_SOFT_CLASS_PATH
+BINDING_STRUCT(FSoftClassPath)
+#endif
 
 namespace
 {
