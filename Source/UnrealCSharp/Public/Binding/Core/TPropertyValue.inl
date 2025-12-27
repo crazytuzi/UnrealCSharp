@@ -472,7 +472,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
+struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value &&
+                                          !std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
 	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
@@ -519,6 +520,61 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 	static auto Set(const FGarbageCollectionHandle InValue) -> T
 	{
 		return *FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<T>>(InValue);
+	}
+};
+
+template <typename T>
+struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<T>>>::Value &&
+                                          std::is_pointer_v<std::remove_reference_t<T>>, T>>
+{
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
+			std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+			FCSharpEnvironment::GetEnvironment().Bind<false>(std::remove_pointer_t<std::decay_t<T>>::StaticStruct());
+
+			FCSharpEnvironment::GetEnvironment().AddStructReference(
+				InGarbageCollectionHandle, std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember,
+				SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().Bind<false>(std::remove_pointer_t<std::decay_t<T>>::StaticStruct());
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
+				std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember, SrcMonoObject);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+				std::remove_pointer_t<std::decay_t<T>>::StaticStruct(),
+				new std::remove_pointer_t<std::decay_t<T>>(**InMember), SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue) -> T
+	{
+		return FCSharpEnvironment::GetEnvironment().GetStruct<std::remove_pointer_t<std::decay_t<T>>>(InValue);
 	}
 };
 

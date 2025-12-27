@@ -241,7 +241,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>
 };
 
 template <typename T>
-struct TDefaultArgument<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>> :
+struct TDefaultArgument<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<T>>>::Value, T>> :
 	TEmptyDefaultArgument<T>
 {
 };
