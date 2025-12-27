@@ -106,6 +106,14 @@ struct TReturnValue<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_
 	using TCompoundReturnValue<T>::TCompoundReturnValue; \
 };
 
+#define BINDING_STRUCT(Class) \
+template <typename T> \
+struct TStaticName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
+{ \
+	static auto IsEmpty() { return false; } \
+	static auto Get() { return F_STRING_STR(Class); } \
+};
+
 #define BINDING_SCRIPT_STRUCT(Class) \
 template <typename T> \
 struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<std::remove_pointer_t<std::remove_reference_t<T>>>, Class>, T>> \
