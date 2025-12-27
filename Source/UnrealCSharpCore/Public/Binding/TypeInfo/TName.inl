@@ -21,7 +21,7 @@ struct TName
 {
 };
 
-template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 struct TGenericName
 {
 	static auto Get()
@@ -218,7 +218,7 @@ struct TName<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>>
 
 template <typename T>
 struct TName<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value, T>> :
-	TGenericName<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+	TGenericName<T>
 {
 };
 
@@ -253,8 +253,8 @@ struct TName<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 		),
 		                       *TGeneric<T, T>::GetTemplateName(),
 		                       *TName<
-			                       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-			                       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+			                       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+			                       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 		                       ::Get(),
 		                       *TName<
 			                       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
@@ -266,7 +266,7 @@ struct TName<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 
 template <typename T>
 struct TName<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>> :
-	TGenericName<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+	TGenericName<T>
 {
 };
 
@@ -278,7 +278,7 @@ struct TName<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>> :
 
 template <typename T>
 struct TName<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>> :
-	TGenericName<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+	TGenericName<T>
 {
 };
 

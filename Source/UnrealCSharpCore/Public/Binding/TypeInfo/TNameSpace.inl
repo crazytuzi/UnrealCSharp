@@ -23,7 +23,7 @@ struct TNameSpace
 {
 };
 
-template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 struct TGenericNameSpace
 {
 	static auto Get()
@@ -181,7 +181,7 @@ struct TNameSpace<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>, T>
 
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value, T>> final :
-	TGenericNameSpace<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+	TGenericNameSpace<T>
 {
 };
 
@@ -210,8 +210,8 @@ struct TNameSpace<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 	{
 		return TArrayBuilder<FString>()
 		       .Append(TNameSpace<
-				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			       ::Get())
 		       .Append(TNameSpace<
 				       typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
@@ -224,7 +224,7 @@ struct TNameSpace<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>> final :
-	TGenericNameSpace<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+	TGenericNameSpace<T>
 {
 };
 
@@ -236,7 +236,7 @@ struct TNameSpace<T, std::enable_if_t<TIsTSubclassOf<std::decay_t<T>>::Value, T>
 
 template <typename T>
 struct TNameSpace<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>> final :
-	TGenericNameSpace<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+	TGenericNameSpace<T>
 {
 };
 
