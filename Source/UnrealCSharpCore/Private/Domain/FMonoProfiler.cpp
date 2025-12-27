@@ -6,16 +6,19 @@ MonoProfilerHandle FMonoProfiler::ProfilerHandle = nullptr;
 
 void FMonoProfiler::Register()
 {
-	if (FParse::Param(FCommandLine::Get(), TEXT("CSharpInsights")))
+	if (FString Channels; FParse::Value(FCommandLine::Get(), TEXT("-trace="), Channels, false))
 	{
-		if (ProfilerHandle = mono_profiler_create(nullptr);
-			ProfilerHandle != nullptr)
+		if (Channels.ToLower().Contains(TEXT("CSharp")))
 		{
-			mono_profiler_set_method_enter_callback(ProfilerHandle, Method_Enter);
+			if (ProfilerHandle = mono_profiler_create(nullptr);
+				ProfilerHandle != nullptr)
+			{
+				mono_profiler_set_method_enter_callback(ProfilerHandle, Method_Enter);
 
-			mono_profiler_set_method_leave_callback(ProfilerHandle, Method_Leave);
+				mono_profiler_set_method_leave_callback(ProfilerHandle, Method_Leave);
 
-			mono_profiler_set_call_instrumentation_filter_callback(ProfilerHandle, Call_Instrumentation_Filter);
+				mono_profiler_set_call_instrumentation_filter_callback(ProfilerHandle, Call_Instrumentation_Filter);
+			}
 		}
 	}
 }
