@@ -249,7 +249,7 @@ void FCSharpCompilerRunnable::Compile()
 
 	FString Result;
 
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe, true);
 
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*CompileTool,
@@ -260,7 +260,7 @@ void FCSharpCompilerRunnable::Compile()
 		&OutProcessID,
 		1,
 		nullptr,
-		WritePipe,
+		nullptr,
 		ReadPipe);
 
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))

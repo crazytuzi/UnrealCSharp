@@ -143,7 +143,7 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 
 	FString Result;
 
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe, true);
 
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*DotNet,
@@ -154,7 +154,7 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 		&OutProcessID,
 		1,
 		nullptr,
-		WritePipe,
+		nullptr,
 		ReadPipe);
 
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
