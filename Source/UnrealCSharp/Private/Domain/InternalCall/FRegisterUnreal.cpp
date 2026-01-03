@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/FClassBuilder.h"
+﻿#include "Engine/GameInstance.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"

@@ -89,7 +89,7 @@ void FCodeAnalysis::Compile()
 
 	FString Result;
 
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe, true);
 
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*CompileTool,
@@ -100,7 +100,7 @@ void FCodeAnalysis::Compile()
 		&OutProcessID,
 		1,
 		nullptr,
-		WritePipe,
+		nullptr,
 		ReadPipe);
 
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
@@ -167,7 +167,7 @@ void FCodeAnalysis::Analysis()
 
 	auto OutProcessID = 0u;
 
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe, true);
 
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*Program,
@@ -178,7 +178,7 @@ void FCodeAnalysis::Analysis()
 		&OutProcessID,
 		1,
 		nullptr,
-		WritePipe,
+		nullptr,
 		ReadPipe);
 
 	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))

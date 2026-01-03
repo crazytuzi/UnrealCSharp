@@ -263,7 +263,7 @@ struct TArgument<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Value
 };
 
 template <typename T>
-struct TArgument<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>> :
+struct TArgument<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<T>>>::Value, T>> :
 	TCompoundArgument<T, T>
 {
 	using TCompoundArgument<T, T>::TCompoundArgument;

@@ -134,7 +134,7 @@ struct TReturnValue<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::Va
 };
 
 template <typename T>
-struct TReturnValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value>> :
+struct TReturnValue<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<T>>>::Value>> :
 	TCompoundReturnValue<T>
 {
 	using TCompoundReturnValue<T>::TCompoundReturnValue;

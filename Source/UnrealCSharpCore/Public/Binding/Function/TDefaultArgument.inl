@@ -241,7 +241,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>
 };
 
 template <typename T>
-struct TDefaultArgument<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>> :
+struct TDefaultArgument<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<T>>>::Value, T>> :
 	TEmptyDefaultArgument<T>
 {
 };
@@ -480,7 +480,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
-	static auto Get(const TMap<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
+	static auto Get(const TMap<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
 	                           typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>& InValue)
 	{
 		auto Value0 = FString::Printf(TEXT(
@@ -496,8 +496,8 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 				"%s{%s, %s}"),
 			                          bIsFirst ? TEXT("") : TEXT(" ,"),
 			                          *TDefaultArgument<
-				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			                          ::Get(Key),
 			                          *TDefaultArgument<
 				                          typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>,
@@ -517,7 +517,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 {
-	static auto Get(const TSet<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>& InValue)
+	static auto Get(const TSet<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>& InValue)
 	{
 		auto Value = FString::Printf(TEXT(
 			"new %s{"),
@@ -532,8 +532,8 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 				"%s%s"),
 			                         bIsFirst ? TEXT("") : TEXT(" ,"),
 			                         *TDefaultArgument<
-				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			                         ::Get(Iterator)
 			);
 
@@ -549,7 +549,7 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 template <typename T>
 struct TDefaultArgument<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
-	static auto Get(const TArray<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>& InValue)
+	static auto Get(const TArray<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>& InValue)
 	{
 		auto Value = FString::Printf(TEXT(
 			"new %s{"),
@@ -564,8 +564,8 @@ struct TDefaultArgument<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T
 				"%s%s"),
 			                         bIsFirst ? TEXT("") : TEXT(" ,"),
 			                         *TDefaultArgument<
-				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				                         typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			                         ::Get(Iterator)
 			);
 

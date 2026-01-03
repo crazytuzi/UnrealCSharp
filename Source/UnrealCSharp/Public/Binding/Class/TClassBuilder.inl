@@ -3,6 +3,7 @@
 #include "FClassBuilder.h"
 #include "Binding/Template/TIsProjectClass.inl"
 #include "Binding/TypeInfo/TTypeInfo.inl"
+#include "Binding/TypeInfo/TStaticName.inl"
 #include "CoreMacro/BindingMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Template/TIsReflectionClass.inl"
@@ -40,7 +41,7 @@ public:
 		InFunctionInfoFunction.GetValue()()->SetParamNames(InParamNames);
 #endif
 
-		Function(TName<T, T>::Get(), InMethod
+		Function(!TStaticName<T, T>::IsEmpty() ? TStaticName<T, T>::Get() : TName<T, T>::Get(), InMethod
 #if WITH_FUNCTION_INFO
 		         , InFunctionInfoFunction
 #endif

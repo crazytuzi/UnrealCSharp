@@ -33,6 +33,8 @@ TMap<FString, UClass*> FDynamicClassGenerator::DynamicClassMap;
 
 TSet<UClass*> FDynamicClassGenerator::DynamicClassSet;
 
+TMap<UClass*, TArray<TTuple<const FProperty*, FString>>> FDynamicClassGenerator::DefaultValueMap;
+
 void FDynamicClassGenerator::Generator()
 {
 	FDynamicGeneratorCore::Generator(CLASS_U_CLASS_ATTRIBUTE,
@@ -625,6 +627,16 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 					                                         DefaultSubObject);
 			                                         }
 		                                         }
+
+		                                         if (FDynamicGeneratorCore::AttrsHasAttr(
+			                                         InMonoCustomAttrInfo, CLASS_DEFAULT_VALUE_ATTRIBUTE))
+		                                         {
+			                                         const auto DefaultValue = FDynamicGeneratorCore::AttrGetValue(
+				                                         InMonoCustomAttrInfo, CLASS_DEFAULT_VALUE_ATTRIBUTE);
+
+			                                         DefaultValueMap.FindOrAdd(InClass, {}).Emplace(
+				                                         MakeTuple(InProperty, DefaultValue));
+		                                         }
 	                                         });
 
 	if (IsDynamicBlueprintGeneratedClass(InClass))
@@ -691,6 +703,24 @@ void FDynamicClassGenerator::ClassConstructor(const FObjectInitializer& InObject
 			                                  EFieldIteratorFlags::ExcludeDeprecated); It; ++It)
 			{
 				It->InitializeValue(It->ContainerPtrToValuePtr<void>(Object));
+			}
+
+			if (auto DefaultValues = DefaultValueMap.Find(Class))
+			{
+				for (const auto& [Property, Value] : *DefaultValues)
+				{
+#if UE_F_PROPERTY_IMPORT_TEXT_DIRECT
+					Property->ImportText_Direct(*Value,
+					                            Property->ContainerPtrToValuePtr<uint8>(Object),
+					                            Object,
+					                            0);
+#else
+					Property->ImportText(*Value,
+					                     Property->ContainerPtrToValuePtr<uint8>(Object),
+					                     0,
+					                     Object);
+#endif
+				}
 			}
 		}
 

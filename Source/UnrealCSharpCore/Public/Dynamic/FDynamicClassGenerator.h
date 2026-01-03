@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/BlueprintGeneratedClass.h"
 #include "Template/TFunctionPointer.inl"
 #include "EDynamicClassGeneratorType.h"
 #include "mono/metadata/object.h"
@@ -124,4 +125,6 @@ private:
 	static TMap<FString, UClass*> DynamicClassMap;
 
 	static TSet<UClass*> DynamicClassSet;
+
+	static TMap<UClass*, TArray<TTuple<const FProperty*, FString>>> DefaultValueMap;
 };

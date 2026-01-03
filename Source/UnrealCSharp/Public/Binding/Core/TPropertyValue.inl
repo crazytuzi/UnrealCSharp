@@ -472,7 +472,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::
 };
 
 template <typename T>
-struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
+struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value &&
+                                          !std::is_pointer_v<std::remove_reference_t<T>>, T>>
 {
 	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
 	{
@@ -519,6 +520,61 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>
 	static auto Set(const FGarbageCollectionHandle InValue) -> T
 	{
 		return *FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<T>>(InValue);
+	}
+};
+
+template <typename T>
+struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<T>>>::Value &&
+                                          std::is_pointer_v<std::remove_reference_t<T>>, T>>
+{
+	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	{
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
+			std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember);
+
+		if (SrcMonoObject == nullptr)
+		{
+			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+			SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+			FCSharpEnvironment::GetEnvironment().Bind<false>(std::remove_pointer_t<std::decay_t<T>>::StaticStruct());
+
+			FCSharpEnvironment::GetEnvironment().AddStructReference(
+				InGarbageCollectionHandle, std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember,
+				SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	template <auto IsReference>
+	static auto Get(std::decay_t<T>* InMember)
+	{
+		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
+
+		auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+
+		FCSharpEnvironment::GetEnvironment().Bind<false>(std::remove_pointer_t<std::decay_t<T>>::StaticStruct());
+
+		if constexpr (IsReference)
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
+				std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember, SrcMonoObject);
+		}
+		else
+		{
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+				std::remove_pointer_t<std::decay_t<T>>::StaticStruct(),
+				new std::remove_pointer_t<std::decay_t<T>>(**InMember), SrcMonoObject);
+		}
+
+		return SrcMonoObject;
+	}
+
+	static auto Set(const FGarbageCollectionHandle InValue) -> T
+	{
+		return FCSharpEnvironment::GetEnvironment().GetStruct<std::remove_pointer_t<std::decay_t<T>>>(InValue);
 	}
 };
 
@@ -586,8 +642,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 			const auto FoundKeyPropertyMonoClass = TPropertyClass<
-					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 				::Get();
 
 			const auto FoundKeyPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -635,8 +691,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 		const auto FoundKeyPropertyMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			::Get();
 
 		const auto FoundKeyPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -698,7 +754,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 		{
 			if (SrcContainer->IsValidIndex(Index))
 			{
-				Value.Add(*static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>*>
+				Value.Add(*static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>*>
 				          (SrcContainer->GetEnumeratorKey(Index)),
 				          *static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>*>
 				          (SrcContainer->GetEnumeratorValue(Index)));
@@ -721,8 +777,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 			const auto FoundPropertyMonoClass = TPropertyClass<
-					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 				::Get();
 
 			const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -753,8 +809,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 		const auto FoundPropertyMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			::Get();
 
 		const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -799,7 +855,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 			if (SrcContainer->IsValidIndex(Index))
 			{
 				Value.Add(
-					*static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>*>(SrcContainer->
+					*static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>*>(SrcContainer->
 						GetEnumerator(Index)));
 			}
 		}
@@ -826,8 +882,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 			const auto FoundPropertyMonoClass = TPropertyClass<
-					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 				::Get();
 
 			const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -858,8 +914,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 		const auto FoundPropertyMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			::Get();
 
 		const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -896,7 +952,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InValue);
 
 		return std::decay_t<T>(
-			static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>*>
+			static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>*>
 			(SrcContainer->GetScriptArray()->GetData()),
 			SrcContainer->Num());
 	}
@@ -957,8 +1013,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 			const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 			const auto FoundPropertyMonoClass = TPropertyClass<
-					typename TTemplateTypeTraits<std::decay_t<T>>::Type,
-					typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+					typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 				::Get();
 
 			const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -994,8 +1050,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 		const auto FoundMonoClass = TPropertyClass<T, T>::Get();
 
 		const auto FoundPropertyMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<std::decay_t<T>>::Type,
-				typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			::Get();
 
 		const auto FoundPropertyMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
@@ -1039,7 +1095,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 	{
 		const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(InValue);
 
-		return *static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::Type*>(SrcOptional->GetData());
+		return *static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>*>(SrcOptional->GetData());
 	}
 };
 #endif

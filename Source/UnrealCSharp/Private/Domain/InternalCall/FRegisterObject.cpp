@@ -1,4 +1,5 @@
-﻿#include "Binding/Class/TBindingClassBuilder.inl"
+﻿#include "Engine/World.h"
+#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/Core/TPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"

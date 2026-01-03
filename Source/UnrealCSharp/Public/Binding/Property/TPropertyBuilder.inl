@@ -198,7 +198,8 @@ struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTScriptInte
 };
 
 template <typename Class, typename Result, Result Class::* Member>
-struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsUStruct<Result>::Value>> :
+struct TPropertyBuilder<Result Class::*, Member,
+                        std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<Result>>>::Value>> :
 	TCompoundPropertyBuilder<Class, Result, Member>
 {
 };
@@ -400,7 +401,8 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTScriptInterface<st
 };
 
 template <typename Result, Result* Member>
-struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsUStruct<std::decay_t<Result>>::Value>> :
+struct TPropertyBuilder<Result*, Member,
+                        std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<Result>>>::Value>> :
 	TCompoundPropertyBuilder<void, Result, Member>
 {
 };

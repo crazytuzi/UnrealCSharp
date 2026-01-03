@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MaterialExpressionIO.h"
 #include "Macro/BindingMacro.h"
 #include "UEVersion.h"
 
@@ -11,7 +12,13 @@ static UScriptStruct* StaticGetBaseStructureInternal(const FName& Name)
 #if UE_STATIC_FIND_OBJECT_FAST_ANY_PACKAGE
 		UScriptStruct::StaticClass(), CoreUObjectPkg, Name, false, false, RF_NoFlags, EInternalObjectFlags::None));
 #else
-		UScriptStruct::StaticClass(), CoreUObjectPkg, Name, false, RF_NoFlags, EInternalObjectFlags::None));
+		UScriptStruct::StaticClass(), CoreUObjectPkg, Name,
+#if STATIC_FIND_OBJECT_FAST_E_FIND_OBJECT_FLAGS
+		EFindObjectFlags::None,
+#else
+		false,
+#endif
+		RF_NoFlags, EInternalObjectFlags::None));
 #endif
 
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)

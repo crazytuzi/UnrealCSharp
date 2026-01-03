@@ -23,7 +23,7 @@ struct TPropertyClass
 {
 };
 
-template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+template <typename T, typename Type = typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 struct TMultiPropertyClass
 {
 	static auto Get()
@@ -197,7 +197,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTScriptInterface<std::decay_t<T>>::
 };
 
 template <typename T>
-struct TPropertyClass<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value, T>>
+struct TPropertyClass<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<T>>>::Value, T>>
 {
 	static auto Get()
 	{
@@ -247,7 +247,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>
 
 template <typename T>
 struct TPropertyClass<T, std::enable_if_t<TIsTWeakObjectPtr<std::decay_t<T>>::Value, T>> :
-	TMultiPropertyClass<T, typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+	TMultiPropertyClass<T>
 {
 };
 
@@ -281,8 +281,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
 		const auto FoundKeyMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			::Get();
 
 		const auto FoundKeyMonoType = FMonoDomain::Class_Get_Type(FoundKeyMonoClass);
@@ -318,8 +318,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
 		const auto FoundMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			::Get();
 
 		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);
@@ -350,8 +350,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
 		const auto FoundMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>,
-				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<0>>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			::Get();
 
 		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);
@@ -398,8 +398,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
 
 		const auto FoundMonoClass = TPropertyClass<
-				typename TTemplateTypeTraits<std::decay_t<T>>::Type,
-				typename TTemplateTypeTraits<std::decay_t<T>>::Type>
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
+				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>>
 			::Get();
 
 		const auto FoundMonoType = FMonoDomain::Class_Get_Type(FoundMonoClass);

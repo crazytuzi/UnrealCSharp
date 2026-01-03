@@ -1,6 +1,12 @@
 ﻿#include "Binding/Class/TBindingClassBuilder.inl"
-#include "Binding/ScriptStruct/TScriptStruct.inl"
 #include "Macro/NamespaceMacro.h"
+#if !UE_U_STRUCT_F_PRIMARY_ASSET_ID
+#include "Binding/ScriptStruct/TScriptStruct.inl"
+#endif
+
+#if UE_U_STRUCT_F_PRIMARY_ASSET_ID
+BINDING_STRUCT(FPrimaryAssetId)
+#endif
 
 namespace
 {

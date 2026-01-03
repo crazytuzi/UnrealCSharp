@@ -1,4 +1,5 @@
 #include "EnhancedInputComponent.h"
+#include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/DynamicBlueprintBinding.h"
 #include "EnhancedInputActionDelegateBinding.h"
 #include "Binding/Class/TBindingClassBuilder.inl"

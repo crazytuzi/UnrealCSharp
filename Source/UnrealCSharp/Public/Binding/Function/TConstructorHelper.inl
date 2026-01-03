@@ -22,7 +22,14 @@ struct TConstructorHelper<std::tuple<Args...>>
 
 		TOut<std::tuple<TArgument<Args, Args>...>>(OUT_BUFFER, Argument);
 
-		if constexpr (TIsScriptStruct<Class>::Value)
+		if constexpr (TIsUStruct<Class>::Value)
+		{
+			FCSharpEnvironment::GetEnvironment().Bind<false>(Class::StaticStruct());
+
+			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
+				Class::StaticStruct(), Value, InMonoObject);
+		}
+		else if constexpr (TIsScriptStruct<Class>::Value)
 		{
 			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<Class>::Get());
 

@@ -1109,7 +1109,10 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 			}
 			else
 			{
-				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
+				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), MetaData.IsEmpty()
+						                       ? *ByteProperty->Enum->GetDisplayNameTextByIndex(ENUM_DEFAULT_MAX_INDEX).
+						                                        ToString()
+						                       : *MetaData);
 			}
 		}
 		else
