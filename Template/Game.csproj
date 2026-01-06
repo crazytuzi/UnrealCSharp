@@ -3,9 +3,7 @@
   <PropertyGroup>
     <TargetFramework></TargetFramework>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>Script</RootNamespace>
-    <OutputPath></OutputPath>
     <DebugType>Embedded</DebugType>
     <DefineConstants></DefineConstants>
   </PropertyGroup>
@@ -29,4 +27,20 @@
     <None Remove="*.csproj.props" />
     <WeaverFiles Include="$(ProjectDir)..\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
   </ItemGroup>
+
+
+	<Target Name="AfterBuildPublish" AfterTargets="Build">
+		<MSBuild Projects="$(ProjectPath)" Targets="Publish" Properties="Configuration=$(Configuration)" />
+	</Target>
+
+	<Target Name="CopyDllsAfterPublish" AfterTargets="Publish">
+		<PropertyGroup>
+			<ScriptOutputPath></ScriptOutputPath>
+		</PropertyGroup>
+		<ItemGroup>
+			<PublishFiles Include="$(PublishDir)*.*" />
+		</ItemGroup>
+		<MakeDir Directories="$(ScriptOutputPath)" Condition="!Exists('$(ScriptOutputPath)')" />
+		<Copy SourceFiles="@(PublishFiles)" DestinationFolder="$(ScriptOutputPath)" />
+	</Target>
 </Project>

@@ -34,4 +34,6 @@ private:
 	static void ReplaceProjectPlaceholder(FString& OutResult);
 
 	static void ReplaceSolutionConfigurationPlatformsPlaceholder(FString& OutResult);
+	
+	static void ReplaceScriptPath(FString& OutResult);
 };

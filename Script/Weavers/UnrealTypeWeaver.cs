@@ -5,6 +5,7 @@ using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace Weavers
 {
@@ -1063,11 +1064,14 @@ namespace Weavers
         private void GetAllMeta()
         {
             var definition = ModuleDefinition;
-
+            
             if (definition.Name != "")
             {
-                definition = ModuleDefinition.ReadModule("");
+                var path = GetUEAssemblyPath(AssemblyFilePath);
+
+                definition = ModuleDefinition.ReadModule(path);
             }
+
 
             _pathNameAttributeType = definition.GetType("Script.CoreUObject.PathNameAttribute");
 
@@ -1113,6 +1117,42 @@ namespace Weavers
 
             _getGarbageCollectionHandle = definition.GetType("Script.CoreUObject.UObject").Methods
                 .FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle");
+        }
+
+        private string GetUEAssemblyPath(string assemblyFilePath)
+        {
+			var scriptPathName = "";
+			
+			var ueAssemblyName = "";
+
+            var scriptIndex = assemblyFilePath.LastIndexOf(scriptPathName);
+
+            var scriptPathLen = scriptPathName.Length;
+
+            string relativePath = assemblyFilePath.Substring(scriptIndex + scriptPathLen + 1, assemblyFilePath.Length - scriptIndex - scriptPathLen - 1);
+
+            string basePath = assemblyFilePath.Substring(0, scriptIndex + scriptPathLen); 
+
+            string[] segments = relativePath.Split(new[] { '\\', '/' });
+
+            segments[0] = ueAssemblyName;
+
+            segments[segments.Length - 1] = ueAssemblyName + ".dll";
+            
+            return Path.Combine(basePath, Path.Combine(segments));
+        }
+
+        private string GetRelativePath_Compatible(string baseFilePath, string targetFilePath)
+        {
+            // 转换为Uri（需用file://协议）
+            Uri baseUri = new Uri(baseFilePath);
+            Uri targetUri = new Uri(targetFilePath);
+
+            // 计算相对路径（自动处理跨平台分隔符）
+            string relativeUri = baseUri.MakeRelativeUri(targetUri).ToString();
+
+            // 转换Uri的%20等编码 + 适配Windows分隔符（可选）
+            return Uri.UnescapeDataString(relativeUri).Replace('/', Path.DirectorySeparatorChar);
         }
     }
 

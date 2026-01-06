@@ -46,7 +46,8 @@ void FSolutionGenerator::Generator()
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplaceYield,
-			&FSolutionGenerator::ReplaceDefinition
+			&FSolutionGenerator::ReplaceDefinition,
+			&FSolutionGenerator::ReplaceScriptPath
 		});
 
 	CopyTemplate(
@@ -60,7 +61,6 @@ void FSolutionGenerator::Generator()
 		{
 			&FSolutionGenerator::ReplacePluginBaseDir,
 			&FSolutionGenerator::ReplaceDefineConstants,
-			&FSolutionGenerator::ReplaceOutputPath,
 			&FSolutionGenerator::ReplaceTargetFramework
 		});
 
@@ -174,9 +174,9 @@ void FSolutionGenerator::ReplaceDefineConstants(FString& OutResult)
 
 void FSolutionGenerator::ReplaceOutputPath(FString& OutResult)
 {
-	OutResult = OutResult.Replace(TEXT("<OutputPath></OutputPath>"),
+	OutResult = OutResult.Replace(TEXT("<ScriptOutputPath></ScriptOutputPath>"),
 	                              *FString::Printf(TEXT(
-		                              "<OutputPath>..\\..\\Content\\%s</OutputPath>"
+		                              "<ScriptOutputPath>..\\..\\Content\\%s</ScriptOutputPath>"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory()
 	                              ));
@@ -230,11 +230,10 @@ void FSolutionGenerator::ReplaceDefinition(FString& OutResult)
 	                                               *DLL_SUFFIX
 	                              ));
 
-	OutResult = OutResult.Replace(TEXT("definition = ModuleDefinition.ReadModule(\"\");"),
+	OutResult = OutResult.Replace(TEXT("var ueAssemblyName = \"\";"),
 	                              *FString::Printf(TEXT(
-		                              "definition = ModuleDefinition.ReadModule(\"../../Content/%s/%s%s\");"
+		                              "var ueAssemblyName = \"%s\";"
 	                              ),
-	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory(),
 	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
 	                                               *DLL_SUFFIX
 	                              ));
@@ -326,4 +325,10 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 	                                               *SOLUTION_CONFIGURATION_PLATFORMS_PLACEHOLDER
 	                              ),
 	                              *SolutionConfigurationPlatforms);
+}
+
+void FSolutionGenerator::ReplaceScriptPath(FString& OutResult)
+{
+	OutResult = OutResult.Replace(TEXT("var scriptPathName = \"\";"),
+		*FString::Printf(TEXT("var scriptPathName = \"%s\";"), *PLUGIN_SCRIPT_PATH));
 }

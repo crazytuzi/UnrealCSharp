@@ -2,9 +2,7 @@
   <PropertyGroup>
     <TargetFramework></TargetFramework>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>Script</RootNamespace>
-    <OutputPath></OutputPath>
     <DebugType>Embedded</DebugType>
     <DefineConstants></DefineConstants>
   </PropertyGroup>
