@@ -31,44 +31,9 @@ void FCodeAnalysis::Analysis(const FString& InFile)
 	                                           *InFile
 	);
 
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
-
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
-
-	auto ProcessHandle = FPlatformProcess::CreateProc(
-		*Program,
-		*AnalysisParam,
-		false,
-		true,
-		true,
-		&OutProcessID,
-		1,
-		nullptr,
-		WritePipe,
-		ReadPipe);
-
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	FUnrealCSharpFunctionLibrary::SyncProcess(Program, AnalysisParam, [](const int32, const FString&)
 	{
-		FPlatformProcess::Sleep(0.01f);
-	}
-
-	auto ReturnCode = 0;
-
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
-	{
-		if (ReturnCode == 0)
-		{
-			// @TODO
-		}
-		else
-		{
-			// @TODO
-		}
-	}
+	});
 }
 
 void FCodeAnalysis::Compile()
@@ -81,52 +46,9 @@ void FCodeAnalysis::Compile()
 	                                          *FUnrealCSharpFunctionLibrary::GetCodeAnalysisProjectPath()
 	);
 
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
-
-	FString Result;
-
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe, true);
-
-	auto ProcessHandle = FPlatformProcess::CreateProc(
-		*CompileTool,
-		*CompileParam,
-		false,
-		true,
-		true,
-		&OutProcessID,
-		1,
-		nullptr,
-		nullptr,
-		ReadPipe);
-
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, [](const int32, const FString&)
 	{
-		FPlatformProcess::Sleep(0.01f);
-
-		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
-	}
-
-	auto ReturnCode = 0;
-
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
-	{
-		if (ReturnCode == 0)
-		{
-			// @TODO
-		}
-		else
-		{
-			// @TODO
-		}
-	}
-
-	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
-
-	FPlatformProcess::CloseProc(ProcessHandle);
+	});
 }
 
 void FCodeAnalysis::Analysis()
@@ -161,42 +83,7 @@ void FCodeAnalysis::Analysis()
 		);
 	}
 
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
-
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe, true);
-
-	auto ProcessHandle = FPlatformProcess::CreateProc(
-		*Program,
-		*AnalysisParam,
-		false,
-		true,
-		true,
-		&OutProcessID,
-		1,
-		nullptr,
-		nullptr,
-		ReadPipe);
-
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	FUnrealCSharpFunctionLibrary::SyncProcess(Program, AnalysisParam, [](const int32, const FString&)
 	{
-		FPlatformProcess::Sleep(0.01f);
-	}
-
-	auto ReturnCode = 0;
-
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
-	{
-		if (ReturnCode == 0)
-		{
-			// @TODO
-		}
-		else
-		{
-			// @TODO
-		}
-	}
+	});
 }

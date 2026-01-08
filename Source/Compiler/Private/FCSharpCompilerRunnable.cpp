@@ -241,40 +241,9 @@ void FCSharpCompilerRunnable::Compile()
 	                                          *FUnrealCSharpFunctionLibrary::GetFullPublishDirectory()
 	);
 
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
-
-	FString Result;
-
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe, true);
-
-	auto ProcessHandle = FPlatformProcess::CreateProc(
-		*CompileTool,
-		*CompileParam,
-		false,
-		true,
-		true,
-		&OutProcessID,
-		1,
-		nullptr,
-		nullptr,
-		ReadPipe);
-
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
-	{
-		FPlatformProcess::Sleep(0.01f);
-
-		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
-	}
-
 	FNotificationInfo* NotificationInfo{};
 
-	auto ReturnCode = 0;
-
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	const auto OnComplete = [&NotificationInfo](const int32 InReturnCode, const FString& InResult)
 	{
 		[[maybe_unused]] static const FName CompileStatusUnknown("Blueprint.CompileStatus.Overlay.Unknown");
 
@@ -284,7 +253,7 @@ void FCSharpCompilerRunnable::Compile()
 
 		[[maybe_unused]] static const FName CompileStatusWarning("Blueprint.CompileStatus.Overlay.Warning");
 
-		if (ReturnCode == 0)
+		if (InReturnCode == 0)
 		{
 			NotificationInfo = new FNotificationInfo(FText::FromString(TEXT("Compilation succeeded")));
 
@@ -308,13 +277,11 @@ void FCSharpCompilerRunnable::Compile()
 			NotificationInfo->Image = FEditorStyle::GetBrush(CompileStatusError);
 #endif
 
-			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *Result);
+			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *InResult);
 		}
-	}
+	};
 
-	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
-
-	FPlatformProcess::CloseProc(ProcessHandle);
+	FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam, OnComplete);
 
 	AsyncTask(ENamedThreads::GameThread, [this, NotificationInfo]()
 	{

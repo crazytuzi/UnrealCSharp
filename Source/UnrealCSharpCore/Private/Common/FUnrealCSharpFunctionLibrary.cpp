@@ -1407,3 +1407,49 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObjec
 	InClass->ClassDefaultObject = InClassDefaultObject;
 #endif
 }
+
+#if WITH_EDITOR
+void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FString& InParms,
+                                               const TFunction<void(const int32, const FString&)>& InOnComplete)
+{
+	void* ReadPipe = nullptr;
+
+	void* WritePipe = nullptr;
+
+	auto OutProcessID = 0u;
+
+	FString Result;
+
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+
+	auto ProcessHandle = FPlatformProcess::CreateProc(
+		*InURL,
+		*InParms,
+		false,
+		true,
+		true,
+		&OutProcessID,
+		1,
+		nullptr,
+		WritePipe,
+		ReadPipe);
+
+	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	{
+		FPlatformProcess::Sleep(0.01f);
+
+		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
+	}
+
+	auto ReturnCode = 0;
+
+	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	{
+		InOnComplete(ReturnCode, Result);
+	}
+
+	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+	FPlatformProcess::CloseProc(ProcessHandle);
+}
+#endif

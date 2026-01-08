@@ -135,48 +135,12 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 
 	const FString Params = TEXT("--list-sdks");
 
-	void* ReadPipe = nullptr;
-
-	void* WritePipe = nullptr;
-
-	auto OutProcessID = 0u;
-
 	FString Result;
 
-	FPlatformProcess::CreatePipe(ReadPipe, WritePipe, true);
-
-	auto ProcessHandle = FPlatformProcess::CreateProc(
-		*DotNet,
-		*Params,
-		false,
-		true,
-		true,
-		&OutProcessID,
-		1,
-		nullptr,
-		nullptr,
-		ReadPipe);
-
-	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	FUnrealCSharpFunctionLibrary::SyncProcess(DotNet, Params, [&Result](const int32, const FString& InResult)
 	{
-		FPlatformProcess::Sleep(0.01f);
-
-		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
-	}
-
-	auto ReturnCode = 0;
-
-	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
-	{
-		if (ReturnCode == 0)
-		{
-			// @TODO
-		}
-		else
-		{
-			// @TODO
-		}
-	}
+		Result = InResult;
+	});
 
 	TArray<FString> ResultArray;
 
@@ -256,10 +220,6 @@ TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
 	{
 		ResultArray.Add(TEXT(""));
 	}
-
-	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
-
-	FPlatformProcess::CloseProc(ProcessHandle);
 
 	// 运行失败,返回默认路径
 	return ResultArray;
