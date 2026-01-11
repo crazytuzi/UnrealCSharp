@@ -1,4 +1,5 @@
 ﻿#include "Domain/FMonoDomain.h"
+#include "Misc/FileHelper.h"
 #include "Log/FMonoLog.h"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/PropertyMacro.h"
@@ -14,14 +15,17 @@
 #include "mono/metadata/mono-debug.h"
 #include "mono/metadata/class.h"
 #include "mono/metadata/reflection.h"
+#include "DotnetVersion.h"
+#if DOTNET9
+#include "mono/jit/mono-private-unstable.h"
+#endif
 #if UE_TRACE_ENABLED
 #include "Domain/FMonoProfiler.h"
 #endif
-#include "Misc/FileHelper.h"
 #include "Binding/FBinding.h"
 #include "Setting/UnrealCSharpSetting.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "DotnetVersion.h"
+#include "Domain/FMonoFunctionLibrary.h"
 
 PRAGMA_DISABLE_DANGLING_WARNINGS
 
@@ -54,6 +58,7 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 		mono_aot_register_module(static_cast<void**>(mono_aot_module_System_Private_CoreLib_info));
 
+#if !DOTNET9
 		mono_dllmap_insert(NULL, "System.Native", NULL, "__Internal", NULL);
 
 		mono_dllmap_insert(NULL, "System.Net.Security.Native", NULL, "__Internal", NULL);
@@ -65,9 +70,25 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 #if DOTNET8
 		mono_dllmap_insert(NULL, "System.Globalization.Native", NULL, "__Internal", NULL);
 #endif
+#endif
 
 		setenv("DOTNET_SYSTEM_GLOBALIZATION_INVARIANT", "1", TRUE);
 #else
+#if DOTNET9
+#if PLATFORM_WINDOWS
+		const auto LibDirectory = FMonoFunctionLibrary::GetLibDirectory();
+
+		const char* PropertyKeys[] = {
+			"NATIVE_DLL_SEARCH_DIRECTORIES"
+		};
+		const char* PropertyValues[] = {
+			TCHAR_TO_ANSI(*LibDirectory),
+		};
+
+		monovm_initialize(std::size(PropertyKeys), PropertyKeys, PropertyValues);
+#endif
+#endif
+
 		mono_jit_set_aot_mode(MONO_AOT_MODE_NONE);
 #endif
 
@@ -1080,4 +1101,5 @@ void FMonoDomain::RegisterProfiler()
 	FMonoProfiler::Register();
 #endif
 }
+
 PRAGMA_ENABLE_DANGLING_WARNINGS
