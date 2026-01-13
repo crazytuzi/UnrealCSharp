@@ -17,6 +17,10 @@ void FMonoProfiler::Register()
 
 				mono_profiler_set_method_leave_callback(ProfilerHandle, Method_Leave);
 
+				mono_profiler_set_method_exception_leave_callback(ProfilerHandle, Method_Exception_Leave);
+
+				mono_profiler_set_method_tail_call_callback(ProfilerHandle, Method_Tail_Call);
+
 				mono_profiler_set_call_instrumentation_filter_callback(ProfilerHandle, Call_Instrumentation_Filter);
 			}
 		}
@@ -48,6 +52,18 @@ void FMonoProfiler::Method_Leave(MonoProfiler* InMonoProfiler, MonoMethod* InMon
 	FCpuProfilerTrace::OutputEndEvent();
 }
 
+void FMonoProfiler::Method_Exception_Leave(MonoProfiler* InMonoProfiler, MonoMethod* InMonoMethod,
+                                           MonoObject* InException)
+{
+	FCpuProfilerTrace::OutputEndEvent();
+}
+
+void FMonoProfiler::Method_Tail_Call(MonoProfiler* InMonoProfiler, MonoMethod* InMonoMethod,
+                                     MonoMethod* InTargetMonoMethod)
+{
+	FCpuProfilerTrace::OutputEndEvent();
+}
+
 MonoProfilerCallInstrumentationFlags FMonoProfiler::Call_Instrumentation_Filter(MonoProfiler* InMonoProfiler,
 	MonoMethod* InMonoMethod)
 {
@@ -55,7 +71,9 @@ MonoProfilerCallInstrumentationFlags FMonoProfiler::Call_Instrumentation_Filter(
 		MONO_PROFILER_CALL_INSTRUMENTATION_ENTER |
 		MONO_PROFILER_CALL_INSTRUMENTATION_LEAVE |
 		MONO_PROFILER_CALL_INSTRUMENTATION_ENTER_CONTEXT |
-		MONO_PROFILER_CALL_INSTRUMENTATION_LEAVE_CONTEXT
+		MONO_PROFILER_CALL_INSTRUMENTATION_LEAVE_CONTEXT |
+		MONO_PROFILER_CALL_INSTRUMENTATION_EXCEPTION_LEAVE |
+		MONO_PROFILER_CALL_INSTRUMENTATION_TAIL_CALL
 	);
 }
 #endif

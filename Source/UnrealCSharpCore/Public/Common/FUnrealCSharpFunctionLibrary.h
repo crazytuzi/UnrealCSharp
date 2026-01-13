@@ -248,4 +248,9 @@ public:
 	{
 		return !GExitPurge ? GetMutableDefault<T>() : nullptr;
 	}
+
+#if WITH_EDITOR
+	static void SyncProcess(const FString& InURL, const FString& InParms,
+	                        const TFunction<void(const int32, const FString&)>& InOnComplete);
+#endif
 };

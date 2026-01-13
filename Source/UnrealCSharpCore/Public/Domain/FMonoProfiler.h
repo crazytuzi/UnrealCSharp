@@ -15,6 +15,12 @@ private:
 	static void Method_Leave(MonoProfiler* InMonoProfiler, MonoMethod* InMonoMethod,
 	                         MonoProfilerCallContext* InMonoProfilerCallContext);
 
+	static void Method_Exception_Leave(MonoProfiler* InMonoProfiler, MonoMethod* InMonoMethod,
+	                                   MonoObject* InException);
+
+	static void Method_Tail_Call(MonoProfiler* InMonoProfiler, MonoMethod* InMonoMethod,
+	                             MonoMethod* InTargetMonoMethod);
+
 	static MonoProfilerCallInstrumentationFlags Call_Instrumentation_Filter(MonoProfiler* InMonoProfiler,
 	                                                                        MonoMethod* InMonoMethod);
 

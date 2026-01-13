@@ -13,7 +13,7 @@ static UScriptStruct* StaticGetBaseStructureInternal(const FName& Name)
 		UScriptStruct::StaticClass(), CoreUObjectPkg, Name, false, false, RF_NoFlags, EInternalObjectFlags::None));
 #else
 		UScriptStruct::StaticClass(), CoreUObjectPkg, Name,
-#if STATIC_FIND_OBJECT_FAST_E_FIND_OBJECT_FLAGS
+#if UE_STATIC_FIND_OBJECT_FAST_E_FIND_OBJECT_FLAGS
 		EFindObjectFlags::None,
 #else
 		false,
