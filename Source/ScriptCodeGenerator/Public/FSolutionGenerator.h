@@ -8,10 +8,10 @@ public:
 	static SCRIPTCODEGENERATOR_API void Generator();
 
 private:
-	static void CopyTemplate(const FString& Dest, const FString& Src);
+	static void CopyTemplate(const FString& Dest, const FString& Src, bool ReplaceExistingFile = true);
 
 	static void CopyTemplate(const FString& Dest, const FString& Src,
-	                         const TArray<TFunction<void(FString& OutResult)>>& InFunction);
+	                         const TArray<TFunction<void(FString& OutResult)>>& InFunction, bool ReplaceExistingFile = true);
 
 	static void ReplacePluginBaseDir(FString& OutResult);
 
