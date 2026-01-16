@@ -5,6 +5,11 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "HAL/PlatformFileManager.h"
+#if WITH_EDITOR
+#include "WidgetBlueprint.h"
+#include "Animation/AnimBlueprint.h"
+#include "Animation/AnimInstance.h"
+#endif
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Common/NameEncode.h"
@@ -14,10 +19,14 @@
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Setting/UnrealCSharpSetting.h"
+#include "UEVersion.h"
 #if WITH_EDITOR
-#include "WidgetBlueprint.h"
-#include "Animation/AnimBlueprint.h"
-#include "Animation/AnimInstance.h"
+#if UE_SET_HANDLE_INFORMATION
+#if PLATFORM_WINDOWS
+#include "Windows/AllowWindowsPlatformTypes.h"
+#include "Windows/HideWindowsPlatformTypes.h"
+#endif
+#endif
 #endif
 
 #if WITH_EDITOR
@@ -1407,3 +1416,57 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObjec
 	InClass->ClassDefaultObject = InClassDefaultObject;
 #endif
 }
+
+#if WITH_EDITOR
+void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FString& InParms,
+                                               const TFunction<void(const int32, const FString&)>& InOnComplete)
+{
+	void* ReadPipe = nullptr;
+
+	void* WritePipe = nullptr;
+
+	auto OutProcessID = 0u;
+
+	FString Result;
+
+	FPlatformProcess::CreatePipe(ReadPipe, WritePipe);
+
+#if UE_SET_HANDLE_INFORMATION
+#if PLATFORM_WINDOWS
+	SetHandleInformation(WritePipe, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+
+	SetHandleInformation(ReadPipe, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+#endif
+#endif
+
+	auto ProcessHandle = FPlatformProcess::CreateProc(
+		*InURL,
+		*InParms,
+		false,
+		true,
+		true,
+		&OutProcessID,
+		1,
+		nullptr,
+		WritePipe,
+		ReadPipe);
+
+	while (ProcessHandle.IsValid() && FPlatformProcess::IsApplicationRunning(OutProcessID))
+	{
+		FPlatformProcess::Sleep(0.01f);
+
+		Result.Append(FPlatformProcess::ReadPipe(ReadPipe));
+	}
+
+	auto ReturnCode = 0;
+
+	if (FPlatformProcess::GetProcReturnCode(ProcessHandle, &ReturnCode))
+	{
+		InOnComplete(ReturnCode, Result);
+	}
+
+	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
+
+	FPlatformProcess::CloseProc(ProcessHandle);
+}
+#endif
