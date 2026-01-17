@@ -46,7 +46,8 @@ void FSolutionGenerator::Generator()
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplaceYield,
-			&FSolutionGenerator::ReplaceDefinition
+			&FSolutionGenerator::ReplaceDefinition,
+			&FSolutionGenerator::ReplaceScriptPath
 		});
 
 	CopyTemplate(
@@ -59,8 +60,6 @@ void FSolutionGenerator::Generator()
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplacePluginBaseDir,
-			&FSolutionGenerator::ReplaceDefineConstants,
-			&FSolutionGenerator::ReplaceOutputPath,
 			&FSolutionGenerator::ReplaceTargetFramework
 		});
 
@@ -70,16 +69,27 @@ void FSolutionGenerator::Generator()
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplaceImport,
-			&FSolutionGenerator::ReplaceDefineConstants,
-			&FSolutionGenerator::ReplaceOutputPath,
 			&FSolutionGenerator::ReplaceTargetFramework,
 			&FSolutionGenerator::ReplaceProjectReference
-		});
+		}, 
+		false);
 
 	CopyTemplate(
 		FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath(),
-		TemplatePath / DEFAULT_GAME_NAME + PROJECT_PROPS_SUFFIX);
-
+		TemplatePath / DEFAULT_GAME_NAME + PROJECT_PROPS_SUFFIX,
+		TArray<TFunction<void(FString& OutResult)>> {
+			&FSolutionGenerator::ReplaceOutputPath,
+		});
+	
+	
+	CopyTemplate(
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(), SHARED_PROPS_NAME + PROPS_SUFFIX),
+		FPaths::Combine(TemplatePath, SHARED_PROPS_NAME + PROPS_SUFFIX),
+		TArray<TFunction<void(FString& OutResult)>>
+		{
+			&FSolutionGenerator::ReplaceDefineConstants,
+		});
+	
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(),
 		                FUnrealCSharpFunctionLibrary::GetScriptDirectory() + SOLUTION_SUFFIX),
@@ -92,29 +102,30 @@ void FSolutionGenerator::Generator()
 		});
 }
 
-void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src)
+void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src, bool ReplaceExistingFile)
 {
-	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest))
+	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || ReplaceExistingFile)
 	{
 		FileManager.Copy(*Dest, *Src);
 	}
 }
 
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
-                                      const TArray<TFunction<void(FString& OutResult)>>& InFunction)
+                                      const TArray<TFunction<void(FString& OutResult)>>& InFunction, bool ReplaceExistingFile)
 {
-	FString Result;
-
-	FFileHelper::LoadFileToString(Result, *Src);
-
-	for (const auto& Function : InFunction)
+	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || ReplaceExistingFile)
 	{
-		Function(Result);
+		FString Result;
+
+		FFileHelper::LoadFileToString(Result, *Src);
+
+		for (const auto& Function : InFunction)
+		{
+			Function(Result);
+		}
+
+		FFileHelper::SaveStringToFile(Result, *Dest, FFileHelper::EEncodingOptions::ForceUTF8, &FileManager);
 	}
-
-	auto& FileManager = IFileManager::Get();
-
-	FFileHelper::SaveStringToFile(Result, *Dest, FFileHelper::EEncodingOptions::ForceUTF8, &FileManager);
 }
 
 void FSolutionGenerator::ReplacePluginBaseDir(FString& OutResult)
@@ -174,9 +185,9 @@ void FSolutionGenerator::ReplaceDefineConstants(FString& OutResult)
 
 void FSolutionGenerator::ReplaceOutputPath(FString& OutResult)
 {
-	OutResult = OutResult.Replace(TEXT("<OutputPath></OutputPath>"),
+	OutResult = OutResult.Replace(TEXT("<ScriptOutputPath></ScriptOutputPath>"),
 	                              *FString::Printf(TEXT(
-		                              "<OutputPath>..\\..\\Content\\%s</OutputPath>"
+		                              "<ScriptOutputPath>..\\..\\Content\\%s</ScriptOutputPath>"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory()
 	                              ));
@@ -230,11 +241,10 @@ void FSolutionGenerator::ReplaceDefinition(FString& OutResult)
 	                                               *DLL_SUFFIX
 	                              ));
 
-	OutResult = OutResult.Replace(TEXT("definition = ModuleDefinition.ReadModule(\"\");"),
+	OutResult = OutResult.Replace(TEXT("var ueAssemblyName = \"\";"),
 	                              *FString::Printf(TEXT(
-		                              "definition = ModuleDefinition.ReadModule(\"../../Content/%s/%s%s\");"
+		                              "var ueAssemblyName = \"%s\";"
 	                              ),
-	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory(),
 	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
 	                                               *DLL_SUFFIX
 	                              ));
@@ -326,4 +336,10 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 	                                               *SOLUTION_CONFIGURATION_PLATFORMS_PLACEHOLDER
 	                              ),
 	                              *SolutionConfigurationPlatforms);
+}
+
+void FSolutionGenerator::ReplaceScriptPath(FString& OutResult)
+{
+	OutResult = OutResult.Replace(TEXT("var scriptPathName = \"\";"),
+		*FString::Printf(TEXT("var scriptPathName = \"%s\";"), *PLUGIN_SCRIPT_PATH));
 }

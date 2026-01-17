@@ -1,18 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Shared.props" Condition="Exists('../Shared.props')" />
   <PropertyGroup>
     <TargetFramework></TargetFramework>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <RootNamespace>Script</RootNamespace>
-    <OutputPath></OutputPath>
-    <DebugType>Embedded</DebugType>
-    <DefineConstants></DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <NoWarn>1701;1702;8500</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <NoWarn>1701;1702;8500</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Plugins\UnrealCSharp\Script\UE\**" Exclude="..\..\Plugins\UnrealCSharp\Script\UE\**\*.DS_Store"></Compile>
