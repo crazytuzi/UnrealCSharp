@@ -1110,6 +1110,19 @@ UAssemblyLoader* FUnrealCSharpFunctionLibrary::GetAssemblyLoader()
 
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
+	const auto FileManager = &IFileManager::Get();
+
+	if (FileManager->FileExists(*InFileName))
+	{
+		if (FString Result; FFileHelper::LoadFileToString(Result, *InFileName))
+		{
+			if (Result.Equals(InString, ESearchCase::CaseSensitive))
+			{
+				return true;
+			}
+		}
+	}
+
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
 	if (const auto DirectoryName = FPaths::GetPath(InFileName);
@@ -1117,8 +1130,6 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 	{
 		PlatformFile.CreateDirectoryTree(*DirectoryName);
 	}
-
-	const auto FileManager = &IFileManager::Get();
 
 	return FFileHelper::SaveStringToFile(InString, *InFileName, FFileHelper::EEncodingOptions::ForceUTF8, FileManager,
 	                                     FILEWRITE_None);

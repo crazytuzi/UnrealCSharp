@@ -124,7 +124,7 @@ void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
 			Function(Result);
 		}
 
-		FFileHelper::SaveStringToFile(Result, *Dest, FFileHelper::EEncodingOptions::ForceUTF8, &FileManager);
+		FUnrealCSharpFunctionLibrary::SaveStringToFile(*Dest, Result);
 	}
 }
 
