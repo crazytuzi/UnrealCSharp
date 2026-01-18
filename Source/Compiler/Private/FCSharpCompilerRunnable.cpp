@@ -238,7 +238,6 @@ void FCSharpCompilerRunnable::Compile()
 		"build \"%s\" --nologo -c Debug"
 	),
 	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath()
-	                                    // ,      *FUnrealCSharpFunctionLibrary::GetFullPublishDirectory()
 	);
 
 	FNotificationInfo* NotificationInfo{};

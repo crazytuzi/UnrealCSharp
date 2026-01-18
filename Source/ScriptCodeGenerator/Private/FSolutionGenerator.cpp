@@ -1,7 +1,7 @@
 #include "FSolutionGenerator.h"
+#include "Misc/FileHelper.h"
 #include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
-#include "Misc/FileHelper.h"
 #include "Setting/UnrealCSharpSetting.h"
 
 void FSolutionGenerator::Generator()
@@ -71,25 +71,24 @@ void FSolutionGenerator::Generator()
 			&FSolutionGenerator::ReplaceImport,
 			&FSolutionGenerator::ReplaceTargetFramework,
 			&FSolutionGenerator::ReplaceProjectReference
-		}, 
+		},
 		false);
 
 	CopyTemplate(
-		FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath(),
-		TemplatePath / DEFAULT_GAME_NAME + PROJECT_PROPS_SUFFIX,
-		TArray<TFunction<void(FString& OutResult)>> {
+		FUnrealCSharpFunctionLibrary::GetGamePropsPath(),
+		TemplatePath / DEFAULT_GAME_NAME + PROPS_SUFFIX,
+		TArray<TFunction<void(FString& OutResult)>>{
 			&FSolutionGenerator::ReplaceOutputPath,
 		});
-	
-	
+
 	CopyTemplate(
-		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(), SHARED_PROPS_NAME + PROPS_SUFFIX),
-		FPaths::Combine(TemplatePath, SHARED_PROPS_NAME + PROPS_SUFFIX),
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(), SHARED_NAME + PROPS_SUFFIX),
+		FPaths::Combine(TemplatePath, SHARED_NAME + PROPS_SUFFIX),
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplaceDefineConstants,
 		});
-	
+
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetFullScriptDirectory(),
 		                FUnrealCSharpFunctionLibrary::GetScriptDirectory() + SOLUTION_SUFFIX),
@@ -102,18 +101,19 @@ void FSolutionGenerator::Generator()
 		});
 }
 
-void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src, bool ReplaceExistingFile)
+void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src, const bool bReplaceExistingFile)
 {
-	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || ReplaceExistingFile)
+	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || bReplaceExistingFile)
 	{
 		FileManager.Copy(*Dest, *Src);
 	}
 }
 
 void FSolutionGenerator::CopyTemplate(const FString& Dest, const FString& Src,
-                                      const TArray<TFunction<void(FString& OutResult)>>& InFunction, bool ReplaceExistingFile)
+                                      const TArray<TFunction<void(FString& OutResult)>>& InFunction,
+                                      const bool bReplaceExistingFile)
 {
-	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || ReplaceExistingFile)
+	if (auto& FileManager = IFileManager::Get(); !FileManager.FileExists(*Dest) || bReplaceExistingFile)
 	{
 		FString Result;
 
@@ -146,9 +146,9 @@ void FSolutionGenerator::ReplaceImport(FString& OutResult)
 		                              "<Import Project=\"%s%s\" Condition=\"Exists(\'%s%s\')\" />"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetGameName(),
-	                                               *PROJECT_PROPS_SUFFIX,
+	                                               *PROPS_SUFFIX,
 	                                               *FUnrealCSharpFunctionLibrary::GetGameName(),
-	                                               *PROJECT_PROPS_SUFFIX
+	                                               *PROPS_SUFFIX
 	                              ));
 }
 
@@ -245,8 +245,7 @@ void FSolutionGenerator::ReplaceDefinition(FString& OutResult)
 	                              *FString::Printf(TEXT(
 		                              "var ueAssemblyName = \"%s\";"
 	                              ),
-	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
-	                                               *DLL_SUFFIX
+	                                               *FUnrealCSharpFunctionLibrary::GetUEName()
 	                              ));
 }
 
@@ -341,5 +340,9 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 void FSolutionGenerator::ReplaceScriptPath(FString& OutResult)
 {
 	OutResult = OutResult.Replace(TEXT("var scriptPathName = \"\";"),
-		*FString::Printf(TEXT("var scriptPathName = \"%s\";"), *PLUGIN_SCRIPT_PATH));
+	                              *FString::Printf(TEXT(
+		                              "var scriptPathName = \"%s\";"
+	                              ),
+	                                               *PLUGIN_SCRIPT_PATH
+	                              ));
 }

@@ -1,12 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="" Condition="Exists('')" />
-  
   <PropertyGroup>
     <TargetFramework></TargetFramework>
   </PropertyGroup>
-  
   <ItemGroup>
-    <ProjectReference Include="" /> 
-  </ItemGroup>	
-  
+    <ProjectReference Include="" />
+  </ItemGroup>
 </Project>

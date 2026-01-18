@@ -3,6 +3,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>Script</RootNamespace>
     <DebugType>Embedded</DebugType>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
     <DefineConstants></DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

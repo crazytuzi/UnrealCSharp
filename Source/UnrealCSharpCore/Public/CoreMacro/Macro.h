@@ -38,7 +38,7 @@
 
 #define FODY_WEAVERS_NAME FString(TEXT("FodyWeavers"))
 
-#define SHARED_PROPS_NAME FString(TEXT("Shared"))
+#define SHARED_NAME FString(TEXT("Shared"))
 
 #define PROXY_NAME FString(TEXT("Proxy"))
 
@@ -53,8 +53,6 @@
 #define PROPS_SUFFIX FString(TEXT(".props"))
 
 #define PROJECT_SUFFIX FString(TEXT(".csproj"))
-
-#define PROJECT_PROPS_SUFFIX (PROJECT_SUFFIX + PROPS_SUFFIX)
 
 #define SOLUTION_SUFFIX FString(TEXT(".sln"))
 

@@ -122,7 +122,7 @@ public:
 
 	static FString GetGameProjectPath();
 
-	static FString GetGameProjectPropsPath();
+	static FString GetGamePropsPath();
 #endif
 
 #if WITH_EDITOR
