@@ -760,9 +760,9 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPath()
 	return GetGameDirectory() / GetGameName() + PROJECT_SUFFIX;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
+FString FUnrealCSharpFunctionLibrary::GetGamePropsPath()
 {
-	return GetGameDirectory() / GetGameName() + PROJECT_PROPS_SUFFIX;
+	return GetGameDirectory() / GetGameName() + PROPS_SUFFIX;
 }
 #endif
 

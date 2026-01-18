@@ -5,6 +5,7 @@ using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace Weavers
 {
@@ -1066,7 +1067,9 @@ namespace Weavers
 
             if (definition.Name != "")
             {
-                definition = ModuleDefinition.ReadModule("");
+                var path = GetUEAssemblyPath(AssemblyFilePath);
+
+                definition = ModuleDefinition.ReadModule(path);
             }
 
             _pathNameAttributeType = definition.GetType("Script.CoreUObject.PathNameAttribute");
@@ -1113,6 +1116,30 @@ namespace Weavers
 
             _getGarbageCollectionHandle = definition.GetType("Script.CoreUObject.UObject").Methods
                 .FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle");
+        }
+
+        private string GetUEAssemblyPath(string assemblyFilePath)
+        {
+            var scriptPathName = "";
+
+            var ueAssemblyName = "";
+
+            var scriptIndex = assemblyFilePath.LastIndexOf(scriptPathName, StringComparison.Ordinal);
+
+            var scriptPathNameLength = scriptPathName.Length;
+
+            var relativePath = assemblyFilePath.Substring(scriptIndex + scriptPathNameLength + 1,
+                assemblyFilePath.Length - scriptIndex - scriptPathNameLength - 1);
+
+            var basePath = assemblyFilePath.Substring(0, scriptIndex + scriptPathNameLength);
+
+            var segments = relativePath.Split(new[] { '\\', '/' });
+
+            segments[0] = ueAssemblyName;
+
+            segments[segments.Length - 1] = ueAssemblyName + ".dll";
+
+            return Path.Combine(basePath, Path.Combine(segments));
         }
     }
 

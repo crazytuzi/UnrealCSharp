@@ -235,10 +235,9 @@ void FCSharpCompilerRunnable::Compile()
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
 	const auto CompileParam = FString::Printf(TEXT(
-		"publish \"%s\" --nologo -c Debug -o \"%s\""
+		"build \"%s\" --nologo -c Debug"
 	),
-	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath(),
-	                                          *FUnrealCSharpFunctionLibrary::GetFullPublishDirectory()
+	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath()
 	);
 
 	FNotificationInfo* NotificationInfo{};

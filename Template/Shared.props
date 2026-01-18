@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <RootNamespace>Script</RootNamespace>
+    <DebugType>Embedded</DebugType>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <DefineConstants></DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <NoWarn>0109;1701;1702;8500</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <NoWarn>0109;1701;1702;8500</NoWarn>
+  </PropertyGroup>
+</Project>

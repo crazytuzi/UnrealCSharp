@@ -2,31 +2,8 @@
   <Import Project="" Condition="Exists('')" />
   <PropertyGroup>
     <TargetFramework></TargetFramework>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <RootNamespace>Script</RootNamespace>
-    <OutputPath></OutputPath>
-    <DebugType>Embedded</DebugType>
-    <DefineConstants></DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <NoWarn>0109;1701;1702;8500</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <NoWarn>0109;1701;1702;8500</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="" /> 
-    <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
-    <ProjectReference Include="..\Weavers\Weavers.csproj" ReferenceOutputAssembly="false" />
-  </ItemGroup>	
-  <ItemGroup>
-    <PackageReference Include="Fody" Version="6.8.0">
-    <PrivateAssets>all</PrivateAssets>
-    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <None Remove="FodyWeavers.xml" />
-    <None Remove="*.csproj.props" />
-    <WeaverFiles Include="$(ProjectDir)..\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
+    <ProjectReference Include="" />
   </ItemGroup>
 </Project>
