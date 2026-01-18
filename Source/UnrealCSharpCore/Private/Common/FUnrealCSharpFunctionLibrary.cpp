@@ -14,6 +14,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Common/NameEncode.h"
 #include "Domain/AssemblyLoader.h"
+#include "Domain/FMonoFunctionLibrary.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Dynamic/FDynamicClassGenerator.h"
@@ -1032,6 +1033,14 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 	       Add(GetFullUEPublishPath()).
 	       Add(GetFullGamePublishPath()).
 	       Append(GetFullCustomProjectsPublishPath()).
+	       Build();
+}
+
+TArray<FString> FUnrealCSharpFunctionLibrary::GetAssemblyPath()
+{
+	return TArrayBuilder<FString>().
+	       Add(FPaths::ProjectContentDir() / GetPublishDirectory()).
+	       Add(FMonoFunctionLibrary::GetNetDirectory()).
 	       Build();
 }
 

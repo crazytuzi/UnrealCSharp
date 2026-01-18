@@ -185,6 +185,8 @@ public:
 
 	static TArray<FString> GetFullAssemblyPublishPath();
 
+	static TArray<FString> GetAssemblyPath();
+
 #if WITH_EDITOR
 	static FString GetScriptDirectory();
 
