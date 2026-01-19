@@ -3,6 +3,13 @@
 #include "CoreMinimal.h"
 #include "UnrealCSharpEditorSetting.generated.h"
 
+UENUM()
+enum ESolutionConfiguration
+{
+	Debug,
+	Release
+};
+
 USTRUCT()
 struct FProjectDirectoryPath : public FDirectoryPath
 {
@@ -72,6 +79,10 @@ public:
 	TArray<FString> GetModuleList();
 
 	const TArray<FString>& GetClassBlacklist() const;
+
+	ESolutionConfiguration GetEditorConfiguration() const;
+
+	ESolutionConfiguration GetRuntimeConfiguration() const;
 #endif
 
 private:
@@ -126,5 +137,11 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bEnableExport"))
 	TArray<FString> ClassBlacklist;
+
+	UPROPERTY(Config, EditAnywhere, Category = Solution)
+	TEnumAsByte<ESolutionConfiguration> EditorConfiguration;
+
+	UPROPERTY(Config, EditAnywhere, Category = Solution)
+	TEnumAsByte<ESolutionConfiguration> RuntimeConfiguration;
 #endif
 };

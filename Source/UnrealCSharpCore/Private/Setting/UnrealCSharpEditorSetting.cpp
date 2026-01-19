@@ -30,7 +30,9 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bIsGenerateAllModules(true),
 	bIsGenerateAsset(true),
 	bIsGenerateFunctionComment(true),
-	bEnableExport(false)
+	bEnableExport(false),
+	EditorConfiguration(ESolutionConfiguration::Debug),
+	RuntimeConfiguration(ESolutionConfiguration::Release)
 #else
 	Super(ObjectInitializer)
 #endif
@@ -312,6 +314,16 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 const TArray<FString>& UUnrealCSharpEditorSetting::GetClassBlacklist() const
 {
 	return ClassBlacklist;
+}
+
+ESolutionConfiguration UUnrealCSharpEditorSetting::GetEditorConfiguration() const
+{
+	return EditorConfiguration;
+}
+
+ESolutionConfiguration UUnrealCSharpEditorSetting::GetRuntimeConfiguration() const
+{
+	return RuntimeConfiguration;
 }
 #endif
 

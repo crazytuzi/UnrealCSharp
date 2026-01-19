@@ -21,7 +21,7 @@
 			<ScriptOutputPath></ScriptOutputPath>
 		</PropertyGroup>
 		<ItemGroup>
-			<PublishFiles Include="$(PublishDir)*.*" />
+			<PublishFiles Include="$(PublishDir)*.dll" />
 		</ItemGroup>
 		<MakeDir Directories="$(ScriptOutputPath)" Condition="!Exists('$(ScriptOutputPath)')" />
 		<Copy SourceFiles="@(PublishFiles)" DestinationFolder="$(ScriptOutputPath)" />

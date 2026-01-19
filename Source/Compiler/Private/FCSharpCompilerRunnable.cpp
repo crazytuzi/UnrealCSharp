@@ -232,12 +232,28 @@ void FCSharpCompilerRunnable::Compile()
 		NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
 	});
 
+	auto GetSolutionConfiguration = []()
+	{
+		if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+			UUnrealCSharpEditorSetting>())
+		{
+			return IsRunningCookCommandlet()
+				       ? UnrealCSharpEditorSetting->GetRuntimeConfiguration()
+				       : UnrealCSharpEditorSetting->GetEditorConfiguration();
+		}
+
+		return ESolutionConfiguration::Debug;
+	};
+
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
 	const auto CompileParam = FString::Printf(TEXT(
-		"build \"%s\" --nologo -c Debug"
+		"build \"%s\" --nologo -c %s"
 	),
-	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath()
+	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath(),
+	                                          GetSolutionConfiguration() == ESolutionConfiguration::Debug
+		                                          ? TEXT("Debug")
+		                                          : TEXT("Release")
 	);
 
 	FNotificationInfo* NotificationInfo{};
