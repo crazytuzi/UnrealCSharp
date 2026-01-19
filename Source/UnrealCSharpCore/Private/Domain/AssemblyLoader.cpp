@@ -1,17 +1,24 @@
 #include "Domain/AssemblyLoader.h"
-#include "CoreMacro/Macro.h"
-#include "Domain/FMonoFunctionLibrary.h"
 #include "Misc/FileHelper.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "CoreMacro/Macro.h"
 
 TArray<uint8> UAssemblyLoader::Load(const FString& InAssemblyName)
 {
-	const auto Directory = FMonoFunctionLibrary::GetNetDirectory();
+	auto AssemblyPaths = FUnrealCSharpFunctionLibrary::GetAssemblyPath();
 
-	const auto File = FPaths::Combine(Directory, InAssemblyName) + DLL_SUFFIX;
+	for (const auto& AssemblyPath : AssemblyPaths)
+	{
+		if (const auto File = FPaths::Combine(AssemblyPath, InAssemblyName) + DLL_SUFFIX;
+			IFileManager::Get().FileExists(*File))
+		{
+			TArray<uint8> Data;
 
-	TArray<uint8> Data;
+			FFileHelper::LoadFileToArray(Data, *File);
 
-	FFileHelper::LoadFileToArray(Data, *File);
+			return Data;
+		}
+	}
 
-	return Data;
+	return {};
 }

@@ -1,0 +1,29 @@
+﻿<Project>
+    <Import Project="../Shared.props" Condition="Exists('../Shared.props')" />
+    <ItemGroup>
+        <PackageReference Include="Fody" Version="6.9.3">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <None Remove="FodyWeavers.xml" />
+        <None Remove="*.props" />
+        <WeaverFiles Include="$(ProjectDir)..\Weavers\bin\$(Configuration)\netstandard2.0\Weavers.dll" WeaverClassNames="UnrealTypeWeaver" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <ProjectReference Include="..\Weavers\Weavers.csproj" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+	<Target Name="AfterBuildPublish" AfterTargets="Build">
+		<MSBuild Projects="$(ProjectPath)" Targets="Publish" Properties="Configuration=$(Configuration)" />
+	</Target>
+	<Target Name="CopyDllsAfterPublish" AfterTargets="Publish">
+		<PropertyGroup>
+			<ScriptOutputPath></ScriptOutputPath>
+		</PropertyGroup>
+		<ItemGroup>
+			<PublishFiles Include="$(PublishDir)*.dll" />
+		</ItemGroup>
+		<MakeDir Directories="$(ScriptOutputPath)" Condition="!Exists('$(ScriptOutputPath)')" />
+		<Copy SourceFiles="@(PublishFiles)" DestinationFolder="$(ScriptOutputPath)" />
+	</Target>
+</Project>

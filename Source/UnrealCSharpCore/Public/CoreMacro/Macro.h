@@ -38,6 +38,8 @@
 
 #define FODY_WEAVERS_NAME FString(TEXT("FodyWeavers"))
 
+#define SHARED_NAME FString(TEXT("Shared"))
+
 #define PROXY_NAME FString(TEXT("Proxy"))
 
 #define BINDING_NAME FString(TEXT("Binding"))
@@ -48,9 +50,9 @@
 
 #define SOLUTION_CONFIGURATION_PLATFORMS_PLACEHOLDER FString(TEXT("SolutionConfigurationPlatformsPlaceholder"))
 
-#define PROJECT_SUFFIX FString(TEXT(".csproj"))
+#define PROPS_SUFFIX FString(TEXT(".props"))
 
-#define PROJECT_PROPS_SUFFIX FString(TEXT(".csproj.props"))
+#define PROJECT_SUFFIX FString(TEXT(".csproj"))
 
 #define SOLUTION_SUFFIX FString(TEXT(".sln"))
 

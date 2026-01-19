@@ -14,6 +14,7 @@
 #include "CoreMacro/NamespaceMacro.h"
 #include "Common/NameEncode.h"
 #include "Domain/AssemblyLoader.h"
+#include "Domain/FMonoFunctionLibrary.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Dynamic/FDynamicClassGenerator.h"
@@ -760,9 +761,9 @@ FString FUnrealCSharpFunctionLibrary::GetGameProjectPath()
 	return GetGameDirectory() / GetGameName() + PROJECT_SUFFIX;
 }
 
-FString FUnrealCSharpFunctionLibrary::GetGameProjectPropsPath()
+FString FUnrealCSharpFunctionLibrary::GetGamePropsPath()
 {
-	return GetGameDirectory() / GetGameName() + PROJECT_PROPS_SUFFIX;
+	return GetGameDirectory() / GetGameName() + PROPS_SUFFIX;
 }
 #endif
 
@@ -1035,6 +1036,14 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 	       Build();
 }
 
+TArray<FString> FUnrealCSharpFunctionLibrary::GetAssemblyPath()
+{
+	return TArrayBuilder<FString>().
+	       Add(FPaths::ProjectContentDir() / GetPublishDirectory()).
+	       Add(FMonoFunctionLibrary::GetNetDirectory()).
+	       Build();
+}
+
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetScriptDirectory()
 {
@@ -1101,6 +1110,19 @@ UAssemblyLoader* FUnrealCSharpFunctionLibrary::GetAssemblyLoader()
 
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
+	const auto FileManager = &IFileManager::Get();
+
+	if (FileManager->FileExists(*InFileName))
+	{
+		if (FString Result; FFileHelper::LoadFileToString(Result, *InFileName))
+		{
+			if (Result.Equals(InString, ESearchCase::CaseSensitive))
+			{
+				return true;
+			}
+		}
+	}
+
 	auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
 	if (const auto DirectoryName = FPaths::GetPath(InFileName);
@@ -1108,8 +1130,6 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 	{
 		PlatformFile.CreateDirectoryTree(*DirectoryName);
 	}
-
-	const auto FileManager = &IFileManager::Get();
 
 	return FFileHelper::SaveStringToFile(InString, *InFileName, FFileHelper::EEncodingOptions::ForceUTF8, FileManager,
 	                                     FILEWRITE_None);

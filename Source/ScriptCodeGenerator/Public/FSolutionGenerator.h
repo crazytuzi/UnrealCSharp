@@ -8,10 +8,11 @@ public:
 	static SCRIPTCODEGENERATOR_API void Generator();
 
 private:
-	static void CopyTemplate(const FString& Dest, const FString& Src);
+	static void CopyTemplate(const FString& Dest, const FString& Src, bool bReplaceExistingFile = true);
 
 	static void CopyTemplate(const FString& Dest, const FString& Src,
-	                         const TArray<TFunction<void(FString& OutResult)>>& InFunction);
+	                         const TArray<TFunction<void(FString& OutResult)>>& InFunction,
+	                         bool bReplaceExistingFile = true);
 
 	static void ReplacePluginBaseDir(FString& OutResult);
 
@@ -34,4 +35,6 @@ private:
 	static void ReplaceProjectPlaceholder(FString& OutResult);
 
 	static void ReplaceSolutionConfigurationPlatformsPlaceholder(FString& OutResult);
+
+	static void ReplaceScriptPath(FString& OutResult);
 };

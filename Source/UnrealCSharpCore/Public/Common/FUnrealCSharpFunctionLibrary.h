@@ -122,7 +122,7 @@ public:
 
 	static FString GetGameProjectPath();
 
-	static FString GetGameProjectPropsPath();
+	static FString GetGamePropsPath();
 #endif
 
 #if WITH_EDITOR
@@ -184,6 +184,8 @@ public:
 	static TArray<FString> GetFullCustomProjectsPublishPath();
 
 	static TArray<FString> GetFullAssemblyPublishPath();
+
+	static TArray<FString> GetAssemblyPath();
 
 #if WITH_EDITOR
 	static FString GetScriptDirectory();

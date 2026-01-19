@@ -6,7 +6,7 @@
 
 # 概述
 
-&ensp;&ensp;&ensp;&ensp;UnrealCSharp是UE下C#编程插件，基于.NET 8（Mono）。提供多种编程模式，功能强大且容易上手，能够灵活高效地进行游戏开发。
+&ensp;&ensp;&ensp;&ensp;UnrealCSharp是UE下C#编程插件，基于.NET 10（Mono）。提供多种编程模式，功能强大且容易上手，能够灵活高效地进行游戏开发。
 
 # 特性列表
 
