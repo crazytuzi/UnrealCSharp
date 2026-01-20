@@ -89,6 +89,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\t[PathName(\"%s\")]\n"
@@ -98,6 +99,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		"\t}\n"
 		"}"
 	),
+	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
 	                                     *PathNameAttributeContent,
