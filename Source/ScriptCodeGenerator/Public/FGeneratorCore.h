@@ -32,6 +32,8 @@ public:
 
 	static TArray<FString> GetOverrideFunctions(const FString& InNameSpace, const FString& InClass);
 
+	static const FString& GetGeneratorHeaderComment();
+
 	static bool IsSkip(const UField* InField);
 
 	static bool IsSupported(FProperty* Property);
@@ -68,6 +70,8 @@ private:
 	static TMap<TWeakObjectPtr<const UObject>, bool> SupportedMap;
 
 	static TArray<FName> SupportedAssetClassName;
+
+	static FString GeneratorHeaderComment;
 };
 
 #include "FGeneratorCore.inl"

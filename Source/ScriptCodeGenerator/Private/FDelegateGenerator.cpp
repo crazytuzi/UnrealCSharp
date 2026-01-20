@@ -371,6 +371,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\tpublic class %s : IGarbageCollectionHandle\n"
@@ -387,6 +388,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		"\t}\n"
 		"}\n"
 	),
+	                               *FGeneratorCore::GetGeneratorHeaderComment(),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *ClassContent,
