@@ -301,6 +301,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\t[PathName(\"%s\")]\n"
@@ -320,6 +321,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"\t}\n"
 		"}"
 	),
+	                               *FGeneratorCore::GetGeneratorHeaderComment(),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *PathNameAttributeContent,

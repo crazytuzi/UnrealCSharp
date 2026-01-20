@@ -27,6 +27,13 @@ TMap<TWeakObjectPtr<const UObject>, bool> FGeneratorCore::SupportedMap;
 
 TArray<FName> FGeneratorCore::SupportedAssetClassName;
 
+FString FGeneratorCore::GeneratorHeaderComment = TEXT(
+	"/*===========================================================================\n"
+	"    Generated code exported from UnrealCSharp.\n"
+	"    DO NOT modify this manually!\n"
+	"===========================================================================*/\n"
+);
+
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
 	if (InField == nullptr)
@@ -645,6 +652,11 @@ TArray<FString> FGeneratorCore::GetOverrideFunctions(const FString& InNameSpace,
 	));
 
 	return FoundFunctions != nullptr ? *FoundFunctions : TArray<FString>{};
+}
+
+const FString& FGeneratorCore::GetGeneratorHeaderComment()
+{
+	return GeneratorHeaderComment;
 }
 
 bool FGeneratorCore::IsSkip(const UField* InField)

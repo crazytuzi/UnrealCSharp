@@ -1,4 +1,5 @@
 #include "FBindingEnumGenerator.h"
+#include "FGeneratorCore.h"
 #include "Binding/FBinding.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
@@ -38,6 +39,7 @@ void FBindingEnumGenerator::Generator(const FBindingEnum* InEnum)
 	}
 
 	const auto Content = FString::Printf(TEXT(
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\tpublic enum %s : %s\n"
@@ -46,6 +48,7 @@ void FBindingEnumGenerator::Generator(const FBindingEnum* InEnum)
 		"\t}\n"
 		"}"
 	),
+	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *NameSpaceContent[0],
 	                                     *ClassContent,
 	                                     *InEnum->GetUnderlyingType(),

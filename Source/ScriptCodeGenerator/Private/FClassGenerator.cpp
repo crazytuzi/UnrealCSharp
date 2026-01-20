@@ -831,6 +831,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\t[PathName(\"%s\")]\n"
@@ -848,6 +849,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		"%s"
 		"}"
 	),
+	                               *FGeneratorCore::GetGeneratorHeaderComment(),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *PathNameAttributeContent,
