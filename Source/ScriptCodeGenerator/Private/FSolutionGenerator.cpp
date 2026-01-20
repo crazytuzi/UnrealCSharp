@@ -3,6 +3,7 @@
 #include "CoreMacro/Macro.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Setting/UnrealCSharpSetting.h"
+#include "FGeneratorCore.h"
 
 void FSolutionGenerator::Generator()
 {
@@ -15,21 +16,34 @@ void FSolutionGenerator::Generator()
 		ScriptPath / CODE_ANALYSIS_NAME / CODE_ANALYSIS_NAME + PROJECT_SUFFIX,
 		TArray<TFunction<void(FString& OutResult)>>
 		{
-			&FSolutionGenerator::ReplaceTargetFramework
+			&FSolutionGenerator::ReplaceTargetFramework,
+			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetCodeAnalysisCSProjPath(), CODE_ANALYSIS_NAME + CSHARP_SUFFIX),
-		ScriptPath / CODE_ANALYSIS_NAME / CODE_ANALYSIS_NAME + CSHARP_SUFFIX);
+		ScriptPath / CODE_ANALYSIS_NAME / CODE_ANALYSIS_NAME + CSHARP_SUFFIX,
+		TArray<TFunction<void(FString& OutResult)>>
+		{
+			&FSolutionGenerator::AddCSharpGeneratorHeaderComment
+		});
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetSourceGeneratorPath(), SOURCE_GENERATOR_NAME + PROJECT_SUFFIX),
-		ScriptPath / SOURCE_GENERATOR_NAME / SOURCE_GENERATOR_NAME + PROJECT_SUFFIX);
+		ScriptPath / SOURCE_GENERATOR_NAME / SOURCE_GENERATOR_NAME + PROJECT_SUFFIX,
+		TArray<TFunction<void(FString& OutResult)>>
+		{
+			&FSolutionGenerator::AddProjectGeneratorHeaderComment
+		});
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetSourceGeneratorPath(),
 		                UNREAL_TYPE_SOURCE_GENERATOR_NAME + CSHARP_SUFFIX),
-		ScriptPath / SOURCE_GENERATOR_NAME / UNREAL_TYPE_SOURCE_GENERATOR_NAME + CSHARP_SUFFIX);
+		ScriptPath / SOURCE_GENERATOR_NAME / UNREAL_TYPE_SOURCE_GENERATOR_NAME + CSHARP_SUFFIX,
+		TArray<TFunction<void(FString& OutResult)>>
+		{
+			&FSolutionGenerator::AddCSharpGeneratorHeaderComment
+		});
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetSourceGeneratorPath(),
@@ -38,7 +52,11 @@ void FSolutionGenerator::Generator()
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetWeaversPath(), WEAVERS_NAME + PROJECT_SUFFIX),
-		ScriptPath / WEAVERS_NAME / WEAVERS_NAME + PROJECT_SUFFIX);
+		ScriptPath / WEAVERS_NAME / WEAVERS_NAME + PROJECT_SUFFIX,
+		TArray<TFunction<void(FString& OutResult)>>{
+			&FSolutionGenerator::ReplaceOutputPath,
+			&FSolutionGenerator::AddProjectGeneratorHeaderComment
+		});
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetWeaversPath(), UNREAL_TYPE_WEAVER_NAME + CSHARP_SUFFIX),
@@ -47,7 +65,8 @@ void FSolutionGenerator::Generator()
 		{
 			&FSolutionGenerator::ReplaceYield,
 			&FSolutionGenerator::ReplaceDefinition,
-			&FSolutionGenerator::ReplaceScriptPath
+			&FSolutionGenerator::ReplaceScriptPath,
+			&FSolutionGenerator::AddCSharpGeneratorHeaderComment
 		});
 
 	CopyTemplate(
@@ -60,7 +79,8 @@ void FSolutionGenerator::Generator()
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplacePluginBaseDir,
-			&FSolutionGenerator::ReplaceTargetFramework
+			&FSolutionGenerator::ReplaceTargetFramework,
+			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
 	CopyTemplate(
@@ -79,6 +99,7 @@ void FSolutionGenerator::Generator()
 		TemplatePath / DEFAULT_GAME_NAME + PROPS_SUFFIX,
 		TArray<TFunction<void(FString& OutResult)>>{
 			&FSolutionGenerator::ReplaceOutputPath,
+			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
 	CopyTemplate(
@@ -87,6 +108,7 @@ void FSolutionGenerator::Generator()
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplaceDefineConstants,
+			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
 	CopyTemplate(
@@ -97,7 +119,8 @@ void FSolutionGenerator::Generator()
 		{
 			&FSolutionGenerator::ReplaceProject,
 			&FSolutionGenerator::ReplaceProjectPlaceholder,
-			&FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder
+			&FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder,
+			&FSolutionGenerator::AddSolutionGeneratorHeaderComment
 		});
 }
 
@@ -345,4 +368,42 @@ void FSolutionGenerator::ReplaceScriptPath(FString& OutResult)
 	                              ),
 	                                               *PLUGIN_SCRIPT_PATH
 	                              ));
+}
+
+void FSolutionGenerator::AddProjectGeneratorHeaderComment(FString& OutResult)
+{
+	OutResult = FString::Printf(TEXT(
+		"<!-- ===========================================================================\n"
+		"    Generated code exported from UnrealCSharp.\n"
+		"    DO NOT modify this manually!\n"
+		"============================================================================ -->\n"
+		"\n"
+		"%s"
+	),
+	                            *OutResult
+	);
+}
+
+void FSolutionGenerator::AddSolutionGeneratorHeaderComment(FString& OutResult)
+{
+	OutResult = FString::Printf(TEXT(
+		"# ===========================================================================\n"
+		"#    Generated code exported from UnrealCSharp.\n"
+		"#    DO NOT modify this manually!\n"
+		"# ===========================================================================\n"
+		"\n"
+		"%s"
+	),
+	                            *OutResult
+	);
+}
+
+void FSolutionGenerator::AddCSharpGeneratorHeaderComment(FString& OutResult)
+{
+	OutResult = FString::Printf(TEXT(
+		"%s\n%s"
+	),
+	                            *FGeneratorCore::GetGeneratorHeaderComment(),
+	                            *OutResult
+	);
 }
