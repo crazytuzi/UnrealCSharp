@@ -311,6 +311,28 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 	return ModuleArray;
 }
 
+TArray<FString> UUnrealCSharpEditorSetting::GetAllClasses()
+{
+	TArray<FString> ClassArray;
+
+	for (TObjectIterator<UClass> It; It; ++It)
+	{
+		if (const auto Class = *It; Class && Class->HasAnyClassFlags(CLASS_Native))
+		{
+			auto FullClassName = FString::Printf(TEXT(
+				"%s%s"
+			),
+			                                     Class->GetPrefixCPP(),
+			                                     *Class->GetName()
+			);
+
+			ClassArray.AddUnique(FullClassName);
+		}
+	}
+
+	return ClassArray;
+}
+
 const TArray<FString>& UUnrealCSharpEditorSetting::GetClassBlacklist() const
 {
 	return ClassBlacklist;

@@ -78,6 +78,9 @@ public:
 	UFUNCTION()
 	TArray<FString> GetModuleList();
 
+	UFUNCTION()
+	TArray<FString> GetAllClasses();
+
 	const TArray<FString>& GetClassBlacklist() const;
 
 	ESolutionConfiguration GetEditorConfiguration() const;
@@ -135,7 +138,8 @@ private:
 		meta = (GetOptions = "GetModuleList", EditCondition = "bEnableExport"))
 	TArray<FString> ExportModule;
 
-	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bEnableExport"))
+	UPROPERTY(Config, EditAnywhere, Category = Generator,
+		meta = (GetOptions = "GetAllClasses", EditCondition = "bEnableExport"))
 	TArray<FString> ClassBlacklist;
 
 	UPROPERTY(Config, EditAnywhere, Category = Solution)
