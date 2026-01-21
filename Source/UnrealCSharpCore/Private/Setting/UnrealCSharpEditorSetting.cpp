@@ -317,13 +317,14 @@ TArray<FString> UUnrealCSharpEditorSetting::GetAllClasses()
 
 	for (TObjectIterator<UClass> It; It; ++It)
 	{
-		if (const auto Class = *It; Class->HasAnyClassFlags(CLASS_Native))
+		if (const auto Class = *It; Class && Class->HasAnyClassFlags(CLASS_Native))
 		{
-			FString Prefix = Class->GetPrefixCPP();
-
-			FString ClassName = Class->GetName();
-
-			FString FullClassName = Prefix + ClassName;
+			auto FullClassName = FString::Printf(TEXT(
+				"%s%s"
+			),
+			                                     Class->GetPrefixCPP(),
+			                                     *Class->GetName()
+			);
 
 			ClassArray.AddUnique(FullClassName);
 		}
