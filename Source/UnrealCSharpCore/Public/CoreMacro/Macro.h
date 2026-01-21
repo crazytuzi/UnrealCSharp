@@ -60,6 +60,8 @@
 
 #define CSHARP_SUFFIX FString(TEXT(".cs"))
 
+#define REGULAR_CSHARP FString(TEXT("*.cs"))
+
 #define MARKDOWN_SUFFIX FString(TEXT(".md"))
 
 #define XML_SUFFIX FString(TEXT(".xml"))

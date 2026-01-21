@@ -1,6 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UnrealCSharpEditor.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "ToolMenus.h"
+#include "Internationalization/Culture.h"
+#include "Settings/ProjectPackagingSettings.h"
+#include "Misc/ScopedSlowTask.h"
+#include "IContentBrowserDataModule.h"
 #include "FAssetGenerator.h"
 #include "FClassGenerator.h"
 #include "FCSharpCompiler.h"
@@ -12,14 +18,9 @@
 #include "FBindingEnumGenerator.h"
 #include "UnrealCSharpEditorStyle.h"
 #include "UnrealCSharpEditorCommands.h"
-#include "ToolMenus.h"
-#include "Internationalization/Culture.h"
-#include "Settings/ProjectPackagingSettings.h"
 #include "FCodeAnalysis.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
-#include "Misc/ScopedSlowTask.h"
 #include "Dynamic/FDynamicGenerator.h"
-#include "IContentBrowserDataModule.h"
 #include "ToolBar/UnrealCSharpPlayToolBar.h"
 #include "ToolBar/UnrealCSharpBlueprintToolBar.h"
 #include "DetailCustomization/GameContentDirectoryPathCustomization.h"
@@ -113,7 +114,13 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	if (IsRunningCookCommandlet())
 	{
-		Generator();
+		if (const auto AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+		{
+			AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
+			{
+				Generator();
+			});
+		}
 	}
 }
 
@@ -274,8 +281,6 @@ void FUnrealCSharpEditorModule::Generator()
 
 	FAssetGenerator::Generator();
 
-	FGeneratorCore::EndGenerator();
-
 	if (!CurrentCultureName.Equals(DefaultCultureName))
 	{
 		FInternationalization::Get().SetCurrentCulture(CurrentCultureName);
@@ -288,6 +293,8 @@ void FUnrealCSharpEditorModule::Generator()
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "BindingEnum Generator"));
 
 	FBindingEnumGenerator::Generator();
+
+	FGeneratorCore::EndGenerator();
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Garbage Collect"));
 
