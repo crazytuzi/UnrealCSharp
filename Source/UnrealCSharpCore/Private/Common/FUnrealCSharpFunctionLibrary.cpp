@@ -1325,6 +1325,18 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 	return ProjectModuleList;
 }
 
+int32 FUnrealCSharpFunctionLibrary::GetDotnetVersion()
+{
+	int32 DotnetVersion = EDotnetVersion::Latest;
+
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		DotnetVersion = UnrealCSharpSetting->GetDotnetVersion();
+	}
+
+	return DotnetVersion == EDotnetVersion::Latest ? DotnetVersion - 1 : DotnetVersion;
+}
+
 #if WITH_EDITOR
 bool FUnrealCSharpFunctionLibrary::IsSpecialClass(const UClass* InClass)
 {

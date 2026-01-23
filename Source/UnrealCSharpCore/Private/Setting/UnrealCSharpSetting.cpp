@@ -17,7 +17,8 @@ UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectIniti
 	  AssemblyLoader(UAssemblyLoader::StaticClass()),
 	  bEnableDebug(false),
 	  Port(0),
-	  bEnableImmediatelyActive(true)
+	  bEnableImmediatelyActive(true),
+	  DotnetVersion(EDotnetVersion::Latest)
 {
 }
 
@@ -114,6 +115,11 @@ int32 UUnrealCSharpSetting::GetPort() const
 bool UUnrealCSharpSetting::IsEnableImmediatelyActive() const
 {
 	return bEnableImmediatelyActive;
+}
+
+int32 UUnrealCSharpSetting::GetDotnetVersion() const
+{
+	return DotnetVersion;
 }
 
 #undef LOCTEXT_NAMESPACE

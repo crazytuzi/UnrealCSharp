@@ -222,7 +222,7 @@ void FSolutionGenerator::ReplaceTargetFramework(FString& OutResult)
 	                              *FString::Printf(TEXT(
 		                              "<TargetFramework>net%d.%d</TargetFramework>"
 	                              ),
-	                                               DOTNET_MAJOR_VERSION,
+	                                               FUnrealCSharpFunctionLibrary::GetDotnetVersion(),
 	                                               DOTNET_MINOR_VERSION
 	                              )
 	);
