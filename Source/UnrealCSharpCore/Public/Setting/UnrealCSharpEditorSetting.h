@@ -55,6 +55,8 @@ public:
 
 	bool EnableDeleteProxyDirectory() const;
 
+	bool EnableDeleteBindingDirectory() const;
+
 	bool EnableCompiled() const;
 
 	bool EnableAssetChanged() const;
@@ -79,7 +81,7 @@ public:
 	TArray<FString> GetModuleList();
 
 	UFUNCTION()
-	TArray<FString> GetAllClasses();
+	TArray<FString> GetClassList();
 
 	const TArray<FString>& GetClassBlacklist() const;
 
@@ -98,6 +100,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bEnableDeleteProxyDirectory;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bEnableDeleteBindingDirectory;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bEnableCompiled;
@@ -139,7 +144,7 @@ private:
 	TArray<FString> ExportModule;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator,
-		meta = (GetOptions = "GetAllClasses", EditCondition = "bEnableExport"))
+		meta = (GetOptions = "GetClassList", EditCondition = "bEnableExport"))
 	TArray<FString> ClassBlacklist;
 
 	UPROPERTY(Config, EditAnywhere, Category = Solution)

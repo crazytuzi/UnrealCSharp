@@ -735,6 +735,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + CSHARP_SUFFIX;
 
+	FGeneratorCore::AddGeneratorFile(FileName);
+
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
 
@@ -940,6 +942,8 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 	const auto FileName = FPaths::Combine(DirectoryName,
 	                                      BINDING_COMBINE_CLASS_IMPLEMENTATION(FileBaseName)) + CSHARP_SUFFIX;
+
+	FGeneratorCore::AddGeneratorFile(FileName);
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

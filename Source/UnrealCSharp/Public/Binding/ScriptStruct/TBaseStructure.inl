@@ -91,6 +91,15 @@ struct TBaseStructure<FIntVector>
 #endif
 
 template <>
+struct TBaseStructure<FIntVector2>
+{
+	static auto Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FIntVector2));
+	}
+};
+
+template <>
 struct TBaseStructure<FExpressionInput>
 {
 	static auto Get()
@@ -105,6 +114,15 @@ struct TBaseStructure<FExpressionOutput>
 	static auto Get()
 	{
 		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FExpressionOutput));
+	}
+};
+
+template <>
+struct TBaseStructure<FVector2f>
+{
+	static auto Get()
+	{
+		return StaticGetBaseStructureInternal(*BINDING_REMOVE_PREFIX_CLASS_STR(FVector2f));
 	}
 };
 

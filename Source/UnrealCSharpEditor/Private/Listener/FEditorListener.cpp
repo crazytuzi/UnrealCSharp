@@ -185,22 +185,23 @@ void FEditorListener::OnBeginGenerator()
 				PlatformFile.DeleteDirectoryRecursively(*GameProxyDirectory);
 			}
 		}
-	}
 
-	auto BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(),
-	                                   FUnrealCSharpFunctionLibrary::GetBindingDirectory());
+		if (UnrealCSharpEditorSetting->EnableDeleteBindingDirectory())
+		{
+			if (const auto UEBindingDirectory = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(),
+			                                                    FUnrealCSharpFunctionLibrary::GetBindingDirectory());
+				PlatformFile.DirectoryExists(*UEBindingDirectory))
+			{
+				PlatformFile.DeleteDirectoryRecursively(*UEBindingDirectory);
+			}
 
-	if (PlatformFile.DirectoryExists(*BindingPath))
-	{
-		PlatformFile.DeleteDirectoryRecursively(*BindingPath);
-	}
-
-	BindingPath = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(),
-	                              FUnrealCSharpFunctionLibrary::GetBindingDirectory());
-
-	if (PlatformFile.DirectoryExists(*BindingPath))
-	{
-		PlatformFile.DeleteDirectoryRecursively(*BindingPath);
+			if (const auto GameBindingDirectory = FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(),
+			                                                      FUnrealCSharpFunctionLibrary::GetBindingDirectory());
+				PlatformFile.DirectoryExists(*GameBindingDirectory))
+			{
+				PlatformFile.DeleteDirectoryRecursively(*GameBindingDirectory);
+			}
+		}
 	}
 
 	bIsGenerating = true;
@@ -369,7 +370,7 @@ void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunct
 		{
 			if (!bIsPIEPlaying && !bIsGenerating)
 			{
-				FGeneratorCore::BeginGenerator();
+				FGeneratorCore::BeginGenerator(false);
 
 				if (FGeneratorCore::IsSupported(InAssetData))
 				{
@@ -378,7 +379,7 @@ void FEditorListener::OnAssetChanged(const FAssetData& InAssetData, const TFunct
 					FCSharpCompiler::Get().Compile();
 				}
 
-				FGeneratorCore::EndGenerator();
+				FGeneratorCore::EndGenerator(false);
 			}
 		}
 	}

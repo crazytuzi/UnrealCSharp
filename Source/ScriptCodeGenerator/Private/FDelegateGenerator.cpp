@@ -403,7 +403,11 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *GCHandleContent
 	);
 
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InDelegateProperty), Content);
+	const auto FileName = FGeneratorCore::GetFileName(InDelegateProperty);
+
+	FGeneratorCore::AddGeneratorFile(FileName);
+
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
 
 void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelegateProperty)
@@ -756,5 +760,9 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *GCHandleContent
 	);
 
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InMulticastDelegateProperty), Content);
+	const auto FileName = FGeneratorCore::GetFileName(InMulticastDelegateProperty);
+
+	FGeneratorCore::AddGeneratorFile(FileName);
+
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
