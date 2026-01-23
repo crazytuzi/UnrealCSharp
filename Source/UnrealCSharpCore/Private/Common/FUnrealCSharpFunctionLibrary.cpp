@@ -1044,18 +1044,6 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetAssemblyPath()
 	       Build();
 }
 
-int32 FUnrealCSharpFunctionLibrary::GetDotnetVersion()
-{
-	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
-	{
-		const auto DotnetVersion = UnrealCSharpSetting->GetDotnetVersion();
-
-		return DotnetVersion == EDotnetVersion::Latest ? DotnetVersion - 1 : DotnetVersion;
-	}
-
-	return DOTNET_MAJOR_VERSION;
-}
-
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetScriptDirectory()
 {
@@ -1335,6 +1323,18 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 	}
 
 	return ProjectModuleList;
+}
+
+int32 FUnrealCSharpFunctionLibrary::GetDotnetVersion()
+{
+	int32 DotnetVersion = EDotnetVersion::Latest;
+
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		DotnetVersion = UnrealCSharpSetting->GetDotnetVersion();
+	}
+
+	return DotnetVersion == EDotnetVersion::Latest ? DotnetVersion - 1 : DotnetVersion;
 }
 
 #if WITH_EDITOR
