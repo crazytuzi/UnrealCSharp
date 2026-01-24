@@ -15,8 +15,23 @@ namespace Script.CoreUObject
 
         public static implicit operator TSubclassOf<T>(UClass InClass) => new(InClass);
 
-        public static bool operator ==(TSubclassOf<T> A, TSubclassOf<T> B) =>
-            Utils.EqualsTo(A, B, TSubclassOfImplementation.TSubclassOf_IdenticalImplementation);
+        public static bool operator ==(TSubclassOf<T> A, TSubclassOf<T> B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   TSubclassOfImplementation.TSubclassOf_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(TSubclassOf<T> A, TSubclassOf<T> B) => !(A == B);
 

@@ -16,8 +16,23 @@ namespace Script.CoreUObject
 
         public static implicit operator TLazyObjectPtr<T>(T InObject) => new(InObject);
 
-        public static bool operator ==(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B) =>
-            Utils.EqualsTo(A, B, TLazyObjectPtrImplementation.TLazyObjectPtr_IdenticalImplementation);
+        public static bool operator ==(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   TLazyObjectPtrImplementation.TLazyObjectPtr_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(TLazyObjectPtr<T> A, TLazyObjectPtr<T> B) => !(A == B);
 

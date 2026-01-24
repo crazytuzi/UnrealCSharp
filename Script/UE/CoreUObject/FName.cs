@@ -14,8 +14,23 @@ namespace Script.CoreUObject
 
         public static implicit operator FName(string InValue) => new(InValue);
 
-        public static bool operator ==(FName A, FName B) =>
-            Utils.EqualsTo(A, B, FNameImplementation.FName_IdenticalImplementation);
+        public static bool operator ==(FName A, FName B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   FNameImplementation.FName_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(FName A, FName B) => !(A == B);
 

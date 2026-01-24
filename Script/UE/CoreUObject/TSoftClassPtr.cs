@@ -15,8 +15,23 @@ namespace Script.CoreUObject
 
         public static implicit operator TSoftClassPtr<T>(UClass InClass) => new(InClass);
 
-        public static bool operator ==(TSoftClassPtr<T> A, TSoftClassPtr<T> B) =>
-            Utils.EqualsTo(A, B, TSoftClassPtrImplementation.TSoftClassPtr_IdenticalImplementation);
+        public static bool operator ==(TSoftClassPtr<T> A, TSoftClassPtr<T> B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   TSoftClassPtrImplementation.TSoftClassPtr_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(TSoftClassPtr<T> A, TSoftClassPtr<T> B) => !(A == B);
 

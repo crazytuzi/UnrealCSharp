@@ -15,8 +15,23 @@ namespace Script.CoreUObject
 
         ~TArray() => TArrayImplementation.TArray_UnRegisterImplementation(GarbageCollectionHandle);
 
-        public static bool operator ==(TArray<T> A, TArray<T> B) =>
-            Utils.EqualsTo(A, B, TArrayImplementation.TArray_IdenticalImplementation);
+        public static bool operator ==(TArray<T> A, TArray<T> B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   TArrayImplementation.TArray_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(TArray<T> A, TArray<T> B) => !(A == B);
 

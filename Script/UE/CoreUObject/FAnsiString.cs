@@ -16,8 +16,23 @@ namespace Script.CoreUObject
 
         public static implicit operator FAnsiString(string InValue) => new(InValue);
 
-        public static bool operator ==(FAnsiString A, FAnsiString B) =>
-            Utils.EqualsTo(A, B, FAnsiStringImplementation.FAnsiString_IdenticalImplementation);
+        public static bool operator ==(FAnsiString A, FAnsiString B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   FAnsiStringImplementation.FAnsiString_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(FAnsiString A, FAnsiString B) => !(A == B);
 
