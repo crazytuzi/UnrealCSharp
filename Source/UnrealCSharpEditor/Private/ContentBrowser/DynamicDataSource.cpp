@@ -12,6 +12,8 @@
 #include "ContentBrowserDataMenuContexts.h"
 #include "ToolMenuDelegates.h"
 #include "ToolMenus.h"
+#include "Misc/FileHelper.h"
+#include "UnrealEd/Classes/Editor/Transactor.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicGenerator.h"
@@ -24,6 +26,29 @@
 #endif
 
 #define LOCTEXT_NAMESPACE "UDynamicDataSource"
+
+FDeleteFileChange::FDeleteFileChange(const FString& InPath, const FString& InContent)
+	: FilePath(InPath), FileContent(InContent)
+{
+}
+
+void FDeleteFileChange::Apply(UObject* Object)
+{
+	if (IFileManager::Get().FileExists(*FilePath))
+	{
+		IFileManager::Get().Delete(*FilePath);
+	}
+}
+
+void FDeleteFileChange::Revert(UObject* Object)
+{
+	FFileHelper::SaveStringToFile(FileContent, *FilePath, FFileHelper::EEncodingOptions::ForceUTF8);
+}
+
+FString FDeleteFileChange::ToString() const
+{
+	return FString::Printf(TEXT("Delete File: %s"), *FilePath);
+}
 
 void UDynamicDataSource::Initialize(const bool InAutoRegister)
 {
@@ -508,6 +533,51 @@ bool UDynamicDataSource::BulkEditItems(TArrayView<const FContentBrowserItemData>
 	return true;
 }
 
+bool UDynamicDataSource::CanDeleteItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg)
+{
+	return true;
+}
+
+bool UDynamicDataSource::DeleteItem(const FContentBrowserItemData& InItem)
+{
+	const auto ItemDataPayload = GetFileItemDataPayload(InItem);
+
+	FString InternalPath = ItemDataPayload
+		                       ? ItemDataPayload->GetInternalPath().ToString()
+		                       : TEXT("");
+
+	if (InternalPath.IsEmpty())
+	{
+		return false;
+	}
+
+	const FText DialogText = FText::Format(
+		LOCTEXT("ConfirmDeleteMsg", "确定要永久删除文件 {0} 吗？"),
+		FText::FromString(FPaths::GetCleanFilename(InternalPath))
+	);
+
+	if (FMessageDialog::Open(EAppMsgType::YesNo, DialogText) != EAppReturnType::Yes)
+	{
+		return false;
+	}
+
+	if (GEditor && GEditor->Trans)
+	{
+		if (FString Content; FFileHelper::LoadFileToString(Content, *InternalPath))
+		{
+			FScopedTransaction Transaction(LOCTEXT("DeleteAction", "Delete File"));
+
+			if (GUndo)
+			{
+				GUndo->StoreUndo(this, MakeUnique<FDeleteFileChange>(InternalPath, Content));
+
+				return IFileManager::Get().Delete(*InternalPath);
+			}
+		}
+	}
+
+	return false;
+}
 
 bool UDynamicDataSource::AppendItemReference(const FContentBrowserItemData& InItem, FString& InOutStr)
 {
