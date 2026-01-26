@@ -13,7 +13,7 @@
 #include "ToolMenuDelegates.h"
 #include "ToolMenus.h"
 #include "Misc/FileHelper.h"
-#include "UnrealEd/Classes/Editor/Transactor.h"
+#include "Editor/Transactor.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicGenerator.h"
