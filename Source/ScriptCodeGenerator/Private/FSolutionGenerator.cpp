@@ -4,6 +4,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Setting/UnrealCSharpSetting.h"
 #include "FGeneratorCore.h"
+#include "VSVersion.h"
 
 void FSolutionGenerator::Generator()
 {
@@ -386,6 +387,7 @@ void FSolutionGenerator::AddProjectGeneratorHeaderComment(FString& OutResult)
 
 void FSolutionGenerator::AddSolutionGeneratorHeaderComment(FString& OutResult)
 {
+#if !VS2026
 	OutResult = FString::Printf(TEXT(
 		"# ===========================================================================\n"
 		"#    Generated code exported from UnrealCSharp.\n"
@@ -396,6 +398,7 @@ void FSolutionGenerator::AddSolutionGeneratorHeaderComment(FString& OutResult)
 	),
 	                            *OutResult
 	);
+#endif
 }
 
 void FSolutionGenerator::AddCSharpGeneratorHeaderComment(FString& OutResult)
