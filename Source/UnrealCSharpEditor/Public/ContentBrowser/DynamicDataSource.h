@@ -24,7 +24,7 @@ struct FDynamicDataFilter
 class FDeleteFileChange : public FCommandChange
 {
 public:
-	FDeleteFileChange(const FString& InPath, const FString& InContent);
+	FDeleteFileChange(const FString& InFilePath, const FString& InFileContent);
 
 	virtual void Apply(UObject* Object) override;
 
@@ -34,6 +34,7 @@ public:
 
 private:
 	FString FilePath;
+
 	FString FileContent;
 };
 
