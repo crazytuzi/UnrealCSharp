@@ -190,31 +190,35 @@ void FDynamicHierarchy::AddClass(UClass* InClass) const
 	{
 		return;
 	}
-
-	if (const auto& Path = FPaths::GetPath(FDynamicGenerator::GetDynamicNormalizeFile(InClass));
-		FUnrealCSharpFunctionLibrary::IsRootPath(Path))
+	
+	if (const auto& File = FDynamicGenerator::GetDynamicFile(InClass);
+		IFileManager::Get().FileExists(*File))
 	{
-		const auto& RelativePath = Path.RightChop(
-			FUnrealCSharpFunctionLibrary::GetFullScriptDirectory().Len());
+		if (const auto& Path = FPaths::GetPath(FDynamicGenerator::GetDynamicNormalizeFile(InClass));
+			FUnrealCSharpFunctionLibrary::IsRootPath(Path))
+		{
+			const auto& RelativePath = Path.RightChop(
+				FUnrealCSharpFunctionLibrary::GetFullScriptDirectory().Len());
 
-		auto Node = Root;
+			auto Node = Root;
 
-		EnumeratePath(RelativePath,
-		              [&Node](const FName& InInternalPath)
-		              {
-			              auto& Child = Node->GetChildren().FindOrAdd(InInternalPath);
-
-			              if (!Child.IsValid())
+			EnumeratePath(RelativePath,
+			              [&Node](const FName& InInternalPath)
 			              {
-				              Child = MakeShared<FDynamicHierarchyNode>();
-			              }
+				              auto& Child = Node->GetChildren().FindOrAdd(InInternalPath);
 
-			              Node = Child;
+				              if (!Child.IsValid())
+				              {
+					              Child = MakeShared<FDynamicHierarchyNode>();
+				              }
 
-			              return true;
-		              });
+				              Node = Child;
 
-		Node->GetClasses().Add(InClass);
+				              return true;
+			              });
+
+			Node->GetClasses().Add(InClass);
+		}
 	}
 }
 

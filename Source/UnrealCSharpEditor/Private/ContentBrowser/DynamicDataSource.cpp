@@ -12,18 +12,49 @@
 #include "ContentBrowserDataMenuContexts.h"
 #include "ToolMenuDelegates.h"
 #include "ToolMenus.h"
+#include "Misc/FileHelper.h"
+#include "Editor/Transactor.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "ContentBrowser/DynamicNewClassContextMenu.h"
 #include "NewClass/DynamicNewClassUtils.h"
+#include "FCSharpCompiler.h"
 
 #ifdef UE_INLINE_GENERATED_CPP_BY_NAME
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DynamicDataSource)
 #endif
 
 #define LOCTEXT_NAMESPACE "UDynamicDataSource"
+
+FDeleteFileChange::FDeleteFileChange(const FString& InFilePath, const FString& InFileContent):
+	FilePath(InFilePath),
+	FileContent(InFileContent)
+{
+}
+
+void FDeleteFileChange::Apply(UObject* Object)
+{
+	if (IFileManager::Get().FileExists(*FilePath))
+	{
+		IFileManager::Get().Delete(*FilePath);
+
+		FCSharpCompiler::Get().ImmediatelyCompile();
+	}
+}
+
+void FDeleteFileChange::Revert(UObject* Object)
+{
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(*FilePath, FileContent);
+
+	FCSharpCompiler::Get().ImmediatelyCompile();
+}
+
+FString FDeleteFileChange::ToString() const
+{
+	return FString::Printf(TEXT("Delete File: %s"), *FilePath);
+}
 
 void UDynamicDataSource::Initialize(const bool InAutoRegister)
 {
@@ -508,6 +539,55 @@ bool UDynamicDataSource::BulkEditItems(TArrayView<const FContentBrowserItemData>
 	return true;
 }
 
+bool UDynamicDataSource::CanDeleteItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg)
+{
+	return true;
+}
+
+bool UDynamicDataSource::DeleteItem(const FContentBrowserItemData& InItem)
+{
+	const auto ItemDataPayload = GetFileItemDataPayload(InItem);
+
+	auto InternalPath = ItemDataPayload.IsValid()
+		                    ? ItemDataPayload->GetInternalPath().ToString()
+		                    : TEXT("");
+
+	if (InternalPath.IsEmpty())
+	{
+		return false;
+	}
+
+	const auto DialogText = FText::Format(
+		LOCTEXT(LOCTEXT_NAMESPACE, "Delete File {0}?"),
+		FText::FromString(FPaths::GetCleanFilename(InternalPath))
+	);
+
+	if (FMessageDialog::Open(EAppMsgType::YesNo, DialogText) != EAppReturnType::Yes)
+	{
+		return false;
+	}
+
+	if (GEditor != nullptr && IsValid(GEditor->Trans))
+	{
+		if (FString Content; FFileHelper::LoadFileToString(Content, *InternalPath))
+		{
+			FScopedTransaction Transaction(LOCTEXT(LOCTEXT_NAMESPACE, "Delete File"));
+
+			if (GUndo != nullptr)
+			{
+				auto DeleteFileChange = MakeUnique<FDeleteFileChange>(InternalPath, Content);
+
+				DeleteFileChange->Apply(nullptr);
+
+				GUndo->StoreUndo(this, MoveTemp(DeleteFileChange));
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
 
 bool UDynamicDataSource::AppendItemReference(const FContentBrowserItemData& InItem, FString& InOutStr)
 {

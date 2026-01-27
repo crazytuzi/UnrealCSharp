@@ -21,6 +21,23 @@ struct FDynamicDataFilter
 	TSet<FName> Folders;
 };
 
+class FDeleteFileChange : public FCommandChange
+{
+public:
+	FDeleteFileChange(const FString& InFilePath, const FString& InFileContent);
+
+	virtual void Apply(UObject* Object) override;
+
+	virtual void Revert(UObject* Object) override;
+
+	virtual FString ToString() const override;
+
+private:
+	FString FilePath;
+
+	FString FileContent;
+};
+
 UCLASS()
 class UDynamicDataSource : public UContentBrowserDataSource
 {
@@ -55,6 +72,10 @@ public:
 	virtual bool EditItem(const FContentBrowserItemData& InItem) override;
 
 	virtual bool BulkEditItems(TArrayView<const FContentBrowserItemData> InItems) override;
+
+	virtual bool CanDeleteItem(const FContentBrowserItemData& InItem, FText* OutErrorMsg) override;
+
+	virtual bool DeleteItem(const FContentBrowserItemData& InItem) override;
 
 	virtual bool AppendItemReference(const FContentBrowserItemData& InItem, FString& InOutStr) override;
 
