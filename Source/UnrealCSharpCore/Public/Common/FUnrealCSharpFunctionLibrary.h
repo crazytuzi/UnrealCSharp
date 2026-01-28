@@ -229,6 +229,8 @@ public:
 
 	static const TArray<FString>& GetProjectModuleList();
 
+	static int32 GetDotnetVersion();
+
 #if WITH_EDITOR
 	static bool IsSpecialClass(const UClass* InClass);
 

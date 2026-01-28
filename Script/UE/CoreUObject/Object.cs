@@ -4,8 +4,23 @@ namespace Script.CoreUObject
 {
     public partial class UObject : IGarbageCollectionHandle
     {
-        public static bool operator ==(UObject A, UObject B) =>
-            Utils.EqualsTo(A, B, UObjectImplementation.UObject_IdenticalImplementation);
+        public static bool operator ==(UObject A, UObject B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   UObjectImplementation.UObject_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(UObject A, UObject B) => !(A == B);
 

@@ -63,38 +63,6 @@ namespace Script.CoreUObject
             return Types.ToArray();
         }
 
-        private static bool EqualsTo<T>(T A, T B, Func<bool> IdenticalImplementation)
-        {
-            if (A is null && B is null)
-            {
-                return true;
-            }
-
-            if (A is null || B is null)
-            {
-                return false;
-            }
-
-            return ReferenceEquals(A, B) || IdenticalImplementation();
-        }
-
-        public static bool EqualsTo<T>(T A, T B, Func<nint, nint, bool> IdenticalImplementation)
-            where T : IGarbageCollectionHandle
-        {
-            return EqualsTo(A, B, () => A.GarbageCollectionHandle == B.GarbageCollectionHandle ||
-                                        IdenticalImplementation(A.GarbageCollectionHandle,
-                                            B.GarbageCollectionHandle));
-        }
-
-        public static bool EqualsTo<T>(T A, T B, Func<nint, nint, nint, bool> IdenticalImplementation)
-            where T : IStaticStruct, IGarbageCollectionHandle
-        {
-            return EqualsTo(A, B, () => A.GarbageCollectionHandle == B.GarbageCollectionHandle ||
-                                        IdenticalImplementation(T.StaticStruct().GarbageCollectionHandle,
-                                            A.GarbageCollectionHandle,
-                                            B.GarbageCollectionHandle));
-        }
-
         public static bool IsClass(Type InType)
         {
             return InType.IsClass;

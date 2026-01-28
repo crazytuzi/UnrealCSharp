@@ -11,8 +11,23 @@ namespace Script.CoreUObject
 
         ~TOptional() => TOptionalImplementation.TOptional_UnRegisterImplementation(GarbageCollectionHandle);
 
-        public static bool operator ==(TOptional<T> A, TOptional<T> B) =>
-            Utils.EqualsTo(A, B, TOptionalImplementation.TOptional_IdenticalImplementation);
+        public static bool operator ==(TOptional<T> A, TOptional<T> B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   TOptionalImplementation.TOptional_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(TOptional<T> A, TOptional<T> B) => !(A == B);
 

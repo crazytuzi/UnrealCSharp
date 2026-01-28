@@ -37,4 +37,10 @@ private:
 	static void ReplaceSolutionConfigurationPlatformsPlaceholder(FString& OutResult);
 
 	static void ReplaceScriptPath(FString& OutResult);
+
+	static void AddProjectGeneratorHeaderComment(FString& OutResult);
+
+	static void AddSolutionGeneratorHeaderComment(FString& OutResult);
+
+	static void AddCSharpGeneratorHeaderComment(FString& OutResult);
 };

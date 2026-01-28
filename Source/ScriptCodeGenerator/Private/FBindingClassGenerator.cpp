@@ -692,6 +692,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 	auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\tpublic partial class %s%s\n"
@@ -706,6 +707,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		"\t}\n"
 		"}"
 	),
+	                               *FGeneratorCore::GetGeneratorHeaderComment(),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent[0],
 	                               *ClassContent,
@@ -732,6 +734,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	auto FileBaseName = InClass->IsReflectionClass() ? ClassContent.RightChop(1) : ClassContent;
 
 	const auto FileName = FPaths::Combine(DirectoryName, FileBaseName) + CSHARP_SUFFIX;
+
+	FGeneratorCore::AddGeneratorFile(FileName);
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
@@ -914,6 +918,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 	auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\tpublic static unsafe partial class %s\n"
@@ -922,6 +927,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		"\t}\n"
 		"}"
 	),
+	                               *FGeneratorCore::GetGeneratorHeaderComment(),
 	                               *UsingNameSpaceContent,
 	                               *ImplementationNameSpaceContent,
 	                               *ClassImplementationContent,
@@ -936,6 +942,8 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 
 	const auto FileName = FPaths::Combine(DirectoryName,
 	                                      BINDING_COMBINE_CLASS_IMPLEMENTATION(FileBaseName)) + CSHARP_SUFFIX;
+
+	FGeneratorCore::AddGeneratorFile(FileName);
 
 	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

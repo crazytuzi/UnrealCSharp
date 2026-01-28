@@ -23,6 +23,7 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	Super(ObjectInitializer),
 	ScriptDirectory(DEFAULT_SCRIPT_DIRECTORY),
 	bEnableDeleteProxyDirectory(false),
+	bEnableDeleteBindingDirectory(false),
 	bEnableCompiled(true),
 	bEnableAssetChanged(true),
 	bEnableDirectoryChanged(true),
@@ -240,6 +241,11 @@ bool UUnrealCSharpEditorSetting::EnableDeleteProxyDirectory() const
 	return bEnableDeleteProxyDirectory;
 }
 
+bool UUnrealCSharpEditorSetting::EnableDeleteBindingDirectory() const
+{
+	return bEnableDeleteBindingDirectory;
+}
+
 bool UUnrealCSharpEditorSetting::EnableCompiled() const
 {
 	return bEnableCompiled;
@@ -309,6 +315,27 @@ TArray<FString> UUnrealCSharpEditorSetting::GetModuleList()
 	}
 
 	return ModuleArray;
+}
+
+TArray<FString> UUnrealCSharpEditorSetting::GetClassList()
+{
+	TArray<FString> ClassArray;
+
+	for (TObjectIterator<UClass> ClassIterator; ClassIterator; ++ClassIterator)
+	{
+		if (const auto Class = *ClassIterator; Class != nullptr && Class->HasAnyClassFlags(CLASS_Native))
+		{
+			ClassArray.AddUnique(FString::Printf(TEXT(
+					"%s%s"
+				),
+			                                     Class->GetPrefixCPP(),
+			                                     *Class->GetName()
+				)
+			);
+		}
+	}
+
+	return ClassArray;
 }
 
 const TArray<FString>& UUnrealCSharpEditorSetting::GetClassBlacklist() const

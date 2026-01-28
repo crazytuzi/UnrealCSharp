@@ -89,6 +89,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\t[PathName(\"%s\")]\n"
@@ -98,6 +99,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 		"\t}\n"
 		"}"
 	),
+	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
 	                                     *PathNameAttributeContent,
@@ -106,7 +108,11 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	                                     *EnumeratorContent
 	);
 
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InEnum), Content);
+	const auto FileName = FGeneratorCore::GetFileName(InEnum);
+
+	FGeneratorCore::AddGeneratorFile(FileName);
+
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
 
 void FEnumGenerator::AddEnumUnderlyingType(const UEnum* InEnum, const FNumericProperty* InNumericProperty)
@@ -229,7 +235,11 @@ void FEnumGenerator::GeneratorCollisionChannel()
 	                                     *EnumeratorContent
 	);
 
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InEnum), Content);
+	const auto FileName = FGeneratorCore::GetFileName(InEnum);
+
+	FGeneratorCore::AddGeneratorFile(FileName);
+
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
 
 FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)

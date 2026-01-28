@@ -27,6 +27,15 @@ TMap<TWeakObjectPtr<const UObject>, bool> FGeneratorCore::SupportedMap;
 
 TArray<FName> FGeneratorCore::SupportedAssetClassName;
 
+FString FGeneratorCore::GeneratorHeaderComment = TEXT(
+	"/*===========================================================================\n"
+	"    Generated code exported from UnrealCSharp.\n"
+	"    DO NOT modify this manually!\n"
+	"===========================================================================*/\n"
+);
+
+TSet<FString> FGeneratorCore::GeneratorFiles;
+
 FString FGeneratorCore::GetPathNameAttribute(const UField* InField)
 {
 	if (InField == nullptr)
@@ -647,6 +656,16 @@ TArray<FString> FGeneratorCore::GetOverrideFunctions(const FString& InNameSpace,
 	return FoundFunctions != nullptr ? *FoundFunctions : TArray<FString>{};
 }
 
+const FString& FGeneratorCore::GetGeneratorHeaderComment()
+{
+	return GeneratorHeaderComment;
+}
+
+void FGeneratorCore::AddGeneratorFile(const FString& InFile)
+{
+	GeneratorFiles.Add(InFile);
+}
+
 bool FGeneratorCore::IsSkip(const UField* InField)
 {
 	return bIsSkipGenerateEngineModules && !FUnrealCSharpFunctionLibrary::IsGameField(InField);
@@ -918,7 +937,7 @@ const TArray<FName>& FGeneratorCore::GetSupportedAssetClassName()
 	return SupportedAssetClassName;
 }
 
-void FGeneratorCore::BeginGenerator()
+void FGeneratorCore::BeginGenerator(const bool bIsFull)
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -958,7 +977,7 @@ void FGeneratorCore::BeginGenerator()
 	));
 }
 
-void FGeneratorCore::EndGenerator()
+void FGeneratorCore::EndGenerator(const bool bIsFull)
 {
 	bIsSkipGenerateEngineModules = false;
 
@@ -975,4 +994,42 @@ void FGeneratorCore::EndGenerator()
 	FDelegateGenerator::Delegate.Empty();
 
 	FEnumGenerator::EnumUnderlyingType.Empty();
+
+	if (bIsFull)
+	{
+		DeleteRemainGeneratorFiles();
+	}
+
+	GeneratorFiles.Empty();
+}
+
+void FGeneratorCore::DeleteRemainGeneratorFiles()
+{
+	const auto DeleteRemain = [](const FString& InDirectory, const FString& InFilename,
+	                             const bool InFiles, const bool InDirectories, const bool bClearFileNames = true)
+	{
+		if (const auto FileManager = &IFileManager::Get())
+		{
+			TArray<FString> Files;
+
+			IFileManager::Get().FindFilesRecursive(Files,
+			                                       *InDirectory,
+			                                       *InFilename,
+			                                       InFiles,
+			                                       InDirectories,
+			                                       bClearFileNames);
+
+			for (const auto& File : Files)
+			{
+				if (!GeneratorFiles.Contains(File))
+				{
+					FileManager->Delete(*File);
+				}
+			}
+		}
+	};
+
+	DeleteRemain(FUnrealCSharpFunctionLibrary::GetUEProxyDirectory(), REGULAR_CSHARP, true, false);
+
+	DeleteRemain(FUnrealCSharpFunctionLibrary::GetGameProxyDirectory(), REGULAR_CSHARP, true, false);
 }

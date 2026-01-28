@@ -62,6 +62,15 @@ struct FBindClass
 	bool bNeedMonoClass = true;
 };
 
+UENUM()
+enum EDotnetVersion
+{
+	V8 = 8 UMETA(DisplayName="dotnet8"),
+	V9 = 9 UMETA(DisplayName="dotnet9"),
+	V10 = 10 UMETA(DisplayName="dotnet10"),
+	Latest
+};
+
 /**
  * 
  */
@@ -104,6 +113,8 @@ public:
 
 	bool IsEnableImmediatelyActive() const;
 
+	int32 GetDotnetVersion() const;
+
 private:
 	UPROPERTY(Config, EditAnywhere, Category = Publish, meta = (RelativePath))
 	FGameContentDirectoryPath PublishDirectory;
@@ -143,4 +154,7 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Module)
 	bool bEnableImmediatelyActive;
+
+	UPROPERTY(Config, EditAnywhere, Category = Solution)
+	TEnumAsByte<EDotnetVersion> DotnetVersion;
 };

@@ -16,8 +16,23 @@ namespace Script.CoreUObject
 
         public static implicit operator TWeakObjectPtr<T>(T InObject) => new(InObject);
 
-        public static bool operator ==(TWeakObjectPtr<T> A, TWeakObjectPtr<T> B) =>
-            Utils.EqualsTo(A, B, TWeakObjectPtrImplementation.TWeakObjectPtr_IdenticalImplementation);
+        public static bool operator ==(TWeakObjectPtr<T> A, TWeakObjectPtr<T> B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   TWeakObjectPtrImplementation.TWeakObjectPtr_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(TWeakObjectPtr<T> A, TWeakObjectPtr<T> B) => !(A == B);
 

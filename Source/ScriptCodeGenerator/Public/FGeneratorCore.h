@@ -32,6 +32,10 @@ public:
 
 	static TArray<FString> GetOverrideFunctions(const FString& InNameSpace, const FString& InClass);
 
+	static const FString& GetGeneratorHeaderComment();
+
+	static void AddGeneratorFile(const FString& InFile);
+
 	static bool IsSkip(const UField* InField);
 
 	static bool IsSupported(FProperty* Property);
@@ -50,9 +54,12 @@ public:
 
 	static SCRIPTCODEGENERATOR_API const TArray<FName>& GetSupportedAssetClassName();
 
-	static SCRIPTCODEGENERATOR_API void BeginGenerator();
+	static SCRIPTCODEGENERATOR_API void BeginGenerator(bool bIsFull = true);
 
-	static SCRIPTCODEGENERATOR_API void EndGenerator();
+	static SCRIPTCODEGENERATOR_API void EndGenerator(bool bIsFull = true);
+
+private:
+	static void DeleteRemainGeneratorFiles();
 
 private:
 	static TMap<FString, TArray<FString>> OverrideFunctionsMap;
@@ -68,6 +75,10 @@ private:
 	static TMap<TWeakObjectPtr<const UObject>, bool> SupportedMap;
 
 	static TArray<FName> SupportedAssetClassName;
+
+	static FString GeneratorHeaderComment;
+
+	static TSet<FString> GeneratorFiles;
 };
 
 #include "FGeneratorCore.inl"

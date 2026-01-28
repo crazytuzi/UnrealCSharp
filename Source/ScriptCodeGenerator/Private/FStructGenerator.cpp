@@ -152,13 +152,30 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	);
 
 	IdenticalContent = FString::Printf(TEXT(
-		"\t\tpublic static bool operator ==(%s A, %s B) => Utils.EqualsTo(A, B, UStructImplementation.UStruct_IdenticalImplementation);\n\n"
+		"\t\tpublic static bool operator ==(%s A, %s B)\n"
+		"\t\t{\n"
+		"\t\t\tif (A is null && B is null)\n"
+		"\t\t\t{\n"
+		"\t\t\t\treturn true;\n"
+		"\t\t\t}\n"
+		"\n"
+		"\t\t\tif (A is null || B is null)\n"
+		"\t\t\t{\n"
+		"\t\t\t\treturn false;\n"
+		"\t\t\t}\n"
+		"\n"
+		"\t\t\treturn ReferenceEquals(A, B) || UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A.%s, B.%s);\n"
+		"\t\t}\n"
+		"\n"
 		"\t\tpublic static bool operator !=(%s A, %s B) => !(A == B);\n\n"
 		"\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
 		"\t\tpublic override int GetHashCode() => (int)%s;\n"
 	),
 	                                   *ClassContent,
 	                                   *ClassContent,
+	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *ClassContent,
 	                                   *ClassContent,
 	                                   *ClassContent,
@@ -301,6 +318,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\t[PathName(\"%s\")]\n"
@@ -320,6 +338,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"\t}\n"
 		"}"
 	),
+	                               *FGeneratorCore::GetGeneratorHeaderComment(),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *PathNameAttributeContent,
@@ -336,5 +355,9 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               *GCHandleContent
 	);
 
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InScriptStruct), Content);
+	const auto FileName = FGeneratorCore::GetFileName(InScriptStruct);
+
+	FGeneratorCore::AddGeneratorFile(FileName);
+
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

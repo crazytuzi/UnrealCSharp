@@ -371,6 +371,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\tpublic class %s : IGarbageCollectionHandle\n"
@@ -387,6 +388,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		"\t}\n"
 		"}\n"
 	),
+	                               *FGeneratorCore::GetGeneratorHeaderComment(),
 	                               *UsingNameSpaceContent,
 	                               *NameSpaceContent,
 	                               *ClassContent,
@@ -401,7 +403,11 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *GCHandleContent
 	);
 
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InDelegateProperty), Content);
+	const auto FileName = FGeneratorCore::GetFileName(InDelegateProperty);
+
+	FGeneratorCore::AddGeneratorFile(FileName);
+
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
 
 void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelegateProperty)
@@ -754,5 +760,9 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *GCHandleContent
 	);
 
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FGeneratorCore::GetFileName(InMulticastDelegateProperty), Content);
+	const auto FileName = FGeneratorCore::GetFileName(InMulticastDelegateProperty);
+
+	FGeneratorCore::AddGeneratorFile(FileName);
+
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }

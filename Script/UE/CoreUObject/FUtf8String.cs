@@ -16,8 +16,23 @@ namespace Script.CoreUObject
 
         public static implicit operator FUtf8String(string InValue) => new(InValue);
 
-        public static bool operator ==(FUtf8String A, FUtf8String B) =>
-            Utils.EqualsTo(A, B, FUtf8StringImplementation.FUtf8String_IdenticalImplementation);
+        public static bool operator ==(FUtf8String A, FUtf8String B)
+        {
+            if (A is null && B is null)
+            {
+                return true;
+            }
+
+            if (A is null || B is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(A, B) ||
+                   FUtf8StringImplementation.FUtf8String_IdenticalImplementation(
+                       A.GarbageCollectionHandle,
+                       B.GarbageCollectionHandle);
+        }
 
         public static bool operator !=(FUtf8String A, FUtf8String B) => !(A == B);
 

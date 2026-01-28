@@ -180,7 +180,18 @@ namespace SourceGenerator
                     if (type.Value.HasOperatorEqualTo == false)
                     {
                         source +=
-                            $"\t\tpublic static bool operator ==({type.Value.Name} A, {type.Value.Name} B) => Utils.EqualsTo(A, B, UStructImplementation.UStruct_IdenticalImplementation);\n";
+                            $"\t\tpublic static bool operator ==({type.Value.Name} A, {type.Value.Name} B)\n" +
+                            "\t\t{\n" +
+                            "\t\t\tif (A is null && B is null)\n" +
+                            "\t\t\t{\n" +
+                            "\t\t\t\treturn true;\n" +
+                            "\t\t\t}\n" +
+                            "\t\t\tif (A is null || B is null)\n" +
+                            "\t\t\t{\n" +
+                            "\t\t\t\treturn false;\n" +
+                            "\t\t\t}\n" +
+                            "\t\t\treturn ReferenceEquals(A, B) || UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A.GarbageCollectionHandle, B.GarbageCollectionHandle);\n" +
+                            "\t\t}\n";
                     }
 
                     if (type.Value.HasOperatorNotEqualTo == false)

@@ -161,6 +161,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 
 	const auto Content = FString::Printf(TEXT(
 		"%s\n"
+		"%s\n"
 		"namespace %s\n"
 		"{\n"
 		"\t[PathName(\"%s\")]\n"
@@ -169,6 +170,7 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 		"\t}\n"
 		"}"
 	),
+	                                     *FGeneratorCore::GetGeneratorHeaderComment(),
 	                                     *UsingNameSpaceContent,
 	                                     *NameSpaceContent,
 	                                     *FUnrealCSharpFunctionLibrary::GetObjectPathName(
@@ -182,5 +184,9 @@ void FAssetGenerator::GeneratorAsset(const FAssetData& InAssetData)
 		                                     InAssetData, FUnrealCSharpFunctionLibrary::GetFullClass(SuperClass))
 	);
 
-	FUnrealCSharpFunctionLibrary::SaveStringToFile(FUnrealCSharpFunctionLibrary::GetFileName(InAssetData), Content);
+	const auto FileName = FUnrealCSharpFunctionLibrary::GetFileName(InAssetData);
+
+	FGeneratorCore::AddGeneratorFile(FileName);
+
+	FUnrealCSharpFunctionLibrary::SaveStringToFile(FileName, Content);
 }
