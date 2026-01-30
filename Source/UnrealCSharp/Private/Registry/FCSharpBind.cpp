@@ -12,9 +12,7 @@
 #include "Setting/UnrealCSharpSetting.h"
 #include "UEVersion.h"
 
-#if !WITH_EDITOR
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
-#endif
 
 FCSharpBind::FCSharpBind()
 {
@@ -28,6 +26,8 @@ FCSharpBind::~FCSharpBind()
 
 void FCSharpBind::Initialize()
 {
+	NotOverrideTypes.Empty();
+
 	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.AddRaw(
 		this, &FCSharpBind::OnCSharpEnvironmentInitialize);
 }
@@ -416,12 +416,10 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, MonoObject* InMonoObject
 
 bool FCSharpBind::CanBind(const FDomain* InDomain, UStruct* InStruct)
 {
-#if !WITH_EDITOR
 	if (NotOverrideTypes.Contains(InStruct))
 	{
 		return false;
 	}
-#endif
 
 	MonoClass* FoundMonoClass{};
 

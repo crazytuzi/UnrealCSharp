@@ -82,12 +82,9 @@ private:
 private:
 	void OnCSharpEnvironmentInitialize();
 
-#if !WITH_EDITOR
 private:
 	static TSet<TWeakObjectPtr<UStruct>> NotOverrideTypes;
-#endif
 
-private:
 	FDelegateHandle OnCSharpEnvironmentInitializeDelegateHandle;
 };
 
