@@ -19,51 +19,36 @@ FEditorListener::FEditorListener():
 	bIsPIEPlaying(false),
 	bIsGenerating(false)
 {
-	OnPostEngineInitDelegateHandle = FCoreDelegates::OnPostEngineInit.AddRaw(this, &FEditorListener::OnPostEngineInit);
-
-	OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddRaw(this, &FEditorListener::OnPreBeginPIE);
-
-	OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddRaw(this, &FEditorListener::OnPrePIEEnded);
-
-	OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEditorListener::OnCancelPIE);
-
-	OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
-		this, &FEditorListener::OnBeginGenerator);
-
-	OnEndGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnEndGenerator.AddRaw(
-		this, &FEditorListener::OnEndGenerator);
-
-	OnCompileDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnCompile.AddRaw(
-		this, &FEditorListener::OnCompile);
-
-	const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
-
-	AssetRegistryModule.Get().OnFilesLoaded().AddRaw(this, &FEditorListener::OnFilesLoaded);
-
-	auto& MainFrameModule = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
-
-	OnMainFrameCreationFinishedDelegateHandle = MainFrameModule.OnMainFrameCreationFinished().AddRaw(
-		this, &FEditorListener::OnMainFrameCreationFinished);
-
-	auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(TEXT("DirectoryWatcher"));
-
-	const auto& ChangedDirectories = FUnrealCSharpFunctionLibrary::GetChangedDirectories();
-
-	for (const auto& Directory : ChangedDirectories)
+	if (!IsRunningCookCommandlet())
 	{
-		DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
-			Directory,
-			IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
-			OnDirectoryChangedDelegateHandle,
-			IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
-		);
-	}
-}
+		OnPostEngineInitDelegateHandle = FCoreDelegates::OnPostEngineInit.AddRaw(
+			this, &FEditorListener::OnPostEngineInit);
 
-FEditorListener::~FEditorListener()
-{
-	if (OnDirectoryChangedDelegateHandle.IsValid())
-	{
+		OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddRaw(this, &FEditorListener::OnPreBeginPIE);
+
+		OnPrePIEEndedDelegateHandle = FEditorDelegates::PrePIEEnded.AddRaw(this, &FEditorListener::OnPrePIEEnded);
+
+		OnCancelPIEDelegateHandle = FEditorDelegates::CancelPIE.AddRaw(this, &FEditorListener::OnCancelPIE);
+
+		OnBeginGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.AddRaw(
+			this, &FEditorListener::OnBeginGenerator);
+
+		OnEndGeneratorDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnEndGenerator.AddRaw(
+			this, &FEditorListener::OnEndGenerator);
+
+		OnCompileDelegateHandle = FUnrealCSharpCoreModuleDelegates::OnCompile.AddRaw(
+			this, &FEditorListener::OnCompile);
+
+		const auto& AssetRegistryModule = FModuleManager::LoadModuleChecked<
+			FAssetRegistryModule>(TEXT("AssetRegistry"));
+
+		AssetRegistryModule.Get().OnFilesLoaded().AddRaw(this, &FEditorListener::OnFilesLoaded);
+
+		auto& MainFrameModule = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
+
+		OnMainFrameCreationFinishedDelegateHandle = MainFrameModule.OnMainFrameCreationFinished().AddRaw(
+			this, &FEditorListener::OnMainFrameCreationFinished);
+
 		auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
 			TEXT("DirectoryWatcher"));
 
@@ -71,57 +56,81 @@ FEditorListener::~FEditorListener()
 
 		for (const auto& Directory : ChangedDirectories)
 		{
-			DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
-				Directory, OnDirectoryChangedDelegateHandle);
+			DirectoryWatcherModule.Get()->RegisterDirectoryChangedCallback_Handle(
+				Directory,
+				IDirectoryWatcher::FDirectoryChanged::CreateRaw(this, &FEditorListener::OnDirectoryChanged),
+				OnDirectoryChangedDelegateHandle,
+				IDirectoryWatcher::WatchOptions::IncludeDirectoryChanges
+			);
 		}
 	}
+}
 
-	if (FSlateApplication::IsInitialized() && OnApplicationActivationStateChangedDelegateHandle.IsValid())
+FEditorListener::~FEditorListener()
+{
+	if (!IsRunningCookCommandlet())
 	{
-		FSlateApplication::Get().OnApplicationActivationStateChanged().Remove(
-			OnApplicationActivationStateChangedDelegateHandle);
-	}
+		if (OnDirectoryChangedDelegateHandle.IsValid())
+		{
+			auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
+				TEXT("DirectoryWatcher"));
 
-	if (OnMainFrameCreationFinishedDelegateHandle.IsValid())
-	{
-		auto& MainFrameModule = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
+			const auto& ChangedDirectories = FUnrealCSharpFunctionLibrary::GetChangedDirectories();
 
-		MainFrameModule.OnMainFrameCreationFinished().Remove(OnMainFrameCreationFinishedDelegateHandle);
-	}
+			for (const auto& Directory : ChangedDirectories)
+			{
+				DirectoryWatcherModule.Get()->UnregisterDirectoryChangedCallback_Handle(
+					Directory, OnDirectoryChangedDelegateHandle);
+			}
+		}
 
-	if (OnCompileDelegateHandle.IsValid())
-	{
-		FUnrealCSharpCoreModuleDelegates::OnCompile.Remove(OnCompileDelegateHandle);
-	}
+		if (FSlateApplication::IsInitialized() && OnApplicationActivationStateChangedDelegateHandle.IsValid())
+		{
+			FSlateApplication::Get().OnApplicationActivationStateChanged().Remove(
+				OnApplicationActivationStateChangedDelegateHandle);
+		}
 
-	if (OnEndGeneratorDelegateHandle.IsValid())
-	{
-		FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Remove(OnEndGeneratorDelegateHandle);
-	}
+		if (OnMainFrameCreationFinishedDelegateHandle.IsValid())
+		{
+			auto& MainFrameModule = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
 
-	if (OnBeginGeneratorDelegateHandle.IsValid())
-	{
-		FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.Remove(OnBeginGeneratorDelegateHandle);
-	}
+			MainFrameModule.OnMainFrameCreationFinished().Remove(OnMainFrameCreationFinishedDelegateHandle);
+		}
 
-	if (OnCancelPIEDelegateHandle.IsValid())
-	{
-		FEditorDelegates::CancelPIE.Remove(OnCancelPIEDelegateHandle);
-	}
+		if (OnCompileDelegateHandle.IsValid())
+		{
+			FUnrealCSharpCoreModuleDelegates::OnCompile.Remove(OnCompileDelegateHandle);
+		}
 
-	if (OnPrePIEEndedDelegateHandle.IsValid())
-	{
-		FEditorDelegates::PrePIEEnded.Remove(OnPrePIEEndedDelegateHandle);
-	}
+		if (OnEndGeneratorDelegateHandle.IsValid())
+		{
+			FUnrealCSharpCoreModuleDelegates::OnEndGenerator.Remove(OnEndGeneratorDelegateHandle);
+		}
 
-	if (OnPreBeginPIEDelegateHandle.IsValid())
-	{
-		FEditorDelegates::PreBeginPIE.Remove(OnPreBeginPIEDelegateHandle);
-	}
+		if (OnBeginGeneratorDelegateHandle.IsValid())
+		{
+			FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.Remove(OnBeginGeneratorDelegateHandle);
+		}
 
-	if (OnPostEngineInitDelegateHandle.IsValid())
-	{
-		FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitDelegateHandle);
+		if (OnCancelPIEDelegateHandle.IsValid())
+		{
+			FEditorDelegates::CancelPIE.Remove(OnCancelPIEDelegateHandle);
+		}
+
+		if (OnPrePIEEndedDelegateHandle.IsValid())
+		{
+			FEditorDelegates::PrePIEEnded.Remove(OnPrePIEEndedDelegateHandle);
+		}
+
+		if (OnPreBeginPIEDelegateHandle.IsValid())
+		{
+			FEditorDelegates::PreBeginPIE.Remove(OnPreBeginPIEDelegateHandle);
+		}
+
+		if (OnPostEngineInitDelegateHandle.IsValid())
+		{
+			FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitDelegateHandle);
+		}
 	}
 }
 

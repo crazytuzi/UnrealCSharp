@@ -1499,6 +1499,8 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 
 	FPlatformProcess::ClosePipe(ReadPipe, WritePipe);
 
+	FPlatformProcess::TerminateProc(ProcessHandle, true);
+
 	FPlatformProcess::CloseProc(ProcessHandle);
 }
 #endif
