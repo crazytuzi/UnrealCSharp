@@ -127,7 +127,7 @@ private:
 	bool bIsGenerateAsset;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator,
-		meta = (LongPackageName, EditCondition = "bIsGenerateAsset"))
+		meta = (LongPackageName, ForceShowEngineContent, ForceShowPluginContent, EditCondition = "bIsGenerateAsset"))
 	TArray<FDirectoryPath> SupportedAssetPath;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bIsGenerateAsset"))
