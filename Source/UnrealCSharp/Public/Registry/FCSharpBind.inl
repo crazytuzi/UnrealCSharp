@@ -15,9 +15,7 @@ auto FCSharpBind::Bind(FDomain* InDomain, UStruct* InStruct)
 	{
 		if (!CanBind(InDomain, InStruct))
 		{
-#if !WITH_EDITOR
 			NotOverrideTypes.Add(InStruct);
-#endif
 
 			return false;
 		}
