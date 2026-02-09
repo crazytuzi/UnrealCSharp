@@ -18,6 +18,17 @@ Class(InClass)
 	Initialize();
 }
 
+FClassReflection::FClassReflection(const TWeakObjectPtr<UField>& InStruct, MonoClass* InClass):
+FReflection(InStruct->GetName()),
+Class(InClass)
+{
+	Type = FMonoDomain::Class_Get_Type(Class);
+		
+	ReflectionType = FMonoDomain::Type_Get_Object(Type);
+	
+	Initialize();
+}
+
 FClassReflection::FClassReflection(MonoClass* InClass) : FReflection({}),
                                                          Class(InClass)
 {
@@ -221,7 +232,7 @@ FMethodReflection* FClassReflection::Get_Method_From_Name(const FString& InFunct
 	return FoundMethod != nullptr ? *FoundMethod : nullptr;
 }
 
-MonoClass* FClassReflection::GetMonoClass(const TWeakObjectPtr<UStruct>& InStruct)
+MonoClass* FClassReflection::GetMonoClass(const TWeakObjectPtr<UField>& InStruct)
 {
 	if (const auto InClass = Cast<UClass>(InStruct))
 	{
@@ -235,6 +246,13 @@ MonoClass* FClassReflection::GetMonoClass(const TWeakObjectPtr<UStruct>& InStruc
 		return FMonoDomain::Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct));
+	}
+	
+	if (const auto InEnum = Cast<UEnum>(InStruct))
+	{
+		return FMonoDomain::Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InEnum),
+			FUnrealCSharpFunctionLibrary::GetFullClass(InEnum));
 	}
 	
 	return nullptr;

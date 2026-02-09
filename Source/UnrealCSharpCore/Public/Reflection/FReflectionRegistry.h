@@ -17,7 +17,7 @@ public:
 	void Deinitialize();
 	
 public:
-	FClassReflection* GetClassReflection(const TWeakObjectPtr<UStruct>& InStruct);
+	FClassReflection* GetClassReflection(const TWeakObjectPtr<UField>& InStruct);
 	
 	FClassReflection* GetClassReflection(MonoClass* InStruct);
 	
@@ -158,7 +158,7 @@ public:
 	static inline FClassReflection* Utils_Class{};
 	
 public:
-	TMap<TWeakObjectPtr<UStruct>, FClassReflection*> ClassReflection;
+	TMap<TWeakObjectPtr<UField>, FClassReflection*> ClassReflection;
 	
 	TMap<MonoClass*, FClassReflection*> ClassReflection1;
 	

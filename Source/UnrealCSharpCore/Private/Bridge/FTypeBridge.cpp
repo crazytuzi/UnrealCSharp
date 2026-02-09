@@ -391,9 +391,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FByteProperty* InProperty)
 	if (InProperty != nullptr)
 	{
 		return InProperty->Enum != nullptr
-			       ? FMonoDomain::Class_From_Name(
-				       FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->Enum),
-				       FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->Enum))
+			       ? FReflectionRegistry::Get().GetClassReflection(InProperty->Enum)->GetClass()
 			       : FReflectionRegistry::Get().Get_Byte_Class();
 	}
 
@@ -508,9 +506,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FEnumProperty* InProperty)
 {
 	if (InProperty != nullptr)
 	{
-		return FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->GetEnum()),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->GetEnum()));
+		return FReflectionRegistry::Get().GetClassReflection(InProperty->GetEnum())->GetClass();
 	}
 
 	return nullptr;

@@ -9,6 +9,8 @@ class UNREALCSHARPCORE_API FClassReflection : public FReflection
 {
 public:
 	FClassReflection(const TWeakObjectPtr<UStruct>& InStruct, MonoClass* InClass);
+	
+	FClassReflection(const TWeakObjectPtr<UField>& InStruct, MonoClass* InClass);
 
 	FClassReflection(MonoClass* InClass);
 	
@@ -45,7 +47,7 @@ public:
 	FMethodReflection* Get_Method_From_Name(const FString& InFunctionName, const int32 InParamCount);
 
 public:
-	static MonoClass* GetMonoClass(const TWeakObjectPtr<UStruct>& InStruct);
+	static MonoClass* GetMonoClass(const TWeakObjectPtr<UField>& InStruct);
 
 public:
 	bool bIsOverride{};

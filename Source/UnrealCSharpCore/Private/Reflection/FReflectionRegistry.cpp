@@ -87,7 +87,7 @@ void FReflectionRegistry::Deinitialize()
 	ClassReflection2.Empty();
 }
 
-FClassReflection* FReflectionRegistry::GetClassReflection(const TWeakObjectPtr<UStruct>& InStruct)
+FClassReflection* FReflectionRegistry::GetClassReflection(const TWeakObjectPtr<UField>& InStruct)
 {
 	if (const auto FoundClassReflection = ClassReflection.Find(InStruct))
 	{
