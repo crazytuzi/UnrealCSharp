@@ -1,9 +1,10 @@
 ﻿#include "Reflection/Class/FClassDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reflection/FReflectionRegistry.h"
+#include "Template/TGetArrayLength.inl"
 
-FClassDescriptor::FClassDescriptor(UStruct* InStruct, MonoClass* InBindMonoClass):
-	Struct(InStruct),
-	BindMonoClass(InBindMonoClass)
+FClassDescriptor::FClassDescriptor(UStruct* InStruct):
+	Struct(InStruct)
 {
 	Initialize();
 }
@@ -19,8 +20,10 @@ void FClassDescriptor::Initialize()
 	{
 		Class->ClearFunctionMapsCaches();
 	}
-
-	FMonoDomain::Class_Constructor(BindMonoClass);
+	
+	ClassReflection = FReflectionRegistry::Get().GetClassReflection(Struct);
+	
+	FMonoDomain::Class_Constructor(ClassReflection->GetClass());
 }
 
 void FClassDescriptor::Deinitialize()
@@ -28,19 +31,19 @@ void FClassDescriptor::Deinitialize()
 	if (const auto Class = Cast<UClass>(Struct))
 	{
 		Class->ClearFunctionMapsCaches();
-
-		FDomain::StaticClassSingleton_Reset(BindMonoClass);
+		
+		ClassReflection->Property_Set_Value(PROPERTY_STATIC_CLASS_SINGLETON, nullptr, {nullptr}, nullptr);
 	}
-	else if (Cast<UScriptStruct>(Struct))
+	else
 	{
-		FDomain::StaticStructSingleton_Reset(BindMonoClass);
+		ClassReflection->Property_Set_Value(PROPERTY_STATIC_STRUCT_SINGLETON, nullptr, {nullptr}, nullptr);
 	}
-
+	
 	for (const auto& FunctionHash : FunctionHashSet)
 	{
 		FCSharpEnvironment::GetEnvironment().RemoveFunctionDescriptor(FunctionHash);
 	}
-
+	
 	FunctionHashSet.Empty();
 
 	for (const auto& PropertyHash : PropertyHashSet)
@@ -49,11 +52,43 @@ void FClassDescriptor::Deinitialize()
 	}
 
 	PropertyHashSet.Empty();
+	
+	// if (ClassReflection != nullptr)
+	// {
+	// 	delete ClassReflection;
+	// }
+	// @TOOD
 }
 
 MonoClass* FClassDescriptor::GetMonoClass() const
 {
-	return BindMonoClass;
+	return ClassReflection != nullptr ? ClassReflection->GetClass() : nullptr;
+}
+
+MonoVTable* FClassDescriptor::GetVTable() const
+{
+	return ClassReflection != nullptr ? ClassReflection->GetVTable() : nullptr;
+}
+
+const TMap<FString, FPropertyReflection*>& FClassDescriptor::GetProperties() const
+{
+	static TMap<FString, FPropertyReflection*> Default;
+	
+	return ClassReflection != nullptr ? ClassReflection->GetProperties() : Default;
+}
+
+const TMap<FString, FFieldReflection*>& FClassDescriptor::GetField() const
+{
+	static TMap<FString, FFieldReflection*> Default;
+	
+	return ClassReflection != nullptr ? ClassReflection->GetFields() : Default;
+}
+
+const TMap<TPair<FString,int32>, FMethodReflection*>& FClassDescriptor::GetMethods() const
+{
+	static TMap<TPair<FString, int32>, FMethodReflection*> Default;
+	
+	return ClassReflection != nullptr ? ClassReflection->GetMethods() : Default;
 }
 
 FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FString& InFunctionName)

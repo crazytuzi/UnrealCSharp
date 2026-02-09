@@ -1,12 +1,13 @@
 ﻿#pragma once
 
+#include "Reflection//FClassReflection.h"
 #include "Reflection/Function/FFunctionDescriptor.h"
 #include "mono/metadata/object-forward.h"
 
-class FClassDescriptor
+class UNREALCSHARP_API FClassDescriptor
 {
 public:
-	FClassDescriptor(UStruct* InStruct, MonoClass* InBindMonoClass);
+	FClassDescriptor(UStruct* InStruct);
 
 	~FClassDescriptor();
 
@@ -16,8 +17,16 @@ public:
 	void Deinitialize();
 
 public:
-	UNREALCSHARP_API MonoClass* GetMonoClass() const;
-
+	MonoClass* GetMonoClass() const;
+	
+	MonoVTable* GetVTable() const;
+	
+	const TMap<FString, FPropertyReflection*>& GetProperties() const;
+	
+	const TMap<FString, FFieldReflection*>& GetField() const;
+	
+	const TMap<TPair<FString,int32>, FMethodReflection*>& GetMethods() const;
+	
 public:
 	FFunctionDescriptor* GetFunctionDescriptor(const FString& InFunctionName);
 
@@ -32,6 +41,8 @@ private:
 	TWeakObjectPtr<UStruct> Struct;
 
 	MonoClass* BindMonoClass;
+	
+	FClassReflection* ClassReflection;
 
 	TSet<uint32> PropertyHashSet;
 

@@ -14,6 +14,7 @@
 #include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #endif
 #include "UEVersion.h"
+#include "Reflection/FReflectionRegistry.h"
 
 TMap<UDynamicScriptStruct*, FString> FDynamicStructGenerator::NamespaceMap;
 
@@ -117,7 +118,7 @@ void FDynamicStructGenerator::Generator(MonoClass* InMonoClass)
 
 	if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
 	{
-		if (ParentMonoClass != FMonoDomain::Get_Object_Class())
+		if (ParentMonoClass != FReflectionRegistry::Get().Get_Object_Class())
 		{
 			if (const auto ParentMonoType = FMonoDomain::Class_Get_Type(ParentMonoClass))
 			{

@@ -13,7 +13,7 @@ uint32 GetTypeHash(const FStructAddressBase& InStructAddressBase)
 template <auto IsNeedFree>
 auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject)
 {
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InScriptStruct, InMonoObject, true);
 
 	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
 		                                          InScriptStruct,

@@ -14,7 +14,7 @@ namespace
 			const auto LazyObjectPtr = new TLazyObjectPtr<UObject>(FoundObject);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, true, false>(
-				InMonoObject, LazyObjectPtr);
+				FDomain::Object_Get_Class(InMonoObject), InMonoObject, LazyObjectPtr);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)

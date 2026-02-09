@@ -38,7 +38,7 @@ struct TConstructorHelper<std::tuple<Args...>>
 		}
 		else
 		{
-			FCSharpEnvironment::GetEnvironment().AddBindingReference<Class, true>(InMonoObject, Value);
+			FCSharpEnvironment::GetEnvironment().AddBindingReference<Class, true>(TPropertyClass<Class, Class>::Get(), InMonoObject, Value);
 		}
 	}
 };

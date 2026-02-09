@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
 namespace Script.Library
@@ -6,7 +7,7 @@ namespace Script.Library
     public static unsafe class TMapImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap);
+        public static extern void TMap_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, Type InKeyType, Type InValueType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TMap_UnRegisterImplementation(nint InMap);

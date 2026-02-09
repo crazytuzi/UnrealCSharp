@@ -27,16 +27,16 @@ public:
 	static auto Bind(FDomain* InDomain, UObject* InObject);
 
 	template <typename T>
-	static auto Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
+	static auto Bind(MonoClass* InMonoClass, MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
 
 	template <typename T>
-	static auto Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+	static auto Bind(MonoClass* InMonoClass, MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	                 MonoReflectionType* InValueReflectionType);
 
 	static bool Bind(FDomain* InDomain, MonoObject* InMonoObject, const FName& InStructName);
 
 	template <typename T>
-	static auto Bind(MonoObject* InMonoObject);
+	static auto Bind(MonoClass* InMonoClass, MonoObject* InMonoObject);
 
 	static bool Bind(FDomain* InDomain, FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
@@ -55,19 +55,19 @@ private:
 	                               UClass* InClass, const FString& InMethodName, UFunction* InFunction);
 
 	template <typename T>
-	static auto BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
+	static auto BindImplementation(MonoClass* InMonoClass, MonoObject* InMonoObject, MonoReflectionType* InReflectionType);
 
 	template <typename T>
-	static auto BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+	static auto BindImplementation(MonoClass* InMonoClass, MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
 	                               MonoReflectionType* InValueReflectionType);
 
 	static bool BindImplementation(FDomain* InDomain, MonoObject* InMonoObject, const FName& InStructName);
 
 	template <typename T>
-	static auto BindImplementation(MonoObject* InMonoObject);
+	static auto BindImplementation(MonoClass* InMonoClass, MonoObject* InMonoObject);
 
 private:
-	static bool CanBind(const FDomain* InDomain, UStruct* InStruct);
+	static bool CanBind(UStruct* InStruct);
 
 private:
 	static UFunction* GetOriginalFunction(FClassDescriptor* InClassDescriptor, UFunction* InFunction);
@@ -75,9 +75,6 @@ private:
 	static bool IsCallCSharpFunction(const UFunction* InFunction);
 
 	static UFunction* DuplicateFunction(UFunction* InOriginalFunction, UClass* InClass, const FName& InFunctionName);
-
-private:
-	static bool IsOverrideType(const FDomain* InDomain, MonoReflectionType* InMonoReflectionType);
 
 private:
 	void OnCSharpEnvironmentInitialize();

@@ -35,9 +35,9 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 	}
 
 	static auto AddReference(Class* InRegistry, typename FDelegateValueMapping::ValueType InValue,
-	                         MonoObject* InMonoObject)
+	                         MonoClass* InMonoClass, MonoObject* InMonoObject)
 	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoClass, InMonoObject, true);
 
 		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
 
@@ -46,9 +46,9 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 
 	static auto AddReference(Class* InRegistry, const FGarbageCollectionHandle& InOwner,
 	                         const typename FDelegateValueMapping::FAddressType InAddress,
-	                         typename FDelegateValueMapping::ValueType InValue, MonoObject* InMonoObject)
+	                         typename FDelegateValueMapping::ValueType InValue, MonoClass* InMonoClass, MonoObject* InMonoObject)
 	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
+		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoClass, InMonoObject, true);
 
 		(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
 

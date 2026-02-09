@@ -11,10 +11,9 @@ namespace
 	{
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
 		{
-			const auto AnsiString = new FAnsiString(UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue)));
+			const auto AnsiString = new FAnsiString(UTF8_TO_TCHAR(FDomain::String_To_UTF8(InValue)));
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(InMonoObject, AnsiString);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(FReflectionRegistry::Get().Get_AnsiString_Class(), InMonoObject, AnsiString);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
@@ -43,8 +42,7 @@ namespace
 		{
 			auto AnsiString = FCSharpEnvironment::GetEnvironment().GetString<FAnsiString>(InGarbageCollectionHandle);
 
-			return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(
-				TCHAR_TO_UTF8(*FAnsiString(*AnsiString)));
+			return FDomain::String_New(TCHAR_TO_UTF8(*FAnsiString(*AnsiString)));
 		}
 
 		FRegisterAnsiString()

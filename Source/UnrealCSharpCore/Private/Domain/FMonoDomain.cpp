@@ -26,6 +26,7 @@
 #include "Setting/UnrealCSharpSetting.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Domain/FMonoFunctionLibrary.h"
+#include "Reflection/FReflectionRegistry.h"
 
 PRAGMA_DISABLE_DANGLING_WARNINGS
 
@@ -124,6 +125,11 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 	InitializeAssembly(InParams.Assemblies);
 
+	if (bLoadSucceed)
+	{
+		FReflectionRegistry::Get().Initialize();
+	}
+
 	RegisterLog();
 
 	RegisterBinding();
@@ -131,6 +137,11 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 void FMonoDomain::Deinitialize()
 {
+	if (bLoadSucceed)
+	{
+		FReflectionRegistry::Get().Deinitialize();
+	}
+	
 	UnloadAssembly();
 
 	DeinitializeAssembly();
@@ -175,6 +186,12 @@ MonoClass* FMonoDomain::Class_From_Name(const FString& InNameSpace, const FStrin
 MonoMethod* FMonoDomain::Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
                                                     const int32 InParamCount)
 {
+	// if (auto ClassReflection = FReflectionRegistry::Get().GetClassReflection(InMonoClass))
+	// {
+	// 	ClassReflection->Get_Method_From_Name(InFunctionName, InParamCount);
+	// }
+	//
+	// return nullptr;
 	if (InMonoClass == nullptr)
 	{
 		return nullptr;
@@ -512,14 +529,9 @@ MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
 	return mono_array_new(Domain, InMonoClass, InNum);
 }
 
-char* FMonoDomain::Array_Addr_With_Size(MonoArray* InArray, const int32 InSize, const uint64 InIndex)
-{
-	return InArray != nullptr ? mono_array_addr_with_size(InArray, InSize, InIndex) : nullptr;
-}
-
 uint64 FMonoDomain::Array_Length(MonoArray* InMonoArray)
 {
-	return InMonoArray != nullptr ? mono_array_length(InMonoArray) : 0u;
+	return InMonoArray != nullptr ? InMonoArray->max_length : 0u;
 }
 
 MonoClass* FMonoDomain::Get_Byte_Class()
@@ -634,9 +646,12 @@ void* FMonoDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
 
 void FMonoDomain::Class_Constructor(MonoClass* InMonoClass)
 {
-	if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_CLASS_CONSTRUCTOR, 0))
+	if (const auto ClassReflection = FReflectionRegistry::Get().GetClassReflection(InMonoClass))
 	{
-		Runtime_Invoke(FoundMethod, InMonoClass, nullptr);
+		if (const auto Method = ClassReflection->Get_Method_From_Name(FUNCTION_CLASS_CONSTRUCTOR, 0))
+		{
+			Runtime_Invoke(Method->GetMethod(), InMonoClass, nullptr);
+		}
 	}
 }
 
@@ -650,35 +665,6 @@ void FMonoDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InPar
 			Runtime_Invoke(FoundMethod, InMonoObject, InParams);
 		}
 	}
-}
-
-MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
-                                                           const int32 InParamCount)
-{
-	while (InMonoClass != nullptr)
-	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, InFunctionName, InParamCount))
-		{
-			return FoundMethod;
-		}
-
-		InMonoClass = Class_Get_Parent(InMonoClass);
-	}
-
-	return nullptr;
-}
-
-MonoClassField* FMonoDomain::Self_Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName)
-{
-	if (const auto Field = Class_Get_Field_From_Name(InMonoClass, InName))
-	{
-		if (mono_field_get_parent(Field) == InMonoClass)
-		{
-			return Field;
-		}
-	}
-
-	return nullptr;
 }
 
 MonoType* FMonoDomain::Property_Get_Type(MonoProperty* InMonoProperty)
@@ -760,14 +746,13 @@ MonoMethod* FMonoDomain::Delegate_Get_Method(MonoObject* InDelegate)
 
 mono_bool FMonoDomain::Type_Is_Class(MonoType* InMonoType)
 {
-	if (const auto FoundMonoClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_Utils_Class())
 	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_IS_CLASS, 1))
+		if (const auto FoundMethod = FoundMonoClass->Get_Method_From_Name(FUNCTION_UTILS_IS_CLASS, 1))
 		{
 			void* InParams[1] = {Type_Get_Object(InMonoType)};
 
-			return *static_cast<bool*>(Object_Unbox(Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr)));
+			return *static_cast<bool*>(Object_Unbox(Runtime_Invoke(FoundMethod->GetMethod(), nullptr, InParams, nullptr)));
 		}
 	}
 
@@ -776,14 +761,13 @@ mono_bool FMonoDomain::Type_Is_Class(MonoType* InMonoType)
 
 mono_bool FMonoDomain::Type_Is_Enum(MonoType* InMonoType)
 {
-	if (const auto FoundMonoClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_Utils_Class())
 	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_IS_ENUM, 1))
+		if (const auto FoundMethod = FoundMonoClass->Get_Method_From_Name(FUNCTION_UTILS_IS_ENUM, 1))
 		{
 			void* InParams[1] = {Type_Get_Object(InMonoType)};
 
-			return *static_cast<bool*>(Object_Unbox(Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr)));
+			return *static_cast<bool*>(Object_Unbox(Runtime_Invoke(FoundMethod->GetMethod(), nullptr, InParams, nullptr)));
 		}
 	}
 
@@ -1073,12 +1057,11 @@ void FMonoDomain::RegisterLog()
 {
 	if (Domain != nullptr)
 	{
-		if (const auto FoundMonoClass = Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
+		if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_Utils_Class())
 		{
-			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_SET_OUT, 0))
+			if (const auto FoundMethod = FoundMonoClass->Get_Method_From_Name(FUNCTION_UTILS_SET_OUT, 0))
 			{
-				Runtime_Invoke(FoundMethod, nullptr, nullptr, nullptr);
+				Runtime_Invoke(FoundMethod->GetMethod(), nullptr, nullptr, nullptr);
 			}
 		}
 	}

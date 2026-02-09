@@ -12,7 +12,7 @@ namespace
 	{
 		static void RegisterImplementation(MonoObject* InMonoObject)
 		{
-			FCSharpBind::Bind<FDelegateHelper>(InMonoObject);
+			FCSharpBind::Bind<FDelegateHelper>(FMonoDomain::Object_Get_Class(InMonoObject), InMonoObject);
 		}
 
 		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)

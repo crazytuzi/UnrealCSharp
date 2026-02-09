@@ -178,7 +178,7 @@ namespace
 
 				FCSharpEnvironment::GetEnvironment().AddBindingReference<
 					std::decay_t<FEnhancedInputActionEventBinding>, false>(
-					SrcMonoObject, &EnhancedInputActionEventBinding);
+					FoundMonoClass, SrcMonoObject, &EnhancedInputActionEventBinding);
 
 				return SrcMonoObject;
 			}

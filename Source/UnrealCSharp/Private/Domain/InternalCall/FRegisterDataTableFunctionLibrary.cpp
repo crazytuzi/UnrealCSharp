@@ -22,22 +22,17 @@ namespace
 					UDataTable>(InGarbageCollectionHandle))
 				{
 					FCSharpEnvironment::GetEnvironment().Bind<false>(DataTable->RowStruct.Get());
+					
+					*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Init(DataTable->RowStruct);
 
-					if (const auto ClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
-						DataTable->RowStruct.Get()))
-					{
-						*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->
-						                                               Object_Init(ClassDescriptor->GetMonoClass());
+					const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
 
-						const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
+					const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct<>(
+						*FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(*OutRow));
 
-						const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct<>(
-							*FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(*OutRow));
+					DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
 
-						DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
-
-						return true;
-					}
+					return true;
 				}
 			}
 

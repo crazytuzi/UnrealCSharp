@@ -19,8 +19,7 @@ TMap<int32, struct sigaction> SignalActions;
 void SignalHandler(int32 Signal)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
-	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
-		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
+	       *FString(UTF8_TO_TCHAR(FDomain::String_To_UTF8(FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
 
@@ -385,7 +384,7 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 
 		if (const auto FoundMonoObject = GetObject(PendingBindObject))
 		{
-			FDomain::Object_Constructor(FoundMonoObject);
+			FDomain::Object_Constructor(PendingBindObject->GetClass(), FoundMonoObject);
 		}
 	}
 }

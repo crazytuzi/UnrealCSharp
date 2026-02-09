@@ -13,11 +13,9 @@ auto FCSharpBind::Bind(FDomain* InDomain, UStruct* InStruct)
 
 	if constexpr (IsNeedMonoClass)
 	{
-		if (!CanBind(InDomain, InStruct))
+		if (!CanBind(InStruct))
 		{
-#if !WITH_EDITOR
 			NotOverrideTypes.Add(InStruct);
-#endif
 
 			return false;
 		}
@@ -33,22 +31,22 @@ auto FCSharpBind::Bind(FDomain* InDomain, UObject* InObject)
 }
 
 template <typename T>
-auto FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
+auto FCSharpBind::Bind(MonoClass* InMonoClass, MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 {
-	return BindImplementation<T>(InMonoObject, InReflectionType);
+	return BindImplementation<T>(InMonoClass, InMonoObject, InReflectionType);
 }
 
 template <typename T>
-auto FCSharpBind::Bind(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+auto FCSharpBind::Bind(MonoClass* InMonoClass, MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
                        MonoReflectionType* InValueReflectionType)
 {
-	return BindImplementation<T>(InMonoObject, InKeyReflectionType, InValueReflectionType);
+	return BindImplementation<T>(InMonoClass, InMonoObject, InKeyReflectionType, InValueReflectionType);
 }
 
 template <typename T>
-auto FCSharpBind::Bind(MonoObject* InMonoObject)
+auto FCSharpBind::Bind(MonoClass* InMonoClass, MonoObject* InMonoObject)
 {
-	return BindImplementation<T>(InMonoObject);
+	return BindImplementation<T>(InMonoClass, InMonoObject);
 }
 
 template <auto IsNeedMonoClass>
@@ -93,7 +91,7 @@ auto FCSharpBind::BindImplementation(FDomain* InDomain, UObject* InObject) -> Mo
 }
 
 template <typename T>
-auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
+auto FCSharpBind::BindImplementation(MonoClass* InMonoClass, MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 {
 	const auto Property = FTypeBridge::Factory<>(InReflectionType, nullptr, "", EObjectFlags::RF_Transient);
 
@@ -101,13 +99,13 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 
 	const auto ContainerHelper = new T(Property, nullptr, true, true);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InMonoClass, InMonoObject);
 
 	return true;
 }
 
 template <typename T>
-auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
+auto FCSharpBind::BindImplementation(MonoClass* InMonoClass, MonoObject* InMonoObject, MonoReflectionType* InKeyReflectionType,
                                      MonoReflectionType* InValueReflectionType)
 {
 	const auto KeyProperty = FTypeBridge::Factory<>(InKeyReflectionType, nullptr, "", EObjectFlags::RF_Transient);
@@ -121,17 +119,17 @@ auto FCSharpBind::BindImplementation(MonoObject* InMonoObject, MonoReflectionTyp
 
 	const auto ContainerHelper = new T(KeyProperty, ValueProperty, nullptr, true, true);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InMonoClass, InMonoObject);
 
 	return true;
 }
 
 template <typename T>
-auto FCSharpBind::BindImplementation(MonoObject* InMonoObject)
+auto FCSharpBind::BindImplementation(MonoClass* InMonoClass, MonoObject* InMonoObject)
 {
 	const auto Helper = new T();
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(Helper, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(Helper, InMonoClass, InMonoObject);
 
 	return true;
 }

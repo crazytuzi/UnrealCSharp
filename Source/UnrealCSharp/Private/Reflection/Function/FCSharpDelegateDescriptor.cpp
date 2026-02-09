@@ -1,5 +1,6 @@
 ﻿#include "Reflection/Function/FCSharpDelegateDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reflection/FReflectionRegistry.h"
 
 FCSharpDelegateDescriptor::FCSharpDelegateDescriptor(UFunction* InFunction):
 	Super(InFunction,
@@ -9,8 +10,7 @@ FCSharpDelegateDescriptor::FCSharpDelegateDescriptor(UFunction* InFunction):
 
 bool FCSharpDelegateDescriptor::CallDelegate(const UObject* InObject, MonoMethod* InMethod, void* InParams)
 {
-	const auto CSharpParams = FCSharpEnvironment::GetEnvironment().GetDomain()->Array_New(
-		FCSharpEnvironment::GetEnvironment().GetDomain()->Get_Object_Class(), PropertyDescriptors.Num());
+	const auto CSharpParams = FDomain::Array_New(FReflectionRegistry::Get().Get_Object_Class(), PropertyDescriptors.Num());
 
 	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
 	{
@@ -31,8 +31,7 @@ bool FCSharpDelegateDescriptor::CallDelegate(const UObject* InObject, MonoMethod
 	{
 		if (ReturnPropertyDescriptor->IsPrimitiveProperty())
 		{
-			if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(
-				ReturnValue))
+			if (const auto UnBoxResultValue = FDomain::Object_Unbox(ReturnValue))
 			{
 				ReturnPropertyDescriptor->Set(UnBoxResultValue,
 				                              ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(InParams));
@@ -53,8 +52,7 @@ bool FCSharpDelegateDescriptor::CallDelegate(const UObject* InObject, MonoMethod
 			{
 				if (OutPropertyDescriptor->IsPrimitiveProperty())
 				{
-					if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-						Object_Unbox(FDomain::Array_Get<MonoObject*>(CSharpParams, Index)))
+					if (const auto UnBoxResultValue = FDomain::Object_Unbox(FDomain::Array_Get<MonoObject*>(CSharpParams, Index)))
 					{
 						OutPropertyDescriptor->Set(UnBoxResultValue,
 						                           OutPropertyDescriptor->ContainerPtrToValuePtr<void>(InParams));

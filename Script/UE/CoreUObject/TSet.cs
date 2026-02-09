@@ -6,7 +6,7 @@ namespace Script.CoreUObject
 {
     public class TSet<T> : IEnumerable<T>, IGarbageCollectionHandle
     {
-        public TSet() => TSetImplementation.TSet_RegisterImplementation(this);
+        public TSet() => TSetImplementation.TSet_RegisterImplementation(this, typeof(T));
 
         ~TSet() => TSetImplementation.TSet_UnRegisterImplementation(GarbageCollectionHandle);
 

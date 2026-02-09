@@ -6,7 +6,7 @@ void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) 
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, true, false>(
-		Object, Src);
+		Class, Object, Src);
 
 	*Dest = Object;
 }
@@ -20,7 +20,7 @@ void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, std::false_type)
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false, true>(
-			Object, Src);
+			Class, Object, Src);
 	}
 
 	*Dest = Object;

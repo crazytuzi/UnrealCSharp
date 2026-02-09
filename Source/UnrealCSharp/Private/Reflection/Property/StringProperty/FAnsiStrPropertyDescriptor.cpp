@@ -6,7 +6,7 @@ void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) con
 {
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(Object, Src);
+	FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(Class, Object, Src);
 
 	*Dest = Object;
 }
@@ -19,7 +19,7 @@ void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) co
 	{
 		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, false, true>(Object, Src);
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, false, true>(Class, Object, Src);
 	}
 
 	*Dest = Object;

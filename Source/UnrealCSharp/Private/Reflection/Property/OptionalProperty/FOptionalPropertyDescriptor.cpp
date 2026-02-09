@@ -9,7 +9,7 @@ void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) co
 
 	const auto OptionalHelper = new FOptionalHelper(Property, Src, true, false);
 
-	FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(Src, OptionalHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(Src, OptionalHelper, Class, Object);
 
 	*Dest = Object;
 }
@@ -24,7 +24,7 @@ void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) c
 
 		const auto OptionalHelper = new FOptionalHelper(Property, Src, false, false);
 
-		FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, true>(Src, OptionalHelper, Object);
+		FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, true>(Src, OptionalHelper, Class, Object);
 	}
 
 	*Dest = Object;

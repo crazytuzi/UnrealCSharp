@@ -9,10 +9,9 @@ namespace
 	{
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
 		{
-			const auto String = new FString(UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue)));
+			const auto String = new FString(UTF8_TO_TCHAR(FDomain::String_To_UTF8(InValue)));
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(InMonoObject, String);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(FReflectionRegistry::Get().Get_String_Class(), InMonoObject, String);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
@@ -40,7 +39,7 @@ namespace
 		{
 			auto String = FCSharpEnvironment::GetEnvironment().GetString<FString>(InGarbageCollectionHandle);
 
-			return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*FString(*String)));
+			return FDomain::String_New(TCHAR_TO_UTF8(*FString(*String)));
 		}
 
 		FRegisterString()

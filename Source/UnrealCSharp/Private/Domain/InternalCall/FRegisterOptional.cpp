@@ -26,7 +26,7 @@ namespace
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				nullptr, OptionalHelper, InMonoObject);
+				nullptr, OptionalHelper, FDomain::Object_Get_Class(InMonoObject), InMonoObject);
 		}
 
 		static void Register2Implementation(MonoObject* InMonoObject, MonoObject* InValue)
@@ -44,10 +44,10 @@ namespace
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				nullptr, OptionalHelper, InMonoObject);
+				nullptr, OptionalHelper, FDomain::Object_Get_Class(InMonoObject), InMonoObject);
 
 			OptionalHelper->Set(OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
-				                    ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+				                    ? FDomain::Object_Unbox(InValue)
 				                    : static_cast<void*>(
 					                    FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 		}
@@ -115,7 +115,7 @@ namespace
 				InGarbageCollectionHandle))
 			{
 				OptionalHelper->Set(OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
-					                    ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+					                    ? FDomain::Object_Unbox(InValue)
 					                    : static_cast<void*>(
 						                    FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
 			}

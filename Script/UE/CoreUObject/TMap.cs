@@ -6,7 +6,7 @@ namespace Script.CoreUObject
 {
     public class TMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>, IGarbageCollectionHandle
     {
-        public TMap() => TMapImplementation.TMap_RegisterImplementation(this);
+        public TMap() => TMapImplementation.TMap_RegisterImplementation(this, typeof(TKey), typeof(TValue));
 
         ~TMap() => TMapImplementation.TMap_UnRegisterImplementation(GarbageCollectionHandle);
 

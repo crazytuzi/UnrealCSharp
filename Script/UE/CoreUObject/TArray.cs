@@ -11,7 +11,7 @@ namespace Script.CoreUObject
 
     public class TArray<T> : IEnumerable<T>, IGarbageCollectionHandle
     {
-        public TArray() => TArrayImplementation.TArray_RegisterImplementation(this);
+        public TArray() => TArrayImplementation.TArray_RegisterImplementation(this, typeof(T));
 
         ~TArray() => TArrayImplementation.TArray_UnRegisterImplementation(GarbageCollectionHandle);
 

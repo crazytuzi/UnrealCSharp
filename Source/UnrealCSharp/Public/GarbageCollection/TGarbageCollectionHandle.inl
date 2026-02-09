@@ -51,14 +51,24 @@ public:
 	}
 
 public:
-	static auto NewRef(MonoObject* InMonoObject, const mono_bool bPinned)
+	static auto NewRef(UStruct* InStruct, MonoObject* InMonoObject, const mono_bool bPinned)
 	{
-		return FDomain::GCHandle_New_V2(InMonoObject, bPinned);
+		return FDomain::GCHandle_New_V2(InStruct, InMonoObject, bPinned);
 	}
-
-	static auto NewWeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
+	
+	static auto NewRef(MonoClass* InMonoClass, MonoObject* InMonoObject, const mono_bool bPinned)
 	{
-		return FDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
+		return FDomain::GCHandle_New_V2(InMonoClass, InMonoObject, bPinned);
+	}
+	
+	static auto NewWeakRef(UStruct* InStruct, MonoObject* InMonoObject, const mono_bool bTrackResurrection)
+	{
+		return FDomain::GCHandle_New_WeakRef_V2(InStruct, InMonoObject, bTrackResurrection);
+	}
+	
+	static auto NewWeakRef(MonoClass* InMonoClass, MonoObject* InMonoObject, const mono_bool bTrackResurrection)
+	{
+		return FDomain::GCHandle_New_WeakRef_V2(InMonoClass, InMonoObject, bTrackResurrection);
 	}
 
 	template <auto IsReset>

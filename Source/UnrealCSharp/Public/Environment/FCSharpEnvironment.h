@@ -129,11 +129,11 @@ public:
 	auto GetContainerObject(void* InAddress) const;
 
 	template <typename T>
-	auto AddContainerReference(T* InValue, MonoObject* InMonoObject) const;
+	auto AddContainerReference(T* InValue, MonoClass* InMonoClass, MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto AddContainerReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
-	                           MonoObject* InMonoObject) const;
+	                           MonoClass* InMonoClass, MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto RemoveContainerReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -146,11 +146,11 @@ public:
 	auto GetDelegateObject(void* InAddress) const;
 
 	template <typename T>
-	auto AddDelegateReference(T* InValue, MonoObject* InMonoObject) const;
+	auto AddDelegateReference(T* InValue, MonoClass* InMonoClass, MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto AddDelegateReference(const FGarbageCollectionHandle& InOwner, void* InAddress, T* InValue,
-	                          MonoObject* InMonoObject) const;
+	                          MonoClass* InMonoClass, MonoObject* InMonoObject) const;
 
 	template <typename T>
 	auto RemoveDelegateReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -185,7 +185,7 @@ public:
 	auto GetMultiObject(void* InAddress) const;
 
 	template <typename T, auto IsNeedFree, auto IsMember>
-	auto AddMultiReference(MonoObject* InMonoObject, void* InValue) const;
+	auto AddMultiReference(MonoClass* InMonoClass, MonoObject* InMonoObject, void* InValue) const;
 
 	template <typename T>
 	auto RemoveMultiReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -198,7 +198,7 @@ public:
 	auto GetStringObject(void* InAddress) const;
 
 	template <typename T, auto IsNeedFree, auto IsMember>
-	auto AddStringReference(MonoObject* InMonoObject, void* InValue) const;
+	auto AddStringReference(MonoClass* InMonoClass, MonoObject* InMonoObject, void* InValue) const;
 
 	template <typename T>
 	auto RemoveStringReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -210,10 +210,10 @@ public:
 	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 
 	template <typename T, auto IsNeedFree>
-	auto AddBindingReference(MonoObject* InMonoObject, const T* InObject) const;
+	auto AddBindingReference(MonoClass* InMonoClass, MonoObject* InMonoObject, const T* InObject) const;
 
 	template <typename T>
-	auto AddBindingReference(const FGarbageCollectionHandle& InOwner, MonoObject* InMonoObject,
+	auto AddBindingReference(const FGarbageCollectionHandle& InOwner, MonoClass* InMonoClass, MonoObject* InMonoObject,
 	                         const T* InObject) const;
 
 	bool RemoveBindingReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
@@ -226,7 +226,7 @@ public:
 	auto GetOptionalObject(void* InAddress) const;
 
 	template <typename T, auto IsMember>
-	auto AddOptionalReference(void* InAddress, T* InValue, MonoObject* InMonoObject) const;
+	auto AddOptionalReference(void* InAddress, T* InValue, MonoClass* InMonoClass, MonoObject* InMonoObject) const;
 
 	bool RemoveOptionalReference(const FGarbageCollectionHandle& InGarbageCollectionHandle) const;
 #endif

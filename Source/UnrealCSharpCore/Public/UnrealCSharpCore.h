@@ -18,12 +18,12 @@ public:
 	{
 		return FModuleManager::LoadModuleChecked<FUnrealCSharpCoreModule>("UnrealCSharpCore");
 	}
-
+	
 public:
 	void SetActive(bool InbIsActive);
 
 private:
 	FEngineListener EngineListener;
-
+	
 	bool bIsActive = false;
 };

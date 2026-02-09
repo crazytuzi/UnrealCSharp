@@ -4,16 +4,15 @@
 #include "Reflection/Container/FSetHelper.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "Bridge/FTypeBridge.h"
 #include "Async/Async.h"
 
 namespace
 {
 	struct FRegisterSet
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject)
+		static void RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 		{
-			FCSharpBind::Bind<FSetHelper>(InMonoObject, FTypeBridge::GetGenericArgument(InMonoObject));
+			FCSharpBind::Bind<FSetHelper>(FMonoDomain::Object_Get_Class(InMonoObject), InMonoObject, InReflectionType);
 		}
 
 		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)

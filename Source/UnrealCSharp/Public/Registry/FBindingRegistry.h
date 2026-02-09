@@ -76,10 +76,10 @@ public:
 
 public:
 	template <typename T, auto IsNeedFree>
-	auto AddReference(const T* InObject, MonoObject* InMonoObject);
+	auto AddReference(const T* InObject, MonoClass* InMonoClass, MonoObject* InMonoObject);
 
 	template <typename T>
-	auto AddReference(const FGarbageCollectionHandle& InOwner, const T* InObject, MonoObject* InMonoObject);
+	auto AddReference(const FGarbageCollectionHandle& InOwner, const T* InObject, MonoClass* InMonoClass, MonoObject* InMonoObject);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 

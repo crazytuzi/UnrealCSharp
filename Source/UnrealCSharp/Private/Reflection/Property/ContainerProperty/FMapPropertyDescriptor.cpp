@@ -44,7 +44,7 @@ MonoObject* FMapPropertyDescriptor::NewRef(void* InAddress) const
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerGarbageCollectionHandle, InAddress, MapHelper, Object);
+			OwnerGarbageCollectionHandle, InAddress, MapHelper, Class, Object);
 	}
 
 	return Object;
@@ -57,7 +57,7 @@ MonoObject* FMapPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCo
 	const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
 	                                      bIsCopy, false);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Class, Object);
 
 	return Object;
 }

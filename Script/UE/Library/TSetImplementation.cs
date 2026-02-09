@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
 namespace Script.Library
@@ -6,7 +7,7 @@ namespace Script.Library
     public static unsafe class TSetImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSet_RegisterImplementation<T>(TSet<T> InSet);
+        public static extern void TSet_RegisterImplementation<T>(TSet<T> InSet, Type InType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TSet_UnRegisterImplementation(nint InSet);

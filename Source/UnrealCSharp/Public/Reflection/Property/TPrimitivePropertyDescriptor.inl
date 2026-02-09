@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "TPropertyDescriptor.inl"
-#include "Environment/FCSharpEnvironment.h"
+#include "Domain/FDomain.h"
 #include "UEVersion.h"
 
 template <typename T>
@@ -20,12 +20,12 @@ public:
 
 	virtual auto Get(void* Src, void** Dest, std::true_type) const -> void override
 	{
-		*Dest = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(Super::Class, Src));
+		*Dest = static_cast<void*>(FDomain::Value_Box(Super::Class, Src));
 	}
 
 	virtual auto Get(void* Src, void** Dest, std::false_type) const -> void override
 	{
-		*Dest = static_cast<void*>(FCSharpEnvironment::GetEnvironment().GetDomain()->Value_Box(Super::Class, Src));
+		*Dest = static_cast<void*>(FDomain::Value_Box(Super::Class, Src));
 	}
 
 	virtual auto Get(void* Src, void* Dest) const -> void override

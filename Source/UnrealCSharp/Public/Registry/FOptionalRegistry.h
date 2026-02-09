@@ -35,7 +35,7 @@ public:
 
 	template <auto IsMember>
 	auto AddReference(const FOptionalHelperValueMapping::FAddressType& InAddress,
-	                  const FOptionalHelperValueMapping::ValueType& InValue, MonoObject* InMonoObject);
+	                  const FOptionalHelperValueMapping::ValueType& InValue, MonoClass* InMonoClass, MonoObject* InMonoObject);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 

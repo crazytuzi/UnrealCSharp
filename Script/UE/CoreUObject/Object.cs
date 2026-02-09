@@ -53,5 +53,13 @@ namespace Script.CoreUObject
             UObjectImplementation.UObject_RemoveReferenceImplementation(GarbageCollectionHandle);
 
         public nint GarbageCollectionHandle { get; set; }
+        
+        public void GetRe()
+        {
+            foreach (var PropertyInfo in GetType().GetProperties())
+            {
+                // PropertyInfo.Name
+            }
+        }
     }
 }

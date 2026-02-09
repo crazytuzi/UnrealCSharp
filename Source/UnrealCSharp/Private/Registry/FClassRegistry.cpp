@@ -96,27 +96,7 @@ FClassDescriptor* FClassRegistry::AddClassDescriptor(UStruct* InStruct)
 		return *FoundClassDescriptor;
 	}
 
-	MonoClass* FoundMonoClass{};
-
-	if (const auto InClass = Cast<UClass>(InStruct))
-	{
-		FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InClass));
-	}
-	else if (const auto InScriptStruct = Cast<UScriptStruct>(InStruct))
-	{
-		FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct));
-	}
-
-	if (FoundMonoClass == nullptr)
-	{
-		return nullptr;
-	}
-
-	const auto ClassDescriptor = new FClassDescriptor(InStruct, FoundMonoClass);
+	const auto ClassDescriptor = new FClassDescriptor(InStruct);
 
 	ClassDescriptorMap.Add(InStruct, ClassDescriptor);
 
@@ -234,12 +214,15 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 			if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
 				InObjectInitializer.GetObj()))
 			{
+				auto Obj = InObjectInitializer.GetObj();
+				
 				auto& ObjectInitializer = FObjectInitializer::Get();
 
 				ObjectInitializer.~FObjectInitializer();
 
 				ObjectInitializer.*TAccessPrivate<FObjectInitializer_bIsDeferredInitializer>::Value = true;
 
+				// @TODO
 				FDomain::Object_Constructor(FoundMonoObject);
 			}
 		}

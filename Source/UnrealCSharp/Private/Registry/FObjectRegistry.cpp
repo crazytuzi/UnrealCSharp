@@ -68,7 +68,7 @@ FGarbageCollectionHandle FObjectRegistry::GetGarbageCollectionHandle(const UObje
 
 bool FObjectRegistry::AddReference(UObject* InObject, MonoObject* InMonoObject)
 {
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InObject->GetClass(), InMonoObject, true);
 
 	Object2GarbageCollectionHandleMap.Add(InObject, GarbageCollectionHandle);
 

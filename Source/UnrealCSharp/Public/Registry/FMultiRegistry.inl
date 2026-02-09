@@ -35,10 +35,10 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 	}
 
 	template <auto IsNeedFree, auto IsMember>
-	static auto AddReference(Class* InRegistry, MonoObject* InMonoObject,
+	static auto AddReference(Class* InRegistry, MonoClass* InMonoClass, MonoObject* InMonoObject,
 	                         typename FMultiValueMapping::FAddressType InAddress)
 	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoClass, InMonoObject, true);
 
 		if constexpr (IsMember)
 		{

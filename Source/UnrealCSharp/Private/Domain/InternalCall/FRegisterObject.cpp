@@ -27,8 +27,7 @@ namespace
 
 		static MonoObject* StaticClassImplementation(MonoString* InClassName)
 		{
-			const auto ClassName =
-				UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InClassName));
+			const auto ClassName = UTF8_TO_TCHAR(FDomain::String_To_UTF8(InClassName));
 
 			const auto InClass = LoadObject<UClass>(nullptr, ClassName);
 
@@ -58,7 +57,7 @@ namespace
 				const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
 
 				FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(
-					Object, new FString(Name));
+					FoundMonoClass, Object, new FString(Name));
 
 				return Object;
 			}

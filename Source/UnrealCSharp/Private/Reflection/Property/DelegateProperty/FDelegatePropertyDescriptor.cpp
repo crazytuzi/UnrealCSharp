@@ -46,7 +46,7 @@ MonoObject* FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerGarbageCollectionHandle, InAddress,
-		                                                          DelegateHelper, Object);
+		                                                          DelegateHelper, Class, Object);
 	}
 
 	return Object;
@@ -59,7 +59,7 @@ MonoObject* FDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
 
 	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(DelegateHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(DelegateHelper, Class, Object);
 
 	return Object;
 }

@@ -5,6 +5,7 @@
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reflection/FReflectionRegistry.h"
 #include "Template/TGetArrayLength.inl"
 
 FDynamicRegistry::FDynamicRegistry()
@@ -40,17 +41,11 @@ void FDynamicRegistry::RegisterDynamic() const
 {
 	if (FMonoDomain::bLoadSucceed)
 	{
-		const auto AttributeMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
+		// @TODO
+		const auto AttributeMonoClass = FReflectionRegistry::Get().GetClassReflection(
 			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_CLASS_ATTRIBUTE);
-
-		const auto AttributeMonoType = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_Get_Type(
-			AttributeMonoClass);
-
-		const auto AttributeMonoReflectionType = FCSharpEnvironment::GetEnvironment().GetDomain()->Type_Get_Object(
-			AttributeMonoType);
-
-		const auto UtilsMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
+		
+		const auto UtilsMonoClass = FReflectionRegistry::Get().Get_Utils_Class();
 
 		auto bIsUEAssemblyGCHandle = true;
 
@@ -63,15 +58,15 @@ void FDynamicRegistry::RegisterDynamic() const
 			else
 			{
 				void* InParams[2] = {
-					AttributeMonoReflectionType,
+					AttributeMonoClass->GetReflectionType(),
 					FMonoDomain::GCHandle_Get_Target_V2(AssemblyGCHandle)
 				};
 
-				const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
-					UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
+				const auto GetTypesWithAttributeMethod = UtilsMonoClass->Get_Method_From_Name(
+					FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
 
 				const auto Types = reinterpret_cast<MonoArray*>(FMonoDomain::Runtime_Invoke(
-					GetTypesWithAttributeMethod, nullptr, InParams));
+					GetTypesWithAttributeMethod->GetMethod(), nullptr, InParams));
 
 				const auto Length = FMonoDomain::Array_Length(Types);
 

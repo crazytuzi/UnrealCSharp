@@ -16,6 +16,7 @@
 #include "Log/UnrealCSharpLog.h"
 #include "Template/TGetArrayLength.inl"
 #include "mono/metadata/object.h"
+#include "Reflection/FReflectionRegistry.h"
 
 #if WITH_EDITOR
 TMap<FString, TArray<FString>> FDynamicGeneratorCore::DynamicMap;
@@ -306,8 +307,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 
 	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SUB_CLASS_OF))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_TSubclassOf_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -317,9 +317,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
-		FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass())))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_UObject_Class())
 	{
 		if (InMonoClass == FoundMonoClass ||
 			FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
@@ -337,8 +335,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SCRIPT_INTERFACE))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_TScriptInterface_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -348,7 +345,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FMonoDomain::Get_Enum_Class(), false))
+	if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FReflectionRegistry::Get().Get_Enum_Class(), false))
 	{
 		if (ClassHasAttr(InMonoClass, CLASS_U_ENUM_ATTRIBUTE))
 		{
@@ -369,8 +366,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		return;
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_WEAK_OBJECT_PTR))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_TWeakObjectPtr_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -380,8 +376,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_LAZY_OBJECT_PTR))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_TLazyObjectPtr_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -391,8 +386,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_CLASS_PTR))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_TSoftClassPtr_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -402,8 +396,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_OBJECT_PTR))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_TSoftObjectPtr_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -413,8 +406,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_MAP))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_TMap_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -426,8 +418,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SET))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().Get_TSet_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -437,8 +428,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		}
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_ARRAY))
+	if (const auto FoundMonoClass = FReflectionRegistry::Get().GetTArray_Class())
 	{
 		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
@@ -548,8 +538,7 @@ void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunctio
 
 	const auto AttributeMonoReflectionType = FMonoDomain::Type_Get_Object(AttributeMonoType);
 
-	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
+	const auto UtilsMonoClass = FReflectionRegistry::Get().Get_Utils_Class();
 
 	auto bIsUEAssemblyGCHandle = true;
 
@@ -566,11 +555,11 @@ void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunctio
 				FMonoDomain::GCHandle_Get_Target_V2(AssemblyGCHandle)
 			};
 
-			const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
-				UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
+			const auto GetTypesWithAttributeMethod = UtilsMonoClass->Get_Method_From_Name(
+				FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
 
 			const auto Types = reinterpret_cast<MonoArray*>(FMonoDomain::Runtime_Invoke(
-				GetTypesWithAttributeMethod, nullptr, InParams));
+				GetTypesWithAttributeMethod->GetMethod(), nullptr, InParams));
 
 			const auto Length = FMonoDomain::Array_Length(Types);
 

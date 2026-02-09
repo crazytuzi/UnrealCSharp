@@ -2,6 +2,7 @@
 
 #include "FMonoDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Reflection/FReflectionRegistry.h"
 
 class FMonoDomainScope
 {
@@ -19,6 +20,8 @@ public:
 		if (FMonoDomain::bLoadSucceed)
 		{
 			InFunction();
+			
+			FReflectionRegistry::Get().Initialize();
 		}
 	}
 
@@ -26,6 +29,8 @@ public:
 	{
 		if (FMonoDomain::bLoadSucceed)
 		{
+			FReflectionRegistry::Get().Deinitialize();
+			
 			FMonoDomain::Deinitialize();
 		}
 	}

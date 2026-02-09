@@ -136,8 +136,6 @@ public:
 
 	static MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum);
 
-	static char* Array_Addr_With_Size(MonoArray* InArray, int32 InSize, uint64 InIndex);
-
 	static uint64 Array_Length(MonoArray* InMonoArray);
 
 	static MonoClass* Get_Byte_Class();
@@ -188,11 +186,6 @@ public:
 	static void Class_Constructor(MonoClass* InMonoClass);
 
 	static void Object_Constructor(MonoObject* InMonoObject, int32 InParamCount = 0, void** InParams = nullptr);
-
-	static MonoMethod* Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
-	                                                     int32 InParamCount);
-
-	static MonoClassField* Self_Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName);
 
 	static MonoType* Property_Get_Type(MonoProperty* InMonoProperty);
 

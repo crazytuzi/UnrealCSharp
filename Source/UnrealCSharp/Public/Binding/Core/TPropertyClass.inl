@@ -14,6 +14,7 @@
 #include "Template/TIsNotUEnum.inl"
 #include "Template/TIsTEnumAsByte.inl"
 #include "UEVersion.h"
+#include "Reflection/FReflectionRegistry.h"
 #if UE_F_OPTIONAL_PROPERTY
 #include "Template/TIsTOptional.inl"
 #endif
@@ -28,8 +29,8 @@ struct TMultiPropertyClass
 {
 	static auto Get()
 	{
-		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
+		const auto FoundGenericMonoClass = FReflectionRegistry::Get().GetClassReflection(
+			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName())->GetClass();
 
 		const auto FoundMonoClass = TPropertyClass<Type, Type>::Get();
 
@@ -69,7 +70,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint8>
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_Byte_Class();
+		return FReflectionRegistry::Get().Get_Byte_Class();
 	}
 };
 
@@ -78,7 +79,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint16
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_UInt16_Class();
+		return FReflectionRegistry::Get().Get_UInt16_Class();
 	}
 };
 
@@ -87,7 +88,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint32
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_UInt32_Class();
+		return FReflectionRegistry::Get().Get_UInt32_Class();
 	}
 };
 
@@ -96,7 +97,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, uint64
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_UInt64_Class();
+		return FReflectionRegistry::Get().Get_UInt64_Class();
 	}
 };
 
@@ -105,7 +106,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int8>,
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_SByte_Class();
+		return FReflectionRegistry::Get().Get_SByte_Class();
 	}
 };
 
@@ -114,7 +115,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int16>
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_Int16_Class();
+		return FReflectionRegistry::Get().Get_Int16_Class();
 	}
 };
 
@@ -123,7 +124,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int32>
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_Int32_Class();
+		return FReflectionRegistry::Get().Get_Int32_Class();
 	}
 };
 
@@ -132,7 +133,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, int64>
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_Int64_Class();
+		return FReflectionRegistry::Get().Get_Int64_Class();
 	}
 };
 
@@ -141,7 +142,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, bool>,
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_Boolean_Class();
+		return FReflectionRegistry::Get().Get_Boolean_Class();
 	}
 };
 
@@ -150,7 +151,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, float>
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_Single_Class();
+		return FReflectionRegistry::Get().Get_Single_Class();
 	}
 };
 
@@ -177,7 +178,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FName>
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().Get_Name_Class();
 	}
 };
 
@@ -210,7 +211,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FStrin
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().Get_String_Class();
 	}
 };
 
@@ -220,7 +221,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FUtf8S
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().Get_Utf8String_Class();
 	}
 };
 #endif
@@ -231,7 +232,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FAnsiS
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().Get_AnsiString_Class();
 	}
 };
 #endif
@@ -241,7 +242,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, FText>
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().Get_Text_Class();
 	}
 };
 
@@ -268,7 +269,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_same_v<std::decay_t<T>, double
 {
 	static auto Get()
 	{
-		return FMonoDomain::Get_Double_Class();
+		return FReflectionRegistry::Get().Get_Double_Class();
 	}
 };
 
@@ -299,7 +300,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 		const auto FoundValueReflectionType = FMonoDomain::Type_Get_Object(FoundValueMonoType);
 
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
-			FMonoDomain::Get_Object_Class(), 2);
+			FReflectionRegistry::Get().Get_Object_Class(), 2);
 
 		FDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundKeyReflectionType);
 
@@ -327,7 +328,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 		const auto FoundReflectionType = FMonoDomain::Type_Get_Object(FoundMonoType);
 
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
-			FMonoDomain::Get_Object_Class(), 1);
+			FReflectionRegistry::Get().Get_Object_Class(), 1);
 
 		FDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
@@ -359,7 +360,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 		const auto FoundReflectionType = FMonoDomain::Type_Get_Object(FoundMonoType);
 
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
-			FMonoDomain::Get_Object_Class(), 1);
+			FReflectionRegistry::Get().Get_Object_Class(), 1);
 
 		FDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 
@@ -407,7 +408,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 		const auto FoundReflectionType = FMonoDomain::Type_Get_Object(FoundMonoType);
 
 		const auto ReflectionTypeMonoArray = FMonoDomain::Array_New(
-			FMonoDomain::Get_Object_Class(), 1);
+			FReflectionRegistry::Get().Get_Object_Class(), 1);
 
 		FDomain::Array_Set(ReflectionTypeMonoArray, 0, FoundReflectionType);
 

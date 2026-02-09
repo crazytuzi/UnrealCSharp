@@ -1,8 +1,4 @@
 ﻿#include "Registry/FCSharpBind.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "CoreMacro/GenericAttributeMacro.h"
-#include "Macro/FunctionMacro.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/CSharpFunction.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -11,6 +7,7 @@
 #include "Template/TFieldIteratorExt.inl"
 #include "Setting/UnrealCSharpSetting.h"
 #include "UEVersion.h"
+#include "Reflection/FReflectionRegistry.h"
 
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
 
@@ -77,7 +74,7 @@ bool FCSharpBind::Bind(FDomain* InDomain, FClassDescriptor* InClassDescriptor, U
 
 bool FCSharpBind::BindClassDefaultObject(FDomain* InDomain, UObject* InObject)
 {
-	if (CanBind(InDomain, InObject->GetClass()))
+	if (CanBind(InObject->GetClass()))
 	{
 		FClassRegistry::AddClassConstructor(InObject->GetClass());
 
@@ -125,18 +122,14 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 	{
 		return false;
 	}
-
+	
 	TMap<FString, MonoClassField*> Fields;
-
-	void* FieldIterator = nullptr;
-
-	while (const auto Field = FDomain::Class_Get_Fields(NewClassDescriptor->GetMonoClass(), &FieldIterator))
+	
+	for (const auto& [Name, Field] : NewClassDescriptor->GetField())
 	{
-		if (auto FieldName = FString(FDomain::Field_Get_Name(Field)); FieldName.StartsWith(TEXT("__")))
+		if (Name.StartsWith(TEXT("__")))
 		{
-			FieldName.RightChopInline(2);
-
-			Fields.Add(FieldName, Field);
+			Fields.Add(Name.RightChop(2), Field->GetField());
 		}
 	}
 
@@ -158,9 +151,13 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			if (FieldName == PropertyName)
 			{
 				auto FieldHash = GetTypeHash(Property);
-
-				InDomain->Field_Static_Set_Value(InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
-				                                 Field, &FieldHash);
+				
+				FReflectionRegistry::Get().GetClassReflection(InStruct)->Field_Static_Set_Value(
+				FString::Printf(TEXT(
+					"__%s"
+				),
+				*FieldName),
+				&FieldHash);
 
 				FCSharpEnvironment::GetEnvironment().AddPropertyHash(FieldHash, NewClassDescriptor, Property);
 
@@ -173,9 +170,9 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 
 	if (const auto InClass = Cast<UClass>(InStruct))
 	{
-		if (const auto FoundMonoClass = InDomain->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InClass)))
+		// if (const auto FoundMonoClass = InDomain->Class_From_Name(
+		// 	FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
+		// 	FUnrealCSharpFunctionLibrary::GetFullClass(InClass)))
 		{
 			TMap<FString, UFunction*> Functions;
 
@@ -209,9 +206,12 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 					if (FieldName == FunctionName)
 					{
 						auto FieldHash = GetTypeHash(Function);
-
-						InDomain->Field_Static_Set_Value(InDomain->Class_VTable(NewClassDescriptor->GetMonoClass()),
-						                                 Field, &FieldHash);
+						
+						FReflectionRegistry::Get().GetClassReflection(InClass)->Field_Static_Set_Value(FString::Printf(TEXT(
+						"__%s"
+					),
+					*FieldName),
+					&FieldHash);
 
 						FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
 							FieldHash, NewClassDescriptor, Function);
@@ -254,22 +254,15 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 				}
 			}
 
-			TMap<FString, MonoMethod*> Methods;
+			TMap<FString, FMethodReflection*> Methods;
 
-			const auto AttributeMonoClass = FDomain::Class_From_Name(
-				COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_OVERRIDE_ATTRIBUTE);
-
-			void* MethodIterator = nullptr;
-
-			while (const auto Method = FDomain::Class_Get_Methods(FoundMonoClass, &MethodIterator))
+			for (const auto& [Name, MethodReflection] : NewClassDescriptor->GetMethods())
 			{
-				if (const auto Attrs = FDomain::Custom_Attrs_From_Method(Method))
+				if (MethodReflection != nullptr)
 				{
-					if (!!FDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+					if (MethodReflection->IsOverride())
 					{
-						const auto MethodName = FString(FDomain::Method_Get_Name(Method));
-
-						Methods.Add(MethodName, Method);
+						Methods.Add(Name.Key, MethodReflection);
 					}
 				}
 			}
@@ -278,23 +271,24 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, UStruct* InStruct)
 			{
 				for (const auto& [MethodName, Method] : Methods)
 				{
-					if (FunctionName == MethodName)
+					if (Method != nullptr)
 					{
-						const auto Signature = FDomain::Method_Signature(Method);
-
-						const auto MethodParamCount = FDomain::Signature_Get_Param_Count(Signature);
-
-						auto FunctionParamCount = Function->ReturnValueOffset != MAX_uint16
-							                          ? Function->NumParms - 1
-							                          : Function->NumParms;
-
-						if (MethodParamCount == FunctionParamCount)
+						if (FunctionName == MethodName)
 						{
-							Bind(InDomain, NewClassDescriptor, InClass, MethodName, Function);
+							const auto MethodParamCount = Method->GetParamCount();
 
-							Methods.Remove(MethodName);
+							auto FunctionParamCount = Function->ReturnValueOffset != MAX_uint16
+														  ? Function->NumParms - 1
+														  : Function->NumParms;
 
-							break;
+							if (MethodParamCount == FunctionParamCount)
+							{
+								Bind(InDomain, NewClassDescriptor, InClass, MethodName, Function);
+
+								Methods.Remove(MethodName);
+
+								break;
+							}
 						}
 					}
 				}
@@ -345,17 +339,13 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, FClassDescriptor* InClas
 			const auto& OverrideMethodName = FUnrealCSharpFunctionLibrary::GetOverrideFunctionName(InMethodName);
 
 			auto OverrideFunctionHash = GetTypeHash(OverrideFunction);
-
-			if (const auto FoundField = InDomain->Self_Class_Get_Field_From_Name(
-				InClassDescriptor->GetMonoClass(), TCHAR_TO_UTF8(*FString::Printf(TEXT(
+			
+			FReflectionRegistry::Get().GetClassReflection(InClass)->Field_Static_Set_Value(FString::Printf(TEXT(
 						"__%s"
 					),
 					*OverrideMethodName
-				))))
-			{
-				InDomain->Field_Static_Set_Value(InDomain->Class_VTable(InClassDescriptor->GetMonoClass()),
-				                                 FoundField, &OverrideFunctionHash);
-			}
+				),
+			&OverrideFunctionHash);
 
 			FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
 				OverrideFunctionHash, InClassDescriptor, OverrideFunction);
@@ -414,37 +404,16 @@ bool FCSharpBind::BindImplementation(FDomain* InDomain, MonoObject* InMonoObject
 	return true;
 }
 
-bool FCSharpBind::CanBind(const FDomain* InDomain, UStruct* InStruct)
+bool FCSharpBind::CanBind(UStruct* InStruct)
 {
 	if (NotOverrideTypes.Contains(InStruct))
 	{
 		return false;
 	}
 
-	MonoClass* FoundMonoClass{};
-
-	if (const auto InClass = Cast<UClass>(InStruct))
+	if (const auto ClassReflection = FReflectionRegistry::Get().GetClassReflection(InStruct))
 	{
-		FoundMonoClass = InDomain->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InClass));
-	}
-	else if (const auto InScriptStruct = Cast<UScriptStruct>(InStruct))
-	{
-		FoundMonoClass = InDomain->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct));
-	}
-
-	if (FoundMonoClass != nullptr)
-	{
-		if (const auto FoundMonoType = InDomain->Class_Get_Type(FoundMonoClass))
-		{
-			if (const auto FoundReflectionType = InDomain->Type_Get_Object(FoundMonoType))
-			{
-				return IsOverrideType(InDomain, FoundReflectionType);
-			}
-		}
+		return ClassReflection->IsOverride();
 	}
 
 	return false;
@@ -531,32 +500,6 @@ UFunction* FCSharpBind::DuplicateFunction(UFunction* InOriginalFunction, UClass*
 	}
 
 	return NewFunction;
-}
-
-bool FCSharpBind::IsOverrideType(const FDomain* InDomain, MonoReflectionType* InMonoReflectionType)
-{
-	if (InDomain == nullptr || InMonoReflectionType == nullptr)
-	{
-		return false;
-	}
-
-	if (const auto UtilsMonoClass = InDomain->Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
-	{
-		auto InParams = static_cast<void*>(InMonoReflectionType);
-
-		if (const auto IsOverrideTypeMonoMethod = InDomain->Class_Get_Method_From_Name(
-			UtilsMonoClass, FUNCTION_UTILS_IS_OVERRIDE_TYPE, TGetArrayLength(InParams)))
-		{
-			if (const auto IsOverrideTypeMonoObject = InDomain->Runtime_Invoke(
-				IsOverrideTypeMonoMethod, nullptr, &InParams))
-			{
-				return *static_cast<bool*>(InDomain->Object_Unbox(IsOverrideTypeMonoObject));
-			}
-		}
-	}
-
-	return false;
 }
 
 void FCSharpBind::OnCSharpEnvironmentInitialize()

@@ -14,7 +14,7 @@ namespace
 			const auto WeakObjectPtr = new TWeakObjectPtr<UObject>(FoundObject);
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>, true, false>(
-				InMonoObject, WeakObjectPtr);
+				FDomain::Object_Get_Class(InMonoObject), InMonoObject, WeakObjectPtr);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
