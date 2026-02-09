@@ -32,11 +32,15 @@ void FClassDescriptor::Deinitialize()
 	{
 		Class->ClearFunctionMapsCaches();
 		
-		ClassReflection->Property_Set_Value(PROPERTY_STATIC_CLASS_SINGLETON, nullptr, {nullptr}, nullptr);
+		void* InParams[] = {nullptr};
+		
+		ClassReflection->Property_Set_Value(PROPERTY_STATIC_CLASS_SINGLETON, nullptr, InParams, nullptr);
 	}
 	else
 	{
-		ClassReflection->Property_Set_Value(PROPERTY_STATIC_STRUCT_SINGLETON, nullptr, {nullptr}, nullptr);
+		void* InParams[] = {nullptr};
+		
+		ClassReflection->Property_Set_Value(PROPERTY_STATIC_STRUCT_SINGLETON, nullptr, InParams, nullptr);
 	}
 	
 	for (const auto& FunctionHash : FunctionHashSet)
