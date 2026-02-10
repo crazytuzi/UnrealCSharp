@@ -43,7 +43,7 @@ struct TBindingPropertyClass
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().GetClassReflection<T>()->GetClass();
 	}
 };
 
@@ -52,7 +52,7 @@ struct TScriptStructPropertyClass
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().GetClassReflection<T>()->GetClass();
 	}
 };
 
@@ -61,7 +61,7 @@ struct TBindingEnumPropertyClass
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().GetClassReflection<T>()->GetClass();
 	}
 };
 
@@ -160,7 +160,7 @@ struct TPropertyClass<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().GetClassReflection<T>()->GetClass();
 	}
 };
 
@@ -169,7 +169,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTObjectPtr<std::decay_t<T>>::Value,
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().GetClassReflection<T>()->GetClass();
 	}
 };
 
@@ -187,7 +187,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsIInterface<std::decay_t<T>>::Value,
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().GetClassReflection<T>()->GetClass();
 	}
 };
 
@@ -202,7 +202,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().GetClassReflection<T>()->GetClass();
 	}
 };
 
@@ -278,8 +278,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 {
 	static auto Get()
 	{
-		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
+		const auto FoundGenericMonoClass = FReflectionRegistry::Get().GetClassReflection(
+			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName())->GetClass();
 
 		const auto FoundKeyMonoClass = TPropertyClass<
 				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
@@ -315,8 +315,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>
 {
 	static auto Get()
 	{
-		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
+		const auto FoundGenericMonoClass = FReflectionRegistry::Get().GetClassReflection(
+			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName())->GetClass();
 
 		const auto FoundMonoClass = TPropertyClass<
 				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
@@ -347,8 +347,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
 	static auto Get()
 	{
-		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
+		const auto FoundGenericMonoClass = FReflectionRegistry::Get().GetClassReflection(
+			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName())->GetClass();
 
 		const auto FoundMonoClass = TPropertyClass<
 				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,
@@ -373,7 +373,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TI
 {
 	static auto Get()
 	{
-		return FMonoDomain::Class_From_Name(TNameSpace<T, T>::Get()[0], TName<T, T>::Get());
+		return FReflectionRegistry::Get().GetClassReflection<T>()->GetClass();
 	}
 };
 
@@ -395,8 +395,8 @@ struct TPropertyClass<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 {
 	static auto Get()
 	{
-		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName());
+		const auto FoundGenericMonoClass = FReflectionRegistry::Get().GetClassReflection(
+			TGeneric<T, T>::GetNameSpace(), TGeneric<T, T>::GetGenericName())->GetClass();
 
 		const auto FoundMonoClass = TPropertyClass<
 				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>,

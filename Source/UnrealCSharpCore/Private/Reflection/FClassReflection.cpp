@@ -236,6 +236,13 @@ MonoClass* FClassReflection::GetMonoClass(const TWeakObjectPtr<UField>& InStruct
 {
 	if (const auto InClass = Cast<UClass>(InStruct))
 	{
+		if (InClass->HasAnyClassFlags(CLASS_Interface))
+		{
+			return FMonoDomain::Class_From_Name(
+			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
+			FUnrealCSharpFunctionLibrary::GetFullInterface(InClass));
+		}
+		
 		return FMonoDomain::Class_From_Name(
 			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
 			FUnrealCSharpFunctionLibrary::GetFullClass(InClass));

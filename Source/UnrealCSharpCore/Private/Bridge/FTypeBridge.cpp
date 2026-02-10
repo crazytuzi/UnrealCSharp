@@ -404,11 +404,9 @@ MonoClass* FTypeBridge::GetMonoClass(const FClassProperty* InProperty)
 	{
 		const auto FoundGenericMonoClass = FReflectionRegistry::Get().Get_TSubclassOf_Class();
 
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->MetaClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->MetaClass));
+		const auto FoundMonoClass = FReflectionRegistry::Get().GetClassReflection(InProperty->MetaClass);
 
-		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass->GetClass());
 	}
 
 	return nullptr;
@@ -418,9 +416,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FObjectProperty* InProperty)
 {
 	if (InProperty != nullptr)
 	{
-		return FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->PropertyClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->PropertyClass));
+		return FReflectionRegistry::Get().GetClassReflection(InProperty->PropertyClass)->GetClass();
 	}
 
 	return nullptr;
@@ -456,11 +452,9 @@ MonoClass* FTypeBridge::GetMonoClass(const FInterfaceProperty* InProperty)
 
 		const auto FoundGenericMonoClass = FReflectionRegistry::Get().Get_TScriptInterface_Class();
 
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->InterfaceClass),
-			FUnrealCSharpFunctionLibrary::GetFullInterface(InProperty->InterfaceClass));
+		const auto FoundMonoClass = FReflectionRegistry::Get().GetClassReflection(InProperty->InterfaceClass);
 
-		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass->GetClass());
 	}
 
 	return nullptr;
@@ -470,9 +464,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FStructProperty* InProperty)
 {
 	if (InProperty != nullptr)
 	{
-		return FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->Struct),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->Struct));
+		return FReflectionRegistry::Get().GetClassReflection(InProperty->Struct)->GetClass();
 	}
 
 	return nullptr;
@@ -554,11 +546,9 @@ MonoClass* FTypeBridge::GetMonoClass(const FWeakObjectProperty* InProperty)
 	{
 		const auto FoundGenericMonoClass = FReflectionRegistry::Get().Get_TWeakObjectPtr_Class();
 
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->PropertyClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->PropertyClass));
+		const auto FoundMonoClass = FReflectionRegistry::Get().GetClassReflection(InProperty->PropertyClass);
 
-		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass->GetClass());
 	}
 
 	return nullptr;
@@ -570,11 +560,9 @@ MonoClass* FTypeBridge::GetMonoClass(const FLazyObjectProperty* InProperty)
 	{
 		const auto FoundGenericMonoClass = FReflectionRegistry::Get().Get_TLazyObjectPtr_Class();
 
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->PropertyClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->PropertyClass));
+		const auto FoundMonoClass = FReflectionRegistry::Get().GetClassReflection(InProperty->PropertyClass);
 
-		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass->GetClass());
 	}
 
 	return nullptr;
@@ -586,11 +574,9 @@ MonoClass* FTypeBridge::GetMonoClass(const FSoftClassProperty* InProperty)
 	{
 		const auto FoundGenericMonoClass = FReflectionRegistry::Get().Get_TSoftClassPtr_Class();
 
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->MetaClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->MetaClass));
+		const auto FoundMonoClass = FReflectionRegistry::Get().GetClassReflection(InProperty->MetaClass);
 
-		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass->GetClass());
 	}
 
 	return nullptr;
@@ -602,11 +588,9 @@ MonoClass* FTypeBridge::GetMonoClass(const FSoftObjectProperty* InProperty)
 	{
 		const auto FoundGenericMonoClass = FReflectionRegistry::Get().Get_TSoftObjectPtr_Class();
 
-		const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InProperty->PropertyClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InProperty->PropertyClass));
+		const auto FoundMonoClass = FReflectionRegistry::Get().GetClassReflection(InProperty->PropertyClass);
 
-		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass);
+		return GetMonoClass(FoundGenericMonoClass, FoundMonoClass->GetClass());
 	}
 
 	return nullptr;
@@ -676,8 +660,7 @@ MonoClass* FTypeBridge::GetMonoClass(const FOptionalProperty* InProperty)
 {
 	if (InProperty != nullptr)
 	{
-		const auto FoundGenericMonoClass = FMonoDomain::Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_OPTIONAL);
+		const auto FoundGenericMonoClass = FReflectionRegistry::Get().GetTOptional_Class();
 
 		const auto FoundMonoClass = GetMonoClass(InProperty->GetValueProperty());
 

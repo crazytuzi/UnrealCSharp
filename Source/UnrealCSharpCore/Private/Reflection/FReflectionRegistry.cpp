@@ -76,6 +76,10 @@ void FReflectionRegistry::Initialize()
 	TSet_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SET)->GetClass();
 	
 	TArray_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_ARRAY)->GetClass();
+	
+#if UE_F_OPTIONAL_PROPERTY
+	TOptional_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_OPTIONAL)->GetClass();
+#endif
 }
 
 void FReflectionRegistry::Deinitialize()
@@ -289,6 +293,13 @@ MonoClass* FReflectionRegistry::GetTArray_Class() const
 {
 	return TArray_Class;
 }
+
+#if UE_F_OPTIONAL_PROPERTY
+MonoClass* FReflectionRegistry::GetTOptional_Class() const
+{
+	return TOptional_Class;
+}
+#endif
 
 FClassReflection* FReflectionRegistry::Get_Utils_Class()
 {

@@ -88,6 +88,10 @@ public:
 	
 	MonoClass* GetTArray_Class() const;
 	
+#if UE_F_OPTIONAL_PROPERTY
+	MonoClass* GetTOptional_Class() const;
+#endif
+	
 	static FClassReflection* Get_Utils_Class();
 	
 	void Reset();
@@ -154,6 +158,10 @@ public:
 	MonoClass* TSet_Class;
 	
 	MonoClass* TArray_Class;
+	
+#if UE_F_OPTIONAL_PROPERTY
+	MonoClass* TOptional_Class;
+#endif
 	
 	static inline FClassReflection* Utils_Class{};
 	
