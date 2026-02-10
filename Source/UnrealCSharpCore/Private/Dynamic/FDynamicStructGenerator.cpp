@@ -24,7 +24,7 @@ TSet<UDynamicScriptStruct*> FDynamicStructGenerator::DynamicStructSet;
 
 void FDynamicStructGenerator::Generator()
 {
-	FDynamicGeneratorCore::Generator(CLASS_U_STRUCT_ATTRIBUTE,
+	FDynamicGeneratorCore::Generator(FReflectionRegistry::Get().GetUStructAttribute_Class(),
 	                                 [](MonoClass* InMonoClass)
 	                                 {
 		                                 if (InMonoClass == nullptr)
@@ -73,11 +73,6 @@ void FDynamicStructGenerator::CodeAnalysisGenerator()
 			                                                             nullptr);
 		                                             }
 	                                             });
-}
-
-bool FDynamicStructGenerator::IsDynamicStruct(MonoClass* InMonoClass)
-{
-	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_STRUCT_ATTRIBUTE);
 }
 #endif
 
@@ -381,11 +376,9 @@ void FDynamicStructGenerator::ReInstance(UDynamicScriptStruct* InOldScriptStruct
 
 	for (const auto DynamicClass : DynamicClasses)
 	{
-		if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(DynamicClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(DynamicClass)))
+		if (const auto FoundMonoClass = FReflectionRegistry::Get().GetClassReflection(DynamicClass))
 		{
-			FDynamicClassGenerator::Generator(FoundMonoClass, EDynamicClassGeneratorType::ReInstance);
+			FDynamicClassGenerator::Generator(FoundMonoClass->GetClass(), EDynamicClassGeneratorType::ReInstance);
 		}
 	}
 

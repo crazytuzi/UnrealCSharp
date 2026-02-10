@@ -12,6 +12,7 @@
 #include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #endif
 #include "UEVersion.h"
+#include "Reflection/FReflectionRegistry.h"
 
 TMap<UClass*, FString> FDynamicInterfaceGenerator::NamespaceMap;
 
@@ -21,7 +22,7 @@ TSet<UClass*> FDynamicInterfaceGenerator::DynamicInterfaceSet;
 
 void FDynamicInterfaceGenerator::Generator()
 {
-	FDynamicGeneratorCore::Generator(CLASS_U_INTERFACE_ATTRIBUTE,
+	FDynamicGeneratorCore::Generator(FReflectionRegistry::Get().GetUInterfaceAttribute_Class(),
 	                                 [](MonoClass* InMonoClass)
 	                                 {
 		                                 if (InMonoClass == nullptr)
@@ -75,11 +76,6 @@ void FDynamicInterfaceGenerator::CodeAnalysisGenerator()
 			                                                                UInterface::StaticClass());
 		                                             }
 	                                             });
-}
-
-bool FDynamicInterfaceGenerator::IsDynamicInterface(MonoClass* InMonoClass)
-{
-	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_INTERFACE_ATTRIBUTE);
 }
 #endif
 

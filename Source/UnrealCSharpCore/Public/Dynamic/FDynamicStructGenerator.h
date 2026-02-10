@@ -10,8 +10,6 @@ public:
 
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
-
-	static bool IsDynamicStruct(MonoClass* InMonoClass);
 #endif
 
 	static void Generator(MonoClass* InMonoClass);

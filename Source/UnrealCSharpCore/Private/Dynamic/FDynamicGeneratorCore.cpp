@@ -247,16 +247,6 @@ void FDynamicGeneratorCore::CodeAnalysisGenerator(const FString& InName,
 	}
 }
 
-bool FDynamicGeneratorCore::IsDynamic(MonoClass* InMonoClass, const FString& InAttribute)
-{
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttribute);
-
-	const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
-
-	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
-}
-
 const FString& FDynamicGeneratorCore::DynamicReInstanceBaseName()
 {
 	static FString DynamicReInstance = TEXT("DYNAMIC_REINSTANCE");
@@ -444,8 +434,7 @@ void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, FDynamicDe
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_PROPERTY_ATTRIBUTE);
+	const auto AttributeMonoClass = FReflectionRegistry::Get().GetUPropertyAttribute_Class();
 
 	void* Iterator = nullptr;
 
@@ -472,8 +461,7 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, FDynamicDe
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_FUNCTION_ATTRIBUTE);
+	const auto AttributeMonoClass = FReflectionRegistry::Get().GetUFunctionAttribute_Class();
 
 	void* MethodIterator = nullptr;
 
@@ -505,8 +493,7 @@ void FDynamicGeneratorCore::GeneratorInterface(MonoClass* InMonoClass, FDynamicD
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_INTERFACE_ATTRIBUTE);
+	const auto AttributeMonoClass = FReflectionRegistry::Get().GetUInterfaceAttribute_Class();
 
 	void* Iterator = nullptr;
 
@@ -529,12 +516,9 @@ bool FDynamicGeneratorCore::ClassHasAttr(MonoClass* InMonoClass, const FString& 
 	return AttrsHasAttr(FMonoDomain::Custom_Attrs_From_Class(InMonoClass), InAttributeName);
 }
 
-void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator)
+void FDynamicGeneratorCore::Generator(MonoClass* InAttributeMonoClass, const TFunction<void(MonoClass*)>& InGenerator)
 {
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttribute);
-
-	const auto AttributeMonoType = FMonoDomain::Class_Get_Type(AttributeMonoClass);
+	const auto AttributeMonoType = FMonoDomain::Class_Get_Type(InAttributeMonoClass);
 
 	const auto AttributeMonoReflectionType = FMonoDomain::Type_Get_Object(AttributeMonoType);
 
@@ -1060,10 +1044,10 @@ void FDynamicGeneratorCore::SetFlags(UClass* InClass, MonoCustomAttrInfo* InMono
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC),
-		InClass->IsChildOf(UInterface::StaticClass()) ? CLASS_U_INTERFACE_ATTRIBUTE : CLASS_U_CLASS_ATTRIBUTE);
-
+	const auto AttributeMonoClass = InClass->HasAnyClassFlags(CLASS_Interface)
+	? FReflectionRegistry::Get().GetUInterfaceAttribute_Class()
+	: FReflectionRegistry::Get().GetUClassAttribute_Class();
+	
 	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
 	{
 #if WITH_EDITOR
@@ -1086,8 +1070,7 @@ void FDynamicGeneratorCore::SetFlags(UScriptStruct* InScriptStruct, MonoCustomAt
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_STRUCT_ATTRIBUTE);
+	const auto AttributeMonoClass = FReflectionRegistry::Get().GetUStructAttribute_Class();
 
 	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
 	{
@@ -1104,8 +1087,7 @@ void FDynamicGeneratorCore::SetFlags(UEnum* InEnum, MonoCustomAttrInfo* InMonoCu
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_ENUM_ATTRIBUTE);
+	const auto AttributeMonoClass = FReflectionRegistry::Get().GetUEnumAttribute_Class();
 
 	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
 	{
@@ -1270,8 +1252,7 @@ void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* In
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_PROPERTY_ATTRIBUTE);
+	const auto AttributeMonoClass = FReflectionRegistry::Get().GetUPropertyAttribute_Class();
 
 	void* Iterator = nullptr;
 
@@ -1317,8 +1298,7 @@ void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* In
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_FUNCTION_ATTRIBUTE);
+	const auto AttributeMonoClass = FReflectionRegistry::Get().GetUFunctionAttribute_Class();
 
 	void* MethodIterator = nullptr;
 
@@ -1418,12 +1398,12 @@ MonoClass* FDynamicGeneratorCore::UInterfaceToIInterface(MonoClass* InMonoClass)
 
 	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
 
-	return FMonoDomain::Class_From_Name(NameSpace,
+	return FReflectionRegistry::Get().GetClassReflection(NameSpace,
 	                                    FString::Printf(TEXT(
 		                                    "I%s"
 	                                    ),
 	                                                    *ClassName.RightChop(1)
-	                                    ));
+	                                    ))->GetClass();
 }
 
 MonoClass* FDynamicGeneratorCore::IInterfaceToUInterface(MonoClass* InMonoClass)
@@ -1432,12 +1412,12 @@ MonoClass* FDynamicGeneratorCore::IInterfaceToUInterface(MonoClass* InMonoClass)
 
 	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
 
-	return FMonoDomain::Class_From_Name(NameSpace,
+	return FReflectionRegistry::Get().GetClassReflection(NameSpace,
 	                                    FString::Printf(TEXT(
 		                                    "U%s"
 	                                    ),
 	                                                    *ClassName.RightChop(1)
-	                                    ));
+	                                    ))->GetClass();
 }
 
 #if WITH_EDITOR

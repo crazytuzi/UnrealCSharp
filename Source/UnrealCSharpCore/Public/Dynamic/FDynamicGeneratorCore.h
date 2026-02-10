@@ -17,8 +17,6 @@ public:
 	static void CodeAnalysisGenerator(const FString& InName,
 	                                  const TFunction<void(const FString&, const FString&)>& InGenerator);
 
-	static bool IsDynamic(MonoClass* InMonoClass, const FString& InAttribute);
-
 	static const FString& DynamicReInstanceBaseName();
 #endif
 
@@ -45,7 +43,7 @@ public:
 
 	static bool ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName);
 
-	static void Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator);
+	static void Generator(MonoClass* InAttributeMonoClass, const TFunction<void(MonoClass*)>& InGenerator);
 
 	static UPackage* GetOuter();
 

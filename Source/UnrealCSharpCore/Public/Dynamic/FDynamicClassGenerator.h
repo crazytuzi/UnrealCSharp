@@ -30,8 +30,6 @@ public:
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
 
-	static bool IsDynamicClass(MonoClass* InMonoClass);
-
 	static void OnPrePIEEnded(const bool bIsSimulating);
 
 	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses();

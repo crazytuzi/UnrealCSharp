@@ -196,7 +196,7 @@ EDynamicType FDynamicGenerator::GetDynamicType(const FString& InFile, MonoClass*
 		{
 			if (auto Index = 0; Name.FindLastChar(TEXT('.'), Index))
 			{
-				OutMonoClass = FMonoDomain::Class_From_Name(Name.Left(Index), Name.Right(Name.Len() - Index - 1));
+				OutMonoClass = FReflectionRegistry::Get().GetClassReflection(Name.Left(Index), Name.Right(Name.Len() - Index - 1))->GetClass();
 
 				return FDynamicGeneratorCore::GetDynamicType(Name);
 			}

@@ -19,6 +19,7 @@
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #endif
 #include "UEVersion.h"
+#include "Reflection/FReflectionRegistry.h"
 
 TSet<UClass::ClassConstructorType> FDynamicClassGenerator::ClassConstructorSet
 {
@@ -37,7 +38,7 @@ TMap<UClass*, TArray<TTuple<const FProperty*, FString>>> FDynamicClassGenerator:
 
 void FDynamicClassGenerator::Generator()
 {
-	FDynamicGeneratorCore::Generator(CLASS_U_CLASS_ATTRIBUTE,
+	FDynamicGeneratorCore::Generator(FReflectionRegistry::Get().GetUClassAttribute_Class(),
 	                                 [](MonoClass* InMonoClass)
 	                                 {
 		                                 if (InMonoClass == nullptr)
@@ -109,11 +110,6 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 	                                             });
 
 	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Broadcast();
-}
-
-bool FDynamicClassGenerator::IsDynamicClass(MonoClass* InMonoClass)
-{
-	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_CLASS_ATTRIBUTE);
 }
 
 void FDynamicClassGenerator::OnPrePIEEnded(const bool bIsSimulating)

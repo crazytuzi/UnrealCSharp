@@ -9,8 +9,6 @@ public:
 
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
-
-	static bool IsDynamicEnum(MonoClass* InMonoClass);
 #endif
 
 	static void Generator(MonoClass* InMonoClass);

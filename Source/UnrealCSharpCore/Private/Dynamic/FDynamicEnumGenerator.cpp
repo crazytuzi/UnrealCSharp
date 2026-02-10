@@ -12,6 +12,7 @@
 #include "Dynamic/FDynamicBlueprintExtensionScope.h"
 #endif
 #include "UEVersion.h"
+#include "Reflection/FReflectionRegistry.h"
 
 TMap<UEnum*, FString> FDynamicEnumGenerator::NamespaceMap;
 
@@ -21,7 +22,7 @@ TSet<UEnum*> FDynamicEnumGenerator::DynamicEnumSet;
 
 void FDynamicEnumGenerator::Generator()
 {
-	FDynamicGeneratorCore::Generator(CLASS_U_ENUM_ATTRIBUTE,
+	FDynamicGeneratorCore::Generator(FReflectionRegistry::Get().GetUEnumAttribute_Class(),
 	                                 [](MonoClass* InMonoClass)
 	                                 {
 		                                 if (InMonoClass == nullptr)
@@ -60,11 +61,6 @@ void FDynamicEnumGenerator::CodeAnalysisGenerator()
 				                                             InName);
 		                                             }
 	                                             });
-}
-
-bool FDynamicEnumGenerator::IsDynamicEnum(MonoClass* InMonoClass)
-{
-	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_ENUM_ATTRIBUTE);
 }
 #endif
 

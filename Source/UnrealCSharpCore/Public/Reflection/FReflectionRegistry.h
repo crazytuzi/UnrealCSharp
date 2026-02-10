@@ -92,6 +92,18 @@ public:
 	MonoClass* GetTOptional_Class() const;
 #endif
 	
+	MonoClass* GetUClassAttribute_Class() const;
+	
+	MonoClass* GetUStructAttribute_Class() const;
+	
+	MonoClass* GetUEnumAttribute_Class() const;
+	
+	MonoClass* GetUPropertyAttribute_Class() const;
+	
+	MonoClass* GetUFunctionAttribute_Class() const;
+	
+	MonoClass* GetUInterfaceAttribute_Class() const;
+	
 	static FClassReflection* Get_Utils_Class();
 	
 	void Reset();
@@ -162,6 +174,18 @@ public:
 #if UE_F_OPTIONAL_PROPERTY
 	MonoClass* TOptional_Class;
 #endif
+	
+	MonoClass* UClassAttribute_Class;
+	
+	MonoClass* UStructAttribute_Class;
+	
+	MonoClass* UEnumAttribute_Class;
+	
+	MonoClass* UPropertyAttribute_Class;
+	
+	MonoClass* UFunctionAttribute_Class;
+	
+	MonoClass* UInterfaceAttribute_Class;
 	
 	static inline FClassReflection* Utils_Class{};
 	

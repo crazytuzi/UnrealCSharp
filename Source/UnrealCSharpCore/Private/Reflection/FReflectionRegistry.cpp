@@ -1,5 +1,8 @@
 ﻿#include "Reflection/FReflectionRegistry.h"
 
+#include "CoreMacro/FunctionAttributeMacro.h"
+#include "CoreMacro/PropertyAttributeMacro.h"
+
 FReflectionRegistry& FReflectionRegistry::Get()
 {
 	static FReflectionRegistry ReflectionRegistry;
@@ -80,6 +83,18 @@ void FReflectionRegistry::Initialize()
 #if UE_F_OPTIONAL_PROPERTY
 	TOptional_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_OPTIONAL)->GetClass();
 #endif
+	
+	UClassAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_CLASS_ATTRIBUTE)->GetClass();
+	
+	UStructAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_STRUCT_ATTRIBUTE)->GetClass();
+	
+	UEnumAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_ENUM_ATTRIBUTE)->GetClass();
+	
+	UPropertyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_PROPERTY_ATTRIBUTE)->GetClass();
+
+	UFunctionAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_FUNCTION_ATTRIBUTE)->GetClass();
+	
+	UInterfaceAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_INTERFACE_ATTRIBUTE)->GetClass();
 }
 
 void FReflectionRegistry::Deinitialize()
@@ -294,12 +309,42 @@ MonoClass* FReflectionRegistry::GetTArray_Class() const
 	return TArray_Class;
 }
 
+MonoClass* FReflectionRegistry::GetUClassAttribute_Class() const
+{
+	return UClassAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetUStructAttribute_Class() const
+{
+	return UStructAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetUEnumAttribute_Class() const
+{
+	return UEnumAttribute_Class;
+}
+
 #if UE_F_OPTIONAL_PROPERTY
 MonoClass* FReflectionRegistry::GetTOptional_Class() const
 {
 	return TOptional_Class;
 }
 #endif
+
+MonoClass* FReflectionRegistry::GetUPropertyAttribute_Class() const
+{
+	return UPropertyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetUFunctionAttribute_Class() const
+{
+	return UFunctionAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetUInterfaceAttribute_Class() const
+{
+	return UInterfaceAttribute_Class;
+}
 
 FClassReflection* FReflectionRegistry::Get_Utils_Class()
 {
