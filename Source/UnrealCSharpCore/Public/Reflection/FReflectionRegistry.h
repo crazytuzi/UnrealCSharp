@@ -202,6 +202,76 @@ public:
 	
 	MonoClass* GetCannotImplementInterfaceInBlueprintAttribute_Class() const;
 	
+	
+	MonoClass* GetGlobalConfigAttribute_Class() const;
+	
+	MonoClass* GetLocalizedAttribute_Class() const;
+	
+	MonoClass* GetDuplicateTransientAttribute_Class() const;
+	
+	MonoClass* GetNonPIETransientAttribute_Class() const;
+	
+	MonoClass* GetNonPIEDuplicateTransientAttribute_Class() const;
+	
+	MonoClass* GetExportAttribute_Class() const;
+	
+	MonoClass* GetNoClearAttribute_Class() const;
+	
+	MonoClass* GetEditFixedSizeAttribute_Class() const;
+	
+	MonoClass* GetReplicatedAttribute_Class() const;
+	
+	MonoClass* GetReplicatedUsingAttribute_Class() const;
+	
+	MonoClass* GetNotReplicatedAttribute_Class() const;
+	
+	MonoClass* GetInterpAttribute_Class() const;
+	
+	MonoClass* GetNonTransactionalAttribute_Class() const;
+	
+	MonoClass* GetInstancedAttribute_Class() const;
+	
+	MonoClass* GetBlueprintAssignableAttribute_Class() const;
+	
+	MonoClass* GetSimpleDisplayAttribute_Class() const;
+	
+	MonoClass* GetAdvancedDisplayAttribute_Class() const;
+	
+	MonoClass* GetEditAnywhereAttribute_Class() const;
+	
+	MonoClass* GetEditInstanceOnlyAttribute_Class() const;
+	
+	MonoClass* GetEditDefaultsOnlyAttribute_Class() const;
+	
+	MonoClass* GetVisibleAnywhereAttribute_Class() const;
+	
+	MonoClass* GetVisibleDefaultsOnlyAttribute_Class() const;
+	
+	MonoClass* GetBlueprintReadOnlyAttribute_Class() const;
+	
+	MonoClass* GetBlueprintReadWriteAttribute_Class() const;
+	
+	MonoClass* GetAssetRegistrySearchableAttribute_Class() const;
+	
+	MonoClass* GetSaveGameAttribute_Class() const;
+	
+	MonoClass* GetTextExportTransientAttribute_Class() const;
+	
+	MonoClass* GetSkipSerializationAttribute_Class() const;
+	
+	MonoClass* GetDefaultSubObjectAttribute_Class() const;
+	
+	MonoClass* GetRootComponentAttribute_Class() const;
+	
+	MonoClass* GetAttachmentParentAttribute_Class() const;
+	
+	MonoClass* GetAttachmentSocketNameAttribute_Class() const;
+	
+	MonoClass* GetDefaultValueAttribute_Class() const;
+	
+	
+	
+	
 	FClassReflection* Get_Utils_Class() const;
 	
 	void Reset();
@@ -383,6 +453,74 @@ public:
 	MonoClass* SparseClassDataTypeAttribute_Class;
 	
 	MonoClass* CannotImplementInterfaceInBlueprintAttribute_Class;
+	
+	
+	
+	MonoClass* GlobalConfigAttribute_Class;
+	
+	MonoClass* LocalizedAttribute_Class;
+	
+	MonoClass* DuplicateTransientAttribute_Class;
+	
+	MonoClass* NonPIETransientAttribute_Class;
+	
+	MonoClass* NonPIEDuplicateTransientAttribute_Class;
+	
+	MonoClass* ExportAttribute_Class;
+	
+	MonoClass* NoClearAttribute_Class;
+	
+	MonoClass* EditFixedSizeAttribute_Class;
+	
+	MonoClass* ReplicatedAttribute_Class;
+	
+	MonoClass* ReplicatedUsingAttribute_Class;
+	
+	MonoClass* NotReplicatedAttribute_Class;
+	
+	MonoClass* InterpAttribute_Class;
+	
+	MonoClass* NonTransactionalAttribute_Class;
+	
+	MonoClass* InstancedAttribute_Class;
+	
+	MonoClass* BlueprintAssignableAttribute_Class;
+	
+	MonoClass* SimpleDisplayAttribute_Class;
+	
+	MonoClass* AdvancedDisplayAttribute_Class;
+	
+	MonoClass* EditAnywhereAttribute_Class;
+	
+	MonoClass* EditInstanceOnlyAttribute_Class;
+	
+	MonoClass* EditDefaultsOnlyAttribute_Class;
+	
+	MonoClass* VisibleAnywhereAttribute_Class;
+	
+	MonoClass* VisibleDefaultsOnlyAttribute_Class;
+	
+	MonoClass* BlueprintReadOnlyAttribute_Class;
+	
+	MonoClass* BlueprintReadWriteAttribute_Class;
+	
+	MonoClass* AssetRegistrySearchableAttribute_Class;
+	
+	MonoClass* SaveGameAttribute_Class;
+	
+	MonoClass* TextExportTransientAttribute_Class;
+	
+	MonoClass* SkipSerializationAttribute_Class;
+	
+	MonoClass* DefaultSubObjectAttribute_Class;
+	
+	MonoClass* RootComponentAttribute_Class;
+	
+	MonoClass* AttachmentParentAttribute_Class;
+	
+	MonoClass* AttachmentSocketNameAttribute_Class;
+	
+	MonoClass* DefaultValueAttribute_Class;
 	
 	
 	

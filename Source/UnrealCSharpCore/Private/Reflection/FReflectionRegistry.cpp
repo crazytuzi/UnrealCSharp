@@ -1,6 +1,7 @@
 ﻿#include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/GenericAttributeMacro.h"
 #include "CoreMacro/ClassAttributeMacro.h"
+#include "CoreMacro/PropertyAttributeMacro.h"
 
 FReflectionRegistry& FReflectionRegistry::Get()
 {
@@ -193,6 +194,74 @@ void FReflectionRegistry::Initialize()
 	SparseClassDataTypeAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SPARSE_CLASS_DATA_TYPE_ATTRIBUTE)->GetClass();
 
 	CannotImplementInterfaceInBlueprintAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE)->GetClass();
+
+	GlobalConfigAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_GLOBAL_CONFIG_ATTRIBUTE)->GetClass();
+
+	LocalizedAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_LOCALIZED_ATTRIBUTE)->GetClass();
+
+	DuplicateTransientAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DUPLICATE_TRANSIENT_ATTRIBUTE)->GetClass();
+
+	NonPIETransientAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NON_PIE_TRANSIENT_ATTRIBUTE)->GetClass();
+
+	NonPIEDuplicateTransientAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NON_PIE_DUPLICATE_TRANSIENT_ATTRIBUTE)->GetClass();
+
+	ExportAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EXPORT_ATTRIBUTE)->GetClass();
+
+	NoClearAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NO_CLEAR_ATTRIBUTE)->GetClass();
+
+	EditFixedSizeAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EDIT_FIXED_SIZE_ATTRIBUTE)->GetClass();
+
+	ReplicatedAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_REPLICATED_ATTRIBUTE)->GetClass();
+
+	ReplicatedUsingAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_REPLICATED_USING_ATTRIBUTE)->GetClass();
+
+	NotReplicatedAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NOT_REPLICATED_ATTRIBUTE)->GetClass();
+
+	InterpAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_INTERP_ATTRIBUTE)->GetClass();
+
+	NonTransactionalAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NON_TRANSACTIONAL_ATTRIBUTE)->GetClass();
+
+	InstancedAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_INSTANCED_ATTRIBUTE)->GetClass();
+
+	BlueprintAssignableAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_ASSIGNABLE_ATTRIBUTE)->GetClass();
+	
+	SimpleDisplayAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SIMPLE_DISPLAY_ATTRIBUTE)->GetClass();
+	
+	AdvancedDisplayAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ADVANCED_DISPLAY_ATTRIBUTE)->GetClass();
+	
+	EditAnywhereAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EDIT_ANYWHERE_ATTRIBUTE)->GetClass();
+	
+	EditInstanceOnlyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EDIT_INSTANCE_ONLY_ATTRIBUTE)->GetClass();
+	
+	EditDefaultsOnlyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EDIT_DEFAULTS_ONLY_ATTRIBUTE)->GetClass();
+	
+	VisibleAnywhereAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_VISIBLE_ANYWHERE_ATTRIBUTE)->GetClass();
+	
+	VisibleDefaultsOnlyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_VISIBLE_DEFAULTS_ONLY_ATTRIBUTE)->GetClass();
+	
+	BlueprintReadOnlyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_READ_ONLY_ATTRIBUTE)->GetClass();
+	
+	BlueprintReadWriteAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_READ_WRITE_ATTRIBUTE)->GetClass();
+	
+	AssetRegistrySearchableAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ASSET_REGISTRY_SEARCHABLE_ATTRIBUTE)->GetClass();
+	
+	SaveGameAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SAVE_GAME_ATTRIBUTE)->GetClass();
+	
+	TextExportTransientAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_TEXT_EXPORT_TRANSIENT_ATTRIBUTE)->GetClass();
+	
+	SkipSerializationAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SKIP_SERIALIZATION_ATTRIBUTE)->GetClass();
+	
+	DefaultSubObjectAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DEFAULT_SUB_OBJECT_ATTRIBUTE)->GetClass();
+	
+	RootComponentAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ROOT_COMPONENT_ATTRIBUTE)->GetClass();
+	
+	AttachmentParentAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ATTACHMENT_PARENT_ATTRIBUTE)->GetClass();
+	
+	AttachmentSocketNameAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ATTACHMENT_SOCKET_NAME_ATTRIBUTE)->GetClass();
+	
+	DefaultValueAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DEFAULT_VALUE_ATTRIBUTE)->GetClass();
+	
+	
 }
 
 void FReflectionRegistry::Deinitialize()
@@ -677,6 +746,171 @@ MonoClass* FReflectionRegistry::GetSparseClassDataTypeAttribute_Class() const
 MonoClass* FReflectionRegistry::GetCannotImplementInterfaceInBlueprintAttribute_Class() const
 {
 	return CannotImplementInterfaceInBlueprintAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetGlobalConfigAttribute_Class() const
+{
+	return GlobalConfigAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetLocalizedAttribute_Class() const
+{
+	return LocalizedAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetDuplicateTransientAttribute_Class() const
+{
+	return DuplicateTransientAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNonPIETransientAttribute_Class() const
+{
+	return NonPIETransientAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNonPIEDuplicateTransientAttribute_Class() const
+{
+	return NonPIEDuplicateTransientAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetExportAttribute_Class() const
+{
+	return ExportAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNoClearAttribute_Class() const
+{
+	return NoClearAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetEditFixedSizeAttribute_Class() const
+{
+	return EditFixedSizeAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetReplicatedAttribute_Class() const
+{
+	return ReplicatedAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetReplicatedUsingAttribute_Class() const
+{
+	return ReplicatedUsingAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNotReplicatedAttribute_Class() const
+{
+	return NotReplicatedAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetInterpAttribute_Class() const
+{
+	return InterpAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNonTransactionalAttribute_Class() const
+{
+	return NonTransactionalAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetInstancedAttribute_Class() const
+{
+	return InstancedAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintAssignableAttribute_Class() const
+{
+	return BlueprintAssignableAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetSimpleDisplayAttribute_Class() const
+{
+	return SimpleDisplayAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetAdvancedDisplayAttribute_Class() const
+{
+	return AdvancedDisplayAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetEditAnywhereAttribute_Class() const
+{
+	return EditAnywhereAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetEditInstanceOnlyAttribute_Class() const
+{
+	return EditInstanceOnlyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetEditDefaultsOnlyAttribute_Class() const
+{
+	return EditDefaultsOnlyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetVisibleAnywhereAttribute_Class() const
+{
+	return VisibleAnywhereAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetVisibleDefaultsOnlyAttribute_Class() const
+{
+	return VisibleDefaultsOnlyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintReadOnlyAttribute_Class() const
+{
+	return BlueprintReadOnlyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintReadWriteAttribute_Class() const
+{
+	return BlueprintReadWriteAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetAssetRegistrySearchableAttribute_Class() const
+{
+	return AssetRegistrySearchableAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetSaveGameAttribute_Class() const
+{
+	return SaveGameAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetTextExportTransientAttribute_Class() const
+{
+	return TextExportTransientAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetSkipSerializationAttribute_Class() const
+{
+	return SkipSerializationAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetDefaultSubObjectAttribute_Class() const
+{
+	return DefaultSubObjectAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetRootComponentAttribute_Class() const
+{
+	return RootComponentAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetAttachmentParentAttribute_Class() const
+{
+	return AttachmentParentAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetAttachmentSocketNameAttribute_Class() const
+{
+	return AttachmentSocketNameAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetDefaultValueAttribute_Class() const
+{
+	return DefaultValueAttribute_Class;
 }
 
 FClassReflection* FReflectionRegistry::Get_Utils_Class() const

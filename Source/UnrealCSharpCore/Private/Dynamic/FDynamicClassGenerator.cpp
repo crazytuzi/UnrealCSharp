@@ -592,7 +592,7 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 		                                         if (IsDynamicBlueprintGeneratedClass(InClass))
 		                                         {
 			                                         if (FDynamicGeneratorCore::AttrsHasAttr(
-				                                         InMonoCustomAttrInfo, CLASS_DEFAULT_SUB_OBJECT_ATTRIBUTE))
+				                                         InMonoCustomAttrInfo, FReflectionRegistry::Get().GetDefaultSubObjectAttribute_Class()))
 			                                         {
 				                                         FDefaultSubObjectInfo DefaultSubObject;
 
@@ -601,22 +601,22 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 
 				                                         DefaultSubObject.bIsRootComponent =
 					                                         FDynamicGeneratorCore::AttrsHasAttr(
-						                                         InMonoCustomAttrInfo, CLASS_ROOT_COMPONENT_ATTRIBUTE);
+						                                         InMonoCustomAttrInfo, FReflectionRegistry::Get().GetRootComponentAttribute_Class());
 
 				                                         DefaultSubObject.Parent = FDynamicGeneratorCore::AttrsHasAttr(
 						                                         InMonoCustomAttrInfo,
-						                                         CLASS_ATTACHMENT_PARENT_ATTRIBUTE)
+						                                         FReflectionRegistry::Get().GetAttachmentParentAttribute_Class())
 						                                         ? FDynamicGeneratorCore::AttrGetValue(
 							                                         InMonoCustomAttrInfo,
-							                                         CLASS_ATTACHMENT_PARENT_ATTRIBUTE)
+							                                         FReflectionRegistry::Get().GetAttachmentParentAttribute_Class())
 						                                         : FString{};
 
 				                                         DefaultSubObject.Socket = FDynamicGeneratorCore::AttrsHasAttr(
 						                                         InMonoCustomAttrInfo,
-						                                         CLASS_ATTACHMENT_SOCKET_NAME_ATTRIBUTE)
+						                                         FReflectionRegistry::Get().GetAttachmentSocketNameAttribute_Class())
 						                                         ? FDynamicGeneratorCore::AttrGetValue(
 							                                         InMonoCustomAttrInfo,
-							                                         CLASS_ATTACHMENT_SOCKET_NAME_ATTRIBUTE)
+							                                         FReflectionRegistry::Get().GetAttachmentSocketNameAttribute_Class())
 						                                         : FString{};
 
 				                                         DefaultSubObjectInfoMap.FindOrAdd(InClass).Add(
@@ -625,10 +625,10 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 		                                         }
 
 		                                         if (FDynamicGeneratorCore::AttrsHasAttr(
-			                                         InMonoCustomAttrInfo, CLASS_DEFAULT_VALUE_ATTRIBUTE))
+			                                         InMonoCustomAttrInfo, FReflectionRegistry::Get().GetDefaultValueAttribute_Class()))
 		                                         {
 			                                         const auto DefaultValue = FDynamicGeneratorCore::AttrGetValue(
-				                                         InMonoCustomAttrInfo, CLASS_DEFAULT_VALUE_ATTRIBUTE);
+				                                         InMonoCustomAttrInfo, FReflectionRegistry::Get().GetDefaultValueAttribute_Class());
 
 			                                         DefaultValueMap.FindOrAdd(InClass, {}).Emplace(
 				                                         MakeTuple(InProperty, DefaultValue));

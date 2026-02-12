@@ -315,8 +315,8 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 			if (ClassHasAttr(InMonoClass, CLASS_U_CLASS_ATTRIBUTE))
 			{
 				const auto bIsSoftReference =
-					!(AttrsHasAttr(InMonoCustomAttrInfo, CLASS_DEFAULT_SUB_OBJECT_ATTRIBUTE) ||
-						AttrsHasAttr(InMonoCustomAttrInfo, CLASS_ROOT_COMPONENT_ATTRIBUTE));
+					!(AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetDefaultSubObjectAttribute_Class()) ||
+						AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetRootComponentAttribute_Class()));
 
 				OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, bIsSoftReference});
 			}
@@ -579,22 +579,22 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_ANYWHERE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetEditAnywhereAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_INSTANCE_ONLY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetEditInstanceOnlyAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_DisableEditOnTemplate);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_DEFAULTS_ONLY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetEditDefaultsOnlyAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_DisableEditOnInstance);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_VISIBLE_ANYWHERE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetVisibleAnywhereAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst);
 	}
@@ -604,7 +604,7 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst | CPF_DisableEditOnTemplate);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_READ_WRITE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintReadWriteAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
 	}
@@ -614,7 +614,7 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_READ_ONLY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintReadOnlyAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible | CPF_BlueprintReadOnly);
 	}
@@ -629,12 +629,12 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_Config);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_GLOBAL_CONFIG_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetGlobalConfigAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_GlobalConfig | CPF_Config);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_LOCALIZED_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetLocalizedAttribute_Class()))
 	{
 		// @TODO
 	}
@@ -644,47 +644,47 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_Transient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_DUPLICATE_TRANSIENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetDuplicateTransientAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_DuplicateTransient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_TEXT_EXPORT_TRANSIENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetTextExportTransientAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_TextExportTransient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NON_PIE_TRANSIENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetNonPIETransientAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_NonPIEDuplicateTransient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NON_PIE_DUPLICATE_TRANSIENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetNonPIEDuplicateTransientAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_NonPIEDuplicateTransient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EXPORT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetExportAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_ExportObject);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NO_CLEAR_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().NoClearAttribute_Class))
 	{
 		InProperty->SetPropertyFlags(CPF_NoClear);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_FIXED_SIZE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetEditFixedSizeAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_EditFixedSize);
 	}
 #endif
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetReplicatedAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Net);
 
-		if (const auto FoundMonoObject = AttrsGetAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_ATTRIBUTE))
+		if (const auto FoundMonoObject = AttrsGetAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetReplicatedAttribute_Class()))
 		{
 			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
 				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_LIFETIME_CONDITION))
@@ -696,11 +696,11 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		}
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_USING_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetReplicatedUsingAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Net | CPF_RepNotify);
 
-		if (const auto FoundMonoObject = AttrsGetAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_USING_ATTRIBUTE))
+		if (const auto FoundMonoObject = AttrsGetAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetReplicatedUsingAttribute_Class()))
 		{
 			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
 				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_LIFETIME_CONDITION))
@@ -719,28 +719,28 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		}
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NOT_REPLICATED_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetNotReplicatedAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_RepSkip);
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_INTERP_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetInterpAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_BlueprintVisible | CPF_Interp);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NON_TRANSACTIONAL_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetNonTransactionalAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_NonTransactional);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_INSTANCED_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetInstancedAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_PersistentInstance | CPF_ExportObject | CPF_InstancedReference);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_ASSIGNABLE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintAssignableAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintAssignable);
 	}
@@ -755,27 +755,27 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_BlueprintAuthorityOnly);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_ASSET_REGISTRY_SEARCHABLE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetAssetRegistrySearchableAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_AssetRegistrySearchable);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SIMPLE_DISPLAY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetSimpleDisplayAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_SimpleDisplay);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_ADVANCED_DISPLAY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetAdvancedDisplayAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_AdvancedDisplay);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SAVE_GAME_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetSaveGameAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_SaveGame);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SKIP_SERIALIZATION_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetSkipSerializationAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_SkipSerialization);
 	}
@@ -1231,6 +1231,11 @@ MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* InMonoCustom
 	}
 
 	return nullptr;
+}
+
+MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
+{
+	return FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, InMonoClass);
 }
 
 FString FDynamicGeneratorCore::AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName)
