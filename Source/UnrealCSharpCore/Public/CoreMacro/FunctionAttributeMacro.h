@@ -31,7 +31,3 @@
 #define CLASS_SERVICE_REQUEST_ATTRIBUTE FString(TEXT("ServiceRequestAttribute"))
 
 #define CLASS_SERVICE_RESPONSE_ATTRIBUTE FString(TEXT("ServiceResponseAttribute"))
-
-#define CLASS_RETURN_DISPLAY_NAME_ATTRIBUTE FString(TEXT("ReturnDisplayNameAttribute"))
-
-#define CLASS_INTERNAL_USE_PARAM_ATTRIBUTE FString(TEXT("InternalUseParamAttribute"))

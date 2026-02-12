@@ -2,6 +2,7 @@
 #include "CoreMacro/GenericAttributeMacro.h"
 #include "CoreMacro/ClassAttributeMacro.h"
 #include "CoreMacro/PropertyAttributeMacro.h"
+#include "CoreMacro/FunctionAttributeMacro.h"
 
 FReflectionRegistry& FReflectionRegistry::Get()
 {
@@ -262,6 +263,35 @@ void FReflectionRegistry::Initialize()
 	DefaultValueAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DEFAULT_VALUE_ATTRIBUTE)->GetClass();
 	
 	
+	BlueprintImplementableEventAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_IMPLEMENTABLE_EVENT_ATTRIBUTE)->GetClass();
+
+	SealedEventAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SEALED_EVENT_ATTRIBUTE)->GetClass();
+
+	ExecAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EXEC_ATTRIBUTE)->GetClass();
+
+	ServerAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SERVER_ATTRIBUTE)->GetClass();
+
+	ClientAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CLIENT_ATTRIBUTE)->GetClass();
+
+	NetMulticastAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NET_MULTICAST_ATTRIBUTE)->GetClass();
+
+	ReliableAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_RELIABLE_ATTRIBUTE)->GetClass();
+
+	UnreliableAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_UNRELIABLE_ATTRIBUTE)->GetClass();
+
+	BlueprintPureAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_PURE_ATTRIBUTE)->GetClass();
+
+	BlueprintCosmeticAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_COSMETIC_ATTRIBUTE)->GetClass();
+
+	CallInEditorAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CALL_IN_EDITOR_ATTRIBUTE)->GetClass();
+
+	CustomThunkAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CUSTOM_THUNK_ATTRIBUTE)->GetClass();
+
+	WithValidationAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_WITH_VALIDATION_ATTRIBUTE)->GetClass();
+
+	ServiceRequestAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SERVICE_REQUEST_ATTRIBUTE)->GetClass();
+
+	ServiceResponseAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SERVICE_RESPONSE_ATTRIBUTE)->GetClass();
 }
 
 void FReflectionRegistry::Deinitialize()
@@ -911,6 +941,86 @@ MonoClass* FReflectionRegistry::GetAttachmentSocketNameAttribute_Class() const
 MonoClass* FReflectionRegistry::GetDefaultValueAttribute_Class() const
 {
 	return DefaultValueAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintImplementableEventAttribute_Class() const
+{
+	return BlueprintImplementableEventAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintNativeEventAttribute_Class() const
+{
+	return BlueprintNativeEventAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetSealedEventAttribute_Class() const
+{
+	return SealedEventAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetExecAttribute_Class() const
+{
+	return ExecAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetServerAttribute_Class() const
+{
+	return ServerAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetClientAttribute_Class() const
+{
+	return ClientAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNetMulticastAttribute_Class() const
+{
+	return NetMulticastAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetReliableAttribute_Class() const
+{
+	return ReliableAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetUnreliableAttribute_Class() const
+{
+	return UnreliableAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintPureAttribute_Class() const
+{
+	return BlueprintPureAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintCosmeticAttribute_Class() const
+{
+	return BlueprintCosmeticAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetCallInEditorAttribute_Class() const
+{
+	return CallInEditorAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetCustomThunkAttribute_Class() const
+{
+	return CustomThunkAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetWithValidationAttribute_Class() const
+{
+	return WithinAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetServiceRequestAttribute_Class() const
+{
+	return ServiceRequestAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetServiceResponseAttribute_Class() const
+{
+	return ServiceResponseAttribute_Class;
 }
 
 FClassReflection* FReflectionRegistry::Get_Utils_Class() const

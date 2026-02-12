@@ -270,6 +270,38 @@ public:
 	MonoClass* GetDefaultValueAttribute_Class() const;
 	
 	
+	MonoClass* GetBlueprintImplementableEventAttribute_Class() const;
+	
+	MonoClass* GetBlueprintNativeEventAttribute_Class() const;
+	
+	MonoClass* GetSealedEventAttribute_Class() const;
+	
+	MonoClass* GetExecAttribute_Class() const;
+	
+	MonoClass* GetServerAttribute_Class() const;
+	
+	MonoClass* GetClientAttribute_Class() const;
+	
+	MonoClass* GetNetMulticastAttribute_Class() const;
+	
+	MonoClass* GetReliableAttribute_Class() const;
+	
+	MonoClass* GetUnreliableAttribute_Class() const;
+	
+	MonoClass* GetBlueprintPureAttribute_Class() const;
+	
+	MonoClass* GetBlueprintCosmeticAttribute_Class() const;
+	
+	MonoClass* GetCallInEditorAttribute_Class() const;
+	
+	MonoClass* GetCustomThunkAttribute_Class() const;
+	
+	MonoClass* GetWithValidationAttribute_Class() const;
+	
+	MonoClass* GetServiceRequestAttribute_Class() const;
+	
+	MonoClass* GetServiceResponseAttribute_Class() const;
+	
 	
 	
 	FClassReflection* Get_Utils_Class() const;
@@ -521,6 +553,40 @@ public:
 	MonoClass* AttachmentSocketNameAttribute_Class;
 	
 	MonoClass* DefaultValueAttribute_Class;
+	
+	
+	
+	MonoClass* BlueprintImplementableEventAttribute_Class;
+	
+	MonoClass* BlueprintNativeEventAttribute_Class;
+	
+	MonoClass* SealedEventAttribute_Class;
+	
+	MonoClass* ExecAttribute_Class;
+	
+	MonoClass* ServerAttribute_Class;
+	
+	MonoClass* ClientAttribute_Class;
+	
+	MonoClass* NetMulticastAttribute_Class;
+	
+	MonoClass* ReliableAttribute_Class;
+	
+	MonoClass* UnreliableAttribute_Class;
+	
+	MonoClass* BlueprintPureAttribute_Class;
+	
+	MonoClass* BlueprintCosmeticAttribute_Class;
+	
+	MonoClass* CallInEditorAttribute_Class;
+	
+	MonoClass* CustomThunkAttribute_Class;
+	
+	MonoClass* WithValidationAttribute_Class;
+	
+	MonoClass* ServiceRequestAttribute_Class;
+	
+	MonoClass* ServiceResponseAttribute_Class;
 	
 	
 	

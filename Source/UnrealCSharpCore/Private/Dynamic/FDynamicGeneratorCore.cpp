@@ -820,7 +820,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 
 	auto FunctionExportFlags = 0u;
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_NATIVE_EVENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintNativeEventAttribute_Class()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Net)
 		{
@@ -843,7 +843,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		InFunction->FunctionFlags |= FUNC_BlueprintEvent;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_IMPLEMENTABLE_EVENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintImplementableEventAttribute_Class()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Net)
 		{
@@ -866,7 +866,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		InFunction->FunctionFlags &= ~FUNC_Native;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EXEC_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetExecAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_Exec;
 
@@ -877,12 +877,12 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SEALED_EVENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetSealedEventAttribute_Class()))
 	{
 	}
 #endif
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVER_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetServerAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
@@ -894,21 +894,21 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		}
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLIENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetClientAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetClient;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NET_MULTICAST_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetNetMulticastAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetMulticast;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_REQUEST_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetServiceRequestAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
@@ -921,7 +921,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		// @TODO ParseNetServiceIdentifiers(HeaderParser, FuncInfo, Specifier.Values)
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_RESPONSE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetServiceResponseAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
@@ -932,18 +932,18 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		// @TODO ParseNetServiceIdentifiers(HeaderParser, FuncInfo, Specifier.Values)
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_RELIABLE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetReliableAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_NetReliable;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_UNRELIABLE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetUnreliableAttribute_Class()))
 	{
 		bSpecifiedUnreliable = true;
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CUSTOM_THUNK_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetCustomThunkAttribute_Class()))
 	{
 		FunctionExportFlags |= static_cast<uint32>(EDynamicFunctionExportFlags::FUNCEXPORT_CustomThunk);
 	}
@@ -991,13 +991,13 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		InFunction->FunctionFlags |= FUNC_BlueprintAuthorityOnly;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_COSMETIC_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintPureAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintCosmetic;
 	}
 #endif
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_WITH_VALIDATION_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetWithValidationAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_NetValidate;
 	}
