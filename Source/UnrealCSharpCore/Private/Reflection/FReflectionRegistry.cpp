@@ -1,5 +1,6 @@
 ﻿#include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/GenericAttributeMacro.h"
+#include "CoreMacro/ClassAttributeMacro.h"
 
 FReflectionRegistry& FReflectionRegistry::Get()
 {
@@ -93,6 +94,105 @@ void FReflectionRegistry::Initialize()
 	UFunctionAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_FUNCTION_ATTRIBUTE)->GetClass();
 	
 	UInterfaceAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_INTERFACE_ATTRIBUTE)->GetClass();
+	
+	
+	
+	
+	VisibleInstanceOnlyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_VISIBLE_INSTANCE_ONLY_ATTRIBUTE)->GetClass();
+	
+	BlueprintCallableAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_CALLABLE_ATTRIBUTE)->GetClass();
+
+	BlueprintAuthorityOnlyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_AUTHORITY_ONLY_ATTRIBUTE)->GetClass();
+
+	BlueprintGetterAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_GETTER_ATTRIBUTE)->GetClass();
+
+	BlueprintSetterAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_SETTER_ATTRIBUTE)->GetClass();
+
+	FieldNotifyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_FIELD_NOTIFY_ATTRIBUTE)->GetClass();
+
+	TransientAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_TRANSIENT_ATTRIBUTE)->GetClass();
+
+	ConfigAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CONFIG_ATTRIBUTE)->GetClass();
+
+	BlueprintTypeAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_TYPE_ATTRIBUTE)->GetClass();
+
+	NotBlueprintTypeAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NOT_BLUEPRINT_TYPE_ATTRIBUTE)->GetClass();
+	
+	BlueprintableAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINTABLE_ATTRIBUTE)->GetClass();
+	
+	NotBlueprintableAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NOT_BLUEPRINTABLE_ATTRIBUTE)->GetClass();
+	
+	NoExportAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NO_EXPORT_ATTRIBUTE)->GetClass();
+	
+	AbstractAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ABSTRACT_ATTRIBUTE)->GetClass();
+	
+	ExperimentalAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EXPERIMENTAL_ATTRIBUTE)->GetClass();
+	
+	EditorConfigAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EDITOR_CONFIG_ATTRIBUTE)->GetClass();
+	
+	CategoryAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CATEGORY_ATTRIBUTE)->GetClass();
+	
+	BlueprintInternalUseOnlyAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_BLUEPRINT_INTERNAL_USE_ONLY_ATTRIBUTE)->GetClass();
+	
+	
+	
+	ClassGroupAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CLASS_GROUP_ATTRIBUTE)->GetClass();
+	
+	WithinAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_WITHIN_ATTRIBUTE)->GetClass();
+	
+	MinimalAPIAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_MINIMAL_API_ATTRIBUTE)->GetClass();
+	
+	CustomConstructorAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CUSTOM_CONSTRUCTOR_ATTRIBUTE)->GetClass();
+	
+	IntrinsicAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_INTRINSIC_ATTRIBUTE)->GetClass();
+	
+	NotPlaceableAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NOT_PLACEABLE_ATTRIBUTE)->GetClass();
+	
+	DefaultToInstancedAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DEFAULT_TO_INSTANCED_ATTRIBUTE)->GetClass();
+	
+	ConstAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CONST_ATTRIBUTE)->GetClass();
+	
+	DeprecatedAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DEPRECATED_ATTRIBUTE)->GetClass();
+	
+	PerObjectConfigAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_PER_OBJECT_CONFIG_ATTRIBUTE)->GetClass();
+	
+	ConfigDoNotCheckDefaultsAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CONFIG_DO_NOT_CHECK_DEFAULTS_ATTRIBUTE)->GetClass();
+	
+	DefaultConfigAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DEFAULT_CONFIG_ATTRIBUTE)->GetClass();
+	
+	EditInlineNewAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EDIT_INLINE_NEW_ATTRIBUTE)->GetClass();
+	
+	NotEditInlineNewAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_NOT_EDIT_INLINE_NEW_ATTRIBUTE)->GetClass();
+	
+	HideDropdownAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_HIDE_DROP_DOWN_ATTRIBUTE)->GetClass();
+	
+	ShowCategoriesAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SHOW_CATEGORIES_ATTRIBUTE)->GetClass();
+	
+	HideCategoriesAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_HIDE_CATEGORIES_ATTRIBUTE)->GetClass();
+	
+	ComponentWrapperClassAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_COMPONENT_WRAPPER_CLASS_ATTRIBUTE)->GetClass();
+	
+	HideFunctionsAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_HIDE_FUNCTIONS_ATTRIBUTE)->GetClass();
+	
+	AutoExpandCategoriesAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_AUTO_EXPAND_CATEGORIES_ATTRIBUTE)->GetClass();
+	
+	AutoCollapseCategoriesAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_AUTO_COLLAPSE_CATEGORIES_ATTRIBUTE)->GetClass();
+	
+	CollapseCategoriesAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_COLLAPSE_CATEGORIES_ATTRIBUTE)->GetClass();
+	
+	DontCollapseCategoriesAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_DONT_COLLAPSE_CATEGORIES_ATTRIBUTE)->GetClass();
+	
+	PrioritizeCategoriesAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_PRIORITIZE_CATEGORIES_ATTRIBUTE)->GetClass();
+	
+	AdvancedClassDisplayAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_ADVANCED_CLASS_DISPLAY_ATTRIBUTE)->GetClass();
+	
+	ConversionRootAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CONVERSION_ROOT_ATTRIBUTE)->GetClass();
+
+	EarlyAccessPreviewAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_EARLY_ACCESS_PREVIEW_ATTRIBUTE)->GetClass();
+
+	SparseClassDataTypeAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_SPARSE_CLASS_DATA_TYPE_ATTRIBUTE)->GetClass();
+
+	CannotImplementInterfaceInBlueprintAttribute_Class = GetClassReflection(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE)->GetClass();
 }
 
 void FReflectionRegistry::Deinitialize()
@@ -342,6 +442,241 @@ MonoClass* FReflectionRegistry::GetUPropertyAttribute_Class() const
 MonoClass* FReflectionRegistry::GetUFunctionAttribute_Class() const
 {
 	return UFunctionAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetVisibleInstanceOnlyAttribute_Class() const
+{
+	return VisibleInstanceOnlyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintCallableAttribute_Class() const
+{
+	return BlueprintCallableAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintAuthorityOnlyAttribute_Class() const
+{
+	return BlueprintAuthorityOnlyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintGetterAttribute_Class() const
+{
+	return BlueprintGetterAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintSetterAttribute_Class() const
+{
+	return BlueprintSetterAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetFieldNotifyAttribute_Class() const
+{
+	return FieldNotifyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetTransientAttribute_Class() const
+{
+	return TransientAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetConfigAttribute_Class() const
+{
+	return ConfigAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintTypeAttribute_Class() const
+{
+	return BlueprintTypeAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNotBlueprintTypeAttribute_Class() const
+{
+	return NotBlueprintTypeAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintableAttribute_Class() const
+{
+	return BlueprintableAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNotBlueprintableAttribute_Class() const
+{
+	return NotBlueprintableAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNoExportAttribute_Class() const
+{
+	return NoExportAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetAbstractAttribute_Class() const
+{
+	return AbstractAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetExperimentalAttribute_Class() const
+{
+	return ExperimentalAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetEditorConfigAttribute_Class() const
+{
+	return EditorConfigAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetCategoryAttribute_Class() const
+{
+	return CategoryAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetBlueprintInternalUseOnlyAttribute_Class() const
+{
+	return BlueprintInternalUseOnlyAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetClassGroupAttribute_Class() const
+{
+	return ClassGroupAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetWithinAttribute_Class() const
+{
+	return WithinAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetMinimalAPIAttribute_Class() const
+{
+	return MinimalAPIAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetCustomConstructorAttribute_Class() const
+{
+	return CustomConstructorAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetIntrinsicAttribute_Class() const
+{
+	return IntrinsicAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNotPlaceableAttribute_Class() const
+{
+	return NotPlaceableAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetDefaultToInstancedAttribute_Class() const
+{
+	return DefaultToInstancedAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetConstAttribute_Class() const
+{
+	return ConstAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetDeprecatedAttribute_Class() const
+{
+	return DeprecatedAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetPerObjectConfigAttribute_Class() const
+{
+	return PerObjectConfigAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetConfigDoNotCheckDefaultsAttribute_Class() const
+{
+	return ConfigDoNotCheckDefaultsAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetDefaultConfigAttribute_Class() const
+{
+	return DefaultConfigAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetEditInlineNewAttribute_Class() const
+{
+	return EditInlineNewAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetNotEditInlineNewAttribute_Class() const
+{
+	return NotEditInlineNewAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetHideDropdownAttribute_Class() const
+{
+	return HideDropdownAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetShowCategoriesAttribute_Class() const
+{
+	return ShowCategoriesAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetHideCategoriesAttribute_Class() const
+{
+	return HideCategoriesAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetComponentWrapperClassAttribute_Class() const
+{
+	return ComponentWrapperClassAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetHideFunctionsAttribute_Class() const
+{
+	return HideFunctionsAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetAutoExpandCategoriesAttribute_Class() const
+{
+	return AutoExpandCategoriesAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetAutoCollapseCategoriesAttribute_Class() const
+{
+	return AutoCollapseCategoriesAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetCollapseCategoriesAttribute_Class() const
+{
+	return CollapseCategoriesAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetDontCollapseCategoriesAttribute_Class() const
+{
+	return DontCollapseCategoriesAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetPrioritizeCategoriesAttribute_Class() const
+{
+	return PrioritizeCategoriesAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetAdvancedClassDisplayAttribute_Class() const
+{
+	return AdvancedClassDisplayAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetConversionRootAttribute_Class() const
+{
+	return ConversionRootAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetEarlyAccessPreviewAttribute_Class() const
+{
+	return EarlyAccessPreviewAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetSparseClassDataTypeAttribute_Class() const
+{
+	return SparseClassDataTypeAttribute_Class;
+}
+
+MonoClass* FReflectionRegistry::GetCannotImplementInterfaceInBlueprintAttribute_Class() const
+{
+	return CannotImplementInterfaceInBlueprintAttribute_Class;
 }
 
 FClassReflection* FReflectionRegistry::Get_Utils_Class() const

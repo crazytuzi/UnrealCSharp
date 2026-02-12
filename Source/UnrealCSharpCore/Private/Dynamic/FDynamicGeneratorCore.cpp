@@ -599,7 +599,7 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_VISIBLE_INSTANCE_ONLY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetVisibleInstanceOnlyAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst | CPF_DisableEditOnTemplate);
 	}
@@ -609,7 +609,7 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_SETTER_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintSetterAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
 	}
@@ -619,12 +619,12 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible | CPF_BlueprintReadOnly);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_GETTER_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintGetterAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CONFIG_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetConfigAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Config);
 	}
@@ -639,7 +639,7 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		// @TODO
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_TRANSIENT_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetTransientAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_Transient);
 	}
@@ -745,12 +745,12 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_BlueprintAssignable);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_CALLABLE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintCallableAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintCallable);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_AUTHORITY_ONLY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintAuthorityOnlyAttribute_Class()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintAuthorityOnly);
 	}
@@ -780,7 +780,7 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 		InProperty->SetPropertyFlags(CPF_SkipSerialization);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_FIELD_NOTIFY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetFieldNotifyAttribute_Class()))
 	{
 		// @TODO
 	}
@@ -948,12 +948,12 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		FunctionExportFlags |= static_cast<uint32>(EDynamicFunctionExportFlags::FUNCEXPORT_CustomThunk);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_CALLABLE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintCallableAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintCallable;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_GETTER_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintGetterAttribute_Class()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Event)
 		{
@@ -967,7 +967,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		// @TODO
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_SETTER_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintSetterAttribute_Class()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Event)
 		{
@@ -986,7 +986,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		InFunction->FunctionFlags |= FUNC_BlueprintPure;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_AUTHORITY_ONLY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintAuthorityOnlyAttribute_Class()))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintAuthorityOnly;
 	}
@@ -1003,7 +1003,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_FIELD_NOTIFY_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetFieldNotifyAttribute_Class()))
 	{
 	}
 #endif
@@ -1051,7 +1051,7 @@ void FDynamicGeneratorCore::SetFlags(UClass* InClass, MonoCustomAttrInfo* InMono
 	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
 	{
 #if WITH_EDITOR
-		if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NOT_PLACEABLE_ATTRIBUTE))
+		if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetNotPlaceableAttribute_Class()))
 		{
 			InClass->ClassFlags |= CLASS_NotPlaceable;
 		}
@@ -1145,24 +1145,24 @@ void FDynamicGeneratorCore::SetMetaData(UClass* InClass, MonoCustomAttrInfo* InM
 		                          : ClassMetaDataAttrs,
 	                 InMonoCustomAttrInfo, [InClass, InMonoCustomAttrInfo]()
 	                 {
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLASS_GROUP_ATTRIBUTE))
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetClassGroupAttribute_Class()))
 		                 {
 			                 SetMetaData(InClass, FString(TEXT("ClassGroupNamesAttribute")),
 			                             *AttrGetValue(InMonoCustomAttrInfo,
-			                                           *CLASS_CLASS_GROUP_ATTRIBUTE));
+			                                           FReflectionRegistry::Get().GetClassGroupAttribute_Class()));
 		                 }
 
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_MINIMAL_API_ATTRIBUTE))
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetMinimalAPIAttribute_Class()))
 		                 {
 			                 SetMetaData(InClass, CLASS_MINIMAL_API_ATTRIBUTE, TEXT("true"));
 		                 }
 
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintTypeAttribute_Class()))
 		                 {
 			                 SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
 		                 }
 
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINTABLE_ATTRIBUTE))
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintableAttribute_Class()))
 		                 {
 			                 SetMetaData(InClass, CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE, TEXT("true"));
 
@@ -1180,7 +1180,7 @@ void FDynamicGeneratorCore::SetMetaData(UScriptStruct* InScriptStruct, MonoCusto
 
 	SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo, [InScriptStruct, InMonoCustomAttrInfo]()
 	{
-		if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintTypeAttribute_Class()))
 		{
 			SetMetaData(InScriptStruct, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
 		}
@@ -1197,7 +1197,7 @@ void FDynamicGeneratorCore::SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMon
 	SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo,
 	                 [InEnum, InMonoCustomAttrInfo]()
 	                 {
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		                 if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintTypeAttribute_Class()))
 		                 {
 			                 SetMetaData(InEnum, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
 		                 }
@@ -1214,6 +1214,11 @@ bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInf
 	}
 
 	return false;
+}
+
+bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
+{
+	return !!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, InMonoClass);
 }
 
 MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo,
@@ -1236,6 +1241,17 @@ FString FDynamicGeneratorCore::AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttr
 	const auto FoundMonoObject = FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, FoundMonoClass);
 
 	const auto FoundMonoProperty = FMonoDomain::Class_Get_Property_From_Name(FoundMonoClass, TEXT("Value"));
+
+	const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
+
+	return FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(FMonoDomain::Object_To_String(Value,nullptr))));
+}
+
+FString FDynamicGeneratorCore::AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
+{
+	const auto FoundMonoObject = FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, InMonoClass);
+
+	const auto FoundMonoProperty = FMonoDomain::Class_Get_Property_From_Name(InMonoClass, TEXT("Value"));
 
 	const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
 

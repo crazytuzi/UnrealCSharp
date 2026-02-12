@@ -18,8 +18,6 @@
 
 #define CLASS_DEPRECATED_ATTRIBUTE FString(TEXT("DeprecatedAttribute"))
 
-#define CLASS_CONFIG_ATTRIBUTE FString(TEXT("ConfigAttribute"))
-
 #define CLASS_PER_OBJECT_CONFIG_ATTRIBUTE FString(TEXT("PerObjectConfigAttribute"))
 
 #define CLASS_CONFIG_DO_NOT_CHECK_DEFAULTS_ATTRIBUTE FString(TEXT("ConfigDoNotCheckDefaultsAttribute"))

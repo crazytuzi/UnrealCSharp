@@ -12,8 +12,6 @@
 
 #define CLASS_U_FUNCTION_ATTRIBUTE FString(TEXT("UFunctionAttribute"))
 
-#define CLASS_OVERRIDE_ATTRIBUTE FString(TEXT("OverrideAttribute"))
-
 #define CLASS_VISIBLE_INSTANCE_ONLY_ATTRIBUTE FString(TEXT("VisibleInstanceOnlyAttribute"))
 
 #define CLASS_BLUEPRINT_CALLABLE_ATTRIBUTE FString(TEXT("BlueprintCallableAttribute"))

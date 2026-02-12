@@ -104,6 +104,104 @@ public:
 	
 	MonoClass* GetUFunctionAttribute_Class() const;
 	
+	
+	
+	MonoClass* GetVisibleInstanceOnlyAttribute_Class() const;
+	
+	MonoClass* GetBlueprintCallableAttribute_Class() const;
+	
+	MonoClass* GetBlueprintAuthorityOnlyAttribute_Class() const;
+	
+	MonoClass* GetBlueprintGetterAttribute_Class() const;
+	
+	MonoClass* GetBlueprintSetterAttribute_Class() const;
+	
+	MonoClass* GetFieldNotifyAttribute_Class() const;
+	
+	MonoClass* GetTransientAttribute_Class() const;
+	
+	MonoClass* GetConfigAttribute_Class() const;
+	
+	MonoClass* GetBlueprintTypeAttribute_Class() const;
+	
+	MonoClass* GetNotBlueprintTypeAttribute_Class() const;
+	
+	MonoClass* GetBlueprintableAttribute_Class() const;
+	
+	MonoClass* GetNotBlueprintableAttribute_Class() const;
+	
+	MonoClass* GetNoExportAttribute_Class() const;
+	
+	MonoClass* GetAbstractAttribute_Class() const;
+	
+	MonoClass* GetExperimentalAttribute_Class() const;
+	
+	MonoClass* GetEditorConfigAttribute_Class() const;
+	
+	MonoClass* GetCategoryAttribute_Class() const;
+	
+	MonoClass* GetBlueprintInternalUseOnlyAttribute_Class() const;
+	
+	
+	
+	MonoClass* GetClassGroupAttribute_Class() const;
+	
+	MonoClass* GetWithinAttribute_Class() const;
+	
+	MonoClass* GetMinimalAPIAttribute_Class() const;
+	
+	MonoClass* GetCustomConstructorAttribute_Class() const;
+	
+	MonoClass* GetIntrinsicAttribute_Class() const;
+	
+	MonoClass* GetNotPlaceableAttribute_Class() const;
+	
+	MonoClass* GetDefaultToInstancedAttribute_Class() const;
+	
+	MonoClass* GetConstAttribute_Class() const;
+	
+	MonoClass* GetDeprecatedAttribute_Class() const;
+	
+	MonoClass* GetPerObjectConfigAttribute_Class() const;
+	
+	MonoClass* GetConfigDoNotCheckDefaultsAttribute_Class() const;
+	
+	MonoClass* GetDefaultConfigAttribute_Class() const;
+	
+	MonoClass* GetEditInlineNewAttribute_Class() const;
+	
+	MonoClass* GetNotEditInlineNewAttribute_Class() const;
+	
+	MonoClass* GetHideDropdownAttribute_Class() const;
+	
+	MonoClass* GetShowCategoriesAttribute_Class() const;
+	
+	MonoClass* GetHideCategoriesAttribute_Class() const;
+	
+	MonoClass* GetComponentWrapperClassAttribute_Class() const;
+	
+	MonoClass* GetHideFunctionsAttribute_Class() const;
+	
+	MonoClass* GetAutoExpandCategoriesAttribute_Class() const;
+	
+	MonoClass* GetAutoCollapseCategoriesAttribute_Class() const;
+	
+	MonoClass* GetCollapseCategoriesAttribute_Class() const;
+	
+	MonoClass* GetDontCollapseCategoriesAttribute_Class() const;
+	
+	MonoClass* GetPrioritizeCategoriesAttribute_Class() const;
+	
+	MonoClass* GetAdvancedClassDisplayAttribute_Class() const;
+	
+	MonoClass* GetConversionRootAttribute_Class() const;
+	
+	MonoClass* GetEarlyAccessPreviewAttribute_Class() const;
+	
+	MonoClass* GetSparseClassDataTypeAttribute_Class() const;
+	
+	MonoClass* GetCannotImplementInterfaceInBlueprintAttribute_Class() const;
+	
 	FClassReflection* Get_Utils_Class() const;
 	
 	void Reset();
@@ -186,6 +284,107 @@ public:
 	MonoClass* UPropertyAttribute_Class;
 	
 	MonoClass* UFunctionAttribute_Class;
+	
+	
+	
+	MonoClass* VisibleInstanceOnlyAttribute_Class;
+	
+	MonoClass* BlueprintCallableAttribute_Class;
+	
+	MonoClass* BlueprintAuthorityOnlyAttribute_Class;
+	
+	MonoClass* BlueprintGetterAttribute_Class;
+	
+	MonoClass* BlueprintSetterAttribute_Class;
+	
+	MonoClass* FieldNotifyAttribute_Class;
+	
+	MonoClass* TransientAttribute_Class;
+	
+	MonoClass* ConfigAttribute_Class;
+	
+	MonoClass* BlueprintTypeAttribute_Class;
+	
+	MonoClass* NotBlueprintTypeAttribute_Class;
+	
+	MonoClass* BlueprintableAttribute_Class;
+	
+	MonoClass* NotBlueprintableAttribute_Class;
+	
+	MonoClass* NoExportAttribute_Class;
+	
+	MonoClass* AbstractAttribute_Class;
+	
+	MonoClass* ExperimentalAttribute_Class;
+	
+	MonoClass* EditorConfigAttribute_Class;
+	
+	MonoClass* CategoryAttribute_Class;
+	
+	MonoClass* BlueprintInternalUseOnlyAttribute_Class;
+	
+	
+	
+	
+	MonoClass* ClassGroupAttribute_Class;
+	
+	MonoClass* WithinAttribute_Class;
+	
+	MonoClass* MinimalAPIAttribute_Class;
+	
+	MonoClass* CustomConstructorAttribute_Class;
+	
+	MonoClass* IntrinsicAttribute_Class;
+	
+	MonoClass* NotPlaceableAttribute_Class;
+	
+	MonoClass* DefaultToInstancedAttribute_Class;
+	
+	MonoClass* ConstAttribute_Class;
+	
+	MonoClass* DeprecatedAttribute_Class;
+	
+	MonoClass* PerObjectConfigAttribute_Class;
+	
+	MonoClass* ConfigDoNotCheckDefaultsAttribute_Class;
+	
+	MonoClass* DefaultConfigAttribute_Class;
+	
+	MonoClass* EditInlineNewAttribute_Class;
+	
+	MonoClass* NotEditInlineNewAttribute_Class;
+	
+	MonoClass* HideDropdownAttribute_Class;
+	
+	MonoClass* ShowCategoriesAttribute_Class;
+	
+	MonoClass* HideCategoriesAttribute_Class;
+	
+	MonoClass* ComponentWrapperClassAttribute_Class;
+	
+	MonoClass* HideFunctionsAttribute_Class;
+	
+	MonoClass* AutoExpandCategoriesAttribute_Class;
+	
+	MonoClass* AutoCollapseCategoriesAttribute_Class;
+	
+	MonoClass* CollapseCategoriesAttribute_Class;
+	
+	MonoClass* DontCollapseCategoriesAttribute_Class;
+	
+	MonoClass* PrioritizeCategoriesAttribute_Class;
+	
+	MonoClass* AdvancedClassDisplayAttribute_Class;
+	
+	MonoClass* ConversionRootAttribute_Class;
+	
+	MonoClass* EarlyAccessPreviewAttribute_Class;
+	
+	MonoClass* SparseClassDataTypeAttribute_Class;
+	
+	MonoClass* CannotImplementInterfaceInBlueprintAttribute_Class;
+	
+	
 	
 	FClassReflection* Utils_Class{};
 	

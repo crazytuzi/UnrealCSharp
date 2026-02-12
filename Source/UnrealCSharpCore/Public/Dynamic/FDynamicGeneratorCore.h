@@ -90,11 +90,15 @@ public:
 #endif
 
 	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
+	
+	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
 
 	static MonoObject* AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
 
 	static FString AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
 
+	static FString AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
+	
 	static void GeneratorProperty(MonoClass* InMonoClass, UField* InField,
 	                              const TFunction<void(const MonoProperty*, MonoCustomAttrInfo*, const FProperty*)>&
 	                              InGenerator);
