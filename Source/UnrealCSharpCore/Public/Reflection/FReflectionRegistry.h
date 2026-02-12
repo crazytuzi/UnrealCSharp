@@ -138,10 +138,6 @@ public:
 	
 	MonoClass* GetEditorConfigAttribute_Class() const;
 	
-	MonoClass* GetCategoryAttribute_Class() const;
-	
-	MonoClass* GetBlueprintInternalUseOnlyAttribute_Class() const;
-	
 	
 	
 	MonoClass* GetClassGroupAttribute_Class() const;
@@ -176,8 +172,6 @@ public:
 	
 	MonoClass* GetShowCategoriesAttribute_Class() const;
 	
-	MonoClass* GetHideCategoriesAttribute_Class() const;
-	
 	MonoClass* GetComponentWrapperClassAttribute_Class() const;
 	
 	MonoClass* GetHideFunctionsAttribute_Class() const;
@@ -194,13 +188,9 @@ public:
 	
 	MonoClass* GetAdvancedClassDisplayAttribute_Class() const;
 	
-	MonoClass* GetConversionRootAttribute_Class() const;
-	
 	MonoClass* GetEarlyAccessPreviewAttribute_Class() const;
 	
 	MonoClass* GetSparseClassDataTypeAttribute_Class() const;
-	
-	MonoClass* GetCannotImplementInterfaceInBlueprintAttribute_Class() const;
 	
 	
 	MonoClass* GetGlobalConfigAttribute_Class() const;
@@ -291,8 +281,6 @@ public:
 	MonoClass* GetBlueprintPureAttribute_Class() const;
 	
 	MonoClass* GetBlueprintCosmeticAttribute_Class() const;
-	
-	MonoClass* GetCallInEditorAttribute_Class() const;
 	
 	MonoClass* GetCustomThunkAttribute_Class() const;
 	
@@ -421,10 +409,6 @@ public:
 	
 	MonoClass* EditorConfigAttribute_Class;
 	
-	MonoClass* CategoryAttribute_Class;
-	
-	MonoClass* BlueprintInternalUseOnlyAttribute_Class;
-	
 	
 	
 	
@@ -460,8 +444,6 @@ public:
 	
 	MonoClass* ShowCategoriesAttribute_Class;
 	
-	MonoClass* HideCategoriesAttribute_Class;
-	
 	MonoClass* ComponentWrapperClassAttribute_Class;
 	
 	MonoClass* HideFunctionsAttribute_Class;
@@ -478,14 +460,9 @@ public:
 	
 	MonoClass* AdvancedClassDisplayAttribute_Class;
 	
-	MonoClass* ConversionRootAttribute_Class;
-	
 	MonoClass* EarlyAccessPreviewAttribute_Class;
 	
 	MonoClass* SparseClassDataTypeAttribute_Class;
-	
-	MonoClass* CannotImplementInterfaceInBlueprintAttribute_Class;
-	
 	
 	
 	MonoClass* GlobalConfigAttribute_Class;
@@ -577,8 +554,6 @@ public:
 	MonoClass* BlueprintPureAttribute_Class;
 	
 	MonoClass* BlueprintCosmeticAttribute_Class;
-	
-	MonoClass* CallInEditorAttribute_Class;
 	
 	MonoClass* CustomThunkAttribute_Class;
 	

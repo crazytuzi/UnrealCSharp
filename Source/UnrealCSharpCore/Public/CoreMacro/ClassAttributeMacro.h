@@ -32,8 +32,6 @@
 
 #define CLASS_SHOW_CATEGORIES_ATTRIBUTE FString(TEXT("ShowCategoriesAttribute"))
 
-#define CLASS_HIDE_CATEGORIES_ATTRIBUTE FString(TEXT("HideCategoriesAttribute"))
-
 #define CLASS_COMPONENT_WRAPPER_CLASS_ATTRIBUTE FString(TEXT("ComponentWrapperClassAttribute"))
 
 #define CLASS_HIDE_FUNCTIONS_ATTRIBUTE FString(TEXT("HideFunctionsAttribute"))
@@ -50,10 +48,6 @@
 
 #define CLASS_ADVANCED_CLASS_DISPLAY_ATTRIBUTE FString(TEXT("AdvancedClassDisplayAttribute"))
 
-#define CLASS_CONVERSION_ROOT_ATTRIBUTE FString(TEXT("ConversionRootAttribute"))
-
 #define CLASS_EARLY_ACCESS_PREVIEW_ATTRIBUTE FString(TEXT("EarlyAccessPreviewAttribute"))
 
 #define CLASS_SPARSE_CLASS_DATA_TYPE_ATTRIBUTE FString(TEXT("SparseClassDataTypeAttribute"))
-
-#define CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE FString(TEXT("CannotImplementInterfaceInBlueprintAttribute"))

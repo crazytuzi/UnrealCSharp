@@ -43,7 +43,3 @@
 #define CLASS_EXPERIMENTAL_ATTRIBUTE FString(TEXT("ExperimentalAttribute"))
 
 #define CLASS_EDITOR_CONFIG_ATTRIBUTE FString(TEXT("EditorConfigAttribute"))
-
-#define CLASS_CATEGORY_ATTRIBUTE FString(TEXT("CategoryAttribute"))
-
-#define CLASS_BLUEPRINT_INTERNAL_USE_ONLY_ATTRIBUTE FString(TEXT("BlueprintInternalUseOnlyAttribute"))
