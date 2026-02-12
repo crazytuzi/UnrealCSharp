@@ -1,5 +1,5 @@
 ﻿#include "Registry/FDynamicRegistry.h"
-#include "CoreMacro/ClassMacro.h"
+#include "CoreMacro/GenericAttributeMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"

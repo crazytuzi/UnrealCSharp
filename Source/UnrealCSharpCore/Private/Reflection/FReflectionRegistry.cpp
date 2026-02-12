@@ -1,7 +1,5 @@
 ﻿#include "Reflection/FReflectionRegistry.h"
-
-#include "CoreMacro/FunctionAttributeMacro.h"
-#include "CoreMacro/PropertyAttributeMacro.h"
+#include "CoreMacro/GenericAttributeMacro.h"
 
 FReflectionRegistry& FReflectionRegistry::Get()
 {
@@ -309,6 +307,13 @@ MonoClass* FReflectionRegistry::GetTArray_Class() const
 	return TArray_Class;
 }
 
+#if UE_F_OPTIONAL_PROPERTY
+MonoClass* FReflectionRegistry::GetTOptional_Class() const
+{
+	return TOptional_Class;
+}
+#endif
+
 MonoClass* FReflectionRegistry::GetUClassAttribute_Class() const
 {
 	return UClassAttribute_Class;
@@ -324,12 +329,10 @@ MonoClass* FReflectionRegistry::GetUEnumAttribute_Class() const
 	return UEnumAttribute_Class;
 }
 
-#if UE_F_OPTIONAL_PROPERTY
-MonoClass* FReflectionRegistry::GetTOptional_Class() const
+MonoClass* FReflectionRegistry::GetUInterfaceAttribute_Class() const
 {
-	return TOptional_Class;
+	return UInterfaceAttribute_Class;
 }
-#endif
 
 MonoClass* FReflectionRegistry::GetUPropertyAttribute_Class() const
 {
@@ -341,12 +344,7 @@ MonoClass* FReflectionRegistry::GetUFunctionAttribute_Class() const
 	return UFunctionAttribute_Class;
 }
 
-MonoClass* FReflectionRegistry::GetUInterfaceAttribute_Class() const
-{
-	return UInterfaceAttribute_Class;
-}
-
-FClassReflection* FReflectionRegistry::Get_Utils_Class()
+FClassReflection* FReflectionRegistry::Get_Utils_Class() const
 {
 	return Utils_Class;
 }

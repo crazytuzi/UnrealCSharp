@@ -1,7 +1,5 @@
 #pragma once
 
-#define CLASS_U_PROPERTY_ATTRIBUTE FString(TEXT("UPropertyAttribute"))
-
 #define CLASS_GLOBAL_CONFIG_ATTRIBUTE FString(TEXT("GlobalConfigAttribute"))
 
 #define CLASS_LOCALIZED_ATTRIBUTE FString(TEXT("LocalizedAttribute"))

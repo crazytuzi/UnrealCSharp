@@ -1,5 +1,17 @@
 #pragma once
 
+#define CLASS_U_CLASS_ATTRIBUTE FString(TEXT("UClassAttribute"))
+
+#define CLASS_U_STRUCT_ATTRIBUTE FString(TEXT("UStructAttribute"))
+
+#define CLASS_U_ENUM_ATTRIBUTE FString(TEXT("UEnumAttribute"))
+
+#define CLASS_U_INTERFACE_ATTRIBUTE FString(TEXT("UInterfaceAttribute"))
+
+#define CLASS_U_PROPERTY_ATTRIBUTE FString(TEXT("UPropertyAttribute"))
+
+#define CLASS_U_FUNCTION_ATTRIBUTE FString(TEXT("UFunctionAttribute"))
+
 #define CLASS_OVERRIDE_ATTRIBUTE FString(TEXT("OverrideAttribute"))
 
 #define CLASS_VISIBLE_INSTANCE_ONLY_ATTRIBUTE FString(TEXT("VisibleInstanceOnlyAttribute"))

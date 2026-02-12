@@ -108,7 +108,7 @@ void FClassReflection::Initialize()
 	}
 	else
 	{
-		GetTypesWithAttributeMethod = FReflectionRegistry::Get_Utils_Class()->Get_Method_From_Name("GetPropertyInfo", TGetArrayLength(InParams))->GetMethod();
+		GetTypesWithAttributeMethod = FReflectionRegistry::Get().Get_Utils_Class()->Get_Method_From_Name("GetPropertyInfo", TGetArrayLength(InParams))->GetMethod();
 	}
 
 	FMonoDomain::Runtime_Invoke(

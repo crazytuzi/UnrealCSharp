@@ -8,14 +8,6 @@
 
 #define CLASS_SYNCHRONIZATION_CONTEXT FString(TEXT("SynchronizationContext"))
 
-#define CLASS_U_CLASS_ATTRIBUTE FString(TEXT("UClassAttribute"))
-
-#define CLASS_U_STRUCT_ATTRIBUTE FString(TEXT("UStructAttribute"))
-
-#define CLASS_U_ENUM_ATTRIBUTE FString(TEXT("UEnumAttribute"))
-
-#define CLASS_U_INTERFACE_ATTRIBUTE FString(TEXT("UInterfaceAttribute"))
-
 #define CLASS_F_STRING FString(TEXT("FString"))
 
 #if UE_F_UTF8_STR_PROPERTY

@@ -1,7 +1,5 @@
 #pragma once
 
-#define CLASS_U_FUNCTION_ATTRIBUTE FString(TEXT("UFunctionAttribute"))
-
 #define CLASS_BLUEPRINT_IMPLEMENTABLE_EVENT_ATTRIBUTE FString(TEXT("BlueprintImplementableEventAttribute"))
 
 #define CLASS_BLUEPRINT_NATIVE_EVENT_ATTRIBUTE FString(TEXT("BlueprintNativeEventAttribute"))

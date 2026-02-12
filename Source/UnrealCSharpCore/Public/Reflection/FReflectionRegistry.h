@@ -98,13 +98,13 @@ public:
 	
 	MonoClass* GetUEnumAttribute_Class() const;
 	
+	MonoClass* GetUInterfaceAttribute_Class() const;
+	
 	MonoClass* GetUPropertyAttribute_Class() const;
 	
 	MonoClass* GetUFunctionAttribute_Class() const;
 	
-	MonoClass* GetUInterfaceAttribute_Class() const;
-	
-	static FClassReflection* Get_Utils_Class();
+	FClassReflection* Get_Utils_Class() const;
 	
 	void Reset();
 	
@@ -181,13 +181,13 @@ public:
 	
 	MonoClass* UEnumAttribute_Class;
 	
+	MonoClass* UInterfaceAttribute_Class;
+	
 	MonoClass* UPropertyAttribute_Class;
 	
 	MonoClass* UFunctionAttribute_Class;
 	
-	MonoClass* UInterfaceAttribute_Class;
-	
-	static inline FClassReflection* Utils_Class{};
+	FClassReflection* Utils_Class{};
 	
 public:
 	TMap<TWeakObjectPtr<UField>, FClassReflection*> ClassReflection;
