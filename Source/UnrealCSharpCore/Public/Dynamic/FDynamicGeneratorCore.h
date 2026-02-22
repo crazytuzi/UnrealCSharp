@@ -42,7 +42,7 @@ public:
 
 	static void GeneratorInterface(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode);
 
-	static bool ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName);
+	static bool ClassHasAttr(MonoClass* InMonoClass, MonoClass* InAttributeMonoClass);
 
 	static void Generator(MonoClass* InAttributeMonoClass, const TFunction<void(MonoClass*)>& InGenerator);
 
@@ -90,15 +90,9 @@ public:
 	}
 #endif
 
-	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
-	
 	static bool AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
 
-	static MonoObject* AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
-	
 	static MonoObject* AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
-
-	static FString AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName);
 
 	static FString AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass);
 	

@@ -118,7 +118,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 		if (InMonoClass == FoundMonoClass ||
 			FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
 		{
-			if (ClassHasAttr(InMonoClass, CLASS_U_CLASS_ATTRIBUTE))
+			if (ClassHasAttr(InMonoClass, FReflectionRegistry::Get().GetUClassAttribute_Class()))
 			{
 				const auto bIsSoftReference =
 					!(AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetDefaultSubObjectAttribute_Class()) ||
@@ -143,7 +143,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 
 	if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FReflectionRegistry::Get().Get_Enum_Class(), false))
 	{
-		if (ClassHasAttr(InMonoClass, CLASS_U_ENUM_ATTRIBUTE))
+		if (ClassHasAttr(InMonoClass, FReflectionRegistry::Get().GetUEnumAttribute_Class()))
 		{
 			OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
 		}
@@ -154,7 +154,7 @@ void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrI
 	if (FMonoDomain::Class_Get_Method_From_Name(
 		InMonoClass, FUNCTION_STATIC_STRUCT, 0))
 	{
-		if (ClassHasAttr(InMonoClass, CLASS_U_STRUCT_ATTRIBUTE))
+		if (ClassHasAttr(InMonoClass, FReflectionRegistry::Get().GetUStructAttribute_Class()))
 		{
 			OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
 		}
@@ -317,9 +317,9 @@ void FDynamicGeneratorCore::GeneratorInterface(MonoClass* InMonoClass, FDynamicD
 	}
 }
 
-bool FDynamicGeneratorCore::ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName)
+bool FDynamicGeneratorCore::ClassHasAttr(MonoClass* InMonoClass, MonoClass* InAttributeMonoClass)
 {
-	return AttrsHasAttr(FMonoDomain::Custom_Attrs_From_Class(InMonoClass), InAttributeName);
+	return AttrsHasAttr(FMonoDomain::Custom_Attrs_From_Class(InMonoClass), InAttributeMonoClass);
 }
 
 void FDynamicGeneratorCore::Generator(MonoClass* InAttributeMonoClass, const TFunction<void(MonoClass*)>& InGenerator)
@@ -785,7 +785,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		// @TODO
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_PURE_ATTRIBUTE))
+	if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().BlueprintPureAttribute_Class))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintCallable;
 
@@ -1011,51 +1011,14 @@ void FDynamicGeneratorCore::SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMon
 }
 #endif
 
-bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName)
-{
-	if (const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttributeName))
-	{
-		return !!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass);
-	}
-
-	return false;
-}
-
 bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
 {
 	return !!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, InMonoClass);
 }
 
-MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo,
-                                                const FString& InAttributeName)
-{
-	if (const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttributeName))
-	{
-		return FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, AttributeMonoClass);
-	}
-
-	return nullptr;
-}
-
 MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
 {
 	return FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, InMonoClass);
-}
-
-FString FDynamicGeneratorCore::AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName)
-{
-	const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttributeName);
-
-	const auto FoundMonoObject = FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, FoundMonoClass);
-
-	const auto FoundMonoProperty = FMonoDomain::Class_Get_Property_From_Name(FoundMonoClass, TEXT("Value"));
-
-	const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
-
-	return FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(FMonoDomain::Object_To_String(Value,nullptr))));
 }
 
 FString FDynamicGeneratorCore::AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)

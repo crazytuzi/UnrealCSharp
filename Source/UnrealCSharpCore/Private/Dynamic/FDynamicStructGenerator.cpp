@@ -42,7 +42,7 @@ void FDynamicStructGenerator::Generator()
 		                                 if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
 		                                 {
 			                                 if (FDynamicGeneratorCore::ClassHasAttr(
-				                                 ParentMonoClass, CLASS_U_STRUCT_ATTRIBUTE))
+				                                 ParentMonoClass, FReflectionRegistry::Get().GetUStructAttribute_Class()))
 			                                 {
 				                                 const auto ParentClassName = FString(
 					                                 FMonoDomain::Class_Get_Name(ParentMonoClass));

@@ -61,7 +61,7 @@ void FDynamicClassGenerator::Generator()
 		                                 if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
 		                                 {
 			                                 if (FDynamicGeneratorCore::ClassHasAttr(
-				                                 ParentMonoClass, CLASS_U_CLASS_ATTRIBUTE))
+				                                 ParentMonoClass, FReflectionRegistry::Get().GetUClassAttribute_Class()))
 			                                 {
 				                                 const auto ParentClassName = FString(
 					                                 FMonoDomain::Class_Get_Name(ParentMonoClass));
