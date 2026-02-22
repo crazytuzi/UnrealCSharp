@@ -5,6 +5,7 @@
 #endif
 #include "FDynamicDependencyGraph.h"
 #include "mono/metadata/details/reflection-types.h"
+#include "Reflection/FClassReflection.h"
 
 class FDynamicGeneratorCore
 {
@@ -114,22 +115,22 @@ public:
 
 #if WITH_EDITOR
 	static EDynamicType GetDynamicType(const FString& InName);
+	
+	static const TArray<FClassReflection*>& GetClassMetaDataAttrs();
+
+	static const TArray<FClassReflection*>& GetStructMetaDataAttrs();
+
+	static const TArray<FClassReflection*>& GetEnumMetaDataAttrs();
+
+	static const TArray<FClassReflection*>& GetInterfaceMetaDataAttrs();
+
+	static const TArray<FClassReflection*>& GetPropertyMetaDataAttrs();
+
+	static const TArray<FClassReflection*>& GetFunctionMetaDataAttrs();
 #endif
 
 private:
 #if WITH_EDITOR
 	static TMap<FString, TArray<FString>> DynamicMap;
-
-	static TArray<FString> ClassMetaDataAttrs;
-
-	static TArray<FString> StructMetaDataAttrs;
-
-	static TArray<FString> EnumMetaDataAttrs;
-
-	static TArray<FString> InterfaceMetaDataAttrs;
-
-	static TArray<FString> PropertyMetaDataAttrs;
-
-	static TArray<FString> FunctionMetaDataAttrs;
 #endif
 };

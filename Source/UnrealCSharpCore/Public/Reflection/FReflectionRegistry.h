@@ -291,319 +291,321 @@ public:
 	MonoClass* GetServiceResponseAttribute_Class() const;
 	
 	// MetaDataAttributeMacro.h - 按顺序添加
-	MonoClass* GetHideCategoriesAttribute_Class() const;
+#if WITH_EDITOR
+	FClassReflection* GetHideCategoriesAttribute_Class() const;
 	
-	MonoClass* GetConversionRootAttribute_Class() const;
+	FClassReflection* GetConversionRootAttribute_Class() const;
 	
-	MonoClass* GetCannotImplementInterfaceInBlueprintAttribute_Class() const;
+	FClassReflection* GetCannotImplementInterfaceInBlueprintAttribute_Class() const;
 	
-	MonoClass* GetToolTipAttribute_Class() const;
+	FClassReflection* GetToolTipAttribute_Class() const;
 	
-	MonoClass* GetShortTooltipAttribute_Class() const;
+	FClassReflection* GetShortTooltipAttribute_Class() const;
 	
-	MonoClass* GetDocumentationPolicyAttribute_Class() const;
+	FClassReflection* GetDocumentationPolicyAttribute_Class() const;
 	
-	MonoClass* GetBlueprintSpawnableComponentAttribute_Class() const;
+	FClassReflection* GetBlueprintSpawnableComponentAttribute_Class() const;
 	
-	MonoClass* GetChildCanTickAttribute_Class() const;
+	FClassReflection* GetChildCanTickAttribute_Class() const;
 	
-	MonoClass* GetChildCannotTickAttribute_Class() const;
+	FClassReflection* GetChildCannotTickAttribute_Class() const;
 	
-	MonoClass* GetDebugTreeLeafAttribute_Class() const;
+	FClassReflection* GetDebugTreeLeafAttribute_Class() const;
 	
-	MonoClass* GetIgnoreCategoryKeywordsInSubclassesAttribute_Class() const;
+	FClassReflection* GetIgnoreCategoryKeywordsInSubclassesAttribute_Class() const;
 	
-	MonoClass* GetDeprecatedNodeAttribute_Class() const;
+	FClassReflection* GetDeprecatedNodeAttribute_Class() const;
 	
-	MonoClass* GetDeprecationMessageAttribute_Class() const;
+	FClassReflection* GetDeprecationMessageAttribute_Class() const;
 	
-	MonoClass* GetDisplayNameAttribute_Class() const;
+	FClassReflection* GetDisplayNameAttribute_Class() const;
 	
-	MonoClass* GetScriptNameAttribute_Class() const;
+	FClassReflection* GetScriptNameAttribute_Class() const;
 	
-	MonoClass* GetIsBlueprintBaseAttribute_Class() const;
+	FClassReflection* GetIsBlueprintBaseAttribute_Class() const;
 	
-	MonoClass* GetKismetHideOverridesAttribute_Class() const;
+	FClassReflection* GetKismetHideOverridesAttribute_Class() const;
 	
-	MonoClass* GetLoadBehaviorAttribute_Class() const;
+	FClassReflection* GetLoadBehaviorAttribute_Class() const;
 	
-	MonoClass* GetProhibitedInterfacesAttribute_Class() const;
+	FClassReflection* GetProhibitedInterfacesAttribute_Class() const;
 	
-	MonoClass* GetRestrictedToClassesAttribute_Class() const;
+	FClassReflection* GetRestrictedToClassesAttribute_Class() const;
 	
-	MonoClass* GetShowWorldContextPinAttribute_Class() const;
+	FClassReflection* GetShowWorldContextPinAttribute_Class() const;
 	
-	MonoClass* GetDontUseGenericSpawnObjectAttribute_Class() const;
+	FClassReflection* GetDontUseGenericSpawnObjectAttribute_Class() const;
 	
-	MonoClass* GetExposedAsyncProxyAttribute_Class() const;
+	FClassReflection* GetExposedAsyncProxyAttribute_Class() const;
 	
-	MonoClass* GetBlueprintThreadSafeAttribute_Class() const;
+	FClassReflection* GetBlueprintThreadSafeAttribute_Class() const;
 	
-	MonoClass* GetUsesHierarchyAttribute_Class() const;
+	FClassReflection* GetUsesHierarchyAttribute_Class() const;
 	
-	MonoClass* GetHasNativeBreakAttribute_Class() const;
+	FClassReflection* GetHasNativeBreakAttribute_Class() const;
 	
-	MonoClass* GetHasNativeMakeAttribute_Class() const;
+	FClassReflection* GetHasNativeMakeAttribute_Class() const;
 	
-	MonoClass* GetHiddenByDefaultAttribute_Class() const;
+	FClassReflection* GetHiddenByDefaultAttribute_Class() const;
 	
-	MonoClass* GetDisableSplitPinAttribute_Class() const;
+	FClassReflection* GetDisableSplitPinAttribute_Class() const;
 	
-	MonoClass* GetAllowAbstractAttribute_Class() const;
+	FClassReflection* GetAllowAbstractAttribute_Class() const;
 	
-	MonoClass* GetAllowAnyActorAttribute_Class() const;
+	FClassReflection* GetAllowAnyActorAttribute_Class() const;
 	
-	MonoClass* GetAllowedClassesAttribute_Class() const;
+	FClassReflection* GetAllowedClassesAttribute_Class() const;
 	
-	MonoClass* GetAllowPreserveRatioAttribute_Class() const;
+	FClassReflection* GetAllowPreserveRatioAttribute_Class() const;
 	
-	MonoClass* GetAllowPrivateAccessAttribute_Class() const;
+	FClassReflection* GetAllowPrivateAccessAttribute_Class() const;
 	
-	MonoClass* GetArrayClampAttribute_Class() const;
+	FClassReflection* GetArrayClampAttribute_Class() const;
 	
-	MonoClass* GetAssetBundlesAttribute_Class() const;
+	FClassReflection* GetAssetBundlesAttribute_Class() const;
 	
-	MonoClass* GetBlueprintBaseOnlyAttribute_Class() const;
+	FClassReflection* GetBlueprintBaseOnlyAttribute_Class() const;
 	
-	MonoClass* GetBlueprintCompilerGeneratedDefaultsAttribute_Class() const;
+	FClassReflection* GetBlueprintCompilerGeneratedDefaultsAttribute_Class() const;
 	
-	MonoClass* GetClampMinAttribute_Class() const;
+	FClassReflection* GetClampMinAttribute_Class() const;
 	
-	MonoClass* GetClampMaxAttribute_Class() const;
+	FClassReflection* GetClampMaxAttribute_Class() const;
 	
-	MonoClass* GetConfigHierarchyEditableAttribute_Class() const;
+	FClassReflection* GetConfigHierarchyEditableAttribute_Class() const;
 	
-	MonoClass* GetContentDirAttribute_Class() const;
+	FClassReflection* GetContentDirAttribute_Class() const;
 	
-	MonoClass* GetDeltaAttribute_Class() const;
+	FClassReflection* GetDeltaAttribute_Class() const;
 	
-	MonoClass* GetDeprecatedPropertyAttribute_Class() const;
+	FClassReflection* GetDeprecatedPropertyAttribute_Class() const;
 	
-	MonoClass* GetDisallowedAssetDataTagsAttribute_Class() const;
+	FClassReflection* GetDisallowedAssetDataTagsAttribute_Class() const;
 	
-	MonoClass* GetDisallowedClassesAttribute_Class() const;
+	FClassReflection* GetDisallowedClassesAttribute_Class() const;
 	
-	MonoClass* GetDisplayAfterAttribute_Class() const;
+	FClassReflection* GetDisplayAfterAttribute_Class() const;
 	
-	MonoClass* GetDisplayPriorityAttribute_Class() const;
+	FClassReflection* GetDisplayPriorityAttribute_Class() const;
 	
-	MonoClass* GetDisplayThumbnailAttribute_Class() const;
+	FClassReflection* GetDisplayThumbnailAttribute_Class() const;
 	
-	MonoClass* GetEditConditionAttribute_Class() const;
+	FClassReflection* GetEditConditionAttribute_Class() const;
 	
-	MonoClass* GetEditConditionHidesAttribute_Class() const;
+	FClassReflection* GetEditConditionHidesAttribute_Class() const;
 	
-	MonoClass* GetEditFixedOrderAttribute_Class() const;
+	FClassReflection* GetEditFixedOrderAttribute_Class() const;
 	
-	MonoClass* GetCategoryAttribute_Class() const;
+	FClassReflection* GetCategoryAttribute_Class() const;
 	
-	MonoClass* GetExactClassAttribute_Class() const;
+	FClassReflection* GetExactClassAttribute_Class() const;
 	
-	MonoClass* GetExposeFunctionCategoriesAttribute_Class() const;
+	FClassReflection* GetExposeFunctionCategoriesAttribute_Class() const;
 	
-	MonoClass* GetExposeOnSpawnAttribute_Class() const;
+	FClassReflection* GetExposeOnSpawnAttribute_Class() const;
 	
-	MonoClass* GetFilePathFilterAttribute_Class() const;
+	FClassReflection* GetFilePathFilterAttribute_Class() const;
 	
-	MonoClass* GetRelativeToGameDirAttribute_Class() const;
+	FClassReflection* GetRelativeToGameDirAttribute_Class() const;
 	
-	MonoClass* GetFixedIncrementAttribute_Class() const;
+	FClassReflection* GetFixedIncrementAttribute_Class() const;
 	
-	MonoClass* GetForceShowEngineContentAttribute_Class() const;
+	FClassReflection* GetForceShowEngineContentAttribute_Class() const;
 	
-	MonoClass* GetForceShowPluginContentAttribute_Class() const;
+	FClassReflection* GetForceShowPluginContentAttribute_Class() const;
 	
-	MonoClass* GetHideAlphaChannelAttribute_Class() const;
+	FClassReflection* GetHideAlphaChannelAttribute_Class() const;
 	
-	MonoClass* GetHideInDetailPanelAttribute_Class() const;
+	FClassReflection* GetHideInDetailPanelAttribute_Class() const;
 	
-	MonoClass* GetHideViewOptionsAttribute_Class() const;
+	FClassReflection* GetHideViewOptionsAttribute_Class() const;
 	
-	MonoClass* GetIgnoreForMemberInitializationTestAttribute_Class() const;
+	FClassReflection* GetIgnoreForMemberInitializationTestAttribute_Class() const;
 	
-	MonoClass* GetInlineEditConditionToggleAttribute_Class() const;
+	FClassReflection* GetInlineEditConditionToggleAttribute_Class() const;
 	
-	MonoClass* GetLinearDeltaSensitivityAttribute_Class() const;
+	FClassReflection* GetLinearDeltaSensitivityAttribute_Class() const;
 	
-	MonoClass* GetLongPackageNameAttribute_Class() const;
+	FClassReflection* GetLongPackageNameAttribute_Class() const;
 	
-	MonoClass* GetMakeEditWidgetAttribute_Class() const;
+	FClassReflection* GetMakeEditWidgetAttribute_Class() const;
 	
-	MonoClass* GetMakeStructureDefaultValueAttribute_Class() const;
+	FClassReflection* GetMakeStructureDefaultValueAttribute_Class() const;
 	
-	MonoClass* GetMetaClassAttribute_Class() const;
+	FClassReflection* GetMetaClassAttribute_Class() const;
 	
-	MonoClass* GetMustImplementAttribute_Class() const;
+	FClassReflection* GetMustImplementAttribute_Class() const;
 	
-	MonoClass* GetMultipleAttribute_Class() const;
+	FClassReflection* GetMultipleAttribute_Class() const;
 	
-	MonoClass* GetMaxLengthAttribute_Class() const;
+	FClassReflection* GetMaxLengthAttribute_Class() const;
 	
-	MonoClass* GetMultiLineAttribute_Class() const;
+	FClassReflection* GetMultiLineAttribute_Class() const;
 	
-	MonoClass* GetPasswordFieldAttribute_Class() const;
+	FClassReflection* GetPasswordFieldAttribute_Class() const;
 	
-	MonoClass* GetNoElementDuplicateAttribute_Class() const;
+	FClassReflection* GetNoElementDuplicateAttribute_Class() const;
 	
-	MonoClass* GetNoResetToDefaultAttribute_Class() const;
+	FClassReflection* GetNoResetToDefaultAttribute_Class() const;
 	
-	MonoClass* GetEditInlineAttribute_Class() const;
+	FClassReflection* GetEditInlineAttribute_Class() const;
 	
-	MonoClass* GetNoEditInlineAttribute_Class() const;
+	FClassReflection* GetNoEditInlineAttribute_Class() const;
 	
-	MonoClass* GetNoSpinboxAttribute_Class() const;
+	FClassReflection* GetNoSpinboxAttribute_Class() const;
 	
-	MonoClass* GetOnlyPlaceableAttribute_Class() const;
+	FClassReflection* GetOnlyPlaceableAttribute_Class() const;
 	
-	MonoClass* GetRelativePathAttribute_Class() const;
+	FClassReflection* GetRelativePathAttribute_Class() const;
 	
-	MonoClass* GetRelativeToGameContentDirAttribute_Class() const;
+	FClassReflection* GetRelativeToGameContentDirAttribute_Class() const;
 	
-	MonoClass* GetRequiredAssetDataTagsAttribute_Class() const;
+	FClassReflection* GetRequiredAssetDataTagsAttribute_Class() const;
 	
-	MonoClass* GetScriptNoExportAttribute_Class() const;
+	FClassReflection* GetScriptNoExportAttribute_Class() const;
 	
-	MonoClass* GetShowOnlyInnerPropertiesAttribute_Class() const;
+	FClassReflection* GetShowOnlyInnerPropertiesAttribute_Class() const;
 	
-	MonoClass* GetShowTreeViewAttribute_Class() const;
+	FClassReflection* GetShowTreeViewAttribute_Class() const;
 	
-	MonoClass* GetSliderExponentAttribute_Class() const;
+	FClassReflection* GetSliderExponentAttribute_Class() const;
 	
-	MonoClass* GetTitlePropertyAttribute_Class() const;
+	FClassReflection* GetTitlePropertyAttribute_Class() const;
 	
-	MonoClass* GetUIMinAttribute_Class() const;
+	FClassReflection* GetUIMinAttribute_Class() const;
 	
-	MonoClass* GetUIMaxAttribute_Class() const;
+	FClassReflection* GetUIMaxAttribute_Class() const;
 	
-	MonoClass* GetUnitsAttribute_Class() const;
+	FClassReflection* GetUnitsAttribute_Class() const;
 	
-	MonoClass* GetForceUnitsAttribute_Class() const;
+	FClassReflection* GetForceUnitsAttribute_Class() const;
 	
-	MonoClass* GetUntrackedAttribute_Class() const;
+	FClassReflection* GetUntrackedAttribute_Class() const;
 	
-	MonoClass* GetDevelopmentOnlyAttribute_Class() const;
+	FClassReflection* GetDevelopmentOnlyAttribute_Class() const;
 	
-	MonoClass* GetNeedsLatentFixupAttribute_Class() const;
+	FClassReflection* GetNeedsLatentFixupAttribute_Class() const;
 	
-	MonoClass* GetLatentCallbackTargetAttribute_Class() const;
+	FClassReflection* GetLatentCallbackTargetAttribute_Class() const;
 	
-	MonoClass* GetGetOptionsAttribute_Class() const;
+	FClassReflection* GetGetOptionsAttribute_Class() const;
 	
-	MonoClass* GetPinHiddenByDefaultAttribute_Class() const;
+	FClassReflection* GetPinHiddenByDefaultAttribute_Class() const;
 	
-	MonoClass* GetValidEnumValuesAttribute_Class() const;
+	FClassReflection* GetValidEnumValuesAttribute_Class() const;
 	
-	MonoClass* GetInvalidEnumValuesAttribute_Class() const;
+	FClassReflection* GetInvalidEnumValuesAttribute_Class() const;
 	
-	MonoClass* GetOverridingInputPropertyAttribute_Class() const;
+	FClassReflection* GetOverridingInputPropertyAttribute_Class() const;
 	
-	MonoClass* GetRequiredInputAttribute_Class() const;
+	FClassReflection* GetRequiredInputAttribute_Class() const;
 	
-	MonoClass* GetNeverAsPinAttribute_Class() const;
+	FClassReflection* GetNeverAsPinAttribute_Class() const;
 	
-	MonoClass* GetPinShownByDefaultAttribute_Class() const;
+	FClassReflection* GetPinShownByDefaultAttribute_Class() const;
 	
-	MonoClass* GetAlwaysAsPinAttribute_Class() const;
+	FClassReflection* GetAlwaysAsPinAttribute_Class() const;
 	
-	MonoClass* GetCustomizePropertyAttribute_Class() const;
+	FClassReflection* GetCustomizePropertyAttribute_Class() const;
 	
-	MonoClass* GetCallInEditorAttribute_Class() const;
+	FClassReflection* GetCallInEditorAttribute_Class() const;
 	
-	MonoClass* GetVariadicAttribute_Class() const;
+	FClassReflection* GetVariadicAttribute_Class() const;
 	
-	MonoClass* GetReturnDisplayNameAttribute_Class() const;
+	FClassReflection* GetReturnDisplayNameAttribute_Class() const;
 	
-	MonoClass* GetInternalUseParamAttribute_Class() const;
+	FClassReflection* GetInternalUseParamAttribute_Class() const;
 	
-	MonoClass* GetForceAsFunctionAttribute_Class() const;
+	FClassReflection* GetForceAsFunctionAttribute_Class() const;
 	
-	MonoClass* GetIgnoreTypePromotionAttribute_Class() const;
+	FClassReflection* GetIgnoreTypePromotionAttribute_Class() const;
 	
-	MonoClass* GetArrayParmAttribute_Class() const;
+	FClassReflection* GetArrayParmAttribute_Class() const;
 	
-	MonoClass* GetArrayTypeDependentParamsAttribute_Class() const;
+	FClassReflection* GetArrayTypeDependentParamsAttribute_Class() const;
 	
-	MonoClass* GetAutoCreateRefTermAttribute_Class() const;
+	FClassReflection* GetAutoCreateRefTermAttribute_Class() const;
 	
-	MonoClass* GetHideAssetPickerAttribute_Class() const;
+	FClassReflection* GetHideAssetPickerAttribute_Class() const;
 	
-	MonoClass* GetBlueprintInternalUseOnlyAttribute_Class() const;
+	FClassReflection* GetBlueprintInternalUseOnlyAttribute_Class() const;
 	
-	MonoClass* GetBlueprintProtectedAttribute_Class() const;
+	FClassReflection* GetBlueprintProtectedAttribute_Class() const;
 	
-	MonoClass* GetCallableWithoutWorldContextAttribute_Class() const;
+	FClassReflection* GetCallableWithoutWorldContextAttribute_Class() const;
 	
-	MonoClass* GetCommutativeAssociativeBinaryOperatorAttribute_Class() const;
+	FClassReflection* GetCommutativeAssociativeBinaryOperatorAttribute_Class() const;
 	
-	MonoClass* GetCompactNodeTitleAttribute_Class() const;
+	FClassReflection* GetCompactNodeTitleAttribute_Class() const;
 	
-	MonoClass* GetCustomStructureParamAttribute_Class() const;
+	FClassReflection* GetCustomStructureParamAttribute_Class() const;
 	
-	MonoClass* GetDefaultToSelfAttribute_Class() const;
+	FClassReflection* GetDefaultToSelfAttribute_Class() const;
 	
-	MonoClass* GetDeprecatedFunctionAttribute_Class() const;
+	FClassReflection* GetDeprecatedFunctionAttribute_Class() const;
 	
-	MonoClass* GetExpandEnumAsExecsAttribute_Class() const;
+	FClassReflection* GetExpandEnumAsExecsAttribute_Class() const;
 	
-	MonoClass* GetExpandBoolAsExecsAttribute_Class() const;
+	FClassReflection* GetExpandBoolAsExecsAttribute_Class() const;
 	
-	MonoClass* GetScriptMethodAttribute_Class() const;
+	FClassReflection* GetScriptMethodAttribute_Class() const;
 	
-	MonoClass* GetScriptMethodSelfReturnAttribute_Class() const;
+	FClassReflection* GetScriptMethodSelfReturnAttribute_Class() const;
 	
-	MonoClass* GetScriptOperatorAttribute_Class() const;
+	FClassReflection* GetScriptOperatorAttribute_Class() const;
 	
-	MonoClass* GetScriptConstantAttribute_Class() const;
+	FClassReflection* GetScriptConstantAttribute_Class() const;
 	
-	MonoClass* GetScriptConstantHostAttribute_Class() const;
+	FClassReflection* GetScriptConstantHostAttribute_Class() const;
 	
-	MonoClass* GetHidePinAttribute_Class() const;
+	FClassReflection* GetHidePinAttribute_Class() const;
 	
-	MonoClass* GetHideSpawnParmsAttribute_Class() const;
+	FClassReflection* GetHideSpawnParmsAttribute_Class() const;
 	
-	MonoClass* GetKeywordsAttribute_Class() const;
+	FClassReflection* GetKeywordsAttribute_Class() const;
 	
-	MonoClass* GetLatentAttribute_Class() const;
+	FClassReflection* GetLatentAttribute_Class() const;
 	
-	MonoClass* GetLatentInfoAttribute_Class() const;
+	FClassReflection* GetLatentInfoAttribute_Class() const;
 	
-	MonoClass* GetMaterialParameterCollectionFunctionAttribute_Class() const;
+	FClassReflection* GetMaterialParameterCollectionFunctionAttribute_Class() const;
 	
-	MonoClass* GetNativeBreakFuncAttribute_Class() const;
+	FClassReflection* GetNativeBreakFuncAttribute_Class() const;
 	
-	MonoClass* GetNativeMakeFuncAttribute_Class() const;
+	FClassReflection* GetNativeMakeFuncAttribute_Class() const;
 	
-	MonoClass* GetUnsafeDuringActorConstructionAttribute_Class() const;
+	FClassReflection* GetUnsafeDuringActorConstructionAttribute_Class() const;
 	
-	MonoClass* GetWorldContextAttribute_Class() const;
+	FClassReflection* GetWorldContextAttribute_Class() const;
 	
-	MonoClass* GetBlueprintAutoCastAttribute_Class() const;
+	FClassReflection* GetBlueprintAutoCastAttribute_Class() const;
 	
-	MonoClass* GetNotBlueprintThreadSafeAttribute_Class() const;
+	FClassReflection* GetNotBlueprintThreadSafeAttribute_Class() const;
 	
-	MonoClass* GetDeterminesOutputTypeAttribute_Class() const;
+	FClassReflection* GetDeterminesOutputTypeAttribute_Class() const;
 	
-	MonoClass* GetDynamicOutputParamAttribute_Class() const;
+	FClassReflection* GetDynamicOutputParamAttribute_Class() const;
 	
-	MonoClass* GetDataTablePinAttribute_Class() const;
+	FClassReflection* GetDataTablePinAttribute_Class() const;
 	
-	MonoClass* GetSetParamAttribute_Class() const;
+	FClassReflection* GetSetParamAttribute_Class() const;
 	
-	MonoClass* GetMapParamAttribute_Class() const;
+	FClassReflection* GetMapParamAttribute_Class() const;
 	
-	MonoClass* GetMapKeyParamAttribute_Class() const;
+	FClassReflection* GetMapKeyParamAttribute_Class() const;
 	
-	MonoClass* GetMapValueParamAttribute_Class() const;
+	FClassReflection* GetMapValueParamAttribute_Class() const;
 	
-	MonoClass* GetBitmaskAttribute_Class() const;
+	FClassReflection* GetBitmaskAttribute_Class() const;
 	
-	MonoClass* GetBitmaskEnumAttribute_Class() const;
+	FClassReflection* GetBitmaskEnumAttribute_Class() const;
 	
-	MonoClass* GetBitflagsAttribute_Class() const;
+	FClassReflection* GetBitflagsAttribute_Class() const;
 	
-	MonoClass* GetUseEnumValuesAsMaskValuesInEditorAttribute_Class() const;
+	FClassReflection* GetUseEnumValuesAsMaskValuesInEditorAttribute_Class() const;
 	
-	MonoClass* GetArrayParamAttribute_Class() const;
+	FClassReflection* GetArrayParamAttribute_Class() const;
+#endif
 	
 	
 	
@@ -879,319 +881,321 @@ public:
 	MonoClass* ServiceResponseAttribute_Class;
 	
 	// MetaDataAttributeMacro.h - 按顺序添加
-	MonoClass* HideCategoriesAttribute_Class;
+#if WITH_EDITOR
+	FClassReflection* HideCategoriesAttribute_Class;
 	
-	MonoClass* ConversionRootAttribute_Class;
+	FClassReflection* ConversionRootAttribute_Class;
 	
-	MonoClass* CannotImplementInterfaceInBlueprintAttribute_Class;
+	FClassReflection* CannotImplementInterfaceInBlueprintAttribute_Class;
 	
-	MonoClass* ToolTipAttribute_Class;
+	FClassReflection* ToolTipAttribute_Class;
 	
-	MonoClass* ShortTooltipAttribute_Class;
+	FClassReflection* ShortTooltipAttribute_Class;
 	
-	MonoClass* DocumentationPolicyAttribute_Class;
+	FClassReflection* DocumentationPolicyAttribute_Class;
 	
-	MonoClass* BlueprintSpawnableComponentAttribute_Class;
+	FClassReflection* BlueprintSpawnableComponentAttribute_Class;
 	
-	MonoClass* ChildCanTickAttribute_Class;
+	FClassReflection* ChildCanTickAttribute_Class;
 	
-	MonoClass* ChildCannotTickAttribute_Class;
+	FClassReflection* ChildCannotTickAttribute_Class;
 	
-	MonoClass* DebugTreeLeafAttribute_Class;
+	FClassReflection* DebugTreeLeafAttribute_Class;
 	
-	MonoClass* IgnoreCategoryKeywordsInSubclassesAttribute_Class;
+	FClassReflection* IgnoreCategoryKeywordsInSubclassesAttribute_Class;
 	
-	MonoClass* DeprecatedNodeAttribute_Class;
+	FClassReflection* DeprecatedNodeAttribute_Class;
 	
-	MonoClass* DeprecationMessageAttribute_Class;
+	FClassReflection* DeprecationMessageAttribute_Class;
 	
-	MonoClass* DisplayNameAttribute_Class;
+	FClassReflection* DisplayNameAttribute_Class;
 	
-	MonoClass* ScriptNameAttribute_Class;
+	FClassReflection* ScriptNameAttribute_Class;
 	
-	MonoClass* IsBlueprintBaseAttribute_Class;
+	FClassReflection* IsBlueprintBaseAttribute_Class;
 	
-	MonoClass* KismetHideOverridesAttribute_Class;
+	FClassReflection* KismetHideOverridesAttribute_Class;
 	
-	MonoClass* LoadBehaviorAttribute_Class;
+	FClassReflection* LoadBehaviorAttribute_Class;
 	
-	MonoClass* ProhibitedInterfacesAttribute_Class;
+	FClassReflection* ProhibitedInterfacesAttribute_Class;
 	
-	MonoClass* RestrictedToClassesAttribute_Class;
+	FClassReflection* RestrictedToClassesAttribute_Class;
 	
-	MonoClass* ShowWorldContextPinAttribute_Class;
+	FClassReflection* ShowWorldContextPinAttribute_Class;
 	
-	MonoClass* DontUseGenericSpawnObjectAttribute_Class;
+	FClassReflection* DontUseGenericSpawnObjectAttribute_Class;
 	
-	MonoClass* ExposedAsyncProxyAttribute_Class;
+	FClassReflection* ExposedAsyncProxyAttribute_Class;
 	
-	MonoClass* BlueprintThreadSafeAttribute_Class;
+	FClassReflection* BlueprintThreadSafeAttribute_Class;
 	
-	MonoClass* UsesHierarchyAttribute_Class;
+	FClassReflection* UsesHierarchyAttribute_Class;
 	
-	MonoClass* HasNativeBreakAttribute_Class;
+	FClassReflection* HasNativeBreakAttribute_Class;
 	
-	MonoClass* HasNativeMakeAttribute_Class;
+	FClassReflection* HasNativeMakeAttribute_Class;
 	
-	MonoClass* HiddenByDefaultAttribute_Class;
+	FClassReflection* HiddenByDefaultAttribute_Class;
 	
-	MonoClass* DisableSplitPinAttribute_Class;
+	FClassReflection* DisableSplitPinAttribute_Class;
 	
-	MonoClass* AllowAbstractAttribute_Class;
+	FClassReflection* AllowAbstractAttribute_Class;
 	
-	MonoClass* AllowAnyActorAttribute_Class;
+	FClassReflection* AllowAnyActorAttribute_Class;
 	
-	MonoClass* AllowedClassesAttribute_Class;
+	FClassReflection* AllowedClassesAttribute_Class;
 	
-	MonoClass* AllowPreserveRatioAttribute_Class;
+	FClassReflection* AllowPreserveRatioAttribute_Class;
 	
-	MonoClass* AllowPrivateAccessAttribute_Class;
+	FClassReflection* AllowPrivateAccessAttribute_Class;
 	
-	MonoClass* ArrayClampAttribute_Class;
+	FClassReflection* ArrayClampAttribute_Class;
 	
-	MonoClass* AssetBundlesAttribute_Class;
+	FClassReflection* AssetBundlesAttribute_Class;
 	
-	MonoClass* BlueprintBaseOnlyAttribute_Class;
+	FClassReflection* BlueprintBaseOnlyAttribute_Class;
 	
-	MonoClass* BlueprintCompilerGeneratedDefaultsAttribute_Class;
+	FClassReflection* BlueprintCompilerGeneratedDefaultsAttribute_Class;
 	
-	MonoClass* ClampMinAttribute_Class;
+	FClassReflection* ClampMinAttribute_Class;
 	
-	MonoClass* ClampMaxAttribute_Class;
+	FClassReflection* ClampMaxAttribute_Class;
 	
-	MonoClass* ConfigHierarchyEditableAttribute_Class;
+	FClassReflection* ConfigHierarchyEditableAttribute_Class;
 	
-	MonoClass* ContentDirAttribute_Class;
+	FClassReflection* ContentDirAttribute_Class;
 	
-	MonoClass* DeltaAttribute_Class;
+	FClassReflection* DeltaAttribute_Class;
 	
-	MonoClass* DeprecatedPropertyAttribute_Class;
+	FClassReflection* DeprecatedPropertyAttribute_Class;
 	
-	MonoClass* DisallowedAssetDataTagsAttribute_Class;
+	FClassReflection* DisallowedAssetDataTagsAttribute_Class;
 	
-	MonoClass* DisallowedClassesAttribute_Class;
+	FClassReflection* DisallowedClassesAttribute_Class;
 	
-	MonoClass* DisplayAfterAttribute_Class;
+	FClassReflection* DisplayAfterAttribute_Class;
 	
-	MonoClass* DisplayPriorityAttribute_Class;
+	FClassReflection* DisplayPriorityAttribute_Class;
 	
-	MonoClass* DisplayThumbnailAttribute_Class;
+	FClassReflection* DisplayThumbnailAttribute_Class;
 	
-	MonoClass* EditConditionAttribute_Class;
+	FClassReflection* EditConditionAttribute_Class;
 	
-	MonoClass* EditConditionHidesAttribute_Class;
+	FClassReflection* EditConditionHidesAttribute_Class;
 	
-	MonoClass* EditFixedOrderAttribute_Class;
+	FClassReflection* EditFixedOrderAttribute_Class;
 	
-	MonoClass* CategoryAttribute_Class;
+	FClassReflection* CategoryAttribute_Class;
 	
-	MonoClass* ExactClassAttribute_Class;
+	FClassReflection* ExactClassAttribute_Class;
 	
-	MonoClass* ExposeFunctionCategoriesAttribute_Class;
+	FClassReflection* ExposeFunctionCategoriesAttribute_Class;
 	
-	MonoClass* ExposeOnSpawnAttribute_Class;
+	FClassReflection* ExposeOnSpawnAttribute_Class;
 	
-	MonoClass* FilePathFilterAttribute_Class;
+	FClassReflection* FilePathFilterAttribute_Class;
 	
-	MonoClass* RelativeToGameDirAttribute_Class;
+	FClassReflection* RelativeToGameDirAttribute_Class;
 	
-	MonoClass* FixedIncrementAttribute_Class;
+	FClassReflection* FixedIncrementAttribute_Class;
 	
-	MonoClass* ForceShowEngineContentAttribute_Class;
+	FClassReflection* ForceShowEngineContentAttribute_Class;
 	
-	MonoClass* ForceShowPluginContentAttribute_Class;
+	FClassReflection* ForceShowPluginContentAttribute_Class;
 	
-	MonoClass* HideAlphaChannelAttribute_Class;
+	FClassReflection* HideAlphaChannelAttribute_Class;
 	
-	MonoClass* HideInDetailPanelAttribute_Class;
+	FClassReflection* HideInDetailPanelAttribute_Class;
 	
-	MonoClass* HideViewOptionsAttribute_Class;
+	FClassReflection* HideViewOptionsAttribute_Class;
 	
-	MonoClass* IgnoreForMemberInitializationTestAttribute_Class;
+	FClassReflection* IgnoreForMemberInitializationTestAttribute_Class;
 	
-	MonoClass* InlineEditConditionToggleAttribute_Class;
+	FClassReflection* InlineEditConditionToggleAttribute_Class;
 	
-	MonoClass* LinearDeltaSensitivityAttribute_Class;
+	FClassReflection* LinearDeltaSensitivityAttribute_Class;
 	
-	MonoClass* LongPackageNameAttribute_Class;
+	FClassReflection* LongPackageNameAttribute_Class;
 	
-	MonoClass* MakeEditWidgetAttribute_Class;
+	FClassReflection* MakeEditWidgetAttribute_Class;
 	
-	MonoClass* MakeStructureDefaultValueAttribute_Class;
+	FClassReflection* MakeStructureDefaultValueAttribute_Class;
 	
-	MonoClass* MetaClassAttribute_Class;
+	FClassReflection* MetaClassAttribute_Class;
 	
-	MonoClass* MustImplementAttribute_Class;
+	FClassReflection* MustImplementAttribute_Class;
 	
-	MonoClass* MultipleAttribute_Class;
+	FClassReflection* MultipleAttribute_Class;
 	
-	MonoClass* MaxLengthAttribute_Class;
+	FClassReflection* MaxLengthAttribute_Class;
 	
-	MonoClass* MultiLineAttribute_Class;
+	FClassReflection* MultiLineAttribute_Class;
 	
-	MonoClass* PasswordFieldAttribute_Class;
+	FClassReflection* PasswordFieldAttribute_Class;
 	
-	MonoClass* NoElementDuplicateAttribute_Class;
+	FClassReflection* NoElementDuplicateAttribute_Class;
 	
-	MonoClass* NoResetToDefaultAttribute_Class;
+	FClassReflection* NoResetToDefaultAttribute_Class;
 	
-	MonoClass* EditInlineAttribute_Class;
+	FClassReflection* EditInlineAttribute_Class;
 	
-	MonoClass* NoEditInlineAttribute_Class;
+	FClassReflection* NoEditInlineAttribute_Class;
 	
-	MonoClass* NoSpinboxAttribute_Class;
+	FClassReflection* NoSpinboxAttribute_Class;
 	
-	MonoClass* OnlyPlaceableAttribute_Class;
+	FClassReflection* OnlyPlaceableAttribute_Class;
 	
-	MonoClass* RelativePathAttribute_Class;
+	FClassReflection* RelativePathAttribute_Class;
 	
-	MonoClass* RelativeToGameContentDirAttribute_Class;
+	FClassReflection* RelativeToGameContentDirAttribute_Class;
 	
-	MonoClass* RequiredAssetDataTagsAttribute_Class;
+	FClassReflection* RequiredAssetDataTagsAttribute_Class;
 	
-	MonoClass* ScriptNoExportAttribute_Class;
+	FClassReflection* ScriptNoExportAttribute_Class;
 	
-	MonoClass* ShowOnlyInnerPropertiesAttribute_Class;
+	FClassReflection* ShowOnlyInnerPropertiesAttribute_Class;
 	
-	MonoClass* ShowTreeViewAttribute_Class;
+	FClassReflection* ShowTreeViewAttribute_Class;
 	
-	MonoClass* SliderExponentAttribute_Class;
+	FClassReflection* SliderExponentAttribute_Class;
 	
-	MonoClass* TitlePropertyAttribute_Class;
+	FClassReflection* TitlePropertyAttribute_Class;
 	
-	MonoClass* UIMinAttribute_Class;
+	FClassReflection* UIMinAttribute_Class;
 	
-	MonoClass* UIMaxAttribute_Class;
+	FClassReflection* UIMaxAttribute_Class;
 	
-	MonoClass* UnitsAttribute_Class;
+	FClassReflection* UnitsAttribute_Class;
 	
-	MonoClass* ForceUnitsAttribute_Class;
+	FClassReflection* ForceUnitsAttribute_Class;
 	
-	MonoClass* UntrackedAttribute_Class;
+	FClassReflection* UntrackedAttribute_Class;
 	
-	MonoClass* DevelopmentOnlyAttribute_Class;
+	FClassReflection* DevelopmentOnlyAttribute_Class;
 	
-	MonoClass* NeedsLatentFixupAttribute_Class;
+	FClassReflection* NeedsLatentFixupAttribute_Class;
 	
-	MonoClass* LatentCallbackTargetAttribute_Class;
+	FClassReflection* LatentCallbackTargetAttribute_Class;
 	
-	MonoClass* GetOptionsAttribute_Class;
+	FClassReflection* GetOptionsAttribute_Class;
 	
-	MonoClass* PinHiddenByDefaultAttribute_Class;
+	FClassReflection* PinHiddenByDefaultAttribute_Class;
 	
-	MonoClass* ValidEnumValuesAttribute_Class;
+	FClassReflection* ValidEnumValuesAttribute_Class;
 	
-	MonoClass* InvalidEnumValuesAttribute_Class;
+	FClassReflection* InvalidEnumValuesAttribute_Class;
 	
-	MonoClass* OverridingInputPropertyAttribute_Class;
+	FClassReflection* OverridingInputPropertyAttribute_Class;
 	
-	MonoClass* RequiredInputAttribute_Class;
+	FClassReflection* RequiredInputAttribute_Class;
 	
-	MonoClass* NeverAsPinAttribute_Class;
+	FClassReflection* NeverAsPinAttribute_Class;
 	
-	MonoClass* PinShownByDefaultAttribute_Class;
+	FClassReflection* PinShownByDefaultAttribute_Class;
 	
-	MonoClass* AlwaysAsPinAttribute_Class;
+	FClassReflection* AlwaysAsPinAttribute_Class;
 	
-	MonoClass* CustomizePropertyAttribute_Class;
+	FClassReflection* CustomizePropertyAttribute_Class;
 	
-	MonoClass* CallInEditorAttribute_Class;
+	FClassReflection* CallInEditorAttribute_Class;
 	
-	MonoClass* VariadicAttribute_Class;
+	FClassReflection* VariadicAttribute_Class;
 	
-	MonoClass* ReturnDisplayNameAttribute_Class;
+	FClassReflection* ReturnDisplayNameAttribute_Class;
 	
-	MonoClass* InternalUseParamAttribute_Class;
+	FClassReflection* InternalUseParamAttribute_Class;
 	
-	MonoClass* ForceAsFunctionAttribute_Class;
+	FClassReflection* ForceAsFunctionAttribute_Class;
 	
-	MonoClass* IgnoreTypePromotionAttribute_Class;
+	FClassReflection* IgnoreTypePromotionAttribute_Class;
 	
-	MonoClass* ArrayParmAttribute_Class;
+	FClassReflection* ArrayParmAttribute_Class;
 	
-	MonoClass* ArrayTypeDependentParamsAttribute_Class;
+	FClassReflection* ArrayTypeDependentParamsAttribute_Class;
 	
-	MonoClass* AutoCreateRefTermAttribute_Class;
+	FClassReflection* AutoCreateRefTermAttribute_Class;
 	
-	MonoClass* HideAssetPickerAttribute_Class;
+	FClassReflection* HideAssetPickerAttribute_Class;
 	
-	MonoClass* BlueprintInternalUseOnlyAttribute_Class;
+	FClassReflection* BlueprintInternalUseOnlyAttribute_Class;
 	
-	MonoClass* BlueprintProtectedAttribute_Class;
+	FClassReflection* BlueprintProtectedAttribute_Class;
 	
-	MonoClass* CallableWithoutWorldContextAttribute_Class;
+	FClassReflection* CallableWithoutWorldContextAttribute_Class;
 	
-	MonoClass* CommutativeAssociativeBinaryOperatorAttribute_Class;
+	FClassReflection* CommutativeAssociativeBinaryOperatorAttribute_Class;
 	
-	MonoClass* CompactNodeTitleAttribute_Class;
+	FClassReflection* CompactNodeTitleAttribute_Class;
 	
-	MonoClass* CustomStructureParamAttribute_Class;
+	FClassReflection* CustomStructureParamAttribute_Class;
 	
-	MonoClass* DefaultToSelfAttribute_Class;
+	FClassReflection* DefaultToSelfAttribute_Class;
 	
-	MonoClass* DeprecatedFunctionAttribute_Class;
+	FClassReflection* DeprecatedFunctionAttribute_Class;
 	
-	MonoClass* ExpandEnumAsExecsAttribute_Class;
+	FClassReflection* ExpandEnumAsExecsAttribute_Class;
 	
-	MonoClass* ExpandBoolAsExecsAttribute_Class;
+	FClassReflection* ExpandBoolAsExecsAttribute_Class;
 	
-	MonoClass* ScriptMethodAttribute_Class;
+	FClassReflection* ScriptMethodAttribute_Class;
 	
-	MonoClass* ScriptMethodSelfReturnAttribute_Class;
+	FClassReflection* ScriptMethodSelfReturnAttribute_Class;
 	
-	MonoClass* ScriptOperatorAttribute_Class;
+	FClassReflection* ScriptOperatorAttribute_Class;
 	
-	MonoClass* ScriptConstantAttribute_Class;
+	FClassReflection* ScriptConstantAttribute_Class;
 	
-	MonoClass* ScriptConstantHostAttribute_Class;
+	FClassReflection* ScriptConstantHostAttribute_Class;
 	
-	MonoClass* HidePinAttribute_Class;
+	FClassReflection* HidePinAttribute_Class;
 	
-	MonoClass* HideSpawnParmsAttribute_Class;
+	FClassReflection* HideSpawnParmsAttribute_Class;
 	
-	MonoClass* KeywordsAttribute_Class;
+	FClassReflection* KeywordsAttribute_Class;
 	
-	MonoClass* LatentAttribute_Class;
+	FClassReflection* LatentAttribute_Class;
 	
-	MonoClass* LatentInfoAttribute_Class;
+	FClassReflection* LatentInfoAttribute_Class;
 	
-	MonoClass* MaterialParameterCollectionFunctionAttribute_Class;
+	FClassReflection* MaterialParameterCollectionFunctionAttribute_Class;
 	
-	MonoClass* NativeBreakFuncAttribute_Class;
+	FClassReflection* NativeBreakFuncAttribute_Class;
 	
-	MonoClass* NativeMakeFuncAttribute_Class;
+	FClassReflection* NativeMakeFuncAttribute_Class;
 	
-	MonoClass* UnsafeDuringActorConstructionAttribute_Class;
+	FClassReflection* UnsafeDuringActorConstructionAttribute_Class;
 	
-	MonoClass* WorldContextAttribute_Class;
+	FClassReflection* WorldContextAttribute_Class;
 	
-	MonoClass* BlueprintAutoCastAttribute_Class;
+	FClassReflection* BlueprintAutoCastAttribute_Class;
 	
-	MonoClass* NotBlueprintThreadSafeAttribute_Class;
+	FClassReflection* NotBlueprintThreadSafeAttribute_Class;
 	
-	MonoClass* DeterminesOutputTypeAttribute_Class;
+	FClassReflection* DeterminesOutputTypeAttribute_Class;
 	
-	MonoClass* DynamicOutputParamAttribute_Class;
+	FClassReflection* DynamicOutputParamAttribute_Class;
 	
-	MonoClass* DataTablePinAttribute_Class;
+	FClassReflection* DataTablePinAttribute_Class;
 	
-	MonoClass* SetParamAttribute_Class;
+	FClassReflection* SetParamAttribute_Class;
 	
-	MonoClass* MapParamAttribute_Class;
+	FClassReflection* MapParamAttribute_Class;
 	
-	MonoClass* MapKeyParamAttribute_Class;
+	FClassReflection* MapKeyParamAttribute_Class;
 	
-	MonoClass* MapValueParamAttribute_Class;
+	FClassReflection* MapValueParamAttribute_Class;
 	
-	MonoClass* BitmaskAttribute_Class;
+	FClassReflection* BitmaskAttribute_Class;
 	
-	MonoClass* BitmaskEnumAttribute_Class;
+	FClassReflection* BitmaskEnumAttribute_Class;
 	
-	MonoClass* BitflagsAttribute_Class;
+	FClassReflection* BitflagsAttribute_Class;
 	
-	MonoClass* UseEnumValuesAsMaskValuesInEditorAttribute_Class;
+	FClassReflection* UseEnumValuesAsMaskValuesInEditorAttribute_Class;
 	
-	MonoClass* ArrayParamAttribute_Class;
+	FClassReflection* ArrayParamAttribute_Class;
+#endif
 	
 	
 	

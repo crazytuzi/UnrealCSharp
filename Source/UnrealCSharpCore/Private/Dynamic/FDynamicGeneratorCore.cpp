@@ -20,200 +20,6 @@
 
 #if WITH_EDITOR
 TMap<FString, TArray<FString>> FDynamicGeneratorCore::DynamicMap;
-
-TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
-{
-	CLASS_HIDE_CATEGORIES_ATTRIBUTE,
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_BLUEPRINT_SPAWNABLE_COMPONENT_ATTRIBUTE,
-	CLASS_CHILD_CAN_TICK_ATTRIBUTE,
-	CLASS_CHILD_CANNOT_TICK_ATTRIBUTE,
-	CLASS_DEBUG_TREE_LEAF_ATTRIBUTE,
-	CLASS_IGNORE_CATEGORY_KEYWORDS_IN_SUBCLASSES_ATTRIBUTE,
-	CLASS_DEPRECATED_NODE_ATTRIBUTE,
-	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
-	CLASS_DISPLAY_NAME_ATTRIBUTE,
-	CLASS_SCRIPT_NAME_ATTRIBUTE,
-	CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE,
-	CLASS_KISMET_HIDE_OVERRIDES_ATTRIBUTE,
-	CLASS_LOAD_BEHAVIOR_ATTRIBUTE,
-	CLASS_PROHIBITED_INTERFACES_ATTRIBUTE,
-	CLASS_RESTRICTED_TO_CLASSES_ATTRIBUTE,
-	CLASS_SHOW_WORLD_CONTEXT_PIN_ATTRIBUTE,
-	CLASS_DONT_USE_GENERIC_SPAWN_OBJECT_ATTRIBUTE,
-	CLASS_EXPOSED_ASYNC_PROXY_ATTRIBUTE,
-	CLASS_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
-	CLASS_USES_HIERARCHY_ATTRIBUTE
-};
-
-TArray<FString> FDynamicGeneratorCore::StructMetaDataAttrs =
-{
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_HAS_NATIVE_BREAK_ATTRIBUTE,
-	CLASS_HAS_NATIVE_MAKE_ATTRIBUTE,
-	CLASS_HIDDEN_BY_DEFAULT_ATTRIBUTE,
-	CLASS_DISABLE_SPLIT_PIN_ATTRIBUTE
-};
-
-TArray<FString> FDynamicGeneratorCore::EnumMetaDataAttrs =
-{
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_BITFLAGS_ATTRIBUTE,
-	CLASS_USE_ENUM_VALUES_AS_MASK_VALUES_IN_EDITOR
-};
-
-TArray<FString> FDynamicGeneratorCore::InterfaceMetaDataAttrs =
-{
-	CLASS_CONVERSION_ROOT_ATTRIBUTE,
-	CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE,
-	CLASS_TOOLTIP_ATTRIBUTE
-};
-
-TArray<FString> FDynamicGeneratorCore::PropertyMetaDataAttrs =
-{
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
-	CLASS_DISPLAY_NAME_ATTRIBUTE,
-	CLASS_SCRIPT_NAME_ATTRIBUTE,
-	CLASS_LOAD_BEHAVIOR_ATTRIBUTE,
-	CLASS_ALLOW_ABSTRACT_ATTRIBUTE,
-	CLASS_ALLOW_ANY_ACTOR_ATTRIBUTE,
-	CLASS_ALLOWED_CLASSES_ATTRIBUTE,
-	CLASS_ALLOW_PRESERVE_RATIO_ATTRIBUTE,
-	CLASS_ALLOW_PRIVATE_ACCESS_ATTRIBUTE,
-	CLASS_ARRAY_CLAMP_ATTRIBUTE,
-	CLASS_ASSET_BUNDLES_ATTRIBUTE,
-	CLASS_BLUEPRINT_BASE_ONLY_ATTRIBUTE,
-	CLASS_BLUEPRINT_COMPILER_GENERATED_DEFAULTS_ATTRIBUTE,
-	CLASS_CLAMP_MIN_ATTRIBUTE,
-	CLASS_CLAMP_MAX_ATTRIBUTE,
-	CLASS_CONFIG_HIERARCHY_EDITABLE_ATTRIBUTE,
-	CLASS_CONTENT_DIR_ATTRIBUTE,
-	CLASS_DELTA_ATTRIBUTE,
-	CLASS_DEPRECATED_PROPERTY_ATTRIBUTE,
-	CLASS_DISALLOWED_ASSET_DATA_TAGS_ATTRIBUTE,
-	CLASS_DISALLOWED_CLASSES_ATTRIBUTE,
-	CLASS_DISPLAY_AFTER_ATTRIBUTE,
-	CLASS_DISPLAY_PRIORITY_ATTRIBUTE,
-	CLASS_DISPLAY_THUMBNAIL_ATTRIBUTE,
-	CLASS_EDIT_CONDITION_ATTRIBUTE,
-	CLASS_EDIT_CONDITION_HIDES_ATTRIBUTE,
-	CLASS_EDIT_FIXED_ORDER_ATTRIBUTE,
-	CLASS_CATEGORY_ATTRIBUTE,
-	CLASS_EXACT_CLASS_ATTRIBUTE,
-	CLASS_EXPOSE_FUNCTION_CATEGORIES_ATTRIBUTE,
-	CLASS_EXPOSE_ON_SPAWN_ATTRIBUTE,
-	CLASS_FILE_PATH_FILTER_ATTRIBUTE,
-	CLASS_RELATIVE_TO_GAME_DIR_ATTRIBUTE,
-	CLASS_FIXED_INCREMENT_ATTRIBUTE,
-	CLASS_FORCE_SHOW_ENGINE_CONTENT_ATTRIBUTE,
-	CLASS_FORCE_SHOW_PLUGIN_CONTENT_ATTRIBUTE,
-	CLASS_HIDE_ALPHA_CHANNEL_ATTRIBUTE,
-	CLASS_HIDE_IN_DETAIL_PANEL_ATTRIBUTE,
-	CLASS_HIDE_VIEW_OPTIONS_ATTRIBUTE,
-	CLASS_IGNORE_FOR_MEMBER_INITIALIZATION_TEST_ATTRIBUTE,
-	CLASS_INLINE_EDIT_CONDITION_TOGGLE_ATTRIBUTE,
-	CLASS_LINEAR_DELTA_SENSITIVITY_ATTRIBUTE,
-	CLASS_LONG_PACKAGE_NAME_ATTRIBUTE,
-	CLASS_MAKE_EDIT_WIDGET_ATTRIBUTE,
-	CLASS_MAKE_STRUCTURE_DEFAULT_VALUE_ATTRIBUTE,
-	CLASS_META_CLASS_ATTRIBUTE,
-	CLASS_MUST_IMPLEMENT_ATTRIBUTE,
-	CLASS_MULTIPLE_ATTRIBUTE,
-	CLASS_MAX_LENGTH_ATTRIBUTE,
-	CLASS_MULTILINE_ATTRIBUTE,
-	CLASS_PASSWORD_FIELD_ATTRIBUTE,
-	CLASS_NO_ELEMENT_DUPLICATE_ATTRIBUTE,
-	CLASS_NO_RESET_TO_DEFAULT_ATTRIBUTE,
-	CLASS_NO_EDIT_INLINE_ATTRIBUTE,
-	CLASS_NO_SPIN_BOX_ATTRIBUTE,
-	CLASS_ONLY_PLACEABLE_ATTRIBUTE,
-	CLASS_RELATIVE_PATH_ATTRIBUTE,
-	CLASS_RELATIVE_TO_GAME_CONTENT_DIR_ATTRIBUTE,
-	CLASS_REQUIRED_ASSET_DATA_TAGS_ATTRIBUTE,
-	CLASS_SCRIPT_NO_EXPORT_ATTRIBUTE,
-	CLASS_SHOW_ONLY_INNER_PROPERTIES_ATTRIBUTE,
-	CLASS_SHOW_TREE_VIEW_ATTRIBUTE,
-	CLASS_SLIDER_EXPONENT_ATTRIBUTE,
-	CLASS_TITLE_PROPERTY_ATTRIBUTE,
-	CLASS_UI_MIN_ATTRIBUTE,
-	CLASS_UI_MAX_ATTRIBUTE,
-	CLASS_UNITS_ATTRIBUTE,
-	CLASS_FORCE_UNITS_ATTRIBUTE,
-	CLASS_UNTRACKED_ATTRIBUTE,
-	CLASS_DEVELOPMENT_ONLY_ATTRIBUTE,
-	CLASS_NEEDS_LATENT_FIXUP_ATTRIBUTE,
-	CLASS_LATENT_CALLBACK_TARGET_ATTRIBUTE,
-	CLASS_GET_OPTIONS_ATTRIBUTE,
-	CLASS_PIN_HIDDEN_BY_DEFAULT_ATTRIBUTE,
-	CLASS_VALID_ENUM_VALUES_ATTRIBUTE,
-	CLASS_INVALID_ENUM_VALUES_ATTRIBUTE,
-	CLASS_OVERRIDING_INPUT_PROPERTY_ATTRIBUTE,
-	CLASS_REQUIRED_INPUT_ATTRIBUTE,
-	CLASS_NEVER_AS_PIN_ATTRIBUTE,
-	CLASS_PIN_SHOWN_BY_DEFAULT_ATTRIBUTE,
-	CLASS_ALWAYS_AS_PIN_ATTRIBUTE,
-	CLASS_CUSTOMIZE_PROPERTY_ATTRIBUTE
-};
-
-TArray<FString> FDynamicGeneratorCore::FunctionMetaDataAttrs =
-{
-	CLASS_CALL_IN_EDITOR_ATTRIBUTE,
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_CATEGORY_ATTRIBUTE,
-	CLASS_VARIADIC_ATTRIBUTE,
-	CLASS_RETURN_DISPLAY_NAME_ATTRIBUTE,
-	CLASS_INTERNAL_USE_PARAM_ATTRIBUTE,
-	CLASS_FORCE_AS_FUNCTION_ATTRIBUTE,
-	CLASS_IGNORE_TYPE_PROMOTION_ATTRIBUTE,
-	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
-	CLASS_DISPLAY_NAME_ATTRIBUTE,
-	CLASS_SCRIPT_NAME_ATTRIBUTE,
-	CLASS_SCRIPT_NO_EXPORT_ATTRIBUTE,
-	CLASS_ADVANCED_DISPLAY_ATTRIBUTE,
-	CLASS_ARRAY_PARM_ATTRIBUTE,
-	CLASS_ARRAY_TYPE_DEPENDENT_PARAMS_ATTRIBUTE,
-	CLASS_AUTO_CREATE_REF_TERM_ATTRIBUTE,
-	CLASS_HIDE_ASSET_PICKER_ATTRIBUTE,
-	CLASS_BLUEPRINT_INTERNAL_USE_ONLY_ATTRIBUTE,
-	CLASS_BLUEPRINT_PROTECTED_ATTRIBUTE,
-	CLASS_CALLABLE_WITHOUT_WORLD_CONTEXT_ATTRIBUTE,
-	CLASS_COMMUTATIVE_ASSOCIATIVE_BINARY_OPERATOR_ATTRIBUTE,
-	CLASS_COMPACT_NODE_TITLE_ATTRIBUTE,
-	CLASS_CUSTOM_STRUCTURE_PARAM_ATTRIBUTE,
-	CLASS_DEFAULT_TO_SELF_ATTRIBUTE,
-	CLASS_DEPRECATED_FUNCTION_ATTRIBUTE,
-	CLASS_EXPAND_ENUM_AS_EXECS_ATTRIBUTE,
-	CLASS_EXPAND_BOOL_AS_EXECS_ATTRIBUTE,
-	CLASS_SCRIPT_METHOD_ATTRIBUTE,
-	CLASS_SCRIPT_METHOD_SELF_RETURN_ATTRIBUTE,
-	CLASS_SCRIPT_OPERATOR_ATTRIBUTE,
-	CLASS_SCRIPT_CONSTANT_ATTRIBUTE,
-	CLASS_SCRIPT_CONSTANT_HOST_ATTRIBUTE,
-	CLASS_HIDE_PIN_ATTRIBUTE,
-	CLASS_HIDE_SPAWN_PARMS_ATTRIBUTE,
-	CLASS_KEYWORDS_ATTRIBUTE,
-	CLASS_LATENT_ATTRIBUTE,
-	CLASS_LATENT_INFO_ATTRIBUTE,
-	CLASS_MATERIAL_PARAMETER_COLLECTION_FUNCTION_ATTRIBUTE,
-	CLASS_NATIVE_BREAK_FUNC_ATTRIBUTE,
-	CLASS_NATIVE_MAKE_FUNC_ATTRIBUTE,
-	CLASS_UNSAFE_DURING_ACTOR_CONSTRUCTION_ATTRIBUTE,
-	CLASS_WORLD_CONTEXT_ATTRIBUTE,
-	CLASS_BLUEPRINT_AUTO_CAST_ATTRIBUTE,
-	CLASS_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
-	CLASS_NOT_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
-	CLASS_DETERMINES_OUTPUT_TYPE_ATTRIBUTE,
-	CLASS_DYNAMIC_OUTPUT_PARAM_ATTRIBUTE,
-	CLASS_DATA_TABLE_PIN_ATTRIBUTE,
-	CLASS_SET_PARAM_ATTRIBUTE,
-	CLASS_MAP_PARAM_ATTRIBUTE,
-	CLASS_MAP_KEY_PARAM_ATTRIBUTE,
-	CLASS_MAP_VALUE_PARAM_ATTRIBUTE,
-	CLASS_BIT_MASK_ATTRIBUTE,
-	CLASS_BIT_MASK_ENUM_ATTRIBUTE,
-	CLASS_ARRAY_PARAM_ATTRIBUTE
-};
 #endif
 
 #if WITH_EDITOR
@@ -1109,15 +915,15 @@ void FDynamicGeneratorCore::SetMetaData(UField* InField, const FString& InAttrib
 }
 
 template <typename T>
-static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
-                             MonoCustomAttrInfo* InMonoCustomAttrInfo, const TFunction<void()>& InSetMetaData)
+static void SetFieldMetaData(T InField, const TArray<FClassReflection*>& InMetaDataAttrs,
+							 MonoCustomAttrInfo* InMonoCustomAttrInfo, const TFunction<void()>& InSetMetaData)
 {
 	for (const auto& MetaDataAttr : InMetaDataAttrs)
 	{
-		if (FDynamicGeneratorCore::AttrsHasAttr(InMonoCustomAttrInfo, MetaDataAttr))
+		if (FDynamicGeneratorCore::AttrsHasAttr(InMonoCustomAttrInfo, MetaDataAttr->GetClass()))
 		{
-			FDynamicGeneratorCore::SetMetaData(InField, MetaDataAttr,
-			                                   FDynamicGeneratorCore::AttrGetValue(InMonoCustomAttrInfo, MetaDataAttr));
+			FDynamicGeneratorCore::SetMetaData(InField, MetaDataAttr->GetName(),
+											   FDynamicGeneratorCore::AttrGetValue(InMonoCustomAttrInfo, MetaDataAttr->GetClass()));
 		}
 	}
 
@@ -1126,14 +932,14 @@ static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
 
 void FDynamicGeneratorCore::SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
-	SetFieldMetaData(InProperty, PropertyMetaDataAttrs, InMonoCustomAttrInfo, []()
+	SetFieldMetaData(InProperty, GetPropertyMetaDataAttrs(), InMonoCustomAttrInfo, []()
 	{
 	});
 }
 
 void FDynamicGeneratorCore::SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
-	SetFieldMetaData(InFunction, FunctionMetaDataAttrs, InMonoCustomAttrInfo, []()
+	SetFieldMetaData(InFunction, GetFunctionMetaDataAttrs(), InMonoCustomAttrInfo, []()
 	{
 	});
 }
@@ -1141,8 +947,8 @@ void FDynamicGeneratorCore::SetMetaData(UFunction* InFunction, MonoCustomAttrInf
 void FDynamicGeneratorCore::SetMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
 {
 	SetFieldMetaData(InClass, InClass->IsChildOf(UInterface::StaticClass())
-		                          ? InterfaceMetaDataAttrs
-		                          : ClassMetaDataAttrs,
+		                          ? GetInterfaceMetaDataAttrs()
+		                          : GetClassMetaDataAttrs(),
 	                 InMonoCustomAttrInfo, [InClass, InMonoCustomAttrInfo]()
 	                 {
 		                 if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetClassGroupAttribute_Class()))
@@ -1178,7 +984,7 @@ void FDynamicGeneratorCore::SetMetaData(UScriptStruct* InScriptStruct, MonoCusto
 		return;
 	}
 
-	SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo, [InScriptStruct, InMonoCustomAttrInfo]()
+	SetFieldMetaData(InScriptStruct, GetStructMetaDataAttrs(), InMonoCustomAttrInfo, [InScriptStruct, InMonoCustomAttrInfo]()
 	{
 		if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintTypeAttribute_Class()))
 		{
@@ -1194,7 +1000,7 @@ void FDynamicGeneratorCore::SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMon
 		return;
 	}
 
-	SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo,
+	SetFieldMetaData(InEnum, GetEnumMetaDataAttrs(), InMonoCustomAttrInfo,
 	                 [InEnum, InMonoCustomAttrInfo]()
 	                 {
 		                 if (AttrsHasAttr(InMonoCustomAttrInfo, FReflectionRegistry::Get().GetBlueprintTypeAttribute_Class()))
@@ -1465,5 +1271,221 @@ EDynamicType FDynamicGeneratorCore::GetDynamicType(const FString& InName)
 	}
 
 	return EDynamicType::None;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetClassMetaDataAttrs()
+{
+	static auto& Registry = FReflectionRegistry::Get();
+	static TArray<FClassReflection*> ClassMetaDataAttrs = {
+		Registry.GetHideCategoriesAttribute_Class(),
+		Registry.GetToolTipAttribute_Class(),
+		Registry.GetBlueprintSpawnableComponentAttribute_Class(),
+		Registry.GetChildCanTickAttribute_Class(),
+		Registry.GetChildCannotTickAttribute_Class(),
+		Registry.GetDebugTreeLeafAttribute_Class(),
+		Registry.GetIgnoreCategoryKeywordsInSubclassesAttribute_Class(),
+		Registry.GetDeprecatedNodeAttribute_Class(),
+		Registry.GetDeprecationMessageAttribute_Class(),
+		Registry.GetDisplayNameAttribute_Class(),
+		Registry.GetScriptNameAttribute_Class(),
+		Registry.GetIsBlueprintBaseAttribute_Class(),
+		Registry.GetKismetHideOverridesAttribute_Class(),
+		Registry.GetLoadBehaviorAttribute_Class(),
+		Registry.GetProhibitedInterfacesAttribute_Class(),
+		Registry.GetRestrictedToClassesAttribute_Class(),
+		Registry.GetShowWorldContextPinAttribute_Class(),
+		Registry.GetDontUseGenericSpawnObjectAttribute_Class(),
+		Registry.GetExposedAsyncProxyAttribute_Class(),
+		Registry.GetBlueprintThreadSafeAttribute_Class(),
+		Registry.GetUsesHierarchyAttribute_Class()
+	};
+	return ClassMetaDataAttrs;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetStructMetaDataAttrs()
+{
+	static auto& Registry = FReflectionRegistry::Get();
+	static TArray<FClassReflection*> StructMetaDataAttrs = {
+		Registry.GetToolTipAttribute_Class(),
+		Registry.GetHasNativeBreakAttribute_Class(),
+		Registry.GetHasNativeMakeAttribute_Class(),
+		Registry.GetHiddenByDefaultAttribute_Class(),
+		Registry.GetDisableSplitPinAttribute_Class()
+	};
+	return StructMetaDataAttrs;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetEnumMetaDataAttrs()
+{
+	static auto& Registry = FReflectionRegistry::Get();
+	static TArray<FClassReflection*> EnumMetaDataAttrs = {
+		Registry.GetToolTipAttribute_Class(),
+		Registry.GetBitflagsAttribute_Class(),
+		Registry.GetUseEnumValuesAsMaskValuesInEditorAttribute_Class()
+	};
+	return EnumMetaDataAttrs;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetInterfaceMetaDataAttrs()
+{
+	static auto& Registry = FReflectionRegistry::Get();
+	static TArray<FClassReflection*> InterfaceMetaDataAttrs = {
+		Registry.GetConversionRootAttribute_Class(),
+		Registry.GetCannotImplementInterfaceInBlueprintAttribute_Class(),
+		Registry.GetToolTipAttribute_Class()
+	};
+	return InterfaceMetaDataAttrs;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetPropertyMetaDataAttrs()
+{
+	static auto& Registry = FReflectionRegistry::Get();
+	static TArray<FClassReflection*> PropertyMetaDataAttrs = {
+		Registry.GetToolTipAttribute_Class(),
+		Registry.GetDeprecationMessageAttribute_Class(),
+		Registry.GetDisplayNameAttribute_Class(),
+		Registry.GetScriptNameAttribute_Class(),
+		Registry.GetLoadBehaviorAttribute_Class(),
+		Registry.GetAllowAbstractAttribute_Class(),
+		Registry.GetAllowAnyActorAttribute_Class(),
+		Registry.GetAllowedClassesAttribute_Class(),
+		Registry.GetAllowPreserveRatioAttribute_Class(),
+		Registry.GetAllowPrivateAccessAttribute_Class(),
+		Registry.GetArrayClampAttribute_Class(),
+		Registry.GetAssetBundlesAttribute_Class(),
+		Registry.GetBlueprintBaseOnlyAttribute_Class(),
+		Registry.GetBlueprintCompilerGeneratedDefaultsAttribute_Class(),
+		Registry.GetClampMinAttribute_Class(),
+		Registry.GetClampMaxAttribute_Class(),
+		Registry.GetConfigHierarchyEditableAttribute_Class(),
+		Registry.GetContentDirAttribute_Class(),
+		Registry.GetDeltaAttribute_Class(),
+		Registry.GetDeprecatedPropertyAttribute_Class(),
+		Registry.GetDisallowedAssetDataTagsAttribute_Class(),
+		Registry.GetDisallowedClassesAttribute_Class(),
+		Registry.GetDisplayAfterAttribute_Class(),
+		Registry.GetDisplayPriorityAttribute_Class(),
+		Registry.GetDisplayThumbnailAttribute_Class(),
+		Registry.GetEditConditionAttribute_Class(),
+		Registry.GetEditConditionHidesAttribute_Class(),
+		Registry.GetEditFixedOrderAttribute_Class(),
+		Registry.GetCategoryAttribute_Class(),
+		Registry.GetExactClassAttribute_Class(),
+		Registry.GetExposeFunctionCategoriesAttribute_Class(),
+		Registry.GetExposeOnSpawnAttribute_Class(),
+		Registry.GetFilePathFilterAttribute_Class(),
+		Registry.GetRelativeToGameDirAttribute_Class(),
+		Registry.GetFixedIncrementAttribute_Class(),
+		Registry.GetForceShowEngineContentAttribute_Class(),
+		Registry.GetForceShowPluginContentAttribute_Class(),
+		Registry.GetHideAlphaChannelAttribute_Class(),
+		Registry.GetHideInDetailPanelAttribute_Class(),
+		Registry.GetHideViewOptionsAttribute_Class(),
+		Registry.GetIgnoreForMemberInitializationTestAttribute_Class(),
+		Registry.GetInlineEditConditionToggleAttribute_Class(),
+		Registry.GetLinearDeltaSensitivityAttribute_Class(),
+		Registry.GetLongPackageNameAttribute_Class(),
+		Registry.GetMakeEditWidgetAttribute_Class(),
+		Registry.GetMakeStructureDefaultValueAttribute_Class(),
+		Registry.GetMetaClassAttribute_Class(),
+		Registry.GetMustImplementAttribute_Class(),
+		Registry.GetMultipleAttribute_Class(),
+		Registry.GetMaxLengthAttribute_Class(),
+		Registry.GetMultiLineAttribute_Class(),
+		Registry.GetPasswordFieldAttribute_Class(),
+		Registry.GetNoElementDuplicateAttribute_Class(),
+		Registry.GetNoResetToDefaultAttribute_Class(),
+		Registry.GetNoEditInlineAttribute_Class(),
+		Registry.GetNoSpinboxAttribute_Class(),
+		Registry.GetOnlyPlaceableAttribute_Class(),
+		Registry.GetRelativePathAttribute_Class(),
+		Registry.GetRelativeToGameContentDirAttribute_Class(),
+		Registry.GetRequiredAssetDataTagsAttribute_Class(),
+		Registry.GetScriptNoExportAttribute_Class(),
+		Registry.GetShowOnlyInnerPropertiesAttribute_Class(),
+		Registry.GetShowTreeViewAttribute_Class(),
+		Registry.GetSliderExponentAttribute_Class(),
+		Registry.GetTitlePropertyAttribute_Class(),
+		Registry.GetUIMinAttribute_Class(),
+		Registry.GetUIMaxAttribute_Class(),
+		Registry.GetUnitsAttribute_Class(),
+		Registry.GetForceUnitsAttribute_Class(),
+		Registry.GetUntrackedAttribute_Class(),
+		Registry.GetDevelopmentOnlyAttribute_Class(),
+		Registry.GetNeedsLatentFixupAttribute_Class(),
+		Registry.GetLatentCallbackTargetAttribute_Class(),
+		Registry.GetGetOptionsAttribute_Class(),
+		Registry.GetPinHiddenByDefaultAttribute_Class(),
+		Registry.GetValidEnumValuesAttribute_Class(),
+		Registry.GetInvalidEnumValuesAttribute_Class(),
+		Registry.GetOverridingInputPropertyAttribute_Class(),
+		Registry.GetRequiredInputAttribute_Class(),
+		Registry.GetNeverAsPinAttribute_Class(),
+		Registry.GetPinShownByDefaultAttribute_Class(),
+		Registry.GetAlwaysAsPinAttribute_Class(),
+		Registry.GetCustomizePropertyAttribute_Class()
+	};
+	return PropertyMetaDataAttrs;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetFunctionMetaDataAttrs()
+{
+	static auto& Registry = FReflectionRegistry::Get();
+	static TArray<FClassReflection*> FunctionMetaDataAttrs = {
+		Registry.GetCallInEditorAttribute_Class(),
+		Registry.GetToolTipAttribute_Class(),
+		Registry.GetCategoryAttribute_Class(),
+		Registry.GetVariadicAttribute_Class(),
+		Registry.GetReturnDisplayNameAttribute_Class(),
+		Registry.GetInternalUseParamAttribute_Class(),
+		Registry.GetForceAsFunctionAttribute_Class(),
+		Registry.GetIgnoreTypePromotionAttribute_Class(),
+		Registry.GetDeprecationMessageAttribute_Class(),
+		Registry.GetDisplayNameAttribute_Class(),
+		Registry.GetScriptNameAttribute_Class(),
+		Registry.GetScriptNoExportAttribute_Class(),
+		Registry.GetArrayParmAttribute_Class(),
+		Registry.GetArrayTypeDependentParamsAttribute_Class(),
+		Registry.GetAutoCreateRefTermAttribute_Class(),
+		Registry.GetHideAssetPickerAttribute_Class(),
+		Registry.GetBlueprintInternalUseOnlyAttribute_Class(),
+		Registry.GetBlueprintProtectedAttribute_Class(),
+		Registry.GetCallableWithoutWorldContextAttribute_Class(),
+		Registry.GetCommutativeAssociativeBinaryOperatorAttribute_Class(),
+		Registry.GetCompactNodeTitleAttribute_Class(),
+		Registry.GetCustomStructureParamAttribute_Class(),
+		Registry.GetDefaultToSelfAttribute_Class(),
+		Registry.GetDeprecatedFunctionAttribute_Class(),
+		Registry.GetExpandEnumAsExecsAttribute_Class(),
+		Registry.GetExpandBoolAsExecsAttribute_Class(),
+		Registry.GetScriptMethodAttribute_Class(),
+		Registry.GetScriptMethodSelfReturnAttribute_Class(),
+		Registry.GetScriptOperatorAttribute_Class(),
+		Registry.GetScriptConstantAttribute_Class(),
+		Registry.GetScriptConstantHostAttribute_Class(),
+		Registry.GetHidePinAttribute_Class(),
+		Registry.GetHideSpawnParmsAttribute_Class(),
+		Registry.GetKeywordsAttribute_Class(),
+		Registry.GetLatentAttribute_Class(),
+		Registry.GetLatentInfoAttribute_Class(),
+		Registry.GetMaterialParameterCollectionFunctionAttribute_Class(),
+		Registry.GetNativeBreakFuncAttribute_Class(),
+		Registry.GetNativeMakeFuncAttribute_Class(),
+		Registry.GetUnsafeDuringActorConstructionAttribute_Class(),
+		Registry.GetWorldContextAttribute_Class(),
+		Registry.GetBlueprintAutoCastAttribute_Class(),
+		Registry.GetNotBlueprintThreadSafeAttribute_Class(),
+		Registry.GetDeterminesOutputTypeAttribute_Class(),
+		Registry.GetDynamicOutputParamAttribute_Class(),
+		Registry.GetDataTablePinAttribute_Class(),
+		Registry.GetSetParamAttribute_Class(),
+		Registry.GetMapParamAttribute_Class(),
+		Registry.GetMapKeyParamAttribute_Class(),
+		Registry.GetMapValueParamAttribute_Class(),
+		Registry.GetBitmaskAttribute_Class(),
+		Registry.GetBitmaskEnumAttribute_Class(),
+		Registry.GetArrayParamAttribute_Class()
+	};
+	return FunctionMetaDataAttrs;
 }
 #endif
