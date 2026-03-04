@@ -740,7 +740,7 @@ void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* 
 			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
 				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_REP_CALLBACK_NAME))
 			{
-				InProperty->RepNotifyFunc = FName(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(
+				InProperty->RepNotifyFunc = FName(UTF8_TO_TCHAR(FMonoDomain::String_To_Scoped_UTF8(
 					(MonoString*)FMonoDomain::Property_Get_Value(FoundProperty, FoundMonoObject, nullptr, nullptr))));
 			}
 		}
@@ -1268,7 +1268,7 @@ FString FDynamicGeneratorCore::AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttr
 
 	const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
 
-	return FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(FMonoDomain::Object_To_String(Value,nullptr))));
+	return FString(UTF8_TO_TCHAR(FMonoDomain::String_To_Scoped_UTF8(FMonoDomain::Object_To_String(Value,nullptr))));
 }
 
 void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* InField,

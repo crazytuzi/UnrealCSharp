@@ -147,6 +147,8 @@ public:
 	MonoString* Object_To_String(MonoObject* InMonoObject, MonoObject** InExc) const;
 
 	char* String_To_UTF8(MonoString* InMonoString) const;
+	
+	FScopedMonoUTF8Char String_To_Scoped_UTF8(MonoString* InMonoString) const;
 
 	MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum) const;
 

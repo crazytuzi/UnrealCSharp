@@ -4,6 +4,19 @@
 #include "FMonoDomainInitializeParams.h"
 #include "mono/metadata/appdomain.h"
 
+class UNREALCSHARPCORE_API FScopedMonoUTF8Char
+{
+public:	
+	~FScopedMonoUTF8Char();	
+	operator const char*() const;
+private:
+	explicit FScopedMonoUTF8Char(char* InPtr);
+	FScopedMonoUTF8Char(const FScopedMonoUTF8Char&) = delete;
+	FScopedMonoUTF8Char& operator=(const FScopedMonoUTF8Char&) = delete;
+	char* Ptr;
+	friend class FMonoDomain;
+};
+
 class UNREALCSHARPCORE_API FMonoDomain
 {
 public:
@@ -133,6 +146,10 @@ public:
 	static MonoString* Object_To_String(MonoObject* InMonoObject, MonoObject** InExc);
 
 	static char* String_To_UTF8(MonoString* InMonoString);
+	
+	static FScopedMonoUTF8Char String_To_Scoped_UTF8(MonoString* InMonoString);
+	
+	static void Free(void * InPtr);
 
 	static MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum);
 

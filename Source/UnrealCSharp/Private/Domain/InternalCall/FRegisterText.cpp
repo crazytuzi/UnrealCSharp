@@ -15,19 +15,19 @@ namespace
 		{
 			const auto Buffer = InBuffer != nullptr
 				                    ? UTF8_TO_TCHAR(
-					                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+					                    FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_Scoped_UTF8(
 						                    InBuffer))
 				                    : nullptr;
 
 			const auto TextNamespace = InTextNamespace != nullptr
 				                           ? UTF8_TO_TCHAR(
-					                           FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+					                           FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_Scoped_UTF8(
 						                           InTextNamespace))
 				                           : nullptr;
 
 			const auto PackageNamespace = InPackageNamespace != nullptr
 				                              ? UTF8_TO_TCHAR(
-					                              FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+					                              FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_Scoped_UTF8(
 						                              InPackageNamespace))
 				                              : nullptr;
 
