@@ -12,7 +12,7 @@ namespace
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
 		{
 			const auto Utf8String = new FUtf8String(UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue)));
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_Scoped_UTF8(InValue)));
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, true, false>(InMonoObject, Utf8String);
 		}

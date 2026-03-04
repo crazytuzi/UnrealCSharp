@@ -352,6 +352,11 @@ char* FDomain::String_To_UTF8(MonoString* InMonoString) const
 	return FMonoDomain::String_To_UTF8(InMonoString);
 }
 
+FScopedMonoUTF8Char FDomain::String_To_Scoped_UTF8(MonoString* InMonoString) const
+{
+	return FMonoDomain::String_To_Scoped_UTF8(InMonoString);
+}
+
 MonoArray* FDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum) const
 {
 	return FMonoDomain::Array_New(InMonoClass, InNum);

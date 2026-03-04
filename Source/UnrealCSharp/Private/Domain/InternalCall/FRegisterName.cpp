@@ -10,7 +10,7 @@ namespace
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
 		{
 			const auto Name = new FName(UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue)));
+				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_Scoped_UTF8(InValue)));
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(InMonoObject, Name);
 		}

@@ -876,7 +876,7 @@ FString FTypeBridge::GetPathName(MonoReflectionType* InReflectionType)
 	const auto PathNameMonoString = FMonoDomain::Object_To_String(
 		PathNameMonoObject, nullptr);
 
-	return UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(PathNameMonoString));
+	return UTF8_TO_TCHAR(FMonoDomain::String_To_Scoped_UTF8(PathNameMonoString));
 }
 
 FString FTypeBridge::GetGenericPathName(MonoReflectionType* InReflectionType)

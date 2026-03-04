@@ -19,7 +19,7 @@ TMap<int32, struct sigaction> SignalActions;
 void SignalHandler(int32 Signal)
 {
 	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
-	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
+	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_Scoped_UTF8(
 		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
 
 	GLog->Flush();
