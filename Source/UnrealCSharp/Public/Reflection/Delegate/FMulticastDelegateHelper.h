@@ -21,13 +21,13 @@ public:
 public:
 	bool IsBound() const;
 
-	bool Contains(UObject* InObject, MonoMethod* InMonoMethod) const;
+	bool Contains(UObject* InObject, FMethodReflection* InMethod) const;
 
-	void Add(UObject* InObject, MonoMethod* InMonoMethod) const;
+	void Add(UObject* InObject, FMethodReflection* InMethod) const;
 
-	void AddUnique(UObject* InObject, MonoMethod* InMonoMethod) const;
+	void AddUnique(UObject* InObject, FMethodReflection* InMethod) const;
 
-	void Remove(UObject* InObject, MonoMethod* InMonoMethod) const;
+	void Remove(UObject* InObject, FMethodReflection* InMethod) const;
 
 	void RemoveAll(UObject* InObject) const;
 

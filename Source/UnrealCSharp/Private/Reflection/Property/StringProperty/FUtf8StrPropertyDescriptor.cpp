@@ -1,12 +1,12 @@
-﻿#include "Reflection/Property/StringProperty/FUtf8StrPropertyDescriptor.h"
+#include "Reflection/Property/StringProperty/FUtf8StrPropertyDescriptor.h"
 #if UE_F_UTF8_STR_PROPERTY
 #include "Environment/FCSharpEnvironment.h"
 
 void FUtf8StrPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, true, false>(Object, Src);
+	FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, true, false>(Class, Object, Src);
 
 	*Dest = Object;
 }
@@ -17,9 +17,9 @@ void FUtf8StrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) co
 
 	if (Object == nullptr)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		Object = Class->NewObject();
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, false, true>(Object, Src);
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, false, true>(Class, Object, Src);
 	}
 
 	*Dest = Object;

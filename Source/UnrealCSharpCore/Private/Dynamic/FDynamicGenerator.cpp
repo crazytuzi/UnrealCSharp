@@ -146,7 +146,7 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& InFileChangeDat
 			{
 				if (IFileManager::Get().FileExists(*File))
 				{
-					switch (MonoClass* Class; GetDynamicType(File, Class))
+					switch (FClassReflection* Class; GetDynamicType(File, Class))
 					{
 					case EDynamicType::Class:
 						{
@@ -188,7 +188,7 @@ bool FDynamicGenerator::IsFullGenerator()
 	return bIsFullGenerator;
 }
 
-EDynamicType FDynamicGenerator::GetDynamicType(const FString& InFile, MonoClass*& OutMonoClass)
+EDynamicType FDynamicGenerator::GetDynamicType(const FString& InFile, FClassReflection*& OutClass)
 {
 	for (auto const& [Name, File] : CodeAnalysisDynamicFilesMap)
 	{
@@ -196,7 +196,8 @@ EDynamicType FDynamicGenerator::GetDynamicType(const FString& InFile, MonoClass*
 		{
 			if (auto Index = 0; Name.FindLastChar(TEXT('.'), Index))
 			{
-				OutMonoClass = FMonoDomain::Class_From_Name(Name.Left(Index), Name.Right(Name.Len() - Index - 1));
+				OutClass = FReflectionRegistry::Get().GetClass(
+					Name.Left(Index), Name.Right(Name.Len() - Index - 1));
 
 				return FDynamicGeneratorCore::GetDynamicType(Name);
 			}

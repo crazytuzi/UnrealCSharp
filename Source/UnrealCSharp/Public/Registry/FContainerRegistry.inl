@@ -35,9 +35,9 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 	}
 
 	static auto AddReference(Class* InRegistry, typename FContainerValueMapping::ValueType InValue,
-	                         MonoObject* InMonoObject)
+	                         const FClassReflection* InClass, MonoObject* InMonoObject)
 	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InClass, InMonoObject, true);
 
 		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
 
@@ -46,9 +46,10 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 
 	static auto AddReference(Class* InRegistry, const FGarbageCollectionHandle& InOwner,
 	                         const typename FContainerValueMapping::FAddressType InAddress,
-	                         typename FContainerValueMapping::ValueType InValue, MonoObject* InMonoObject)
+	                         typename FContainerValueMapping::ValueType InValue,
+	                         FClassReflection* InClass, MonoObject* InMonoObject)
 	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
+		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InClass, InMonoObject, true);
 
 		(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
 

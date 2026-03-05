@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
 namespace Script.Library
@@ -7,7 +8,7 @@ namespace Script.Library
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TScriptInterface_RegisterImplementation<T>(TScriptInterface<T> InScriptInterface,
-            nint InObject) where T : IInterface;
+            nint InObject, Type InType) where T : IInterface;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool TScriptInterface_IdenticalImplementation(nint InA, nint InB);

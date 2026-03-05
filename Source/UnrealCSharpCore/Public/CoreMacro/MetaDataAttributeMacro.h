@@ -1,5 +1,11 @@
 #pragma once
 
+#define CLASS_HIDE_CATEGORIES_ATTRIBUTE FString(TEXT("HideCategoriesAttribute"))
+
+#define CLASS_CONVERSION_ROOT_ATTRIBUTE FString(TEXT("ConversionRootAttribute"))
+
+#define CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE FString(TEXT("CannotImplementInterfaceInBlueprintAttribute"))
+
 #define CLASS_TOOLTIP_ATTRIBUTE FString(TEXT("ToolTipAttribute"))
 
 #define CLASS_SHORT_TOOLTIP_ATTRIBUTE FString(TEXT("ShortTooltipAttribute"))
@@ -97,6 +103,8 @@
 #define CLASS_EDIT_CONDITION_HIDES_ATTRIBUTE FString(TEXT("EditConditionHidesAttribute"))
 
 #define CLASS_EDIT_FIXED_ORDER_ATTRIBUTE FString(TEXT("EditFixedOrderAttribute"))
+
+#define CLASS_CATEGORY_ATTRIBUTE FString(TEXT("CategoryAttribute"))
 
 #define CLASS_EXACT_CLASS_ATTRIBUTE FString(TEXT("ExactClassAttribute"))
 
@@ -208,6 +216,8 @@
 
 #define CLASS_CUSTOMIZE_PROPERTY_ATTRIBUTE FString(TEXT("CustomizePropertyAttribute"))
 
+#define CLASS_CALL_IN_EDITOR_ATTRIBUTE FString(TEXT("CallInEditorAttribute"))
+
 #define CLASS_VARIADIC_ATTRIBUTE FString(TEXT("VariadicAttribute"))
 
 #define CLASS_RETURN_DISPLAY_NAME_ATTRIBUTE FString(TEXT("ReturnDisplayNameAttribute"))
@@ -225,6 +235,8 @@
 #define CLASS_AUTO_CREATE_REF_TERM_ATTRIBUTE FString(TEXT("AutoCreateRefTermAttribute"))
 
 #define CLASS_HIDE_ASSET_PICKER_ATTRIBUTE FString(TEXT("HideAssetPickerAttribute"))
+
+#define CLASS_BLUEPRINT_INTERNAL_USE_ONLY_ATTRIBUTE FString(TEXT("BlueprintInternalUseOnlyAttribute"))
 
 #define CLASS_BLUEPRINT_PROTECTED_ATTRIBUTE FString(TEXT("BlueprintProtectedAttribute"))
 

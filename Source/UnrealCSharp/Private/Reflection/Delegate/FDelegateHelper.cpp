@@ -39,11 +39,11 @@ void FDelegateHelper::Deinitialize()
 	}
 }
 
-void FDelegateHelper::Bind(UObject* InObject, MonoMethod* InMonoMethod) const
+void FDelegateHelper::Bind(UObject* InObject, FMethodReflection* InMethod) const
 {
 	if (DelegateHandler != nullptr)
 	{
-		DelegateHandler->Bind(InObject, InMonoMethod);
+		DelegateHandler->Bind(InObject, InMethod);
 	}
 }
 

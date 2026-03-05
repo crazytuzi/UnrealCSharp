@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Script.Library
@@ -6,14 +7,14 @@ namespace Script.Library
     public static unsafe class FDelegateImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_RegisterImplementation(object InMonoObject);
+        public static extern void FDelegate_RegisterImplementation(object InMonoObject, Type InType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FDelegate_UnRegisterImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_BindImplementation<T>(nint InMonoObject, nint InObject, T InDelegate)
-            where T : Delegate;
+        public static extern void FDelegate_BindImplementation(nint InMonoObject,
+            nint InObject, Type InType, MethodInfo InMethodInfo);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool FDelegate_IsBoundImplementation(nint InMonoObject);

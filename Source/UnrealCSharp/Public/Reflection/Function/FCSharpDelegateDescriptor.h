@@ -3,7 +3,6 @@
 #include "CoreMacro/BufferMacro.h"
 #include "FFunctionDescriptor.h"
 #include "Common/EFunctionReturnType.h"
-#include "mono/metadata/object.h"
 
 class FCSharpDelegateDescriptor final : public FFunctionDescriptor
 {
@@ -14,7 +13,7 @@ public:
 	explicit FCSharpDelegateDescriptor(UFunction* InFunction);
 
 public:
-	bool CallDelegate(const UObject* InObject, MonoMethod* InMethod, void* InParams);
+	bool CallDelegate(const UObject* InObject, const FMethodReflection* InMethod, void* InParams);
 
 	template <auto ReturnType = EFunctionReturnType::Void>
 	void Execute0(const FScriptDelegate* InScriptDelegate) const;

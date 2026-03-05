@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Reflection/FReflectionRegistry.h"
+
 bool operator==(const FStructAddressBase& A, const FStructAddressBase& B)
 {
 	return A.Value == B.Value && A.Address == B.Address;
@@ -13,7 +15,8 @@ uint32 GetTypeHash(const FStructAddressBase& InStructAddressBase)
 template <auto IsNeedFree>
 auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject)
 {
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InMonoObject, true);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(
+		FReflectionRegistry::Get().GetClass(InScriptStruct), InMonoObject, true);
 
 	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
 		                                          InScriptStruct,

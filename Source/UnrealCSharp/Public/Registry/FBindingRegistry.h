@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "TValueMapping.inl"
+#include "Reflection/FClassReflection.h"
 
 class UNREALCSHARP_API FBindingRegistry
 {
@@ -76,10 +77,11 @@ public:
 
 public:
 	template <typename T, auto IsNeedFree>
-	auto AddReference(const T* InObject, MonoObject* InMonoObject);
+	auto AddReference(const T* InObject, FClassReflection* InClass, MonoObject* InMonoObject);
 
 	template <typename T>
-	auto AddReference(const FGarbageCollectionHandle& InOwner, const T* InObject, MonoObject* InMonoObject);
+	auto AddReference(const FGarbageCollectionHandle& InOwner, const T* InObject,
+	                  FClassReflection* InClass, MonoObject* InMonoObject);
 
 	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
 

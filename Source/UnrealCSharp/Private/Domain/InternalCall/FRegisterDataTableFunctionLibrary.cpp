@@ -23,21 +23,18 @@ namespace
 				{
 					FCSharpEnvironment::GetEnvironment().Bind<false>(DataTable->RowStruct.Get());
 
-					if (const auto ClassDescriptor = FCSharpEnvironment::GetEnvironment().GetClassDescriptor(
-						DataTable->RowStruct.Get()))
-					{
-						*OutRow = FCSharpEnvironment::GetEnvironment().GetDomain()->
-						                                               Object_Init(ClassDescriptor->GetMonoClass());
+					const auto Class = FReflectionRegistry::Get().GetClass(DataTable->RowStruct);
 
-						const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
+					*OutRow = Class->InitObject();
 
-						const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct<>(
-							*FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(*OutRow));
+					const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
 
-						DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
+					const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct<>(
+						*FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(Class, *OutRow));
 
-						return true;
-					}
+					DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
+
+					return true;
 				}
 			}
 

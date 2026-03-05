@@ -1,6 +1,5 @@
 ﻿#include "Registry/FClassRegistry.h"
 #include "Domain/FDomain.h"
-#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/AccessPrivateMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Environment/FCSharpEnvironment.h"
@@ -96,27 +95,7 @@ FClassDescriptor* FClassRegistry::AddClassDescriptor(UStruct* InStruct)
 		return *FoundClassDescriptor;
 	}
 
-	MonoClass* FoundMonoClass{};
-
-	if (const auto InClass = Cast<UClass>(InStruct))
-	{
-		FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InClass),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InClass));
-	}
-	else if (const auto InScriptStruct = Cast<UScriptStruct>(InStruct))
-	{
-		FoundMonoClass = FCSharpEnvironment::GetEnvironment().GetDomain()->Class_From_Name(
-			FUnrealCSharpFunctionLibrary::GetClassNameSpace(InScriptStruct),
-			FUnrealCSharpFunctionLibrary::GetFullClass(InScriptStruct));
-	}
-
-	if (FoundMonoClass == nullptr)
-	{
-		return nullptr;
-	}
-
-	const auto ClassDescriptor = new FClassDescriptor(InStruct, FoundMonoClass);
+	const auto ClassDescriptor = new FClassDescriptor(InStruct);
 
 	ClassDescriptorMap.Add(InStruct, ClassDescriptor);
 
@@ -229,10 +208,11 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 
 	if (IsInGameThread())
 	{
-		if (FMonoDomain::bLoadSucceed)
+		if (FDomain::IsLoadSucceed())
 		{
-			if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(
-				InObjectInitializer.GetObj()))
+			const auto Object = InObjectInitializer.GetObj();
+
+			if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(Object))
 			{
 				auto& ObjectInitializer = FObjectInitializer::Get();
 
@@ -240,7 +220,10 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 
 				ObjectInitializer.*TAccessPrivate<FObjectInitializer_bIsDeferredInitializer>::Value = true;
 
-				FDomain::Object_Constructor(FoundMonoObject);
+				if (const auto FoundClass = FReflectionRegistry::Get().GetClass(Object->GetClass()))
+				{
+					FoundClass->ConstructorObject(FoundMonoObject);
+				}
 			}
 		}
 	}

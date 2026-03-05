@@ -1,6 +1,7 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
+#include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
@@ -10,9 +11,11 @@ namespace
 {
 	struct FRegisterMulticastDelegate
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject)
+		static void RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 		{
-			FCSharpBind::Bind<FMulticastDelegateHelper>(InMonoObject);
+			const auto Class = FReflectionRegistry::Get().GetClass(InReflectionType);
+
+			FCSharpBind::Bind<FMulticastDelegateHelper>(Class, InMonoObject);
 		}
 
 		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
@@ -36,16 +39,22 @@ namespace
 		}
 
 		static bool ContainsImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                   const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
+		                                   const FGarbageCollectionHandle InObject,
+		                                   MonoReflectionType* InReflectionType,
+		                                   MonoReflectionMethod* InReflectionMethod)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					return MulticastDelegateHelper->Contains(FoundObject,
-					                                         FCSharpEnvironment::GetEnvironment().GetDomain()->
-					                                         Delegate_Get_Method(InDelegate));
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InReflectionType))
+					{
+						if (const auto FoundMethod = FoundClass->GetMethod(InReflectionMethod))
+						{
+							return MulticastDelegateHelper->Contains(FoundObject, FoundMethod);
+						}
+					}
 				}
 			}
 
@@ -53,46 +62,62 @@ namespace
 		}
 
 		static void AddImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
+		                              const FGarbageCollectionHandle InObject, MonoReflectionType* InReflectionType,
+		                              MonoReflectionMethod* InReflectionMethod)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					MulticastDelegateHelper->Add(FoundObject,
-					                             FCSharpEnvironment::GetEnvironment().GetDomain()->
-					                             Delegate_Get_Method(InDelegate));
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InReflectionType))
+					{
+						if (const auto FoundMethod = FoundClass->GetMethod(InReflectionMethod))
+						{
+							MulticastDelegateHelper->Add(FoundObject, FoundMethod);
+						}
+					}
 				}
 			}
 		}
 
 		static void AddUniqueImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                    const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
+		                                    const FGarbageCollectionHandle InObject,
+		                                    MonoReflectionType* InReflectionType,
+		                                    MonoReflectionMethod* InReflectionMethod)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					MulticastDelegateHelper->AddUnique(FoundObject,
-					                                   FCSharpEnvironment::GetEnvironment().GetDomain()->
-					                                   Delegate_Get_Method(InDelegate));
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InReflectionType))
+					{
+						if (const auto FoundMethod = FoundClass->GetMethod(InReflectionMethod))
+						{
+							MulticastDelegateHelper->AddUnique(FoundObject, FoundMethod);
+						}
+					}
 				}
 			}
 		}
 
 		static void RemoveImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                                 const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
+		                                 const FGarbageCollectionHandle InObject, MonoReflectionType* InReflectionType,
+		                                 MonoReflectionMethod* InReflectionMethod)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InGarbageCollectionHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					MulticastDelegateHelper->Remove(FoundObject,
-					                                FCSharpEnvironment::GetEnvironment().GetDomain()->
-					                                Delegate_Get_Method(InDelegate));
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InReflectionType))
+					{
+						if (const auto FoundMethod = FoundClass->GetMethod(InReflectionMethod))
+						{
+							MulticastDelegateHelper->Remove(FoundObject, FoundMethod);
+						}
+					}
 				}
 			}
 		}

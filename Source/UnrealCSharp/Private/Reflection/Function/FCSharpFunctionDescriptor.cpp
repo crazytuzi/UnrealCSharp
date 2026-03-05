@@ -1,15 +1,17 @@
 ﻿#include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reflection/FReflectionRegistry.h"
 
 FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
                                                      FCSharpFunctionRegister&& InFunctionRegister):
 	Super(InFunction,
 	      FFunctionParamBufferAllocatorFactory::Factory<FFunctionParamPoolBufferAllocator>(InFunction)),
-	FunctionRegister(std::move(InFunctionRegister)),
-	Method(FCSharpEnvironment::GetEnvironment().GetDomain()->Parent_Class_Get_Method_From_Name(
-		FCSharpEnvironment::GetEnvironment().GetClassDescriptor(InFunction->GetOwnerClass())->GetMonoClass(),
-		InFunction->GetName(), PropertyDescriptors.Num()))
+	FunctionRegister(std::move(InFunctionRegister))
 {
+	if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InFunction->GetOwnerClass()))
+	{
+		Method = FoundClass->GetParentMethod(InFunction->GetName(), PropertyDescriptors.Num());
+	}
 }
 
 bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, RESULT_DECL)
@@ -77,8 +79,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 
 	auto OutParams = NewOutParams != nullptr ? NewOutParams : InStack.OutParms;
 
-	const auto CSharpParams = FCSharpEnvironment::GetEnvironment().GetDomain()->Array_New(
-		FCSharpEnvironment::GetEnvironment().GetDomain()->Get_Object_Class(), PropertyDescriptors.Num());
+	const auto CSharpParams = FReflectionRegistry::Get().GetObjectClass()->NewArray(PropertyDescriptors.Num());
 
 	auto ReferenceParam = OutParams;
 
@@ -114,14 +115,12 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 		                             ? nullptr
 		                             : FCSharpEnvironment::GetEnvironment().GetObject(InContext);
 
-	if (const auto ReturnValue = FCSharpEnvironment::GetEnvironment().GetDomain()->Runtime_Invoke_Array(
-			Method, FoundMonoObject, CSharpParams);
+	if (const auto ReturnValue = Method->Runtime_Invoke_Array(FoundMonoObject, CSharpParams);
 		ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
 	{
 		if (ReturnPropertyDescriptor->IsPrimitiveProperty())
 		{
-			if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-				Object_Unbox(ReturnValue))
+			if (const auto UnBoxResultValue = FDomain::Object_Unbox(ReturnValue))
 			{
 				ReturnPropertyDescriptor->Set(UnBoxResultValue, RESULT_PARAM);
 			}
@@ -129,7 +128,8 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 		else
 		{
 			ReturnPropertyDescriptor->Set(
-				FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(ReturnValue),
+				FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+					ReturnPropertyDescriptor->GetClass(), ReturnValue),
 				RESULT_PARAM);
 		}
 	}
@@ -144,8 +144,8 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 			{
 				if (OutPropertyDescriptor->IsPrimitiveProperty())
 				{
-					if (const auto UnBoxResultValue = FCSharpEnvironment::GetEnvironment().GetDomain()->
-						Object_Unbox(FDomain::Array_Get<MonoObject*>(CSharpParams, Index)))
+					if (const auto UnBoxResultValue = FDomain::Object_Unbox(
+						FDomain::Array_Get<MonoObject*>(CSharpParams, Index)))
 					{
 						OutPropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
 					}
@@ -154,6 +154,7 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 				{
 					OutPropertyDescriptor->Set(
 						FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+							OutPropertyDescriptor->GetClass(),
 							FDomain::Array_Get<MonoObject*>(CSharpParams, Index)),
 						OutParams->PropAddr);
 				}

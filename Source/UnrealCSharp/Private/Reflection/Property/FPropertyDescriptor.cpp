@@ -194,3 +194,8 @@ bool FPropertyDescriptor::IsPrimitiveProperty() const
 {
 	return false;
 }
+
+FClassReflection* FPropertyDescriptor::GetClass() const
+{
+	return nullptr;
+}

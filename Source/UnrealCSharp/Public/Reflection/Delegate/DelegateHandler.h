@@ -29,7 +29,7 @@ public:
 	void Deinitialize();
 
 public:
-	void Bind(UObject* InObject, MonoMethod* InMonoMethod);
+	void Bind(UObject* InObject, FMethodReflection* InMethod);
 
 	bool IsBound() const;
 

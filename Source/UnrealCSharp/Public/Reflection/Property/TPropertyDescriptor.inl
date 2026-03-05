@@ -2,7 +2,6 @@
 
 #include "Reflection/Property/FPropertyDescriptor.h"
 #include "Bridge/FTypeBridge.h"
-#include "mono/metadata/details/object-types.h"
 
 template <typename T, auto IsPrimitive>
 class TPropertyDescriptor : public FPropertyDescriptor
@@ -10,7 +9,7 @@ class TPropertyDescriptor : public FPropertyDescriptor
 public:
 	explicit TPropertyDescriptor(T* InProperty):
 		Property(InProperty),
-		Class(FTypeBridge::GetMonoClass(InProperty))
+		Class(FTypeBridge::GetClass(InProperty))
 	{
 	}
 
@@ -36,8 +35,13 @@ public:
 		return IsPrimitive;
 	}
 
-protected:
-	T* Property;
+	virtual auto GetClass() const -> FClassReflection* override
+	{
+		return Class;
+	}
 
-	MonoClass* Class;
+protected:
+	T* Property{};
+
+	FClassReflection* Class{};
 };

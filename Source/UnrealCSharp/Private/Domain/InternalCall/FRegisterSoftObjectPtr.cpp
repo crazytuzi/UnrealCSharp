@@ -1,5 +1,6 @@
 ﻿#include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 
@@ -7,14 +8,17 @@ namespace
 {
 	struct FRegisterSoftObjectPtr
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InObject)
+		static void RegisterImplementation(MonoObject* InMonoObject, const FGarbageCollectionHandle InObject,
+		                                   MonoReflectionType* InReflectionType)
 		{
 			const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
 			const auto SoftObjectPtr = new TSoftObjectPtr<UObject>(FoundObject);
 
+			const auto Class = FReflectionRegistry::Get().GetClass(InReflectionType);
+
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftObjectPtr<UObject>, true, false>(
-				InMonoObject, SoftObjectPtr);
+				Class, InMonoObject, SoftObjectPtr);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)

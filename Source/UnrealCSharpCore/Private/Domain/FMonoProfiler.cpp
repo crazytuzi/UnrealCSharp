@@ -1,6 +1,6 @@
 ﻿#include "Domain/FMonoProfiler.h"
 #if UE_TRACE_ENABLED
-#include "Domain/FMonoDomain.h"
+#include "mono/metadata/class.h"
 
 MonoProfilerHandle FMonoProfiler::ProfilerHandle = nullptr;
 
@@ -30,17 +30,17 @@ void FMonoProfiler::Register()
 void FMonoProfiler::Method_Enter(MonoProfiler* InMonoProfiler, MonoMethod* InMonoMethod,
                                  MonoProfilerCallContext* InMonoProfilerCallContext)
 {
-	const auto MethodClass = FMonoDomain::Method_Get_Class(InMonoMethod);
+	const auto MethodClass = mono_method_get_class(InMonoMethod);
 
-	const auto MethodNamespace = FString(FMonoDomain::Class_Get_Namespace(MethodClass));
+	const auto MethodNamespace = FString(mono_class_get_namespace(MethodClass));
 
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(MethodClass));
+	const auto ClassName = FString(mono_class_get_name(MethodClass));
 
-	const auto MethodName = FString(FMonoDomain::Method_Get_Name(InMonoMethod));
+	const auto MethodName = FString(mono_method_get_name(InMonoMethod));
 
 	const auto EventName = FString::Printf(TEXT(
-		"[C#] %s.%s.%s"
-	),
+		                                       "[C#] %s.%s.%s"
+	                                       ),
 	                                       *MethodNamespace, *ClassName, *MethodName);
 
 	FCpuProfilerTrace::OutputBeginDynamicEvent(*EventName);

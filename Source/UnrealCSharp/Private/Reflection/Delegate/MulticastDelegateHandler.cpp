@@ -1,7 +1,6 @@
 ﻿#include "Reflection/Delegate/MulticastDelegateHandler.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/FunctionMacro.h"
-#include "Template/TGetArrayLength.inl"
 
 void UMulticastDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)
 {
@@ -68,12 +67,12 @@ bool UMulticastDelegateHandler::IsBound() const
 	return MulticastScriptDelegate != nullptr ? MulticastScriptDelegate->IsBound() : false;
 }
 
-bool UMulticastDelegateHandler::Contains(UObject* InObject, MonoMethod* InMonoMethod) const
+bool UMulticastDelegateHandler::Contains(UObject* InObject, FMethodReflection* InMethod) const
 {
-	return DelegateWrappers.Contains(FDelegateWrapper{InObject, InMonoMethod});
+	return DelegateWrappers.Contains(FDelegateWrapper{InObject, InMethod});
 }
 
-void UMulticastDelegateHandler::Add(UObject* InObject, MonoMethod* InMonoMethod)
+void UMulticastDelegateHandler::Add(UObject* InObject, FMethodReflection* InMethod)
 {
 	if (MulticastScriptDelegate != nullptr)
 	{
@@ -87,10 +86,10 @@ void UMulticastDelegateHandler::Add(UObject* InObject, MonoMethod* InMonoMethod)
 		}
 	}
 
-	DelegateWrappers.Add({InObject, InMonoMethod});
+	DelegateWrappers.Add({InObject, InMethod});
 }
 
-void UMulticastDelegateHandler::AddUnique(UObject* InObject, MonoMethod* InMonoMethod)
+void UMulticastDelegateHandler::AddUnique(UObject* InObject, FMethodReflection* InMethod)
 {
 	if (MulticastScriptDelegate != nullptr)
 	{
@@ -104,12 +103,12 @@ void UMulticastDelegateHandler::AddUnique(UObject* InObject, MonoMethod* InMonoM
 		}
 	}
 
-	DelegateWrappers.AddUnique({InObject, InMonoMethod});
+	DelegateWrappers.AddUnique({InObject, InMethod});
 }
 
-void UMulticastDelegateHandler::Remove(UObject* InObject, MonoMethod* InMonoMethod)
+void UMulticastDelegateHandler::Remove(UObject* InObject, FMethodReflection* InMethod)
 {
-	DelegateWrappers.Remove({InObject, InMonoMethod});
+	DelegateWrappers.Remove({InObject, InMethod});
 
 	if (DelegateWrappers.IsEmpty())
 	{

@@ -1,11 +1,11 @@
-﻿#include "Reflection/Property/StringProperty/FStrPropertyDescriptor.h"
+#include "Reflection/Property/StringProperty/FStrPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
 void FStrPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(Object, Src);
+	FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(Class, Object, Src);
 
 	*Dest = Object;
 }
@@ -16,9 +16,9 @@ void FStrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 
 	if (Object == nullptr)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		Object = Class->NewObject();
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FString, false, true>(Object, Src);
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FString, false, true>(Class, Object, Src);
 	}
 
 	*Dest = Object;

@@ -11,11 +11,13 @@ namespace
 {
 	struct FRegisterOptional
 	{
-		static void Register1Implementation(MonoObject* InMonoObject)
+		static void Register1Implementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 		{
+			const auto Class = FReflectionRegistry::Get().GetClass(InReflectionType);
+
 			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 
-			const auto ValueProperty = FTypeBridge::Factory(FTypeBridge::GetGenericArgument(InMonoObject),
+			const auto ValueProperty = FTypeBridge::Factory(Class->GetGenericArgument(),
 			                                                OptionalProperty, "",
 			                                                EObjectFlags::RF_Transient);
 
@@ -26,14 +28,17 @@ namespace
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				nullptr, OptionalHelper, InMonoObject);
+				nullptr, OptionalHelper, Class, InMonoObject);
 		}
 
-		static void Register2Implementation(MonoObject* InMonoObject, MonoObject* InValue)
+		static void Register2Implementation(MonoObject* InMonoObject, MonoObject* InValue,
+		                                    MonoReflectionType* InReflectionType)
 		{
+			const auto Class = FReflectionRegistry::Get().GetClass(InReflectionType);
+
 			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 
-			const auto ValueProperty = FTypeBridge::Factory(FTypeBridge::GetGenericArgument(InMonoObject),
+			const auto ValueProperty = FTypeBridge::Factory(Class->GetGenericArgument(),
 			                                                OptionalProperty, "",
 			                                                EObjectFlags::RF_Transient);
 
@@ -44,12 +49,12 @@ namespace
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				nullptr, OptionalHelper, InMonoObject);
+				nullptr, OptionalHelper, Class, InMonoObject);
 
 			OptionalHelper->Set(OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
-				                    ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
-				                    : static_cast<void*>(
-					                    FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
+				                    ? FDomain::Object_Unbox(InValue)
+				                    : static_cast<void*>(FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+					                    Class->GetGenericArgument(), InValue)));
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
@@ -109,15 +114,18 @@ namespace
 		}
 
 		static void SetImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                              MonoObject* InValue)
+		                              MonoObject* InValue, MonoReflectionType* InReflectionType)
 		{
 			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(
 				InGarbageCollectionHandle))
 			{
 				OptionalHelper->Set(OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty()
-					                    ? FCSharpEnvironment::GetEnvironment().GetDomain()->Object_Unbox(InValue)
+					                    ? FDomain::Object_Unbox(InValue)
 					                    : static_cast<void*>(
-						                    FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(InValue)));
+						                    FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
+							                    FReflectionRegistry::Get().
+							                    GetClass(InReflectionType)->GetGenericArgument(),
+							                    InValue)));
 			}
 		}
 

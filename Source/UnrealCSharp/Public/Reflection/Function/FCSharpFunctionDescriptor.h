@@ -2,7 +2,6 @@
 
 #include "FFunctionDescriptor.h"
 #include "FCSharpFunctionRegister.h"
-#include "mono/metadata/object-forward.h"
 
 class FCSharpFunctionDescriptor final : public FFunctionDescriptor
 {
@@ -24,5 +23,5 @@ private:
 private:
 	FCSharpFunctionRegister FunctionRegister;
 
-	MonoMethod* Method;
+	FMethodReflection* Method{};
 };

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Reflection/FClassReflection.h"
+
 class FPropertyDescriptor
 {
 public:
@@ -56,6 +58,8 @@ public:
 	FORCEINLINE bool SameType(const FPropertyDescriptor* Other) const;
 
 	virtual bool IsPrimitiveProperty() const;
+
+	virtual FClassReflection* GetClass() const;
 };
 
 #include "FPropertyDescriptor.inl"

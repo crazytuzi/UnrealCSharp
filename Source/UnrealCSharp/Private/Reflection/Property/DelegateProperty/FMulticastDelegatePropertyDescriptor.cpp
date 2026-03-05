@@ -1,4 +1,4 @@
-﻿#include "Reflection/Property/DelegateProperty/FMulticastDelegatePropertyDescriptor.h"
+#include "Reflection/Property/DelegateProperty/FMulticastDelegatePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
 
@@ -51,13 +51,13 @@ MonoObject* FMulticastDelegatePropertyDescriptor::NewRef(void* InAddress) const
 			const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
 			Property->SignatureFunction);
 
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		Object = Class->NewObject();
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerGarbageCollectionHandle, InAddress,
-		                                                          MulticastDelegateHelper, Object);
+		                                                          MulticastDelegateHelper, Class, Object);
 	}
 
 	return Object;
@@ -69,9 +69,9 @@ MonoObject* FMulticastDelegatePropertyDescriptor::NewWeakRef(void* InAddress) co
 		const_cast<FMulticastScriptDelegate*>(GetMulticastDelegate(InAddress)),
 		Property->SignatureFunction);
 
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(MulticastDelegateHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(MulticastDelegateHelper, Class, Object);
 
 	return Object;
 }

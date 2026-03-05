@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "mono/metadata/object-forward.h"
+#include "Reflection/FMethodReflection.h"
 
 struct FDelegateWrapper
 {
 	TWeakObjectPtr<UObject> Object;
 
-	MonoMethod* Method;
+	FMethodReflection* Method;
 };
 
 static bool operator==(const FDelegateWrapper& A, const FDelegateWrapper& B)

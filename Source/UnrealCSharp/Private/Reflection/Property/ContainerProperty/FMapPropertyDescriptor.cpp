@@ -1,4 +1,4 @@
-﻿#include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
+#include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FMapHelper.h"
 
@@ -35,7 +35,7 @@ MonoObject* FMapPropertyDescriptor::NewRef(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		Object = Class->NewObject();
 
 		const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
 		                                      false, false);
@@ -44,7 +44,7 @@ MonoObject* FMapPropertyDescriptor::NewRef(void* InAddress) const
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerGarbageCollectionHandle, InAddress, MapHelper, Object);
+			OwnerGarbageCollectionHandle, InAddress, MapHelper, Class, Object);
 	}
 
 	return Object;
@@ -52,12 +52,12 @@ MonoObject* FMapPropertyDescriptor::NewRef(void* InAddress) const
 
 MonoObject* FMapPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = Class->NewObject();
 
 	const auto MapHelper = new FMapHelper(Property->KeyProp, Property->ValueProp, InAddress,
 	                                      bIsCopy, false);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Class, Object);
 
 	return Object;
 }

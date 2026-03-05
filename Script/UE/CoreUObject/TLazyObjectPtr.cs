@@ -12,7 +12,8 @@ namespace Script.CoreUObject
             TLazyObjectPtrImplementation.TLazyObjectPtr_UnRegisterImplementation(GarbageCollectionHandle);
 
         public TLazyObjectPtr(T InObject) =>
-            TLazyObjectPtrImplementation.TLazyObjectPtr_RegisterImplementation(this, InObject.GarbageCollectionHandle);
+            TLazyObjectPtrImplementation.TLazyObjectPtr_RegisterImplementation(
+                this, InObject.GarbageCollectionHandle, GetType());
 
         public static implicit operator TLazyObjectPtr<T>(T InObject) => new(InObject);
 

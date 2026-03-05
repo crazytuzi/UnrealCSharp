@@ -1,14 +1,13 @@
 ﻿#pragma once
 
-#include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "UEVersion.h"
 
 template <auto IsSoftReference>
-FProperty* FTypeBridge::Factory(MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
-                                const FName& InName, const EObjectFlags InObjectFlags)
+FProperty* FTypeBridge::Factory(FClassReflection* InClass, const FFieldVariant& InOwner, const FName& InName,
+                                const EObjectFlags InObjectFlags)
 {
-	switch (const auto PropertyType = GetPropertyType(InReflectionType); PropertyType)
+	switch (const auto PropertyType = GetPropertyType(InClass); PropertyType)
 	{
 	case EPropertyTypeExtent::Byte: return new FByteProperty(InOwner, InName, InObjectFlags);
 
@@ -32,34 +31,34 @@ FProperty* FTypeBridge::Factory(MonoReflectionType* InReflectionType, const FFie
 
 	case EPropertyTypeExtent::ClassReference:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::SubclassOfReference:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::ObjectReference:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::Name: return new FNameProperty(InOwner, InName, InObjectFlags);
 
 	case EPropertyTypeExtent::Interface:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::Struct:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::Enum:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::String: return new FStrProperty(InOwner, InName, InObjectFlags);
@@ -76,39 +75,39 @@ FProperty* FTypeBridge::Factory(MonoReflectionType* InReflectionType, const FFie
 
 	case EPropertyTypeExtent::WeakObjectReference:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::LazyObjectReference:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::SoftClassReference:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::SoftObjectReference:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::Double: return new FDoubleProperty(InOwner, InName, InObjectFlags);
 
 	case EPropertyTypeExtent::Map:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::Set:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	case EPropertyTypeExtent::Array:
 		{
-			return ManagedFactory<IsSoftReference>(PropertyType, InReflectionType, InOwner, InName, InObjectFlags);
+			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
 	default: return nullptr;
@@ -143,16 +142,14 @@ void SetClass(const FString& InPathName, const TFunction<void()>& InSetClass)
 }
 
 template <auto IsSoftReference>
-FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
-                                       MonoReflectionType* InReflectionType, const FFieldVariant& InOwner,
-                                       const FName& InName, const EObjectFlags InObjectFlags)
+FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClassReflection* InClass,
+                                       const FFieldVariant& InOwner, const FName& InName,
+                                       const EObjectFlags InObjectFlags)
 {
 	switch (InPropertyType)
 	{
 	case EPropertyTypeExtent::ClassReference:
 		{
-			const auto PathName = GetGenericPathName(InReflectionType);
-
 			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
 
 			ClassProperty->PropertyClass = UObject::StaticClass();
@@ -164,7 +161,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::SubclassOfReference:
 		{
-			const auto PathName = GetGenericPathName(InReflectionType);
+			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
 			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
 
@@ -184,7 +181,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::ObjectReference:
 		{
-			const auto PathName = GetPathName(InReflectionType);
+			const auto PathName = InClass->GetPathName();
 
 			const auto ObjectProperty = new FObjectProperty(InOwner, InName, InObjectFlags);
 
@@ -200,7 +197,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::Interface:
 		{
-			const auto PathName = GetGenericPathName(InReflectionType);
+			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
 			const auto InterfaceProperty = new FInterfaceProperty(InOwner, InName, InObjectFlags);
 
@@ -216,7 +213,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::Struct:
 		{
-			const auto PathName = GetPathName(InReflectionType);
+			const auto PathName = InClass->GetPathName();
 
 			const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *PathName);
 
@@ -237,10 +234,12 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 		{
 			const auto MapProperty = new FMapProperty(InOwner, InName, InObjectFlags);
 
-			MapProperty->KeyProp = Factory<IsSoftReference>(GetGenericArgument(InReflectionType), MapProperty, "",
+			MapProperty->KeyProp = Factory<IsSoftReference>(InClass->GetGenericArgument(),
+			                                                MapProperty, "",
 			                                                EObjectFlags::RF_Transient);
 
-			MapProperty->ValueProp = Factory<IsSoftReference>(GetGenericArgument(InReflectionType, 1), MapProperty, "",
+			MapProperty->ValueProp = Factory<IsSoftReference>(InClass->GetGenericArgument(1),
+			                                                  MapProperty, "",
 			                                                  EObjectFlags::RF_Transient);
 
 			return MapProperty;
@@ -250,7 +249,8 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 		{
 			const auto SetProperty = new FSetProperty(InOwner, InName, InObjectFlags);
 
-			SetProperty->ElementProp = Factory<IsSoftReference>(GetGenericArgument(InReflectionType), SetProperty, "",
+			SetProperty->ElementProp = Factory<IsSoftReference>(InClass->GetGenericArgument(),
+			                                                    SetProperty, "",
 			                                                    EObjectFlags::RF_Transient);
 
 			return SetProperty;
@@ -260,7 +260,8 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 		{
 			const auto ArrayProperty = new FArrayProperty(InOwner, InName, InObjectFlags);
 
-			ArrayProperty->Inner = Factory<IsSoftReference>(GetGenericArgument(InReflectionType), ArrayProperty, "",
+			ArrayProperty->Inner = Factory<IsSoftReference>(InClass->GetGenericArgument(),
+			                                                ArrayProperty, "",
 			                                                EObjectFlags::RF_Transient);
 
 			return ArrayProperty;
@@ -268,23 +269,14 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::Enum:
 		{
-			const auto PathName = GetPathName(InReflectionType);
+			const auto PathName = InClass->GetPathName();
 
 			const auto InEnum = LoadObject<UEnum>(nullptr, *PathName);
 
 			const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
 
-			const auto InType = FMonoDomain::Reflection_Type_Get_Type(
-				GetType(InReflectionType));
-
-			const auto UnderlyingType = FMonoDomain::
-				Type_Get_Underlying_Type(InType);
-
-			const auto UnderlyingReflectionType = FMonoDomain::Type_Get_Object(
-				UnderlyingType);
-
-			const auto UnderlyingProperty = Factory(UnderlyingReflectionType, EnumProperty, "",
-			                                        EObjectFlags::RF_NoFlags);
+			const auto UnderlyingProperty = Factory(InClass->GetUnderlyingType(),
+			                                        EnumProperty, "", EObjectFlags::RF_NoFlags);
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE && UE_F_PROPERTY_GET_ELEMENT_SIZE
 			EnumProperty->SetElementSize(UnderlyingProperty->GetElementSize());
@@ -301,7 +293,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::WeakObjectReference:
 		{
-			const auto PathName = GetGenericPathName(InReflectionType);
+			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
 			const auto WeakObjectProperty = new FWeakObjectProperty(InOwner, InName, InObjectFlags);
 
@@ -317,7 +309,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::LazyObjectReference:
 		{
-			const auto PathName = GetGenericPathName(InReflectionType);
+			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
 			const auto LazyObjectProperty = new FLazyObjectProperty(InOwner, InName, InObjectFlags);
 
@@ -333,7 +325,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::SoftClassReference:
 		{
-			const auto PathName = GetGenericPathName(InReflectionType);
+			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
 			const auto SoftClassProperty = new FSoftClassProperty(InOwner, InName, InObjectFlags);
 
@@ -351,7 +343,7 @@ FProperty* FTypeBridge::ManagedFactory(const EPropertyTypeExtent InPropertyType,
 
 	case EPropertyTypeExtent::SoftObjectReference:
 		{
-			const auto PathName = GetGenericPathName(InReflectionType);
+			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
 			const auto SoftObjectProperty = new FSoftObjectProperty(InOwner, InName, InObjectFlags);
 

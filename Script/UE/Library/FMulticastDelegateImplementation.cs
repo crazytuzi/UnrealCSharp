@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Script.Library
@@ -6,7 +7,7 @@ namespace Script.Library
     public static unsafe class FMulticastDelegateImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_RegisterImplementation(object InMonoObject);
+        public static extern void FMulticastDelegate_RegisterImplementation(object InMonoObject, Type InType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FMulticastDelegate_UnRegisterImplementation(nint InMonoObject);
@@ -15,20 +16,20 @@ namespace Script.Library
         public static extern bool FMulticastDelegate_IsBoundImplementation(nint InMonoObject);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FMulticastDelegate_ContainsImplementation<T>(nint InMonoObject, nint InObject,
-            T InMulticastDelegate) where T : Delegate;
+        public static extern bool FMulticastDelegate_ContainsImplementation(nint InMonoObject, nint InObject,
+            Type InType, MethodInfo InMethodInfo);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_AddImplementation<T>(nint InMonoObject, nint InObject,
-            T InMulticastDelegate) where T : Delegate;
+        public static extern void FMulticastDelegate_AddImplementation(nint InMonoObject, nint InObject,
+            Type InType, MethodInfo InMethodInfo);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_AddUniqueImplementation<T>(nint InMonoObject, nint InObject,
-            T InMulticastDelegate) where T : Delegate;
+        public static extern void FMulticastDelegate_AddUniqueImplementation(nint InMonoObject, nint InObject,
+            Type InType, MethodInfo InMethodInfo);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_RemoveImplementation<T>(nint InMonoObject, nint InObject,
-            T InMulticastDelegate) where T : Delegate;
+        public static extern void FMulticastDelegate_RemoveImplementation(nint InMonoObject, nint InObject,
+            Type InType, MethodInfo InMethodInfo);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FMulticastDelegate_RemoveAllImplementation(nint InMonoObject, nint InObject);

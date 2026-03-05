@@ -12,8 +12,8 @@ namespace Script.CoreUObject
             TScriptInterfaceImplementation.TScriptInterface_UnRegisterImplementation(GarbageCollectionHandle);
 
         public TScriptInterface(T InObject) =>
-            TScriptInterfaceImplementation.TScriptInterface_RegisterImplementation(this,
-                (InObject as UObject)!.GarbageCollectionHandle);
+            TScriptInterfaceImplementation.TScriptInterface_RegisterImplementation(
+                this, (InObject as UObject)!.GarbageCollectionHandle, GetType());
 
         public static implicit operator TScriptInterface<T>(T InObject) => new(InObject);
 

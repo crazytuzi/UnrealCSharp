@@ -5,9 +5,10 @@ namespace Script.CoreUObject
 {
     public class TOptional<T> : IGarbageCollectionHandle
     {
-        public TOptional() => TOptionalImplementation.TOptional_Register1Implementation(this);
+        public TOptional() => TOptionalImplementation.TOptional_Register1Implementation(this, GetType());
 
-        public TOptional(T InObject) => TOptionalImplementation.TOptional_Register2Implementation(this, InObject);
+        public TOptional(T InObject) =>
+            TOptionalImplementation.TOptional_Register2Implementation(this, InObject, GetType());
 
         ~TOptional() => TOptionalImplementation.TOptional_UnRegisterImplementation(GarbageCollectionHandle);
 
@@ -42,7 +43,7 @@ namespace Script.CoreUObject
         public T Get() => (T)TOptionalImplementation.TOptional_GetImplementation(GarbageCollectionHandle);
 
         public void Set(T InValue) =>
-            TOptionalImplementation.TOptional_SetImplementation(GarbageCollectionHandle, InValue);
+            TOptionalImplementation.TOptional_SetImplementation(GarbageCollectionHandle, InValue, GetType());
 
         public nint GarbageCollectionHandle { get; set; }
     }

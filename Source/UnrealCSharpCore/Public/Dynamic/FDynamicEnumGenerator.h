@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mono/metadata/object.h"
+#include "Reflection/FClassReflection.h"
 
 class FDynamicEnumGenerator
 {
@@ -9,11 +9,9 @@ public:
 
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
-
-	static bool IsDynamicEnum(MonoClass* InMonoClass);
 #endif
 
-	static void Generator(MonoClass* InMonoClass);
+	static void Generator(FClassReflection* InClassReflection);
 
 	static bool IsDynamicEnum(const UEnum* InEnum);
 
@@ -22,7 +20,7 @@ public:
 private:
 	static void BeginGenerator(const UEnum* InEnum);
 
-	static void ProcessGenerator(MonoClass* InMonoClass, UEnum* InEnum);
+	static void ProcessGenerator(FClassReflection* InClassReflection, UEnum* InEnum);
 
 	static void EndGenerator(UEnum* InEnum);
 
@@ -38,7 +36,7 @@ private:
 	static void ReInstance(UEnum* InEnum);
 #endif
 
-	static void GeneratorEnumerator(MonoClass* InMonoClass, UEnum* InEnum);
+	static void GeneratorEnumerator(const FClassReflection* InClassReflection, UEnum* InEnum);
 
 private:
 	static TMap<UEnum*, FString> NamespaceMap;

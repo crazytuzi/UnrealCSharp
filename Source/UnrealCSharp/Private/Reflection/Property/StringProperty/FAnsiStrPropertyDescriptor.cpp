@@ -1,12 +1,12 @@
-﻿#include "Reflection/Property/StringProperty/FAnsiStrPropertyDescriptor.h"
+#include "Reflection/Property/StringProperty/FAnsiStrPropertyDescriptor.h"
 #if UE_F_ANSI_STR_PROPERTY
 #include "Environment/FCSharpEnvironment.h"
 
 void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(Object, Src);
+	FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(Class, Object, Src);
 
 	*Dest = Object;
 }
@@ -17,9 +17,9 @@ void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) co
 
 	if (Object == nullptr)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		Object = Class->NewObject();
 
-		FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, false, true>(Object, Src);
+		FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, false, true>(Class, Object, Src);
 	}
 
 	*Dest = Object;

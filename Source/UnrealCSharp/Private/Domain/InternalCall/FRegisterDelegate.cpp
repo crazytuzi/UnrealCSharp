@@ -2,6 +2,7 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
+#include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
@@ -10,9 +11,11 @@ namespace
 {
 	struct FRegisterDelegate
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject)
+		static void RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 		{
-			FCSharpBind::Bind<FDelegateHelper>(InMonoObject);
+			const auto Class = FReflectionRegistry::Get().GetClass(InReflectionType);
+
+			FCSharpBind::Bind<FDelegateHelper>(Class, InMonoObject);
 		}
 
 		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)
@@ -25,15 +28,21 @@ namespace
 		}
 
 		static void BindImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle,
-		                               const FGarbageCollectionHandle InObject, MonoObject* InDelegate)
+		                               const FGarbageCollectionHandle InObject, MonoReflectionType* InReflectionType,
+		                               MonoReflectionMethod* InReflectionMethod)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InGarbageCollectionHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					DelegateHelper->Bind(FoundObject, FCSharpEnvironment::GetEnvironment().GetDomain()->
-					                     Delegate_Get_Method(InDelegate));
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InReflectionType))
+					{
+						if (const auto FoundMethod = FoundClass->GetMethod(InReflectionMethod))
+						{
+							DelegateHelper->Bind(FoundObject, FoundMethod);
+						}
+					}
 				}
 			}
 		}

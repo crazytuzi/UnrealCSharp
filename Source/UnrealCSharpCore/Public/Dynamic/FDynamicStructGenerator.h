@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Dynamic/DynamicScriptStruct.h"
-#include "mono/metadata/object.h"
+#include "Reflection/FClassReflection.h"
 
 class FDynamicStructGenerator
 {
@@ -10,20 +10,20 @@ public:
 
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
-
-	static bool IsDynamicStruct(MonoClass* InMonoClass);
 #endif
 
-	static void Generator(MonoClass* InMonoClass);
+	static void Generator(FClassReflection* InClassReflection);
 
 	static bool IsDynamicStruct(const UScriptStruct* InScriptStruct);
+
+	static bool IsDynamicStruct(const UField* InField);
 
 	static FString GetNameSpace(const UScriptStruct* InScriptStruct);
 
 private:
 	static void BeginGenerator(UDynamicScriptStruct* InScriptStruct, UScriptStruct* InParentScriptStruct);
 
-	static void ProcessGenerator(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct);
+	static void ProcessGenerator(FClassReflection* InClassReflection, UDynamicScriptStruct* InScriptStruct);
 
 	static void EndGenerator(UDynamicScriptStruct* InScriptStruct);
 
@@ -42,7 +42,7 @@ private:
 	static void ReInstance(UDynamicScriptStruct* InOldScriptStruct, UDynamicScriptStruct* InNewScriptStruct);
 #endif
 
-	static void GeneratorProperty(MonoClass* InMonoClass, UDynamicScriptStruct* InScriptStruct);
+	static void GeneratorProperty(const FClassReflection* InClassReflection, UDynamicScriptStruct* InScriptStruct);
 
 private:
 	static TMap<UDynamicScriptStruct*, FString> NamespaceMap;

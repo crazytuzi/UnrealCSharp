@@ -8,7 +8,7 @@ class FMonoDomainScope
 public:
 	explicit FMonoDomainScope(const TFunction<void()>& InFunction)
 	{
-		if (!FMonoDomain::bLoadSucceed)
+		if (!FMonoDomain::IsLoadSucceed())
 		{
 			FMonoDomain::Initialize({
 				"",
@@ -16,7 +16,7 @@ public:
 			});
 		}
 
-		if (FMonoDomain::bLoadSucceed)
+		if (FMonoDomain::IsLoadSucceed())
 		{
 			InFunction();
 		}
@@ -24,7 +24,7 @@ public:
 
 	~FMonoDomainScope()
 	{
-		if (FMonoDomain::bLoadSucceed)
+		if (FMonoDomain::IsLoadSucceed())
 		{
 			FMonoDomain::Deinitialize();
 		}

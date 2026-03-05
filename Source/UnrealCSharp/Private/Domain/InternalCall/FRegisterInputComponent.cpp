@@ -283,8 +283,7 @@ namespace
 
 			Function->AddToRoot();
 
-			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetDomain(),
-			                                                     FCSharpEnvironment::GetEnvironment().GetRegistry<
+			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetRegistry<
 				                                                     FClassRegistry>()->GetClassDescriptor(InClass),
 			                                                     InClass,
 			                                                     Function

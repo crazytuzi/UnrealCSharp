@@ -9,10 +9,10 @@ namespace
 	{
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
 		{
-			const auto Name = new FName(UTF8_TO_TCHAR(
-				FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InValue)));
+			const auto Name = new FName(UTF8_TO_TCHAR(FDomain::String_To_UTF8(InValue)));
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(InMonoObject, Name);
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(
+				FReflectionRegistry::Get().GetNameClass(), InMonoObject, Name);
 		}
 
 		static bool IdenticalImplementation(const FGarbageCollectionHandle InA, const FGarbageCollectionHandle InB)
@@ -40,16 +40,17 @@ namespace
 		{
 			const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InGarbageCollectionHandle);
 
-			return FCSharpEnvironment::GetEnvironment().GetDomain()->String_New(TCHAR_TO_UTF8(*Name->ToString()));
+			return FDomain::String_New(TCHAR_TO_UTF8(*Name->ToString()));
 		}
 
 		static MonoObject* NAME_NoneImplementation()
 		{
-			const auto FoundMonoClass = TPropertyClass<FName, FName>::Get();
+			const auto FoundClass = TPropertyClass<FName, FName>::Get();
 
-			const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+			const auto Object = FoundClass->NewObject();
 
-			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(Object, new FName(NAME_None));
+			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(
+				FoundClass, Object, new FName(NAME_None));
 
 			return Object;
 		}

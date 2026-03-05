@@ -2,6 +2,18 @@
 
 #define CLASS_OVERRIDE_ATTRIBUTE FString(TEXT("OverrideAttribute"))
 
+#define CLASS_U_CLASS_ATTRIBUTE FString(TEXT("UClassAttribute"))
+
+#define CLASS_U_STRUCT_ATTRIBUTE FString(TEXT("UStructAttribute"))
+
+#define CLASS_U_ENUM_ATTRIBUTE FString(TEXT("UEnumAttribute"))
+
+#define CLASS_U_INTERFACE_ATTRIBUTE FString(TEXT("UInterfaceAttribute"))
+
+#define CLASS_U_PROPERTY_ATTRIBUTE FString(TEXT("UPropertyAttribute"))
+
+#define CLASS_U_FUNCTION_ATTRIBUTE FString(TEXT("UFunctionAttribute"))
+
 #define CLASS_VISIBLE_INSTANCE_ONLY_ATTRIBUTE FString(TEXT("VisibleInstanceOnlyAttribute"))
 
 #define CLASS_BLUEPRINT_CALLABLE_ATTRIBUTE FString(TEXT("BlueprintCallableAttribute"))
@@ -33,7 +45,3 @@
 #define CLASS_EXPERIMENTAL_ATTRIBUTE FString(TEXT("ExperimentalAttribute"))
 
 #define CLASS_EDITOR_CONFIG_ATTRIBUTE FString(TEXT("EditorConfigAttribute"))
-
-#define CLASS_CATEGORY_ATTRIBUTE FString(TEXT("CategoryAttribute"))
-
-#define CLASS_BLUEPRINT_INTERNAL_USE_ONLY_ATTRIBUTE FString(TEXT("BlueprintInternalUseOnlyAttribute"))

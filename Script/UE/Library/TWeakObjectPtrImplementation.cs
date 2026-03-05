@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
 namespace Script.Library
@@ -7,7 +8,7 @@ namespace Script.Library
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TWeakObjectPtr_RegisterImplementation<T>(TWeakObjectPtr<T> InWeakObjectPtr,
-            nint InObject) where T : UObject;
+            nint InObject, Type InType) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool TWeakObjectPtr_IdenticalImplementation(nint InA, nint InB);

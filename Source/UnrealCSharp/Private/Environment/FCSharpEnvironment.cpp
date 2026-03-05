@@ -18,9 +18,7 @@ TMap<int32, struct sigaction> SignalActions;
 
 void SignalHandler(int32 Signal)
 {
-	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
-	       *FString(UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(
-		       FCSharpEnvironment::GetEnvironment().GetDomain()->GetTraceback()))));
+	UE_LOG(LogUnrealCSharp, Error, TEXT("%s"), *FDomain::GetTraceback());
 
 	GLog->Flush();
 
@@ -243,11 +241,6 @@ FCSharpEnvironment& FCSharpEnvironment::GetEnvironment()
 	return Environment;
 }
 
-FDomain* FCSharpEnvironment::GetDomain() const
-{
-	return Domain;
-}
-
 void FCSharpEnvironment::NotifyUObjectCreated(const UObjectBase* Object, int32 Index)
 {
 	if (const auto InObject = static_cast<UObject*>(const_cast<UObjectBase*>(Object)))
@@ -376,7 +369,7 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 	{
 		if (PendingBindObject->HasAnyFlags(EObjectFlags::RF_ClassDefaultObject))
 		{
-			FCSharpBind::BindClassDefaultObject(Domain, PendingBindObject);
+			FCSharpBind::BindClassDefaultObject(PendingBindObject);
 		}
 		else
 		{
@@ -385,14 +378,17 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 
 		if (const auto FoundMonoObject = GetObject(PendingBindObject))
 		{
-			FDomain::Object_Constructor(FoundMonoObject);
+			if (const auto FoundClass = FReflectionRegistry::Get().GetClass(PendingBindObject->GetClass()))
+			{
+				FoundClass->ConstructorObject(FoundMonoObject);
+			}
 		}
 	}
 }
 
 MonoObject* FCSharpEnvironment::Bind(UObject* Object) const
 {
-	return FCSharpBind::Bind(Domain, Object);
+	return FCSharpBind::Bind(Object);
 }
 
 MonoObject* FCSharpEnvironment::Bind(const UObject* Object) const
@@ -402,12 +398,12 @@ MonoObject* FCSharpEnvironment::Bind(const UObject* Object) const
 
 MonoObject* FCSharpEnvironment::Bind(UClass* Class) const
 {
-	return FCSharpBind::Bind(Domain, Class);
+	return FCSharpBind::Bind(Class);
 }
 
 bool FCSharpEnvironment::Bind(MonoObject* InMonoObject, const FName& InStructName) const
 {
-	return FCSharpBind::Bind(Domain, InMonoObject, InStructName);
+	return FCSharpBind::Bind(InMonoObject, InStructName);
 }
 
 FClassDescriptor* FCSharpEnvironment::GetClassDescriptor(const UStruct* InStruct) const
@@ -463,9 +459,10 @@ void FCSharpEnvironment::RemovePropertyDescriptor(const uint32 InPropertyHash) c
 	}
 }
 
-bool FCSharpEnvironment::AddObjectReference(UObject* InObject, MonoObject* InMonoObject) const
+bool FCSharpEnvironment::AddObjectReference(FClassReflection* InClass, UObject* InObject,
+                                            MonoObject* InMonoObject) const
 {
-	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InObject, InMonoObject) : false;
+	return ObjectRegistry != nullptr ? ObjectRegistry->AddReference(InClass, InObject, InMonoObject) : false;
 }
 
 MonoObject* FCSharpEnvironment::GetObject(const UObject* InObject) const

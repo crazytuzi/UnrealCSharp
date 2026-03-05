@@ -10,7 +10,9 @@ FDynamicDependencyGraph& FDynamicDependencyGraph::Get()
 
 void FDynamicDependencyGraph::AddNode(const FNode& InNode)
 {
-	Nodes.Emplace(InNode.Name, InNode);
+	NodeArray.Emplace(InNode);
+
+	NodeMap.Emplace(InNode.Name, NodeArray.Num() - 1);
 }
 
 bool FDynamicDependencyGraph::IsCompleted(const FString& InName)
@@ -21,21 +23,21 @@ bool FDynamicDependencyGraph::IsCompleted(const FString& InName)
 
 	static auto F = STRUCT_PREFIX;
 
-	if (auto FoundNode = Nodes.Find(InName))
+	if (auto FoundNode = NodeMap.Find(InName))
 	{
-		return FoundNode->IsCompleted();
+		return NodeArray[*FoundNode].IsCompleted();
 	}
-	else if (FoundNode = Nodes.Find(A + InName); FoundNode != nullptr)
+	else if (FoundNode = NodeMap.Find(A + InName); FoundNode != nullptr)
 	{
-		return FoundNode->IsCompleted();
+		return NodeArray[*FoundNode].IsCompleted();
 	}
-	else if (FoundNode = Nodes.Find(U + InName); FoundNode != nullptr)
+	else if (FoundNode = NodeMap.Find(U + InName); FoundNode != nullptr)
 	{
-		return FoundNode->IsCompleted();
+		return NodeArray[*FoundNode].IsCompleted();
 	}
-	else if (FoundNode = Nodes.Find(F + InName); FoundNode != nullptr)
+	else if (FoundNode = NodeMap.Find(F + InName); FoundNode != nullptr)
 	{
-		return FoundNode->IsCompleted();
+		return NodeArray[*FoundNode].IsCompleted();
 	}
 
 	return true;
@@ -43,9 +45,9 @@ bool FDynamicDependencyGraph::IsCompleted(const FString& InName)
 
 void FDynamicDependencyGraph::Completed(const FString& InName)
 {
-	if (const auto FoundNode = Nodes.Find(InName))
+	if (const auto FoundNode = NodeMap.Find(InName))
 	{
-		FoundNode->Completed();
+		NodeArray[*FoundNode].Completed();
 	}
 }
 
@@ -57,35 +59,35 @@ void FDynamicDependencyGraph::OnCompleted(const FString& InName, const TFunction
 
 	static auto F = STRUCT_PREFIX;
 
-	if (auto FoundNode = Nodes.Find(InName))
+	if (auto FoundNode = NodeMap.Find(InName))
 	{
-		FoundNode->OnCompleted.Add(InOnCompleted);
+		NodeArray[*FoundNode].OnCompleted.Add(InOnCompleted);
 	}
-	else if (FoundNode = Nodes.Find(A + InName); FoundNode != nullptr)
+	else if (FoundNode = NodeMap.Find(A + InName); FoundNode != nullptr)
 	{
-		FoundNode->OnCompleted.Add(InOnCompleted);
+		NodeArray[*FoundNode].OnCompleted.Add(InOnCompleted);
 	}
-	else if (FoundNode = Nodes.Find(U + InName); FoundNode != nullptr)
+	else if (FoundNode = NodeMap.Find(U + InName); FoundNode != nullptr)
 	{
-		FoundNode->OnCompleted.Add(InOnCompleted);
+		NodeArray[*FoundNode].OnCompleted.Add(InOnCompleted);
 	}
-	else if (FoundNode = Nodes.Find(F + InName); FoundNode != nullptr)
+	else if (FoundNode = NodeMap.Find(F + InName); FoundNode != nullptr)
 	{
-		FoundNode->OnCompleted.Add(InOnCompleted);
+		NodeArray[*FoundNode].OnCompleted.Add(InOnCompleted);
 	}
 }
 
 void FDynamicDependencyGraph::Generator()
 {
-	for (auto& [Name, PLACEHOLDER] : Nodes)
+	for (const auto& Node : NodeArray)
 	{
-		if (Nodes[Name].IsCompleted())
+		if (Node.IsCompleted())
 		{
 			// @TODO
 		}
 		else
 		{
-			TArray<FString> NodeStack{Name};
+			TArray<FString> NodeStack{Node.Name};
 
 			TQueue<FString> NodeQueue;
 
@@ -93,8 +95,8 @@ void FDynamicDependencyGraph::Generator()
 
 			while (!NodeStack.IsEmpty())
 			{
-				if (const auto& Node = NodeStack.Pop();
-					NodeSet.Contains(Node))
+				if (const auto& Element = NodeStack.Pop();
+					NodeSet.Contains(Element))
 				{
 					// @TODO
 				}
@@ -102,20 +104,20 @@ void FDynamicDependencyGraph::Generator()
 				{
 					auto bIsCompleted = true;
 
-					for (const auto& [Dependency, bIsSoftReference] : Nodes[Node].Dependencies)
+					for (const auto& [Dependency, bIsSoftReference] : NodeArray[NodeMap[Element]].Dependencies)
 					{
-						if (Nodes[Dependency].IsPending())
+						if (NodeArray[NodeMap[Element]].IsPending())
 						{
 							if (!bIsSoftReference)
 							{
 								bIsCompleted = false;
 							}
 						}
-						else if (Nodes[Dependency].IsInitial())
+						else if (NodeArray[NodeMap[Element]].IsInitial())
 						{
 							if (!bIsSoftReference)
 							{
-								Nodes[Dependency].Pending();
+								NodeArray[NodeMap[Element]].Pending();
 
 								NodeStack.Push(Dependency);
 
@@ -126,15 +128,15 @@ void FDynamicDependencyGraph::Generator()
 
 					if (bIsCompleted)
 					{
-						Nodes[Node].Generator();
+						NodeArray[NodeMap[Element]].Generator();
 					}
 					else
 					{
-						Nodes[Node].Pending();
+						NodeArray[NodeMap[Element]].Pending();
 
-						NodeQueue.Enqueue(Node);
+						NodeQueue.Enqueue(Element);
 
-						NodeSet.Add(Node);
+						NodeSet.Add(Element);
 					}
 				}
 			}
@@ -147,18 +149,20 @@ void FDynamicDependencyGraph::Generator()
 
 				auto bIsCompleted = true;
 
-				for (const auto& [Dependency, bIsSoftReference] : Nodes[OutNode].Dependencies)
+				for (const auto& [Dependency, bIsSoftReference] : NodeArray[NodeMap[OutNode]].Dependencies)
 				{
 					if (!bIsSoftReference)
 					{
-						if (Nodes[Dependency].IsInitial())
+						auto Type = FDependency::GetType(Dependency);
+
+						if (NodeArray[NodeMap[Type]].IsInitial())
 						{
 							bIsCompleted = false;
 
 							break;
 						}
 
-						if (Nodes[Dependency].IsPending())
+						if (NodeArray[NodeMap[Type]].IsPending())
 						{
 							bIsPending = true;
 
@@ -176,7 +180,7 @@ void FDynamicDependencyGraph::Generator()
 
 				if (bIsCompleted)
 				{
-					Nodes[OutNode].Generator();
+					NodeArray[NodeMap[OutNode]].Generator();
 				}
 				else
 				{

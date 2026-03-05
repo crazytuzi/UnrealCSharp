@@ -66,9 +66,9 @@ FGarbageCollectionHandle FObjectRegistry::GetGarbageCollectionHandle(const UObje
 	return FoundGarbageCollectionHandle != nullptr ? *FoundGarbageCollectionHandle : FGarbageCollectionHandle();
 }
 
-bool FObjectRegistry::AddReference(UObject* InObject, MonoObject* InMonoObject)
+bool FObjectRegistry::AddReference(FClassReflection* InClass, UObject* InObject, MonoObject* InMonoObject)
 {
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InMonoObject, true);
+	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InClass, InMonoObject, true);
 
 	Object2GarbageCollectionHandleMap.Add(InObject, GarbageCollectionHandle);
 

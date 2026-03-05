@@ -1,10 +1,7 @@
 ﻿#include "Domain/FMonoDomain.h"
 #include "Misc/FileHelper.h"
 #include "Log/FMonoLog.h"
-#include "CoreMacro/ClassMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "CoreMacro/FunctionMacro.h"
-#include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/MonoMacro.h"
 #include "CoreMacro/CompilerMacro.h"
 #include "Template/TGetArrayLength.inl"
@@ -26,6 +23,7 @@
 #include "Setting/UnrealCSharpSetting.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Domain/FMonoFunctionLibrary.h"
+#include "Reflection/FReflectionRegistry.h"
 
 PRAGMA_DISABLE_DANGLING_WARNINGS
 
@@ -124,6 +122,11 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 	InitializeAssembly(InParams.Assemblies);
 
+	if (bLoadSucceed)
+	{
+		FReflectionRegistry::Get().Initialize();
+	}
+
 	RegisterLog();
 
 	RegisterBinding();
@@ -131,6 +134,11 @@ void FMonoDomain::Initialize(const FMonoDomainInitializeParams& InParams)
 
 void FMonoDomain::Deinitialize()
 {
+	if (bLoadSucceed)
+	{
+		FReflectionRegistry::Get().Deinitialize();
+	}
+
 	UnloadAssembly();
 
 	DeinitializeAssembly();
@@ -191,78 +199,9 @@ mono_bool FMonoDomain::Class_Is_Subclass_Of(MonoClass* InMonoClass, MonoClass* I
 		       : false;
 }
 
-MonoClass* FMonoDomain::Class_Get_Parent(MonoClass* InMonoClass)
-{
-	return InMonoClass != nullptr ? mono_class_get_parent(InMonoClass) : nullptr;
-}
-
-const char* FMonoDomain::Class_Get_Name(MonoClass* InMonoClass)
-{
-	return InMonoClass != nullptr ? mono_class_get_name(InMonoClass) : nullptr;
-}
-
-const char* FMonoDomain::Class_Get_Namespace(MonoClass* InMonoClass)
-{
-	return InMonoClass != nullptr ? mono_class_get_namespace(InMonoClass) : nullptr;
-}
-
-MonoClassField* FMonoDomain::Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName)
-{
-	return InMonoClass != nullptr ? mono_class_get_field_from_name(InMonoClass, InName) : nullptr;
-}
-
 MonoType* FMonoDomain::Class_Get_Type(MonoClass* InMonoClass)
 {
 	return InMonoClass != nullptr ? mono_class_get_type(InMonoClass) : nullptr;
-}
-
-MonoClassField* FMonoDomain::Class_Get_Fields(MonoClass* InMonoClass, void** InIterator)
-{
-	return InMonoClass != nullptr ? mono_class_get_fields(InMonoClass, InIterator) : nullptr;
-}
-
-MonoProperty* FMonoDomain::Class_Get_Properties(MonoClass* InMonoClass, void** InIterator)
-{
-	return InMonoClass != nullptr ? mono_class_get_properties(InMonoClass, InIterator) : nullptr;
-}
-
-MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, const char* InName)
-{
-	return InMonoClass != nullptr ? mono_class_get_property_from_name(InMonoClass, InName) : nullptr;
-}
-
-MonoMethod* FMonoDomain::Class_Get_Methods(MonoClass* InMonoClass, void** InIterator)
-{
-	return InMonoClass != nullptr ? mono_class_get_methods(InMonoClass, InIterator) : nullptr;
-}
-
-MonoClass* FMonoDomain::Class_Get_Interfaces(MonoClass* InMonoClass, void** InIterator)
-{
-	return InMonoClass != nullptr ? mono_class_get_interfaces(InMonoClass, InIterator) : nullptr;
-}
-
-MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Class(MonoClass* InMonoClass)
-{
-	return InMonoClass != nullptr ? mono_custom_attrs_from_class(InMonoClass) : nullptr;
-}
-
-MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Field(MonoClass* InMonoClass, MonoClassField* InMonoClassField)
-{
-	return InMonoClass != nullptr && InMonoClassField != nullptr
-		       ? mono_custom_attrs_from_field(InMonoClass, InMonoClassField)
-		       : nullptr;
-}
-
-MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Property(MonoClass* InMonoClass, MonoProperty* InMonoProperty)
-{
-	return InMonoClass != nullptr && InMonoProperty != nullptr
-		       ? mono_custom_attrs_from_property(InMonoClass, InMonoProperty)
-		       : nullptr;
-}
-
-MonoCustomAttrInfo* FMonoDomain::Custom_Attrs_From_Method(MonoMethod* InMonoMethod)
-{
-	return InMonoMethod != nullptr ? mono_custom_attrs_from_method(InMonoMethod) : nullptr;
 }
 
 void FMonoDomain::Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassField* InMonoClassField, void* InValue)
@@ -270,51 +209,11 @@ void FMonoDomain::Field_Static_Set_Value(MonoVTable* InMonoVTable, MonoClassFiel
 	mono_field_static_set_value(InMonoVTable, InMonoClassField, InValue);
 }
 
-mono_bool FMonoDomain::Custom_Attrs_Has_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
+MonoObject* FMonoDomain::Field_Get_Value_Object(MonoClassField* InMonoClassField, MonoObject* InMonoObject)
 {
-	return InMonoCustomAttrInfo != nullptr && InMonoClass != nullptr
-		       ? mono_custom_attrs_has_attr(InMonoCustomAttrInfo, InMonoClass)
-		       : false;
-}
-
-MonoObject* FMonoDomain::Custom_Attrs_Get_Attr(MonoCustomAttrInfo* InMonoCustomAttrInfo, MonoClass* InMonoClass)
-{
-	return InMonoCustomAttrInfo != nullptr && InMonoClass != nullptr
-		       ? mono_custom_attrs_get_attr(InMonoCustomAttrInfo, InMonoClass)
+	return Domain != nullptr && InMonoClassField != nullptr && InMonoObject != nullptr
+		       ? mono_field_get_value_object(Domain, InMonoClassField, InMonoObject)
 		       : nullptr;
-}
-
-const char* FMonoDomain::Field_Get_Name(MonoClassField* InMonoClassField)
-{
-	return InMonoClassField != nullptr ? mono_field_get_name(InMonoClassField) : nullptr;
-}
-
-MonoType* FMonoDomain::Field_Get_Type(MonoClassField* InMonoClassField)
-{
-	return InMonoClassField != nullptr ? mono_field_get_type(InMonoClassField) : nullptr;
-}
-
-MonoObject* FMonoDomain::Field_Get_Value_Object(MonoDomain* InMonoDomain, MonoClassField* InMonoClassField,
-                                                MonoObject* InMonoObject)
-{
-	return InMonoDomain != nullptr && InMonoClassField != nullptr && InMonoObject != nullptr
-		       ? mono_field_get_value_object(InMonoDomain, InMonoClassField, InMonoObject)
-		       : nullptr;
-}
-
-const char* FMonoDomain::Property_Get_Name(MonoProperty* InMonoProperty)
-{
-	return InMonoProperty != nullptr ? mono_property_get_name(InMonoProperty) : nullptr;
-}
-
-MonoMethod* FMonoDomain::Property_Get_Get_Method(MonoProperty* InMonoProperty)
-{
-	return InMonoProperty != nullptr ? mono_property_get_get_method(InMonoProperty) : nullptr;
-}
-
-MonoProperty* FMonoDomain::Class_Get_Property_From_Name(MonoClass* InMonoClass, const FString& InName)
-{
-	return InMonoClass != nullptr ? mono_class_get_property_from_name(InMonoClass, TCHAR_TO_ANSI(*InName)) : nullptr;
 }
 
 void FMonoDomain::Property_Set_Value(MonoProperty* InMonoProperty, void* InMonoObject, void** InParams,
@@ -332,79 +231,19 @@ MonoObject* FMonoDomain::Property_Get_Value(MonoProperty* InMonoProperty, void* 
 	return InMonoProperty != nullptr ? mono_property_get_value(InMonoProperty, InMonoObject, InParams, InExc) : nullptr;
 }
 
-const char* FMonoDomain::Method_Get_Name(MonoMethod* InMonoMethod)
-{
-	return InMonoMethod != nullptr ? mono_method_get_name(InMonoMethod) : nullptr;
-}
-
-MonoClass* FMonoDomain::Method_Get_Class(MonoMethod* InMonoMethod)
-{
-	return InMonoMethod != nullptr ? mono_method_get_class(InMonoMethod) : nullptr;
-}
-
-void FMonoDomain::Method_Get_Param_Names(MonoMethod* InMonoMethod, const char** InNames)
-{
-	if (InMonoMethod != nullptr)
-	{
-		mono_method_get_param_names(InMonoMethod, InNames);
-	}
-}
-
-MonoMethodSignature* FMonoDomain::Method_Signature(MonoMethod* InMonoMethod)
-{
-	return InMonoMethod != nullptr ? mono_method_signature(InMonoMethod) : nullptr;
-}
-
-uint32_t FMonoDomain::Signature_Get_Param_Count(MonoMethodSignature* InMonoMethodSignature)
-{
-	return InMonoMethodSignature != nullptr ? mono_signature_get_param_count(InMonoMethodSignature) : 0u;
-}
-
-MonoType* FMonoDomain::Signature_Get_Params(MonoMethodSignature* InMonoMethodSignature, void** InIterator)
-{
-	return InMonoMethodSignature != nullptr ? mono_signature_get_params(InMonoMethodSignature, InIterator) : nullptr;
-}
-
-MonoType* FMonoDomain::Signature_Get_Return_Type(MonoMethodSignature* InMonoMethodSignature)
-{
-	return InMonoMethodSignature != nullptr ? mono_signature_get_return_type(InMonoMethodSignature) : nullptr;
-}
-
-mono_bool FMonoDomain::Signature_Is_Instance(MonoMethodSignature* InMonoMethodSignature)
-{
-	return InMonoMethodSignature != nullptr ? mono_signature_is_instance(InMonoMethodSignature) : false;
-}
-
 MonoType* FMonoDomain::Reflection_Type_Get_Type(MonoReflectionType* InMonoReflectionType)
 {
 	return InMonoReflectionType != nullptr ? mono_reflection_type_get_type(InMonoReflectionType) : nullptr;
 }
 
-MonoClass* FMonoDomain::Type_Get_Class(MonoType* InMonoType)
+MonoClass* FMonoDomain::Class_From_Type(MonoType* InMonoType)
 {
-	return InMonoType != nullptr ? mono_type_get_class(InMonoType) : nullptr;
+	return mono_class_from_mono_type(InMonoType);
 }
 
 MonoReflectionType* FMonoDomain::Type_Get_Object(MonoType* InMonoType)
 {
 	return Domain != nullptr && InMonoType != nullptr ? mono_type_get_object(Domain, InMonoType) : nullptr;
-}
-
-MonoType* FMonoDomain::Type_Get_Underlying_Type(MonoType* InMonoType)
-{
-	return mono_type_get_underlying_type(InMonoType);
-}
-
-mono_bool FMonoDomain::Type_Is_ByRef(MonoType* InMonoType)
-{
-	return mono_type_is_byref(InMonoType);
-}
-
-MonoReflectionMethod* FMonoDomain::Method_Get_Object(MonoMethod* InMethod, MonoClass* InMonoClass)
-{
-	return Domain != nullptr && InMethod != nullptr && InMonoClass != nullptr
-		       ? mono_method_get_object(Domain, InMethod, InMonoClass)
-		       : nullptr;
 }
 
 MonoObject* FMonoDomain::Runtime_Invoke(MonoMethod* InFunction, void* InMonoObject, void** InParams)
@@ -451,35 +290,9 @@ MonoObject* FMonoDomain::Runtime_Invoke_Array(MonoMethod* InFunction, void* InMo
 	return InFunction != nullptr ? mono_runtime_invoke_array(InFunction, InMonoObject, InParams, InExc) : nullptr;
 }
 
-MonoObject* FMonoDomain::Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams)
-{
-	MonoObject* Exception = nullptr;
-
-	const auto ReturnValue = Runtime_Delegate_Invoke(InDelegate, InParams, &Exception);
-
-	if (Exception != nullptr)
-	{
-		Unhandled_Exception(Exception);
-
-		return nullptr;
-	}
-
-	return ReturnValue;
-}
-
-MonoObject* FMonoDomain::Runtime_Delegate_Invoke(MonoObject* InDelegate, void** InParams, MonoObject** InExc)
-{
-	return InDelegate != nullptr ? mono_runtime_delegate_invoke(InDelegate, InParams, InExc) : nullptr;
-}
-
 void FMonoDomain::Unhandled_Exception(MonoObject* InException)
 {
 	mono_unhandled_exception(InException);
-}
-
-MonoClass* FMonoDomain::Object_Get_Class(MonoObject* InMonoObject)
-{
-	return InMonoObject != nullptr ? mono_object_get_class(InMonoObject) : nullptr;
 }
 
 MonoObject* FMonoDomain::Value_Box(MonoClass* InMonoClass, void* InValue)
@@ -497,11 +310,6 @@ MonoString* FMonoDomain::String_New(const char* InText)
 	return Domain != nullptr && InText != nullptr ? mono_string_new(Domain, InText) : nullptr;
 }
 
-MonoString* FMonoDomain::Object_To_String(MonoObject* InMonoObject, MonoObject** InExc)
-{
-	return InMonoObject != nullptr ? mono_object_to_string(InMonoObject, InExc) : nullptr;
-}
-
 char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
 {
 	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
@@ -510,16 +318,6 @@ char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
 MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
 {
 	return mono_array_new(Domain, InMonoClass, InNum);
-}
-
-char* FMonoDomain::Array_Addr_With_Size(MonoArray* InArray, const int32 InSize, const uint64 InIndex)
-{
-	return InArray != nullptr ? mono_array_addr_with_size(InArray, InSize, InIndex) : nullptr;
-}
-
-uint64 FMonoDomain::Array_Length(MonoArray* InMonoArray)
-{
-	return InMonoArray != nullptr ? mono_array_length(InMonoArray) : 0u;
 }
 
 MonoClass* FMonoDomain::Get_Byte_Class()
@@ -587,26 +385,6 @@ MonoClass* FMonoDomain::Get_Double_Class()
 	return mono_get_double_class();
 }
 
-uint32 FMonoDomain::GCHandle_New(MonoObject* InMonoObject, const mono_bool bPinned)
-{
-	return mono_gchandle_new(InMonoObject, bPinned);
-}
-
-uint32 FMonoDomain::GCHandle_New_WeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
-{
-	return mono_gchandle_new_weakref(InMonoObject, bTrackResurrection);
-}
-
-MonoObject* FMonoDomain::GCHandle_Get_Target(const uint32 InGCHandle)
-{
-	return mono_gchandle_get_target(InGCHandle);
-}
-
-void FMonoDomain::GCHandle_Free(const uint32 InGCHandle)
-{
-	mono_gchandle_free(InGCHandle);
-}
-
 MonoGCHandle FMonoDomain::GCHandle_New_V2(MonoObject* InMonoObject, const mono_bool bPinned)
 {
 	return mono_gchandle_new_v2(InMonoObject, bPinned);
@@ -632,17 +410,9 @@ void* FMonoDomain::Method_Get_Unmanaged_Thunk(MonoMethod* InMonoMethod)
 	return mono_method_get_unmanaged_thunk(InMonoMethod);
 }
 
-void FMonoDomain::Class_Constructor(MonoClass* InMonoClass)
-{
-	if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, FUNCTION_CLASS_CONSTRUCTOR, 0))
-	{
-		Runtime_Invoke(FoundMethod, InMonoClass, nullptr);
-	}
-}
-
 void FMonoDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InParamCount, void** InParams)
 {
-	if (const auto FoundMonoClass = Object_Get_Class(InMonoObject))
+	if (const auto FoundMonoClass = mono_object_get_class(InMonoObject))
 	{
 		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_OBJECT_CONSTRUCTOR,
 		                                                        InParamCount))
@@ -650,48 +420,6 @@ void FMonoDomain::Object_Constructor(MonoObject* InMonoObject, const int32 InPar
 			Runtime_Invoke(FoundMethod, InMonoObject, InParams);
 		}
 	}
-}
-
-MonoMethod* FMonoDomain::Parent_Class_Get_Method_From_Name(MonoClass* InMonoClass, const FString& InFunctionName,
-                                                           const int32 InParamCount)
-{
-	while (InMonoClass != nullptr)
-	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(InMonoClass, InFunctionName, InParamCount))
-		{
-			return FoundMethod;
-		}
-
-		InMonoClass = Class_Get_Parent(InMonoClass);
-	}
-
-	return nullptr;
-}
-
-MonoClassField* FMonoDomain::Self_Class_Get_Field_From_Name(MonoClass* InMonoClass, const char* InName)
-{
-	if (const auto Field = Class_Get_Field_From_Name(InMonoClass, InName))
-	{
-		if (mono_field_get_parent(Field) == InMonoClass)
-		{
-			return Field;
-		}
-	}
-
-	return nullptr;
-}
-
-MonoType* FMonoDomain::Property_Get_Type(MonoProperty* InMonoProperty)
-{
-	if (const auto Method = Property_Get_Get_Method(InMonoProperty))
-	{
-		if (const auto Signature = Method_Signature(Method))
-		{
-			return Signature_Get_Return_Type(Signature);
-		}
-	}
-
-	return nullptr;
 }
 
 MonoMethod* FMonoDomain::Class_Get_Method_From_Params(MonoClass* InMonoClass, const FString& InMethodName,
@@ -741,53 +469,14 @@ MonoMethod* FMonoDomain::Class_Get_Method_From_Params(MonoClass* InMonoClass, co
 	return nullptr;
 }
 
-MonoMethod* FMonoDomain::Delegate_Get_Method(MonoObject* InDelegate)
+const TArray<MonoGCHandle>& FMonoDomain::GetAssemblyGCHandles()
 {
-	if (const auto Class = Object_Get_Class(InDelegate))
-	{
-		if (const auto Property = Class_Get_Property_From_Name(Class, PROPERTY_METHOD))
-		{
-			if (const auto ReflectionMethod = (MonoReflectionMethod*)Property_Get_Value(
-				Property, InDelegate, nullptr, nullptr))
-			{
-				return ReflectionMethod->method;
-			}
-		}
-	}
-
-	return nullptr;
+	return AssemblyGCHandles;
 }
 
-mono_bool FMonoDomain::Type_Is_Class(MonoType* InMonoType)
+bool FMonoDomain::IsLoadSucceed()
 {
-	if (const auto FoundMonoClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
-	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_IS_CLASS, 1))
-		{
-			void* InParams[1] = {Type_Get_Object(InMonoType)};
-
-			return *static_cast<bool*>(Object_Unbox(Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr)));
-		}
-	}
-
-	return false;
-}
-
-mono_bool FMonoDomain::Type_Is_Enum(MonoType* InMonoType)
-{
-	if (const auto FoundMonoClass = Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
-	{
-		if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_IS_ENUM, 1))
-		{
-			void* InParams[1] = {Type_Get_Object(InMonoType)};
-
-			return *static_cast<bool*>(Object_Unbox(Runtime_Invoke(FoundMethod, nullptr, InParams, nullptr)));
-		}
-	}
-
-	return false;
+	return bLoadSucceed;
 }
 
 MonoAssembly* FMonoDomain::AssemblyPreloadHook(MonoAssemblyName* InAssemblyName, char** OutAssemblyPath,
@@ -915,7 +604,7 @@ void FMonoDomain::DeinitializeAssemblyLoadContext()
 
 	const auto AssemblyLoadContextObject = GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
 
-	const auto AssemblyLoadContextClass = Object_Get_Class(AssemblyLoadContextObject);
+	const auto AssemblyLoadContextClass = mono_object_get_class(AssemblyLoadContextObject);
 
 	const auto UnloadMethod = Class_Get_Method_From_Name(AssemblyLoadContextClass, TEXT("Unload"), 0);
 
@@ -940,15 +629,15 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 		Assembly = mono_assembly_load(Name, nullptr, nullptr);
 	}
 
-	auto Image = mono_assembly_get_image(Assembly);
+	const auto Image = mono_assembly_get_image(Assembly);
 
 	const auto StreamReaderClass = mono_class_from_name(Image, "System.IO", "StreamReader");
 
 	const auto TextReaderClass = mono_class_from_name(Image, "System.IO", "TextReader");
 
-	const auto BaseStreamProperty = Class_Get_Property_From_Name(StreamReaderClass, TEXT("BaseStream"));
+	const auto BaseStreamProperty = mono_class_get_property_from_name(StreamReaderClass, "BaseStream");
 
-	const auto BaseStreamGetterMethod = Property_Get_Get_Method(BaseStreamProperty);
+	const auto BaseStreamGetterMethod = mono_property_get_get_method(BaseStreamProperty);
 
 	const auto StreamReaderConstructorMethod = Class_Get_Method_From_Params(
 		StreamReaderClass, FUNCTION_OBJECT_CONSTRUCTOR,
@@ -960,7 +649,7 @@ void FMonoDomain::LoadAssembly(const TArray<FString>& InAssemblies)
 
 	const auto AssemblyLoadContextObject = GCHandle_Get_Target_V2(AssemblyLoadContextGCHandle);
 
-	const auto AssemblyLoadContextClass = Object_Get_Class(AssemblyLoadContextObject);
+	const auto AssemblyLoadContextClass = mono_object_get_class(AssemblyLoadContextObject);
 
 	const auto AlcLoadFromStreamMethod = Class_Get_Method_From_Name(AssemblyLoadContextClass, "LoadFromStream", 1);
 
@@ -1073,12 +762,11 @@ void FMonoDomain::RegisterLog()
 {
 	if (Domain != nullptr)
 	{
-		if (const auto FoundMonoClass = Class_From_Name(
-			COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS))
+		if (const auto UtilsClass = FReflectionRegistry::Get().GetUtilsClass())
 		{
-			if (const auto FoundMethod = Class_Get_Method_From_Name(FoundMonoClass, FUNCTION_UTILS_SET_OUT, 0))
+			if (const auto FoundMethod = UtilsClass->GetMethod(FUNCTION_UTILS_SET_OUT, 0))
 			{
-				Runtime_Invoke(FoundMethod, nullptr, nullptr, nullptr);
+				FoundMethod->Runtime_Invoke(nullptr, nullptr);
 			}
 		}
 	}

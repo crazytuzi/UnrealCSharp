@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
 namespace Script.Library
@@ -6,8 +7,8 @@ namespace Script.Library
     public static class TSubclassOfImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSubclassOf_RegisterImplementation<T>(TSubclassOf<T> InSubclassOf, nint InClass)
-            where T : UObject;
+        public static extern void TSubclassOf_RegisterImplementation<T>(TSubclassOf<T> InSubclassOf,
+            nint InClass, Type InType) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool TSubclassOf_IdenticalImplementation(nint InA, nint InB);

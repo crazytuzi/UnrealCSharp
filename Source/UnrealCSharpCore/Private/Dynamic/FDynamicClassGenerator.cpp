@@ -3,10 +3,8 @@
 #include "Bridge/FTypeBridge.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "CoreMacro/PropertyAttributeMacro.h"
-#include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "Reflection/FReflectionRegistry.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/KismetEditorUtilities.h"
@@ -37,45 +35,42 @@ TMap<UClass*, TArray<TTuple<const FProperty*, FString>>> FDynamicClassGenerator:
 
 void FDynamicClassGenerator::Generator()
 {
-	FDynamicGeneratorCore::Generator(CLASS_U_CLASS_ATTRIBUTE,
-	                                 [](MonoClass* InMonoClass)
+	FDynamicGeneratorCore::Generator(FReflectionRegistry::Get().GetUClassAttributeClass(),
+	                                 [](FClassReflection* InClassReflection)
 	                                 {
-		                                 if (InMonoClass == nullptr)
+		                                 if (InClassReflection == nullptr)
 		                                 {
 			                                 return;
 		                                 }
 
-		                                 if (!FMonoDomain::Type_Is_Class(FMonoDomain::Class_Get_Type(InMonoClass)))
+		                                 if (!InClassReflection->IsClass())
 		                                 {
 			                                 return;
 		                                 }
 
-		                                 const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
-
-		                                 auto Node = FDynamicDependencyGraph::FNode(ClassName, [InMonoClass]()
-		                                 {
-			                                 Generator(InMonoClass, EDynamicClassGeneratorType::DependencyGraph);
-		                                 });
-
-		                                 if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
-		                                 {
-			                                 if (FDynamicGeneratorCore::ClassHasAttr(
-				                                 ParentMonoClass, CLASS_U_CLASS_ATTRIBUTE))
+		                                 auto Node = FDynamicDependencyGraph::FNode(
+			                                 InClassReflection->GetName(), [InClassReflection]()
 			                                 {
-				                                 const auto ParentClassName = FString(
-					                                 FMonoDomain::Class_Get_Name(ParentMonoClass));
+				                                 Generator(InClassReflection,
+				                                           EDynamicClassGeneratorType::DependencyGraph);
+			                                 });
 
+		                                 if (const auto Parent = InClassReflection->GetParent())
+		                                 {
+			                                 if (Parent->HasAttribute(
+				                                 FReflectionRegistry::Get().GetUClassAttributeClass()))
+			                                 {
 				                                 Node.Dependency(FDynamicDependencyGraph::FDependency{
-					                                 ParentClassName, false
+					                                 Parent->GetName(), false
 				                                 });
 			                                 }
 		                                 }
 
-		                                 FDynamicGeneratorCore::GeneratorProperty(InMonoClass, Node);
+		                                 FDynamicGeneratorCore::GeneratorProperty(InClassReflection, Node);
 
-		                                 FDynamicGeneratorCore::GeneratorFunction(InMonoClass, Node);
+		                                 FDynamicGeneratorCore::GeneratorFunction(InClassReflection, Node);
 
-		                                 FDynamicGeneratorCore::GeneratorInterface(InMonoClass, Node);
+		                                 FDynamicGeneratorCore::GeneratorInterface(InClassReflection, Node);
 
 		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
@@ -111,11 +106,6 @@ void FDynamicClassGenerator::CodeAnalysisGenerator()
 	FUnrealCSharpCoreModuleDelegates::OnDynamicClassUpdated.Broadcast();
 }
 
-bool FDynamicClassGenerator::IsDynamicClass(MonoClass* InMonoClass)
-{
-	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_CLASS_ATTRIBUTE);
-}
-
 void FDynamicClassGenerator::OnPrePIEEnded(const bool bIsSimulating)
 {
 	FDynamicGeneratorCore::IteratorObject<UBlueprintGeneratedClass>(
@@ -143,34 +133,31 @@ const TSet<UClass*>& FDynamicClassGenerator::GetDynamicClasses()
 }
 #endif
 
-void FDynamicClassGenerator::Generator(MonoClass* InMonoClass,
-                                       const EDynamicClassGeneratorType InDynamicClassGeneratorType)
+void FDynamicClassGenerator::Generator(FClassReflection* InClassReflection,
+                                       EDynamicClassGeneratorType InDynamicClassGeneratorType)
 {
-	if (InMonoClass == nullptr)
+	if (InClassReflection == nullptr)
 	{
 		return;
 	}
 
-	if (!FMonoDomain::Type_Is_Class(FMonoDomain::Class_Get_Type(InMonoClass)))
+	if (!InClassReflection->IsClass())
 	{
 		return;
 	}
 
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+	const auto ClassName = InClassReflection->GetName();
 
-	const auto ClassNamespace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
+	const auto ClassNamespace = InClassReflection->GetNameSpace();
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
-	const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass);
+	UClass* ParentClass{};
 
-	const auto ParentMonoType = FMonoDomain::Class_Get_Type(ParentMonoClass);
-
-	const auto ParentMonoReflectionType = FMonoDomain::Type_Get_Object(ParentMonoType);
-
-	const auto ParentPathName = FTypeBridge::GetPathName(ParentMonoReflectionType);
-
-	const auto ParentClass = LoadClass<UObject>(nullptr, *ParentPathName);
+	if (const auto Parent = InClassReflection->GetParent())
+	{
+		ParentClass = LoadClass<UObject>(nullptr, *Parent->GetPathName());
+	}
 
 	UClass* Class{};
 
@@ -214,17 +201,17 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass,
 	if (IsDynamicBlueprintGeneratedClass(ClassName))
 	{
 		Class = GeneratorBlueprintGeneratedClass(Outer, ClassNamespace, ClassName, ParentClass,
-		                                         [InMonoClass](UClass* InClass)
+		                                         [InClassReflection](UClass* InClass)
 		                                         {
-			                                         ProcessGenerator(InMonoClass, InClass);
+			                                         ProcessGenerator(InClassReflection, InClass);
 		                                         });
 	}
 	else
 	{
 		Class = GeneratorClass(Outer, ClassNamespace, ClassName, ParentClass,
-		                       [InMonoClass](UClass* InClass)
+		                       [InClassReflection](UClass* InClass)
 		                       {
-			                       ProcessGenerator(InMonoClass, InClass);
+			                       ProcessGenerator(InClassReflection, InClass);
 		                       });
 	}
 
@@ -245,6 +232,11 @@ void FDynamicClassGenerator::Generator(MonoClass* InMonoClass,
 bool FDynamicClassGenerator::IsDynamicClass(const UClass* InClass)
 {
 	return DynamicClassSet.Contains(InClass);
+}
+
+bool FDynamicClassGenerator::IsDynamicClass(const UField* InField)
+{
+	return DynamicClassSet.Contains(Cast<UClass>(InField));
 }
 
 bool FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(const UField* InField)
@@ -270,11 +262,9 @@ bool FDynamicClassGenerator::IsDynamicBlueprintGeneratedSubClass(const UBlueprin
 	return false;
 }
 
-UClass* FDynamicClassGenerator::GetDynamicClass(MonoClass* InMonoClass)
+UClass* FDynamicClassGenerator::GetDynamicClass(const FClassReflection* InClassReflection)
 {
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
-
-	const auto FoundDynamicClass = DynamicClassMap.Find(ClassName);
+	const auto FoundDynamicClass = DynamicClassMap.Find(InClassReflection->GetName());
 
 	return FoundDynamicClass != nullptr ? *FoundDynamicClass : nullptr;
 }
@@ -318,15 +308,15 @@ void FDynamicClassGenerator::BeginGenerator(UBlueprintGeneratedClass* InClass, U
 	InClass->ClassFlags &= ~CLASS_Native;
 }
 
-void FDynamicClassGenerator::ProcessGenerator(MonoClass* InMonoClass, UClass* InClass)
+void FDynamicClassGenerator::ProcessGenerator(FClassReflection* InClassReflection, UClass* InClass)
 {
-	FDynamicGeneratorCore::SetFlags(InClass, FMonoDomain::Custom_Attrs_From_Class(InMonoClass));
+	FDynamicGeneratorCore::SetFlags(InClassReflection, InClass);
 
-	GeneratorProperty(InMonoClass, InClass);
+	GeneratorProperty(InClassReflection, InClass);
 
-	GeneratorFunction(InMonoClass, InClass);
+	GeneratorFunction(InClassReflection, InClass);
 
-	GeneratorInterface(InMonoClass, InClass);
+	GeneratorInterface(InClassReflection, InClass);
 }
 
 void FDynamicClassGenerator::EndGenerator(UClass* InClass)
@@ -549,11 +539,10 @@ void FDynamicClassGenerator::ReInstance(UClass* InOldClass, UClass* InNewClass)
 }
 #endif
 
-void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* InClass)
+void FDynamicClassGenerator::GeneratorProperty(const FClassReflection* InClassReflection, UClass* InClass)
 {
-	FDynamicGeneratorCore::GeneratorProperty(InMonoClass, InClass,
-	                                         [InClass](const MonoProperty* InMonoProperty,
-	                                                   MonoCustomAttrInfo* InMonoCustomAttrInfo,
+	FDynamicGeneratorCore::GeneratorProperty(InClassReflection, InClass,
+	                                         [InClass](FPropertyReflection* InPropertyReflection,
 	                                                   const FProperty* InProperty)
 	                                         {
 		                                         if (InProperty->HasAnyPropertyFlags(CPF_Net))
@@ -595,8 +584,9 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 
 		                                         if (IsDynamicBlueprintGeneratedClass(InClass))
 		                                         {
-			                                         if (FDynamicGeneratorCore::AttrsHasAttr(
-				                                         InMonoCustomAttrInfo, CLASS_DEFAULT_SUB_OBJECT_ATTRIBUTE))
+			                                         if (InPropertyReflection->HasAttribute(
+				                                         FReflectionRegistry::Get().
+				                                         GetDefaultSubObjectAttributeClass()))
 			                                         {
 				                                         FDefaultSubObjectInfo DefaultSubObject;
 
@@ -604,23 +594,24 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 					                                         InProperty);
 
 				                                         DefaultSubObject.bIsRootComponent =
-					                                         FDynamicGeneratorCore::AttrsHasAttr(
-						                                         InMonoCustomAttrInfo, CLASS_ROOT_COMPONENT_ATTRIBUTE);
+					                                         InPropertyReflection->HasAttribute(
+						                                         FReflectionRegistry::Get().
+						                                         GetRootComponentAttributeClass());
 
-				                                         DefaultSubObject.Parent = FDynamicGeneratorCore::AttrsHasAttr(
-						                                         InMonoCustomAttrInfo,
-						                                         CLASS_ATTACHMENT_PARENT_ATTRIBUTE)
-						                                         ? FDynamicGeneratorCore::AttrGetValue(
-							                                         InMonoCustomAttrInfo,
-							                                         CLASS_ATTACHMENT_PARENT_ATTRIBUTE)
+				                                         DefaultSubObject.Parent = InPropertyReflection->HasAttribute(
+						                                         FReflectionRegistry::Get().
+						                                         GetAttachmentParentAttributeClass())
+						                                         ? InPropertyReflection->GetAttributeValue(
+							                                         FReflectionRegistry::Get().
+							                                         GetAttachmentParentAttributeClass())
 						                                         : FString{};
 
-				                                         DefaultSubObject.Socket = FDynamicGeneratorCore::AttrsHasAttr(
-						                                         InMonoCustomAttrInfo,
-						                                         CLASS_ATTACHMENT_SOCKET_NAME_ATTRIBUTE)
-						                                         ? FDynamicGeneratorCore::AttrGetValue(
-							                                         InMonoCustomAttrInfo,
-							                                         CLASS_ATTACHMENT_SOCKET_NAME_ATTRIBUTE)
+				                                         DefaultSubObject.Socket = InPropertyReflection->HasAttribute(
+						                                         FReflectionRegistry::Get().
+						                                         GetAttachmentSocketNameAttributeClass())
+						                                         ? InPropertyReflection->GetAttributeValue(
+							                                         FReflectionRegistry::Get().
+							                                         GetAttachmentSocketNameAttributeClass())
 						                                         : FString{};
 
 				                                         DefaultSubObjectInfoMap.FindOrAdd(InClass).Add(
@@ -628,11 +619,13 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 			                                         }
 		                                         }
 
-		                                         if (FDynamicGeneratorCore::AttrsHasAttr(
-			                                         InMonoCustomAttrInfo, CLASS_DEFAULT_VALUE_ATTRIBUTE))
+		                                         if (InPropertyReflection->HasAttribute(
+			                                         FReflectionRegistry::Get().
+			                                         GetDefaultValueAttributeClass()))
 		                                         {
-			                                         const auto DefaultValue = FDynamicGeneratorCore::AttrGetValue(
-				                                         InMonoCustomAttrInfo, CLASS_DEFAULT_VALUE_ATTRIBUTE);
+			                                         const auto DefaultValue = InPropertyReflection->GetAttributeValue(
+				                                         FReflectionRegistry::Get().
+				                                         GetDefaultValueAttributeClass());
 
 			                                         DefaultValueMap.FindOrAdd(InClass, {}).Emplace(
 				                                         MakeTuple(InProperty, DefaultValue));
@@ -652,30 +645,24 @@ void FDynamicClassGenerator::GeneratorProperty(MonoClass* InMonoClass, UClass* I
 	}
 }
 
-void FDynamicClassGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)
+void FDynamicClassGenerator::GeneratorFunction(const FClassReflection* InClassReflection, UClass* InClass)
 {
-	FDynamicGeneratorCore::GeneratorFunction(InMonoClass, InClass,
-	                                         [](const UFunction* InFunction)
+	FDynamicGeneratorCore::GeneratorFunction(InClassReflection, InClass,
+	                                         [](FMethodReflection* InMethodReflection, const UFunction* InFunction)
 	                                         {
 	                                         });
 }
 
-void FDynamicClassGenerator::GeneratorInterface(MonoClass* InMonoClass, UClass* InClass)
+void FDynamicClassGenerator::GeneratorInterface(const FClassReflection* InClassReflection, UClass* InClass)
 {
-	if (InMonoClass == nullptr || InClass == nullptr)
+	if (InClassReflection == nullptr || InClass == nullptr)
 	{
 		return;
 	}
 
-	void* Iterator = nullptr;
-
-	while (const auto Interface = FMonoDomain::Class_Get_Interfaces(InMonoClass, &Iterator))
+	for (const auto Interface : InClassReflection->GetInterfaces())
 	{
-		const auto InterfaceMonoType = FMonoDomain::Class_Get_Type(Interface);
-
-		const auto InterfaceMonoReflectionType = FMonoDomain::Type_Get_Object(InterfaceMonoType);
-
-		if (const auto InterfacePathName = FTypeBridge::GetPathName(InterfaceMonoReflectionType);
+		if (const auto InterfacePathName = Interface->GetPathName();
 			!InterfacePathName.IsEmpty())
 		{
 			if (const auto InterfaceClass = LoadClass<UObject>(nullptr, *InterfacePathName))

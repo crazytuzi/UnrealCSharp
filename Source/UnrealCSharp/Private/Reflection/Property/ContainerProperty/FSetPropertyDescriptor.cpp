@@ -1,4 +1,4 @@
-﻿#include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
+#include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
 
@@ -35,7 +35,7 @@ MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		Object = Class->NewObject();
 
 		const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
 		                                      false, false);
@@ -44,7 +44,7 @@ MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerGarbageCollectionHandle, InAddress, SetHelper, Object);
+			OwnerGarbageCollectionHandle, InAddress, SetHelper, Class, Object);
 	}
 
 	return Object;
@@ -52,12 +52,12 @@ MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const
 
 MonoObject* FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = Class->NewObject();
 
 	const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
 	                                      bIsCopy, false);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Object);
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Class, Object);
 
 	return Object;
 }

@@ -51,7 +51,7 @@ void UDelegateHandler::Deinitialize()
 	}
 }
 
-void UDelegateHandler::Bind(UObject* InObject, MonoMethod* InMonoMethod)
+void UDelegateHandler::Bind(UObject* InObject, FMethodReflection* InMethod)
 {
 	if (ScriptDelegate != nullptr)
 	{
@@ -61,7 +61,7 @@ void UDelegateHandler::Bind(UObject* InObject, MonoMethod* InMonoMethod)
 		}
 	}
 
-	DelegateWrapper = {InObject, InMonoMethod};
+	DelegateWrapper = {InObject, InMethod};
 }
 
 bool UDelegateHandler::IsBound() const

@@ -1,9 +1,9 @@
 ﻿#include "Reflection/Class/FClassDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Reflection/FReflectionRegistry.h"
 
-FClassDescriptor::FClassDescriptor(UStruct* InStruct, MonoClass* InBindMonoClass):
-	Struct(InStruct),
-	BindMonoClass(InBindMonoClass)
+FClassDescriptor::FClassDescriptor(UStruct* InStruct):
+	Struct(InStruct)
 {
 	Initialize();
 }
@@ -15,25 +15,37 @@ FClassDescriptor::~FClassDescriptor()
 
 void FClassDescriptor::Initialize()
 {
-	if (const auto Class = Cast<UClass>(Struct))
+	if (const auto FoundClass = Cast<UClass>(Struct))
 	{
-		Class->ClearFunctionMapsCaches();
+		FoundClass->ClearFunctionMapsCaches();
 	}
 
-	FMonoDomain::Class_Constructor(BindMonoClass);
+	Class = FReflectionRegistry::Get().GetClass(Struct);
+
+	Class->ConstructorClass();
 }
 
 void FClassDescriptor::Deinitialize()
 {
-	if (const auto Class = Cast<UClass>(Struct))
+	if (const auto FoundClass = Cast<UClass>(Struct))
 	{
-		Class->ClearFunctionMapsCaches();
+		FoundClass->ClearFunctionMapsCaches();
 
-		FDomain::StaticClassSingleton_Reset(BindMonoClass);
+		void* InParams[] = {nullptr};
+
+		if (const auto FoundProperty = Class->GetProperty(PROPERTY_STATIC_CLASS_SINGLETON))
+		{
+			FoundProperty->SetValue(nullptr, InParams, nullptr);
+		}
 	}
-	else if (Cast<UScriptStruct>(Struct))
+	else
 	{
-		FDomain::StaticStructSingleton_Reset(BindMonoClass);
+		void* InParams[] = {nullptr};
+
+		if (const auto FoundProperty = Class->GetProperty(PROPERTY_STATIC_STRUCT_SINGLETON))
+		{
+			FoundProperty->SetValue(nullptr, InParams, nullptr);
+		}
 	}
 
 	for (const auto& FunctionHash : FunctionHashSet)
@@ -51,9 +63,9 @@ void FClassDescriptor::Deinitialize()
 	PropertyHashSet.Empty();
 }
 
-MonoClass* FClassDescriptor::GetMonoClass() const
+FClassReflection* FClassDescriptor::GetClass() const
 {
-	return BindMonoClass;
+	return Class;
 }
 
 FFunctionDescriptor* FClassDescriptor::GetFunctionDescriptor(const FString& InFunctionName)

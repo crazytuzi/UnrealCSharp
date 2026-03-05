@@ -72,7 +72,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	FProperty* DelegateReturnParam = nullptr;
 
 	const auto ConstructorContent = FString::Printf(TEXT(
-		"\t\tpublic %s() => FDelegateImplementation.FDelegate_RegisterImplementation(this);\n"
+		"\t\tpublic %s() => FDelegateImplementation.FDelegate_RegisterImplementation(this, GetType());\n"
 	),
 	                                                *ClassContent
 	);
@@ -327,7 +327,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 
 	BindFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, InObject.%s, InDelegate);\n\n"
+		"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
 	),
 	                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE
@@ -462,7 +462,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	TArray<int32> DelegateRefParamIndex;
 
 	const auto ConstructorContent = FString::Printf(TEXT(
-		"\t\tpublic %s() => FMulticastDelegateImplementation.FMulticastDelegate_RegisterImplementation(this);\n"
+		"\t\tpublic %s() => FMulticastDelegateImplementation.FMulticastDelegate_RegisterImplementation(this, GetType());\n"
 	),
 	                                                *ClassContent
 	);
@@ -662,28 +662,28 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	);
 
 	ContainsFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic bool Contains(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, InObject.%s, InDelegate);\n\n"
+		"\t\tpublic bool Contains(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
 	),
 	                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);
 
 	AddFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Add(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, InObject.%s, InDelegate);\n\n"
+		"\t\tpublic void Add(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
 	),
 	                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);
 
 	AddUniqueFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void AddUnique(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, InObject.%s, InDelegate);\n\n"
+		"\t\tpublic void AddUnique(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
 	),
 	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
 	);
 
 	RemoveFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Remove(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, InObject.%s, InDelegate);\n\n"
+		"\t\tpublic void Remove(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
 	),
 	                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE

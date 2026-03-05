@@ -3,7 +3,7 @@
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Template/TFunctionPointer.inl"
 #include "EDynamicClassGeneratorType.h"
-#include "mono/metadata/object.h"
+#include "Reflection/FClassReflection.h"
 
 inline uint32 GetTypeHash(const UClass::ClassConstructorType& InClassConstructor)
 {
@@ -30,16 +30,16 @@ public:
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
 
-	static bool IsDynamicClass(MonoClass* InMonoClass);
-
 	static void OnPrePIEEnded(const bool bIsSimulating);
 
 	static UNREALCSHARPCORE_API const TSet<UClass*>& GetDynamicClasses();
 #endif
 
-	static void Generator(MonoClass* InMonoClass, EDynamicClassGeneratorType InDynamicClassGeneratorType);
+	static void Generator(FClassReflection* InClassReflection, EDynamicClassGeneratorType InDynamicClassGeneratorType);
 
 	static UNREALCSHARPCORE_API bool IsDynamicClass(const UClass* InClass);
+
+	static UNREALCSHARPCORE_API bool IsDynamicClass(const UField* InField);
 
 	static UNREALCSHARPCORE_API bool IsDynamicBlueprintGeneratedClass(const UField* InField);
 
@@ -47,7 +47,7 @@ public:
 
 	static bool IsDynamicBlueprintGeneratedSubClass(const UBlueprintGeneratedClass* InClass);
 
-	static UNREALCSHARPCORE_API UClass* GetDynamicClass(MonoClass* InMonoClass);
+	static UNREALCSHARPCORE_API UClass* GetDynamicClass(const FClassReflection* InClassReflection);
 
 	static FString GetNameSpace(const UClass* InClass);
 
@@ -56,7 +56,7 @@ private:
 
 	static void BeginGenerator(UBlueprintGeneratedClass* InClass, UClass* InParentClass);
 
-	static void ProcessGenerator(MonoClass* InMonoClass, UClass* InClass);
+	static void ProcessGenerator(FClassReflection* InClassReflection, UClass* InClass);
 
 	static void EndGenerator(UClass* InClass);
 
@@ -94,11 +94,11 @@ private:
 	static void ReInstance(UClass* InOldClass, UClass* InNewClass);
 #endif
 
-	static void GeneratorProperty(MonoClass* InMonoClass, UClass* InClass);
+	static void GeneratorProperty(const FClassReflection* InClassReflection, UClass* InClass);
 
-	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
+	static void GeneratorFunction(const FClassReflection* InClassReflection, UClass* InClass);
 
-	static void GeneratorInterface(MonoClass* InMonoClass, UClass* InClass);
+	static void GeneratorInterface(const FClassReflection* InClassReflection, UClass* InClass);
 
 	static void ClassConstructor(const FObjectInitializer& InObjectInitializer);
 

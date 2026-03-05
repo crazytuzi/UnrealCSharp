@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "TValueMapping.inl"
-#include "mono/metadata/object-forward.h"
+#include "Reflection/FClassReflection.h"
 
 class UNREALCSHARP_API FObjectRegistry
 {
@@ -36,7 +36,7 @@ public:
 	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject);
 
 public:
-	bool AddReference(UObject* InObject, MonoObject* InMonoObject);
+	bool AddReference(FClassReflection* InClass, UObject* InObject, MonoObject* InMonoObject);
 
 	bool RemoveReference(const UObject* InObject);
 

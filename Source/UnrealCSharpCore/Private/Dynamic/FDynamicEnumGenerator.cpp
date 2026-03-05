@@ -5,6 +5,7 @@
 #include "Template/TGetArrayLength.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "Reflection/FReflectionRegistry.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -21,25 +22,25 @@ TSet<UEnum*> FDynamicEnumGenerator::DynamicEnumSet;
 
 void FDynamicEnumGenerator::Generator()
 {
-	FDynamicGeneratorCore::Generator(CLASS_U_ENUM_ATTRIBUTE,
-	                                 [](MonoClass* InMonoClass)
+	FDynamicGeneratorCore::Generator(FReflectionRegistry::Get().GetUEnumAttributeClass(),
+	                                 [](FClassReflection* InClassReflection)
 	                                 {
-		                                 if (InMonoClass == nullptr)
+		                                 if (InClassReflection == nullptr)
 		                                 {
 			                                 return;
 		                                 }
 
-		                                 if (!FMonoDomain::Type_Is_Enum(FMonoDomain::Class_Get_Type(InMonoClass)))
+		                                 if (!InClassReflection->IsEnum())
 		                                 {
 			                                 return;
 		                                 }
 
-		                                 const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+		                                 const auto ClassName = InClassReflection->GetName();
 
 		                                 const auto Node = FDynamicDependencyGraph::FNode(
-			                                 ClassName, [InMonoClass]()
+			                                 ClassName, [InClassReflection]()
 			                                 {
-				                                 Generator(InMonoClass);
+				                                 Generator(InClassReflection);
 			                                 });
 
 		                                 FDynamicGeneratorCore::AddNode(Node);
@@ -61,28 +62,23 @@ void FDynamicEnumGenerator::CodeAnalysisGenerator()
 		                                             }
 	                                             });
 }
-
-bool FDynamicEnumGenerator::IsDynamicEnum(MonoClass* InMonoClass)
-{
-	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_ENUM_ATTRIBUTE);
-}
 #endif
 
-void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
+void FDynamicEnumGenerator::Generator(FClassReflection* InClassReflection)
 {
-	if (InMonoClass == nullptr)
+	if (InClassReflection == nullptr)
 	{
 		return;
 	}
 
-	if (!FMonoDomain::Type_Is_Enum(FMonoDomain::Class_Get_Type(InMonoClass)))
+	if (!InClassReflection->IsEnum())
 	{
 		return;
 	}
 
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+	const auto ClassName = InClassReflection->GetName();
 
-	const auto ClassNamespace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
+	const auto ClassNamespace = InClassReflection->GetNameSpace();
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
@@ -96,9 +92,9 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
 	{
 		Enum = DynamicEnumMap[ClassName];
 
-		GeneratorEnum(ClassNamespace, ClassName, Enum, [InMonoClass](UEnum* InEnum)
+		GeneratorEnum(ClassNamespace, ClassName, Enum, [InClassReflection](UEnum* InEnum)
 		{
-			ProcessGenerator(InMonoClass, InEnum);
+			ProcessGenerator(InClassReflection, InEnum);
 		});
 
 #if WITH_EDITOR
@@ -108,9 +104,9 @@ void FDynamicEnumGenerator::Generator(MonoClass* InMonoClass)
 	else
 	{
 		Enum = GeneratorEnum(Outer, ClassNamespace, ClassName,
-		                     [InMonoClass](UEnum* InEnum)
+		                     [InClassReflection](UEnum* InEnum)
 		                     {
-			                     ProcessGenerator(InMonoClass, InEnum);
+			                     ProcessGenerator(InClassReflection, InEnum);
 		                     });
 	}
 
@@ -141,11 +137,11 @@ void FDynamicEnumGenerator::BeginGenerator(const UEnum* InEnum)
 	InEnum->SetInternalFlags(EInternalObjectFlags::Native);
 }
 
-void FDynamicEnumGenerator::ProcessGenerator(MonoClass* InMonoClass, UEnum* InEnum)
+void FDynamicEnumGenerator::ProcessGenerator(FClassReflection* InClassReflection, UEnum* InEnum)
 {
-	FDynamicGeneratorCore::SetFlags(InEnum, FMonoDomain::Custom_Attrs_From_Class(InMonoClass));
+	FDynamicGeneratorCore::SetFlags(InClassReflection, InEnum);
 
-	GeneratorEnumerator(InMonoClass, InEnum);
+	GeneratorEnumerator(InClassReflection, InEnum);
 }
 
 void FDynamicEnumGenerator::EndGenerator(UEnum* InEnum)
@@ -274,29 +270,25 @@ void FDynamicEnumGenerator::ReInstance(UEnum* InEnum)
 }
 #endif
 
-void FDynamicEnumGenerator::GeneratorEnumerator(MonoClass* InMonoClass, UEnum* InEnum)
+void FDynamicEnumGenerator::GeneratorEnumerator(const FClassReflection* InClassReflection, UEnum* InEnum)
 {
-	if (InMonoClass == nullptr || InEnum == nullptr)
+	if (InClassReflection == nullptr || InEnum == nullptr)
 	{
 		return;
 	}
 
 	TArray<TPair<FName, int64>> InNames;
 
-	void* Iterator = nullptr;
-
-	while (const auto Field = FMonoDomain::Class_Get_Fields(InMonoClass, &Iterator))
+	for (const auto& [Name, Field] : InClassReflection->GetFields())
 	{
-		static auto value__ = FName(TEXT("value__"));
+		static auto value__ = FString(TEXT("value__"));
 
-		const auto FieldName = FMonoDomain::Field_Get_Name(Field);
-
-		if (FieldName != value__)
+		if (Name != value__)
 		{
 			auto FieldValue = *(int64*)FMonoDomain::Object_Unbox(
-				FMonoDomain::Field_Get_Value_Object(FMonoDomain::Domain, Field, (MonoObject*)InMonoClass));
+				Field->GetValue((MonoObject*)InClassReflection->GetClass()));
 
-			InNames.Add({FieldName, FieldValue});
+			InNames.Add({FName(Name), FieldValue});
 		}
 	}
 

@@ -8,6 +8,16 @@ public:
 		FString Name;
 
 		bool bIsSoftReference;
+
+		bool operator==(const FDependency& InOther) const
+		{
+			return Name == InOther.Name && bIsSoftReference == InOther.bIsSoftReference;
+		}
+
+		static FString GetType(const FString& InName)
+		{
+			return InName.Replace(TEXT("&"), TEXT(""));
+		}
 	};
 
 	enum class EState
@@ -53,7 +63,7 @@ public:
 
 		void Dependency(const FDependency& InDependency)
 		{
-			Dependencies.Add(InDependency);
+			Dependencies.AddUnique(InDependency);
 		}
 
 		void Generator()
@@ -92,5 +102,7 @@ public:
 	void Generator();
 
 private:
-	TSortedMap<FString, FNode> Nodes;
+	TArray<FNode> NodeArray;
+
+	TMap<FString, int32> NodeMap;
 };

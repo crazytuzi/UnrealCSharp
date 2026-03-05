@@ -51,14 +51,15 @@ public:
 	}
 
 public:
-	static auto NewRef(MonoObject* InMonoObject, const mono_bool bPinned)
+	static auto NewRef(const FClassReflection* InClass, MonoObject* InMonoObject, const mono_bool bPinned)
 	{
-		return FDomain::GCHandle_New_V2(InMonoObject, bPinned);
+		return InClass->NewGCHandle(InMonoObject, bPinned);
 	}
 
-	static auto NewWeakRef(MonoObject* InMonoObject, const mono_bool bTrackResurrection)
+	static auto NewWeakRef(const FClassReflection* InClass, MonoObject* InMonoObject,
+	                       const mono_bool bTrackResurrection)
 	{
-		return FDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
+		return InClass->NewWeakRefGCHandle(InMonoObject, bTrackResurrection);
 	}
 
 	template <auto IsReset>
@@ -72,21 +73,17 @@ public:
 		}
 	}
 
-	static auto MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject,
-	                                               MonoProperty* InMonoProperty) -> T*
+	static auto MonoObject2GarbageCollectionHandle(const FClassReflection* InClass, MonoObject* InMonoObject) -> T*
 	{
-		return static_cast<T*>(FMonoDomain::Object_Unbox(
-			FMonoDomain::Property_Get_Value(InMonoProperty, InMonoObject, nullptr, nullptr)));
-	}
+		if (InClass != nullptr)
+		{
+			if (const auto FoundProperty = InClass->GetProperty(PROPERTY_GARBAGE_COLLECTION_HANDLE))
+			{
+				return static_cast<T*>(FDomain::Object_Unbox(FoundProperty->GetValue(InMonoObject, nullptr, nullptr)));
+			}
+		}
 
-	static auto MonoObject2GarbageCollectionHandle(MonoObject* InMonoObject)
-	{
-		const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
-			FMonoDomain::Object_Get_Class(InMonoObject), PROPERTY_GARBAGE_COLLECTION_HANDLE);
-
-		return FoundProperty != nullptr
-			       ? MonoObject2GarbageCollectionHandle(InMonoObject, FoundProperty)
-			       : nullptr;
+		return nullptr;
 	}
 
 private:

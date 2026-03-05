@@ -95,8 +95,7 @@ namespace
 
 			Function->AddToRoot();
 
-			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetDomain(),
-			                                                     FCSharpEnvironment::GetEnvironment().GetRegistry<
+			FCSharpEnvironment::GetEnvironment().GetBind()->Bind(FCSharpEnvironment::GetEnvironment().GetRegistry<
 				                                                     FClassRegistry>()->GetClassDescriptor(InClass),
 			                                                     InClass,
 			                                                     Function
@@ -171,16 +170,16 @@ namespace
 				BindActionFunction(ObjectToBindTo->GetClass(),
 				                   FCSharpEnvironment::GetEnvironment().GetString<FName>(InFunctionNameToBind));
 
-				const auto FoundMonoClass = TPropertyClass<
+				const auto FoundClass = TPropertyClass<
 					FEnhancedInputActionEventBinding, FEnhancedInputActionEventBinding>::Get();
 
-				const auto SrcMonoObject = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+				const auto Object = FoundClass->NewObject();
 
 				FCSharpEnvironment::GetEnvironment().AddBindingReference<
 					std::decay_t<FEnhancedInputActionEventBinding>, false>(
-					SrcMonoObject, &EnhancedInputActionEventBinding);
+					FoundClass, Object, &EnhancedInputActionEventBinding);
 
-				return SrcMonoObject;
+				return Object;
 			}
 
 			return nullptr;

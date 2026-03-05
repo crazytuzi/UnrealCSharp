@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
 namespace Script.Library
@@ -6,7 +7,7 @@ namespace Script.Library
     public static unsafe class TArrayImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_RegisterImplementation<T>(TArray<T> InArray);
+        public static extern void TArray_RegisterImplementation<T>(TArray<T> InArray, Type InType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool TArray_IdenticalImplementation(nint InA, nint InB);

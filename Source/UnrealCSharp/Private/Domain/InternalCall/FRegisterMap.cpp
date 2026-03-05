@@ -11,11 +11,14 @@ namespace
 {
 	struct FRegisterMap
 	{
-		static void RegisterImplementation(MonoObject* InMonoObject)
+		static void RegisterImplementation(MonoObject* InMonoObject, MonoReflectionType* InReflectionType)
 		{
-			FCSharpBind::Bind<FMapHelper>(InMonoObject,
-			                              FTypeBridge::GetGenericArgument(InMonoObject),
-			                              FTypeBridge::GetGenericArgument(InMonoObject, 1));
+			const auto Class = FReflectionRegistry::Get().GetClass(InReflectionType);
+
+			FCSharpBind::Bind<FMapHelper>(Class,
+			                              Class->GetGenericArgument(),
+			                              Class->GetGenericArgument(1),
+			                              InMonoObject);
 		}
 
 		static void UnRegisterImplementation(const FGarbageCollectionHandle InGarbageCollectionHandle)

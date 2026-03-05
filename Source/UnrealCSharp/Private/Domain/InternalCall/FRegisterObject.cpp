@@ -1,6 +1,5 @@
-﻿#include "Engine/World.h"
+#include "Engine/World.h"
 #include "Binding/Class/TBindingClassBuilder.inl"
-#include "Binding/Core/TPropertyClass.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/CompilerMacro.h"
@@ -27,8 +26,7 @@ namespace
 
 		static MonoObject* StaticClassImplementation(MonoString* InClassName)
 		{
-			const auto ClassName =
-				UTF8_TO_TCHAR(FCSharpEnvironment::GetEnvironment().GetDomain()->String_To_UTF8(InClassName));
+			const auto ClassName = UTF8_TO_TCHAR(FDomain::String_To_UTF8(InClassName));
 
 			const auto InClass = LoadObject<UClass>(nullptr, ClassName);
 
@@ -53,12 +51,12 @@ namespace
 			{
 				const auto Name = FoundObject->GetName();
 
-				const auto FoundMonoClass = TPropertyClass<FString, FString>::Get();
+				const auto FoundClass = TPropertyClass<FString, FString>::Get();
 
-				const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(FoundMonoClass);
+				const auto Object = FoundClass->NewObject();
 
 				FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(
-					Object, new FString(Name));
+					FoundClass, Object, new FString(Name));
 
 				return Object;
 			}

@@ -1,4 +1,5 @@
 #if UE_5_3_OR_LATER
+using System;
 using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
@@ -7,10 +8,11 @@ namespace Script.Library
     public static class TOptionalImplementation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TOptional_Register1Implementation<T>(TOptional<T> InOptional);
+        public static extern void TOptional_Register1Implementation<T>(TOptional<T> InOptional, Type InType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TOptional_Register2Implementation<T>(TOptional<T> InOptional, object InValue);
+        public static extern void TOptional_Register2Implementation<T>(TOptional<T> InOptional,
+            object InValue, Type InType);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool TOptional_IdenticalImplementation(nint InA, nint InB);
@@ -28,7 +30,7 @@ namespace Script.Library
         public static extern object TOptional_GetImplementation(nint InOptional);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TOptional_SetImplementation(nint InOptional, object InValue);
+        public static extern void TOptional_SetImplementation(nint InOptional, object InValue, Type InType);
     }
 }
 #endif

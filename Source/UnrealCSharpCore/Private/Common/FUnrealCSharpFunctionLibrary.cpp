@@ -18,6 +18,7 @@
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Dynamic/FDynamicClassGenerator.h"
+#include "Dynamic/FDynamicStructGenerator.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Setting/UnrealCSharpSetting.h"
 #include "UEVersion.h"
@@ -386,12 +387,16 @@ FString FUnrealCSharpFunctionLibrary::GetFullClass(const UStruct* InStruct)
 	return Encode(FString::Printf(TEXT(
 		              "%s%s"
 	              ),
-	                              InStruct->IsNative() &&
+	                              (InStruct->IsNative() ||
+		                              FDynamicClassGenerator::IsDynamicClass(InStruct) ||
+		                              FDynamicStructGenerator::IsDynamicStruct(InStruct)) &&
 	                              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
 		                              ? InStruct->GetPrefixCPP()
 		                              : TEXT(""),
 	                              *InStruct->GetName()),
-	              InStruct->IsNative() &&
+	              (InStruct->IsNative() ||
+		              FDynamicClassGenerator::IsDynamicClass(InStruct) ||
+		              FDynamicStructGenerator::IsDynamicStruct(InStruct)) &&
 	              !FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(InStruct)
 	);
 }

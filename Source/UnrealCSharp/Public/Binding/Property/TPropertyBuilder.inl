@@ -2,7 +2,6 @@
 
 #include "CoreMacro/BufferMacro.h"
 #include "Binding/Core/TPropertyValue.inl"
-#include "Binding/Core/TPropertyClass.inl"
 #include "Binding/TypeInfo/TTypeInfo.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Template/TGetArrayLength.inl"

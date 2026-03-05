@@ -12,7 +12,8 @@ namespace Script.CoreUObject
             TSoftObjectPtrImplementation.TSoftObjectPtr_UnRegisterImplementation(GarbageCollectionHandle);
 
         public TSoftObjectPtr(T InObject) =>
-            TSoftObjectPtrImplementation.TSoftObjectPtr_RegisterImplementation(this, InObject.GarbageCollectionHandle);
+            TSoftObjectPtrImplementation.TSoftObjectPtr_RegisterImplementation(
+                this, InObject.GarbageCollectionHandle, GetType());
 
         public static implicit operator TSoftObjectPtr<T>(T InObject) => new(InObject);
 

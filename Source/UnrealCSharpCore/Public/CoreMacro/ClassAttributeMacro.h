@@ -18,8 +18,6 @@
 
 #define CLASS_DEPRECATED_ATTRIBUTE FString(TEXT("DeprecatedAttribute"))
 
-#define CLASS_CONFIG_ATTRIBUTE FString(TEXT("ConfigAttribute"))
-
 #define CLASS_PER_OBJECT_CONFIG_ATTRIBUTE FString(TEXT("PerObjectConfigAttribute"))
 
 #define CLASS_CONFIG_DO_NOT_CHECK_DEFAULTS_ATTRIBUTE FString(TEXT("ConfigDoNotCheckDefaultsAttribute"))
@@ -33,8 +31,6 @@
 #define CLASS_HIDE_DROP_DOWN_ATTRIBUTE FString(TEXT("HideDropdownAttribute"))
 
 #define CLASS_SHOW_CATEGORIES_ATTRIBUTE FString(TEXT("ShowCategoriesAttribute"))
-
-#define CLASS_HIDE_CATEGORIES_ATTRIBUTE FString(TEXT("HideCategoriesAttribute"))
 
 #define CLASS_COMPONENT_WRAPPER_CLASS_ATTRIBUTE FString(TEXT("ComponentWrapperClassAttribute"))
 
@@ -52,10 +48,6 @@
 
 #define CLASS_ADVANCED_CLASS_DISPLAY_ATTRIBUTE FString(TEXT("AdvancedClassDisplayAttribute"))
 
-#define CLASS_CONVERSION_ROOT_ATTRIBUTE FString(TEXT("ConversionRootAttribute"))
-
 #define CLASS_EARLY_ACCESS_PREVIEW_ATTRIBUTE FString(TEXT("EarlyAccessPreviewAttribute"))
 
 #define CLASS_SPARSE_CLASS_DATA_TYPE_ATTRIBUTE FString(TEXT("SparseClassDataTypeAttribute"))
-
-#define CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE FString(TEXT("CannotImplementInterfaceInBlueprintAttribute"))

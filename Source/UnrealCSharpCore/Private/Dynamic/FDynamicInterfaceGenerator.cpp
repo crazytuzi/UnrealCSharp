@@ -2,9 +2,8 @@
 #include "Bridge/FTypeBridge.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Domain/FMonoDomain.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "Reflection/FReflectionRegistry.h"
 #if WITH_EDITOR
 #include "BlueprintActionDatabase.h"
 #include "Kismet2/KismetEditorUtilities.h"
@@ -21,41 +20,37 @@ TSet<UClass*> FDynamicInterfaceGenerator::DynamicInterfaceSet;
 
 void FDynamicInterfaceGenerator::Generator()
 {
-	FDynamicGeneratorCore::Generator(CLASS_U_INTERFACE_ATTRIBUTE,
-	                                 [](MonoClass* InMonoClass)
+	FDynamicGeneratorCore::Generator(FReflectionRegistry::Get().GetUInterfaceAttributeClass(),
+	                                 [](FClassReflection* InClassReflection)
 	                                 {
-		                                 if (InMonoClass == nullptr)
+		                                 if (InClassReflection == nullptr)
 		                                 {
 			                                 return;
 		                                 }
 
-		                                 if (!FMonoDomain::Type_Is_Class(FMonoDomain::Class_Get_Type(InMonoClass)))
+		                                 if (!InClassReflection->IsClass())
 		                                 {
 			                                 return;
 		                                 }
 
-		                                 const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
-
-		                                 auto Node = FDynamicDependencyGraph::FNode(ClassName, [InMonoClass]()
-		                                 {
-			                                 Generator(InMonoClass);
-		                                 });
-
-		                                 if (const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass))
-		                                 {
-			                                 if (FDynamicGeneratorCore::ClassHasAttr(
-				                                 ParentMonoClass, CLASS_U_INTERFACE_ATTRIBUTE))
+		                                 auto Node = FDynamicDependencyGraph::FNode(
+			                                 InClassReflection->GetName(), [InClassReflection]()
 			                                 {
-				                                 const auto ParentClassName = FString(
-					                                 FMonoDomain::Class_Get_Name(ParentMonoClass));
+				                                 Generator(InClassReflection);
+			                                 });
 
+		                                 if (const auto Parent = InClassReflection->GetParent())
+		                                 {
+			                                 if (Parent->HasAttribute(
+				                                 FReflectionRegistry::Get().GetUInterfaceAttributeClass()))
+			                                 {
 				                                 Node.Dependency(FDynamicDependencyGraph::FDependency{
-					                                 ParentClassName, false
+					                                 Parent->GetName(), false
 				                                 });
 			                                 }
 		                                 }
 
-		                                 FDynamicGeneratorCore::GeneratorFunction(InMonoClass, Node);
+		                                 FDynamicGeneratorCore::GeneratorFunction(InClassReflection, Node);
 
 		                                 FDynamicGeneratorCore::AddNode(Node);
 	                                 });
@@ -76,40 +71,32 @@ void FDynamicInterfaceGenerator::CodeAnalysisGenerator()
 		                                             }
 	                                             });
 }
-
-bool FDynamicInterfaceGenerator::IsDynamicInterface(MonoClass* InMonoClass)
-{
-	return FDynamicGeneratorCore::IsDynamic(InMonoClass, CLASS_U_INTERFACE_ATTRIBUTE);
-}
 #endif
 
-void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
+void FDynamicInterfaceGenerator::Generator(FClassReflection* InClassReflection)
 {
-	if (InMonoClass == nullptr)
+	if (InClassReflection == nullptr)
 	{
 		return;
 	}
 
-	if (!FMonoDomain::Type_Is_Class(FMonoDomain::Class_Get_Type(InMonoClass)))
+	if (!InClassReflection->IsClass())
 	{
 		return;
 	}
 
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
+	const auto ClassName = InClassReflection->GetName();
 
-	const auto ClassNamespace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
+	const auto ClassNamespace = InClassReflection->GetNameSpace();
 
 	const auto Outer = FDynamicGeneratorCore::GetOuter();
 
-	const auto ParentMonoClass = FMonoDomain::Class_Get_Parent(InMonoClass);
+	UClass* ParentClass{};
 
-	const auto ParentMonoType = FMonoDomain::Class_Get_Type(ParentMonoClass);
-
-	const auto ParentMonoReflectionType = FMonoDomain::Type_Get_Object(ParentMonoType);
-
-	const auto ParentPathName = FTypeBridge::GetPathName(ParentMonoReflectionType);
-
-	const auto ParentClass = LoadClass<UInterface>(nullptr, *ParentPathName);
+	if (const auto Parent = InClassReflection->GetParent())
+	{
+		ParentClass = LoadClass<UInterface>(nullptr, *Parent->GetPathName());
+	}
 
 #if WITH_EDITOR
 	const UClass* OldClass{};
@@ -124,9 +111,9 @@ void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
 		Class->PurgeClass(true);
 
 		GeneratorInterface(ClassNamespace, ClassName, Class, ParentClass,
-		                   [InMonoClass](UClass* InInterface)
+		                   [InClassReflection](UClass* InInterface)
 		                   {
-			                   ProcessGenerator(InMonoClass, InInterface);
+			                   ProcessGenerator(InClassReflection, InInterface);
 		                   });
 
 #if WITH_EDITOR
@@ -136,9 +123,9 @@ void FDynamicInterfaceGenerator::Generator(MonoClass* InMonoClass)
 	else
 	{
 		Class = GeneratorInterface(Outer, ClassNamespace, ClassName, ParentClass,
-		                           [InMonoClass](UClass* InInterface)
+		                           [InClassReflection](UClass* InInterface)
 		                           {
-			                           ProcessGenerator(InMonoClass, InInterface);
+			                           ProcessGenerator(InClassReflection, InInterface);
 		                           });
 	}
 
@@ -183,11 +170,11 @@ void FDynamicInterfaceGenerator::BeginGenerator(UClass* InClass, UClass* InParen
 	InClass->ClassFlags |= CLASS_Abstract | CLASS_Native | CLASS_Interface;
 }
 
-void FDynamicInterfaceGenerator::ProcessGenerator(MonoClass* InMonoClass, UClass* InClass)
+void FDynamicInterfaceGenerator::ProcessGenerator(FClassReflection* InClassReflection, UClass* InClass)
 {
-	FDynamicGeneratorCore::SetFlags(InClass, FMonoDomain::Custom_Attrs_From_Class(InMonoClass));
+	FDynamicGeneratorCore::SetFlags(InClassReflection, InClass);
 
-	GeneratorFunction(InMonoClass, InClass);
+	GeneratorFunction(InClassReflection, InClass);
 }
 
 void FDynamicInterfaceGenerator::EndGenerator(UClass* InClass)
@@ -222,21 +209,21 @@ void FDynamicInterfaceGenerator::EndGenerator(UClass* InClass)
 #if UE_NOTIFY_REGISTRATION_EVENT
 #if !WITH_EDITOR
 	NotifyRegistrationEvent(*InClass->GetDefaultObject(false)->GetPackage()->GetName(),
-							*InClass->GetDefaultObject(false)->GetName(),
-							ENotifyRegistrationType::NRT_ClassCDO,
-							ENotifyRegistrationPhase::NRP_Finished,
-							nullptr,
-							false,
-							InClass->GetDefaultObject(false));
+	                        *InClass->GetDefaultObject(false)->GetName(),
+	                        ENotifyRegistrationType::NRT_ClassCDO,
+	                        ENotifyRegistrationPhase::NRP_Finished,
+	                        nullptr,
+	                        false,
+	                        InClass->GetDefaultObject(false));
 
 
 	NotifyRegistrationEvent(*InClass->GetPackage()->GetName(),
-							*InClass->GetName(),
-							ENotifyRegistrationType::NRT_Class,
-							ENotifyRegistrationPhase::NRP_Finished,
-							nullptr,
-							false,
-							InClass);
+	                        *InClass->GetName(),
+	                        ENotifyRegistrationType::NRT_Class,
+	                        ENotifyRegistrationPhase::NRP_Finished,
+	                        nullptr,
+	                        false,
+	                        InClass);
 #endif
 #endif
 }
@@ -325,11 +312,11 @@ void FDynamicInterfaceGenerator::ReInstance(UClass* InClass)
 }
 #endif
 
-void FDynamicInterfaceGenerator::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass)
+void FDynamicInterfaceGenerator::GeneratorFunction(const FClassReflection* InClassReflection, UClass* InClass)
 {
-	FDynamicGeneratorCore::GeneratorFunction(FDynamicGeneratorCore::UInterfaceToIInterface(InMonoClass),
+	FDynamicGeneratorCore::GeneratorFunction(FDynamicGeneratorCore::UInterfaceToIInterface(InClassReflection),
 	                                         InClass,
-	                                         [](const UFunction* InFunction)
+	                                         [](FMethodReflection* InMethodReflection, const UFunction* InFunction)
 	                                         {
 		                                         InFunction->SetInternalFlags(EInternalObjectFlags::Native);
 	                                         });

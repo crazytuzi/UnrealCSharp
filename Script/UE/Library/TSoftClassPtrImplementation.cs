@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Script.CoreUObject;
 
 namespace Script.Library
@@ -7,7 +8,7 @@ namespace Script.Library
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TSoftClassPtr_RegisterImplementation<T>(TSoftClassPtr<T> InSoftClassPtr,
-            nint InClass) where T : UObject;
+            nint InClass, Type InType) where T : UObject;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool TSoftClassPtr_IdenticalImplementation(nint InA, nint InB);

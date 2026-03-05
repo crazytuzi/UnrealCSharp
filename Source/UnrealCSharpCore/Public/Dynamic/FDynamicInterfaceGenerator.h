@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mono/metadata/object.h"
+#include "Reflection/FClassReflection.h"
 
 class FDynamicInterfaceGenerator
 {
@@ -9,11 +9,9 @@ public:
 
 #if WITH_EDITOR
 	static void CodeAnalysisGenerator();
-
-	static bool IsDynamicInterface(MonoClass* InMonoClass);
 #endif
 
-	static void Generator(MonoClass* InMonoClass);
+	static void Generator(FClassReflection* InClassReflection);
 
 	static bool IsDynamicInterface(const UClass* InClass);
 
@@ -22,7 +20,7 @@ public:
 private:
 	static void BeginGenerator(UClass* InClass, UClass* InParentClass);
 
-	static void ProcessGenerator(MonoClass* InMonoClass, UClass* InClass);
+	static void ProcessGenerator(FClassReflection* InClassReflection, UClass* InClass);
 
 	static void EndGenerator(UClass* InClass);
 
@@ -41,7 +39,7 @@ private:
 	static void ReInstance(UClass* InClass);
 #endif
 
-	static void GeneratorFunction(MonoClass* InMonoClass, UClass* InClass);
+	static void GeneratorFunction(const FClassReflection* InClassReflection, UClass* InClass);
 
 private:
 	static TMap<UClass*, FString> NamespaceMap;

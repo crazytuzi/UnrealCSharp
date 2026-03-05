@@ -1,7 +1,7 @@
-﻿#include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
+#include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 
-FStructPropertyDescriptor::FStructPropertyDescriptor(FStructProperty* InProperty):
+FStructPropertyDescriptor::FStructPropertyDescriptor(FStructProperty* InProperty) :
 	TCompoundPropertyDescriptor(InProperty)
 {
 	FCSharpEnvironment::GetEnvironment().Bind<false>(InProperty->Struct);
@@ -9,7 +9,7 @@ FStructPropertyDescriptor::FStructPropertyDescriptor(FStructProperty* InProperty
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = Class->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(Property->Struct, Src, Object);
 
@@ -18,7 +18,7 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) cons
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
-	const auto Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+	const auto Object = Class->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddStructReference<false>(Property->Struct, Src, Object);
 
@@ -59,7 +59,7 @@ MonoObject* FStructPropertyDescriptor::NewRef(void* InAddress) const
 
 	if (Object == nullptr)
 	{
-		Object = FCSharpEnvironment::GetEnvironment().GetDomain()->Object_New(Class);
+		Object = Class->NewObject();
 
 		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
 			InAddress, Property);

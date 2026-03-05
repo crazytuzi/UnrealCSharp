@@ -1,218 +1,19 @@
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "Kismet/KismetStringLibrary.h"
 #include "Dynamic/FDynamicDependencyGraph.h"
 #include "Bridge/FTypeBridge.h"
 #include "CoreMacro/Macro.h"
-#include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/ClassAttributeMacro.h"
 #include "CoreMacro/FunctionMacro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "CoreMacro/PropertyMacro.h"
-#include "CoreMacro/PropertyAttributeMacro.h"
-#include "CoreMacro/FunctionAttributeMacro.h"
 #include "CoreMacro/GenericAttributeMacro.h"
 #include "CoreMacro/MetaDataAttributeMacro.h"
 #include "Domain/FMonoDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Log/UnrealCSharpLog.h"
 #include "Template/TGetArrayLength.inl"
-#include "mono/metadata/object.h"
+#include "Reflection/FReflectionRegistry.h"
 
 #if WITH_EDITOR
 TMap<FString, TArray<FString>> FDynamicGeneratorCore::DynamicMap;
-
-TArray<FString> FDynamicGeneratorCore::ClassMetaDataAttrs =
-{
-	CLASS_HIDE_CATEGORIES_ATTRIBUTE,
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_BLUEPRINT_SPAWNABLE_COMPONENT_ATTRIBUTE,
-	CLASS_CHILD_CAN_TICK_ATTRIBUTE,
-	CLASS_CHILD_CANNOT_TICK_ATTRIBUTE,
-	CLASS_DEBUG_TREE_LEAF_ATTRIBUTE,
-	CLASS_IGNORE_CATEGORY_KEYWORDS_IN_SUBCLASSES_ATTRIBUTE,
-	CLASS_DEPRECATED_NODE_ATTRIBUTE,
-	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
-	CLASS_DISPLAY_NAME_ATTRIBUTE,
-	CLASS_SCRIPT_NAME_ATTRIBUTE,
-	CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE,
-	CLASS_KISMET_HIDE_OVERRIDES_ATTRIBUTE,
-	CLASS_LOAD_BEHAVIOR_ATTRIBUTE,
-	CLASS_PROHIBITED_INTERFACES_ATTRIBUTE,
-	CLASS_RESTRICTED_TO_CLASSES_ATTRIBUTE,
-	CLASS_SHOW_WORLD_CONTEXT_PIN_ATTRIBUTE,
-	CLASS_DONT_USE_GENERIC_SPAWN_OBJECT_ATTRIBUTE,
-	CLASS_EXPOSED_ASYNC_PROXY_ATTRIBUTE,
-	CLASS_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
-	CLASS_USES_HIERARCHY_ATTRIBUTE
-};
-
-TArray<FString> FDynamicGeneratorCore::StructMetaDataAttrs =
-{
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_HAS_NATIVE_BREAK_ATTRIBUTE,
-	CLASS_HAS_NATIVE_MAKE_ATTRIBUTE,
-	CLASS_HIDDEN_BY_DEFAULT_ATTRIBUTE,
-	CLASS_DISABLE_SPLIT_PIN_ATTRIBUTE
-};
-
-TArray<FString> FDynamicGeneratorCore::EnumMetaDataAttrs =
-{
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_BITFLAGS_ATTRIBUTE,
-	CLASS_USE_ENUM_VALUES_AS_MASK_VALUES_IN_EDITOR
-};
-
-TArray<FString> FDynamicGeneratorCore::InterfaceMetaDataAttrs =
-{
-	CLASS_CONVERSION_ROOT_ATTRIBUTE,
-	CLASS_CANNOT_IMPLEMENT_INTERFACE_IN_BLUEPRINT_ATTRIBUTE,
-	CLASS_TOOLTIP_ATTRIBUTE
-};
-
-TArray<FString> FDynamicGeneratorCore::PropertyMetaDataAttrs =
-{
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
-	CLASS_DISPLAY_NAME_ATTRIBUTE,
-	CLASS_SCRIPT_NAME_ATTRIBUTE,
-	CLASS_LOAD_BEHAVIOR_ATTRIBUTE,
-	CLASS_ALLOW_ABSTRACT_ATTRIBUTE,
-	CLASS_ALLOW_ANY_ACTOR_ATTRIBUTE,
-	CLASS_ALLOWED_CLASSES_ATTRIBUTE,
-	CLASS_ALLOW_PRESERVE_RATIO_ATTRIBUTE,
-	CLASS_ALLOW_PRIVATE_ACCESS_ATTRIBUTE,
-	CLASS_ARRAY_CLAMP_ATTRIBUTE,
-	CLASS_ASSET_BUNDLES_ATTRIBUTE,
-	CLASS_BLUEPRINT_BASE_ONLY_ATTRIBUTE,
-	CLASS_BLUEPRINT_COMPILER_GENERATED_DEFAULTS_ATTRIBUTE,
-	CLASS_CLAMP_MIN_ATTRIBUTE,
-	CLASS_CLAMP_MAX_ATTRIBUTE,
-	CLASS_CONFIG_HIERARCHY_EDITABLE_ATTRIBUTE,
-	CLASS_CONTENT_DIR_ATTRIBUTE,
-	CLASS_DELTA_ATTRIBUTE,
-	CLASS_DEPRECATED_PROPERTY_ATTRIBUTE,
-	CLASS_DISALLOWED_ASSET_DATA_TAGS_ATTRIBUTE,
-	CLASS_DISALLOWED_CLASSES_ATTRIBUTE,
-	CLASS_DISPLAY_AFTER_ATTRIBUTE,
-	CLASS_DISPLAY_PRIORITY_ATTRIBUTE,
-	CLASS_DISPLAY_THUMBNAIL_ATTRIBUTE,
-	CLASS_EDIT_CONDITION_ATTRIBUTE,
-	CLASS_EDIT_CONDITION_HIDES_ATTRIBUTE,
-	CLASS_EDIT_FIXED_ORDER_ATTRIBUTE,
-	CLASS_CATEGORY_ATTRIBUTE,
-	CLASS_EXACT_CLASS_ATTRIBUTE,
-	CLASS_EXPOSE_FUNCTION_CATEGORIES_ATTRIBUTE,
-	CLASS_EXPOSE_ON_SPAWN_ATTRIBUTE,
-	CLASS_FILE_PATH_FILTER_ATTRIBUTE,
-	CLASS_RELATIVE_TO_GAME_DIR_ATTRIBUTE,
-	CLASS_FIXED_INCREMENT_ATTRIBUTE,
-	CLASS_FORCE_SHOW_ENGINE_CONTENT_ATTRIBUTE,
-	CLASS_FORCE_SHOW_PLUGIN_CONTENT_ATTRIBUTE,
-	CLASS_HIDE_ALPHA_CHANNEL_ATTRIBUTE,
-	CLASS_HIDE_IN_DETAIL_PANEL_ATTRIBUTE,
-	CLASS_HIDE_VIEW_OPTIONS_ATTRIBUTE,
-	CLASS_IGNORE_FOR_MEMBER_INITIALIZATION_TEST_ATTRIBUTE,
-	CLASS_INLINE_EDIT_CONDITION_TOGGLE_ATTRIBUTE,
-	CLASS_LINEAR_DELTA_SENSITIVITY_ATTRIBUTE,
-	CLASS_LONG_PACKAGE_NAME_ATTRIBUTE,
-	CLASS_MAKE_EDIT_WIDGET_ATTRIBUTE,
-	CLASS_MAKE_STRUCTURE_DEFAULT_VALUE_ATTRIBUTE,
-	CLASS_META_CLASS_ATTRIBUTE,
-	CLASS_MUST_IMPLEMENT_ATTRIBUTE,
-	CLASS_MULTIPLE_ATTRIBUTE,
-	CLASS_MAX_LENGTH_ATTRIBUTE,
-	CLASS_MULTILINE_ATTRIBUTE,
-	CLASS_PASSWORD_FIELD_ATTRIBUTE,
-	CLASS_NO_ELEMENT_DUPLICATE_ATTRIBUTE,
-	CLASS_NO_RESET_TO_DEFAULT_ATTRIBUTE,
-	CLASS_NO_EDIT_INLINE_ATTRIBUTE,
-	CLASS_NO_SPIN_BOX_ATTRIBUTE,
-	CLASS_ONLY_PLACEABLE_ATTRIBUTE,
-	CLASS_RELATIVE_PATH_ATTRIBUTE,
-	CLASS_RELATIVE_TO_GAME_CONTENT_DIR_ATTRIBUTE,
-	CLASS_REQUIRED_ASSET_DATA_TAGS_ATTRIBUTE,
-	CLASS_SCRIPT_NO_EXPORT_ATTRIBUTE,
-	CLASS_SHOW_ONLY_INNER_PROPERTIES_ATTRIBUTE,
-	CLASS_SHOW_TREE_VIEW_ATTRIBUTE,
-	CLASS_SLIDER_EXPONENT_ATTRIBUTE,
-	CLASS_TITLE_PROPERTY_ATTRIBUTE,
-	CLASS_UI_MIN_ATTRIBUTE,
-	CLASS_UI_MAX_ATTRIBUTE,
-	CLASS_UNITS_ATTRIBUTE,
-	CLASS_FORCE_UNITS_ATTRIBUTE,
-	CLASS_UNTRACKED_ATTRIBUTE,
-	CLASS_DEVELOPMENT_ONLY_ATTRIBUTE,
-	CLASS_NEEDS_LATENT_FIXUP_ATTRIBUTE,
-	CLASS_LATENT_CALLBACK_TARGET_ATTRIBUTE,
-	CLASS_GET_OPTIONS_ATTRIBUTE,
-	CLASS_PIN_HIDDEN_BY_DEFAULT_ATTRIBUTE,
-	CLASS_VALID_ENUM_VALUES_ATTRIBUTE,
-	CLASS_INVALID_ENUM_VALUES_ATTRIBUTE,
-	CLASS_OVERRIDING_INPUT_PROPERTY_ATTRIBUTE,
-	CLASS_REQUIRED_INPUT_ATTRIBUTE,
-	CLASS_NEVER_AS_PIN_ATTRIBUTE,
-	CLASS_PIN_SHOWN_BY_DEFAULT_ATTRIBUTE,
-	CLASS_ALWAYS_AS_PIN_ATTRIBUTE,
-	CLASS_CUSTOMIZE_PROPERTY_ATTRIBUTE
-};
-
-TArray<FString> FDynamicGeneratorCore::FunctionMetaDataAttrs =
-{
-	CLASS_CALL_IN_EDITOR_ATTRIBUTE,
-	CLASS_TOOLTIP_ATTRIBUTE,
-	CLASS_CATEGORY_ATTRIBUTE,
-	CLASS_VARIADIC_ATTRIBUTE,
-	CLASS_RETURN_DISPLAY_NAME_ATTRIBUTE,
-	CLASS_INTERNAL_USE_PARAM_ATTRIBUTE,
-	CLASS_FORCE_AS_FUNCTION_ATTRIBUTE,
-	CLASS_IGNORE_TYPE_PROMOTION_ATTRIBUTE,
-	CLASS_DEPRECATION_MESSAGE_ATTRIBUTE,
-	CLASS_DISPLAY_NAME_ATTRIBUTE,
-	CLASS_SCRIPT_NAME_ATTRIBUTE,
-	CLASS_SCRIPT_NO_EXPORT_ATTRIBUTE,
-	CLASS_ADVANCED_DISPLAY_ATTRIBUTE,
-	CLASS_ARRAY_PARM_ATTRIBUTE,
-	CLASS_ARRAY_TYPE_DEPENDENT_PARAMS_ATTRIBUTE,
-	CLASS_AUTO_CREATE_REF_TERM_ATTRIBUTE,
-	CLASS_HIDE_ASSET_PICKER_ATTRIBUTE,
-	CLASS_BLUEPRINT_INTERNAL_USE_ONLY_ATTRIBUTE,
-	CLASS_BLUEPRINT_PROTECTED_ATTRIBUTE,
-	CLASS_CALLABLE_WITHOUT_WORLD_CONTEXT_ATTRIBUTE,
-	CLASS_COMMUTATIVE_ASSOCIATIVE_BINARY_OPERATOR_ATTRIBUTE,
-	CLASS_COMPACT_NODE_TITLE_ATTRIBUTE,
-	CLASS_CUSTOM_STRUCTURE_PARAM_ATTRIBUTE,
-	CLASS_DEFAULT_TO_SELF_ATTRIBUTE,
-	CLASS_DEPRECATED_FUNCTION_ATTRIBUTE,
-	CLASS_EXPAND_ENUM_AS_EXECS_ATTRIBUTE,
-	CLASS_EXPAND_BOOL_AS_EXECS_ATTRIBUTE,
-	CLASS_SCRIPT_METHOD_ATTRIBUTE,
-	CLASS_SCRIPT_METHOD_SELF_RETURN_ATTRIBUTE,
-	CLASS_SCRIPT_OPERATOR_ATTRIBUTE,
-	CLASS_SCRIPT_CONSTANT_ATTRIBUTE,
-	CLASS_SCRIPT_CONSTANT_HOST_ATTRIBUTE,
-	CLASS_HIDE_PIN_ATTRIBUTE,
-	CLASS_HIDE_SPAWN_PARMS_ATTRIBUTE,
-	CLASS_KEYWORDS_ATTRIBUTE,
-	CLASS_LATENT_ATTRIBUTE,
-	CLASS_LATENT_INFO_ATTRIBUTE,
-	CLASS_MATERIAL_PARAMETER_COLLECTION_FUNCTION_ATTRIBUTE,
-	CLASS_NATIVE_BREAK_FUNC_ATTRIBUTE,
-	CLASS_NATIVE_MAKE_FUNC_ATTRIBUTE,
-	CLASS_UNSAFE_DURING_ACTOR_CONSTRUCTION_ATTRIBUTE,
-	CLASS_WORLD_CONTEXT_ATTRIBUTE,
-	CLASS_BLUEPRINT_AUTO_CAST_ATTRIBUTE,
-	CLASS_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
-	CLASS_NOT_BLUEPRINT_THREAD_SAFE_ATTRIBUTE,
-	CLASS_DETERMINES_OUTPUT_TYPE_ATTRIBUTE,
-	CLASS_DYNAMIC_OUTPUT_PARAM_ATTRIBUTE,
-	CLASS_DATA_TABLE_PIN_ATTRIBUTE,
-	CLASS_SET_PARAM_ATTRIBUTE,
-	CLASS_MAP_PARAM_ATTRIBUTE,
-	CLASS_MAP_KEY_PARAM_ATTRIBUTE,
-	CLASS_MAP_VALUE_PARAM_ATTRIBUTE,
-	CLASS_BIT_MASK_ATTRIBUTE,
-	CLASS_BIT_MASK_ENUM_ATTRIBUTE,
-	CLASS_ARRAY_PARAM_ATTRIBUTE
-};
 #endif
 
 #if WITH_EDITOR
@@ -244,16 +45,6 @@ void FDynamicGeneratorCore::CodeAnalysisGenerator(const FString& InName,
 			}
 		}
 	}
-}
-
-bool FDynamicGeneratorCore::IsDynamic(MonoClass* InMonoClass, const FString& InAttribute)
-{
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttribute);
-
-	const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(InMonoClass);
-
-	return !!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass);
 }
 
 const FString& FDynamicGeneratorCore::DynamicReInstanceBaseName()
@@ -289,271 +80,166 @@ void FDynamicGeneratorCore::Generator()
 	FDynamicDependencyGraph::Get().Generator();
 }
 
-void FDynamicGeneratorCore::GeneratorField(MonoReflectionType* InMonoReflectionType,
+void FDynamicGeneratorCore::GeneratorField(FReflection* InReflection,
+                                           const FClassReflection* InClassReflection,
                                            FDynamicDependencyGraph::FNode& OutNode)
 {
-	GeneratorField(nullptr, InMonoReflectionType, OutNode);
-}
-
-void FDynamicGeneratorCore::GeneratorField(MonoCustomAttrInfo* InMonoCustomAttrInfo,
-                                           MonoReflectionType* InMonoReflectionType,
-                                           FDynamicDependencyGraph::FNode& OutNode)
-{
-	const auto InMonoType = FMonoDomain::Reflection_Type_Get_Type(
-		FTypeBridge::GetType(InMonoReflectionType));
-
-	const auto InMonoClass = FMonoDomain::Type_Get_Class(InMonoType);
-
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SUB_CLASS_OF))
+	if (InClassReflection == nullptr)
 	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
-		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-
-			return;
-		}
+		return;
 	}
 
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()),
-		FUnrealCSharpFunctionLibrary::GetFullClass(UObject::StaticClass())))
+	const auto ClassName = InClassReflection->GetName();
+
+	switch (FTypeBridge::GetPropertyType(InClassReflection))
 	{
-		if (InMonoClass == FoundMonoClass ||
-			FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+	case EPropertyTypeExtent::SubclassOfReference:
 		{
-			if (ClassHasAttr(InMonoClass, CLASS_U_CLASS_ATTRIBUTE))
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
+		}
+		break;
+	case EPropertyTypeExtent::ObjectReference:
+		{
+			if (InClassReflection->HasAttribute(FReflectionRegistry::Get().GetUClassAttributeClass()))
 			{
 				const auto bIsSoftReference =
-					!(AttrsHasAttr(InMonoCustomAttrInfo, CLASS_DEFAULT_SUB_OBJECT_ATTRIBUTE) ||
-						AttrsHasAttr(InMonoCustomAttrInfo, CLASS_ROOT_COMPONENT_ATTRIBUTE));
+					!(InReflection->HasAttribute(FReflectionRegistry::Get().GetDefaultSubObjectAttributeClass()) ||
+						InReflection->HasAttribute(FReflectionRegistry::Get().GetRootComponentAttributeClass()));
 
 				OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, bIsSoftReference});
 			}
-
-			return;
 		}
-	}
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SCRIPT_INTERFACE))
-	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
+		break;
+	case EPropertyTypeExtent::Interface:
 		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-
-			return;
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
 		}
-	}
-
-	if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FMonoDomain::Get_Enum_Class(), false))
-	{
-		if (ClassHasAttr(InMonoClass, CLASS_U_ENUM_ATTRIBUTE))
+		break;
+	case EPropertyTypeExtent::Enum:
 		{
-			OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
-		}
-
-		return;
-	}
-
-	if (FMonoDomain::Class_Get_Method_From_Name(
-		InMonoClass, FUNCTION_STATIC_STRUCT, 0))
-	{
-		if (ClassHasAttr(InMonoClass, CLASS_U_STRUCT_ATTRIBUTE))
-		{
-			OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
-		}
-
-		return;
-	}
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_WEAK_OBJECT_PTR))
-	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
-		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-
-			return;
-		}
-	}
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_LAZY_OBJECT_PTR))
-	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
-		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-
-			return;
-		}
-	}
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_CLASS_PTR))
-	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
-		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-
-			return;
-		}
-	}
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SOFT_OBJECT_PTR))
-	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
-		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-
-			return;
-		}
-	}
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_MAP))
-	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
-		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType, 1), OutNode);
-
-			return;
-		}
-	}
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_SET))
-	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
-		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-
-			return;
-		}
-	}
-
-	if (const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), GENERIC_T_ARRAY))
-	{
-		if (FMonoDomain::Class_Is_Subclass_Of(InMonoClass, FoundMonoClass, false))
-		{
-			GeneratorField(InMonoCustomAttrInfo, FTypeBridge::GetGenericArgument(InMonoReflectionType), OutNode);
-		}
-	}
-}
-
-void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode)
-{
-	if (InMonoClass == nullptr)
-	{
-		return;
-	}
-
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_PROPERTY_ATTRIBUTE);
-
-	void* Iterator = nullptr;
-
-	while (const auto Property = FMonoDomain::Class_Get_Properties(InMonoClass, &Iterator))
-	{
-		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Property(InMonoClass, Property))
-		{
-			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			if (InClassReflection->HasAttribute(FReflectionRegistry::Get().GetUEnumAttributeClass()))
 			{
-				const auto PropertyType = FMonoDomain::Property_Get_Type(Property);
-
-				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
-
-				GeneratorField(Attrs, ReflectionType, OutNode);
-			}
-		}
-	}
-}
-
-void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode)
-{
-	if (InMonoClass == nullptr)
-	{
-		return;
-	}
-
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_FUNCTION_ATTRIBUTE);
-
-	void* MethodIterator = nullptr;
-
-	while (const auto Method = FMonoDomain::Class_Get_Methods(InMonoClass, &MethodIterator))
-	{
-		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Method(Method))
-		{
-			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
-			{
-				const auto Signature = FMonoDomain::Method_Signature(Method);
-
-				void* ParamIterator = nullptr;
-
-				while (const auto Param = FMonoDomain::Signature_Get_Params(Signature, &ParamIterator))
-				{
-					const auto ReflectionType = FMonoDomain::Type_Get_Object(Param);
-
-					GeneratorField(ReflectionType, OutNode);
-				}
-			}
-		}
-	}
-}
-
-void FDynamicGeneratorCore::GeneratorInterface(MonoClass* InMonoClass, FDynamicDependencyGraph::FNode& OutNode)
-{
-	if (InMonoClass == nullptr)
-	{
-		return;
-	}
-
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_INTERFACE_ATTRIBUTE);
-
-	void* Iterator = nullptr;
-
-	while (const auto Interface = FMonoDomain::Class_Get_Interfaces(InMonoClass, &Iterator))
-	{
-		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Class(Interface))
-		{
-			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
-			{
-				const auto ClassName = FString(FMonoDomain::Class_Get_Name(IInterfaceToUInterface(Interface)));
-
 				OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
 			}
 		}
+		break;
+	case EPropertyTypeExtent::Struct:
+		{
+			if (InClassReflection->HasAttribute(FReflectionRegistry::Get().GetUStructAttributeClass()))
+			{
+				OutNode.Dependency(FDynamicDependencyGraph::FDependency{ClassName, false});
+			}
+		}
+		break;
+	case EPropertyTypeExtent::WeakObjectReference:
+		{
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
+		}
+		break;
+	case EPropertyTypeExtent::LazyObjectReference:
+		{
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
+		}
+		break;
+	case EPropertyTypeExtent::SoftClassReference:
+		{
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
+		}
+		break;
+	case EPropertyTypeExtent::SoftObjectReference:
+		{
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
+		}
+		break;
+	case EPropertyTypeExtent::Map:
+		{
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
+
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(1), OutNode);
+		}
+		break;
+	case EPropertyTypeExtent::Set:
+		{
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
+		}
+		break;
+	case EPropertyTypeExtent::Array:
+		{
+			GeneratorField(InReflection, InClassReflection->GetGenericArgument(), OutNode);
+		}
+		break;
+	default: ;
 	}
 }
 
-bool FDynamicGeneratorCore::ClassHasAttr(MonoClass* InMonoClass, const FString& InAttributeName)
+void FDynamicGeneratorCore::GeneratorProperty(const FClassReflection* InClassReflection,
+                                              FDynamicDependencyGraph::FNode& OutNode)
 {
-	return AttrsHasAttr(FMonoDomain::Custom_Attrs_From_Class(InMonoClass), InAttributeName);
+	if (InClassReflection == nullptr)
+	{
+		return;
+	}
+
+	for (const auto& [Name, Property] : InClassReflection->GetProperties())
+	{
+		if (Property->IsUProperty())
+		{
+			GeneratorField(Property, Property->GetReflectionType(), OutNode);
+		}
+	}
 }
 
-void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunction<void(MonoClass*)>& InGenerator)
+void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassReflection,
+                                              FDynamicDependencyGraph::FNode& OutNode)
 {
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttribute);
+	if (InClassReflection == nullptr)
+	{
+		return;
+	}
 
-	const auto AttributeMonoType = FMonoDomain::Class_Get_Type(AttributeMonoClass);
+	for (const auto& [PLACEHOLDER, Method] : InClassReflection->GetMethods())
+	{
+		if (Method->IsUFunction())
+		{
+			for (const auto Param : Method->GetParams())
+			{
+				GeneratorField(Param, Param->GetReflectionType(), OutNode);
+			}
+		}
+	}
+}
 
-	const auto AttributeMonoReflectionType = FMonoDomain::Type_Get_Object(AttributeMonoType);
+void FDynamicGeneratorCore::GeneratorInterface(const FClassReflection* InClassReflection,
+                                               FDynamicDependencyGraph::FNode& OutNode)
+{
+	if (InClassReflection == nullptr)
+	{
+		return;
+	}
 
-	const auto UtilsMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
+	const auto AttributeClass = FReflectionRegistry::Get().GetUInterfaceAttributeClass();
+
+	for (const auto Interface : InClassReflection->GetInterfaces())
+	{
+		if (Interface->HasAttribute(AttributeClass))
+		{
+			OutNode.Dependency(FDynamicDependencyGraph::FDependency{
+				IInterfaceToUInterface(Interface)->GetName(), false
+			});
+		}
+	}
+}
+
+void FDynamicGeneratorCore::Generator(const FClassReflection* InClassReflection,
+                                      const TFunction<void(FClassReflection*)>& InGenerator)
+{
+	const auto AttributeReflectionType = InClassReflection->GetReflectionType();
+
+	const auto UtilsClass = FReflectionRegistry::Get().GetUtilsClass();
 
 	auto bIsUEAssemblyGCHandle = true;
 
-	for (const auto& AssemblyGCHandle : FMonoDomain::AssemblyGCHandles)
+	for (const auto& AssemblyGCHandle : FMonoDomain::GetAssemblyGCHandles())
 	{
 		if (bIsUEAssemblyGCHandle)
 		{
@@ -561,28 +247,25 @@ void FDynamicGeneratorCore::Generator(const FString& InAttribute, const TFunctio
 		}
 		else
 		{
-			void* InParams[2] = {
-				AttributeMonoReflectionType,
-				FMonoDomain::GCHandle_Get_Target_V2(AssemblyGCHandle)
+			int32 OutLength{};
+
+			void* InParams[3] = {
+				AttributeReflectionType,
+				FMonoDomain::GCHandle_Get_Target_V2(AssemblyGCHandle),
+				&OutLength
 			};
 
-			const auto GetTypesWithAttributeMethod = FMonoDomain::Class_Get_Method_From_Name(
-				UtilsMonoClass, FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
+			const auto GetTypesWithAttributeMethod = UtilsClass->GetMethod(
+				FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
 
-			const auto Types = reinterpret_cast<MonoArray*>(FMonoDomain::Runtime_Invoke(
-				GetTypesWithAttributeMethod, nullptr, InParams));
+			const auto Types = reinterpret_cast<MonoArray*>(GetTypesWithAttributeMethod->Runtime_Invoke(
+				nullptr, InParams));
 
-			const auto Length = FMonoDomain::Array_Length(Types);
-
-			for (auto Index = 0; Index < Length; ++Index)
+			for (auto Index = 0; Index < OutLength; ++Index)
 			{
 				const auto ReflectionType = FMonoDomain::Array_Get<MonoReflectionType*>(Types, Index);
 
-				const auto Type = FMonoDomain::Reflection_Type_Get_Type(ReflectionType);
-
-				const auto Class = FMonoDomain::Type_Get_Class(Type);
-
-				InGenerator(Class);
+				InGenerator(FReflectionRegistry::Get().GetClass(ReflectionType));
 			}
 		}
 	}
@@ -598,223 +281,205 @@ FString FDynamicGeneratorCore::GetClassNameSpace()
 	return FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass());
 }
 
-void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetFlags(FProperty* InProperty, FReflection* InReflection)
 {
-	if (InProperty == nullptr || InMonoCustomAttrInfo == nullptr)
+	if (InProperty == nullptr || InReflection == nullptr)
 	{
 		return;
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_ANYWHERE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetEditAnywhereAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_INSTANCE_ONLY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetEditInstanceOnlyAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_DisableEditOnTemplate);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_DEFAULTS_ONLY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetEditDefaultsOnlyAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_DisableEditOnInstance);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_VISIBLE_ANYWHERE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetVisibleAnywhereAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_VISIBLE_INSTANCE_ONLY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetVisibleInstanceOnlyAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_EditConst | CPF_DisableEditOnTemplate);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_READ_WRITE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintReadWriteAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_SETTER_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintSetterAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_READ_ONLY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintReadOnlyAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible | CPF_BlueprintReadOnly);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_GETTER_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintGetterAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintVisible);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CONFIG_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetConfigAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Config);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_GLOBAL_CONFIG_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetGlobalConfigAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_GlobalConfig | CPF_Config);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_LOCALIZED_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetLocalizedAttributeClass()))
 	{
 		// @TODO
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_TRANSIENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetTransientAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Transient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_DUPLICATE_TRANSIENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetDuplicateTransientAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_DuplicateTransient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_TEXT_EXPORT_TRANSIENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetTextExportTransientAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_TextExportTransient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NON_PIE_TRANSIENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetNonPIETransientAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_NonPIEDuplicateTransient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NON_PIE_DUPLICATE_TRANSIENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetNonPIEDuplicateTransientAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_NonPIEDuplicateTransient);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EXPORT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetExportAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_ExportObject);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NO_CLEAR_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetNoClearAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_NoClear);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EDIT_FIXED_SIZE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetEditFixedSizeAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_EditFixedSize);
 	}
 #endif
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetReplicatedAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Net);
 
-		if (const auto FoundMonoObject = AttrsGetAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_ATTRIBUTE))
-		{
-			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
-				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_LIFETIME_CONDITION))
-			{
-				InProperty->SetBlueprintReplicationCondition(
-					static_cast<ELifetimeCondition>(*static_cast<uint8*>(FMonoDomain::Object_Unbox(
-						FMonoDomain::Property_Get_Value(FoundProperty, FoundMonoObject, nullptr, nullptr)))));
-			}
-		}
+		InProperty->SetBlueprintReplicationCondition(static_cast<ELifetimeCondition>(
+			UKismetStringLibrary::Conv_StringToInt(
+				InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 0))));
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_USING_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Net | CPF_RepNotify);
 
-		if (const auto FoundMonoObject = AttrsGetAttr(InMonoCustomAttrInfo, CLASS_REPLICATED_USING_ATTRIBUTE))
-		{
-			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
-				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_LIFETIME_CONDITION))
-			{
-				InProperty->SetBlueprintReplicationCondition(
-					static_cast<ELifetimeCondition>(*static_cast<uint8*>(FMonoDomain::Object_Unbox(
-						FMonoDomain::Property_Get_Value(FoundProperty, FoundMonoObject, nullptr, nullptr)))));
-			}
+		InProperty->RepNotifyFunc = FName(
+			InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 0));
 
-			if (const auto FoundProperty = FMonoDomain::Class_Get_Property_From_Name(
-				FMonoDomain::Object_Get_Class(FoundMonoObject), PROPERTY_REP_CALLBACK_NAME))
-			{
-				InProperty->RepNotifyFunc = FName(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(
-					(MonoString*)FMonoDomain::Property_Get_Value(FoundProperty, FoundMonoObject, nullptr, nullptr))));
-			}
-		}
+		InProperty->SetBlueprintReplicationCondition(static_cast<ELifetimeCondition>(
+			UKismetStringLibrary::Conv_StringToInt(
+				InReflection->GetAttributeValue(FReflectionRegistry::Get().GetReplicatedUsingAttributeClass(), 1))));
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NOT_REPLICATED_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetNotReplicatedAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_RepSkip);
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_INTERP_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetInterpAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_Edit | CPF_BlueprintVisible | CPF_Interp);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NON_TRANSACTIONAL_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetNonTransactionalAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_NonTransactional);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_INSTANCED_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetInstancedAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_PersistentInstance | CPF_ExportObject | CPF_InstancedReference);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_ASSIGNABLE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintAssignableAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintAssignable);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_CALLABLE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintCallableAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintCallable);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_AUTHORITY_ONLY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintAuthorityOnlyAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_BlueprintAuthorityOnly);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_ASSET_REGISTRY_SEARCHABLE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetAssetRegistrySearchableAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_AssetRegistrySearchable);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SIMPLE_DISPLAY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetSimpleDisplayAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_SimpleDisplay);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_ADVANCED_DISPLAY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetAdvancedDisplayAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_AdvancedDisplay);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SAVE_GAME_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetSaveGameAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_SaveGame);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SKIP_SERIALIZATION_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetSkipSerializationAttributeClass()))
 	{
 		InProperty->SetPropertyFlags(CPF_SkipSerialization);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_FIELD_NOTIFY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetFieldNotifyAttributeClass()))
 	{
 		// @TODO
 	}
 #endif
 
 #if WITH_EDITOR
-	SetMetaData(InProperty, InMonoCustomAttrInfo);
+	SetMetaData(InProperty, InReflection);
 #endif
 }
 
@@ -836,9 +501,9 @@ enum class EDynamicFunctionExportFlags
 	//									= 0x00000100,
 };
 
-void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InReflection)
 {
-	if (InFunction == nullptr || InMonoCustomAttrInfo == nullptr)
+	if (InFunction == nullptr || InReflection == nullptr)
 	{
 		return;
 	}
@@ -847,7 +512,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 
 	auto FunctionExportFlags = 0u;
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_NATIVE_EVENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintNativeEventAttributeClass()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Net)
 		{
@@ -870,7 +535,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		InFunction->FunctionFlags |= FUNC_BlueprintEvent;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_IMPLEMENTABLE_EVENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintImplementableEventAttributeClass()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Net)
 		{
@@ -893,7 +558,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		InFunction->FunctionFlags &= ~FUNC_Native;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_EXEC_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetExecAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_Exec;
 
@@ -904,12 +569,12 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SEALED_EVENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetSealedEventAttributeClass()))
 	{
 	}
 #endif
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVER_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetServerAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
@@ -921,21 +586,21 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		}
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLIENT_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetClientAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetClient;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NET_MULTICAST_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetNetMulticastAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
 		InFunction->FunctionFlags |= FUNC_NetMulticast;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_REQUEST_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetServiceRequestAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
@@ -948,7 +613,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		// @TODO ParseNetServiceIdentifiers(HeaderParser, FuncInfo, Specifier.Values)
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_SERVICE_RESPONSE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetServiceResponseAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_Net;
 
@@ -959,28 +624,28 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		// @TODO ParseNetServiceIdentifiers(HeaderParser, FuncInfo, Specifier.Values)
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_RELIABLE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetReliableAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_NetReliable;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_UNRELIABLE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetUnreliableAttributeClass()))
 	{
 		bSpecifiedUnreliable = true;
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CUSTOM_THUNK_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetCustomThunkAttributeClass()))
 	{
 		FunctionExportFlags |= static_cast<uint32>(EDynamicFunctionExportFlags::FUNCEXPORT_CustomThunk);
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_CALLABLE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintCallableAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintCallable;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_GETTER_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintGetterAttributeClass()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Event)
 		{
@@ -994,7 +659,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		// @TODO
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_SETTER_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintSetterAttributeClass()))
 	{
 		if (InFunction->FunctionFlags & FUNC_Event)
 		{
@@ -1006,31 +671,31 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 		// @TODO
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_PURE_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintPureAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintCallable;
 
 		InFunction->FunctionFlags |= FUNC_BlueprintPure;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_AUTHORITY_ONLY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintAuthorityOnlyAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintAuthorityOnly;
 	}
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_COSMETIC_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintPureAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintCosmetic;
 	}
 #endif
 
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_WITH_VALIDATION_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetWithValidationAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_NetValidate;
 	}
 
 #if WITH_EDITOR
-	if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_FIELD_NOTIFY_ATTRIBUTE))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetFieldNotifyAttributeClass()))
 	{
 	}
 #endif
@@ -1060,68 +725,64 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, MonoCustomAttrInfo* 
 	}
 
 #if WITH_EDITOR
-	SetMetaData(InFunction, InMonoCustomAttrInfo);
+	SetMetaData(InFunction, InReflection);
 #endif
 }
 
-void FDynamicGeneratorCore::SetFlags(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetFlags(FClassReflection* InClassReflection, UClass* InClass)
 {
-	if (InClass == nullptr || InMonoCustomAttrInfo == nullptr)
+	if (InClassReflection == nullptr || InClass == nullptr)
 	{
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC),
-		InClass->IsChildOf(UInterface::StaticClass()) ? CLASS_U_INTERFACE_ATTRIBUTE : CLASS_U_CLASS_ATTRIBUTE);
+	const auto AttributeClass = InClass->HasAnyClassFlags(CLASS_Interface)
+		                            ? FReflectionRegistry::Get().GetUInterfaceAttributeClass()
+		                            : FReflectionRegistry::Get().GetUClassAttributeClass();
 
-	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
+	if (InClassReflection->HasAttribute(AttributeClass))
 	{
 #if WITH_EDITOR
-		if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_NOT_PLACEABLE_ATTRIBUTE))
+		if (InClassReflection->HasAttribute(FReflectionRegistry::Get().GetNotPlaceableAttributeClass()))
 		{
 			InClass->ClassFlags |= CLASS_NotPlaceable;
 		}
 #endif
 
 #if WITH_EDITOR
-		SetMetaData(InClass, InMonoCustomAttrInfo);
+		SetMetaData(InClass, InClassReflection);
 #endif
 	}
 }
 
-void FDynamicGeneratorCore::SetFlags(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetFlags(FClassReflection* InClassReflection, UScriptStruct* InScriptStruct)
 {
-	if (InScriptStruct == nullptr || InMonoCustomAttrInfo == nullptr)
+	if (InClassReflection == nullptr || InScriptStruct == nullptr)
 	{
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_STRUCT_ATTRIBUTE);
-
-	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
+	if (const auto AttributeClass = FReflectionRegistry::Get().GetUStructAttributeClass();
+		InClassReflection->HasAttribute(AttributeClass))
 	{
 #if WITH_EDITOR
-		SetMetaData(InScriptStruct, InMonoCustomAttrInfo);
+		SetMetaData(InScriptStruct, InClassReflection);
 #endif
 	}
 }
 
-void FDynamicGeneratorCore::SetFlags(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetFlags(FClassReflection* InClassReflection, UEnum* InEnum)
 {
-	if (InEnum == nullptr || InMonoCustomAttrInfo == nullptr)
+	if (InClassReflection == nullptr || InEnum == nullptr)
 	{
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_ENUM_ATTRIBUTE);
-
-	if (!!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass))
+	if (const auto AttributeClass = FReflectionRegistry::Get().GetUEnumAttributeClass();
+		InClassReflection->HasAttribute(AttributeClass))
 	{
 #if WITH_EDITOR
-		SetMetaData(InEnum, InMonoCustomAttrInfo);
+		SetMetaData(InEnum, InClassReflection);
 #endif
 	}
 }
@@ -1138,60 +799,71 @@ void FDynamicGeneratorCore::SetMetaData(UField* InField, const FString& InAttrib
 }
 
 template <typename T>
-static void SetFieldMetaData(T InField, const TArray<FString>& InMetaDataAttrs,
-                             MonoCustomAttrInfo* InMonoCustomAttrInfo, const TFunction<void()>& InSetMetaData)
+static void SetFieldMetaData(T InField, const TArray<FClassReflection*>& InMetaDataAttributes,
+                             FReflection* InReflection, const TFunction<void()>& InSetMetaData)
 {
-	for (const auto& MetaDataAttr : InMetaDataAttrs)
+	for (const auto& MetaDataAttribute : InMetaDataAttributes)
 	{
-		if (FDynamicGeneratorCore::AttrsHasAttr(InMonoCustomAttrInfo, MetaDataAttr))
+		if (InReflection->HasAttribute(MetaDataAttribute))
 		{
-			FDynamicGeneratorCore::SetMetaData(InField, MetaDataAttr,
-			                                   FDynamicGeneratorCore::AttrGetValue(InMonoCustomAttrInfo, MetaDataAttr));
+			FDynamicGeneratorCore::SetMetaData(InField, MetaDataAttribute->GetName(),
+			                                   InReflection->GetAttributeValue(MetaDataAttribute));
 		}
 	}
 
 	InSetMetaData();
 }
 
-void FDynamicGeneratorCore::SetMetaData(FProperty* InProperty, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetMetaData(FProperty* InProperty, FReflection* InReflection)
 {
-	SetFieldMetaData(InProperty, PropertyMetaDataAttrs, InMonoCustomAttrInfo, []()
+	SetFieldMetaData(InProperty, GetPropertyMetaDataAttributes(), InReflection, []()
 	{
 	});
 }
 
-void FDynamicGeneratorCore::SetMetaData(UFunction* InFunction, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetMetaData(UFunction* InFunction, FReflection* InReflection)
 {
-	SetFieldMetaData(InFunction, FunctionMetaDataAttrs, InMonoCustomAttrInfo, []()
+	SetFieldMetaData(InFunction, GetFunctionMetaDataAttributes(), InReflection, []()
 	{
 	});
 }
 
-void FDynamicGeneratorCore::SetMetaData(UClass* InClass, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetMetaData(UClass* InClass, FReflection* InReflection)
 {
 	SetFieldMetaData(InClass, InClass->IsChildOf(UInterface::StaticClass())
-		                          ? InterfaceMetaDataAttrs
-		                          : ClassMetaDataAttrs,
-	                 InMonoCustomAttrInfo, [InClass, InMonoCustomAttrInfo]()
+		                          ? GetInterfaceMetaDataAttributes()
+		                          : GetClassMetaDataAttributes(),
+	                 InReflection, [InClass, InReflection]()
 	                 {
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_CLASS_GROUP_ATTRIBUTE))
+		                 if (const auto ClassGroupAttributeClass = FReflectionRegistry::Get().
+			                 GetClassGroupAttributeClass())
 		                 {
-			                 SetMetaData(InClass, FString(TEXT("ClassGroupNamesAttribute")),
-			                             *AttrGetValue(InMonoCustomAttrInfo,
-			                                           *CLASS_CLASS_GROUP_ATTRIBUTE));
+			                 if (InReflection->HasAttribute(ClassGroupAttributeClass))
+			                 {
+				                 SetMetaData(InClass, ClassGroupAttributeClass->GetName(),
+				                             *InReflection->GetAttributeValue(ClassGroupAttributeClass));
+			                 }
 		                 }
 
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_MINIMAL_API_ATTRIBUTE))
+		                 if (const auto MinimalAPIAttributeClass = FReflectionRegistry::Get().
+			                 GetMinimalAPIAttributeClass())
 		                 {
-			                 SetMetaData(InClass, CLASS_MINIMAL_API_ATTRIBUTE, TEXT("true"));
+			                 if (InReflection->HasAttribute(MinimalAPIAttributeClass))
+			                 {
+				                 SetMetaData(InClass, MinimalAPIAttributeClass->GetName(),TEXT("true"));
+			                 }
 		                 }
 
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		                 if (const auto BlueprintTypeAttributeClass = FReflectionRegistry::Get().
+			                 GetBlueprintTypeAttributeClass())
 		                 {
-			                 SetMetaData(InClass, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+			                 if (InReflection->HasAttribute(BlueprintTypeAttributeClass))
+			                 {
+				                 SetMetaData(InClass, BlueprintTypeAttributeClass->GetName(),TEXT("true"));
+			                 }
 		                 }
 
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINTABLE_ATTRIBUTE))
+		                 if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintableAttributeClass()))
 		                 {
 			                 SetMetaData(InClass, CLASS_IS_BLUEPRINT_BASE_ATTRIBUTE, TEXT("true"));
 
@@ -1200,255 +872,166 @@ void FDynamicGeneratorCore::SetMetaData(UClass* InClass, MonoCustomAttrInfo* InM
 	                 });
 }
 
-void FDynamicGeneratorCore::SetMetaData(UScriptStruct* InScriptStruct, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetMetaData(UScriptStruct* InScriptStruct, FReflection* InReflection)
 {
 	if (InScriptStruct == nullptr || InScriptStruct == nullptr)
 	{
 		return;
 	}
 
-	SetFieldMetaData(InScriptStruct, StructMetaDataAttrs, InMonoCustomAttrInfo, [InScriptStruct, InMonoCustomAttrInfo]()
+	SetFieldMetaData(InScriptStruct, GetStructMetaDataAttributes(), InReflection, [InScriptStruct, InReflection]()
 	{
-		if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		if (const auto BlueprintTypeAttributeClass = FReflectionRegistry::Get().GetBlueprintTypeAttributeClass())
 		{
-			SetMetaData(InScriptStruct, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+			if (InReflection->HasAttribute(BlueprintTypeAttributeClass))
+			{
+				SetMetaData(InScriptStruct, BlueprintTypeAttributeClass->GetName(), TEXT("true"));
+			}
 		}
 	});
 }
 
-void FDynamicGeneratorCore::SetMetaData(UEnum* InEnum, MonoCustomAttrInfo* InMonoCustomAttrInfo)
+void FDynamicGeneratorCore::SetMetaData(UEnum* InEnum, FReflection* InReflection)
 {
-	if (InEnum == nullptr || InMonoCustomAttrInfo == nullptr)
+	if (InEnum == nullptr || InReflection == nullptr)
 	{
 		return;
 	}
 
-	SetFieldMetaData(InEnum, EnumMetaDataAttrs, InMonoCustomAttrInfo,
-	                 [InEnum, InMonoCustomAttrInfo]()
+	SetFieldMetaData(InEnum, GetEnumMetaDataAttributes(), InReflection,
+	                 [InEnum, InReflection]()
 	                 {
-		                 if (AttrsHasAttr(InMonoCustomAttrInfo, CLASS_BLUEPRINT_TYPE_ATTRIBUTE))
+		                 if (const auto BlueprintTypeAttributeClass = FReflectionRegistry::Get().
+			                 GetBlueprintTypeAttributeClass())
 		                 {
-			                 SetMetaData(InEnum, CLASS_BLUEPRINT_TYPE_ATTRIBUTE, TEXT("true"));
+			                 if (InReflection->HasAttribute(BlueprintTypeAttributeClass))
+			                 {
+				                 SetMetaData(InEnum, BlueprintTypeAttributeClass->GetName(), TEXT("true"));
+			                 }
 		                 }
 	                 });
 }
 #endif
 
-bool FDynamicGeneratorCore::AttrsHasAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName)
+void FDynamicGeneratorCore::GeneratorProperty(const FClassReflection* InClassReflection, UField* InField,
+                                              const TFunction<void(FPropertyReflection*, const FProperty*)>&
+                                              InGenerator)
 {
-	if (const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttributeName))
-	{
-		return !!FMonoDomain::Custom_Attrs_Has_Attr(InMonoCustomAttrInfo, AttributeMonoClass);
-	}
-
-	return false;
-}
-
-MonoObject* FDynamicGeneratorCore::AttrsGetAttr(MonoCustomAttrInfo* InMonoCustomAttrInfo,
-                                                const FString& InAttributeName)
-{
-	if (const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttributeName))
-	{
-		return FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, AttributeMonoClass);
-	}
-
-	return nullptr;
-}
-
-FString FDynamicGeneratorCore::AttrGetValue(MonoCustomAttrInfo* InMonoCustomAttrInfo, const FString& InAttributeName)
-{
-	const auto FoundMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), InAttributeName);
-
-	const auto FoundMonoObject = FMonoDomain::Custom_Attrs_Get_Attr(InMonoCustomAttrInfo, FoundMonoClass);
-
-	const auto FoundMonoProperty = FMonoDomain::Class_Get_Property_From_Name(FoundMonoClass, TEXT("Value"));
-
-	const auto Value = FMonoDomain::Property_Get_Value(FoundMonoProperty, FoundMonoObject, nullptr, nullptr);
-
-	return FString(UTF8_TO_TCHAR(FMonoDomain::String_To_UTF8(FMonoDomain::Object_To_String(Value,nullptr))));
-}
-
-void FDynamicGeneratorCore::GeneratorProperty(MonoClass* InMonoClass, UField* InField,
-                                              const TFunction<void(const MonoProperty*,
-                                                                   MonoCustomAttrInfo*,
-                                                                   const FProperty*)>& InGenerator)
-{
-	if (InMonoClass == nullptr || InField == nullptr)
+	if (InClassReflection == nullptr)
 	{
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_PROPERTY_ATTRIBUTE);
-
-	void* Iterator = nullptr;
-
-	while (const auto Property = FMonoDomain::Class_Get_Properties(InMonoClass, &Iterator))
+	for (const auto& [Name, Property] : InClassReflection->GetProperties())
 	{
-		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Property(InMonoClass, Property))
+		if (Property != nullptr)
 		{
-			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			if (Property->IsUProperty())
 			{
-				const auto PropertyName = FMonoDomain::Property_Get_Name(Property);
+				const auto CppProperty = FTypeBridge::Factory<true>(
+					Property->GetReflectionType(), InField, FName(Name),
+					EObjectFlags::RF_Public);
 
-				const auto PropertyType = FMonoDomain::Property_Get_Type(Property);
-
-				const auto ReflectionType = FMonoDomain::Type_Get_Object(PropertyType);
-
-				const auto CppProperty = FTypeBridge::Factory<true>(ReflectionType, InField, PropertyName,
-				                                                    EObjectFlags::RF_Public);
-
-				SetFlags(CppProperty, Attrs);
+				SetFlags(CppProperty, Property);
 
 				InField->AddCppProperty(CppProperty);
 
-				InGenerator(Property, Attrs, CppProperty);
+				InGenerator(Property, CppProperty);
 			}
 		}
 	}
 }
 
-void FDynamicGeneratorCore::GeneratorFunction(MonoClass* InMonoClass, UClass* InClass,
-                                              const TFunction<void(const UFunction* InFunction)>& InGenerator)
+void FDynamicGeneratorCore::GeneratorFunction(const FClassReflection* InClassReflection, UClass* InClass,
+                                              const TFunction<void(FMethodReflection*, const UFunction* InFunction)>&
+                                              InGenerator)
 {
-	struct FParamDescriptor
-	{
-		MonoReflectionType* ReflectionType;
-
-		FName Name;
-
-		bool bIsRef;
-	};
-
-	if (InMonoClass == nullptr || InClass == nullptr)
+	if (InClassReflection == nullptr)
 	{
 		return;
 	}
 
-	const auto AttributeMonoClass = FMonoDomain::Class_From_Name(
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_DYNAMIC), CLASS_U_FUNCTION_ATTRIBUTE);
-
-	void* MethodIterator = nullptr;
-
-	while (const auto Method = FMonoDomain::Class_Get_Methods(InMonoClass, &MethodIterator))
+	for (const auto& [Pair, Method] : InClassReflection->GetMethods())
 	{
-		if (const auto Attrs = FMonoDomain::Custom_Attrs_From_Method(Method))
+		if (Method->IsUFunction())
 		{
-			if (!!FMonoDomain::Custom_Attrs_Has_Attr(Attrs, AttributeMonoClass))
+			auto Function = NewObject<UFunction>(InClass, FName(Pair.Key), RF_Public | RF_Transient);
+
+			if (Method->IsStatic())
 			{
-				const auto MethodName = FMonoDomain::Method_Get_Name(Method);
+				Function->FunctionFlags |= FUNC_Static;
+			}
 
-				const auto Signature = FMonoDomain::Method_Signature(Method);
+			Function->MinAlignment = 1;
 
-				void* ParamIterator = nullptr;
-
-				const auto ParamCount = FMonoDomain::Signature_Get_Param_Count(Signature);
-
-				const auto ParamNames = static_cast<const char**>(FMemory_Alloca(ParamCount * sizeof(const char*)));
-
-				FMonoDomain::Method_Get_Param_Names(Method, ParamNames);
-
-				auto ParamIndex = 0;
-
-				TArray<FParamDescriptor> ParamDescriptors;
-
-				while (const auto Param = FMonoDomain::Signature_Get_Params(Signature, &ParamIterator))
+			if (const auto Return = Method->GetReturn())
+			{
+				if (const auto Property = FTypeBridge::Factory<true>(Return, Function, "",
+				                                                     RF_Public | RF_Transient))
 				{
-					ParamDescriptors.Add({
-						FMonoDomain::Type_Get_Object(Param),
-						ParamNames[ParamIndex++],
-						!!FMonoDomain::Type_Is_ByRef(Param)
-					});
-				}
-
-				auto Function = NewObject<UFunction>(InClass, MethodName, RF_Public | RF_Transient);
-
-				if (!!!FMonoDomain::Signature_Is_Instance(Signature))
-				{
-					Function->FunctionFlags |= FUNC_Static;
-				}
-
-				Function->MinAlignment = 1;
-
-				if (const auto ReturnParamType = FMonoDomain::Signature_Get_Return_Type(Signature))
-				{
-					const auto ReturnParamReflectionType = FMonoDomain::Type_Get_Object(ReturnParamType);
-
-					if (const auto Property = FTypeBridge::Factory<true>(ReturnParamReflectionType, Function, "",
-					                                                     RF_Public | RF_Transient))
-					{
-						Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
-
-						Function->AddCppProperty(Property);
-
-						Function->FunctionFlags |= FUNC_HasOutParms;
-					}
-				}
-
-				for (auto Index = ParamDescriptors.Num() - 1; Index >= 0; --Index)
-				{
-					const auto Property = FTypeBridge::Factory<true>(ParamDescriptors[Index].ReflectionType,
-					                                                 Function,
-					                                                 ParamDescriptors[Index].Name,
-					                                                 RF_Public | RF_Transient);
-
-					Property->SetPropertyFlags(CPF_Parm);
-
-					if (ParamDescriptors[Index].bIsRef)
-					{
-						Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
-					}
+					Property->SetPropertyFlags(CPF_Parm | CPF_OutParm | CPF_ReturnParm);
 
 					Function->AddCppProperty(Property);
+
+					Function->FunctionFlags |= FUNC_HasOutParms;
+				}
+			}
+
+			const auto& Params = Method->GetParams();
+
+			for (auto Index = Method->GetParamCount() - 1; Index >= 0; --Index)
+			{
+				const auto Property = FTypeBridge::Factory<true>(
+					Params[Index]->GetReflectionType(),
+					Function,
+					FName(Params[Index]->GetName()),
+					RF_Public | RF_Transient);
+
+				Property->SetPropertyFlags(CPF_Parm);
+
+				if (Params[Index]->IsRef())
+				{
+					Property->SetPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
 				}
 
-				Function->Bind();
-
-				Function->StaticLink(true);
-
-				Function->Next = InClass->Children;
-
-				InClass->Children = Function;
-
-				SetFlags(Function, Attrs);
-
-				InClass->AddFunctionToFunctionMap(Function, MethodName);
-
-				InGenerator(Function);
+				Function->AddCppProperty(Property);
 			}
+
+			Function->Bind();
+
+			Function->StaticLink(true);
+
+			Function->Next = InClass->Children;
+
+			InClass->Children = Function;
+
+			SetFlags(Function, Method);
+
+			InClass->AddFunctionToFunctionMap(Function, FName(Method->GetName()));
+
+			InGenerator(Method, Function);
 		}
 	}
 }
 
-MonoClass* FDynamicGeneratorCore::UInterfaceToIInterface(MonoClass* InMonoClass)
+FClassReflection* FDynamicGeneratorCore::UInterfaceToIInterface(const FClassReflection* InClassReflection)
 {
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
-
-	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
-
-	return FMonoDomain::Class_From_Name(NameSpace,
-	                                    FString::Printf(TEXT(
-		                                    "I%s"
-	                                    ),
-	                                                    *ClassName.RightChop(1)
-	                                    ));
+	return FReflectionRegistry::Get().GetClass(InClassReflection->GetNameSpace(),
+	                                           FString::Printf(TEXT(
+		                                           "I%s"
+	                                           ),
+	                                                           *InClassReflection->GetName().RightChop(1)
+	                                           ));
 }
 
-MonoClass* FDynamicGeneratorCore::IInterfaceToUInterface(MonoClass* InMonoClass)
+FClassReflection* FDynamicGeneratorCore::IInterfaceToUInterface(const FClassReflection* InClassReflection)
 {
-	const auto ClassName = FString(FMonoDomain::Class_Get_Name(InMonoClass));
-
-	const auto NameSpace = FString(FMonoDomain::Class_Get_Namespace(InMonoClass));
-
-	return FMonoDomain::Class_From_Name(NameSpace,
-	                                    FString::Printf(TEXT(
-		                                    "U%s"
-	                                    ),
-	                                                    *ClassName.RightChop(1)
-	                                    ));
+	return FReflectionRegistry::Get().GetClass(InClassReflection->GetNameSpace(),
+	                                           FString::Printf(TEXT(
+		                                           "U%s"
+	                                           ),
+	                                                           *InClassReflection->GetName().RightChop(1)
+	                                           ));
 }
 
 #if WITH_EDITOR
@@ -1475,5 +1058,233 @@ EDynamicType FDynamicGeneratorCore::GetDynamicType(const FString& InName)
 	}
 
 	return EDynamicType::None;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetClassMetaDataAttributes()
+{
+	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+
+	static TArray<FClassReflection*> ClassMetaDataAttributes = {
+		ReflectionRegistry.GetHideCategoriesAttributeClass(),
+		ReflectionRegistry.GetToolTipAttributeClass(),
+		ReflectionRegistry.GetBlueprintSpawnableComponentAttributeClass(),
+		ReflectionRegistry.GetChildCanTickAttributeClass(),
+		ReflectionRegistry.GetChildCannotTickAttributeClass(),
+		ReflectionRegistry.GetDebugTreeLeafAttributeClass(),
+		ReflectionRegistry.GetIgnoreCategoryKeywordsInSubclassesAttributeClass(),
+		ReflectionRegistry.GetDeprecatedNodeAttributeClass(),
+		ReflectionRegistry.GetDeprecationMessageAttributeClass(),
+		ReflectionRegistry.GetDisplayNameAttributeClass(),
+		ReflectionRegistry.GetScriptNameAttributeClass(),
+		ReflectionRegistry.GetIsBlueprintBaseAttributeClass(),
+		ReflectionRegistry.GetKismetHideOverridesAttributeClass(),
+		ReflectionRegistry.GetLoadBehaviorAttributeClass(),
+		ReflectionRegistry.GetProhibitedInterfacesAttributeClass(),
+		ReflectionRegistry.GetRestrictedToClassesAttributeClass(),
+		ReflectionRegistry.GetShowWorldContextPinAttributeClass(),
+		ReflectionRegistry.GetDontUseGenericSpawnObjectAttributeClass(),
+		ReflectionRegistry.GetExposedAsyncProxyAttributeClass(),
+		ReflectionRegistry.GetBlueprintThreadSafeAttributeClass(),
+		ReflectionRegistry.GetUsesHierarchyAttributeClass()
+	};
+
+	return ClassMetaDataAttributes;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetStructMetaDataAttributes()
+{
+	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+
+	static TArray<FClassReflection*> StructMetaDataAttributes = {
+		ReflectionRegistry.GetToolTipAttributeClass(),
+		ReflectionRegistry.GetHasNativeBreakAttributeClass(),
+		ReflectionRegistry.GetHasNativeMakeAttributeClass(),
+		ReflectionRegistry.GetHiddenByDefaultAttributeClass(),
+		ReflectionRegistry.GetDisableSplitPinAttributeClass()
+	};
+
+	return StructMetaDataAttributes;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetEnumMetaDataAttributes()
+{
+	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+
+	static TArray<FClassReflection*> EnumMetaDataAttrs = {
+		ReflectionRegistry.GetToolTipAttributeClass(),
+		ReflectionRegistry.GetBitflagsAttributeClass(),
+		ReflectionRegistry.GetUseEnumValuesAsMaskValuesInEditorAttributeClass()
+	};
+
+	return EnumMetaDataAttrs;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetInterfaceMetaDataAttributes()
+{
+	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+
+	static TArray<FClassReflection*> InterfaceMetaDataAttributes = {
+		ReflectionRegistry.GetConversionRootAttributeClass(),
+		ReflectionRegistry.GetCannotImplementInterfaceInBlueprintAttributeClass(),
+		ReflectionRegistry.GetToolTipAttributeClass()
+	};
+
+	return InterfaceMetaDataAttributes;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetPropertyMetaDataAttributes()
+{
+	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+
+	static TArray<FClassReflection*> PropertyMetaDataAttributes = {
+		ReflectionRegistry.GetToolTipAttributeClass(),
+		ReflectionRegistry.GetDeprecationMessageAttributeClass(),
+		ReflectionRegistry.GetDisplayNameAttributeClass(),
+		ReflectionRegistry.GetScriptNameAttributeClass(),
+		ReflectionRegistry.GetLoadBehaviorAttributeClass(),
+		ReflectionRegistry.GetAllowAbstractAttributeClass(),
+		ReflectionRegistry.GetAllowAnyActorAttributeClass(),
+		ReflectionRegistry.GetAllowedClassesAttributeClass(),
+		ReflectionRegistry.GetAllowPreserveRatioAttributeClass(),
+		ReflectionRegistry.GetAllowPrivateAccessAttributeClass(),
+		ReflectionRegistry.GetArrayClampAttributeClass(),
+		ReflectionRegistry.GetAssetBundlesAttributeClass(),
+		ReflectionRegistry.GetBlueprintBaseOnlyAttributeClass(),
+		ReflectionRegistry.GetBlueprintCompilerGeneratedDefaultsAttributeClass(),
+		ReflectionRegistry.GetClampMinAttributeClass(),
+		ReflectionRegistry.GetClampMaxAttributeClass(),
+		ReflectionRegistry.GetConfigHierarchyEditableAttributeClass(),
+		ReflectionRegistry.GetContentDirAttributeClass(),
+		ReflectionRegistry.GetDeltaAttributeClass(),
+		ReflectionRegistry.GetDeprecatedPropertyAttributeClass(),
+		ReflectionRegistry.GetDisallowedAssetDataTagsAttributeClass(),
+		ReflectionRegistry.GetDisallowedClassesAttributeClass(),
+		ReflectionRegistry.GetDisplayAfterAttributeClass(),
+		ReflectionRegistry.GetDisplayPriorityAttributeClass(),
+		ReflectionRegistry.GetDisplayThumbnailAttributeClass(),
+		ReflectionRegistry.GetEditConditionAttributeClass(),
+		ReflectionRegistry.GetEditConditionHidesAttributeClass(),
+		ReflectionRegistry.GetEditFixedOrderAttributeClass(),
+		ReflectionRegistry.GetCategoryAttributeClass(),
+		ReflectionRegistry.GetExactClassAttributeClass(),
+		ReflectionRegistry.GetExposeFunctionCategoriesAttributeClass(),
+		ReflectionRegistry.GetExposeOnSpawnAttributeClass(),
+		ReflectionRegistry.GetFilePathFilterAttributeClass(),
+		ReflectionRegistry.GetRelativeToGameDirAttributeClass(),
+		ReflectionRegistry.GetFixedIncrementAttributeClass(),
+		ReflectionRegistry.GetForceShowEngineContentAttributeClass(),
+		ReflectionRegistry.GetForceShowPluginContentAttributeClass(),
+		ReflectionRegistry.GetHideAlphaChannelAttributeClass(),
+		ReflectionRegistry.GetHideInDetailPanelAttributeClass(),
+		ReflectionRegistry.GetHideViewOptionsAttributeClass(),
+		ReflectionRegistry.GetIgnoreForMemberInitializationTestAttributeClass(),
+		ReflectionRegistry.GetInlineEditConditionToggleAttributeClass(),
+		ReflectionRegistry.GetLinearDeltaSensitivityAttributeClass(),
+		ReflectionRegistry.GetLongPackageNameAttributeClass(),
+		ReflectionRegistry.GetMakeEditWidgetAttributeClass(),
+		ReflectionRegistry.GetMakeStructureDefaultValueAttributeClass(),
+		ReflectionRegistry.GetMetaClassAttributeClass(),
+		ReflectionRegistry.GetMustImplementAttributeClass(),
+		ReflectionRegistry.GetMultipleAttributeClass(),
+		ReflectionRegistry.GetMaxLengthAttributeClass(),
+		ReflectionRegistry.GetMultiLineAttributeClass(),
+		ReflectionRegistry.GetPasswordFieldAttributeClass(),
+		ReflectionRegistry.GetNoElementDuplicateAttributeClass(),
+		ReflectionRegistry.GetNoResetToDefaultAttributeClass(),
+		ReflectionRegistry.GetNoEditInlineAttributeClass(),
+		ReflectionRegistry.GetNoSpinboxAttributeClass(),
+		ReflectionRegistry.GetOnlyPlaceableAttributeClass(),
+		ReflectionRegistry.GetRelativePathAttributeClass(),
+		ReflectionRegistry.GetRelativeToGameContentDirAttributeClass(),
+		ReflectionRegistry.GetRequiredAssetDataTagsAttributeClass(),
+		ReflectionRegistry.GetScriptNoExportAttributeClass(),
+		ReflectionRegistry.GetShowOnlyInnerPropertiesAttributeClass(),
+		ReflectionRegistry.GetShowTreeViewAttributeClass(),
+		ReflectionRegistry.GetSliderExponentAttributeClass(),
+		ReflectionRegistry.GetTitlePropertyAttributeClass(),
+		ReflectionRegistry.GetUIMinAttributeClass(),
+		ReflectionRegistry.GetUIMaxAttributeClass(),
+		ReflectionRegistry.GetUnitsAttributeClass(),
+		ReflectionRegistry.GetForceUnitsAttributeClass(),
+		ReflectionRegistry.GetUntrackedAttributeClass(),
+		ReflectionRegistry.GetDevelopmentOnlyAttributeClass(),
+		ReflectionRegistry.GetNeedsLatentFixupAttributeClass(),
+		ReflectionRegistry.GetLatentCallbackTargetAttributeClass(),
+		ReflectionRegistry.GetGetOptionsAttributeClass(),
+		ReflectionRegistry.GetPinHiddenByDefaultAttributeClass(),
+		ReflectionRegistry.GetValidEnumValuesAttributeClass(),
+		ReflectionRegistry.GetInvalidEnumValuesAttributeClass(),
+		ReflectionRegistry.GetOverridingInputPropertyAttributeClass(),
+		ReflectionRegistry.GetRequiredInputAttributeClass(),
+		ReflectionRegistry.GetNeverAsPinAttributeClass(),
+		ReflectionRegistry.GetPinShownByDefaultAttributeClass(),
+		ReflectionRegistry.GetAlwaysAsPinAttributeClass(),
+		ReflectionRegistry.GetCustomizePropertyAttributeClass()
+	};
+
+	return PropertyMetaDataAttributes;
+}
+
+const TArray<FClassReflection*>& FDynamicGeneratorCore::GetFunctionMetaDataAttributes()
+{
+	static auto& ReflectionRegistry = FReflectionRegistry::Get();
+
+	static TArray<FClassReflection*> FunctionMetaDataAttributes = {
+		ReflectionRegistry.GetCallInEditorAttributeClass(),
+		ReflectionRegistry.GetToolTipAttributeClass(),
+		ReflectionRegistry.GetCategoryAttributeClass(),
+		ReflectionRegistry.GetVariadicAttributeClass(),
+		ReflectionRegistry.GetReturnDisplayNameAttributeClass(),
+		ReflectionRegistry.GetInternalUseParamAttributeClass(),
+		ReflectionRegistry.GetForceAsFunctionAttributeClass(),
+		ReflectionRegistry.GetIgnoreTypePromotionAttributeClass(),
+		ReflectionRegistry.GetDeprecationMessageAttributeClass(),
+		ReflectionRegistry.GetDisplayNameAttributeClass(),
+		ReflectionRegistry.GetScriptNameAttributeClass(),
+		ReflectionRegistry.GetScriptNoExportAttributeClass(),
+		ReflectionRegistry.GetArrayParmAttributeClass(),
+		ReflectionRegistry.GetArrayTypeDependentParamsAttributeClass(),
+		ReflectionRegistry.GetAutoCreateRefTermAttributeClass(),
+		ReflectionRegistry.GetHideAssetPickerAttributeClass(),
+		ReflectionRegistry.GetBlueprintInternalUseOnlyAttributeClass(),
+		ReflectionRegistry.GetBlueprintProtectedAttributeClass(),
+		ReflectionRegistry.GetCallableWithoutWorldContextAttributeClass(),
+		ReflectionRegistry.GetCommutativeAssociativeBinaryOperatorAttributeClass(),
+		ReflectionRegistry.GetCompactNodeTitleAttributeClass(),
+		ReflectionRegistry.GetCustomStructureParamAttributeClass(),
+		ReflectionRegistry.GetDefaultToSelfAttributeClass(),
+		ReflectionRegistry.GetDeprecatedFunctionAttributeClass(),
+		ReflectionRegistry.GetExpandEnumAsExecsAttributeClass(),
+		ReflectionRegistry.GetExpandBoolAsExecsAttributeClass(),
+		ReflectionRegistry.GetScriptMethodAttributeClass(),
+		ReflectionRegistry.GetScriptMethodSelfReturnAttributeClass(),
+		ReflectionRegistry.GetScriptOperatorAttributeClass(),
+		ReflectionRegistry.GetScriptConstantAttributeClass(),
+		ReflectionRegistry.GetScriptConstantHostAttributeClass(),
+		ReflectionRegistry.GetHidePinAttributeClass(),
+		ReflectionRegistry.GetHideSpawnParmsAttributeClass(),
+		ReflectionRegistry.GetKeywordsAttributeClass(),
+		ReflectionRegistry.GetLatentAttributeClass(),
+		ReflectionRegistry.GetLatentInfoAttributeClass(),
+		ReflectionRegistry.GetMaterialParameterCollectionFunctionAttributeClass(),
+		ReflectionRegistry.GetNativeBreakFuncAttributeClass(),
+		ReflectionRegistry.GetNativeMakeFuncAttributeClass(),
+		ReflectionRegistry.GetUnsafeDuringActorConstructionAttributeClass(),
+		ReflectionRegistry.GetWorldContextAttributeClass(),
+		ReflectionRegistry.GetBlueprintAutoCastAttributeClass(),
+		ReflectionRegistry.GetNotBlueprintThreadSafeAttributeClass(),
+		ReflectionRegistry.GetDeterminesOutputTypeAttributeClass(),
+		ReflectionRegistry.GetDynamicOutputParamAttributeClass(),
+		ReflectionRegistry.GetDataTablePinAttributeClass(),
+		ReflectionRegistry.GetSetParamAttributeClass(),
+		ReflectionRegistry.GetMapParamAttributeClass(),
+		ReflectionRegistry.GetMapKeyParamAttributeClass(),
+		ReflectionRegistry.GetMapValueParamAttributeClass(),
+		ReflectionRegistry.GetBitmaskAttributeClass(),
+		ReflectionRegistry.GetBitmaskEnumAttributeClass(),
+		ReflectionRegistry.GetArrayParamAttributeClass()
+	};
+
+	return FunctionMetaDataAttributes;
 }
 #endif

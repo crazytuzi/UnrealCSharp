@@ -3,7 +3,7 @@
 #if WITH_EDITOR
 #include "IDirectoryWatcher.h"
 #include "EDynamicType.h"
-#include "mono/metadata/object-forward.h"
+#include "Reflection/FClassReflection.h"
 #endif
 
 class UNREALCSHARPCORE_API FDynamicGenerator
@@ -40,7 +40,7 @@ public:
 
 	static bool IsFullGenerator();
 
-	static EDynamicType GetDynamicType(const FString& InFile, MonoClass*& OutMonoClass);
+	static EDynamicType GetDynamicType(const FString& InFile, FClassReflection*& OutClass);
 
 private:
 	static bool bIsFullGenerator;

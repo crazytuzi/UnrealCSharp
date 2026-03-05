@@ -12,7 +12,8 @@ namespace Script.CoreUObject
             TWeakObjectPtrImplementation.TWeakObjectPtr_UnRegisterImplementation(GarbageCollectionHandle);
 
         public TWeakObjectPtr(T InObject) =>
-            TWeakObjectPtrImplementation.TWeakObjectPtr_RegisterImplementation(this, InObject.GarbageCollectionHandle);
+            TWeakObjectPtrImplementation.TWeakObjectPtr_RegisterImplementation(
+                this, InObject.GarbageCollectionHandle, GetType());
 
         public static implicit operator TWeakObjectPtr<T>(T InObject) => new(InObject);
 

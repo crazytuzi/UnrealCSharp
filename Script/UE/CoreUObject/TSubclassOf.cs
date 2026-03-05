@@ -11,7 +11,8 @@ namespace Script.CoreUObject
         ~TSubclassOf() => TSubclassOfImplementation.TSubclassOf_UnRegisterImplementation(GarbageCollectionHandle);
 
         public TSubclassOf(UClass InClass) =>
-            TSubclassOfImplementation.TSubclassOf_RegisterImplementation(this, InClass.GarbageCollectionHandle);
+            TSubclassOfImplementation.TSubclassOf_RegisterImplementation(
+                this, InClass.GarbageCollectionHandle, GetType());
 
         public static implicit operator TSubclassOf<T>(UClass InClass) => new(InClass);
 
