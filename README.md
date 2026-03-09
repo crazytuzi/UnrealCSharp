@@ -40,4 +40,14 @@
 <a href="https://github.com/crazytuzi/UnrealCSharp/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=crazytuzi/UnrealCSharp"/>
 </a>
+
+# Star History
+
+<a href="https://www.star-history.com/?repos=crazytuzi%2FUnrealCSharp&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=crazytuzi/UnrealCSharp&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=crazytuzi/UnrealCSharp&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=crazytuzi/UnrealCSharp&type=date&legend=top-left" />
+ </picture>
+</a>
     
