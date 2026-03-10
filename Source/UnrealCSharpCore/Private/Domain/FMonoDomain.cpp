@@ -27,6 +27,22 @@
 
 PRAGMA_DISABLE_DANGLING_WARNINGS
 
+FScopedMonoUTF8Char::FScopedMonoUTF8Char(char* InPtr) : Ptr(InPtr)
+{}
+	
+FScopedMonoUTF8Char::~FScopedMonoUTF8Char()
+{
+	if (Ptr)
+	{
+		FMonoDomain::Free(Ptr);
+	}
+}
+
+FScopedMonoUTF8Char::operator const char*() const 
+{ 
+	return Ptr ? Ptr : ""; 
+}
+
 MonoDomain* FMonoDomain::Domain = nullptr;
 
 MonoGCHandle FMonoDomain::AssemblyLoadContextGCHandle = nullptr;
@@ -313,6 +329,19 @@ MonoString* FMonoDomain::String_New(const char* InText)
 char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
 {
 	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
+}
+
+FScopedMonoUTF8Char FMonoDomain::String_To_Scoped_UTF8(MonoString* InMonoString)
+{
+	return FScopedMonoUTF8Char(String_To_UTF8(InMonoString));
+}
+	
+void FMonoDomain::Free(void * InPtr)
+{
+	if (InPtr != nullptr)
+	{
+		mono_free(InPtr);
+	}
 }
 
 MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)

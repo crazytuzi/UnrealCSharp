@@ -9,7 +9,7 @@ namespace
 	{
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InValue)
 		{
-			const auto String = new FString(UTF8_TO_TCHAR(FDomain::String_To_UTF8(InValue)));
+			const auto String = new FString(UTF8_TO_TCHAR(FDomain::String_To_Scoped_UTF8(InValue)));
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FString, true, false>(
 				FReflectionRegistry::Get().GetStringClass(), InMonoObject, String);

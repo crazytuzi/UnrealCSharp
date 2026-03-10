@@ -12,7 +12,7 @@ namespace
 	{
 		static MonoObject* StaticStructImplementation(MonoString* InStructName)
 		{
-			const auto StructName = UTF8_TO_TCHAR(FDomain::String_To_UTF8(InStructName));
+			const auto StructName = UTF8_TO_TCHAR(FDomain::String_To_Scoped_UTF8(InStructName));
 
 			const auto InStruct = LoadObject<UScriptStruct>(nullptr, StructName);
 
@@ -21,7 +21,7 @@ namespace
 
 		static void RegisterImplementation(MonoObject* InMonoObject, MonoString* InStructName)
 		{
-			const auto StructName = UTF8_TO_TCHAR(FDomain::String_To_UTF8(InStructName));
+			const auto StructName = UTF8_TO_TCHAR(FDomain::String_To_Scoped_UTF8(InStructName));
 
 			FCSharpEnvironment::GetEnvironment().Bind(InMonoObject, StructName);
 		}
