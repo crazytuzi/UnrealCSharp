@@ -1,4 +1,4 @@
-#include "Binding/Class/TBindingClassBuilder.inl"
+﻿#include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/CompilerMacro.h"
