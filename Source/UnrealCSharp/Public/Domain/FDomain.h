@@ -31,6 +31,8 @@ public:
 	static MonoString* String_New(const char* InText);
 
 	static char* String_To_UTF8(MonoString* InMonoString);
+	
+	static FScopedMonoUTF8Char String_To_Scoped_UTF8(MonoString* InMonoString);
 
 	static MonoObject* GCHandle_Get_Target_V2(MonoGCHandle InGCHandle);
 
