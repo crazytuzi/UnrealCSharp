@@ -66,14 +66,9 @@ MonoString* FDomain::String_New(const char* InText)
 	return FMonoDomain::String_New(InText);
 }
 
-char* FDomain::String_To_UTF8(MonoString* InMonoString)
+FMonoUTF8Scope FDomain::String_To_UTF8(MonoString* InMonoString)
 {
 	return FMonoDomain::String_To_UTF8(InMonoString);
-}
-
-FScopedMonoUTF8Char FDomain::String_To_Scoped_UTF8(MonoString* InMonoString)
-{
-	return FMonoDomain::String_To_Scoped_UTF8(InMonoString);
 }
 
 MonoObject* FDomain::GCHandle_Get_Target_V2(const MonoGCHandle InGCHandle)
@@ -97,7 +92,7 @@ FString FDomain::GetTraceback()
 	{
 		if (const auto TracebackMethod = UtilsClass->GetMethod(FUNCTION_UTILS_GET_TRACEBACK, 0))
 		{
-			return FString(UTF8_TO_TCHAR(String_To_Scoped_UTF8((MonoString*)TracebackMethod->Runtime_Invoke())));
+			return FString(UTF8_TO_TCHAR(String_To_UTF8((MonoString*)TracebackMethod->Runtime_Invoke())));
 		}
 	}
 

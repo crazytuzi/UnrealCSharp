@@ -27,22 +27,6 @@
 
 PRAGMA_DISABLE_DANGLING_WARNINGS
 
-FScopedMonoUTF8Char::FScopedMonoUTF8Char(char* InPtr) : Ptr(InPtr)
-{}
-	
-FScopedMonoUTF8Char::~FScopedMonoUTF8Char()
-{
-	if (Ptr)
-	{
-		FMonoDomain::Free(Ptr);
-	}
-}
-
-FScopedMonoUTF8Char::operator const char*() const 
-{ 
-	return Ptr ? Ptr : ""; 
-}
-
 MonoDomain* FMonoDomain::Domain = nullptr;
 
 MonoGCHandle FMonoDomain::AssemblyLoadContextGCHandle = nullptr;
@@ -326,21 +310,16 @@ MonoString* FMonoDomain::String_New(const char* InText)
 	return Domain != nullptr && InText != nullptr ? mono_string_new(Domain, InText) : nullptr;
 }
 
-char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
+FMonoUTF8Scope FMonoDomain::String_To_UTF8(MonoString* InMonoString)
 {
-	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
+	return FMonoUTF8Scope(mono_string_to_utf8(InMonoString));
 }
 
-FScopedMonoUTF8Char FMonoDomain::String_To_Scoped_UTF8(MonoString* InMonoString)
+void FMonoDomain::Free(void* InPointer)
 {
-	return FScopedMonoUTF8Char(String_To_UTF8(InMonoString));
-}
-	
-void FMonoDomain::Free(void * InPtr)
-{
-	if (InPtr != nullptr)
+	if (InPointer != nullptr)
 	{
-		mono_free(InPtr);
+		mono_free(InPointer);
 	}
 }
 

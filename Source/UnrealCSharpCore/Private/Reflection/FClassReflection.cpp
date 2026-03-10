@@ -197,11 +197,11 @@ void FClassReflection::Initialize()
 		TypeDefinition = this;
 	}
 
-	Name = FString(FMonoDomain::String_To_Scoped_UTF8(OutName));
+	Name = FString(FMonoDomain::String_To_UTF8(OutName));
 
-	NameSpace = FString(FMonoDomain::String_To_Scoped_UTF8(OutNameSpace));
+	NameSpace = FString(FMonoDomain::String_To_UTF8(OutNameSpace));
 
-	PathName = FString(FMonoDomain::String_To_Scoped_UTF8(OutPathName));
+	PathName = FString(FMonoDomain::String_To_UTF8(OutPathName));
 
 	if (Name != CLASS_UTILS && OutParent != nullptr)
 	{
@@ -240,8 +240,8 @@ void FClassReflection::Initialize()
 		for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
 		{
 			AttributeValues.FindOrAdd(Attribute).Add(FString(
-				FMonoDomain::String_To_Scoped_UTF8(FMonoDomain::Array_Get<MonoString*>(OutClassAttributeValues,
-					AttributeIndex + AttributeValueIndex))));
+				FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutClassAttributeValues,
+					ClassAttributeIndex + AttributeValueIndex))));
 		}
 
 		ClassAttributeIndex += AttributeValueCount;
@@ -260,7 +260,7 @@ void FClassReflection::Initialize()
 	for (auto PropertyIndex = 0; PropertyIndex < OutPropertyLength; ++PropertyIndex)
 	{
 		auto PropertyName = FString(
-			FMonoDomain::String_To_Scoped_UTF8(FMonoDomain::Array_Get<MonoString*>(OutPropertyNames, PropertyIndex)));
+			FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutPropertyNames, PropertyIndex)));
 
 		auto AttributeCount = FMonoDomain::Array_Get<int32>(OutPropertyAttributeCounts, PropertyIndex);
 
@@ -281,7 +281,7 @@ void FClassReflection::Initialize()
 
 			for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
 			{
-				PropertyAttributeValues.FindOrAdd(Attribute).Add(FString(FMonoDomain::String_To_Scoped_UTF8(
+				PropertyAttributeValues.FindOrAdd(Attribute).Add(FString(FMonoDomain::String_To_UTF8(
 					FMonoDomain::Array_Get<MonoString*>(
 						OutPropertyAttributeValues, PropertyAttributeValueIndex + AttributeValueIndex))));
 			}
@@ -303,7 +303,7 @@ void FClassReflection::Initialize()
 	for (auto FieldIndex = 0; FieldIndex < OutFieldLength; ++FieldIndex)
 	{
 		auto FieldName = FString(
-			FMonoDomain::String_To_Scoped_UTF8(FMonoDomain::Array_Get<MonoString*>(OutFieldNames, FieldIndex)));
+			FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutFieldNames, FieldIndex)));
 
 		Fields.Add(FieldName,
 		           new FFieldReflection(FieldName,
@@ -318,7 +318,7 @@ void FClassReflection::Initialize()
 	for (auto MethodIndex = 0; MethodIndex < OutMethodLength; ++MethodIndex)
 	{
 		auto MethodName = FString(
-			FMonoDomain::String_To_Scoped_UTF8(FMonoDomain::Array_Get<MonoString*>(OutMethodNames, MethodIndex)));
+			FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutMethodNames, MethodIndex)));
 
 		auto MethodParamCount = FMonoDomain::Array_Get<int32>(OutMethodParamCounts, MethodIndex);
 
@@ -341,7 +341,7 @@ void FClassReflection::Initialize()
 
 			for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
 			{
-				MethodAttributeValue.FindOrAdd(Attribute).Add(FString(FMonoDomain::String_To_Scoped_UTF8(
+				MethodAttributeValue.FindOrAdd(Attribute).Add(FString(FMonoDomain::String_To_UTF8(
 					FMonoDomain::Array_Get<MonoString*>(
 						OutMethodAttributeValues, MethodAttributeValueIndex + AttributeValueIndex))));
 			}
@@ -372,7 +372,7 @@ void FClassReflection::Initialize()
 
 			for (auto ParamIndex = 0; ParamIndex < MethodParamCount; ++ParamIndex)
 			{
-				auto ParamName = FString(FMonoDomain::String_To_Scoped_UTF8(
+				auto ParamName = FString(FMonoDomain::String_To_UTF8(
 					FMonoDomain::Array_Get<MonoString*>(OutMethodParamNames, MethodParamIndex + ParamIndex)));
 
 				ParamReflections[ParamIndex] = new FParamReflection(

@@ -26,7 +26,7 @@ namespace
 
 		static MonoObject* StaticClassImplementation(MonoString* InClassName)
 		{
-			const auto ClassName = UTF8_TO_TCHAR(FDomain::String_To_Scoped_UTF8(InClassName));
+			const auto ClassName = UTF8_TO_TCHAR(FDomain::String_To_UTF8(InClassName));
 
 			const auto InClass = LoadObject<UClass>(nullptr, ClassName);
 

@@ -14,15 +14,15 @@ namespace
 		                                   MonoString* InPackageNamespace, const bool bRequiresQuotes)
 		{
 			const auto Buffer = InBuffer != nullptr
-				                    ? UTF8_TO_TCHAR(FDomain::String_To_Scoped_UTF8(InBuffer))
+				                    ? UTF8_TO_TCHAR(FDomain::String_To_UTF8(InBuffer))
 				                    : nullptr;
 
 			const auto TextNamespace = InTextNamespace != nullptr
-				                           ? UTF8_TO_TCHAR(FDomain::String_To_Scoped_UTF8(InTextNamespace))
+				                           ? UTF8_TO_TCHAR(FDomain::String_To_UTF8(InTextNamespace))
 				                           : nullptr;
 
 			const auto PackageNamespace = InPackageNamespace != nullptr
-				                              ? UTF8_TO_TCHAR(FDomain::String_To_Scoped_UTF8(InPackageNamespace))
+				                              ? UTF8_TO_TCHAR(FDomain::String_To_UTF8(InPackageNamespace))
 				                              : nullptr;
 
 			const auto OutText = new FText();
