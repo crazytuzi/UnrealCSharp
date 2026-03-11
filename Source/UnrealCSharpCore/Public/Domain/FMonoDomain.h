@@ -2,6 +2,7 @@
 
 #include "FMonoObjectTypes.h"
 #include "FMonoDomainInitializeParams.h"
+#include "Domain/FMonoUTF8Scope.h"
 #include "mono/metadata/appdomain.h"
 
 class UNREALCSHARPCORE_API FMonoDomain
@@ -61,7 +62,9 @@ public:
 
 	static MonoString* String_New(const char* InText);
 
-	static char* String_To_UTF8(MonoString* InMonoString);
+	static FMonoUTF8Scope String_To_UTF8(MonoString* InMonoString);
+
+	static void Free(void* InPointer);
 
 	static MonoArray* Array_New(MonoClass* InMonoClass, uint32 InNum);
 

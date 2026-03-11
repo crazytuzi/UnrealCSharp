@@ -241,7 +241,7 @@ void FClassReflection::Initialize()
 		{
 			AttributeValues.FindOrAdd(Attribute).Add(FString(
 				FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutClassAttributeValues,
-					AttributeIndex + AttributeValueIndex))));
+					ClassAttributeIndex + AttributeValueIndex))));
 		}
 
 		ClassAttributeIndex += AttributeValueCount;

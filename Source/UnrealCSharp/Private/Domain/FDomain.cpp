@@ -66,7 +66,7 @@ MonoString* FDomain::String_New(const char* InText)
 	return FMonoDomain::String_New(InText);
 }
 
-char* FDomain::String_To_UTF8(MonoString* InMonoString)
+FMonoUTF8Scope FDomain::String_To_UTF8(MonoString* InMonoString)
 {
 	return FMonoDomain::String_To_UTF8(InMonoString);
 }

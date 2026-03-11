@@ -310,9 +310,17 @@ MonoString* FMonoDomain::String_New(const char* InText)
 	return Domain != nullptr && InText != nullptr ? mono_string_new(Domain, InText) : nullptr;
 }
 
-char* FMonoDomain::String_To_UTF8(MonoString* InMonoString)
+FMonoUTF8Scope FMonoDomain::String_To_UTF8(MonoString* InMonoString)
 {
-	return InMonoString != nullptr ? mono_string_to_utf8(InMonoString) : nullptr;
+	return FMonoUTF8Scope(mono_string_to_utf8(InMonoString));
+}
+
+void FMonoDomain::Free(void* InPointer)
+{
+	if (InPointer != nullptr)
+	{
+		mono_free(InPointer);
+	}
 }
 
 MonoArray* FMonoDomain::Array_New(MonoClass* InMonoClass, const uint32 InNum)
