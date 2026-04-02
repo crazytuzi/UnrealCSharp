@@ -34,6 +34,8 @@ public:
 
 	FScriptSet* GetScriptSet() const;
 
+	void* GetAddress() const;
+
 	bool IsValidIndex(int32 InIndex) const;
 
 	void* GetEnumerator(int32 InIndex) const;

@@ -18,6 +18,9 @@ auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* In
 	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(
 		FReflectionRegistry::Get().GetClass(InScriptStruct), InMonoObject, true);
 
+	StructAddress2GarbageCollectionHandle.Add(
+		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), GarbageCollectionHandle);
+
 	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
 		                                          InScriptStruct,
 		                                          const_cast<void*>(InStruct),

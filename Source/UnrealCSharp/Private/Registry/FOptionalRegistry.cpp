@@ -54,11 +54,13 @@ bool FOptionalRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbag
 {
 	if (const auto FoundValue = OptionalGarbageCollectionHandle2Helper.Find(InGarbageCollectionHandle))
 	{
-		if (const auto FoundGarbageCollectionHandle = OptionalAddress2GarbageCollectionHandle.Find(*FoundValue))
+		const auto Address = (*FoundValue)->GetAddress();
+
+		if (const auto FoundGarbageCollectionHandle = OptionalAddress2GarbageCollectionHandle.Find(Address))
 		{
 			if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
 			{
-				OptionalAddress2GarbageCollectionHandle.Remove(*FoundValue);
+				OptionalAddress2GarbageCollectionHandle.Remove(Address);
 			}
 		}
 

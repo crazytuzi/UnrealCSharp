@@ -42,6 +42,8 @@ public:
 
 	FScriptMap* GetScriptMap() const;
 
+	void* GetAddress() const;
+
 	int32 GetMaxIndex() const;
 
 	bool IsValidIndex(int32 InIndex) const;

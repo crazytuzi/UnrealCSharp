@@ -18,6 +18,8 @@ FMulticastDelegateHelper::~FMulticastDelegateHelper()
 
 void FMulticastDelegateHelper::Initialize(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction)
 {
+	SetAddress(InMulticastDelegate);
+
 	MulticastDelegateHandler = NewObject<UMulticastDelegateHandler>();
 
 	MulticastDelegateHandler->AddToRoot();

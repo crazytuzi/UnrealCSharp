@@ -17,6 +17,8 @@ FDelegateHelper::~FDelegateHelper()
 
 void FDelegateHelper::Initialize(FScriptDelegate* InDelegate, UFunction* InSignatureFunction)
 {
+	SetAddress(InDelegate);
+
 	DelegateHandler = NewObject<UDelegateHandler>();
 
 	DelegateHandler->AddToRoot();

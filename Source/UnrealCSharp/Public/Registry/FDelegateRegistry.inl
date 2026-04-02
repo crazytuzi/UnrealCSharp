@@ -65,12 +65,14 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 	{
 		if (const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle))
 		{
+			const auto Address = (*FoundValue)->GetAddress();
+
 			if (const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(
-				*FoundValue))
+				Address))
 			{
 				if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
 				{
-					(InRegistry->*Address2GarbageCollectionHandle).Remove(*FoundValue);
+					(InRegistry->*Address2GarbageCollectionHandle).Remove(Address);
 				}
 			}
 

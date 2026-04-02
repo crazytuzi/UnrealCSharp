@@ -72,6 +72,8 @@ public:
 
 	FScriptArray* GetScriptArray() const;
 
+	void* GetAddress() const;
+
 	FORCEINLINE FScriptArrayHelper CreateHelperFormInnerProperty() const
 	{
 		return FScriptArrayHelper::CreateHelperFormInnerProperty(InnerPropertyDescriptor->GetProperty(), ScriptArray);
