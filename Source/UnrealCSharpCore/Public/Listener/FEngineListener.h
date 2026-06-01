@@ -20,7 +20,7 @@ private:
 	void OnLoadingPhaseComplete(ELoadingPhase::Type LoadingPhase, bool bSuccess);
 
 	void OnPreExit();
-	
+
 	static void SetActive(bool InbIsActive);
 
 	FDelegateHandle OnLoadingPhaseCompleteHandle;

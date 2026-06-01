@@ -1,4 +1,4 @@
-﻿#include "Listener/FEngineListener.h"
+#include "Listener/FEngineListener.h"
 #include "Interfaces/IPluginManager.h"
 #include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"

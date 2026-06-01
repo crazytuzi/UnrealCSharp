@@ -3,9 +3,7 @@
 #include "UnrealCSharp.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
-#if !WITH_EDITOR
 #include "Dynamic/FDynamicGenerator.h"
-#endif
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpModule"
 
@@ -37,7 +35,12 @@ void FUnrealCSharpModule::ShutdownModule()
 
 void FUnrealCSharpModule::OnUnrealCSharpCoreModuleActive()
 {
-#if !WITH_EDITOR
+#if WITH_EDITOR
+	if (IsRunningGame())
+	{
+		FDynamicGenerator::Generator();
+	}
+#else
 	FDynamicGenerator::Generator();
 #endif
 
