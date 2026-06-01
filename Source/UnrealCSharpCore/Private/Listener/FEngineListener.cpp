@@ -1,24 +1,26 @@
-#include "Listener/FEngineListener.h"
-#if !WITH_EDITOR
+﻿#include "Listener/FEngineListener.h"
 #include "Interfaces/IPluginManager.h"
-#endif
 #include "UnrealCSharpCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Setting/UnrealCSharpSetting.h"
 
 FEngineListener::FEngineListener()
 {
-#if !WITH_EDITOR
+#if WITH_EDITOR
+	if (!IsRunningGame())
+	{
+		return;
+	}
+#endif
+
 	OnLoadingPhaseCompleteHandle = IPluginManager::Get().OnLoadingPhaseComplete().AddRaw(
 		this, &FEngineListener::OnLoadingPhaseComplete);
 
 	OnPreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FEngineListener::OnPreExit);
-#endif
 }
 
 FEngineListener::~FEngineListener()
 {
-#if !WITH_EDITOR
 	if (OnPreExitHandle.IsValid())
 	{
 		FCoreDelegates::OnPreExit.Remove(OnPreExitHandle);
@@ -28,7 +30,6 @@ FEngineListener::~FEngineListener()
 	{
 		IPluginManager::Get().OnLoadingPhaseComplete().Remove(OnLoadingPhaseCompleteHandle);
 	}
-#endif
 }
 
 #if WITH_EDITOR
@@ -41,7 +42,8 @@ void FEngineListener::OnCancelPIE()
 {
 	SetActive(false);
 }
-#else
+#endif
+
 void FEngineListener::OnLoadingPhaseComplete(const ELoadingPhase::Type LoadingPhase, const bool bSuccess)
 {
 	if (bSuccess)
@@ -57,7 +59,6 @@ void FEngineListener::OnPreExit()
 {
 	SetActive(false);
 }
-#endif
 
 void FEngineListener::SetActive(const bool InbIsActive)
 {
