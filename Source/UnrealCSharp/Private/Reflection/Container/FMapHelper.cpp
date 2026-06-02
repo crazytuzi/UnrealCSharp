@@ -233,6 +233,11 @@ FScriptMap* FMapHelper::GetScriptMap() const
 	return ScriptMap;
 }
 
+void* FMapHelper::GetAddress() const
+{
+	return ScriptMap;
+}
+
 int32 FMapHelper::GetMaxIndex() const
 {
 	return ScriptMap->GetMaxIndex();

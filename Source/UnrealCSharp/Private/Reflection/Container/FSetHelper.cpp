@@ -171,6 +171,11 @@ FScriptSet* FSetHelper::GetScriptSet() const
 	return ScriptSet;
 }
 
+void* FSetHelper::GetAddress() const
+{
+	return ScriptSet;
+}
+
 bool FSetHelper::IsValidIndex(const int32 InIndex) const
 {
 	return ScriptSet->IsValidIndex(InIndex);

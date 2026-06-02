@@ -56,11 +56,21 @@ bool FOptionalRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 {
 	if (const auto FoundValue = ManagedHandle2Helper.Find(InManagedHandle))
 	{
+<<<<<<< HEAD
 		if (const auto FoundManagedHandle = Address2ManagedHandle.Find(*FoundValue))
+=======
+		const auto Address = (*FoundValue)->GetAddress();
+
+		if (const auto FoundGarbageCollectionHandle = OptionalAddress2GarbageCollectionHandle.Find(Address))
+>>>>>>> zjt9363/fix/struct-registry-and-remove-cleanup
 		{
 			if (*FoundManagedHandle == InManagedHandle)
 			{
+<<<<<<< HEAD
 				Address2ManagedHandle.Remove(*FoundValue);
+=======
+				OptionalAddress2GarbageCollectionHandle.Remove(Address);
+>>>>>>> zjt9363/fix/struct-registry-and-remove-cleanup
 			}
 		}
 

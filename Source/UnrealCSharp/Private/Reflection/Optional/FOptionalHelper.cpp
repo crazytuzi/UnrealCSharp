@@ -100,4 +100,9 @@ void* FOptionalHelper::GetData() const
 {
 	return Data;
 }
+
+void* FOptionalHelper::GetAddress() const
+{
+	return Data;
+}
 #endif

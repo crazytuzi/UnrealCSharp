@@ -62,11 +62,22 @@ struct FContainerRegistry::TContainerRegistryImplementation<
 	{
 		if (const auto FoundValue = (InRegistry->*ManagedHandle2Value).Find(InManagedHandle))
 		{
+<<<<<<< HEAD
 			if (const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(*FoundValue))
+=======
+			const auto Address = (*FoundValue)->GetAddress();
+
+			if (const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(
+				Address))
+>>>>>>> zjt9363/fix/struct-registry-and-remove-cleanup
 			{
 				if (*FoundManagedHandle == InManagedHandle)
 				{
+<<<<<<< HEAD
 					(InRegistry->*Address2ManagedHandle).Remove(*FoundValue);
+=======
+					(InRegistry->*Address2GarbageCollectionHandle).Remove(Address);
+>>>>>>> zjt9363/fix/struct-registry-and-remove-cleanup
 				}
 			}
 

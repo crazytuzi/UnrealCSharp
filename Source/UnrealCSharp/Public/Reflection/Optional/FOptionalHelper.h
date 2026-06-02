@@ -32,6 +32,8 @@ public:
 
 	void* GetData() const;
 
+	void* GetAddress() const;
+
 private:
 	FOptionalProperty* OptionalProperty;
 

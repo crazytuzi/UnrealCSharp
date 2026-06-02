@@ -340,3 +340,8 @@ FScriptArray* FArrayHelper::GetScriptArray() const
 {
 	return ScriptArray;
 }
+
+void* FArrayHelper::GetAddress() const
+{
+	return ScriptArray;
+}
