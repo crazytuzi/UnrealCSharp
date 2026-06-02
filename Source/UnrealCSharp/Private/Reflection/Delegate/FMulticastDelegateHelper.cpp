@@ -1,12 +1,14 @@
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
 
-FMulticastDelegateHelper::FMulticastDelegateHelper()
+FMulticastDelegateHelper::FMulticastDelegateHelper():
+	FDelegateBaseHelper(nullptr)
 {
 	Initialize(nullptr, nullptr);
 }
 
 FMulticastDelegateHelper::FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate,
-                                                   UFunction* InSignatureFunction)
+                                                   UFunction* InSignatureFunction):
+	FDelegateBaseHelper(InMulticastDelegate)
 {
 	Initialize(InMulticastDelegate, InSignatureFunction);
 }
@@ -18,8 +20,6 @@ FMulticastDelegateHelper::~FMulticastDelegateHelper()
 
 void FMulticastDelegateHelper::Initialize(FMulticastScriptDelegate* InMulticastDelegate, UFunction* InSignatureFunction)
 {
-	SetAddress(InMulticastDelegate);
-
 	MulticastDelegateHandler = NewObject<UMulticastDelegateHandler>();
 
 	MulticastDelegateHandler->AddToRoot();

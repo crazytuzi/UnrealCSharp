@@ -19,22 +19,14 @@ auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* In
 	const auto ManagedHandle = FReflectionRegistry::Get().GetClass(InScriptStruct)->NewWeakRefGCHandle(
 		InManagedHandle, true);
 
-<<<<<<< HEAD
+	StructAddress2ManagedHandle.Add(
+		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), ManagedHandle);
+
 	ManagedHandle2StructAddress.Add(ManagedHandle, {
 		                                InScriptStruct,
 		                                const_cast<void*>(InStruct),
 		                                IsNeedFree
 	                                });
-=======
-	StructAddress2GarbageCollectionHandle.Add(
-		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), GarbageCollectionHandle);
-
-	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
-		                                          InScriptStruct,
-		                                          const_cast<void*>(InStruct),
-		                                          IsNeedFree
-	                                          });
->>>>>>> zjt9363/fix/struct-registry-and-remove-cleanup
 
 	return true;
 }
