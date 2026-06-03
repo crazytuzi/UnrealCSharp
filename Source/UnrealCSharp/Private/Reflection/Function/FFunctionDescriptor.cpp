@@ -1,4 +1,4 @@
-﻿#include "Reflection/Function/FFunctionDescriptor.h"
+#include "Reflection/Function/FFunctionDescriptor.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 
 FFunctionDescriptor::FFunctionDescriptor(UFunction* InFunction,
@@ -23,7 +23,8 @@ void FFunctionDescriptor::Initialize()
 	}
 
 	const auto IsNativeFunction =
-		FUnrealCSharpFunctionLibrary::IsNativeFunction(Function->GetOwnerClass(), Function->GetFName());
+		FUnrealCSharpFunctionLibrary::IsNativeFunction(Function->GetOwnerClass(), Function->GetFName()) ||
+		Function->GetName().EndsWith(HEADER_GENERATED_DELEGATE_SIGNATURE_SUFFIX);
 
 	PropertyDescriptors.Reserve(Function->ReturnValueOffset != MAX_uint16
 		                            ? (Function->NumParms > 0

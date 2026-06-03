@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "TGeneric.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"

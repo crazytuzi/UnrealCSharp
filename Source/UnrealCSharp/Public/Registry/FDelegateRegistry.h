@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "TValueMapping.inl"
 #include "Reflection/Delegate/FDelegateHelper.h"
@@ -12,7 +12,7 @@ public:
 	{
 		typedef Address FAddressType;
 
-		typedef typename TDelegateValueMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
+		typedef typename TDelegateValueMapping::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
 	typedef TDelegateValueMapping<void*, FDelegateHelper*> FDelegateHelperMapping;
@@ -40,13 +40,13 @@ public:
 	void Deinitialize();
 
 private:
-	FDelegateHelperMapping::FGarbageCollectionHandle2Value DelegateGarbageCollectionHandle2Helper;
+	FDelegateHelperMapping::FManagedHandle2Value DelegateManagedHandle2Helper;
 
-	FDelegateHelperMapping::FAddress2GarbageCollectionHandle DelegateAddress2GarbageCollectionHandle;
+	FDelegateHelperMapping::FAddress2ManagedHandle DelegateAddress2ManagedHandle;
 
-	FMulticastDelegateHelperMapping::FGarbageCollectionHandle2Value MulticastDelegateGarbageCollectionHandle2Helper;
+	FMulticastDelegateHelperMapping::FManagedHandle2Value MulticastDelegateManagedHandle2Helper;
 
-	FMulticastDelegateHelperMapping::FAddress2GarbageCollectionHandle MulticastDelegateAddress2GarbageCollectionHandle;
+	FMulticastDelegateHelperMapping::FAddress2ManagedHandle MulticastDelegateAddress2ManagedHandle;
 };
 
 #include "FDelegateRegistry.inl"

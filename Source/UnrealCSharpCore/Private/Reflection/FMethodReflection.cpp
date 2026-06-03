@@ -1,23 +1,30 @@
-﻿#include "Reflection/FMethodReflection.h"
+#include "Reflection/FMethodReflection.h"
 #include "Reflection/FReflectionRegistry.h"
+#include "Domain/Mono/FMonoDomain.h"
+#include "Domain/Script/IManagedHandle.h"
+#include "Domain/Script/IScriptDomain.h"
 
 FMethodReflection::FMethodReflection(const FString& InName, const int32 InParamCount,
-                                     MonoReflectionMethod* InReflectionMethod,
+                                     const IManagedReflectionMethod InManagedReflectionMethod,
                                      const bool InIsStatic, FClassReflection* InReturn,
-                                     const TArray<FParamReflection*>& InParamReflections,
+                                     const TArray<FParamReflection*>& InParams,
                                      const TSet<FClassReflection*>& InAttributes,
                                      const TMap<FClassReflection*, TArray<FString>>& InAttributeValues):
 	FReflection(InName, InAttributes, InAttributeValues),
 	ParamCount(InParamCount),
-	ReflectionMethod(InReflectionMethod),
+	ManagedReflectionMethod(InManagedReflectionMethod),
 	bIsStatic(InIsStatic),
 	Return(InReturn),
-	ParamReflections(InParamReflections)
+	Params(InParams)
 {
-	if (ReflectionMethod != nullptr)
+#if WITH_MONO
+	if (IManagedIsValid(ManagedReflectionMethod))
 	{
-		Method = ReflectionMethod->method;
+		ManagedMethod = ManagedReflectionMethod->method;
 	}
+#else
+	ManagedMethod = IManagedHandleToIManagedMethod(MANAGED_HANDLE_FROM_OBJECT(InManagedReflectionMethod));
+#endif
 
 	bIsUFunction = HasAttribute(FReflectionRegistry::Get().GetUFunctionAttributeClass());
 
@@ -26,12 +33,24 @@ FMethodReflection::FMethodReflection(const FString& InName, const int32 InParamC
 
 FMethodReflection::~FMethodReflection()
 {
-	for (const auto Param : ParamReflections)
+	for (const auto Param : Params)
 	{
 		delete Param;
 	}
 
-	ParamReflections.Empty();
+	Params.Empty();
+
+#if WITH_CORECLR
+	if (IManagedIsValid(ManagedReflectionMethod))
+	{
+		if (const auto ScriptDomain = IScriptDomain::Get())
+		{
+			ScriptDomain->Free(MANAGED_HANDLE_FROM_OBJECT(ManagedReflectionMethod));
+		}
+
+		ManagedReflectionMethod = INVALID_MANAGED;
+	}
+#endif
 }
 
 int32 FMethodReflection::GetParamCount() const
@@ -39,14 +58,9 @@ int32 FMethodReflection::GetParamCount() const
 	return ParamCount;
 }
 
-MonoReflectionMethod* FMethodReflection::GetReflectionMethod() const
+IManagedMethod FMethodReflection::GetManagedMethod() const
 {
-	return ReflectionMethod;
-}
-
-MonoMethod* FMethodReflection::GetMethod() const
-{
-	return Method;
+	return ManagedMethod;
 }
 
 bool FMethodReflection::IsOverride() const
@@ -71,20 +85,27 @@ FClassReflection* FMethodReflection::GetReturn() const
 
 const TArray<FParamReflection*>& FMethodReflection::GetParams() const
 {
-	return ParamReflections;
+	return Params;
 }
 
-MonoObject* FMethodReflection::Runtime_Invoke(void* InMonoObject, void** InParams) const
+IManagedHandle FMethodReflection::Runtime_Invoke(const IManagedHandle InManagedHandle, void** InParams) const
 {
-	return FMonoDomain::Runtime_Invoke(Method, InMonoObject, InParams);
+	const auto ScriptDomain = IScriptDomain::Get();
+
+	return ScriptDomain != nullptr
+		       ? ScriptDomain->Invoke(InManagedHandle, ManagedMethod, ParamCount, InParams)
+		       : InvalidManagedHandle;
 }
 
-MonoObject* FMethodReflection::Runtime_Invoke_Array(void* InMonoObject, MonoArray* InParams) const
+#if WITH_MONO
+IManagedObject FMethodReflection::Runtime_Invoke_Array(const IManagedHandle InManagedHandle,
+                                                       const IManagedArray InParams) const
 {
-	return FMonoDomain::Runtime_Invoke_Array(Method, InMonoObject, InParams);
+	return FMonoDomain::Runtime_Invoke_Array(ManagedMethod, IManagedHandleToIManagedObject(InManagedHandle), InParams);
 }
 
 void* FMethodReflection::Method_Get_Unmanaged_Thunk() const
 {
-	return FMonoDomain::Method_Get_Unmanaged_Thunk(Method);
+	return FMonoDomain::Method_Get_Unmanaged_Thunk(ManagedMethod);
 }
+#endif

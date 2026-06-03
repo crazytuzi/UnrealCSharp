@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #define PLUGIN_NAME FString(TEXT("UnrealCSharp"))
 
@@ -30,6 +30,8 @@
 
 #define WEAVERS_NAME FString(TEXT("Weavers"))
 
+#define INTEROP_NAME FString(TEXT("Interop"))
+
 #define UNREAL_TYPE_SOURCE_GENERATOR_NAME FString(TEXT("UnrealTypeSourceGenerator"))
 
 #define ANALYZER_RELEASES_UN_SHIPPED_NAME FString(TEXT("AnalyzerReleases.Unshipped"))
@@ -46,9 +48,21 @@
 
 #define CSHARP_GUID FString(TEXT("9A19103F-16F7-4668-BE54-9A1E7A4F7556"))
 
+#define INTEROP_GUID FString(TEXT("E3A5C6B1-2D4F-4A8E-9B7C-1F6D3E2A5B8C"))
+
 #define PROJECT_PLACEHOLDER FString(TEXT("ProjectPlaceholder"))
 
 #define SOLUTION_CONFIGURATION_PLATFORMS_PLACEHOLDER FString(TEXT("SolutionConfigurationPlatformsPlaceholder"))
+
+#define UE_NAME_PLACEHOLDER FString(TEXT("UENamePlaceholder"))
+
+#define GAME_NAME_PLACEHOLDER FString(TEXT("GameNamePlaceholder"))
+
+#define DEFINITION_PLACEHOLDER FString(TEXT("DefinitionPlaceholder"))
+
+#define ASSEMBLY_PLACEHOLDER FString(TEXT("AssemblyPlaceholder"))
+
+#define SCRIPT_PATH_PLACEHOLDER FString(TEXT("ScriptPathPlaceholder"))
 
 #define PROPS_SUFFIX FString(TEXT(".props"))
 
@@ -65,6 +79,16 @@
 #define MARKDOWN_SUFFIX FString(TEXT(".md"))
 
 #define XML_SUFFIX FString(TEXT(".xml"))
+
+#if PLATFORM_WINDOWS
+#define LIB_HOSTFXR FString(TEXT("hostfxr.dll"))
+#elif PLATFORM_LINUX
+#define LIB_HOSTFXR FString(TEXT("libhostfxr.so"))
+#elif PLATFORM_MAC_X86 || PLATFORM_MAC_ARM64
+#define LIB_HOSTFXR FString(TEXT("libhostfxr.dylib"))
+#endif
+
+#define CORECLR_RUNTIME_CONFIG FString(TEXT("CoreCLR.runtimeconfig.json"))
 
 #define DEFAULT_PUBLISH_DIRECTORY FString(TEXT("Script"))
 

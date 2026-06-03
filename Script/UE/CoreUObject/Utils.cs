@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Diagnostics;
 using System.Text;
@@ -24,7 +24,12 @@ namespace Script.CoreUObject
                     ? InType.GetGenericTypeDefinition()
                     : InType;
 
-        private static void SetOut() => Console.SetOut(Log.Log.Create());
+        private static void SetOut()
+        {
+            Console.SetOut(Log.Log.Create(InIsError: false));
+
+            Console.SetError(Log.Log.Create(InIsError: true));
+        }
 
         private static string GetTraceback()
         {
@@ -48,19 +53,30 @@ namespace Script.CoreUObject
 
         public static Type[] GetTypesWithAttribute(Type InAttributeType, Assembly InAssembly, out int OutLength)
         {
-            var Types = new List<Type>();
+            var Result = new List<Type>();
 
-            foreach (var Type in InAssembly.GetTypes())
+            Type[] Types;
+
+            try
             {
-                if (Type.IsDefined(InAttributeType, false))
+                Types = InAssembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ReflectionTypeLoadException)
+            {
+                Types = ReflectionTypeLoadException.Types;
+            }
+
+            foreach (var Type in Types)
+            {
+                if (Type != null && Type.IsDefined(InAttributeType, false))
                 {
-                    Types.Add(Type);
+                    Result.Add(Type);
                 }
             }
 
-            OutLength = Types.Count;
+            OutLength = Result.Count;
 
-            return Types.ToArray();
+            return Result.ToArray();
         }
 
         public static void GetClassReflection(Type InType,
@@ -107,271 +123,344 @@ namespace Script.CoreUObject
 
             OutIsEnum = InType.IsEnum;
 
-            OutGenericArguments = InType.GenericTypeArguments;
-
-            OutGenericArgumentLength = OutGenericArguments.Length;
-
-            OutInterfaces = InType.GetInterfaces();
-
-            OutInterfaceLength = (InType.IsValueType || InType.IsGenericType) ? 0 : OutInterfaces.Length;
-
-            var ClassAttributes = new List<Type>();
-
-            var ClassAttributeValueIndex = new List<int>();
-
-            var ClassAttributeValues = new List<string>();
-
-            var UClassAttributeNamespace = typeof(UClassAttribute).Namespace;
-
-            var OverrideAttributeType = typeof(OverrideAttribute);
-
-            foreach (var CustomAttribute in InType.CustomAttributes)
+            if (OutIsClass || OutIsEnum)
             {
-                if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace ||
-                    CustomAttribute.AttributeType == OverrideAttributeType)
+                OutGenericArguments = InType.GenericTypeArguments;
+
+                OutGenericArgumentLength = OutGenericArguments.Length;
+
+                OutInterfaces = InType.GetInterfaces();
+
+                OutInterfaceLength = (InType.IsValueType || InType.IsGenericType) ? 0 : OutInterfaces.Length;
+
+                var ClassAttributes = new List<Type>();
+
+                var ClassAttributeValueIndex = new List<int>();
+
+                var ClassAttributeValues = new List<string>();
+
+                var UClassAttributeNamespace = typeof(UClassAttribute).Namespace;
+
+                var OverrideAttributeType = typeof(OverrideAttribute);
+
+                foreach (var CustomAttribute in InType.CustomAttributes)
                 {
-                    ClassAttributes.Add(CustomAttribute.AttributeType);
-
-                    var ClassAttributeValueCount = 0;
-
-                    foreach (var ConstructorArgument in CustomAttribute.ConstructorArguments)
+                    if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace ||
+                        CustomAttribute.AttributeType == OverrideAttributeType)
                     {
-                        ClassAttributeValues.Add(ConstructorArgument.Value.ToString());
+                        ClassAttributes.Add(CustomAttribute.AttributeType);
 
-                        ClassAttributeValueCount++;
-                    }
-
-                    ClassAttributeValueIndex.Add(ClassAttributeValueCount);
-                }
-            }
-
-            OutClassAttributeLength = ClassAttributes.Count;
-
-            OutClassAttributes = ClassAttributes.ToArray();
-
-            OutClassAttributeValueLength = ClassAttributeValueIndex.ToArray();
-
-            OutClassAttributeValues = ClassAttributeValues.ToArray();
-
-            OutPropertyInfos = InType.GetProperties(
-                BindingFlags.Instance |
-                BindingFlags.Static |
-                BindingFlags.Public |
-                BindingFlags.NonPublic
-            );
-
-            OutPropertyLength = OutPropertyInfos.Length;
-
-            OutPropertyNames = new string[OutPropertyLength];
-
-            OutPropertyTypes = new Type[OutPropertyLength];
-
-            OutPropertyAttributeCounts = new int[OutPropertyLength];
-
-            var PropertyAttributes = new List<Type>();
-
-            var PropertyAttributeIndex = new List<int>();
-
-            var PropertyAttributeValues = new List<string>();
-
-            for (var i = 0; i < OutPropertyInfos.Length; i++)
-            {
-                OutPropertyNames[i] = OutPropertyInfos[i].Name;
-
-                OutPropertyTypes[i] = OutPropertyInfos[i].PropertyType;
-
-                var PropertyAttributeCount = 0;
-
-                foreach (var CustomAttribute in OutPropertyInfos[i].CustomAttributes)
-                {
-                    if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace)
-                    {
-                        var PropertyAttributeValueCount = 0;
-
-                        PropertyAttributes.Add(CustomAttribute.AttributeType);
+                        var ClassAttributeValueCount = 0;
 
                         foreach (var ConstructorArgument in CustomAttribute.ConstructorArguments)
                         {
-                            PropertyAttributeValues.Add(ConstructorArgument.Value.ToString());
+                            ClassAttributeValues.Add(ConstructorArgument.Value.ToString());
 
-                            PropertyAttributeValueCount++;
+                            ClassAttributeValueCount++;
                         }
 
-                        PropertyAttributeIndex.Add(PropertyAttributeValueCount);
-
-                        PropertyAttributeCount++;
+                        ClassAttributeValueIndex.Add(ClassAttributeValueCount);
                     }
                 }
 
-                OutPropertyAttributeCounts[i] = PropertyAttributeCount;
-            }
+                OutClassAttributeLength = ClassAttributes.Count;
 
-            OutPropertyAttributes = PropertyAttributes.ToArray();
+                OutClassAttributes = ClassAttributes.ToArray();
 
-            OutPropertyAttributeValueCounts = PropertyAttributeIndex.ToArray();
+                OutClassAttributeValueLength = ClassAttributeValueIndex.ToArray();
 
-            OutPropertyAttributeValues = PropertyAttributeValues.ToArray();
+                OutClassAttributeValues = ClassAttributeValues.ToArray();
 
-            OutFieldInfos = InType.GetFields(
-                BindingFlags.Instance |
-                BindingFlags.Static |
-                BindingFlags.Public |
-                BindingFlags.NonPublic);
-
-            OutFieldLength = OutFieldInfos.Length;
-
-            OutFieldNames = new string[OutFieldLength];
-
-            for (var i = 0; i < OutFieldInfos.Length; i++)
-            {
-                OutFieldNames[i] = OutFieldInfos[i].Name;
-            }
-
-            var Constructors = InType.GetConstructors(
-                BindingFlags.Instance |
-                BindingFlags.Static |
-                BindingFlags.Public |
-                BindingFlags.NonPublic);
-
-            var Methods = InType.GetMethods(
+                OutPropertyInfos = InType.GetProperties(
                     BindingFlags.Instance |
                     BindingFlags.Static |
                     BindingFlags.Public |
-                    BindingFlags.NonPublic)
-                .Where(Method => !Method.IsSpecialName)
-                .ToArray();
+                    BindingFlags.NonPublic
+                );
 
-            var ConstructorLength = Constructors.Length;
+                OutPropertyLength = OutPropertyInfos.Length;
 
-            OutMethodLength = ConstructorLength + Methods.Length;
+                OutPropertyNames = new string[OutPropertyLength];
 
-            OutMethodInfos = new MethodBase[OutMethodLength];
+                OutPropertyTypes = new Type[OutPropertyLength];
 
-            for (var i = 0; i < ConstructorLength; i++)
-            {
-                OutMethodInfos[i] = Constructors[i];
-            }
+                OutPropertyAttributeCounts = new int[OutPropertyLength];
 
-            for (var i = 0; i < Methods.Length; i++)
-            {
-                OutMethodInfos[ConstructorLength + i] = Methods[i];
-            }
+                var PropertyAttributes = new List<Type>();
 
-            OutMethodNames = new string[OutMethodLength];
+                var PropertyAttributeIndex = new List<int>();
 
-            OutMethodParamCounts = new int[OutMethodLength];
+                var PropertyAttributeValues = new List<string>();
 
-            for (var i = 0; i < OutMethodInfos.Length; i++)
-            {
-                OutMethodNames[i] = OutMethodInfos[i].Name;
-
-                OutMethodParamCounts[i] = OutMethodInfos[i].GetParameters().Length;
-            }
-
-            OutMethodIsStatics = new bool[OutMethodLength];
-
-            OutMethodReturnTypes = new Type[OutMethodLength];
-
-            OutMethodParamIndex = new int[OutMethodLength];
-
-            var MethodParamNames = new List<string>();
-
-            var MethodParamTypes = new List<Type>();
-
-            var MethodParamRefs = new List<bool>();
-
-            var UFunctionAttributeType = typeof(UFunctionAttribute);
-
-            for (var i = 0; i < OutMethodInfos.Length; i++)
-            {
-                var IsUFunction = false;
-
-                foreach (var CustomAttribute in OutMethodInfos[i].CustomAttributes)
+                for (var i = 0; i < OutPropertyInfos.Length; i++)
                 {
-                    if (CustomAttribute.AttributeType == UFunctionAttributeType)
+                    OutPropertyNames[i] = OutPropertyInfos[i].Name;
+
+                    OutPropertyTypes[i] = OutPropertyInfos[i].PropertyType;
+
+                    var PropertyAttributeCount = 0;
+
+                    foreach (var CustomAttribute in OutPropertyInfos[i].CustomAttributes)
                     {
-                        IsUFunction = true;
-
-                        break;
-                    }
-                }
-
-                OutMethodParamIndex[i] = MethodParamNames.Count;
-
-                if (IsUFunction && OutMethodInfos[i] is MethodInfo MethodInfo)
-                {
-                    OutMethodIsStatics[i] = MethodInfo.IsStatic;
-
-                    OutMethodReturnTypes[i] = MethodInfo.ReturnType;
-
-                    foreach (var Parameter in MethodInfo.GetParameters())
-                    {
-                        MethodParamNames.Add(Parameter.Name);
-
-                        var ParameterType = Parameter.ParameterType;
-
-                        MethodParamTypes.Add(ParameterType.IsByRef ? ParameterType.GetElementType() : ParameterType);
-
-                        MethodParamRefs.Add(ParameterType.IsByRef);
-                    }
-                }
-                else
-                {
-                    OutMethodIsStatics[i] = false;
-
-                    OutMethodReturnTypes[i] = null;
-                }
-            }
-
-            OutMethodParamNames = MethodParamNames.ToArray();
-
-            OutMethodParamTypes = MethodParamTypes.ToArray();
-
-            OutMethodParamRefs = MethodParamRefs.ToArray();
-
-            OutMethodAttributeCounts = new int[OutMethodLength];
-
-            var MethodAttributes = new List<Type>();
-
-            var MethodAttributeValueIndex = new List<int>();
-
-            var MethodAttributeValues = new List<string>();
-
-            for (var i = 0; i < OutMethodInfos.Length; i++)
-            {
-                var MethodAttribute = 0;
-
-                foreach (var CustomAttribute in OutMethodInfos[i].CustomAttributes)
-                {
-                    if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace ||
-                        CustomAttribute.AttributeType == OverrideAttributeType
-                       )
-                    {
-                        var MethodAttributeValue = 0;
-
-                        MethodAttributes.Add(CustomAttribute.AttributeType);
-
-                        foreach (var ConstructorArgument in CustomAttribute.ConstructorArguments)
+                        if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace)
                         {
-                            MethodAttributeValues.Add(ConstructorArgument.Value.ToString());
+                            var PropertyAttributeValueCount = 0;
 
-                            MethodAttributeValue++;
+                            PropertyAttributes.Add(CustomAttribute.AttributeType);
+
+                            foreach (var ConstructorArgument in CustomAttribute.ConstructorArguments)
+                            {
+                                PropertyAttributeValues.Add(ConstructorArgument.Value.ToString());
+
+                                PropertyAttributeValueCount++;
+                            }
+
+                            PropertyAttributeIndex.Add(PropertyAttributeValueCount);
+
+                            PropertyAttributeCount++;
                         }
+                    }
 
-                        MethodAttributeValueIndex.Add(MethodAttributeValue);
+                    OutPropertyAttributeCounts[i] = PropertyAttributeCount;
+                }
 
-                        MethodAttribute++;
+                OutPropertyAttributes = PropertyAttributes.ToArray();
+
+                OutPropertyAttributeValueCounts = PropertyAttributeIndex.ToArray();
+
+                OutPropertyAttributeValues = PropertyAttributeValues.ToArray();
+
+                OutFieldInfos = InType.GetFields(
+                    BindingFlags.Instance |
+                    BindingFlags.Static |
+                    BindingFlags.Public |
+                    BindingFlags.NonPublic);
+
+                OutFieldLength = OutFieldInfos.Length;
+
+                OutFieldNames = new string[OutFieldLength];
+
+                for (var i = 0; i < OutFieldInfos.Length; i++)
+                {
+                    OutFieldNames[i] = OutFieldInfos[i].Name;
+                }
+
+                var Constructors = InType.GetConstructors(
+                    BindingFlags.Instance |
+                    BindingFlags.Static |
+                    BindingFlags.Public |
+                    BindingFlags.NonPublic);
+
+                var Methods = InType.GetMethods(
+                        BindingFlags.Instance |
+                        BindingFlags.Static |
+                        BindingFlags.Public |
+                        BindingFlags.NonPublic)
+                    .Where(Method => !Method.IsSpecialName)
+                    .ToArray();
+
+                var ConstructorLength = Constructors.Length;
+
+                OutMethodLength = ConstructorLength + Methods.Length;
+
+                OutMethodInfos = new MethodBase[OutMethodLength];
+
+                for (var i = 0; i < ConstructorLength; i++)
+                {
+                    OutMethodInfos[i] = Constructors[i];
+                }
+
+                for (var i = 0; i < Methods.Length; i++)
+                {
+                    OutMethodInfos[ConstructorLength + i] = Methods[i];
+                }
+
+                OutMethodNames = new string[OutMethodLength];
+
+                OutMethodParamCounts = new int[OutMethodLength];
+
+                for (var i = 0; i < OutMethodInfos.Length; i++)
+                {
+                    OutMethodNames[i] = OutMethodInfos[i].Name;
+
+                    OutMethodParamCounts[i] = OutMethodInfos[i].GetParameters().Length;
+                }
+
+                OutMethodIsStatics = new bool[OutMethodLength];
+
+                OutMethodReturnTypes = new Type[OutMethodLength];
+
+                OutMethodParamIndex = new int[OutMethodLength];
+
+                var MethodParamNames = new List<string>();
+
+                var MethodParamTypes = new List<Type>();
+
+                var MethodParamRefs = new List<bool>();
+
+                var UFunctionAttributeType = typeof(UFunctionAttribute);
+
+                for (var i = 0; i < OutMethodInfos.Length; i++)
+                {
+                    var IsUFunction = false;
+
+                    foreach (var CustomAttribute in OutMethodInfos[i].CustomAttributes)
+                    {
+                        if (CustomAttribute.AttributeType == UFunctionAttributeType)
+                        {
+                            IsUFunction = true;
+
+                            break;
+                        }
+                    }
+
+                    OutMethodParamIndex[i] = MethodParamNames.Count;
+
+                    if (IsUFunction && OutMethodInfos[i] is MethodInfo MethodInfo)
+                    {
+                        OutMethodIsStatics[i] = MethodInfo.IsStatic;
+
+                        OutMethodReturnTypes[i] = MethodInfo.ReturnType;
+
+                        foreach (var Parameter in MethodInfo.GetParameters())
+                        {
+                            MethodParamNames.Add(Parameter.Name);
+
+                            var ParameterType = Parameter.ParameterType;
+
+                            MethodParamTypes.Add(ParameterType.IsByRef
+                                ? ParameterType.GetElementType()
+                                : ParameterType);
+
+                            MethodParamRefs.Add(ParameterType.IsByRef);
+                        }
+                    }
+                    else
+                    {
+                        OutMethodIsStatics[i] = false;
+
+                        OutMethodReturnTypes[i] = null;
                     }
                 }
 
-                OutMethodAttributeCounts[i] = MethodAttribute;
+                OutMethodParamNames = MethodParamNames.ToArray();
+
+                OutMethodParamTypes = MethodParamTypes.ToArray();
+
+                OutMethodParamRefs = MethodParamRefs.ToArray();
+
+                OutMethodAttributeCounts = new int[OutMethodLength];
+
+                var MethodAttributes = new List<Type>();
+
+                var MethodAttributeValueIndex = new List<int>();
+
+                var MethodAttributeValues = new List<string>();
+
+                for (var i = 0; i < OutMethodInfos.Length; i++)
+                {
+                    var MethodAttribute = 0;
+
+                    foreach (var CustomAttribute in OutMethodInfos[i].CustomAttributes)
+                    {
+                        if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace ||
+                            CustomAttribute.AttributeType == OverrideAttributeType
+                           )
+                        {
+                            var MethodAttributeValue = 0;
+
+                            MethodAttributes.Add(CustomAttribute.AttributeType);
+
+                            foreach (var ConstructorArgument in CustomAttribute.ConstructorArguments)
+                            {
+                                MethodAttributeValues.Add(ConstructorArgument.Value.ToString());
+
+                                MethodAttributeValue++;
+                            }
+
+                            MethodAttributeValueIndex.Add(MethodAttributeValue);
+
+                            MethodAttribute++;
+                        }
+                    }
+
+                    OutMethodAttributeCounts[i] = MethodAttribute;
+                }
+
+                OutMethodAttributes = MethodAttributes.ToArray();
+
+                OutMethodAttributeValueCounts = MethodAttributeValueIndex.ToArray();
+
+                OutMethodAttributeValues = MethodAttributeValues.ToArray();
             }
+            else
+            {
+                OutGenericArgumentLength = 0;
 
-            OutMethodAttributes = MethodAttributes.ToArray();
+                OutGenericArguments = null;
 
-            OutMethodAttributeValueCounts = MethodAttributeValueIndex.ToArray();
+                OutInterfaceLength = 0;
 
-            OutMethodAttributeValues = MethodAttributeValues.ToArray();
+                OutInterfaces = null;
+
+                OutClassAttributeLength = 0;
+
+                OutClassAttributes = null;
+
+                OutClassAttributeValueLength = null;
+
+                OutClassAttributeValues = null;
+
+                OutPropertyLength = 0;
+
+                OutPropertyNames = null;
+
+                OutPropertyInfos = null;
+
+                OutPropertyTypes = null;
+
+                OutPropertyAttributeCounts = null;
+
+                OutPropertyAttributes = null;
+
+                OutPropertyAttributeValueCounts = null;
+
+                OutPropertyAttributeValues = null;
+
+                OutFieldLength = 0;
+
+                OutFieldNames = null;
+
+                OutFieldInfos = null;
+
+                OutMethodLength = 0;
+
+                OutMethodNames = null;
+
+                OutMethodInfos = null;
+
+                OutMethodIsStatics = null;
+
+                OutMethodParamCounts = null;
+
+                OutMethodReturnTypes = null;
+
+                OutMethodParamIndex = null;
+
+                OutMethodParamNames = null;
+
+                OutMethodParamTypes = null;
+
+                OutMethodParamRefs = null;
+
+                OutMethodAttributeCounts = null;
+
+                OutMethodAttributes = null;
+
+                OutMethodAttributeValueCounts = null;
+
+                OutMethodAttributeValues = null;
+            }
         }
     }
 }

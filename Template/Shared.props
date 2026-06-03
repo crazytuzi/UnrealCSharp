@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <TargetFramework></TargetFramework>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>Script</RootNamespace>
     <GenerateDependencyFile>false</GenerateDependencyFile>
@@ -12,4 +13,10 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <NoWarn>0109;1701;1702;8500</NoWarn>
   </PropertyGroup>
+  <ItemGroup Condition="$(DefineConstants.Contains('WITH_CORECLR'))">
+    <Reference Include="Interop">
+      <HintPath></HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
 </Project>

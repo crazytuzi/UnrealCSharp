@@ -1,4 +1,4 @@
-﻿#include "FClassGenerator.h"
+#include "FClassGenerator.h"
 #include "FDoxygenConverter.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
@@ -95,6 +95,11 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
+	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+	{
+		UsingNameSpaces.Add(NAMESPACE_INTEROP);
+	}
+
 	auto SuperClass = InClass->GetSuperClass();
 
 	if (SuperClass != nullptr)
@@ -186,7 +191,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			"\n"
 			"\t\t\t\t\tFPropertyImplementation.FProperty_GetObjectPropertyImplementation(%s, %s, %s);\n"
 			"\n"
-			"\t\t\t\t\treturn *(%s*)%s;\n"
+			"\t\t\t\t\treturn %s;\n"
 			"\t\t\t\t}\n"
 			"\t\t\t}\n"
 			"\n"
@@ -211,8 +216,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                   *DummyPropertyName,
 		                                   RETURN_BUFFER_TEXT,
-		                                   *PropertyType,
-		                                   RETURN_BUFFER_TEXT,
+		                                   *FGeneratorCore::GetReturn(*PropertyIterator, PropertyType,
+		                                                              RETURN_BUFFER_TEXT),
 		                                   IN_BUFFER_TEXT,
 		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
 		                                   *FGeneratorCore::GetBufferCast(*PropertyIterator),
@@ -693,10 +698,10 @@ void FClassGenerator::Generator(const UClass* InClass)
 		if (FunctionReturnParam != nullptr)
 		{
 			FunctionReturnParamBody = FString::Printf(TEXT(
-				"return *(%s*)%s;"
+				"return %s;"
 			),
-			                                          *FunctionReturnType,
-			                                          RETURN_BUFFER_TEXT
+			                                          *FGeneratorCore::GetReturn(
+				                                          FunctionReturnParam, FunctionReturnType, RETURN_BUFFER_TEXT)
 			);
 		}
 
@@ -723,22 +728,24 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 			for (auto Index = 0; Index < FunctionOutBufferIndex.Num(); ++Index)
 			{
-				FunctionOutParamBody += FString::Printf(TEXT(
-					"\n\t\t\t\t%s = *(%s*)(%s%s);\n"
-				),
-				                                        *FUnrealCSharpFunctionLibrary::Encode(
-					                                        FunctionParams[FunctionOutBufferIndex[Index]]),
-				                                        *FGeneratorCore::GetPropertyType(
-					                                        FunctionParams[FunctionOutBufferIndex[Index]]),
-				                                        OUT_BUFFER_TEXT,
-				                                        BufferSize == 0
-					                                        ? TEXT("")
-					                                        : *FString::Printf(TEXT(
-						                                        " + %d"),
-					                                                           BufferSize)
+				const auto Param = FunctionParams[FunctionOutBufferIndex[Index]];
+
+				FunctionOutParamBody += FGeneratorCore::GetOutParam(
+					Param,
+					FUnrealCSharpFunctionLibrary::Encode(Param),
+					FGeneratorCore::GetPropertyType(Param),
+					OUT_BUFFER_TEXT,
+					BufferSize == 0
+						? TEXT("")
+						: *FString::Printf(TEXT(
+							" + %d"
+						),
+						                   BufferSize
+						),
+					TEXT("\t\t\t\t")
 				);
 
-				BufferSize += FGeneratorCore::GetBufferSize(FunctionParams[FunctionOutBufferIndex[Index]]);
+				BufferSize += FGeneratorCore::GetBufferSize(Param);
 			}
 		}
 
@@ -1103,15 +1110,15 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 			if (const auto UserDefinedEnum = Cast<UUserDefinedEnum>(ByteProperty->Enum))
 			{
 				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
-				*FUnrealCSharpFunctionLibrary::Encode(MetaData.IsEmpty()
-														  ? *UserDefinedEnum->
-														  GetDisplayNameTextByIndex(
-															  ENUM_DEFAULT_MAX_INDEX).ToString()
-														  : *UserDefinedEnum->
-														  GetDisplayNameTextByIndex(
-															  UserDefinedEnum->
-															  GetIndexByNameString(MetaData)).
-														  ToString(), false));
+				                       *FUnrealCSharpFunctionLibrary::Encode(MetaData.IsEmpty()
+					                                                             ? *UserDefinedEnum->
+					                                                             GetDisplayNameTextByIndex(
+						                                                             ENUM_DEFAULT_MAX_INDEX).ToString()
+					                                                             : *UserDefinedEnum->
+					                                                             GetDisplayNameTextByIndex(
+						                                                             UserDefinedEnum->
+						                                                             GetIndexByNameString(MetaData)).
+					                                                             ToString(), false));
 			}
 			else
 			{

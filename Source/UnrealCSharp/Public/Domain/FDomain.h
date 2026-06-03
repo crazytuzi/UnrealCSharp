@@ -1,20 +1,18 @@
 #pragma once
 
 #include "Tickable.h"
-#include "Domain/FMonoDomain.h"
+#include "Domain/Script/IManagedTypes.h"
+#include "Domain/Script/IScriptDomain.h"
 
 class UNREALCSHARP_API FDomain final : public FTickableGameObject
 {
-private:
-	typedef void (*SynchronizationContextTickType)(float, MonoObject**);
-
 public:
-	explicit FDomain(const FMonoDomainInitializeParams& InParams);
+	explicit FDomain();
 
 	virtual ~FDomain() override;
 
 public:
-	void Initialize(const FMonoDomainInitializeParams& InParams);
+	void Initialize();
 
 	void Deinitialize();
 
@@ -26,23 +24,23 @@ public:
 	virtual TStatId GetStatId() const override;
 
 public:
-	static void* Object_Unbox(MonoObject* InMonoObject);
+	static void* Object_Unbox(const IManagedHandle InManagedHandle);
 
-	static MonoString* String_New(const char* InText);
+	static IManagedHandle String_New(const char* InText);
 
-	static FMonoUTF8Scope String_To_UTF8(MonoString* InMonoString);
+	static FString StringToFString(const IManagedHandle InManagedHandle);
 
-	static MonoObject* GCHandle_Get_Target_V2(MonoGCHandle InGCHandle);
+	static IManagedHandle GCHandle_Get_Target(const IManagedHandle InManagedHandle);
 
-	static void GCHandle_Free_V2(MonoGCHandle InGCHandle);
+	static void GCHandle_Free(const IManagedHandle InManagedHandle);
 
 	static bool IsLoadSucceed();
 
 	template <typename T>
-	static auto Array_Get(MonoArray* InArray, const uint64 InIndex) -> T;
+	static auto Array_Get(const IManagedArray InArray, const uint64 InIndex) -> T;
 
 	template <typename T>
-	static auto Array_Set(MonoArray* InArray, const uint64 InIndex, T InValue) -> void;
+	static auto Array_Set(const IManagedArray InArray, const uint64 InIndex, T InValue) -> void;
 
 public:
 	static FString GetTraceback();
@@ -51,9 +49,6 @@ private:
 	void InitializeSynchronizationContext();
 
 	void DeinitializeSynchronizationContext();
-
-private:
-	SynchronizationContextTickType SynchronizationContextTick;
 };
 
 #include "FDomain.inl"

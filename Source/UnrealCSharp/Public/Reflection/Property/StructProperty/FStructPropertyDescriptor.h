@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 
@@ -20,5 +20,5 @@ public:
 	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const override;
 
 private:
-	MonoObject* NewRef(void* InAddress) const;
+	IManagedObject NewRef(void* InAddress) const;
 };

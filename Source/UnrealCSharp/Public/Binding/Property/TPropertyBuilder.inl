@@ -32,8 +32,8 @@ struct TPrimitivePropertyBuilder
 		return TPropertyClass<Result, Result>::Get()->BoxValue(
 			const_cast<std::remove_const_t<std::decay_t<Result>>*>(&InValue));
 	}
-	
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, RETURN_BUFFER_SIGNATURE)
+
+	static auto Get(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)
 	{
 		if constexpr (std::is_same_v<Class, void>)
 		{
@@ -42,14 +42,14 @@ struct TPrimitivePropertyBuilder
 		else
 		{
 			if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-				FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+				FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 			{
 				*(std::remove_const_t<Result>*)RETURN_BUFFER = FoundObject->*Member;
 			}
 		}
 	}
 
-	static auto Set(const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE)
+	static auto Set(const IManagedHandle InManagedHandle, IN_BUFFER_SIGNATURE)
 	{
 		if constexpr (std::is_same_v<Class, void>)
 		{
@@ -58,7 +58,7 @@ struct TPrimitivePropertyBuilder
 		else
 		{
 			if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-				FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+				FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 			{
 				FoundObject->*Member = *(Result*)IN_BUFFER;
 			}
@@ -78,41 +78,41 @@ struct TCompoundPropertyBuilder
 	{
 		return TPropertyValue<Result, Result>::template Get<false>(&InValue);
 	}
-	
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, RETURN_BUFFER_SIGNATURE)
+
+	static auto Get(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)
 	{
 		if constexpr (std::is_same_v<Class, void>)
 		{
 			*reinterpret_cast<void**>(RETURN_BUFFER) = TPropertyValue<Result, Result>::Get(
 				const_cast<std::remove_const_t<Result>*>(Member),
-				InGarbageCollectionHandle);
+				InManagedHandle);
 		}
 		else
 		{
 			if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-				FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+				FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 			{
 				*reinterpret_cast<void**>(RETURN_BUFFER) = TPropertyValue<Result, Result>::Get(
 					&(FoundObject->*Member),
-					InGarbageCollectionHandle);
+					InManagedHandle);
 			}
 		}
 	}
 
-	static auto Set(const FGarbageCollectionHandle InGarbageCollectionHandle, IN_BUFFER_SIGNATURE)
+	static auto Set(const IManagedHandle InManagedHandle, IN_BUFFER_SIGNATURE)
 	{
 		if constexpr (std::is_same_v<Class, void>)
 		{
 			*const_cast<std::remove_const_t<Result>*>(Member) = TPropertyValue<Result, Result>::Get(
-				*(FGarbageCollectionHandle*)IN_BUFFER);
+				*(IManagedHandle*)IN_BUFFER);
 		}
 		else
 		{
 			if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-				FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+				FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 			{
 				FoundObject->*Member = TPropertyValue<Result, Result>::Get(
-					*(FGarbageCollectionHandle*)IN_BUFFER);
+					*(IManagedHandle*)IN_BUFFER);
 			}
 		}
 	}
@@ -302,10 +302,10 @@ template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTEnumAsByte<Result>::Value>> :
 	TPrimitivePropertyBuilder<Class, Result, Member>
 {
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, RETURN_BUFFER_SIGNATURE)
+	static auto Get(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+			FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 		{
 			*(std::underlying_type_t<typename Result::EnumType>*)RETURN_BUFFER = FoundObject->*Member;
 		}
@@ -505,7 +505,7 @@ template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTEnumAsByte<std::decay_t<Result>>::Value>> :
 	TPrimitivePropertyBuilder<void, Result, Member>
 {
-	static auto Get(const FGarbageCollectionHandle InGarbageCollectionHandle, RETURN_BUFFER_SIGNATURE)
+	static auto Get(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)
 	{
 		*(std::underlying_type_t<typename Result::EnumType>*)RETURN_BUFFER = *Member;
 	}
@@ -524,5 +524,3 @@ struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTOptional<std::deca
 {
 };
 #endif
-
-

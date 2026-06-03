@@ -1,4 +1,4 @@
-﻿#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Misc/FileHelper.h"
 #include "Containers/ArrayBuilder.h"
 #include "Interfaces/IPluginManager.h"
@@ -9,12 +9,11 @@
 #include "WidgetBlueprint.h"
 #include "Animation/AnimBlueprint.h"
 #include "Animation/AnimInstance.h"
+#include "Interfaces/ITargetPlatformManagerModule.h"
 #endif
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Common/NameEncode.h"
-#include "Domain/AssemblyLoader.h"
-#include "Domain/FMonoFunctionLibrary.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Dynamic/FDynamicGenerator.h"
 #include "Dynamic/FDynamicClassGenerator.h"
@@ -713,6 +712,18 @@ FString FUnrealCSharpFunctionLibrary::GetOldFileName(const FAssetData& InAssetDa
 }
 #endif
 
+#if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetInteropDirectory()
+{
+	return GetFullScriptDirectory() / INTEROP_NAME;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetInteropProjectPath()
+{
+	return GetInteropDirectory() / INTEROP_NAME + PROJECT_SUFFIX;
+}
+#endif
+
 FString FUnrealCSharpFunctionLibrary::GetUEName()
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
@@ -1007,6 +1018,17 @@ FString FUnrealCSharpFunctionLibrary::GetFullPublishDirectory()
 	return FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / GetPublishDirectory());
 }
 
+FString FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath()
+{
+#if WITH_EDITOR
+	return FPaths::ConvertRelativePathToFull(
+		FUnrealCSharpFunctionLibrary::GetFullPublishDirectory() / (INTEROP_NAME + DLL_SUFFIX));
+#else
+	return FPaths::ConvertRelativePathToFull(
+		FPaths::GetPath(FPlatformProcess::ExecutablePath()) / (INTEROP_NAME + DLL_SUFFIX));
+#endif
+}
+
 FString FUnrealCSharpFunctionLibrary::GetFullUEPublishPath()
 {
 	return GetFullPublishDirectory() / GetUEName() + DLL_SUFFIX;
@@ -1038,14 +1060,6 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 	       Add(GetFullUEPublishPath()).
 	       Add(GetFullGamePublishPath()).
 	       Append(GetFullCustomProjectsPublishPath()).
-	       Build();
-}
-
-TArray<FString> FUnrealCSharpFunctionLibrary::GetAssemblyPath()
-{
-	return TArrayBuilder<FString>().
-	       Add(FPaths::ProjectContentDir() / GetPublishDirectory()).
-	       Add(FMonoFunctionLibrary::GetNetDirectory()).
 	       Build();
 }
 
@@ -1089,6 +1103,11 @@ FString FUnrealCSharpFunctionLibrary::GetWeaversPath()
 {
 	return GetFullScriptDirectory() / WEAVERS_NAME;
 }
+
+FString FUnrealCSharpFunctionLibrary::GetInteropPath()
+{
+	return GetFullScriptDirectory() / INTEROP_NAME;
+}
 #endif
 
 #if WITH_EDITOR
@@ -1102,16 +1121,6 @@ bool FUnrealCSharpFunctionLibrary::IsGenerateFunctionComment()
 	return false;
 }
 #endif
-
-UAssemblyLoader* FUnrealCSharpFunctionLibrary::GetAssemblyLoader()
-{
-	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
-	{
-		return UnrealCSharpSetting->GetAssemblyLoader();
-	}
-
-	return nullptr;
-}
 
 bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, const FString& InString)
 {
@@ -1136,8 +1145,8 @@ bool FUnrealCSharpFunctionLibrary::SaveStringToFile(const FString& InFileName, c
 		PlatformFile.CreateDirectoryTree(*DirectoryName);
 	}
 
-	return FFileHelper::SaveStringToFile(InString, *InFileName, FFileHelper::EEncodingOptions::ForceUTF8, FileManager,
-	                                     FILEWRITE_None);
+	return FFileHelper::SaveStringToFile(InString, *InFileName, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
+	                                     FileManager, FILEWRITE_None);
 }
 
 TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(const FString& InFileName)
@@ -1456,7 +1465,8 @@ void FUnrealCSharpFunctionLibrary::SetClassDefaultObject(UClass* InClass, UObjec
 
 #if WITH_EDITOR
 void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FString& InParms,
-                                               const TFunction<void(const int32, const FString&)>& InOnComplete)
+                                               const TFunction<void(const int32, const FString&)>& InOnComplete,
+                                               const FString& InWorkingDirectory)
 {
 	void* ReadPipe = nullptr;
 
@@ -1476,6 +1486,8 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 #endif
 #endif
 
+	const auto WorkingDirectory = InWorkingDirectory.IsEmpty() ? nullptr : *InWorkingDirectory;
+
 	auto ProcessHandle = FPlatformProcess::CreateProc(
 		*InURL,
 		*InParms,
@@ -1484,7 +1496,7 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 		true,
 		&OutProcessID,
 		1,
-		nullptr,
+		WorkingDirectory,
 		WritePipe,
 		ReadPipe);
 
@@ -1507,5 +1519,44 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 	FPlatformProcess::TerminateProc(ProcessHandle, true);
 
 	FPlatformProcess::CloseProc(ProcessHandle);
+}
+#endif
+
+#if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::GetPlatformName()
+{
+	if (IsRunningCookCommandlet())
+	{
+		if (const auto TargetPlatformManager = GetTargetPlatformManager())
+		{
+			if (const auto& ActiveTargetPlatforms = TargetPlatformManager->GetActiveTargetPlatforms();
+				!ActiveTargetPlatforms.IsEmpty())
+			{
+				return ActiveTargetPlatforms[0]->IniPlatformName();
+			}
+		}
+	}
+
+	return FPlatformProperties::IniPlatformName();
+}
+
+EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType()
+{
+	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
+	{
+		return UnrealCSharpSetting->GetScriptDomainType(GetPlatformName());
+	}
+
+	return EScriptDomainType::CoreCLR;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsMonoDomain()
+{
+	return GetScriptDomainType() == EScriptDomainType::Mono;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsCoreCLRDomain()
+{
+	return GetScriptDomainType() == EScriptDomainType::CoreCLR;
 }
 #endif

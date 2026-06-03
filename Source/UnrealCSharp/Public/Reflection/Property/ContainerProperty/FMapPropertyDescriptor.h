@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 
@@ -17,7 +17,7 @@ public:
 	virtual void Set(void* Src, void* Dest) const override;
 
 private:
-	MonoObject* NewRef(void* InAddress) const;
+	IManagedObject NewRef(void* InAddress) const;
 
-	MonoObject* NewWeakRef(void* InAddress, bool bIsCopy) const;
+	IManagedObject NewWeakRef(void* InAddress, bool bIsCopy) const;
 };

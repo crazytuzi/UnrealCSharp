@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Class/FBindingClass.h"
 #include "Class/FBindingClassRegister.h"

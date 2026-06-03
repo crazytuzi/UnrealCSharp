@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "TValueMapping.inl"
 #include "Reflection/FClassReflection.h"
+#include "Domain/Script/IManagedHandle.h"
 
 class UNREALCSHARP_API FBindingRegistry
 {
@@ -54,7 +55,7 @@ private:
 	{
 		typedef Address FAddressType;
 
-		typedef typename TBindingValueMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
+		typedef typename TBindingValueMapping::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
 	typedef TBindingValueMapping<void*, FBindingAddress> FBindingValueMapping;
@@ -71,24 +72,24 @@ public:
 
 public:
 	template <typename T>
-	auto GetBinding(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	auto GetBinding(const IManagedHandle InManagedHandle);
 
-	MonoObject* GetObject(const FBindingValueMapping::FAddressType InAddress);
+	IManagedHandle GetObject(const FBindingValueMapping::FAddressType InAddress);
 
 public:
 	template <typename T, auto IsNeedFree>
-	auto AddReference(const T* InObject, FClassReflection* InClass, MonoObject* InMonoObject);
+	auto AddReference(const T* InObject, FClassReflection* InClass, const IManagedHandle InManagedHandle);
 
 	template <typename T>
-	auto AddReference(const FGarbageCollectionHandle& InOwner, const T* InObject,
-	                  FClassReflection* InClass, MonoObject* InMonoObject);
+	auto AddReference(const IManagedHandle InOwner, const T* InObject,
+	                  FClassReflection* InClass, const IManagedHandle InManagedHandle);
 
-	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	bool RemoveReference(const IManagedHandle InManagedHandle);
 
 private:
-	FBindingValueMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2BindingAddress;
+	FBindingValueMapping::FManagedHandle2Value ManagedHandle2BindingAddress;
 
-	FBindingValueMapping::FAddress2GarbageCollectionHandle BindingAddress2GarbageCollectionHandle;
+	FBindingValueMapping::FAddress2ManagedHandle BindingAddress2ManagedHandle;
 };
 
 #include "FBindingRegistry.inl"

@@ -40,7 +40,6 @@ public class UnrealCSharpCore : ModuleRules
 			{
 				"Core",
 				"Projects",
-				"Mono"
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);
@@ -59,7 +58,8 @@ public class UnrealCSharpCore : ModuleRules
 				new string[]
 				{
 					"BlueprintGraph",
-					"UnrealEd"
+					"UnrealEd",
+					"TargetPlatform"
 					// ... add other public dependencies that you statically link with here ...
 				}
 			);
@@ -97,35 +97,22 @@ public class UnrealCSharpCore : ModuleRules
 			}
 		);
 
+		AddExternalDependencies();
+
 		GeneratorModules();
 
-		var SettingFilePath = Path.Combine(Target.ProjectFile.Directory.FullName,
-			"Config",
-			"DefaultUnrealCSharpEditorSetting.ini");
+		EnableExport();
 
-		var SettingConfigFile = File.Exists(SettingFilePath)
-			? new ConfigFile(new FileReference(SettingFilePath))
-			: new ConfigFile();
+		WithDomain();
+	}
 
-		var SettingSection = "/Script/UnrealCSharpCore.UnrealCSharpEditorSetting";
+	private void AddExternalDependencies()
+	{
+		ExternalDependencies.Add(Path.Combine(Target.ProjectFile.Directory.FullName, "Config",
+			"DefaultUnrealCSharpSetting.ini"));
 
-		bool GetBoolValue(string key, bool defaultValue)
-		{
-			if (SettingConfigFile.TryGetSection(SettingSection, out var SettingConfigSection))
-			{
-				var SettingConfigHierarchySection = new ConfigHierarchySection(
-					new List<ConfigFileSection> { SettingConfigSection });
-
-				if (SettingConfigHierarchySection.TryGetValue(key, out var Value))
-				{
-					return bool.Parse(Value.ToLower());
-				}
-			}
-
-			return defaultValue;
-		}
-
-		PublicDefinitions.Add($"WITH_BINDING={(GetBoolValue("bEnableExport", false) ? "1" : "0")}");
+		ExternalDependencies.Add(Path.Combine(Target.ProjectFile.Directory.FullName, "Config",
+			"DefaultUnrealCSharpEditorSetting.ini"));
 	}
 
 	private void GeneratorModules()
@@ -209,6 +196,99 @@ public class UnrealCSharpCore : ModuleRules
 		Writer.WriteObjectEnd();
 
 		Writer.WriteObjectEnd();
+	}
+
+	private void EnableExport()
+	{
+		var SettingFilePath = Path.Combine(Target.ProjectFile.Directory.FullName,
+			"Config",
+			"DefaultUnrealCSharpEditorSetting.ini");
+
+		var SettingConfigFile = File.Exists(SettingFilePath)
+			? new ConfigFile(new FileReference(SettingFilePath))
+			: new ConfigFile();
+
+		var SettingSection = "/Script/UnrealCSharpCore.UnrealCSharpEditorSetting";
+
+		bool GetBoolValue(string key, bool defaultValue)
+		{
+			if (SettingConfigFile.TryGetSection(SettingSection, out var SettingConfigSection))
+			{
+				var SettingConfigHierarchySection = new ConfigHierarchySection(
+					new List<ConfigFileSection> { SettingConfigSection });
+
+				if (SettingConfigHierarchySection.TryGetValue(key, out var Value))
+				{
+					return bool.Parse(Value.ToLower());
+				}
+			}
+
+			return defaultValue;
+		}
+
+		PublicDefinitions.Add($"WITH_BINDING={(GetBoolValue("bEnableExport", false) ? "1" : "0")}");
+	}
+
+	private void WithDomain()
+	{
+		var SettingFilePath = Path.Combine(Target.ProjectFile.Directory.FullName,
+			"Config", "DefaultUnrealCSharpSetting.ini");
+
+		var SettingConfigFile = File.Exists(SettingFilePath)
+			? new ConfigFile(new FileReference(SettingFilePath))
+			: new ConfigFile();
+
+		var SettingSection = "/Script/UnrealCSharpCore.UnrealCSharpSetting";
+
+		string GetStringValue(string Key, string defaultValue)
+		{
+			if (SettingConfigFile.TryGetSection(SettingSection, out var SettingConfigSection))
+			{
+				var SettingConfigHierarchySection = new ConfigHierarchySection(
+					new List<ConfigFileSection> { SettingConfigSection });
+
+				if (SettingConfigHierarchySection.TryGetValue(Key, out var Value))
+				{
+					return Value.Trim();
+				}
+			}
+
+			return defaultValue;
+		}
+
+		var PlatformName = Target.Platform == UnrealTargetPlatform.Win64 ? "Windows" : Target.Platform.ToString();
+
+		var ScriptDomainType = GetStringValue(PlatformName + "ScriptDomainType",
+			Target.Platform == UnrealTargetPlatform.Android ||
+			Target.Platform == UnrealTargetPlatform.IOS
+				? "Mono"
+				: "CoreCLR");
+
+		var bWithMono = string.Equals(ScriptDomainType, "Mono", System.StringComparison.OrdinalIgnoreCase);
+
+		var bWithCoreCLR = string.Equals(ScriptDomainType, "CoreCLR", System.StringComparison.OrdinalIgnoreCase);
+
+		if (bWithCoreCLR)
+		{
+			PublicDependencyModuleNames.Add("CoreCLR");
+
+			PublicDefinitions.Add("WITH_CORECLR=1");
+		}
+		else
+		{
+			PublicDefinitions.Add("WITH_CORECLR=0");
+		}
+
+		if (bWithMono)
+		{
+			PublicDependencyModuleNames.Add("Mono");
+
+			PublicDefinitions.Add("WITH_MONO=1");
+		}
+		else
+		{
+			PublicDefinitions.Add("WITH_MONO=0");
+		}
 	}
 
 	private void GetPlugins(string InPathName, Dictionary<string, string> Plugins)

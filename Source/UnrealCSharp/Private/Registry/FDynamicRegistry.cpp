@@ -1,4 +1,4 @@
-﻿#include "Registry/FDynamicRegistry.h"
+#include "Registry/FDynamicRegistry.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Environment/FCSharpEnvironment.h"
@@ -16,6 +16,23 @@ FDynamicRegistry::~FDynamicRegistry()
 
 void FDynamicRegistry::Initialize()
 {
+	FDynamicClassGenerator::OnPostClassConstructor = [](UObject* InObject)
+	{
+		if (IsInGameThread())
+		{
+			FCSharpEnvironment::GetEnvironment().Bind<true>(InObject);
+
+			if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
+				IManagedHandleIsValid(FoundManagedHandle))
+			{
+				if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InObject->GetClass()))
+				{
+					FoundClass->ConstructorObject(FoundManagedHandle);
+				}
+			}
+		}
+	};
+
 	OnCSharpEnvironmentInitializeDelegateHandle = FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.AddRaw(
 		this, &FDynamicRegistry::OnCSharpEnvironmentInitialize);
 }
@@ -26,6 +43,8 @@ void FDynamicRegistry::Deinitialize()
 	{
 		FUnrealCSharpModuleDelegates::OnCSharpEnvironmentInitialize.Remove(OnCSharpEnvironmentInitializeDelegateHandle);
 	}
+
+	FDynamicClassGenerator::OnPostClassConstructor = nullptr;
 }
 
 void FDynamicRegistry::OnCSharpEnvironmentInitialize() const

@@ -1,4 +1,4 @@
-﻿#include "Delegate/FUnrealCSharpModuleDelegates.h"
+#include "Delegate/FUnrealCSharpModuleDelegates.h"
 
 FUnrealCSharpModuleDelegates::FOnUnrealCSharpModuleActive FUnrealCSharpModuleDelegates::OnUnrealCSharpModuleActive;
 

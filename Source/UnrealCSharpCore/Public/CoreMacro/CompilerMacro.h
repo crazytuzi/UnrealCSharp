@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #if defined(_MSC_VER)
 #elif defined(__clang__)

@@ -2,6 +2,7 @@
 
 #include "CoreMacro/BufferMacro.h"
 #include "TBufferOffset.inl"
+#include "Domain/Script/IManagedHandle.h"
 
 template <typename Type, typename... Args0>
 struct TOut

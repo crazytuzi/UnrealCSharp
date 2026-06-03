@@ -1,1 +1,1 @@
-﻿#include "Reflection/Property/PrimitiveProperty/FUInt32PropertyDescriptor.h"
+#include "Reflection/Property/PrimitiveProperty/FUInt32PropertyDescriptor.h"

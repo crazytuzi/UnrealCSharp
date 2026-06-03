@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "TValueMapping.inl"
 #include "Reflection/FClassReflection.h"
+#include "Domain/Script/IManagedHandle.h"
 
 class UNREALCSHARP_API FObjectRegistry
 {
@@ -9,7 +10,7 @@ private:
 	template <typename Key>
 	struct TObjectMapping : TValueMapping<Key>
 	{
-		typedef typename TObjectMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
+		typedef typename TObjectMapping::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
 	typedef TObjectMapping<TWeakObjectPtr<const UObject>> FObjectMapping;
@@ -25,25 +26,25 @@ public:
 	void Deinitialize();
 
 public:
-	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	void* GetAddress(const IManagedHandle InManagedHandle);
 
-	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct);
+	void* GetAddress(const IManagedHandle InManagedHandle, UStruct*& InStruct);
 
-	MonoObject* GetObject(const UObject* InObject);
+	IManagedHandle GetObject(const UObject* InObject);
 
-	UObject* GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	UObject* GetObject(const IManagedHandle InManagedHandle);
 
-	FGarbageCollectionHandle GetGarbageCollectionHandle(const UObject* InObject);
+	IManagedHandle GetManagedHandle(const UObject* InObject);
 
 public:
-	bool AddReference(FClassReflection* InClass, UObject* InObject, MonoObject* InMonoObject);
+	bool AddReference(const FClassReflection* InClass, UObject* InObject, const IManagedHandle InManagedHandle);
 
 	bool RemoveReference(const UObject* InObject);
 
-	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	bool RemoveReference(const IManagedHandle InManagedHandle);
 
 private:
-	FObjectMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2Object;
+	FObjectMapping::FManagedHandle2Value ManagedHandle2Object;
 
-	FObjectMapping::FAddress2GarbageCollectionHandle Object2GarbageCollectionHandleMap;
+	FObjectMapping::FAddress2ManagedHandle Object2ManagedHandle;
 };

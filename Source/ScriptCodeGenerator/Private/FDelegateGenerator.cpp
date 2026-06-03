@@ -1,4 +1,4 @@
-﻿#include "FDelegateGenerator.h"
+#include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BufferMacro.h"
@@ -64,6 +64,11 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
 	};
+
+	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+	{
+		UsingNameSpaces.Add(NAMESPACE_INTEROP);
+	}
 
 	TArray<FProperty*> DelegateParams;
 
@@ -246,10 +251,11 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	if (DelegateReturnParam != nullptr)
 	{
 		ExecuteFunctionReturnParamBody = FString::Printf(TEXT(
-			"return *(%s*)%s;"
+			"return %s;"
 		),
-		                                                 *DelegateReturnType,
-		                                                 RETURN_BUFFER_TEXT
+		                                                 *FGeneratorCore::GetReturn(
+			                                                 DelegateReturnParam, DelegateReturnType,
+			                                                 RETURN_BUFFER_TEXT)
 		);
 	}
 
@@ -261,22 +267,23 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 		for (auto Index = 0; Index < DelegateRefParamIndex.Num(); ++Index)
 		{
-			ExecuteFunctionOutParamBody += FString::Printf(TEXT(
-				"\n\t\t\t\t%s = *(%s*)(%s%s);\n"
-			),
-			                                               *FUnrealCSharpFunctionLibrary::Encode(
-				                                               DelegateParams[DelegateRefParamIndex[Index]]),
-			                                               *FGeneratorCore::GetPropertyType(
-				                                               DelegateParams[DelegateRefParamIndex[Index]]),
-			                                               OUT_BUFFER_TEXT,
-			                                               BufferSize == 0
-				                                               ? TEXT("")
-				                                               : *FString::Printf(TEXT(
-					                                               " + %d"),
-					                                               BufferSize)
-			);
+			const auto Param = DelegateParams[DelegateRefParamIndex[Index]];
 
-			BufferSize += FGeneratorCore::GetBufferSize(DelegateParams[DelegateRefParamIndex[Index]]);
+			ExecuteFunctionOutParamBody += FGeneratorCore::GetOutParam(
+				Param,
+				FUnrealCSharpFunctionLibrary::Encode(Param),
+				FGeneratorCore::GetPropertyType(Param),
+				OUT_BUFFER_TEXT,
+				BufferSize == 0
+					? TEXT("")
+					: *FString::Printf(TEXT(
+						" + %d"
+					),
+					                   BufferSize
+					),
+				TEXT("\t\t\t\t"));
+
+			BufferSize += FGeneratorCore::GetBufferSize(Param);
 		}
 	}
 

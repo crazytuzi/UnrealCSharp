@@ -57,7 +57,7 @@ struct TBaseArgument<T, false>
 	TBaseArgument() = default;
 
 	explicit TBaseArgument(IN_BUFFER_SIGNATURE) :
-		Value(TPropertyValue<Type, Type>::Get(*(FGarbageCollectionHandle*)IN_BUFFER))
+		Value(TPropertyValue<Type, Type>::Get(*(IManagedHandle*)IN_BUFFER))
 	{
 	}
 

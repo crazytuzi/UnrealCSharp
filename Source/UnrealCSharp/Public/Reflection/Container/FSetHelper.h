@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Property/FPropertyDescriptor.h"
 
@@ -33,6 +33,8 @@ public:
 	FPropertyDescriptor* GetElementPropertyDescriptor() const;
 
 	FScriptSet* GetScriptSet() const;
+
+	void* GetAddress() const;
 
 	bool IsValidIndex(int32 InIndex) const;
 

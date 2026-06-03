@@ -1,4 +1,4 @@
-﻿#include "FGeneratorCore.h"
+#include "FGeneratorCore.h"
 #include "FDelegateGenerator.h"
 #include "FEnumGenerator.h"
 #include "Binding/TypeInfo/TName.inl"
@@ -586,6 +586,55 @@ bool FGeneratorCore::IsPrimitiveProperty(FProperty* Property)
 	}
 
 	return false;
+}
+
+FString FGeneratorCore::GetReturn(FProperty* InProperty, const FString& InPropertyType, const FString& InBuffer)
+{
+	return GetReturn(IsPrimitiveProperty(InProperty), InPropertyType, InBuffer);
+}
+
+FString FGeneratorCore::GetReturn(const bool bIsPrimitive, const FString& InPropertyType, const FString& InBuffer)
+{
+	return bIsPrimitive || FUnrealCSharpFunctionLibrary::IsMonoDomain()
+		       ? FString::Printf(TEXT("*(%s*)%s"), *InPropertyType, *InBuffer)
+		       : FString::Printf(TEXT(
+			       "(%s)HandleData.GetObject(*(nint*)%s)"
+		       ),
+		                         *InPropertyType,
+		                         *InBuffer
+		       );
+}
+
+FString FGeneratorCore::GetOutParam(FProperty* InProperty, const FString& InName,
+                                    const FString& InPropertyType, const FString& InBuffer,
+                                    const FString& InOffset, const FString& InIndent)
+{
+	return GetOutParam(IsPrimitiveProperty(InProperty), InName, InPropertyType, InBuffer, InOffset, InIndent);
+}
+
+FString FGeneratorCore::GetOutParam(const bool bIsPrimitive, const FString& InName,
+                                    const FString& InPropertyType, const FString& InBuffer,
+                                    const FString& InOffset, const FString& InIndent)
+{
+	return bIsPrimitive || FUnrealCSharpFunctionLibrary::IsMonoDomain()
+		       ? FString::Printf(TEXT(
+			       "\n%s%s = *(%s*)(%s%s);\n"
+		       ),
+		                         *InIndent,
+		                         *InName,
+		                         *InPropertyType,
+		                         *InBuffer,
+		                         *InOffset
+		       )
+		       : FString::Printf(TEXT(
+			       "\n%s%s = (%s)HandleData.GetObject(*(nint*)%s%s);\n"
+		       ),
+		                         *InIndent,
+		                         *InName,
+		                         *InPropertyType,
+		                         *InBuffer,
+		                         *InOffset
+		       );
 }
 
 FString FGeneratorCore::GetParamName(FProperty* Property)

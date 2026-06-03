@@ -19,7 +19,7 @@ struct TBufferOffset
 {
 	typedef int32 TBufferOffsetType;
 
-	TBufferOffset():
+	TBufferOffset() :
 		Offset(0)
 	{
 		Get<0, Args0...>();

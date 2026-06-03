@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Domain/FDomain.h"
 #include "Bridge/FTypeBridge.h"
 #include "Binding/TypeInfo/TGeneric.inl"
 #include "Binding/TypeInfo/TName.inl"
@@ -292,13 +291,7 @@ struct TPropertyClass<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>
 				typename TTemplateTypeTraits<std::decay_t<T>>::template Type<1>>
 			::Get();
 
-		const auto ReflectionTypeArray = FReflectionRegistry::Get().GetObjectClass()->NewArray(2);
-
-		FDomain::Array_Set(ReflectionTypeArray, 0, FoundKeyClass->GetReflectionType());
-
-		FDomain::Array_Set(ReflectionTypeArray, 1, FoundValueClass->GetReflectionType());
-
-		return FTypeBridge::MakeGenericTypeInstance(FoundGenericClass, ReflectionTypeArray);
+		return FTypeBridge::MakeGenericTypeInstance(FoundGenericClass, FoundKeyClass, FoundValueClass);
 	}
 };
 

@@ -1,4 +1,5 @@
-﻿#include "Registry/FReferenceRegistry.h"
+#include "Registry/FReferenceRegistry.h"
+#include "Domain/FDomain.h"
 #include "CoreMacro/Macro.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reference/FReference.h"
@@ -9,9 +10,11 @@ FReferenceRegistry::~FReferenceRegistry()
 	{
 		for (const auto& Reference : Value)
 		{
-			auto GarbageCollectionHandle = static_cast<FGarbageCollectionHandle>(*Reference);
+			auto ManagedHandle = static_cast<IManagedHandle>(*Reference);
 
-			FGarbageCollectionHandle::Free<true>(GarbageCollectionHandle);
+			FDomain::GCHandle_Free(ManagedHandle);
+
+			ManagedHandle = IManagedHandle{};
 
 			delete Reference;
 		}
@@ -32,7 +35,7 @@ FString FReferenceRegistry::GetReferencerName() const
 	return TEXT("FReferenceRegistry");
 }
 
-bool FReferenceRegistry::AddReference(const FGarbageCollectionHandle& InOwner, FReference* InReference)
+bool FReferenceRegistry::AddReference(const IManagedHandle InOwner, FReference* InReference)
 {
 	if (!ReferenceRelationship.Contains(InOwner))
 	{
@@ -44,7 +47,7 @@ bool FReferenceRegistry::AddReference(const FGarbageCollectionHandle& InOwner, F
 	return true;
 }
 
-bool FReferenceRegistry::RemoveReference(const FGarbageCollectionHandle& InOwner)
+bool FReferenceRegistry::RemoveReference(const IManagedHandle InOwner)
 {
 	if (const auto FoundReferences = ReferenceRelationship.Find(InOwner))
 	{

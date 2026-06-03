@@ -1,37 +1,37 @@
 #include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Domain/Script/IManagedHandle.h"
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto Object = Class->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
-		Class, Object, Src);
+		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
 
-	*Dest = Object;
+	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
 }
 
 void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(Src);
 
-	if (Object == nullptr)
+	if (!IManagedHandleIsValid(Object))
 	{
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, true>(
-			Class, Object, Src);
+			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
 	}
 
-	*Dest = Object;
+	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
 }
 
 void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcManagedHandle = *static_cast<IManagedHandle*>(Src);
 
-	const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
-		SrcGarbageCollectionHandle);
+	const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(SrcManagedHandle);
 
 	Property->InitializeValue(Dest);
 
@@ -49,7 +49,7 @@ bool FInterfacePropertyDescriptor::Identical(const void* A, const void* B, const
 	const auto InterfaceA = static_cast<FScriptInterface*>(const_cast<void*>(A));
 
 	const auto InterfaceB = FCSharpEnvironment::GetEnvironment().GetMulti<TScriptInterface<IInterface>>(
-		*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
+		*static_cast<IManagedHandle*>(const_cast<void*>(B)));
 
 	return Property->Identical(InterfaceA, &InterfaceB, PortFlags);
 }

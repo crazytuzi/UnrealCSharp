@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "FReference.h"
 #include "Environment/FCSharpEnvironment.h"
@@ -12,6 +12,6 @@ public:
 public:
 	virtual ~TDelegateReference() override
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference<T>(GarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveDelegateReference<T>(ManagedHandle);
 	}
 };

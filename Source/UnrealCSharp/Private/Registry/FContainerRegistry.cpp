@@ -1,4 +1,5 @@
-﻿#include "Registry/FContainerRegistry.h"
+#include "Registry/FContainerRegistry.h"
+#include "Domain/FDomain.h"
 
 FContainerRegistry::FContainerRegistry()
 {
@@ -16,7 +17,7 @@ void FContainerRegistry::Initialize()
 
 void FContainerRegistry::Deinitialize()
 {
-	for (auto& [Key, Value] : ArrayGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : ArrayManagedHandle2Helper.Get())
 	{
 		if (Value != nullptr)
 		{
@@ -25,14 +26,16 @@ void FContainerRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 	}
 
-	ArrayGarbageCollectionHandle2Helper.Empty();
+	ArrayManagedHandle2Helper.Empty();
 
-	ArrayAddress2GarbageCollectionHandle.Empty();
+	ArrayAddress2ManagedHandle.Empty();
 
-	for (auto& [Key, Value] : MapGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : MapManagedHandle2Helper.Get())
 	{
 		if (Value != nullptr)
 		{
@@ -41,14 +44,16 @@ void FContainerRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 	}
 
-	MapGarbageCollectionHandle2Helper.Empty();
+	MapManagedHandle2Helper.Empty();
 
-	MapAddress2GarbageCollectionHandle.Empty();
+	MapAddress2ManagedHandle.Empty();
 
-	for (auto& [Key, Value] : SetGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : SetManagedHandle2Helper.Get())
 	{
 		if (Value != nullptr)
 		{
@@ -57,10 +62,12 @@ void FContainerRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 	}
 
-	SetGarbageCollectionHandle2Helper.Empty();
+	SetManagedHandle2Helper.Empty();
 
-	SetAddress2GarbageCollectionHandle.Empty();
+	SetAddress2ManagedHandle.Empty();
 }

@@ -1,14 +1,13 @@
-﻿#pragma once
+#pragma once
 
 #include "FReflection.h"
-#include "Domain/FMonoDomain.h"
 
 class FClassReflection;
 
 class FParamReflection : public FReflection
 {
 public:
-	FParamReflection(const FString& InName, bool InIsRef, MonoReflectionType* InReflectionType);
+	FParamReflection(const FString& InName, bool InIsRef, FClassReflection* InReflectionType);
 
 public:
 	bool IsRef() const;
@@ -18,5 +17,5 @@ public:
 private:
 	bool bIsRef{};
 
-	MonoReflectionType* ReflectionType{};
+	FClassReflection* ReflectionType{};
 };

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <DebugType>Embedded</DebugType>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Plugins\UnrealCSharp\Script\Interop\**" Exclude="..\..\Plugins\UnrealCSharp\Script\Interop\**\*.DS_Store"></Compile>
+  </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework></TargetFramework>
+    <AssemblyName>Interop</AssemblyName>
+    <RootNamespace>Interop</RootNamespace>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <PublishAot>false</PublishAot>
+    <Deterministic>true</Deterministic>
+    <NoWarn>CS8618</NoWarn>
+    <OutputPath></OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+  </PropertyGroup>
+</Project>

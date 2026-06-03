@@ -1,6 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMacro/BufferMacro.h"
+
+#define FUNCTION_IMPLEMENTATION_SUFFIX FString("_Implementation")
 
 #define FUNCTION_CSHARP_CALLBACK FString(TEXT("CSharpCallBack"))
 
@@ -9,8 +11,6 @@
 #define FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE FString(TEXT("Initialize"))
 
 #define FUNCTION_SYNCHRONIZATION_CONTEXT_DEINITIALIZE FString(TEXT("Deinitialize"))
-
-#define FUNCTION_SYNCHRONIZATION_CONTEXT_TICK FString(TEXT("Tick"))
 
 #define FUNCTION_DESTRUCTOR FString(TEXT("Destructor"))
 

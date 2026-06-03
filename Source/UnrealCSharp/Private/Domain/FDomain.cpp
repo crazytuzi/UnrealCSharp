@@ -1,15 +1,15 @@
 #include "Domain/FDomain.h"
-#include "Log/FMonoLog.h"
+#include "Domain/Script/IScriptDomain.h"
+#include "Domain/Script/FScriptDomainFactory.h"
 #include "Template/TGetArrayLength.inl"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/FunctionMacro.h"
 #include "Reflection/FReflectionRegistry.h"
 
-FDomain::FDomain(const FMonoDomainInitializeParams& InParams):
-	SynchronizationContextTick{nullptr}
+FDomain::FDomain()
 {
-	Initialize(InParams);
+	Initialize();
 }
 
 FDomain::~FDomain()
@@ -17,9 +17,18 @@ FDomain::~FDomain()
 	Deinitialize();
 }
 
-void FDomain::Initialize(const FMonoDomainInitializeParams& InParams)
+void FDomain::Initialize()
 {
-	FMonoDomain::Initialize(InParams);
+	auto ScriptDomain = IScriptDomain::Get();
+
+	if (ScriptDomain == nullptr)
+	{
+		ScriptDomain = FScriptDomainFactory::Create();
+
+		IScriptDomain::Set(ScriptDomain);
+	}
+
+	ScriptDomain->Initialize();
 
 	InitializeSynchronizationContext();
 }
@@ -28,21 +37,17 @@ void FDomain::Deinitialize()
 {
 	DeinitializeSynchronizationContext();
 
-	FMonoDomain::Deinitialize();
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		FScriptDomainFactory::Destroy(ScriptDomain);
+	}
 }
 
 void FDomain::Tick(const float DeltaTime)
 {
-	if (SynchronizationContextTick != nullptr)
+	if (const auto ScriptDomain = IScriptDomain::Get())
 	{
-		MonoObject* Exception{};
-
-		SynchronizationContextTick(DeltaTime, &Exception);
-
-		if (Exception != nullptr)
-		{
-			FMonoDomain::Unhandled_Exception(Exception);
-		}
+		ScriptDomain->Tick(DeltaTime);
 	}
 }
 
@@ -56,34 +61,62 @@ TStatId FDomain::GetStatId() const
 	RETURN_QUICK_DECLARE_CYCLE_STAT(FMonoDomain, STATGROUP_Tickables);
 }
 
-void* FDomain::Object_Unbox(MonoObject* InMonoObject)
+void* FDomain::Object_Unbox(const IManagedHandle InManagedHandle)
 {
-	return FMonoDomain::Object_Unbox(InMonoObject);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->UnboxValue(InManagedHandle);
+	}
+
+	return nullptr;
 }
 
-MonoString* FDomain::String_New(const char* InText)
+IManagedHandle FDomain::String_New(const char* InText)
 {
-	return FMonoDomain::String_New(InText);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->NewString(InText);
+	}
+
+	return InvalidManagedHandle;
 }
 
-FMonoUTF8Scope FDomain::String_To_UTF8(MonoString* InMonoString)
+FString FDomain::StringToFString(const IManagedHandle InManagedHandle)
 {
-	return FMonoDomain::String_To_UTF8(InMonoString);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->StringToFString(InManagedHandle);
+	}
+
+	return FString();
 }
 
-MonoObject* FDomain::GCHandle_Get_Target_V2(const MonoGCHandle InGCHandle)
+IManagedHandle FDomain::GCHandle_Get_Target(const IManagedHandle InManagedHandle)
 {
-	return FMonoDomain::GCHandle_Get_Target_V2(InGCHandle);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->GetTarget(InManagedHandle);
+	}
+
+	return InvalidManagedHandle;
 }
 
-void FDomain::GCHandle_Free_V2(const MonoGCHandle InGCHandle)
+void FDomain::GCHandle_Free(const IManagedHandle InManagedHandle)
 {
-	return FMonoDomain::GCHandle_Free_V2(InGCHandle);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		ScriptDomain->Free(InManagedHandle);
+	}
 }
 
 bool FDomain::IsLoadSucceed()
 {
-	return FMonoDomain::IsLoadSucceed();
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->IsInitialized();
+	}
+
+	return false;
 }
 
 FString FDomain::GetTraceback()
@@ -92,7 +125,7 @@ FString FDomain::GetTraceback()
 	{
 		if (const auto TracebackMethod = UtilsClass->GetMethod(FUNCTION_UTILS_GET_TRACEBACK, 0))
 		{
-			return FString(UTF8_TO_TCHAR(String_To_UTF8((MonoString*)TracebackMethod->Runtime_Invoke())));
+			return StringToFString(TracebackMethod->Runtime_Invoke());
 		}
 	}
 
@@ -108,12 +141,6 @@ void FDomain::InitializeSynchronizationContext()
 			FUNCTION_SYNCHRONIZATION_CONTEXT_INITIALIZE, 0))
 		{
 			InitializeMethod->Runtime_Invoke();
-		}
-
-		if (const auto TickMethod = SynchronizationContextClass->GetMethod(
-			FUNCTION_SYNCHRONIZATION_CONTEXT_TICK, 1))
-		{
-			SynchronizationContextTick = (SynchronizationContextTickType)TickMethod->Method_Get_Unmanaged_Thunk();
 		}
 	}
 }

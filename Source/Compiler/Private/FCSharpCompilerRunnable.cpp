@@ -1,4 +1,4 @@
-﻿#include "FCSharpCompilerRunnable.h"
+#include "FCSharpCompilerRunnable.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Delegate/FUnrealCSharpCoreModuleDelegates.h"
 #include "Dynamic/FDynamicGenerator.h"
@@ -160,10 +160,10 @@ void FCSharpCompilerRunnable::ImmediatelyDoWork()
 	Compile([]()
 	{
 		FDynamicGenerator::Generator();
-	});
+	}, true);
 }
 
-void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
+void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const bool bCompileInterop)
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -171,6 +171,11 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
 		if (UnrealCSharpEditorSetting->EnableCompiled())
 		{
 			bIsCompiling = true;
+
+			if (bCompileInterop)
+			{
+				CompileInterop();
+			}
 
 			Compile();
 
@@ -192,6 +197,54 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction)
 
 			bIsCompiling = false;
 		}
+	}
+}
+
+FString FCSharpCompilerRunnable::GetBuildConfiguration()
+{
+	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+		UUnrealCSharpEditorSetting>())
+	{
+		const auto Configuration = IsRunningCookCommandlet()
+			                           ? UnrealCSharpEditorSetting->GetRuntimeConfiguration()
+			                           : UnrealCSharpEditorSetting->GetEditorConfiguration();
+
+		return Configuration == ESolutionConfiguration::Debug ? TEXT("Debug") : TEXT("Release");
+	}
+
+	return TEXT("Debug");
+}
+
+void FCSharpCompilerRunnable::CompileInterop()
+{
+	const auto InteropProjectPath = FUnrealCSharpFunctionLibrary::GetInteropProjectPath();
+
+	if (!IFileManager::Get().FileExists(*InteropProjectPath))
+	{
+		return;
+	}
+
+	if (const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
+		!IFileManager::Get().FileExists(*InteropPath))
+	{
+		static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
+
+		const auto CompileParam = FString::Printf(TEXT(
+			"build \"%s\" --nologo -c %s"
+		),
+		                                          *FUnrealCSharpFunctionLibrary::GetInteropProjectPath(),
+		                                          *GetBuildConfiguration()
+		);
+
+		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,
+		                                          [](const int32 InReturnCode, const FString& InResult)
+		                                          {
+			                                          if (InReturnCode != 0)
+			                                          {
+			                                          }
+		                                          },
+		                                          FPaths::GetPath(InteropProjectPath)
+		);
 	}
 }
 
@@ -232,28 +285,13 @@ void FCSharpCompilerRunnable::Compile()
 		NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
 	});
 
-	auto GetSolutionConfiguration = []()
-	{
-		if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
-			UUnrealCSharpEditorSetting>())
-		{
-			return IsRunningCookCommandlet()
-				       ? UnrealCSharpEditorSetting->GetRuntimeConfiguration()
-				       : UnrealCSharpEditorSetting->GetEditorConfiguration();
-		}
-
-		return ESolutionConfiguration::Debug;
-	};
-
 	static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
 	const auto CompileParam = FString::Printf(TEXT(
 		"build \"%s\" --nologo -c %s"
 	),
 	                                          *FUnrealCSharpFunctionLibrary::GetGameProjectPath(),
-	                                          GetSolutionConfiguration() == ESolutionConfiguration::Debug
-		                                          ? TEXT("Debug")
-		                                          : TEXT("Release")
+	                                          *GetBuildConfiguration()
 	);
 
 	FNotificationInfo* NotificationInfo{};

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
 
@@ -142,12 +142,8 @@ namespace Script.CoreUObject
 
                         *(TValue*)ValueBuffer = InValue;
 
-                        var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-                        TMapImplementation.TMap_FindKeyImplementation(GarbageCollectionHandle, ValueBuffer,
-                            ReturnBuffer);
-
-                        return *(TKey*)ReturnBuffer;
+                        return TMapImplementation.TMap_FindKeyCompoundImplementation<TKey>(
+                            GarbageCollectionHandle, ValueBuffer);
                     }
                 }
                 else
@@ -171,12 +167,8 @@ namespace Script.CoreUObject
 
                         *(nint*)ValueBuffer = (InValue as IGarbageCollectionHandle)!.GarbageCollectionHandle;
 
-                        var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-                        TMapImplementation.TMap_FindKeyImplementation(GarbageCollectionHandle, ValueBuffer,
-                            ReturnBuffer);
-
-                        return *(TKey*)ReturnBuffer;
+                        return TMapImplementation.TMap_FindKeyCompoundImplementation<TKey>(
+                            GarbageCollectionHandle, ValueBuffer);
                     }
                 }
             }
@@ -206,11 +198,8 @@ namespace Script.CoreUObject
 
                         *(TKey*)KeyBuffer = InKey;
 
-                        var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-                        TMapImplementation.TMap_FindImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
-
-                        return *(TValue*)ReturnBuffer;
+                        return TMapImplementation.TMap_FindCompoundImplementation<TValue>(
+                            GarbageCollectionHandle, KeyBuffer);
                     }
                 }
                 else
@@ -233,11 +222,8 @@ namespace Script.CoreUObject
 
                         *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
 
-                        var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-                        TMapImplementation.TMap_FindImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
-
-                        return *(TValue*)ReturnBuffer;
+                        return TMapImplementation.TMap_FindCompoundImplementation<TValue>(
+                            GarbageCollectionHandle, KeyBuffer);
                     }
                 }
             }
@@ -292,11 +278,8 @@ namespace Script.CoreUObject
 
                             *(TKey*)KeyBuffer = InKey;
 
-                            var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-                            TMapImplementation.TMap_GetImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
-
-                            return *(TValue*)ReturnBuffer;
+                            return TMapImplementation.TMap_GetCompoundImplementation<TValue>(
+                                GarbageCollectionHandle, KeyBuffer);
                         }
                     }
                     else
@@ -319,11 +302,8 @@ namespace Script.CoreUObject
 
                             *(nint*)KeyBuffer = (InKey as IGarbageCollectionHandle)!.GarbageCollectionHandle;
 
-                            var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-                            TMapImplementation.TMap_GetImplementation(GarbageCollectionHandle, KeyBuffer, ReturnBuffer);
-
-                            return *(TValue*)ReturnBuffer;
+                            return TMapImplementation.TMap_GetCompoundImplementation<TValue>(
+                                GarbageCollectionHandle, KeyBuffer);
                         }
                     }
                 }
@@ -411,12 +391,8 @@ namespace Script.CoreUObject
                 }
                 else
                 {
-                    var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-                    TMapImplementation.TMap_GetEnumeratorKeyImplementation(GarbageCollectionHandle, InIndex,
-                        ReturnBuffer);
-
-                    return *(TKey*)ReturnBuffer;
+                    return TMapImplementation.TMap_GetEnumeratorKeyCompoundImplementation<TKey>(
+                        GarbageCollectionHandle, InIndex);
                 }
             }
         }
@@ -436,12 +412,8 @@ namespace Script.CoreUObject
                 }
                 else
                 {
-                    var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-                    TMapImplementation.TMap_GetEnumeratorValueImplementation(GarbageCollectionHandle, InIndex,
-                        ReturnBuffer);
-
-                    return *(TValue*)ReturnBuffer;
+                    return TMapImplementation.TMap_GetEnumeratorValueCompoundImplementation<TValue>(
+                        GarbageCollectionHandle, InIndex);
                 }
             }
         }

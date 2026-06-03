@@ -1,28 +1,26 @@
-﻿#pragma once
+#pragma once
 
 #include "FReflection.h"
 #include "FParamReflection.h"
-#include "Domain/FMonoDomain.h"
+#include "Domain/Script/IManagedTypes.h"
 
 class FClassReflection;
 
 class UNREALCSHARPCORE_API FMethodReflection : public FReflection
 {
 public:
-	FMethodReflection(const FString& InName, int32 InParamCount, MonoReflectionMethod* InReflectionMethod,
+	FMethodReflection(const FString& InName, int32 InParamCount,
+	                  const IManagedReflectionMethod InManagedReflectionMethod,
 	                  bool InIsStatic, FClassReflection* InReturn, const TArray<FParamReflection*>& InParams,
 	                  const TSet<FClassReflection*>& InAttributes,
-	                  const TMap<FClassReflection*, TArray<FString>>& InAttributeValues
-	);
+	                  const TMap<FClassReflection*, TArray<FString>>& InAttributeValues);
 
 	~FMethodReflection();
 
 public:
 	int32 GetParamCount() const;
 
-	MonoReflectionMethod* GetReflectionMethod() const;
-
-	MonoMethod* GetMethod() const;
+	IManagedMethod GetManagedMethod() const;
 
 	bool IsOverride() const;
 
@@ -35,18 +33,21 @@ public:
 	const TArray<FParamReflection*>& GetParams() const;
 
 public:
-	MonoObject* Runtime_Invoke(void* InMonoObject = nullptr, void** InParams = nullptr) const;
+	IManagedHandle Runtime_Invoke(const IManagedHandle InManagedHandle = InvalidManagedHandle,
+	                              void** InParams = nullptr) const;
 
-	MonoObject* Runtime_Invoke_Array(void* InMonoObject, MonoArray* InParams) const;
+#if WITH_MONO
+	IManagedObject Runtime_Invoke_Array(const IManagedHandle InManagedHandle, const IManagedArray InParams) const;
 
 	void* Method_Get_Unmanaged_Thunk() const;
+#endif
 
 private:
 	int32 ParamCount{};
 
-	MonoReflectionMethod* ReflectionMethod{};
+	IManagedReflectionMethod ManagedReflectionMethod{INVALID_MANAGED};
 
-	MonoMethod* Method{};
+	IManagedMethod ManagedMethod{INVALID_MANAGED};
 
 	bool bIsOverride{};
 
@@ -56,5 +57,5 @@ private:
 
 	FClassReflection* Return{};
 
-	TArray<FParamReflection*> ParamReflections;
+	TArray<FParamReflection*> Params;
 };

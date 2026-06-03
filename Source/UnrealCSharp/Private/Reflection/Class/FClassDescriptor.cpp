@@ -1,4 +1,5 @@
-﻿#include "Reflection/Class/FClassDescriptor.h"
+#include "Reflection/Class/FClassDescriptor.h"
+#include "CoreMacro/PropertyMacro.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/FReflectionRegistry.h"
 
@@ -31,20 +32,26 @@ void FClassDescriptor::Deinitialize()
 	{
 		FoundClass->ClearFunctionMapsCaches();
 
-		void* InParams[] = {nullptr};
-
-		if (const auto FoundProperty = Class->GetProperty(PROPERTY_STATIC_CLASS_SINGLETON))
+		if (Class != nullptr && IManagedIsValid(Class->GetManagedClass()))
 		{
-			FoundProperty->SetValue(nullptr, InParams, nullptr);
+			void* InParams[] = {nullptr};
+
+			if (const auto FoundProperty = Class->GetProperty(PROPERTY_STATIC_CLASS_SINGLETON))
+			{
+				FoundProperty->SetValue(InvalidManagedHandle, InParams);
+			}
 		}
 	}
 	else
 	{
-		void* InParams[] = {nullptr};
-
-		if (const auto FoundProperty = Class->GetProperty(PROPERTY_STATIC_STRUCT_SINGLETON))
+		if (Class != nullptr && IManagedIsValid(Class->GetManagedClass()))
 		{
-			FoundProperty->SetValue(nullptr, InParams, nullptr);
+			void* InParams[] = {nullptr};
+
+			if (const auto FoundProperty = Class->GetProperty(PROPERTY_STATIC_STRUCT_SINGLETON))
+			{
+				FoundProperty->SetValue(InvalidManagedHandle, InParams);
+			}
 		}
 	}
 

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 #include "UEVersion.h"

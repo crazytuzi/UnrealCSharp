@@ -1,4 +1,4 @@
-﻿#include "Reflection/Function/FFunctionParamBufferAllocator.h"
+#include "Reflection/Function/FFunctionParamBufferAllocator.h"
 
 FFunctionParamBufferAllocator::FFunctionParamBufferAllocator()
 {

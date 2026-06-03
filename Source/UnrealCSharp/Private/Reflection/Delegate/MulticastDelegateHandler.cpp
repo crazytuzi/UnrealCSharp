@@ -1,4 +1,4 @@
-﻿#include "Reflection/Delegate/MulticastDelegateHandler.h"
+#include "Reflection/Delegate/MulticastDelegateHandler.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/FunctionMacro.h"
 

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
 
@@ -130,12 +130,8 @@ namespace Script.CoreUObject
                     }
                     else
                     {
-                        var ValueBuffer = stackalloc byte[sizeof(nint)];
-
-                        TSetImplementation.TSet_GetEnumeratorImplementation(GarbageCollectionHandle, InIndex,
-                            ValueBuffer);
-
-                        return *(T*)ValueBuffer;
+                        return TSetImplementation.TSet_GetEnumeratorCompoundImplementation<T>(
+                            GarbageCollectionHandle, InIndex);
                     }
                 }
             }

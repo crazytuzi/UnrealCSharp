@@ -1,4 +1,4 @@
-﻿#include "ContentBrowser/DynamicHierarchy.h"
+#include "ContentBrowser/DynamicHierarchy.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicClassGenerator.h"

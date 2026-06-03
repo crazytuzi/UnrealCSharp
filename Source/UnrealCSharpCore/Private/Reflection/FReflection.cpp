@@ -1,4 +1,4 @@
-﻿#include "Reflection/FReflection.h"
+#include "Reflection/FReflection.h"
 #include "Reflection/FClassReflection.h"
 
 FReflection::FReflection(const FString& InName,

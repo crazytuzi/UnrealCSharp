@@ -4,14 +4,16 @@
 #include "FPropertyReflection.h"
 #include "FFieldReflection.h"
 #include "FMethodReflection.h"
-#include "Domain/FMonoDomain.h"
+#include "Domain/Script/IManagedTypes.h"
 
 class UNREALCSHARPCORE_API FClassReflection : public FReflection
 {
 public:
-	explicit FClassReflection(MonoClass* InClass, const FString& InName = {});
+	explicit FClassReflection(const IManagedClass InManagedClass, const FString& InName = {});
 
-	explicit FClassReflection(MonoReflectionType* InReflectionType);
+#if WITH_MONO
+	explicit FClassReflection(const IManagedReflectionType InManagedReflectionType);
+#endif
 
 	~FClassReflection();
 
@@ -21,11 +23,11 @@ public:
 	void Deinitialize();
 
 public:
-	MonoClass* GetClass() const;
+	IManagedClass GetManagedClass() const;
 
-	MonoVTable* GetVTable() const;
-
-	MonoReflectionType* GetReflectionType() const;
+#if WITH_MONO
+	IManagedReflectionType GetManagedReflectionType() const;
+#endif
 
 	FClassReflection* GetTypeDefinition() const;
 
@@ -59,37 +61,40 @@ public:
 
 	const TMap<TPair<FString, int32>, FMethodReflection*>& GetMethods() const;
 
-	FMethodReflection* GetMethod(const FString& InMethodName, int32 InParamCount) const;
+	FMethodReflection* GetMethod(const FString& InName, int32 InParamCount) const;
 
-	FMethodReflection* GetMethod(const MonoReflectionMethod* InReflectionMethod);
+	FMethodReflection* GetMethod(const IManagedReflectionMethod InManagedReflectionMethod);
 
-	FMethodReflection* GetParentMethod(const FString& InFunctionName, int32 InParamCount) const;
+	FMethodReflection* GetParentMethod(const FString& InName, int32 InParamCount) const;
 
 public:
-	MonoObject* NewObject() const;
+	IManagedHandle NewObject() const;
 
-	MonoObject* InitObject(int32 InParamCount = 0, void** InParams = nullptr) const;
+	IManagedHandle InitObject(int32 InParamCount = 0, void** InParams = nullptr) const;
 
-	void ConstructorObject(MonoObject* InMonoObject, int32 InParamCount = 0, void** InParams = nullptr) const;
+	void ConstructorObject(const IManagedHandle InManagedHandle, int32 InParamCount = 0,
+	                       void** InParams = nullptr) const;
 
 	void ConstructorClass() const;
 
-	MonoGCHandle NewGCHandle(MonoObject* InMonoObject, mono_bool bPinned) const;
+	IManagedHandle NewGCHandle(const IManagedHandle InManagedHandle, bool bPinned) const;
 
-	MonoGCHandle NewWeakRefGCHandle(MonoObject* InMonoObject, mono_bool bTrackResurrection) const;
+	IManagedHandle NewWeakRefGCHandle(const IManagedHandle InManagedHandle, bool bTrackResurrection) const;
 
-	MonoObject* BoxValue(void* InValue) const;
+	IManagedHandle GetGCHandle(const IManagedObject InManagedObject) const;
 
-	MonoArray* NewArray(uint32 InNum) const;
+	IManagedHandle BoxValue(void* InValue) const;
 
-	bool IsAssignableFrom(const FClassReflection* InSuperClass, mono_bool bCheckInterfaces = false) const;
+	IManagedArray NewArray(int32 InNum) const;
+
+	bool IsAssignableFrom(const FClassReflection* InSuperClass, bool bIncludeInterfaces = false) const;
 
 private:
-	MonoClass* Class{};
+	IManagedClass ManagedClass{INVALID_MANAGED};
 
-	MonoVTable* VTable{};
-
-	MonoReflectionType* ReflectionType{};
+#if WITH_MONO
+	IManagedReflectionType ManagedReflectionType{INVALID_MANAGED};
+#endif
 
 	FClassReflection* TypeDefinition{};
 

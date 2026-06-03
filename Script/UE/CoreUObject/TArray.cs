@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Script.Library;
 
@@ -84,11 +84,8 @@ namespace Script.CoreUObject
                     }
                     else
                     {
-                        var ValueBuffer = stackalloc byte[sizeof(nint)];
-
-                        TArrayImplementation.TArray_GetImplementation(GarbageCollectionHandle, InIndex, ValueBuffer);
-
-                        return *(T*)ValueBuffer;
+                        return TArrayImplementation.TArray_GetCompoundImplementation<T>(
+                            GarbageCollectionHandle, InIndex);
                     }
                 }
             }

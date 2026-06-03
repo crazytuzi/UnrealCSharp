@@ -1,23 +1,26 @@
 #pragma once
 
+#include "Domain/FDomain.h"
+#include "Reflection/FClassReflection.h"
+
 template <
 	typename Class,
 	typename FStringValueMapping,
-	typename FStringValueMapping::FGarbageCollectionHandle2Value Class::* GarbageCollectionHandle2Value,
-	typename FStringValueMapping::FAddress2GarbageCollectionHandle Class::* Address2GarbageCollectionHandle
+	typename FStringValueMapping::FManagedHandle2Value Class::* ManagedHandle2Value,
+	typename FStringValueMapping::FAddress2ManagedHandle Class::* Address2ManagedHandle
 >
 struct FStringRegistry::TStringRegistryImplementation<
 		FStringValueMapping,
-		typename FStringValueMapping::FGarbageCollectionHandle2Value Class::*,
-		GarbageCollectionHandle2Value,
-		typename FStringValueMapping::FAddress2GarbageCollectionHandle Class::*,
-		Address2GarbageCollectionHandle
+		typename FStringValueMapping::FManagedHandle2Value Class::*,
+		ManagedHandle2Value,
+		typename FStringValueMapping::FAddress2ManagedHandle Class::*,
+		Address2ManagedHandle
 	>
 {
-	static auto GetString(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto GetString(Class* InRegistry, const IManagedHandle InManagedHandle)
 		-> typename FStringValueMapping::ValueType::Type
 	{
-		const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle);
+		const auto FoundValue = (InRegistry->*ManagedHandle2Value).Find(InManagedHandle);
 
 		return FoundValue != nullptr
 			       ? static_cast<typename FStringValueMapping::ValueType::Type>(FoundValue->Value)
@@ -25,44 +28,41 @@ struct FStringRegistry::TStringRegistryImplementation<
 	}
 
 	static auto GetObject(Class* InRegistry, typename FStringValueMapping::FAddressType InAddress)
-		-> MonoObject*
+		-> IManagedHandle
 	{
-		const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(InAddress);
+		const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress);
 
-		return FoundGarbageCollectionHandle != nullptr
-			       ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle)
-			       : nullptr;
+		return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
 	}
 
 	template <auto IsNeedFree, auto IsMember>
-	static auto AddReference(Class* InRegistry, FClassReflection* InClass, MonoObject* InMonoObject,
+	static auto AddReference(Class* InRegistry, FClassReflection* InClass, const IManagedHandle InManagedHandle,
 	                         typename FStringValueMapping::FAddressType InAddress)
 	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InClass, InMonoObject, true);
+		const auto ManagedHandle = InClass->NewWeakRefGCHandle(InManagedHandle, true);
 
 		if constexpr (IsMember)
 		{
-			(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
+			(InRegistry->*Address2ManagedHandle).Add(InAddress, ManagedHandle);
 		}
 
-		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle,
-		                                                 typename FStringValueMapping::ValueType(
-			                                                 static_cast<typename FStringValueMapping::ValueType::Type>(
-				                                                 InAddress), IsNeedFree));
+		(InRegistry->*ManagedHandle2Value).Add(ManagedHandle,
+		                                       typename FStringValueMapping::ValueType(
+			                                       static_cast<typename FStringValueMapping::ValueType::Type>(
+				                                       InAddress), IsNeedFree));
 
 		return true;
 	}
 
-	static auto RemoveReference(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto RemoveReference(Class* InRegistry, const IManagedHandle InManagedHandle)
 	{
-		if (const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle))
+		if (const auto FoundValue = (InRegistry->*ManagedHandle2Value).Find(InManagedHandle))
 		{
-			if (const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(
-				FoundValue->Value))
+			if (const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(FoundValue->Value))
 			{
-				if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+				if (*FoundManagedHandle == InManagedHandle)
 				{
-					(InRegistry->*Address2GarbageCollectionHandle).Remove(FoundValue->Value);
+					(InRegistry->*Address2ManagedHandle).Remove(FoundValue->Value);
 				}
 			}
 
@@ -73,7 +73,7 @@ struct FStringRegistry::TStringRegistryImplementation<
 				FoundValue->Value = nullptr;
 			}
 
-			(InRegistry->*GarbageCollectionHandle2Value).Remove(InGarbageCollectionHandle);
+			(InRegistry->*ManagedHandle2Value).Remove(InManagedHandle);
 
 			return true;
 		}
@@ -86,10 +86,10 @@ template <>
 struct FStringRegistry::TStringRegistry<FName> :
 	TStringRegistryImplementation<
 		FNameMapping,
-		decltype(&FStringRegistry::NameGarbageCollectionHandle2Address),
-		&FStringRegistry::NameGarbageCollectionHandle2Address,
-		decltype(&FStringRegistry::NameAddress2GarbageCollectionHandle),
-		&FStringRegistry::NameAddress2GarbageCollectionHandle
+		decltype(&FStringRegistry::NameManagedHandle2Address),
+		&FStringRegistry::NameManagedHandle2Address,
+		decltype(&FStringRegistry::NameAddress2ManagedHandle),
+		&FStringRegistry::NameAddress2ManagedHandle
 	>
 {
 };
@@ -98,10 +98,10 @@ template <>
 struct FStringRegistry::TStringRegistry<FString> :
 	TStringRegistryImplementation<
 		FStringMapping,
-		decltype(&FStringRegistry::StringGarbageCollectionHandle2Address),
-		&FStringRegistry::StringGarbageCollectionHandle2Address,
-		decltype(&FStringRegistry::StringAddress2GarbageCollectionHandle),
-		&FStringRegistry::StringAddress2GarbageCollectionHandle
+		decltype(&FStringRegistry::StringManagedHandle2Address),
+		&FStringRegistry::StringManagedHandle2Address,
+		decltype(&FStringRegistry::StringAddress2ManagedHandle),
+		&FStringRegistry::StringAddress2ManagedHandle
 	>
 {
 };
@@ -111,10 +111,10 @@ template <>
 struct FStringRegistry::TStringRegistry<FUtf8String> :
 	TStringRegistryImplementation<
 		FUtf8StringMapping,
-		decltype(&FStringRegistry::Utf8StringGarbageCollectionHandle2Address),
-		&FStringRegistry::Utf8StringGarbageCollectionHandle2Address,
-		decltype(&FStringRegistry::Utf8StringAddress2GarbageCollectionHandle),
-		&FStringRegistry::Utf8StringAddress2GarbageCollectionHandle
+		decltype(&FStringRegistry::Utf8StringManagedHandle2Address),
+		&FStringRegistry::Utf8StringManagedHandle2Address,
+		decltype(&FStringRegistry::Utf8StringAddress2ManagedHandle),
+		&FStringRegistry::Utf8StringAddress2ManagedHandle
 	>
 {
 };
@@ -125,10 +125,10 @@ template <>
 struct FStringRegistry::TStringRegistry<FAnsiString> :
 	TStringRegistryImplementation<
 		FAnsiStringMapping,
-		decltype(&FStringRegistry::AnsiStringGarbageCollectionHandle2Address),
-		&FStringRegistry::AnsiStringGarbageCollectionHandle2Address,
-		decltype(&FStringRegistry::AnsiStringAddress2GarbageCollectionHandle),
-		&FStringRegistry::AnsiStringAddress2GarbageCollectionHandle
+		decltype(&FStringRegistry::AnsiStringManagedHandle2Address),
+		&FStringRegistry::AnsiStringManagedHandle2Address,
+		decltype(&FStringRegistry::AnsiStringAddress2ManagedHandle),
+		&FStringRegistry::AnsiStringAddress2ManagedHandle
 	>
 {
 };
@@ -138,10 +138,10 @@ template <>
 struct FStringRegistry::TStringRegistry<FText> :
 	TStringRegistryImplementation<
 		FTextMapping,
-		decltype(&FStringRegistry::TextGarbageCollectionHandle2Address),
-		&FStringRegistry::TextGarbageCollectionHandle2Address,
-		decltype(&FStringRegistry::TextAddress2GarbageCollectionHandle),
-		&FStringRegistry::TextAddress2GarbageCollectionHandle
+		decltype(&FStringRegistry::TextManagedHandle2Address),
+		&FStringRegistry::TextManagedHandle2Address,
+		decltype(&FStringRegistry::TextAddress2ManagedHandle),
+		&FStringRegistry::TextAddress2ManagedHandle
 	>
 {
 };

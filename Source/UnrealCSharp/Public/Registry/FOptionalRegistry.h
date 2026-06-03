@@ -2,6 +2,7 @@
 
 #include "TValueMapping.inl"
 #include "Reflection/Optional/FOptionalHelper.h"
+#include "Domain/Script/IManagedHandle.h"
 #include "UEVersion.h"
 
 #if UE_F_OPTIONAL_PROPERTY
@@ -13,7 +14,7 @@ public:
 	{
 		typedef Address FAddressType;
 
-		typedef typename TValueMapping<FAddressType>::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
+		typedef typename TValueMapping<FAddressType>::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
 	typedef TOptionalValueMapping<FOptionalHelper*, void*> FOptionalHelperValueMapping;
@@ -29,21 +30,21 @@ public:
 	void Deinitialize();
 
 public:
-	FOptionalHelper* GetOptional(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	FOptionalHelper* GetOptional(const IManagedHandle InManagedHandle);
 
-	MonoObject* GetObject(const FOptionalHelperValueMapping::FAddressType& InAddress);
+	IManagedHandle GetObject(const FOptionalHelperValueMapping::FAddressType& InAddress);
 
 	template <auto IsMember>
 	auto AddReference(const FOptionalHelperValueMapping::FAddressType& InAddress,
 	                  const FOptionalHelperValueMapping::ValueType& InValue,
-	                  FClassReflection* InClass, MonoObject* InMonoObject);
+	                  FClassReflection* InClass, const IManagedHandle InManagedHandle);
 
-	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	bool RemoveReference(const IManagedHandle InManagedHandle);
 
 private:
-	FOptionalHelperValueMapping::FGarbageCollectionHandle2Value OptionalGarbageCollectionHandle2Helper;
+	FOptionalHelperValueMapping::FManagedHandle2Value ManagedHandle2Helper;
 
-	FOptionalHelperValueMapping::FAddress2GarbageCollectionHandle OptionalAddress2GarbageCollectionHandle;
+	FOptionalHelperValueMapping::FAddress2ManagedHandle Address2ManagedHandle;
 };
 
 #include "FOptionalRegistry.inl"

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "FReference.h"
 #include "Environment/FCSharpEnvironment.h"
@@ -11,6 +11,6 @@ public:
 public:
 	virtual ~FBindingReference() override
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(GarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(ManagedHandle);
 	}
 };

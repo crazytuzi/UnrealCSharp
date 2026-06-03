@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "FReference.h"
 #include "Environment/FCSharpEnvironment.h"
@@ -11,6 +11,6 @@ public:
 public:
 	virtual ~FStructReference() override
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveStructReference(GarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveStructReference(ManagedHandle);
 	}
 };

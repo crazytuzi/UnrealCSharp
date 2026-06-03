@@ -1,4 +1,4 @@
-﻿using Script.Reflection.Property;
+using Script.Reflection.Property;
 
 namespace Script.CoreUObject
 {

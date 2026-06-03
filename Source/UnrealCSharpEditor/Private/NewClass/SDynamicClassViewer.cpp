@@ -1,4 +1,4 @@
-﻿#include "NewClass/SDynamicClassViewer.h"
+#include "NewClass/SDynamicClassViewer.h"
 #include "Misc/TextFilterExpressionEvaluator.h"
 #include "SlateOptMacros.h"
 #include "Widgets/Input/SSearchBox.h"

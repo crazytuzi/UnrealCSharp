@@ -1,4 +1,4 @@
-﻿#include "FCodeAnalysis.h"
+#include "FCodeAnalysis.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 

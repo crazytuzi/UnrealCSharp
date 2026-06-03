@@ -1,8 +1,8 @@
-﻿#pragma once
+#pragma once
 
 class FClassReflection;
 
-class FReflection
+class UNREALCSHARPCORE_API FReflection
 {
 public:
 	explicit FReflection(const FString& InName = {},

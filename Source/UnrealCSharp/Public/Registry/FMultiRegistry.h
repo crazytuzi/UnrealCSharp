@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Template/TIsTWeakObjectPtr.inl"
 #include "Template/TIsTLazyObjectPtr.inl"
@@ -46,7 +46,7 @@ public:
 	{
 		typedef Address FAddressType;
 
-		typedef typename TValueMapping<FAddressType>::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
+		typedef typename TValueMapping<FAddressType>::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
 	typedef TMultiValueMapping<void*, FSubclassOfAddress> FSubclassOfMapping;
@@ -82,29 +82,29 @@ public:
 	void Deinitialize();
 
 private:
-	FSubclassOfMapping::FGarbageCollectionHandle2Value SubclassOfGarbageCollectionHandle2Address;
+	FSubclassOfMapping::FManagedHandle2Value SubclassOfManagedHandle2Address;
 
-	FSubclassOfMapping::FAddress2GarbageCollectionHandle SubclassOfAddress2GarbageCollectionHandle;
+	FSubclassOfMapping::FAddress2ManagedHandle SubclassOfAddress2ManagedHandle;
 
-	FWeakObjectPtrMapping::FGarbageCollectionHandle2Value WeakObjectPtrGarbageCollectionHandle2Address;
+	FWeakObjectPtrMapping::FManagedHandle2Value WeakObjectPtrManagedHandle2Address;
 
-	FWeakObjectPtrMapping::FAddress2GarbageCollectionHandle WeakObjectPtrAddress2GarbageCollectionHandle;
+	FWeakObjectPtrMapping::FAddress2ManagedHandle WeakObjectPtrAddress2ManagedHandle;
 
-	FLazyObjectPtrMapping::FGarbageCollectionHandle2Value LazyObjectPtrGarbageCollectionHandle2Address;
+	FLazyObjectPtrMapping::FManagedHandle2Value LazyObjectPtrManagedHandle2Address;
 
-	FLazyObjectPtrMapping::FAddress2GarbageCollectionHandle LazyObjectPtrAddress2GarbageCollectionHandle;
+	FLazyObjectPtrMapping::FAddress2ManagedHandle LazyObjectPtrAddress2ManagedHandle;
 
-	FSoftObjectPtrMapping::FGarbageCollectionHandle2Value SoftObjectPtrGarbageCollectionHandle2Address;
+	FSoftObjectPtrMapping::FManagedHandle2Value SoftObjectPtrManagedHandle2Address;
 
-	FSoftObjectPtrMapping::FAddress2GarbageCollectionHandle SoftObjectPtrAddress2GarbageCollectionHandle;
+	FSoftObjectPtrMapping::FAddress2ManagedHandle SoftObjectPtrAddress2ManagedHandle;
 
-	FScriptInterfaceMapping::FGarbageCollectionHandle2Value ScriptInterfaceGarbageCollectionHandle2Address;
+	FScriptInterfaceMapping::FManagedHandle2Value ScriptInterfaceManagedHandle2Address;
 
-	FScriptInterfaceMapping::FKey2GarbageCollectionHandle ScriptInterfaceAddress2GarbageCollectionHandle;
+	FScriptInterfaceMapping::FKey2ManagedHandle ScriptInterfaceAddress2ManagedHandle;
 
-	FSoftClassPtrMapping::FGarbageCollectionHandle2Value SoftClassPtrGarbageCollectionHandle2Address;
+	FSoftClassPtrMapping::FManagedHandle2Value SoftClassPtrManagedHandle2Address;
 
-	FSoftClassPtrMapping::FAddress2GarbageCollectionHandle SoftClassPtrAddress2GarbageCollectionHandle;
+	FSoftClassPtrMapping::FAddress2ManagedHandle SoftClassPtrAddress2ManagedHandle;
 };
 
 #include "FMultiRegistry.inl"

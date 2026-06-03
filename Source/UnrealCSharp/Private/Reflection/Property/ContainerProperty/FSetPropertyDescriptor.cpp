@@ -1,56 +1,56 @@
 #include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
+#include "Domain/Script/IManagedTypes.h"
 
 void FSetPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	*Dest = NewWeakRef(Src, true);
+	*reinterpret_cast<IManagedObject*>(Dest) = NewWeakRef(Src, true);
 }
 
 void FSetPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
-	*Dest = NewWeakRef(Src, false);
+	*reinterpret_cast<IManagedObject*>(Dest) = NewWeakRef(Src, false);
 }
 
 void FSetPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	*static_cast<void**>(Dest) = NewRef(Src);
+	*static_cast<IManagedObject*>(Dest) = NewRef(Src);
 }
 
 void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcManagedHandle = *static_cast<IManagedHandle*>(Src);
 
-	const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-		SrcGarbageCollectionHandle);
+	const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(SrcManagedHandle);
 
 	Property->InitializeValue(Dest);
 
 	Property->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
 }
 
-MonoObject* FSetPropertyDescriptor::NewRef(void* InAddress) const
+IManagedObject FSetPropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InAddress);
 
-	if (Object == nullptr)
+	if (!IManagedHandleIsValid(Object))
 	{
 		Object = Class->NewObject();
 
 		const auto SetHelper = new FSetHelper(Property->ElementProp, InAddress,
 		                                      false, false);
 
-		const auto OwnerGarbageCollectionHandle = FCSharpEnvironment::GetEnvironment().GetGarbageCollectionHandle(
+		const auto OwnerManagedHandle = FCSharpEnvironment::GetEnvironment().GeManagedHandle(
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerGarbageCollectionHandle, InAddress, SetHelper, Class, Object);
+			OwnerManagedHandle, InAddress, SetHelper, Class, MANAGED_HANDLE_FROM_OBJECT(Object));
 	}
 
-	return Object;
+	return IManagedHandleToIManagedObject(Object);
 }
 
-MonoObject* FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
+IManagedObject FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
 	const auto Object = Class->NewObject();
 
@@ -59,5 +59,5 @@ MonoObject* FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCo
 
 	FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Class, Object);
 
-	return Object;
+	return IManagedHandleToIManagedObject(Object);
 }

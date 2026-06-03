@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 class FGeneratorCore
 {
@@ -20,6 +20,18 @@ public:
 	static FString GetSetAccessorParamName(FProperty* Property);
 
 	static bool IsPrimitiveProperty(FProperty* Property);
+
+	static FString GetReturn(FProperty* InProperty, const FString& InPropertyType, const FString& InBuffer);
+
+	static FString GetReturn(bool bIsPrimitive, const FString& InPropertyType, const FString& InBuffer);
+
+	static FString GetOutParam(FProperty* InProperty, const FString& InName,
+	                           const FString& InPropertyType, const FString& InBuffer,
+	                           const FString& InOffset, const FString& InIndent);
+
+	static FString GetOutParam(bool bIsPrimitive, const FString& InName,
+	                           const FString& InPropertyType, const FString& InBuffer,
+	                           const FString& InOffset, const FString& InIndent);
 
 	static FString GetParamName(FProperty* Property);
 

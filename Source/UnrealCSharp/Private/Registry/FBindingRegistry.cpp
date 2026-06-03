@@ -1,4 +1,6 @@
-﻿#include "Registry/FBindingRegistry.h"
+#include "Registry/FBindingRegistry.h"
+#include "Domain/Script/IManagedHandle.h"
+#include "Domain/FDomain.h"
 
 FBindingRegistry::FBindingRegistry()
 {
@@ -16,9 +18,11 @@ void FBindingRegistry::Initialize()
 
 void FBindingRegistry::Deinitialize()
 {
-	for (auto& [Key, Value] : GarbageCollectionHandle2BindingAddress.Get())
+	for (auto& [Key, Value] : ManagedHandle2BindingAddress.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 
 		if (Value.bNeedFree)
 		{
@@ -28,28 +32,33 @@ void FBindingRegistry::Deinitialize()
 		}
 	}
 
-	GarbageCollectionHandle2BindingAddress.Empty();
+	ManagedHandle2BindingAddress.Empty();
 
-	BindingAddress2GarbageCollectionHandle.Empty();
+	BindingAddress2ManagedHandle.Empty();
 }
 
-MonoObject* FBindingRegistry::GetObject(const FBindingValueMapping::FAddressType InAddress)
+IManagedHandle FBindingRegistry::GetObject(const FBindingValueMapping::FAddressType InAddress)
 {
-	const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find(InAddress);
+	const auto FoundManagedHandle = BindingAddress2ManagedHandle.Find(InAddress);
 
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
-}
-
-bool FBindingRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
-{
-	if (const auto FoundValue = GarbageCollectionHandle2BindingAddress.Find(InGarbageCollectionHandle))
+	if (FoundManagedHandle == nullptr)
 	{
-		if (const auto FoundGarbageCollectionHandle = BindingAddress2GarbageCollectionHandle.Find(
+		return InvalidManagedHandle;
+	}
+
+	return FDomain::GCHandle_Get_Target(*FoundManagedHandle);
+}
+
+bool FBindingRegistry::RemoveReference(const IManagedHandle InManagedHandle)
+{
+	if (const auto FoundValue = ManagedHandle2BindingAddress.Find(InManagedHandle))
+	{
+		if (const auto FoundManagedHandle = BindingAddress2ManagedHandle.Find(
 			FoundValue->AddressWrapper->Value))
 		{
-			if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+			if (*FoundManagedHandle == InManagedHandle)
 			{
-				BindingAddress2GarbageCollectionHandle.Remove(FoundValue->AddressWrapper->Value);
+				BindingAddress2ManagedHandle.Remove(FoundValue->AddressWrapper->Value);
 			}
 		}
 
@@ -60,7 +69,7 @@ bool FBindingRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbage
 			FoundValue->AddressWrapper = nullptr;
 		}
 
-		GarbageCollectionHandle2BindingAddress.Remove(InGarbageCollectionHandle);
+		ManagedHandle2BindingAddress.Remove(InManagedHandle);
 
 		return true;
 	}

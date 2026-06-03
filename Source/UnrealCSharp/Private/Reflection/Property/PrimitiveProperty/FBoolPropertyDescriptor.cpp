@@ -1,4 +1,4 @@
-﻿#include "Reflection/Property/PrimitiveProperty/FBoolPropertyDescriptor.h"
+#include "Reflection/Property/PrimitiveProperty/FBoolPropertyDescriptor.h"
 
 void FBoolPropertyDescriptor::Set(void* Src, void* Dest) const
 {

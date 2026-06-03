@@ -1,4 +1,4 @@
-﻿#include "FEnumGenerator.h"
+#include "FEnumGenerator.h"
 #include "FGeneratorCore.h"
 #include "Engine/UserDefinedEnum.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"

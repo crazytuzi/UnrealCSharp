@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #define STD_CPP_11 __cplusplus >= 201103L
 

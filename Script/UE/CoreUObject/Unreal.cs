@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Script.Engine;
 using Script.Library;
 using Script.UMG;

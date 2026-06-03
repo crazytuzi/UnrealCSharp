@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Property/TCompoundPropertyDescriptor.inl"
 
@@ -20,7 +20,7 @@ protected:
 	virtual const FMulticastScriptDelegate* GetMulticastDelegate(void* InAddress) const;
 
 private:
-	MonoObject* NewRef(void* InAddress) const;
+	IManagedObject NewRef(void* InAddress) const;
 
-	MonoObject* NewWeakRef(void* InAddress) const;
+	IManagedObject NewWeakRef(void* InAddress) const;
 };

@@ -1,4 +1,4 @@
-﻿#include "Binding/Class/FClassBuilder.h"
+#include "Binding/Class/FClassBuilder.h"
 #include "Binding/FBinding.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Algo/Count.h"

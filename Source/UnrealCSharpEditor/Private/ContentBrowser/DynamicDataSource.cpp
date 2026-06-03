@@ -1,4 +1,4 @@
-﻿#include "ContentBrowser/DynamicDataSource.h"
+#include "ContentBrowser/DynamicDataSource.h"
 #include "CollectionManagerModule.h"
 #include "ContentBrowserDataUtils.h"
 #include "ContentBrowserItemPath.h"

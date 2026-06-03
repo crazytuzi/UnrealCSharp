@@ -1,4 +1,4 @@
-﻿#include "ContentBrowser/DynamicFileItemDataPayload.h"
+#include "ContentBrowser/DynamicFileItemDataPayload.h"
 #include "ContentBrowserDataSource.h"
 
 FDynamicFileItemDataPayload::FDynamicFileItemDataPayload(const FName& InInternalPath, UClass* InClass):

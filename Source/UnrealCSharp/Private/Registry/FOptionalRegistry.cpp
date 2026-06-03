@@ -1,4 +1,6 @@
 #include "Registry/FOptionalRegistry.h"
+#include "Domain/Script/IManagedHandle.h"
+#include "Domain/FDomain.h"
 
 #if UE_F_OPTIONAL_PROPERTY
 FOptionalRegistry::FOptionalRegistry()
@@ -17,7 +19,7 @@ void FOptionalRegistry::Initialize()
 
 void FOptionalRegistry::Deinitialize()
 {
-	for (auto& [Key, Value] : OptionalGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : ManagedHandle2Helper.Get())
 	{
 		if (Value != nullptr)
 		{
@@ -26,45 +28,47 @@ void FOptionalRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 	}
 
-	OptionalGarbageCollectionHandle2Helper.Empty();
+	ManagedHandle2Helper.Empty();
 
-	OptionalAddress2GarbageCollectionHandle.Empty();
+	Address2ManagedHandle.Empty();
 }
 
-FOptionalHelper* FOptionalRegistry::GetOptional(const FGarbageCollectionHandle& InGarbageCollectionHandle)
+FOptionalHelper* FOptionalRegistry::GetOptional(const IManagedHandle InManagedHandle)
 {
-	const auto FoundValue = OptionalGarbageCollectionHandle2Helper.Find(InGarbageCollectionHandle);
+	const auto FoundValue = ManagedHandle2Helper.Find(InManagedHandle);
 
 	return FoundValue != nullptr ? *FoundValue : nullptr;
 }
 
-MonoObject* FOptionalRegistry::GetObject(const FOptionalHelperValueMapping::FAddressType& InAddress)
+IManagedHandle FOptionalRegistry::GetObject(const FOptionalHelperValueMapping::FAddressType& InAddress)
 {
-	const auto FoundGarbageCollectionHandle = OptionalAddress2GarbageCollectionHandle.Find(InAddress);
+	const auto FoundManagedHandle = Address2ManagedHandle.Find(InAddress);
 
-	return FoundGarbageCollectionHandle != nullptr
-		       ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle)
-		       : nullptr;
+	return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
 }
 
-bool FOptionalRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
+bool FOptionalRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 {
-	if (const auto FoundValue = OptionalGarbageCollectionHandle2Helper.Find(InGarbageCollectionHandle))
+	if (const auto FoundValue = ManagedHandle2Helper.Find(InManagedHandle))
 	{
-		if (const auto FoundGarbageCollectionHandle = OptionalAddress2GarbageCollectionHandle.Find(*FoundValue))
+		const auto Address = (*FoundValue)->GetAddress();
+
+		if (const auto FoundManagedHandle = Address2ManagedHandle.Find(Address))
 		{
-			if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+			if (*FoundManagedHandle == InManagedHandle)
 			{
-				OptionalAddress2GarbageCollectionHandle.Remove(*FoundValue);
+				Address2ManagedHandle.Remove(Address);
 			}
 		}
 
 		delete *FoundValue;
 
-		OptionalGarbageCollectionHandle2Helper.Remove(InGarbageCollectionHandle);
+		ManagedHandle2Helper.Remove(InManagedHandle);
 
 		return true;
 	}

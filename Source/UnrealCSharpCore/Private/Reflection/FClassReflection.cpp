@@ -1,33 +1,39 @@
-﻿#include "Reflection/FClassReflection.h"
+#include "Reflection/FClassReflection.h"
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/ClassMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/PropertyMacro.h"
+#include "Domain/Mono/FMonoDomain.h"
+#include "Domain/Script/IScriptDomain.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "Template/TGetArrayLength.inl"
 
-FClassReflection::FClassReflection(MonoClass* InClass, const FString& InName):
+#define FREE_PARAM(InIndex)\
+	ScriptDomain->Free(Params[InIndex]); \
+	Params[InIndex] = InvalidManagedHandle;
+
+FClassReflection::FClassReflection(const IManagedClass InManagedClass, const FString& InName):
 	FReflection(InName),
-	Class(InClass)
+	ManagedClass(InManagedClass)
 {
-	const auto Type = FMonoDomain::Class_Get_Type(Class);
+#if WITH_MONO
+	const auto Type = FMonoDomain::Class_Get_Type(ManagedClass);
 
-	ReflectionType = FMonoDomain::Type_Get_Object(Type);
-
-	Initialize();
+	ManagedReflectionType = FMonoDomain::Type_Get_Object(Type);
+#endif
 }
 
-FClassReflection::FClassReflection(MonoReflectionType* InReflectionType)
+#if WITH_MONO
+FClassReflection::FClassReflection(const IManagedReflectionType InManagedReflectionType)
 {
-	ReflectionType = InReflectionType;
+	ManagedReflectionType = InManagedReflectionType;
 
-	const auto Type = FMonoDomain::Reflection_Type_Get_Type(ReflectionType);
+	const auto Type = FMonoDomain::Reflection_Type_Get_Type(ManagedReflectionType);
 
-	Class = FMonoDomain::Class_From_Type(Type);
-
-	Initialize();
+	ManagedClass = FMonoDomain::Class_From_Type(Type);
 }
+#endif
 
 FClassReflection::~FClassReflection()
 {
@@ -36,91 +42,87 @@ FClassReflection::~FClassReflection()
 
 void FClassReflection::Initialize()
 {
-	if (Class != nullptr)
-	{
-		VTable = FMonoDomain::Class_VTable(Class);
-	}
+#if WITH_MONO
+	IManagedReflectionType OutTypeDefinition{};
 
-	MonoReflectionType* OutTypeDefinition{};
+	IManagedString OutName{};
 
-	MonoString* OutName{};
+	IManagedString OutNameSpace{};
 
-	MonoString* OutNameSpace{};
+	IManagedString OutPathName{};
 
-	MonoString* OutPathName{};
+	IManagedReflectionType OutParent{};
 
-	MonoReflectionType* OutParent{};
-
-	MonoReflectionType* OutUnderlyingType{};
+	IManagedReflectionType OutUnderlyingType{};
 
 	int32 OutGenericArgumentLength{};
 
-	MonoArray* OutGenericArguments{};
+	IManagedArray OutGenericArguments{};
 
 	int32 OutInterfaceLength{};
 
-	MonoArray* OutInterfaces{};
+	IManagedArray OutInterfaces{};
 
 	int32 OutClassAttributeLength{};
 
-	MonoArray* OutClassAttributes{};
+	IManagedArray OutClassAttributes{};
 
-	MonoArray* OutClassAttributeValueLength{};
+	IManagedArray OutClassAttributeValueLength{};
 
-	MonoArray* OutClassAttributeValues{};
+	IManagedArray OutClassAttributeValues{};
 
 	int32 OutPropertyLength{};
 
-	MonoArray* OutPropertyNames{};
+	IManagedArray OutPropertyNames{};
 
-	MonoArray* OutPropertyInfos{};
+	IManagedArray OutPropertyInfos{};
 
-	MonoArray* OutPropertyTypes{};
+	IManagedArray OutPropertyTypes{};
 
-	MonoArray* OutPropertyAttributeCounts{};
+	IManagedArray OutPropertyAttributeCounts{};
 
-	MonoArray* OutPropertyAttributes{};
+	IManagedArray OutPropertyAttributes{};
 
-	MonoArray* OutPropertyAttributeValueCounts{};
+	IManagedArray OutPropertyAttributeValueCounts{};
 
-	MonoArray* OutPropertyAttributeValues{};
+	IManagedArray OutPropertyAttributeValues{};
 
 	int32 OutFieldLength{};
 
-	MonoArray* OutFieldNames{};
+	IManagedArray OutFieldNames{};
 
-	MonoArray* OutFieldInfos{};
+	IManagedArray OutFieldInfos{};
 
 	int32 OutMethodLength{};
 
-	MonoArray* OutMethodNames{};
+	IManagedArray OutMethodNames{};
 
-	MonoArray* OutMethodInfos{};
+	IManagedArray OutMethodInfos{};
 
-	MonoArray* OutMethodIsStatics{};
+	IManagedArray OutMethodIsStatics{};
 
-	MonoArray* OutMethodParamCounts{};
+	IManagedArray OutMethodParamCounts{};
 
-	MonoArray* OutMethodReturnTypes{};
+	IManagedArray OutMethodReturnTypes{};
 
-	MonoArray* OutMethodParamIndex{};
+	IManagedArray OutMethodParamIndex{};
 
-	MonoArray* OutMethodParamNames{};
+	IManagedArray OutMethodParamNames{};
 
-	MonoArray* OutMethodParamTypes{};
+	IManagedArray OutMethodParamTypes{};
 
-	MonoArray* OutMethodParamRefs{};
+	IManagedArray OutMethodParamRefs{};
 
-	MonoArray* OutMethodAttributeCounts{};
+	IManagedArray OutMethodAttributeCounts{};
 
-	MonoArray* OutMethodAttributes{};
+	IManagedArray OutMethodAttributes{};
 
-	MonoArray* OutMethodAttributeValueCounts{};
+	IManagedArray OutMethodAttributeValueCounts{};
 
-	MonoArray* OutMethodAttributeValues{};
+	IManagedArray OutMethodAttributeValues{};
 
 	void* InParams[42] = {
-		ReflectionType,
+		ManagedReflectionType,
 		&OutTypeDefinition,
 		&OutName,
 		&OutNameSpace,
@@ -183,12 +185,12 @@ void FClassReflection::Initialize()
 			if (const auto GetTypesWithAttributeMethod = UtilsClass->GetMethod(
 				FUNCTION_UTILS_GET_CLASS_REFLECTION, TGetArrayLength(InParams)))
 			{
-				GetTypesWithAttributeMethod->Runtime_Invoke(nullptr, InParams);
+				GetTypesWithAttributeMethod->Runtime_Invoke(InvalidManagedHandle, InParams);
 			}
 		}
 	}
 
-	if (OutTypeDefinition != ReflectionType)
+	if (OutTypeDefinition != ManagedReflectionType)
 	{
 		TypeDefinition = FReflectionRegistry::Get().GetClass(OutTypeDefinition);
 	}
@@ -197,203 +199,607 @@ void FClassReflection::Initialize()
 		TypeDefinition = this;
 	}
 
-	Name = FString(FMonoDomain::String_To_UTF8(OutName));
+	Name = FMonoDomain::String_To_UTF8(OutName);
 
-	NameSpace = FString(FMonoDomain::String_To_UTF8(OutNameSpace));
+	NameSpace = FMonoDomain::String_To_UTF8(OutNameSpace);
 
-	PathName = FString(FMonoDomain::String_To_UTF8(OutPathName));
+	PathName = FMonoDomain::String_To_UTF8(OutPathName);
 
 	if (Name != CLASS_UTILS && OutParent != nullptr)
 	{
 		Parent = FReflectionRegistry::Get().GetClass(OutParent);
 	}
 
-	if (OutUnderlyingType != nullptr)
+	if (IManagedIsValid(OutUnderlyingType))
 	{
 		UnderlyingType = FReflectionRegistry::Get().GetClass(OutUnderlyingType);
 	}
 
-	for (auto GenericArgumentIndex = 0; GenericArgumentIndex < OutGenericArgumentLength; ++GenericArgumentIndex)
+	if (bIsClass || bIsEnum)
 	{
-		GenericArguments.Add(FReflectionRegistry::Get().GetClass(
-			FMonoDomain::Array_Get<MonoReflectionType*>(OutGenericArguments, GenericArgumentIndex)));
-	}
-
-	for (auto InterfaceIndex = 0; InterfaceIndex < OutInterfaceLength; ++InterfaceIndex)
-	{
-		Interfaces.Add(FReflectionRegistry::Get().GetClass(
-			FMonoDomain::Array_Get<MonoReflectionType*>(OutInterfaces, InterfaceIndex)));
-	}
-
-	auto ClassAttributeIndex = 0;
-
-	for (auto AttributeIndex = 0; AttributeIndex < OutClassAttributeLength; ++AttributeIndex)
-	{
-		const auto Attribute = FReflectionRegistry::Get().GetClass(
-			FMonoDomain::Array_Get<MonoReflectionType*>(OutClassAttributes, AttributeIndex));
-
-		Attributes.Add(Attribute);
-
-		const auto AttributeValueCount = FMonoDomain::Array_Get<int32>(
-			OutClassAttributeValueLength, AttributeIndex);
-
-		for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
+		for (auto GenericArgumentIndex = 0; GenericArgumentIndex < OutGenericArgumentLength; ++GenericArgumentIndex)
 		{
-			AttributeValues.FindOrAdd(Attribute).Add(FString(
-				FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutClassAttributeValues,
-					ClassAttributeIndex + AttributeValueIndex))));
+			GenericArguments.Add(FReflectionRegistry::Get().GetClass(
+				FMonoDomain::Array_Get<IManagedReflectionType>(OutGenericArguments, GenericArgumentIndex)));
 		}
 
-		ClassAttributeIndex += AttributeValueCount;
-	}
+		for (auto InterfaceIndex = 0; InterfaceIndex < OutInterfaceLength; ++InterfaceIndex)
+		{
+			Interfaces.Add(FReflectionRegistry::Get().GetClass(
+				FMonoDomain::Array_Get<IManagedReflectionType>(OutInterfaces, InterfaceIndex)));
+		}
 
-	if (Name != CLASS_UTILS)
-	{
-		bIsOverride = HasAttribute(FReflectionRegistry::Get().GetOverrideAttributeClass()) ||
-			HasAttribute(FReflectionRegistry::Get().GetUClassAttributeClass());
-	}
+		auto ClassAttributeIndex = 0;
 
-	auto PropertyAttributeIndex = 0;
-
-	auto PropertyAttributeValueIndex = 0;
-
-	for (auto PropertyIndex = 0; PropertyIndex < OutPropertyLength; ++PropertyIndex)
-	{
-		auto PropertyName = FString(
-			FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutPropertyNames, PropertyIndex)));
-
-		auto AttributeCount = FMonoDomain::Array_Get<int32>(OutPropertyAttributeCounts, PropertyIndex);
-
-		TSet<FClassReflection*> PropertyAttributes;
-
-		TMap<FClassReflection*, TArray<FString>> PropertyAttributeValues;
-
-		for (auto AttributeIndex = 0; AttributeIndex < AttributeCount; ++AttributeIndex)
+		for (auto AttributeIndex = 0; AttributeIndex < OutClassAttributeLength; ++AttributeIndex)
 		{
 			const auto Attribute = FReflectionRegistry::Get().GetClass(
-				FMonoDomain::Array_Get<MonoReflectionType*>(
-					OutPropertyAttributes, PropertyAttributeIndex + AttributeIndex));
+				FMonoDomain::Array_Get<IManagedReflectionType>(OutClassAttributes, AttributeIndex));
 
-			PropertyAttributes.Add(Attribute);
+			Attributes.Add(Attribute);
 
-			auto AttributeValueCount = FMonoDomain::Array_Get<int32>(
-				OutPropertyAttributeValueCounts, PropertyAttributeIndex + AttributeIndex);
+			const auto AttributeValueCount = FMonoDomain::Array_Get<int32>(
+				OutClassAttributeValueLength, AttributeIndex);
 
 			for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
 			{
-				PropertyAttributeValues.FindOrAdd(Attribute).Add(FString(FMonoDomain::String_To_UTF8(
-					FMonoDomain::Array_Get<MonoString*>(
-						OutPropertyAttributeValues, PropertyAttributeValueIndex + AttributeValueIndex))));
+				AttributeValues.FindOrAdd(Attribute).Add(
+					FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<IManagedString>(OutClassAttributeValues,
+						ClassAttributeIndex + AttributeValueIndex)));
 			}
 
-			PropertyAttributeValueIndex += AttributeValueCount;
+			ClassAttributeIndex += AttributeValueCount;
 		}
 
-		PropertyAttributeIndex += AttributeCount;
-
-		Properties.Add(PropertyName,
-		               new FPropertyReflection(PropertyName,
-		                                       FMonoDomain::Array_Get<MonoReflectionProperty*>(
-			                                       OutPropertyInfos, PropertyIndex),
-		                                       FMonoDomain::Array_Get<MonoReflectionType*>(
-			                                       OutPropertyTypes, PropertyIndex),
-		                                       PropertyAttributes, PropertyAttributeValues));
-	}
-
-	for (auto FieldIndex = 0; FieldIndex < OutFieldLength; ++FieldIndex)
-	{
-		auto FieldName = FString(
-			FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutFieldNames, FieldIndex)));
-
-		Fields.Add(FieldName,
-		           new FFieldReflection(FieldName,
-		                                FMonoDomain::Array_Get<MonoReflectionField*>(OutFieldInfos, FieldIndex)
-		           ));
-	}
-
-	auto MethodAttributeIndex = 0;
-
-	auto MethodAttributeValueIndex = 0;
-
-	for (auto MethodIndex = 0; MethodIndex < OutMethodLength; ++MethodIndex)
-	{
-		auto MethodName = FString(
-			FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<MonoString*>(OutMethodNames, MethodIndex)));
-
-		auto MethodParamCount = FMonoDomain::Array_Get<int32>(OutMethodParamCounts, MethodIndex);
-
-		auto AttributeCount = FMonoDomain::Array_Get<int32>(OutMethodAttributeCounts, MethodIndex);
-
-		TSet<FClassReflection*> MethodAttributes;
-
-		TMap<FClassReflection*, TArray<FString>> MethodAttributeValue;
-
-		for (auto AttributeIndex = 0; AttributeIndex < AttributeCount; ++AttributeIndex)
+		if (Name != CLASS_UTILS)
 		{
-			const auto Attribute = FReflectionRegistry::Get().GetClass(
-				FMonoDomain::Array_Get<MonoReflectionType*>(
-					OutMethodAttributes, MethodAttributeIndex + AttributeIndex));
-
-			MethodAttributes.Add(Attribute);
-
-			auto AttributeValueCount = FMonoDomain::Array_Get<int32>(
-				OutMethodAttributeValueCounts, MethodAttributeIndex + AttributeIndex);
-
-			for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
-			{
-				MethodAttributeValue.FindOrAdd(Attribute).Add(FString(FMonoDomain::String_To_UTF8(
-					FMonoDomain::Array_Get<MonoString*>(
-						OutMethodAttributeValues, MethodAttributeValueIndex + AttributeValueIndex))));
-			}
-
-			MethodAttributeValueIndex += AttributeValueCount;
+			bIsOverride = HasAttribute(FReflectionRegistry::Get().GetOverrideAttributeClass()) ||
+				HasAttribute(FReflectionRegistry::Get().GetUClassAttributeClass());
 		}
 
-		MethodAttributeIndex += AttributeCount;
+		auto PropertyAttributeIndex = 0;
 
-		auto bIsUFunction = MethodAttributes.Contains(
-			FReflectionRegistry::Get().GetUFunctionAttributeClass());
+		auto PropertyAttributeValueIndex = 0;
 
-		auto bMethodIsStatic = false;
-
-		MonoReflectionType* ReturnType{};
-
-		TArray<FParamReflection*> ParamReflections;
-
-		if (bIsUFunction)
+		for (auto PropertyIndex = 0; PropertyIndex < OutPropertyLength; ++PropertyIndex)
 		{
-			bMethodIsStatic = FMonoDomain::Array_Get<bool>(OutMethodIsStatics, MethodIndex);
+			auto PropertyName =
+				FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<IManagedString>(OutPropertyNames, PropertyIndex));
 
-			ReturnType = FMonoDomain::Array_Get<MonoReflectionType*>(OutMethodReturnTypes, MethodIndex);
+			auto AttributeCount = FMonoDomain::Array_Get<int32>(OutPropertyAttributeCounts, PropertyIndex);
 
-			const auto MethodParamIndex = FMonoDomain::Array_Get<int32>(OutMethodParamIndex, MethodIndex);
+			TSet<FClassReflection*> PropertyAttributes;
 
-			ParamReflections.Init(nullptr, MethodParamCount);
+			TMap<FClassReflection*, TArray<FString>> PropertyAttributeValues;
 
-			for (auto ParamIndex = 0; ParamIndex < MethodParamCount; ++ParamIndex)
+			for (auto AttributeIndex = 0; AttributeIndex < AttributeCount; ++AttributeIndex)
 			{
-				auto ParamName = FString(FMonoDomain::String_To_UTF8(
-					FMonoDomain::Array_Get<MonoString*>(OutMethodParamNames, MethodParamIndex + ParamIndex)));
+				const auto Attribute = FReflectionRegistry::Get().GetClass(
+					FMonoDomain::Array_Get<IManagedReflectionType>(
+						OutPropertyAttributes, PropertyAttributeIndex + AttributeIndex));
 
-				ParamReflections[ParamIndex] = new FParamReflection(
-					ParamName,
-					FMonoDomain::Array_Get<bool>(OutMethodParamRefs, MethodParamIndex + ParamIndex),
-					FMonoDomain::Array_Get<MonoReflectionType*>(OutMethodParamTypes, MethodParamIndex + ParamIndex));
+				PropertyAttributes.Add(Attribute);
+
+				auto AttributeValueCount = FMonoDomain::Array_Get<int32>(
+					OutPropertyAttributeValueCounts, PropertyAttributeIndex + AttributeIndex);
+
+				for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
+				{
+					PropertyAttributeValues.FindOrAdd(Attribute).Add(FMonoDomain::String_To_UTF8(
+						FMonoDomain::Array_Get<IManagedString>(
+							OutPropertyAttributeValues, PropertyAttributeValueIndex + AttributeValueIndex)));
+				}
+
+				PropertyAttributeValueIndex += AttributeValueCount;
 			}
+
+			PropertyAttributeIndex += AttributeCount;
+
+			Properties.Add(PropertyName,
+			               new FPropertyReflection(PropertyName,
+			                                       FMonoDomain::Array_Get<IManagedReflectionProperty>(
+				                                       OutPropertyInfos, PropertyIndex),
+			                                       FReflectionRegistry::Get().GetClass(
+				                                       FMonoDomain::Array_Get<IManagedReflectionType>(
+					                                       OutPropertyTypes, PropertyIndex)),
+			                                       PropertyAttributes, PropertyAttributeValues));
 		}
 
-		Methods.Add({MethodName, MethodParamCount},
-		            new FMethodReflection(MethodName,
-		                                  FMonoDomain::Array_Get<int32>(OutMethodParamCounts, MethodIndex),
-		                                  FMonoDomain::Array_Get<MonoReflectionMethod*>(OutMethodInfos, MethodIndex),
-		                                  bMethodIsStatic,
-		                                  ReturnType
-			                                  ? FReflectionRegistry::Get().GetClass(ReturnType)
-			                                  : nullptr,
-		                                  ParamReflections,
-		                                  MethodAttributes,
-		                                  MethodAttributeValue));
+		for (auto FieldIndex = 0; FieldIndex < OutFieldLength; ++FieldIndex)
+		{
+			auto FieldName =
+				FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<IManagedString>(OutFieldNames, FieldIndex));
+
+			Fields.Add(FieldName,
+			           new FFieldReflection(FieldName,
+			                                FMonoDomain::Array_Get<IManagedReflectionField>(OutFieldInfos, FieldIndex)
+			           ));
+		}
+
+		auto MethodAttributeIndex = 0;
+
+		auto MethodAttributeValueIndex = 0;
+
+		for (auto MethodIndex = 0; MethodIndex < OutMethodLength; ++MethodIndex)
+		{
+			auto MethodName =
+				FMonoDomain::String_To_UTF8(FMonoDomain::Array_Get<IManagedString>(OutMethodNames, MethodIndex));
+
+			auto MethodParamCount = FMonoDomain::Array_Get<int32>(OutMethodParamCounts, MethodIndex);
+
+			auto AttributeCount = FMonoDomain::Array_Get<int32>(OutMethodAttributeCounts, MethodIndex);
+
+			TSet<FClassReflection*> MethodAttributes;
+
+			TMap<FClassReflection*, TArray<FString>> MethodAttributeValue;
+
+			for (auto AttributeIndex = 0; AttributeIndex < AttributeCount; ++AttributeIndex)
+			{
+				const auto Attribute = FReflectionRegistry::Get().GetClass(
+					FMonoDomain::Array_Get<IManagedReflectionType>(
+						OutMethodAttributes, MethodAttributeIndex + AttributeIndex));
+
+				MethodAttributes.Add(Attribute);
+
+				auto AttributeValueCount = FMonoDomain::Array_Get<int32>(
+					OutMethodAttributeValueCounts, MethodAttributeIndex + AttributeIndex);
+
+				for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
+				{
+					MethodAttributeValue.FindOrAdd(Attribute).Add(FMonoDomain::String_To_UTF8(
+						FMonoDomain::Array_Get<IManagedString>(
+							OutMethodAttributeValues, MethodAttributeValueIndex + AttributeValueIndex)));
+				}
+
+				MethodAttributeValueIndex += AttributeValueCount;
+			}
+
+			MethodAttributeIndex += AttributeCount;
+
+			auto bIsUFunction = MethodAttributes.Contains(
+				FReflectionRegistry::Get().GetUFunctionAttributeClass());
+
+			auto bMethodIsStatic = false;
+
+			FClassReflection* ReturnType{};
+
+			TArray<FParamReflection*> ParamReflections;
+
+			if (bIsUFunction)
+			{
+				bMethodIsStatic = FMonoDomain::Array_Get<bool>(OutMethodIsStatics, MethodIndex);
+
+				ReturnType = FReflectionRegistry::Get().GetClass(
+					FMonoDomain::Array_Get<IManagedReflectionType>(OutMethodReturnTypes, MethodIndex));
+
+				const auto MethodParamIndex = FMonoDomain::Array_Get<int32>(OutMethodParamIndex, MethodIndex);
+
+				ParamReflections.Init(nullptr, MethodParamCount);
+
+				for (auto ParamIndex = 0; ParamIndex < MethodParamCount; ++ParamIndex)
+				{
+					auto ParamName = FMonoDomain::String_To_UTF8(
+						FMonoDomain::Array_Get<IManagedString>(OutMethodParamNames, MethodParamIndex + ParamIndex));
+
+					ParamReflections[ParamIndex] = new FParamReflection(
+						ParamName,
+						FMonoDomain::Array_Get<bool>(OutMethodParamRefs, MethodParamIndex + ParamIndex),
+						FReflectionRegistry::Get().GetClass(
+							FMonoDomain::Array_Get<IManagedReflectionType>(
+								OutMethodParamTypes, MethodParamIndex + ParamIndex)));
+				}
+			}
+
+			Methods.Add({MethodName, MethodParamCount},
+			            new FMethodReflection(MethodName,
+			                                  FMonoDomain::Array_Get<int32>(OutMethodParamCounts, MethodIndex),
+			                                  FMonoDomain::Array_Get<IManagedReflectionMethod>(
+				                                  OutMethodInfos, MethodIndex),
+			                                  bMethodIsStatic,
+			                                  ReturnType,
+			                                  ParamReflections,
+			                                  MethodAttributes,
+			                                  MethodAttributeValue));
+		}
 	}
+#else
+	if (IManagedIsValid(ManagedClass))
+	{
+		if (const auto ScriptDomain = IScriptDomain::Get())
+		{
+			constexpr auto ParamCount = 42;
+
+			IManagedHandle Params[ParamCount];
+
+			Params[0] = MANAGED_HANDLE_FROM_OBJECT(ManagedClass);
+
+			for (auto Index = 1; Index < ParamCount; ++Index)
+			{
+				Params[Index] = InvalidManagedHandle;
+			}
+
+			if (const auto UtilsClass = ScriptDomain->GetClass(
+					COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
+				IManagedIsValid(UtilsClass))
+			{
+				if (const auto Method = ScriptDomain->GetMethod(
+						UtilsClass, FUNCTION_UTILS_GET_CLASS_REFLECTION, ParamCount);
+					IManagedIsValid(Method))
+				{
+					void* MethodParams[ParamCount];
+
+					for (auto Index = 0; Index < ParamCount; ++Index)
+					{
+						MethodParams[Index] = &Params[Index];
+					}
+
+					ScriptDomain->Invoke(INVALID_MANAGED, Method, ParamCount, MethodParams);
+				}
+			}
+
+			auto GetBool = [&](const int32 InIndex) -> bool
+			{
+				return Params[InIndex].Value != 0;
+			};
+
+			auto GetInt32 = [&](const int32 InIndex) -> int32
+			{
+				return static_cast<int32>(Params[InIndex].Value);
+			};
+
+			auto GetString = [&](const int32 InIndex) -> FString
+			{
+				if (IManagedIsValid(Params[InIndex]))
+				{
+					auto Result = ScriptDomain->StringToFString(Params[InIndex]);
+
+					FREE_PARAM(InIndex)
+
+					return Result;
+				}
+
+				return {};
+			};
+
+			auto GetClass = [&](const int32 InIndex) -> FClassReflection*
+			{
+				if (IManagedIsValid(Params[InIndex]))
+				{
+					const auto Result = FReflectionRegistry::Get().GetClass(
+						IManagedHandleToIManagedClass(Params[InIndex]));
+
+					Params[InIndex] = InvalidManagedHandle;
+
+					return Result;
+				}
+
+				return {};
+			};
+
+			auto ArrayGetBool = [&](const IManagedHandle InManagedHandle, const int32 Index) -> bool
+			{
+				if (const auto ManagedHandle = ScriptDomain->ArrayGetRef(
+						IManagedHandleToIManagedArray(InManagedHandle), Index);
+					IManagedIsValid(InManagedHandle))
+				{
+					const auto Result = *static_cast<bool*>(ScriptDomain->UnboxValue(ManagedHandle));
+
+					ScriptDomain->Free(ManagedHandle);
+
+					return Result;
+				}
+
+				return {};
+			};
+
+			auto ArrayGetInt32 = [&](const IManagedHandle InManagedHandle, const int32 Index) -> int32
+			{
+				if (const auto ManagedHandle = ScriptDomain->ArrayGetRef(
+						IManagedHandleToIManagedArray(InManagedHandle), Index);
+					IManagedIsValid(InManagedHandle))
+				{
+					const auto Result = *static_cast<int32*>(ScriptDomain->UnboxValue(ManagedHandle));
+
+					ScriptDomain->Free(ManagedHandle);
+
+					return Result;
+				}
+
+				return {};
+			};
+
+			auto ArrayGetRef = [&](const IManagedHandle InManagedHandle, const int32 InIndex) -> IManagedHandle
+			{
+				return ScriptDomain->ArrayGetRef(IManagedHandleToIManagedArray(InManagedHandle), InIndex);
+			};
+
+			auto ArrayGetString = [&](const IManagedHandle InManagedHandle, const int32 Index) -> FString
+			{
+				if (const auto ManagedHandle = ArrayGetRef(InManagedHandle, Index);
+					IManagedIsValid(InManagedHandle))
+				{
+					return ScriptDomain->StringToFString(ManagedHandle);
+				}
+
+				return {};
+			};
+
+			auto ArrayGetClass = [&](const IManagedHandle InManagedHandle, const int32 Index) -> FClassReflection*
+			{
+				if (const auto ManagedHandle = ArrayGetRef(InManagedHandle, Index);
+					IManagedIsValid(InManagedHandle))
+				{
+					return FReflectionRegistry::Get().GetClass(IManagedHandleToIManagedClass(ManagedHandle));
+				}
+
+				return {};
+			};
+
+			if (auto Class = GetClass(1))
+			{
+				TypeDefinition = Class;
+			}
+			else
+			{
+				TypeDefinition = this;
+			}
+
+			Name = GetString(2);
+
+			NameSpace = GetString(3);
+
+			PathName = GetString(4);
+
+			if (Name != CLASS_UTILS)
+			{
+				Parent = GetClass(5);
+			}
+			else
+			{
+				FREE_PARAM(5)
+			}
+
+			UnderlyingType = GetClass(6);
+
+			bIsClass = GetBool(7);
+
+			bIsEnum = GetBool(8);
+
+			if (bIsClass || bIsEnum)
+			{
+				for (auto GenericArgumentIndex = 0; GenericArgumentIndex < GetInt32(9); ++GenericArgumentIndex)
+				{
+					GenericArguments.Add(ArrayGetClass(Params[10], GenericArgumentIndex));
+				}
+
+				FREE_PARAM(10)
+
+				for (auto InterfaceIndex = 0; InterfaceIndex < GetInt32(11); ++InterfaceIndex)
+				{
+					Interfaces.Add(ArrayGetClass(Params[12], InterfaceIndex));
+				}
+
+				FREE_PARAM(12)
+
+				auto ClassAttributeIndex = 0;
+
+				for (auto AttributeIndex = 0; AttributeIndex < GetInt32(13); ++AttributeIndex)
+				{
+					const auto Attribute = ArrayGetClass(Params[14], AttributeIndex);
+
+					Attributes.Add(Attribute);
+
+					const auto AttributeValueCount = ArrayGetInt32(Params[15], AttributeIndex);
+
+					for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++AttributeValueIndex)
+					{
+						AttributeValues.FindOrAdd(Attribute).Add(
+							ArrayGetString(Params[16], ClassAttributeIndex + AttributeValueIndex));
+					}
+
+					ClassAttributeIndex += AttributeValueCount;
+				}
+
+				FREE_PARAM(14)
+
+				FREE_PARAM(15)
+
+				FREE_PARAM(16)
+
+				if (Name != CLASS_UTILS)
+				{
+					bIsOverride = HasAttribute(FReflectionRegistry::Get().GetOverrideAttributeClass()) ||
+						HasAttribute(FReflectionRegistry::Get().GetUClassAttributeClass());
+				}
+
+				auto PropertyAttributeIndex = 0;
+
+				auto PropertyAttributeValueIndex = 0;
+
+				for (auto PropertyIndex = 0; PropertyIndex < GetInt32(17); ++PropertyIndex)
+				{
+					auto PropertyName = ArrayGetString(Params[18], PropertyIndex);
+
+					const auto AttributeCount = ArrayGetInt32(Params[21], PropertyIndex);
+
+					TSet<FClassReflection*> PropertyAttributes;
+
+					TMap<FClassReflection*, TArray<FString>> PropertyAttributeValues;
+
+					for (auto AttributeIndex = 0; AttributeIndex < AttributeCount; ++AttributeIndex)
+					{
+						const auto Attribute = ArrayGetClass(Params[22], PropertyAttributeIndex + AttributeIndex);
+
+						PropertyAttributes.Add(Attribute);
+
+						const auto AttributeValueCount = ArrayGetInt32(
+							Params[23], PropertyAttributeIndex + AttributeIndex);
+
+						for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++
+						     AttributeValueIndex)
+						{
+							PropertyAttributeValues.FindOrAdd(Attribute).Add(
+								ArrayGetString(Params[24], PropertyAttributeValueIndex + AttributeValueIndex));
+						}
+
+						PropertyAttributeValueIndex += AttributeValueCount;
+					}
+
+					PropertyAttributeIndex += AttributeCount;
+
+					Properties.Add(PropertyName, new FPropertyReflection(PropertyName,
+					                                                     IManagedHandleToIManagedReflectionProperty(
+						                                                     ArrayGetRef(Params[19], PropertyIndex)),
+					                                                     FReflectionRegistry::Get().GetClass(
+						                                                     IManagedHandleToIManagedClass(
+							                                                     ArrayGetRef(
+								                                                     Params[20], PropertyIndex))),
+					                                                     PropertyAttributes,
+					                                                     PropertyAttributeValues));
+				}
+
+				FREE_PARAM(18)
+
+				FREE_PARAM(19)
+
+				FREE_PARAM(20)
+
+				FREE_PARAM(21)
+
+				FREE_PARAM(22)
+
+				FREE_PARAM(23)
+
+				FREE_PARAM(24)
+
+				for (auto FieldIndex = 0; FieldIndex < GetInt32(25); ++FieldIndex)
+				{
+					auto FieldName = ArrayGetString(Params[26], FieldIndex);
+
+					Fields.Add(FieldName, new FFieldReflection(
+						           FieldName,
+						           IManagedHandleToIManagedReflectionField(ArrayGetRef(Params[27], FieldIndex))));
+				}
+
+				FREE_PARAM(26)
+
+				FREE_PARAM(27)
+
+				auto MethodAttributeIndex = 0;
+
+				auto MethodAttributeValueIndex = 0;
+
+				for (auto MethodIndex = 0; MethodIndex < GetInt32(28); ++MethodIndex)
+				{
+					auto MethodName = ArrayGetString(Params[29], MethodIndex);
+
+					const auto MethodParamCount = ArrayGetInt32(Params[32], MethodIndex);
+
+					const auto AttributeCount = ArrayGetInt32(Params[38], MethodIndex);
+
+					TSet<FClassReflection*> MethodAttributes;
+
+					TMap<FClassReflection*, TArray<FString>> MethodAttributeValue;
+
+					for (auto AttributeIndex = 0; AttributeIndex < AttributeCount; ++AttributeIndex)
+					{
+						const auto Attribute = ArrayGetClass(Params[39], MethodAttributeIndex + AttributeIndex);
+
+						MethodAttributes.Add(Attribute);
+
+						const auto AttributeValueCount = ArrayGetInt32(
+							Params[40], MethodAttributeIndex + AttributeIndex);
+
+						for (auto AttributeValueIndex = 0; AttributeValueIndex < AttributeValueCount; ++
+						     AttributeValueIndex)
+						{
+							MethodAttributeValue.FindOrAdd(Attribute).Add(
+								ArrayGetString(Params[41], MethodAttributeValueIndex + AttributeValueIndex));
+						}
+
+						MethodAttributeValueIndex += AttributeValueCount;
+					}
+
+					MethodAttributeIndex += AttributeCount;
+
+					auto bIsUFunction = MethodAttributes.Contains(
+						FReflectionRegistry::Get().GetUFunctionAttributeClass());
+
+					auto bMethodIsStatic = false;
+
+					FClassReflection* ReturnType{};
+
+					TArray<FParamReflection*> ParamReflections;
+
+					if (bIsUFunction)
+					{
+						bMethodIsStatic = ArrayGetBool(Params[31], MethodIndex);
+
+						if (const auto ManagedHandle = ArrayGetRef(Params[33], MethodIndex);
+							IManagedIsValid(ManagedHandle))
+						{
+							ReturnType = FReflectionRegistry::Get().GetClass(
+								IManagedHandleToIManagedClass(ManagedHandle));
+						}
+
+						const auto MethodParamIndex = ArrayGetInt32(Params[34], MethodIndex);
+
+						ParamReflections.Init(nullptr, MethodParamCount);
+
+						for (auto ParamIndex = 0; ParamIndex < MethodParamCount; ++ParamIndex)
+						{
+							auto ParamName = ArrayGetString(Params[35], MethodParamIndex + ParamIndex);
+
+							ParamReflections[ParamIndex] = new FParamReflection(
+								ParamName,
+								ArrayGetBool(Params[37], MethodParamIndex + ParamIndex),
+								FReflectionRegistry::Get().GetClass(
+									IManagedHandleToIManagedClass(
+										ArrayGetRef(Params[36], MethodParamIndex + ParamIndex))));
+						}
+					}
+
+					Methods.Add({MethodName, MethodParamCount},
+					            new FMethodReflection(MethodName,
+					                                  MethodParamCount,
+					                                  IManagedHandleToIManagedReflectionMethod(
+						                                  ArrayGetRef(Params[30], MethodIndex)),
+					                                  bMethodIsStatic,
+					                                  ReturnType,
+					                                  ParamReflections,
+					                                  MethodAttributes,
+					                                  MethodAttributeValue));
+				}
+
+				FREE_PARAM(29)
+
+				FREE_PARAM(30)
+
+				FREE_PARAM(31)
+
+				FREE_PARAM(32)
+
+				FREE_PARAM(33)
+
+				FREE_PARAM(34)
+
+				FREE_PARAM(35)
+
+				FREE_PARAM(36)
+
+				FREE_PARAM(37)
+
+				FREE_PARAM(38)
+
+				FREE_PARAM(39)
+
+				FREE_PARAM(40)
+
+				FREE_PARAM(41)
+			}
+		}
+	}
+#endif
 }
 
 void FClassReflection::Deinitialize()
@@ -418,22 +824,42 @@ void FClassReflection::Deinitialize()
 	}
 
 	Methods.Empty();
+
+#if WITH_CORECLR
+	if (IManagedIsValid(ManagedClass))
+	{
+		if (const auto ScriptDomain = IScriptDomain::Get())
+		{
+			if (!bIsEnum)
+			{
+				uint32 Value{};
+
+				ScriptDomain->SetFieldStaticValue(ManagedClass,
+				                                  bIsClass
+					                                  ? PROPERTY_STATIC_CLASS_SINGLETON
+					                                  : PROPERTY_STATIC_STRUCT_SINGLETON,
+				                                  &Value);
+			}
+
+			ScriptDomain->Free(MANAGED_HANDLE_FROM_OBJECT(ManagedClass));
+		}
+
+		ManagedClass = INVALID_MANAGED;
+	}
+#endif
 }
 
-MonoClass* FClassReflection::GetClass() const
+IManagedClass FClassReflection::GetManagedClass() const
 {
-	return Class;
+	return ManagedClass;
 }
 
-MonoVTable* FClassReflection::GetVTable() const
+#if WITH_MONO
+IManagedReflectionType FClassReflection::GetManagedReflectionType() const
 {
-	return VTable;
+	return ManagedReflectionType;
 }
-
-MonoReflectionType* FClassReflection::GetReflectionType() const
-{
-	return ReflectionType;
-}
+#endif
 
 FClassReflection* FClassReflection::GetTypeDefinition() const
 {
@@ -519,18 +945,24 @@ const TMap<TPair<FString, int32>, FMethodReflection*>& FClassReflection::GetMeth
 	return Methods;
 }
 
-FMethodReflection* FClassReflection::GetMethod(const FString& InMethodName, const int32 InParamCount) const
+FMethodReflection* FClassReflection::GetMethod(const FString& InName, const int32 InParamCount) const
 {
-	const auto FoundMethod = Methods.Find({InMethodName, InParamCount});
+	const auto FoundMethod = Methods.Find({InName, InParamCount});
 
 	return FoundMethod != nullptr ? *FoundMethod : nullptr;
 }
 
-FMethodReflection* FClassReflection::GetMethod(const MonoReflectionMethod* InReflectionMethod)
+FMethodReflection* FClassReflection::GetMethod(const IManagedReflectionMethod InManagedReflectionMethod)
 {
+#if WITH_MONO
+	const auto ManagedMethod = InManagedReflectionMethod->method;
+#else
+	const auto ManagedMethod = IManagedHandleToIManagedMethod(MANAGED_HANDLE_FROM_OBJECT(InManagedReflectionMethod));
+#endif
+
 	for (const auto& [PLACEHOLDER, Method] : Methods)
 	{
-		if (Method->GetReflectionMethod() == InReflectionMethod)
+		if (Method->GetManagedMethod() == ManagedMethod)
 		{
 			return Method;
 		}
@@ -539,32 +971,36 @@ FMethodReflection* FClassReflection::GetMethod(const MonoReflectionMethod* InRef
 	return nullptr;
 }
 
-FMethodReflection* FClassReflection::GetParentMethod(const FString& InFunctionName,
-                                                     const int32 InParamCount) const
+FMethodReflection* FClassReflection::GetParentMethod(const FString& InName, const int32 InParamCount) const
 {
-	auto ClassReflection = this;
+	auto Class = this;
 
-	while (ClassReflection != nullptr)
+	while (Class != nullptr)
 	{
-		if (const auto FoundMethod = ClassReflection->GetMethod(InFunctionName, InParamCount))
+		if (const auto FoundMethod = Class->GetMethod(InName, InParamCount))
 		{
 			return FoundMethod;
 		}
 
-		ClassReflection = ClassReflection->GetParent();
+		Class = Class->GetParent();
 	}
 
 	return nullptr;
 }
 
-MonoObject* FClassReflection::NewObject() const
+IManagedHandle FClassReflection::NewObject() const
 {
-	return FMonoDomain::Object_New(Class);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		return ScriptDomain->NewObject(ManagedClass);
+	}
+
+	return InvalidManagedHandle;
 }
 
-MonoObject* FClassReflection::InitObject(const int32 InParamCount, void** InParams) const
+IManagedHandle FClassReflection::InitObject(const int32 InParamCount, void** InParams) const
 {
-	if (const auto Object = NewObject())
+	if (const auto Object = NewObject(); IManagedHandleIsValid(Object))
 	{
 		if (const auto FoundMethod = GetMethod(FUNCTION_OBJECT_CONSTRUCTOR, InParamCount))
 		{
@@ -574,14 +1010,15 @@ MonoObject* FClassReflection::InitObject(const int32 InParamCount, void** InPara
 		return Object;
 	}
 
-	return nullptr;
+	return InvalidManagedHandle;
 }
 
-void FClassReflection::ConstructorObject(MonoObject* InMonoObject, const int32 InParamCount, void** InParams) const
+void FClassReflection::ConstructorObject(const IManagedHandle InManagedHandle, const int32 InParamCount,
+                                         void** InParams) const
 {
 	if (const auto FoundMethod = GetMethod(FUNCTION_OBJECT_CONSTRUCTOR, InParamCount))
 	{
-		FoundMethod->Runtime_Invoke(InMonoObject, InParams);
+		FoundMethod->Runtime_Invoke(InManagedHandle, InParams);
 	}
 }
 
@@ -589,49 +1026,112 @@ void FClassReflection::ConstructorClass() const
 {
 	if (const auto FoundMethod = GetMethod(FUNCTION_CLASS_CONSTRUCTOR, 0))
 	{
-		FoundMethod->Runtime_Invoke(Class, nullptr);
+		FoundMethod->Runtime_Invoke(MANAGED_HANDLE_FROM_OBJECT(ManagedClass), nullptr);
 	}
 }
 
-MonoGCHandle FClassReflection::NewGCHandle(MonoObject* InMonoObject, const mono_bool bPinned) const
+IManagedHandle FClassReflection::NewGCHandle(const IManagedHandle InManagedHandle, const bool bPinned) const
 {
-	auto GarbageCollectionHandle = FMonoDomain::GCHandle_New_V2(InMonoObject, bPinned);
+	auto ManagedHandle = InvalidManagedHandle;
 
-	void* InParams[] = {&GarbageCollectionHandle};
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		ManagedHandle = ScriptDomain->NewRef(InManagedHandle, bPinned);
+	}
+
+	void* InParams[] = {&ManagedHandle};
 
 	if (const auto FoundProperty = GetProperty(PROPERTY_GARBAGE_COLLECTION_HANDLE))
 	{
-		FoundProperty->SetValue(InMonoObject, InParams, nullptr);
+		FoundProperty->SetValue(InManagedHandle, InParams);
 	}
 
-	return GarbageCollectionHandle;
+	return ManagedHandle;
 }
 
-MonoGCHandle FClassReflection::NewWeakRefGCHandle(MonoObject* InMonoObject, const mono_bool bTrackResurrection) const
+IManagedHandle FClassReflection::NewWeakRefGCHandle(const IManagedHandle InManagedHandle,
+                                                    const bool bTrackResurrection) const
 {
-	auto GarbageCollectionHandle = FMonoDomain::GCHandle_New_WeakRef_V2(InMonoObject, bTrackResurrection);
+	auto ManagedHandle = InvalidManagedHandle;
 
-	void* InParams[] = {&GarbageCollectionHandle};
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		ManagedHandle = ScriptDomain->NewWeakRef(InManagedHandle, bTrackResurrection);
+	}
+
+	void* InParams[] = {&ManagedHandle};
 
 	if (const auto FoundProperty = GetProperty(PROPERTY_GARBAGE_COLLECTION_HANDLE))
 	{
-		FoundProperty->SetValue(InMonoObject, InParams, nullptr);
+		FoundProperty->SetValue(InManagedHandle, InParams);
 	}
 
-	return GarbageCollectionHandle;
+	return ManagedHandle;
 }
 
-MonoObject* FClassReflection::BoxValue(void* InValue) const
+IManagedHandle FClassReflection::GetGCHandle(const IManagedObject InManagedObject) const
 {
-	return FMonoDomain::Value_Box(Class, InValue);
+	if (const auto FoundProperty = GetProperty(PROPERTY_GARBAGE_COLLECTION_HANDLE))
+	{
+		if (const auto ScriptDomain = IScriptDomain::Get())
+		{
+			return *static_cast<IManagedHandle*>(ScriptDomain->UnboxValue(
+				MANAGED_HANDLE_FROM_OBJECT(
+					FoundProperty->GetValue(MANAGED_HANDLE_FROM_OBJECT(InManagedObject), nullptr))));
+		}
+	}
+
+	return InvalidManagedHandle;
 }
 
-MonoArray* FClassReflection::NewArray(const uint32 InNum) const
+IManagedHandle FClassReflection::BoxValue(void* InValue) const
 {
-	return FMonoDomain::Array_New(Class, InNum);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+#if WITH_MONO
+		return ScriptDomain->BoxValue(ManagedClass, InValue);
+#else
+		return ScriptDomain->BoxValue(NameSpace, Name, InValue);
+#endif
+	}
+
+	return InvalidManagedHandle;
 }
 
-bool FClassReflection::IsAssignableFrom(const FClassReflection* InSuperClass, const mono_bool bCheckInterfaces) const
+IManagedArray FClassReflection::NewArray(const int32 InNum) const
 {
-	return this == InSuperClass || !!FMonoDomain::Class_Is_Subclass_Of(Class, InSuperClass->Class, bCheckInterfaces);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+#if WITH_MONO
+		return ScriptDomain->NewArray(ManagedClass, InNum);
+#else
+		return ScriptDomain->NewArray(NameSpace, Name, InNum);
+#endif
+	}
+
+	return INVALID_MANAGED;
+}
+
+bool FClassReflection::IsAssignableFrom(const FClassReflection* InSuperClass, const bool bIncludeInterfaces) const
+{
+	for (auto Class = this; Class != nullptr; Class = Class->Parent)
+	{
+		if (Class == InSuperClass)
+		{
+			return true;
+		}
+	}
+
+	if (bIncludeInterfaces)
+	{
+		for (const auto Interface : Interfaces)
+		{
+			if (Interface == InSuperClass)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }

@@ -1,4 +1,5 @@
-﻿#include "Registry/FDelegateRegistry.h"
+#include "Registry/FDelegateRegistry.h"
+#include "Domain/FDomain.h"
 
 FDelegateRegistry::FDelegateRegistry()
 {
@@ -16,7 +17,7 @@ void FDelegateRegistry::Initialize()
 
 void FDelegateRegistry::Deinitialize()
 {
-	for (auto& [Key, Value] : DelegateGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : DelegateManagedHandle2Helper.Get())
 	{
 		if (Value != nullptr)
 		{
@@ -25,14 +26,16 @@ void FDelegateRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 	}
 
-	DelegateGarbageCollectionHandle2Helper.Empty();
+	DelegateManagedHandle2Helper.Empty();
 
-	DelegateAddress2GarbageCollectionHandle.Empty();
+	DelegateAddress2ManagedHandle.Empty();
 
-	for (auto& [Key, Value] : MulticastDelegateGarbageCollectionHandle2Helper.Get())
+	for (auto& [Key, Value] : MulticastDelegateManagedHandle2Helper.Get())
 	{
 		if (Value != nullptr)
 		{
@@ -41,10 +44,12 @@ void FDelegateRegistry::Deinitialize()
 			Value = nullptr;
 		}
 
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 	}
 
-	MulticastDelegateGarbageCollectionHandle2Helper.Empty();
+	MulticastDelegateManagedHandle2Helper.Empty();
 
-	MulticastDelegateAddress2GarbageCollectionHandle.Empty();
+	MulticastDelegateAddress2ManagedHandle.Empty();
 }

@@ -1,8 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
-#include "mono/metadata/object-forward.h"
+#include "Domain/Script/IManagedHandle.h"
 
 struct FStructAddressBase : TValueWrapper<TWeakObjectPtr<UScriptStruct>>
 {
@@ -36,7 +36,7 @@ private:
 	template <typename Key, typename Value>
 	struct TStructMapping : TValueMapping<Key, Value>
 	{
-		typedef typename TStructMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
+		typedef typename TStructMapping::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
 	typedef TStructMapping<FStructAddressBase, FStructAddress> FStructMapping;
@@ -52,29 +52,29 @@ public:
 	void Deinitialize();
 
 public:
-	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	void* GetAddress(const IManagedHandle InManagedHandle);
 
-	void* GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct);
+	void* GetAddress(const IManagedHandle InManagedHandle, UStruct*& InStruct);
 
-	MonoObject* GetObject(UScriptStruct* InScriptStruct, const void* InStruct);
+	IManagedHandle GetObject(UScriptStruct* InScriptStruct, const void* InStruct);
 
-	void* GetStruct(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	void* GetStruct(const IManagedHandle InManagedHandle);
 
-	FGarbageCollectionHandle GetGarbageCollectionHandle(UScriptStruct* InScriptStruct, const void* InStruct);
+	IManagedHandle GetManagedHandle(UScriptStruct* InScriptStruct, const void* InStruct);
 
 public:
 	template <auto IsNeedFree>
-	auto AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject);
+	auto AddReference(UScriptStruct* InScriptStruct, const void* InStruct, const IManagedHandle InManagedHandle);
 
-	bool AddReference(const FGarbageCollectionHandle& InOwner, UScriptStruct* InScriptStruct,
-	                  const void* InStruct, MonoObject* InMonoObject);
+	bool AddReference(const IManagedHandle InOwner, UScriptStruct* InScriptStruct,
+	                  const void* InStruct, const IManagedHandle InManagedHandle);
 
-	bool RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle);
+	bool RemoveReference(const IManagedHandle InManagedHandle);
 
 private:
-	FStructMapping::FGarbageCollectionHandle2Value GarbageCollectionHandle2StructAddress;
+	FStructMapping::FManagedHandle2Value ManagedHandle2StructAddress;
 
-	FStructMapping::FAddress2GarbageCollectionHandle StructAddress2GarbageCollectionHandle;
+	FStructMapping::FAddress2ManagedHandle StructAddress2ManagedHandle;
 };
 
 #include "FStructRegistry.inl"

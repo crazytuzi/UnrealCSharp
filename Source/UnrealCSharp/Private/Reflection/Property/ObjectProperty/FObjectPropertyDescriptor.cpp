@@ -1,26 +1,26 @@
-﻿#include "Reflection/Property/ObjectProperty/FObjectPropertyDescriptor.h"
+#include "Reflection/Property/ObjectProperty/FObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Domain/Script/IManagedHandle.h"
 
 void FObjectPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto SrcObject = Property->GetObjectPropertyValue(Src);
 
-	*Dest = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
+	*reinterpret_cast<IManagedObject*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
 }
 
 void FObjectPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
 	const auto SrcObject = Property->GetObjectPropertyValue(Src);
 
-	*Dest = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
+	*reinterpret_cast<IManagedObject*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
 }
 
 void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcManagedHandle = *static_cast<IManagedHandle*>(Src);
 
-	const auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(
-		SrcGarbageCollectionHandle);
+	const auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(SrcManagedHandle);
 
 	Property->InitializeValue(Dest);
 
@@ -32,7 +32,7 @@ bool FObjectPropertyDescriptor::Identical(const void* A, const void* B, const ui
 	const auto ObjectA = Property->GetObjectPropertyValue(A);
 
 	const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetObject(
-		*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)));
+		*static_cast<IManagedHandle*>(const_cast<void*>(B)));
 
 	return Property->StaticIdentical(ObjectA, ObjectB, PortFlags);
 }

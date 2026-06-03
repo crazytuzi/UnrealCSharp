@@ -1,4 +1,4 @@
-﻿#include "NewClass/SDynamicNewClassDialog.h"
+#include "NewClass/SDynamicNewClassDialog.h"
 #include "DesktopPlatformModule.h"
 #include "SourceCodeNavigation.h"
 #include "IDocumentation.h"

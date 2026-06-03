@@ -1,1 +1,1 @@
-﻿#include "Reflection/Property/PrimitiveProperty/FDoublePropertyDescriptor.h"
+#include "Reflection/Property/PrimitiveProperty/FDoublePropertyDescriptor.h"

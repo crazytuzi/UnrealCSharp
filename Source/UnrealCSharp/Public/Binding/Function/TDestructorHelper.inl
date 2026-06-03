@@ -15,6 +15,6 @@ struct TDestructorHelper<std::tuple<Args...>>
 	template <auto... Index>
 	static auto Call(std::index_sequence<Index...>, BINDING_DESTRUCTOR_SIGNATURE)
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InGarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveBindingReference(InManagedHandle);
 	}
 };

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -90,13 +90,16 @@ namespace Script.Log
 
         private uint _writeIndex;
 
-        private Log()
+        private readonly bool bIsError;
+
+        private Log(bool InIsError)
         {
+            bIsError = InIsError;
         }
 
-        public static TextWriter Create()
+        public static TextWriter Create(bool InIsError)
         {
-            return Synchronized(new Log());
+            return Synchronized(new Log(InIsError));
         }
 
         public override Encoding Encoding => Encoding.Default;
@@ -163,7 +166,7 @@ namespace Script.Log
             {
                 _storage[_writeIndex] = '\0';
 
-                LogImplementation.Log_LogImplementation(_storage, _readIndex);
+                LogImplementation.Log_LogImplementation(_storage, _readIndex, bIsError);
             }
             else
             {
@@ -175,7 +178,7 @@ namespace Script.Log
 
                 _tempStorage[firstBlockCount + _writeIndex] = '\0';
 
-                LogImplementation.Log_LogImplementation(_tempStorage, 0);
+                LogImplementation.Log_LogImplementation(_tempStorage, 0, bIsError);
             }
 
             _readIndex = _writeIndex;

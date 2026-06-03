@@ -1,27 +1,33 @@
-﻿#include "Reflection/FFieldReflection.h"
+#include "Reflection/FFieldReflection.h"
 #include "Reflection/FClassReflection.h"
+#include "Domain/Script/IManagedTypes.h"
+#include "Domain/Script/IScriptDomain.h"
 
-FFieldReflection::FFieldReflection(const FString& InName, MonoReflectionField* InReflectionField):
+FFieldReflection::FFieldReflection(const FString& InName, const IManagedReflectionField InManagedReflectionField):
 	FReflection(InName),
-	ReflectionField(InReflectionField)
+	ManagedReflectionField(InManagedReflectionField)
 {
-	if (ReflectionField != nullptr)
-	{
-		Field = ReflectionField->field;
-	}
 }
 
-MonoClassField* FFieldReflection::GetField() const
+FFieldReflection::~FFieldReflection()
 {
-	return Field;
+	if (IManagedIsValid(ManagedReflectionField))
+	{
+#if WITH_CORECLR
+		if (const auto ScriptDomain = IScriptDomain::Get())
+		{
+			ScriptDomain->Free(MANAGED_HANDLE_FROM_OBJECT(ManagedReflectionField));
+		}
+#endif
+
+		ManagedReflectionField = INVALID_MANAGED;
+	}
 }
 
 void FFieldReflection::SetValue(const FClassReflection* InClass, void* InValue) const
 {
-	FMonoDomain::Field_Static_Set_Value(InClass != nullptr ? InClass->GetVTable() : nullptr, Field, InValue);
-}
-
-MonoObject* FFieldReflection::GetValue(MonoObject* InMonoObject) const
-{
-	return FMonoDomain::Field_Get_Value_Object(Field, InMonoObject);
+	if (const auto ScriptDomain = IScriptDomain::Get())
+	{
+		ScriptDomain->SetFieldStaticValue(InClass->GetManagedClass(), Name, InValue);
+	}
 }

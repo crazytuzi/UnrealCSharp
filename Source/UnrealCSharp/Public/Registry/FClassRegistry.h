@@ -1,7 +1,10 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Class/FClassDescriptor.h"
 #include "Reflection/Function/FCSharpFunctionRegister.h"
+
+class FCSharpFunctionDescriptor;
+class FUnrealFunctionDescriptor;
 
 class UNREALCSHARP_API FClassRegistry
 {
@@ -34,7 +37,8 @@ public:
 
 	FPropertyDescriptor* GetOrAddPropertyDescriptor(uint32 InPropertyHash);
 
-	void AddFunctionDescriptor(uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor);
+	template <typename T>
+	void AddFunctionDescriptor(uint32 InFunctionHash, T* InFunctionDescriptor);
 
 	template <typename T, typename... Args>
 	auto AddFunctionHash(uint32 InFunctionHash, Args&&... InArgs) -> void;
@@ -59,7 +63,9 @@ private:
 
 	TMap<uint32, std::tuple<FClassDescriptor*, UFunction*>> UnrealFunctionHashMap;
 
-	TMap<uint32, FFunctionDescriptor*> FunctionDescriptorMap;
+	TMap<uint32, FCSharpFunctionDescriptor*> CSharpFunctionDescriptorMap;
+
+	TMap<uint32, FUnrealFunctionDescriptor*> UnrealFunctionDescriptorMap;
 
 	static TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> ClassConstructorMap;
 };

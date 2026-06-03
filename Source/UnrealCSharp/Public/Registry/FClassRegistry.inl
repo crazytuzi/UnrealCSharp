@@ -6,9 +6,22 @@
 template <typename T>
 auto FClassRegistry::GetFunctionDescriptor(const uint32 InFunctionHash) -> T*
 {
-	const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionHash);
+	if constexpr (std::is_same_v<T, FCSharpFunctionDescriptor>)
+	{
+		const auto FoundFunctionDescriptor = CSharpFunctionDescriptorMap.Find(InFunctionHash);
 
-	return FoundFunctionDescriptor != nullptr ? static_cast<T*>(*FoundFunctionDescriptor) : nullptr;
+		return FoundFunctionDescriptor != nullptr ? *FoundFunctionDescriptor : nullptr;
+	}
+	else if constexpr (std::is_same_v<T, FUnrealFunctionDescriptor>)
+	{
+		const auto FoundFunctionDescriptor = UnrealFunctionDescriptorMap.Find(InFunctionHash);
+
+		return FoundFunctionDescriptor != nullptr ? *FoundFunctionDescriptor : nullptr;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 template <typename T>
@@ -28,7 +41,7 @@ auto FClassRegistry::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) -> 
 			{
 				CSharpFunctionHashMap.Remove(InFunctionHash);
 
-				FunctionDescriptorMap.Add(InFunctionHash, FoundFunctionDescriptor);
+				CSharpFunctionDescriptorMap.Add(InFunctionHash, FoundFunctionDescriptor);
 
 				return FoundFunctionDescriptor;
 			}
@@ -43,7 +56,7 @@ auto FClassRegistry::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) -> 
 			{
 				UnrealFunctionHashMap.Remove(InFunctionHash);
 
-				FunctionDescriptorMap.Add(InFunctionHash, FoundFunctionDescriptor);
+				UnrealFunctionDescriptorMap.Add(InFunctionHash, FoundFunctionDescriptor);
 
 				return FoundFunctionDescriptor;
 			}
@@ -51,6 +64,19 @@ auto FClassRegistry::GetOrAddFunctionDescriptor(const uint32 InFunctionHash) -> 
 	}
 
 	return nullptr;
+}
+
+template <typename T>
+void FClassRegistry::AddFunctionDescriptor(uint32 InFunctionHash, T* InFunctionDescriptor)
+{
+	if constexpr (std::is_same_v<T, FCSharpFunctionDescriptor>)
+	{
+		CSharpFunctionDescriptorMap.Add(InFunctionHash, InFunctionDescriptor);
+	}
+	else if constexpr (std::is_same_v<T, FUnrealFunctionDescriptor>)
+	{
+		UnrealFunctionDescriptorMap.Add(InFunctionHash, InFunctionDescriptor);
+	}
 }
 
 template <typename T, typename... Args>

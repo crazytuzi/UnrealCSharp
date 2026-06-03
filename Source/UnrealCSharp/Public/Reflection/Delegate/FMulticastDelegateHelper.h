@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMacro/BufferMacro.h"
 #include "FDelegateBaseHelper.h"

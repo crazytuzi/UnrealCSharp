@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #define DOTNET_GREATER_SORT(Value, ValueToBeGreaterThan, TieBreaker) \
 	(((Value) > (ValueToBeGreaterThan)) || (((Value) == (ValueToBeGreaterThan)) && (TieBreaker)))

@@ -1,37 +1,37 @@
 #include "Reflection/Property/ObjectProperty/FWeakObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Domain/Script/IManagedHandle.h"
 
 void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto Object = Class->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>, true, false>(
-		Class, Object, Src);
+		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
 
-	*Dest = Object;
+	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
 }
 
 void FWeakObjectPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TWeakObjectPtr<UObject>>(Src);
 
-	if (Object == nullptr)
+	if (!IManagedHandleIsValid(Object))
 	{
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TWeakObjectPtr<UObject>, false, true>(
-			Class, Object, Src);
+			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
 	}
 
-	*Dest = Object;
+	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
 }
 
 void FWeakObjectPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcManagedHandle = *static_cast<IManagedHandle*>(Src);
 
-	const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(
-		SrcGarbageCollectionHandle);
+	const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(SrcManagedHandle);
 
 	Property->InitializeValue(Dest);
 
@@ -43,7 +43,7 @@ bool FWeakObjectPropertyDescriptor::Identical(const void* A, const void* B, cons
 	const auto ObjectA = Property->GetObjectPropertyValue(A);
 
 	const auto ObjectB = FCSharpEnvironment::GetEnvironment().GetMulti<TWeakObjectPtr<UObject>>(
-		*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)))->Get();
+		*static_cast<IManagedHandle*>(const_cast<void*>(B)))->Get();
 
 	return Property->StaticIdentical(ObjectA, ObjectB, PortFlags);
 }

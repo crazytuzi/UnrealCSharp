@@ -1,5 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.Generic;
+#if WITH_CORECLR
+using System.Runtime.InteropServices;
+#endif
 using System.Threading;
 
 namespace Script.CoreUObject;
@@ -22,9 +25,12 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
         Context = null;
     }
 
+#if WITH_CORECLR
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+#endif
     public static void Tick(float DeltaTime)
     {
-        Context?.Tick();
+        Context?.Process();
     }
 
     private SynchronizationContext() => ThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -33,7 +39,7 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
 
     List<TaskInfo> PendingTaskList = new();
 
-    private void Tick()
+    private void Process()
     {
         lock (TaskList)
         {

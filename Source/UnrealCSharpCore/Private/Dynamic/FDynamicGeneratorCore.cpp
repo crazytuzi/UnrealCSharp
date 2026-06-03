@@ -3,13 +3,12 @@
 #include "Dynamic/FDynamicDependencyGraph.h"
 #include "Bridge/FTypeBridge.h"
 #include "CoreMacro/Macro.h"
-#include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/GenericAttributeMacro.h"
 #include "CoreMacro/MetaDataAttributeMacro.h"
-#include "Domain/FMonoDomain.h"
+#include "Domain/Script/IManagedHandle.h"
+#include "Domain/Script/IScriptDomain.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Log/UnrealCSharpLog.h"
-#include "Template/TGetArrayLength.inl"
 #include "Reflection/FReflectionRegistry.h"
 
 #if WITH_EDITOR
@@ -233,39 +232,13 @@ void FDynamicGeneratorCore::GeneratorInterface(const FClassReflection* InClassRe
 void FDynamicGeneratorCore::Generator(const FClassReflection* InClassReflection,
                                       const TFunction<void(FClassReflection*)>& InGenerator)
 {
-	const auto AttributeReflectionType = InClassReflection->GetReflectionType();
-
-	const auto UtilsClass = FReflectionRegistry::Get().GetUtilsClass();
-
-	auto bIsUEAssemblyGCHandle = true;
-
-	for (const auto& AssemblyGCHandle : FMonoDomain::GetAssemblyGCHandles())
+	if (const auto ScriptDomain = IScriptDomain::Get())
 	{
-		if (bIsUEAssemblyGCHandle)
+		for (const auto AssemblyHandle : ScriptDomain->GetAssemblies())
 		{
-			bIsUEAssemblyGCHandle = false;
-		}
-		else
-		{
-			int32 OutLength{};
-
-			void* InParams[3] = {
-				AttributeReflectionType,
-				FMonoDomain::GCHandle_Get_Target_V2(AssemblyGCHandle),
-				&OutLength
-			};
-
-			const auto GetTypesWithAttributeMethod = UtilsClass->GetMethod(
-				FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE, TGetArrayLength(InParams));
-
-			const auto Types = reinterpret_cast<MonoArray*>(GetTypesWithAttributeMethod->Runtime_Invoke(
-				nullptr, InParams));
-
-			for (auto Index = 0; Index < OutLength; ++Index)
+			for (const auto Class : ScriptDomain->GetClassesWithAttribute(InClassReflection, AssemblyHandle))
 			{
-				const auto ReflectionType = FMonoDomain::Array_Get<MonoReflectionType*>(Types, Index);
-
-				InGenerator(FReflectionRegistry::Get().GetClass(ReflectionType));
+				InGenerator(Class);
 			}
 		}
 	}

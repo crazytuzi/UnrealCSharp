@@ -1,4 +1,4 @@
-﻿#include "Listener/FEditorListener.h"
+#include "Listener/FEditorListener.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "DirectoryWatcherModule.h"
 #include "HAL/ThreadHeartBeat.h"

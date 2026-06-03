@@ -1,4 +1,4 @@
-﻿using Script.CoreUObject;
+using Script.CoreUObject;
 using Script.Engine;
 
 namespace Script.Engine

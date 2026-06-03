@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Script.CoreUObject;
 
 namespace Script.Dynamic

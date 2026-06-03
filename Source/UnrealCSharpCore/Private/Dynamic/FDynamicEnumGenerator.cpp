@@ -1,7 +1,6 @@
 #include "Dynamic/FDynamicEnumGenerator.h"
 #include "CoreMacro/Macro.h"
-#include "CoreMacro/ClassMacro.h"
-#include "Domain/FMonoDomain.h"
+#include "Domain/Script/IScriptDomain.h"
 #include "Template/TGetArrayLength.inl"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
@@ -285,10 +284,13 @@ void FDynamicEnumGenerator::GeneratorEnumerator(const FClassReflection* InClassR
 
 		if (Name != value__)
 		{
-			auto FieldValue = *(int64*)FMonoDomain::Object_Unbox(
-				Field->GetValue((MonoObject*)InClassReflection->GetClass()));
+			if (const auto ScriptDomain = IScriptDomain::Get())
+			{
+				const auto FieldValue = reinterpret_cast<int64>(ScriptDomain->GetFieldStaticValue(
+					InClassReflection->GetManagedClass(), Name));
 
-			InNames.Add({FName(Name), FieldValue});
+				InNames.Add({FName(Name), FieldValue});
+			}
 		}
 	}
 

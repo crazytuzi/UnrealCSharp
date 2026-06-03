@@ -1,12 +1,60 @@
-﻿#pragma once
+#pragma once
 
 #include "UEVersion.h"
+
+#define COMBINE_FULL_NAME(A, B) FString::Printf(TEXT("%s.%s"), *A, *B)
 
 #define COMBINE_GENERIC(Type, Arguments) FString::Printf(TEXT("%s`%s"), *Type, *Arguments)
 
 #define CLASS_UTILS FString(TEXT("Utils"))
 
 #define CLASS_SYNCHRONIZATION_CONTEXT FString(TEXT("SynchronizationContext"))
+
+#if WITH_CORECLR
+#define CLASS_OBJECT FString(TEXT("Object"))
+
+#define CLASS_BOOLEAN FString(TEXT("Boolean"))
+
+#define CLASS_SBYTE FString(TEXT("SByte"))
+
+#define CLASS_INT16 FString(TEXT("Int16"))
+
+#define CLASS_INT32 FString(TEXT("Int32"))
+
+#define CLASS_INT64 FString(TEXT("Int64"))
+
+#define CLASS_BYTE FString(TEXT("Byte"))
+
+#define CLASS_UINT16 FString(TEXT("UInt16"))
+
+#define CLASS_UINT32 FString(TEXT("UInt32"))
+
+#define CLASS_UINT64 FString(TEXT("UInt64"))
+
+#define CLASS_SINGLE FString(TEXT("Single"))
+
+#define CLASS_DOUBLE FString(TEXT("Double"))
+
+#define CLASS_ENUM FString(TEXT("Enum"))
+
+#define CLASS_ASSEMBLY_LOADER FString(TEXT("AssemblyLoader"))
+
+#define CLASS_HANDLE_DATA FString(TEXT("HandleData"))
+
+#define CLASS_LOG_BRIDGE FString(TEXT("LogBridge"))
+
+#define CLASS_TYPE_BRIDGE FString(TEXT("TypeBridge"))
+
+#define CLASS_OBJECT_BRIDGE FString(TEXT("ObjectBridge"))
+
+#define CLASS_FIELD_BRIDGE FString(TEXT("FieldBridge"))
+
+#define CLASS_METHOD_BRIDGE FString(TEXT("MethodBridge"))
+
+#define CLASS_STRING_BRIDGE FString(TEXT("StringBridge"))
+
+#define CLASS_ARRAY_BRIDGE FString(TEXT("ArrayBridge"))
+#endif
 
 #define CLASS_F_STRING FString(TEXT("FString"))
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TPropertyDescriptor.inl"
+#include "Domain/Script/IManagedHandle.h"
 #include "UEVersion.h"
 
 template <typename T>
@@ -19,12 +20,12 @@ public:
 
 	virtual auto Get(void* Src, void** Dest, std::true_type) const -> void override
 	{
-		*Dest = static_cast<void*>(Super::Class->BoxValue(Src));
+		*Dest = MANAGED_HANDLE_TO_OBJECT(Super::Class->BoxValue(Src));
 	}
 
 	virtual auto Get(void* Src, void** Dest, std::false_type) const -> void override
 	{
-		*Dest = static_cast<void*>(Super::Class->BoxValue(Src));
+		*Dest = MANAGED_HANDLE_TO_OBJECT(Super::Class->BoxValue(Src));
 	}
 
 	virtual auto Get(void* Src, void* Dest) const -> void override

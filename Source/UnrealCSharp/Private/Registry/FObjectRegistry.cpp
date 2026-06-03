@@ -1,5 +1,6 @@
-﻿#include "Registry/FObjectRegistry.h"
-#include "CoreMacro/Macro.h"
+#include "Registry/FObjectRegistry.h"
+#include "Domain/Script/IManagedHandle.h"
+#include "Domain/FDomain.h"
 #include "Environment/FCSharpEnvironment.h"
 
 FObjectRegistry::FObjectRegistry()
@@ -18,26 +19,28 @@ void FObjectRegistry::Initialize()
 
 void FObjectRegistry::Deinitialize()
 {
-	for (auto& [Key, PLACEHOLDER] : GarbageCollectionHandle2Object.Get())
+	for (auto& [Key, _] : ManagedHandle2Object.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 	}
 
-	GarbageCollectionHandle2Object.Empty();
+	ManagedHandle2Object.Empty();
 
-	Object2GarbageCollectionHandleMap.Empty();
+	Object2ManagedHandle.Empty();
 }
 
-void* FObjectRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle)
+void* FObjectRegistry::GetAddress(const IManagedHandle InManagedHandle)
 {
-	const auto FoundObject = GarbageCollectionHandle2Object.Find(InGarbageCollectionHandle);
+	const auto FoundObject = ManagedHandle2Object.Find(InManagedHandle);
 
 	return FoundObject != nullptr ? const_cast<UObject*>(FoundObject->Get()) : nullptr;
 }
 
-void* FObjectRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageCollectionHandle, UStruct*& InStruct)
+void* FObjectRegistry::GetAddress(const IManagedHandle InManagedHandle, UStruct*& InStruct)
 {
-	if (const auto FoundObject = GarbageCollectionHandle2Object.Find(InGarbageCollectionHandle))
+	if (const auto FoundObject = ManagedHandle2Object.Find(InManagedHandle))
 	{
 		InStruct = (*FoundObject)->GetClass();
 
@@ -47,47 +50,48 @@ void* FObjectRegistry::GetAddress(const FGarbageCollectionHandle& InGarbageColle
 	return nullptr;
 }
 
-MonoObject* FObjectRegistry::GetObject(const UObject* InObject)
+IManagedHandle FObjectRegistry::GetObject(const UObject* InObject)
 {
-	const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(InObject);
+	const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject);
 
-	return FoundGarbageCollectionHandle != nullptr ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle) : nullptr;
+	return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
 }
 
-UObject* FObjectRegistry::GetObject(const FGarbageCollectionHandle& InGarbageCollectionHandle)
+UObject* FObjectRegistry::GetObject(const IManagedHandle InManagedHandle)
 {
-	return static_cast<UObject*>(GetAddress(InGarbageCollectionHandle));
+	return static_cast<UObject*>(GetAddress(InManagedHandle));
 }
 
-FGarbageCollectionHandle FObjectRegistry::GetGarbageCollectionHandle(const UObject* InObject)
+IManagedHandle FObjectRegistry::GetManagedHandle(const UObject* InObject)
 {
-	const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(InObject);
+	const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject);
 
-	return FoundGarbageCollectionHandle != nullptr ? *FoundGarbageCollectionHandle : FGarbageCollectionHandle();
+	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
 }
 
-bool FObjectRegistry::AddReference(FClassReflection* InClass, UObject* InObject, MonoObject* InMonoObject)
+bool FObjectRegistry::AddReference(const FClassReflection* InClass, UObject* InObject,
+                                   const IManagedHandle InManagedHandle)
 {
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InClass, InMonoObject, true);
+	const auto ManagedHandle = InClass->NewGCHandle(InManagedHandle, true);
 
-	Object2GarbageCollectionHandleMap.Add(InObject, GarbageCollectionHandle);
+	Object2ManagedHandle.Add(InObject, ManagedHandle);
 
-	GarbageCollectionHandle2Object.Add(GarbageCollectionHandle, &*InObject);
+	ManagedHandle2Object.Add(ManagedHandle, &*InObject);
 
 	return true;
 }
 
 bool FObjectRegistry::RemoveReference(const UObject* InObject)
 {
-	if (const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(InObject))
+	if (const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject))
 	{
-		Object2GarbageCollectionHandleMap.Remove(InObject);
+		Object2ManagedHandle.Remove(InObject);
 
-		GarbageCollectionHandle2Object.Remove(*FoundGarbageCollectionHandle);
+		ManagedHandle2Object.Remove(*FoundManagedHandle);
 
-		FGarbageCollectionHandle::Free<false>(*FoundGarbageCollectionHandle);
+		FDomain::GCHandle_Free(*FoundManagedHandle);
 
-		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundManagedHandle);
 
 		return true;
 	}
@@ -95,23 +99,23 @@ bool FObjectRegistry::RemoveReference(const UObject* InObject)
 	return false;
 }
 
-bool FObjectRegistry::RemoveReference(const FGarbageCollectionHandle& InGarbageCollectionHandle)
+bool FObjectRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 {
-	if (const auto FoundValue = GarbageCollectionHandle2Object.Find(InGarbageCollectionHandle))
+	if (const auto FoundValue = ManagedHandle2Object.Find(InManagedHandle))
 	{
-		if (const auto FoundGarbageCollectionHandle = Object2GarbageCollectionHandleMap.Find(*FoundValue))
+		if (const auto FoundManagedHandle = Object2ManagedHandle.Find(*FoundValue))
 		{
-			if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+			if (*FoundManagedHandle == InManagedHandle)
 			{
-				FGarbageCollectionHandle::Free<false>(*FoundGarbageCollectionHandle);
+				FDomain::GCHandle_Free(*FoundManagedHandle);
 
-				(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundGarbageCollectionHandle);
+				(void)FCSharpEnvironment::GetEnvironment().RemoveReference(*FoundManagedHandle);
 
-				Object2GarbageCollectionHandleMap.Remove(*FoundValue);
+				Object2ManagedHandle.Remove(*FoundValue);
 			}
 		}
 
-		GarbageCollectionHandle2Object.Remove(InGarbageCollectionHandle);
+		ManagedHandle2Object.Remove(InManagedHandle);
 
 		return true;
 	}

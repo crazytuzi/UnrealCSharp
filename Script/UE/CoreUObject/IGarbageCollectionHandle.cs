@@ -1,7 +1,7 @@
-﻿namespace Script.CoreUObject
+namespace Script.CoreUObject
 {
     public interface IGarbageCollectionHandle
     {
-        public nint GarbageCollectionHandle { get; set; }
+        nint GarbageCollectionHandle { get; set; }
     }
 }

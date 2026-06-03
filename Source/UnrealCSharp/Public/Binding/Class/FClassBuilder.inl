@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 template <typename T>
 auto FClassBuilder::Function(const FString& InName,

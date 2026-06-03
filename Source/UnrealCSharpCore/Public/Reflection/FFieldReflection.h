@@ -1,25 +1,20 @@
-﻿#pragma once
+#pragma once
 
 #include "FReflection.h"
-#include "Domain/FMonoDomain.h"
+#include "Domain/Script/IManagedTypes.h"
 
 class FClassReflection;
 
 class UNREALCSHARPCORE_API FFieldReflection : public FReflection
 {
 public:
-	FFieldReflection(const FString& InName, MonoReflectionField* InReflectionField);
+	FFieldReflection(const FString& InName, const IManagedReflectionField InManagedReflectionField);
 
-public:
-	MonoClassField* GetField() const;
+	~FFieldReflection();
 
 public:
 	void SetValue(const FClassReflection* InClass, void* InValue) const;
 
-	MonoObject* GetValue(MonoObject* InMonoObject) const;
-
 private:
-	MonoReflectionField* ReflectionField{};
-
-	MonoClassField* Field{};
+	IManagedReflectionField ManagedReflectionField{INVALID_MANAGED};
 };

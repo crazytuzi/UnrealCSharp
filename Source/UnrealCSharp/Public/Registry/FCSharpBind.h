@@ -1,6 +1,5 @@
-﻿#pragma once
+#pragma once
 
-#include "Domain/FDomain.h"
 #include "Reflection/Class/FClassDescriptor.h"
 
 class UNREALCSHARP_API FCSharpBind
@@ -19,25 +18,25 @@ public:
 	template <auto IsNeedOverride>
 	static auto Bind(UStruct* InStruct);
 
-	static MonoObject* Bind(UObject* InObject);
+	static IManagedObject Bind(UObject* InObject);
 
-	static MonoObject* Bind(UClass* InClass);
+	static IManagedObject Bind(UClass* InClass);
 
 	template <auto IsNeedOverride>
 	static auto Bind(UObject* InObject);
 
 	template <typename T>
 	static auto Bind(FClassReflection* InClassReflection, FClassReflection* InPropertyClassReflection,
-	                 MonoObject* InMonoObject);
+	                 const IManagedObject InManagedObject);
 
 	template <typename T>
 	static auto Bind(FClassReflection* InClassReflection, FClassReflection* InKeyClassReflection,
-	                 FClassReflection* InValueClassReflection, MonoObject* InMonoObject);
+	                 FClassReflection* InValueClassReflection, const IManagedObject InManagedObject);
 
-	static bool Bind(MonoObject* InMonoObject, const FName& InStructName);
+	static bool Bind(const IManagedObject InManagedObject, const FName& InStructName);
 
 	template <typename T>
-	static auto Bind(FClassReflection* InClassReflection, MonoObject* InMonoObject);
+	static auto Bind(FClassReflection* InClassReflection, const IManagedObject InManagedObject);
 
 	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
@@ -48,7 +47,7 @@ public:
 
 private:
 	template <auto IsNeedOverride>
-	static auto BindImplementation(UObject* InObject) -> MonoObject*;
+	static auto BindImplementation(UObject* InObject) -> IManagedObject;
 
 	static bool BindImplementation(UStruct* InStruct);
 
@@ -57,16 +56,16 @@ private:
 
 	template <typename T>
 	static auto BindImplementation(FClassReflection* InClassReflection, FClassReflection* InPropertyClassReflection,
-	                               MonoObject* InMonoObject);
+	                               const IManagedObject InManagedObject);
 
 	template <typename T>
 	static auto BindImplementation(FClassReflection* InClassReflection, FClassReflection* InKeyClassReflection,
-	                               FClassReflection* InValueClassReflection, MonoObject* InMonoObject);
+	                               FClassReflection* InValueClassReflection, const IManagedObject InManagedObject);
 
-	static bool BindImplementation(MonoObject* InMonoObject, const FName& InStructName);
+	static bool BindImplementation(const IManagedObject InManagedObject, const FName& InStructName);
 
 	template <typename T>
-	static auto BindImplementation(FClassReflection* InClassReflection, MonoObject* InMonoObject);
+	static auto BindImplementation(FClassReflection* InClassReflection, const IManagedObject InManagedObject);
 
 private:
 	static bool CanBind(UStruct* InStruct);

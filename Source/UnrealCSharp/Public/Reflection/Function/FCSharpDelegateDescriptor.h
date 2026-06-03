@@ -1,13 +1,13 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMacro/BufferMacro.h"
-#include "FFunctionDescriptor.h"
+#include "FManagedFunctionDescriptor.h"
 #include "Common/EFunctionReturnType.h"
 
-class FCSharpDelegateDescriptor final : public FFunctionDescriptor
+class FCSharpDelegateDescriptor final : public FManagedFunctionDescriptor
 {
 public:
-	typedef FFunctionDescriptor Super;
+	typedef FManagedFunctionDescriptor Super;
 
 public:
 	explicit FCSharpDelegateDescriptor(UFunction* InFunction);

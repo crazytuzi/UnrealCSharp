@@ -1,4 +1,5 @@
-﻿#include "Registry/FCSharpBind.h"
+#include "Registry/FCSharpBind.h"
+#include "Domain/Script/IManagedHandle.h"
 #include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Reflection/Function/CSharpFunction.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
@@ -7,6 +8,7 @@
 #include "Template/TFieldIteratorExt.inl"
 #include "Setting/UnrealCSharpSetting.h"
 #include "Reflection/FReflectionRegistry.h"
+#include "Macro/FunctionMacro.h"
 #include "UEVersion.h"
 
 TSet<TWeakObjectPtr<UStruct>> FCSharpBind::NotOverrideTypes;
@@ -37,26 +39,27 @@ void FCSharpBind::Deinitialize()
 	}
 }
 
-MonoObject* FCSharpBind::Bind(UObject* InObject)
+IManagedObject FCSharpBind::Bind(UObject* InObject)
 {
-	if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
+	if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
+		IManagedHandleIsValid(FoundManagedHandle))
 	{
-		return FoundObject;
+		return IManagedHandleToIManagedObject(FoundManagedHandle);
 	}
 
 	return Bind<false>(InObject);
 }
 
-MonoObject* FCSharpBind::Bind(UClass* InClass)
+IManagedObject FCSharpBind::Bind(UClass* InClass)
 {
 	Bind<false>(InClass);
 
 	return Bind(static_cast<UObject*>(InClass));
 }
 
-bool FCSharpBind::Bind(MonoObject* InMonoObject, const FName& InStructName)
+bool FCSharpBind::Bind(const IManagedObject InManagedObject, const FName& InStructName)
 {
-	return BindImplementation(InMonoObject, InStructName);
+	return BindImplementation(InManagedObject, InStructName);
 }
 
 bool FCSharpBind::Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction)
@@ -87,11 +90,11 @@ bool FCSharpBind::BindClassDefaultObject(UObject* InObject)
 		if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 			UUnrealCSharpSetting>())
 		{
-			for (const auto& [Class, bNeedMonoClass] : UnrealCSharpSetting->GetBindClass())
+			for (const auto& [Class, bNeedOverrideAttribute] : UnrealCSharpSetting->GetBindClass())
 			{
 				if (InObject->IsA(Class))
 				{
-					return bNeedMonoClass ? false : !!Bind<false>(InObject);
+					return bNeedOverrideAttribute ? false : IManagedIsValid(Bind<false>(InObject));
 				}
 			}
 		}
@@ -130,13 +133,13 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 		return false;
 	}
 
-	TMap<FString, MonoClassField*> Fields;
+	TSet<FString> Fields;
 
 	for (const auto& [Name, Field] : Class->GetFields())
 	{
 		if (Name.StartsWith(TEXT("__")))
 		{
-			Fields.Add(Name.RightChop(2), Field->GetField());
+			Fields.Add(Name.RightChop(2));
 		}
 	}
 
@@ -153,23 +156,23 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 	for (const auto& [PropertyName, Property] : Properties)
 	{
-		for (const auto& [FieldName, Field] : Fields)
+		for (const auto& Field : Fields)
 		{
-			if (FieldName == PropertyName)
+			if (Field == PropertyName)
 			{
 				auto FieldHash = GetTypeHash(Property);
 
 				if (auto FoundField = Class->GetField(FString::Printf(TEXT(
 					"__%s"
 				),
-				                                                      *FieldName)))
+				                                                      *Field)))
 				{
 					FoundField->SetValue(Class, &FieldHash);
 				}
 
 				FCSharpEnvironment::GetEnvironment().AddPropertyHash(FieldHash, NewClassDescriptor, Property);
 
-				Fields.Remove(FieldName);
+				Fields.Remove(Field);
 
 				break;
 			}
@@ -205,16 +208,16 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 
 		for (const auto& [FunctionName, Function] : Functions)
 		{
-			for (const auto& [FieldName, Field] : Fields)
+			for (const auto& Field : Fields)
 			{
-				if (FieldName == FunctionName)
+				if (Field == FunctionName)
 				{
 					auto FieldHash = GetTypeHash(Function);
 
 					if (auto FoundField = Class->GetField(FString::Printf(TEXT(
 						"__%s"
 					),
-					                                                      *FieldName)))
+					                                                      *Field)))
 					{
 						FoundField->SetValue(Class, &FieldHash);
 					}
@@ -222,7 +225,7 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 					FCSharpEnvironment::GetEnvironment().AddFunctionHash<FUnrealFunctionDescriptor>(
 						FieldHash, NewClassDescriptor, Function);
 
-					Fields.Remove(FieldName);
+					Fields.Remove(Field);
 
 					break;
 				}
@@ -248,9 +251,10 @@ bool FCSharpBind::BindImplementation(UStruct* InStruct)
 						Functions.Emplace(FUnrealCSharpFunctionLibrary::Encode(
 							                  Function->HasAnyFunctionFlags(FUNC_Net)
 								                  ? FString::Printf(TEXT(
-									                  "%s_Implementation"
+									                  "%s%s"
 								                  ),
-								                                    *Name
+								                                    *Name,
+								                                    *FUNCTION_IMPLEMENTATION_SUFFIX
 								                  )
 								                  : Name,
 							                  Function->IsNative()),
@@ -389,7 +393,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 	return true;
 }
 
-bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, const FName& InStructName)
+bool FCSharpBind::BindImplementation(const IManagedObject InManagedObject, const FName& InStructName)
 {
 	const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *InStructName.ToString());
 
@@ -409,7 +413,8 @@ bool FCSharpBind::BindImplementation(MonoObject* InMonoObject, const FName& InSt
 
 	InScriptStruct->InitializeStruct(Structure);
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure, InMonoObject);
+	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure,
+	                                                              MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
 
 	return true;
 }

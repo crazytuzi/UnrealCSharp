@@ -13,16 +13,20 @@ uint32 GetTypeHash(const FStructAddressBase& InStructAddressBase)
 }
 
 template <auto IsNeedFree>
-auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct, MonoObject* InMonoObject)
+auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct,
+                                   const IManagedHandle InManagedHandle)
 {
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(
-		FReflectionRegistry::Get().GetClass(InScriptStruct), InMonoObject, true);
+	const auto ManagedHandle = FReflectionRegistry::Get().GetClass(InScriptStruct)->NewWeakRefGCHandle(
+		InManagedHandle, true);
 
-	GarbageCollectionHandle2StructAddress.Add(GarbageCollectionHandle, {
-		                                          InScriptStruct,
-		                                          const_cast<void*>(InStruct),
-		                                          IsNeedFree
-	                                          });
+	StructAddress2ManagedHandle.Add(
+		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), ManagedHandle);
+
+	ManagedHandle2StructAddress.Add(ManagedHandle, {
+		                                InScriptStruct,
+		                                const_cast<void*>(InStruct),
+		                                IsNeedFree
+	                                });
 
 	return true;
 }

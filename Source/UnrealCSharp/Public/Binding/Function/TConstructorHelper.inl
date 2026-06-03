@@ -4,6 +4,7 @@
 #include "TOut.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Macro/SignatureMacro.h"
+#include "Domain/Script/IManagedHandle.h"
 
 template <typename>
 struct TConstructorHelper
@@ -27,19 +28,19 @@ struct TConstructorHelper<std::tuple<Args...>>
 			FCSharpEnvironment::GetEnvironment().Bind<false>(Class::StaticStruct());
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
-				Class::StaticStruct(), Value, InMonoObject);
+				Class::StaticStruct(), Value, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
 		}
 		else if constexpr (TIsScriptStruct<Class>::Value)
 		{
 			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<Class>::Get());
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
-				TBaseStructure<Class>::Get(), Value, InMonoObject);
+				TBaseStructure<Class>::Get(), Value, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddBindingReference<Class, true>(
-				TPropertyClass<Class, Class>::Get(), InMonoObject, Value);
+				TPropertyClass<Class, Class>::Get(), MANAGED_HANDLE_FROM_OBJECT(InManagedObject), Value);
 		}
 	}
 };

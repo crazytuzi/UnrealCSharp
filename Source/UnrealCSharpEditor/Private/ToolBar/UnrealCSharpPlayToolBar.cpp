@@ -1,4 +1,4 @@
-﻿#include "ToolBar/UnrealCSharpPlayToolBar.h"
+#include "ToolBar/UnrealCSharpPlayToolBar.h"
 #include "ISettingsModule.h"
 #include "ToolMenus.h"
 #include "UnrealCSharpEditor.h"

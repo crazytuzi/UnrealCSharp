@@ -1,4 +1,5 @@
 #include "Registry/FStringRegistry.h"
+#include "Domain/FDomain.h"
 
 FStringRegistry::FStringRegistry()
 {
@@ -16,9 +17,11 @@ void FStringRegistry::Initialize()
 
 void FStringRegistry::Deinitialize()
 {
-	for (auto& [Key, Value] : NameGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : NameManagedHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 
 		if (Value.bNeedFree)
 		{
@@ -28,13 +31,15 @@ void FStringRegistry::Deinitialize()
 		}
 	}
 
-	NameGarbageCollectionHandle2Address.Empty();
+	NameManagedHandle2Address.Empty();
 
-	NameAddress2GarbageCollectionHandle.Empty();
+	NameAddress2ManagedHandle.Empty();
 
-	for (auto& [Key, Value] : StringGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : StringManagedHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 
 		if (Value.bNeedFree)
 		{
@@ -44,14 +49,16 @@ void FStringRegistry::Deinitialize()
 		}
 	}
 
-	StringGarbageCollectionHandle2Address.Empty();
+	StringManagedHandle2Address.Empty();
 
-	StringAddress2GarbageCollectionHandle.Empty();
+	StringAddress2ManagedHandle.Empty();
 
 #if UE_F_UTF8_STR_PROPERTY
-	for (auto& [Key, Value] : Utf8StringGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : Utf8StringManagedHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 
 		if (Value.bNeedFree)
 		{
@@ -61,15 +68,17 @@ void FStringRegistry::Deinitialize()
 		}
 	}
 
-	Utf8StringGarbageCollectionHandle2Address.Empty();
+	Utf8StringManagedHandle2Address.Empty();
 
-	Utf8StringAddress2GarbageCollectionHandle.Empty();
+	Utf8StringAddress2ManagedHandle.Empty();
 #endif
 
 #if UE_F_ANSI_STR_PROPERTY
-	for (auto& [Key, Value] : AnsiStringGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : AnsiStringManagedHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 
 		if (Value.bNeedFree)
 		{
@@ -79,14 +88,16 @@ void FStringRegistry::Deinitialize()
 		}
 	}
 
-	AnsiStringGarbageCollectionHandle2Address.Empty();
+	AnsiStringManagedHandle2Address.Empty();
 
-	AnsiStringAddress2GarbageCollectionHandle.Empty();
+	AnsiStringAddress2ManagedHandle.Empty();
 #endif
 
-	for (auto& [Key, Value] : TextGarbageCollectionHandle2Address.Get())
+	for (auto& [Key, Value] : TextManagedHandle2Address.Get())
 	{
-		FGarbageCollectionHandle::Free<true>(Key);
+		FDomain::GCHandle_Free(Key);
+
+		Key = IManagedHandle{};
 
 		if (Value.bNeedFree)
 		{
@@ -96,7 +107,7 @@ void FStringRegistry::Deinitialize()
 		}
 	}
 
-	TextGarbageCollectionHandle2Address.Empty();
+	TextManagedHandle2Address.Empty();
 
-	TextAddress2GarbageCollectionHandle.Empty();
+	TextAddress2ManagedHandle.Empty();
 }

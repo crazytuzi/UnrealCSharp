@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
+#include "TManagedHandleMapping.inl"
 
 class UNREALCSHARP_API FReferenceRegistry : FGCObject
 {
@@ -15,16 +15,16 @@ public:
 	virtual FString GetReferencerName() const override;
 
 public:
-	bool AddReference(const FGarbageCollectionHandle& InOwner, class FReference* InReference);
+	bool AddReference(const IManagedHandle InOwner, class FReference* InReference);
 
-	bool RemoveReference(const FGarbageCollectionHandle& InOwner);
+	bool RemoveReference(const IManagedHandle InOwner);
 
 	bool AddReference(UObject* InObject);
 
 	bool RemoveReference(UObject* InObject);
 
 private:
-	TGarbageCollectionHandleMapping<TSet<class FReference*>> ReferenceRelationship;
+	TManagedHandleMapping<TSet<class FReference*>> ReferenceRelationship;
 
 	TArray<TObjectPtr<UObject>> ObjectArray;
 };

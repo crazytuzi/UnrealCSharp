@@ -1,37 +1,37 @@
 #include "Reflection/Property/ObjectProperty/FSubclassOfPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
+#include "Domain/Script/IManagedHandle.h"
 
 void FSubclassOfPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto Object = Class->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, true, false>(
-		Class, Object, Src);
+		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
 
-	*Dest = Object;
+	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
 }
 
 void FSubclassOfPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSubclassOf<UObject>>(Src);
 
-	if (Object == nullptr)
+	if (!IManagedHandleIsValid(Object))
 	{
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSubclassOf<UObject>, false, true>(
-			Class, Object, Src);
+			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
 	}
 
-	*Dest = Object;
+	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
 }
 
 void FSubclassOfPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcManagedHandle = *static_cast<IManagedHandle*>(Src);
 
-	const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-		SrcGarbageCollectionHandle);
+	const auto SrcMulti = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(SrcManagedHandle);
 
 	Property->InitializeValue(Dest);
 
@@ -46,7 +46,7 @@ bool FSubclassOfPropertyDescriptor::Identical(const void* A, const void* B, cons
 	const auto ClassA = Cast<UClass>(Property->GetObjectPropertyValue(A));
 
 	const auto ClassB = FCSharpEnvironment::GetEnvironment().GetMulti<TSubclassOf<UObject>>(
-		*static_cast<FGarbageCollectionHandle*>(const_cast<void*>(B)))->Get();
+		*static_cast<IManagedHandle*>(const_cast<void*>(B)))->Get();
 
 	return Property->StaticIdentical(ClassA, ClassB, PortFlags);
 }

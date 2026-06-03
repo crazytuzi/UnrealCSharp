@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "UEVersion.h"
 
@@ -6,16 +6,16 @@
 template <auto IsMember>
 auto FOptionalRegistry::AddReference(const FOptionalHelperValueMapping::FAddressType& InAddress,
                                      const FOptionalHelperValueMapping::ValueType& InValue,
-                                     FClassReflection* InClass, MonoObject* InMonoObject)
+                                     FClassReflection* InClass, const IManagedHandle InManagedHandle)
 {
-	const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InClass, InMonoObject, true);
+	const auto ManagedHandle = InClass->NewWeakRefGCHandle(InManagedHandle, true);
 
 	if constexpr (IsMember)
 	{
-		OptionalAddress2GarbageCollectionHandle.Add(InAddress, GarbageCollectionHandle);
+		Address2ManagedHandle.Add(InAddress, ManagedHandle);
 	}
 
-	OptionalGarbageCollectionHandle2Helper.Add(GarbageCollectionHandle, InValue);
+	ManagedHandle2Helper.Add(ManagedHandle, InValue);
 
 	return true;
 }

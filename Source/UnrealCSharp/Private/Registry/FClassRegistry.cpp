@@ -1,10 +1,7 @@
-﻿#include "Registry/FClassRegistry.h"
+#include "Registry/FClassRegistry.h"
 #include "Domain/FDomain.h"
-#include "CoreMacro/AccessPrivateMacro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Environment/FCSharpEnvironment.h"
-
-ACCESS_PRIVATE_MEMBER_PROPERTY(FObjectInitializer, bIsDeferredInitializer, bool)
 
 TMap<TWeakObjectPtr<UClass>, UClass::ClassConstructorType> FClassRegistry::ClassConstructorMap;
 
@@ -64,14 +61,23 @@ void FClassRegistry::Deinitialize()
 
 	UnrealFunctionHashMap.Empty();
 
-	for (auto& [Key, Value] : FunctionDescriptorMap)
+	for (auto& [Key, Value] : CSharpFunctionDescriptorMap)
 	{
 		delete Value;
 
 		Value = nullptr;
 	}
 
-	FunctionDescriptorMap.Empty();
+	CSharpFunctionDescriptorMap.Empty();
+
+	for (auto& [Key, Value] : UnrealFunctionDescriptorMap)
+	{
+		delete Value;
+
+		Value = nullptr;
+	}
+
+	UnrealFunctionDescriptorMap.Empty();
 }
 
 FClassDescriptor* FClassRegistry::GetClassDescriptor(const UStruct* InStruct) const
@@ -155,20 +161,22 @@ FPropertyDescriptor* FClassRegistry::GetOrAddPropertyDescriptor(const uint32 InP
 	return nullptr;
 }
 
-void FClassRegistry::AddFunctionDescriptor(const uint32 InFunctionHash, FFunctionDescriptor* InFunctionDescriptor)
-{
-	FunctionDescriptorMap.Add(InFunctionHash, InFunctionDescriptor);
-}
-
 void FClassRegistry::RemoveFunctionDescriptor(const uint32 InFunctionHash)
 {
-	if (const auto FoundFunctionDescriptor = FunctionDescriptorMap.Find(InFunctionHash))
+	if (const auto FoundCSharpFunctionDescriptor = CSharpFunctionDescriptorMap.Find(InFunctionHash))
 	{
-		delete *FoundFunctionDescriptor;
+		delete *FoundCSharpFunctionDescriptor;
 
-		FunctionDescriptorMap.Remove(InFunctionHash);
+		CSharpFunctionDescriptorMap.Remove(InFunctionHash);
 
 		CSharpFunctionHashMap.Remove(InFunctionHash);
+	}
+
+	if (const auto FoundUnrealFunctionDescriptor = UnrealFunctionDescriptorMap.Find(InFunctionHash))
+	{
+		delete *FoundUnrealFunctionDescriptor;
+
+		UnrealFunctionDescriptorMap.Remove(InFunctionHash);
 
 		UnrealFunctionHashMap.Remove(InFunctionHash);
 	}
@@ -212,17 +220,14 @@ void FClassRegistry::ClassConstructor(const FObjectInitializer& InObjectInitiali
 		{
 			const auto Object = InObjectInitializer.GetObj();
 
-			if (const auto FoundMonoObject = FCSharpEnvironment::GetEnvironment().GetObject(Object))
+			if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(Object);
+				IManagedHandleIsValid(FoundManagedHandle))
 			{
-				auto& ObjectInitializer = FObjectInitializer::Get();
-
-				ObjectInitializer.~FObjectInitializer();
-
-				ObjectInitializer.*TAccessPrivate<FObjectInitializer_bIsDeferredInitializer>::Value = true;
+				FDynamicClassGenerator::ObjectDeferredInitializer(InObjectInitializer);
 
 				if (const auto FoundClass = FReflectionRegistry::Get().GetClass(Object->GetClass()))
 				{
-					FoundClass->ConstructorObject(FoundMonoObject);
+					FoundClass->ConstructorObject(FoundManagedHandle);
 				}
 			}
 		}

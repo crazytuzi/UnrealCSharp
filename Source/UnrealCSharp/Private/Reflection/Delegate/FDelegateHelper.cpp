@@ -1,11 +1,13 @@
-﻿#include "Reflection/Delegate/FDelegateHelper.h"
+#include "Reflection/Delegate/FDelegateHelper.h"
 
-FDelegateHelper::FDelegateHelper()
+FDelegateHelper::FDelegateHelper():
+	FDelegateBaseHelper(nullptr)
 {
 	Initialize(nullptr, nullptr);
 }
 
-FDelegateHelper::FDelegateHelper(FScriptDelegate* InDelegate, UFunction* InSignatureFunction)
+FDelegateHelper::FDelegateHelper(FScriptDelegate* InDelegate, UFunction* InSignatureFunction):
+	FDelegateBaseHelper(InDelegate)
 {
 	Initialize(InDelegate, InSignatureFunction);
 }

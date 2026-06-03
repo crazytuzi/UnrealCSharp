@@ -20,7 +20,11 @@ private:
 
 	static void ReplaceDefineConstants(FString& OutResult);
 
+	static void ReplaceScriptOutputPath(FString& OutResult);
+
 	static void ReplaceOutputPath(FString& OutResult);
+
+	static void ReplaceHintPath(FString& OutResult);
 
 	static void ReplaceTargetFramework(FString& OutResult);
 

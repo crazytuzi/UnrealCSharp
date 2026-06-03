@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Domain/AssemblyLoader.h"
+#include "Domain/Mono/AssemblyLoader.h"
 #include "UnrealCSharpSetting.generated.h"
 
 USTRUCT()
@@ -59,7 +59,7 @@ struct FBindClass
 	TSubclassOf<UObject> Class;
 
 	UPROPERTY(EditAnywhere)
-	bool bNeedMonoClass = true;
+	bool bNeedOverrideAttribute = true;
 };
 
 UENUM()
@@ -69,6 +69,13 @@ enum EDotnetVersion
 	V9 = 9 UMETA(DisplayName="dotnet9"),
 	V10 = 10 UMETA(DisplayName="dotnet10"),
 	Latest
+};
+
+UENUM(BlueprintType)
+enum class EScriptDomainType : uint8
+{
+	Mono,
+	CoreCLR,
 };
 
 /**
@@ -100,6 +107,8 @@ public:
 	const FString& GetOverrideFunctionNamePrefix() const;
 
 	const FString& GetOverrideFunctionNameSuffix() const;
+
+	EScriptDomainType GetScriptDomainType(const FString& InPlatformName) const;
 
 	UAssemblyLoader* GetAssemblyLoader() const;
 
@@ -136,6 +145,21 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Override, meta = (EditCondition = "bEnableCallOverrideFunction"))
 	FString OverrideFunctionNameSuffix;
+
+	UPROPERTY(Config, EditAnywhere, Category = Domain)
+	EScriptDomainType WindowsScriptDomainType;
+
+	UPROPERTY(Config, EditAnywhere, Category = Domain)
+	EScriptDomainType LinuxScriptDomainType;
+
+	UPROPERTY(Config, EditAnywhere, Category = Domain)
+	EScriptDomainType MacScriptDomainType;
+
+	UPROPERTY(Config, VisibleAnywhere, Category = Domain)
+	EScriptDomainType AndroidScriptDomainType;
+
+	UPROPERTY(Config, VisibleAnywhere, Category = Domain)
+	EScriptDomainType IOSScriptDomainType;
 
 	UPROPERTY(Config, EditAnywhere, Category = Domain)
 	TSubclassOf<UAssemblyLoader> AssemblyLoader;

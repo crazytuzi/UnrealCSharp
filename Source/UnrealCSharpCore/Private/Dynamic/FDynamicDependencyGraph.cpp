@@ -95,40 +95,51 @@ void FDynamicDependencyGraph::Generator()
 
 			while (!NodeStack.IsEmpty())
 			{
-				if (const auto& Element = NodeStack.Pop();
+				if (const auto Element = NodeStack.Pop();
 					NodeSet.Contains(Element))
 				{
 					// @TODO
 				}
 				else
 				{
+					if (NodeArray[NodeMap[Element]].IsCompleted())
+					{
+						continue;
+					}
+
 					auto bIsCompleted = true;
 
 					for (const auto& [Dependency, bIsSoftReference] : NodeArray[NodeMap[Element]].Dependencies)
 					{
-						if (NodeArray[NodeMap[Element]].IsPending())
+						if (bIsSoftReference)
 						{
-							if (!bIsSoftReference)
-							{
-								bIsCompleted = false;
-							}
+							continue;
 						}
-						else if (NodeArray[NodeMap[Element]].IsInitial())
+
+						const auto Type = FDependency::GetType(Dependency);
+
+						if (!NodeMap.Contains(Type))
 						{
-							if (!bIsSoftReference)
-							{
-								NodeArray[NodeMap[Element]].Pending();
+							continue;
+						}
 
-								NodeStack.Push(Dependency);
+						if (NodeArray[NodeMap[Type]].IsPending())
+						{
+							bIsCompleted = false;
+						}
+						else if (NodeArray[NodeMap[Type]].IsInitial())
+						{
+							NodeStack.Push(Type);
 
-								bIsCompleted = false;
-							}
+							bIsCompleted = false;
 						}
 					}
 
 					if (bIsCompleted)
 					{
 						NodeArray[NodeMap[Element]].Generator();
+
+						NodeArray[NodeMap[Element]].Completed();
 					}
 					else
 					{
@@ -145,6 +156,11 @@ void FDynamicDependencyGraph::Generator()
 
 			while (NodeQueue.Dequeue(OutNode))
 			{
+				if (NodeArray[NodeMap[OutNode]].IsCompleted())
+				{
+					continue;
+				}
+
 				auto bIsPending = false;
 
 				auto bIsCompleted = true;
@@ -153,7 +169,12 @@ void FDynamicDependencyGraph::Generator()
 				{
 					if (!bIsSoftReference)
 					{
-						auto Type = FDependency::GetType(Dependency);
+						const auto Type = FDependency::GetType(Dependency);
+
+						if (!NodeMap.Contains(Type))
+						{
+							continue;
+						}
 
 						if (NodeArray[NodeMap[Type]].IsInitial())
 						{
@@ -181,6 +202,8 @@ void FDynamicDependencyGraph::Generator()
 				if (bIsCompleted)
 				{
 					NodeArray[NodeMap[OutNode]].Generator();
+
+					NodeArray[NodeMap[OutNode]].Completed();
 				}
 				else
 				{

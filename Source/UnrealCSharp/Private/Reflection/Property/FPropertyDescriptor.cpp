@@ -1,4 +1,4 @@
-﻿#include "Reflection/Property/FPropertyDescriptor.h"
+#include "Reflection/Property/FPropertyDescriptor.h"
 #include "Macro/PropertyMacro.h"
 #include "Reflection/Property/PrimitiveProperty/FBytePropertyDescriptor.h"
 #include "Reflection/Property/PrimitiveProperty/FUInt16PropertyDescriptor.h"

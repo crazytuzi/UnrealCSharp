@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/FClassReflection.h"
 #include "Reflection/Function/FFunctionDescriptor.h"

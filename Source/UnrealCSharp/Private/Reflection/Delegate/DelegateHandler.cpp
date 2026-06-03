@@ -1,4 +1,4 @@
-﻿#include "Reflection/Delegate/DelegateHandler.h"
+#include "Reflection/Delegate/DelegateHandler.h"
 #include "Macro/FunctionMacro.h"
 
 void UDelegateHandler::ProcessEvent(UFunction* Function, void* Parms)

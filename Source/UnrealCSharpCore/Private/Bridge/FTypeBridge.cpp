@@ -1,8 +1,7 @@
 #include "Bridge/FTypeBridge.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/FunctionMacro.h"
-#include "Domain/FMonoDomain.h"
-#include "Template/TGetArrayLength.inl"
+#include "Domain/Script/IScriptDomain.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "UEVersion.h"
 #if UE_F_OPTIONAL_PROPERTY
@@ -168,30 +167,30 @@ EPropertyTypeExtent FTypeBridge::GetPropertyType(const FClassReflection* InClass
 FClassReflection* FTypeBridge::MakeGenericTypeInstance(const FClassReflection* InGeneric,
                                                        const FClassReflection* InType)
 {
-	const auto FoundReflectionType = InType->GetReflectionType();
+	if (InGeneric != nullptr && InType != nullptr)
+	{
+		if (const auto ScriptDomain = IScriptDomain::Get())
+		{
+			return ScriptDomain->MakeGenericType(InGeneric, InType);
+		}
+	}
 
-	const auto ReflectionTypeArray = FReflectionRegistry::Get().GetObjectClass()->NewArray(1);
-
-	FMonoDomain::Array_Set(ReflectionTypeArray, 0, FoundReflectionType);
-
-	return MakeGenericTypeInstance(InGeneric, ReflectionTypeArray);
+	return nullptr;
 }
 
-FClassReflection* FTypeBridge::MakeGenericTypeInstance(const FClassReflection* InGeneric, MonoArray* InTypeArray)
+FClassReflection* FTypeBridge::MakeGenericTypeInstance(const FClassReflection* InGeneric,
+                                                       const FClassReflection* InKeyType,
+                                                       const FClassReflection* InValueType)
 {
-	void* InParams[2];
+	if (InGeneric != nullptr && InKeyType != nullptr && InValueType != nullptr)
+	{
+		if (const auto ScriptDomain = IScriptDomain::Get())
+		{
+			return ScriptDomain->MakeGenericType(InGeneric, InKeyType, InValueType);
+		}
+	}
 
-	InParams[0] = InGeneric->GetReflectionType();
-
-	InParams[1] = InTypeArray;
-
-	const auto UtilsClass = FReflectionRegistry::Get().GetUtilsClass();
-
-	const auto MakeGenericTypeInstanceMethod = UtilsClass->GetMethod(
-		FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE, TGetArrayLength(InParams));
-
-	return FReflectionRegistry::Get().GetClass(
-		(MonoReflectionType*)MakeGenericTypeInstanceMethod->Runtime_Invoke(nullptr, InParams));
+	return nullptr;
 }
 
 FClassReflection* FTypeBridge::GetClass(FProperty* InProperty)
@@ -569,13 +568,7 @@ FClassReflection* FTypeBridge::GetClass(const FMapProperty* InProperty)
 
 		const auto FoundValueClass = GetClass(InProperty->ValueProp);
 
-		const auto ReflectionTypeArray = FReflectionRegistry::Get().GetObjectClass()->NewArray(2);
-
-		FMonoDomain::Array_Set(ReflectionTypeArray, 0, FoundKeyClass->GetReflectionType());
-
-		FMonoDomain::Array_Set(ReflectionTypeArray, 1, FoundValueClass->GetReflectionType());
-
-		return MakeGenericTypeInstance(FoundGenericClass, ReflectionTypeArray);
+		return MakeGenericTypeInstance(FoundGenericClass, FoundKeyClass, FoundValueClass);
 	}
 
 	return nullptr;

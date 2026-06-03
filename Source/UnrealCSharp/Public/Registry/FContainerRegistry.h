@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "TValueMapping.inl"
 #include "Reflection/Container/FArrayHelper.h"
@@ -13,7 +13,7 @@ public:
 	{
 		typedef Address FAddressType;
 
-		typedef typename TValueMapping<FAddressType>::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
+		typedef typename TValueMapping<FAddressType>::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
 	typedef TContainerValueMapping<FArrayHelper*, void*> FArrayHelperValueMapping;
@@ -43,17 +43,17 @@ public:
 	void Deinitialize();
 
 private:
-	FArrayHelperValueMapping::FGarbageCollectionHandle2Value ArrayGarbageCollectionHandle2Helper;
+	FArrayHelperValueMapping::FManagedHandle2Value ArrayManagedHandle2Helper;
 
-	FArrayHelperValueMapping::FAddress2GarbageCollectionHandle ArrayAddress2GarbageCollectionHandle;
+	FArrayHelperValueMapping::FAddress2ManagedHandle ArrayAddress2ManagedHandle;
 
-	FMapHelperValueMapping::FGarbageCollectionHandle2Value MapGarbageCollectionHandle2Helper;
+	FMapHelperValueMapping::FManagedHandle2Value MapManagedHandle2Helper;
 
-	FMapHelperValueMapping::FAddress2GarbageCollectionHandle MapAddress2GarbageCollectionHandle;
+	FMapHelperValueMapping::FAddress2ManagedHandle MapAddress2ManagedHandle;
 
-	FSetHelperValueMapping::FGarbageCollectionHandle2Value SetGarbageCollectionHandle2Helper;
+	FSetHelperValueMapping::FManagedHandle2Value SetManagedHandle2Helper;
 
-	FSetHelperValueMapping::FAddress2GarbageCollectionHandle SetAddress2GarbageCollectionHandle;
+	FSetHelperValueMapping::FAddress2ManagedHandle SetAddress2ManagedHandle;
 };
 
 #include "FContainerRegistry.inl"

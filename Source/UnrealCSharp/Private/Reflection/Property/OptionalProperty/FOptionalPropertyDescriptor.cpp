@@ -1,7 +1,7 @@
 #include "Reflection/Property/OptionalProperty/FOptionalPropertyDescriptor.h"
 #if UE_F_OPTIONAL_PROPERTY
 #include "Environment/FCSharpEnvironment.h"
-#include "GarbageCollection/FGarbageCollectionHandle.h"
+#include "Domain/Script/IManagedHandle.h"
 
 void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
@@ -10,34 +10,33 @@ void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) co
 	const auto OptionalHelper = new FOptionalHelper(Property, Src, true, false);
 
 	FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-		Src, OptionalHelper, Class, Object);
+		Src, OptionalHelper, Class, MANAGED_HANDLE_FROM_OBJECT(Object));
 
-	*Dest = Object;
+	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
 }
 
 void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetOptionalObject<FOptionalHelper>(Src);
 
-	if (Object == nullptr)
+	if (!IManagedHandleIsValid(Object))
 	{
 		Object = Class->NewObject();
 
 		const auto OptionalHelper = new FOptionalHelper(Property, Src, false, false);
 
 		FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, true>(
-			Src, OptionalHelper, Class, Object);
+			Src, OptionalHelper, Class, MANAGED_HANDLE_FROM_OBJECT(Object));
 	}
 
-	*Dest = Object;
+	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
 }
 
 void FOptionalPropertyDescriptor::Set(void* Src, void* Dest) const
 {
-	const auto SrcGarbageCollectionHandle = *static_cast<FGarbageCollectionHandle*>(Src);
+	const auto SrcManagedHandle = *static_cast<IManagedHandle*>(Src);
 
-	const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(
-		SrcGarbageCollectionHandle);
+	const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(SrcManagedHandle);
 
 	Property->InitializeValue(Dest);
 

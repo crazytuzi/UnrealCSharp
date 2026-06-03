@@ -1,4 +1,4 @@
-﻿#include "FStructGenerator.h"
+#include "FStructGenerator.h"
 #include "FDelegateGenerator.h"
 #include "FGeneratorCore.h"
 #include "Binding/Class/FBindingClass.h"
@@ -89,6 +89,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
 	};
+
+	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+	{
+		UsingNameSpaces.Add(NAMESPACE_INTEROP);
+	}
 
 	auto SuperStruct = Cast<UScriptStruct>(InScriptStruct->GetSuperStruct());
 
@@ -251,7 +256,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\n"
 			"\t\t\t\t\tFPropertyImplementation.FProperty_GetStructPropertyImplementation(%s, %s, %s);\n"
 			"\n"
-			"\t\t\t\t\treturn *(%s*)%s;\n"
+			"\t\t\t\t\treturn %s;\n"
 			"\t\t\t\t}\n"
 			"\t\t\t}\n"
 			"\n"
@@ -277,8 +282,8 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                   *DummyPropertyName,
 		                                   RETURN_BUFFER_TEXT,
-		                                   *PropertyType,
-		                                   RETURN_BUFFER_TEXT,
+		                                   *FGeneratorCore::GetReturn(*PropertyIterator, PropertyType,
+		                                                              RETURN_BUFFER_TEXT),
 		                                   IN_BUFFER_TEXT,
 		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
 		                                   *FGeneratorCore::GetBufferCast(*PropertyIterator),

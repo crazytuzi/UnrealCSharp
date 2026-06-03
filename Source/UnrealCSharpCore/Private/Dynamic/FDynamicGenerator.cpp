@@ -1,11 +1,13 @@
-﻿#include "Dynamic/FDynamicGenerator.h"
+#include "Dynamic/FDynamicGenerator.h"
 #include "CoreMacro/Macro.h"
-#include "Domain/FMonoDomainScope.h"
+#include "Domain/Script/FScriptDomainScope.h"
 #include "Dynamic/FDynamicEnumGenerator.h"
 #include "Dynamic/FDynamicStructGenerator.h"
 #include "Dynamic/FDynamicInterfaceGenerator.h"
 #include "Dynamic/FDynamicClassGenerator.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
+#include "Common/FUnrealCSharpFunctionLibrary.h"
+#include "Reflection/FReflectionRegistry.h"
 
 #if WITH_EDITOR
 bool FDynamicGenerator::bIsFullGenerator{};
@@ -19,7 +21,7 @@ void FDynamicGenerator::Generator()
 	bIsFullGenerator = true;
 #endif
 
-	FMonoDomainScope([]()
+	FScriptDomainScope([]()
 	{
 		FDynamicEnumGenerator::Generator();
 
@@ -133,7 +135,7 @@ void FDynamicGenerator::Generator(const TArray<FFileChangeData>& InFileChangeDat
 	{
 		FDynamicGeneratorCore::BeginCodeAnalysisGenerator();
 
-		FMonoDomainScope([InFileChangeData]()
+		FScriptDomainScope([InFileChangeData]()
 		{
 			TArray<FString> FileChange;
 

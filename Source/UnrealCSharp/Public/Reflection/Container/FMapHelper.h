@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Property/FPropertyDescriptor.h"
 
@@ -41,6 +41,8 @@ public:
 	FPropertyDescriptor* GetValuePropertyDescriptor() const;
 
 	FScriptMap* GetScriptMap() const;
+
+	void* GetAddress() const;
 
 	int32 GetMaxIndex() const;
 

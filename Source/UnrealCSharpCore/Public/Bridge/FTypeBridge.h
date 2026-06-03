@@ -1,8 +1,7 @@
-﻿#pragma once
+#pragma once
 
 #include "EPropertyTypeExtent.h"
 #include "UEVersion.h"
-#include "mono/metadata/object.h"
 
 class FClassReflection;
 
@@ -13,7 +12,9 @@ public:
 
 	static FClassReflection* MakeGenericTypeInstance(const FClassReflection* InGeneric, const FClassReflection* InType);
 
-	static FClassReflection* MakeGenericTypeInstance(const FClassReflection* InGeneric, MonoArray* InTypeArray);
+	static FClassReflection* MakeGenericTypeInstance(const FClassReflection* InGeneric,
+	                                                 const FClassReflection* InKeyType,
+	                                                 const FClassReflection* InValueType);
 
 	static FClassReflection* GetClass(FProperty* InProperty);
 

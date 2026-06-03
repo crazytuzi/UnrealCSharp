@@ -2,7 +2,7 @@
 
 #include "UEVersion.h"
 #include "FClassReflection.h"
-#include "Domain/FMonoDomain.h"
+#include "Domain/Script/IManagedTypes.h"
 
 class UNREALCSHARPCORE_API FReflectionRegistry
 {
@@ -20,9 +20,9 @@ public:
 public:
 	FClassReflection* GetClass(const TWeakObjectPtr<UField>& InField);
 
-	FClassReflection* GetClass(MonoReflectionType* InReflectionType);
+	FClassReflection* GetClass(const IManagedReflectionType InManagedReflectionType);
 
-	FClassReflection* GetClass(MonoClass* InClass);
+	FClassReflection* GetClass(const IManagedClass InManagedClass);
 
 	FClassReflection* GetClass(const FString& InNameSpace, const FString& InName);
 
@@ -32,15 +32,9 @@ public:
 public:
 	FClassReflection* GetUtilsClass() const;
 
-	FClassReflection* GetByteClass() const;
-
 	FClassReflection* GetObjectClass() const;
 
-	FClassReflection* GetUInt16Class() const;
-
-	FClassReflection* GetUInt32Class() const;
-
-	FClassReflection* GetUInt64Class() const;
+	FClassReflection* GetBooleanClass() const;
 
 	FClassReflection* GetSByteClass() const;
 
@@ -50,13 +44,19 @@ public:
 
 	FClassReflection* GetInt64Class() const;
 
-	FClassReflection* GetBooleanClass() const;
+	FClassReflection* GetByteClass() const;
+
+	FClassReflection* GetUInt16Class() const;
+
+	FClassReflection* GetUInt32Class() const;
+
+	FClassReflection* GetUInt64Class() const;
 
 	FClassReflection* GetSingleClass() const;
 
-	FClassReflection* GetEnumClass() const;
-
 	FClassReflection* GetDoubleClass() const;
+
+	FClassReflection* GetEnumClass() const;
 
 	FClassReflection* GetUClassClass() const;
 
@@ -609,20 +609,11 @@ public:
 #endif
 
 private:
-	static MonoClass* GetMonoClass(const TWeakObjectPtr<UField>& InField);
-
-private:
 	FClassReflection* UtilsClass{};
-
-	FClassReflection* ByteClass{};
 
 	FClassReflection* ObjectClass{};
 
-	FClassReflection* UInt16Class{};
-
-	FClassReflection* UInt32Class{};
-
-	FClassReflection* UInt64Class{};
+	FClassReflection* BooleanClass{};
 
 	FClassReflection* SByteClass{};
 
@@ -632,13 +623,19 @@ private:
 
 	FClassReflection* Int64Class{};
 
-	FClassReflection* BooleanClass{};
+	FClassReflection* ByteClass{};
+
+	FClassReflection* UInt16Class{};
+
+	FClassReflection* UInt32Class{};
+
+	FClassReflection* UInt64Class{};
 
 	FClassReflection* SingleClass{};
 
-	FClassReflection* EnumClass{};
-
 	FClassReflection* DoubleClass{};
+
+	FClassReflection* EnumClass{};
 
 	FClassReflection* UClassClass{};
 
@@ -1193,11 +1190,13 @@ private:
 private:
 	TMap<TWeakObjectPtr<UField>, FClassReflection*> Field2Class;
 
-	TMap<MonoClass*, FClassReflection*> Class2Class;
+#if WITH_MONO
+	TMap<IManagedClass, FClassReflection*> Class2Class;
 
-	TMap<MonoReflectionType*, FClassReflection*> ReflectionType2Class;
+	TMap<IManagedReflectionType, FClassReflection*> ReflectionType2Class;
+#endif
 
-	TMap<TPair<FString, FString>, FClassReflection*> NameNameSpace2Class;
+	TMap<FString, FClassReflection*> FullName2Class;
 };
 
 #include "FReflectionRegistry.inl"

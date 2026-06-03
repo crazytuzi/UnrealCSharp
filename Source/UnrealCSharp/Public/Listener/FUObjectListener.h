@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 class FUObjectListener final : FUObjectArray::FUObjectCreateListener, FUObjectArray::FUObjectDeleteListener
 {

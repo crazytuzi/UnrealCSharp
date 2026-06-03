@@ -1,82 +1,80 @@
-﻿#pragma once
+#pragma once
 
 #include "Reference/TDelegateReference.h"
 
 template <
 	typename Class,
 	typename FDelegateValueMapping,
-	typename FDelegateValueMapping::FGarbageCollectionHandle2Value Class::* GarbageCollectionHandle2Value,
-	typename FDelegateValueMapping::FAddress2GarbageCollectionHandle Class::* Address2GarbageCollectionHandle
+	typename FDelegateValueMapping::FManagedHandle2Value Class::* ManagedHandle2Value,
+	typename FDelegateValueMapping::FAddress2ManagedHandle Class::* Address2ManagedHandle
 >
 struct FDelegateRegistry::TDelegateRegistryImplementation<
 		FDelegateValueMapping,
-		typename FDelegateValueMapping::FGarbageCollectionHandle2Value Class::*,
-		GarbageCollectionHandle2Value,
-		typename FDelegateValueMapping::FAddress2GarbageCollectionHandle Class::*,
-		Address2GarbageCollectionHandle
+		typename FDelegateValueMapping::FManagedHandle2Value Class::*,
+		ManagedHandle2Value,
+		typename FDelegateValueMapping::FAddress2ManagedHandle Class::*,
+		Address2ManagedHandle
 	>
 {
-	static auto GetDelegate(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto GetDelegate(Class* InRegistry, const IManagedHandle InManagedHandle)
 		-> typename FDelegateValueMapping::ValueType
 	{
-		const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle);
+		const auto FoundValue = (InRegistry->*ManagedHandle2Value).Find(InManagedHandle);
 
 		return FoundValue != nullptr ? *FoundValue : nullptr;
 	}
 
 	static auto GetObject(Class* InRegistry, const typename FDelegateValueMapping::FAddressType InAddress)
-		-> MonoObject*
+		-> IManagedHandle
 	{
-		const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(InAddress);
+		const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress);
 
-		return FoundGarbageCollectionHandle != nullptr
-			       ? static_cast<MonoObject*>(*FoundGarbageCollectionHandle)
-			       : nullptr;
+		return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
 	}
 
 	static auto AddReference(Class* InRegistry, typename FDelegateValueMapping::ValueType InValue,
-	                         const FClassReflection* InClass, MonoObject* InMonoObject)
+	                         const FClassReflection* InClass, const IManagedHandle InManagedHandle)
 	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewWeakRef(InClass, InMonoObject, true);
+		const auto ManagedHandle = InClass->NewWeakRefGCHandle(InManagedHandle, true);
 
-		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
+		(InRegistry->*ManagedHandle2Value).Add(ManagedHandle, InValue);
 
 		return true;
 	}
 
-	static auto AddReference(Class* InRegistry, const FGarbageCollectionHandle& InOwner,
+	static auto AddReference(Class* InRegistry, const IManagedHandle InOwner,
 	                         const typename FDelegateValueMapping::FAddressType InAddress,
 	                         typename FDelegateValueMapping::ValueType InValue,
-	                         const FClassReflection* InClass, MonoObject* InMonoObject)
+	                         const FClassReflection* InClass, const IManagedHandle InManagedHandle)
 	{
-		const auto GarbageCollectionHandle = FGarbageCollectionHandle::NewRef(InClass, InMonoObject, true);
+		const auto ManagedHandle = InClass->NewGCHandle(InManagedHandle, true);
 
-		(InRegistry->*Address2GarbageCollectionHandle).Add(InAddress, GarbageCollectionHandle);
+		(InRegistry->*Address2ManagedHandle).Add(InAddress, ManagedHandle);
 
-		(InRegistry->*GarbageCollectionHandle2Value).Add(GarbageCollectionHandle, InValue);
+		(InRegistry->*ManagedHandle2Value).Add(ManagedHandle, InValue);
 
 		return FCSharpEnvironment::GetEnvironment().AddReference(
 			InOwner,
-			new TDelegateReference<std::remove_pointer_t<typename FDelegateValueMapping::ValueType>>(
-				GarbageCollectionHandle));
+			new TDelegateReference<std::remove_pointer_t<typename FDelegateValueMapping::ValueType>>(ManagedHandle));
 	}
 
-	static auto RemoveReference(Class* InRegistry, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto RemoveReference(Class* InRegistry, const IManagedHandle InManagedHandle)
 	{
-		if (const auto FoundValue = (InRegistry->*GarbageCollectionHandle2Value).Find(InGarbageCollectionHandle))
+		if (const auto FoundValue = (InRegistry->*ManagedHandle2Value).Find(InManagedHandle))
 		{
-			if (const auto FoundGarbageCollectionHandle = (InRegistry->*Address2GarbageCollectionHandle).Find(
-				*FoundValue))
+			const auto Address = (*FoundValue)->GetAddress();
+
+			if (const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(Address))
 			{
-				if (*FoundGarbageCollectionHandle == InGarbageCollectionHandle)
+				if (*FoundManagedHandle == InManagedHandle)
 				{
-					(InRegistry->*Address2GarbageCollectionHandle).Remove(*FoundValue);
+					(InRegistry->*Address2ManagedHandle).Remove(Address);
 				}
 			}
 
 			delete *FoundValue;
 
-			(InRegistry->*GarbageCollectionHandle2Value).Remove(InGarbageCollectionHandle);
+			(InRegistry->*ManagedHandle2Value).Remove(InManagedHandle);
 
 			return true;
 		}
@@ -90,10 +88,10 @@ struct FDelegateRegistry::TDelegateRegistry<std::remove_pointer_t<
 		FDelegateRegistry::FDelegateHelperMapping::ValueType>> :
 	TDelegateRegistryImplementation<
 		FDelegateHelperMapping,
-		decltype(&FDelegateRegistry::DelegateGarbageCollectionHandle2Helper),
-		&FDelegateRegistry::DelegateGarbageCollectionHandle2Helper,
-		decltype(&FDelegateRegistry::DelegateAddress2GarbageCollectionHandle),
-		&FDelegateRegistry::DelegateAddress2GarbageCollectionHandle
+		decltype(&FDelegateRegistry::DelegateManagedHandle2Helper),
+		&FDelegateRegistry::DelegateManagedHandle2Helper,
+		decltype(&FDelegateRegistry::DelegateAddress2ManagedHandle),
+		&FDelegateRegistry::DelegateAddress2ManagedHandle
 	>
 {
 };
@@ -103,10 +101,10 @@ struct FDelegateRegistry::TDelegateRegistry<std::remove_pointer_t<
 		FDelegateRegistry::FMulticastDelegateHelperMapping::ValueType>> :
 	TDelegateRegistryImplementation<
 		FMulticastDelegateHelperMapping,
-		decltype(&FDelegateRegistry::MulticastDelegateGarbageCollectionHandle2Helper),
-		&FDelegateRegistry::MulticastDelegateGarbageCollectionHandle2Helper,
-		decltype(&FDelegateRegistry::MulticastDelegateAddress2GarbageCollectionHandle),
-		&FDelegateRegistry::MulticastDelegateAddress2GarbageCollectionHandle
+		decltype(&FDelegateRegistry::MulticastDelegateManagedHandle2Helper),
+		&FDelegateRegistry::MulticastDelegateManagedHandle2Helper,
+		decltype(&FDelegateRegistry::MulticastDelegateAddress2ManagedHandle),
+		&FDelegateRegistry::MulticastDelegateAddress2ManagedHandle
 	>
 {
 };

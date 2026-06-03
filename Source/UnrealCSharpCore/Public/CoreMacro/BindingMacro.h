@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #define BINDING_COMBINE_CLASS(A, B) FString::Printf(TEXT("%s.%s"), *A, *B)
 

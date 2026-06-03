@@ -1,4 +1,4 @@
-﻿#include "Reflection/Container/FSetHelper.h"
+#include "Reflection/Container/FSetHelper.h"
 #include "Reflection/Property/FPropertyDescriptor.h"
 #include "CppVersion.h"
 
@@ -167,6 +167,11 @@ FPropertyDescriptor* FSetHelper::GetElementPropertyDescriptor() const
 }
 
 FScriptSet* FSetHelper::GetScriptSet() const
+{
+	return ScriptSet;
+}
+
+void* FSetHelper::GetAddress() const
 {
 	return ScriptSet;
 }

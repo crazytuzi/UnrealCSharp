@@ -1,4 +1,4 @@
-﻿#include "Reflection/Property/DelegateProperty/FMulticastSparseDelegatePropertyDescriptor.h"
+#include "Reflection/Property/DelegateProperty/FMulticastSparseDelegatePropertyDescriptor.h"
 
 const FMulticastScriptDelegate* FMulticastSparseDelegatePropertyDescriptor::GetMulticastDelegate(void* InAddress) const
 {

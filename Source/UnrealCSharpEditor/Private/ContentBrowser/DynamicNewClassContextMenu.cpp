@@ -1,4 +1,4 @@
-﻿#include "ContentBrowser/DynamicNewClassContextMenu.h"
+#include "ContentBrowser/DynamicNewClassContextMenu.h"
 #include "ToolMenus.h"
 #include "UnrealCSharpEditorStyle.h"
 

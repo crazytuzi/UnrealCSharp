@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/BindingMacro.h"

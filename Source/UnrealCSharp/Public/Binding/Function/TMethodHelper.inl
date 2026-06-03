@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Environment/FCSharpEnvironment.h"
+#include "Domain/Script/IManagedHandle.h"
 #include "Binding/Property/TPropertyBuilder.inl"
+#include "Binding/TypeInfo/TIsPrimitive.inl"
+#include "Binding/Core/TPropertyValue.inl"
 #include "Reflection/FReflectionRegistry.h"
 
 template <typename>
@@ -16,7 +19,7 @@ public:
 	template <typename Class>
 	static auto Call(Class* InObject, const FString& InName, Args&&... InArgs)
 	{
-		MonoObject* Object{};
+		IManagedHandle Object{};
 
 		FClassReflection* ClassReflection{};
 
@@ -28,7 +31,7 @@ public:
 		{
 			Object = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 
-			if (Object == nullptr)
+			if (!IManagedHandleIsValid(Object))
 			{
 				return DefaultReturn();
 			}
@@ -39,7 +42,7 @@ public:
 		{
 			Object = FCSharpEnvironment::GetEnvironment().GetBinding(InObject);
 
-			if (Object == nullptr)
+			if (!IManagedHandleIsValid(Object))
 			{
 				return DefaultReturn();
 			}
@@ -59,9 +62,39 @@ public:
 			return DefaultReturn();
 		}
 
-		const auto ReturnValue = Method->Runtime_Invoke_Array(
-			Object, ArgumentToArray(std::index_sequence_for<Args...>{},
-			                        std::tuple<Args...>(std::forward<Args>(InArgs)...)));
+#if WITH_MONO
+		const auto ManagedArray = ArgumentToArray(std::index_sequence_for<Args...>{},
+		                                          std::tuple<Args...>(std::forward<Args>(InArgs)...));
+
+		const auto ReturnValue = Method->Runtime_Invoke_Array(Object, ManagedArray);
+
+		if constexpr (sizeof...(Args) > 0)
+		{
+			GetReferenceValue(ManagedArray, std::index_sequence_for<Args...>{}, std::tie(InArgs...));
+		}
+#else
+		constexpr auto Size = static_cast<int32>(sizeof...(Args));
+
+		constexpr auto ArraySize = Size > 0 ? Size : 1;
+
+		IManagedHandle ManagedHandles[ArraySize] = {};
+
+		IManagedHandle ShadowManagedHandles[ArraySize] = {};
+
+		void* Params[ArraySize] = {};
+
+		auto ShadowArgs = std::tuple<std::decay_t<Args>...>(std::forward<Args>(InArgs)...);
+
+		ArgumentToParams(std::index_sequence_for<Args...>{}, ShadowArgs, ManagedHandles, ShadowManagedHandles, Params);
+
+		const auto ReturnValue = Method->Runtime_Invoke(Object, Size > 0 ? Params : nullptr);
+
+		if constexpr (Size > 0)
+		{
+			GetReferenceValue(std::index_sequence_for<Args...>{}, std::tie(InArgs...), ShadowArgs,
+			                  ManagedHandles, ShadowManagedHandles);
+		}
+#endif
 
 		if constexpr (!std::is_void_v<Result>)
 		{
@@ -70,8 +103,9 @@ public:
 	}
 
 private:
+#if WITH_MONO
 	template <auto... Index>
-	static auto ArgumentToArray(std::index_sequence<Index...>, std::tuple<std::decay_t<Args>...>&& InArgs)
+	static IManagedArray ArgumentToArray(std::index_sequence<Index...>, std::tuple<std::decay_t<Args>...>&& InArgs)
 	{
 		if constexpr (constexpr auto Size = static_cast<int32>(sizeof...(Args));
 			Size > 0)
@@ -85,9 +119,80 @@ private:
 		}
 		else
 		{
-			return nullptr;
+			return INVALID_MANAGED;
 		}
 	}
+
+	template <auto... Index, typename ArgsTuple>
+	static void GetReferenceValue(const IManagedArray InManagedArray, std::index_sequence<Index...>, ArgsTuple InArgs)
+	{
+		([&]
+		{
+			using Type = std::tuple_element_t<Index, std::tuple<Args...>>;
+
+			if constexpr (std::is_lvalue_reference_v<Type> &&
+				!std::is_const_v<std::remove_reference_t<Type>>)
+			{
+				std::get<Index>(InArgs) = TPropertyValue<Type, Type>::Get(
+					FDomain::Array_Get<IManagedObject>(InManagedArray, Index));
+			}
+		}(), ...);
+	}
+#else
+	template <auto... Index>
+	static void ArgumentToParams(std::index_sequence<Index...>,
+	                             std::tuple<std::decay_t<Args>...>& InShadowArgs,
+	                             IManagedHandle* InManagedHandles,
+	                             IManagedHandle* InShadowManagedHandles,
+	                             void** InParams)
+	{
+		([&]
+		{
+			using Type = std::decay_t<std::tuple_element_t<Index, std::tuple<Args...>>>;
+
+			if constexpr (TIsPrimitive<Type>::Value)
+			{
+				InParams[Index] = &std::get<Index>(InShadowArgs);
+			}
+			else
+			{
+				InManagedHandles[Index] = IManagedHandleFromObject(
+					TPropertyBuilder<Type*, nullptr>::Get(std::get<Index>(InShadowArgs)));
+
+				InShadowManagedHandles[Index] = InManagedHandles[Index];
+
+				InParams[Index] = &InManagedHandles[Index];
+			}
+		}(), ...);
+	}
+
+	template <auto... Index, typename ArgsTuple>
+	static void GetReferenceValue(std::index_sequence<Index...>,
+	                              ArgsTuple InArgs,
+	                              std::tuple<std::decay_t<Args>...>& InShadowArgs,
+	                              IManagedHandle* InManagedHandles,
+	                              IManagedHandle* InShadowManagedHandles
+	)
+	{
+		([&]
+		{
+			using Type = std::tuple_element_t<Index, std::tuple<Args...>>;
+
+			if constexpr (std::is_lvalue_reference_v<Type> &&
+				!std::is_const_v<std::remove_reference_t<Type>>)
+			{
+				if constexpr (TIsPrimitive<Type>::Value)
+				{
+					std::get<Index>(InArgs) = std::get<Index>(InShadowArgs);
+				}
+				else if (InManagedHandles[Index] != InShadowManagedHandles[Index])
+				{
+					std::get<Index>(InArgs) = TPropertyValue<Type, Type>::Get(InManagedHandles[Index]);
+				}
+			}
+		}(), ...);
+	}
+#endif
 
 	static auto DefaultReturn()
 	{

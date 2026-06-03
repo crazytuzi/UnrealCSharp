@@ -3,6 +3,7 @@
 #include "Bridge/FTypeBridge.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
+#include "CoreMacro/AccessPrivateMacro.h"
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "Reflection/FReflectionRegistry.h"
 #if WITH_EDITOR
@@ -18,10 +19,14 @@
 #endif
 #include "UEVersion.h"
 
+ACCESS_PRIVATE_MEMBER_PROPERTY(FObjectInitializer, bIsDeferredInitializer, bool)
+
 TSet<UClass::ClassConstructorType> FDynamicClassGenerator::ClassConstructorSet
 {
 	&FDynamicClassGenerator::ClassConstructor
 };
+
+TFunction<void(UObject*)> FDynamicClassGenerator::OnPostClassConstructor;
 
 TMap<UClass*, FString> FDynamicClassGenerator::NamespaceMap;
 
@@ -822,6 +827,13 @@ void FDynamicClassGenerator::ClassConstructor(const FObjectInitializer& InObject
 			}
 		}
 	}
+
+	if (OnPostClassConstructor != nullptr)
+	{
+		ObjectDeferredInitializer(InObjectInitializer);
+
+		OnPostClassConstructor(Object);
+	}
 }
 
 bool FDynamicClassGenerator::IsDynamicBlueprintGeneratedClass(const FString& InName)
@@ -902,4 +914,13 @@ USCS_Node* FDynamicClassGenerator::NewNode(USimpleConstructionScript* InSimpleCo
 	InSimpleConstructionScript->AddNode(Node);
 
 	return Node;
+}
+
+void FDynamicClassGenerator::ObjectDeferredInitializer(const FObjectInitializer& InObjectInitializer)
+{
+	auto& ObjectInitializer = const_cast<FObjectInitializer&>(InObjectInitializer);
+
+	ObjectInitializer.~FObjectInitializer();
+
+	ObjectInitializer.*TAccessPrivate<FObjectInitializer_bIsDeferredInitializer>::Value = true;
 }

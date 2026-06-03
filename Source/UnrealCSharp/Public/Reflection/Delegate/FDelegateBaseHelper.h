@@ -1,9 +1,21 @@
-﻿#pragma once
+#pragma once
 
 class FDelegateBaseHelper
 {
 public:
-	FDelegateBaseHelper() = default;
+	explicit FDelegateBaseHelper(void* InAddress):
+		Address(InAddress)
+	{
+	}
 
 	virtual ~FDelegateBaseHelper() = default;
+
+public:
+	void* GetAddress() const
+	{
+		return Address;
+	}
+
+private:
+	void* Address;
 };

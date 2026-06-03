@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Binding/TypeInfo/FTypeInfo.h"
 #include "CoreMacro/BindingMacro.h"

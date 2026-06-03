@@ -1,4 +1,4 @@
-﻿using Script.Library;
+using Script.Library;
 
 namespace Script.CoreUObject
 {

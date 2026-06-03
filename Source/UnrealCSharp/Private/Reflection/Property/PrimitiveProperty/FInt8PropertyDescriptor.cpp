@@ -1,1 +1,1 @@
-﻿#include "Reflection/Property/PrimitiveProperty/FInt8PropertyDescriptor.h"
+#include "Reflection/Property/PrimitiveProperty/FInt8PropertyDescriptor.h"

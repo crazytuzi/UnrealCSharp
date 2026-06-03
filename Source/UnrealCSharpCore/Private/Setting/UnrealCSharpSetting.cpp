@@ -6,19 +6,24 @@
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpSettings"
 
-UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer),
-	  PublishDirectory(DEFAULT_PUBLISH_DIRECTORY),
-	  UEName(DEFAULT_UE_NAME),
-	  GameName(DEFAULT_GAME_NAME),
-	  bEnableCallOverrideFunction(true),
-	  OverrideFunctionNamePrefix(DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX),
-	  OverrideFunctionNameSuffix(DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX),
-	  AssemblyLoader(UAssemblyLoader::StaticClass()),
-	  bEnableDebug(false),
-	  Port(0),
-	  bEnableImmediatelyActive(true),
-	  DotnetVersion(EDotnetVersion::Latest)
+UUnrealCSharpSetting::UUnrealCSharpSetting(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer),
+	PublishDirectory(DEFAULT_PUBLISH_DIRECTORY),
+	UEName(DEFAULT_UE_NAME),
+	GameName(DEFAULT_GAME_NAME),
+	bEnableCallOverrideFunction(true),
+	OverrideFunctionNamePrefix(DEFAULT_OVERRIDE_FUNCTION_NAME_PREFIX),
+	OverrideFunctionNameSuffix(DEFAULT_OVERRIDE_FUNCTION_NAME_SUFFIX),
+	WindowsScriptDomainType(EScriptDomainType::CoreCLR),
+	LinuxScriptDomainType(EScriptDomainType::CoreCLR),
+	MacScriptDomainType(EScriptDomainType::CoreCLR),
+	AndroidScriptDomainType(EScriptDomainType::Mono),
+	IOSScriptDomainType(EScriptDomainType::Mono),
+	AssemblyLoader(UAssemblyLoader::StaticClass()),
+	bEnableDebug(false),
+	Port(0),
+	bEnableImmediatelyActive(true),
+	DotnetVersion(EDotnetVersion::Latest)
 {
 }
 
@@ -82,6 +87,36 @@ const FString& UUnrealCSharpSetting::GetOverrideFunctionNamePrefix() const
 const FString& UUnrealCSharpSetting::GetOverrideFunctionNameSuffix() const
 {
 	return OverrideFunctionNameSuffix;
+}
+
+EScriptDomainType UUnrealCSharpSetting::GetScriptDomainType(const FString& InPlatformName) const
+{
+	if (InPlatformName.Equals(TEXT("Windows"), ESearchCase::IgnoreCase))
+	{
+		return WindowsScriptDomainType;
+	}
+
+	if (InPlatformName.Equals(TEXT("Linux"), ESearchCase::IgnoreCase))
+	{
+		return LinuxScriptDomainType;
+	}
+
+	if (InPlatformName.Equals(TEXT("Mac"), ESearchCase::IgnoreCase))
+	{
+		return MacScriptDomainType;
+	}
+
+	if (InPlatformName.Equals(TEXT("Android"), ESearchCase::IgnoreCase))
+	{
+		return AndroidScriptDomainType;
+	}
+
+	if (InPlatformName.Equals(TEXT("IOS"), ESearchCase::IgnoreCase))
+	{
+		return IOSScriptDomainType;
+	}
+
+	return EScriptDomainType::CoreCLR;
 }
 
 UAssemblyLoader* UUnrealCSharpSetting::GetAssemblyLoader() const

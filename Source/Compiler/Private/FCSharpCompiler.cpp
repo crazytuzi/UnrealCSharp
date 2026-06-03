@@ -1,4 +1,4 @@
-﻿#include "FCSharpCompiler.h"
+#include "FCSharpCompiler.h"
 #include "FCSharpCompilerRunnable.h"
 
 FCSharpCompiler::FCSharpCompiler():

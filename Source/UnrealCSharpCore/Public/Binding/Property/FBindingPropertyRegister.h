@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Binding/TypeInfo/FBindingTypeInfoRegister.h"
 #include "EBindingPropertyAccess.h"

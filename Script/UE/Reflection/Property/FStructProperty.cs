@@ -1,4 +1,4 @@
-﻿namespace Script.Reflection.Property
+namespace Script.Reflection.Property
 {
     public class FStructProperty : FProperty
     {

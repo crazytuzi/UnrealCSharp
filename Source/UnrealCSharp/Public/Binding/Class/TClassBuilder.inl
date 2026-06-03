@@ -13,7 +13,7 @@ class TClassBuilder : public FClassBuilder
 {
 public:
 	explicit TClassBuilder(const FString& InImplementationNameSpace,
-	                       const TOptional<TFunction<FString()>>& InClassFunction):
+	                       const TOptional<TFunction<FString()>>& InClassFunction) :
 		FClassBuilder({
 			              [InClassFunction]()
 			              {

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "ModuleDescriptor.h"
 
@@ -20,7 +20,7 @@ private:
 	void OnLoadingPhaseComplete(ELoadingPhase::Type LoadingPhase, bool bSuccess);
 
 	void OnPreExit();
-	
+
 	static void SetActive(bool InbIsActive);
 
 	FDelegateHandle OnLoadingPhaseCompleteHandle;

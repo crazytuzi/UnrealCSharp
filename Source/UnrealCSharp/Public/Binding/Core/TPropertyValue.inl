@@ -29,7 +29,7 @@ struct TPropertyValue
 template <typename T>
 struct TPrimitivePropertyValue
 {
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
 		return TPropertyClass<T, T>::Get()->Value_Box(InMember);
 	}
@@ -40,20 +40,25 @@ struct TPrimitivePropertyValue
 		return TPropertyClass<T, T>::Get()->Value_Box(InMember);
 	}
 
-	static auto Get(MonoObject* InValue)
+	static auto Get(const IManagedObject InManagedObject)
 	{
-		return *static_cast<std::decay_t<T>*>(FDomain::Object_Unbox(InValue));
+		return Get(MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+	}
+
+	static auto Get(const IManagedHandle InManagedHandle)
+	{
+		return *static_cast<std::decay_t<T>*>(FDomain::Object_Unbox(InManagedHandle));
 	}
 };
 
 template <typename T>
 struct TCompoundPropertyValue
 {
-	static auto Get(MonoObject* InValue)
+	static auto Get(const IManagedObject InManagedObject)
 	{
-		return T::Get(*FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-			TPropertyClass<typename TTemplateTypeTraits<T>::template Type<>,
-			               typename TTemplateTypeTraits<T>::template Type<>>::Get(), InValue));
+		return T::Get(TPropertyClass<typename TTemplateTypeTraits<T>::template Type<>,
+		                             typename TTemplateTypeTraits<T>::template Type<>>::Get()->GetGCHandle(
+			InManagedObject));
 	}
 };
 
@@ -73,21 +78,21 @@ struct TStringPropertyValue :
 {
 	using TCompoundPropertyValue<TStringPropertyValue<T>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetStringObject<std::decay_t<T>>(InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetStringObject<std::decay_t<T>>(InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = FoundClass->NewObject();
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, true>(
-				FoundClass, SrcObject, InMember);
+				FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle), InMember);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -95,25 +100,25 @@ struct TStringPropertyValue :
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FoundClass->NewObject();
+		auto SrcManagedHandle = FoundClass->NewObject();
 
 		if constexpr (IsReference)
 		{
 			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, false, false>(
-				FoundClass, SrcObject, InMember);
+				FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle), InMember);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddStringReference<std::decay_t<T>, true, false>(
-				FoundClass, SrcObject, new std::decay_t<T>(*InMember));
+				FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle), new std::decay_t<T>(*InMember));
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue)
+	static auto Get(const IManagedHandle InManagedHandle)
 	{
-		return std::decay_t<T>(*FCSharpEnvironment::GetEnvironment().GetString<std::decay_t<T>>(InValue));
+		return std::decay_t<T>(*FCSharpEnvironment::GetEnvironment().GetString<std::decay_t<T>>(InManagedHandle));
 	}
 };
 
@@ -123,21 +128,21 @@ struct TMultiPropertyValue :
 {
 	using TCompoundPropertyValue<TMultiPropertyValue<T>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetMultiObject<std::decay_t<T>>(InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetMultiObject<std::decay_t<T>>(InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = FoundClass->NewObject();
 
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false, true>(
-				FoundClass, SrcObject, InMember);
+				FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle), InMember);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -145,25 +150,25 @@ struct TMultiPropertyValue :
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FoundClass->NewObject();
+		auto SrcManagedHandle = FoundClass->NewObject();
 
 		if constexpr (IsReference)
 		{
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, false, false>(
-				FoundClass, SrcObject, InMember);
+				FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle), InMember);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddMultiReference<std::decay_t<T>, true, false>(
-				FoundClass, SrcObject, new std::decay_t<T>(*InMember));
+				FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle), new std::decay_t<T>(*InMember));
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue) -> T
+	static auto Get(const IManagedHandle InManagedHandle) -> T
 	{
-		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetMulti<std::decay_t<T>>(InValue);
+		return *(std::decay_t<T>*)FCSharpEnvironment::GetEnvironment().GetMulti<std::decay_t<T>>(InManagedHandle);
 	}
 };
 
@@ -175,21 +180,21 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 	using TCompoundPropertyValue<
 		TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetBinding(InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 			FCSharpEnvironment::GetEnvironment().AddBindingReference(
-				InGarbageCollectionHandle, FoundClass, SrcObject, InMember);
+				InManagedHandle, FoundClass, SrcManagedHandle, InMember);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -197,25 +202,25 @@ struct TBindingPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FoundClass->NewObject();
+		const auto SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 		if constexpr (IsReference)
 		{
 			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false>(
-				FoundClass, SrcObject, InMember);
+				FoundClass, SrcManagedHandle, InMember);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, true>(
-				FoundClass, SrcObject, new std::decay_t<T>(*InMember));
+				FoundClass, SrcManagedHandle, new std::decay_t<T>(*InMember));
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue) -> T
+	static auto Get(const IManagedHandle InManagedHandle) -> T
 	{
-		return *FCSharpEnvironment::GetEnvironment().GetBinding<std::decay_t<T>>(InValue);
+		return *FCSharpEnvironment::GetEnvironment().GetBinding<std::decay_t<T>>(InManagedHandle);
 	}
 };
 
@@ -227,21 +232,21 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 	using TCompoundPropertyValue<
 		TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetBinding(*InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetBinding(*InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 			FCSharpEnvironment::GetEnvironment().AddBindingReference(
-				InGarbageCollectionHandle, FoundClass, SrcObject, *InMember);
+				InManagedHandle, FoundClass, SrcManagedHandle, *InMember);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -249,26 +254,26 @@ struct TBindingPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_r
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FoundClass->NewObject();
+		const auto SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 		if constexpr (IsReference)
 		{
 			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, false>(
-				SrcObject, InMember);
+				FoundClass, SrcManagedHandle, *InMember);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddBindingReference<std::decay_t<T>, true>(
-				SrcObject, new std::decay_t<T>(*InMember));
+				FoundClass, SrcManagedHandle, new std::decay_t<T>(**InMember));
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue) -> std::decay_t<T>
+	static auto Get(const IManagedHandle InManagedHandle) -> std::decay_t<T>
 	{
 		return FCSharpEnvironment::GetEnvironment().GetBinding<
-			std::remove_pointer_t<std::remove_reference_t<T>>>(InValue);
+			std::remove_pointer_t<std::remove_reference_t<T>>>(InManagedHandle);
 	}
 };
 
@@ -280,24 +285,24 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 	using TCompoundPropertyValue<
 		TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::remove_reference_t<T>>, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(
 			TBaseStructure<std::decay_t<T>>::Get(), InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<std::decay_t<T>>::Get());
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference(
-				InGarbageCollectionHandle, TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcObject);
+				InManagedHandle, TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -305,27 +310,27 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<!std::is_pointer_v<std::re
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FoundClass->NewObject();
+		auto SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 		FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<std::decay_t<T>>::Get());
 
 		if constexpr (IsReference)
 		{
 			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
-				TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcObject);
+				TBaseStructure<std::decay_t<T>>::Get(), InMember, SrcManagedHandle);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
-				TBaseStructure<std::decay_t<T>>::Get(), new std::decay_t<T>(*InMember), SrcObject);
+				TBaseStructure<std::decay_t<T>>::Get(), new std::decay_t<T>(*InMember), SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue) -> T
+	static auto Get(const IManagedHandle InManagedHandle) -> T
 	{
-		return *FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<T>>(InValue);
+		return *FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<T>>(InManagedHandle);
 	}
 };
 
@@ -337,26 +342,26 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 	using TCompoundPropertyValue<
 		TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::remove_reference_t<T>>, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(
 			TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), *InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 			FCSharpEnvironment::GetEnvironment().Bind<false>(
 				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get());
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference(
-				InGarbageCollectionHandle, TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(),
-				*InMember, SrcObject, false);
+				InManagedHandle, TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(),
+				*InMember, SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -364,7 +369,7 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FoundClass->NewObject();
+		const auto SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 		FCSharpEnvironment::GetEnvironment().Bind<false>(
 			TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get());
@@ -373,21 +378,21 @@ struct TScriptStructPropertyValue<T, std::enable_if_t<std::is_pointer_v<std::rem
 		{
 			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
 				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), InMember,
-				SrcObject);
+				SrcManagedHandle);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
 				TBaseStructure<std::decay_t<std::remove_pointer_t<T>>>::Get(), new std::decay_t<T>(*InMember),
-				SrcObject);
+				SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue)
+	static auto Get(const IManagedHandle InManagedHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<std::remove_pointer_t<T>>>(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<std::remove_pointer_t<T>>>(InManagedHandle);
 	}
 };
 
@@ -466,22 +471,22 @@ struct TPropertyValue<T, std::enable_if_t<std::is_base_of_v<UObject, std::remove
 		TPropertyValue<T,
 		               std::enable_if_t<std::is_base_of_v<UObject, std::remove_pointer_t<std::decay_t<T>>>, T>>>::Get ;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle& InManagedHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind(
-			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember));
+		return MANAGED_HANDLE_TO_OBJECT(MANAGED_HANDLE_FROM_OBJECT(FCSharpEnvironment::GetEnvironment().Bind(
+			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember))));
 	}
 
 	template <auto IsReference>
 	static auto Get(std::decay_t<T>* InMember)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind(
-			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember));
+		return MANAGED_HANDLE_TO_OBJECT(MANAGED_HANDLE_FROM_OBJECT(FCSharpEnvironment::GetEnvironment().Bind(
+			std::add_pointer_t<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>>(*InMember))));
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue)
+	static auto Get(const IManagedHandle InManagedHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetObject<std::remove_pointer_t<std::decay_t<T>>>(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetObject<std::remove_pointer_t<std::decay_t<T>>>(InManagedHandle);
 	}
 };
 
@@ -491,20 +496,20 @@ struct TPropertyValue<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>> :
 {
 	using TCompoundPropertyValue<TPropertyValue<T, std::enable_if_t<TIsTObjectPtr<T>::Value, T>>>::Get;
 
-	static auto Get(T* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(T* InMember, const IManagedHandle& InManagedHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
+		return MANAGED_HANDLE_TO_OBJECT(FCSharpEnvironment::GetEnvironment().Bind(*InMember));
 	}
 
 	template <auto IsReference>
 	static auto Get(T* InMember)
 	{
-		return FCSharpEnvironment::GetEnvironment().Bind(*InMember);
+		return MANAGED_HANDLE_TO_OBJECT(FCSharpEnvironment::GetEnvironment().Bind(*InMember));
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue)
+	static auto Get(const IManagedHandle InManagedHandle)
 	{
-		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType>(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetObject<typename T::ElementType>(InManagedHandle);
 	}
 };
 
@@ -531,23 +536,24 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value &&
 		TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value &&
 		                                   !std::is_pointer_v<std::remove_reference_t<T>>, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(std::decay_t<T>::StaticStruct(), InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(
+			std::decay_t<T>::StaticStruct(), InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 			FCSharpEnvironment::GetEnvironment().Bind<false>(std::decay_t<T>::StaticStruct());
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference(
-				InGarbageCollectionHandle, std::decay_t<T>::StaticStruct(), InMember, SrcObject);
+				InManagedHandle, std::decay_t<T>::StaticStruct(), InMember, SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -555,27 +561,27 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::decay_t<T>>::Value &&
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FoundClass->NewObject();
+		const auto SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 		FCSharpEnvironment::GetEnvironment().Bind<false>(std::decay_t<T>::StaticStruct());
 
 		if constexpr (IsReference)
 		{
 			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
-				std::decay_t<T>::StaticStruct(), InMember, SrcObject);
+				std::decay_t<T>::StaticStruct(), InMember, SrcManagedHandle);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
-				std::decay_t<T>::StaticStruct(), new std::decay_t<T>(*InMember), SrcObject);
+				std::decay_t<T>::StaticStruct(), new std::decay_t<T>(*InMember), SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue) -> T
+	static auto Get(const IManagedHandle InManagedHandle) -> T
 	{
-		return *FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<T>>(InValue);
+		return *FCSharpEnvironment::GetEnvironment().GetStruct<std::decay_t<T>>(InManagedHandle);
 	}
 };
 
@@ -590,25 +596,25 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::
 		TPropertyValue<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::decay_t<T>>>::Value &&
 		                                   std::is_pointer_v<std::remove_reference_t<T>>, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetObject(
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(
 			std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 			FCSharpEnvironment::GetEnvironment().Bind<false>(std::remove_pointer_t<std::decay_t<T>>::StaticStruct());
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference(
-				InGarbageCollectionHandle, std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember,
-				SrcObject);
+				InManagedHandle, std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember,
+				SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -616,28 +622,28 @@ struct TPropertyValue<T, std::enable_if_t<TIsUStruct<std::remove_pointer_t<std::
 	{
 		const auto FoundClass = TPropertyClass<T, T>::Get();
 
-		auto SrcObject = FoundClass->NewObject();
+		const auto SrcManagedHandle = MANAGED_HANDLE_FROM_OBJECT(FoundClass->NewObject());
 
 		FCSharpEnvironment::GetEnvironment().Bind<false>(std::remove_pointer_t<std::decay_t<T>>::StaticStruct());
 
 		if constexpr (IsReference)
 		{
 			FCSharpEnvironment::GetEnvironment().AddStructReference<false>(
-				std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember, SrcObject);
+				std::remove_pointer_t<std::decay_t<T>>::StaticStruct(), *InMember, SrcManagedHandle);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
 				std::remove_pointer_t<std::decay_t<T>>::StaticStruct(),
-				new std::remove_pointer_t<std::decay_t<T>>(**InMember), SrcObject);
+				new std::remove_pointer_t<std::decay_t<T>>(**InMember), SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue) -> T
+	static auto Get(const IManagedHandle InManagedHandle) -> T
 	{
-		return FCSharpEnvironment::GetEnvironment().GetStruct<std::remove_pointer_t<std::decay_t<T>>>(InValue);
+		return FCSharpEnvironment::GetEnvironment().GetStruct<std::remove_pointer_t<std::decay_t<T>>>(InManagedHandle);
 	}
 };
 
@@ -699,11 +705,11 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>> :
 {
 	using TCompoundPropertyValue<TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
@@ -717,16 +723,16 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>> :
 
 			ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = FoundClass->NewObject();
 
 			const auto MapHelper = new FMapHelper(KeyProperty, ValueProperty,
 			                                      InMember, false, true);
 
 			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				InGarbageCollectionHandle, InMember, MapHelper, FoundClass, SrcObject);
+				InManagedHandle, InMember, MapHelper, FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle));
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -744,7 +750,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>> :
 
 		ValueProperty->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-		auto SrcObject = FoundClass->NewObject();
+		auto SrcManagedHandle = FoundClass->NewObject();
 
 		if constexpr (IsReference)
 		{
@@ -752,7 +758,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>> :
 			                                      InMember, false, true);
 
 			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				MapHelper, FoundClass, SrcObject);
+				MapHelper, FoundClass, SrcManagedHandle);
 		}
 		else
 		{
@@ -760,17 +766,17 @@ struct TPropertyValue<T, std::enable_if_t<TIsTMap<std::decay_t<T>>::Value, T>> :
 			                                      new std::decay_t<T>(*InMember), true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				MapHelper, FoundClass, SrcObject);
+				MapHelper, FoundClass, SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue)
+	static auto Get(const IManagedHandle InManagedHandle)
 	{
 		std::decay_t<T> Value;
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InValue);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(InManagedHandle);
 
 		for (auto Index = 0; Index < SrcContainer->GetMaxIndex(); ++Index)
 		{
@@ -793,11 +799,11 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>> :
 {
 	using TCompoundPropertyValue<TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
@@ -806,15 +812,15 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>> :
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = FoundClass->NewObject();
 
 			const auto SetHelper = new FSetHelper(Property, InMember, false, true);
 
 			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				InGarbageCollectionHandle, InMember, SetHelper, FoundClass, SrcObject);
+				InManagedHandle, InMember, SetHelper, FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle));
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -827,31 +833,31 @@ struct TPropertyValue<T, std::enable_if_t<TIsTSet<std::decay_t<T>>::Value, T>> :
 
 		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-		auto SrcObject = FoundClass->NewObject();
+		auto SrcManagedHandle = FoundClass->NewObject();
 
 		if constexpr (IsReference)
 		{
 			const auto SetHelper = new FSetHelper(Property, InMember, false, true);
 
 			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				SetHelper, FoundClass, SrcObject);
+				SetHelper, FoundClass, SrcManagedHandle);
 		}
 		else
 		{
 			const auto SetHelper = new FSetHelper(Property, new std::decay_t<T>(*InMember), true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				SetHelper, FoundClass, SrcObject);
+				SetHelper, FoundClass, SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue)
+	static auto Get(const IManagedHandle InManagedHandle)
 	{
 		std::decay_t<T> Value;
 
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InValue);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle);
 
 		for (auto Index = 0; Index < SrcContainer->GetMaxIndex(); ++Index)
 		{
@@ -879,11 +885,11 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 {
 	using TCompoundPropertyValue<TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetContainerObject<FArrayHelper>(InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetContainerObject<FArrayHelper>(InMember);
 
-		if (SrcObject == nullptr)
+		if (!IManagedHandleIsValid(SrcManagedHandle))
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
@@ -892,15 +898,15 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 
 			Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = FoundClass->NewObject();
 
 			const auto ArrayHelper = new FArrayHelper(Property, InMember, false, true);
 
 			FCSharpEnvironment::GetEnvironment().AddContainerReference(
-				InGarbageCollectionHandle, InMember, ArrayHelper, FoundClass, SrcObject);
+				InManagedHandle, InMember, ArrayHelper, FoundClass, MANAGED_HANDLE_FROM_OBJECT(SrcManagedHandle));
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -913,27 +919,27 @@ struct TPropertyValue<T, std::enable_if_t<TIsTArray<std::decay_t<T>>::Value, T>>
 
 		Property->SetPropertyFlags(CPF_HasGetValueTypeHash);
 
-		auto SrcObject = FoundClass->NewObject();
+		auto SrcManagedHandle = FoundClass->NewObject();
 
 		if constexpr (IsReference)
 		{
 			const auto ArrayHelper = new FArrayHelper(Property, InMember, false, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, FoundClass, SrcObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, FoundClass, SrcManagedHandle);
 		}
 		else
 		{
 			const auto ArrayHelper = new FArrayHelper(Property, new std::decay_t<T>(*InMember), true, true);
 
-			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, FoundClass, SrcObject);
+			FCSharpEnvironment::GetEnvironment().AddContainerReference(ArrayHelper, FoundClass, SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue)
+	static auto Get(const IManagedHandle InManagedHandle)
 	{
-		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InValue);
+		const auto SrcContainer = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InManagedHandle);
 
 		return std::decay_t<T>(
 			static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>*>
@@ -947,8 +953,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TI
 	TPrimitivePropertyValue<T>
 {
 	using TPrimitivePropertyValue<T>::Get;
-	
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
 		return TPropertyClass<T, T>::Get()->Value_Box(InMember);
 	}
@@ -965,8 +971,8 @@ struct TPropertyValue<T, std::enable_if_t<TIsTEnumAsByte<std::decay_t<T>>::Value
 	TPrimitivePropertyValue<T>
 {
 	using TPrimitivePropertyValue<T>::Get;
-	
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle InManagedHandle)
 	{
 		return TPropertyClass<T, T>::Get()->Value_Box(InMember);
 	}
@@ -991,11 +997,11 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 {
 	using TCompoundPropertyValue<TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, T>>>::Get;
 
-	static auto Get(std::decay_t<T>* InMember, const FGarbageCollectionHandle& InGarbageCollectionHandle)
+	static auto Get(std::decay_t<T>* InMember, const IManagedHandle& InManagedHandle)
 	{
-		auto SrcObject = FCSharpEnvironment::GetEnvironment().GetOptionalObject<FOptionalHelper>(InMember);
+		auto SrcManagedHandle = FCSharpEnvironment::GetEnvironment().GetOptionalObject<FOptionalHelper>(InMember);
 
-		if (SrcObject == nullptr)
+		if (SrcManagedHandle == nullptr)
 		{
 			const auto FoundClass = TPropertyClass<T, T>::Get();
 
@@ -1008,16 +1014,16 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 
 			OptionalProperty->SetValueProperty(Property);
 
-			SrcObject = FoundClass->NewObject();
+			SrcManagedHandle = FoundClass->NewObject();
 
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, InMember,
 			                                                false, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, true>(
-				InMember, OptionalHelper, SrcObject);
+				InMember, OptionalHelper, SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
 	template <auto IsReference>
@@ -1034,7 +1040,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 
 		OptionalProperty->SetValueProperty(Property);
 
-		auto SrcObject = FoundClass->NewObject();
+		auto SrcManagedHandle = FoundClass->NewObject();
 
 		if constexpr (IsReference)
 		{
@@ -1042,7 +1048,7 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 			                                                false, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				InMember, OptionalHelper, SrcObject);
+				InMember, OptionalHelper, SrcManagedHandle);
 		}
 		else
 		{
@@ -1050,15 +1056,15 @@ struct TPropertyValue<T, std::enable_if_t<TIsTOptional<std::decay_t<T>>::Value, 
 			                                                true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				InMember, OptionalHelper, SrcObject);
+				InMember, OptionalHelper, SrcManagedHandle);
 		}
 
-		return SrcObject;
+		return MANAGED_HANDLE_TO_OBJECT(SrcManagedHandle);
 	}
 
-	static auto Get(const FGarbageCollectionHandle InValue)
+	static auto Get(const IManagedHandle InManagedHandle)
 	{
-		const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(InValue);
+		const auto SrcOptional = FCSharpEnvironment::GetEnvironment().GetOptional(InManagedHandle);
 
 		return *static_cast<typename TTemplateTypeTraits<std::decay_t<T>>::template Type<>*>(SrcOptional->GetData());
 	}

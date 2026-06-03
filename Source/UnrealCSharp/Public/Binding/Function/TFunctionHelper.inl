@@ -37,7 +37,7 @@ struct TFunctionHelper<std::tuple<Result, std::tuple<Args...>>>
 	static auto Call(Function InFunction, std::index_sequence<Index...>, BINDING_FUNCTION_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+			FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 		{
 			std::tuple<TArgument<Args, Args>...> Argument(
 				IN_BUFFER + std::get<Index>(TBufferOffset<Args...>()())...);

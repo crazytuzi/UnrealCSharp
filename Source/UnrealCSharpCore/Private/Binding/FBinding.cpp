@@ -1,4 +1,4 @@
-﻿#include "Binding/FBinding.h"
+#include "Binding/FBinding.h"
 
 FBinding& FBinding::Get()
 {

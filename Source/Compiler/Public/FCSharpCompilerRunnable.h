@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "IDirectoryWatcher.h"
 
@@ -29,9 +29,13 @@ public:
 
 	void ImmediatelyDoWork();
 
-	void Compile(const TFunction<void()>& InFunction);
+	void Compile(const TFunction<void()>& InFunction, bool bCompileInterop = false);
 
 private:
+	static FString GetBuildConfiguration();
+
+	void CompileInterop();
+
 	void Compile();
 
 private:

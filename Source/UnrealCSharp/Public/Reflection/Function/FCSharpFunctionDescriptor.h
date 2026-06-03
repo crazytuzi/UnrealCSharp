@@ -1,12 +1,12 @@
-﻿#pragma once
+#pragma once
 
-#include "FFunctionDescriptor.h"
+#include "FManagedFunctionDescriptor.h"
 #include "FCSharpFunctionRegister.h"
 
-class FCSharpFunctionDescriptor final : public FFunctionDescriptor
+class FCSharpFunctionDescriptor final : public FManagedFunctionDescriptor
 {
 public:
-	typedef FFunctionDescriptor Super;
+	typedef FManagedFunctionDescriptor Super;
 
 public:
 	explicit FCSharpFunctionDescriptor(UFunction* InFunction, FCSharpFunctionRegister&& InFunctionRegister);

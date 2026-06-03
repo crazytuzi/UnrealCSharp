@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Dynamic/FDynamicGeneratorCore.h"
 #include "UEVersion.h"
@@ -169,11 +169,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			SetClass<IsSoftReference>(PathName, [PathName, ClassProperty]()
 			{
-				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+				const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				ClassProperty->PropertyClass = InClass;
+				ClassProperty->PropertyClass = Class;
 
-				ClassProperty->MetaClass = InClass;
+				ClassProperty->MetaClass = Class;
 			});
 
 			return ClassProperty;
@@ -187,9 +187,9 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			SetClass<IsSoftReference>(PathName, [PathName, ObjectProperty]()
 			{
-				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+				const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				ObjectProperty->PropertyClass = InClass;
+				ObjectProperty->PropertyClass = Class;
 			});
 
 			return ObjectProperty;
@@ -203,9 +203,9 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			SetClass<IsSoftReference>(PathName, [PathName, InterfaceProperty]()
 			{
-				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+				const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				InterfaceProperty->InterfaceClass = InClass;
+				InterfaceProperty->InterfaceClass = Class;
 			});
 
 			return InterfaceProperty;
@@ -299,9 +299,9 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			SetClass<IsSoftReference>(PathName, [PathName, WeakObjectProperty]()
 			{
-				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+				const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				WeakObjectProperty->PropertyClass = InClass;
+				WeakObjectProperty->PropertyClass = Class;
 			});
 
 			return WeakObjectProperty;
@@ -315,9 +315,9 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			SetClass<IsSoftReference>(PathName, [PathName, LazyObjectProperty]()
 			{
-				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+				const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				LazyObjectProperty->PropertyClass = InClass;
+				LazyObjectProperty->PropertyClass = Class;
 			});
 
 			return LazyObjectProperty;
@@ -331,11 +331,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			SetClass<IsSoftReference>(PathName, [PathName, SoftClassProperty]()
 			{
-				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+				const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				SoftClassProperty->PropertyClass = InClass;
+				SoftClassProperty->PropertyClass = Class;
 
-				SoftClassProperty->MetaClass = InClass;
+				SoftClassProperty->MetaClass = Class;
 			});
 
 			return SoftClassProperty;
@@ -349,9 +349,9 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			SetClass<IsSoftReference>(PathName, [PathName, SoftObjectProperty]()
 			{
-				const auto InClass = LoadObject<UClass>(nullptr, *PathName);
+				const auto Class = LoadObject<UClass>(nullptr, *PathName);
 
-				SoftObjectProperty->PropertyClass = InClass;
+				SoftObjectProperty->PropertyClass = Class;
 			});
 
 			return SoftObjectProperty;

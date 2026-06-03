@@ -1,21 +1,135 @@
-﻿#pragma once
+#pragma once
 
 #define FUNCTION_CLASS_CONSTRUCTOR FString(".cctor")
 
 #define FUNCTION_OBJECT_CONSTRUCTOR FString(".ctor")
 
-#define FUNCTION_UTILS_SET_OUT FString(TEXT("SetOut"))
-
 #define FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE FString(TEXT("GetTypesWithAttribute"))
-
-#define FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE FString(TEXT("MakeGenericTypeInstance"))
 
 #define FUNCTION_UTILS_GET_CLASS_REFLECTION FString(TEXT("GetClassReflection"))
 
 #define FUNCTION_STATIC_STRUCT FString(TEXT("StaticStruct"))
+
+#define FUNCTION_SYNCHRONIZATION_CONTEXT_TICK FString(TEXT("Tick"))
+
+#if WITH_MONO
+#define FUNCTION_UTILS_SET_OUT FString(TEXT("SetOut"))
+
+#define FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE FString(TEXT("MakeGenericTypeInstance"))
 
 #define FUNCTION_ASSEMBLY_UTIL_INITIALIZE FString(TEXT("Initialize"))
 
 #define FUNCTION_ASSEMBLY_UTIL_DEINITIALIZE FString(TEXT("Deinitialize"))
 
 #define FUNCTION_ASSEMBLY_UTIL_LOAD FString(TEXT("Load"))
+#endif
+
+#if WITH_CORECLR
+#define FUNCTION_HOSTFXR_SET_ERROR_WRITER FString(TEXT("hostfxr_set_error_writer"))
+
+#define FUNCTION_HOSTFXR_INITIALIZE_FOR_RUNTIME_CONFIG FString(TEXT("hostfxr_initialize_for_runtime_config"))
+
+#define FUNCTION_HOSTFXR_GET_RUNTIME_DELEGATE FString(TEXT("hostfxr_get_runtime_delegate"))
+
+#define FUNCTION_HOSTFXR_CLOSE FString(TEXT("hostfxr_close"))
+
+#define FUNCTION_ASSEMBLY_LOADER_LOAD_FROM_STREAM FString(TEXT("LoadFromStream"))
+
+#define FUNCTION_ASSEMBLY_LOADER_UNLOAD FString(TEXT("Unload"))
+
+#define FUNCTION_HANDLE_DATA_ALLOC FString(TEXT("Alloc"))
+
+#define FUNCTION_HANDLE_DATA_ALLOC_WEAK_REF FString(TEXT("AllocWeakRef"))
+
+#define FUNCTION_HANDLE_DATA_GET_TARGET FString(TEXT("GetTarget"))
+
+#define FUNCTION_HANDLE_DATA_FREE FString(TEXT("Free"))
+
+#define FUNCTION_LOG_BRIDGE_SET_LOG FString(TEXT("SetLog"))
+
+#define FUNCTION_LOG_BRIDGE_INITIALIZE FString(TEXT("Initialize"))
+
+#define FUNCTION_LOG_BRIDGE_DEINITIALIZE FString(TEXT("Deinitialize"))
+
+#define FUNCTION_TYPE_BRIDGE_GET_CLASS FString(TEXT("GetClass"))
+
+#define FUNCTION_TYPE_BRIDGE_GET_TYPE FString(TEXT("GetType"))
+
+#define FUNCTION_TYPE_BRIDGE_GET_METHOD FString(TEXT("GetMethod"))
+
+#define FUNCTION_TYPE_BRIDGE_GET_FUNCTION_POINTER FString(TEXT("GetFunctionPointer"))
+
+#define FUNCTION_TYPE_BRIDGE_GET_NAMESPACE FString(TEXT("GetNamespace"))
+
+#define FUNCTION_TYPE_BRIDGE_GET_NAME FString(TEXT("GetName"))
+
+#define FUNCTION_TYPE_BRIDGE_GET_FULL_NAME FString(TEXT("GetFullName"))
+
+#define FUNCTION_TYPE_BRIDGE_MAKE_GENERIC_TYPE FString(TEXT("MakeGenericType"))
+
+#define FUNCTION_TYPE_BRIDGE_MAKE_GENERIC_TYPE2 FString(TEXT("MakeGenericType2"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_BOOL FString(TEXT("BoxBool"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_SBYTE FString(TEXT("BoxSByte"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_INT16 FString(TEXT("BoxInt16"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_INT32 FString(TEXT("BoxInt32"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_INT64 FString(TEXT("BoxInt64"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_BYTE FString(TEXT("BoxByte"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_UINT16 FString(TEXT("BoxUInt16"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_UINT32 FString(TEXT("BoxUInt32"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_UINT64 FString(TEXT("BoxUInt64"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_FLOAT FString(TEXT("BoxFloat"))
+
+#define FUNCTION_TYPE_BRIDGE_BOX_DOUBLE FString(TEXT("BoxDouble"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_BOOL FString(TEXT("UnboxBool"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_SBYTE FString(TEXT("UnboxSByte"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_INT16 FString(TEXT("UnboxInt16"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_INT32 FString(TEXT("UnboxInt32"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_INT64 FString(TEXT("UnboxInt64"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_BYTE FString(TEXT("UnboxByte"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_UINT16 FString(TEXT("UnboxUInt16"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_UINT32 FString(TEXT("UnboxUInt32"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_UINT64 FString(TEXT("UnboxUInt64"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_FLOAT FString(TEXT("UnboxFloat"))
+
+#define FUNCTION_TYPE_BRIDGE_UNBOX_DOUBLE FString(TEXT("UnboxDouble"))
+
+#define FUNCTION_OBJECT_BRIDGE_NEW_OBJECT FString(TEXT("NewObject"))
+
+#define FUNCTION_FIELD_BRIDGE_SET_STATIC_VALUE FString(TEXT("SetStaticValue"))
+
+#define FUNCTION_FIELD_BRIDGE_GET_STATIC_VALUE FString(TEXT("GetStaticValue"))
+
+#define FUNCTION_METHOD_BRIDGE_REGISTER_BINDING FString(TEXT("RegisterBinding"))
+
+#define FUNCTION_METHOD_BRIDGE_INVOKE FString(TEXT("Invoke"))
+
+#define FUNCTION_STRING_BRIDGE_NEW_STRING FString(TEXT("NewString"))
+
+#define FUNCTION_STRING_BRIDGE_GET_STRING FString(TEXT("GetString"))
+
+#define FUNCTION_ARRAY_BRIDGE_ARRAY_NEW FString(TEXT("NewArray"))
+
+#define FUNCTION_ARRAY_BRIDGE_ARRAY_GET FString(TEXT("ArrayGet"))
+
+#define FUNCTION_ARRAY_BRIDGE_ARRAY_GET_REF FString(TEXT("ArrayGetRef"))
+#endif

@@ -1,4 +1,4 @@
-﻿#include "NewClass/DynamicNewClassUtils.h"
+#include "NewClass/DynamicNewClassUtils.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Misc/FileHelper.h"
 #include "Blueprint/UserWidget.h"

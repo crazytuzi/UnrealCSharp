@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "FReference.h"
 #include "Environment/FCSharpEnvironment.h"
@@ -12,6 +12,6 @@ public:
 public:
 	virtual ~TContainerReference() override
 	{
-		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<T>(GarbageCollectionHandle);
+		(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<T>(ManagedHandle);
 	}
 };

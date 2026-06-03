@@ -55,7 +55,7 @@ void FSolutionGenerator::Generator()
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetWeaversPath(), WEAVERS_NAME + PROJECT_SUFFIX),
 		ScriptPath / WEAVERS_NAME / WEAVERS_NAME + PROJECT_SUFFIX,
 		TArray<TFunction<void(FString& OutResult)>>{
-			&FSolutionGenerator::ReplaceOutputPath,
+			&FSolutionGenerator::ReplaceScriptOutputPath,
 			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
@@ -74,13 +74,25 @@ void FSolutionGenerator::Generator()
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameDirectory() / FODY_WEAVERS_NAME + XML_SUFFIX),
 		ScriptPath / WEAVERS_NAME / FODY_WEAVERS_NAME + XML_SUFFIX);
 
+	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+	{
+		CopyTemplate(
+			FUnrealCSharpFunctionLibrary::GetInteropProjectPath(),
+			TemplatePath / INTEROP_NAME + PROJECT_SUFFIX,
+			TArray<TFunction<void(FString& OutResult)>>
+			{
+				&FSolutionGenerator::ReplaceOutputPath,
+				&FSolutionGenerator::ReplaceTargetFramework,
+				&FSolutionGenerator::AddProjectGeneratorHeaderComment
+			});
+	}
+
 	CopyTemplate(
 		FUnrealCSharpFunctionLibrary::GetUEProjectPath(),
 		TemplatePath / DEFAULT_UE_NAME + PROJECT_SUFFIX,
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplacePluginBaseDir,
-			&FSolutionGenerator::ReplaceTargetFramework,
 			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
@@ -90,7 +102,6 @@ void FSolutionGenerator::Generator()
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplaceImport,
-			&FSolutionGenerator::ReplaceTargetFramework,
 			&FSolutionGenerator::ReplaceProjectReference
 		},
 		false);
@@ -99,7 +110,7 @@ void FSolutionGenerator::Generator()
 		FUnrealCSharpFunctionLibrary::GetGamePropsPath(),
 		TemplatePath / DEFAULT_GAME_NAME + PROPS_SUFFIX,
 		TArray<TFunction<void(FString& OutResult)>>{
-			&FSolutionGenerator::ReplaceOutputPath,
+			&FSolutionGenerator::ReplaceScriptOutputPath,
 			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
@@ -108,7 +119,9 @@ void FSolutionGenerator::Generator()
 		FPaths::Combine(TemplatePath, SHARED_NAME + PROPS_SUFFIX),
 		TArray<TFunction<void(FString& OutResult)>>
 		{
+			&FSolutionGenerator::ReplaceTargetFramework,
 			&FSolutionGenerator::ReplaceDefineConstants,
+			&FSolutionGenerator::ReplaceHintPath,
 			&FSolutionGenerator::AddProjectGeneratorHeaderComment
 		});
 
@@ -195,7 +208,16 @@ void FSolutionGenerator::ReplaceDefineConstants(FString& OutResult)
 
 	if (!IsRunningCookCommandlet())
 	{
-		DefineConstants += TEXT("WITH_EDITOR");
+		DefineConstants += TEXT("WITH_EDITOR;");
+	}
+
+	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+	{
+		DefineConstants += TEXT("WITH_CORECLR;");
+	}
+	else
+	{
+		DefineConstants += TEXT("WITH_MONO;");
 	}
 
 	DefineConstants = FString::Printf(TEXT(
@@ -207,13 +229,35 @@ void FSolutionGenerator::ReplaceDefineConstants(FString& OutResult)
 	OutResult = OutResult.Replace(TEXT("<DefineConstants></DefineConstants>"), *DefineConstants);
 }
 
-void FSolutionGenerator::ReplaceOutputPath(FString& OutResult)
+void FSolutionGenerator::ReplaceScriptOutputPath(FString& OutResult)
 {
 	OutResult = OutResult.Replace(TEXT("<ScriptOutputPath></ScriptOutputPath>"),
 	                              *FString::Printf(TEXT(
 		                              "<ScriptOutputPath>..\\..\\Content\\%s</ScriptOutputPath>"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory()
+	                              ));
+}
+
+void FSolutionGenerator::ReplaceOutputPath(FString& OutResult)
+{
+	OutResult = OutResult.Replace(TEXT("<OutputPath></OutputPath>"),
+	                              *FString::Printf(TEXT(
+		                              "<OutputPath>..\\..\\Content\\%s</OutputPath>"
+	                              ),
+	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory()
+	                              ));
+}
+
+void FSolutionGenerator::ReplaceHintPath(FString& OutResult)
+{
+	OutResult = OutResult.Replace(TEXT("<HintPath></HintPath>"),
+	                              *FString::Printf(TEXT(
+		                              "<HintPath>..\\..\\Content\\%s\\%s%s</HintPath>"
+	                              ),
+	                                               *FUnrealCSharpFunctionLibrary::GetPublishDirectory(),
+	                                               *INTEROP_NAME,
+	                                               *DLL_SUFFIX
 	                              ));
 }
 
@@ -244,33 +288,25 @@ void FSolutionGenerator::ReplaceProjectReference(FString& OutResult)
 
 void FSolutionGenerator::ReplaceYield(FString& OutResult)
 {
-	OutResult = OutResult.Replace(TEXT("yield return \"\";"),
-	                              *FString::Printf(TEXT(
-		                              "yield return \"%s\";\r\n"
-		                              "\r\n"
-		                              "\t\t\tyield return \"%s\";"
-	                              ),
-	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
-	                                               *FUnrealCSharpFunctionLibrary::GetGameName()
-	                              ));
+	OutResult = OutResult.Replace(*UE_NAME_PLACEHOLDER,
+	                              *FUnrealCSharpFunctionLibrary::GetUEName());
+
+	OutResult = OutResult.Replace(*GAME_NAME_PLACEHOLDER,
+	                              *FUnrealCSharpFunctionLibrary::GetGameName());
 }
 
 void FSolutionGenerator::ReplaceDefinition(FString& OutResult)
 {
-	OutResult = OutResult.Replace(TEXT("if (definition.Name != \"\")"),
+	OutResult = OutResult.Replace(*DEFINITION_PLACEHOLDER,
 	                              *FString::Printf(TEXT(
-		                              "if (definition.Name != \"%s%s\")"
+		                              "%s%s"
 	                              ),
 	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
 	                                               *DLL_SUFFIX
 	                              ));
 
-	OutResult = OutResult.Replace(TEXT("var ueAssemblyName = \"\";"),
-	                              *FString::Printf(TEXT(
-		                              "var ueAssemblyName = \"%s\";"
-	                              ),
-	                                               *FUnrealCSharpFunctionLibrary::GetUEName()
-	                              ));
+	OutResult = OutResult.Replace(*ASSEMBLY_PLACEHOLDER,
+	                              *FUnrealCSharpFunctionLibrary::GetUEName());
 }
 
 void FSolutionGenerator::ReplaceProject(FString& OutResult)
@@ -306,11 +342,26 @@ void FSolutionGenerator::ReplaceProjectPlaceholder(FString& OutResult)
 
 	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
+		if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+		{
+			Projects += FString::Printf(TEXT(
+				"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\r\n"
+				"EndProject\r\n"
+			),
+			                            *CSHARP_GUID,
+			                            *INTEROP_NAME,
+			                            *INTEROP_NAME,
+			                            *INTEROP_NAME,
+			                            *PROJECT_SUFFIX,
+			                            *INTEROP_GUID
+			);
+		}
+
 		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{
 			Projects += FString::Printf(TEXT(
-				"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\n"
-				"EndProject\n"
+				"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\r\n"
+				"EndProject\r\n"
 			),
 			                            *CSHARP_GUID,
 			                            *CustomProject.Name,
@@ -336,13 +387,28 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 
 	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
+		if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+		{
+			SolutionConfigurationPlatforms += FString::Printf(TEXT(
+				"\t\t{%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\r\n"
+				"\t\t{%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\r\n"
+				"\t\t{%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\r\n"
+				"\t\t{%s}.Release|Any CPU.Build.0 = Release|Any CPU\r\n"
+			),
+			                                                  *INTEROP_GUID,
+			                                                  *INTEROP_GUID,
+			                                                  *INTEROP_GUID,
+			                                                  *INTEROP_GUID
+			);
+		}
+
 		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{
 			SolutionConfigurationPlatforms += FString::Printf(TEXT(
-				"\t\t{%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n"
-				"\t\t{%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\n"
-				"\t\t{%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\n"
-				"\t\t{%s}.Release|Any CPU.Build.0 = Release|Any CPU\n"
+				"\t\t{%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\r\n"
+				"\t\t{%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\r\n"
+				"\t\t{%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\r\n"
+				"\t\t{%s}.Release|Any CPU.Build.0 = Release|Any CPU\r\n"
 			),
 			                                                  *CustomProject.GUID(),
 			                                                  *CustomProject.GUID(),
@@ -363,22 +429,17 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 
 void FSolutionGenerator::ReplaceScriptPath(FString& OutResult)
 {
-	OutResult = OutResult.Replace(TEXT("var scriptPathName = \"\";"),
-	                              *FString::Printf(TEXT(
-		                              "var scriptPathName = \"%s\";"
-	                              ),
-	                                               *PLUGIN_SCRIPT_PATH
-	                              ));
+	OutResult = OutResult.Replace(*SCRIPT_PATH_PLACEHOLDER, *PLUGIN_SCRIPT_PATH);
 }
 
 void FSolutionGenerator::AddProjectGeneratorHeaderComment(FString& OutResult)
 {
 	OutResult = FString::Printf(TEXT(
-		"<!-- ===========================================================================\n"
-		"    Generated code exported from UnrealCSharp.\n"
-		"    DO NOT modify this manually!\n"
-		"============================================================================ -->\n"
-		"\n"
+		"<!-- ===========================================================================\r\n"
+		"    Generated code exported from UnrealCSharp.\r\n"
+		"    DO NOT modify this manually!\r\n"
+		"============================================================================ -->\r\n"
+		"\r\n"
 		"%s"
 	),
 	                            *OutResult
@@ -389,11 +450,11 @@ void FSolutionGenerator::AddSolutionGeneratorHeaderComment(FString& OutResult)
 {
 #if !VS2026
 	OutResult = FString::Printf(TEXT(
-		"# ===========================================================================\n"
-		"#    Generated code exported from UnrealCSharp.\n"
-		"#    DO NOT modify this manually!\n"
-		"# ===========================================================================\n"
-		"\n"
+		"# ===========================================================================\r\n"
+		"#    Generated code exported from UnrealCSharp.\r\n"
+		"#    DO NOT modify this manually!\r\n"
+		"# ===========================================================================\r\n"
+		"\r\n"
 		"%s"
 	),
 	                            *OutResult
@@ -404,9 +465,9 @@ void FSolutionGenerator::AddSolutionGeneratorHeaderComment(FString& OutResult)
 void FSolutionGenerator::AddCSharpGeneratorHeaderComment(FString& OutResult)
 {
 	OutResult = FString::Printf(TEXT(
-		"%s\n%s"
+		"%s\r\n%s"
 	),
-	                            *FGeneratorCore::GetGeneratorHeaderComment(),
+	                            *FGeneratorCore::GetGeneratorHeaderComment().Replace(TEXT("\n"), TEXT("\r\n")),
 	                            *OutResult
 	);
 }

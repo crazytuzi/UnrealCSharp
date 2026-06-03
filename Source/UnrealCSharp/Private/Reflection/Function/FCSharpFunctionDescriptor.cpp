@@ -1,6 +1,7 @@
-﻿#include "Reflection/Function/FCSharpFunctionDescriptor.h"
+#include "Reflection/Function/FCSharpFunctionDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/FReflectionRegistry.h"
+#include "Macro/FunctionMacro.h"
 
 FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
                                                      FCSharpFunctionRegister&& InFunctionRegister):
@@ -10,7 +11,15 @@ FCSharpFunctionDescriptor::FCSharpFunctionDescriptor(UFunction* InFunction,
 {
 	if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InFunction->GetOwnerClass()))
 	{
-		Method = FoundClass->GetParentMethod(InFunction->GetName(), PropertyDescriptors.Num());
+		Method = FoundClass->GetParentMethod(InFunction->HasAnyFunctionFlags(FUNC_Net)
+			                                     ? FString::Printf(TEXT(
+				                                     "%s%s"
+			                                     ),
+			                                                       *InFunction->GetName(),
+			                                                       *FUNCTION_IMPLEMENTATION_SUFFIX
+			                                     )
+			                                     : InFunction->GetName(),
+		                                     PropertyDescriptors.Num());
 	}
 }
 
@@ -79,88 +88,40 @@ bool FCSharpFunctionDescriptor::CallCSharp(UObject* InContext, FFrame& InStack, 
 
 	auto OutParams = NewOutParams != nullptr ? NewOutParams : InStack.OutParms;
 
-	const auto CSharpParams = FReflectionRegistry::Get().GetObjectClass()->NewArray(PropertyDescriptors.Num());
-
 	auto ReferenceParam = OutParams;
 
-	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
-	{
-		void* PropertyAddress{};
-
-		if (ReferencePropertyIndexes.Contains(Index))
+	Invoke(
+		Method,
+		FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static
+			? InvalidManagedHandle
+			: FCSharpEnvironment::GetEnvironment().GetObject(InContext),
+		[this, Params, &ReferenceParam](const int32 Index) -> void*
 		{
-			if (const auto ReferencePropertyDescriptor = PropertyDescriptors[Index])
+			if (ReferencePropertyIndexes.Contains(Index))
 			{
-				ReferenceParam = FindOutParmRec(ReferenceParam, ReferencePropertyDescriptor->GetProperty());
-
-				if (ReferenceParam != nullptr)
+				if (const auto ReferencePropertyDescriptor = PropertyDescriptors[Index])
 				{
-					PropertyAddress = ReferenceParam->PropAddr;
-				}
-			}
-		}
-		else
-		{
-			PropertyAddress = PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(Params);
-		}
+					ReferenceParam = FindOutParmRec(ReferenceParam, ReferencePropertyDescriptor->GetProperty());
 
-		void* Object = nullptr;
-
-		PropertyDescriptors[Index]->Get<std::false_type>(PropertyAddress, &Object);
-
-		FDomain::Array_Set(CSharpParams, Index, static_cast<MonoObject*>(Object));
-	}
-
-	const auto FoundMonoObject = FunctionRegister.GetOriginalFunctionFlags() & FUNC_Static
-		                             ? nullptr
-		                             : FCSharpEnvironment::GetEnvironment().GetObject(InContext);
-
-	if (const auto ReturnValue = Method->Runtime_Invoke_Array(FoundMonoObject, CSharpParams);
-		ReturnValue != nullptr && ReturnPropertyDescriptor != nullptr)
-	{
-		if (ReturnPropertyDescriptor->IsPrimitiveProperty())
-		{
-			if (const auto UnBoxResultValue = FDomain::Object_Unbox(ReturnValue))
-			{
-				ReturnPropertyDescriptor->Set(UnBoxResultValue, RESULT_PARAM);
-			}
-		}
-		else
-		{
-			ReturnPropertyDescriptor->Set(
-				FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-					ReturnPropertyDescriptor->GetClass(), ReturnValue),
-				RESULT_PARAM);
-		}
-	}
-
-	for (const auto& Index : OutPropertyIndexes)
-	{
-		if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
-		{
-			OutParams = FindOutParmRec(OutParams, OutPropertyDescriptor->GetProperty());
-
-			if (OutParams != nullptr)
-			{
-				if (OutPropertyDescriptor->IsPrimitiveProperty())
-				{
-					if (const auto UnBoxResultValue = FDomain::Object_Unbox(
-						FDomain::Array_Get<MonoObject*>(CSharpParams, Index)))
+					if (ReferenceParam != nullptr)
 					{
-						OutPropertyDescriptor->Set(UnBoxResultValue, OutParams->PropAddr);
+						return ReferenceParam->PropAddr;
 					}
 				}
-				else
-				{
-					OutPropertyDescriptor->Set(
-						FGarbageCollectionHandle::MonoObject2GarbageCollectionHandle(
-							OutPropertyDescriptor->GetClass(),
-							FDomain::Array_Get<MonoObject*>(CSharpParams, Index)),
-						OutParams->PropAddr);
-				}
+
+				return nullptr;
 			}
+
+			return PropertyDescriptors[Index]->ContainerPtrToValuePtr<void>(Params);
+		},
+		RESULT_PARAM,
+		[this, &OutParams](const FPropertyDescriptor* InPropertyDescriptor) -> void*
+		{
+			OutParams = FindOutParmRec(OutParams, InPropertyDescriptor->GetProperty());
+
+			return OutParams != nullptr ? OutParams->PropAddr : nullptr;
 		}
-	}
+	);
 
 	if (Params != nullptr && Params != InStack.Locals)
 	{

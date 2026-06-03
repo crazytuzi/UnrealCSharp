@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GarbageCollection/TGarbageCollectionHandleMapping.inl"
+#include "TManagedHandleMapping.inl"
 
 template <typename Key, typename Value = Key>
 struct TValueMapping
@@ -9,7 +9,7 @@ struct TValueMapping
 
 	typedef Value ValueType;
 
-	typedef TGarbageCollectionHandleMapping<ValueType> FGarbageCollectionHandle2Value;
+	typedef TManagedHandleMapping<ValueType> FManagedHandle2Value;
 
-	typedef TMap<KeyType, typename FGarbageCollectionHandle2Value::KeyType> FKey2GarbageCollectionHandle;
+	typedef TMap<KeyType, typename FManagedHandle2Value::KeyType> FKey2ManagedHandle;
 };

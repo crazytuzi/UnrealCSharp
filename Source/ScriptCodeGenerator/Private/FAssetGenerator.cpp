@@ -1,4 +1,4 @@
-﻿#include "FAssetGenerator.h"
+#include "FAssetGenerator.h"
 #include "FClassGenerator.h"
 #include "FEnumGenerator.h"
 #include "FStructGenerator.h"

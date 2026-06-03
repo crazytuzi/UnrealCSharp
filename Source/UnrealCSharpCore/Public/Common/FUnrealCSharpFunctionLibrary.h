@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "UEVersion.h"
+#include "Setting/UnrealCSharpSetting.h"
 
 class UNREALCSHARPCORE_API FUnrealCSharpFunctionLibrary
 {
@@ -103,6 +104,12 @@ public:
 	static FString GetOldFileName(const FAssetData& InAssetData, const FString& InOldObjectPath);
 #endif
 
+#if WITH_EDITOR
+	static FString GetInteropDirectory();
+
+	static FString GetInteropProjectPath();
+#endif
+
 	static FString GetUEName();
 
 #if WITH_EDITOR
@@ -177,6 +184,8 @@ public:
 
 	static FString GetFullPublishDirectory();
 
+	static FString GetFullInteropPublishPath();
+
 	static FString GetFullUEPublishPath();
 
 	static FString GetFullGamePublishPath();
@@ -184,8 +193,6 @@ public:
 	static TArray<FString> GetFullCustomProjectsPublishPath();
 
 	static TArray<FString> GetFullAssemblyPublishPath();
-
-	static TArray<FString> GetAssemblyPath();
 
 #if WITH_EDITOR
 	static FString GetScriptDirectory();
@@ -201,13 +208,13 @@ public:
 	static FString GetSourceGeneratorPath();
 
 	static FString GetWeaversPath();
+
+	static FString GetInteropPath();
 #endif
 
 #if WITH_EDITOR
 	static bool IsGenerateFunctionComment();
 #endif
-
-	static class UAssemblyLoader* GetAssemblyLoader();
 
 	static bool SaveStringToFile(const FString& InFileName, const FString& InString);
 
@@ -255,6 +262,17 @@ public:
 
 #if WITH_EDITOR
 	static void SyncProcess(const FString& InURL, const FString& InParms,
-	                        const TFunction<void(const int32, const FString&)>& InOnComplete);
+	                        const TFunction<void(const int32, const FString&)>& InOnComplete,
+	                        const FString& InWorkingDirectory = FString());
+#endif
+
+#if WITH_EDITOR
+	static FString GetPlatformName();
+
+	static EScriptDomainType GetScriptDomainType();
+
+	static bool IsMonoDomain();
+
+	static bool IsCoreCLRDomain();
 #endif
 };

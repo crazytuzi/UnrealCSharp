@@ -1,12 +1,14 @@
-﻿#include "Reflection/Delegate/FMulticastDelegateHelper.h"
+#include "Reflection/Delegate/FMulticastDelegateHelper.h"
 
-FMulticastDelegateHelper::FMulticastDelegateHelper()
+FMulticastDelegateHelper::FMulticastDelegateHelper():
+	FDelegateBaseHelper(nullptr)
 {
 	Initialize(nullptr, nullptr);
 }
 
 FMulticastDelegateHelper::FMulticastDelegateHelper(FMulticastScriptDelegate* InMulticastDelegate,
-                                                   UFunction* InSignatureFunction)
+                                                   UFunction* InSignatureFunction):
+	FDelegateBaseHelper(InMulticastDelegate)
 {
 	Initialize(InMulticastDelegate, InSignatureFunction);
 }

@@ -3,6 +3,7 @@
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
 #include "UEVersion.h"
+#include "Domain/Script/IManagedHandle.h"
 
 class UNREALCSHARP_API FStringRegistry
 {
@@ -38,7 +39,7 @@ public:
 	{
 		typedef Address FAddressType;
 
-		typedef typename TStringValueMapping::FKey2GarbageCollectionHandle FAddress2GarbageCollectionHandle;
+		typedef typename TStringValueMapping::FKey2ManagedHandle FAddress2ManagedHandle;
 	};
 
 	typedef TStringValueMapping<void*, FNameAddress> FNameMapping;
@@ -76,29 +77,29 @@ public:
 	void Deinitialize();
 
 private:
-	FNameMapping::FGarbageCollectionHandle2Value NameGarbageCollectionHandle2Address;
+	FNameMapping::FManagedHandle2Value NameManagedHandle2Address;
 
-	FNameMapping::FAddress2GarbageCollectionHandle NameAddress2GarbageCollectionHandle;
+	FNameMapping::FAddress2ManagedHandle NameAddress2ManagedHandle;
 
-	FStringMapping::FGarbageCollectionHandle2Value StringGarbageCollectionHandle2Address;
+	FStringMapping::FManagedHandle2Value StringManagedHandle2Address;
 
-	FStringMapping::FAddress2GarbageCollectionHandle StringAddress2GarbageCollectionHandle;
+	FStringMapping::FAddress2ManagedHandle StringAddress2ManagedHandle;
 
 #if UE_F_UTF8_STR_PROPERTY
-	FUtf8StringMapping::FGarbageCollectionHandle2Value Utf8StringGarbageCollectionHandle2Address;
+	FUtf8StringMapping::FManagedHandle2Value Utf8StringManagedHandle2Address;
 
-	FUtf8StringMapping::FAddress2GarbageCollectionHandle Utf8StringAddress2GarbageCollectionHandle;
+	FUtf8StringMapping::FAddress2ManagedHandle Utf8StringAddress2ManagedHandle;
 #endif
 
 #if UE_F_ANSI_STR_PROPERTY
-	FAnsiStringMapping::FGarbageCollectionHandle2Value AnsiStringGarbageCollectionHandle2Address;
+	FAnsiStringMapping::FManagedHandle2Value AnsiStringManagedHandle2Address;
 
-	FAnsiStringMapping::FAddress2GarbageCollectionHandle AnsiStringAddress2GarbageCollectionHandle;
+	FAnsiStringMapping::FAddress2ManagedHandle AnsiStringAddress2ManagedHandle;
 #endif
 
-	FTextMapping::FGarbageCollectionHandle2Value TextGarbageCollectionHandle2Address;
+	FTextMapping::FManagedHandle2Value TextManagedHandle2Address;
 
-	FTextMapping::FAddress2GarbageCollectionHandle TextAddress2GarbageCollectionHandle;
+	FTextMapping::FAddress2ManagedHandle TextAddress2ManagedHandle;
 };
 
 #include "FStringRegistry.inl"

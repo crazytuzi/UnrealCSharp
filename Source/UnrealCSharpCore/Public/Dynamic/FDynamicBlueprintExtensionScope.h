@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #if WITH_EDITOR
 #include "Dynamic/DynamicBlueprintExtension.h"

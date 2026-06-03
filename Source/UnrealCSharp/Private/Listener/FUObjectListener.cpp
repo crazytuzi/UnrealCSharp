@@ -1,4 +1,4 @@
-﻿#include "Listener/FUObjectListener.h"
+#include "Listener/FUObjectListener.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Delegate/FUnrealCSharpModuleDelegates.h"
 

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Reflection/Property/FPropertyDescriptor.h"
 
@@ -71,6 +71,8 @@ public:
 	FPropertyDescriptor* GetInnerPropertyDescriptor() const;
 
 	FScriptArray* GetScriptArray() const;
+
+	void* GetAddress() const;
 
 	FORCEINLINE FScriptArrayHelper CreateHelperFormInnerProperty() const
 	{

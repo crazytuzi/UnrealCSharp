@@ -12,7 +12,7 @@ struct TSubscriptHelper
 	static auto Get(BINDING_SUBSCRIPT_GET_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+			FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 		{
 			TReturnValue<Result>(RETURN_BUFFER, std::forward<Result>(
 				                     FoundObject->operator[](
@@ -25,7 +25,7 @@ struct TSubscriptHelper
 	static auto Set(BINDING_SUBSCRIPT_SET_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
-			FCSharpEnvironment::GetEnvironment(), InGarbageCollectionHandle))
+			FCSharpEnvironment::GetEnvironment(), InManagedHandle))
 		{
 			FoundObject->operator[](
 					TArgument<Index, Index>(

@@ -1,4 +1,4 @@
-﻿using Script.CoreUObject;
+using Script.CoreUObject;
 
 namespace Script.UMG
 {

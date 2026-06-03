@@ -1,4 +1,4 @@
-﻿#include "Reflection/Container/FMapHelper.h"
+#include "Reflection/Container/FMapHelper.h"
 #include "CppVersion.h"
 
 FMapHelper::FMapHelper(FProperty* InKeyProperty, FProperty* InValueProperty, void* InData,
@@ -229,6 +229,11 @@ FPropertyDescriptor* FMapHelper::GetValuePropertyDescriptor() const
 }
 
 FScriptMap* FMapHelper::GetScriptMap() const
+{
+	return ScriptMap;
+}
+
+void* FMapHelper::GetAddress() const
 {
 	return ScriptMap;
 }

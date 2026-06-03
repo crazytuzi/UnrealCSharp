@@ -1,4 +1,4 @@
-﻿namespace Script.CoreUObject
+namespace Script.CoreUObject
 {
     public interface IStaticClass
     {

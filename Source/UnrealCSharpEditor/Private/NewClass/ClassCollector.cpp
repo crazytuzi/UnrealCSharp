@@ -1,4 +1,4 @@
-﻿#include "NewClass/ClassCollector.h"
+#include "NewClass/ClassCollector.h"
 #include "WidgetBlueprint.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Common/FUnrealCSharpFunctionLibrary.h"

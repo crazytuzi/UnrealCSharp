@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 template <typename T, auto Size>
 static constexpr auto TGetArrayLength(T (&)[Size])
