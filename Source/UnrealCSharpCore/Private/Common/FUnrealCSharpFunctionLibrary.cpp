@@ -31,6 +31,8 @@
 #endif
 
 #if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::ForcedPlatformName;
+
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefaultSafe<UUnrealCSharpEditorSetting>())
@@ -1525,6 +1527,11 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 #if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetPlatformName()
 {
+	if (!ForcedPlatformName.IsEmpty())
+	{
+		return ForcedPlatformName;
+	}
+
 	if (IsRunningCookCommandlet())
 	{
 		if (const auto TargetPlatformManager = GetTargetPlatformManager())
@@ -1538,6 +1545,16 @@ FString FUnrealCSharpFunctionLibrary::GetPlatformName()
 	}
 
 	return FPlatformProperties::IniPlatformName();
+}
+
+void FUnrealCSharpFunctionLibrary::SetForcedPlatformName(const FString& InPlatformName)
+{
+	ForcedPlatformName = InPlatformName;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetForcedPlatformName()
+{
+	return ForcedPlatformName;
 }
 
 EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType()

@@ -116,10 +116,17 @@ void FUnrealCSharpEditorModule::StartupModule()
 	{
 		if (const auto AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
 		{
-			AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
+			if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+				UUnrealCSharpEditorSetting>())
 			{
-				Generator();
-			});
+				if (!UnrealCSharpEditorSetting->IsSkipCodeGeneratorDuringCook())
+				{
+					AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
+					{
+						Generator();
+					});
+				}
+			}
 		}
 	}
 }

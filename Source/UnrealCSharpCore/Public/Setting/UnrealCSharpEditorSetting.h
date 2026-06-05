@@ -85,6 +85,8 @@ public:
 
 	const TArray<FString>& GetClassBlacklist() const;
 
+	bool IsSkipCodeGeneratorDuringCook() const;
+
 	ESolutionConfiguration GetEditorConfiguration() const;
 
 	ESolutionConfiguration GetRuntimeConfiguration() const;
@@ -132,6 +134,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bIsGenerateAsset"))
 	TArray<TSubclassOf<UObject>> SupportedAssetClass;
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bSkipCodeGeneratorDuringCook;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bIsGenerateFunctionComment;
