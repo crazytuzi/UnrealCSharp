@@ -302,6 +302,8 @@ template <typename Class, typename Result, Result Class::* Member>
 struct TPropertyBuilder<Result Class::*, Member, std::enable_if_t<TIsTEnumAsByte<Result>::Value>> :
 	TPrimitivePropertyBuilder<Class, Result, Member>
 {
+	using TPrimitivePropertyBuilder<Class, Result, Member>::Get;
+
 	static auto Get(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)
 	{
 		if (auto FoundObject = FCSharpEnvironment::TGetObject<Class, Class>()(
@@ -505,6 +507,8 @@ template <typename Result, Result* Member>
 struct TPropertyBuilder<Result*, Member, std::enable_if_t<TIsTEnumAsByte<std::decay_t<Result>>::Value>> :
 	TPrimitivePropertyBuilder<void, Result, Member>
 {
+	using TPrimitivePropertyBuilder<void, Result, Member>::Get;
+
 	static auto Get(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)
 	{
 		*(std::underlying_type_t<typename Result::EnumType>*)RETURN_BUFFER = *Member;

@@ -964,6 +964,11 @@ struct TPropertyValue<T, std::enable_if_t<TIsEnum<std::decay_t<T>>::Value && !TI
 	{
 		return TPropertyClass<T, T>::Get()->Value_Box(InMember);
 	}
+
+	static auto Get(const IManagedHandle InManagedHandle)
+	{
+		return static_cast<std::decay_t<T>>(*static_cast<uint8*>(FDomain::Object_Unbox(InManagedHandle)));
+	}
 };
 
 template <typename T>

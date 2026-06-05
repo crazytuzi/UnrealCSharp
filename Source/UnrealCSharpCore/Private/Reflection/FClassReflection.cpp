@@ -1071,13 +1071,16 @@ IManagedHandle FClassReflection::NewWeakRefGCHandle(const IManagedHandle InManag
 
 IManagedHandle FClassReflection::GetGCHandle(const IManagedObject InManagedObject) const
 {
-	if (const auto FoundProperty = GetProperty(PROPERTY_GARBAGE_COLLECTION_HANDLE))
+	if (IManagedIsValid(InManagedObject))
 	{
-		if (const auto ScriptDomain = IScriptDomain::Get())
+		if (const auto FoundProperty = GetProperty(PROPERTY_GARBAGE_COLLECTION_HANDLE))
 		{
-			return *static_cast<IManagedHandle*>(ScriptDomain->UnboxValue(
-				MANAGED_HANDLE_FROM_OBJECT(
-					FoundProperty->GetValue(MANAGED_HANDLE_FROM_OBJECT(InManagedObject), nullptr))));
+			if (const auto ScriptDomain = IScriptDomain::Get())
+			{
+				return *static_cast<IManagedHandle*>(ScriptDomain->UnboxValue(
+					MANAGED_HANDLE_FROM_OBJECT(
+						FoundProperty->GetValue(MANAGED_HANDLE_FROM_OBJECT(InManagedObject), nullptr))));
+			}
 		}
 	}
 

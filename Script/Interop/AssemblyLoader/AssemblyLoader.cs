@@ -21,7 +21,7 @@ namespace Interop
 
                 using var Stream = new UnmanagedMemoryStream(InData, InLength);
 
-                return HandleData.AllocImplementation(Context.LoadFromStream(Stream), bPinned: false);
+                return HandleData.AllocImplementation(Context.LoadFromStream(Stream));
             }
 
             return 0;
