@@ -10,13 +10,7 @@ int32 UGeneratorCodeCommandlet::Main(const FString& Params)
 
 	if (!TargetPlatform.IsEmpty())
 	{
-		const auto OriginalPlatformName = FUnrealCSharpFunctionLibrary::GetForcedPlatformName();
-
-		FUnrealCSharpFunctionLibrary::SetForcedPlatformName(TargetPlatform);
-
-		FUnrealCSharpEditorModule::Generator();
-
-		FUnrealCSharpFunctionLibrary::SetForcedPlatformName(OriginalPlatformName);
+		FUnrealCSharpEditorModule::Generator(TargetPlatform);
 	}
 	else
 	{

@@ -7,6 +7,8 @@ class FSolutionGenerator
 public:
 	static SCRIPTCODEGENERATOR_API void Generator();
 
+	static SCRIPTCODEGENERATOR_API void Generator(const FString& InTargetPlatform);
+
 private:
 	static void CopyTemplate(const FString& Dest, const FString& Src, bool bReplaceExistingFile = true);
 

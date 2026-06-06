@@ -269,19 +269,19 @@ public:
 #if WITH_EDITOR
 	static FString GetPlatformName();
 
-	static void SetForcedPlatformName(const FString& InPlatformName);
+	static void SetTargetPlatform(const FString& InPlatformName);
 
-	static FString GetForcedPlatformName();
+	static FString GetTargetPlatform();
 
-	static EScriptDomainType GetScriptDomainType();
+	static EScriptDomainType GetScriptDomainType(const FString& InPlatformName = TEXT(""));
 
-	static bool IsMonoDomain();
+	static bool IsMonoDomain(const FString& InPlatformName = TEXT(""));
 
-	static bool IsCoreCLRDomain();
+	static bool IsCoreCLRDomain(const FString& InPlatformName = TEXT(""));
 #endif
 
 #if WITH_EDITOR
 private:
-	static FString ForcedPlatformName;
+	static FString TargetPlatform;
 #endif
 };

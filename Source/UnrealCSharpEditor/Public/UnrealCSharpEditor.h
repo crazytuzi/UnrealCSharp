@@ -31,6 +31,8 @@ public:
 
 	static void Generator();
 
+	static void Generator(const FString& InTargetPlatform);
+
 private:
 	TSharedPtr<class FUnrealCSharpPlayToolBar> UnrealCSharpPlayToolBar;
 

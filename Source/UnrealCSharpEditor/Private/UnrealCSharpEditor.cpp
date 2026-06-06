@@ -241,6 +241,15 @@ void FUnrealCSharpEditorModule::UpdatePackagingSettings()
 	}
 }
 
+void FUnrealCSharpEditorModule::Generator(const FString& InTargetPlatform)
+{
+	FUnrealCSharpFunctionLibrary::SetTargetPlatform(InTargetPlatform);
+
+	Generator();
+
+	FUnrealCSharpFunctionLibrary::SetTargetPlatform(TEXT(""));
+}
+
 void FUnrealCSharpEditorModule::Generator()
 {
 	FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.Broadcast();
