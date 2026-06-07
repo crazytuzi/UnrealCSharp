@@ -31,6 +31,8 @@
 #endif
 
 #if WITH_EDITOR
+FString FUnrealCSharpFunctionLibrary::TargetPlatform;
+
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefaultSafe<UUnrealCSharpEditorSetting>())
@@ -1540,23 +1542,39 @@ FString FUnrealCSharpFunctionLibrary::GetPlatformName()
 	return FPlatformProperties::IniPlatformName();
 }
 
-EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType()
+void FUnrealCSharpFunctionLibrary::SetTargetPlatform(const FString& InPlatformName)
+{
+	TargetPlatform = InPlatformName;
+}
+
+FString FUnrealCSharpFunctionLibrary::GetTargetPlatform()
+{
+	return TargetPlatform;
+}
+
+EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType(const FString& InPlatformName)
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
-		return UnrealCSharpSetting->GetScriptDomainType(GetPlatformName());
+		const auto PlatformName = !InPlatformName.IsEmpty()
+			                          ? InPlatformName
+			                          : !TargetPlatform.IsEmpty()
+			                          ? TargetPlatform
+			                          : GetPlatformName();
+
+		return UnrealCSharpSetting->GetScriptDomainType(PlatformName);
 	}
 
 	return EScriptDomainType::CoreCLR;
 }
 
-bool FUnrealCSharpFunctionLibrary::IsMonoDomain()
+bool FUnrealCSharpFunctionLibrary::IsMonoDomain(const FString& InPlatformName)
 {
-	return GetScriptDomainType() == EScriptDomainType::Mono;
+	return GetScriptDomainType(InPlatformName) == EScriptDomainType::Mono;
 }
 
-bool FUnrealCSharpFunctionLibrary::IsCoreCLRDomain()
+bool FUnrealCSharpFunctionLibrary::IsCoreCLRDomain(const FString& InPlatformName)
 {
-	return GetScriptDomainType() == EScriptDomainType::CoreCLR;
+	return GetScriptDomainType(InPlatformName) == EScriptDomainType::CoreCLR;
 }
 #endif

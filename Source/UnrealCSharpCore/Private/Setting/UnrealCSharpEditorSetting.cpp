@@ -30,6 +30,7 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bIsSkipGenerateEngineModules(false),
 	bIsGenerateAllModules(true),
 	bIsGenerateAsset(true),
+	bSkipCodeGeneratorDuringCook(false),
 	bIsGenerateFunctionComment(true),
 	bEnableExport(false),
 	EditorConfiguration(ESolutionConfiguration::Debug),
@@ -341,6 +342,11 @@ TArray<FString> UUnrealCSharpEditorSetting::GetClassList()
 const TArray<FString>& UUnrealCSharpEditorSetting::GetClassBlacklist() const
 {
 	return ClassBlacklist;
+}
+
+bool UUnrealCSharpEditorSetting::IsSkipCodeGeneratorDuringCook() const
+{
+	return bSkipCodeGeneratorDuringCook;
 }
 
 ESolutionConfiguration UUnrealCSharpEditorSetting::GetEditorConfiguration() const

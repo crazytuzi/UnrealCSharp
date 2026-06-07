@@ -6,6 +6,15 @@
 #include "FGeneratorCore.h"
 #include "VSVersion.h"
 
+void FSolutionGenerator::Generator(const FString& InTargetPlatform)
+{
+	FUnrealCSharpFunctionLibrary::SetTargetPlatform(InTargetPlatform);
+
+	Generator();
+
+	FUnrealCSharpFunctionLibrary::SetTargetPlatform(TEXT(""));
+}
+
 void FSolutionGenerator::Generator()
 {
 	const auto TemplatePath = FUnrealCSharpFunctionLibrary::GetPluginTemplateDirectory();
