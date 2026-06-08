@@ -7,6 +7,7 @@
 #include "Settings/ProjectPackagingSettings.h"
 #include "Misc/ScopedSlowTask.h"
 #include "IContentBrowserDataModule.h"
+#include "Interfaces/ITargetPlatformManagerModule.h"
 #include "FAssetGenerator.h"
 #include "FClassGenerator.h"
 #include "FCSharpCompiler.h"
@@ -27,6 +28,7 @@
 #include "DetailCustomization/ProjectDirectoryPathCustomization.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Setting/UnrealCSharpSetting.h"
+#include "Common/FScriptDomainTypeScope.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 
@@ -96,7 +98,7 @@ void FUnrealCSharpEditorModule::StartupModule()
 		FConsoleCommandDelegate::CreateLambda(
 			[]()
 			{
-				Generator();
+				Generator(FPlatformProperties::IniPlatformName());
 			}));
 
 	UpdatePackagingSettings();
@@ -114,18 +116,24 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	if (IsRunningCookCommandlet())
 	{
-		if (const auto AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+		if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+				UUnrealCSharpEditorSetting>();
+			UnrealCSharpEditorSetting != nullptr && !UnrealCSharpEditorSetting->IsSkipGenerateScriptCode())
 		{
-			if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
-				UUnrealCSharpEditorSetting>())
+			if (const auto AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(
+				TEXT("AssetRegistry")))
 			{
-				if (!UnrealCSharpEditorSetting->IsSkipCodeGeneratorDuringCook())
+				AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
 				{
-					AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
+					if (const auto TargetPlatformManager = GetTargetPlatformManager())
 					{
-						Generator();
-					});
-				}
+						if (const auto& ActiveTargetPlatforms = TargetPlatformManager->GetActiveTargetPlatforms();
+							!ActiveTargetPlatforms.IsEmpty())
+						{
+							Generator(ActiveTargetPlatforms[0]->IniPlatformName());
+						}
+					}
+				});
 			}
 		}
 	}
@@ -189,7 +197,7 @@ void FUnrealCSharpEditorModule::Tick(const float InDeltaTime)
 
 void FUnrealCSharpEditorModule::PluginButtonClicked() const
 {
-	Generator();
+	Generator(FPlatformProperties::IniPlatformName());
 }
 
 void FUnrealCSharpEditorModule::OnPostEngineInit()
@@ -241,17 +249,10 @@ void FUnrealCSharpEditorModule::UpdatePackagingSettings()
 	}
 }
 
-void FUnrealCSharpEditorModule::Generator(const FString& InTargetPlatform)
+void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName)
 {
-	FUnrealCSharpFunctionLibrary::SetTargetPlatform(InTargetPlatform);
+	FScriptDomainTypeScope ScriptDomainTypeScope(FUnrealCSharpFunctionLibrary::GetScriptDomainType(InPlatformName));
 
-	Generator();
-
-	FUnrealCSharpFunctionLibrary::SetTargetPlatform(TEXT(""));
-}
-
-void FUnrealCSharpEditorModule::Generator()
-{
 	FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.Broadcast();
 
 	static FString DefaultCultureName = TEXT("en");

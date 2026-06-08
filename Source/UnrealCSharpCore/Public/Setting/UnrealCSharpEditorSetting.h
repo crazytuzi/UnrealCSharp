@@ -48,6 +48,8 @@ public:
 #if WITH_EDITOR
 	const FString& GetDotNetPath() const;
 
+	bool IsSkipGenerateScriptCode() const;
+
 	UFUNCTION()
 	TArray<FString> GetDotNetPathArray() const;
 
@@ -85,8 +87,6 @@ public:
 
 	const TArray<FString>& GetClassBlacklist() const;
 
-	bool IsSkipCodeGeneratorDuringCook() const;
-
 	ESolutionConfiguration GetEditorConfiguration() const;
 
 	ESolutionConfiguration GetRuntimeConfiguration() const;
@@ -96,6 +96,9 @@ private:
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(Config, EditAnywhere, Category = DotNet, meta = (GetOptions = "GetDotNetPathArray"))
 	FString DotNetPath = TEXT("");
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bIsSkipGenerateScriptCode;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (RelativePath))
 	FProjectDirectoryPath ScriptDirectory;
@@ -134,9 +137,6 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (EditCondition = "bIsGenerateAsset"))
 	TArray<TSubclassOf<UObject>> SupportedAssetClass;
-
-	UPROPERTY(Config, EditAnywhere, Category = Generator)
-	bool bSkipCodeGeneratorDuringCook;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator)
 	bool bIsGenerateFunctionComment;

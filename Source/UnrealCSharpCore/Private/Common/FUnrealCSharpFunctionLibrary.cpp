@@ -9,7 +9,6 @@
 #include "WidgetBlueprint.h"
 #include "Animation/AnimBlueprint.h"
 #include "Animation/AnimInstance.h"
-#include "Interfaces/ITargetPlatformManagerModule.h"
 #endif
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -31,8 +30,10 @@
 #endif
 
 #if WITH_EDITOR
-FString FUnrealCSharpFunctionLibrary::TargetPlatform;
+EScriptDomainType FUnrealCSharpFunctionLibrary::ScriptDomainType = EScriptDomainType::CoreCLR;
+#endif
 
+#if WITH_EDITOR
 FString FUnrealCSharpFunctionLibrary::GetDotNet()
 {
 	if (const auto UnrealCSharpEditorSetting = GetMutableDefaultSafe<UUnrealCSharpEditorSetting>())
@@ -1525,56 +1526,33 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 #endif
 
 #if WITH_EDITOR
-FString FUnrealCSharpFunctionLibrary::GetPlatformName()
+void FUnrealCSharpFunctionLibrary::SetScriptDomainType(const EScriptDomainType InScriptDomainType)
 {
-	if (IsRunningCookCommandlet())
-	{
-		if (const auto TargetPlatformManager = GetTargetPlatformManager())
-		{
-			if (const auto& ActiveTargetPlatforms = TargetPlatformManager->GetActiveTargetPlatforms();
-				!ActiveTargetPlatforms.IsEmpty())
-			{
-				return ActiveTargetPlatforms[0]->IniPlatformName();
-			}
-		}
-	}
-
-	return FPlatformProperties::IniPlatformName();
-}
-
-void FUnrealCSharpFunctionLibrary::SetTargetPlatform(const FString& InPlatformName)
-{
-	TargetPlatform = InPlatformName;
-}
-
-FString FUnrealCSharpFunctionLibrary::GetTargetPlatform()
-{
-	return TargetPlatform;
+	ScriptDomainType = InScriptDomainType;
 }
 
 EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType(const FString& InPlatformName)
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
-		const auto PlatformName = !InPlatformName.IsEmpty()
-			                          ? InPlatformName
-			                          : !TargetPlatform.IsEmpty()
-			                          ? TargetPlatform
-			                          : GetPlatformName();
-
-		return UnrealCSharpSetting->GetScriptDomainType(PlatformName);
+		return UnrealCSharpSetting->GetScriptDomainType(InPlatformName);
 	}
 
 	return EScriptDomainType::CoreCLR;
 }
 
-bool FUnrealCSharpFunctionLibrary::IsMonoDomain(const FString& InPlatformName)
+EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType()
 {
-	return GetScriptDomainType(InPlatformName) == EScriptDomainType::Mono;
+	return ScriptDomainType;
 }
 
-bool FUnrealCSharpFunctionLibrary::IsCoreCLRDomain(const FString& InPlatformName)
+bool FUnrealCSharpFunctionLibrary::IsMonoDomain()
 {
-	return GetScriptDomainType(InPlatformName) == EScriptDomainType::CoreCLR;
+	return GetScriptDomainType() == EScriptDomainType::Mono;
+}
+
+bool FUnrealCSharpFunctionLibrary::IsCoreCLRDomain()
+{
+	return GetScriptDomainType() == EScriptDomainType::CoreCLR;
 }
 #endif

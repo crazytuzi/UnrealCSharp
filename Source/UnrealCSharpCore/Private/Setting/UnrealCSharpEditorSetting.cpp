@@ -21,6 +21,7 @@
 UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer& ObjectInitializer):
 #if WITH_EDITOR
 	Super(ObjectInitializer),
+	bIsSkipGenerateScriptCode(false),
 	ScriptDirectory(DEFAULT_SCRIPT_DIRECTORY),
 	bEnableDeleteProxyDirectory(false),
 	bEnableDeleteBindingDirectory(false),
@@ -30,7 +31,6 @@ UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer&
 	bIsSkipGenerateEngineModules(false),
 	bIsGenerateAllModules(true),
 	bIsGenerateAsset(true),
-	bSkipCodeGeneratorDuringCook(false),
 	bIsGenerateFunctionComment(true),
 	bEnableExport(false),
 	EditorConfiguration(ESolutionConfiguration::Debug),
@@ -129,6 +129,11 @@ void UUnrealCSharpEditorSetting::UnregisterSettings()
 const FString& UUnrealCSharpEditorSetting::GetDotNetPath() const
 {
 	return DotNetPath;
+}
+
+bool UUnrealCSharpEditorSetting::IsSkipGenerateScriptCode() const
+{
+	return bIsSkipGenerateScriptCode;
 }
 
 TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const
@@ -342,11 +347,6 @@ TArray<FString> UUnrealCSharpEditorSetting::GetClassList()
 const TArray<FString>& UUnrealCSharpEditorSetting::GetClassBlacklist() const
 {
 	return ClassBlacklist;
-}
-
-bool UUnrealCSharpEditorSetting::IsSkipCodeGeneratorDuringCook() const
-{
-	return bSkipCodeGeneratorDuringCook;
 }
 
 ESolutionConfiguration UUnrealCSharpEditorSetting::GetEditorConfiguration() const

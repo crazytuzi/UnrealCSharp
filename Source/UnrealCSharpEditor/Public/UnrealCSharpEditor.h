@@ -29,9 +29,7 @@ private:
 public:
 	static void UpdatePackagingSettings();
 
-	static void Generator();
-
-	static void Generator(const FString& InTargetPlatform);
+	static void Generator(const FString& InPlatformName);
 
 private:
 	TSharedPtr<class FUnrealCSharpPlayToolBar> UnrealCSharpPlayToolBar;

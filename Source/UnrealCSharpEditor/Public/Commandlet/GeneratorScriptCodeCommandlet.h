@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Commandlets/Commandlet.h"
-#include "GeneratorCodeCommandlet.generated.h"
+#include "GeneratorScriptCodeCommandlet.generated.h"
 
 UCLASS()
-class UGeneratorCodeCommandlet : public UCommandlet
+class UGeneratorScriptCodeCommandlet : public UCommandlet
 {
 	GENERATED_BODY()
 
