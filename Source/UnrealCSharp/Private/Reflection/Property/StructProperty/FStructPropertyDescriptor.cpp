@@ -1,6 +1,5 @@
 #include "Reflection/Property/StructProperty/FStructPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedTypes.h"
 
 FStructPropertyDescriptor::FStructPropertyDescriptor(FStructProperty* InProperty) :
 	TCompoundPropertyDescriptor(InProperty)
@@ -12,23 +11,23 @@ void FStructPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) cons
 {
 	const auto Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(Property->Struct, Src,
-	                                                              MANAGED_HANDLE_FROM_OBJECT(Object));
-	*reinterpret_cast<IManagedObject*>(Dest) = IManagedHandleToIManagedObject(Object);
+	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(Property->Struct, Src, Object);
+
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FStructPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
 	const auto Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference<false>(Property->Struct, Src,
-	                                                               MANAGED_HANDLE_FROM_OBJECT(Object));
-	*reinterpret_cast<IManagedObject*>(Dest) = IManagedHandleToIManagedObject(Object);
+	FCSharpEnvironment::GetEnvironment().AddStructReference<false>(Property->Struct, Src, Object);
+
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FStructPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	*static_cast<IManagedObject*>(Dest) = NewRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewRef(Src);
 }
 
 void FStructPropertyDescriptor::Set(void* Src, void* Dest) const
@@ -53,7 +52,7 @@ bool FStructPropertyDescriptor::Identical(const void* A, const void* B, const ui
 	return Property->Identical(StructA, StructB, PortFlags);
 }
 
-IManagedObject FStructPropertyDescriptor::NewRef(void* InAddress) const
+IManagedHandle FStructPropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetObject(Property->Struct, InAddress);
 
@@ -65,8 +64,8 @@ IManagedObject FStructPropertyDescriptor::NewRef(void* InAddress) const
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddStructReference(OwnerManagedHandle, Property->Struct,
-		                                                        InAddress, MANAGED_HANDLE_FROM_OBJECT(Object));
+		                                                        InAddress, Object);
 	}
 
-	return IManagedHandleToIManagedObject(Object);
+	return Object;
 }

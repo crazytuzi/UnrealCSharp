@@ -1,8 +1,6 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedTypes.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "CoreMacro/NamespaceMacro.h"
 
@@ -10,15 +8,15 @@ namespace
 {
 	struct FRegisterDataTableFunctionLibrary
 	{
-		static IUnmanagedBool GetDataTableRowFromNameImplementation(const IManagedHandle InManagedHandle,
-		                                                            const IManagedHandle RowName,
-		                                                            IManagedObject* OutRow)
+		static uint8 GetDataTableRowFromNameImplementation(const IManagedHandle InManagedHandle,
+		                                                   const IManagedHandle RowName,
+		                                                   IManagedHandle* OutRow)
 		{
 			if (const auto InRowName = FCSharpEnvironment::GetEnvironment().GetString<FName>(RowName))
 			{
 				if (InRowName->IsNone())
 				{
-					return IUnmanagedFalse;
+					return 0;
 				}
 
 				if (const auto DataTable = FCSharpEnvironment::GetEnvironment().GetObject<
@@ -28,20 +26,19 @@ namespace
 
 					const auto Class = FReflectionRegistry::Get().GetClass(DataTable->RowStruct);
 
-					*OutRow = IManagedHandleToIManagedObject(Class->InitObject());
+					*OutRow = Class->InitObject();
 
 					const auto FindRowData = *DataTable->GetRowMap().Find(*InRowName);
 
-					const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct<>(
-						Class->GetGCHandle(*OutRow));
+					const auto OutRowData = FCSharpEnvironment::GetEnvironment().GetStruct<>(*OutRow);
 
 					DataTable->RowStruct->CopyScriptStruct(OutRowData, FindRowData);
 
-					return IUnmanagedTrue;
+					return 1;
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		FRegisterDataTableFunctionLibrary()

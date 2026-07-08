@@ -34,61 +34,61 @@ auto FCSharpBind::Bind(UObject* InObject)
 
 template <typename T>
 auto FCSharpBind::Bind(FClassReflection* InClassReflection, FClassReflection* InPropertyClassReflection,
-                       const IManagedObject InManagedObject)
+                       const IManagedHandle InManagedObject)
 {
 	return BindImplementation<T>(InClassReflection, InPropertyClassReflection, InManagedObject);
 }
 
 template <typename T>
 auto FCSharpBind::Bind(FClassReflection* InClassReflection, FClassReflection* InKeyClassReflection,
-                       FClassReflection* InValueClassReflection, const IManagedObject InManagedObject)
+                       FClassReflection* InValueClassReflection, const IManagedHandle InManagedObject)
 {
 	return BindImplementation<T>(InClassReflection, InKeyClassReflection, InValueClassReflection, InManagedObject);
 }
 
 template <typename T>
-auto FCSharpBind::Bind(FClassReflection* InClassReflection, const IManagedObject InManagedObject)
+auto FCSharpBind::Bind(FClassReflection* InClassReflection, const IManagedHandle InManagedObject)
 {
 	return BindImplementation<T>(InClassReflection, InManagedObject);
 }
 
 template <auto IsNeedOverride>
-auto FCSharpBind::BindImplementation(UObject* InObject) -> IManagedObject
+auto FCSharpBind::BindImplementation(UObject* InObject) -> IManagedHandle
 {
 	if (InObject == nullptr)
 	{
-		return INVALID_MANAGED;
+		return InvalidManagedHandle;
 	}
 
 	const auto Class = InObject->GetClass();
 
 	if (Class == nullptr)
 	{
-		return INVALID_MANAGED;
+		return InvalidManagedHandle;
 	}
 
 	if (!Bind<IsNeedOverride>(static_cast<UStruct*>(Class)))
 	{
-		return INVALID_MANAGED;
+		return InvalidManagedHandle;
 	}
 
 	const auto FoundClass = FReflectionRegistry::Get().GetClass(Class);
 
 	if (FoundClass == nullptr)
 	{
-		return INVALID_MANAGED;
+		return InvalidManagedHandle;
 	}
 
 	const auto NewObject = FoundClass->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddObjectReference(FoundClass, InObject, NewObject);
 
-	return IManagedHandleToIManagedObject(NewObject);
+	return NewObject;
 }
 
 template <typename T>
 auto FCSharpBind::BindImplementation(FClassReflection* InClassReflection, FClassReflection* InPropertyClassReflection,
-                                     const IManagedObject InManagedObject)
+                                     const IManagedHandle InManagedObject)
 {
 	const auto Property = FTypeBridge::Factory<>(InPropertyClassReflection, nullptr, "", EObjectFlags::RF_Transient);
 
@@ -96,15 +96,14 @@ auto FCSharpBind::BindImplementation(FClassReflection* InClassReflection, FClass
 
 	const auto ContainerHelper = new T(Property, nullptr, true, true);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(
-		ContainerHelper, InClassReflection, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InClassReflection, InManagedObject);
 
 	return true;
 }
 
 template <typename T>
 auto FCSharpBind::BindImplementation(FClassReflection* InClassReflection, FClassReflection* InKeyClassReflection,
-                                     FClassReflection* InValueClassReflection, const IManagedObject InManagedObject)
+                                     FClassReflection* InValueClassReflection, const IManagedHandle InManagedObject)
 {
 	const auto KeyProperty = FTypeBridge::Factory<>(InKeyClassReflection, nullptr, "", EObjectFlags::RF_Transient);
 
@@ -117,19 +116,17 @@ auto FCSharpBind::BindImplementation(FClassReflection* InClassReflection, FClass
 
 	const auto ContainerHelper = new T(KeyProperty, ValueProperty, nullptr, true, true);
 
-	FCSharpEnvironment::GetEnvironment().AddContainerReference(
-		ContainerHelper, InClassReflection, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+	FCSharpEnvironment::GetEnvironment().AddContainerReference(ContainerHelper, InClassReflection, InManagedObject);
 
 	return true;
 }
 
 template <typename T>
-auto FCSharpBind::BindImplementation(FClassReflection* InClassReflection, const IManagedObject InManagedObject)
+auto FCSharpBind::BindImplementation(FClassReflection* InClassReflection, const IManagedHandle InManagedObject)
 {
 	const auto Helper = new T();
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(
-		Helper, InClassReflection, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(Helper, InClassReflection, InManagedObject);
 
 	return true;
 }

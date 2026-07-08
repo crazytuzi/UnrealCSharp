@@ -9,7 +9,6 @@
 #include "Containers/ArrayBuilder.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "ScriptCodeGeneratorMacro.h"
 #include "Dynamic/FDynamicGenerator.h"
 
@@ -93,12 +92,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 
 	auto bIsInterface = InClass->IsChildOf(UInterface::StaticClass());
 
-	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
-
-	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
-	{
-		UsingNameSpaces.Add(NAMESPACE_INTEROP);
-	}
+	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), NAMESPACE_INTEROP};
 
 	auto SuperClass = InClass->GetSuperClass();
 
@@ -189,7 +183,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			"\t\t\t\t{\n"
 			"\t\t\t\t\tvar %s = stackalloc byte[%d];\n"
 			"\n"
-			"\t\t\t\t\tFPropertyImplementation.FProperty_GetObjectPropertyImplementation(%s, %s, %s);\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_GetObjectPropertyImplementation(HandleData.GetHandle(this), %s, %s);\n"
 			"\n"
 			"\t\t\t\t\treturn %s;\n"
 			"\t\t\t\t}\n"
@@ -203,7 +197,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 			"\n"
 			"\t\t\t\t\t*(%s*)%s = %s;\n"
 			"\n"
-			"\t\t\t\t\tFPropertyImplementation.FProperty_SetObjectPropertyImplementation(%s, %s, %s);\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_SetObjectPropertyImplementation(HandleData.GetHandle(this), %s, %s);\n"
 			"\t\t\t\t}\n"
 			"\t\t\t}\n"
 			"\t\t}\n"
@@ -213,7 +207,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                   *EncodePropertyName,
 		                                   RETURN_BUFFER_TEXT,
 		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
-		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                   *DummyPropertyName,
 		                                   RETURN_BUFFER_TEXT,
 		                                   *FGeneratorCore::GetReturn(*PropertyIterator, PropertyType,
@@ -223,7 +216,6 @@ void FClassGenerator::Generator(const UClass* InClass)
 		                                   *FGeneratorCore::GetBufferCast(*PropertyIterator),
 		                                   IN_BUFFER_TEXT,
 		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator),
-		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                   *DummyPropertyName,
 		                                   IN_BUFFER_TEXT
 		);
@@ -658,7 +650,7 @@ void FClassGenerator::Generator(const UClass* InClass)
 		}
 
 		auto FunctionCallBody = FString::Printf(TEXT(
-			"FFunctionImplementation.FFunction_%sCall%dImplementation(%s, %s%s%s%s);\n"
+			"FFunctionImplementation.FFunction_%sCall%dImplementation(HandleData.GetHandle(%s), %s%s%s%s);\n"
 		),
 		                                        *FGeneratorCore::GetFunctionPrefix(FunctionReturnParam),
 		                                        FGeneratorCore::GetFunctionIndex(FunctionReturnParam != nullptr,
@@ -668,10 +660,8 @@ void FClassGenerator::Generator(const UClass* InClass)
 			                                        Function->HasAnyFunctionFlags(FUNC_Native),
 			                                        Function->HasAnyFunctionFlags(FUNC_Net)),
 		                                        bIsStatic == true
-			                                        ? *FString::Printf(
-				                                        TEXT("StaticClass().%s"),
-				                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE)
-			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+			                                        ? TEXT("StaticClass()")
+			                                        : TEXT("this"),
 		                                        *DummyFunctionName,
 		                                        bHasInBuffer
 			                                        ? *FString::Printf(TEXT(

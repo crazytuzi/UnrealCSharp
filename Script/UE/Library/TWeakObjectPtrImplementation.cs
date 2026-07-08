@@ -1,29 +1,11 @@
 using System;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class TWeakObjectPtrImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TWeakObjectPtr_RegisterImplementation<T>(TWeakObjectPtr<T> InWeakObjectPtr,
-            nint InObject, Type InType) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TWeakObjectPtr_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TWeakObjectPtr_UnRegisterImplementation(nint InWeakObjectPtr);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T TWeakObjectPtr_GetImplementation<T>(nint InWeakObjectPtr);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, void>
             __TWeakObjectPtr_RegisterImplementation;
 
@@ -37,20 +19,17 @@ namespace Script.Library
                         "Script.Library.TWeakObjectPtrImplementation::TWeakObjectPtr_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InWeakObjectPtr);
-
-            InWeakObjectPtr.GarbageCollectionHandle = Handle;
-
-            __TWeakObjectPtr_RegisterImplementation(Handle, InObject, HandleData.AllocImplementation(InType));
+            __TWeakObjectPtr_RegisterImplementation(HandleData.Alloc(InWeakObjectPtr), InObject,
+                HandleData.Alloc(InType));
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __TWeakObjectPtr_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __TWeakObjectPtr_IdenticalImplementation;
 
         public static unsafe bool TWeakObjectPtr_IdenticalImplementation(nint InA, nint InB)
         {
             if (__TWeakObjectPtr_IdenticalImplementation == null)
             {
-                __TWeakObjectPtr_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __TWeakObjectPtr_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TWeakObjectPtrImplementation::TWeakObjectPtr_IdenticalImplementation");
             }
@@ -87,6 +66,5 @@ namespace Script.Library
 
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : default;
         }
-#endif
     }
 }

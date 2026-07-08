@@ -1,19 +1,18 @@
 #include "Reflection/Property/ObjectProperty/FClassPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
 void FClassPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto SrcClass = Cast<UClass>(Property->GetObjectPropertyValue(Src));
 
-	*reinterpret_cast<IManagedObject*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcClass);
+	*reinterpret_cast<IManagedHandle*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcClass);
 }
 
 void FClassPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
 	const auto SrcClass = Cast<UClass>(Property->GetObjectPropertyValue(Src));
 
-	*reinterpret_cast<IManagedObject*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcClass);
+	*reinterpret_cast<IManagedHandle*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcClass);
 }
 
 void FClassPropertyDescriptor::Set(void* Src, void* Dest) const

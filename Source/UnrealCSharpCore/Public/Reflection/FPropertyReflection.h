@@ -1,14 +1,14 @@
 #pragma once
 
 #include "FReflection.h"
-#include "Domain/Script/IManagedTypes.h"
+#include "Domain/Script/IManagedHandle.h"
 
 class FClassReflection;
 
 class UNREALCSHARPCORE_API FPropertyReflection : public FReflection
 {
 public:
-	FPropertyReflection(const FString& InName, const IManagedReflectionProperty InManagedReflectionProperty,
+	FPropertyReflection(const FString& InName, const IManagedHandle InManagedProperty,
 	                    FClassReflection* InReflectionType,
 	                    const TSet<FClassReflection*>& InAttributes,
 	                    const TMap<FClassReflection*, TArray<FString>>& InAttributeValues);
@@ -23,10 +23,8 @@ public:
 public:
 	void SetValue(const IManagedHandle InManagedHandle, void** InParams) const;
 
-	void* GetValue(const IManagedHandle InManagedHandle, void** InParams) const;
-
 private:
-	IManagedReflectionProperty ManagedReflectionProperty{INVALID_MANAGED};
+	IManagedHandle ManagedProperty{InvalidManagedHandle};
 
 	FClassReflection* ReflectionType{};
 

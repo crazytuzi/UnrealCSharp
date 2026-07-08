@@ -1,56 +1,18 @@
 using System.Text;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static partial class UObjectImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool UObject_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass UObject_StaticClassImplementation(string InClassName);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass UObject_GetClassImplementation(nint InObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern string UObject_GetNameImplementation(nint InObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool UObject_IsValidImplementation(nint InObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool UObject_IsAImplementation(nint InObject, nint SomeBase);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UObject_AddToRootImplementation(nint InObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UObject_RemoveFromRootImplementation(nint InObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool UObject_IsRootedImplementation(nint InObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool UObject_AddReferenceImplementation(nint InObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool UObject_RemoveReferenceImplementation(nint InObject);
-#else
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __UObject_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __UObject_IdenticalImplementation;
 
         public static unsafe bool UObject_IdenticalImplementation(nint InA, nint InB)
         {
             if (__UObject_IdenticalImplementation == null)
             {
-                __UObject_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __UObject_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.UObjectImplementation::UObject_IdenticalImplementation");
             }
@@ -113,13 +75,13 @@ namespace Script.Library
             return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, int> __UObject_IsValidImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, byte> __UObject_IsValidImplementation;
 
         public static unsafe bool UObject_IsValidImplementation(nint InObject)
         {
             if (__UObject_IsValidImplementation == null)
             {
-                __UObject_IsValidImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __UObject_IsValidImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.UObjectImplementation::UObject_IsValidImplementation");
             }
@@ -127,13 +89,13 @@ namespace Script.Library
             return __UObject_IsValidImplementation(InObject) != 0;
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __UObject_IsAImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __UObject_IsAImplementation;
 
         public static unsafe bool UObject_IsAImplementation(nint InObject, nint SomeBase)
         {
             if (__UObject_IsAImplementation == null)
             {
-                __UObject_IsAImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __UObject_IsAImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod("Script.Library.UObjectImplementation::UObject_IsAImplementation");
             }
 
@@ -168,13 +130,13 @@ namespace Script.Library
             __UObject_RemoveFromRootImplementation(InObject);
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, int> __UObject_IsRootedImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, byte> __UObject_IsRootedImplementation;
 
         public static unsafe bool UObject_IsRootedImplementation(nint InObject)
         {
             if (__UObject_IsRootedImplementation == null)
             {
-                __UObject_IsRootedImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __UObject_IsRootedImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.UObjectImplementation::UObject_IsRootedImplementation");
             }
@@ -182,13 +144,13 @@ namespace Script.Library
             return __UObject_IsRootedImplementation(InObject) != 0;
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, int> __UObject_AddReferenceImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, byte> __UObject_AddReferenceImplementation;
 
         public static unsafe bool UObject_AddReferenceImplementation(nint InObject)
         {
             if (__UObject_AddReferenceImplementation == null)
             {
-                __UObject_AddReferenceImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __UObject_AddReferenceImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.UObjectImplementation::UObject_AddReferenceImplementation");
             }
@@ -196,19 +158,18 @@ namespace Script.Library
             return __UObject_AddReferenceImplementation(InObject) != 0;
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, int> __UObject_RemoveReferenceImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, byte> __UObject_RemoveReferenceImplementation;
 
         public static unsafe bool UObject_RemoveReferenceImplementation(nint InObject)
         {
             if (__UObject_RemoveReferenceImplementation == null)
             {
-                __UObject_RemoveReferenceImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __UObject_RemoveReferenceImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.UObjectImplementation::UObject_RemoveReferenceImplementation");
             }
 
             return __UObject_RemoveReferenceImplementation(InObject) != 0;
         }
-#endif
     }
 }

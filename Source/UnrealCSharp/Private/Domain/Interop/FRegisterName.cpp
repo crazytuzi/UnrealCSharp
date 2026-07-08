@@ -1,8 +1,7 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Domain/Script/IManagedHandle.h"
-#include "Domain/Script/IUnmanagedBool.h"
-#include "Domain/Script/IManagedMarshalledString.h"
+#include "Domain/Script/IScriptDomain.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
@@ -11,25 +10,25 @@ namespace
 {
 	struct FRegisterName
 	{
-		static void RegisterImplementation(const IManagedObject InManagedObject, const IManagedMarshalledString InValue)
+		static void RegisterImplementation(const IManagedHandle InManagedObject, const char* InValue)
 		{
-			const auto Name = new FName(MANAGED_MARSHALLED_STRING_TO_F_STRING(InValue));
+			const auto Name = new FName(InValue != nullptr ? FString(UTF8_TO_TCHAR(InValue)) : FString(TEXT("")));
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(
-				FReflectionRegistry::Get().GetNameClass(), MANAGED_HANDLE_FROM_OBJECT(InManagedObject), Name);
+				FReflectionRegistry::Get().GetNameClass(), InManagedObject, Name);
 		}
 
-		static IUnmanagedBool IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
+		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
 		{
 			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetString<FName>(InA))
 			{
 				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetString<FName>(InB))
 				{
-					return BoolToIUnmanagedBool(*FoundA == *FoundB);
+					return *FoundA == *FoundB ? 1 : 0;
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
@@ -40,14 +39,14 @@ namespace
 			});
 		}
 
-		static IManagedString ToStringImplementation(const IManagedHandle InManagedHandle)
+		static IManagedHandle ToStringImplementation(const IManagedHandle InManagedHandle)
 		{
 			const auto Name = FCSharpEnvironment::GetEnvironment().GetString<FName>(InManagedHandle);
 
-			return MANAGED_MARSHALLED_STRING_NEW(TCHAR_TO_UTF8(*Name->ToString()));
+			return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Name->ToString()));
 		}
 
-		static IManagedObject NAME_NoneImplementation()
+		static IManagedHandle NAME_NoneImplementation()
 		{
 			const auto FoundClass = TPropertyClass<FName, FName>::Get();
 
@@ -56,7 +55,7 @@ namespace
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FName, true, false>(
 				FoundClass, Object, new FName(NAME_None));
 
-			return IManagedHandleToIManagedObject(Object);
+			return Object;
 		}
 
 		FRegisterName()

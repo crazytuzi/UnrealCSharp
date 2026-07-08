@@ -8,7 +8,6 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "Dynamic/FDynamicGenerator.h"
 
 void FStructGenerator::Generator()
@@ -83,17 +82,11 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 
 	FString PropertyNameContent;
 
-	FString GCHandleContent;
-
 	TSet<FString> UsingNameSpaces{
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY),
+		NAMESPACE_INTEROP
 	};
-
-	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
-	{
-		UsingNameSpaces.Add(NAMESPACE_INTEROP);
-	}
 
 	auto SuperStruct = Cast<UScriptStruct>(InScriptStruct->GetSuperStruct());
 
@@ -107,7 +100,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		}
 
 		SuperStructContent = FString::Printf(TEXT(
-			" : %s, IStaticStruct, IGarbageCollectionHandle"
+			" : %s, IStaticStruct"
 		),
 		                                     *FUnrealCSharpFunctionLibrary::GetFullClass(SuperStruct));
 
@@ -121,7 +114,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	}
 	else
 	{
-		SuperStructContent = TEXT(" : IStaticStruct, IGarbageCollectionHandle");
+		SuperStructContent = TEXT(" : IStaticStruct");
 
 		ConstructorContent = FString::Printf(TEXT(
 			"\t\tpublic %s() => UStructImplementation.UStruct_RegisterImplementation(this, Utils.GetPathName(GetType()));\n"
@@ -130,16 +123,9 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		);
 
 		DestructorContent = FString::Printf(TEXT(
-			"\n\t\t~%s() => UStructImplementation.UStruct_UnRegisterImplementation(%s);\n"
+			"\n\t\t~%s() => UStructImplementation.UStruct_UnRegisterImplementation(HandleData.GetHandle(this));\n"
 		),
-		                                    *ClassContent,
-		                                    *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
-
-		GCHandleContent = FString::Printf(TEXT(
-			"\t\tpublic nint %s { get; set; }\n"
-		),
-		                                  *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		                                    *ClassContent
 		);
 
 		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
@@ -169,22 +155,18 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"\t\t\t\treturn false;\n"
 		"\t\t\t}\n"
 		"\n"
-		"\t\t\treturn ReferenceEquals(A, B) || UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().%s, A.%s, B.%s);\n"
+		"\t\t\treturn ReferenceEquals(A, B) || UStructImplementation.UStruct_IdenticalImplementation(HandleData.GetHandle(StaticStruct()), HandleData.GetHandle(A), HandleData.GetHandle(B));\n"
 		"\t\t}\n"
 		"\n"
 		"\t\tpublic static bool operator !=(%s A, %s B) => !(A == B);\n\n"
 		"\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
-		"\t\tpublic override int GetHashCode() => (int)%s;\n"
+		"\t\tpublic override int GetHashCode() => (int)HandleData.GetHandle(this);\n"
 	),
 	                                   *ClassContent,
 	                                   *ClassContent,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                   *ClassContent,
 	                                   *ClassContent,
-	                                   *ClassContent,
-	                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	                                   *ClassContent
 	);
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UScriptStruct::StaticClass()));
@@ -254,7 +236,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\t\t\t\t{\n"
 			"\t\t\t\t\tvar %s = stackalloc byte[%d];\n"
 			"\n"
-			"\t\t\t\t\tFPropertyImplementation.FProperty_GetStructPropertyImplementation(%s, %s, %s);\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_GetStructPropertyImplementation(HandleData.GetHandle(this), %s, %s);\n"
 			"\n"
 			"\t\t\t\t\treturn %s;\n"
 			"\t\t\t\t}\n"
@@ -268,7 +250,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			"\n"
 			"\t\t\t\t\t*(%s*)%s = %s;\n"
 			"\n"
-			"\t\t\t\t\tFPropertyImplementation.FProperty_SetStructPropertyImplementation(%s, %s, %s);\n"
+			"\t\t\t\t\tFPropertyImplementation.FProperty_SetStructPropertyImplementation(HandleData.GetHandle(this), %s, %s);\n"
 			"\t\t\t\t}\n"
 			"\t\t\t}\n"
 			"\t\t}\n"
@@ -279,7 +261,6 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 			                                   VariableFriendlyPropertyName, PropertyIterator->IsNative()),
 		                                   RETURN_BUFFER_TEXT,
 		                                   FGeneratorCore::GetBufferSize(*PropertyIterator),
-		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                   *DummyPropertyName,
 		                                   RETURN_BUFFER_TEXT,
 		                                   *FGeneratorCore::GetReturn(*PropertyIterator, PropertyType,
@@ -289,7 +270,6 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		                                   *FGeneratorCore::GetBufferCast(*PropertyIterator),
 		                                   IN_BUFFER_TEXT,
 		                                   *FGeneratorCore::GetSetAccessorParamName(*PropertyIterator),
-		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                   *DummyPropertyName,
 		                                   IN_BUFFER_TEXT
 		);
@@ -337,7 +317,6 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 		"%s"
 		"%s"
 		"%s"
-		"%s"
 		"\n"
 		"%s"
 		"\t}\n"
@@ -356,8 +335,7 @@ void FStructGenerator::Generator(const UScriptStruct* InScriptStruct)
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
 	                               *PropertyContent,
 	                               bHasProperty == true ? TEXT("\n") : TEXT(""),
-	                               *PropertyNameContent,
-	                               *GCHandleContent
+	                               *PropertyNameContent
 	);
 
 	const auto FileName = FGeneratorCore::GetFileName(InScriptStruct);

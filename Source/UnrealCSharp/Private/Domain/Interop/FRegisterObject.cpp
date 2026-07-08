@@ -2,8 +2,7 @@
 #include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
 #include "Domain/Script/IManagedHandle.h"
-#include "Domain/Script/IUnmanagedBool.h"
-#include "Domain/Script/IManagedMarshalledString.h"
+#include "Domain/Script/IScriptDomain.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/CompilerMacro.h"
 #include "Macro/BindingMacro.h"
@@ -14,29 +13,29 @@ namespace
 {
 	struct FRegisterObject
 	{
-		static IUnmanagedBool IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
+		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
 		{
 			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetObject(InA))
 			{
 				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetObject(InB))
 				{
-					return BoolToIUnmanagedBool(FoundA == FoundB);
+					return FoundA == FoundB ? 1 : 0;
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static IManagedObject StaticClassImplementation(IManagedMarshalledString InClassName)
+		static IManagedHandle StaticClassImplementation(const char* InClassName)
 		{
-			const auto ClassName = MANAGED_MARSHALLED_STRING_TO_F_STRING(InClassName);
+			const auto ClassName = InClassName != nullptr ? FString(UTF8_TO_TCHAR(InClassName)) : FString(TEXT(""));
 
 			const auto InClass = LoadObject<UClass>(nullptr, *ClassName);
 
 			return FCSharpEnvironment::GetEnvironment().Bind(InClass);
 		}
 
-		static IManagedObject GetClassImplementation(const IManagedHandle InManagedHandle)
+		static IManagedHandle GetClassImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
 			{
@@ -45,43 +44,42 @@ namespace
 				return FCSharpEnvironment::GetEnvironment().Bind(Class);
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
-		static IManagedString GetNameImplementation(const IManagedHandle InManagedHandle)
+		static IManagedHandle GetNameImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
 			{
 				const auto Name = FoundObject->GetName();
 
-				return MANAGED_MARSHALLED_STRING_NEW(TCHAR_TO_UTF8(*Name));
+				return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Name));
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
-		static IUnmanagedBool IsValidImplementation(const IManagedHandle InManagedHandle)
+		static uint8 IsValidImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(IsValid(FoundObject));
+				return IsValid(FoundObject) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static IUnmanagedBool IsAImplementation(const IManagedHandle InManagedHandle,
-		                                        const IManagedHandle SomeBase)
+		static uint8 IsAImplementation(const IManagedHandle InManagedHandle, const IManagedHandle SomeBase)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
 			{
 				if (const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(SomeBase))
 				{
-					return BoolToIUnmanagedBool(FoundObject->IsA(FoundClass));
+					return FoundObject->IsA(FoundClass) ? 1 : 0;
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void AddToRootImplementation(const IManagedHandle InManagedHandle)
@@ -100,34 +98,34 @@ namespace
 			}
 		}
 
-		static IUnmanagedBool IsRootedImplementation(const IManagedHandle InManagedHandle)
+		static uint8 IsRootedImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(FoundObject->IsRooted());
+				return FoundObject->IsRooted() ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static IUnmanagedBool AddReferenceImplementation(const IManagedHandle InManagedHandle)
+		static uint8 AddReferenceImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(FCSharpEnvironment::GetEnvironment().AddReference(FoundObject));
+				return FCSharpEnvironment::GetEnvironment().AddReference(FoundObject) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static IUnmanagedBool RemoveReferenceImplementation(const IManagedHandle InManagedHandle)
+		static uint8 RemoveReferenceImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(FCSharpEnvironment::GetEnvironment().RemoveReference(FoundObject));
+				return FCSharpEnvironment::GetEnvironment().RemoveReference(FoundObject) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		FRegisterObject()

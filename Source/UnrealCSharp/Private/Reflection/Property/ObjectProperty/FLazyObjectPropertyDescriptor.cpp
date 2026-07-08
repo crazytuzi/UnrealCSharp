@@ -1,15 +1,14 @@
 #include "Reflection/Property/ObjectProperty/FLazyObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto Object = Class->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, true, false>(
-		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+		Class, Object, Src);
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
@@ -21,10 +20,10 @@ void FLazyObjectPropertyDescriptor::Get(void* Src, void** Dest, std::false_type)
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TLazyObjectPtr<UObject>, false, true>(
-			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+			Class, Object, Src);
 	}
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FLazyObjectPropertyDescriptor::Set(void* Src, void* Dest) const

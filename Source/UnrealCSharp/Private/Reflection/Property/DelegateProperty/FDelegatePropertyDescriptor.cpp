@@ -1,21 +1,20 @@
 #include "Reflection/Property/DelegateProperty/FDelegatePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
-#include "Domain/Script/IManagedTypes.h"
 
 void FDelegatePropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	*reinterpret_cast<IManagedObject*>(Dest) = NewWeakRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src);
 }
 
 void FDelegatePropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
-	*reinterpret_cast<IManagedObject*>(Dest) = NewWeakRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src);
 }
 
 void FDelegatePropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	*static_cast<IManagedObject*>(Dest) = NewRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewRef(Src);
 }
 
 void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
@@ -31,7 +30,7 @@ void FDelegatePropertyDescriptor::Set(void* Src, void* Dest) const
 	DestScriptDelegate->BindUFunction(SrcDelegateHelper->GetUObject(), SrcDelegateHelper->GetFunctionName());
 }
 
-IManagedObject FDelegatePropertyDescriptor::NewRef(void* InAddress) const
+IManagedHandle FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetDelegateObject<FDelegateHelper>(InAddress);
 
@@ -46,22 +45,20 @@ IManagedObject FDelegatePropertyDescriptor::NewRef(void* InAddress) const
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddDelegateReference(OwnerManagedHandle, InAddress,
-		                                                          DelegateHelper, Class,
-		                                                          MANAGED_HANDLE_FROM_OBJECT(Object));
+		                                                          DelegateHelper, Class, Object);
 	}
 
-	return IManagedHandleToIManagedObject(Object);
+	return Object;
 }
 
-IManagedObject FDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
+IManagedHandle FDelegatePropertyDescriptor::NewWeakRef(void* InAddress) const
 {
 	const auto DelegateHelper = new FDelegateHelper(Property->GetPropertyValuePtr(InAddress),
 	                                                Property->SignatureFunction);
 
 	const auto Object = Class->NewObject();
 
-	FCSharpEnvironment::GetEnvironment().AddDelegateReference(DelegateHelper, Class,
-	                                                          MANAGED_HANDLE_FROM_OBJECT(Object));
+	FCSharpEnvironment::GetEnvironment().AddDelegateReference(DelegateHelper, Class, Object);
 
-	return IManagedHandleToIManagedObject(Object);
+	return Object;
 }

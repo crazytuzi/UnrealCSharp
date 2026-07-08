@@ -10,12 +10,6 @@ FReferenceRegistry::~FReferenceRegistry()
 	{
 		for (const auto& Reference : Value)
 		{
-			auto ManagedHandle = static_cast<IManagedHandle>(*Reference);
-
-			FDomain::GCHandle_Free(ManagedHandle);
-
-			ManagedHandle = IManagedHandle{};
-
 			delete Reference;
 		}
 	}

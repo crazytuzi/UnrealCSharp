@@ -1,8 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
-#if WITH_CORECLR
 using System.Runtime.InteropServices;
-#endif
 using System.Threading;
 
 namespace Script.CoreUObject;
@@ -25,9 +23,7 @@ public class SynchronizationContext : System.Threading.SynchronizationContext
         Context = null;
     }
 
-#if WITH_CORECLR
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
-#endif
+    [UnmanagedCallersOnly(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
     public static void Tick(float DeltaTime)
     {
         Context?.Process();

@@ -4,16 +4,12 @@
 #include "FPropertyReflection.h"
 #include "FFieldReflection.h"
 #include "FMethodReflection.h"
-#include "Domain/Script/IManagedTypes.h"
+#include "Domain/Script/IManagedHandle.h"
 
 class UNREALCSHARPCORE_API FClassReflection : public FReflection
 {
 public:
-	explicit FClassReflection(const IManagedClass InManagedClass, const FString& InName = {});
-
-#if WITH_MONO
-	explicit FClassReflection(const IManagedReflectionType InManagedReflectionType);
-#endif
+	explicit FClassReflection(const IManagedHandle InManagedClass, const FString& InName = {});
 
 	~FClassReflection();
 
@@ -23,11 +19,7 @@ public:
 	void Deinitialize();
 
 public:
-	IManagedClass GetManagedClass() const;
-
-#if WITH_MONO
-	IManagedReflectionType GetManagedReflectionType() const;
-#endif
+	IManagedHandle GetManagedClass() const;
 
 	FClassReflection* GetTypeDefinition() const;
 
@@ -63,7 +55,7 @@ public:
 
 	FMethodReflection* GetMethod(const FString& InName, int32 InParamCount) const;
 
-	FMethodReflection* GetMethod(const IManagedReflectionMethod InManagedReflectionMethod);
+	FMethodReflection* GetMethod(const IManagedHandle InManagedMethod);
 
 	FMethodReflection* GetParentMethod(const FString& InName, int32 InParamCount) const;
 
@@ -77,24 +69,14 @@ public:
 
 	void ConstructorClass() const;
 
-	IManagedHandle NewGCHandle(const IManagedHandle InManagedHandle, bool bPinned) const;
-
-	IManagedHandle NewWeakRefGCHandle(const IManagedHandle InManagedHandle, bool bTrackResurrection) const;
-
-	IManagedHandle GetGCHandle(const IManagedObject InManagedObject) const;
-
 	IManagedHandle BoxValue(void* InValue) const;
 
-	IManagedArray NewArray(int32 InNum) const;
+	IManagedHandle NewArray(int32 InNum) const;
 
 	bool IsAssignableFrom(const FClassReflection* InSuperClass, bool bIncludeInterfaces = false) const;
 
 private:
-	IManagedClass ManagedClass{INVALID_MANAGED};
-
-#if WITH_MONO
-	IManagedReflectionType ManagedReflectionType{INVALID_MANAGED};
-#endif
+	IManagedHandle ManagedClass{InvalidManagedHandle};
 
 	FClassReflection* TypeDefinition{};
 

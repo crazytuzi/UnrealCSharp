@@ -1,28 +1,11 @@
 using System.Text;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static partial class UStructImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UScriptStruct UStruct_StaticStructImplementation(string InStructName);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UStruct_RegisterImplementation(object InMonoObject, string InStructName);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool UStruct_IdenticalImplementation(nint InScriptStruct, nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UStruct_UnRegisterImplementation(nint InMonoObject);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<byte*, nint> __UStruct_StaticStructImplementation;
 
         public static unsafe UScriptStruct UStruct_StaticStructImplementation(string InStructName)
@@ -57,23 +40,21 @@ namespace Script.Library
                         "Script.Library.UStructImplementation::UStruct_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InMonoObject);
-
             var UTF8 = InStructName != null ? Encoding.UTF8.GetBytes(InStructName + '\0') : [0];
 
             fixed (byte* Ptr = UTF8)
             {
-                __UStruct_RegisterImplementation(Handle, Ptr);
+                __UStruct_RegisterImplementation(HandleData.Alloc(InMonoObject), Ptr);
             }
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, int> __UStruct_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, byte> __UStruct_IdenticalImplementation;
 
         public static unsafe bool UStruct_IdenticalImplementation(nint InScriptStruct, nint InA, nint InB)
         {
             if (__UStruct_IdenticalImplementation == null)
             {
-                __UStruct_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, int>)
+                __UStruct_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.UStructImplementation::UStruct_IdenticalImplementation");
             }
@@ -94,6 +75,5 @@ namespace Script.Library
 
             __UStruct_UnRegisterImplementation(InMonoObject);
         }
-#endif
     }
 }

@@ -3,8 +3,7 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Domain/Script/IManagedHandle.h"
-#include "Domain/Script/IUnmanagedBool.h"
-#include "Domain/Script/IManagedMarshalledString.h"
+#include "Domain/Script/IScriptDomain.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
@@ -13,26 +12,27 @@ namespace
 {
 	struct FRegisterAnsiString
 	{
-		static void RegisterImplementation(const IManagedObject InManagedObject, const IManagedMarshalledString InValue)
+		static void RegisterImplementation(const IManagedHandle InManagedObject, const char* InValue)
 		{
-			const auto AnsiString = new FAnsiString(MANAGED_MARSHALLED_STRING_TO_F_STRING(InValue));
+			const auto AnsiString = new FAnsiString(InValue != nullptr
+				                                        ? FString(UTF8_TO_TCHAR(InValue))
+				                                        : FString(TEXT("")));
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(
-				FReflectionRegistry::Get().GetAnsiStringClass(), MANAGED_HANDLE_FROM_OBJECT(InManagedObject),
-				AnsiString);
+				FReflectionRegistry::Get().GetAnsiStringClass(), InManagedObject, AnsiString);
 		}
 
-		static IUnmanagedBool IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
+		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
 		{
 			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetString<FAnsiString>(InA))
 			{
 				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetString<FAnsiString>(InB))
 				{
-					return BoolToIUnmanagedBool(*FoundA == *FoundB);
+					return *FoundA == *FoundB ? 1 : 0;
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
@@ -44,13 +44,13 @@ namespace
 			});
 		}
 
-		static IManagedString ToStringImplementation(const IManagedHandle InManagedHandle)
+		static IManagedHandle ToStringImplementation(const IManagedHandle InManagedHandle)
 		{
 			const auto AnsiString = FCSharpEnvironment::GetEnvironment().GetString<FAnsiString>(InManagedHandle);
 
 			return AnsiString != nullptr
-				       ? MANAGED_MARSHALLED_STRING_NEW(TCHAR_TO_UTF8(*FAnsiString(*AnsiString)))
-				       : INVALID_MANAGED;
+				       ? IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*FAnsiString(*AnsiString)))
+				       : InvalidManagedHandle;
 		}
 
 		FRegisterAnsiString()

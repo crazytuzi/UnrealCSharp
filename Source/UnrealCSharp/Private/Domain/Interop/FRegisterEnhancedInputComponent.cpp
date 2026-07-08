@@ -40,7 +40,7 @@ namespace
 
 	struct FRegisterEnhancedInputComponent
 	{
-		static IManagedObject GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
+		static IManagedHandle GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
 		                                                            const IManagedHandle InBindingClass)
 		{
 			const auto ThisClass = FCSharpEnvironment::GetEnvironment().GetObject<
@@ -62,7 +62,7 @@ namespace
 				return FCSharpEnvironment::GetEnvironment().Bind(DynamicBindingObject);
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
 		static void BindFunction(UClass* InClass, const FName* InFunctionName,
@@ -147,7 +147,7 @@ namespace
 			});
 		}
 
-		static IManagedObject BindActionImplementation(const IManagedHandle InManagedHandle,
+		static IManagedHandle BindActionImplementation(const IManagedHandle InManagedHandle,
 		                                               const IManagedHandle InBlueprintEnhancedInputActionBinding,
 		                                               const IManagedHandle InObjectToBindTo,
 		                                               const IManagedHandle InFunctionNameToBind)
@@ -179,10 +179,10 @@ namespace
 					std::decay_t<FEnhancedInputActionEventBinding>, false>(
 					FoundClass, Object, &EnhancedInputActionEventBinding);
 
-				return IManagedHandleToIManagedObject(Object);
+				return Object;
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
 		static void RemoveBindingImplementation(const IManagedHandle InManagedHandle,

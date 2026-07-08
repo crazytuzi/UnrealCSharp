@@ -42,12 +42,12 @@ namespace
 
 	struct FRegisterUnreal
 	{
-		static IManagedObject NewObjectImplementation(const IManagedHandle Outer,
+		static IManagedHandle NewObjectImplementation(const IManagedHandle Outer,
 		                                              const IManagedHandle Class,
 		                                              const IManagedHandle Name,
 		                                              const EObjectFlags Flags,
 		                                              const IManagedHandle Template,
-		                                              const bool bCopyTransientsFromClassDefaults)
+		                                              const uint8 bCopyTransientsFromClassDefaults)
 		{
 			const auto ObjectOuter = FCSharpEnvironment::GetEnvironment().GetObject(Outer);
 
@@ -62,12 +62,12 @@ namespace
 			                                       *ObjectName,
 			                                       Flags,
 			                                       ObjectTemplate,
-			                                       bCopyTransientsFromClassDefaults);
+			                                       bCopyTransientsFromClassDefaults != 0);
 
 			return FCSharpEnvironment::GetEnvironment().Bind(Object);
 		}
 
-		static IManagedObject DuplicateObjectImplementation(const IManagedHandle SourceObject,
+		static IManagedHandle DuplicateObjectImplementation(const IManagedHandle SourceObject,
 		                                                    const IManagedHandle Outer,
 		                                                    const IManagedHandle Name)
 		{
@@ -84,7 +84,7 @@ namespace
 			return FCSharpEnvironment::GetEnvironment().Bind(Object);
 		}
 
-		static IManagedObject LoadObjectImplementation(const IManagedHandle Outer,
+		static IManagedHandle LoadObjectImplementation(const IManagedHandle Outer,
 		                                               const IManagedHandle Name,
 		                                               const IManagedHandle Filename,
 		                                               const ELoadFlags LoadFlags,
@@ -108,7 +108,7 @@ namespace
 			return FCSharpEnvironment::GetEnvironment().Bind(Object);
 		}
 
-		static IManagedObject LoadClassImplementation(const IManagedHandle Outer,
+		static IManagedHandle LoadClassImplementation(const IManagedHandle Outer,
 		                                              const IManagedHandle Name,
 		                                              const IManagedHandle Filename,
 		                                              const ELoadFlags LoadFlags,
@@ -132,7 +132,7 @@ namespace
 			return FCSharpEnvironment::GetEnvironment().Bind(Class);
 		}
 
-		static IManagedObject CreateWidgetImplementation(const IManagedHandle InOwningObject,
+		static IManagedHandle CreateWidgetImplementation(const IManagedHandle InOwningObject,
 		                                                 const IManagedHandle InUserWidgetClass)
 		{
 			const auto OwningObject = FCSharpEnvironment::GetEnvironment().GetObject<UObject>(InOwningObject);
@@ -165,12 +165,12 @@ namespace
 			return FCSharpEnvironment::GetEnvironment().Bind(UserWidget);
 		}
 
-		static IManagedObject GWorldImplementation()
+		static IManagedHandle GWorldImplementation()
 		{
 			return FCSharpEnvironment::GetEnvironment().Bind(GWorld);
 		}
 
-		static IManagedObject GetTransientPackageImplementation()
+		static IManagedHandle GetTransientPackageImplementation()
 		{
 			return FCSharpEnvironment::GetEnvironment().Bind(GetTransientPackage());
 		}

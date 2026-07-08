@@ -20,7 +20,7 @@ protected:
 	virtual const FMulticastScriptDelegate* GetMulticastDelegate(void* InAddress) const;
 
 private:
-	IManagedObject NewRef(void* InAddress) const;
+	IManagedHandle NewRef(void* InAddress) const;
 
-	IManagedObject NewWeakRef(void* InAddress) const;
+	IManagedHandle NewWeakRef(void* InAddress) const;
 };

@@ -1,4 +1,5 @@
 using Script.Library;
+using Interop;
 
 namespace Script.CoreUObject
 {
@@ -7,28 +8,29 @@ namespace Script.CoreUObject
         public bool bNoFail
         {
             get => FActorSpawnParametersImplementation
-                .FActorSpawnParameters_GetbNoFailImplementation(GarbageCollectionHandle);
+                .FActorSpawnParameters_GetbNoFailImplementation(HandleData.GetHandle(this));
 
             set => FActorSpawnParametersImplementation
-                .FActorSpawnParameters_SetbNoFailImplementation(GarbageCollectionHandle, value);
+                .FActorSpawnParameters_SetbNoFailImplementation(HandleData.GetHandle(this), value);
         }
 
         public bool bDeferConstruction
         {
             get => FActorSpawnParametersImplementation
-                .FActorSpawnParameters_GetbDeferConstructionImplementation(GarbageCollectionHandle);
+                .FActorSpawnParameters_GetbDeferConstructionImplementation(HandleData.GetHandle(this));
 
             set => FActorSpawnParametersImplementation
-                .FActorSpawnParameters_SetbDeferConstructionImplementation(GarbageCollectionHandle, value);
+                .FActorSpawnParameters_SetbDeferConstructionImplementation(HandleData.GetHandle(this), value);
         }
 
         public bool bAllowDuringConstructionScript
         {
             get => FActorSpawnParametersImplementation
-                .FActorSpawnParameters_GetbAllowDuringConstructionScriptImplementation(GarbageCollectionHandle);
+                .FActorSpawnParameters_GetbAllowDuringConstructionScriptImplementation(HandleData.GetHandle(this));
 
             set => FActorSpawnParametersImplementation
-                .FActorSpawnParameters_SetbAllowDuringConstructionScriptImplementation(GarbageCollectionHandle, value);
+                .FActorSpawnParameters_SetbAllowDuringConstructionScriptImplementation(HandleData.GetHandle(this),
+                    value);
         }
     }
 }

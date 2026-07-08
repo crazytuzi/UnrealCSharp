@@ -41,12 +41,7 @@ IManagedHandle FBindingRegistry::GetObject(const FBindingValueMapping::FAddressT
 {
 	const auto FoundManagedHandle = BindingAddress2ManagedHandle.Find(InAddress);
 
-	if (FoundManagedHandle == nullptr)
-	{
-		return InvalidManagedHandle;
-	}
-
-	return FDomain::GCHandle_Get_Target(*FoundManagedHandle);
+	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
 }
 
 bool FBindingRegistry::RemoveReference(const IManagedHandle InManagedHandle)
@@ -61,6 +56,8 @@ bool FBindingRegistry::RemoveReference(const IManagedHandle InManagedHandle)
 				BindingAddress2ManagedHandle.Remove(FoundValue->AddressWrapper->Value);
 			}
 		}
+
+		FDomain::GCHandle_Free(InManagedHandle);
 
 		if (FoundValue->bNeedFree)
 		{

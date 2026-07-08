@@ -8,14 +8,12 @@ auto FOptionalRegistry::AddReference(const FOptionalHelperValueMapping::FAddress
                                      const FOptionalHelperValueMapping::ValueType& InValue,
                                      FClassReflection* InClass, const IManagedHandle InManagedHandle)
 {
-	const auto ManagedHandle = InClass->NewWeakRefGCHandle(InManagedHandle, true);
-
 	if constexpr (IsMember)
 	{
-		Address2ManagedHandle.Add(InAddress, ManagedHandle);
+		Address2ManagedHandle.Add(InAddress, InManagedHandle);
 	}
 
-	ManagedHandle2Helper.Add(ManagedHandle, InValue);
+	ManagedHandle2Helper.Add(InManagedHandle, InValue);
 
 	return true;
 }

@@ -1,29 +1,11 @@
 using System;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class TLazyObjectPtrImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TLazyObjectPtr_RegisterImplementation<T>(TLazyObjectPtr<T> InLazyObjectPtr,
-            nint InObject, Type InType) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TLazyObjectPtr_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TLazyObjectPtr_UnRegisterImplementation(nint InLazyObjectPtr);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T TLazyObjectPtr_GetImplementation<T>(nint InLazyObjectPtr);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, void>
             __TLazyObjectPtr_RegisterImplementation;
 
@@ -37,20 +19,17 @@ namespace Script.Library
                         "Script.Library.TLazyObjectPtrImplementation::TLazyObjectPtr_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InLazyObjectPtr);
-
-            InLazyObjectPtr.GarbageCollectionHandle = Handle;
-
-            __TLazyObjectPtr_RegisterImplementation(Handle, InObject, HandleData.AllocImplementation(InType));
+            __TLazyObjectPtr_RegisterImplementation(HandleData.Alloc(InLazyObjectPtr), InObject,
+                HandleData.Alloc(InType));
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __TLazyObjectPtr_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __TLazyObjectPtr_IdenticalImplementation;
 
         public static unsafe bool TLazyObjectPtr_IdenticalImplementation(nint InA, nint InB)
         {
             if (__TLazyObjectPtr_IdenticalImplementation == null)
             {
-                __TLazyObjectPtr_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __TLazyObjectPtr_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TLazyObjectPtrImplementation::TLazyObjectPtr_IdenticalImplementation");
             }
@@ -87,6 +66,5 @@ namespace Script.Library
 
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : default;
         }
-#endif
     }
 }

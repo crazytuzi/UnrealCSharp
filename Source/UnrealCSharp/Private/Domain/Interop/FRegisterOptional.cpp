@@ -2,8 +2,6 @@
 #if UE_F_OPTIONAL_PROPERTY
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedTypes.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
 #include "Reflection/Optional/FOptionalHelper.h"
@@ -13,10 +11,9 @@ namespace
 {
 	struct FRegisterOptional
 	{
-		static void Register1Implementation(const IManagedObject InManagedObject,
-		                                    const IManagedReflectionType InManagedReflectionType)
+		static void Register1Implementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedReflectionType);
+			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
 			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 
@@ -31,13 +28,13 @@ namespace
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				nullptr, OptionalHelper, Class, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+				nullptr, OptionalHelper, Class, InManagedObject);
 		}
 
-		static void Register2Implementation(const IManagedObject InManagedObject, const IManagedObject InValue,
-		                                    const IManagedReflectionType InManagedReflectionType)
+		static void Register2Implementation(const IManagedHandle InManagedObject,
+		                                    const IManagedHandle InValue, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedReflectionType);
+			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
 			const auto OptionalProperty = new FOptionalProperty(nullptr, "", EObjectFlags::RF_Transient);
 
@@ -52,31 +49,31 @@ namespace
 			const auto OptionalHelper = new FOptionalHelper(OptionalProperty, nullptr, true, true);
 
 			FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-				nullptr, OptionalHelper, Class, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+				nullptr, OptionalHelper, Class, InManagedObject);
 
 			if (OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 			{
-				OptionalHelper->Set(FDomain::Object_Unbox(MANAGED_HANDLE_FROM_OBJECT(InValue)));
+				OptionalHelper->Set(FDomain::Object_Unbox(InValue));
 			}
 			else
 			{
-				auto ManagedHandle = Class->GetGenericArgument()->GetGCHandle(InValue);
+				auto ManagedHandle = InValue;
 
 				OptionalHelper->Set(&ManagedHandle);
 			}
 		}
 
-		static IUnmanagedBool IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
+		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
 		{
 			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetOptional(InA))
 			{
 				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetOptional(InB))
 				{
-					return BoolToIUnmanagedBool(FOptionalHelper::Identical(FoundA, FoundB));
+					return FOptionalHelper::Identical(FoundA, FoundB) ? 1 : 0;
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
@@ -89,30 +86,27 @@ namespace
 
 		static void ResetImplementation(const IManagedHandle InManagedHandle)
 		{
-			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(
-				InManagedHandle))
+			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(InManagedHandle))
 			{
 				OptionalHelper->Reset();
 			}
 		}
 
-		static IUnmanagedBool IsSetImplementation(const IManagedHandle InManagedHandle)
+		static uint8 IsSetImplementation(const IManagedHandle InManagedHandle)
 		{
-			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(
-				InManagedHandle))
+			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(OptionalHelper->IsSet());
+				return OptionalHelper->IsSet() ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static IManagedObject GetImplementation(const IManagedHandle InManagedHandle)
+		static IManagedHandle GetImplementation(const IManagedHandle InManagedHandle)
 		{
-			IManagedObject ReturnValue{};
+			IManagedHandle ReturnValue{};
 
-			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(
-				InManagedHandle))
+			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(InManagedHandle))
 			{
 				const auto Value = OptionalHelper->Get();
 
@@ -122,21 +116,17 @@ namespace
 			return ReturnValue;
 		}
 
-		static void SetImplementation(const IManagedHandle InManagedHandle,
-		                              const IManagedObject InValue, const IManagedReflectionType InReflectionType)
+		static void SetImplementation(const IManagedHandle InManagedHandle, const IManagedHandle InValue)
 		{
-			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(
-				InManagedHandle))
+			if (const auto OptionalHelper = FCSharpEnvironment::GetEnvironment().GetOptional(InManagedHandle))
 			{
 				if (OptionalHelper->GetValuePropertyDescriptor()->IsPrimitiveProperty())
 				{
-					OptionalHelper->Set(FDomain::Object_Unbox(MANAGED_HANDLE_FROM_OBJECT(InValue)));
+					OptionalHelper->Set(FDomain::Object_Unbox(InValue));
 				}
 				else
 				{
-					const auto Class = FReflectionRegistry::Get().GetClass(InReflectionType);
-
-					auto ManagedHandle = Class->GetGenericArgument()->GetGCHandle(InValue);
+					auto ManagedHandle = InValue;
 
 					OptionalHelper->Set(&ManagedHandle);
 				}

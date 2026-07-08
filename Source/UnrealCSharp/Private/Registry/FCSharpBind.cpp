@@ -39,25 +39,25 @@ void FCSharpBind::Deinitialize()
 	}
 }
 
-IManagedObject FCSharpBind::Bind(UObject* InObject)
+IManagedHandle FCSharpBind::Bind(UObject* InObject)
 {
 	if (const auto FoundManagedHandle = FCSharpEnvironment::GetEnvironment().GetObject(InObject);
 		IManagedHandleIsValid(FoundManagedHandle))
 	{
-		return IManagedHandleToIManagedObject(FoundManagedHandle);
+		return FoundManagedHandle;
 	}
 
 	return Bind<false>(InObject);
 }
 
-IManagedObject FCSharpBind::Bind(UClass* InClass)
+IManagedHandle FCSharpBind::Bind(UClass* InClass)
 {
 	Bind<false>(InClass);
 
 	return Bind(static_cast<UObject*>(InClass));
 }
 
-bool FCSharpBind::Bind(const IManagedObject InManagedObject, const FName& InStructName)
+bool FCSharpBind::Bind(const IManagedHandle InManagedObject, const FName& InStructName)
 {
 	return BindImplementation(InManagedObject, InStructName);
 }
@@ -94,7 +94,7 @@ bool FCSharpBind::BindClassDefaultObject(UObject* InObject)
 			{
 				if (InObject->IsA(Class))
 				{
-					return bNeedOverrideAttribute ? false : IManagedIsValid(Bind<false>(InObject));
+					return bNeedOverrideAttribute ? false : IManagedHandleIsValid(Bind<false>(InObject));
 				}
 			}
 		}
@@ -393,7 +393,7 @@ bool FCSharpBind::BindImplementation(FClassDescriptor* InClassDescriptor, UClass
 	return true;
 }
 
-bool FCSharpBind::BindImplementation(const IManagedObject InManagedObject, const FName& InStructName)
+bool FCSharpBind::BindImplementation(const IManagedHandle InManagedObject, const FName& InStructName)
 {
 	const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *InStructName.ToString());
 
@@ -413,8 +413,7 @@ bool FCSharpBind::BindImplementation(const IManagedObject InManagedObject, const
 
 	InScriptStruct->InitializeStruct(Structure);
 
-	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure,
-	                                                              MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+	FCSharpEnvironment::GetEnvironment().AddStructReference<true>(InScriptStruct, Structure, InManagedObject);
 
 	return true;
 }

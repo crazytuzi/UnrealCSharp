@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Shared.props" Condition="Exists('../Shared.props')" />
   <ItemGroup>
     <Compile Include="..\..\Plugins\UnrealCSharp\Script\UE\**" Exclude="..\..\Plugins\UnrealCSharp\Script\UE\**\*.DS_Store"></Compile>

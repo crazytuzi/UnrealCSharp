@@ -8,7 +8,7 @@ namespace Interop;
 
 public sealed class LogBridge : TextWriter
 {
-    private static unsafe delegate* unmanaged[Cdecl]<byte*, int, bool, void> LogFn;
+    private static unsafe delegate* unmanaged[Cdecl]<byte*, int, byte, void> LogFn;
 
     private static TextWriter? ConsoleOut;
 
@@ -25,7 +25,7 @@ public sealed class LogBridge : TextWriter
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe void SetLog(nint InLogFn)
     {
-        LogFn = (delegate* unmanaged[Cdecl]<byte*, int, bool, void>)InLogFn;
+        LogFn = (delegate* unmanaged[Cdecl]<byte*, int, byte, void>)InLogFn;
     }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
@@ -144,7 +144,7 @@ public sealed class LogBridge : TextWriter
 
             fixed (byte* Ptr = UTF8)
             {
-                LogFn(Ptr, Size, InIsError);
+                LogFn(Ptr, Size, (byte)(InIsError ? 1 : 0));
             }
         }
     }

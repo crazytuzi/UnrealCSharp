@@ -20,5 +20,5 @@ public:
 	virtual bool Identical(const void* A, const void* B, uint32 PortFlags = 0) const override;
 
 private:
-	IManagedObject NewRef(void* InAddress) const;
+	IManagedHandle NewRef(void* InAddress) const;
 };

@@ -29,7 +29,7 @@ private:
 public:
 	static void UpdatePackagingSettings();
 
-	static void Generator();
+	static void Generator(const FString& InPlatformName);
 
 	static void Generator(const FString& InTargetPlatform);
 

@@ -8,66 +8,6 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
                                         void* InReturnAddress,
                                         const TFunctionRef<void*(const FPropertyDescriptor*)>& InOutPropertyAddress)
 {
-#if WITH_MONO
-	const auto CSharpParams = FReflectionRegistry::Get().GetObjectClass()->NewArray(PropertyDescriptors.Num());
-
-	for (auto Index = 0; Index < PropertyDescriptors.Num(); ++Index)
-	{
-		if (const auto PropertyDescriptor = PropertyDescriptors[Index])
-		{
-			void* Object{};
-
-			PropertyDescriptor->Get<std::false_type>(InPropertyAddress(Index), &Object);
-
-			FDomain::Array_Set(CSharpParams, Index, Object);
-		}
-	}
-
-	if (const auto ReturnValue = InMethod->Runtime_Invoke_Array(InManagedHandle, CSharpParams);
-		IManagedIsValid(ReturnValue) && ReturnPropertyDescriptor != nullptr)
-	{
-		if (ReturnPropertyDescriptor->IsPrimitiveProperty())
-		{
-			if (const auto UnBoxResultValue = FDomain::Object_Unbox(
-				MANAGED_HANDLE_FROM_OBJECT(ReturnValue)))
-			{
-				ReturnPropertyDescriptor->Set(UnBoxResultValue, InReturnAddress);
-			}
-		}
-		else
-		{
-			auto ManagedHandle = ReturnPropertyDescriptor->GetClass()->GetGCHandle(ReturnValue);
-
-			ReturnPropertyDescriptor->Set(&ManagedHandle, InReturnAddress);
-		}
-	}
-
-	for (const auto Index : OutPropertyIndexes)
-	{
-		if (const auto OutPropertyDescriptor = PropertyDescriptors[Index])
-		{
-			if (const auto OutAddress = InOutPropertyAddress(OutPropertyDescriptor))
-			{
-				if (OutPropertyDescriptor->IsPrimitiveProperty())
-				{
-					if (const auto UnBoxResultValue = FDomain::Object_Unbox(
-						MANAGED_HANDLE_FROM_OBJECT(
-							FDomain::Array_Get<IManagedObject>(CSharpParams, Index))))
-					{
-						OutPropertyDescriptor->Set(UnBoxResultValue, OutAddress);
-					}
-				}
-				else
-				{
-					auto ManagedHandle = OutPropertyDescriptor->GetClass()->GetGCHandle(
-						FDomain::Array_Get<IManagedObject>(CSharpParams, Index));
-
-					OutPropertyDescriptor->Set(&ManagedHandle, OutAddress);
-				}
-			}
-		}
-	}
-#else
 	TArray<void*> CSharpParams;
 
 	CSharpParams.Reserve(PropertyDescriptors.Num());
@@ -119,6 +59,8 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
 		{
 			ReturnPropertyDescriptor->Set(&ReturnValue, InReturnAddress);
 		}
+
+		FDomain::GCHandle_Free(ReturnValue);
 	}
 
 	for (const auto Index : OutPropertyIndexes)
@@ -134,7 +76,7 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
 						CompoundManagedHandles.IsValidIndex(CompoundPropertyIndex))
 					{
 						if (auto ManagedHandle = CompoundManagedHandles[CompoundPropertyIndex];
-							IManagedIsValid(ManagedHandle))
+							IManagedHandleIsValid(ManagedHandle))
 						{
 							OutPropertyDescriptor->Set(&ManagedHandle, OutAddress);
 						}
@@ -143,7 +85,6 @@ bool FManagedFunctionDescriptor::Invoke(const FMethodReflection* InMethod,
 			}
 		}
 	}
-#endif
 
 	return true;
 }

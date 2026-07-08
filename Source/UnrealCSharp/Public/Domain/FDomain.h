@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Tickable.h"
-#include "Domain/Script/IManagedTypes.h"
-#include "Domain/Script/IScriptDomain.h"
+#include "Domain/Script/IManagedHandle.h"
 
 class UNREALCSHARP_API FDomain final : public FTickableGameObject
 {
@@ -30,17 +29,9 @@ public:
 
 	static FString StringToFString(const IManagedHandle InManagedHandle);
 
-	static IManagedHandle GCHandle_Get_Target(const IManagedHandle InManagedHandle);
-
 	static void GCHandle_Free(const IManagedHandle InManagedHandle);
 
 	static bool IsLoadSucceed();
-
-	template <typename T>
-	static auto Array_Get(const IManagedArray InArray, const uint64 InIndex) -> T;
-
-	template <typename T>
-	static auto Array_Set(const IManagedArray InArray, const uint64 InIndex, T InValue) -> void;
 
 public:
 	static FString GetTraceback();
@@ -50,5 +41,3 @@ private:
 
 	void DeinitializeSynchronizationContext();
 };
-
-#include "FDomain.inl"

@@ -1,16 +1,15 @@
 #include "Reflection/Property/StringProperty/FAnsiStrPropertyDescriptor.h"
 #if UE_F_ANSI_STR_PROPERTY
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
 void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto Object = Class->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, true, false>(
-		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+		Class, Object, Src);
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
@@ -22,10 +21,10 @@ void FAnsiStrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) co
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddStringReference<FAnsiString, false, true>(
-			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+			Class, Object, Src);
 	}
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FAnsiStrPropertyDescriptor::Set(void* Src, void* Dest) const

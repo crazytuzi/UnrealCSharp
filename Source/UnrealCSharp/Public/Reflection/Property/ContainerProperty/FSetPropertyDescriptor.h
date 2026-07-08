@@ -17,7 +17,7 @@ public:
 	virtual void Set(void* Src, void* Dest) const override;
 
 private:
-	IManagedObject NewRef(void* InAddress) const;
+	IManagedHandle NewRef(void* InAddress) const;
 
-	IManagedObject NewWeakRef(void* InAddress, bool bIsCopy) const;
+	IManagedHandle NewWeakRef(void* InAddress, bool bIsCopy) const;
 };

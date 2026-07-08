@@ -2,6 +2,7 @@
 
 #include "Environment/FCSharpEnvironment.h"
 #include "Domain/Script/IManagedHandle.h"
+#include "Domain/FDomain.h"
 #include "Binding/Property/TPropertyBuilder.inl"
 #include "Binding/TypeInfo/TIsPrimitive.inl"
 #include "Binding/Core/TPropertyValue.inl"
@@ -62,17 +63,6 @@ public:
 			return DefaultReturn();
 		}
 
-#if WITH_MONO
-		const auto ManagedArray = ArgumentToArray(std::index_sequence_for<Args...>{},
-		                                          std::tuple<Args...>(std::forward<Args>(InArgs)...));
-
-		const auto ReturnValue = Method->Runtime_Invoke_Array(Object, ManagedArray);
-
-		if constexpr (sizeof...(Args) > 0)
-		{
-			GetReferenceValue(ManagedArray, std::index_sequence_for<Args...>{}, std::tie(InArgs...));
-		}
-#else
 		constexpr auto Size = static_cast<int32>(sizeof...(Args));
 
 		constexpr auto ArraySize = Size > 0 ? Size : 1;
@@ -94,51 +84,18 @@ public:
 			GetReferenceValue(std::index_sequence_for<Args...>{}, std::tie(InArgs...), ShadowArgs,
 			                  ManagedHandles, ShadowManagedHandles);
 		}
-#endif
 
 		if constexpr (!std::is_void_v<Result>)
 		{
-			return TPropertyValue<Result, Result>::Get(ReturnValue);
+			auto Value = TPropertyValue<Result, Result>::Get(ReturnValue);
+
+			FDomain::GCHandle_Free(ReturnValue);
+
+			return Value;
 		}
 	}
 
 private:
-#if WITH_MONO
-	template <auto... Index>
-	static IManagedArray ArgumentToArray(std::index_sequence<Index...>, std::tuple<std::decay_t<Args>...>&& InArgs)
-	{
-		if constexpr (constexpr auto Size = static_cast<int32>(sizeof...(Args));
-			Size > 0)
-		{
-			const auto Array = FReflectionRegistry::Get().GetObjectClass()->NewArray(Size);
-
-			(FDomain::Array_Set(Array, static_cast<int32>(Index),
-			                    TPropertyBuilder<std::decay_t<Args>*, nullptr>::Get(std::get<Index>(InArgs))), ...);
-
-			return Array;
-		}
-		else
-		{
-			return INVALID_MANAGED;
-		}
-	}
-
-	template <auto... Index, typename ArgsTuple>
-	static void GetReferenceValue(const IManagedArray InManagedArray, std::index_sequence<Index...>, ArgsTuple InArgs)
-	{
-		([&]
-		{
-			using Type = std::tuple_element_t<Index, std::tuple<Args...>>;
-
-			if constexpr (std::is_lvalue_reference_v<Type> &&
-				!std::is_const_v<std::remove_reference_t<Type>>)
-			{
-				std::get<Index>(InArgs) = TPropertyValue<Type, Type>::Get(
-					FDomain::Array_Get<IManagedObject>(InManagedArray, Index));
-			}
-		}(), ...);
-	}
-#else
 	template <auto... Index>
 	static void ArgumentToParams(std::index_sequence<Index...>,
 	                             std::tuple<std::decay_t<Args>...>& InShadowArgs,
@@ -192,7 +149,6 @@ private:
 			}
 		}(), ...);
 	}
-#endif
 
 	static auto DefaultReturn()
 	{

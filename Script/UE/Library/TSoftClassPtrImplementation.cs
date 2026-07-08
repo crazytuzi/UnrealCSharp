@@ -1,36 +1,15 @@
 using System;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class TSoftClassPtrImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSoftClassPtr_RegisterImplementation<T>(TSoftClassPtr<T> InSoftClassPtr,
-            nint InClass, Type InType) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TSoftClassPtr_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSoftClassPtr_UnRegisterImplementation(nint InSoftClassPtr);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass TSoftClassPtr_GetImplementation(nint InSoftClassPtr);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass TSoftClassPtr_LoadSynchronousImplementation(nint InSoftClassPtr);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, void> __TSoftClassPtr_RegisterImplementation;
 
         public static unsafe void TSoftClassPtr_RegisterImplementation<T>(TSoftClassPtr<T> InSoftClassPtr,
-            nint InObject, Type InType) where T : UObject
+            nint InClass, Type InType) where T : UObject
         {
             if (__TSoftClassPtr_RegisterImplementation == null)
             {
@@ -39,20 +18,17 @@ namespace Script.Library
                         "Script.Library.TSoftClassPtrImplementation::TSoftClassPtr_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InSoftClassPtr);
-
-            InSoftClassPtr.GarbageCollectionHandle = Handle;
-
-            __TSoftClassPtr_RegisterImplementation(Handle, InObject, HandleData.AllocImplementation(InType));
+            __TSoftClassPtr_RegisterImplementation(HandleData.Alloc(InSoftClassPtr), InClass,
+                HandleData.Alloc(InType));
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __TSoftClassPtr_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __TSoftClassPtr_IdenticalImplementation;
 
         public static unsafe bool TSoftClassPtr_IdenticalImplementation(nint InA, nint InB)
         {
             if (__TSoftClassPtr_IdenticalImplementation == null)
             {
-                __TSoftClassPtr_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __TSoftClassPtr_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TSoftClassPtrImplementation::TSoftClassPtr_IdenticalImplementation");
             }
@@ -105,6 +81,5 @@ namespace Script.Library
 
             return Handle != 0 ? (UClass)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }

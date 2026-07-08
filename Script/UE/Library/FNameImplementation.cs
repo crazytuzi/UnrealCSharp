@@ -1,31 +1,11 @@
 using System.Text;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class FNameImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FName_RegisterImplementation(FName InName, string InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FName_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FName_UnRegisterImplementation(nint InName);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern string FName_ToStringImplementation(nint InName);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern FName FName_NAME_NoneImplementation();
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, byte*, void> __FName_RegisterImplementation;
 
         public static unsafe void FName_RegisterImplementation(FName InName, string InValue)
@@ -36,25 +16,21 @@ namespace Script.Library
                     MethodBridge.GetMethod("Script.Library.FNameImplementation::FName_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InName);
-
-            InName.GarbageCollectionHandle = Handle;
-
             var UTF8 = InValue != null ? Encoding.UTF8.GetBytes(InValue + '\0') : [0];
 
             fixed (byte* Ptr = UTF8)
             {
-                __FName_RegisterImplementation(Handle, Ptr);
+                __FName_RegisterImplementation(HandleData.Alloc(InName), Ptr);
             }
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __FName_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __FName_IdenticalImplementation;
 
         public static unsafe bool FName_IdenticalImplementation(nint InA, nint InB)
         {
             if (__FName_IdenticalImplementation == null)
             {
-                __FName_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __FName_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.FNameImplementation::FName_IdenticalImplementation");
             }
@@ -106,6 +82,5 @@ namespace Script.Library
 
             return Handle != 0 ? (FName)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }

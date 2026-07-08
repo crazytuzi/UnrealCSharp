@@ -3,7 +3,6 @@
 #include "TValueWrapper.inl"
 #include "TValueMapping.inl"
 #include "UEVersion.h"
-#include "Domain/Script/IManagedHandle.h"
 
 class UNREALCSHARP_API FStringRegistry
 {

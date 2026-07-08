@@ -1,21 +1,20 @@
 #include "Reflection/Property/ContainerProperty/FSetPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
-#include "Domain/Script/IManagedTypes.h"
 
 void FSetPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	*reinterpret_cast<IManagedObject*>(Dest) = NewWeakRef(Src, true);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src, true);
 }
 
 void FSetPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
-	*reinterpret_cast<IManagedObject*>(Dest) = NewWeakRef(Src, false);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src, false);
 }
 
 void FSetPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	*static_cast<IManagedObject*>(Dest) = NewRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewRef(Src);
 }
 
 void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
@@ -29,7 +28,7 @@ void FSetPropertyDescriptor::Set(void* Src, void* Dest) const
 	Property->CopyCompleteValue(Dest, SrcContainer->GetScriptSet());
 }
 
-IManagedObject FSetPropertyDescriptor::NewRef(void* InAddress) const
+IManagedHandle FSetPropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject<FSetHelper>(InAddress);
 
@@ -44,13 +43,13 @@ IManagedObject FSetPropertyDescriptor::NewRef(void* InAddress) const
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerManagedHandle, InAddress, SetHelper, Class, MANAGED_HANDLE_FROM_OBJECT(Object));
+			OwnerManagedHandle, InAddress, SetHelper, Class, Object);
 	}
 
-	return IManagedHandleToIManagedObject(Object);
+	return Object;
 }
 
-IManagedObject FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
+IManagedHandle FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
 	const auto Object = Class->NewObject();
 
@@ -59,5 +58,5 @@ IManagedObject FSetPropertyDescriptor::NewWeakRef(void* InAddress, const bool bI
 
 	FCSharpEnvironment::GetEnvironment().AddContainerReference(SetHelper, Class, Object);
 
-	return IManagedHandleToIManagedObject(Object);
+	return Object;
 }

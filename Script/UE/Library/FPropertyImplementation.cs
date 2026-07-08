@@ -1,30 +1,9 @@
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static unsafe class FPropertyImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FProperty_GetObjectPropertyImplementation(nint InMonoObject,
-            uint InPropertyHash, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FProperty_SetObjectPropertyImplementation(nint InMonoObject,
-            uint InPropertyHash, byte* InBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FProperty_GetStructPropertyImplementation(nint InMonoObject,
-            uint InPropertyHash, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FProperty_SetStructPropertyImplementation(nint InMonoObject,
-            uint InPropertyHash, byte* InBuffer);
-#else
         private static delegate* unmanaged[Cdecl]<nint, uint, byte*, void> __FProperty_GetObjectPropertyImplementation;
 
         public static void FProperty_GetObjectPropertyImplementation(nint InMonoObject, uint InPropertyHash,
@@ -84,6 +63,5 @@ namespace Script.Library
 
             __FProperty_SetStructPropertyImplementation(InMonoObject, InPropertyHash, InBuffer);
         }
-#endif
     }
 }

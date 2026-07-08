@@ -66,7 +66,7 @@ namespace SourceGenerator
             {
                 var source = "";
 
-                @interface.Usings.Add("using Script.Library;");
+                @interface.Usings.Add("using Script.Library;\n");
 
                 @interface.Usings.ForEach(Str => source += Str);
 
@@ -93,7 +93,6 @@ namespace SourceGenerator
                     Usings = @interface.Usings,
                     HasBase = true,
                     HasEqualsMethod = false,
-                    HasGarbageCollectionHandle = false,
                     HasHashCodeMethod = false,
                     HasOperatorEqualTo = false,
                     HasOperatorNotEqualTo = false,
@@ -101,7 +100,7 @@ namespace SourceGenerator
                     HasStaticStruct = false,
                 });
 
-                Context.AddSource(@interface.Name + ".gen.cs", source);
+                Context.AddSource("Script.CoreUObject." + @interface.Name + ".gen.cs", source);
             }
 
             foreach (var type in unrealTypeReceiver.TypeInfos)
@@ -113,7 +112,6 @@ namespace SourceGenerator
 
                 if (type.Value.DynamicType == EDynamicType.UStruct &&
                     type.Value.HasStaticStruct &&
-                    type.Value.HasGarbageCollectionHandle &&
                     type.Value.HasEqualsMethod &&
                     type.Value.HasHashCodeMethod &&
                     type.Value.HasOperatorEqualTo &&
@@ -134,17 +132,13 @@ namespace SourceGenerator
 
                 if (type.Value.DynamicType == EDynamicType.UStruct)
                 {
-                    var interfaceBody = type.Value.HasBase || type.Value.HasGarbageCollectionHandle
-                        ? ": IStaticStruct"
-                        : ": IStaticStruct, IGarbageCollectionHandle";
-
                     var source = "";
 
                     type.Value.Usings.ForEach(Str => source += Str);
 
                     source +=
                         $"\nnamespace {type.Value.NameSpace}\n" +
-                        $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}{interfaceBody}\n" +
+                        $"{{\n\t{type.Value.Modifiers} class {type.Value.Name} : IStaticStruct\n" +
                         "\t{\n";
 
                     if (type.Value.HasStaticStruct == false)
@@ -161,11 +155,6 @@ namespace SourceGenerator
                             "\t\tprivate static UScriptStruct StaticStructSingleton { get; set; }\n";
                     }
 
-                    if (type.Value.HasGarbageCollectionHandle == false && type.Value.HasBase == false)
-                    {
-                        source += "\t\tpublic nint GarbageCollectionHandle { get; set; }\n";
-                    }
-
                     if (type.Value.HasEqualsMethod == false)
                     {
                         source +=
@@ -174,7 +163,7 @@ namespace SourceGenerator
 
                     if (type.Value.HasHashCodeMethod == false)
                     {
-                        source += "\t\tpublic override int GetHashCode() => (int)GarbageCollectionHandle;\n";
+                        source += "\t\tpublic override int GetHashCode() => (int)HandleData.GetHandle(this);\n";
                     }
 
                     if (type.Value.HasOperatorEqualTo == false)
@@ -190,7 +179,7 @@ namespace SourceGenerator
                             "\t\t\t{\n" +
                             "\t\t\t\treturn false;\n" +
                             "\t\t\t}\n" +
-                            "\t\t\treturn ReferenceEquals(A, B) || UStructImplementation.UStruct_IdenticalImplementation(StaticStruct().GarbageCollectionHandle, A.GarbageCollectionHandle, B.GarbageCollectionHandle);\n" +
+                            "\t\t\treturn ReferenceEquals(A, B) || UStructImplementation.UStruct_IdenticalImplementation(HandleData.GetHandle(StaticStruct()), HandleData.GetHandle(A), HandleData.GetHandle(B));\n" +
                             "\t\t}\n";
                     }
 
@@ -214,7 +203,7 @@ namespace SourceGenerator
                     type.Value.Usings.ForEach(Str => source += Str);
 
                     source += $"\nnamespace {type.Value.NameSpace}\n" +
-                              $"{{\n\t{type.Value.Modifiers} class {type.Value.Name}: IStaticClass\n" +
+                              $"{{\n\t{type.Value.Modifiers} class {type.Value.Name} : IStaticClass\n" +
                               "\t{\n";
 
                     if (type.Value.HasStaticClass == false)
@@ -550,10 +539,6 @@ namespace SourceGenerator
             var bHasStaticStruct = methodArray.Any(Method =>
                 ((MethodDeclarationSyntax)Method).Identifier.ToString() == "StaticStruct");
 
-            var bHasGarbageCollectionHandle = Syntax.Members.Any(Member =>
-                Member is PropertyDeclarationSyntax declarationSyntax &&
-                declarationSyntax.Identifier.ToString() == "GarbageCollectionHandle");
-
             var bHasEqualsMethod = methodArray.Any(Method =>
             {
                 var method = (MethodDeclarationSyntax)Method;
@@ -644,7 +629,8 @@ namespace SourceGenerator
                 {
                     "using Script.Library;\n",
                     "using Script.UnrealCSharpCore;\n",
-                    "using Script.CoreUObject;\n"
+                    "using Script.CoreUObject;\n",
+                    "using Interop;\n"
                 };
             }
 
@@ -692,8 +678,6 @@ namespace SourceGenerator
             type.HasStaticStruct |= bHasStaticStruct;
 
             type.HasStaticClass |= bHasStaticClass;
-
-            type.HasGarbageCollectionHandle |= bHasGarbageCollectionHandle;
 
             type.HasHashCodeMethod |= bHasHashCodeMethod;
 
@@ -809,8 +793,6 @@ namespace SourceGenerator
         public string Modifiers { get; set; }
 
         public bool HasBase { get; set; }
-
-        public bool HasGarbageCollectionHandle { get; set; }
 
         public bool HasStaticClass { get; set; }
 

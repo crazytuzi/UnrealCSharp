@@ -32,21 +32,19 @@ struct FStringRegistry::TStringRegistryImplementation<
 	{
 		const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress);
 
-		return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
+		return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
 	}
 
 	template <auto IsNeedFree, auto IsMember>
 	static auto AddReference(Class* InRegistry, FClassReflection* InClass, const IManagedHandle InManagedHandle,
 	                         typename FStringValueMapping::FAddressType InAddress)
 	{
-		const auto ManagedHandle = InClass->NewWeakRefGCHandle(InManagedHandle, true);
-
 		if constexpr (IsMember)
 		{
-			(InRegistry->*Address2ManagedHandle).Add(InAddress, ManagedHandle);
+			(InRegistry->*Address2ManagedHandle).Add(InAddress, InManagedHandle);
 		}
 
-		(InRegistry->*ManagedHandle2Value).Add(ManagedHandle,
+		(InRegistry->*ManagedHandle2Value).Add(InManagedHandle,
 		                                       typename FStringValueMapping::ValueType(
 			                                       static_cast<typename FStringValueMapping::ValueType::Type>(
 				                                       InAddress), IsNeedFree));
@@ -74,6 +72,8 @@ struct FStringRegistry::TStringRegistryImplementation<
 			}
 
 			(InRegistry->*ManagedHandle2Value).Remove(InManagedHandle);
+
+			FDomain::GCHandle_Free(InManagedHandle);
 
 			return true;
 		}

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Shared.props" Condition="Exists('../Shared.props')" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -11,5 +11,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FodyHelpers" Version="6.8.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Remove="Interop" />
   </ItemGroup>
 </Project>

@@ -2,7 +2,6 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FSetHelper.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -12,10 +11,9 @@ namespace
 {
 	struct FRegisterSet
 	{
-		static void RegisterImplementation(const IManagedObject InManagedObject,
-		                                   const IManagedReflectionType InManagedReflectionType)
+		static void RegisterImplementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedReflectionType);
+			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
 			FCSharpBind::Bind<FSetHelper>(Class, Class->GetGenericArgument(), InManagedObject);
 		}
@@ -24,16 +22,13 @@ namespace
 		{
 			AsyncTask(ENamedThreads::GameThread, [InManagedHandle]
 			{
-				(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FSetHelper>(
-					InManagedHandle);
+				(void)FCSharpEnvironment::GetEnvironment().RemoveContainerReference<FSetHelper>(InManagedHandle);
 			});
 		}
 
-		static void EmptyImplementation(const IManagedHandle InManagedHandle,
-		                                const int32 InExpectedNumElements)
+		static void EmptyImplementation(const IManagedHandle InManagedHandle, const int32 InExpectedNumElements)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
 				SetHelper->Empty(InExpectedNumElements);
 			}
@@ -41,8 +36,7 @@ namespace
 
 		static int32 NumImplementation(const IManagedHandle InManagedHandle)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
 				return SetHelper->Num();
 			}
@@ -50,21 +44,19 @@ namespace
 			return 0;
 		}
 
-		static IUnmanagedBool IsEmptyImplementation(const IManagedHandle InManagedHandle)
+		static uint8 IsEmptyImplementation(const IManagedHandle InManagedHandle)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(SetHelper->IsEmpty());
+				return SetHelper->IsEmpty() ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static int32 GetMaxIndexImplementation(const IManagedHandle InManagedHandle)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
 				return SetHelper->GetMaxIndex();
 			}
@@ -72,21 +64,17 @@ namespace
 			return 0;
 		}
 
-		static void AddImplementation(const IManagedHandle InManagedHandle,
-		                              IN_VALUE_BUFFER_SIGNATURE)
+		static void AddImplementation(const IManagedHandle InManagedHandle, IN_VALUE_BUFFER_SIGNATURE)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
 				SetHelper->Add(IN_VALUE_BUFFER);
 			}
 		}
 
-		static int32 RemoveImplementation(const IManagedHandle InManagedHandle,
-		                                  const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 RemoveImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
 				return SetHelper->Remove(IN_VALUE_BUFFER);
 			}
@@ -94,35 +82,30 @@ namespace
 			return 0;
 		}
 
-		static IUnmanagedBool ContainsImplementation(const IManagedHandle InManagedHandle,
-		                                             const IN_VALUE_BUFFER_SIGNATURE)
+		static uint8 ContainsImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(SetHelper->Contains(IN_VALUE_BUFFER));
+				return SetHelper->Contains(IN_VALUE_BUFFER) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static IUnmanagedBool IsValidIndexImplementation(const IManagedHandle InManagedHandle,
-		                                                 const int32 InIndex)
+		static uint8 IsValidIndexImplementation(const IManagedHandle InManagedHandle, const int32 InIndex)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(SetHelper->IsValidIndex(InIndex));
+				return SetHelper->IsValidIndex(InIndex) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void GetEnumeratorImplementation(const IManagedHandle InManagedHandle,
 		                                        const int32 InIndex, RETURN_BUFFER_SIGNATURE)
 		{
-			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(
-				InManagedHandle))
+			if (const auto SetHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FSetHelper>(InManagedHandle))
 			{
 				const auto Value = SetHelper->GetEnumerator(InIndex);
 

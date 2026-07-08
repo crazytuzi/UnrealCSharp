@@ -21,6 +21,7 @@
 UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer& ObjectInitializer):
 #if WITH_EDITOR
 	Super(ObjectInitializer),
+	bIsSkipGenerateScriptCode(false),
 	ScriptDirectory(DEFAULT_SCRIPT_DIRECTORY),
 	bEnableDeleteProxyDirectory(false),
 	bEnableDeleteBindingDirectory(false),
@@ -129,6 +130,11 @@ void UUnrealCSharpEditorSetting::UnregisterSettings()
 const FString& UUnrealCSharpEditorSetting::GetDotNetPath() const
 {
 	return DotNetPath;
+}
+
+bool UUnrealCSharpEditorSetting::IsSkipGenerateScriptCode() const
+{
+	return bIsSkipGenerateScriptCode;
 }
 
 TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const

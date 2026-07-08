@@ -16,13 +16,10 @@ template <auto IsNeedFree>
 auto FStructRegistry::AddReference(UScriptStruct* InScriptStruct, const void* InStruct,
                                    const IManagedHandle InManagedHandle)
 {
-	const auto ManagedHandle = FReflectionRegistry::Get().GetClass(InScriptStruct)->NewWeakRefGCHandle(
-		InManagedHandle, true);
-
 	StructAddress2ManagedHandle.Add(
-		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), ManagedHandle);
+		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), InManagedHandle);
 
-	ManagedHandle2StructAddress.Add(ManagedHandle, {
+	ManagedHandle2StructAddress.Add(InManagedHandle, {
 		                                InScriptStruct,
 		                                const_cast<void*>(InStruct),
 		                                IsNeedFree

@@ -21,7 +21,7 @@ namespace Interop
 
                 using var Stream = new UnmanagedMemoryStream(InData, InLength);
 
-                return HandleData.AllocImplementation(Context.LoadFromStream(Stream));
+                return HandleData.Alloc(Context.LoadFromStream(Stream));
             }
 
             return 0;
@@ -35,8 +35,6 @@ namespace Interop
                 HandleData.Clear();
 
                 TypeBridge.Clear();
-
-                MethodBridge.Clear();
 
                 var ContextWeakReference = new WeakReference(Context);
 
@@ -53,23 +51,11 @@ namespace Interop
 
                 var Stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-                while (ContextWeakReference.IsAlive)
+                while (ContextWeakReference.IsAlive && Stopwatch.ElapsedMilliseconds < TimeLimit)
                 {
                     GC.Collect();
 
                     GC.WaitForPendingFinalizers();
-
-                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, blocking: true, compacting: true);
-
-                    if (!ContextWeakReference.IsAlive)
-                    {
-                        break;
-                    }
-
-                    if (Stopwatch.ElapsedMilliseconds >= TimeLimit)
-                    {
-                        break;
-                    }
                 }
             }
         }

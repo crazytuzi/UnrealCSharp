@@ -3,7 +3,6 @@
 #include "Binding/Class/TBindingClassBuilder.inl"
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Macro/BindingMacro.h"
 #include "FRegisterObjectFlags.h"
@@ -31,68 +30,64 @@ namespace
 
 	struct FRegisterActorSpawnParameters
 	{
-		static IUnmanagedBool GetbNoFailImplementation(const IManagedHandle InManagedHandle)
+		static uint8 GetbNoFailImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
 				FActorSpawnParameters>(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(FoundActorSpawnParameters->bNoFail);
+				return FoundActorSpawnParameters->bNoFail ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static void SetbNoFailImplementation(const IManagedHandle InManagedHandle,
-		                                     const bool InValue)
+		static void SetbNoFailImplementation(const IManagedHandle InManagedHandle, const uint8 InValue)
 		{
 			if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
 				FActorSpawnParameters>(InManagedHandle))
 			{
-				FoundActorSpawnParameters->bNoFail = InValue;
-			}
-		}
-
-		static IUnmanagedBool GetbDeferConstructionImplementation(const IManagedHandle InManagedHandle)
-		{
-			if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
-				FActorSpawnParameters>(InManagedHandle))
-			{
-				return BoolToIUnmanagedBool(FoundActorSpawnParameters->bDeferConstruction);
-			}
-
-			return IUnmanagedFalse;
-		}
-
-		static void SetbDeferConstructionImplementation(const IManagedHandle InManagedHandle,
-		                                                const bool InValue)
-		{
-			if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
-				FActorSpawnParameters>(InManagedHandle))
-			{
-				FoundActorSpawnParameters->bDeferConstruction = InValue;
+				FoundActorSpawnParameters->bNoFail = InValue != 0;
 			}
 		}
 
-		static IUnmanagedBool GetbAllowDuringConstructionScriptImplementation(
-			const IManagedHandle InManagedHandle)
+		static uint8 GetbDeferConstructionImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
 				FActorSpawnParameters>(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(FoundActorSpawnParameters->bAllowDuringConstructionScript);
+				return FoundActorSpawnParameters->bDeferConstruction ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static void SetbAllowDuringConstructionScriptImplementation(
-			const IManagedHandle InManagedHandle,
-			const bool InValue)
+		static void SetbDeferConstructionImplementation(const IManagedHandle InManagedHandle, const uint8 InValue)
 		{
 			if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
 				FActorSpawnParameters>(InManagedHandle))
 			{
-				FoundActorSpawnParameters->bAllowDuringConstructionScript = InValue;
+				FoundActorSpawnParameters->bDeferConstruction = InValue != 0;
+			}
+		}
+
+		static uint8 GetbAllowDuringConstructionScriptImplementation(const IManagedHandle InManagedHandle)
+		{
+			if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+				FActorSpawnParameters>(InManagedHandle))
+			{
+				return FoundActorSpawnParameters->bAllowDuringConstructionScript ? 1 : 0;
+			}
+
+			return 0;
+		}
+
+		static void SetbAllowDuringConstructionScriptImplementation(const IManagedHandle InManagedHandle,
+		                                                            const uint8 InValue)
+		{
+			if (const auto FoundActorSpawnParameters = FCSharpEnvironment::GetEnvironment().GetBinding<
+				FActorSpawnParameters>(InManagedHandle))
+			{
+				FoundActorSpawnParameters->bAllowDuringConstructionScript = InValue != 0;
 			}
 		}
 
@@ -122,13 +117,12 @@ namespace
 
 	struct FRegisterWorld
 	{
-		static IManagedObject SpawnActorImplementation(const IManagedHandle InManagedHandle,
+		static IManagedHandle SpawnActorImplementation(const IManagedHandle InManagedHandle,
 		                                               const IManagedHandle InClass,
 		                                               const IManagedHandle InTransform,
 		                                               const IManagedHandle InActorSpawnParameters)
 		{
-			if (const auto FoundWorld = FCSharpEnvironment::GetEnvironment().GetObject<UWorld>(
-				InManagedHandle))
+			if (const auto FoundWorld = FCSharpEnvironment::GetEnvironment().GetObject<UWorld>(InManagedHandle))
 			{
 				const auto FoundClass = FCSharpEnvironment::GetEnvironment().GetObject<UClass>(InClass);
 
@@ -147,7 +141,7 @@ namespace
 				return FCSharpEnvironment::GetEnvironment().Bind(Actor);
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
 		FRegisterWorld()

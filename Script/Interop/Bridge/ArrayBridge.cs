@@ -16,9 +16,7 @@ public static unsafe class ArrayBridge
 
             if (Type != null)
             {
-                var Handle = GCHandle.Alloc(Array.CreateInstance(Type, InLength), GCHandleType.Pinned);
-
-                return HandleData.AddEntity(Handle);
+                return HandleData.Alloc(Array.CreateInstance(Type, InLength), true);
             }
         }
 
@@ -28,27 +26,7 @@ public static unsafe class ArrayBridge
     [UnmanagedCallersOnly]
     public static nint ArrayGet(nint InHandle, int InIndex)
     {
-        var Handle = HandleData.GetHandle(InHandle);
-
-        if (Handle is { IsAllocated: true, Target: Array Array })
-        {
-            if (InIndex < Array.Length)
-            {
-                var Type = Array.GetType().GetElementType()!;
-
-                var Size = Type.IsValueType ? Marshal.SizeOf(Type) : sizeof(nint);
-
-                return Handle.AddrOfPinnedObject() + InIndex * Size;
-            }
-        }
-
-        return 0;
-    }
-
-    [UnmanagedCallersOnly]
-    public static nint ArrayGetRef(nint InHandle, int InIndex)
-    {
-        if (HandleData.GetHandle(InHandle) is { IsAllocated: true, Target: Array Array })
+        if (HandleData.GetObject(InHandle) is Array Array)
         {
             if (InIndex < Array.Length)
             {
@@ -56,7 +34,7 @@ public static unsafe class ArrayBridge
 
                 if (Value != null)
                 {
-                    return HandleData.AllocImplementation(Value);
+                    return HandleData.Alloc(Value);
                 }
             }
         }

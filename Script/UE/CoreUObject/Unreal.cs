@@ -2,6 +2,7 @@ using System;
 using Script.Engine;
 using Script.Library;
 using Script.UMG;
+using Interop;
 
 namespace Script.CoreUObject
 {
@@ -15,19 +16,21 @@ namespace Script.CoreUObject
             bool bCopyTransientsFromClassDefaults = false
         ) where T : UObject, IStaticClass =>
             UnrealImplementation.Unreal_NewObjectImplementation<T>(
-                Outer?.GarbageCollectionHandle ?? GetTransientPackage().GarbageCollectionHandle,
-                Class?.GarbageCollectionHandle ?? T.StaticClass().GarbageCollectionHandle,
-                Name?.GarbageCollectionHandle ?? FName.NAME_None.GarbageCollectionHandle,
+                HandleData.GetHandle(Outer) != 0
+                    ? HandleData.GetHandle(Outer)
+                    : HandleData.GetHandle(GetTransientPackage()),
+                HandleData.GetHandle(Class) != 0 ? HandleData.GetHandle(Class) : HandleData.GetHandle(T.StaticClass()),
+                HandleData.GetHandle(Name) != 0 ? HandleData.GetHandle(Name) : HandleData.GetHandle(FName.NAME_None),
                 Flags,
-                Template?.GarbageCollectionHandle ?? nint.Zero,
+                HandleData.GetHandle(Template),
                 bCopyTransientsFromClassDefaults);
 
         public static T DuplicateObject<T>(UObject SourceObject, UObject Outer = null, FName Name = null)
             where T : UObject =>
             UnrealImplementation.Unreal_DuplicateObjectImplementation<T>(
-                SourceObject?.GarbageCollectionHandle ?? nint.Zero,
-                Outer?.GarbageCollectionHandle ?? nint.Zero,
-                Name?.GarbageCollectionHandle ?? FName.NAME_None.GarbageCollectionHandle);
+                HandleData.GetHandle(SourceObject),
+                HandleData.GetHandle(Outer),
+                HandleData.GetHandle(Name) != 0 ? HandleData.GetHandle(Name) : HandleData.GetHandle(FName.NAME_None));
 
         public static T LoadObject<T>(UObject Outer = null,
             FString Name = null,
@@ -36,11 +39,13 @@ namespace Script.CoreUObject
             UPackageMap Sandbox = null
         ) where T : UObject =>
             UnrealImplementation.Unreal_LoadObjectImplementation<T>(
-                Outer?.GarbageCollectionHandle ?? nint.Zero,
-                Name?.GarbageCollectionHandle ?? new FString(Utils.GetPathName(typeof(T))).GarbageCollectionHandle,
-                Filename?.GarbageCollectionHandle ?? nint.Zero,
+                HandleData.GetHandle(Outer),
+                HandleData.GetHandle(Name) != 0
+                    ? HandleData.GetHandle(Name)
+                    : HandleData.GetHandle(new FString(Utils.GetPathName(typeof(T)))),
+                HandleData.GetHandle(Filename),
                 LoadFlags,
-                Sandbox?.GarbageCollectionHandle ?? nint.Zero);
+                HandleData.GetHandle(Sandbox));
 
         public static UClass LoadClass(UObject Outer,
             FString Name,
@@ -48,31 +53,31 @@ namespace Script.CoreUObject
             ELoadFlags LoadFlags = ELoadFlags.LOAD_None,
             UPackageMap Sandbox = null) =>
             UnrealImplementation.Unreal_LoadClassImplementation(
-                Outer?.GarbageCollectionHandle ?? nint.Zero,
-                Name?.GarbageCollectionHandle ?? nint.Zero,
-                Filename?.GarbageCollectionHandle ?? nint.Zero,
+                HandleData.GetHandle(Outer),
+                HandleData.GetHandle(Name),
+                HandleData.GetHandle(Filename),
                 LoadFlags,
-                Sandbox?.GarbageCollectionHandle ?? nint.Zero);
+                HandleData.GetHandle(Sandbox));
 
         public static T CreateWidget<T>(UWidget OwningObject) where T : UUserWidget, IStaticClass =>
-            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GarbageCollectionHandle,
-                T.StaticClass().GarbageCollectionHandle);
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(HandleData.GetHandle(OwningObject),
+                HandleData.GetHandle(T.StaticClass()));
 
         public static T CreateWidget<T>(UWidgetTree OwningObject) where T : UUserWidget, IStaticClass =>
-            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GarbageCollectionHandle,
-                T.StaticClass().GarbageCollectionHandle);
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(HandleData.GetHandle(OwningObject),
+                HandleData.GetHandle(T.StaticClass()));
 
         public static T CreateWidget<T>(APlayerController OwningObject) where T : UUserWidget, IStaticClass =>
-            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GarbageCollectionHandle,
-                T.StaticClass().GarbageCollectionHandle);
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(HandleData.GetHandle(OwningObject),
+                HandleData.GetHandle(T.StaticClass()));
 
         public static T CreateWidget<T>(UGameInstance OwningObject) where T : UUserWidget, IStaticClass =>
-            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GarbageCollectionHandle,
-                T.StaticClass().GarbageCollectionHandle);
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(HandleData.GetHandle(OwningObject),
+                HandleData.GetHandle(T.StaticClass()));
 
         public static T CreateWidget<T>(UWorld OwningObject) where T : UUserWidget, IStaticClass =>
-            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(OwningObject.GarbageCollectionHandle,
-                T.StaticClass().GarbageCollectionHandle);
+            UnrealImplementation.Unreal_CreateWidgetImplementation<T>(HandleData.GetHandle(OwningObject),
+                HandleData.GetHandle(T.StaticClass()));
 
         public static UEnum StaticEnum<T>() where T : Enum
         {

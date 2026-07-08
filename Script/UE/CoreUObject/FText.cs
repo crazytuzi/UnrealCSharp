@@ -1,14 +1,15 @@
 using Script.Library;
+using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FText : IGarbageCollectionHandle
+    public class FText
     {
         public FText()
         {
         }
 
-        ~FText() => FTextImplementation.FText_UnRegisterImplementation(GarbageCollectionHandle);
+        ~FText() => FTextImplementation.FText_UnRegisterImplementation(HandleData.GetHandle(this));
 
         public FText(string InBuffer, string InTextNamespace = null, string InPackageNamespace = null,
             bool bRequiresQuotes = false) =>
@@ -31,18 +32,17 @@ namespace Script.CoreUObject
 
             return ReferenceEquals(A, B) ||
                    FTextImplementation.FText_IdenticalImplementation(
-                       A.GarbageCollectionHandle,
-                       B.GarbageCollectionHandle);
+                       HandleData.GetHandle(A),
+                       HandleData.GetHandle(B));
         }
 
         public static bool operator !=(FText A, FText B) => !(A == B);
 
         public override bool Equals(object Other) => this == Other as FText;
 
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
+        public override int GetHashCode() => (int)HandleData.GetHandle(this);
 
-        public override string ToString() => FTextImplementation.FText_ToStringImplementation(GarbageCollectionHandle);
-
-        public nint GarbageCollectionHandle { get; set; }
+        public override string ToString() =>
+            FTextImplementation.FText_ToStringImplementation(HandleData.GetHandle(this));
     }
 }

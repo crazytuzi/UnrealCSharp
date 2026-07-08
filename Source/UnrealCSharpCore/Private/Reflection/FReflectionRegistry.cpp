@@ -6,7 +6,6 @@
 #include "CoreMacro/FunctionAttributeMacro.h"
 #include "CoreMacro/MetaDataAttributeMacro.h"
 #include "Domain/Script/IScriptDomain.h"
-#include "Domain/Mono/FMonoDomain.h"
 
 FReflectionRegistry& FReflectionRegistry::Get()
 {
@@ -24,33 +23,6 @@ void FReflectionRegistry::Initialize()
 	UtilsClass = GetClass(
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS);
 
-#if WITH_MONO
-	ObjectClass = GetClass(FMonoDomain::Get_Object_Class());
-
-	BooleanClass = GetClass(FMonoDomain::Get_Boolean_Class());
-
-	SByteClass = GetClass(FMonoDomain::Get_SByte_Class());
-
-	Int16Class = GetClass(FMonoDomain::Get_Int16_Class());
-
-	Int32Class = GetClass(FMonoDomain::Get_Int32_Class());
-
-	Int64Class = GetClass(FMonoDomain::Get_Int64_Class());
-
-	ByteClass = GetClass(FMonoDomain::Get_Byte_Class());
-
-	UInt16Class = GetClass(FMonoDomain::Get_UInt16_Class());
-
-	UInt32Class = GetClass(FMonoDomain::Get_UInt32_Class());
-
-	UInt64Class = GetClass(FMonoDomain::Get_UInt64_Class());
-
-	SingleClass = GetClass(FMonoDomain::Get_Single_Class());
-
-	DoubleClass = GetClass(FMonoDomain::Get_Double_Class());
-
-	EnumClass = GetClass(FMonoDomain::Get_Enum_Class());
-#else
 	ObjectClass = GetClass(NAMESPACE_SYSTEM, CLASS_OBJECT);
 
 	BooleanClass = GetClass(NAMESPACE_SYSTEM, CLASS_BOOLEAN);
@@ -75,8 +47,7 @@ void FReflectionRegistry::Initialize()
 
 	DoubleClass = GetClass(NAMESPACE_SYSTEM, CLASS_DOUBLE);
 
-	EnumClass = GetClass(NAMESPACE_SYSTEM, TEXT("Enum"));
-#endif
+	EnumClass = GetClass(NAMESPACE_SYSTEM, CLASS_ENUM);
 
 	UClassClass = GetClass(UClass::StaticClass());
 
@@ -897,21 +868,10 @@ void FReflectionRegistry::Deinitialize()
 {
 	Field2Class.Empty();
 
-#if WITH_MONO
-	for (const auto& [PLACEHOLDER, Class] : Class2Class)
-	{
-		delete Class;
-	}
-
-	Class2Class.Empty();
-
-	ReflectionType2Class.Empty();
-#else
 	for (const auto& [PLACEHOLDER, Class] : FullName2Class)
 	{
 		delete Class;
 	}
-#endif
 
 	FullName2Class.Empty();
 }
@@ -953,116 +913,19 @@ FClassReflection* FReflectionRegistry::GetClass(const TWeakObjectPtr<UField>& In
 		return {};
 	}();
 
-#if WITH_MONO
-	if (const auto FoundManagedClass = FMonoDomain::Class_From_Name(NameSpace, Name))
-	{
-		if (const auto FoundClass = Class2Class.Find(FoundManagedClass))
-		{
-			Field2Class.Add(InField, *FoundClass);
-
-			return *FoundClass;
-		}
-
-		const auto Class = new FClassReflection(FoundManagedClass);
-
-		Field2Class.Add(InField, Class);
-
-		Class2Class.Add(FoundManagedClass, Class);
-
-		if (!ReflectionType2Class.Contains(Class->GetManagedReflectionType()))
-		{
-			ReflectionType2Class.Add(Class->GetManagedReflectionType(), Class);
-		}
-
-		Class->Initialize();
-
-		if (const auto FullName = COMBINE_FULL_NAME(NameSpace, Name);
-			!FullName2Class.Contains(FullName))
-		{
-			FullName2Class.Add(FullName, Class);
-		}
-
-		return Class;
-	}
-#else
 	if (const auto FoundClass = GetClass(NameSpace, Name))
 	{
 		Field2Class.Add(InField, FoundClass);
 
 		return FoundClass;
 	}
-#endif
 
 	return nullptr;
 }
 
-FClassReflection* FReflectionRegistry::GetClass(const IManagedReflectionType InManagedReflectionType)
+FClassReflection* FReflectionRegistry::GetClass(const IManagedHandle InManagedClass)
 {
-#if WITH_MONO
-	if (const auto FoundClass = ReflectionType2Class.Find(InManagedReflectionType))
-	{
-		return *FoundClass;
-	}
-
-	const auto ManagedType = FMonoDomain::Reflection_Type_Get_Type(InManagedReflectionType);
-
-	const auto ManagedClass = FMonoDomain::Class_From_Type(ManagedType);
-
-	if (const auto FoundClass = Class2Class.Find(ManagedClass))
-	{
-		ReflectionType2Class.Add(InManagedReflectionType, *FoundClass);
-
-		return *FoundClass;
-	}
-
-	const auto Class = new FClassReflection(InManagedReflectionType);
-
-	ReflectionType2Class.Add(InManagedReflectionType, Class);
-
-	Class2Class.Add(Class->GetManagedClass(), Class);
-
-	if (const auto FullName = COMBINE_FULL_NAME(Class->GetNameSpace(), Class->GetName());
-		!FullName2Class.Contains(FullName))
-	{
-		FullName2Class.Add(FullName, Class);
-	}
-
-	Class->Initialize();
-
-	return Class;
-#else
-	return GetClass(IManagedHandleToIManagedClass(MANAGED_HANDLE_FROM_OBJECT(InManagedReflectionType)));
-#endif
-}
-
-FClassReflection* FReflectionRegistry::GetClass(const IManagedClass InManagedClass)
-{
-#if WITH_MONO
-	if (const auto FoundClass = Class2Class.Find(InManagedClass))
-	{
-		return *FoundClass;
-	}
-
-	const auto Class = new FClassReflection(InManagedClass);
-
-	Class2Class.Add(InManagedClass, Class);
-
-	if (!ReflectionType2Class.Contains(Class->GetManagedReflectionType()))
-	{
-		ReflectionType2Class.Add(Class->GetManagedReflectionType(), Class);
-	}
-
-	if (const auto FullName = COMBINE_FULL_NAME(Class->GetNameSpace(), Class->GetName());
-		!FullName2Class.Contains(FullName))
-	{
-		FullName2Class.Add(FullName, Class);
-	}
-
-	Class->Initialize();
-
-	return Class;
-#else
-	if (IManagedIsValid(InManagedClass))
+	if (IManagedHandleIsValid(InManagedClass))
 	{
 		if (const auto ScriptDomain = IScriptDomain::Get())
 		{
@@ -1070,7 +933,7 @@ FClassReflection* FReflectionRegistry::GetClass(const IManagedClass InManagedCla
 
 			if (const auto FoundClass = FullName2Class.Find(FullName))
 			{
-				ScriptDomain->Free(MANAGED_HANDLE_FROM_OBJECT(InManagedClass));
+				ScriptDomain->Free(InManagedClass);
 
 				return *FoundClass;
 			}
@@ -1086,7 +949,6 @@ FClassReflection* FReflectionRegistry::GetClass(const IManagedClass InManagedCla
 	}
 
 	return nullptr;
-#endif
 }
 
 FClassReflection* FReflectionRegistry::GetClass(const FString& InNameSpace, const FString& InName)
@@ -1098,36 +960,10 @@ FClassReflection* FReflectionRegistry::GetClass(const FString& InNameSpace, cons
 		return *FoundClass;
 	}
 
-#if WITH_MONO
-	if (const auto FoundManagedClass = FMonoDomain::Class_From_Name(InNameSpace, InName))
-	{
-		if (const auto FoundClass = Class2Class.Find(FoundManagedClass))
-		{
-			FullName2Class.Add(FullName, *FoundClass);
-
-			return *FoundClass;
-		}
-
-		const auto Class = new FClassReflection(FoundManagedClass, InName);
-
-		FullName2Class.Add(FullName, Class);
-
-		Class2Class.Add(Class->GetManagedClass(), Class);
-
-		if (!ReflectionType2Class.Contains(Class->GetManagedReflectionType()))
-		{
-			ReflectionType2Class.Add(Class->GetManagedReflectionType(), Class);
-		}
-
-		Class->Initialize();
-
-		return Class;
-	}
-#else
 	if (const auto ScriptDomain = IScriptDomain::Get())
 	{
 		if (const auto ManagedClass = ScriptDomain->GetClass(InNameSpace, InName);
-			IManagedIsValid(ManagedClass))
+			IManagedHandleIsValid(ManagedClass))
 		{
 			const auto Class = new FClassReflection(ManagedClass, InName);
 
@@ -1138,7 +974,6 @@ FClassReflection* FReflectionRegistry::GetClass(const FString& InNameSpace, cons
 			return Class;
 		}
 	}
-#endif
 
 	return nullptr;
 }

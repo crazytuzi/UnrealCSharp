@@ -10,7 +10,6 @@
 
 #define CLASS_SYNCHRONIZATION_CONTEXT FString(TEXT("SynchronizationContext"))
 
-#if WITH_CORECLR
 #define CLASS_OBJECT FString(TEXT("Object"))
 
 #define CLASS_BOOLEAN FString(TEXT("Boolean"))
@@ -54,7 +53,6 @@
 #define CLASS_STRING_BRIDGE FString(TEXT("StringBridge"))
 
 #define CLASS_ARRAY_BRIDGE FString(TEXT("ArrayBridge"))
-#endif
 
 #define CLASS_F_STRING FString(TEXT("FString"))
 

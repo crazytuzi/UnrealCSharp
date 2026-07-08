@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Domain/Script/IManagedHandle.h"
-#include "Domain/FDomain.h"
 
 class UNREALCSHARP_API FReference
 {
@@ -13,8 +12,6 @@ public:
 
 	virtual ~FReference()
 	{
-		FDomain::GCHandle_Free(ManagedHandle);
-
 		ManagedHandle = IManagedHandle{};
 	}
 

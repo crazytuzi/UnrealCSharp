@@ -1,6 +1,7 @@
 using System;
 using Script.CoreUObject;
 using Script.Library;
+using Interop;
 
 namespace Script.EnhancedInput
 {
@@ -18,8 +19,8 @@ namespace Script.EnhancedInput
         {
             var EnhancedInputActionDelegateBinding = UEnhancedInputComponentImplementation
                 .UEnhancedInputComponent_GetDynamicBindingObjectImplementation<UEnhancedInputActionDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UEnhancedInputActionDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UEnhancedInputActionDelegateBinding.StaticClass()));
 
             if (EnhancedInputActionDelegateBinding != null)
             {
@@ -43,8 +44,8 @@ namespace Script.EnhancedInput
                 EnhancedInputActionDelegateBinding.InputActionDelegateBindings.Add(Binding);
 
                 return UEnhancedInputComponentImplementation.UEnhancedInputComponent_BindActionImplementation(
-                    GarbageCollectionHandle, Binding.GarbageCollectionHandle, InObject.GarbageCollectionHandle,
-                    Binding.FunctionNameToBind.GarbageCollectionHandle);
+                    HandleData.GetHandle(this), HandleData.GetHandle(Binding), HandleData.GetHandle(InObject),
+                    HandleData.GetHandle(Binding.FunctionNameToBind));
             }
 
             return null;
@@ -55,8 +56,8 @@ namespace Script.EnhancedInput
         {
             var EnhancedInputActionDelegateBinding = UEnhancedInputComponentImplementation
                 .UEnhancedInputComponent_GetDynamicBindingObjectImplementation<UEnhancedInputActionDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UEnhancedInputActionDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UEnhancedInputActionDelegateBinding.StaticClass()));
 
             if (EnhancedInputActionDelegateBinding != null)
             {
@@ -74,8 +75,8 @@ namespace Script.EnhancedInput
             }
 
             UEnhancedInputComponentImplementation.UEnhancedInputComponent_RemoveBindingImplementation(
-                GarbageCollectionHandle,
-                InEnhancedInputActionEventBinding.GarbageCollectionHandle);
+                HandleData.GetHandle(this),
+                HandleData.GetHandle(InEnhancedInputActionEventBinding));
 
             InObject.GetClass().RemoveFunction(InAction.Method.Name);
         }

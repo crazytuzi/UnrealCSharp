@@ -14,6 +14,4 @@
 
 #define NAMESPACE_DYNAMIC FString(TEXT("Dynamic"))
 
-#if WITH_CORECLR
 #define NAMESPACE_SYSTEM FString(TEXT("System"))
-#endif

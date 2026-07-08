@@ -1,5 +1,6 @@
 using Script.CoreUObject;
 using Script.Library;
+using Interop;
 
 namespace Script.Engine
 {
@@ -9,8 +10,8 @@ namespace Script.Engine
         {
             return UDataTableFunctionLibraryImplementation
                 .UDataTableFunctionLibrary_GetDataTableRowFromNameImplementation(
-                    Table.GarbageCollectionHandle,
-                    RowName.GarbageCollectionHandle,
+                    HandleData.GetHandle(Table),
+                    HandleData.GetHandle(RowName),
                     out OutRow);
         }
     }

@@ -1,16 +1,15 @@
 #include "Reflection/Property/StringProperty/FUtf8StrPropertyDescriptor.h"
 #if UE_F_UTF8_STR_PROPERTY
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
 void FUtf8StrPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
 	const auto Object = Class->NewObject();
 
 	FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, true, false>(
-		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+		Class, Object, Src);
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FUtf8StrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
@@ -22,10 +21,10 @@ void FUtf8StrPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) co
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddStringReference<FUtf8String, false, true>(
-			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+			Class, Object, Src);
 	}
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FUtf8StrPropertyDescriptor::Set(void* Src, void* Dest) const

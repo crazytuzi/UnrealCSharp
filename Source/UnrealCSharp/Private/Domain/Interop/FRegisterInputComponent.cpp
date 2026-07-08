@@ -14,7 +14,7 @@ namespace
 {
 	struct FRegisterInputComponent
 	{
-		static IManagedObject GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
+		static IManagedHandle GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
 		                                                            const IManagedHandle InBindingClass)
 		{
 			const auto ThisClass = FCSharpEnvironment::GetEnvironment().GetObject<
@@ -36,7 +36,7 @@ namespace
 				return FCSharpEnvironment::GetEnvironment().Bind(DynamicBindingObject);
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
 		template <typename T>

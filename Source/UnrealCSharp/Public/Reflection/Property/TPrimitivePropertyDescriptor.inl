@@ -20,12 +20,12 @@ public:
 
 	virtual auto Get(void* Src, void** Dest, std::true_type) const -> void override
 	{
-		*Dest = MANAGED_HANDLE_TO_OBJECT(Super::Class->BoxValue(Src));
+		*Dest = IManagedHandleToObject(Super::Class->BoxValue(Src));
 	}
 
 	virtual auto Get(void* Src, void** Dest, std::false_type) const -> void override
 	{
-		*Dest = MANAGED_HANDLE_TO_OBJECT(Super::Class->BoxValue(Src));
+		*Dest = IManagedHandleToObject(Super::Class->BoxValue(Src));
 	}
 
 	virtual auto Get(void* Src, void* Dest) const -> void override

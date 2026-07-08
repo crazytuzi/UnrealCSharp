@@ -1,86 +1,23 @@
 using System;
 using System.Reflection;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static unsafe class FDelegateImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_RegisterImplementation(object InMonoObject, Type InType);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_UnRegisterImplementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_BindImplementation(nint InMonoObject,
-            nint InObject, Type InType, MethodInfo InMethodInfo);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FDelegate_IsBoundImplementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_UnBindImplementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_ClearImplementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_GenericExecute0Implementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_PrimitiveExecute1Implementation(nint InMonoObject,
-            byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_CompoundExecute1Implementation(nint InMonoObject,
-            byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_GenericExecute2Implementation(nint InMonoObject,
-            byte* InBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_PrimitiveExecute3Implementation(nint InMonoObject,
-            byte* InBuffer, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_CompoundExecute3Implementation(nint InMonoObject,
-            byte* InBuffer, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_GenericExecute4Implementation(nint InMonoObject,
-            byte* OutBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_GenericExecute6Implementation(nint InMonoObject,
-            byte* InBuffer, byte* OutBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_PrimitiveExecute7Implementation(nint InMonoObject,
-            byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FDelegate_CompoundExecute7Implementation(nint InMonoObject,
-            byte* InBuffer, byte* OutBuffer, byte* ReturnBuffer);
-#else
-        private static delegate* unmanaged[Cdecl]<object, nint, void> __FDelegate_RegisterImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, nint, void> __FDelegate_RegisterImplementation;
 
         public static void FDelegate_RegisterImplementation(object InMonoObject, Type InType)
         {
             if (__FDelegate_RegisterImplementation == null)
             {
-                __FDelegate_RegisterImplementation = (delegate* unmanaged[Cdecl]<object, nint, void>)
+                __FDelegate_RegisterImplementation = (delegate* unmanaged[Cdecl]<nint, nint, void>)
                     MethodBridge.GetMethod(
                         "Script.Library.FDelegateImplementation::FDelegate_RegisterImplementation");
             }
 
-            __FDelegate_RegisterImplementation(InMonoObject, HandleData.AllocImplementation(InType));
+            __FDelegate_RegisterImplementation(HandleData.Alloc(InMonoObject), HandleData.Alloc(InType));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, void> __FDelegate_UnRegisterImplementation;
@@ -109,17 +46,17 @@ namespace Script.Library
                         "Script.Library.FDelegateImplementation::FDelegate_BindImplementation");
             }
 
-            __FDelegate_BindImplementation(InMonoObject, InObject, HandleData.AllocImplementation(InType),
-                (nint)HandleData.AllocImplementation(InMethodInfo));
+            __FDelegate_BindImplementation(InMonoObject, InObject, HandleData.Alloc(InType),
+                HandleData.Alloc(InMethodInfo));
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int> __FDelegate_IsBoundImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, byte> __FDelegate_IsBoundImplementation;
 
         public static bool FDelegate_IsBoundImplementation(nint InMonoObject)
         {
             if (__FDelegate_IsBoundImplementation == null)
             {
-                __FDelegate_IsBoundImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __FDelegate_IsBoundImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.FDelegateImplementation::FDelegate_IsBoundImplementation");
             }
@@ -306,6 +243,5 @@ namespace Script.Library
 
             __FDelegate_CompoundExecute7Implementation(InMonoObject, InBuffer, OutBuffer, ReturnBuffer);
         }
-#endif
     }
 }

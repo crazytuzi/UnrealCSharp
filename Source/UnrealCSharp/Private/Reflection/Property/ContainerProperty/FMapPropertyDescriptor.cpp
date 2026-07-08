@@ -1,21 +1,20 @@
 #include "Reflection/Property/ContainerProperty/FMapPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FMapHelper.h"
-#include "Domain/Script/IManagedTypes.h"
 
 void FMapPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
 {
-	*reinterpret_cast<IManagedObject*>(Dest) = NewWeakRef(Src, true);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src, true);
 }
 
 void FMapPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 {
-	*reinterpret_cast<IManagedObject*>(Dest) = NewWeakRef(Src, false);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewWeakRef(Src, false);
 }
 
 void FMapPropertyDescriptor::Get(void* Src, void* Dest) const
 {
-	*static_cast<IManagedObject*>(Dest) = NewRef(Src);
+	*reinterpret_cast<IManagedHandle*>(Dest) = NewRef(Src);
 }
 
 void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
@@ -29,7 +28,7 @@ void FMapPropertyDescriptor::Set(void* Src, void* Dest) const
 	Property->CopyCompleteValue(Dest, SrcContainer->GetScriptMap());
 }
 
-IManagedObject FMapPropertyDescriptor::NewRef(void* InAddress) const
+IManagedHandle FMapPropertyDescriptor::NewRef(void* InAddress) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetContainerObject<FMapHelper>(InAddress);
 
@@ -44,13 +43,13 @@ IManagedObject FMapPropertyDescriptor::NewRef(void* InAddress) const
 			InAddress, Property);
 
 		FCSharpEnvironment::GetEnvironment().AddContainerReference(
-			OwnerManagedHandle, InAddress, MapHelper, Class, MANAGED_HANDLE_FROM_OBJECT(Object));
+			OwnerManagedHandle, InAddress, MapHelper, Class, Object);
 	}
 
-	return IManagedHandleToIManagedObject(Object);
+	return Object;
 }
 
-IManagedObject FMapPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
+IManagedHandle FMapPropertyDescriptor::NewWeakRef(void* InAddress, const bool bIsCopy) const
 {
 	const auto Object = Class->NewObject();
 
@@ -59,5 +58,5 @@ IManagedObject FMapPropertyDescriptor::NewWeakRef(void* InAddress, const bool bI
 
 	FCSharpEnvironment::GetEnvironment().AddContainerReference(MapHelper, Class, Object);
 
-	return IManagedHandleToIManagedObject(Object);
+	return Object;
 }
