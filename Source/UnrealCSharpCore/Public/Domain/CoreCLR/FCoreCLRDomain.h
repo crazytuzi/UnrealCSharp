@@ -133,6 +133,10 @@ private:
 
 	static load_assembly_and_get_function_pointer_fn LoadAssemblyAndGetFunctionPointerFn;
 
+	hostfxr_handle HostContextHandle{};
+
+	hostfxr_close_fn HostFxrCloseFn{};
+
 	SCRIPT_TYPES
 
 	TArray<IManagedHandle> Assemblies;
