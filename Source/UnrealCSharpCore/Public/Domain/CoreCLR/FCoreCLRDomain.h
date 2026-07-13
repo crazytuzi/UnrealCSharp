@@ -121,6 +121,10 @@ private:
 private:
 	void* HostFxrHandle{};
 
+	hostfxr_handle HostContextHandle{};
+
+	hostfxr_close_fn HostFxrCloseFn{};
+
 	SCRIPT_TYPES
 
 	TArray<IManagedHandle> Assemblies;

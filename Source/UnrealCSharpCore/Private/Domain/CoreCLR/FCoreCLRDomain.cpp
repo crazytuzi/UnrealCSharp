@@ -30,6 +30,13 @@
 
 FCoreCLRDomain::~FCoreCLRDomain()
 {
+	if (HostFxrCloseFn != nullptr && HostContextHandle != nullptr)
+	{
+		HostFxrCloseFn(HostContextHandle);
+
+		HostContextHandle = nullptr;
+	}
+
 	if (HostFxrHandle != nullptr)
 	{
 		FPlatformProcess::FreeDllHandle(HostFxrHandle);
@@ -70,7 +77,7 @@ void FCoreCLRDomain::Initialize()
 		const auto HostFxrGetRuntimeDelegateFn = GetExport<hostfxr_get_runtime_delegate_fn>(
 			HostFxrHandle, FUNCTION_HOSTFXR_GET_RUNTIME_DELEGATE);
 
-		const auto HostFxrCloseFn = GetExport<hostfxr_close_fn>(HostFxrHandle, FUNCTION_HOSTFXR_CLOSE);
+		HostFxrCloseFn = GetExport<hostfxr_close_fn>(HostFxrHandle, FUNCTION_HOSTFXR_CLOSE);
 
 		const auto HostPath = FCoreCLRFunctionLibrary::GetHostPath();
 
@@ -88,8 +95,6 @@ void FCoreCLRDomain::Initialize()
 			reinterpret_cast<const char_t*>(HostPathString.Get()),
 			reinterpret_cast<const char_t*>(CoreCLRDirectoryString.Get())
 		};
-
-		hostfxr_handle HostContextHandle{};
 
 		const auto HostFxrInitializeForRuntimeConfigErrorCode = HostFxrInitializeForRuntimeConfigFn(
 			reinterpret_cast<const char_t*>(FStringToString<>(FCoreCLRFunctionLibrary::GetRuntimeConfigPath()).Get()),
@@ -109,10 +114,6 @@ void FCoreCLRDomain::Initialize()
 				HostContextHandle, hdt_load_assembly_and_get_function_pointer, &OutLoadAssemblyAndGetFunctionPointerFn);
 			HostFxrGetRuntimeDelegateErrorCode != 0 || OutLoadAssemblyAndGetFunctionPointerFn == nullptr)
 		{
-			HostFxrCloseFn(HostContextHandle);
-
-			HostContextHandle = nullptr;
-
 			return;
 		}
 
