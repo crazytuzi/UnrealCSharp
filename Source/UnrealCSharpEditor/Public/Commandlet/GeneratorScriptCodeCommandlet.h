@@ -11,4 +11,6 @@ class UGeneratorScriptCodeCommandlet : public UCommandlet
 
 public:
 	virtual int32 Main(const FString& Params) override;
+
+	static bool IsRunningGeneratorScriptCodeCommandlet();
 };

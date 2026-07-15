@@ -12,7 +12,7 @@ class UNREALCSHARPCORE_API FCoreCLRDomain final : public IScriptDomain
 public:
 	FCoreCLRDomain() = default;
 
-	virtual ~FCoreCLRDomain() override;
+	virtual ~FCoreCLRDomain() override = default;
 
 public:
 	virtual void Initialize() override;
@@ -119,14 +119,16 @@ private:
 	                                       void** OutFunctionPointer) const;
 
 private:
-	void* HostFxrHandle{};
+	static void* HostFxrDllHandle;
+
+	static hostfxr_handle HostFxrHandle;
+
+	static load_assembly_and_get_function_pointer_fn LoadAssemblyAndGetFunctionPointerFn;
 
 	SCRIPT_TYPES
 
 	TArray<IManagedHandle> Assemblies;
 
 	bool bIsInitialized{};
-
-	load_assembly_and_get_function_pointer_fn LoadAssemblyAndGetFunctionPointerFn{};
 };
 #endif
