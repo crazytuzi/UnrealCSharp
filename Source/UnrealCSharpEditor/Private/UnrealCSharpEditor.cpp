@@ -30,6 +30,7 @@
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Setting/UnrealCSharpSetting.h"
 #include "Common/FScriptDomainTypeScope.h"
+#include "Commandlet/GeneratorScriptCodeCommandlet.h"
 #include "UEVersion.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
@@ -42,7 +43,10 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	UUnrealCSharpSetting::RegisterSettings();
 
-	FDynamicGenerator::Generator();
+	if (!UGeneratorScriptCodeCommandlet::IsRunningGeneratorScriptCodeCommandlet())
+	{
+		FDynamicGenerator::Generator();
+	}
 
 	FUnrealCSharpEditorStyle::Initialize();
 
@@ -260,7 +264,7 @@ void FUnrealCSharpEditorModule::UpdatePackagingSettings()
 	}
 }
 
-void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName)
+void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const bool bForceCompileInterop)
 {
 	FScriptDomainTypeScope ScriptDomainTypeScope(FUnrealCSharpFunctionLibrary::GetScriptDomainType(InPlatformName));
 
@@ -330,7 +334,7 @@ void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName)
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Compiler"));
 
-	FCSharpCompiler::Get().ImmediatelyCompile();
+	FCSharpCompiler::Get().ImmediatelyCompile(bForceCompileInterop);
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Completion"));
 

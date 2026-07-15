@@ -19,14 +19,10 @@ public:
 
 	void OnUnrealCSharpCoreModuleInActive();
 
-	void OnUnloadAssemblies();
-
 private:
 	FDelegateHandle OnUnrealCSharpCoreModuleActiveDelegateHandle;
 
 	FDelegateHandle OnUnrealCSharpCoreModuleInActiveDelegateHandle;
-
-	FDelegateHandle OnUnloadAssembliesDelegateHandle;
 
 	FUObjectListener UObjectListener;
 };

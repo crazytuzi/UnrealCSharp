@@ -28,22 +28,11 @@
 	} \
 }
 
-FCoreCLRDomain::~FCoreCLRDomain()
-{
-	if (HostFxrCloseFn != nullptr && HostContextHandle != nullptr)
-	{
-		HostFxrCloseFn(HostContextHandle);
+void* FCoreCLRDomain::HostFxrDllHandle{};
 
-		HostContextHandle = nullptr;
-	}
+hostfxr_handle FCoreCLRDomain::HostFxrHandle{};
 
-	if (HostFxrHandle != nullptr)
-	{
-		FPlatformProcess::FreeDllHandle(HostFxrHandle);
-
-		HostFxrHandle = nullptr;
-	}
-}
+load_assembly_and_get_function_pointer_fn FCoreCLRDomain::LoadAssemblyAndGetFunctionPointerFn{};
 
 void FCoreCLRDomain::Initialize()
 {
@@ -52,9 +41,9 @@ void FCoreCLRDomain::Initialize()
 		return;
 	}
 
-	if (LoadAssemblyAndGetFunctionPointerFn == nullptr)
+	if (HostFxrDllHandle == nullptr)
 	{
-		HostFxrHandle = FPlatformProcess::GetDllHandle(*FCoreCLRFunctionLibrary::GetHostFxrPath());
+		HostFxrDllHandle = FPlatformProcess::GetDllHandle(*FCoreCLRFunctionLibrary::GetHostFxrPath());
 
 		if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 			UUnrealCSharpSetting>())
@@ -72,12 +61,10 @@ void FCoreCLRDomain::Initialize()
 		RegisterErrorWriter();
 
 		const auto HostFxrInitializeForRuntimeConfigFn = GetExport<hostfxr_initialize_for_runtime_config_fn>(
-			HostFxrHandle, FUNCTION_HOSTFXR_INITIALIZE_FOR_RUNTIME_CONFIG);
+			HostFxrDllHandle, FUNCTION_HOSTFXR_INITIALIZE_FOR_RUNTIME_CONFIG);
 
 		const auto HostFxrGetRuntimeDelegateFn = GetExport<hostfxr_get_runtime_delegate_fn>(
-			HostFxrHandle, FUNCTION_HOSTFXR_GET_RUNTIME_DELEGATE);
-
-		HostFxrCloseFn = GetExport<hostfxr_close_fn>(HostFxrHandle, FUNCTION_HOSTFXR_CLOSE);
+			HostFxrDllHandle, FUNCTION_HOSTFXR_GET_RUNTIME_DELEGATE);
 
 		const auto HostPath = FCoreCLRFunctionLibrary::GetHostPath();
 
@@ -99,7 +86,7 @@ void FCoreCLRDomain::Initialize()
 		const auto HostFxrInitializeForRuntimeConfigErrorCode = HostFxrInitializeForRuntimeConfigFn(
 			reinterpret_cast<const char_t*>(FStringToString<>(FCoreCLRFunctionLibrary::GetRuntimeConfigPath()).Get()),
 			&HostFxrInitializeParameters,
-			&HostContextHandle);
+			&HostFxrHandle);
 
 		if (constexpr auto HostAlreadyInitializedErrorCode = 0x00000008;
 			HostFxrInitializeForRuntimeConfigErrorCode != 0 &&
@@ -111,7 +98,7 @@ void FCoreCLRDomain::Initialize()
 		void* OutLoadAssemblyAndGetFunctionPointerFn{};
 
 		if (const auto HostFxrGetRuntimeDelegateErrorCode = HostFxrGetRuntimeDelegateFn(
-				HostContextHandle, hdt_load_assembly_and_get_function_pointer, &OutLoadAssemblyAndGetFunctionPointerFn);
+				HostFxrHandle, hdt_load_assembly_and_get_function_pointer, &OutLoadAssemblyAndGetFunctionPointerFn);
 			HostFxrGetRuntimeDelegateErrorCode != 0 || OutLoadAssemblyAndGetFunctionPointerFn == nullptr)
 		{
 			return;
@@ -130,12 +117,9 @@ void FCoreCLRDomain::Initialize()
 		return;
 	}
 
-	if (TypeBridgeGetFunctionPointerFn == nullptr)
-	{
-		RegisterInterop(InteropAssembly);
+	RegisterInterop(InteropAssembly);
 
-		RegisterLog();
-	}
+	RegisterLog();
 
 	bIsInitialized = true;
 
@@ -164,6 +148,17 @@ void FCoreCLRDomain::Deinitialize()
 
 			FPlatformMisc::SetEnvironmentVar(TEXT("DOTNET_DiagnosticPorts"), TEXT(""));
 		}
+	}
+
+	if (HostFxrHandle != nullptr)
+	{
+		if (const auto HostFxrCloseFn = GetExport<hostfxr_close_fn>(
+			HostFxrDllHandle, FUNCTION_HOSTFXR_CLOSE))
+		{
+			HostFxrCloseFn(HostFxrHandle);
+		}
+
+		HostFxrHandle = nullptr;
 	}
 }
 
@@ -249,7 +244,7 @@ void FCoreCLRDomain::UnloadAssembly()
 void FCoreCLRDomain::RegisterErrorWriter() const
 {
 	if (const auto HostFxrSetErrorWriterFn = GetExport<hostfxr_set_error_writer_fn>(
-		HostFxrHandle, FUNCTION_HOSTFXR_SET_ERROR_WRITER))
+		HostFxrDllHandle, FUNCTION_HOSTFXR_SET_ERROR_WRITER))
 	{
 		HostFxrSetErrorWriterFn(&FCoreCLRLog::ErrorWriter);
 	}

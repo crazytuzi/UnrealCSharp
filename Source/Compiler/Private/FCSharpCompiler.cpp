@@ -40,11 +40,11 @@ void FCSharpCompiler::Compile() const
 	}
 }
 
-void FCSharpCompiler::ImmediatelyCompile() const
+void FCSharpCompiler::ImmediatelyCompile(const bool bForceCompileInterop) const
 {
 	if (Runnable != nullptr)
 	{
-		Runnable->ImmediatelyDoWork();
+		Runnable->ImmediatelyDoWork(bForceCompileInterop);
 	}
 }
 

@@ -15,8 +15,6 @@ public:
 
 	DECLARE_MULTICAST_DELEGATE(FOnEndGenerator);
 
-	DECLARE_MULTICAST_DELEGATE(FOnUnloadAssemblies);
-
 #if WITH_EDITOR
 	DECLARE_MULTICAST_DELEGATE(FOnDynamicClassUpdated);
 
@@ -30,8 +28,6 @@ public:
 	static FOnBeginGenerator OnBeginGenerator;
 
 	static FOnEndGenerator OnEndGenerator;
-
-	static FOnUnloadAssemblies OnUnloadAssemblies;
 
 #if WITH_EDITOR
 	static FOnDynamicClassUpdated OnDynamicClassUpdated;

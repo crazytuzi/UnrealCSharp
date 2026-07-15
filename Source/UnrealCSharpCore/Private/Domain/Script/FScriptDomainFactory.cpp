@@ -44,10 +44,8 @@ void FScriptDomainFactory::Destroy(IScriptDomain* InScriptDomain)
 			InScriptDomain->Deinitialize();
 		}
 
-#if WITH_MONO
 		delete InScriptDomain;
 
 		IScriptDomain::Set(nullptr);
-#endif
 	}
 }
