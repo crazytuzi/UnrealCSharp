@@ -480,11 +480,45 @@ IManagedHandle SCRIPT_DOMAIN_TYPE::Invoke(const IManagedHandle InManagedHandle, 
 	return InvalidManagedHandle;
 }
 
-void SCRIPT_DOMAIN_TYPE::GetClassReflection(const IManagedHandle InManagedClass, PTRINT* OutParams)
+bool SCRIPT_DOMAIN_TYPE::IsOverride(const IManagedHandle InManagedClass)
 {
-	if (UtilsGetClassReflectionFn != nullptr)
+	if (UtilsIsOverrideFn != nullptr)
 	{
-		UtilsGetClassReflectionFn(InManagedClass, OutParams);
+		return UtilsIsOverrideFn(InManagedClass) != 0;
+	}
+
+	return false;
+}
+
+void SCRIPT_DOMAIN_TYPE::GetClassDescriptor(const IManagedHandle InManagedClass, PTRINT* OutParams)
+{
+	if (UtilsGetClassDescriptorFn != nullptr)
+	{
+		UtilsGetClassDescriptorFn(InManagedClass, OutParams);
+	}
+}
+
+void SCRIPT_DOMAIN_TYPE::GetClassProperties(const IManagedHandle InManagedClass, PTRINT* OutParams)
+{
+	if (UtilsGetClassPropertiesFn != nullptr)
+	{
+		UtilsGetClassPropertiesFn(InManagedClass, OutParams);
+	}
+}
+
+void SCRIPT_DOMAIN_TYPE::GetClassFields(const IManagedHandle InManagedClass, PTRINT* OutParams)
+{
+	if (UtilsGetClassFieldsFn != nullptr)
+	{
+		UtilsGetClassFieldsFn(InManagedClass, OutParams);
+	}
+}
+
+void SCRIPT_DOMAIN_TYPE::GetClassMethods(const IManagedHandle InManagedClass, PTRINT* OutParams)
+{
+	if (UtilsGetClassMethodsFn != nullptr)
+	{
+		UtilsGetClassMethodsFn(InManagedClass, OutParams);
 	}
 }
 

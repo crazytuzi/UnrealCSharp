@@ -6,7 +6,15 @@
 
 #define FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE FString(TEXT("GetTypesWithAttribute"))
 
-#define FUNCTION_UTILS_GET_CLASS_REFLECTION FString(TEXT("GetClassReflection"))
+#define FUNCTION_UTILS_IS_OVERRIDE FString(TEXT("IsOverride"))
+
+#define FUNCTION_UTILS_GET_CLASS_DESCRIPTOR FString(TEXT("GetClassDescriptor"))
+
+#define FUNCTION_UTILS_GET_CLASS_PROPERTIES FString(TEXT("GetClassProperties"))
+
+#define FUNCTION_UTILS_GET_CLASS_FIELDS FString(TEXT("GetClassFields"))
+
+#define FUNCTION_UTILS_GET_CLASS_METHODS FString(TEXT("GetClassMethods"))
 
 #define FUNCTION_STATIC_STRUCT FString(TEXT("StaticStruct"))
 

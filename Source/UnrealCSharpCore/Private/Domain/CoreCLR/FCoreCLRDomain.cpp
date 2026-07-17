@@ -172,13 +172,24 @@ void FCoreCLRDomain::InitializeAssembly(const TArray<FString>& InAssemblies)
 
 	if (TypeBridgeGetFunctionPointerFn != nullptr)
 	{
-		UtilsGetClassReflectionFn = reinterpret_cast<utils_get_class_reflection_fn>(
-			TypeBridgeGetFunctionPointerFn(
-				reinterpret_cast<const char16_t*>(StringCast<UTF16CHAR>(*FUnrealCSharpFunctionLibrary::GetUEName()).
-					Get()),
-				reinterpret_cast<const char16_t*>(StringCast<UTF16CHAR>(
-					*COMBINE_FULL_NAME(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS)).Get()),
-				reinterpret_cast<const char16_t*>(StringCast<UTF16CHAR>(*FUNCTION_UTILS_GET_CLASS_REFLECTION).Get())));
+#define GET_UTILS_FUNCTION_POINTER(InFn, InName) \
+	InFn = reinterpret_cast<decltype(InFn)>(TypeBridgeGetFunctionPointerFn( \
+			reinterpret_cast<const char16_t*>(StringCast<UTF16CHAR>( \
+				*FUnrealCSharpFunctionLibrary::GetUEName()).Get()), \
+			reinterpret_cast<const char16_t*>(StringCast<UTF16CHAR>( \
+				*COMBINE_FULL_NAME(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT), CLASS_UTILS)).Get()), \
+			reinterpret_cast<const char16_t*>(StringCast<UTF16CHAR>(*InName).Get())));
+
+		GET_UTILS_FUNCTION_POINTER(UtilsIsOverrideFn, FUNCTION_UTILS_IS_OVERRIDE)
+
+		GET_UTILS_FUNCTION_POINTER(UtilsGetClassDescriptorFn, FUNCTION_UTILS_GET_CLASS_DESCRIPTOR)
+
+		GET_UTILS_FUNCTION_POINTER(UtilsGetClassPropertiesFn, FUNCTION_UTILS_GET_CLASS_PROPERTIES)
+
+		GET_UTILS_FUNCTION_POINTER(UtilsGetClassFieldsFn, FUNCTION_UTILS_GET_CLASS_FIELDS)
+
+		GET_UTILS_FUNCTION_POINTER(UtilsGetClassMethodsFn, FUNCTION_UTILS_GET_CLASS_METHODS)
+#undef GET_UTILS_FUNCTION_POINTER
 
 		RegisterSynchronizationContextTick();
 
@@ -236,7 +247,15 @@ void FCoreCLRDomain::UnloadAssembly()
 		AssemblyLoaderUnloadFn();
 	}
 
-	UtilsGetClassReflectionFn = nullptr;
+	UtilsIsOverrideFn = nullptr;
+
+	UtilsGetClassDescriptorFn = nullptr;
+
+	UtilsGetClassPropertiesFn = nullptr;
+
+	UtilsGetClassFieldsFn = nullptr;
+
+	UtilsGetClassMethodsFn = nullptr;
 
 	Assemblies.Empty();
 }

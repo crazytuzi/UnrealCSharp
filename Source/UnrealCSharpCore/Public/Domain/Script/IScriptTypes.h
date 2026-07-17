@@ -92,7 +92,15 @@ typedef IManagedHandle (*array_bridge_new_array_fn)(const uint8*, int32);
 
 typedef IManagedHandle (*array_bridge_array_get_fn)(IManagedHandle, int32);
 
-typedef void (*utils_get_class_reflection_fn)(IManagedHandle, PTRINT*);
+typedef int32 (*utils_is_override_fn)(IManagedHandle);
+
+typedef void (*utils_get_class_descriptor_fn)(IManagedHandle, PTRINT*);
+
+typedef void (*utils_get_class_properties_fn)(IManagedHandle, PTRINT*);
+
+typedef void (*utils_get_class_fields_fn)(IManagedHandle, PTRINT*);
+
+typedef void (*utils_get_class_methods_fn)(IManagedHandle, PTRINT*);
 
 typedef void (*synchronization_context_tick_fn)(float);
 
@@ -153,6 +161,10 @@ typedef void (*synchronization_context_tick_fn)(float);
 	array_bridge_new_array_fn ArrayBridgeNewArrayFn{}; \
 	array_bridge_array_get_fn ArrayBridgeArrayGetFn{}; \
 	\
-	utils_get_class_reflection_fn UtilsGetClassReflectionFn{}; \
+	utils_is_override_fn UtilsIsOverrideFn{}; \
+	utils_get_class_descriptor_fn UtilsGetClassDescriptorFn{}; \
+	utils_get_class_properties_fn UtilsGetClassPropertiesFn{}; \
+	utils_get_class_fields_fn UtilsGetClassFieldsFn{}; \
+	utils_get_class_methods_fn UtilsGetClassMethodsFn{}; \
 	\
 	synchronization_context_tick_fn SynchronizationContextTickFn{};

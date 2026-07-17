@@ -425,7 +425,7 @@ bool FCSharpBind::CanBind(UStruct* InStruct)
 		return false;
 	}
 
-	if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InStruct))
+	if (auto FoundClass = FReflectionRegistry::Get().GetClass(InStruct))
 	{
 		return FoundClass->IsOverride();
 	}

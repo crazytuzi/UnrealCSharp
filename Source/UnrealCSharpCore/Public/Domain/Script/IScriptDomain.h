@@ -64,7 +64,15 @@ public:
 	virtual IManagedHandle Invoke(const IManagedHandle InManagedHandle, const IManagedHandle InManagedMethod,
 	                              int32 InParamCount = 0, void** InParams = nullptr) = 0;
 
-	virtual void GetClassReflection(const IManagedHandle InManagedClass, PTRINT* OutParams) = 0;
+	virtual bool IsOverride(const IManagedHandle InManagedClass) = 0;
+
+	virtual void GetClassDescriptor(const IManagedHandle InManagedClass, PTRINT* OutParams) = 0;
+
+	virtual void GetClassProperties(const IManagedHandle InManagedClass, PTRINT* OutParams) = 0;
+
+	virtual void GetClassFields(const IManagedHandle InManagedClass, PTRINT* OutParams) = 0;
+
+	virtual void GetClassMethods(const IManagedHandle InManagedClass, PTRINT* OutParams) = 0;
 
 public:
 	virtual bool IsInitialized() const = 0;

@@ -607,9 +607,6 @@ public:
 #endif
 
 private:
-	void InitializeClass(FClassReflection* InClass);
-
-private:
 	FClassReflection* UtilsClass{};
 
 	FClassReflection* ObjectClass{};
@@ -1189,10 +1186,6 @@ private:
 #endif
 
 private:
-	bool bIsInitializing{};
-
-	TArray<FClassReflection*> PendingInitializeClasses;
-
 	TMap<TWeakObjectPtr<UField>, FClassReflection*> Field2Class;
 
 	TMap<FString, FClassReflection*> FullName2Class;
