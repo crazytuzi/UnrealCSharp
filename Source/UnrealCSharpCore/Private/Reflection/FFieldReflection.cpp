@@ -1,26 +1,25 @@
 #include "Reflection/FFieldReflection.h"
 #include "Reflection/FClassReflection.h"
-#include "Domain/Script/IManagedTypes.h"
 #include "Domain/Script/IScriptDomain.h"
 
-FFieldReflection::FFieldReflection(const FString& InName, const IManagedReflectionField InManagedReflectionField):
+FFieldReflection::FFieldReflection(const FString& InName, const IManagedHandle InManagedField):
 	FReflection(InName),
-	ManagedReflectionField(InManagedReflectionField)
+	ManagedField(InManagedField)
 {
 }
 
 FFieldReflection::~FFieldReflection()
 {
-	if (IManagedIsValid(ManagedReflectionField))
+	if (IManagedHandleIsValid(ManagedField))
 	{
 #if WITH_CORECLR
 		if (const auto ScriptDomain = IScriptDomain::Get())
 		{
-			ScriptDomain->Free(MANAGED_HANDLE_FROM_OBJECT(ManagedReflectionField));
+			ScriptDomain->Free(ManagedField);
 		}
 #endif
 
-		ManagedReflectionField = INVALID_MANAGED;
+		ManagedField = InvalidManagedHandle;
 	}
 }
 

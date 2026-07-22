@@ -2,7 +2,6 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Container/FArrayHelper.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -12,25 +11,24 @@ namespace
 {
 	struct FRegisterArray
 	{
-		static void RegisterImplementation(const IManagedObject InManagedObject,
-		                                   const IManagedReflectionType InManagedReflectionType)
+		static void RegisterImplementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedReflectionType);
+			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
 			FCSharpBind::Bind<FArrayHelper>(Class, Class->GetGenericArgument(), InManagedObject);
 		}
 
-		static IUnmanagedBool IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
+		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
 		{
 			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InA))
 			{
 				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(InB))
 				{
-					return BoolToIUnmanagedBool(FArrayHelper::Identical(FoundA, FoundB));
+					return FArrayHelper::Identical(FoundA, FoundB) ? 1 : 0;
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
@@ -64,15 +62,15 @@ namespace
 			return 0;
 		}
 
-		static IUnmanagedBool IsValidIndexImplementation(const IManagedHandle InManagedHandle, const int32 InIndex)
+		static uint8 IsValidIndexImplementation(const IManagedHandle InManagedHandle, const int32 InIndex)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(ArrayHelper->IsValidIndex(InIndex));
+				return ArrayHelper->IsValidIndex(InIndex) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static int32 NumImplementation(const IManagedHandle InManagedHandle)
@@ -86,15 +84,15 @@ namespace
 			return 0;
 		}
 
-		static IUnmanagedBool IsEmptyImplementation(const IManagedHandle InManagedHandle)
+		static uint8 IsEmptyImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(ArrayHelper->IsEmpty());
+				return ArrayHelper->IsEmpty() ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static int32 MaxImplementation(const IManagedHandle InManagedHandle)
@@ -130,8 +128,7 @@ namespace
 			}
 		}
 
-		static int32 FindImplementation(const IManagedHandle InManagedHandle,
-		                                const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 FindImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -142,8 +139,7 @@ namespace
 			return INDEX_NONE;
 		}
 
-		static int32 FindLastImplementation(const IManagedHandle InManagedHandle,
-		                                    const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 FindLastImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -154,20 +150,18 @@ namespace
 			return INDEX_NONE;
 		}
 
-		static IUnmanagedBool ContainsImplementation(const IManagedHandle InManagedHandle,
-		                                             const IN_VALUE_BUFFER_SIGNATURE)
+		static uint8 ContainsImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(ArrayHelper->Contains(IN_VALUE_BUFFER));
+				return ArrayHelper->Contains(IN_VALUE_BUFFER) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static int32 AddUninitializedImplementation(const IManagedHandle InManagedHandle,
-		                                            const int32 InCount)
+		static int32 AddUninitializedImplementation(const IManagedHandle InManagedHandle, const int32 InCount)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -199,17 +193,16 @@ namespace
 		}
 
 		static void RemoveAtImplementation(const IManagedHandle InManagedHandle,
-		                                   const int32 InIndex, const int32 InCount, const bool bAllowShrinking)
+		                                   const int32 InIndex, const int32 InCount, const uint8 bAllowShrinking)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				ArrayHelper->RemoveAt(InIndex, InCount, bAllowShrinking);
+				ArrayHelper->RemoveAt(InIndex, InCount, bAllowShrinking != 0);
 			}
 		}
 
-		static void ResetImplementation(const IManagedHandle InManagedHandle,
-		                                const int32 InNewSize)
+		static void ResetImplementation(const IManagedHandle InManagedHandle, const int32 InNewSize)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -218,8 +211,7 @@ namespace
 			}
 		}
 
-		static void EmptyImplementation(const IManagedHandle InManagedHandle,
-		                                const int32 InSlack)
+		static void EmptyImplementation(const IManagedHandle InManagedHandle, const int32 InSlack)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -229,17 +221,16 @@ namespace
 		}
 
 		static void SetNumImplementation(const IManagedHandle InManagedHandle,
-		                                 const int32 InNewNum, const bool bAllowShrinking)
+		                                 const int32 InNewNum, const uint8 bAllowShrinking)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
 			{
-				return ArrayHelper->SetNum(InNewNum, bAllowShrinking);
+				return ArrayHelper->SetNum(InNewNum, bAllowShrinking != 0);
 			}
 		}
 
-		static int32 AddImplementation(const IManagedHandle InManagedHandle,
-		                               IN_VALUE_BUFFER_SIGNATURE)
+		static int32 AddImplementation(const IManagedHandle InManagedHandle, IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -250,8 +241,7 @@ namespace
 			return 0;
 		}
 
-		static int32 AddZeroedImplementation(const IManagedHandle InManagedHandle,
-		                                     const int32 InCount)
+		static int32 AddZeroedImplementation(const IManagedHandle InManagedHandle, const int32 InCount)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -262,8 +252,7 @@ namespace
 			return 0;
 		}
 
-		static int32 AddUniqueImplementation(const IManagedHandle InManagedHandle,
-		                                     IN_VALUE_BUFFER_SIGNATURE)
+		static int32 AddUniqueImplementation(const IManagedHandle InManagedHandle, IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -274,8 +263,7 @@ namespace
 			return 0;
 		}
 
-		static int32 RemoveSingleImplementation(const IManagedHandle InManagedHandle,
-		                                        const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 RemoveSingleImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))
@@ -286,8 +274,7 @@ namespace
 			return 0;
 		}
 
-		static int32 RemoveImplementation(const IManagedHandle InManagedHandle,
-		                                  const IN_VALUE_BUFFER_SIGNATURE)
+		static int32 RemoveImplementation(const IManagedHandle InManagedHandle, const IN_VALUE_BUFFER_SIGNATURE)
 		{
 			if (const auto ArrayHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FArrayHelper>(
 				InManagedHandle))

@@ -9,25 +9,75 @@ FProperty* FTypeBridge::Factory(FClassReflection* InClass, const FFieldVariant& 
 {
 	switch (const auto PropertyType = GetPropertyType(InClass); PropertyType)
 	{
-	case EPropertyTypeExtent::Byte: return new FByteProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Byte:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FByteProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FByteProperty(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::UInt16: return new FUInt16Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::UInt16:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FUInt16Property(InOwner, InName, InObjectFlags);
+#else
+		return new FUInt16Property(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::UInt32: return new FUInt32Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::UInt32:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FUInt32Property(InOwner, InName, InObjectFlags);
+#else
+		return new FUInt32Property(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::UInt64: return new FUInt64Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::UInt64:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FUInt64Property(InOwner, InName, InObjectFlags);
+#else
+		return new FUInt64Property(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::Int8: return new FInt8Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Int8:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FInt8Property(InOwner, InName, InObjectFlags);
+#else
+		return new FInt8Property(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::Int16: return new FInt16Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Int16:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FInt16Property(InOwner, InName, InObjectFlags);
+#else
+		return new FInt16Property(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::Int: return new FIntProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Int:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FIntProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FIntProperty(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::Int64: return new FInt64Property(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Int64:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FInt64Property(InOwner, InName, InObjectFlags);
+#else
+		return new FInt64Property(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::Bool: return new FBoolProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Bool:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FBoolProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FBoolProperty(InOwner, InName);
+#endif
 
-	case EPropertyTypeExtent::Float: return new FFloatProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Float:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FFloatProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FFloatProperty(InOwner, InName);
+#endif
 
 	case EPropertyTypeExtent::ClassReference:
 		{
@@ -44,7 +94,12 @@ FProperty* FTypeBridge::Factory(FClassReflection* InClass, const FFieldVariant& 
 			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
-	case EPropertyTypeExtent::Name: return new FNameProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Name:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FNameProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FNameProperty(InOwner, InName);
+#endif
 
 	case EPropertyTypeExtent::Interface:
 		{
@@ -61,17 +116,37 @@ FProperty* FTypeBridge::Factory(FClassReflection* InClass, const FFieldVariant& 
 			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
-	case EPropertyTypeExtent::String: return new FStrProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::String:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FStrProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FStrProperty(InOwner, InName);
+#endif
 
 #if UE_F_UTF8_STR_PROPERTY
-	case EPropertyTypeExtent::Utf8String: return new FUtf8StrProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Utf8String:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FUtf8StrProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FUtf8StrProperty(InOwner, InName);
+#endif
 #endif
 
 #if UE_F_ANSI_STR_PROPERTY
-	case EPropertyTypeExtent::AnsiString: return new FAnsiStrProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::AnsiString:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FAnsiStrProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FAnsiStrProperty(InOwner, InName);
+#endif
 #endif
 
-	case EPropertyTypeExtent::Text: return new FTextProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Text:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FTextProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FTextProperty(InOwner, InName);
+#endif
 
 	case EPropertyTypeExtent::WeakObjectReference:
 		{
@@ -93,7 +168,12 @@ FProperty* FTypeBridge::Factory(FClassReflection* InClass, const FFieldVariant& 
 			return ManagedFactory<IsSoftReference>(PropertyType, InClass, InOwner, InName, InObjectFlags);
 		}
 
-	case EPropertyTypeExtent::Double: return new FDoubleProperty(InOwner, InName, InObjectFlags);
+	case EPropertyTypeExtent::Double:
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
+		return new FDoubleProperty(InOwner, InName, InObjectFlags);
+#else
+		return new FDoubleProperty(InOwner, InName);
+#endif
 
 	case EPropertyTypeExtent::Map:
 		{
@@ -150,7 +230,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 	{
 	case EPropertyTypeExtent::ClassReference:
 		{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto ClassProperty = new FClassProperty(InOwner, InName);
+#endif
 
 			ClassProperty->PropertyClass = UObject::StaticClass();
 
@@ -163,7 +247,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 		{
 			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto ClassProperty = new FClassProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto ClassProperty = new FClassProperty(InOwner, InName);
+#endif
 
 			ClassProperty->SetPropertyFlags(CPF_UObjectWrapper);
 
@@ -183,7 +271,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 		{
 			const auto PathName = InClass->GetPathName();
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto ObjectProperty = new FObjectProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto ObjectProperty = new FObjectProperty(InOwner, InName);
+#endif
 
 			SetClass<IsSoftReference>(PathName, [PathName, ObjectProperty]()
 			{
@@ -199,7 +291,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 		{
 			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto InterfaceProperty = new FInterfaceProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto InterfaceProperty = new FInterfaceProperty(InOwner, InName);
+#endif
 
 			SetClass<IsSoftReference>(PathName, [PathName, InterfaceProperty]()
 			{
@@ -217,7 +313,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			const auto InScriptStruct = LoadObject<UScriptStruct>(nullptr, *PathName);
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto StructProperty = new FStructProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto StructProperty = new FStructProperty(InOwner, InName);
+#endif
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE
 			StructProperty->SetElementSize(InScriptStruct->GetStructureSize());
@@ -232,7 +332,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 	case EPropertyTypeExtent::Map:
 		{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto MapProperty = new FMapProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto MapProperty = new FMapProperty(InOwner, InName);
+#endif
 
 			MapProperty->KeyProp = Factory<IsSoftReference>(InClass->GetGenericArgument(),
 			                                                MapProperty, "",
@@ -247,7 +351,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 	case EPropertyTypeExtent::Set:
 		{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto SetProperty = new FSetProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto SetProperty = new FSetProperty(InOwner, InName);
+#endif
 
 			SetProperty->ElementProp = Factory<IsSoftReference>(InClass->GetGenericArgument(),
 			                                                    SetProperty, "",
@@ -258,7 +366,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 	case EPropertyTypeExtent::Array:
 		{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto ArrayProperty = new FArrayProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto ArrayProperty = new FArrayProperty(InOwner, InName);
+#endif
 
 			ArrayProperty->Inner = Factory<IsSoftReference>(InClass->GetGenericArgument(),
 			                                                ArrayProperty, "",
@@ -273,7 +385,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 
 			const auto InEnum = LoadObject<UEnum>(nullptr, *PathName);
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto EnumProperty = new FEnumProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto EnumProperty = new FEnumProperty(InOwner, InName);
+#endif
 
 			const auto UnderlyingProperty = Factory(InClass->GetUnderlyingType(),
 			                                        EnumProperty, "", EObjectFlags::RF_NoFlags);
@@ -295,7 +411,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 		{
 			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto WeakObjectProperty = new FWeakObjectProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto WeakObjectProperty = new FWeakObjectProperty(InOwner, InName);
+#endif
 
 			SetClass<IsSoftReference>(PathName, [PathName, WeakObjectProperty]()
 			{
@@ -311,7 +431,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 		{
 			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto LazyObjectProperty = new FLazyObjectProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto LazyObjectProperty = new FLazyObjectProperty(InOwner, InName);
+#endif
 
 			SetClass<IsSoftReference>(PathName, [PathName, LazyObjectProperty]()
 			{
@@ -327,7 +451,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 		{
 			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto SoftClassProperty = new FSoftClassProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto SoftClassProperty = new FSoftClassProperty(InOwner, InName);
+#endif
 
 			SetClass<IsSoftReference>(PathName, [PathName, SoftClassProperty]()
 			{
@@ -345,7 +473,11 @@ FProperty* FTypeBridge::ManagedFactory(EPropertyTypeExtent InPropertyType, FClas
 		{
 			const auto PathName = InClass->GetGenericArgument()->GetPathName();
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 			const auto SoftObjectProperty = new FSoftObjectProperty(InOwner, InName, InObjectFlags);
+#else
+			const auto SoftObjectProperty = new FSoftObjectProperty(InOwner, InName);
+#endif
 
 			SetClass<IsSoftReference>(PathName, [PathName, SoftObjectProperty]()
 			{

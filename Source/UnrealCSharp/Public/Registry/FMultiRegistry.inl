@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Domain/FDomain.h"
 #include "Reflection/FClassReflection.h"
 
 template <
@@ -32,21 +31,19 @@ struct FMultiRegistry::TMultiRegistryImplementation<
 	{
 		const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress);
 
-		return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
+		return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
 	}
 
 	template <auto IsNeedFree, auto IsMember>
-	static auto AddReference(Class* InRegistry, FClassReflection* InClass, IManagedHandle InScriptHandle,
+	static auto AddReference(Class* InRegistry, FClassReflection* InClass, IManagedHandle InManagedHandle,
 	                         typename FMultiValueMapping::FAddressType InAddress)
 	{
-		const auto ManagedHandle = InClass->NewWeakRefGCHandle(InScriptHandle, true);
-
 		if constexpr (IsMember)
 		{
-			(InRegistry->*Address2ManagedHandle).Add(InAddress, ManagedHandle);
+			(InRegistry->*Address2ManagedHandle).Add(InAddress, InManagedHandle);
 		}
 
-		(InRegistry->*ManagedHandle2Value).Add(ManagedHandle,
+		(InRegistry->*ManagedHandle2Value).Add(InManagedHandle,
 		                                       typename FMultiValueMapping::ValueType(
 			                                       static_cast<typename FMultiValueMapping::ValueType::Type>(
 				                                       InAddress), IsNeedFree));

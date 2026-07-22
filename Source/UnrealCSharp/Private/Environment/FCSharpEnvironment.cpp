@@ -383,22 +383,22 @@ void FCSharpEnvironment::OnAsyncLoadingFlushUpdate()
 	}
 }
 
-IManagedObject FCSharpEnvironment::Bind(UObject* Object) const
+IManagedHandle FCSharpEnvironment::Bind(UObject* Object) const
 {
 	return FCSharpBind::Bind(Object);
 }
 
-IManagedObject FCSharpEnvironment::Bind(const UObject* Object) const
+IManagedHandle FCSharpEnvironment::Bind(const UObject* Object) const
 {
 	return Bind(const_cast<UObject*>(Object));
 }
 
-IManagedObject FCSharpEnvironment::Bind(UClass* Class) const
+IManagedHandle FCSharpEnvironment::Bind(UClass* Class) const
 {
 	return FCSharpBind::Bind(Class);
 }
 
-bool FCSharpEnvironment::Bind(const IManagedObject InManagedObject, const FName& InStructName) const
+bool FCSharpEnvironment::Bind(const IManagedHandle InManagedObject, const FName& InStructName) const
 {
 	return FCSharpBind::Bind(InManagedObject, InStructName);
 }

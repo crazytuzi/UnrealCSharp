@@ -4,30 +4,29 @@
 #include "FPropertyReflection.h"
 #include "FFieldReflection.h"
 #include "FMethodReflection.h"
-#include "Domain/Script/IManagedTypes.h"
+#include "Domain/Script/IManagedHandle.h"
+
+class IScriptDomain;
+
+struct FManagedReader;
 
 class UNREALCSHARPCORE_API FClassReflection : public FReflection
 {
 public:
-	explicit FClassReflection(const IManagedClass InManagedClass, const FString& InName = {});
-
-#if WITH_MONO
-	explicit FClassReflection(const IManagedReflectionType InManagedReflectionType);
-#endif
+	explicit FClassReflection(const IManagedHandle InManagedClass, const FString& InName = {});
 
 	~FClassReflection();
 
 public:
-	void Initialize();
-
 	void Deinitialize();
 
 public:
-	IManagedClass GetManagedClass() const;
+	bool HasAttribute(const FClassReflection* InAttribute) const;
 
-#if WITH_MONO
-	IManagedReflectionType GetManagedReflectionType() const;
-#endif
+	FString GetAttributeValue(const FClassReflection* InAttribute, int32 InIndex = 0) const;
+
+public:
+	IManagedHandle GetManagedClass() const;
 
 	FClassReflection* GetTypeDefinition() const;
 
@@ -39,7 +38,7 @@ public:
 
 	bool IsEnum() const;
 
-	bool IsOverride() const;
+	bool IsOverride();
 
 	FClassReflection* GetParent() const;
 
@@ -63,7 +62,7 @@ public:
 
 	FMethodReflection* GetMethod(const FString& InName, int32 InParamCount) const;
 
-	FMethodReflection* GetMethod(const IManagedReflectionMethod InManagedReflectionMethod);
+	FMethodReflection* GetMethod(const IManagedHandle InManagedMethod);
 
 	FMethodReflection* GetParentMethod(const FString& InName, int32 InParamCount) const;
 
@@ -77,24 +76,82 @@ public:
 
 	void ConstructorClass() const;
 
-	IManagedHandle NewGCHandle(const IManagedHandle InManagedHandle, bool bPinned) const;
-
-	IManagedHandle NewWeakRefGCHandle(const IManagedHandle InManagedHandle, bool bTrackResurrection) const;
-
-	IManagedHandle GetGCHandle(const IManagedObject InManagedObject) const;
-
 	IManagedHandle BoxValue(void* InValue) const;
 
-	IManagedArray NewArray(int32 InNum) const;
+	IManagedHandle NewArray(int32 InNum) const;
 
 	bool IsAssignableFrom(const FClassReflection* InSuperClass, bool bIncludeInterfaces = false) const;
 
 private:
-	IManagedClass ManagedClass{INVALID_MANAGED};
+	FORCEINLINE void EnsureDescriptor() const
+	{
+		if (!bDescriptorLoaded)
+		{
+			const_cast<FClassReflection*>(this)->EnsureDescriptorImplementation();
+		}
+	}
 
-#if WITH_MONO
-	IManagedReflectionType ManagedReflectionType{INVALID_MANAGED};
-#endif
+	FORCEINLINE void EnsureProperties() const
+	{
+		if (!bPropertiesLoaded)
+		{
+			const_cast<FClassReflection*>(this)->EnsurePropertiesImplementation();
+		}
+	}
+
+	FORCEINLINE void EnsureFields() const
+	{
+		if (!bFieldsLoaded)
+		{
+			const_cast<FClassReflection*>(this)->EnsureFieldsImplementation();
+		}
+	}
+
+	FORCEINLINE void EnsureMethods() const
+	{
+		if (!bMethodsLoaded)
+		{
+			const_cast<FClassReflection*>(this)->EnsureMethodsImplementation();
+		}
+	}
+
+	void EnsureDescriptorImplementation();
+
+	void EnsurePropertiesImplementation();
+
+	void EnsureFieldsImplementation();
+
+	void EnsureMethodsImplementation();
+
+	void EnsureMemberImplementation(
+		bool& bLoaded, int32 InSlotCount,
+		void (IScriptDomain::*GetMemberFunction)(const IManagedHandle, PTRINT*),
+		void (FClassReflection::*ParseMemberFunction)(const FManagedReader&, IManagedHandle*));
+
+	void ParseDescriptor(const FManagedReader& InManagedReader, IManagedHandle* InParams);
+
+	void ParseProperties(const FManagedReader& InManagedReader, IManagedHandle* InParams);
+
+	void ParseFields(const FManagedReader& InManagedReader, IManagedHandle* InParams);
+
+	void ParseMethods(const FManagedReader& InManagedReader, IManagedHandle* InParams);
+
+private:
+	IManagedHandle ManagedClass{InvalidManagedHandle};
+
+	bool bOverrideLoaded{};
+
+	bool bDescriptorLoaded{};
+
+	bool bPropertiesLoaded{};
+
+	bool bFieldsLoaded{};
+
+	bool bMethodsLoaded{};
+
+	bool bInitializing{};
+
+	bool bIsOverride{};
 
 	FClassReflection* TypeDefinition{};
 
@@ -109,8 +166,6 @@ private:
 	bool bIsClass{};
 
 	bool bIsEnum{};
-
-	bool bIsOverride{};
 
 	TArray<FClassReflection*> GenericArguments;
 

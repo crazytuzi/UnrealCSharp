@@ -1,29 +1,11 @@
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class FTextImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FText_RegisterImplementation(FText InText, string InBuffer, string InTextNamespace,
-            string InPackageNamespace, bool bRequiresQuotes);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FText_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FText_UnRegisterImplementation(nint InText);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern string FText_ToStringImplementation(nint InText);
-#else
-        private static unsafe delegate* unmanaged[Cdecl]<nint, byte*, byte*, byte*, bool, void>
+        private static unsafe delegate* unmanaged[Cdecl]<nint, byte*, byte*, byte*, byte, void>
             __FText_RegisterImplementation;
 
         public static unsafe void FText_RegisterImplementation(FText InText, string InBuffer, string InTextNamespace,
@@ -31,13 +13,9 @@ namespace Script.Library
         {
             if (__FText_RegisterImplementation == null)
             {
-                __FText_RegisterImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, byte*, byte*, bool, void>)
+                __FText_RegisterImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, byte*, byte*, byte, void>)
                     MethodBridge.GetMethod("Script.Library.FTextImplementation::FText_RegisterImplementation");
             }
-
-            var Handle = HandleData.AllocImplementation(InText);
-
-            InText.GarbageCollectionHandle = Handle;
 
             var Buffer = InBuffer != null ? System.Text.Encoding.UTF8.GetBytes(InBuffer + '\0') : [0];
 
@@ -51,18 +29,18 @@ namespace Script.Library
 
             fixed (byte* BufferPtr = Buffer, TextNamespacePtr = TextNamespace, PackageNamespacePtr = PackageNamespace)
             {
-                __FText_RegisterImplementation(Handle, BufferPtr, TextNamespacePtr, PackageNamespacePtr,
-                    bRequiresQuotes);
+                __FText_RegisterImplementation(HandleData.Alloc(InText), BufferPtr, TextNamespacePtr,
+                    PackageNamespacePtr, (byte)(bRequiresQuotes ? 1 : 0));
             }
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __FText_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __FText_IdenticalImplementation;
 
         public static unsafe bool FText_IdenticalImplementation(nint InA, nint InB)
         {
             if (__FText_IdenticalImplementation == null)
             {
-                __FText_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __FText_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.FTextImplementation::FText_IdenticalImplementation");
             }
@@ -98,6 +76,5 @@ namespace Script.Library
 
             return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }

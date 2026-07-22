@@ -1,14 +1,14 @@
 #include "Reflection/Property/EnumProperty/FEnumPropertyDescriptor.h"
 #include "Domain/Script/IManagedHandle.h"
 
-void FEnumPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
+void FEnumPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Class->BoxValue(Src));
+	*Dest = IManagedHandleToObject(Class->BoxValue(Src));
 }
 
-void FEnumPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+void FEnumPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Class->BoxValue(Src));
+	*Dest = IManagedHandleToObject(Class->BoxValue(Src));
 }
 
 void FEnumPropertyDescriptor::Get(void* Src, void* Dest) const

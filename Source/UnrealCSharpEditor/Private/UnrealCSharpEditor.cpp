@@ -7,6 +7,8 @@
 #include "Settings/ProjectPackagingSettings.h"
 #include "Misc/ScopedSlowTask.h"
 #include "IContentBrowserDataModule.h"
+#include "Interfaces/ITargetPlatform.h"
+#include "Interfaces/ITargetPlatformManagerModule.h"
 #include "FAssetGenerator.h"
 #include "FClassGenerator.h"
 #include "FCSharpCompiler.h"
@@ -27,6 +29,9 @@
 #include "DetailCustomization/ProjectDirectoryPathCustomization.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "Setting/UnrealCSharpSetting.h"
+#include "Common/FScriptDomainTypeScope.h"
+#include "Commandlet/GeneratorScriptCodeCommandlet.h"
+#include "UEVersion.h"
 
 #define LOCTEXT_NAMESPACE "FUnrealCSharpEditorModule"
 
@@ -38,7 +43,10 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	UUnrealCSharpSetting::RegisterSettings();
 
-	FDynamicGenerator::Generator();
+	if (!UGeneratorScriptCodeCommandlet::IsRunningGeneratorScriptCodeCommandlet())
+	{
+		FDynamicGenerator::Generator();
+	}
 
 	FUnrealCSharpEditorStyle::Initialize();
 
@@ -62,8 +70,13 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	UnrealCSharpBlueprintToolBar = MakeShared<FUnrealCSharpBlueprintToolBar>();
 
+#if UE_F_CORE_DELEGATES_GET_ON_POST_ENGINE_INIT
+	OnPostEngineInitDelegateHandle = FCoreDelegates::GetOnPostEngineInit().AddRaw(
+		this, &FUnrealCSharpEditorModule::OnPostEngineInit);
+#else
 	OnPostEngineInitDelegateHandle = FCoreDelegates::OnPostEngineInit.AddRaw(
 		this, &FUnrealCSharpEditorModule::OnPostEngineInit);
+#endif
 
 	CodeAnalysisConsoleCommand = MakeUnique<FAutoConsoleCommand>(
 		TEXT("UnrealCSharp.Editor.CodeAnalysis"), TEXT(""),
@@ -96,7 +109,7 @@ void FUnrealCSharpEditorModule::StartupModule()
 		FConsoleCommandDelegate::CreateLambda(
 			[]()
 			{
-				Generator();
+				Generator(FPlatformProperties::IniPlatformName());
 			}));
 
 	UpdatePackagingSettings();
@@ -114,12 +127,25 @@ void FUnrealCSharpEditorModule::StartupModule()
 
 	if (IsRunningCookCommandlet())
 	{
-		if (const auto AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(TEXT("AssetRegistry")))
+		if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
+				UUnrealCSharpEditorSetting>();
+			UnrealCSharpEditorSetting != nullptr && !UnrealCSharpEditorSetting->IsSkipGenerateScriptCode())
 		{
-			AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
+			if (const auto AssetRegistryModule = FModuleManager::LoadModulePtr<FAssetRegistryModule>(
+				TEXT("AssetRegistry")))
 			{
-				Generator();
-			});
+				AssetRegistryModule->Get().OnFilesLoaded().AddLambda([]()
+				{
+					if (const auto TargetPlatformManager = GetTargetPlatformManager())
+					{
+						if (const auto& ActiveTargetPlatforms = TargetPlatformManager->GetActiveTargetPlatforms();
+							!ActiveTargetPlatforms.IsEmpty())
+						{
+							Generator(ActiveTargetPlatforms[0]->IniPlatformName());
+						}
+					}
+				});
+			}
 		}
 	}
 }
@@ -148,7 +174,11 @@ void FUnrealCSharpEditorModule::ShutdownModule()
 
 	if (OnPostEngineInitDelegateHandle.IsValid())
 	{
+#if UE_F_CORE_DELEGATES_GET_ON_POST_ENGINE_INIT
+		FCoreDelegates::GetOnPostEngineInit().Remove(OnPostEngineInitDelegateHandle);
+#else
 		FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitDelegateHandle);
+#endif
 	}
 
 	if (UnrealCSharpBlueprintToolBar.IsValid())
@@ -182,7 +212,7 @@ void FUnrealCSharpEditorModule::Tick(const float InDeltaTime)
 
 void FUnrealCSharpEditorModule::PluginButtonClicked() const
 {
-	Generator();
+	Generator(FPlatformProperties::IniPlatformName());
 }
 
 void FUnrealCSharpEditorModule::OnPostEngineInit()
@@ -234,8 +264,10 @@ void FUnrealCSharpEditorModule::UpdatePackagingSettings()
 	}
 }
 
-void FUnrealCSharpEditorModule::Generator()
+void FUnrealCSharpEditorModule::Generator(const FString& InPlatformName, const bool bForceCompileInterop)
 {
+	FScriptDomainTypeScope ScriptDomainTypeScope(FUnrealCSharpFunctionLibrary::GetScriptDomainType(InPlatformName));
+
 	FUnrealCSharpCoreModuleDelegates::OnBeginGenerator.Broadcast();
 
 	static FString DefaultCultureName = TEXT("en");
@@ -302,7 +334,7 @@ void FUnrealCSharpEditorModule::Generator()
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Compiler"));
 
-	FCSharpCompiler::Get().ImmediatelyCompile();
+	FCSharpCompiler::Get().ImmediatelyCompile(bForceCompileInterop);
 
 	SlowTask.EnterProgressFrame(1, LOCTEXT("GeneratingCodeAction", "Completion"));
 

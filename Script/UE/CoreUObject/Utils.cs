@@ -1,19 +1,18 @@
 using System;
 using System.Reflection;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Script.Dynamic;
+using Interop;
 
 namespace Script.CoreUObject
 {
     public static class Utils
     {
         public static string GetPathName(Type InType) => InType.GetCustomAttribute<PathNameAttribute>(true)?.PathName;
-
-        private static Type MakeGenericTypeInstance(Type InGenericTypeDefinition, Type[] InTypeArguments) =>
-            Activator.CreateInstance(InGenericTypeDefinition.MakeGenericType(InTypeArguments)).GetType();
 
         private static Type GetType(Type InType) =>
             InType.IsByRef
@@ -23,13 +22,6 @@ namespace Script.CoreUObject
                 : InType.IsGenericType
                     ? InType.GetGenericTypeDefinition()
                     : InType;
-
-        private static void SetOut()
-        {
-            Console.SetOut(Log.Log.Create(InIsError: false));
-
-            Console.SetError(Log.Log.Create(InIsError: true));
-        }
 
         private static string GetTraceback()
         {
@@ -79,39 +71,28 @@ namespace Script.CoreUObject
             return Result.ToArray();
         }
 
-        public static void GetClassReflection(Type InType,
-            out Type OutTypeDefinition, out string OutName, out string OutNameSpace, out string OutPathName,
+        private static void GetClassDescriptorImplementation(Type InType,
+            out Type OutTypeDefinition, out string OutNameSpace, out string OutPathName,
             out Type OutParent, out Type OutUnderlyingType, out bool OutIsClass, out bool OutIsEnum,
             out int OutGenericArgumentLength, out Type[] OutGenericArguments,
             out int OutInterfaceLength, out Type[] OutInterfaces,
             out int OutClassAttributeLength, out Type[] OutClassAttributes,
-            out int[] OutClassAttributeValueLength, out string[] OutClassAttributeValues,
-            out int OutPropertyLength, out string[] OutPropertyNames,
-            out PropertyInfo[] OutPropertyInfos, out Type[] OutPropertyTypes,
-            out int[] OutPropertyAttributeCounts, out Type[] OutPropertyAttributes,
-            out int[] OutPropertyAttributeValueCounts, out string[] OutPropertyAttributeValues,
-            out int OutFieldLength, out string[] OutFieldNames, out FieldInfo[] OutFieldInfos,
-            out int OutMethodLength, out string[] OutMethodNames, out MethodBase[] OutMethodInfos,
-            out bool[] OutMethodIsStatics, out int[] OutMethodParamCounts, out Type[] OutMethodReturnTypes,
-            out int[] OutMethodParamIndex, out string[] OutMethodParamNames,
-            out Type[] OutMethodParamTypes, out bool[] OutMethodParamRefs,
-            out int[] OutMethodAttributeCounts, out Type[] OutMethodAttributes,
-            out int[] OutMethodAttributeValueCounts, out string[] OutMethodAttributeValues
+            out int[] OutClassAttributeValueLength, out string[] OutClassAttributeValues
         )
         {
             OutTypeDefinition = GetType(InType);
-
-            OutName = InType.Name;
 
             OutNameSpace = InType.Namespace;
 
             OutPathName = null;
 
-            foreach (var CustomAttribute in InType.GetCustomAttributes())
+            var PathNameAttributeFullName = typeof(PathNameAttribute).FullName;
+
+            foreach (var CustomAttribute in InType.CustomAttributes)
             {
-                if (CustomAttribute is PathNameAttribute Attribute)
+                if (CustomAttribute.AttributeType.FullName == PathNameAttributeFullName)
                 {
-                    OutPathName = Attribute.PathName;
+                    OutPathName = CustomAttribute.ConstructorArguments[0].Value as string;
                 }
             }
 
@@ -141,12 +122,12 @@ namespace Script.CoreUObject
 
                 var UClassAttributeNamespace = typeof(UClassAttribute).Namespace;
 
-                var OverrideAttributeType = typeof(OverrideAttribute);
+                var OverrideAttributeTypeFullName = typeof(OverrideAttribute).FullName;
 
                 foreach (var CustomAttribute in InType.CustomAttributes)
                 {
                     if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace ||
-                        CustomAttribute.AttributeType == OverrideAttributeType)
+                        CustomAttribute.AttributeType.FullName == OverrideAttributeTypeFullName)
                     {
                         ClassAttributes.Add(CustomAttribute.AttributeType);
 
@@ -170,6 +151,37 @@ namespace Script.CoreUObject
                 OutClassAttributeValueLength = ClassAttributeValueIndex.ToArray();
 
                 OutClassAttributeValues = ClassAttributeValues.ToArray();
+            }
+            else
+            {
+                OutGenericArgumentLength = 0;
+
+                OutGenericArguments = null;
+
+                OutInterfaceLength = 0;
+
+                OutInterfaces = null;
+
+                OutClassAttributeLength = 0;
+
+                OutClassAttributes = null;
+
+                OutClassAttributeValueLength = null;
+
+                OutClassAttributeValues = null;
+            }
+        }
+
+        private static void GetClassPropertiesImplementation(Type InType,
+            out int OutPropertyLength, out string[] OutPropertyNames,
+            out PropertyInfo[] OutPropertyInfos, out Type[] OutPropertyTypes,
+            out int[] OutPropertyAttributeCounts, out Type[] OutPropertyAttributes,
+            out int[] OutPropertyAttributeValueCounts, out string[] OutPropertyAttributeValues
+        )
+        {
+            if (InType.IsClass)
+            {
+                var UClassAttributeNamespace = typeof(UClassAttribute).Namespace;
 
                 OutPropertyInfos = InType.GetProperties(
                     BindingFlags.Instance |
@@ -229,7 +241,33 @@ namespace Script.CoreUObject
                 OutPropertyAttributeValueCounts = PropertyAttributeIndex.ToArray();
 
                 OutPropertyAttributeValues = PropertyAttributeValues.ToArray();
+            }
+            else
+            {
+                OutPropertyLength = 0;
 
+                OutPropertyNames = null;
+
+                OutPropertyInfos = null;
+
+                OutPropertyTypes = null;
+
+                OutPropertyAttributeCounts = null;
+
+                OutPropertyAttributes = null;
+
+                OutPropertyAttributeValueCounts = null;
+
+                OutPropertyAttributeValues = null;
+            }
+        }
+
+        private static void GetClassFieldsImplementation(Type InType,
+            out int OutFieldLength, out string[] OutFieldNames, out FieldInfo[] OutFieldInfos
+        )
+        {
+            if (InType.IsClass || InType.IsEnum)
+            {
                 OutFieldInfos = InType.GetFields(
                     BindingFlags.Instance |
                     BindingFlags.Static |
@@ -244,6 +282,31 @@ namespace Script.CoreUObject
                 {
                     OutFieldNames[i] = OutFieldInfos[i].Name;
                 }
+            }
+            else
+            {
+                OutFieldLength = 0;
+
+                OutFieldNames = null;
+
+                OutFieldInfos = null;
+            }
+        }
+
+        private static void GetClassMethodsImplementation(Type InType,
+            out int OutMethodLength, out string[] OutMethodNames, out MethodBase[] OutMethodInfos,
+            out bool[] OutMethodIsStatics, out int[] OutMethodParamCounts, out Type[] OutMethodReturnTypes,
+            out int[] OutMethodParamIndex, out string[] OutMethodParamNames,
+            out Type[] OutMethodParamTypes, out bool[] OutMethodParamRefs,
+            out int[] OutMethodAttributeCounts, out Type[] OutMethodAttributes,
+            out int[] OutMethodAttributeValueCounts, out string[] OutMethodAttributeValues
+        )
+        {
+            if (InType.IsClass)
+            {
+                var UClassAttributeNamespace = typeof(UClassAttribute).Namespace;
+
+                var OverrideAttributeTypeFullName = typeof(OverrideAttribute).FullName;
 
                 var Constructors = InType.GetConstructors(
                     BindingFlags.Instance |
@@ -298,7 +361,7 @@ namespace Script.CoreUObject
 
                 var MethodParamRefs = new List<bool>();
 
-                var UFunctionAttributeType = typeof(UFunctionAttribute);
+                var UFunctionAttributeTypeFullName = typeof(UFunctionAttribute).FullName;
 
                 for (var i = 0; i < OutMethodInfos.Length; i++)
                 {
@@ -306,7 +369,7 @@ namespace Script.CoreUObject
 
                     foreach (var CustomAttribute in OutMethodInfos[i].CustomAttributes)
                     {
-                        if (CustomAttribute.AttributeType == UFunctionAttributeType)
+                        if (CustomAttribute.AttributeType.FullName == UFunctionAttributeTypeFullName)
                         {
                             IsUFunction = true;
 
@@ -364,7 +427,7 @@ namespace Script.CoreUObject
                     foreach (var CustomAttribute in OutMethodInfos[i].CustomAttributes)
                     {
                         if (CustomAttribute.AttributeType.Namespace == UClassAttributeNamespace ||
-                            CustomAttribute.AttributeType == OverrideAttributeType
+                            CustomAttribute.AttributeType.FullName == OverrideAttributeTypeFullName
                            )
                         {
                             var MethodAttributeValue = 0;
@@ -395,44 +458,6 @@ namespace Script.CoreUObject
             }
             else
             {
-                OutGenericArgumentLength = 0;
-
-                OutGenericArguments = null;
-
-                OutInterfaceLength = 0;
-
-                OutInterfaces = null;
-
-                OutClassAttributeLength = 0;
-
-                OutClassAttributes = null;
-
-                OutClassAttributeValueLength = null;
-
-                OutClassAttributeValues = null;
-
-                OutPropertyLength = 0;
-
-                OutPropertyNames = null;
-
-                OutPropertyInfos = null;
-
-                OutPropertyTypes = null;
-
-                OutPropertyAttributeCounts = null;
-
-                OutPropertyAttributes = null;
-
-                OutPropertyAttributeValueCounts = null;
-
-                OutPropertyAttributeValues = null;
-
-                OutFieldLength = 0;
-
-                OutFieldNames = null;
-
-                OutFieldInfos = null;
-
                 OutMethodLength = 0;
 
                 OutMethodNames = null;
@@ -460,6 +485,163 @@ namespace Script.CoreUObject
                 OutMethodAttributeValueCounts = null;
 
                 OutMethodAttributeValues = null;
+            }
+        }
+
+        [UnmanagedCallersOnly]
+        public static int IsOverride(nint InTypeHandle)
+        {
+            if (HandleData.GetObject(InTypeHandle) is Type Type)
+            {
+                return Type.IsDefined(typeof(UClassAttribute), false) ||
+                       Type.IsDefined(typeof(OverrideAttribute), false)
+                    ? 1
+                    : 0;
+            }
+
+            return 0;
+        }
+
+        [UnmanagedCallersOnly]
+        public static unsafe void GetClassDescriptor(nint InTypeHandle, nint* OutBuffer)
+        {
+            if (HandleData.GetObject(InTypeHandle) is Type Type)
+            {
+                GetClassDescriptorImplementation(Type,
+                    out var OutTypeDefinition, out var OutNameSpace, out var OutPathName,
+                    out var OutParent, out var OutUnderlyingType, out var OutIsClass, out var OutIsEnum,
+                    out var OutGenericArgumentLength, out var OutGenericArguments,
+                    out var OutInterfaceLength, out var OutInterfaces,
+                    out var OutClassAttributeLength, out var OutClassAttributes,
+                    out var OutClassAttributeValueLength, out var OutClassAttributeValues
+                );
+
+                OutBuffer[0] = OutTypeDefinition != null ? HandleData.Alloc(OutTypeDefinition) : 0;
+
+                OutBuffer[1] = OutNameSpace != null ? HandleData.Alloc(OutNameSpace) : 0;
+
+                OutBuffer[2] = OutPathName != null ? HandleData.Alloc(OutPathName) : 0;
+
+                OutBuffer[3] = OutParent != null ? HandleData.Alloc(OutParent) : 0;
+
+                OutBuffer[4] = OutUnderlyingType != null ? HandleData.Alloc(OutUnderlyingType) : 0;
+
+                OutBuffer[5] = OutIsClass ? 1 : 0;
+
+                OutBuffer[6] = OutIsEnum ? 1 : 0;
+
+                OutBuffer[7] = OutGenericArgumentLength;
+
+                OutBuffer[8] = OutGenericArguments != null ? HandleData.Alloc(OutGenericArguments) : 0;
+
+                OutBuffer[9] = OutInterfaceLength;
+
+                OutBuffer[10] = OutInterfaces != null ? HandleData.Alloc(OutInterfaces) : 0;
+
+                OutBuffer[11] = OutClassAttributeLength;
+
+                OutBuffer[12] = OutClassAttributes != null ? HandleData.Alloc(OutClassAttributes) : 0;
+
+                OutBuffer[13] = OutClassAttributeValueLength != null
+                    ? HandleData.Alloc(OutClassAttributeValueLength)
+                    : 0;
+
+                OutBuffer[14] = OutClassAttributeValues != null ? HandleData.Alloc(OutClassAttributeValues) : 0;
+            }
+        }
+
+        [UnmanagedCallersOnly]
+        public static unsafe void GetClassProperties(nint InTypeHandle, nint* OutBuffer)
+        {
+            if (HandleData.GetObject(InTypeHandle) is Type Type)
+            {
+                GetClassPropertiesImplementation(Type,
+                    out var OutPropertyLength, out var OutPropertyNames,
+                    out var OutPropertyInfos, out var OutPropertyTypes,
+                    out var OutPropertyAttributeCounts, out var OutPropertyAttributes,
+                    out var OutPropertyAttributeValueCounts, out var OutPropertyAttributeValues
+                );
+
+                OutBuffer[0] = OutPropertyLength;
+
+                OutBuffer[1] = OutPropertyNames != null ? HandleData.Alloc(OutPropertyNames) : 0;
+
+                OutBuffer[2] = OutPropertyInfos != null ? HandleData.Alloc(OutPropertyInfos) : 0;
+
+                OutBuffer[3] = OutPropertyTypes != null ? HandleData.Alloc(OutPropertyTypes) : 0;
+
+                OutBuffer[4] = OutPropertyAttributeCounts != null ? HandleData.Alloc(OutPropertyAttributeCounts) : 0;
+
+                OutBuffer[5] = OutPropertyAttributes != null ? HandleData.Alloc(OutPropertyAttributes) : 0;
+
+                OutBuffer[6] = OutPropertyAttributeValueCounts != null
+                    ? HandleData.Alloc(OutPropertyAttributeValueCounts)
+                    : 0;
+
+                OutBuffer[7] = OutPropertyAttributeValues != null ? HandleData.Alloc(OutPropertyAttributeValues) : 0;
+            }
+        }
+
+        [UnmanagedCallersOnly]
+        public static unsafe void GetClassFields(nint InTypeHandle, nint* OutBuffer)
+        {
+            if (HandleData.GetObject(InTypeHandle) is Type Type)
+            {
+                GetClassFieldsImplementation(Type,
+                    out var OutFieldLength, out var OutFieldNames, out var OutFieldInfos
+                );
+
+                OutBuffer[0] = OutFieldLength;
+
+                OutBuffer[1] = OutFieldNames != null ? HandleData.Alloc(OutFieldNames) : 0;
+
+                OutBuffer[2] = OutFieldInfos != null ? HandleData.Alloc(OutFieldInfos) : 0;
+            }
+        }
+
+        [UnmanagedCallersOnly]
+        public static unsafe void GetClassMethods(nint InTypeHandle, nint* OutBuffer)
+        {
+            if (HandleData.GetObject(InTypeHandle) is Type Type)
+            {
+                GetClassMethodsImplementation(Type,
+                    out var OutMethodLength, out var OutMethodNames, out var OutMethodInfos,
+                    out var OutMethodIsStatics, out var OutMethodParamCounts, out var OutMethodReturnTypes,
+                    out var OutMethodParamIndex, out var OutMethodParamNames,
+                    out var OutMethodParamTypes, out var OutMethodParamRefs,
+                    out var OutMethodAttributeCounts, out var OutMethodAttributes,
+                    out var OutMethodAttributeValueCounts, out var OutMethodAttributeValues
+                );
+
+                OutBuffer[0] = OutMethodLength;
+
+                OutBuffer[1] = OutMethodNames != null ? HandleData.Alloc(OutMethodNames) : 0;
+
+                OutBuffer[2] = OutMethodInfos != null ? HandleData.Alloc(OutMethodInfos) : 0;
+
+                OutBuffer[3] = OutMethodIsStatics != null ? HandleData.Alloc(OutMethodIsStatics) : 0;
+
+                OutBuffer[4] = OutMethodParamCounts != null ? HandleData.Alloc(OutMethodParamCounts) : 0;
+
+                OutBuffer[5] = OutMethodReturnTypes != null ? HandleData.Alloc(OutMethodReturnTypes) : 0;
+
+                OutBuffer[6] = OutMethodParamIndex != null ? HandleData.Alloc(OutMethodParamIndex) : 0;
+
+                OutBuffer[7] = OutMethodParamNames != null ? HandleData.Alloc(OutMethodParamNames) : 0;
+
+                OutBuffer[8] = OutMethodParamTypes != null ? HandleData.Alloc(OutMethodParamTypes) : 0;
+
+                OutBuffer[9] = OutMethodParamRefs != null ? HandleData.Alloc(OutMethodParamRefs) : 0;
+
+                OutBuffer[10] = OutMethodAttributeCounts != null ? HandleData.Alloc(OutMethodAttributeCounts) : 0;
+
+                OutBuffer[11] = OutMethodAttributes != null ? HandleData.Alloc(OutMethodAttributes) : 0;
+
+                OutBuffer[12] = OutMethodAttributeValueCounts != null
+                    ? HandleData.Alloc(OutMethodAttributeValueCounts)
+                    : 0;
+
+                OutBuffer[13] = OutMethodAttributeValues != null ? HandleData.Alloc(OutMethodAttributeValues) : 0;
             }
         }
     }

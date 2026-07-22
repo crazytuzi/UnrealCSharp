@@ -294,5 +294,10 @@ void FDynamicEnumGenerator::GeneratorEnumerator(const FClassReflection* InClassR
 		}
 	}
 
+#if UE_U_ENUM_SET_ENUMS_E_UNDERLYING_TYPE
+	InEnum->SetEnums(InNames, UEnum::ECppForm::Regular, UEnum::EUnderlyingType::int64, EEnumFlags::None,
+	                 UEnum::EAddMaxKeyIfMissing::Yes);
+#else
 	InEnum->SetEnums(InNames, UEnum::ECppForm::Regular);
+#endif
 }

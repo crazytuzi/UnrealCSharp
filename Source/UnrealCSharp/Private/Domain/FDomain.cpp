@@ -91,16 +91,6 @@ FString FDomain::StringToFString(const IManagedHandle InManagedHandle)
 	return FString();
 }
 
-IManagedHandle FDomain::GCHandle_Get_Target(const IManagedHandle InManagedHandle)
-{
-	if (const auto ScriptDomain = IScriptDomain::Get())
-	{
-		return ScriptDomain->GetTarget(InManagedHandle);
-	}
-
-	return InvalidManagedHandle;
-}
-
 void FDomain::GCHandle_Free(const IManagedHandle InManagedHandle)
 {
 	if (const auto ScriptDomain = IScriptDomain::Get())
@@ -125,7 +115,13 @@ FString FDomain::GetTraceback()
 	{
 		if (const auto TracebackMethod = UtilsClass->GetMethod(FUNCTION_UTILS_GET_TRACEBACK, 0))
 		{
-			return StringToFString(TracebackMethod->Runtime_Invoke());
+			const auto Traceback = TracebackMethod->Runtime_Invoke();
+
+			auto Result = StringToFString(Traceback);
+
+			GCHandle_Free(Traceback);
+
+			return Result;
 		}
 	}
 

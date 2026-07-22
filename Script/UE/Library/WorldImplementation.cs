@@ -1,19 +1,10 @@
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static partial class UWorldImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T UWorld_SpawnActorImplementation<T>(nint InWorld, nint InClass,
-            nint InTransform, nint InSpawnParameters) where T : UObject;
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, nint, nint>
             __UWorld_SpawnActorImplementation;
 
@@ -31,6 +22,5 @@ namespace Script.Library
 
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }

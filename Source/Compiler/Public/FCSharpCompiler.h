@@ -15,7 +15,7 @@ public:
 public:
 	void Compile() const;
 
-	void ImmediatelyCompile() const;
+	void ImmediatelyCompile(bool bForceCompileInterop = false) const;
 
 	void Compile(const TArray<FFileChangeData>& InFileChangeData) const;
 

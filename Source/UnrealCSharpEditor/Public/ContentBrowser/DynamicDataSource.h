@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Misc/Change.h"
 #include "ContentBrowserDataSource.h"
 #include "ICollectionManager.h"
 #include "DynamicHierarchy.h"

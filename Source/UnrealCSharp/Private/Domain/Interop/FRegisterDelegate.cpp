@@ -1,7 +1,6 @@
 #include "Registry/FCSharpBind.h"
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "Reflection/Delegate/FDelegateHelper.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/BufferMacro.h"
@@ -12,10 +11,9 @@ namespace
 {
 	struct FRegisterDelegate
 	{
-		static void RegisterImplementation(const IManagedObject InManagedObject,
-		                                   const IManagedReflectionType InManagedReflectionType)
+		static void RegisterImplementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedReflectionType);
+			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
 			FCSharpBind::Bind<FDelegateHelper>(Class, InManagedObject);
 		}
@@ -31,17 +29,17 @@ namespace
 
 		static void BindImplementation(const IManagedHandle InManagedHandle,
 		                               const IManagedHandle InObject,
-		                               const IManagedReflectionType InManagedReflectionType,
-		                               const IManagedReflectionMethod InManagedReflectionMethod)
+		                               const IManagedHandle InManagedType,
+		                               const IManagedHandle InManagedMethod)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InManagedHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedReflectionType))
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedType))
 					{
-						if (const auto FoundMethod = FoundClass->GetMethod(InManagedReflectionMethod))
+						if (const auto FoundMethod = FoundClass->GetMethod(InManagedMethod))
 						{
 							DelegateHelper->Bind(FoundObject, FoundMethod);
 						}
@@ -50,15 +48,15 @@ namespace
 			}
 		}
 
-		static IUnmanagedBool IsBoundImplementation(const IManagedHandle InManagedHandle)
+		static uint8 IsBoundImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(DelegateHelper->IsBound());
+				return DelegateHelper->IsBound() ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void UnBindImplementation(const IManagedHandle InManagedHandle)
@@ -88,8 +86,7 @@ namespace
 			}
 		}
 
-		static void PrimitiveExecute1Implementation(const IManagedHandle InManagedHandle,
-		                                            RETURN_BUFFER_SIGNATURE)
+		static void PrimitiveExecute1Implementation(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InManagedHandle))
@@ -98,8 +95,7 @@ namespace
 			}
 		}
 
-		static void CompoundExecute1Implementation(const IManagedHandle InManagedHandle,
-		                                           RETURN_BUFFER_SIGNATURE)
+		static void CompoundExecute1Implementation(const IManagedHandle InManagedHandle, RETURN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InManagedHandle))
@@ -108,8 +104,7 @@ namespace
 			}
 		}
 
-		static void GenericExecute2Implementation(const IManagedHandle InManagedHandle,
-		                                          IN_BUFFER_SIGNATURE)
+		static void GenericExecute2Implementation(const IManagedHandle InManagedHandle, IN_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InManagedHandle))
@@ -138,8 +133,7 @@ namespace
 			}
 		}
 
-		static void GenericExecute4Implementation(const IManagedHandle InManagedHandle,
-		                                          OUT_BUFFER_SIGNATURE)
+		static void GenericExecute4Implementation(const IManagedHandle InManagedHandle, OUT_BUFFER_SIGNATURE)
 		{
 			if (const auto DelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<FDelegateHelper>(
 				InManagedHandle))

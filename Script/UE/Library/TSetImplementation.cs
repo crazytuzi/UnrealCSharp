@@ -1,49 +1,11 @@
 using System;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static unsafe class TSetImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSet_RegisterImplementation<T>(TSet<T> InSet, Type InType);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSet_UnRegisterImplementation(nint InSet);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSet_EmptyImplementation(nint InSet, int InExpectedNumElements);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TSet_NumImplementation(nint InSet);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TSet_IsEmptyImplementation(nint InSet);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TSet_GetMaxIndexImplementation(nint InSet);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSet_AddImplementation(nint InSet, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TSet_RemoveImplementation(nint InSet, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TSet_ContainsImplementation(nint InSet, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TSet_IsValidIndexImplementation(nint InSet, int InIndex);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSet_GetEnumeratorImplementation(nint InSet, int InIndex, byte* ReturnBuffer);
-#else
         private static delegate* unmanaged[Cdecl]<nint, nint, void> __TSet_RegisterImplementation;
 
         public static void TSet_RegisterImplementation<T>(TSet<T> InSet, Type InType)
@@ -54,11 +16,7 @@ namespace Script.Library
                     MethodBridge.GetMethod("Script.Library.TSetImplementation::TSet_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InSet);
-
-            InSet.GarbageCollectionHandle = Handle;
-
-            __TSet_RegisterImplementation(Handle, HandleData.AllocImplementation(InType));
+            __TSet_RegisterImplementation(HandleData.Alloc(InSet), HandleData.Alloc(InType));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, void> __TSet_UnRegisterImplementation;
@@ -100,13 +58,13 @@ namespace Script.Library
             return __TSet_NumImplementation(InSet);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int> __TSet_IsEmptyImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, byte> __TSet_IsEmptyImplementation;
 
         public static bool TSet_IsEmptyImplementation(nint InSet)
         {
             if (__TSet_IsEmptyImplementation == null)
             {
-                __TSet_IsEmptyImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __TSet_IsEmptyImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod("Script.Library.TSetImplementation::TSet_IsEmptyImplementation");
             }
 
@@ -127,13 +85,13 @@ namespace Script.Library
             return __TSet_GetMaxIndexImplementation(InSet);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int, int> __TSet_IsValidIndexImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, int, byte> __TSet_IsValidIndexImplementation;
 
         public static bool TSet_IsValidIndexImplementation(nint InSet, int InIndex)
         {
             if (__TSet_IsValidIndexImplementation == null)
             {
-                __TSet_IsValidIndexImplementation = (delegate* unmanaged[Cdecl]<nint, int, int>)
+                __TSet_IsValidIndexImplementation = (delegate* unmanaged[Cdecl]<nint, int, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TSetImplementation::TSet_IsValidIndexImplementation");
             }
@@ -167,13 +125,13 @@ namespace Script.Library
             return __TSet_RemoveImplementation(InSet, InValueBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, byte*, int> __TSet_ContainsImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, byte*, byte> __TSet_ContainsImplementation;
 
         public static bool TSet_ContainsImplementation(nint InSet, byte* InValueBuffer)
         {
             if (__TSet_ContainsImplementation == null)
             {
-                __TSet_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, int>)
+                __TSet_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, byte>)
                     MethodBridge.GetMethod("Script.Library.TSetImplementation::TSet_ContainsImplementation");
             }
 
@@ -193,17 +151,9 @@ namespace Script.Library
 
             __TSet_GetEnumeratorImplementation(InSet, InIndex, ReturnBuffer);
         }
-#endif
 
         public static T TSet_GetEnumeratorCompoundImplementation<T>(nint InSet, int InIndex)
         {
-#if WITH_MONO
-            var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-            TSet_GetEnumeratorImplementation(InSet, InIndex, ReturnBuffer);
-
-            return *(T*)ReturnBuffer;
-#else
             if (__TSet_GetEnumeratorImplementation == null)
             {
                 __TSet_GetEnumeratorImplementation = (delegate* unmanaged[Cdecl]<nint, int, byte*, void>)
@@ -218,7 +168,6 @@ namespace Script.Library
             var Handle = *(nint*)ReturnBuffer;
 
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : default;
-#endif
         }
     }
 }

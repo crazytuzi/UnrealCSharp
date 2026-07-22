@@ -55,6 +55,7 @@ public class UnrealCSharpEditor : ModuleRules
 				"ToolWidgets",
 				"ClassViewer",
 				"UMGEditor",
+				"TargetPlatform",
 				"ScriptCodeGenerator",
 				"Compiler",
 				"UnrealCSharpCore",

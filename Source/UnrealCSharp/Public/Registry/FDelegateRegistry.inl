@@ -29,15 +29,13 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 	{
 		const auto FoundManagedHandle = (InRegistry->*Address2ManagedHandle).Find(InAddress);
 
-		return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
+		return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
 	}
 
 	static auto AddReference(Class* InRegistry, typename FDelegateValueMapping::ValueType InValue,
 	                         const FClassReflection* InClass, const IManagedHandle InManagedHandle)
 	{
-		const auto ManagedHandle = InClass->NewWeakRefGCHandle(InManagedHandle, true);
-
-		(InRegistry->*ManagedHandle2Value).Add(ManagedHandle, InValue);
+		(InRegistry->*ManagedHandle2Value).Add(InManagedHandle, InValue);
 
 		return true;
 	}
@@ -47,15 +45,13 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 	                         typename FDelegateValueMapping::ValueType InValue,
 	                         const FClassReflection* InClass, const IManagedHandle InManagedHandle)
 	{
-		const auto ManagedHandle = InClass->NewGCHandle(InManagedHandle, true);
+		(InRegistry->*Address2ManagedHandle).Add(InAddress, InManagedHandle);
 
-		(InRegistry->*Address2ManagedHandle).Add(InAddress, ManagedHandle);
-
-		(InRegistry->*ManagedHandle2Value).Add(ManagedHandle, InValue);
+		(InRegistry->*ManagedHandle2Value).Add(InManagedHandle, InValue);
 
 		return FCSharpEnvironment::GetEnvironment().AddReference(
 			InOwner,
-			new TDelegateReference<std::remove_pointer_t<typename FDelegateValueMapping::ValueType>>(ManagedHandle));
+			new TDelegateReference<std::remove_pointer_t<typename FDelegateValueMapping::ValueType>>(InManagedHandle));
 	}
 
 	static auto RemoveReference(Class* InRegistry, const IManagedHandle InManagedHandle)
@@ -75,6 +71,8 @@ struct FDelegateRegistry::TDelegateRegistryImplementation<
 			delete *FoundValue;
 
 			(InRegistry->*ManagedHandle2Value).Remove(InManagedHandle);
+
+			FDomain::GCHandle_Free(InManagedHandle);
 
 			return true;
 		}

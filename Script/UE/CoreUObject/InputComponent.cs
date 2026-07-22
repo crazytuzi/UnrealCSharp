@@ -3,6 +3,7 @@ using Script.CoreUObject;
 using Script.InputCore;
 using Script.Library;
 using Script.Slate;
+using Interop;
 
 namespace Script.Engine
 {
@@ -12,8 +13,8 @@ namespace Script.Engine
         {
             var InputActionDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputActionDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputActionDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputActionDelegateBinding.StaticClass()));
 
             if (InputActionDelegateBinding != null)
             {
@@ -37,10 +38,10 @@ namespace Script.Engine
                 InputActionDelegateBinding.InputActionDelegateBindings.Add(Binding);
 
                 UInputComponentImplementation.UInputComponent_BindActionImplementation(
-                    GarbageCollectionHandle,
-                    InputActionDelegateBinding.GarbageCollectionHandle,
-                    InObject.GarbageCollectionHandle,
-                    Binding.FunctionNameToBind.GarbageCollectionHandle);
+                    HandleData.GetHandle(this),
+                    HandleData.GetHandle(InputActionDelegateBinding),
+                    HandleData.GetHandle(InObject),
+                    HandleData.GetHandle(Binding.FunctionNameToBind));
             }
         }
 
@@ -48,8 +49,8 @@ namespace Script.Engine
         {
             var InputAxisDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputAxisDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputAxisDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputAxisDelegateBinding.StaticClass()));
 
             if (InputAxisDelegateBinding != null)
             {
@@ -71,10 +72,10 @@ namespace Script.Engine
                 InputAxisDelegateBinding.InputAxisDelegateBindings.Add(Binding);
 
                 UInputComponentImplementation.UInputComponent_BindAxisImplementation(
-                    GarbageCollectionHandle,
-                    InputAxisDelegateBinding.GarbageCollectionHandle,
-                    InObject.GarbageCollectionHandle,
-                    Binding.FunctionNameToBind.GarbageCollectionHandle);
+                    HandleData.GetHandle(this),
+                    HandleData.GetHandle(InputAxisDelegateBinding),
+                    HandleData.GetHandle(InObject),
+                    HandleData.GetHandle(Binding.FunctionNameToBind));
             }
         }
 
@@ -82,8 +83,8 @@ namespace Script.Engine
         {
             var InputAxisKeyDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputAxisKeyDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputAxisKeyDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputAxisKeyDelegateBinding.StaticClass()));
 
             if (InputAxisKeyDelegateBinding != null)
             {
@@ -105,10 +106,10 @@ namespace Script.Engine
                 InputAxisKeyDelegateBinding.InputAxisKeyDelegateBindings.Add(Binding);
 
                 UInputComponentImplementation.UInputComponent_BindAxisKeyImplementation(
-                    GarbageCollectionHandle,
-                    InputAxisKeyDelegateBinding.GarbageCollectionHandle,
-                    InObject.GarbageCollectionHandle,
-                    Binding.FunctionNameToBind.GarbageCollectionHandle);
+                    HandleData.GetHandle(this),
+                    HandleData.GetHandle(InputAxisKeyDelegateBinding),
+                    HandleData.GetHandle(InObject),
+                    HandleData.GetHandle(Binding.FunctionNameToBind));
             }
         }
 
@@ -116,8 +117,8 @@ namespace Script.Engine
         {
             var InputKeyDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputKeyDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputKeyDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputKeyDelegateBinding.StaticClass()));
 
             if (InputKeyDelegateBinding != null)
             {
@@ -141,10 +142,10 @@ namespace Script.Engine
                 InputKeyDelegateBinding.InputKeyDelegateBindings.Add(Binding);
 
                 UInputComponentImplementation.UInputComponent_BindKeyImplementation(
-                    GarbageCollectionHandle,
-                    InputKeyDelegateBinding.GarbageCollectionHandle,
-                    InObject.GarbageCollectionHandle,
-                    Binding.FunctionNameToBind.GarbageCollectionHandle);
+                    HandleData.GetHandle(this),
+                    HandleData.GetHandle(InputKeyDelegateBinding),
+                    HandleData.GetHandle(InObject),
+                    HandleData.GetHandle(Binding.FunctionNameToBind));
             }
         }
 
@@ -167,8 +168,8 @@ namespace Script.Engine
         {
             var InputTouchDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputTouchDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputTouchDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputTouchDelegateBinding.StaticClass()));
 
             if (InputTouchDelegateBinding != null)
             {
@@ -190,10 +191,10 @@ namespace Script.Engine
                 InputTouchDelegateBinding.InputTouchDelegateBindings.Add(Binding);
 
                 UInputComponentImplementation.UInputComponent_BindTouchImplementation(
-                    GarbageCollectionHandle,
-                    InputTouchDelegateBinding.GarbageCollectionHandle,
-                    InObject.GarbageCollectionHandle,
-                    Binding.FunctionNameToBind.GarbageCollectionHandle);
+                    HandleData.GetHandle(this),
+                    HandleData.GetHandle(InputTouchDelegateBinding),
+                    HandleData.GetHandle(InObject),
+                    HandleData.GetHandle(Binding.FunctionNameToBind));
             }
         }
 
@@ -201,8 +202,8 @@ namespace Script.Engine
         {
             var InputVectorAxisDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputVectorAxisDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputVectorAxisDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputVectorAxisDelegateBinding.StaticClass()));
 
             if (InputVectorAxisDelegateBinding != null)
             {
@@ -224,10 +225,10 @@ namespace Script.Engine
                 InputVectorAxisDelegateBinding.InputAxisKeyDelegateBindings.Add(Binding);
 
                 UInputComponentImplementation.UInputComponent_BindVectorAxisImplementation(
-                    GarbageCollectionHandle,
-                    InputVectorAxisDelegateBinding.GarbageCollectionHandle,
-                    InObject.GarbageCollectionHandle,
-                    Binding.FunctionNameToBind.GarbageCollectionHandle);
+                    HandleData.GetHandle(this),
+                    HandleData.GetHandle(InputVectorAxisDelegateBinding),
+                    HandleData.GetHandle(InObject),
+                    HandleData.GetHandle(Binding.FunctionNameToBind));
             }
         }
 
@@ -235,8 +236,8 @@ namespace Script.Engine
         {
             var InputActionDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputActionDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputActionDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputActionDelegateBinding.StaticClass()));
 
             if (InputActionDelegateBinding != null)
             {
@@ -260,8 +261,8 @@ namespace Script.Engine
         {
             var InputAxisDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputAxisDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputAxisDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputAxisDelegateBinding.StaticClass()));
 
             if (InputAxisDelegateBinding != null)
             {
@@ -284,8 +285,8 @@ namespace Script.Engine
         {
             var InputAxisKeyDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputAxisKeyDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputAxisKeyDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputAxisKeyDelegateBinding.StaticClass()));
 
             if (InputAxisKeyDelegateBinding != null)
             {
@@ -308,8 +309,8 @@ namespace Script.Engine
         {
             var InputKeyDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputKeyDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputKeyDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputKeyDelegateBinding.StaticClass()));
 
             if (InputKeyDelegateBinding != null)
             {
@@ -348,8 +349,8 @@ namespace Script.Engine
         {
             var InputTouchDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputTouchDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputTouchDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputTouchDelegateBinding.StaticClass()));
 
             if (InputTouchDelegateBinding != null)
             {
@@ -372,8 +373,8 @@ namespace Script.Engine
         {
             var InputVectorAxisDelegateBinding = UInputComponentImplementation
                 .UInputComponent_GetDynamicBindingObjectImplementation<UInputVectorAxisDelegateBinding>(
-                    InObject.GetClass().GarbageCollectionHandle,
-                    UInputVectorAxisDelegateBinding.StaticClass().GarbageCollectionHandle);
+                    HandleData.GetHandle(InObject.GetClass()),
+                    HandleData.GetHandle(UInputVectorAxisDelegateBinding.StaticClass()));
 
             if (InputVectorAxisDelegateBinding != null)
             {
@@ -394,7 +395,7 @@ namespace Script.Engine
 
         public void ClearBindingValues(UObject InObject)
         {
-            UInputComponentImplementation.UInputComponent_ClearBindingValuesImplementation(GarbageCollectionHandle);
+            UInputComponentImplementation.UInputComponent_ClearBindingValuesImplementation(HandleData.GetHandle(this));
         }
     }
 }

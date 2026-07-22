@@ -6,202 +6,125 @@ namespace Interop
 {
     public static class HandleData
     {
-        private static readonly Dictionary<nint, GCHandle> Entities = new();
+        private static readonly System.Threading.Lock Lock = new();
 
-        private static nint Identity;
+        private static readonly Dictionary<nint, GCHandle> Handles = new();
 
-        private sealed class IdentityComparer : IEqualityComparer<object>
-        {
-            bool IEqualityComparer<object>.Equals(object? A, object? B) => ReferenceEquals(A, B);
+        private static nint Handle;
 
-            public int GetHashCode(object InObject) => RuntimeHelpers.GetHashCode(InObject);
-        }
-
-        private sealed class IdentityReference
+        private sealed class HandleReference
         {
             public nint Value;
 
             public int Count;
         }
 
-        private static readonly Dictionary<object, IdentityReference> ObjectToIdentityReference =
-            new(new IdentityComparer());
-
-        [UnmanagedCallersOnly]
-        public static nint Alloc(nint InObjectPtr, int bPinned)
-        {
-            if (InObjectPtr != 0)
-            {
-                var Handle = GCHandle.FromIntPtr(InObjectPtr);
-
-                if (Handle.IsAllocated)
-                {
-                    var Target = Handle.Target;
-
-                    if (Target != null)
-                    {
-                        return AllocImplementation(Target, bPinned != 0);
-                    }
-                }
-            }
-
-            return 0;
-        }
-
-        [UnmanagedCallersOnly]
-        public static nint AllocWeakRef(nint InObjectPtr, int bTrackResurrection)
-        {
-            if (InObjectPtr != 0)
-            {
-                var Handle = GCHandle.FromIntPtr(InObjectPtr);
-
-                if (Handle.IsAllocated)
-                {
-                    var Target = Handle.Target;
-
-                    if (Target != null)
-                    {
-                        var NewIdentity = ++Identity;
-
-                        Entities[NewIdentity] = GCHandle.Alloc(
-                            Target,
-                            bTrackResurrection != 0
-                                ? GCHandleType.WeakTrackResurrection
-                                : GCHandleType.Weak);
-
-                        return NewIdentity;
-                    }
-                }
-            }
-
-            return 0;
-        }
-
-        [UnmanagedCallersOnly]
-        public static nint GetTarget(nint InHandle)
-        {
-            if (InHandle != 0)
-            {
-                if (Entities.TryGetValue(InHandle, out var OutHandle))
-                {
-                    if (OutHandle is { IsAllocated: true, Target: not null })
-                    {
-                        return GCHandle.ToIntPtr(OutHandle);
-                    }
-                }
-            }
-
-            return 0;
-        }
+        private static readonly ConditionalWeakTable<object, HandleReference> ObjectToHandleReference = new();
 
         [UnmanagedCallersOnly]
         public static void Free(nint InHandle) => FreeImplementation(InHandle);
 
-        public static nint AllocImplementation(object InObject, bool bPinned = false)
+        public static nint Alloc(object InObject, bool bPinned = false)
         {
-            if (ObjectToIdentityReference.TryGetValue(InObject, out var OutIdentityReference))
+            lock (Lock)
             {
-                OutIdentityReference.Count++;
+                var HandleReference = ObjectToHandleReference.GetValue(InObject, _ =>
+                    new HandleReference { Value = ++Handle, Count = 0 });
 
-                return OutIdentityReference.Value;
+                HandleReference.Count++;
+
+                if (!Handles.ContainsKey(HandleReference.Value))
+                {
+                    Handles[HandleReference.Value] =
+                        GCHandle.Alloc(InObject, bPinned ? GCHandleType.Pinned : GCHandleType.Normal);
+                }
+
+                return HandleReference.Value;
             }
-
-            var NewIdentity = ++Identity;
-
-            var Handle = GCHandle.Alloc(InObject, bPinned ? GCHandleType.Pinned : GCHandleType.Normal);
-
-            Entities[NewIdentity] = Handle;
-
-            ObjectToIdentityReference[InObject] = new IdentityReference { Value = NewIdentity, Count = 1 };
-
-            return NewIdentity;
         }
 
         public static void FreeImplementation(nint InHandle)
         {
             if (InHandle != 0)
             {
-                if (Entities.TryGetValue(InHandle, out var OutHandle) && OutHandle.IsAllocated)
+                lock (Lock)
                 {
-                    var Target = OutHandle.Target;
-
-                    if (Target != null)
+                    if (Handles.TryGetValue(InHandle, out var OutHandle) && OutHandle.IsAllocated)
                     {
-                        if (ObjectToIdentityReference.TryGetValue(Target, out var OutIdentityReference))
+                        var Target = OutHandle.Target;
+
+                        if (Target != null)
                         {
-                            if (OutIdentityReference.Value == InHandle)
+                            if (ObjectToHandleReference.TryGetValue(Target, out var OutHandleReference))
                             {
-                                OutIdentityReference.Count--;
-
-                                if (OutIdentityReference.Count > 0)
+                                if (OutHandleReference.Value == InHandle)
                                 {
-                                    return;
-                                }
+                                    OutHandleReference.Count--;
 
-                                ObjectToIdentityReference.Remove(Target);
+                                    if (OutHandleReference.Count > 0)
+                                    {
+                                        return;
+                                    }
+                                }
                             }
                         }
                     }
-                }
 
-                if (Entities.Remove(InHandle, out var RemovedHandle))
-                {
-                    if (RemovedHandle.IsAllocated)
+                    if (Handles.Remove(InHandle, out var RemovedHandle))
                     {
-                        RemovedHandle.Free();
+                        if (RemovedHandle.IsAllocated)
+                        {
+                            RemovedHandle.Free();
+                        }
                     }
                 }
             }
+        }
+
+        public static nint GetHandle(object? InObject)
+        {
+            if (InObject != null)
+            {
+                lock (Lock)
+                {
+                    return ObjectToHandleReference.TryGetValue(InObject, out var OutHandleReference)
+                        ? OutHandleReference.Value
+                        : 0;
+                }
+            }
+
+            return 0;
         }
 
         public static object? GetObject(nint InHandle)
         {
             if (InHandle != 0)
             {
-                if (Entities.TryGetValue(InHandle, out var OutHandle))
+                lock (Lock)
                 {
-                    return OutHandle.Target;
+                    return Handles.TryGetValue(InHandle, out var OutHandle) ? OutHandle.Target : null;
                 }
             }
 
             return null;
         }
 
-        internal static GCHandle GetHandle(nint InHandle)
-        {
-            if (InHandle != 0)
-            {
-                if (Entities.TryGetValue(InHandle, out var OutHandle))
-                {
-                    return OutHandle;
-                }
-            }
-
-            return default;
-        }
-
-        internal static nint AddEntity(GCHandle InHandle)
-        {
-            var NewIdentity = ++Identity;
-
-            Entities[NewIdentity] = InHandle;
-
-            return NewIdentity;
-        }
-
         internal static void Clear()
         {
-            foreach (var Entity in Entities)
+            lock (Lock)
             {
-                if (Entity.Value.IsAllocated)
+                foreach (var Handle in Handles)
                 {
-                    Entity.Value.Free();
+                    if (Handle.Value.IsAllocated)
+                    {
+                        Handle.Value.Free();
+                    }
                 }
+
+                Handles.Clear();
+
+                ObjectToHandleReference.Clear();
             }
-
-            Entities.Clear();
-
-            ObjectToIdentityReference.Clear();
         }
     }
 }

@@ -2,6 +2,7 @@
 
 #include "CoreMacro/BufferMacro.h"
 #include "Macro/FunctionMacro.h"
+#include "UEVersion.h"
 
 template <auto ReturnType>
 void FCSharpDelegateDescriptor::Execute0(const FScriptDelegate* InScriptDelegate) const
@@ -83,7 +84,11 @@ void FCSharpDelegateDescriptor::Execute7(const FScriptDelegate* InScriptDelegate
 template <auto ReturnType>
 void FCSharpDelegateDescriptor::Broadcast0(const FMulticastScriptDelegate* InMulticastScriptDelegate) const
 {
+#if UE_T_MULTICAST_SCRIPT_DELEGATE_PROCESS_DELEGATE
+	InMulticastScriptDelegate->ProcessDelegate<UObject>(nullptr);
+#else
 	InMulticastScriptDelegate->ProcessMulticastDelegate<UObject>(nullptr);
+#endif
 }
 
 template <auto ReturnType>
@@ -94,7 +99,11 @@ void FCSharpDelegateDescriptor::Broadcast2(const FMulticastScriptDelegate* InMul
 
 	PROCESS_SCRIPT_IN()
 
+#if UE_T_MULTICAST_SCRIPT_DELEGATE_PROCESS_DELEGATE
+	InMulticastScriptDelegate->ProcessDelegate<UObject>(Params);
+#else
 	InMulticastScriptDelegate->ProcessMulticastDelegate<UObject>(Params);
+#endif
 }
 
 template <auto ReturnType>
@@ -103,7 +112,11 @@ void FCSharpDelegateDescriptor::Broadcast4(const FMulticastScriptDelegate* InMul
 {
 	const auto Params = BufferAllocator.IsValid() ? BufferAllocator->Malloc() : nullptr;
 
+#if UE_T_MULTICAST_SCRIPT_DELEGATE_PROCESS_DELEGATE
+	InMulticastScriptDelegate->ProcessDelegate<UObject>(Params);
+#else
 	InMulticastScriptDelegate->ProcessMulticastDelegate<UObject>(Params);
+#endif
 
 	PROCESS_OUT()
 }
@@ -116,7 +129,11 @@ void FCSharpDelegateDescriptor::Broadcast6(const FMulticastScriptDelegate* InMul
 
 	PROCESS_SCRIPT_REFERENCE_IN()
 
+#if UE_T_MULTICAST_SCRIPT_DELEGATE_PROCESS_DELEGATE
+	InMulticastScriptDelegate->ProcessDelegate<UObject>(Params);
+#else
 	InMulticastScriptDelegate->ProcessMulticastDelegate<UObject>(Params);
+#endif
 
 	PROCESS_OUT()
 }

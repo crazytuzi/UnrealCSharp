@@ -1,29 +1,11 @@
 using Script.CoreUObject;
 using System;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class TSubclassOfImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSubclassOf_RegisterImplementation<T>(TSubclassOf<T> InSubclassOf,
-            nint InClass, Type InType) where T : UObject;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TSubclassOf_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TSubclassOf_UnRegisterImplementation(nint InSubclassOf);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass TSubclassOf_GetImplementation(nint InSubclassOf);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, void> __TSubclassOf_RegisterImplementation;
 
         public static unsafe void TSubclassOf_RegisterImplementation<T>(TSubclassOf<T> InSubclassOf,
@@ -36,17 +18,17 @@ namespace Script.Library
                         "Script.Library.TSubclassOfImplementation::TSubclassOf_RegisterImplementation");
             }
 
-            __TSubclassOf_RegisterImplementation(HandleData.AllocImplementation(InSubclassOf), InClass,
-                HandleData.AllocImplementation(InType));
+            __TSubclassOf_RegisterImplementation(HandleData.Alloc(InSubclassOf), InClass,
+                HandleData.Alloc(InType));
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __TSubclassOf_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __TSubclassOf_IdenticalImplementation;
 
         public static unsafe bool TSubclassOf_IdenticalImplementation(nint InA, nint InB)
         {
             if (__TSubclassOf_IdenticalImplementation == null)
             {
-                __TSubclassOf_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __TSubclassOf_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TSubclassOfImplementation::TSubclassOf_IdenticalImplementation");
             }
@@ -83,6 +65,5 @@ namespace Script.Library
 
             return Handle != 0 ? (UClass)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }

@@ -5,7 +5,6 @@
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/BindingMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "FGeneratorCore.h"
 
 void FBindingClassGenerator::Generator()
@@ -30,12 +29,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 {
 	FString UsingNameSpaceContent;
 
-	TSet<FString> UsingNameSpaces{InClass->GetImplementationNameSpace()};
-
-	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
-	{
-		UsingNameSpaces.Add(NAMESPACE_INTEROP);
-	}
+	TSet<FString> UsingNameSpaces{InClass->GetImplementationNameSpace(), NAMESPACE_INTEROP};
 
 	const auto& NameSpaceContent = InClass->GetTypeInfo().GetNameSpace();
 
@@ -46,8 +40,6 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	FString PropertyContent;
 
 	FString FunctionContent;
-
-	FString GCHandleContent;
 
 	bool bHasEqualTo = false;
 
@@ -61,7 +53,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 		UsingNameSpaces.Append(Param->GetNameSpace());
 
-		if (!Return->IsPrimitive() && FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+		if (!Return->IsPrimitive())
 		{
 			UsingNameSpaces.Add(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY));
 		}
@@ -77,7 +69,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			"\n"
 			"\t\t\t\t\tvar %s = stackalloc byte[%d];\n"
 			"\n"
-			"\t\t\t\t\t%s.%s(%s, %s, %s);\n"
+			"\t\t\t\t\t%s.%s(HandleData.GetHandle(this), %s, %s);\n"
 			"\n"
 			"\t\t\t\t\treturn %s;\n"
 			"\t\t\t\t}\n"
@@ -92,9 +84,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		                                           Param->IsPrimitive()
 			                                           ? *InClass->GetSubscript().GetParamNames()[0]
 			                                           : *FString::Printf(TEXT(
-				                                           "%s?.%s ?? nint.Zero"),
-			                                                              *InClass->GetSubscript().GetParamNames()[0],
-			                                                              *PROPERTY_GARBAGE_COLLECTION_HANDLE
+				                                           "HandleData.GetHandle(%s)"),
+			                                                              *InClass->GetSubscript().GetParamNames()[0]
 			                                           ),
 		                                           RETURN_BUFFER_TEXT,
 		                                           Return->GetBufferSize(),
@@ -102,7 +93,6 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                           ClassContent,
 			                                           InClass->GetSubscript().GetGetImplementationName()),
-		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                           IN_BUFFER_TEXT,
 		                                           RETURN_BUFFER_TEXT,
 		                                           *FGeneratorCore::GetReturn(
@@ -120,7 +110,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			"\n"
 			"\t\t\t\t\t*(%s*)(%s + %d) = %s;\n"
 			"\n"
-			"\t\t\t\t\t%s.%s(%s, %s);\n"
+			"\t\t\t\t\t%s.%s(HandleData.GetHandle(this), %s);\n"
 			"\t\t\t\t}\n"
 			"\t\t\t}\n"
 		),
@@ -133,9 +123,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		                                           Param->IsPrimitive()
 			                                           ? *InClass->GetSubscript().GetParamNames()[0]
 			                                           : *FString::Printf(TEXT(
-				                                           "%s?.%s ?? nint.Zero"),
-			                                                              *InClass->GetSubscript().GetParamNames()[0],
-			                                                              *PROPERTY_GARBAGE_COLLECTION_HANDLE
+				                                           "HandleData.GetHandle(%s)"),
+			                                                              *InClass->GetSubscript().GetParamNames()[0]
 			                                           ),
 		                                           Return->IsPrimitive()
 			                                           ? *Return->GetName()
@@ -145,14 +134,11 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		                                           Return->IsPrimitive()
 			                                           ? TEXT("value")
 			                                           : *FString::Printf(TEXT(
-				                                           "value?.%s ?? nint.Zero"),
-			                                                              *PROPERTY_GARBAGE_COLLECTION_HANDLE
-			                                           ),
+				                                           "HandleData.GetHandle(value)")),
 		                                           *BINDING_COMBINE_CLASS_IMPLEMENTATION(ClassContent),
 		                                           *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 			                                           ClassContent,
 			                                           InClass->GetSubscript().GetSetImplementationName()),
-		                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 		                                           IN_BUFFER_TEXT
 		);
 
@@ -195,7 +181,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 		if (bRead)
 		{
-			if (!Property.IsPrimitive() && FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+			if (!Property.IsPrimitive())
 			{
 				UsingNameSpaces.Add(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY));
 			}
@@ -221,7 +207,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 				                                     ClassContent, (BINDING_PROPERTY_GET + PropertyName)),
 			                                     Property.IsStatic()
 				                                     ? TEXT("nint.Zero")
-				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+				                                     : TEXT("HandleData.GetHandle(this)"),
 			                                     RETURN_BUFFER_TEXT,
 			                                     *FGeneratorCore::GetReturn(
 				                                     Property.IsPrimitive(), PropertyType, RETURN_BUFFER_TEXT)
@@ -251,16 +237,13 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			                                     IN_BUFFER_TEXT,
 			                                     Property.IsPrimitive()
 				                                     ? TEXT("value")
-				                                     : *FString::Printf(TEXT(
-					                                     "value?.%s ?? nint.Zero"),
-				                                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
-				                                     ),
+				                                     : TEXT("HandleData.GetHandle(value)"),
 			                                     *BINDING_COMBINE_CLASS_IMPLEMENTATION(ClassContent),
 			                                     *BINDING_COMBINE_FUNCTION_IMPLEMENTATION(
 				                                     ClassContent, (BINDING_PROPERTY_SET + PropertyName)),
 			                                     Property.IsStatic()
 				                                     ? TEXT("nint.Zero")
-				                                     : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+				                                     : TEXT("HandleData.GetHandle(this)"),
 			                                     IN_BUFFER_TEXT
 			);
 		}
@@ -501,9 +484,8 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 				                                Params[Index]->IsPrimitive()
 					                                ? *FunctionParamName[Index]
 					                                : *FString::Printf(TEXT(
-						                                "%s?.%s ?? nint.Zero"),
-					                                                   *FunctionParamName[Index],
-					                                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
+						                                "HandleData.GetHandle(%s)"),
+					                                                   *FunctionParamName[Index]
 					                                )
 				);
 
@@ -571,7 +553,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 			                                        ? TEXT("nint.Zero")
 			                                        : Function.IsConstructor()
 			                                        ? TEXT("this")
-			                                        : *PROPERTY_GARBAGE_COLLECTION_HANDLE,
+			                                        : TEXT("HandleData.GetHandle(this)"),
 		                                        bHasInBuffer ? IN_BUFFER_TEXT : TEXT("null"),
 		                                        bHasOutBuffer ? OUT_BUFFER_TEXT : TEXT("null"),
 		                                        bHasReturnBuffer ? RETURN_BUFFER_TEXT : TEXT("null")
@@ -581,7 +563,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 		if (Function.GetReturn() != nullptr)
 		{
-			if (!Function.GetReturn()->IsPrimitive() && FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+			if (!Function.GetReturn()->IsPrimitive())
 			{
 				UsingNameSpaces.Add(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY));
 			}
@@ -607,8 +589,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 
 			for (auto Index = 0; Index < FunctionOutBufferIndex.Num(); ++Index)
 			{
-				if (!Params[FunctionOutBufferIndex[Index]]->IsPrimitive() &&
-					FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
+				if (!Params[FunctionOutBufferIndex[Index]]->IsPrimitive())
 				{
 					UsingNameSpaces.Add(COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY));
 				}
@@ -691,21 +672,14 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	{
 		FunctionContent += FString::Printf(TEXT(
 			"\n\t\tpublic override bool Equals(object Other) => this == Other as %s;\n\n"
-			"\t\tpublic override int GetHashCode() => (int)%s;\n"
+			"\t\tpublic override int GetHashCode() => (int)HandleData.GetHandle(this);\n"
 		),
-		                                   *ClassContent,
-		                                   *PROPERTY_GARBAGE_COLLECTION_HANDLE
+		                                   *ClassContent
 		);
 	}
 
 	if (!InClass->IsReflectionClass() && InClass->GetBaseClass().IsEmpty())
 	{
-		GCHandleContent = FString::Printf(TEXT(
-			"\t\tpublic nint %s { get; set; }\n"
-		),
-		                                  *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
-
 		UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 	}
 
@@ -731,8 +705,6 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 		"%s"
 		"%s"
 		"%s"
-		"%s"
-		"%s"
 		"\t}\n"
 		"}"
 	),
@@ -741,7 +713,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	                               *NameSpaceContent[0],
 	                               *ClassContent,
 	                               InClass->GetBaseClass().IsEmpty()
-		                               ? (InClass->IsReflectionClass() ? TEXT("") : TEXT(" : IGarbageCollectionHandle"))
+		                               ? TEXT("")
 		                               : *FString::Printf(TEXT(
 			                               " : %s"
 		                               ),
@@ -751,9 +723,7 @@ void FBindingClassGenerator::GeneratorPartial(const FBindingClass* InClass)
 	                               !SubscriptContent.IsEmpty() ? TEXT("\n") : TEXT(""),
 	                               *PropertyContent,
 	                               !PropertyContent.IsEmpty() && !FunctionContent.IsEmpty() ? TEXT("\n") : TEXT(""),
-	                               *FunctionContent,
-	                               !GCHandleContent.IsEmpty() && !FunctionContent.IsEmpty() ? TEXT("\n") : TEXT(""),
-	                               *GCHandleContent
+	                               *FunctionContent
 	);
 
 	auto DirectoryName = FPaths::Combine(
@@ -794,19 +764,6 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		const FString& InReturn
 	) -> FString
 	{
-		if (FUnrealCSharpFunctionLibrary::IsMonoDomain())
-		{
-			return FString::Printf(TEXT(
-				"\t\t[MethodImpl(MethodImplOptions.InternalCall)]\n"
-				"\t\tpublic static extern void %s(%s InObject%s%s);\n"
-			),
-			                       *InMethodName,
-			                       *InType,
-			                       !InParam.IsEmpty() ? TEXT(", ") : TEXT(""),
-			                       *InParam
-			);
-		}
-
 		const auto bIsConstructor = InType != TEXT("nint");
 
 		const auto MethodName = FString::Printf(TEXT(
@@ -844,17 +801,11 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		                                       *ParamType
 		);
 
-		FString SetGarbageCollectionHandle;
-
 		auto ObjectParam = FString(TEXT("InObject"));
 
 		if (bIsConstructor)
 		{
-			SetGarbageCollectionHandle = TEXT(
-				"\t\t\tInObject.GarbageCollectionHandle = HandleData.AllocImplementation(InObject);\n\n"
-			);
-
-			ObjectParam = TEXT("InObject.GarbageCollectionHandle");
+			ObjectParam = TEXT("HandleData.Alloc(InObject)");
 		}
 
 		return FString::Printf(TEXT(
@@ -867,7 +818,6 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 			"\t\t\t\t%s = (%s)MethodBridge.GetMethod(\"%s.%s::%s\");\n"
 			"\t\t\t}\n"
 			"\n"
-			"%s"
 			"\t\t\t%s(%s%s%s);\n"
 			"\t\t}\n"
 		),
@@ -883,7 +833,6 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		                       *ImplementationNameSpaceContent,
 		                       *ClassImplementationContent,
 		                       *InMethodName,
-		                       *SetGarbageCollectionHandle,
 		                       *MethodName,
 		                       *ObjectParam,
 		                       !InReturn.IsEmpty() ? TEXT(", ") : TEXT(""),
@@ -1053,14 +1002,7 @@ void FBindingClassGenerator::GeneratorImplementation(const FBindingClass* InClas
 		);
 	}
 
-	if (FUnrealCSharpFunctionLibrary::IsMonoDomain())
-	{
-		UsingNameSpaceContent += TEXT("using System.Runtime.CompilerServices;\n");
-	}
-	else
-	{
-		UsingNameSpaceContent += TEXT("using Interop;\n");
-	}
+	UsingNameSpaceContent += TEXT("using Interop;\n");
 
 	for (const auto& UsingNameSpace : UsingNameSpaces)
 	{

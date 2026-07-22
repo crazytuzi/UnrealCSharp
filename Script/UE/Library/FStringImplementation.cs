@@ -1,28 +1,11 @@
 using System.Text;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class FStringImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FString_RegisterImplementation(FString InString, string InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FString_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FString_UnRegisterImplementation(nint InString);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern string FString_ToStringImplementation(nint InString);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, byte*, void> __FString_RegisterImplementation;
 
         public static unsafe void FString_RegisterImplementation(FString InString, string InValue)
@@ -34,25 +17,21 @@ namespace Script.Library
                         "Script.Library.FStringImplementation::FString_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InString);
-
-            InString.GarbageCollectionHandle = Handle;
-
             var UTF8 = InValue != null ? Encoding.UTF8.GetBytes(InValue + '\0') : [0];
 
             fixed (byte* Ptr = UTF8)
             {
-                __FString_RegisterImplementation(Handle, Ptr);
+                __FString_RegisterImplementation(HandleData.Alloc(InString), Ptr);
             }
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __FString_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __FString_IdenticalImplementation;
 
         public static unsafe bool FString_IdenticalImplementation(nint InA, nint InB)
         {
             if (__FString_IdenticalImplementation == null)
             {
-                __FString_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __FString_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.FStringImplementation::FString_IdenticalImplementation");
             }
@@ -89,6 +68,5 @@ namespace Script.Library
 
             return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }

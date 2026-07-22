@@ -1,8 +1,7 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Domain/Script/IManagedHandle.h"
-#include "Domain/Script/IManagedMarshalledString.h"
-#include "Domain/Script/IUnmanagedBool.h"
+#include "Domain/Script/IScriptDomain.h"
 #include "Reflection/FReflectionRegistry.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/CompilerMacro.h"
@@ -14,23 +13,23 @@ namespace
 {
 	struct FRegisterText
 	{
-		static void RegisterImplementation(const IManagedObject InManagedObject,
-		                                   const IManagedMarshalledString InBuffer,
-		                                   const IManagedMarshalledString InTextNamespace,
-		                                   const IManagedMarshalledString InPackageNamespace,
-		                                   const bool bRequiresQuotes)
+		static void RegisterImplementation(const IManagedHandle InManagedObject,
+		                                   const char* InBuffer,
+		                                   const char* InTextNamespace,
+		                                   const char* InPackageNamespace,
+		                                   const uint8 bRequiresQuotes)
 		{
 			const auto Buffer = InBuffer != nullptr
-				                    ? MANAGED_MARSHALLED_STRING_TO_F_STRING(InBuffer)
-				                    : TEXT("");
+				                    ? FString(UTF8_TO_TCHAR(InBuffer))
+				                    : FString(TEXT(""));
 
 			const auto TextNamespace = InTextNamespace != nullptr
-				                           ? MANAGED_MARSHALLED_STRING_TO_F_STRING(InTextNamespace)
-				                           : TEXT("");
+				                           ? FString(UTF8_TO_TCHAR(InTextNamespace))
+				                           : FString(TEXT(""));
 
 			const auto PackageNamespace = InPackageNamespace != nullptr
-				                              ? MANAGED_MARSHALLED_STRING_TO_F_STRING(InPackageNamespace)
-				                              : TEXT("");
+				                              ? FString(UTF8_TO_TCHAR(InPackageNamespace))
+				                              : FString(TEXT(""));
 
 			const auto OutText = new FText();
 
@@ -39,23 +38,23 @@ namespace
 				*OutText,
 				InTextNamespace != nullptr ? *TextNamespace : nullptr,
 				InPackageNamespace != nullptr ? *PackageNamespace : nullptr,
-				bRequiresQuotes);
+				bRequiresQuotes != 0);
 
 			FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(
-				FReflectionRegistry::Get().GetTextClass(), MANAGED_HANDLE_FROM_OBJECT(InManagedObject), OutText);
+				FReflectionRegistry::Get().GetTextClass(), InManagedObject, OutText);
 		}
 
-		static IUnmanagedBool IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
+		static uint8 IdenticalImplementation(const IManagedHandle InA, const IManagedHandle InB)
 		{
 			if (const auto FoundA = FCSharpEnvironment::GetEnvironment().GetString<FText>(InA))
 			{
 				if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetString<FText>(InB))
 				{
-					return BoolToIUnmanagedBool(FoundA->EqualTo(*FoundB));
+					return FoundA->EqualTo(*FoundB) ? 1 : 0;
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)
@@ -66,11 +65,11 @@ namespace
 			});
 		}
 
-		static IManagedString ToStringImplementation(const IManagedHandle InManagedHandle)
+		static IManagedHandle ToStringImplementation(const IManagedHandle InManagedHandle)
 		{
 			const auto Text = FCSharpEnvironment::GetEnvironment().GetString<FText>(InManagedHandle);
 
-			return MANAGED_MARSHALLED_STRING_NEW(TCHAR_TO_UTF8(*Text->ToString()));
+			return IScriptDomain::Get()->NewString(TCHAR_TO_UTF8(*Text->ToString()));
 		}
 
 		FRegisterText()

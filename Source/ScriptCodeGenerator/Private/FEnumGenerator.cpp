@@ -58,11 +58,16 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
+	const auto UnderlyingTypeName = GetEnumUnderlyingTypeName(InEnum);
+
 	for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
 	{
 		const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
 
-		if (InEnum->NumEnums() != 1 && EnumeratorValue == InEnum->GetMaxEnumValue())
+		if (InEnum->NumEnums() != 1 &&
+			Index == InEnum->NumEnums() - 1 &&
+			(!InEnum->HasMetaData(TEXT("Name"), Index) ||
+				!IsValueInUnderlyingTypeRange(EnumeratorValue, UnderlyingTypeName)))
 		{
 			break;
 		}
@@ -104,7 +109,7 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 	                                     *NameSpaceContent,
 	                                     *PathNameAttributeContent,
 	                                     *FullClassContent,
-	                                     *GetEnumUnderlyingTypeName(InEnum),
+	                                     *UnderlyingTypeName,
 	                                     *EnumeratorContent
 	);
 
@@ -263,4 +268,39 @@ FString FEnumGenerator::GetEnumUnderlyingTypeName(const UEnum* InEnum)
 	}
 
 	return InEnum->IsA(UUserDefinedEnum::StaticClass()) ? TEXT("byte") : TEXT("long");
+}
+
+bool FEnumGenerator::IsValueInUnderlyingTypeRange(const int64 InValue, const FString& InUnderlyingTypeName)
+{
+	if (InUnderlyingTypeName == TEXT("sbyte"))
+	{
+		return InValue >= MIN_int8 && InValue <= MAX_int8;
+	}
+
+	if (InUnderlyingTypeName == TEXT("short"))
+	{
+		return InValue >= MIN_int16 && InValue <= MAX_int16;
+	}
+
+	if (InUnderlyingTypeName == TEXT("int"))
+	{
+		return InValue >= MIN_int32 && InValue <= MAX_int32;
+	}
+
+	if (InUnderlyingTypeName == TEXT("byte"))
+	{
+		return InValue >= 0 && InValue <= MAX_uint8;
+	}
+
+	if (InUnderlyingTypeName == TEXT("ushort"))
+	{
+		return InValue >= 0 && InValue <= MAX_uint16;
+	}
+
+	if (InUnderlyingTypeName == TEXT("uint"))
+	{
+		return InValue >= 0 && InValue <= MAX_uint32;
+	}
+
+	return true;
 }

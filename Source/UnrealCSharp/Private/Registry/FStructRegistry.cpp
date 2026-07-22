@@ -72,7 +72,7 @@ IManagedHandle FStructRegistry::GetObject(UScriptStruct* InScriptStruct, const v
 		InScriptStruct, const_cast<void*>(InStruct)
 	});
 
-	return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
+	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
 }
 
 void* FStructRegistry::GetStruct(const IManagedHandle InManagedHandle)
@@ -92,20 +92,17 @@ IManagedHandle FStructRegistry::GetManagedHandle(UScriptStruct* InScriptStruct, 
 bool FStructRegistry::AddReference(const IManagedHandle InOwner, UScriptStruct* InScriptStruct,
                                    const void* InStruct, const IManagedHandle InManagedHandle)
 {
-	const auto ManagedHandle = FReflectionRegistry::Get().GetClass(InScriptStruct)->NewGCHandle(
-		InManagedHandle, true);
-
 	StructAddress2ManagedHandle.Add(
-		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), ManagedHandle);
+		FStructAddressBase(InScriptStruct, const_cast<void*>(InStruct)), InManagedHandle);
 
-	ManagedHandle2StructAddress.Add(ManagedHandle, {
+	ManagedHandle2StructAddress.Add(InManagedHandle, {
 		                                InScriptStruct,
 		                                const_cast<void*>(InStruct),
 		                                false
 	                                });
 
 	return FCSharpEnvironment::GetEnvironment().
-		AddReference(InOwner, new FStructReference(ManagedHandle));
+		AddReference(InOwner, new FStructReference(InManagedHandle));
 }
 
 bool FStructRegistry::RemoveReference(const IManagedHandle InManagedHandle)

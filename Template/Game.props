@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
     <Import Project="../Shared.props" Condition="Exists('../Shared.props')" />
     <ItemGroup>
         <PackageReference Include="Fody" Version="6.9.3">

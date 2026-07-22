@@ -35,11 +35,9 @@ namespace Weavers
 
         private MethodDefinition _genericCall26Implementation;
 
-        private MethodDefinition _getGarbageCollectionHandle;
+        private MethodDefinition _getHandle;
 
-#if WITH_CORECLR
         private MethodDefinition _getObject;
-#endif
 
         private TypeDefinition _pathNameAttributeType;
 
@@ -69,9 +67,6 @@ namespace Weavers
             _enumTypes.ForEach(AddPathNameAttributeToUnrealType);
 
             _interfaceTypes.ForEach(AddPathNameAttributeToUnrealType);
-
-            // 处理GCHandle
-            _structTypes.ForEach(ProcessStructGarbageCollectionHandle);
 
             // 处理结构体注册和注销
             _structTypes.ForEach(ProcessStructRegister);
@@ -131,7 +126,7 @@ namespace Weavers
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
 
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call,
-                    Type.Methods.FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle")));
+                    ModuleDefinition.ImportReference(_getHandle)));
 
                 destructor.Body.Instructions.Add(Instruction.Create(OpCodes.Call,
                     ModuleDefinition.ImportReference(_structUnRegisterImplementation)));
@@ -176,7 +171,7 @@ namespace Weavers
 
                 ilProcessor.InsertBefore(finalize.Body.Instructions[1],
                     Instruction.Create(OpCodes.Call,
-                        Type.Methods.FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle")));
+                        ModuleDefinition.ImportReference(_getHandle)));
 
                 ilProcessor.InsertBefore(finalize.Body.Instructions[2],
                     Instruction.Create(OpCodes.Call,
@@ -184,62 +179,6 @@ namespace Weavers
 
                 finalize.Body.ExceptionHandlers[0].TryStart = finalize.Body.Instructions[0];
             }
-        }
-
-        private void ProcessStructGarbageCollectionHandle(TypeDefinition Type)
-        {
-            if (Type.Properties.Any(Property => Property.Name == "GarbageCollectionHandle"))
-            {
-                return;
-            }
-
-            var garbageCollectionHandle = new PropertyDefinition("GarbageCollectionHandle", PropertyAttributes.None,
-                ModuleDefinition.TypeSystem.IntPtr);
-
-            var garbageCollectionHandleBackingField = new FieldDefinition("<GarbageCollectionHandle>k__BackingField",
-                FieldAttributes.Private, ModuleDefinition.TypeSystem.IntPtr);
-
-            Type.Fields.Add(garbageCollectionHandleBackingField);
-
-            var getter = new MethodDefinition("get_GarbageCollectionHandle",
-                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName |
-                MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final,
-                ModuleDefinition.TypeSystem.IntPtr);
-
-            var instructions = getter.Body.Instructions;
-
-            instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-
-            instructions.Add(Instruction.Create(OpCodes.Ldfld, garbageCollectionHandleBackingField));
-
-            instructions.Add(Instruction.Create(OpCodes.Ret));
-
-            Type.Methods.Add(getter);
-
-            garbageCollectionHandle.GetMethod = getter;
-
-            var setter = new MethodDefinition("set_GarbageCollectionHandle",
-                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName |
-                MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final,
-                ModuleDefinition.TypeSystem.Void);
-
-            setter.Parameters.Add(new ParameterDefinition(ModuleDefinition.TypeSystem.IntPtr));
-
-            instructions = setter.Body.Instructions;
-
-            instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-
-            instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
-
-            instructions.Add(Instruction.Create(OpCodes.Stfld, garbageCollectionHandleBackingField));
-
-            instructions.Add(Instruction.Create(OpCodes.Ret));
-
-            Type.Methods.Add(setter);
-
-            garbageCollectionHandle.SetMethod = setter;
-
-            Type.Properties.Add(garbageCollectionHandle);
         }
 
         private void AddPathNameAttributeToUnrealType(TypeDefinition Type)
@@ -309,19 +248,10 @@ namespace Weavers
                 Type.Fields.Remove(backingField);
             }
 
-            // 获取GarbageCollectionHandle访问器
-            var getGarbageCollectionHandleMethod = GetGarbageCollectionHandle(Type);
-
-            if (getGarbageCollectionHandleMethod == null)
-            {
-                throw new WeavingException("Not Found GetGarbageCollectionHandle property's getter of class " +
-                                           Type.FullName);
-            }
-
             // 修改setter
             if (Property.SetMethod != null)
             {
-                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType);
+                var bIsCompound = IsCompound(Property.PropertyType);
 
                 var field = Type.Fields.FirstOrDefault(Field =>
                     Field.Name == "__" + Property.Name &&
@@ -362,7 +292,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
 
-                if (getParamGarbageCollectionHandle != null)
+                if (bIsCompound)
                 {
                     var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
                         .First(Field => Field.Name == "Zero");
@@ -372,7 +302,7 @@ namespace Weavers
                     var i12 = Instruction.Create(OpCodes.Ldarg_1);
 
                     var i13 = Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+                        ModuleDefinition.ImportReference(_getHandle));
 
                     var i18 = GetTypeStind(Property.PropertyType);
 
@@ -400,7 +330,7 @@ namespace Weavers
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                    ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+                    ModuleDefinition.ImportReference(_getHandle)));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(field)));
 
@@ -432,16 +362,12 @@ namespace Weavers
 
                 var BufferSize = GetTypeSize(Property.PropertyType);
 
-#if WITH_CORECLR
-                var bIsCompound = GetGarbageCollectionHandle(Property.PropertyType) != null;
-#endif
+                var bIsCompound = IsCompound(Property.PropertyType);
 
                 Property.GetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
 
-#if WITH_CORECLR
                 if (!bIsCompound)
-#endif
                 {
                     Property.GetMethod.Body.Variables.Add(
                         new VariableDefinition(ModuleDefinition.ImportReference(Property.PropertyType)));
@@ -468,7 +394,7 @@ namespace Weavers
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                    ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+                    ModuleDefinition.ImportReference(_getHandle)));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(field)));
 
@@ -481,14 +407,12 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
 
-#if WITH_CORECLR
                 if (bIsCompound)
                 {
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldind_I));
 
-                    ilProcessor.Append(Instruction.Create(OpCodes.Conv_I8));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_getObject)));
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(_getObject)));
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Castclass,
                         ModuleDefinition.ImportReference(Property.PropertyType)));
@@ -496,7 +420,6 @@ namespace Weavers
                     ilProcessor.Append(Instruction.Create(OpCodes.Ret));
                 }
                 else
-#endif
                 {
                     ilProcessor.Append(GetTypeLdind(Property.PropertyType));
 
@@ -540,19 +463,10 @@ namespace Weavers
                 Type.Fields.Remove(backingField);
             }
 
-            // 获取GarbageCollectionHandle访问器
-            var getGarbageCollectionHandleMethod = GetGarbageCollectionHandle(Type);
-
-            if (getGarbageCollectionHandleMethod == null)
-            {
-                throw new WeavingException("Not Found GetGarbageCollectionHandle property's getter of class " +
-                                           Type.FullName);
-            }
-
             // 修改setter
             if (Property.SetMethod != null)
             {
-                var getParamGarbageCollectionHandle = GetGarbageCollectionHandle(Property.PropertyType);
+                var bIsCompound = IsCompound(Property.PropertyType);
 
                 var field = Type.Fields.FirstOrDefault(Field =>
                     Field.Name == "__" + Property.Name &&
@@ -593,7 +507,7 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_1));
 
-                if (getParamGarbageCollectionHandle != null)
+                if (bIsCompound)
                 {
                     var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
                         .First(Field => Field.Name == "Zero");
@@ -603,7 +517,7 @@ namespace Weavers
                     var i12 = Instruction.Create(OpCodes.Ldarg_1);
 
                     var i13 = Instruction.Create(OpCodes.Call,
-                        ModuleDefinition.ImportReference(getParamGarbageCollectionHandle));
+                        ModuleDefinition.ImportReference(_getHandle));
 
                     var i18 = GetTypeStind(Property.PropertyType);
 
@@ -631,7 +545,7 @@ namespace Weavers
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                    ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+                    ModuleDefinition.ImportReference(_getHandle)));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(field)));
 
@@ -663,16 +577,12 @@ namespace Weavers
 
                 var BufferSize = GetTypeSize(Property.PropertyType);
 
-#if WITH_CORECLR
-                var bIsCompound = GetGarbageCollectionHandle(Property.PropertyType) != null;
-#endif
+                var bIsCompound = IsCompound(Property.PropertyType);
 
                 Property.GetMethod.Body.Variables.Add(
                     new VariableDefinition(new PointerType(ModuleDefinition.TypeSystem.Byte)));
 
-#if WITH_CORECLR
                 if (!bIsCompound)
-#endif
                 {
                     Property.GetMethod.Body.Variables.Add(
                         new VariableDefinition(ModuleDefinition.ImportReference(Property.PropertyType)));
@@ -699,7 +609,7 @@ namespace Weavers
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldarg_0));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Call,
-                    ModuleDefinition.ImportReference(getGarbageCollectionHandleMethod)));
+                    ModuleDefinition.ImportReference(_getHandle)));
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(field)));
 
@@ -712,14 +622,12 @@ namespace Weavers
 
                 ilProcessor.Append(Instruction.Create(OpCodes.Ldloc_0));
 
-#if WITH_CORECLR
                 if (bIsCompound)
                 {
                     ilProcessor.Append(Instruction.Create(OpCodes.Ldind_I));
 
-                    ilProcessor.Append(Instruction.Create(OpCodes.Conv_I8));
-
-                    ilProcessor.Append(Instruction.Create(OpCodes.Call, ModuleDefinition.ImportReference(_getObject)));
+                    ilProcessor.Append(Instruction.Create(OpCodes.Call,
+                        ModuleDefinition.ImportReference(_getObject)));
 
                     ilProcessor.Append(Instruction.Create(OpCodes.Castclass,
                         ModuleDefinition.ImportReference(Property.PropertyType)));
@@ -727,7 +635,6 @@ namespace Weavers
                     ilProcessor.Append(Instruction.Create(OpCodes.Ret));
                 }
                 else
-#endif
                 {
                     ilProcessor.Append(GetTypeLdind(Property.PropertyType));
 
@@ -937,9 +844,9 @@ namespace Weavers
 
                     Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_S, param));
 
-                    var paramGetGarbageCollectionHandleMethod = GetGarbageCollectionHandle(param.ParameterType);
+                    var bIsCompound = IsCompound(param.ParameterType);
 
-                    if (paramGetGarbageCollectionHandleMethod != null)
+                    if (bIsCompound)
                     {
                         var zeroField = ModuleDefinition.TypeSystem.IntPtr.Resolve().Fields
                             .First(Field => Field.Name == "Zero");
@@ -955,7 +862,7 @@ namespace Weavers
                         var i2 = Instruction.Create(OpCodes.Br_S, i5);
 
                         var i4 = Instruction.Create(OpCodes.Call,
-                            ModuleDefinition.ImportReference(paramGetGarbageCollectionHandleMethod));
+                            ModuleDefinition.ImportReference(_getHandle));
 
                         Method.Body.GetILProcessor().Append(i0);
 
@@ -981,7 +888,7 @@ namespace Weavers
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Ldarg_0));
 
             Method.Body.GetILProcessor().Append(Instruction.Create(OpCodes.Call,
-                ModuleDefinition.ImportReference(_getGarbageCollectionHandle)));
+                ModuleDefinition.ImportReference(_getHandle)));
 
             Method.Body.GetILProcessor()
                 .Append(Instruction.Create(OpCodes.Ldsfld, ModuleDefinition.ImportReference(hashField)));
@@ -1044,45 +951,7 @@ namespace Weavers
             return newMethod;
         }
 
-        private MethodReference GetGarbageCollectionHandle(TypeDefinition Type)
-        {
-            var property = Type.Properties.FirstOrDefault(Property => Property.Name == "GarbageCollectionHandle" &&
-                                                                      Property.PropertyType.FullName ==
-                                                                      ModuleDefinition.TypeSystem.IntPtr.FullName &&
-                                                                      Property.GetMethod != null);
-            if (property != null)
-            {
-                return property.GetMethod;
-            }
-
-            return Type.BaseType != null ? GetGarbageCollectionHandle(Type.BaseType.Resolve()) : null;
-        }
-
-        private MethodReference GetGarbageCollectionHandle(TypeReference Type)
-        {
-            var method = GetGarbageCollectionHandle(Type.Resolve());
-
-            if (method == null)
-            {
-                return null;
-            }
-
-            if (Type.IsGenericInstance)
-            {
-                var arguments = new List<TypeReference>();
-
-                foreach (var argument in ((GenericInstanceType)Type).GenericArguments)
-                {
-                    arguments.Add(argument.Resolve());
-                }
-
-                return method.MakeHostInstanceGeneric(arguments.ToArray());
-            }
-            else
-            {
-                return method;
-            }
-        }
+        private static bool IsCompound(TypeReference Type) => !Type.Resolve().IsValueType;
 
         private void GetAllDynamic()
         {
@@ -1163,11 +1032,9 @@ namespace Weavers
                 .Methods
                 .FirstOrDefault(Method => Method.Name == "FProperty_SetStructPropertyImplementation");
 
-#if WITH_CORECLR
             _getObject = ModuleDefinition.AssemblyResolver.Resolve(ModuleDefinition.AssemblyReferences
                     .FirstOrDefault(Assembly => Assembly.Name == "Interop")).MainModule?.GetType("Interop.HandleData")
                 .Methods.FirstOrDefault(Method => Method.Name == "GetObject");
-#endif
 
             _genericCall24Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
                 .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall24Implementation");
@@ -1175,8 +1042,9 @@ namespace Weavers
             _genericCall26Implementation = definition.GetType("Script.Library.FFunctionImplementation").Methods
                 .FirstOrDefault(Method => Method.Name == "FFunction_GenericCall26Implementation");
 
-            _getGarbageCollectionHandle = definition.GetType("Script.CoreUObject.UObject").Methods
-                .FirstOrDefault(Method => Method.Name == "get_GarbageCollectionHandle");
+            _getHandle = ModuleDefinition.AssemblyResolver.Resolve(ModuleDefinition.AssemblyReferences
+                    .FirstOrDefault(Assembly => Assembly.Name == "Interop")).MainModule?.GetType("Interop.HandleData")
+                .Methods.FirstOrDefault(Method => Method.Name == "GetHandle");
         }
 
         private string GetUEAssemblyPath(string assemblyFilePath)
@@ -1201,32 +1069,6 @@ namespace Weavers
             segments[segments.Length - 1] = ueAssemblyName + ".dll";
 
             return Path.Combine(basePath, Path.Combine(segments));
-        }
-    }
-
-    public static class CecilExtensions
-    {
-        public static MethodReference MakeHostInstanceGeneric(this MethodReference Self, params TypeReference[] Args)
-        {
-            var reference =
-                new MethodReference(Self.Name, Self.ReturnType, Self.DeclaringType.MakeGenericInstanceType(Args))
-                {
-                    HasThis = Self.HasThis,
-                    ExplicitThis = Self.ExplicitThis,
-                    CallingConvention = Self.CallingConvention
-                };
-
-            foreach (var parameter in Self.Parameters)
-            {
-                reference.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
-            }
-
-            foreach (var genericParam in Self.GenericParameters)
-            {
-                reference.GenericParameters.Add(new GenericParameter(genericParam.Name, reference));
-            }
-
-            return reference;
         }
     }
 }

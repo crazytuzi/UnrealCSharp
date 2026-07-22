@@ -137,11 +137,16 @@ void FPropertyDescriptor::Get(void* Src, void** Dest) const
 {
 }
 
-void FPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
+void FPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
 }
 
-void FPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+void FPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FParameter) const
+{
+	Get(Src, Dest, FPropertyArgument::FMember());
+}
+
+void FPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
 }
 

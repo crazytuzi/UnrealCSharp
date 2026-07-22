@@ -1,21 +1,19 @@
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
 #include "Reflection/Delegate/FMulticastDelegateHelper.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "Reflection/FReflectionRegistry.h"
+#include "Registry/FCSharpBind.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "Async/Async.h"
-#include "Registry/FCSharpBind.h"
 
 namespace
 {
 	struct FRegisterMulticastDelegate
 	{
-		static void RegisterImplementation(const IManagedObject InManagedObject,
-		                                   const IManagedReflectionType InManagedReflectionType)
+		static void RegisterImplementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedReflectionType);
+			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
 			FCSharpBind::Bind<FMulticastDelegateHelper>(Class, InManagedObject);
 		}
@@ -29,53 +27,53 @@ namespace
 			});
 		}
 
-		static IUnmanagedBool IsBoundImplementation(const IManagedHandle InManagedHandle)
+		static uint8 IsBoundImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(MulticastDelegateHelper->IsBound());
+				return MulticastDelegateHelper->IsBound() ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
-		static IUnmanagedBool ContainsImplementation(const IManagedHandle InManagedHandle,
-		                                             const IManagedHandle InObject,
-		                                             const IManagedReflectionType InManagedReflectionType,
-		                                             const IManagedReflectionMethod InManagedReflectionMethod)
+		static uint8 ContainsImplementation(const IManagedHandle InManagedHandle,
+		                                    const IManagedHandle InObject,
+		                                    const IManagedHandle InManagedType,
+		                                    const IManagedHandle InManagedMethod)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InManagedHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedReflectionType))
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedType))
 					{
-						if (const auto FoundMethod = FoundClass->GetMethod(InManagedReflectionMethod))
+						if (const auto FoundMethod = FoundClass->GetMethod(InManagedMethod))
 						{
-							return BoolToIUnmanagedBool(MulticastDelegateHelper->Contains(FoundObject, FoundMethod));
+							return MulticastDelegateHelper->Contains(FoundObject, FoundMethod) ? 1 : 0;
 						}
 					}
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void AddImplementation(const IManagedHandle InManagedHandle,
 		                              const IManagedHandle InObject,
-		                              const IManagedReflectionType InManagedReflectionType,
-		                              const IManagedReflectionMethod InManagedReflectionMethod)
+		                              const IManagedHandle InManagedType,
+		                              const IManagedHandle InManagedMethod)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InManagedHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedReflectionType))
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedType))
 					{
-						if (const auto FoundMethod = FoundClass->GetMethod(InManagedReflectionMethod))
+						if (const auto FoundMethod = FoundClass->GetMethod(InManagedMethod))
 						{
 							MulticastDelegateHelper->Add(FoundObject, FoundMethod);
 						}
@@ -86,17 +84,17 @@ namespace
 
 		static void AddUniqueImplementation(const IManagedHandle InManagedHandle,
 		                                    const IManagedHandle InObject,
-		                                    const IManagedReflectionType InManagedReflectionType,
-		                                    const IManagedReflectionMethod InManagedReflectionMethod)
+		                                    const IManagedHandle InManagedType,
+		                                    const IManagedHandle InManagedMethod)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InManagedHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedReflectionType))
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedType))
 					{
-						if (const auto FoundMethod = FoundClass->GetMethod(InManagedReflectionMethod))
+						if (const auto FoundMethod = FoundClass->GetMethod(InManagedMethod))
 						{
 							MulticastDelegateHelper->AddUnique(FoundObject, FoundMethod);
 						}
@@ -107,17 +105,17 @@ namespace
 
 		static void RemoveImplementation(const IManagedHandle InManagedHandle,
 		                                 const IManagedHandle InObject,
-		                                 const IManagedReflectionType InManagedReflectionType,
-		                                 const IManagedReflectionMethod InManagedReflectionMethod)
+		                                 const IManagedHandle InManagedType,
+		                                 const IManagedHandle InManagedMethod)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InManagedHandle))
 			{
 				if (const auto FoundObject = FCSharpEnvironment::GetEnvironment().GetObject(InObject))
 				{
-					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedReflectionType))
+					if (const auto FoundClass = FReflectionRegistry::Get().GetClass(InManagedType))
 					{
-						if (const auto FoundMethod = FoundClass->GetMethod(InManagedReflectionMethod))
+						if (const auto FoundMethod = FoundClass->GetMethod(InManagedMethod))
 						{
 							MulticastDelegateHelper->Remove(FoundObject, FoundMethod);
 						}
@@ -126,8 +124,7 @@ namespace
 			}
 		}
 
-		static void RemoveAllImplementation(const IManagedHandle InManagedHandle,
-		                                    const IManagedHandle InObject)
+		static void RemoveAllImplementation(const IManagedHandle InManagedHandle, const IManagedHandle InObject)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InManagedHandle))
@@ -157,8 +154,7 @@ namespace
 			}
 		}
 
-		static void GenericBroadcast2Implementation(const IManagedHandle InManagedHandle,
-		                                            IN_BUFFER_SIGNATURE)
+		static void GenericBroadcast2Implementation(const IManagedHandle InManagedHandle, IN_BUFFER_SIGNATURE)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InManagedHandle))
@@ -167,8 +163,7 @@ namespace
 			}
 		}
 
-		static void GenericBroadcast4Implementation(const IManagedHandle InManagedHandle,
-		                                            OUT_BUFFER_SIGNATURE)
+		static void GenericBroadcast4Implementation(const IManagedHandle InManagedHandle, OUT_BUFFER_SIGNATURE)
 		{
 			if (const auto MulticastDelegateHelper = FCSharpEnvironment::GetEnvironment().GetDelegate<
 				FMulticastDelegateHelper>(InManagedHandle))

@@ -14,20 +14,20 @@ public:
 public:
 	virtual auto Get(void* Src, void** Dest) const -> void override
 	{
-		Super::template Get<std::false_type>(Src, Dest);
+		Super::template Get<FPropertyArgument::FMember>(Src, Dest);
 	}
 
-	virtual auto Get(void* Src, void** Dest, std::true_type) const -> void override
+	virtual auto Get(void* Src, void** Dest, FPropertyArgument::FMember) const -> void override
 	{
 	}
 
-	virtual auto Get(void* Src, void** Dest, std::false_type) const -> void override
+	virtual auto Get(void* Src, void** Dest, FPropertyArgument::FReturn) const -> void override
 	{
 	}
 
 	virtual auto Get(void* Src, void* Dest) const -> void override
 	{
-		Super::template Get<std::false_type>(Src, static_cast<void**>(Dest));
+		Super::template Get<FPropertyArgument::FMember>(Src, static_cast<void**>(Dest));
 	}
 
 	virtual auto CopyValue(const void* InAddress) const -> void* override

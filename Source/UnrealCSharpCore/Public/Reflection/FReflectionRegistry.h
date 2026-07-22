@@ -2,7 +2,7 @@
 
 #include "UEVersion.h"
 #include "FClassReflection.h"
-#include "Domain/Script/IManagedTypes.h"
+#include "Domain/Script/IManagedHandle.h"
 
 class UNREALCSHARPCORE_API FReflectionRegistry
 {
@@ -20,9 +20,7 @@ public:
 public:
 	FClassReflection* GetClass(const TWeakObjectPtr<UField>& InField);
 
-	FClassReflection* GetClass(const IManagedReflectionType InManagedReflectionType);
-
-	FClassReflection* GetClass(const IManagedClass InManagedClass);
+	FClassReflection* GetClass(const IManagedHandle InManagedClass);
 
 	FClassReflection* GetClass(const FString& InNameSpace, const FString& InName);
 
@@ -1189,12 +1187,6 @@ private:
 
 private:
 	TMap<TWeakObjectPtr<UField>, FClassReflection*> Field2Class;
-
-#if WITH_MONO
-	TMap<IManagedClass, FClassReflection*> Class2Class;
-
-	TMap<IManagedReflectionType, FClassReflection*> ReflectionType2Class;
-#endif
 
 	TMap<FString, FClassReflection*> FullName2Class;
 };

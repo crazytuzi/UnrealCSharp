@@ -1,57 +1,12 @@
 using Script.CoreUObject;
 using Script.Engine;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class UnrealImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Unreal_NewObjectImplementation<T>(nint Outer,
-            nint Class,
-            nint Name,
-            EObjectFlags Flags,
-            nint Template,
-            bool bCopyTransientsFromClassDefaults
-        );
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Unreal_DuplicateObjectImplementation<T>(nint SourceObject,
-            nint Outer,
-            nint Name
-        );
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Unreal_LoadObjectImplementation<T>(nint Outer,
-            nint Name,
-            nint Filename,
-            ELoadFlags LoadFlags,
-            nint Sandbox
-        );
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UClass Unreal_LoadClassImplementation(nint Outer,
-            nint Name,
-            nint Filename,
-            ELoadFlags LoadFlags,
-            nint Sandbox
-        );
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T Unreal_CreateWidgetImplementation<T>(nint OwningObject, nint UserWidgetClass);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UWorld Unreal_GWorldImplementation();
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern UPackage Unreal_GetTransientPackageImplementation();
-#else
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, EObjectFlags, nint, bool, nint>
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, EObjectFlags, nint, byte, nint>
             __Unreal_NewObjectImplementation;
 
         public static unsafe T Unreal_NewObjectImplementation<T>(nint Outer, nint Class, nint Name, EObjectFlags Flags,
@@ -60,13 +15,13 @@ namespace Script.Library
             if (__Unreal_NewObjectImplementation == null)
             {
                 __Unreal_NewObjectImplementation =
-                    (delegate* unmanaged[Cdecl]<nint, nint, nint, EObjectFlags, nint, bool, nint>)
+                    (delegate* unmanaged[Cdecl]<nint, nint, nint, EObjectFlags, nint, byte, nint>)
                     MethodBridge.GetMethod(
                         "Script.Library.UnrealImplementation::Unreal_NewObjectImplementation");
             }
 
             var Handle = __Unreal_NewObjectImplementation(Outer, Class, Name, Flags, Template,
-                bCopyTransientsFromClassDefaults);
+                (byte)(bCopyTransientsFromClassDefaults ? 1 : 0));
 
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : default;
         }
@@ -171,6 +126,5 @@ namespace Script.Library
 
             return Handle != 0 ? (UPackage)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }

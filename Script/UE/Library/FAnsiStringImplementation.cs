@@ -1,28 +1,11 @@
 #if UE_5_6_OR_LATER
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class FAnsiStringImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FAnsiString_RegisterImplementation(FAnsiString InString, string InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FAnsiString_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FAnsiString_UnRegisterImplementation(nint InString);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern string FAnsiString_ToStringImplementation(nint InString);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, byte*, void> __FAnsiString_RegisterImplementation;
 
         public static unsafe void FAnsiString_RegisterImplementation(FAnsiString InString, string InValue)
@@ -34,25 +17,21 @@ namespace Script.Library
                         "Script.Library.FAnsiStringImplementation::FAnsiString_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InString);
-
-            InString.GarbageCollectionHandle = Handle;
-
             var UTF8 = InValue != null ? System.Text.Encoding.UTF8.GetBytes(InValue + '\0') : [0];
 
             fixed (byte* Ptr = UTF8)
             {
-                __FAnsiString_RegisterImplementation(Handle, Ptr);
+                __FAnsiString_RegisterImplementation(HandleData.Alloc(InString), Ptr);
             }
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __FAnsiString_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __FAnsiString_IdenticalImplementation;
 
         public static unsafe bool FAnsiString_IdenticalImplementation(nint InA, nint InB)
         {
             if (__FAnsiString_IdenticalImplementation == null)
             {
-                __FAnsiString_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __FAnsiString_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.FAnsiStringImplementation::FAnsiString_IdenticalImplementation");
             }
@@ -89,7 +68,6 @@ namespace Script.Library
 
             return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }
 #endif

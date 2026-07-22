@@ -1,7 +1,6 @@
 #include "Registry/FCSharpBind.h"
 #include "Binding/Class/FClassBuilder.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "Reflection/Container/FMapHelper.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -11,10 +10,9 @@ namespace
 {
 	struct FRegisterMap
 	{
-		static void RegisterImplementation(const IManagedObject InManagedObject,
-		                                   const IManagedReflectionType InManagedReflectionType)
+		static void RegisterImplementation(const IManagedHandle InManagedObject, const IManagedHandle InManagedType)
 		{
-			const auto Class = FReflectionRegistry::Get().GetClass(InManagedReflectionType);
+			const auto Class = FReflectionRegistry::Get().GetClass(InManagedType);
 
 			FCSharpBind::Bind<FMapHelper>(Class,
 			                              Class->GetGenericArgument(),
@@ -31,8 +29,7 @@ namespace
 			});
 		}
 
-		static void EmptyImplementation(const IManagedHandle InManagedHandle,
-		                                const int32 InExpectedNumElements)
+		static void EmptyImplementation(const IManagedHandle InManagedHandle, const int32 InExpectedNumElements)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
@@ -52,15 +49,15 @@ namespace
 			return 0;
 		}
 
-		static IUnmanagedBool IsEmptyImplementation(const IManagedHandle InManagedHandle)
+		static uint8 IsEmptyImplementation(const IManagedHandle InManagedHandle)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(MapHelper->IsEmpty());
+				return MapHelper->IsEmpty() ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void AddImplementation(const IManagedHandle InManagedHandle,
@@ -107,16 +104,15 @@ namespace
 			}
 		}
 
-		static IUnmanagedBool ContainsImplementation(const IManagedHandle InManagedHandle,
-		                                             const IN_KEY_BUFFER_SIGNATURE)
+		static uint8 ContainsImplementation(const IManagedHandle InManagedHandle, const IN_KEY_BUFFER_SIGNATURE)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(MapHelper->Contains(IN_KEY_BUFFER));
+				return MapHelper->Contains(IN_KEY_BUFFER) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void GetImplementation(const IManagedHandle InManagedHandle,
@@ -151,16 +147,15 @@ namespace
 			return 0;
 		}
 
-		static IUnmanagedBool IsValidIndexImplementation(const IManagedHandle InManagedHandle,
-		                                                 const int32 InIndex)
+		static uint8 IsValidIndexImplementation(const IManagedHandle InManagedHandle, const int32 InIndex)
 		{
 			if (const auto MapHelper = FCSharpEnvironment::GetEnvironment().GetContainer<FMapHelper>(
 				InManagedHandle))
 			{
-				return BoolToIUnmanagedBool(MapHelper->IsValidIndex(InIndex));
+				return MapHelper->IsValidIndex(InIndex) ? 1 : 0;
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void GetEnumeratorKeyImplementation(const IManagedHandle InManagedHandle,

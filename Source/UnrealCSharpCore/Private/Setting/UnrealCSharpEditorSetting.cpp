@@ -10,7 +10,7 @@
 #include "WidgetBlueprint.h"
 #include "Engine/UserDefinedEnum.h"
 #if UE_STRUCT_UTILS_U_USER_DEFINED_STRUCT
-#include "UserDefinedStructure/UserDefinedStructEditorData.h"
+#include "StructUtils/UserDefinedStruct.h"
 #else
 #include "Engine/UserDefinedStruct.h"
 #endif
@@ -21,6 +21,7 @@
 UUnrealCSharpEditorSetting::UUnrealCSharpEditorSetting(const FObjectInitializer& ObjectInitializer):
 #if WITH_EDITOR
 	Super(ObjectInitializer),
+	bIsSkipGenerateScriptCode(false),
 	ScriptDirectory(DEFAULT_SCRIPT_DIRECTORY),
 	bEnableDeleteProxyDirectory(false),
 	bEnableDeleteBindingDirectory(false),
@@ -128,6 +129,11 @@ void UUnrealCSharpEditorSetting::UnregisterSettings()
 const FString& UUnrealCSharpEditorSetting::GetDotNetPath() const
 {
 	return DotNetPath;
+}
+
+bool UUnrealCSharpEditorSetting::IsSkipGenerateScriptCode() const
+{
+	return bIsSkipGenerateScriptCode;
 }
 
 TArray<FString> UUnrealCSharpEditorSetting::GetDotNetPathArray() const

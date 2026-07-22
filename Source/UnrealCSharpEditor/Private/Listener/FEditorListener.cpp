@@ -14,6 +14,7 @@
 #include "Dynamic/FDynamicGenerator.h"
 #include "Listener/FEngineListener.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
+#include "UEVersion.h"
 
 FEditorListener::FEditorListener():
 	bIsPIEPlaying(false),
@@ -21,8 +22,13 @@ FEditorListener::FEditorListener():
 {
 	if (!IsRunningCookCommandlet())
 	{
+#if UE_F_CORE_DELEGATES_GET_ON_POST_ENGINE_INIT
+		OnPostEngineInitDelegateHandle = FCoreDelegates::GetOnPostEngineInit().AddRaw(
+			this, &FEditorListener::OnPostEngineInit);
+#else
 		OnPostEngineInitDelegateHandle = FCoreDelegates::OnPostEngineInit.AddRaw(
 			this, &FEditorListener::OnPostEngineInit);
+#endif
 
 		OnPreBeginPIEDelegateHandle = FEditorDelegates::PreBeginPIE.AddRaw(this, &FEditorListener::OnPreBeginPIE);
 
@@ -129,7 +135,11 @@ FEditorListener::~FEditorListener()
 
 		if (OnPostEngineInitDelegateHandle.IsValid())
 		{
+#if UE_F_CORE_DELEGATES_GET_ON_POST_ENGINE_INIT
+			FCoreDelegates::GetOnPostEngineInit().Remove(OnPostEngineInitDelegateHandle);
+#else
 			FCoreDelegates::OnPostEngineInit.Remove(OnPostEngineInitDelegateHandle);
+#endif
 		}
 	}
 }

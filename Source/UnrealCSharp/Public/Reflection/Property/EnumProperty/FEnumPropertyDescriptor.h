@@ -8,9 +8,9 @@ public:
 	using TPrimitivePropertyDescriptor::TPrimitivePropertyDescriptor;
 
 public:
-	virtual void Get(void* Src, void** Dest, std::true_type) const override;
+	virtual void Get(void* Src, void** Dest, FPropertyArgument::FMember) const override;
 
-	virtual void Get(void* Src, void** Dest, std::false_type) const override;
+	virtual void Get(void* Src, void** Dest, FPropertyArgument::FReturn) const override;
 
 	virtual void Get(void* Src, void* Dest) const override;
 

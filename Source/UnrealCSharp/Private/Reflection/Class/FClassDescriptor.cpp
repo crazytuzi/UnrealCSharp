@@ -32,7 +32,7 @@ void FClassDescriptor::Deinitialize()
 	{
 		FoundClass->ClearFunctionMapsCaches();
 
-		if (Class != nullptr && IManagedIsValid(Class->GetManagedClass()))
+		if (Class != nullptr && IManagedHandleIsValid(Class->GetManagedClass()))
 		{
 			void* InParams[] = {nullptr};
 
@@ -44,7 +44,7 @@ void FClassDescriptor::Deinitialize()
 	}
 	else
 	{
-		if (Class != nullptr && IManagedIsValid(Class->GetManagedClass()))
+		if (Class != nullptr && IManagedHandleIsValid(Class->GetManagedClass()))
 		{
 			void* InParams[] = {nullptr};
 

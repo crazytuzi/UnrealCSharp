@@ -1,29 +1,11 @@
 using System;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class TScriptInterfaceImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TScriptInterface_RegisterImplementation<T>(TScriptInterface<T> InScriptInterface,
-            nint InObject, Type InType) where T : IInterface;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TScriptInterface_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TScriptInterface_UnRegisterImplementation(nint InScriptInterface);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T TScriptInterface_GetObjectImplementation<T>(nint InScriptInterface);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint, void>
             __TScriptInterface_RegisterImplementation;
 
@@ -37,20 +19,17 @@ namespace Script.Library
                         "Script.Library.TScriptInterfaceImplementation::TScriptInterface_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InScriptInterface);
-
-            InScriptInterface.GarbageCollectionHandle = Handle;
-
-            __TScriptInterface_RegisterImplementation(Handle, InObject, HandleData.AllocImplementation(InType));
+            __TScriptInterface_RegisterImplementation(HandleData.Alloc(InScriptInterface), InObject,
+                HandleData.Alloc(InType));
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __TScriptInterface_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __TScriptInterface_IdenticalImplementation;
 
         public static unsafe bool TScriptInterface_IdenticalImplementation(nint InA, nint InB)
         {
             if (__TScriptInterface_IdenticalImplementation == null)
             {
-                __TScriptInterface_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __TScriptInterface_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TScriptInterfaceImplementation::TScriptInterface_IdenticalImplementation");
             }
@@ -87,6 +66,5 @@ namespace Script.Library
 
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : default;
         }
-#endif
     }
 }

@@ -267,12 +267,13 @@ public:
 #endif
 
 #if WITH_EDITOR
-	static FString GetPlatformName();
+	static void SetScriptDomainType(EScriptDomainType InScriptDomainType);
+
+	static EScriptDomainType GetScriptDomainType(const FString& InPlatformName);
 
 	static EScriptDomainType GetScriptDomainType();
 
-	static bool IsMonoDomain();
-
-	static bool IsCoreCLRDomain();
+private:
+	static EScriptDomainType ScriptDomainType;
 #endif
 };

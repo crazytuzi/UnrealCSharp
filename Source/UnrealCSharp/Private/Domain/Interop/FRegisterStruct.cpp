@@ -1,7 +1,5 @@
 #include "Binding/Class/TBindingClassBuilder.inl"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedMarshalledString.h"
-#include "Domain/Script/IUnmanagedBool.h"
 #include "CoreMacro/NamespaceMacro.h"
 #include "CoreMacro/CompilerMacro.h"
 #include "Async/Async.h"
@@ -12,26 +10,24 @@ namespace
 {
 	struct FRegisterStruct
 	{
-		static IManagedObject StaticStructImplementation(const IManagedMarshalledString InStructName)
+		static IManagedHandle StaticStructImplementation(const char* InStructName)
 		{
-			const auto StructName = MANAGED_MARSHALLED_STRING_TO_F_STRING(InStructName);
+			const auto StructName = InStructName != nullptr ? FString(UTF8_TO_TCHAR(InStructName)) : FString(TEXT(""));
 
 			const auto InStruct = LoadObject<UScriptStruct>(nullptr, *StructName);
 
 			return FCSharpEnvironment::GetEnvironment().Bind(InStruct);
 		}
 
-		static void RegisterImplementation(const IManagedObject InManagedObject,
-		                                   const IManagedMarshalledString InStructName)
+		static void RegisterImplementation(const IManagedHandle InManagedHandle, const char* InStructName)
 		{
-			const auto StructName = MANAGED_MARSHALLED_STRING_TO_F_STRING(InStructName);
+			const auto StructName = InStructName != nullptr ? FString(UTF8_TO_TCHAR(InStructName)) : FString(TEXT(""));
 
-			(void)FCSharpEnvironment::GetEnvironment().Bind(InManagedObject, *StructName);
+			(void)FCSharpEnvironment::GetEnvironment().Bind(InManagedHandle, *StructName);
 		}
 
-		static IUnmanagedBool IdenticalImplementation(const IManagedHandle InScriptStruct,
-		                                              const IManagedHandle InA,
-		                                              const IManagedHandle InB)
+		static uint8 IdenticalImplementation(const IManagedHandle InScriptStruct,
+		                                     const IManagedHandle InA, const IManagedHandle InB)
 		{
 			if (const auto FoundScriptStruct = FCSharpEnvironment::GetEnvironment().GetObject<
 				UScriptStruct>(InScriptStruct))
@@ -40,12 +36,12 @@ namespace
 				{
 					if (const auto FoundB = FCSharpEnvironment::GetEnvironment().GetStruct<>(InB))
 					{
-						return BoolToIUnmanagedBool(FoundScriptStruct->CompareScriptStruct(FoundA, FoundB, PPF_None));
+						return FoundScriptStruct->CompareScriptStruct(FoundA, FoundB, PPF_None) ? 1 : 0;
 					}
 				}
 			}
 
-			return IUnmanagedFalse;
+			return 0;
 		}
 
 		static void UnRegisterImplementation(const IManagedHandle InManagedHandle)

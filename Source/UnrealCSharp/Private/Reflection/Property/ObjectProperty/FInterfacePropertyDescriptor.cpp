@@ -1,18 +1,7 @@
 #include "Reflection/Property/ObjectProperty/FInterfacePropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
-void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
-{
-	const auto Object = Class->NewObject();
-
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
-		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
-
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
-}
-
-void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TScriptInterface<IInterface>>(Src);
 
@@ -21,10 +10,30 @@ void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, std::false_type) 
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, true>(
-			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+			Class, Object, Src);
 	}
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
+}
+
+void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FParameter) const
+{
+	const auto Object = Class->NewObject();
+
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, false, false>(
+		Class, Object, Src);
+
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
+}
+
+void FInterfacePropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
+{
+	const auto Object = Class->NewObject();
+
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TScriptInterface<IInterface>, true, false>(
+		Class, Object, Src);
+
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FInterfacePropertyDescriptor::Set(void* Src, void* Dest) const

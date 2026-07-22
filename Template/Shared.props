@@ -13,7 +13,7 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <NoWarn>0109;1701;1702;8500</NoWarn>
   </PropertyGroup>
-  <ItemGroup Condition="$(DefineConstants.Contains('WITH_CORECLR'))">
+  <ItemGroup>
     <Reference Include="Interop">
       <HintPath></HintPath>
       <Private>false</Private>

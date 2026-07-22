@@ -6,23 +6,19 @@
 
 #define FUNCTION_UTILS_GET_TYPES_WITH_ATTRIBUTE FString(TEXT("GetTypesWithAttribute"))
 
-#define FUNCTION_UTILS_GET_CLASS_REFLECTION FString(TEXT("GetClassReflection"))
+#define FUNCTION_UTILS_IS_OVERRIDE FString(TEXT("IsOverride"))
+
+#define FUNCTION_UTILS_GET_CLASS_DESCRIPTOR FString(TEXT("GetClassDescriptor"))
+
+#define FUNCTION_UTILS_GET_CLASS_PROPERTIES FString(TEXT("GetClassProperties"))
+
+#define FUNCTION_UTILS_GET_CLASS_FIELDS FString(TEXT("GetClassFields"))
+
+#define FUNCTION_UTILS_GET_CLASS_METHODS FString(TEXT("GetClassMethods"))
 
 #define FUNCTION_STATIC_STRUCT FString(TEXT("StaticStruct"))
 
 #define FUNCTION_SYNCHRONIZATION_CONTEXT_TICK FString(TEXT("Tick"))
-
-#if WITH_MONO
-#define FUNCTION_UTILS_SET_OUT FString(TEXT("SetOut"))
-
-#define FUNCTION_UTILS_MAKE_GENERIC_TYPE_INSTANCE FString(TEXT("MakeGenericTypeInstance"))
-
-#define FUNCTION_ASSEMBLY_UTIL_INITIALIZE FString(TEXT("Initialize"))
-
-#define FUNCTION_ASSEMBLY_UTIL_DEINITIALIZE FString(TEXT("Deinitialize"))
-
-#define FUNCTION_ASSEMBLY_UTIL_LOAD FString(TEXT("Load"))
-#endif
 
 #if WITH_CORECLR
 #define FUNCTION_HOSTFXR_SET_ERROR_WRITER FString(TEXT("hostfxr_set_error_writer"))
@@ -32,24 +28,17 @@
 #define FUNCTION_HOSTFXR_GET_RUNTIME_DELEGATE FString(TEXT("hostfxr_get_runtime_delegate"))
 
 #define FUNCTION_HOSTFXR_CLOSE FString(TEXT("hostfxr_close"))
+#endif
 
 #define FUNCTION_ASSEMBLY_LOADER_LOAD_FROM_STREAM FString(TEXT("LoadFromStream"))
 
 #define FUNCTION_ASSEMBLY_LOADER_UNLOAD FString(TEXT("Unload"))
-
-#define FUNCTION_HANDLE_DATA_ALLOC FString(TEXT("Alloc"))
-
-#define FUNCTION_HANDLE_DATA_ALLOC_WEAK_REF FString(TEXT("AllocWeakRef"))
-
-#define FUNCTION_HANDLE_DATA_GET_TARGET FString(TEXT("GetTarget"))
 
 #define FUNCTION_HANDLE_DATA_FREE FString(TEXT("Free"))
 
 #define FUNCTION_LOG_BRIDGE_SET_LOG FString(TEXT("SetLog"))
 
 #define FUNCTION_LOG_BRIDGE_INITIALIZE FString(TEXT("Initialize"))
-
-#define FUNCTION_LOG_BRIDGE_DEINITIALIZE FString(TEXT("Deinitialize"))
 
 #define FUNCTION_TYPE_BRIDGE_GET_CLASS FString(TEXT("GetClass"))
 
@@ -130,6 +119,3 @@
 #define FUNCTION_ARRAY_BRIDGE_ARRAY_NEW FString(TEXT("NewArray"))
 
 #define FUNCTION_ARRAY_BRIDGE_ARRAY_GET FString(TEXT("ArrayGet"))
-
-#define FUNCTION_ARRAY_BRIDGE_ARRAY_GET_REF FString(TEXT("ArrayGetRef"))
-#endif

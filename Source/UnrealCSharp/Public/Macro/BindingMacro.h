@@ -18,6 +18,7 @@
 #include "Template/TFunctionPointer.inl"
 #include "Template/TIsScriptStruct.inl"
 #include "Template/TIsNotUEnum.inl"
+#include "UEVersion.h"
 
 template <typename... Args>
 auto constexpr TSizeof_Args(Args... InArgs)
@@ -231,6 +232,14 @@ struct TIsNotUEnum<Class> \
 { \
 	enum { Value = true }; \
 };
+
+#if UE_REGULAR_UENUM_STATIC_ENUM
+#define BINDING_REGULAR_UENUM(Class, ...) \
+template <> \
+__VA_ARGS__ UEnum* StaticEnum<Class>();
+#else
+#define BINDING_REGULAR_UENUM(Class, ...)
+#endif
 
 #define BINDING_PROPERTY_BUILDER_SET(Property) TPropertyBuilder<decltype(Property), Property>::Set
 

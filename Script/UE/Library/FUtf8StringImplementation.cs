@@ -1,28 +1,11 @@
 #if UE_5_6_OR_LATER
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static class FUtf8StringImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FUtf8String_RegisterImplementation(FUtf8String InString, string InValue);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FUtf8String_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FUtf8String_UnRegisterImplementation(nint InString);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern string FUtf8String_ToStringImplementation(nint InString);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, byte*, void> __FUtf8String_RegisterImplementation;
 
         public static unsafe void FUtf8String_RegisterImplementation(FUtf8String InString, string InValue)
@@ -34,25 +17,21 @@ namespace Script.Library
                         "Script.Library.FUtf8StringImplementation::FUtf8String_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InString);
-
-            InString.GarbageCollectionHandle = Handle;
-
             var UTF8 = InValue != null ? System.Text.Encoding.UTF8.GetBytes(InValue + '\0') : [0];
 
             fixed (byte* Ptr = UTF8)
             {
-                __FUtf8String_RegisterImplementation(Handle, Ptr);
+                __FUtf8String_RegisterImplementation(HandleData.Alloc(InString), Ptr);
             }
         }
 
-        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, int> __FUtf8String_IdenticalImplementation;
+        private static unsafe delegate* unmanaged[Cdecl]<nint, nint, byte> __FUtf8String_IdenticalImplementation;
 
         public static unsafe bool FUtf8String_IdenticalImplementation(nint InA, nint InB)
         {
             if (__FUtf8String_IdenticalImplementation == null)
             {
-                __FUtf8String_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __FUtf8String_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.FUtf8StringImplementation::FUtf8String_IdenticalImplementation");
             }
@@ -89,7 +68,6 @@ namespace Script.Library
 
             return Handle != 0 ? (string)HandleData.GetObject(Handle) : null;
         }
-#endif
     }
 }
 #endif

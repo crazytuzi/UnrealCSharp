@@ -49,7 +49,7 @@ IManagedHandle FOptionalRegistry::GetObject(const FOptionalHelperValueMapping::F
 {
 	const auto FoundManagedHandle = Address2ManagedHandle.Find(InAddress);
 
-	return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
+	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
 }
 
 bool FOptionalRegistry::RemoveReference(const IManagedHandle InManagedHandle)

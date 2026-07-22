@@ -3,7 +3,6 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/BufferMacro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 
 TSet<TPair<FString, FString>> FDelegateGenerator::Delegate;
 
@@ -58,17 +57,11 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 
 	FString ClearFunctionContent;
 
-	FString GCHandleContent;
-
 	TSet<FString> UsingNameSpaces{
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY),
+		NAMESPACE_INTEROP
 	};
-
-	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
-	{
-		UsingNameSpaces.Add(NAMESPACE_INTEROP);
-	}
 
 	TArray<FProperty*> DelegateParams;
 
@@ -83,10 +76,9 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => FDelegateImplementation.FDelegate_UnRegisterImplementation(%s);\n\n"
+		"\n\t\t~%s() => FDelegateImplementation.FDelegate_UnRegisterImplementation(HandleData.GetHandle(this));\n\n"
 	),
-	                                               *ClassContent,
-	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	                                               *ClassContent
 	);
 
 	for (TFieldIterator<FProperty> ParamIterator(SignatureFunction); ParamIterator && (ParamIterator->PropertyFlags &
@@ -217,7 +209,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	}
 
 	auto ExecuteFunctionCallBody = FString::Printf(TEXT(
-		"FDelegateImplementation.FDelegate_%sExecute%dImplementation(%s%s%s%s);\n"
+		"FDelegateImplementation.FDelegate_%sExecute%dImplementation(HandleData.GetHandle(this)%s%s%s);\n"
 	),
 	                                               *FGeneratorCore::GetFunctionPrefix(DelegateReturnParam),
 	                                               FGeneratorCore::GetFunctionIndex(DelegateReturnParam != nullptr,
@@ -225,7 +217,6 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		                                               !DelegateRefParamIndex.IsEmpty(),
 		                                               false,
 		                                               false),
-	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                               bHasInBuffer
 		                                               ? *FString::Printf(TEXT(
 			                                               ", %s"
@@ -334,35 +325,20 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 
 	BindFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
-	),
-	                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                      *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic void Bind(UObject InObject, Delegate InDelegate) => FDelegateImplementation.FDelegate_BindImplementation(HandleData.GetHandle(this), HandleData.GetHandle(InObject), InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
+	));
 
 	UnbindFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Unbind() => FDelegateImplementation.FDelegate_UnBindImplementation(%s);\n\n"
-	),
-	                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic void Unbind() => FDelegateImplementation.FDelegate_UnBindImplementation(HandleData.GetHandle(this));\n\n"
+	));
 
 	ClearFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Clear() => FDelegateImplementation.FDelegate_ClearImplementation(%s);\n\n"
-	),
-	                                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic void Clear() => FDelegateImplementation.FDelegate_ClearImplementation(HandleData.GetHandle(this));\n\n"
+	));
 
 	IsBoundFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic bool IsBound() => FDelegateImplementation.FDelegate_IsBoundImplementation(%s);\n\n"
-	),
-	                                         *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
-
-	GCHandleContent = FString::Printf(TEXT(
-		"\t\tpublic nint %s { get; set; }\n"
-	),
-	                                  *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic bool IsBound() => FDelegateImplementation.FDelegate_IsBoundImplementation(HandleData.GetHandle(this));\n\n"
+	));
 
 	UsingNameSpaces.Remove(UsingNameSpaceContent);
 
@@ -381,9 +357,8 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
-		"\tpublic class %s : IGarbageCollectionHandle\n"
+		"\tpublic class %s\n"
 		"\t{\n"
-		"%s"
 		"%s"
 		"%s"
 		"%s"
@@ -406,8 +381,7 @@ void FDelegateGenerator::Generator(FDelegateProperty* InDelegateProperty)
 	                               *BindFunctionContent,
 	                               *UnbindFunctionContent,
 	                               *ClearFunctionContent,
-	                               *IsBoundFunctionContent,
-	                               *GCHandleContent
+	                               *IsBoundFunctionContent
 	);
 
 	const auto FileName = FGeneratorCore::GetFileName(InDelegateProperty);
@@ -457,11 +431,10 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 
 	FString ClearFunctionContent;
 
-	FString GCHandleContent;
-
 	TSet<FString> UsingNameSpaces{
 		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT),
-		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY)
+		COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_LIBRARY),
+		NAMESPACE_INTEROP
 	};
 
 	TArray<FProperty*> DelegateParams;
@@ -475,10 +448,9 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	);
 
 	const auto DestructorContent = FString::Printf(TEXT(
-		"\n\t\t~%s() => FMulticastDelegateImplementation.FMulticastDelegate_UnRegisterImplementation(%s);\n\n"
+		"\n\t\t~%s() => FMulticastDelegateImplementation.FMulticastDelegate_UnRegisterImplementation(HandleData.GetHandle(this));\n\n"
 	),
-	                                               *ClassContent,
-	                                               *PROPERTY_GARBAGE_COLLECTION_HANDLE
+	                                               *ClassContent
 	);
 
 	for (TFieldIterator<FProperty> ParamIterator(SignatureFunction); ParamIterator && (ParamIterator->PropertyFlags &
@@ -578,7 +550,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	}
 
 	auto BroadcastFunctionCallBody = FString::Printf(TEXT(
-		"FMulticastDelegateImplementation.FMulticastDelegate_%sBroadcast%dImplementation(%s%s%s);"
+		"FMulticastDelegateImplementation.FMulticastDelegate_%sBroadcast%dImplementation(HandleData.GetHandle(this)%s%s);"
 	),
 	                                                 *FGeneratorCore::GetFunctionPrefix(nullptr),
 	                                                 FGeneratorCore::GetFunctionIndex(false,
@@ -586,7 +558,6 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		                                                 !DelegateRefParamIndex.IsEmpty(),
 		                                                 false,
 		                                                 false),
-	                                                 *PROPERTY_GARBAGE_COLLECTION_HANDLE,
 	                                                 bHasInBuffer
 		                                                 ? *FString::Printf(TEXT(
 			                                                 ", %s"
@@ -663,57 +634,32 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                                             *DelegateDeclarationBody);
 
 	IsBoundFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic bool IsBound() => FMulticastDelegateImplementation.FMulticastDelegate_IsBoundImplementation(%s);\n\n"
-	),
-	                                         *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic bool IsBound() => FMulticastDelegateImplementation.FMulticastDelegate_IsBoundImplementation(HandleData.GetHandle(this));\n\n"
+	));
 
 	ContainsFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic bool Contains(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
-	),
-	                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                          *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic bool Contains(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_ContainsImplementation(HandleData.GetHandle(this), HandleData.GetHandle(InObject), InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
+	));
 
 	AddFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Add(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
-	),
-	                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                     *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic void Add(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddImplementation(HandleData.GetHandle(this), HandleData.GetHandle(InObject), InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
+	));
 
 	AddUniqueFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void AddUnique(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
-	),
-	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic void AddUnique(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_AddUniqueImplementation(HandleData.GetHandle(this), HandleData.GetHandle(InObject), InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
+	));
 
 	RemoveFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Remove(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(%s, InObject.%s, InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
-	),
-	                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                        *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic void Remove(UObject InObject, Delegate InDelegate) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveImplementation(HandleData.GetHandle(this), HandleData.GetHandle(InObject), InDelegate.Method.DeclaringType, InDelegate.Method);\n\n"
+	));
 
 	RemoveAllFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void RemoveAll(UObject InObject) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveAllImplementation(%s, InObject.%s);\n\n"
-	),
-	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE,
-	                                           *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic void RemoveAll(UObject InObject) => FMulticastDelegateImplementation.FMulticastDelegate_RemoveAllImplementation(HandleData.GetHandle(this), HandleData.GetHandle(InObject));\n\n"
+	));
 
 	ClearFunctionContent = FString::Printf(TEXT(
-		"\t\tpublic void Clear() => FMulticastDelegateImplementation.FMulticastDelegate_ClearImplementation(%s);\n\n"
-	),
-	                                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
-
-	GCHandleContent = FString::Printf(TEXT(
-		"\t\tpublic nint %s { get; set; }\n"
-	),
-	                                  *PROPERTY_GARBAGE_COLLECTION_HANDLE
-	);
+		"\t\tpublic void Clear() => FMulticastDelegateImplementation.FMulticastDelegate_ClearImplementation(HandleData.GetHandle(this));\n\n"
+	));
 
 	UsingNameSpaces.Add(FUnrealCSharpFunctionLibrary::GetClassNameSpace(UObject::StaticClass()));
 
@@ -733,9 +679,8 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 		"%s\n"
 		"namespace %s\n"
 		"{\n"
-		"\tpublic class %s : IGarbageCollectionHandle\n"
+		"\tpublic class %s\n"
 		"\t{\n"
-		"%s"
 		"%s"
 		"%s"
 		"%s"
@@ -763,8 +708,7 @@ void FDelegateGenerator::Generator(FMulticastDelegateProperty* InMulticastDelega
 	                               *AddUniqueFunctionContent,
 	                               *RemoveFunctionContent,
 	                               *RemoveAllFunctionContent,
-	                               *ClearFunctionContent,
-	                               *GCHandleContent
+	                               *ClearFunctionContent
 	);
 
 	const auto FileName = FGeneratorCore::GetFileName(InMulticastDelegateProperty);

@@ -10,7 +10,7 @@ namespace Interop
         {
             if (InText != null)
             {
-                return HandleData.AllocImplementation(Marshal.PtrToStringUTF8((nint)InText)!);
+                return HandleData.Alloc(Marshal.PtrToStringUTF8((nint)InText)!);
             }
 
             return 0;

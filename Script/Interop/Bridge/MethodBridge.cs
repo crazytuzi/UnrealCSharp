@@ -9,8 +9,6 @@ namespace Interop
     {
         private static readonly Dictionary<string, nint> StringToMethod = new(StringComparer.Ordinal);
 
-        private static readonly Dictionary<Type, PropertyInfo?> TypeToPropertyInfo = new();
-
         [UnmanagedCallersOnly]
         public static void RegisterBinding(byte** InNames, nint* InMethods, int InLength)
         {
@@ -92,23 +90,7 @@ namespace Interop
                                 }
                                 else if (Parameter != null)
                                 {
-                                    if (!TypeToPropertyInfo.TryGetValue(ElementType, out var ParameterProperty))
-                                    {
-                                        ParameterProperty = GetGarbageCollectionHandlePropertyInfo(ElementType);
-
-                                        TypeToPropertyInfo[ElementType] = ParameterProperty;
-                                    }
-
-                                    if (ParameterProperty != null)
-                                    {
-                                        var Value = ParameterProperty.GetValue(Parameter);
-
-                                        *Param = Value != null ? (nint)Value : 0;
-                                    }
-                                    else
-                                    {
-                                        *Param = HandleData.AllocImplementation(Parameter);
-                                    }
+                                    *Param = HandleData.Alloc(Parameter);
                                 }
                                 else
                                 {
@@ -133,25 +115,9 @@ namespace Interop
 
                             Result = Convert.ChangeType(Result, UnderlyingType);
                         }
-
-                        return HandleData.AllocImplementation(Result);
                     }
 
-                    if (!TypeToPropertyInfo.TryGetValue(ResultType, out var Property))
-                    {
-                        Property = GetGarbageCollectionHandlePropertyInfo(ResultType);
-
-                        TypeToPropertyInfo[ResultType] = Property;
-                    }
-
-                    if (Property != null)
-                    {
-                        var Value = Property.GetValue(Result);
-
-                        return Value != null ? (nint)Value : 0;
-                    }
-
-                    return HandleData.AllocImplementation(Result);
+                    return HandleData.Alloc(Result);
                 }
 
                 return 0;
@@ -174,22 +140,6 @@ namespace Interop
         public static nint GetMethod(string InName)
         {
             return StringToMethod.TryGetValue(InName, out var Method) ? Method : nint.Zero;
-        }
-
-        private static PropertyInfo? GetGarbageCollectionHandlePropertyInfo(Type InType)
-        {
-            for (var Type = InType; Type != null; Type = Type.BaseType)
-            {
-                var Property = Type.GetProperty("GarbageCollectionHandle",
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
-
-                if (Property != null && Property.PropertyType == typeof(nint))
-                {
-                    return Property;
-                }
-            }
-
-            return null;
         }
 
         private static object GetValue(nint InHandle, Type InType)
@@ -225,11 +175,6 @@ namespace Interop
                         break;
                 }
             }
-        }
-
-        internal static void Clear()
-        {
-            TypeToPropertyInfo.Clear();
         }
     }
 }

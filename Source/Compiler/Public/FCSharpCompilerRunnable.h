@@ -27,14 +27,14 @@ public:
 
 	void DoWork();
 
-	void ImmediatelyDoWork();
+	void ImmediatelyDoWork(bool bForceCompileInterop = false);
 
-	void Compile(const TFunction<void()>& InFunction, bool bCompileInterop = false);
+	void Compile(const TFunction<void()>& InFunction, bool bCompileInterop = false, bool bForceCompileInterop = false);
 
 private:
 	static FString GetBuildConfiguration();
 
-	void CompileInterop();
+	void CompileInterop(bool bForceCompileInterop);
 
 	void Compile();
 

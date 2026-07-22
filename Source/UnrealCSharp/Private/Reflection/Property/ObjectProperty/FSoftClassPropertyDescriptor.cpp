@@ -1,18 +1,7 @@
 #include "Reflection/Property/ObjectProperty/FSoftClassPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
-void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
-{
-	const auto Object = Class->NewObject();
-
-	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, true, false>(
-		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
-
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
-}
-
-void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetMultiObject<TSoftClassPtr<UObject>>(Src);
 
@@ -21,10 +10,30 @@ void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) 
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, false, true>(
-			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+			Class, Object, Src);
 	}
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
+}
+
+void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FParameter) const
+{
+	const auto Object = Class->NewObject();
+
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, false, false>(
+		Class, Object, Src);
+
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
+}
+
+void FSoftClassPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
+{
+	const auto Object = Class->NewObject();
+
+	FCSharpEnvironment::GetEnvironment().AddMultiReference<TSoftClassPtr<UObject>, true, false>(
+		Class, Object, Src);
+
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FSoftClassPropertyDescriptor::Set(void* Src, void* Dest) const

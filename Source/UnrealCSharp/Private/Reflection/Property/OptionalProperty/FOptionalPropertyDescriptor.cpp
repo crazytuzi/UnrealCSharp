@@ -1,21 +1,8 @@
 #include "Reflection/Property/OptionalProperty/FOptionalPropertyDescriptor.h"
 #if UE_F_OPTIONAL_PROPERTY
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
-void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
-{
-	const auto Object = Class->NewObject();
-
-	const auto OptionalHelper = new FOptionalHelper(Property, Src, true, false);
-
-	FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
-		Src, OptionalHelper, Class, MANAGED_HANDLE_FROM_OBJECT(Object));
-
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
-}
-
-void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetOptionalObject<FOptionalHelper>(Src);
 
@@ -26,10 +13,22 @@ void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) c
 		const auto OptionalHelper = new FOptionalHelper(Property, Src, false, false);
 
 		FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, true>(
-			Src, OptionalHelper, Class, MANAGED_HANDLE_FROM_OBJECT(Object));
+			Src, OptionalHelper, Class, Object);
 	}
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
+}
+
+void FOptionalPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
+{
+	const auto Object = Class->NewObject();
+
+	const auto OptionalHelper = new FOptionalHelper(Property, Src, true, false);
+
+	FCSharpEnvironment::GetEnvironment().AddOptionalReference<FOptionalHelper, false>(
+		Src, OptionalHelper, Class, Object);
+
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FOptionalPropertyDescriptor::Set(void* Src, void* Dest) const

@@ -18,25 +18,25 @@ public:
 	template <auto IsNeedOverride>
 	static auto Bind(UStruct* InStruct);
 
-	static IManagedObject Bind(UObject* InObject);
+	static IManagedHandle Bind(UObject* InObject);
 
-	static IManagedObject Bind(UClass* InClass);
+	static IManagedHandle Bind(UClass* InClass);
 
 	template <auto IsNeedOverride>
 	static auto Bind(UObject* InObject);
 
 	template <typename T>
 	static auto Bind(FClassReflection* InClassReflection, FClassReflection* InPropertyClassReflection,
-	                 const IManagedObject InManagedObject);
+	                 const IManagedHandle InManagedObject);
 
 	template <typename T>
 	static auto Bind(FClassReflection* InClassReflection, FClassReflection* InKeyClassReflection,
-	                 FClassReflection* InValueClassReflection, const IManagedObject InManagedObject);
+	                 FClassReflection* InValueClassReflection, const IManagedHandle InManagedObject);
 
-	static bool Bind(const IManagedObject InManagedObject, const FName& InStructName);
+	static bool Bind(const IManagedHandle InManagedObject, const FName& InStructName);
 
 	template <typename T>
-	static auto Bind(FClassReflection* InClassReflection, const IManagedObject InManagedObject);
+	static auto Bind(FClassReflection* InClassReflection, const IManagedHandle InManagedObject);
 
 	static bool Bind(FClassDescriptor* InClassDescriptor, UClass* InClass, UFunction* InFunction);
 
@@ -47,7 +47,7 @@ public:
 
 private:
 	template <auto IsNeedOverride>
-	static auto BindImplementation(UObject* InObject) -> IManagedObject;
+	static auto BindImplementation(UObject* InObject) -> IManagedHandle;
 
 	static bool BindImplementation(UStruct* InStruct);
 
@@ -56,16 +56,16 @@ private:
 
 	template <typename T>
 	static auto BindImplementation(FClassReflection* InClassReflection, FClassReflection* InPropertyClassReflection,
-	                               const IManagedObject InManagedObject);
+	                               const IManagedHandle InManagedObject);
 
 	template <typename T>
 	static auto BindImplementation(FClassReflection* InClassReflection, FClassReflection* InKeyClassReflection,
-	                               FClassReflection* InValueClassReflection, const IManagedObject InManagedObject);
+	                               FClassReflection* InValueClassReflection, const IManagedHandle InManagedObject);
 
-	static bool BindImplementation(const IManagedObject InManagedObject, const FName& InStructName);
+	static bool BindImplementation(const IManagedHandle InManagedObject, const FName& InStructName);
 
 	template <typename T>
-	static auto BindImplementation(FClassReflection* InClassReflection, const IManagedObject InManagedObject);
+	static auto BindImplementation(FClassReflection* InClassReflection, const IManagedHandle InManagedObject);
 
 private:
 	static bool CanBind(UStruct* InStruct);

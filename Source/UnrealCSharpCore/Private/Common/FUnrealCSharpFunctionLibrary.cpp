@@ -9,7 +9,6 @@
 #include "WidgetBlueprint.h"
 #include "Animation/AnimBlueprint.h"
 #include "Animation/AnimInstance.h"
-#include "Interfaces/ITargetPlatformManagerModule.h"
 #endif
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
@@ -28,6 +27,10 @@
 #include "Windows/HideWindowsPlatformTypes.h"
 #endif
 #endif
+#endif
+
+#if WITH_EDITOR
+EScriptDomainType FUnrealCSharpFunctionLibrary::ScriptDomainType = EScriptDomainType::CoreCLR;
 #endif
 
 #if WITH_EDITOR
@@ -1023,6 +1026,9 @@ FString FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath()
 #if WITH_EDITOR
 	return FPaths::ConvertRelativePathToFull(
 		FUnrealCSharpFunctionLibrary::GetFullPublishDirectory() / (INTEROP_NAME + DLL_SUFFIX));
+#elif WITH_MONO
+	return FPaths::ConvertRelativePathToFull(
+		FUnrealCSharpFunctionLibrary::GetFullPublishDirectory() / (INTEROP_NAME + DLL_SUFFIX));
 #else
 	return FPaths::ConvertRelativePathToFull(
 		FPaths::GetPath(FPlatformProcess::ExecutablePath()) / (INTEROP_NAME + DLL_SUFFIX));
@@ -1057,6 +1063,7 @@ TArray<FString> FUnrealCSharpFunctionLibrary::GetFullCustomProjectsPublishPath()
 TArray<FString> FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath()
 {
 	return TArrayBuilder<FString>().
+	       Add(GetFullInteropPublishPath()).
 	       Add(GetFullUEPublishPath()).
 	       Add(GetFullGamePublishPath()).
 	       Append(GetFullCustomProjectsPublishPath()).
@@ -1177,7 +1184,11 @@ TMap<FString, TArray<FString>> FUnrealCSharpFunctionLibrary::LoadFileToArray(con
 					}
 				}
 
+#if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
+				Result.Add(FString(*Key), Array);
+#else
 				Result.Add(Key, Array);
+#endif
 			}
 		}
 	}
@@ -1201,7 +1212,11 @@ TMap<FString, FString> FUnrealCSharpFunctionLibrary::LoadFileToString(const FStr
 
 			for (const auto& [Key, Value] : JsonObject->Values)
 			{
+#if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
+				Result.Add(FString(*Key), Value->AsString());
+#else
 				Result.Add(Key, Value->AsString());
+#endif
 			}
 		}
 	}
@@ -1285,7 +1300,11 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 			{
 				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
 				{
+#if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
+					EngineModuleList.AddUnique(FString(*Key));
+#else
 					EngineModuleList.AddUnique(Key);
+#endif
 				}
 			}
 
@@ -1293,7 +1312,11 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetEngineModuleList()
 			{
 				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
 				{
+#if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
+					EngineModuleList.AddUnique(FString(*Key));
+#else
 					EngineModuleList.AddUnique(Key);
+#endif
 				}
 			}
 		}
@@ -1322,7 +1345,11 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 			{
 				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
 				{
+#if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
+					ProjectModuleList.AddUnique(FString(*Key));
+#else
 					ProjectModuleList.AddUnique(Key);
+#endif
 				}
 			}
 
@@ -1330,7 +1357,11 @@ const TArray<FString>& FUnrealCSharpFunctionLibrary::GetProjectModuleList()
 			{
 				for (const auto& [Key, PLACEHOLDER] : OutObject->Get()->Values)
 				{
+#if UE_F_JSON_OBJECT_VALUES_KEY_F_SHARED_STRING
+					ProjectModuleList.AddUnique(FString(*Key));
+#else
 					ProjectModuleList.AddUnique(Key);
+#endif
 				}
 			}
 		}
@@ -1523,40 +1554,23 @@ void FUnrealCSharpFunctionLibrary::SyncProcess(const FString& InURL, const FStri
 #endif
 
 #if WITH_EDITOR
-FString FUnrealCSharpFunctionLibrary::GetPlatformName()
+void FUnrealCSharpFunctionLibrary::SetScriptDomainType(const EScriptDomainType InScriptDomainType)
 {
-	if (IsRunningCookCommandlet())
-	{
-		if (const auto TargetPlatformManager = GetTargetPlatformManager())
-		{
-			if (const auto& ActiveTargetPlatforms = TargetPlatformManager->GetActiveTargetPlatforms();
-				!ActiveTargetPlatforms.IsEmpty())
-			{
-				return ActiveTargetPlatforms[0]->IniPlatformName();
-			}
-		}
-	}
-
-	return FPlatformProperties::IniPlatformName();
+	ScriptDomainType = InScriptDomainType;
 }
 
-EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType()
+EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType(const FString& InPlatformName)
 {
 	if (const auto UnrealCSharpSetting = GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
-		return UnrealCSharpSetting->GetScriptDomainType(GetPlatformName());
+		return UnrealCSharpSetting->GetScriptDomainType(InPlatformName);
 	}
 
 	return EScriptDomainType::CoreCLR;
 }
 
-bool FUnrealCSharpFunctionLibrary::IsMonoDomain()
+EScriptDomainType FUnrealCSharpFunctionLibrary::GetScriptDomainType()
 {
-	return GetScriptDomainType() == EScriptDomainType::Mono;
-}
-
-bool FUnrealCSharpFunctionLibrary::IsCoreCLRDomain()
-{
-	return GetScriptDomainType() == EScriptDomainType::CoreCLR;
+	return ScriptDomainType;
 }
 #endif

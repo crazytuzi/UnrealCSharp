@@ -5,7 +5,7 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "Dynamic/FDynamicClassGenerator.h"
-#include "NewCLass/SDynamicNewClassDialog.h"
+#include "NewClass/SDynamicNewClassDialog.h"
 
 #define LOCTEXT_NAMESPACE "DynamicNewClassUtils"
 

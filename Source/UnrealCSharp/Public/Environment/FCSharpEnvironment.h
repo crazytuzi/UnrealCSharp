@@ -45,16 +45,16 @@ public:
 	template <auto IsNeedOverride>
 	auto Bind(UStruct* InStruct) const;
 
-	IManagedObject Bind(UObject* Object) const;
+	IManagedHandle Bind(UObject* Object) const;
 
-	IManagedObject Bind(const UObject* Object) const;
+	IManagedHandle Bind(const UObject* Object) const;
 
-	IManagedObject Bind(UClass* Class) const;
+	IManagedHandle Bind(UClass* Class) const;
 
 	template <auto IsNeedOverride>
 	auto Bind(UObject* Object) const;
 
-	bool Bind(const IManagedObject InManagedObject, const FName& InStructName) const;
+	bool Bind(const IManagedHandle InManagedObject, const FName& InStructName) const;
 
 public:
 	FClassDescriptor* GetClassDescriptor(const UStruct* InStruct) const;

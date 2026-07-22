@@ -125,7 +125,7 @@
 			} \
 			else \
 			{ \
-				OutPropertyDescriptor->Get<std::true_type>( \
+				OutPropertyDescriptor->Get<FPropertyArgument::FReturn>( \
 					OutPropertyDescriptor->CopyValue(OutPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
 					reinterpret_cast<void**>(OUT_BUFFER)); \
 			} \
@@ -140,7 +140,7 @@
 	} \
 	else if constexpr (ReturnType == EFunctionReturnType::Compound) \
 	{ \
-		ReturnPropertyDescriptor->Get<std::true_type>( \
+		ReturnPropertyDescriptor->Get<FPropertyArgument::FReturn>( \
 			ReturnPropertyDescriptor->CopyValue(ReturnPropertyDescriptor->ContainerPtrToValuePtr<void>(Params)), \
 			reinterpret_cast<void**>(RETURN_BUFFER)); \
 	} \

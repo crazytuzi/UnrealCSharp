@@ -24,7 +24,7 @@ public static class TypeBridge
 
                 if (Type != null)
                 {
-                    return HandleData.AllocImplementation(Type);
+                    return HandleData.Alloc(Type);
                 }
             }
         }
@@ -39,7 +39,7 @@ public static class TypeBridge
 
         if (Object != null)
         {
-            return HandleData.AllocImplementation(Object.GetType());
+            return HandleData.Alloc(Object.GetType());
         }
 
         return 0;
@@ -64,7 +64,7 @@ public static class TypeBridge
                     {
                         if (Method.Name == Name && Method.GetParameters().Length == InParamCount)
                         {
-                            return HandleData.AllocImplementation(Method);
+                            return HandleData.Alloc(Method);
                         }
                     }
                 }
@@ -173,7 +173,7 @@ public static class TypeBridge
         {
             if (HandleData.GetObject(InType) is Type Type)
             {
-                return HandleData.AllocImplementation(Generic.MakeGenericType(Type));
+                return HandleData.Alloc(Generic.MakeGenericType(Type));
             }
         }
 
@@ -189,7 +189,7 @@ public static class TypeBridge
             {
                 if (HandleData.GetObject(InKeyType) is Type Value)
                 {
-                    return HandleData.AllocImplementation(Generic.MakeGenericType(Key, Value));
+                    return HandleData.Alloc(Generic.MakeGenericType(Key, Value));
                 }
             }
         }
@@ -200,67 +200,67 @@ public static class TypeBridge
     [UnmanagedCallersOnly]
     public static unsafe nint BoxBool(int* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue != 0) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue != 0) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxSByte(sbyte* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxInt16(short* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxInt32(int* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxInt64(long* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxByte(byte* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxUInt16(ushort* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxUInt32(uint* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxUInt64(ulong* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxFloat(float* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]
     public static unsafe nint BoxDouble(double* InValue)
     {
-        return InValue != null ? HandleData.AllocImplementation(*InValue) : 0;
+        return InValue != null ? HandleData.Alloc(*InValue) : 0;
     }
 
     [UnmanagedCallersOnly]

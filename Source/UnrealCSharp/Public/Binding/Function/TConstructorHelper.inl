@@ -28,19 +28,19 @@ struct TConstructorHelper<std::tuple<Args...>>
 			FCSharpEnvironment::GetEnvironment().Bind<false>(Class::StaticStruct());
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
-				Class::StaticStruct(), Value, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+				Class::StaticStruct(), Value, InManagedObject);
 		}
 		else if constexpr (TIsScriptStruct<Class>::Value)
 		{
 			FCSharpEnvironment::GetEnvironment().Bind<false>(TBaseStructure<Class>::Get());
 
 			FCSharpEnvironment::GetEnvironment().AddStructReference<true>(
-				TBaseStructure<Class>::Get(), Value, MANAGED_HANDLE_FROM_OBJECT(InManagedObject));
+				TBaseStructure<Class>::Get(), Value, InManagedObject);
 		}
 		else
 		{
 			FCSharpEnvironment::GetEnvironment().AddBindingReference<Class, true>(
-				TPropertyClass<Class, Class>::Get(), MANAGED_HANDLE_FROM_OBJECT(InManagedObject), Value);
+				TPropertyClass<Class, Class>::Get(), InManagedObject, Value);
 		}
 	}
 };

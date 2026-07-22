@@ -1,106 +1,11 @@
 using System;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static unsafe class TArrayImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_RegisterImplementation<T>(TArray<T> InArray, Type InType);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TArray_IdenticalImplementation(nint InA, nint InB);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_UnRegisterImplementation(nint InArray);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_GetTypeSizeImplementation(nint InArray);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_GetSlackImplementation(nint InArray);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TArray_IsValidIndexImplementation(nint InArray, int InIndex);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_NumImplementation(nint InArray);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TArray_IsEmptyImplementation(nint InArray);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_MaxImplementation(nint InArray);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_GetImplementation(nint InArray, int InIndex, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_SetImplementation(nint InArray, int InIndex, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_FindImplementation(nint InArray, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_FindLastImplementation(nint InArray, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TArray_ContainsImplementation(nint InArray, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_AddUninitializedImplementation(nint InArray, int InCount);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_InsertZeroedImplementation(nint InArray, int InIndex, int InCount);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_InsertDefaultedImplementation(nint InArray, int InIndex, int InCount);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_RemoveAtImplementation(nint InArray, int InIndex, int InCount,
-            bool bAllowShrinking);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_ResetImplementation(nint InArray, int InNewSize);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_EmptyImplementation(nint InArray, int InSlack);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_SetNumImplementation(nint InArray, int InNewNum, bool bAllowShrinking);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_AddImplementation(nint InArray, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_AddZeroedImplementation(nint InArray, int InCount);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_AddUniqueImplementation(nint InArray, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_RemoveSingleImplementation(nint InArray, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_RemoveImplementation(nint InArray, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_SwapMemoryImplementation(nint InArray, int InFirstIndexToSwap,
-            int InSecondIndexToSwap);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TArray_SwapImplementation(nint InArray, int InFirstIndexToSwap,
-            int InSecondIndexToSwap);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TArray_INDEX_NONEImplementation();
-#else
         private static delegate* unmanaged[Cdecl]<nint, nint, void> __TArray_RegisterImplementation;
 
         public static void TArray_RegisterImplementation<T>(TArray<T> InArray, Type InType)
@@ -112,20 +17,16 @@ namespace Script.Library
                         "Script.Library.TArrayImplementation::TArray_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InArray);
-
-            InArray.GarbageCollectionHandle = Handle;
-
-            __TArray_RegisterImplementation(Handle, HandleData.AllocImplementation(InType));
+            __TArray_RegisterImplementation(HandleData.Alloc(InArray), HandleData.Alloc(InType));
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, nint, int> __TArray_IdenticalImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, nint, byte> __TArray_IdenticalImplementation;
 
         public static bool TArray_IdenticalImplementation(nint InA, nint InB)
         {
             if (__TArray_IdenticalImplementation == null)
             {
-                __TArray_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, int>)
+                __TArray_IdenticalImplementation = (delegate* unmanaged[Cdecl]<nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TArrayImplementation::TArray_IdenticalImplementation");
             }
@@ -175,13 +76,13 @@ namespace Script.Library
             return __TArray_GetSlackImplementation(InArray);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int, int> __TArray_IsValidIndexImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, int, byte> __TArray_IsValidIndexImplementation;
 
         public static bool TArray_IsValidIndexImplementation(nint InArray, int InIndex)
         {
             if (__TArray_IsValidIndexImplementation == null)
             {
-                __TArray_IsValidIndexImplementation = (delegate* unmanaged[Cdecl]<nint, int, int>)
+                __TArray_IsValidIndexImplementation = (delegate* unmanaged[Cdecl]<nint, int, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TArrayImplementation::TArray_IsValidIndexImplementation");
             }
@@ -202,13 +103,13 @@ namespace Script.Library
             return __TArray_NumImplementation(InArray);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int> __TArray_IsEmptyImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, byte> __TArray_IsEmptyImplementation;
 
         public static bool TArray_IsEmptyImplementation(nint InArray)
         {
             if (__TArray_IsEmptyImplementation == null)
             {
-                __TArray_IsEmptyImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __TArray_IsEmptyImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TArrayImplementation::TArray_IsEmptyImplementation");
             }
@@ -282,13 +183,13 @@ namespace Script.Library
             return __TArray_FindLastImplementation(InArray, InValueBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, byte*, int> __TArray_ContainsImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, byte*, byte> __TArray_ContainsImplementation;
 
         public static bool TArray_ContainsImplementation(nint InArray, byte* InValueBuffer)
         {
             if (__TArray_ContainsImplementation == null)
             {
-                __TArray_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, int>)
+                __TArray_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TArrayImplementation::TArray_ContainsImplementation");
             }
@@ -338,19 +239,19 @@ namespace Script.Library
             __TArray_InsertDefaultedImplementation(InArray, InIndex, InCount);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int, int, bool, void> __TArray_RemoveAtImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, int, int, byte, void> __TArray_RemoveAtImplementation;
 
         public static void TArray_RemoveAtImplementation(nint InArray, int InIndex, int InCount,
             bool bAllowShrinking)
         {
             if (__TArray_RemoveAtImplementation == null)
             {
-                __TArray_RemoveAtImplementation = (delegate* unmanaged[Cdecl]<nint, int, int, bool, void>)
+                __TArray_RemoveAtImplementation = (delegate* unmanaged[Cdecl]<nint, int, int, byte, void>)
                     MethodBridge.GetMethod(
                         "Script.Library.TArrayImplementation::TArray_RemoveAtImplementation");
             }
 
-            __TArray_RemoveAtImplementation(InArray, InIndex, InCount, bAllowShrinking);
+            __TArray_RemoveAtImplementation(InArray, InIndex, InCount, (byte)(bAllowShrinking ? 1 : 0));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, int, void> __TArray_ResetImplementation;
@@ -379,17 +280,17 @@ namespace Script.Library
             __TArray_EmptyImplementation(InArray, InSlack);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int, bool, void> __TArray_SetNumImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, int, byte, void> __TArray_SetNumImplementation;
 
         public static void TArray_SetNumImplementation(nint InArray, int InNewNum, bool bAllowShrinking)
         {
             if (__TArray_SetNumImplementation == null)
             {
-                __TArray_SetNumImplementation = (delegate* unmanaged[Cdecl]<nint, int, bool, void>)
+                __TArray_SetNumImplementation = (delegate* unmanaged[Cdecl]<nint, int, byte, void>)
                     MethodBridge.GetMethod("Script.Library.TArrayImplementation::TArray_SetNumImplementation");
             }
 
-            __TArray_SetNumImplementation(InArray, InNewNum, bAllowShrinking);
+            __TArray_SetNumImplementation(InArray, InNewNum, (byte)(bAllowShrinking ? 1 : 0));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, byte*, int> __TArray_AddImplementation;
@@ -502,17 +403,9 @@ namespace Script.Library
 
             return __TArray_INDEX_NONEImplementation();
         }
-#endif
 
         public static T TArray_GetCompoundImplementation<T>(nint InArray, int InIndex)
         {
-#if WITH_MONO
-            var ValueBuffer = stackalloc byte[sizeof(nint)];
-
-            TArray_GetImplementation(InArray, InIndex, ValueBuffer);
-
-            return *(T*)ValueBuffer;
-#else
             if (__TArray_GetImplementation == null)
             {
                 __TArray_GetImplementation = (delegate* unmanaged[Cdecl]<nint, int, byte*, void>)
@@ -526,7 +419,6 @@ namespace Script.Library
             var Handle = *(nint*)ValueBuffer;
 
             return Handle != 0 ? (T)HandleData.GetObject(Handle) : default;
-#endif
         }
     }
 }

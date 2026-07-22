@@ -2,6 +2,7 @@
 
 #include "Binding/Enum/TBindingEnumBuilder.inl"
 #include "Macro/BindingMacro.h"
+#include "UEVersion.h"
 
 BINDING_ENUM(EObjectFlags)
 
@@ -40,7 +41,10 @@ struct FRegisterObjectFlags
 			.Enumerator("RF_StrongRefOnFrame", EObjectFlags::RF_StrongRefOnFrame)
 			.Enumerator("RF_NonPIEDuplicateTransient", EObjectFlags::RF_NonPIEDuplicateTransient)
 			.Enumerator("RF_WillBeLoaded", EObjectFlags::RF_WillBeLoaded)
-			.Enumerator("RF_AllocatedInSharedPage", EObjectFlags::RF_AllocatedInSharedPage);
+#if UE_E_OBJECT_FLAGS_RF_ALLOCATED_IN_SHARED_PAGE
+			.Enumerator("RF_AllocatedInSharedPage", EObjectFlags::RF_AllocatedInSharedPage)
+#endif
+			;
 	}
 };
 

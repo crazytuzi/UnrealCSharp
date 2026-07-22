@@ -14,7 +14,7 @@ namespace
 {
 	struct FRegisterInputComponent
 	{
-		static IManagedObject GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
+		static IManagedHandle GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
 		                                                            const IManagedHandle InBindingClass)
 		{
 			const auto ThisClass = FCSharpEnvironment::GetEnvironment().GetObject<
@@ -36,7 +36,7 @@ namespace
 				return FCSharpEnvironment::GetEnvironment().Bind(DynamicBindingObject);
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
 		template <typename T>
@@ -76,7 +76,11 @@ namespace
 				{
 					BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
 					{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 						const auto Property = new FStructProperty(InFunction, TEXT("Key"), RF_Public | RF_Transient);
+#else
+						const auto Property = new FStructProperty(InFunction, TEXT("Key"));
+#endif
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE
 						Property->SetElementSize(FKey::StaticStruct()->GetStructureSize());
@@ -108,8 +112,12 @@ namespace
 				{
 					BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
 					{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 						const auto Property = new FFloatProperty(InFunction, TEXT("AxisValue"),
 						                                         RF_Public | RF_Transient);
+#else
+						const auto Property = new FFloatProperty(InFunction, TEXT("AxisValue"));
+#endif
 
 						Property->SetPropertyFlags(CPF_Parm);
 
@@ -132,8 +140,12 @@ namespace
 				{
 					BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
 					{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 						const auto Property = new FFloatProperty(InFunction, TEXT("AxisValue"),
 						                                         RF_Public | RF_Transient);
+#else
+						const auto Property = new FFloatProperty(InFunction, TEXT("AxisValue"));
+#endif
 
 						Property->SetPropertyFlags(CPF_Parm);
 
@@ -156,7 +168,11 @@ namespace
 				{
 					BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
 					{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 						const auto Property = new FStructProperty(InFunction, TEXT("Key"), RF_Public | RF_Transient);
+#else
+						const auto Property = new FStructProperty(InFunction, TEXT("Key"));
+#endif
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE
 						Property->SetElementSize(FKey::StaticStruct()->GetStructureSize());
@@ -187,8 +203,12 @@ namespace
 				{
 					BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
 					{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 						const auto LocationProperty = new FStructProperty(InFunction, TEXT("Location"),
 						                                                  RF_Public | RF_Transient);
+#else
+						const auto LocationProperty = new FStructProperty(InFunction, TEXT("Location"));
+#endif
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE
 						LocationProperty->SetElementSize(TBaseStructure<FVector2D>().Get()->GetStructureSize());
@@ -202,8 +222,12 @@ namespace
 
 						InFunction->AddCppProperty(LocationProperty);
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 						const auto FingerIndexProperty = new FEnumProperty(InFunction, TEXT("FingerIndex"),
 						                                                   RF_Public | RF_Transient);
+#else
+						const auto FingerIndexProperty = new FEnumProperty(InFunction, TEXT("FingerIndex"));
+#endif
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE
 						FingerIndexProperty->SetElementSize(sizeof(uint8));
@@ -234,8 +258,12 @@ namespace
 				{
 					BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
 					{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 						const auto Property = new FStructProperty(InFunction, TEXT("AxisValue"),
 						                                          RF_Public | RF_Transient);
+#else
+						const auto Property = new FStructProperty(InFunction, TEXT("AxisValue"));
+#endif
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE
 						Property->SetElementSize(TBaseStructure<FVector2D>().Get()->GetStructureSize());

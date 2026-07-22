@@ -29,6 +29,8 @@ private:
 
 	static FString GetEnumUnderlyingTypeName(const UEnum* InEnum);
 
+	static bool IsValueInUnderlyingTypeRange(const int64 InValue, const FString& InUnderlyingTypeName);
+
 private:
 	friend class FGeneratorCore;
 

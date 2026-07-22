@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CoreMacro/BufferMacro.h"
-#include "Domain/Script/IManagedTypes.h"
+#include "Domain/Script/IManagedHandle.h"
 
-#define BINDING_CONSTRUCTOR_SIGNATURE IManagedObject InManagedObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE
+#define BINDING_CONSTRUCTOR_SIGNATURE IManagedHandle InManagedObject, IN_BUFFER_SIGNATURE, OUT_BUFFER_SIGNATURE
 
 #define BINDING_CONSTRUCTOR_PARAM InManagedObject, IN_BUFFER, OUT_BUFFER
 

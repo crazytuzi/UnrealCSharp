@@ -1,19 +1,18 @@
 #include "Reflection/Property/ObjectProperty/FObjectPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
-void FObjectPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
+void FObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
 	const auto SrcObject = Property->GetObjectPropertyValue(Src);
 
-	*reinterpret_cast<IManagedObject*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
+	*reinterpret_cast<IManagedHandle*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
 }
 
-void FObjectPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+void FObjectPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
 {
 	const auto SrcObject = Property->GetObjectPropertyValue(Src);
 
-	*reinterpret_cast<IManagedObject*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
+	*reinterpret_cast<IManagedHandle*>(Dest) = FCSharpEnvironment::GetEnvironment().Bind(SrcObject);
 }
 
 void FObjectPropertyDescriptor::Set(void* Src, void* Dest) const

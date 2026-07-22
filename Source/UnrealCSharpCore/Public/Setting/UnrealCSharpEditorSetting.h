@@ -48,6 +48,8 @@ public:
 #if WITH_EDITOR
 	const FString& GetDotNetPath() const;
 
+	bool IsSkipGenerateScriptCode() const;
+
 	UFUNCTION()
 	TArray<FString> GetDotNetPathArray() const;
 
@@ -94,6 +96,9 @@ private:
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(Config, EditAnywhere, Category = DotNet, meta = (GetOptions = "GetDotNetPathArray"))
 	FString DotNetPath = TEXT("");
+
+	UPROPERTY(Config, EditAnywhere, Category = Generator)
+	bool bIsSkipGenerateScriptCode;
 
 	UPROPERTY(Config, EditAnywhere, Category = Generator, meta = (RelativePath))
 	FProjectDirectoryPath ScriptDirectory;

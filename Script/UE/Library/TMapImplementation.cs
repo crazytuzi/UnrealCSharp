@@ -1,64 +1,11 @@
 using System;
 using Script.CoreUObject;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static unsafe class TMapImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, Type InType);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_UnRegisterImplementation(nint InMap);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_EmptyImplementation(nint InMap, int InExpectedNumElements);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TMap_NumImplementation(nint InMap);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TMap_IsEmptyImplementation(nint InMap);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_AddImplementation(nint InMap, byte* InKeyBuffer, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TMap_RemoveImplementation(nint InMap, byte* InKeyBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_FindKeyImplementation(nint InMap, byte* InValueBuffer, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_FindImplementation(nint InMap, byte* InKeyBuffer, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TMap_ContainsImplementation(nint InMap, byte* InKeyBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_GetImplementation(nint InMap, byte* InKeyBuffer, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_SetImplementation(nint InMap, byte* InKeyBuffer, byte* InValueBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int TMap_GetMaxIndexImplementation(nint InMap);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool TMap_IsValidIndexImplementation(nint InMap, int InIndex);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_GetEnumeratorKeyImplementation(nint InMap, int InIndex, byte* ReturnBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void TMap_GetEnumeratorValueImplementation(nint InMap, int InIndex, byte* ReturnBuffer);
-#else
         private static delegate* unmanaged[Cdecl]<nint, nint, void> __TMap_RegisterImplementation;
 
         public static void TMap_RegisterImplementation<TKey, TValue>(TMap<TKey, TValue> InMap, Type InType)
@@ -69,11 +16,7 @@ namespace Script.Library
                     MethodBridge.GetMethod("Script.Library.TMapImplementation::TMap_RegisterImplementation");
             }
 
-            var Handle = HandleData.AllocImplementation(InMap);
-
-            InMap.GarbageCollectionHandle = Handle;
-
-            __TMap_RegisterImplementation(Handle, HandleData.AllocImplementation(InType));
+            __TMap_RegisterImplementation(HandleData.Alloc(InMap), HandleData.Alloc(InType));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, void> __TMap_UnRegisterImplementation;
@@ -115,13 +58,13 @@ namespace Script.Library
             return __TMap_NumImplementation(InMap);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int> __TMap_IsEmptyImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, byte> __TMap_IsEmptyImplementation;
 
         public static bool TMap_IsEmptyImplementation(nint InMap)
         {
             if (__TMap_IsEmptyImplementation == null)
             {
-                __TMap_IsEmptyImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __TMap_IsEmptyImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod("Script.Library.TMapImplementation::TMap_IsEmptyImplementation");
             }
 
@@ -142,13 +85,13 @@ namespace Script.Library
             return __TMap_GetMaxIndexImplementation(InMap);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int, int> __TMap_IsValidIndexImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, int, byte> __TMap_IsValidIndexImplementation;
 
         public static bool TMap_IsValidIndexImplementation(nint InMap, int InIndex)
         {
             if (__TMap_IsValidIndexImplementation == null)
             {
-                __TMap_IsValidIndexImplementation = (delegate* unmanaged[Cdecl]<nint, int, int>)
+                __TMap_IsValidIndexImplementation = (delegate* unmanaged[Cdecl]<nint, int, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.TMapImplementation::TMap_IsValidIndexImplementation");
             }
@@ -182,13 +125,13 @@ namespace Script.Library
             return __TMap_RemoveImplementation(InMap, InKeyBuffer);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, byte*, int> __TMap_ContainsImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, byte*, byte> __TMap_ContainsImplementation;
 
         public static bool TMap_ContainsImplementation(nint InMap, byte* InKeyBuffer)
         {
             if (__TMap_ContainsImplementation == null)
             {
-                __TMap_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, int>)
+                __TMap_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, byte>)
                     MethodBridge.GetMethod("Script.Library.TMapImplementation::TMap_ContainsImplementation");
             }
 
@@ -275,17 +218,9 @@ namespace Script.Library
 
             __TMap_GetEnumeratorValueImplementation(InMap, InIndex, ReturnBuffer);
         }
-#endif
 
         public static TKey TMap_FindKeyCompoundImplementation<TKey>(nint InMap, byte* InValueBuffer)
         {
-#if WITH_MONO
-            var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-            TMap_FindKeyImplementation(InMap, InValueBuffer, ReturnBuffer);
-
-            return *(TKey*)ReturnBuffer;
-#else
             if (__TMap_FindKeyImplementation == null)
             {
                 __TMap_FindKeyImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, byte*, void>)
@@ -299,18 +234,10 @@ namespace Script.Library
             var Handle = *(nint*)ReturnBuffer;
 
             return Handle != 0 ? (TKey)HandleData.GetObject(Handle) : default;
-#endif
         }
 
         public static TValue TMap_FindCompoundImplementation<TValue>(nint InMap, byte* InKeyBuffer)
         {
-#if WITH_MONO
-            var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-            TMap_FindImplementation(InMap, InKeyBuffer, ReturnBuffer);
-
-            return *(TValue*)ReturnBuffer;
-#else
             if (__TMap_FindImplementation == null)
             {
                 __TMap_FindImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, byte*, void>)
@@ -324,18 +251,10 @@ namespace Script.Library
             var Handle = *(nint*)ReturnBuffer;
 
             return Handle != 0 ? (TValue)HandleData.GetObject(Handle) : default;
-#endif
         }
 
         public static TValue TMap_GetCompoundImplementation<TValue>(nint InMap, byte* InKeyBuffer)
         {
-#if WITH_MONO
-            var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-            TMap_GetImplementation(InMap, InKeyBuffer, ReturnBuffer);
-
-            return *(TValue*)ReturnBuffer;
-#else
             if (__TMap_GetImplementation == null)
             {
                 __TMap_GetImplementation = (delegate* unmanaged[Cdecl]<nint, byte*, byte*, void>)
@@ -349,18 +268,10 @@ namespace Script.Library
             var Handle = *(nint*)ReturnBuffer;
 
             return Handle != 0 ? (TValue)HandleData.GetObject(Handle) : default;
-#endif
         }
 
         public static TKey TMap_GetEnumeratorKeyCompoundImplementation<TKey>(nint InMap, int InIndex)
         {
-#if WITH_MONO
-            var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-            TMap_GetEnumeratorKeyImplementation(InMap, InIndex, ReturnBuffer);
-
-            return *(TKey*)ReturnBuffer;
-#else
             if (__TMap_GetEnumeratorKeyImplementation == null)
             {
                 __TMap_GetEnumeratorKeyImplementation = (delegate* unmanaged[Cdecl]<nint, int, byte*, void>)
@@ -375,18 +286,10 @@ namespace Script.Library
             var Handle = *(nint*)ReturnBuffer;
 
             return Handle != 0 ? (TKey)HandleData.GetObject(Handle) : default;
-#endif
         }
 
         public static TValue TMap_GetEnumeratorValueCompoundImplementation<TValue>(nint InMap, int InIndex)
         {
-#if WITH_MONO
-            var ReturnBuffer = stackalloc byte[sizeof(nint)];
-
-            TMap_GetEnumeratorValueImplementation(InMap, InIndex, ReturnBuffer);
-
-            return *(TValue*)ReturnBuffer;
-#else
             if (__TMap_GetEnumeratorValueImplementation == null)
             {
                 __TMap_GetEnumeratorValueImplementation = (delegate* unmanaged[Cdecl]<nint, int, byte*, void>)
@@ -401,7 +304,6 @@ namespace Script.Library
             var Handle = *(nint*)ReturnBuffer;
 
             return Handle != 0 ? (TValue)HandleData.GetObject(Handle) : default;
-#endif
         }
     }
 }

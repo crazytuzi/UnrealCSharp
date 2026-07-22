@@ -74,18 +74,15 @@ void FSolutionGenerator::Generator()
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetGameDirectory() / FODY_WEAVERS_NAME + XML_SUFFIX),
 		ScriptPath / WEAVERS_NAME / FODY_WEAVERS_NAME + XML_SUFFIX);
 
-	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
-	{
-		CopyTemplate(
-			FUnrealCSharpFunctionLibrary::GetInteropProjectPath(),
-			TemplatePath / INTEROP_NAME + PROJECT_SUFFIX,
-			TArray<TFunction<void(FString& OutResult)>>
-			{
-				&FSolutionGenerator::ReplaceOutputPath,
-				&FSolutionGenerator::ReplaceTargetFramework,
-				&FSolutionGenerator::AddProjectGeneratorHeaderComment
-			});
-	}
+	CopyTemplate(
+		FUnrealCSharpFunctionLibrary::GetInteropProjectPath(),
+		TemplatePath / INTEROP_NAME + PROJECT_SUFFIX,
+		TArray<TFunction<void(FString& OutResult)>>
+		{
+			&FSolutionGenerator::ReplaceOutputPath,
+			&FSolutionGenerator::ReplaceTargetFramework,
+			&FSolutionGenerator::AddProjectGeneratorHeaderComment
+		});
 
 	CopyTemplate(
 		FUnrealCSharpFunctionLibrary::GetUEProjectPath(),
@@ -211,15 +208,6 @@ void FSolutionGenerator::ReplaceDefineConstants(FString& OutResult)
 		DefineConstants += TEXT("WITH_EDITOR;");
 	}
 
-	if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
-	{
-		DefineConstants += TEXT("WITH_CORECLR;");
-	}
-	else
-	{
-		DefineConstants += TEXT("WITH_MONO;");
-	}
-
 	DefineConstants = FString::Printf(TEXT(
 		"<DefineConstants>$(DefineConstants);%s</DefineConstants>"
 	),
@@ -342,20 +330,17 @@ void FSolutionGenerator::ReplaceProjectPlaceholder(FString& OutResult)
 
 	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
-		if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
-		{
-			Projects += FString::Printf(TEXT(
-				"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\r\n"
-				"EndProject\r\n"
-			),
-			                            *CSHARP_GUID,
-			                            *INTEROP_NAME,
-			                            *INTEROP_NAME,
-			                            *INTEROP_NAME,
-			                            *PROJECT_SUFFIX,
-			                            *INTEROP_GUID
-			);
-		}
+		Projects += FString::Printf(TEXT(
+			"Project(\"{%s}\") = \"%s\", \"%s\\%s%s\", \"{%s}\"\r\n"
+			"EndProject\r\n"
+		),
+		                            *CSHARP_GUID,
+		                            *INTEROP_NAME,
+		                            *INTEROP_NAME,
+		                            *INTEROP_NAME,
+		                            *PROJECT_SUFFIX,
+		                            *INTEROP_GUID
+		);
 
 		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{
@@ -387,20 +372,17 @@ void FSolutionGenerator::ReplaceSolutionConfigurationPlatformsPlaceholder(FStrin
 
 	if (const auto UnrealCSharpSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<UUnrealCSharpSetting>())
 	{
-		if (FUnrealCSharpFunctionLibrary::IsCoreCLRDomain())
-		{
-			SolutionConfigurationPlatforms += FString::Printf(TEXT(
-				"\t\t{%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\r\n"
-				"\t\t{%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\r\n"
-				"\t\t{%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\r\n"
-				"\t\t{%s}.Release|Any CPU.Build.0 = Release|Any CPU\r\n"
-			),
-			                                                  *INTEROP_GUID,
-			                                                  *INTEROP_GUID,
-			                                                  *INTEROP_GUID,
-			                                                  *INTEROP_GUID
-			);
-		}
+		SolutionConfigurationPlatforms += FString::Printf(TEXT(
+			"\t\t{%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\r\n"
+			"\t\t{%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\r\n"
+			"\t\t{%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\r\n"
+			"\t\t{%s}.Release|Any CPU.Build.0 = Release|Any CPU\r\n"
+		),
+		                                                  *INTEROP_GUID,
+		                                                  *INTEROP_GUID,
+		                                                  *INTEROP_GUID,
+		                                                  *INTEROP_GUID
+		);
 
 		for (const auto& CustomProject : UnrealCSharpSetting->GetCustomProjects())
 		{

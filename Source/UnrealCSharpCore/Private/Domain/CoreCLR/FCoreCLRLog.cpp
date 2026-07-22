@@ -12,29 +12,4 @@ void FCoreCLRLog::ErrorWriter(const char_t* InMessage)
 #endif
 #endif
 }
-
-void FCoreCLRLog::Log(const uint8* InMessage, const int32 InLength, const bool InIsError)
-{
-#if !NO_LOGGING
-	if (InMessage != nullptr)
-	{
-		TArray<uint8> Message;
-
-		Message.Append(InMessage, InLength);
-
-		Message.Add(0);
-
-		if (InIsError)
-		{
-			UE_LOG(LogUnrealCSharp, Error, TEXT("%s"),
-			       *FString(UTF8_TO_TCHAR(reinterpret_cast<const ANSICHAR*>(Message.GetData()))));
-		}
-		else
-		{
-			UE_LOG(LogUnrealCSharp, Log, TEXT("%s"),
-			       *FString(UTF8_TO_TCHAR(reinterpret_cast<const ANSICHAR*>(Message.GetData()))));
-		}
-	}
-#endif
-}
 #endif

@@ -2,6 +2,21 @@
 
 #include "Reflection/FClassReflection.h"
 
+struct FPropertyArgument
+{
+	struct FMember
+	{
+	};
+
+	struct FParameter
+	{
+	};
+
+	struct FReturn
+	{
+	};
+};
+
 class FPropertyDescriptor
 {
 public:
@@ -16,9 +31,11 @@ public:
 
 	virtual void Get(void* Src, void** Dest) const;
 
-	virtual void Get(void* Src, void** Dest, std::true_type) const;
+	virtual void Get(void* Src, void** Dest, FPropertyArgument::FMember) const;
 
-	virtual void Get(void* Src, void** Dest, std::false_type) const;
+	virtual void Get(void* Src, void** Dest, FPropertyArgument::FParameter) const;
+
+	virtual void Get(void* Src, void** Dest, FPropertyArgument::FReturn) const;
 
 	virtual void Get(void* Src, void* Dest) const;
 

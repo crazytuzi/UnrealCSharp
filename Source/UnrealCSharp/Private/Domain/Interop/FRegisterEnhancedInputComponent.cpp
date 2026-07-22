@@ -40,7 +40,7 @@ namespace
 
 	struct FRegisterEnhancedInputComponent
 	{
-		static IManagedObject GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
+		static IManagedHandle GetDynamicBindingObjectImplementation(const IManagedHandle InThisClass,
 		                                                            const IManagedHandle InBindingClass)
 		{
 			const auto ThisClass = FCSharpEnvironment::GetEnvironment().GetObject<
@@ -62,7 +62,7 @@ namespace
 				return FCSharpEnvironment::GetEnvironment().Bind(DynamicBindingObject);
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
 		static void BindFunction(UClass* InClass, const FName* InFunctionName,
@@ -107,8 +107,12 @@ namespace
 		{
 			BindFunction(InClass, InFunctionName, [](UFunction* InFunction)
 			{
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 				const auto SourceActionProperty = new FObjectProperty(InFunction, TEXT("SourceAction"),
 				                                                      RF_Public | RF_Transient);
+#else
+				const auto SourceActionProperty = new FObjectProperty(InFunction, TEXT("SourceAction"));
+#endif
 
 				SourceActionProperty->PropertyClass = UInputAction::StaticClass();
 
@@ -116,22 +120,34 @@ namespace
 
 				InFunction->AddCppProperty(SourceActionProperty);
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 				const auto TriggeredTimeProperty = new FFloatProperty(InFunction, TEXT("TriggeredTime"),
 				                                                      RF_Public | RF_Transient);
+#else
+				const auto TriggeredTimeProperty = new FFloatProperty(InFunction, TEXT("TriggeredTime"));
+#endif
 
 				TriggeredTimeProperty->SetPropertyFlags(CPF_Parm);
 
 				InFunction->AddCppProperty(TriggeredTimeProperty);
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 				const auto ElapsedTimeProperty = new FFloatProperty(InFunction, TEXT("ElapsedTime"),
 				                                                    RF_Public | RF_Transient);
+#else
+				const auto ElapsedTimeProperty = new FFloatProperty(InFunction, TEXT("ElapsedTime"));
+#endif
 
 				ElapsedTimeProperty->SetPropertyFlags(CPF_Parm);
 
 				InFunction->AddCppProperty(ElapsedTimeProperty);
 
+#if UE_F_PROPERTY_CONSTRUCTOR_E_OBJECT_FLAGS
 				const auto ActionValueProperty = new FStructProperty(InFunction, TEXT("ActionValue"),
 				                                                     RF_Public | RF_Transient);
+#else
+				const auto ActionValueProperty = new FStructProperty(InFunction, TEXT("ActionValue"));
+#endif
 
 #if UE_F_PROPERTY_SET_ELEMENT_SIZE
 				ActionValueProperty->SetElementSize(FInputActionValue::StaticStruct()->GetStructureSize());
@@ -147,7 +163,7 @@ namespace
 			});
 		}
 
-		static IManagedObject BindActionImplementation(const IManagedHandle InManagedHandle,
+		static IManagedHandle BindActionImplementation(const IManagedHandle InManagedHandle,
 		                                               const IManagedHandle InBlueprintEnhancedInputActionBinding,
 		                                               const IManagedHandle InObjectToBindTo,
 		                                               const IManagedHandle InFunctionNameToBind)
@@ -179,10 +195,10 @@ namespace
 					std::decay_t<FEnhancedInputActionEventBinding>, false>(
 					FoundClass, Object, &EnhancedInputActionEventBinding);
 
-				return IManagedHandleToIManagedObject(Object);
+				return Object;
 			}
 
-			return INVALID_MANAGED;
+			return InvalidManagedHandle;
 		}
 
 		static void RemoveBindingImplementation(const IManagedHandle InManagedHandle,

@@ -1,75 +1,24 @@
 using System;
 using System.Reflection;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static unsafe class FMulticastDelegateImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_RegisterImplementation(object InMonoObject, Type InType);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_UnRegisterImplementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FMulticastDelegate_IsBoundImplementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool FMulticastDelegate_ContainsImplementation(nint InMonoObject, nint InObject,
-            Type InType, MethodInfo InMethodInfo);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_AddImplementation(nint InMonoObject, nint InObject,
-            Type InType, MethodInfo InMethodInfo);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_AddUniqueImplementation(nint InMonoObject, nint InObject,
-            Type InType, MethodInfo InMethodInfo);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_RemoveImplementation(nint InMonoObject, nint InObject,
-            Type InType, MethodInfo InMethodInfo);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_RemoveAllImplementation(nint InMonoObject, nint InObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_ClearImplementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_GenericBroadcast0Implementation(nint InMonoObject);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_GenericBroadcast2Implementation(nint InMonoObject,
-            byte* InBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_GenericBroadcast4Implementation(nint InMonoObject,
-            byte* OutBuffer);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void FMulticastDelegate_GenericBroadcast6Implementation(nint InMonoObject,
-            byte* InBuffer, byte* OutBuffer);
-#else
-        private static delegate* unmanaged[Cdecl]<object, nint, void>
+        private static delegate* unmanaged[Cdecl]<nint, nint, void>
             __FMulticastDelegate_RegisterImplementation;
 
         public static void FMulticastDelegate_RegisterImplementation(object InMonoObject, Type InType)
         {
             if (__FMulticastDelegate_RegisterImplementation == null)
             {
-                __FMulticastDelegate_RegisterImplementation = (delegate* unmanaged[Cdecl]<object, nint, void>)
+                __FMulticastDelegate_RegisterImplementation = (delegate* unmanaged[Cdecl]<nint, nint, void>)
                     MethodBridge.GetMethod(
                         "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_RegisterImplementation");
             }
 
-            __FMulticastDelegate_RegisterImplementation(InMonoObject, HandleData.AllocImplementation(InType));
+            __FMulticastDelegate_RegisterImplementation(HandleData.Alloc(InMonoObject), HandleData.Alloc(InType));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, void> __FMulticastDelegate_UnRegisterImplementation;
@@ -86,13 +35,13 @@ namespace Script.Library
             __FMulticastDelegate_UnRegisterImplementation(InMonoObject);
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, int> __FMulticastDelegate_IsBoundImplementation;
+        private static delegate* unmanaged[Cdecl]<nint, byte> __FMulticastDelegate_IsBoundImplementation;
 
         public static unsafe bool FMulticastDelegate_IsBoundImplementation(nint InMonoObject)
         {
             if (__FMulticastDelegate_IsBoundImplementation == null)
             {
-                __FMulticastDelegate_IsBoundImplementation = (delegate* unmanaged[Cdecl]<nint, int>)
+                __FMulticastDelegate_IsBoundImplementation = (delegate* unmanaged[Cdecl]<nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_IsBoundImplementation");
             }
@@ -100,21 +49,21 @@ namespace Script.Library
             return __FMulticastDelegate_IsBoundImplementation(InMonoObject) != 0;
         }
 
-        private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, int>
+        private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, byte>
             __FMulticastDelegate_ContainsImplementation;
 
-        public static unsafe bool FMulticastDelegate_ContainsImplementation(nint InMonoObject, nint InObject,
+        public static bool FMulticastDelegate_ContainsImplementation(nint InMonoObject, nint InObject,
             Type InType, MethodInfo InMethodInfo)
         {
             if (__FMulticastDelegate_ContainsImplementation == null)
             {
-                __FMulticastDelegate_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, int>)
+                __FMulticastDelegate_ContainsImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, byte>)
                     MethodBridge.GetMethod(
                         "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_ContainsImplementation");
             }
 
             return __FMulticastDelegate_ContainsImplementation(InMonoObject, InObject,
-                HandleData.AllocImplementation(InType), HandleData.AllocImplementation(InMethodInfo)) != 0;
+                HandleData.Alloc(InType), HandleData.Alloc(InMethodInfo)) != 0;
         }
 
         private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>
@@ -130,8 +79,8 @@ namespace Script.Library
                         "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_AddImplementation");
             }
 
-            __FMulticastDelegate_AddImplementation(InMonoObject, InObject, HandleData.AllocImplementation(InType),
-                HandleData.AllocImplementation(InMethodInfo));
+            __FMulticastDelegate_AddImplementation(InMonoObject, InObject, HandleData.Alloc(InType),
+                HandleData.Alloc(InMethodInfo));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>
@@ -149,7 +98,7 @@ namespace Script.Library
             }
 
             __FMulticastDelegate_AddUniqueImplementation(InMonoObject, InObject,
-                HandleData.AllocImplementation(InType), HandleData.AllocImplementation(InMethodInfo));
+                HandleData.Alloc(InType), HandleData.Alloc(InMethodInfo));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>
@@ -165,8 +114,8 @@ namespace Script.Library
                         "Script.Library.FMulticastDelegateImplementation::FMulticastDelegate_RemoveImplementation");
             }
 
-            __FMulticastDelegate_RemoveImplementation(InMonoObject, InObject, HandleData.AllocImplementation(InType),
-                HandleData.AllocImplementation(InMethodInfo));
+            __FMulticastDelegate_RemoveImplementation(InMonoObject, InObject, HandleData.Alloc(InType),
+                HandleData.Alloc(InMethodInfo));
         }
 
         private static delegate* unmanaged[Cdecl]<nint, nint, void> __FMulticastDelegate_RemoveAllImplementation;
@@ -258,6 +207,5 @@ namespace Script.Library
 
             __FMulticastDelegate_GenericBroadcast6Implementation(InMonoObject, InBuffer, OutBuffer);
         }
-#endif
     }
 }

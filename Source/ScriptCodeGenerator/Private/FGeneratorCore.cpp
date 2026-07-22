@@ -6,7 +6,6 @@
 #include "Common/FUnrealCSharpFunctionLibrary.h"
 #include "CoreMacro/Macro.h"
 #include "CoreMacro/NamespaceMacro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "Setting/UnrealCSharpEditorSetting.h"
 #include "UEVersion.h"
 #if UE_F_OPTIONAL_PROPERTY
@@ -566,10 +565,7 @@ FString FGeneratorCore::GetSetAccessorParamName(FProperty* Property)
 	}
 	else
 	{
-		return FString::Printf(TEXT(
-			"value?.%s ?? nint.Zero"),
-		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
-		);
+		return TEXT("HandleData.GetHandle(value)");
 	}
 }
 
@@ -595,7 +591,7 @@ FString FGeneratorCore::GetReturn(FProperty* InProperty, const FString& InProper
 
 FString FGeneratorCore::GetReturn(const bool bIsPrimitive, const FString& InPropertyType, const FString& InBuffer)
 {
-	return bIsPrimitive || FUnrealCSharpFunctionLibrary::IsMonoDomain()
+	return bIsPrimitive
 		       ? FString::Printf(TEXT("*(%s*)%s"), *InPropertyType, *InBuffer)
 		       : FString::Printf(TEXT(
 			       "(%s)HandleData.GetObject(*(nint*)%s)"
@@ -616,7 +612,7 @@ FString FGeneratorCore::GetOutParam(const bool bIsPrimitive, const FString& InNa
                                     const FString& InPropertyType, const FString& InBuffer,
                                     const FString& InOffset, const FString& InIndent)
 {
-	return bIsPrimitive || FUnrealCSharpFunctionLibrary::IsMonoDomain()
+	return bIsPrimitive
 		       ? FString::Printf(TEXT(
 			       "\n%s%s = *(%s*)(%s%s);\n"
 		       ),
@@ -667,9 +663,8 @@ FString FGeneratorCore::GetParamName(FProperty* Property)
 	else
 	{
 		return FString::Printf(TEXT(
-			"%s?.%s ?? nint.Zero"),
-		                       *FUnrealCSharpFunctionLibrary::Encode(Property),
-		                       *PROPERTY_GARBAGE_COLLECTION_HANDLE
+			"HandleData.GetHandle(%s)"),
+		                       *FUnrealCSharpFunctionLibrary::Encode(Property)
 		);
 	}
 }

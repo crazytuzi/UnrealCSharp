@@ -1,66 +1,10 @@
 using Script.Engine;
-#if WITH_MONO
-using System.Runtime.CompilerServices;
-#else
 using Interop;
-#endif
 
 namespace Script.Library
 {
     public static partial class UInputComponentImplementation
     {
-#if WITH_MONO
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern T UInputComponent_GetDynamicBindingObjectImplementation<T>(
-            nint InThisClass,
-            nint InBindingClass)
-            where T : UDynamicBlueprintBinding;
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UInputComponent_BindActionImplementation(
-            nint InObject,
-            nint InInputActionDelegateBinding,
-            nint InObjectToBindTo,
-            nint InFunctionNameToBind);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UInputComponent_BindAxisImplementation(
-            nint InObject,
-            nint InInputAxisDelegateBinding,
-            nint InObjectToBindTo,
-            nint InFunctionNameToBind);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UInputComponent_BindAxisKeyImplementation(
-            nint InObject,
-            nint InInputAxisKeyDelegateBinding,
-            nint InObjectToBindTo,
-            nint InFunctionNameToBind);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UInputComponent_BindKeyImplementation(
-            nint InObject,
-            nint InInputKeyDelegateBinding,
-            nint InObjectToBindTo,
-            nint InFunctionNameToBind);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UInputComponent_BindTouchImplementation(
-            nint InObject,
-            nint InInputTouchDelegateBinding,
-            nint InObjectToBindTo,
-            nint InFunctionNameToBind);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UInputComponent_BindVectorAxisImplementation(
-            nint InObject,
-            nint InInputVectorAxisDelegateBinding,
-            nint InObjectToBindTo,
-            nint InFunctionNameToBind);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void UInputComponent_ClearBindingValuesImplementation(nint InObject);
-#else
         private static unsafe delegate* unmanaged[Cdecl]<nint, nint, nint>
             __UInputComponent_GetDynamicBindingObjectImplementation;
 
@@ -89,7 +33,7 @@ namespace Script.Library
             {
                 __UInputComponent_BindActionImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
                     MethodBridge.GetMethod(
-                        "Script.Library.InputComponentImplementation::UInputComponent_BindActionImplementation");
+                        "Script.Library.UInputComponentImplementation::UInputComponent_BindActionImplementation");
             }
 
             __UInputComponent_BindActionImplementation(InObject, InInputActionDelegateBinding, InObjectToBindTo,
@@ -106,7 +50,7 @@ namespace Script.Library
             {
                 __UInputComponent_BindAxisImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
                     MethodBridge.GetMethod(
-                        "Script.Library.InputComponentImplementation::UInputComponent_BindAxisImplementation");
+                        "Script.Library.UInputComponentImplementation::UInputComponent_BindAxisImplementation");
             }
 
             __UInputComponent_BindAxisImplementation(InObject, InInputAxisDelegateBinding, InObjectToBindTo,
@@ -123,7 +67,7 @@ namespace Script.Library
             {
                 __UInputComponent_BindAxisKeyImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
                     MethodBridge.GetMethod(
-                        "Script.Library.InputComponentImplementation::UInputComponent_BindAxisKeyImplementation");
+                        "Script.Library.UInputComponentImplementation::UInputComponent_BindAxisKeyImplementation");
             }
 
             __UInputComponent_BindAxisKeyImplementation(InObject, InInputAxisKeyDelegateBinding, InObjectToBindTo,
@@ -140,7 +84,7 @@ namespace Script.Library
             {
                 __UInputComponent_BindKeyImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
                     MethodBridge.GetMethod(
-                        "Script.Library.InputComponentImplementation::UInputComponent_BindKeyImplementation");
+                        "Script.Library.UInputComponentImplementation::UInputComponent_BindKeyImplementation");
             }
 
             __UInputComponent_BindKeyImplementation(InObject, InInputKeyDelegateBinding, InObjectToBindTo,
@@ -157,7 +101,7 @@ namespace Script.Library
             {
                 __UInputComponent_BindTouchImplementation = (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
                     MethodBridge.GetMethod(
-                        "Script.Library.InputComponentImplementation::UInputComponent_BindTouchImplementation");
+                        "Script.Library.UInputComponentImplementation::UInputComponent_BindTouchImplementation");
             }
 
             __UInputComponent_BindTouchImplementation(InObject, InInputTouchDelegateBinding, InObjectToBindTo,
@@ -175,7 +119,7 @@ namespace Script.Library
                 __UInputComponent_BindVectorAxisImplementation =
                     (delegate* unmanaged[Cdecl]<nint, nint, nint, nint, void>)
                     MethodBridge.GetMethod(
-                        "Script.Library.InputComponentImplementation::UInputComponent_BindVectorAxisImplementation");
+                        "Script.Library.UInputComponentImplementation::UInputComponent_BindVectorAxisImplementation");
             }
 
             __UInputComponent_BindVectorAxisImplementation(InObject, InInputVectorAxisDelegateBinding, InObjectToBindTo,
@@ -190,11 +134,10 @@ namespace Script.Library
             {
                 __UInputComponent_ClearBindingValuesImplementation = (delegate* unmanaged[Cdecl]<nint, void>)
                     MethodBridge.GetMethod(
-                        "Script.Library.InputComponentImplementation::UInputComponent_ClearBindingValuesImplementation");
+                        "Script.Library.UInputComponentImplementation::UInputComponent_ClearBindingValuesImplementation");
             }
 
             __UInputComponent_ClearBindingValuesImplementation(InObject);
         }
-#endif
     }
 }

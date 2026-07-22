@@ -155,15 +155,16 @@ void FCSharpCompilerRunnable::DoWork()
 	});
 }
 
-void FCSharpCompilerRunnable::ImmediatelyDoWork()
+void FCSharpCompilerRunnable::ImmediatelyDoWork(const bool bForceCompileInterop)
 {
 	Compile([]()
 	{
 		FDynamicGenerator::Generator();
-	}, true);
+	}, true, bForceCompileInterop);
 }
 
-void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const bool bCompileInterop)
+void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const bool bCompileInterop,
+                                      const bool bForceCompileInterop)
 {
 	if (const auto UnrealCSharpEditorSetting = FUnrealCSharpFunctionLibrary::GetMutableDefaultSafe<
 		UUnrealCSharpEditorSetting>())
@@ -174,7 +175,7 @@ void FCSharpCompilerRunnable::Compile(const TFunction<void()>& InFunction, const
 
 			if (bCompileInterop)
 			{
-				CompileInterop();
+				CompileInterop(bForceCompileInterop);
 			}
 
 			Compile();
@@ -215,7 +216,7 @@ FString FCSharpCompilerRunnable::GetBuildConfiguration()
 	return TEXT("Debug");
 }
 
-void FCSharpCompilerRunnable::CompileInterop()
+void FCSharpCompilerRunnable::CompileInterop(const bool bForceCompileInterop)
 {
 	const auto InteropProjectPath = FUnrealCSharpFunctionLibrary::GetInteropProjectPath();
 
@@ -225,15 +226,16 @@ void FCSharpCompilerRunnable::CompileInterop()
 	}
 
 	if (const auto InteropPath = FUnrealCSharpFunctionLibrary::GetFullInteropPublishPath();
-		!IFileManager::Get().FileExists(*InteropPath))
+		bForceCompileInterop || !IFileManager::Get().FileExists(*InteropPath))
 	{
 		static auto CompileTool = FUnrealCSharpFunctionLibrary::GetDotNet();
 
 		const auto CompileParam = FString::Printf(TEXT(
-			"build \"%s\" --nologo -c %s"
+			"build \"%s\" --nologo -c %s%s"
 		),
 		                                          *FUnrealCSharpFunctionLibrary::GetInteropProjectPath(),
-		                                          *GetBuildConfiguration()
+		                                          *GetBuildConfiguration(),
+		                                          bForceCompileInterop ? TEXT(" --no-incremental") : TEXT("")
 		);
 
 		FUnrealCSharpFunctionLibrary::SyncProcess(CompileTool, CompileParam,

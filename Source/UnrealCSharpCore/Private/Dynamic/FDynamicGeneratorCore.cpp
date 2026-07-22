@@ -656,7 +656,7 @@ void FDynamicGeneratorCore::SetFlags(UFunction* InFunction, FReflection* InRefle
 		InFunction->FunctionFlags |= FUNC_BlueprintAuthorityOnly;
 	}
 
-	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintPureAttributeClass()))
+	if (InReflection->HasAttribute(FReflectionRegistry::Get().GetBlueprintCosmeticAttributeClass()))
 	{
 		InFunction->FunctionFlags |= FUNC_BlueprintCosmetic;
 	}

@@ -1,18 +1,7 @@
 #include "Reflection/Property/StringProperty/FTextPropertyDescriptor.h"
 #include "Environment/FCSharpEnvironment.h"
-#include "Domain/Script/IManagedHandle.h"
 
-void FTextPropertyDescriptor::Get(void* Src, void** Dest, std::true_type) const
-{
-	const auto Object = Class->NewObject();
-
-	FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(
-		Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
-
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
-}
-
-void FTextPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
+void FTextPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FMember) const
 {
 	auto Object = FCSharpEnvironment::GetEnvironment().GetStringObject<FText>(Src);
 
@@ -21,10 +10,20 @@ void FTextPropertyDescriptor::Get(void* Src, void** Dest, std::false_type) const
 		Object = Class->NewObject();
 
 		FCSharpEnvironment::GetEnvironment().AddStringReference<FText, false, true>(
-			Class, MANAGED_HANDLE_FROM_OBJECT(Object), Src);
+			Class, Object, Src);
 	}
 
-	*Dest = MANAGED_HANDLE_TO_OBJECT(Object);
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
+}
+
+void FTextPropertyDescriptor::Get(void* Src, void** Dest, FPropertyArgument::FReturn) const
+{
+	const auto Object = Class->NewObject();
+
+	FCSharpEnvironment::GetEnvironment().AddStringReference<FText, true, false>(
+		Class, Object, Src);
+
+	*reinterpret_cast<IManagedHandle*>(Dest) = Object;
 }
 
 void FTextPropertyDescriptor::Set(void* Src, void* Dest) const

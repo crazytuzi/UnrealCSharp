@@ -54,7 +54,7 @@ IManagedHandle FObjectRegistry::GetObject(const UObject* InObject)
 {
 	const auto FoundManagedHandle = Object2ManagedHandle.Find(InObject);
 
-	return FoundManagedHandle != nullptr ? FDomain::GCHandle_Get_Target(*FoundManagedHandle) : InvalidManagedHandle;
+	return FoundManagedHandle != nullptr ? *FoundManagedHandle : InvalidManagedHandle;
 }
 
 UObject* FObjectRegistry::GetObject(const IManagedHandle InManagedHandle)
@@ -72,11 +72,9 @@ IManagedHandle FObjectRegistry::GetManagedHandle(const UObject* InObject)
 bool FObjectRegistry::AddReference(const FClassReflection* InClass, UObject* InObject,
                                    const IManagedHandle InManagedHandle)
 {
-	const auto ManagedHandle = InClass->NewGCHandle(InManagedHandle, true);
+	Object2ManagedHandle.Add(InObject, InManagedHandle);
 
-	Object2ManagedHandle.Add(InObject, ManagedHandle);
-
-	ManagedHandle2Object.Add(ManagedHandle, &*InObject);
+	ManagedHandle2Object.Add(InManagedHandle, &*InObject);
 
 	return true;
 }

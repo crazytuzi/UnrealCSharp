@@ -1,14 +1,15 @@
 using Script.Library;
+using Interop;
 
 namespace Script.CoreUObject
 {
-    public class FString : IGarbageCollectionHandle
+    public class FString
     {
         public FString()
         {
         }
 
-        ~FString() => FStringImplementation.FString_UnRegisterImplementation(GarbageCollectionHandle);
+        ~FString() => FStringImplementation.FString_UnRegisterImplementation(HandleData.GetHandle(this));
 
         public FString(string InValue) => FStringImplementation.FString_RegisterImplementation(this, InValue);
 
@@ -28,19 +29,17 @@ namespace Script.CoreUObject
 
             return ReferenceEquals(A, B) ||
                    FStringImplementation.FString_IdenticalImplementation(
-                       A.GarbageCollectionHandle,
-                       B.GarbageCollectionHandle);
+                       HandleData.GetHandle(A),
+                       HandleData.GetHandle(B));
         }
 
         public static bool operator !=(FString A, FString B) => !(A == B);
 
         public override bool Equals(object Other) => this == Other as FString;
 
-        public override int GetHashCode() => (int)GarbageCollectionHandle;
+        public override int GetHashCode() => (int)HandleData.GetHandle(this);
 
         public override string ToString() =>
-            FStringImplementation.FString_ToStringImplementation(GarbageCollectionHandle);
-
-        public nint GarbageCollectionHandle { get; set; }
+            FStringImplementation.FString_ToStringImplementation(HandleData.GetHandle(this));
     }
 }
