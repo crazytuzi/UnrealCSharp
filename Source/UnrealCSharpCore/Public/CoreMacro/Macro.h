@@ -34,6 +34,8 @@
 
 #define UNREAL_TYPE_SOURCE_GENERATOR_NAME FString(TEXT("UnrealTypeSourceGenerator"))
 
+#define GAMEPLAY_TAG_SOURCE_GENERATOR_NAME FString(TEXT("GameplayTagSourceGenerator"))
+
 #define ANALYZER_RELEASES_UN_SHIPPED_NAME FString(TEXT("AnalyzerReleases.Unshipped"))
 
 #define UNREAL_TYPE_WEAVER_NAME FString(TEXT("UnrealTypeWeaver"))

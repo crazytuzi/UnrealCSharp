@@ -48,6 +48,15 @@ void FSolutionGenerator::Generator()
 
 	CopyTemplate(
 		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetSourceGeneratorPath(),
+						GAMEPLAY_TAG_SOURCE_GENERATOR_NAME + CSHARP_SUFFIX),
+		ScriptPath / SOURCE_GENERATOR_NAME / GAMEPLAY_TAG_SOURCE_GENERATOR_NAME + CSHARP_SUFFIX,
+		TArray<TFunction<void(FString& OutResult)>>
+		{
+			&FSolutionGenerator::AddCSharpGeneratorHeaderComment
+		});
+
+	CopyTemplate(
+		FPaths::Combine(FUnrealCSharpFunctionLibrary::GetSourceGeneratorPath(),
 		                ANALYZER_RELEASES_UN_SHIPPED_NAME + MARKDOWN_SUFFIX),
 		ScriptPath / SOURCE_GENERATOR_NAME / ANALYZER_RELEASES_UN_SHIPPED_NAME + MARKDOWN_SUFFIX);
 
