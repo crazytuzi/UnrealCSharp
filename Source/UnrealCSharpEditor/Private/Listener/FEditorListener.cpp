@@ -263,14 +263,28 @@ void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 
 	if (FCSharpCompiler::Get().IsCompiling())
 	{
-		// 阻塞等待期间弹进度框,避免被误认为编辑器卡死。
 		FScopedSlowTask SlowTask(1.0f, NSLOCTEXT("UnrealCSharp", "WaitingForCSharpCompile",
-		                                         "正在编译 C# 脚本并重新绑定，完成后自动进入运行..."));
+		                                         "Compiling C# scripts, PIE will start automatically when finished..."));
 		SlowTask.MakeDialog();
+
+		auto LastFraction = 0.0f;
 
 		while (FCSharpCompiler::Get().IsCompiling())
 		{
-			SlowTask.EnterProgressFrame(0.0f);
+			FString ProgressMessage;
+
+			auto Fraction = 0.0f;
+
+			FCSharpCompiler::Get().GetCompileProgress(ProgressMessage, Fraction);
+
+			const auto DeltaFraction = FMath::Max(0.0f, Fraction - LastFraction);
+
+			LastFraction = FMath::Max(LastFraction, Fraction);
+
+			SlowTask.EnterProgressFrame(DeltaFraction,
+			                            ProgressMessage.IsEmpty()
+				                            ? FText::GetEmpty()
+				                            : FText::FromString(ProgressMessage));
 
 			FThreadHeartBeat::Get().HeartBeat();
 

@@ -68,3 +68,17 @@ bool FCSharpCompiler::IsCompiling() const
 {
 	return Runnable != nullptr ? Runnable->IsCompiling() : false;
 }
+
+void FCSharpCompiler::GetCompileProgress(FString& OutMessage, float& OutFraction) const
+{
+	if (Runnable != nullptr)
+	{
+		Runnable->GetCompileProgress(OutMessage, OutFraction);
+	}
+	else
+	{
+		OutMessage.Empty();
+
+		OutFraction = 0.0f;
+	}
+}

@@ -263,7 +263,8 @@ public:
 #if WITH_EDITOR
 	static void SyncProcess(const FString& InURL, const FString& InParms,
 	                        const TFunction<void(const int32, const FString&)>& InOnComplete,
-	                        const FString& InWorkingDirectory = FString());
+	                        const FString& InWorkingDirectory = FString(),
+	                        const TFunction<void(const FString&)>& InOnOutput = nullptr);
 #endif
 
 #if WITH_EDITOR
