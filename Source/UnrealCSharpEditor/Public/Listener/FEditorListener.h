@@ -12,6 +12,8 @@ public:
 private:
 	void OnPostEngineInit();
 
+	void OnBlueprintCompiled();
+
 	void OnPreBeginPIE(const bool bIsSimulating);
 
 	void OnPrePIEEnded(const bool bIsSimulating);
@@ -64,10 +66,14 @@ private:
 
 	FDelegateHandle OnDirectoryChangedDelegateHandle;
 
+	FDelegateHandle OnBlueprintCompiledDelegateHandle;
+
 private:
 	TArray<FFileChangeData> FileChanges;
 
 	bool bIsPIEPlaying;
+
+	bool bIsPreparingPIE;
 
 	bool bIsGenerating;
 };

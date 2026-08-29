@@ -1,6 +1,12 @@
 #include "Listener/FEditorListener.h"
+#include "Editor.h"
+#include "Engine/Blueprint.h"
+#include "Kismet2/KismetEditorUtilities.h"
+#include "Misc/ScopedSlowTask.h"
+#include "UObject/UObjectIterator.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "DirectoryWatcherModule.h"
+#include "HAL/PlatformFileManager.h"
 #include "HAL/ThreadHeartBeat.h"
 #include "HAL/ThreadManager.h"
 #include "FAssetGenerator.h"
@@ -18,6 +24,7 @@
 
 FEditorListener::FEditorListener():
 	bIsPIEPlaying(false),
+	bIsPreparingPIE(false),
 	bIsGenerating(false)
 {
 	if (!IsRunningCookCommandlet())
@@ -76,6 +83,11 @@ FEditorListener::~FEditorListener()
 {
 	if (!IsRunningCookCommandlet())
 	{
+		if (OnBlueprintCompiledDelegateHandle.IsValid() && GEditor != nullptr)
+		{
+			GEditor->OnBlueprintCompiled().Remove(OnBlueprintCompiledDelegateHandle);
+		}
+
 		if (OnDirectoryChangedDelegateHandle.IsValid())
 		{
 			auto& DirectoryWatcherModule = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(
@@ -149,26 +161,131 @@ void FEditorListener::OnPostEngineInit()
 	FCodeAnalysis::CodeAnalysis();
 
 	FDynamicGenerator::CodeAnalysisGenerator();
+
+	if (GEditor != nullptr)
+	{
+		OnBlueprintCompiledDelegateHandle = GEditor->OnBlueprintCompiled().AddRaw(
+			this, &FEditorListener::OnBlueprintCompiled);
+	}
+}
+
+void FEditorListener::OnBlueprintCompiled()
+{
+	if (!bIsPIEPlaying && !bIsPreparingPIE && !bIsGenerating && !FCSharpCompiler::Get().IsCompiling())
+	{
+		if (!FileChanges.IsEmpty())
+		{
+			FCSharpCompiler::Get().Compile(FileChanges);
+
+			FileChanges.Reset();
+		}
+		else
+		{
+			FCSharpCompiler::Get().Compile();
+		}
+	}
 }
 
 void FEditorListener::OnPreBeginPIE(const bool bIsSimulating)
 {
+	bIsPreparingPIE = true;
+
+	for (TObjectIterator<UBlueprint> It; It; ++It)
+	{
+		if (It->Status == BS_Dirty && !It->bBeingCompiled)
+		{
+			FKismetEditorUtilities::CompileBlueprint(*It, EBlueprintCompileOptions::SkipGarbageCollection);
+		}
+	}
+
+	if (!bIsGenerating && !FCSharpCompiler::Get().IsCompiling())
+	{
+		auto& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+		auto bNeedsCompile = false;
+
+		auto OldestAssemblyTime = FDateTime::MaxValue();
+
+		for (const auto& AssemblyPath : FUnrealCSharpFunctionLibrary::GetFullAssemblyPublishPath())
+		{
+			if (!PlatformFile.FileExists(*AssemblyPath))
+			{
+				bNeedsCompile = true;
+
+				break;
+			}
+
+			OldestAssemblyTime = FMath::Min(OldestAssemblyTime, PlatformFile.GetTimeStamp(*AssemblyPath));
+		}
+
+		if (!bNeedsCompile)
+		{
+			for (const auto& Directory : FUnrealCSharpFunctionLibrary::GetChangedDirectories())
+			{
+				PlatformFile.IterateDirectoryRecursively(
+					*Directory,
+					[&](const TCHAR* InFilenameOrDirectory, const bool bIsDirectory) -> bool
+					{
+						if (!bIsDirectory && FPaths::GetExtension(InFilenameOrDirectory) == TEXT("cs") &&
+							PlatformFile.GetTimeStamp(InFilenameOrDirectory) > OldestAssemblyTime)
+						{
+							bNeedsCompile = true;
+
+							return false;
+						}
+
+						return true;
+					});
+
+				if (bNeedsCompile)
+				{
+					break;
+				}
+			}
+		}
+
+		if (bNeedsCompile)
+		{
+			if (!FileChanges.IsEmpty())
+			{
+				FCSharpCompiler::Get().Compile(FileChanges);
+
+				FileChanges.Reset();
+			}
+			else
+			{
+				FCSharpCompiler::Get().Compile();
+			}
+		}
+	}
+
 	bIsPIEPlaying = true;
 
-	while (FCSharpCompiler::Get().IsCompiling())
+	if (FCSharpCompiler::Get().IsCompiling())
 	{
-		FThreadHeartBeat::Get().HeartBeat();
+		// 阻塞等待期间弹进度框,避免被误认为编辑器卡死。
+		FScopedSlowTask SlowTask(1.0f, NSLOCTEXT("UnrealCSharp", "WaitingForCSharpCompile",
+		                                         "正在编译 C# 脚本并重新绑定，完成后自动进入运行..."));
+		SlowTask.MakeDialog();
 
-		FPlatformProcess::SleepNoStats(0.0001f);
+		while (FCSharpCompiler::Get().IsCompiling())
+		{
+			SlowTask.EnterProgressFrame(0.0f);
 
-		FTSTicker::GetCoreTicker().Tick(FApp::GetDeltaTime());
+			FThreadHeartBeat::Get().HeartBeat();
 
-		FThreadManager::Get().Tick();
+			FPlatformProcess::SleepNoStats(0.0001f);
 
-		FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
+			FTSTicker::GetCoreTicker().Tick(FApp::GetDeltaTime());
+
+			FThreadManager::Get().Tick();
+
+			FTaskGraphInterface::Get().ProcessThreadUntilIdle(ENamedThreads::GameThread);
+		}
 	}
 
 	FEngineListener::OnPreBeginPIE(bIsSimulating);
+	bIsPreparingPIE = false;
 }
 
 void FEditorListener::OnPrePIEEnded(const bool bIsSimulating)
@@ -180,6 +297,7 @@ void FEditorListener::OnCancelPIE()
 {
 	FEngineListener::OnCancelPIE();
 
+	bIsPreparingPIE = false;
 	bIsPIEPlaying = false;
 }
 
