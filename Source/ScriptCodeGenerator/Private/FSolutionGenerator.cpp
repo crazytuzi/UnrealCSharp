@@ -108,7 +108,8 @@ void FSolutionGenerator::Generator()
 		TArray<TFunction<void(FString& OutResult)>>
 		{
 			&FSolutionGenerator::ReplaceImport,
-			&FSolutionGenerator::ReplaceProjectReference
+			&FSolutionGenerator::ReplaceProjectReference,
+			&FSolutionGenerator::AddGameplayTagAdditionalFiles
 		},
 		false);
 
@@ -280,6 +281,33 @@ void FSolutionGenerator::ReplaceProjectReference(FString& OutResult)
 	                                               *FUnrealCSharpFunctionLibrary::GetUEName(),
 	                                               *PROJECT_SUFFIX
 
+	                              ));
+}
+
+void FSolutionGenerator::AddGameplayTagAdditionalFiles(FString& OutResult)
+{
+	const auto GameProjectDir = FPaths::ConvertRelativePathToFull(
+		FPaths::GetPath(FUnrealCSharpFunctionLibrary::GetGameProjectPath()));
+
+	auto ConfigDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectConfigDir());
+
+	FPaths::MakePathRelativeTo(ConfigDir, *(GameProjectDir + TEXT("/")));
+
+	FPaths::NormalizeDirectoryName(ConfigDir);
+
+	ConfigDir.ReplaceInline(TEXT("/"), TEXT("\\"));
+
+	OutResult = OutResult.Replace(TEXT("</Project>"),
+	                              *FString::Printf(TEXT(
+		                              "  <ItemGroup>\r\n"
+		                              "    <AdditionalFiles Include=\"%s\\DefaultGameplayTags.ini\" Condition=\"Exists('%s\\DefaultGameplayTags.ini')\" />\r\n"
+		                              "    <AdditionalFiles Include=\"%s\\Tags\\*.ini\" />\r\n"
+		                              "  </ItemGroup>\r\n"
+		                              "</Project>"
+	                              ),
+	                                               *ConfigDir,
+	                                               *ConfigDir,
+	                                               *ConfigDir
 	                              ));
 }
 
