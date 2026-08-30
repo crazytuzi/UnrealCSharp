@@ -1099,28 +1099,36 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 		{
 			if (const auto UserDefinedEnum = Cast<UUserDefinedEnum>(ByteProperty->Enum))
 			{
+				auto EnumIndex = MetaData.IsEmpty()
+					                 ? static_cast<int32>(ENUM_DEFAULT_MAX_INDEX)
+					                 : UserDefinedEnum->GetIndexByNameString(MetaData);
+
+				// The recorded default may reference a removed enumerator
+				if (EnumIndex == INDEX_NONE)
+				{
+					EnumIndex = ENUM_DEFAULT_MAX_INDEX;
+				}
+
 				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
-				                       *FUnrealCSharpFunctionLibrary::Encode(MetaData.IsEmpty()
-					                                                             ? *UserDefinedEnum->
-					                                                             GetDisplayNameTextByIndex(
-						                                                             ENUM_DEFAULT_MAX_INDEX).ToString()
-					                                                             : *UserDefinedEnum->
-					                                                             GetDisplayNameTextByIndex(
-						                                                             UserDefinedEnum->
-						                                                             GetIndexByNameString(MetaData)).
-					                                                             ToString(), false));
+				                       *FUnrealCSharpFunctionLibrary::Encode(
+					                       UserDefinedEnum->GetDisplayNameTextByIndex(EnumIndex).ToString(), false));
 			}
 			else
 			{
-				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), MetaData.IsEmpty()
-						                       ? *ByteProperty->Enum->GetDisplayNameTextByIndex(ENUM_DEFAULT_MAX_INDEX).
-						                                        ToString()
-						                       : *MetaData);
+				// The recorded default may reference a removed enumerator
+				if (!MetaData.IsEmpty() && ByteProperty->Enum->GetIndexByNameString(MetaData) != INDEX_NONE)
+				{
+					return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(), *MetaData);
+				}
+
+				return FString::Printf(TEXT(" = %s.%s"), *ByteProperty->Enum->GetName(),
+				                       *ByteProperty->Enum->GetNameStringByIndex(ENUM_DEFAULT_MAX_INDEX));
 			}
 		}
 		else
 		{
-			return FString::Printf(TEXT(" = %s"), MetaData.IsEmpty() ? TEXT("0") : *MetaData);
+			// The metadata may be an enumerator name while the enum was not exported
+			return FString::Printf(TEXT(" = %s"), MetaData.IsNumeric() ? *MetaData : TEXT("0"));
 		}
 	}
 
@@ -1187,11 +1195,14 @@ FString FClassGenerator::GetBlueprintFunctionDefaultParam(const UFunction* InFun
 
 	if (const auto EnumProperty = CastField<FEnumProperty>(InProperty))
 	{
+		// The recorded default may reference a removed enumerator
+		if (!MetaData.IsEmpty() && EnumProperty->GetEnum()->GetIndexByNameString(MetaData) != INDEX_NONE)
+		{
+			return FString::Printf(TEXT(" = %s.%s"), *EnumProperty->GetEnum()->GetName(), *MetaData);
+		}
+
 		return FString::Printf(TEXT(" = %s.%s"), *EnumProperty->GetEnum()->GetName(),
-		                       MetaData.IsEmpty()
-			                       ? *EnumProperty->GetEnum()->GetDisplayNameTextByIndex(ENUM_DEFAULT_MAX_INDEX).
-			                                        ToString()
-			                       : *MetaData);
+		                       *EnumProperty->GetEnum()->GetNameStringByIndex(ENUM_DEFAULT_MAX_INDEX));
 	}
 
 	if (CastField<FStrProperty>(InProperty))

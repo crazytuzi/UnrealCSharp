@@ -58,7 +58,39 @@ void FEnumGenerator::Generator(const UEnum* InEnum)
 
 	TSet<FString> UsingNameSpaces{COMBINE_NAMESPACE(NAMESPACE_ROOT, NAMESPACE_CORE_UOBJECT)};
 
-	const auto UnderlyingTypeName = GetEnumUnderlyingTypeName(InEnum);
+	auto UnderlyingTypeName = GetEnumUnderlyingTypeName(InEnum);
+
+	// The recorded underlying type may come from a byte property while enumerators exceed its range
+	{
+		static const TArray<FString> PromotionOrder{
+			TEXT("sbyte"), TEXT("byte"), TEXT("short"), TEXT("ushort"), TEXT("int"), TEXT("uint"), TEXT("long")
+		};
+
+		for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
+		{
+			if (InEnum->NumEnums() != 1 &&
+				Index == InEnum->NumEnums() - 1 &&
+				!InEnum->HasMetaData(TEXT("Name"), Index))
+			{
+				continue;
+			}
+
+			if (const auto EnumeratorValue = InEnum->GetValueByIndex(Index);
+				!IsValueInUnderlyingTypeRange(EnumeratorValue, UnderlyingTypeName))
+			{
+				for (auto Next = PromotionOrder.IndexOfByKey(UnderlyingTypeName) + 1;
+				     Next < PromotionOrder.Num(); ++Next)
+				{
+					if (IsValueInUnderlyingTypeRange(EnumeratorValue, PromotionOrder[Next]))
+					{
+						UnderlyingTypeName = PromotionOrder[Next];
+
+						break;
+					}
+				}
+			}
+		}
+	}
 
 	for (auto Index = 0; Index < InEnum->NumEnums(); ++Index)
 	{
