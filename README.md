@@ -43,11 +43,7 @@
 
 # Star History
 
-<a href="https://star-history.dera.page/#crazytuzi/UnrealCSharp&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=crazytuzi/UnrealCSharp&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=crazytuzi/UnrealCSharp&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=crazytuzi/UnrealCSharp&type=date&legend=top-left" />
- </picture>
-</a>
+[![Stars](https://raw.githubusercontent.com/crazytuzi/UnrealCSharp/star-tracker-data/stars-badge.svg)](https://github.com/crazytuzi/UnrealCSharp/stargazers)
+
+![Star History](https://raw.githubusercontent.com/crazytuzi/UnrealCSharp/star-tracker-data/charts/star-history.svg)
     

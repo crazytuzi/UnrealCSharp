@@ -1,0 +1,19 @@
+name: Track Stars
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crazytuzi/github-star-tracker@v1.26.3
+        with:
+          github-token: ${{ secrets.STAR_TRACKER_TOKEN }}
+          only-repos: 'UnrealCSharp'
