@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "snapshots": [
+    {
+      "timestamp": "2026-09-02T17:01:18.325Z",
+      "totalStars": 790,
+      "repos": [
+        {
+          "fullName": "crazytuzi/UnrealCSharp",
+          "name": "UnrealCSharp",
+          "owner": "crazytuzi",
+          "stars": 788
+        },
+        {
+          "fullName": "UnrealCSharp/UnrealCSharp",
+          "name": "UnrealCSharp",
+          "owner": "UnrealCSharp",
+          "stars": 2
+        }
+      ]
+    }
+  ],
+  "starsAtLastNotification": 790
+}
