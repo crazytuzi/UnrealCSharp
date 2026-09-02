@@ -137,21 +137,40 @@ namespace Interop
             }
         }
 
-        public static nint GetMethod(string InName)
+        public static nint GetMethod(ref nint InSlot, string InName)
         {
-            return StringToMethod.TryGetValue(InName, out var Method) ? Method : nint.Zero;
+            if (InSlot == nint.Zero)
+            {
+                InSlot = StringToMethod.TryGetValue(InName, out var Method) ? Method : nint.Zero;
+            }
+
+            return InSlot;
         }
 
         private static object GetValue(nint InHandle, Type InType)
         {
-            var Type = Nullable.GetUnderlyingType(InType) ?? InType;
+            return InType.IsEnum
+                ? Enum.ToObject(InType, ReadPrimitiveValue(InHandle, Enum.GetUnderlyingType(InType)))
+                : ReadPrimitiveValue(InHandle, InType);
+        }
 
-            return Type switch
+        private static object ReadPrimitiveValue(nint InHandle, Type InType)
+        {
+            return InType switch
             {
-                _ when Type == typeof(bool) => *(bool*)InHandle,
-                { IsEnum: true } => Enum.ToObject(Type,
-                    Marshal.PtrToStructure(InHandle, Enum.GetUnderlyingType(Type))!),
-                _ => Marshal.PtrToStructure(InHandle, Type)!,
+                _ when InType == typeof(bool) => *(bool*)InHandle,
+                _ when InType == typeof(sbyte) => *(sbyte*)InHandle,
+                _ when InType == typeof(short) => *(short*)InHandle,
+                _ when InType == typeof(int) => *(int*)InHandle,
+                _ when InType == typeof(long) => *(long*)InHandle,
+                _ when InType == typeof(nint) => *(nint*)InHandle,
+                _ when InType == typeof(byte) => *(byte*)InHandle,
+                _ when InType == typeof(ushort) => *(ushort*)InHandle,
+                _ when InType == typeof(uint) => *(uint*)InHandle,
+                _ when InType == typeof(ulong) => *(ulong*)InHandle,
+                _ when InType == typeof(nuint) => *(nuint*)InHandle,
+                _ when InType == typeof(float) => *(float*)InHandle,
+                _ when InType == typeof(double) => *(double*)InHandle
             };
         }
 
@@ -159,21 +178,36 @@ namespace Interop
         {
             if (InValue != null)
             {
-                var Type = Nullable.GetUnderlyingType(InType) ?? InType;
-
-                switch (Type)
+                if (InType.IsEnum)
                 {
-                    case var _ when Type == typeof(bool):
-                        *(bool*)InHandle = (bool)InValue;
-                        break;
-                    case { IsEnum: true }:
-                        Marshal.StructureToPtr(
-                            Convert.ChangeType(InValue, Enum.GetUnderlyingType(Type)), InHandle, false);
-                        break;
-                    default:
-                        Marshal.StructureToPtr(InValue, InHandle, false);
-                        break;
+                    var UnderlyingType = Enum.GetUnderlyingType(InType);
+
+                    WritePrimitiveValue(InHandle, Convert.ChangeType(InValue, UnderlyingType), UnderlyingType);
                 }
+                else
+                {
+                    WritePrimitiveValue(InHandle, InValue, InType);
+                }
+            }
+        }
+
+        private static void WritePrimitiveValue(nint InHandle, object InValue, Type InType)
+        {
+            switch (InType)
+            {
+                case var _ when InType == typeof(bool): *(bool*)InHandle = (bool)InValue; break;
+                case var _ when InType == typeof(sbyte): *(sbyte*)InHandle = (sbyte)InValue; break;
+                case var _ when InType == typeof(short): *(short*)InHandle = (short)InValue; break;
+                case var _ when InType == typeof(int): *(int*)InHandle = (int)InValue; break;
+                case var _ when InType == typeof(long): *(long*)InHandle = (long)InValue; break;
+                case var _ when InType == typeof(nint): *(nint*)InHandle = (nint)InValue; break;
+                case var _ when InType == typeof(byte): *(byte*)InHandle = (byte)InValue; break;
+                case var _ when InType == typeof(ushort): *(ushort*)InHandle = (ushort)InValue; break;
+                case var _ when InType == typeof(uint): *(uint*)InHandle = (uint)InValue; break;
+                case var _ when InType == typeof(ulong): *(ulong*)InHandle = (ulong)InValue; break;
+                case var _ when InType == typeof(nuint): *(nuint*)InHandle = (nuint)InValue; break;
+                case var _ when InType == typeof(float): *(float*)InHandle = (float)InValue; break;
+                case var _ when InType == typeof(double): *(double*)InHandle = (double)InValue; break;
             }
         }
     }

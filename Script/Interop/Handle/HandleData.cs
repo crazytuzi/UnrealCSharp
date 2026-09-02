@@ -33,7 +33,7 @@ namespace Interop
 
                 HandleReference.Count++;
 
-                if (!Handles.ContainsKey(HandleReference.Value))
+                if (!Handles.TryGetValue(HandleReference.Value, out _))
                 {
                     Handles[HandleReference.Value] =
                         GCHandle.Alloc(InObject, bPinned ? GCHandleType.Pinned : GCHandleType.Normal);
@@ -49,7 +49,7 @@ namespace Interop
             {
                 lock (Lock)
                 {
-                    if (Handles.TryGetValue(InHandle, out var OutHandle) && OutHandle.IsAllocated)
+                    if (Handles.TryGetValue(InHandle, out var OutHandle))
                     {
                         var Target = OutHandle.Target;
 
@@ -68,14 +68,10 @@ namespace Interop
                                 }
                             }
                         }
-                    }
 
-                    if (Handles.Remove(InHandle, out var RemovedHandle))
-                    {
-                        if (RemovedHandle.IsAllocated)
-                        {
-                            RemovedHandle.Free();
-                        }
+                        Handles.Remove(InHandle);
+
+                        OutHandle.Free();
                     }
                 }
             }
@@ -107,6 +103,27 @@ namespace Interop
             }
 
             return null;
+        }
+
+        public static nint GetObjectPointer(nint InHandle)
+        {
+            if (GetObject(InHandle) is { } Object)
+            {
+                return Unsafe.As<object, nint>(ref Object);
+            }
+
+            return 0;
+        }
+
+        public static unsafe void GetObjectPointers(nint* InHandles, nint* OutObjectPointers, int InLength)
+        {
+            if (InHandles != null && OutObjectPointers != null)
+            {
+                for (var Index = 0; Index < InLength; Index++)
+                {
+                    OutObjectPointers[Index] = GetObjectPointer(InHandles[Index]);
+                }
+            }
         }
 
         internal static void Clear()

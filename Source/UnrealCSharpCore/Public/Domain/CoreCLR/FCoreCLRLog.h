@@ -1,7 +1,6 @@
 #pragma once
 
 #if WITH_CORECLR
-#include "CoreMinimal.h"
 #include "corehost/coreclr_delegates.h"
 
 class FCoreCLRLog

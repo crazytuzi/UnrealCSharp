@@ -30,7 +30,7 @@ public:
 
 	virtual IManagedHandle NewObject(const IManagedHandle InManagedClass) override;
 
-	virtual IManagedHandle BoxValue(const FString& InNamespace, const FString& InName, void* InValue) override;
+	virtual IManagedHandle BoxValue(const FString& InName, void* InValue) override;
 
 	virtual void* UnboxValue(const IManagedHandle InManagedHandle) override;
 

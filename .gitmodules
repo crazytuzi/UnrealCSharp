@@ -4,6 +4,9 @@
 [submodule "Source/ThirdParty/CoreCLR"]
 	path = Source/ThirdParty/CoreCLR
 	url = https://github.com/crazytuzi/CoreCLR
+[submodule "Source/ThirdParty/LeanCLR"]
+	path = Source/ThirdParty/LeanCLR
+	url = https://github.com/crazytuzi/LeanCLR
 [submodule "Source/SourceCodeGenerator"]
 	path = Source/SourceCodeGenerator
 	url = https://github.com/crazytuzi/SourceCodeGenerator

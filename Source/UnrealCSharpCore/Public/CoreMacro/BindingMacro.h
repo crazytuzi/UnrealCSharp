@@ -6,7 +6,7 @@
 
 #define BINDING_COMBINE_FUNCTION(Function) FString::Printf(TEXT("::%s"), *Function)
 
-#define BINDING_COMBINE_FUNCTION_IMPLEMENTATION(A, B) FString::Printf(TEXT("%s_%sImplementation"), *A, *B)
+#define BINDING_COMBINE_FUNCTION_IMPLEMENTATION(A, B) FString::Printf(TEXT("__%s_%sImplementation"), *A, *B)
 
 #define BINDING_PROPERTY_SET FString(TEXT("Set"))
 

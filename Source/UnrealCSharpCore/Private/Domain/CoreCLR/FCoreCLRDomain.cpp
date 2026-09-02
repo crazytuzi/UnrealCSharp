@@ -13,7 +13,6 @@
 #include "CoreMacro/CoreCLRMacro.h"
 #include "CoreMacro/FunctionMacro.h"
 #include "CoreMacro/Macro.h"
-#include "CoreMacro/PropertyMacro.h"
 #include "Domain/CoreCLR/FCoreCLRFunctionLibrary.h"
 #include "Domain/CoreCLR/FCoreCLRLog.h"
 #include "Domain/Script/FScriptLog.h"
@@ -247,6 +246,14 @@ void FCoreCLRDomain::UnloadAssembly()
 		AssemblyLoaderUnloadFn();
 	}
 
+#define CORECLR_METHOD_CLEAR(Name, FnType, ClassMacro, FuncMacro, ParamCount) Name##Fn = nullptr;
+
+	COMMON_BRIDGE_METHODS(CORECLR_METHOD_CLEAR)
+
+	NATIVE_BRIDGE_METHODS(CORECLR_METHOD_CLEAR)
+
+#undef CORECLR_METHOD_CLEAR
+
 	UtilsIsOverrideFn = nullptr;
 
 	UtilsGetClassDescriptorFn = nullptr;
@@ -256,6 +263,8 @@ void FCoreCLRDomain::UnloadAssembly()
 	UtilsGetClassFieldsFn = nullptr;
 
 	UtilsGetClassMethodsFn = nullptr;
+
+	SynchronizationContextTickFn = nullptr;
 
 	Assemblies.Empty();
 }
@@ -271,159 +280,17 @@ void FCoreCLRDomain::RegisterErrorWriter() const
 
 void FCoreCLRDomain::RegisterInterop(const FString& InAssembly)
 {
-	const auto AssemblyLoader = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_ASSEMBLY_LOADER, INTEROP_NAME);
+#define RESOLVE_CORECLR_METHOD(Name, FnType, ClassMacro, FuncMacro, ParamCount) \
+	{ \
+		const auto TypeName = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, ClassMacro, INTEROP_NAME); \
+		LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeName, FuncMacro, Name##Fn) \
+	}
 
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, AssemblyLoader, FUNCTION_ASSEMBLY_LOADER_LOAD_FROM_STREAM,
-	                                       AssemblyLoaderLoadFromStreamFn)
+	COMMON_BRIDGE_METHODS(RESOLVE_CORECLR_METHOD)
 
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, AssemblyLoader, FUNCTION_ASSEMBLY_LOADER_UNLOAD,
-	                                       AssemblyLoaderUnloadFn)
+	NATIVE_BRIDGE_METHODS(RESOLVE_CORECLR_METHOD)
 
-	const auto HandleData = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_HANDLE_DATA, INTEROP_NAME);
-
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, HandleData, FUNCTION_HANDLE_DATA_FREE,
-	                                       HandleDataFreeFn)
-
-	const auto LogBridge = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_LOG_BRIDGE, INTEROP_NAME);
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, LogBridge, FUNCTION_LOG_BRIDGE_SET_LOG,
-	                                       LogBridgeSetLogFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, LogBridge, FUNCTION_LOG_BRIDGE_INITIALIZE,
-	                                       LogBridgeInitializeFn)
-
-	const auto TypeBridge = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_TYPE_BRIDGE, INTEROP_NAME);
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_CLASS,
-	                                       TypeBridgeGetClassFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_TYPE,
-	                                       TypeBridgeGetTypeFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_METHOD,
-	                                       TypeBridgeGetMethodFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_FUNCTION_POINTER,
-	                                       TypeBridgeGetFunctionPointerFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_NAMESPACE,
-	                                       TypeBridgeGetNamespaceFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_NAME,
-	                                       TypeBridgeGetNameFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_GET_FULL_NAME,
-	                                       TypeBridgeGetFullNameFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_MAKE_GENERIC_TYPE,
-	                                       TypeBridgeMakeGenericTypeFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_MAKE_GENERIC_TYPE2,
-	                                       TypeBridgeMakeGenericType2Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_BOOL,
-	                                       TypeBridgeBoxBoolFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_SBYTE,
-	                                       TypeBridgeBoxSByteFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_INT16,
-	                                       TypeBridgeBoxInt16Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_INT32,
-	                                       TypeBridgeBoxInt32Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_INT64,
-	                                       TypeBridgeBoxInt64Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_BYTE,
-	                                       TypeBridgeBoxByteFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_UINT16,
-	                                       TypeBridgeBoxUInt16Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_UINT32,
-	                                       TypeBridgeBoxUInt32Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_UINT64,
-	                                       TypeBridgeBoxUInt64Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_FLOAT,
-	                                       TypeBridgeBoxFloatFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_BOX_DOUBLE,
-	                                       TypeBridgeBoxDoubleFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_BOOL,
-	                                       TypeBridgeUnboxBoolFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_SBYTE,
-	                                       TypeBridgeUnboxSByteFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_INT16,
-	                                       TypeBridgeUnboxInt16Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_INT32,
-	                                       TypeBridgeUnboxInt32Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_INT64,
-	                                       TypeBridgeUnboxInt64Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_BYTE,
-	                                       TypeBridgeUnboxByteFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_UINT16,
-	                                       TypeBridgeUnboxUInt16Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_UINT32,
-	                                       TypeBridgeUnboxUInt32Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_UINT64,
-	                                       TypeBridgeUnboxUInt64Fn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_FLOAT,
-	                                       TypeBridgeUnboxFloatFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, TypeBridge, FUNCTION_TYPE_BRIDGE_UNBOX_DOUBLE,
-	                                       TypeBridgeUnboxDoubleFn)
-
-	const auto ObjectBridge = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_OBJECT_BRIDGE, INTEROP_NAME);
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, ObjectBridge, FUNCTION_OBJECT_BRIDGE_NEW_OBJECT,
-	                                       ObjectBridgeNewObjectFn)
-
-	const auto FieldBridge = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_FIELD_BRIDGE, INTEROP_NAME);
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, FieldBridge, FUNCTION_FIELD_BRIDGE_SET_STATIC_VALUE,
-	                                       FieldBridgeSetStaticValueFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, FieldBridge, FUNCTION_FIELD_BRIDGE_GET_STATIC_VALUE,
-	                                       FieldBridgeGetStaticValueFn)
-
-	const auto MethodBridge = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_METHOD_BRIDGE, INTEROP_NAME);
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, MethodBridge, FUNCTION_METHOD_BRIDGE_REGISTER_BINDING,
-	                                       MethodBridgeRegisterBindingFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, MethodBridge, FUNCTION_METHOD_BRIDGE_INVOKE,
-	                                       MethodBridgeInvokeFn)
-
-	const auto StringBridge = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_STRING_BRIDGE, INTEROP_NAME);
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, StringBridge, FUNCTION_STRING_BRIDGE_NEW_STRING,
-	                                       StringBridgeNewStringFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, StringBridge, FUNCTION_STRING_BRIDGE_GET_STRING,
-	                                       StringBridgeGetStringFn)
-
-	const auto ArrayBridge = CORECLR_TYPE_NAME(NAMESPACE_INTEROP, CLASS_ARRAY_BRIDGE, INTEROP_NAME);
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, ArrayBridge, FUNCTION_ARRAY_BRIDGE_ARRAY_NEW,
-	                                       ArrayBridgeNewArrayFn)
-
-	LOAD_ASSEMBLY_AND_GET_FUNCTION_POINTER(InAssembly, ArrayBridge, FUNCTION_ARRAY_BRIDGE_ARRAY_GET,
-	                                       ArrayBridgeArrayGetFn)
+#undef RESOLVE_CORECLR_METHOD
 }
 
 

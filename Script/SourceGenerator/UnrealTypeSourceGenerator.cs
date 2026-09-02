@@ -10,6 +10,8 @@ namespace SourceGenerator
     [Generator]
     public class UnrealTypeSourceGenerator : ISourceGenerator
     {
+        private const string GameAssemblyName = "GameNamePlaceholder";
+
         public static readonly DiagnosticDescriptor ErrorDynamicClassNotAPartialClass = new DiagnosticDescriptor(
             "UC_ERROR_01",
             "UClass or UStruct must be a partial class", "{0} \"{1}\" must be a partial class",
@@ -53,6 +55,11 @@ namespace SourceGenerator
         public void Execute(GeneratorExecutionContext Context)
         {
             if (!(Context.SyntaxReceiver is UnrealTypeReceiver unrealTypeReceiver))
+            {
+                return;
+            }
+
+            if (Context.Compilation.AssemblyName != GameAssemblyName)
             {
                 return;
             }
@@ -235,7 +242,7 @@ namespace SourceGenerator
 
     public class UnrealTypeReceiver : ISyntaxReceiver
     {
-        private readonly string[] _interfaceAttributes =
+        private readonly string[] InterfaceAttributes =
         {
             "UInterface",
             "MinimalAPI",
@@ -364,7 +371,7 @@ namespace SourceGenerator
                         {
                             var text = attribute.ToFullString().Trim();
 
-                            if (_interfaceAttributes.Any(
+                            if (InterfaceAttributes.Any(
                                     AttributeText => text.IndexOf(AttributeText, StringComparison.Ordinal) >= 0))
                             {
                                 attributes.Add(text);
@@ -489,7 +496,7 @@ namespace SourceGenerator
                 }
             }
 
-            if (Syntax.Modifiers.ToArray().Any(Modifier => Modifier.Text == "partial") == false)
+            if (Syntax.Modifiers.Any(Modifier => Modifier.Text == "partial") == false)
             {
                 if (bIsUClass || bIsUStruct)
                 {
@@ -527,60 +534,33 @@ namespace SourceGenerator
 
             var usingList = Syntax.GetUsingList();
 
-            var modifiers = string.Join(" ", Syntax.Modifiers.ToArray().Select(Modifier => Modifier.Text));
+            var modifiers = string.Join(" ", Syntax.Modifiers.Select(Modifier => Modifier.Text));
 
-            var methods = Syntax.Members.Where(Member => Member is MethodDeclarationSyntax);
+            var methods = Syntax.Members.OfType<MethodDeclarationSyntax>().ToArray();
 
-            var methodArray = methods as MemberDeclarationSyntax[] ?? methods.ToArray();
+            var bHasStaticClass = methods.Any(Method => Method.Identifier.ToString() == "StaticClass");
 
-            var bHasStaticClass = methodArray.Any(Method =>
-                ((MethodDeclarationSyntax)Method).Identifier.ToString() == "StaticClass");
+            var bHasStaticStruct = methods.Any(Method => Method.Identifier.ToString() == "StaticStruct");
 
-            var bHasStaticStruct = methodArray.Any(Method =>
-                ((MethodDeclarationSyntax)Method).Identifier.ToString() == "StaticStruct");
+            var bHasEqualsMethod = methods.Any(Method =>
+                Method.Identifier.ToString() == "Equals" && Method.ParameterList.Parameters.Count == 1);
 
-            var bHasEqualsMethod = methodArray.Any(Method =>
+            var bHasHashCodeMethod = methods.Any(Method =>
+                Method.Identifier.ToString() == "GetHashCode" && Method.ParameterList.Parameters.Count <= 0);
+
+            var operators = Syntax.Members.OfType<OperatorDeclarationSyntax>().ToArray();
+
+            var bHasOperatorEqualTo = operators.Any(Operator =>
             {
-                var method = (MethodDeclarationSyntax)Method;
-
-                if (method.Identifier.ToString() != "Equals")
+                if (Operator.OperatorToken.Text != "==")
                 {
                     return false;
                 }
 
-                return method.ParameterList.Parameters.Count == 1;
-            });
-
-            var bHasHashCodeMethod = methodArray.Any(Method =>
-            {
-                var method = (MethodDeclarationSyntax)Method;
-
-                if (method.Identifier.ToString() != "GetHashCode")
+                foreach (var parameter in Operator.ParameterList.Parameters)
                 {
-                    return false;
-                }
-
-                return method.ParameterList.Parameters.Count <= 0;
-            });
-
-            var operators = Syntax.Members.Where(Member => Member is OperatorDeclarationSyntax);
-
-            var operatorArray = operators as MemberDeclarationSyntax[] ?? operators.ToArray();
-
-            var bHasOperatorEqualTo = operatorArray.Any(Operator =>
-            {
-                var op = (OperatorDeclarationSyntax)Operator;
-
-                if (op.OperatorToken.Text != "==")
-                {
-                    return false;
-                }
-
-                foreach (var parameter in op.ParameterList.Parameters)
-                {
-                    var parameterType = (IdentifierNameSyntax)parameter.Type;
-
-                    if (parameterType != null && parameterType.Identifier.Text != name)
+                    if (parameter.Type is IdentifierNameSyntax parameterType == false ||
+                        parameterType.Identifier.Text != name)
                     {
                         return false;
                     }
@@ -589,20 +569,17 @@ namespace SourceGenerator
                 return true;
             });
 
-            var bHasOperatorNotEqualTo = operatorArray.Any(Operator =>
+            var bHasOperatorNotEqualTo = operators.Any(Operator =>
             {
-                var op = (OperatorDeclarationSyntax)Operator;
-
-                if (op.OperatorToken.Text != "!=")
+                if (Operator.OperatorToken.Text != "!=")
                 {
                     return false;
                 }
 
-                foreach (var parameter in op.ParameterList.Parameters)
+                foreach (var parameter in Operator.ParameterList.Parameters)
                 {
-                    var parameterType = (IdentifierNameSyntax)parameter.Type;
-
-                    if (parameterType != null && parameterType.Identifier.Text != name)
+                    if (parameter.Type is IdentifierNameSyntax parameterType == false ||
+                        parameterType.Identifier.Text != name)
                     {
                         return false;
                     }
@@ -650,17 +627,9 @@ namespace SourceGenerator
             {
                 if (bIsUClass || bIsUStruct)
                 {
-                    var currentFileName = name + ".cs";
-
-                    if (bIsUClass && name.EndsWith("_C") == false)
-                    {
-                        currentFileName = currentFileName.Substring(1, currentFileName.Length - 1);
-                    }
-
-                    if (bIsUStruct)
-                    {
-                        currentFileName = currentFileName.Substring(1, currentFileName.Length - 1);
-                    }
+                    var currentFileName = bIsUClass && name.EndsWith("_C")
+                        ? name + ".cs"
+                        : name.Substring(1) + ".cs";
 
                     if (Path.GetFileName(filePath) != currentFileName)
                     {
@@ -710,7 +679,9 @@ namespace SourceGenerator
             {
                 foreach (var attribute in attributeList.Attributes)
                 {
-                    if (attribute.GetText().ToString().IndexOf(Name, StringComparison.Ordinal) >= 0)
+                    var attributeName = attribute.Name.ToString();
+
+                    if (attributeName == Name || attributeName == Name + "Attribute")
                     {
                         return attribute;
                     }
@@ -817,12 +788,7 @@ namespace SourceGenerator
             {
                 foreach (var @using in compilationUnitSyntax.Usings)
                 {
-                    var str = @using.GetText().ToString().Replace(" ", "").Replace("\t", "").Replace("\n", "")
-                        .Replace("\r", "").Trim() + "\n";
-
-                    str = str.Replace("using", "using ");
-
-                    result.Add(str);
+                    result.Add(@using.ToFullString().Trim() + "\n");
                 }
 
                 return result;
@@ -839,6 +805,163 @@ namespace SourceGenerator
             }
 
             return baseNamespaceDeclarationSyntax.GetFullNamespace() + "." + Syntax.Name;
+        }
+    }
+
+    [Generator]
+    public class LibraryBridgeGenerator : ISourceGenerator
+    {
+        private readonly string[] BridgeNamespaces = { "Script.Binding", "Script.Library" };
+
+        private const string NativeModuleName = "UnrealCSharp";
+
+        public void Initialize(GeneratorInitializationContext Context)
+        {
+            Context.RegisterForSyntaxNotifications(() => new LibraryBridgeReceiver());
+        }
+
+        public void Execute(GeneratorExecutionContext Context)
+        {
+            if (!(Context.SyntaxReceiver is LibraryBridgeReceiver receiver) || receiver.Candidates.Count == 0)
+            {
+                return;
+            }
+
+            var byType = new Dictionary<INamedTypeSymbol, List<IMethodSymbol>>(SymbolEqualityComparer.Default);
+
+            var semanticModels = new Dictionary<SyntaxTree, SemanticModel>();
+
+            foreach (var candidate in receiver.Candidates)
+            {
+                if (semanticModels.TryGetValue(candidate.SyntaxTree, out var semanticModel) == false)
+                {
+                    semanticModel = Context.Compilation.GetSemanticModel(candidate.SyntaxTree);
+
+                    semanticModels[candidate.SyntaxTree] = semanticModel;
+                }
+
+                if (semanticModel.GetDeclaredSymbol(candidate) is IMethodSymbol method == false)
+                {
+                    continue;
+                }
+
+                var owner = method.ContainingType;
+
+                if (owner == null ||
+                    BridgeNamespaces.Contains(owner.ContainingNamespace?.ToDisplayString()) == false)
+                {
+                    continue;
+                }
+
+                if (byType.TryGetValue(owner, out var methods) == false)
+                {
+                    methods = new List<IMethodSymbol>();
+
+                    byType[owner] = methods;
+                }
+
+                methods.Add(method);
+            }
+
+            foreach (var pair in byType)
+            {
+                Context.AddSource($"{pair.Key.ContainingNamespace?.ToDisplayString()}.{pair.Key.Name}.LibraryBridge.g.cs",
+                    EmitBridges(pair.Key, pair.Value));
+            }
+        }
+
+        private string EmitBridges(INamedTypeSymbol InOwner, List<IMethodSymbol> InMethods)
+        {
+            var source = "// <auto-generated/> LibraryBridgeGenerator -- do not edit.\n" +
+                         "#if WITH_LEANCLR\n" +
+                         "using System.Runtime.InteropServices;\n" +
+                         "#endif\n";
+
+            var containingNamespace = InOwner.ContainingNamespace?.ToDisplayString() ?? BridgeNamespaces[1];
+
+            var qualifiedTypes = new Dictionary<ITypeSymbol, string>(SymbolEqualityComparer.Default);
+
+            source +=
+                $"\nnamespace {containingNamespace}\n" +
+                $"{{\n\t{(InOwner.DeclaredAccessibility == Accessibility.Public ? "public" : "internal")} static unsafe partial class {InOwner.Name}\n" +
+                "\t{\n";
+
+            foreach (var method in InMethods
+                         .OrderBy(Method => Method.Name, StringComparer.Ordinal)
+                         .ThenBy(Method => Method.ToDisplayString(), StringComparer.Ordinal))
+            {
+                var returnType = method.ReturnsVoid ? "void" : Qualify(method.ReturnType, qualifiedTypes);
+
+                var parameters = string.Join(", ", method.Parameters.Select(
+                    Parameter => $"{Qualify(Parameter.Type, qualifiedTypes)} {Parameter.Name}"));
+
+                var arguments = string.Join(", ", method.Parameters.Select(Parameter => Parameter.Name));
+
+                var pointerType = string.Join(", ", method.Parameters
+                    .Select(Parameter => Qualify(Parameter.Type, qualifiedTypes)).Concat(new[] { returnType }));
+
+                var key = $"{containingNamespace}.{InOwner.Name}::{method.Name}";
+
+                var slot = $"{method.Name}_Slot";
+
+                var accessibility = method.DeclaredAccessibility == Accessibility.Public ? "public" : "private";
+
+                source +=
+                    "#if WITH_LEANCLR\n" +
+                    $"\t\t[DllImport(\"{NativeModuleName}\", CallingConvention = CallingConvention.Cdecl)]\n" +
+                    $"\t\t{accessibility} static extern unsafe partial {returnType} {method.Name}({parameters});\n" +
+                    "#else\n" +
+                    $"\t\tprivate static nint {slot};\n" +
+                    "\n" +
+                    $"\t\t{accessibility} static unsafe partial {returnType} {method.Name}({parameters}) =>\n" +
+                    $"\t\t\t((delegate* unmanaged[Cdecl]<{pointerType}>)global::Interop.MethodBridge.GetMethod(\n" +
+                    $"\t\t\t\tref {slot}, \"{key}\"))({arguments});\n" +
+                    "#endif\n\n";
+            }
+
+            source += "\t}\n";
+
+            source += "}";
+
+            return source;
+        }
+
+        private static string Qualify(ITypeSymbol InType, Dictionary<ITypeSymbol, string> InCache)
+        {
+            if (InCache.TryGetValue(InType, out var display) == false)
+            {
+                display = InType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                InCache[InType] = display;
+            }
+
+            return display;
+        }
+    }
+
+    public class LibraryBridgeReceiver : ISyntaxReceiver
+    {
+        public readonly List<MethodDeclarationSyntax> Candidates = new List<MethodDeclarationSyntax>();
+
+        public void OnVisitSyntaxNode(SyntaxNode Node)
+        {
+            if (Node is MethodDeclarationSyntax methodDeclarationSyntax == false)
+            {
+                return;
+            }
+
+            if (methodDeclarationSyntax.Body != null || methodDeclarationSyntax.ExpressionBody != null)
+            {
+                return;
+            }
+
+            if (methodDeclarationSyntax.Modifiers.Any(Modifier => Modifier.ValueText == "partial") == false ||
+                methodDeclarationSyntax.Modifiers.Any(Modifier => Modifier.ValueText == "static") == false)
+            {
+                return;
+            }
+
+            Candidates.Add(methodDeclarationSyntax);
         }
     }
 }
